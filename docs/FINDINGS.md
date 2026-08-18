@@ -188,3 +188,55 @@ per-coordinate extremes are now logged (`beta_true_min`/`beta_true_max`).
 This is the failure mode the classical guards exist to prevent, and it is now being tested
 directly with **SwiftTD's published bounds**, `β ∈ [ln(e⁻¹⁵), ln(0.1)]` = `[−15, −2.3026]`,
 applied to weightwise and layerwise (`BETA_CLIP=lo:hi`, 3 seeds each).
+
+---
+
+# The guard separates artifact from finding
+
+`BETA_CLIP=-15,-2.3026` implements SwiftTD's published bound
+`beta <- clip(beta, ln(e^-15), ln(0.1))` (Javed, Sharifnassab & Sutton, RLC 2024).
+SGDm + Lion meta, augmented, 100 epochs, 3 seeds:
+
+| arm | best test accuracy |
+|---|---|
+| weightwise, **no guard** | collapse to **10.00** (chance) |
+| weightwise **+ guard** | **79.70 / 79.59 / 78.86** — stable, 3/3 |
+| layerwise + guard | 91.55 / 91.44 / 91.18 (unchanged vs unguarded) |
+
+**Two separate things, now disentangled:**
+1. The *collapse* is a numerical artifact of an unguarded exponential parameterisation. A guard
+   published in 1992 (IDBD), 2012 (Autostep) and 2024 (SwiftTD) removes it completely. This is
+   a rediscovery and must be written up as one.
+2. **Per-weight still loses ~12pp to layerwise with the guard in place.** That gap is the real
+   granularity effect and is not a numerics story.
+
+The guard is a no-op for layerwise, so it is safe to make it standard in all subsequent runs.
+
+# Granularity also STABILISES training
+
+Gate 3, the paper's own (SGDm, Adam) configuration, 100 epochs, 3 seeds:
+
+| arm | seeds | mean |
+|---|---|---|
+| 6-block | 90.89 / 90.80 / 90.75 | 90.81 ± 0.07 |
+| layerwise | 91.11 / 90.74 / 90.53 | 90.79 ± 0.29 |
+| **scalar** | 88.45 / **18.47** / **20.71** | catastrophic on 2 of 3 seeds |
+
+The scalar arm of the parent paper's own configuration fails outright on two thirds of seeds
+while every granular arm is stable to within 0.3pp. So granularity delivers **three** distinct
+benefits, not one:
+
+* **speed** — 19% fewer epochs to 90% under the paper's AdamW+Adam config;
+* **final accuracy**, but only when the budget is too short for the coarse arm to converge;
+* **stability** — it rescues seeds on which the scalar arm diverges.
+
+The third is the most robust of the three and, unlike the first two, is visible in the parent
+paper's own configuration without any modification.
+
+# Hierarchical method — implemented and validated
+
+`HIER=shrink LAM=x` (M0, pull each group's beta toward the group mean) and
+`HIER=additive ETA_RATIO=r` (M1, shared component takes the full meta step, deviations take a
+fraction r). Validated by exact identity: **LAM=0 and ETA_RATIO=1 both reproduce plain
+layerwise** to within the +-0.02pp non-determinism floor, and LAM=1 (full pooling) correctly
+departs from it.
