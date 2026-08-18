@@ -93,3 +93,55 @@ not an artifact of the base optimizer, unlike the +3.5pp benefit.
 AdamW + meta **Adam**. Since the D1 gate showed the meta-optimizer changes the outcome
 qualitatively, base-AdamW + meta-Adam x {scalar, 6-block, layerwise} x 3 seeds is queued as
 Gate 2 before any reproduction claim is made.
+
+---
+
+# THE UNIFYING RESULT — granularity buys SPEED, not asymptotic accuracy
+
+Measuring only final/best accuracy was the wrong instrument. MetaOptimize's objective is a
+discounted sum of *future losses*, and the parent paper's CIFAR-10 evidence is **Figure 1,
+which is learning curves**. Re-analysed as epochs-to-threshold (mean of 3 seeds, augmented,
+100 epochs):
+
+### AdamW base + Adam meta — the paper's exact CIFAR-10 configuration
+
+| arm | ep→85% | ep→88% | ep→90% | final | best |
+|---|---|---|---|---|---|
+| scalar | 9.7 | 18.0 | 29.7 | 91.76 | 91.93 |
+| 6-block | 9.0 | 15.0 | 26.3 | 91.83 | 92.06 |
+| layerwise | **7.7** | **14.3** | **24.0** | 91.73 | 92.09 |
+
+Monotonic in granularity at every threshold ≥85% — layerwise reaches 90% **19% sooner** than
+scalar — while final accuracy is identical to within 0.1pp. **The paper's CIFAR-10 claim
+reproduces, on the axis the paper actually plotted.**
+
+### SGDm base + Lion meta
+
+| arm | ep→85% | ep→88% | ep→90% | final |
+|---|---|---|---|---|
+| scalar | 36.0 | 87.5 | **never** | 87.93 |
+| 6-block | 29.0 | 35.0 | 42.0 | 91.41 |
+| layerwise | 27.3 | 35.0 | 52.0 | 91.06 |
+
+Same acceleration — but here the scalar arm **never converges within the budget**, so the speed
+advantage shows up as a +3.5pp final-accuracy gap.
+
+### The single statement that covers every cell
+
+> **Step-size granularity accelerates optimisation. It shows up as higher final accuracy only
+> when the training budget is too short for the coarser arm to catch up.**
+
+This reconciles four results that looked contradictory:
+1. Our AdamW final-accuracy null — scalar catches up by epoch 100.
+2. Our SGDm +3.5pp — scalar never catches up.
+3. The paper's CIFAR-10 blockwise claim — it is a learning-curve claim, and it holds.
+4. **The paper's own ImageNet null (§7.3)** — a long budget lets the scalar arm converge, so
+   the speed advantage stops converting into a final-accuracy difference. The paper reports
+   this as "no improvement" and offers no explanation; this predicts it.
+
+### Consequence for methodology
+
+**Primary metric from here on is epochs/steps-to-target-accuracy (and area under the loss
+curve), with final accuracy reported alongside.** Final-accuracy-only comparisons are
+underpowered for this method by construction, and every earlier table in this document should
+be read with that in mind.
