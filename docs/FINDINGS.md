@@ -29,3 +29,36 @@ RandomCrop(32,pad=4)+HorizontalFlip, meta-optimizer Lion, `meta_stepsize=1e-3`,
 `alpha0` and `meta_stepsize` are the values the authors used for scalar/6-block.
 Comparing granularities at a fixed meta-step-size may be unfair to the finer arms;
 a defensible comparison tunes the meta-step-size per arm at equal search budget.
+
+---
+
+## D1 numerics gate — the collapse is sign-specific, the granularity failure is not
+
+weightwise (m = 11,173,962) + SGDm base, 100 epochs, augmented:
+
+| meta-optimizer | best | final | outcome |
+|---|---|---|---|
+| **Adam** (non-sign), 3 seeds | 50.35 / 50.29 / 51.61 | 50.35 / 50.23 / 51.58 | stable, no collapse |
+| **Lion** (sign), 1 seed | 65.29 | **10.00** | collapsed to chance |
+
+**Two distinct conclusions:**
+1. The *collapse* is an artifact of the sign-based meta-update. Swapping Lion → Adam removes
+   it in 3/3 seeds. Consistent with Balles & Hennig (ICML 2018): Adam scales its step by
+   `1/√(1+η̂²)` in low-SNR coordinates; sign takes a full ±η step regardless.
+2. The *granularity failure* is real and survives the fix. Adam-meta is stable but plateaus
+   near 50%, still ~40 points below layerwise (91.34) and 6-block (91.56).
+
+**So: per-weight granularity fails regardless of meta-optimizer; the sign convention decides
+whether it fails by collapsing or by plateauing.** Do not attribute the granularity result to
+`sign(0)=0`.
+
+## Reproducibility floor
+
+Three runs with identical config and seed on the same partition (two with the probe on, one
+off) differ from each other by up to ~0.02pp per epoch, with the two probe-on runs differing
+from *each other* as much as either differs from the probe-off run. The variation is cuDNN
+autotuning, not the probe.
+
+**Runs are reproducible to ~±0.02pp, not bitwise.** Effect sizes below ~0.05pp are not
+resolvable without more seeds. The measured effects (+3.3pp granularity, +3.5pp base-optimizer,
+−40pp weightwise) are two to three orders of magnitude above that floor.
