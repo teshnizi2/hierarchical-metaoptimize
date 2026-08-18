@@ -6,10 +6,17 @@ RandomCrop(32,pad=4)+HorizontalFlip, meta-optimizer Lion, `meta_stepsize=1e-3`,
 
 | granularity | m | SGDm base | AdamW base |
 |---|---|---|---|
-| scalar | 1 | 88.09 ± 0.16 | (pending) |
-| resnet18_blocks | 6 | 91.56 ± 0.03 | 91.86 ± 0.31 |
+| scalar | 1 | 88.09 ± 0.16 | **91.99 ± 0.10** |
+| resnet18_blocks | 6 | **91.56 ± 0.03** | 91.86 ± 0.30 |
 | layerwise | 62 | 91.34 ± 0.09 | 91.83 ± 0.17 |
-| weightwise | 11.17M | seed 0 peaked 70.09 then collapsed to 10.00 | 86.05 ± 0.29 |
+| weightwise | 11,173,962 | 66.54 ± 3.26 (3/3 collapsed) | 86.05 ± 0.29 |
+
+**Effect of granularity relative to scalar, same base optimizer** (pooled sd in brackets):
+
+| | m = 6 | m = 62 | m = 11.17M |
+|---|---|---|---|
+| **SGDm** | **+3.47pp** (0.12, ~30x) | **+3.26pp** (0.13, ~25x) | −21.55pp (2.31, ~9x) |
+| **AdamW** | −0.13pp (0.22, ~1x — null) | −0.15pp (0.14, ~1x — null) | −5.93pp (0.22, ~27x) |
 
 ## Reading
 1. **The proposal's premise does not reproduce at this scale.** Layerwise does not
@@ -62,3 +69,27 @@ autotuning, not the probe.
 **Runs are reproducible to ~±0.02pp, not bitwise.** Effect sizes below ~0.05pp are not
 resolvable without more seeds. The measured effects (+3.3pp granularity, +3.5pp base-optimizer,
 −40pp weightwise) are two to three orders of magnitude above that floor.
+
+---
+
+## Gate 1 headline — granularity x base-optimizer is an interaction, not a main effect
+
+**Step-size granularity buys +3.5pp under SGDm and nothing at all under AdamW.** Under AdamW
+the differences between m=1, 6 and 62 are ~0.15pp against a pooled sd of ~0.2 — statistically
+null. Under SGDm the same contrast is 25–30x the noise.
+
+Reading: **per-coordinate normalization in the base optimizer substitutes for step-size
+granularity.** AdamW already divides each coordinate by a running second-moment estimate, so a
+learned per-block step size has nothing left to contribute. SGDm does not, so granularity
+supplies the missing normalization. This is hypothesis H4, and it is a candidate mechanism for
+the parent paper's own unexplained §7.3 result ("the blockwise versions showed no improvement
+over the scalar versions").
+
+Per-weight (m = n) is catastrophic under **both** bases — so the fine-granularity failure is
+not an artifact of the base optimizer, unlike the +3.5pp benefit.
+
+**Caveat — the paper's exact cell is still untested.** All of the above used meta-optimizer
+**Lion** (the released code's default). PILOT.md records the paper's CIFAR-10 config as base
+AdamW + meta **Adam**. Since the D1 gate showed the meta-optimizer changes the outcome
+qualitatively, base-AdamW + meta-Adam x {scalar, 6-block, layerwise} x 3 seeds is queued as
+Gate 2 before any reproduction claim is made.

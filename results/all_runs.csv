@@ -6,6 +6,9 @@ g1_adamw_layer_s2,4679171,salehkaleybars,layerwise,AdamW,Lion,1e-3,1e-6,1,1,2,10
 g1_adamw_blk6_s0,4679166,salehkaleybars,resnet18_blocks,AdamW,Lion,1e-3,1e-6,1,1,0,100,100,92.1,91.68,99.62,0,node882,46
 g1_adamw_blk6_s1,4679167,salehkaleybars,resnet18_blocks,AdamW,Lion,1e-3,1e-6,1,1,1,100,100,91.52,91.3,99.66,0,node880,46
 g1_adamw_blk6_s2,4679168,salehkaleybars,resnet18_blocks,AdamW,Lion,1e-3,1e-6,1,1,2,100,100,91.95,91.07,99.79,0,node881,46
+g1_adamw_scal_s0,4679277,salehkaleybars,scalar,AdamW,Lion,1e-3,1e-6,1,1,0,100,100,92.05,91.67,99.58,0,node885,45
+g1_adamw_scal_s1,4679278,salehkaleybars,scalar,AdamW,Lion,1e-3,1e-6,1,1,1,100,100,91.87,91.87,99.65,0,node885,45
+g1_adamw_scal_s2,4679279,salehkaleybars,scalar,AdamW,Lion,1e-3,1e-6,1,1,2,100,100,92.04,90.97,99.53,0,node885,45
 g1_adamw_weight_s0,4679172,salehkaleybars,weightwise,AdamW,Lion,1e-3,1e-6,1,1,0,100,100,85.82,85.2,97.7,0,node885,44
 g1_adamw_weight_s1,4679173,salehkaleybars,weightwise,AdamW,Lion,1e-3,1e-6,1,1,1,100,100,85.96,85.2,97.75,0,node886,45
 g1_adamw_weight_s2,4679174,salehkaleybars,weightwise,AdamW,Lion,1e-3,1e-6,1,1,2,100,100,86.38,86.14,97.74,0,node886,45
@@ -26,6 +29,7 @@ gate0c_scal_m2_s1,4652593,salehkaleybars,scalar,HF,?,1e-2,1e-6,1,0,1,81,100,92.4
 gate0b_scal_s1,4651336,salehkaleybars,scalar,HF,?,1e-3,1e-6,1,0,1,100,100,69.24,68.95,100.0,0,node864,44
 a2_smoke,4679107,salehkaleybars,scalar,HF,?,1e-3,1e-6,1,1,1,2,2,56.12,56.12,50.69,0,node851,4
 gate0b_scal_s2,4651337,salehkaleybars,scalar,HF,?,1e-3,1e-6,1,0,2,100,100,69.16,68.87,99.97,0,node873,31
+d2_layer_s0,4679314,salehkaleybars,layerwise,SGDm,Lion,1e-3,1e-6,1,0,0,67,100,90.5,89.88,98.73,0,node886,
 v_layerwise,4679110,salehkaleybars,layerwise,SGDm,Lion,1e-3,1e-6,1,0,0,3,3,13.19,13.19,13.01,0,node851,2
 g1_sgdm_layer_s0,4679157,salehkaleybars,layerwise,SGDm,Lion,1e-3,1e-6,1,0,0,100,100,91.32,91.04,99.66,0,node866,37
 v2_probe,4679122,salehkaleybars,layerwise,SGDm,Lion,1e-3,1e-6,1,0,0,3,3,13.19,13.19,13.01,0,node851,2
@@ -38,8 +42,12 @@ gate0d_blk6_s1,4653444,salehkaleybars,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,0,1,
 g1_sgdm_blk6_s1,4679155,salehkaleybars,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,0,1,100,100,91.54,91.28,99.01,0,node887,42
 gate0d_blk6_s2,4653445,salehkaleybars,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,0,2,100,100,91.34,91.34,99.13,0,node885,42
 g1_sgdm_blk6_s2,4679156,salehkaleybars,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,0,2,100,100,91.55,91.45,99.09,0,node887,42
+det_a,4679318,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.74,13.74,13.67,0,node886,2
+det_b,4679319,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.74,13.74,13.68,0,node886,2
 gate0d_scal_s0,4653440,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,100,100,88.15,88.15,93.71,0,node851,91
+d2_inert,4679311,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.73,13.73,13.68,0,node886,2
 g1_sgdm_scal_s0,4679151,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,100,100,88.27,88.0,93.57,0,node886,42
+det_off,4679320,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.75,13.75,13.66,0,node886,2
 v2_off,4679121,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.75,13.75,13.67,0,node851,4
 v_inert,4679109,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,0,5,5,13.75,13.75,13.67,0,node851,5
 g1_sgdm_scal_s1,4679152,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,1,100,100,88.02,88.02,93.98,0,node886,42
@@ -48,4 +56,11 @@ g1_sgdm_scal_s2,4679153,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,2,100,100,
 gate0d_scal_s2,4653442,salehkaleybars,scalar,SGDm,Lion,1e-3,1e-6,1,0,2,100,100,88.01,87.92,93.88,0,node851,92
 g1_sgdm_weight_s0,4679160,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,0,100,100,70.09,10.0,10.0,1,node870,48
 v_weightwise,4679112,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,0,3,3,13.19,13.19,13.03,0,node851,3
+d1_metaAdam_s0,4679273,salehkaleybars,weightwise,SGDm,Adam,1e-3,1e-6,1,0,0,100,100,50.35,50.35,49.43,0,node880,42
+d2_collapse_s0,4679312,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,0,50,100,66.57,66.57,66.02,0,node886,
+d1_metaAdam_s1,4679274,salehkaleybars,weightwise,SGDm,Adam,1e-3,1e-6,1,0,1,100,100,50.29,50.23,50.11,0,node881,42
+d2_collapse_s1,4679313,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,1,50,100,65.03,10.0,10.0,1,node886,
+g1_sgdm_weight_s1,4679161,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,1,100,100,63.68,10.0,10.0,1,node851,86
+d1_metaAdam_s2,4679275,salehkaleybars,weightwise,SGDm,Adam,1e-3,1e-6,1,0,2,100,100,51.61,51.58,49.59,0,node882,41
 g1_sgdm_weight_s2,4679162,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,2,100,100,65.85,10.0,10.0,1,node882,40
+d1_metaLion_s3,4679276,salehkaleybars,weightwise,SGDm,Lion,1e-3,1e-6,1,0,3,100,100,65.29,10.0,10.0,1,node882,40
