@@ -233,6 +233,14 @@ benefits, not one:
 The third is the most robust of the three and, unlike the first two, is visible in the parent
 paper's own configuration without any modification.
 
+> **CONFOUND FLAGGED 19 Aug 2026 — this claim is not yet safe to report.** Those Gate 3 runs
+> were **unguarded**. The two collapsing scalar seeds (18.47 / 20.71) look exactly like the
+> unguarded weightwise collapse that `BETA_CLIP=-15:-2.3026` was later shown to remove
+> completely (3/3 seeds). If the guard alone rescues those seeds, then the rescuer is the
+> published guard, **not** granularity, and the stability claim as written is wrong.
+> `g4-sgdmAdam-{scal,blk6,layer}` x 3 seeds, guard ON, is running to decide it.
+> **Do not put the stability claim in a draft until that control reports.**
+
 # Hierarchical method — implemented and validated
 
 `HIER=shrink LAM=x` (M0, pull each group's beta toward the group mean) and

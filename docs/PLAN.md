@@ -204,3 +204,62 @@ Surfaced by the adversarial and completeness passes; absent from the student's N
 - **Scooping risk from the proposer's own group**, not from strangers — the proposal is nine months old. Ask directly.
 - **AI-tooling disclosure and an idea-provenance log** as first-class integrity items, given the idea originated with a named human and PaperFactory is in the loop. Hard rule: no autonomous stage generates, phrases, or judges any claim about the supervisor's code or the parent paper's validity.
 - **PaperFactory's configured research programme is small-LLM fine-tuning on a 6GB 2060, baked into its `north_star`** — it is not a neutral pipeline pointed at the wrong hardware. Back half only (`figures`, `writing`, `review_loop`, `hard_questions`, `red_team`, `polish`), with `allow_rog_dispatch: false` verified by inspection before first invocation.
+---
+
+# ImageNet — verified incomplete, and scoped OUT of the critical path (19 Aug 2026)
+
+## What is actually on disk
+
+`/data1/salehkaleybars/imagenet_data/ILSVRC/Data/CLS-LOC`, 87 GB:
+
+| split | state |
+|---|---|
+| `train` | **489 of 1000 class directories** — incomplete |
+| `val` | 50,000 files — complete |
+| `test` | 100,000 files — complete |
+
+The 489 present classes are **spread across the full WNID range** (`n01440764` … `n15075141`),
+none are empty, and per-class file counts are normal (~1000–1300). So this is not a transfer
+that stopped halfway — it is a copy that skipped classes. There is no source archive anywhere
+under `/data1/salehkaleybars`, and the compute nodes have no internet, so completing it needs an
+external re-download from a login node with credentials this campaign does not hold.
+Disk is not the constraint (74 TB free on `/data1`).
+
+## Ruling — ImageNet is out of scope for this paper
+
+1. **It is not load-bearing.** The unifying result *predicts* the parent paper's ImageNet null
+   (§7.3) from CIFAR-10 evidence: a long budget lets the scalar arm converge, so the speed
+   advantage stops converting into a final-accuracy gap. Re-running ImageNet would confirm a
+   prediction we can already make, not decide anything.
+2. **It is the most expensive thing on the list by two orders of magnitude.** Granularities ×
+   seeds on ResNet-50/ImageNet under a 2×A100 per-user cap is weeks of wall-clock.
+3. **Completing the copy needs credentials, not compute**, so it cannot be done autonomously.
+
+**If ImageNet is ever wanted back**, the val and test splits are already complete and only the
+511 missing train classes need fetching — the copy is resumable class-by-class, not from zero.
+
+## The substitute — a depth ladder on CIFAR-10, which tests the premise more directly
+
+The premise this project exists to test is *"layerwise step sizes lose to scalar at scale"*, and
+PLAN §1.2 already records that it is **untested, not falsified**, because ResNet-18/CIFAR-10 is
+the small end. ImageNet was only ever a proxy for "bigger". The released code supports
+**ResNet-34 / 50 / 101 / 152** already (`build_network.py`), which moves the actual axis the
+premise names — model size and the number of step-size groups `m` — while holding the dataset,
+budget and optimiser fixed:
+
+| model | params | tensors = m for layerwise |
+|---|---|---|
+| ResNet-18 | 11.2 M | 62 |
+| ResNet-34 | ~21 M | ~110 |
+| ResNet-50 | ~23.5 M | ~161 |
+| ResNet-101 | ~42.5 M | ~314 |
+
+At ResNet-18 layerwise **beats** scalar by +3.2pp under SGDm+Lion. If the premise holds, that
+gap must close and invert as depth grows. This is a cleaner experiment than ImageNet — it
+changes one variable instead of two — and costs hours rather than weeks. A 2-epoch smoke test of
+ResNet-34/50/101 under `layerwise` is running to confirm the grouping code generalises beyond
+ResNet-18 before the ladder is committed.
+
+**Note:** the `resnet18_blocks` (m=6) partition is architecture-specific and is NOT assumed to
+generalise; the ladder uses the `scalar` vs `layerwise` contrast only, which is the premise's
+exact comparison.
