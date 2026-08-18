@@ -15,6 +15,8 @@ cd /data1/salehkaleybars/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimiz
 
 echo "NODE=$(hostname) | JOB=${SLURM_JOB_NAME} ${SLURM_JOB_ID}"
 echo "ARGS: $@"
+echo "ENV: AUGMENT=${AUGMENT:-0} BETA_CLIP=${BETA_CLIP:-none} HIER=${HIER:-none} LAM=${LAM:-na} ETA_RATIO=${ETA_RATIO:-na}"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
-python train.py "$@"
+export PYTHONUNBUFFERED=1
+python -u train.py "$@"
 echo "RUN_DONE"

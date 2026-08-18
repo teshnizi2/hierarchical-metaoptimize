@@ -7,8 +7,10 @@ Usage:  python aggregate.py <runs_dir> [<runs_dir> ...] > results.csv
 import sys, os, glob, re, csv, json
 
 FIELDS = ["run", "job_id", "account", "granularity", "base", "meta", "meta_stepsize",
-          "alpha0", "gamma", "augment", "seed", "epochs_done", "epochs_requested",
-          "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min"]
+          "alpha0", "gamma", "augment", "beta_clip", "hier", "lam", "eta_ratio",
+          "seed", "epochs_done", "epochs_requested",
+          "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance",
+          "ep_to_85", "ep_to_88", "ep_to_90"]
 
 
 def parse_args_line(line):
@@ -26,6 +28,44 @@ def parse_args_line(line):
     return out
 
 
+# Runs predating the ENV line (19 Aug 2026) carry their guard/hierarchy settings only
+# in the run name. Reconstruct them here, and mark the row provenance as "inferred"
+# so no analysis silently treats a reconstruction as a recorded fact.
+GUARD = "-15:-2.3026"
+
+
+def infer_from_name(name):
+    n = name.replace("_", "-")
+    if n.startswith("hs-"):                      # hierarchical sweep, M0 shrink, guard on
+        lam = {"lam001": "0.01", "lam01": "0.1", "lam05": "0.5"}
+        for k, v in lam.items():
+            if f"-{k}-" in n + "-":
+                return {"beta_clip": GUARD, "hier": "shrink", "lam": v, "eta_ratio": "na"}
+    if n.startswith("ha-"):                      # M1 additive, guard on
+        r = {"r01": "0.1", "r03": "0.3"}
+        for k, v in r.items():
+            if f"-{k}-" in n + "-":
+                return {"beta_clip": GUARD, "hier": "additive", "lam": "na", "eta_ratio": v}
+    if n.startswith("d4-clip"):                  # the guard gate itself
+        return {"beta_clip": GUARD, "hier": "", "lam": "na", "eta_ratio": "na"}
+    if n.startswith("hv-"):                      # hierarchy identity-validation runs
+        m = {"hv-plain": ("", "na", "na"), "hv-lam0": ("shrink", "0", "na"),
+             "hv-lam1": ("shrink", "1", "na"), "hv-ratio1": ("additive", "na", "1")}
+        for k, (h, l, r) in m.items():
+            if n.startswith(k):
+                return {"beta_clip": GUARD, "hier": h, "lam": l, "eta_ratio": r}
+    # everything else predates the guard entirely
+    return {"beta_clip": "none", "hier": "", "lam": "na", "eta_ratio": "na"}
+
+
+def ep_to(tests, target):
+    """1-indexed epoch at which test accuracy first reaches target; "" if never."""
+    for i, v in enumerate(tests):
+        if v >= target:
+            return i + 1
+    return ""
+
+
 def parse_out(path):
     txt = open(path, errors="replace").read()
     m = re.search(r"^ARGS: (.+)$", txt, re.M)
@@ -37,7 +77,11 @@ def parse_out(path):
     if not tests:
         return None
     node = (re.search(r"NODE=(\S+)", txt) or [None, ""])[1]
-    aug = (re.search(r"AUGMENT=(\d)", txt) or [None, "0"])[1]
+    # ENV line (added 19 Aug 2026). Runs older than that have no env provenance:
+    # their guard/hier settings are recorded only in the run name -- see FINDINGS.
+    env = re.search(r"^ENV: (.+)$", txt, re.M)
+    e = dict(kv.split("=", 1) for kv in env.group(1).split()) if env else {}
+    aug = e.get("AUGMENT") or (re.search(r"AUGMENT=(\d)", txt) or [None, "?"])[1]
     wall = (re.search(r"^(\d+)\s+minutes", txt, re.M) or [None, ""])[1]
     base = os.path.basename(path)
     jid = (re.search(r"-(\d+)\.out$", base) or [None, ""])[1]
@@ -47,6 +91,9 @@ def parse_out(path):
         "granularity": a.get("stepsize-groups", "?"), "base": a.get("alg-base", a.get("optimizer", "?")),
         "meta": a.get("alg-meta", "?"), "meta_stepsize": a.get("meta-stepsize", ""),
         "alpha0": a.get("alpha0", ""), "gamma": a.get("gamma", ""), "augment": aug,
+        **({"beta_clip": e["BETA_CLIP"], "hier": e["HIER"] if e["HIER"] != "none" else "",
+            "lam": e["LAM"], "eta_ratio": e["ETA_RATIO"], "provenance": "env"} if env
+           else {**infer_from_name(a.get("run-name", base)), "provenance": "inferred"}),
         "seed": a.get("seed", ""), "epochs_done": len(tests),
         "epochs_requested": a.get("num-epochs", ""),
         "best_test": max(tests), "final_test": tests[-1],
@@ -54,6 +101,9 @@ def parse_out(path):
         # collapse = ended at chance level after having been meaningfully better
         "collapsed": int(tests[-1] <= 11.0 and max(tests) > 20.0),
         "node": node, "wallclock_min": wall,
+        # PRIMARY metric: epochs to reach a target test accuracy (first crossing).
+        "ep_to_85": ep_to(tests, 85.0), "ep_to_88": ep_to(tests, 88.0),
+        "ep_to_90": ep_to(tests, 90.0),
     }
 
 
