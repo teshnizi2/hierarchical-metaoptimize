@@ -145,3 +145,46 @@ This reconciles four results that looked contradictory:
 curve), with final accuracy reported alongside.** Final-accuracy-only comparisons are
 underpowered for this method by construction, and every earlier table in this document should
 be read with that in mind.
+
+---
+
+## The weightwise failure, mechanism finally measured (and two wrong guesses corrected)
+
+Instrumenting `max|h|` (the condensed trace) through the failure gives an unambiguous answer:
+
+| run | step | max\|h\| | note |
+|---|---|---|---|
+| γ=1, seed 1 | 12,500 | 3.7e−1 | normal |
+| | 23,350 | **1.97e+19** | |
+| | 23,400 | **6.69e+33** | +14 orders of magnitude in 50 steps |
+| | 23,450 | **NaN** | float32 max is 3.4e38 |
+| γ=0.999, seed 1 | 23,400 | 3.7e+14 | |
+| | 23,450 | 2.47e+28 | |
+| | 23,500 | **NaN** | **same failure, same timing** |
+
+**The trace blows up geometrically at roughly ×1.9 per step, then overflows float32.** Accuracy
+peaks around 64–72% and drops to chance the moment the trace goes non-finite.
+
+### Two hypotheses of ours that this REFUTES
+
+1. **"β decays to zero, weights freeze, network dies" (from the g1 per-tensor means).** False.
+   At the moment of failure β is in a healthy range and is *not* collapsed.
+2. **"γ = 1 leaves the trace undecayed, so it accumulates until it overflows."** False, and
+   tested directly: γ = 0.999 gives the trace a ~693-step half-life and **fails identically**
+   (72.30 vs 72.08 peak; both → 10.00). A geometric blow-up at ×1.9/step is not something a
+   0.999 decay factor can restrain.
+
+The `sign(0)=0` story was wrong earlier too — it is at most the lock after the fact, never the
+driver.
+
+### What the evidence now points to
+
+A per-coordinate positive feedback loop: with per-weight step sizes nothing bounds any
+individual α, so a few coordinates can be driven to a destabilising value, and the trace — which
+is a running sum of updates each proportional to α — amplifies geometrically from there. Note
+our probe logged **per-tensor means** of β, which hide exactly these extremes; true
+per-coordinate extremes are now logged (`beta_true_min`/`beta_true_max`).
+
+This is the failure mode the classical guards exist to prevent, and it is now being tested
+directly with **SwiftTD's published bounds**, `β ∈ [ln(e⁻¹⁵), ln(0.1)]` = `[−15, −2.3026]`,
+applied to weightwise and layerwise (`BETA_CLIP=lo:hi`, 3 seeds each).
