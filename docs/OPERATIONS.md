@@ -32,3 +32,24 @@ torchvision extraction. Stage and extract once from a login node first.
 
 ## 5. The compute nodes have no internet
 Datasets must be staged from a login node. `download=True` will hang, not fail fast.
+
+## 6. `/tmp` is node-local and the login nodes round-robin — use shared storage for scripts
+
+ALICE alternates between `nodelogin03` and `nodelogin04`. `/tmp` is **per-node**, so a helper
+script `scp`-ed in one SSH session frequently does not exist in the next:
+
+```
+bash: /tmp/final_watch.sh: No such file or directory
+```
+
+This caused a string of "silent" failures where a command appeared to do nothing. Keep helper
+scripts on the shared filesystem instead — `/data1/$USER/metaopt/bin/` — and never rely on
+`/tmp` persisting between invocations.
+
+Related: use `scp` **without** `-q` when transferring, or the failure is invisible.
+
+## 7. Reading command output over this gateway
+
+The SSH banner is printed on every connection and is ~18 lines. Piping through
+`sed -n '/MARKER/,$p'` proved unreliable here; `2>&1 | tail -N` works. Prefer printing a unique
+marker line first and tailing generously.
