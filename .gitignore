@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+envs/
+data/
+*.tar.gz
+runs/
+Tensorboard_outputs/
