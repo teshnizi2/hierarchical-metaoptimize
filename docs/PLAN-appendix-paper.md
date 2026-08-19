@@ -246,3 +246,136 @@ Use it for the **back half only**: `figures`, `writing`, `review_loop`, `hard_qu
 **Do not use the front half.** `trend_scan`, `idea_generation`, and `novelty_gate` solve a problem you do not have — the idea is fixed and the binding constraint is measurement, not ideation. Running them invites narrative drift toward whatever sounds publishable, which is precisely the failure mode this project is one bad decision away from.
 
 **Never use `experiment_run`.** It targets a local RTX 2060; results from it are not comparable to ALICE runs and cannot enter the paper. Every number in the manuscript must trace to an ALICE job ID and a logged config. Enforce that as a hard rule: an autonomous writing pipeline that can generate plausible numbers, attached to a project whose central finding is that other people's code silently didn't do what it claimed, is a research-integrity risk worth naming out loud in your own methods section.
+---
+
+# Cycle-8 reconciliation (19 Aug 2026) — what the evidence now licenses
+
+Narrative A above is built on *"granularity has an optimum and a cliff"*. After cycle 8 the first
+half of that is wrong and the second half is stronger than when it was written. §8 of FINDINGS
+records the complete guarded ladder; this section records what it does to the paper.
+
+## 1. The ladder is a PLATEAU with a cliff, not an optimum with a slope
+
+| granularity | m | n | best test |
+|---|---|---|---|
+| scalar | 1 | 5 | 88.08 ± 0.22 |
+| 6-block | 6 | 5 | 91.69 ± 0.13 |
+| layerwise | 62 | 11 | 91.23 ± 0.22 |
+| nodewise | ≈4,800 | **1** | **92.10** |
+| weightwise | 11.17M | 3 | 79.38 ± 0.46 |
+
+There is a **+3.6pp step from m=1 to m=6, a flat plateau of ±0.5pp from m=6 to m≈4,800, and a
+−12.7pp cliff at m=n.** No interior maximum at m=62 exists to be explained, and the nodewise cell —
+currently the *highest* point on the ladder — is n=1.
+
+**Consequences for the paper:**
+* **Retitle away from "how fine is too fine".** The question the data answers is *"why is there a
+  step at m>1 and a cliff at m=n, and nothing in between"*, which is a two-boundary story, not a
+  tradeoff curve.
+* **The "granularity–noise tradeoff" framing is not supported.** A noise-averaging account predicts
+  smooth degradation as blocks shrink. The measurement is flat across three orders of magnitude of
+  m and then falls off a cliff. Cycle 7 already refuted the 1/√N estimator law directly; this is the
+  same refutation arriving from the accuracy side.
+* **`nd-*` (nodewise to n=5) gates this entire section.** Nothing in §1 may be written until it lands.
+
+## 2. The method contribution is now M1 additive, not M0 shrink
+
+Cycle 8 §1–2 changes which operator the method section is about.
+
+| | M0 shrink | M1 additive |
+|---|---|---|
+| λ / r curve shape | **flat** over λ ∈ [0.001, 1.0] | **non-monotone, interior peak** at r ∈ [0.03, 0.1] |
+| why | every λ ≥ 0.001 is full pooling (gotcha 9) | genuinely partial for the whole run |
+| best cell vs plain layerwise | +1.67pp (λ=0.01) | **+1.90pp** (r=0.1) |
+| effect on training fit | **worse** (97.8–98.1 vs 99.66) | **better** (99.88 vs 99.66) |
+| mechanism | drift rate *and* spread | spread only |
+| character | regulariser | finds a better solution, more slowly |
+
+**Write both, as two methods with two mechanisms.** The temptation is to present one "hierarchical
+MetaOptimize" with a pooling strength dial; §2 of FINDINGS shows that is factually wrong and gotcha
+21 shows why on structural grounds. The honest framing is: *pooling the log step sizes toward a
+shared value regularises; rescaling the per-group deviation of the update finds a better optimum.*
+
+**The strongest single property to lead with is still shrink's flatness** — a method that nominally
+adds a hyperparameter but whose outcome is insensitive to it over three orders of magnitude removes
+a decision rather than adding one. Additive does *not* have that property (r=0.3 is already back
+near plain), so additive's peak must be reported with its sensitivity, not without.
+
+**The cross-operator agreement at full pooling** (shrink λ=1.0 → 92.53 ± 0.17; additive r=0 →
+92.52 ± 0.11, two separately-written code paths 0.01pp apart) belongs in the paper as an
+implementation-validation result, in the same section as the V1–V5 suite. It is the only place the
+campaign has two independent implementations of one physical configuration.
+
+## 3. Two claims are now BUDGET-CONTROLLED, and one of them got weaker
+
+At matched α₀=1e-3, 100 vs 300 epochs (FINDINGS §6):
+
+| effect | 100 ep | 300 ep | verdict |
+|---|---|---|---|
+| granularity (scalar → layerwise) | +3.44pp | +3.42pp | **invariant** — safe to claim |
+| pooling (shrink λ=0.1 − plain) | +0.86pp | +0.60pp | **decays** — must be stated with its budget |
+
+* **Table 1's headline is now budget-controlled at 3×.** State it that way; it is a materially
+  stronger claim than an uncontrolled 100-epoch number and it pre-empts the obvious review attack.
+* **⚠ Our own ImageNet explanation gets weaker and the paper must say so.** Cycles 6–7 read the
+  parent paper's §7.3 ImageNet null as a budget artefact — a long budget lets the coarse arm catch
+  up. At 3× budget on CIFAR-10 the granularity gap does not narrow *at all*. That reading now
+  applies to **pooling**, which does decay, and not to **granularity**. Do **not** carry
+  "granularity buys speed that a long budget erases, which explains §7.3" into the draft. The
+  supportable sentence is: *at 3× budget on CIFAR-10 the granularity gap is invariant, so a pure
+  budget account of the ImageNet null is not supported at this scale; whether it holds at ImageNet's
+  budget ratio is untested and we do not test it.*
+* **The scalar arm still has not converged at 300 epochs** (train 95.4%, rising +0.6pp/100ep). Per
+  gotcha 19 the claim is bounded: *converges to a worse solution* is supported at 3×; *never
+  converges* is not.
+
+## 4. One reviewer attack is now closed, and it should be closed IN the paper
+
+The α₀ confound (every hierarchical result living at α₀=1e-6, where fine partitions have more
+parallel signal with which to grow the step size) is **dead at 100 epochs**: all four arms are flat
+to ≤0.38pp across α₀ ∈ {1e-3, 1e-4, 1e-6}, and the granularity gap is +3.3 to +3.4pp at every α₀
+(FINDINGS §3). Put the ladder in an appendix table rather than waiting to be asked for it.
+
+The mirror finding is a **methods-section rule, not a result**: at 20 epochs α₀ dominates
+everything, and the fine-granularity catastrophe is mostly a startup transient (weightwise
+14.8 → 77.5 purely from α₀). Any short-horizon granularity comparison in the paper must be labelled
+a mechanism probe, never a performance number (OPERATIONS gotcha 24).
+
+## 5. §7's "claims that must not be made" — three additions
+
+Appending to the existing list:
+
+* **No m=n pooling claim of any kind** until the `zv-*` identity block passes. The shipped M0
+  operator pools β toward a *mean* while the scalar arm aggregates the meta-gradient as a *sum*, a
+  factor-of-11.17M mismatch; full pooling at m=n lands at 34.56 where it must reduce to the scalar
+  arm's 88.08. `HIER=zpool` fixes this in meta-gradient space with both endpoints as exact
+  identities. Until it is verified numerically, the m=n pooling column measures our own bug.
+* **No claim that partial pooling "removes partition granularity as a hyperparameter"** — the
+  abstract in §8 asserts it as a placeholder. It requires per-weight parity with the best plain
+  granularity, which is exactly what the confound above currently prevents measuring.
+* **No "granularity–noise tradeoff"** and no smooth-degradation language (§1 above).
+
+## 6. Revised abstract sketch
+
+Replacing §8's, with every unmeasured placeholder removed rather than bracketed:
+
+> Online meta-gradient methods learn optimizer step sizes during training by partitioning a
+> network's parameters into blocks and adapting one step size per block. The partition granularity —
+> from a single scalar to one step size per parameter — is a free design choice that prior work has
+> left largely unexplored, and which the reference implementation advertises but cannot execute. We
+> implement it and measure it. On CIFAR-10/ResNet-18 under SGD with momentum, moving from one step
+> size to six is worth +3.6 points; from six to roughly five thousand is worth nothing; and moving
+> to one step size per parameter costs 12.7 points. The gain is invariant to a 3× training budget,
+> and the coarse arm's training accuracy shows it converges to a worse solution rather than more
+> slowly to the same one. The per-parameter collapse is a rediscovery of a failure documented in the
+> IDBD/Autostep lineage and is largely repaired by a published guard, after which a granularity
+> deficit survives. We then show that the two natural ways to pool step sizes hierarchically are
+> different methods, not two settings of one dial: shrinking the log step sizes toward their mean
+> acts as a regulariser, improving test accuracy by up to 1.7 points while *reducing* training fit,
+> and is insensitive to its own strength over three orders of magnitude — removing a decision rather
+> than adding one; whereas rescaling the per-group deviation of each realised update has an interior
+> optimum, is worth 1.9 points, and improves training fit as well. We release corrected code and
+> document three defects in the public reference implementation that affect reproducibility.
+
+Gated on: `nd-*` (the m≈4,800 rung, currently n=1), `ad-l-*` at n=5 (the interior optimum, currently
+n=2), and `zv-*` (the identity gate, before any per-weight pooling sentence).
