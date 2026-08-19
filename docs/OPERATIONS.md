@@ -785,3 +785,25 @@ Appending to the `ENV:` echo line with `sed` produced an unbalanced quote in
 launching in that window. Caught by `bash -n`; `sacct` confirmed no job started in the gap.
 **Always `bash -n <script>` after editing a runner, and prefer a Python line-rewrite over
 `sed` when the replacement text contains quotes.**
+
+## Cycle 16
+
+* **`aggregate.py` needs the module load, not just the venv.** `source envs/mo/bin/activate`
+  alone gives `python: error while loading shared libraries: libpython3.10.so.1.0`. Prepend
+  `module load Python/3.10.4-GCCcore-11.3.0`, exactly as `jobs/run_cifar.sh` does.
+* **The CSV must be built from BOTH accounts and merged.** `aggregate.py` runs per-filesystem;
+  alice sees 304 runs, alice2 sees 194, and neither can see the other. Merge on
+  `(run, job_id)` — `run` alone is not unique.
+* **`rsync -az docs/ results/ FILE host:repo/` dumps everything into the repo root.** The
+  trailing slash means "contents of". It scattered 15 files across the cluster mirror's root
+  and put `all_runs.csv` inside `docs/`. Use `rsync -az docs results host:repo/` (no trailing
+  slash) so the directories are recreated, and verify with `md5sum` on both ends.
+* **A compound `rsync && rsync && ssh` over the 120s SSH budget dies silently mid-chain.**
+  One of three rsyncs completed; the CSV looked synced and was not. Always `md5sum` after.
+* **Free GPUs from `sinfo` are mostly not free.** 16 "free" GPUs, 14 of them on `maint`/`drain`
+  nodes. Count at node level with `scontrol show node -o` and subtract `AllocTRES` from
+  `CfgTRES`, then exclude non-idle states. Genuine free capacity this cycle: **2**.
+* **When everything is `Priority`-pending, queue depth is worthless and eligibility is not.**
+  Blocks pinned to one saturated partition sit at 0 running indefinitely. Widen with
+  `scontrol update JobId=<j> Partition=<all five>` — legitimate whenever the block is
+  self-anchoring, since GPU type does not affect `plateau` or epochs-to-target.
