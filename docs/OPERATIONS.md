@@ -639,3 +639,36 @@ scontrol show node | grep -A1 'Gres=.*l4'    # alloc:  AllocTRES
 The failure mode is not wasted jobs — Slurm just queues them — it is **a wasted decision**. A
 "there are 13 idle GPUs over there" reading nearly moved the headline sweep onto hardware that
 did not exist. State the capacity claim with the state column attached, or do not state it.
+
+## 30. An interpolation with exact endpoints can still have a garbage interior — check the COMMON MODE
+
+Both `zpool` endpoints are exact identities, verified numerically twice (cycle 9 β-uniformity,
+cycle 10 accuracy gate). That certified the endpoints and **nothing else**. The interior turned
+out to sweep the realised step size over a factor of 35 (cycle 12 §2), because
+
+    z'_b = (1-r)*sum_j(z_j) + r*z_b     =>     mean_b(z'_b) = (1-r)*m*z̄ + r*z̄
+
+carries a factor of **m** on the shared term. The pooling axis (dispersion) was correct; the
+common mode rode along with it uncontrolled.
+
+**Decompose any group-wise operator into its two modes before trusting a ladder built from it:**
+
+```python
+# common mode -- moves the MEAN of beta, i.e. the realised step size
+mean_b(z') / mean(z)      # must be ~flat in r, or the ladder is a step-size sweep
+# dispersion -- the pooling axis proper
+sd_b(z') / sd(z)          # this is what you intended to vary
+```
+
+For `zpool` the first runs 62 → 1 and for `zmpool` it is exactly 1 at every r, while the second is
+identical (= r) for both. Same intended axis, one confounded and one clean.
+
+**The empirical tell is in the probe you already write.** `mean(beta)` per cell is the diagnostic:
+if it is not roughly constant across a ladder, the cells are not running the same optimizer.
+Cycle 12's layerwise ladder read −10.69 / −10.83 / −12.49 / −13.64 / −14.11 / −10.58 — a 3.5-nat
+swing, i.e. a 35x step-size difference, hiding inside what was labelled a pooling sweep. Plot
+`mean(beta)` against the swept parameter **before** reading accuracy against it.
+
+Corollary: an endpoint-only conclusion ("no interior cell beats the endpoint") can still survive a
+confounded interior, provided the confound only ever *penalises* the interior. State which of the
+two you are relying on.

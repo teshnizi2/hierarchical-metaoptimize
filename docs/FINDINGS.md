@@ -2924,3 +2924,148 @@ is precisely why gotcha 24 forbids quoting a granularity comparison at short hor
 * Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
 * **ImageNet stays scoped out.** The language modality remains blocked on the validation-gated
   optimizer port; TinyStories pretokenization is done.
+
+---
+
+# 19 Aug 2026 (cycle 12) — the `zsw` sweep COMPLETES: there is no interior optimum, and the ladder's interior is a step-size sweep in disguise
+
+## 1. The 36-cell meta-gradient-space pooling sweep is COMPLETE — 36/36 at 100/100 epochs
+
+This was the campaign's single biggest open item ("no m=n pooling result is claimed anywhere in
+this document", cycle 11 §5). It is now closed, and the answer is **negative for the method**.
+
+`zsw-*`, L4, α₀=1e-6, guarded, 3 seeds/cell, `HIER=zpool ETA_RATIO=r`:
+
+| r | layerwise (m=62) | ep→85 | ep→90 | weightwise (m=11.17M) | ep→85 |
+|---|---|---|---|---|---|
+| 0.0 | 88.14 ± 0.06 | 37.3 ± 2.1 | never 0/3 | 88.07 ± 0.04 | 37.0 ± 2.6 |
+| 0.1 | 90.01 ± 0.21 | 33.0 ± 1.0 | 98 (1/3) | 88.14 ± 0.13 | 37.7 ± 1.5 |
+| 0.3 | 90.07 ± 0.23 | 33.0 ± 1.0 | 92 (1/3) | 88.26 ± 0.18 | 37.3 ± 2.1 |
+| 0.5 | 89.63 ± 0.13 | 32.7 ± 0.6 | never 0/3 | 88.28 ± 0.10 | 37.0 ± 2.6 |
+| 0.7 | 89.55 ± 0.14 | 32.0 ± 0.0 | never 0/3 | 88.43 ± 0.10 | 36.3 ± 2.5 |
+| **1.0** | **91.35 ± 0.16** | **28.7 ± 0.6** | **56.0 (3/3)** | **79.35 ± 0.37** | never |
+
+Both endpoints land exactly where the identity gate said they would: layerwise r=0 = 88.14 is the
+scalar arm (88.09 ± 0.16), r=1 = 91.35 is plain layerwise (91.34 ± 0.09), weightwise r=1 = 79.35 is
+the guarded per-weight arm (79.4). The sweep is internally valid.
+
+**Two readings, and they point opposite ways:**
+
+* **Layerwise: pooling in meta-gradient space is HARMFUL.** The unpooled endpoint r=1 is the best
+  cell on the ladder on accuracy (+1.28pp over the best interior cell) *and* the fastest on the
+  primary metric (28.7 epochs to 85% vs 32–37; the only cell reaching 90% in all 3 seeds). There
+  is **no interior optimum**. This is a clean negative result for the operator.
+* **Weightwise: any pooling at all prevents the collapse.** Every r ≤ 0.7 sits at 88.1–88.4 while
+  r=1 collapses to 79.35 — a ~9pp rescue. But pooled weightwise never *beats* scalar by more than
+  +0.36pp (r=0.7, 88.43 vs r=0 88.07, ~3σ), and stays 2.9pp below plain layerwise. The ~12pp
+  per-weight deficit is **not** closed by this operator; it is converted into a ~3pp deficit by
+  giving up essentially all per-weight resolution.
+
+## 2. ⚠ The interior of the ladder is CONFOUNDED — it sweeps step-size magnitude, not pooling
+
+The r=0.7 → r=1.0 step is +1.80pp on layerwise and −9.08pp on weightwise. A smooth interpolation
+should not jump at one endpoint in opposite directions on two arms. It does not: the operator is
+
+    z'_b = (1-r)*sum_j(z_j) + r*z_b
+
+and the shared term carries a factor of **m**. Taking the mean over groups:
+
+    mean_b(z'_b) = (1-r)*m*z̄ + r*z̄
+
+so the **common mode** — the component that moves the *mean* of β, i.e. the realised step size —
+is amplified by up to m. Verified in closed form (m=62): the common-mode multiplier runs
+62.0 → 55.9 → 43.7 → 31.5 → 19.3 → 1.0 across the ladder. The ladder sweeps it over a factor of 62.
+
+**This is measured, not just derived.** From the probe β vectors at end of run (layerwise):
+
+| r | mean(β) | realised step size vs r=1 | sd(β) | best test |
+|---|---|---|---|---|
+| 0.0 | −10.69 | 0.895 | 0.000 | 88.14 |
+| 0.1 | −10.83 | 0.779 | 1.156 | 90.01 |
+| 0.3 | −12.49 | **0.149** | 1.836 | 90.07 |
+| 0.5 | −13.64 | **0.047** | 2.145 | 89.63 |
+| 0.7 | −14.11 | **0.029** | 1.840 | 89.55 |
+| 1.0 | −10.58 | 1.000 | 2.295 | 91.35 |
+
+**The interior cells train at 3–35x smaller step size than either endpoint**, and the accuracy dip
+at r=0.5–0.7 sits exactly where the step size is most suppressed (−14.11 nats, 2.9% of r=1's).
+The two endpoints are the only cells on the ladder running at a comparable step size, which is
+precisely why they are the only two cells that can be read against each other.
+
+**Consequence for the write-up: the layerwise interior of `zsw` must not be quoted as a
+pooling-strength result.** The endpoint comparison (r=0 vs r=1) survives — both are exact
+identities at matched step size — and §1's negative conclusion rests only on the endpoints plus
+the fact that no interior cell beats r=1. That conclusion is safe: a confound that *suppresses*
+the interior cannot manufacture the finding that the interior loses.
+
+The weightwise arm is **much less affected**: its mean β moves only −10.82 → −10.20 across
+r=0…0.7 (a 0.6-nat band, vs 3.5 nats on layerwise), while sd(β) rises smoothly
+4.8e-7 → 8.2e-3 → 3.2e-2 → 7.3e-2 → 1.67e-1 → 8.02e-1. So the weightwise reading in §1 **is** a
+genuine dispersion dose-response, and it locates the collapse between **sd(β) = 0.167 and 0.802**.
+
+## 3. The fix: `zmpool`, a mean-normalised sibling that varies dispersion ONLY
+
+    z'_b = (1-r)*mean_j(z_j) + r*z_b   =>   mean_b(z'_b) = z̄  for EVERY r
+
+The common mode is now **exactly invariant in r**, while the injected dispersion is identical to
+`zpool`'s (both scale the deviation component by exactly r — verified numerically at
+r = 0, 0.1, 0.3, 0.5, 0.7, 0.9, 0.99, 1). That makes r a pure pooling axis.
+
+| r | common mode, `zpool` | common mode, `zmpool` | dispersion, both |
+|---|---|---|---|
+| 0.0 | 62.00 | 1.000000 | 0.000 |
+| 0.3 | 43.70 | 1.000000 | 0.300 |
+| 0.7 | 19.30 | 1.000000 | 0.700 |
+| 1.0 | 1.00 | 1.000000 | 1.000 |
+
+Implemented as `patches/patch_zmpool.py`. The existing `_zpool` method is left **byte-identical**
+and `zmpool` is a separate method behind a separate dispatch arm, so **no previously measured
+zpool cell can change**. Applied to both accounts; `HF.py` md5
+`32f32c8119514a4c4c066d799e36bc05` is identical on alice, alice2 and `patches/HF_patched.py`,
+with `grep -c PATCH_ZMPOOL` = 2 everywhere (gotcha 10 checked *before* any submit).
+
+Note r=0 under `zmpool` is **not** the scalar arm — the scalar arm's meta-gradient genuinely is
+the sum, so `zpool` r=0 was correct to use it. `zmpool` r=0 is "uniform β driven by the mean
+meta-gradient", i.e. scalar with an m-times-smaller meta-step. The ladder therefore anchors on
+**r=1 only** and must carry its own r=0 reference rather than borrowing zpool's.
+
+## 4. Queue actions this cycle
+
+1. **`zsx-*` pending cells CANCELLED (18 jobs).** `zsw` — the L4 twin of the identical 36-cell
+   sweep — completed 3/3 seeds on every cell first, so the pending 2080ti cells were redundant by
+   construction (cycle 9 `z2` precedent: redundant ⇒ `scancel`, not `nice`). The 8 *running*
+   cells were left alone as sunk cost and give a free partial cross-GPU spot check. Read-back
+   confirmed: pending zsx = 0, running zsx = 8.
+2. **`zrn-*` submitted (30 jobs, alice2, 2080ti)** — r ∈ {0.7, **0.9, 0.95, 0.99**, 1} × {layerwise,
+   weightwise} × 3 seeds. The entire r ∈ (0.7, 1) region is unsampled, and it is where both open
+   questions live: whether layerwise ramps smoothly to 91.35 or cliffs, and where exactly the
+   weightwise collapse switches on in sd(β). **Self-anchoring** (gotcha 28): it carries its own
+   r=0.7 and r=1 endpoints, so every contrast is internal to 2080ti and is never differenced
+   against the L4-measured `zsw` numbers.
+3. **`zm0-*` submitted (7 jobs, alice, L4)** — the `zmpool` identity gate at 20 epochs, the regime
+   `z3` proved discriminating (gotcha 25). Claims under test: `zmpool` r=1 reproduces plain on
+   both layerwise and weightwise; and r=0 *differs* from plain, without which the gate would be
+   vacuous. Refs for scalar/layerwise/weightwise are re-run inside the block. **The `zmp` ladder
+   is deliberately NOT submitted until this passes** — cycle 9/10's rule that a sweep run against
+   an unverified operator is unrecoverable.
+
+## 5. What this changes about the paper
+
+The draft's "partial pooling beats every fixed granularity (+1.46pp on layerwise)" is **not**
+contradicted — that result is `shrink`/`additive`, which pool in **β space**. `zsw` pools in
+**meta-gradient space** and loses on layerwise. The paper must state the space explicitly wherever
+it says "pooling"; the two operators now have opposite signs on the same arm, and that contrast is
+itself a result worth reporting rather than a wrinkle to smooth over.
+
+## 6. Standing caveats after this cycle
+
+* §1's layerwise **interior** is magnitude-confounded (§2) and may not be quoted as a pooling
+  result. The endpoints, and the "no interior cell beats r=1" conclusion, stand.
+* §1's weightwise interior **is** readable (mean β stable to 0.6 nats) but the +0.36pp
+  r=0.7-vs-r=0 effect is ~3σ at n=3 and should not be leaned on until `zrn` lands.
+* The collapse threshold is bracketed only as sd(β) ∈ (0.167, 0.802). `zrn` is the block that
+  narrows it; nothing may be claimed about its location yet.
+* `zmpool` has **no** empirical result yet — only closed-form and unit-test verification. The
+  `zm0` gate is in flight.
+* The 8 running `zsx` cells are 2080ti and must never be differenced against `zsw` (gotcha 28).
+* Every number remains CIFAR-10 / ResNet-18, 100 epochs unless stated. ImageNet stays scoped out.

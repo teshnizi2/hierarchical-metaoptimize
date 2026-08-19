@@ -84,6 +84,8 @@ class HF():
             self.base_update(net,g)
             if self._hier == 'zpool':  # PATCH_ZPOOL
                 HtT_gradft = self._zpool(HtT_gradft)
+            elif self._hier == 'zmpool':  # PATCH_ZMPOOL
+                HtT_gradft = self._zmpool(HtT_gradft)
             self.meta_update(HtT_gradft)
             if self._hier:  # PATCH_HIER
                 self._apply_hier()
@@ -241,6 +243,23 @@ class HF():
         if r == 0.0:
             return [torch.zeros_like(zz) + tot for zz in z]
         return [tot + r * (zz - tot) for zz in z]
+
+    # ---------------------------------------------------------- PATCH_ZMPOOL
+    def _zmpool(self, z):
+        """z'_b = (1-r)*mean(z) + r*z_b.  r=1 => plain exactly; magnitude is m-invariant."""
+        r = self._hier_ratio
+        if r == 1.0:
+            return z
+        if self.stepsize_type == 'scalar':
+            return z
+        if self.stepsize_type in ('layerwise', 'blockwise'):
+            mu = z[0].sum() / z[0].numel()
+            return [mu + r * (z[0] - mu)]
+        # weightwise / nodewise: z is a list of per-tensor tensors
+        tot = sum(zz.sum() for zz in z)
+        cnt = sum(zz.numel() for zz in z)
+        mu = tot / cnt
+        return [mu + r * (zz - mu) for zz in z]
 
     # ------------------------------------------------------------ PATCH_HIER
     def _apply_hier(self):

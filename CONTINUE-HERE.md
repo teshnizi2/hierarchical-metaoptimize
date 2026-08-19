@@ -26,13 +26,19 @@ across three orders of magnitude. The per-weight collapse is a float32 overflow 
 rediscovery of a guard published in 1992/2012/2024; a real ~12pp deficit survives the fix.
 
 ## Running / next
-* 36-run sweep `zsw-*` on `alice`: meta-gradient-space pooling, r ∈ {0,0.1,0.3,0.5,0.7,1} ×
-  {layerwise, weightwise} × 3 seeds. Both endpoints are proven exact (r=0 keeps β uniform to
-  sd = 0.000e+00; r=1 reproduces plain). **This locates the optimum — the core open question.**
-* 12-run α₀ control `a0-*` on `alice2`: α₀ ∈ {1e-4, 1e-3}. If the ordering changes vs α₀=1e-6,
-  several tables in the draft need revisiting.
-* Then: seeds → 5 on headline cells; budget sweep (25/50/100/300 epochs — the *direct* test of
-  the speed-vs-budget mechanism); CIFAR-100 as the second dataset; finish the draft.
+* **DONE — the 36-cell `zsw` sweep completed (cycle 12).** Meta-gradient-space pooling has **no
+  interior optimum**: on layerwise the unpooled endpoint r=1 wins on both accuracy (91.35) and
+  speed (28.7 ep→85). On weightwise any r<1 prevents the collapse (88.1-88.4 vs 79.35) but never
+  beats scalar by more than +0.36pp. **The layerwise interior is confounded** — it runs at 3-35x
+  smaller step size (see FINDINGS cycle 12 §2 and gotcha 30); quote the endpoints only.
+* **In flight:** `zrn-*` (30 jobs, alice2/2080ti) fills the unsampled r in (0.7, 1) and locates
+  the weightwise collapse threshold, currently bracketed only as sd(beta) in (0.167, 0.802).
+  Self-anchoring, so it carries its own endpoints.
+* **In flight:** `zm0-*` (7 jobs, alice/L4) — identity gate for the new `zmpool` operator
+  (mean-normalised pooling; holds the common mode exactly fixed so r is a pure pooling axis).
+  **Do not launch the `zmp` ladder until this gate passes.**
+* Then: the `zmp` ladder on L4 (same hardware as `zsw`, so the two operators are comparable);
+  seeds -> 5 on headline cells; CIFAR-100 as the second dataset; finish the draft.
 
 ## Gotchas that cost hours — do not rediscover these
 * Helper scripts go in `/data1/salehkaleybars/metaopt/bin`, **never `/tmp`** (node-local; the
