@@ -100,3 +100,23 @@ ssh alice2 "grep -c 'PATCH_HIER\|PATCH_CLIP' ~/metaopt/MetaOptimize/codes/Superv
 
 `patches/HF_patched.py` in this repo is the canonical copy; push it to both and delete
 `Optimizers/__pycache__` afterwards.
+
+## 11. TinyStories — staged, with one portability defect fixed
+
+`tinystories.py` had `DATA_CACHE_DIR` **hard-coded to the authors' Compute Canada path**
+(`/home/asharif/projects/def-sutton/...`), which does not exist on ALICE, so the task would have
+failed on first run. It is now environment-overridable:
+
+```python
+DATA_CACHE_DIR = os.environ.get("TINYSTORIES_DATA", "/data1/salehkaleybars/metaopt/data/tinystories")
+```
+
+Staged on `alice` (login nodes have internet; compute nodes do not — see gotcha 5):
+`data/tinystories/TinyStories_all_data/` — **50 shards, 6.97 GB**, receipt in `STAGED.txt`.
+
+**Two things remain before TinyStories can run:**
+1. **Pretokenization has not been done** and must be a Slurm CPU job, not a login-node job.
+2. **`tinystories/HF.py` is a SEPARATE COPY** of the optimizer and carries **neither the
+   `BETA_CLIP` guard nor the `HIER` hierarchy patch** — both live only in `cifar10/Optimizers/HF.py`.
+   Porting them is a prerequisite for any guarded or hierarchical language-modality run, and a
+   run launched without the port would silently be plain and unguarded (see gotcha 10).
