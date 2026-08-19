@@ -960,3 +960,223 @@ against those caps and will drain as capacity frees, which is the intended behav
 * `h2-w-L1e4` / `h2-w-L1e5` — the only *genuinely partial* λ values on weightwise (half-lives
   6,931 and 69,315 steps against ~50,000 steps in a run) — are 1 running / 3 pending. The λ
   curve is otherwise confirmed flat with the optimum at full pooling.
+
+---
+
+# 19 Aug 2026 (cycle 4) — the hierarchy question closes, and last cycle's stability reading is corrected
+
+15 new runs landed and 16 in-flight runs completed (182 runs aggregated, up from 167).
+Two campaign questions close outright, one previous claim is **wrong and corrected here**, and
+the decisive SGDm α₀ ladder returns its first complete seed.
+
+## 1. CLOSED — hierarchy does not close the per-weight deficit, at any pooling strength
+
+The weightwise pooling ladder is now measured across **six decades of λ**, including the two
+genuinely-partial values whose absence invalidated the first sweep. SGDm + Lion, guard on,
+augmented, α₀=1e-6, 100 epochs:
+
+| variant | pooling half-life (steps) | best test | n |
+|---|---|---|---|
+| plain + guard — **no pooling** | ∞ | **79.38 ± 0.46** | 3 |
+| M0 shrink λ=1e-5 | 69,315 | 78.98 ± 0.17 | 2 |
+| M0 shrink λ=1e-4 | 6,931 | 70.23 ± 0.15 | 2 |
+| M1 additive r=0.3 | — | 66.61 ± 0.74 | 2 |
+| M1 additive r=0.1 | — | 51.30 ± 2.03 | 2 |
+| M0 shrink λ=0.01 | 69 | 49.73 ± 3.51 | 2 |
+| M0 shrink λ=0.1 | 7 | 49.07 ± 3.75 | 2 |
+| M0 shrink λ=0.5 | 1 | 49.06 ± 3.80 | 2 |
+
+Three things make this decisive rather than suggestive:
+
+1. **The operator is verified, not assumed.** λ=1e-5 has a 69,315-step half-life against
+   ~50,000 steps in a run — i.e. it is *effectively no pooling* — and it recovers the unpooled
+   arm to within 0.4pp (78.98 vs 79.38). The shrink operator does what it says.
+2. **λ=1e-4 is the first genuinely partial value ever measured on weightwise** (half-life 6,931
+   steps, ~7 half-lives per run) and it already costs **9.2pp**. The partial-pooling regime the
+   first sweep never reached is now measured, and it is monotonically harmful from the first
+   step away from zero.
+3. **Two independently-parameterised mechanisms interleave on one monotone curve.** Ordering by
+   pooling strength: `79.4 (none) → 79.0 (λ1e-5) → 70.2 (λ1e-4) → 66.6 (r=0.3) → 51.3 (r=0.1)
+   → ~49 (λ≥0.01)`. M0 and M1 share no parameterisation, so the controlling variable is
+   *pooling strength itself*, not either operator's particular form.
+
+**There is no interior optimum and no beneficial regime.** The project's proposed fix does not
+close the ~12pp per-weight deficit; monotonically in pooling strength it widens it to ~30pp.
+This question needs no further compute — priority item 1 is answered, in the negative, and the
+negative is now firm rather than confounded by a saturated sweep.
+
+## 2. CORRECTION — the guard rescues one of the two collapsing scalar seeds
+
+Last cycle recorded, from an **in-flight** snapshot (seeds at 56/37/11 epochs), that "two of
+three seeds collapse to ~19–21% with the guard on, reproducing the unguarded pattern almost
+value-for-value." **All three seeds have now run the full 100 epochs and that is wrong.**
+Seed 2 was read at epoch 11 while at 20.81; it recovered.
+
+SGDm + **Adam** meta, α₀=1e-6, scalar, 100 epochs, n=3:
+
+| | seed 0 | seed 1 | seed 2 | collapsed |
+|---|---|---|---|---|
+| g3, guard **OFF** | 88.45 | **18.47** | **20.71** | 2/3 |
+| g4, guard **ON** | 88.12 | **20.89** | 86.78 | **1/3** |
+
+So the SwiftTD guard **halves** the scalar collapse rate but does not remove it. This is a
+weaker statement than the one on record and it is the right one.
+
+### The stability claim survives — but state it on the primary metric, not on collapse counts
+
+Counting collapses undersells the effect and depends on an arbitrary threshold. On
+epochs-to-target, with the **guard on** throughout, the picture is unambiguous:
+
+| arm (guard ON) | reaches 85% | reaches 88% | reaches 90% | best |
+|---|---|---|---|---|
+| **scalar** | 2/3 (ep 23, 78) | **1/3** (ep 69) | **0/3** | 65.26 ± 38.43 |
+| layerwise | 3/3 (14, 15, 15) | 3/3 (26, 26, 27) | **3/3** (59.7 ± 0.6) | 90.79 ± 0.06 |
+| 6-block | 3/3 (15, 16, 15) | 3/3 (19, 21, 21) | **3/3** (42.0 ± 9.5) | 90.94 ± 0.12 |
+
+**With a published guard already in place, the scalar arm of the parent paper's own
+configuration reaches 90% on zero of three seeds; both granular arms reach it on three of
+three.** And seed 2's "recovery" is a wounded one — it crosses 85% only at epoch 78 and never
+reaches 88% — so treating it as a healthy run flatters the scalar arm.
+
+The confound flagged on 19 Aug is therefore **resolved in the claim's favour, at n=3 and with
+the correction above applied**: granularity's stability benefit is not a repackaging of the
+guard, because the guard alone leaves the scalar arm unable to reach the target at all. The two
+interventions overlap partially and neither substitutes for the other.
+
+## 3. The campaign's largest effect is COMPLETE at n=3 on both arms
+
+`h2A-l-plain` seed 2 finished, so both arms of the Adam-meta contrast are n=3 at 100 epochs.
+SGDm base + **Adam** meta (non-sign), layerwise, guard on, α₀=1e-6:
+
+| arm | ep→90 (n=3) | best (n=3) |
+|---|---|---|
+| plain | 61.0 ± 5.6 (56/60/67) | 90.71 ± 0.17 |
+| **+ M0 shrink λ=0.1** | **19.3 ± 0.6** (20/19/19) | **92.22 ± 0.08** |
+
+**41.7 fewer epochs — 68% — at Welch t = 12.9, plus +1.51pp accuracy at t = 14.0.** The third
+plain seed (67) widens the plain arm's spread and slightly *grows* the effect over last cycle's
+n=2 reading (38.7 epochs). This is the strongest result in the campaign and it is now complete.
+
+It also completes the **refutation of the sign explanation**, which required n=3 before it could
+be written up. Against the same contrast under Lion, using the *matched* baseline (§4):
+
+| meta-optimizer | plain ep→90 | shrink ep→90 | speed-up |
+|---|---|---|---|
+| Lion (sign) | 58.3 ± 2.3 | 41.5 ± 0.7 | 16.8 ep (29%), t = 11.8 |
+| **Adam (non-sign)** | 61.0 ± 5.6 | **19.3 ± 0.6** | **41.7 ep (68%), t = 12.9** |
+
+The prediction on record was that pooling's win should *shrink or vanish* without the sign
+nonlinearity. It is **2.5× larger**. Whatever pooling buys is a property of the per-group
+meta-gradient estimate — its variance — not of how the meta-optimizer consumes it. Both the
+original sign mechanism and its refutation are now at n=3; **the mechanism should not be written
+up, the refutation may be.**
+
+## 4. A matched plain baseline tightens the Lion-meta contrast (and moves it)
+
+`h2-base` is layerwise-plain submitted on the *same seeds and same launcher* as the h2 shrink
+cells, rather than reusing the older `d4_clipL` block:
+
+| baseline | ep→90 | best | n |
+|---|---|---|---|
+| `d4_clipL` (older, used in every previous table) | 54.7 ± 7.5 | 91.39 ± 0.19 | 3 |
+| **`h2-base` (matched)** | **58.3 ± 2.3** | 91.27 ± 0.16 | 3 |
+
+The two agree on accuracy to within noise but the matched baseline's ep→90 is **3.6 epochs
+slower and 3× tighter**. Every Lion-meta pooling speed-up quoted against `d4_clipL` is therefore
+a slight *under*statement: the win is 16.8 epochs (29%), not the 13.2 (24%) on record. Use
+`h2-base` as the Lion plain baseline from here.
+
+## 5. 6-block pooling — confirmed at n=6 across two independent submissions
+
+`h2-b-L0p1` (n=3, complete) and `h2-blk6` (n=3, two seeds at 84/92 epochs but past ep→90, so
+the primary metric is valid) are the same configuration submitted twice. They agree closely
+(ep→90 53.3 ± 3.1 and 52.7 ± 2.5; best 92.12 ± 0.12 and 91.94 ± 0.36), so they are pooled:
+
+| 6-block (m=6), SGDm + Lion | ep→90 | best | n |
+|---|---|---|---|
+| plain | 43.0 ± 2.0 | 91.56 ± 0.03 | 3 |
+| + shrink λ=0.1 | **53.0 ± 2.5** | **92.03 ± 0.26** | 6 |
+
+Pooling m=6 **costs 10.0 epochs of speed (t = 6.5) and buys +0.47pp of accuracy (t = 4.4)**.
+Both effects are real, in opposite directions, now at n=6. The granularity-dependence of
+pooling stands as:
+
+| m | pooling effect on **speed** | pooling effect on **accuracy** |
+|---|---|---|
+| 6 | **hurts** (43.0 → 53.0) | helps (+0.47pp) |
+| 62 | **helps** (58.3 → 41.5 Lion; 61.0 → 19.3 Adam) | helps (+1.26 / +1.51pp) |
+| 11.17M | never reaches 90% at any λ | **monotonically catastrophic** (79.4 → ~49) |
+
+Only m=62 is helped on both axes, and only m=62 is helped a lot.
+
+## 6. The decisive SGDm α₀ ladder — seed 0 complete, and it points opposite to the AdamW ladder
+
+`a0h-*` at 100 epochs, seed 0, SGDm + Lion, guard on, augmented (n=1 — **preliminary**):
+
+| α₀ | scalar | layerwise plain | layerwise + shrink λ=0.1 |
+|---|---|---|---|
+| 1e-6 | *(pending)* | 51 / 91.28 | **42** / 92.53 |
+| 1e-3 | **never reaches 90%** (best 88.28) | 40 / 91.76 | **24** / 92.50 |
+
+Set beside the completed AdamW + Adam ladder (n=3), the two configurations disagree on every
+axis that matters:
+
+| | AdamW + Adam (n=3) | SGDm + Lion (n=1) |
+|---|---|---|
+| best arm at α₀=1e-3 | **scalar** (17.0 ± 1.0, 92.94 ± 0.16) | **layerwise + shrink** (24; scalar never reaches 90%) |
+| effect of α₀=1e-3 on layerwise | **hurts badly** (27.0 → 33.0, U-shaped) | **helps** (51 → 40, monotone) |
+| per-arm-tuned comparison | three-way tie; scalar best on accuracy | scalar cannot reach the target at all |
+
+**Two consequences, both preliminary at n=1 but both directional.**
+
+**(a) The campaign's central claim survives its own fairness objection in the configuration
+that matters.** Under SGDm, giving the scalar arm its own best α₀ does not rescue it — it fails
+to reach 90% in 100 epochs at α₀=1e-3, having also failed at α₀=1e-6. Per-arm α₀ tuning erased
+the granularity advantage under AdamW; it does not under SGDm. That is the H4 story landing:
+**the base optimizer, not α₀, is the controlling variable.**
+
+**(b) "Optimal α₀ falls as the partition gets finer" does NOT generalise across base
+optimizers.** That claim was confirmed at n=3 — but only on AdamW + Adam, where layerwise is
+U-shaped in α₀ and uniquely hurt at 1e-3. Under SGDm + Lion layerwise is *monotone improving*
+across the same range, plain and shrink alike. **The rule as written in cycle 3 is
+over-generalised and must be restated as an AdamW result until the SGDm ladder completes.**
+
+## 7. Queue actions this cycle
+
+* **`a0L-*` (24 cells) submitted and 10 started within a minute.** The SGDm + Lion α₀ ladder,
+  **complete and self-contained on one GPU type**: {scalar, 6-block, layerwise plain, layerwise
+  shrink λ=0.1} × α₀ ∈ {1e-3, 1e-4, 1e-6} × seeds {0,1}. This exists because `a0h` — the same
+  question on 2080ti — is 14/20 still pending behind a saturated partition and has delivered
+  seed 0 only, at two α₀ values, for three of the four arms: it carries **no 1e-4 row and no
+  6-block arm at any seed**, so it cannot reproduce the granularity *ordering* at a given α₀,
+  only a two-point contrast. `a0L` can. `a0h` on 2080ti now serves as independent cross-GPU-type
+  replication rather than as the primary measurement.
+* **The binding constraint was partition eligibility, not capacity.** `node887` sat **IDLE with
+  4 free L4 GPUs** while 32 of our jobs pended, because it belongs to `gpu-short` only and every
+  pending L4 job was pinned to `gpu-l4-24g`. Submitting `a0L` as
+  `--partition=gpu-l4-24g,gpu-short --gres=gpu:l4:1` (gotcha 12) filled node887, node886,
+  node885, node881 and node880 immediately: **running jobs on `alice` went 1 → 11.**
+* **`--time` sized from measurement, not habit.** 140 completed 100-epoch L4 runs span 30–48
+  min, so `a0L` asks 2:00:00 — 2.5× the slowest ever recorded and comfortably inside the
+  `gpu-short` 4 h cap.
+* **All 17 remaining L4-pinned pending jobs widened to `gpu-l4-24g,gpu-short`.** GRES stays
+  pinned to `l4`, so within-block timing comparability is untouched (gotcha 3). Their walltimes
+  (40:00 / 3:00:00) already fitted the 4 h cap; only the partition list was locking them out.
+* **The three `sm-ResNet{34,50,101}` scale smokes un-niced.** They are 2-epoch probes costing
+  ~5 min of GPU each and they are the only pending work that touches the campaign's largest
+  standing caveat — every result to date is ResNet-18 only. The λ-plateau re-measures stay
+  niced (gotcha 14).
+
+## 8. Standing caveats after this cycle
+
+* Every number remains **CIFAR-10 / ResNet-18**. The scale ladder is un-niced but has not run.
+* **ImageNet stays scoped out** — 489/1000 classes and, decisively, no devkit, so the 50,000
+  flat `val` JPEGs cannot be labelled from anything on disk.
+* The **language modality** is still blocked on the validation-gated optimizer port;
+  pretokenization is done (50/50 shards, 8.5 GB).
+* §6 is **n=1**. `a0L` (24 cells) and the `a0h` remainder decide it; nothing from §6 may enter a
+  draft yet, and in particular the cycle-3 "optimal α₀ falls with granularity" rule must be
+  restated as AdamW-only in the meantime.
+* `a0A-*` (20 cells, the α₀ control for §3's effect — the campaign's largest) is **entirely
+  pending** on `alice2`'s 2080ti allowance. The single largest result in the campaign still has
+  no α₀ control.
