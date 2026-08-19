@@ -3246,3 +3246,112 @@ nodewise/weightwise steady-state cells are still running.
 * Cluster is genuinely saturated (`TRULY_FREE` 0–2 GPUs per pool); three 2080ti nodes
   are held by maintenance reservation `root_28` until 2026-12-01. Partition totals
   from `sinfo` include those nodes and overstate free capacity — count at node level.
+
+---
+
+# Cycle 16 — the M1 curve is now well-sampled, and its one untested confound is queued
+
+CSV re-aggregated from artefacts on **both** accounts (`aggregate.py` over
+`/data1/salehkaleybars/metaopt/runs` and `~/metaopt/runs`, merged):
+**498 rows, +33 this cycle** (304 salehkaleybars / 194 s5014158).
+All numbers below re-derived from `results/all_runs.csv`, filtered
+`superseded==0`, `epochs_done>=epochs_requested`, `augment==1`, metric = `plateau`.
+318 rows satisfy the 100-epoch filter.
+
+## 1. M1 additive r-curve, layerwise, SGDm+Lion, alpha0=1e-6, 100 ep — full curve
+
+| r | 0 | 0.03 | 0.05 | **0.07** | 0.1 | 0.2 | 0.3 | 1 |
+|---|---|---|---|---|---|---|---|---|
+| plateau | 92.200 | 92.637 | 93.086 | **93.212** | 92.626 | 91.387 | 90.957 | 90.918 |
+| n | 3 | 5 | 5 | 6 | 5 | 3 | 3 | 1 |
+| sd | 0.044 | 0.164 | 0.097 | 0.124 | 0.215 | 0.142 | 0.079 | — |
+
+Unimodal, n>=3 at every r. Report **the curve**, never the peak cell.
+
+Three reference points, three different questions — do not interchange:
+
+| contrast | delta |
+|---|---|
+| r=0.07 vs r=1 (= no pooling = plain layerwise) | **+2.29** |
+| r=0.07 vs r=0 (= maximal pooling) | **+1.01** |
+| r=0.07 vs tuned non-meta AdamW lr=3e-4 (n=4, 91.894) | **+1.32** (unsafe, see §4) |
+
+## 2. r=1 == plain layerwise confirmed a second time, in plateau
+
+Cycle 15 proved the identity on the first 10 epochs (max deviation 0.03pp).
+Independently, at 100 epochs: additive r=1 = **90.918** (n=1) vs plain layerwise
+SGDm/Lion a0=1e-6 = **90.772** (n=10, sd 0.190). Gap 0.15pp < 1 sd.
+Two independent confirmations; the identity is settled.
+
+## 3. The 300-epoch behaviour is a RIGHT-SHIFT, not an inversion
+
+| budget | r=0 | r=0.05 | r=0.07 | r=0.1 | peak |
+|---|---|---|---|---|---|
+| 100 ep | 92.20 (3) | 93.09 (5) | **93.21** (6) | 92.63 (5) | r=0.07 |
+| 300 ep | 92.07 (2) | 93.01 (2) | — | **93.28** (2) | r=0.1 |
+
+* The **peak value is flat** across budget (93.21 -> 93.28).
+* The **gain over full pooling does not shrink**: +1.01pp at 100 ep, +1.21pp at 300 ep.
+* What moves is *which r wins*: the optimum shifts toward **less** pooling as the
+  budget grows — consistent with pooling buying early-training stability that a
+  longer run no longer needs.
+* **Supersedes the standing "pooling gains invert between 100 and 300 epochs"
+  caveat**: the sign of the pooling benefit does not invert; the r=0.05/r=0.1
+  ordering does. PROVISIONAL — n=2 at 300 ep. Needs n>=5 before it is stated.
+
+## 4. Non-meta AdamW baseline, n now 4-5 — but still the mis-scaled schedule
+
+| lr | n | plateau | sd |
+|---|---|---|---|
+| **3e-4** | 4 | **91.894** | 0.120 |
+| 1e-4 | 5 | 91.188 | 0.223 |
+| 1e-3 | 2 | 90.264 | 0.052 |
+| 3e-3 | 2 | 85.962 | 0.574 |
+
+`fxcos-*` (corrected `COS_TOTAL=50000, COS_WARMUP=2500`) is **still in flight** —
+8 running, at 9-48 of 100 epochs. **The +1.32pp margin in §1 remains unsafe to
+quote**; the corrected baseline can only move up.
+
+## 5. H4 base-optimizer interaction, extended — and nodewise is the best plain granularity
+
+| base/meta | scalar | blocks(6) | layerwise | nodewise | weightwise |
+|---|---|---|---|---|---|
+| SGDm/Lion | 87.750 (8) | 91.330 (8) | 90.772 (10) | **91.593 (8)** | — |
+| AdamW/Adam | 91.555 (6) | 91.663 (6) | 91.707 (6) | — | — |
+| AdamW/Lion | 91.567 (3) | 91.367 (3) | 91.418 (3) | — | 85.386 (3) |
+
+* Under **SGDm the granularity span is 3.84pp** (scalar 87.75 -> nodewise 91.59).
+* Under **AdamW it is 0.15pp** (91.56 -> 91.71) — null, as previously found, now n=6.
+* **nodewise > blocks > layerwise** under SGDm/Lion. Layerwise, the parent paper's
+  default, is *not* the best plain granularity; it is 0.82pp below nodewise.
+* SGDm/Adam scalar is bimodal (n=4, mean 70.65, **sd 33.5**) — some seeds collapse.
+  Quote it as an instability, never as a mean.
+
+## 6. What was decided this cycle
+
+* **Submitted `am4-*` (21 jobs, alice2)** — the M1 r-curve at **alpha0=1e-4**,
+  r in {0, 0.03, 0.05, 0.07, 0.1, 0.2, 1} x 3 seeds, otherwise byte-identical to
+  the 1e-6 sweep (same account, SGDm/Lion, meta-stepsize 1e-3, guard, layerwise,
+  100 ep, batch 100). **Rationale:** every point of the §1 curve sits at
+  alpha0=1e-6, which costs 14-25 epochs of startup *differing per arm*, so the
+  inverted-U could in principle be escape-from-bad-init. The only off-1e-6
+  additive point in 498 runs is `mx-a1e4-add` (r=0.06, n=5, 92.702) — one point
+  cannot distinguish an interior optimum from a monotone trend. Self-anchoring
+  (carries r=0 and r=1), so multi-partition is safe. r=0.06 omitted; it is the
+  anchor tying the new block to existing data.
+  **Read-out:** inverted-U survives -> the optimum is a property of the operator
+  and the headline holds; curve flattens -> the headline needs an alpha0 qualifier
+  or withdrawal.
+* **Widened 54 pending jobs** (`sc-*` model-scale x36, `c100-*` x16, `c100pin-*` x2)
+  from a single pinned partition to all five. Both blocks were 100% starved
+  (0 running) behind saturated pools while the two axes they cover are the paper's
+  top two gaps. Mixing GPU types is safe for `plateau` / epochs-to-target.
+
+## 7. Cluster state
+
+* Genuinely free GPUs cluster-wide: **2** (116 configured, 100 allocated, 14 of the
+  16 "free" sit on `maint`/`drain` nodes — reservation `root_28` until 2026-12-01).
+* Ours running: **12 alice + 13 alice2 = 25**. Pending: **134 + 95 = 229**.
+* Pending reasons on alice: 131 `Priority`, 3 `QOSMaxGRESPerUser`. FairShare 0.341.
+* **Throughput is capped by the cluster, not by queue depth or composition.** Queue
+  ordering, not queue size, is the only remaining lever; hence §6's widening.
