@@ -824,3 +824,34 @@ launching in that window. Caught by `bash -n`; `sacct` confirmed no job started 
   `squeue -h -t PENDING -o "%P" | sort | uniq -c` shows this in one line.
 * **`gpu-short` caps at 4:00:00.** Jobs at `--time=03:50:00` are eligible; anything longer
   must be widened to the four long partitions instead, or the `scontrol update` fails.
+
+# Cycle 18 — five gotchas, one of which was costing us an entire axis
+
+1. **Queue POSITION, not queue depth, is the throughput metric.** We had 190 jobs queued and
+   called that "saturated". Axis 2 (CIFAR-100, 33 jobs) was at positions **73–105 of 105** and
+   had produced nothing in four cycles. Measure it:
+   ```
+   squeue -u $USER -h -t PENDING -o "%Q|%j" | sort -rn | awk -F'|' '{n=$2; gsub(/[0-9]+$/,"",n); print NR" "$1" "substr(n,1,11)}' \
+    | awk '{fam=$3; if(!(fam in first)){first[fam]=$1; pr[fam]=$2} cnt[fam]++} END {for(f in first) printf "%4d  %s  n=%-3d %s\n", first[f], pr[f], cnt[f], f}' | sort -n
+   ```
+2. **You cannot raise your own Slurm priority, but you can lower it — which is enough.**
+   `scontrol update JobId=<j> Nice=<n>` (positive n only). Demoting 47 tier-3 jobs moved
+   CIFAR-100 from 73–105 to 24–55 and `sc-ResNet34` from 62 to 16. Verify with `%Q` before/after;
+   a Nice of 5000 dropped priority 672395 → 667398, far more than the ~200 gap between families.
+   `PriorityWeightAge` is only 10,000 here, so nice values in the thousands dominate age.
+3. **Reduce every probe dir that already exists before submitting new ones.** Two complete drift
+   series had never been analysed (`bdrift3/p3-*` on alice, `bdrift4/p4-ad-*` on alice2). One
+   downgraded a headline effect 16×; the other showed the headline positive result has no
+   mechanism. Sweep both accounts with `find <runs> -name probe.jsonl -size +1k`.
+4. **Validate a new reducer against a published table before trusting it.** `bin/drift_extract.py`
+   was checked against cycle 7's p2 numbers and reproduces all ten values exactly; only then were
+   its p3 outputs believed.
+5. **Check granularity support structurally, on CPU, before queueing a batch.**
+   `bin/probe_gran_scale.py` instantiates each net×granularity with no training (seconds, no GPU)
+   and prints the true group count N. It caught that ResNet18 `nodewise` is **14,420**, not the
+   "~4,800" FINDINGS had carried since cycle 7. Needs
+   `module load Python/3.10.4-GCCcore-11.3.0 && source <workspace>/envs/mo/bin/activate` — a bare
+   `python` on the login node has no torch.
+6. **Name collisions across accounts are real:** `p4-*` already existed on alice2
+   (`runs/bdrift4`, the additive r-ladder probe) and is unrelated to cycle 18's `p4-*` on alice.
+   Grep both accounts for a prefix before reusing it.
