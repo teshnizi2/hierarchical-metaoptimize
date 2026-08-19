@@ -1848,6 +1848,11 @@ is unaffected. Quote ep→88 for scalar as threshold-marginal, not as "never".
 * **Submitted `p2-*` (6 jobs, `alice2`, 20 epochs, `--time=00:45:00`)** — §2's direct β-drift
   measurement. Sized short deliberately so they backfill (gotcha 12) rather than queue behind
   100-epoch work.
+* **Submitted `lp-l-*` (6 jobs, `alice`, L4 dedicated)** — the layerwise analogue of the §1b
+  weightwise ladder, at λ ∈ {1e-5, 3e-5, 1e-4} (half-lives 69,315 / 23,105 / 6,931 steps). Same
+  operator, same α₀, same guard, so the two ladders become directly comparable and §3's unsampled
+  interpolation is filled. Prediction: λ=1e-5 reproduces layerwise plain (90.77), λ=1e-4 is
+  intermediate, and the gain saturates by λ≈0.01 — the mirror image of the weightwise curve.
 * **Niced 5 pending `h2-lam*` cells to 5000.** λ ∈ {0.03, 0.1, 0.3} have half-lives of 23/7/2 steps
   — all full pooling (gotcha 9) — and layerwise λ=0.1 is already at n=7. They re-measure a settled
   point three times. `nice`, not `scancel` (gotcha 14).
