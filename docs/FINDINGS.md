@@ -1180,3 +1180,146 @@ over-generalised and must be restated as an AdamW result until the SGDm ladder c
 * `a0A-*` (20 cells, the α₀ control for §3's effect — the campaign's largest) is **entirely
   pending** on `alice2`'s 2080ti allowance. The single largest result in the campaign still has
   no α₀ control.
+
+---
+
+# 19 Aug 2026 (cycle 4, second pass) — the PRIMARY metric is threshold-sensitive, and it flatters the project's own proposal
+
+This came out of a routine consistency check and it is the most consequential thing in this
+cycle. **It does not threaten the campaign's central granularity claim. It does require the
+project's own pooling result to be restated as something other than a speed-up.**
+
+## 1. How it surfaced — two identical runs, 6 epochs apart on the primary metric
+
+`a0h` was designed with an α₀=1e-6 row that duplicates existing L4 cells as a cross-GPU-type
+anchor. Those anchors have now landed, and they are the same config *and the same seed*,
+differing only in GPU type (argument order aside):
+
+| config (seed 0, α₀=1e-6, guard, augmented) | GPU | best | ep→90 |
+|---|---|---|---|
+| layerwise **+ shrink λ=0.1** (`hs-l-lam01_s0` / `a0h-lsh01-1e6_s0`) | L4 / 2080ti | 92.55 / 92.53 | **42 / 42** |
+| layerwise **plain** (`h2-base_s0` / `a0h-lplain-1e6_s0`) | L4 / 2080ti | 91.37 / 91.28 | **57 / 51** |
+
+Accuracy replicates across GPU types to 0.02–0.09pp, consistent with the ±0.02pp determinism
+floor — **so the campaign's GPU-independence assumption is sound.** But the *plain* arm's
+epochs-to-90% differs by **6 epochs** between two runs that differ only in cuDNN
+non-determinism, while the *pooled* arm's is identical. The primary metric is far noisier on
+one arm than the other.
+
+## 2. The cause — the unpooled arm asymptotes ON the 90% line
+
+Counting how many of 100 epochs each arm spends inside the [89, 91] band, with its plateau
+(mean test accuracy over the last 20 epochs):
+
+| arm | n | epochs in [89,91] | plateau | ep→90 |
+|---|---|---|---|---|
+| layerwise plain (Lion) | 3 | **51 ± 3** | 90.83 ± 0.13 | 58.3 ± 2.3 |
+| layerwise shrink (Lion) | 2 | **4 ± 0** | 92.27 ± 0.04 | 41.5 ± 0.7 |
+| layerwise plain (Adam) | 3 | **61 ± 1** | 90.34 ± 0.08 | 61.0 ± 5.6 |
+| layerwise shrink (Adam) | 3 | 18 ± 1 | 91.86 ± 0.11 | 19.3 ± 0.6 |
+
+The unpooled arms converge to a plateau of **90.3–90.8%** — i.e. **the 90% threshold is drawn
+through their own asymptote**, and they sit inside a ±1pp band around it for half to two-thirds
+of the run. For those arms "epochs to 90%" is not measuring convergence speed at all; it is
+measuring *when noise first nudged an already-converged curve over a line drawn through it*.
+That is why it is late, high-variance, and irreproducible at fixed seed.
+
+## 3. The consequence — the pooling speed-up reverses sign at lower thresholds
+
+Recomputing every headline pooling contrast at all three thresholds instead of one:
+
+### SGDm + Adam meta, layerwise (the campaign's largest effect)
+
+| metric | plain (n=3) | shrink λ=0.1 (n=3) | gain |
+|---|---|---|---|
+| ep→85 | 15.0 ± 0.0 | 15.0 ± 0.0 | **0.0 ep (0%)** |
+| ep→88 | 27.0 ± 0.0 | 16.0 ± 0.0 | +11.0 ep (41%) |
+| ep→90 | 61.0 ± 5.6 | 19.3 ± 0.6 | +41.7 ep (68%) |
+| **plateau** | 90.34 ± 0.08 | **91.86 ± 0.11** | **+1.52pp** |
+
+### SGDm + Lion meta, layerwise
+
+| metric | plain (n=3) | shrink λ=0.1 (n=2) | gain |
+|---|---|---|---|
+| ep→85 | 28.7 ± 0.6 | 35.5 ± 0.7 | **−6.8 ep (−24%), t = −11.4** |
+| ep→88 | 35.7 ± 0.6 | 38.0 ± 1.4 | **−2.3 ep (−7%), t = −2.2** |
+| ep→90 | 58.3 ± 2.3 | 41.5 ± 0.7 | +16.8 ep (29%), t = 11.8 |
+| **plateau** | 90.83 ± 0.13 | **92.27 ± 0.04** | **+1.44pp** |
+
+### SGDm + Lion meta, 6-block
+
+| metric | plain (n=3) | shrink λ=0.1 (n=3) | gain |
+|---|---|---|---|
+| ep→85 | 30.0 ± 1.0 | 31.0 ± 1.0 | −1.0 ep (−3%) |
+| ep→88 | 36.0 ± 1.0 | 39.0 ± 1.0 | −3.0 ep (−8%), t = −3.7 |
+| ep→90 | 43.0 ± 2.0 | 53.3 ± 3.1 | −10.3 ep (−24%), t = −4.9 |
+
+**Under Lion the sign of the pooling "speed-up" flips between 85% and 90%.** Pooled layerwise
+is 24% *slower* to 85% at t = −11.4 — a larger, tighter effect than the +29% at 90% that the
+campaign has been quoting — and 6-block pooling is slower at every threshold.
+
+## 4. What this means, stated plainly
+
+**Pooling is not an acceleration. It is a plateau effect.** The one thing it does at every
+threshold, in every configuration, at 8–14σ, is raise the asymptote: +0.56pp (m=6), +1.26pp
+(m=62, Lion), +1.51pp (m=62, Adam). The apparent speed-up is downstream of that: the unpooled
+arm converges just below 90%, so a 90% threshold catches it late and erratically while the
+pooled arm's higher plateau crosses it decisively and early.
+
+The correct headline for the project's proposal is therefore:
+
+> Averaging the meta-gradient over a partition **raises the accuracy plateau** by 0.6–1.5pp.
+> It does not speed up early training — to 85% it is neutral (Adam meta) or measurably slower
+> (Lion meta, −24%). Epochs-to-90% overstates the benefit because the unpooled arm's plateau
+> sits on the 90% line.
+
+The earlier note that the shrink arm is "slower early and faster late — the signature partial
+pooling is supposed to have" recorded the right observation and drew the wrong conclusion from
+it: the campaign then adopted ep→90 as the primary metric and reported that single threshold as
+a speed claim. Both halves of that were a mistake, and this section is the correction.
+
+## 5. What this does NOT threaten — the granularity claim is threshold-robust
+
+The same recomputation on the *granularity* comparison (AdamW + Adam, the paper's exact
+CIFAR-10 config, guard on, **n=3, all 27 runs at 100 epochs**):
+
+| α₀ | arm | ep→85 | ep→88 | ep→90 |
+|---|---|---|---|---|
+| 1e-6 | scalar | 10.7 ± 1.2 | 19.0 ± 3.0 | 32.3 ± 2.5 |
+| 1e-6 | 6-block | 10.3 ± 0.6 | 16.0 ± 1.0 | 30.7 ± 2.1 |
+| 1e-6 | **layerwise** | **10.0 ± 0.0** | **15.0 ± 1.0** | **27.0 ± 1.0** |
+| 1e-4 | scalar | 9.0 ± 1.0 | 15.0 ± 1.0 | 27.3 ± 1.5 |
+| 1e-4 | 6-block | 9.3 ± 1.2 | 16.3 ± 2.5 | 29.3 ± 4.5 |
+| 1e-4 | **layerwise** | **7.7 ± 0.6** | **12.7 ± 1.2** | **19.3 ± 2.5** |
+| 1e-3 | **scalar** | 10.0 ± 1.0 | **13.0 ± 1.0** | **17.0 ± 1.0** |
+| 1e-3 | 6-block | 8.3 ± 0.6 | 11.7 ± 0.6 | 18.7 ± 0.6 |
+| 1e-3 | layerwise | 9.7 ± 0.6 | 15.0 ± 0.0 | 33.0 ± 4.6 |
+
+**The ordering is the same at 85%, 88% and 90% in every α₀ row.** Layerwise leads at 1e-6 and
+1e-4 on all three thresholds; scalar/6-block lead at 1e-3 on all three. These arms have
+plateaus of 91–93%, comfortably above every threshold, so no threshold is drawn through an
+asymptote. **Granularity is a genuine acceleration; the campaign's central claim, and the §7.3
+ImageNet explanation that rests on it, are unaffected.**
+
+The distinction is now sharp and should be preserved in the draft:
+
+| comparison | nature of the effect | threshold-robust? |
+|---|---|---|
+| **granularity** (m = 1 → 6 → 62) | genuine acceleration | **yes** — same ordering at 85/88/90 |
+| **pooling** (plain → shrink, fixed m) | **plateau shift**, not acceleration | **no** — sign flips between 85 and 90 |
+
+## 6. Methodological rules this forces
+
+1. **Never quote a single threshold.** Report ep→85 / ep→88 / ep→90 together, or the metric can
+   be chosen to suit the conclusion. Every previous table in this document that quotes ep→90
+   alone should be read with §3 in hand.
+2. **Check the threshold against every arm's plateau before using it.** A threshold inside an
+   arm's asymptote measures noise, not speed. Quote the plateau (mean of the last 20 epochs)
+   next to the crossing epoch.
+3. **Prefer thresholds below every arm's plateau, or report area under the accuracy curve.**
+   At 88% — below all four layerwise plateaus — the Adam-meta contrast has *zero* seed variance
+   on both arms (27.0 ± 0.0 vs 16.0 ± 0.0), against ±5.6 at 90%. The lower threshold is a
+   dramatically better-conditioned estimator of the same effect.
+4. **The ±0.02pp determinism floor does not transfer to epochs-to-target.** On a flat curve it
+   becomes ~6 epochs (§1). Effect sizes in epochs must be judged against the *arm's own*
+   threshold jitter, not against the accuracy floor.

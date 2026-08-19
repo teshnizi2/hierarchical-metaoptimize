@@ -254,3 +254,31 @@ and compare `gres/gpu=` on the two lines. Equal means full, whatever `sinfo` say
 bought by queue *ordering* — right-sized `--time` into `gpu-short` (gotcha 12), the additive
 per-GPU-type caps (gotcha 13), and `nice` on low-value work (gotcha 14) — never by submitting
 more jobs.
+
+## 17. The ±0.02pp determinism floor does NOT transfer to epochs-to-target
+
+Two runs with **identical config and identical seed**, differing only in GPU type (and therefore
+in cuDNN autotuning), on the campaign's PRIMARY metric:
+
+| arm | best | ep→90 |
+|---|---|---|
+| layerwise **+ shrink λ=0.1** (L4 vs 2080ti) | 92.55 / 92.53 | **42 / 42** |
+| layerwise **plain** (L4 vs 2080ti) | 91.37 / 91.28 | **57 / 51** |
+
+Accuracy reproduces to 0.02–0.09pp on both, as gotcha-free replication predicts. But the plain
+arm's epochs-to-90% differs by **6 epochs** while the pooled arm's is exact.
+
+**Cause:** the plain arm's asymptote is 90.83 ± 0.13, so the 90% threshold is drawn *through its
+own plateau*; it sits inside [89,91] for **51 of 100 epochs**. The pooled arm plateaus at 92.27
+and is in that band for **4**. A sub-0.1pp wobble therefore moves the crossing epoch by several
+epochs on one arm and not at all on the other.
+
+**Rules:**
+* Before using a threshold, compute each arm's plateau (mean test accuracy over the last 20
+  epochs) and confirm the threshold is **below** it. A threshold inside an asymptote measures
+  noise, not speed.
+* Quote ep→85 / ep→88 / ep→90 together, never one alone — under Lion the pooling effect
+  *changes sign* between 85% and 90% (FINDINGS, cycle 4 second pass §3).
+* Judge an effect in epochs against the arm's own threshold jitter, not against the ±0.02pp
+  accuracy floor. At 88% (below every layerwise plateau) both Adam-meta arms have **zero** seed
+  variance; at 90% the plain arm has ±5.6.
