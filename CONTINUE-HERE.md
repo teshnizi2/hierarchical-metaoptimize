@@ -34,7 +34,7 @@ rediscovery of a guard published in 1992/2012/2024; a real ~12pp deficit survive
 * **In flight:** `zrn-*` (30 jobs, alice2/2080ti) fills the unsampled r in (0.7, 1) and locates
   the weightwise collapse threshold, currently bracketed only as sd(beta) in (0.167, 0.802).
   Self-anchoring, so it carries its own endpoints.
-* **In flight:** `zm0-*` (7 jobs, alice/L4) — identity gate for the new `zmpool` operator
+* **In flight:** `zm0-*` (7 jobs, alice/2080ti) — identity gate for the new `zmpool` operator
   (mean-normalised pooling; holds the common mode exactly fixed so r is a pure pooling axis).
   **Do not launch the `zmp` ladder until this gate passes.**
 * Then: the `zmp` ladder on L4 (same hardware as `zsw`, so the two operators are comparable);

@@ -3042,8 +3042,12 @@ meta-gradient", i.e. scalar with an m-times-smaller meta-step. The ladder theref
    weightwise collapse switches on in sd(β). **Self-anchoring** (gotcha 28): it carries its own
    r=0.7 and r=1 endpoints, so every contrast is internal to 2080ti and is never differenced
    against the L4-measured `zsw` numbers.
-3. **`zm0-*` submitted (7 jobs, alice, L4)** — the `zmpool` identity gate at 20 epochs, the regime
-   `z3` proved discriminating (gotcha 25). Claims under test: `zmpool` r=1 reproduces plain on
+3. **`zm0-*` submitted (7 jobs, alice) — the `zmpool` identity gate** at 20 epochs, the regime
+   `z3` proved discriminating (gotcha 25). Submitted to L4, then **relocated wholesale to 2080ti**
+   when a capacity read showed all 32 L4 GPUs allocated (to another user this time — alice's own
+   `zsw` had already finished) while 2080ti had free CPU+GPU on node853/858/860. All 7 cells moved
+   together and none had started, so nothing was lost and every contrast stays internal to one GPU
+   type — the condition gotcha 28 requires for relocating a self-anchoring block. Claims under test: `zmpool` r=1 reproduces plain on
    both layerwise and weightwise; and r=0 *differs* from plain, without which the gate would be
    vacuous. Refs for scalar/layerwise/weightwise are re-run inside the block. **The `zmp` ladder
    is deliberately NOT submitted until this passes** — cycle 9/10's rule that a sweep run against
