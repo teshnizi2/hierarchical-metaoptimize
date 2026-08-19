@@ -325,3 +325,42 @@ was never checked at all. This one is worse: a check *existed* — `drift_extrac
 It reported 0.0000 by construction and could never have failed. A verification that cannot fail
 is worse than no verification, because it is recorded as evidence. Replaced by `sd_beta` in
 `bin/drift_extract2.py`.
+
+---
+
+## 10. The baseline comparison was NOT fair, and three experiments now fix it
+
+Reported "MetaOptimize loses to tuned AdamW+cosine by 1.41pp." That comparison had three
+structural flaws, all favouring the baseline. None invalidate the measurement; all mean it was
+the wrong measurement to draw a verdict from.
+
+### Flaw 1 — budgets were not matched
+Meta arms were compared at 100 epochs against a baseline measured only at 100 epochs, while the
+300-epoch meta data (93.47) was compared against the *100-epoch* baseline (94.24). MetaOptimize
+optimises a **discounted sum of future losses with gamma -> 1**; it is built for the long run, so
+100 epochs is the regime least favourable to it. The cosine baseline additionally **knows the
+horizon** (`COS_TOTAL`) and anneals onto it — information MetaOptimize is deliberately denied.
+**Running:** baseline vs best meta config at 300 and 600 epochs, budget-matched cosine, n=3.
+
+### Flaw 2 — search budgets were not matched
+The baseline consumed a 4-point LR sweep; each meta arm got a single run. **MetaOptimize's
+actual claim is that it needs no tuning**, so comparing its one run against the best of four is
+rigged on precisely the axis the method exists to address. The honest comparison is *expected
+accuracy per unit of total compute*: for the baseline that is best-of-K LRs, for MetaOptimize it
+is the typical (not best) result over K seeds.
+**Running:** cosine LR sweep over 7 decades x 3 seeds, to characterise what an *untuned* choice
+actually costs.
+
+### Flaw 3 — we never ran the paper's own setup
+All our runs enable augmentation. The parent paper never mentions augmentation and its released
+code has none. Augmentation was the scientifically correct call (unaugmented ResNet-18 memorises
+CIFAR-10 in epoch 1), but it means **we have never reproduced their claim in their setting** and
+cannot answer a reviewer who asks whether it holds there. Their evidence is Fig. 1 *learning
+curves*, so the comparison must be on convergence, not the endpoint.
+**Running:** paper config (AdamW base + Adam meta, alpha0=1e-6, eta=1e-3, gamma=1), **AUGMENT=0**,
+scalar vs 6-block vs layerwise, n=3.
+
+### Standing rule
+**Never report a comparison until budget, search budget, and setup are all matched — or until
+each mismatch is stated in the same breath as the number.** Two of these three flaws were caught
+by the operator, not by us.
