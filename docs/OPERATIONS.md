@@ -547,3 +547,39 @@ Corollaries:
   early is a *false pass*, which is worse than no test — it retires the question.
 * Prefer the direct quantity where one exists. Accuracy is a proxy; `PROBE=100` gives the β
   trajectories, which is what the identity is actually about.
+
+## 26. On the additive ladder, n=2 cannot rank cells ~0.1pp apart — it has already failed twice
+
+Cycle 8 §1 read the M1-additive peak as a tie between r=0.03 (93.01 ± 0.17) and r=0.1
+(93.02 ± 0.01), both at n=2, and designed the next block around separating them. Taken to n=5:
+
+| cell | n=2 reading | n=5 reading | shift |
+|---|---|---|---|
+| r=0.03 | 93.01 ± 0.17 | 92.96 ± 0.15 | −0.05 |
+| r=0.1 | 93.02 ± **0.01** | 92.86 ± 0.19 | **−0.16** |
+
+Both fell, and the "tie" resolved to r=0.03 by 0.10pp — i.e. **the n=2 ranking was wrong, not
+merely imprecise**. Note that r=0.1's n=2 sd was 0.01pp, ~20× tighter than its true n=5 sd of
+0.19: two seeds that happen to agree produce a *confidently* wrong error bar, which reads as the
+most trustworthy cell on the ladder rather than the least.
+
+**Rules:**
+* Any ranking of additive cells whose accuracies are within ~0.3pp requires **n=5**. The ±0.02pp
+  determinism floor (FINDINGS, reproducibility) is irrelevant here — seed variance on this ladder
+  is ~0.15–0.20pp, an order of magnitude larger.
+* **Never read a tight sd at n=2 as precision.** With two samples the sd is one number's distance
+  from another; it carries no information about the population spread.
+* State a ladder's *shape* (one maximum, in this interval, of this height) at low n and its
+  *argmax* only at n=5. Cycle 9 §1 is written that way deliberately.
+
+## 27. "Cancelled" in the write-up is not evidence the jobs are gone — re-read the queue
+
+FINDINGS cycle 8 §7 records the void `z2-*` identity block as "**cancelled before it ran**". At the
+start of cycle 9 all six were still `PENDING` — and queued *ahead of `z3-*`, the block written to
+replace them*. The write-up recorded an intent, the `scancel` never landed, and nothing in the
+queue or the docs flagged the discrepancy for a full cycle.
+
+**Rule: a queue action is not done until its post-state is read back.** Every reprioritise/cancel
+script in `bin/` now ends by printing the affected jobs' state (`squeue -h -o '%i %j %T %r %y %P'`),
+so the receipt is in the same output as the action. When a write-up says a block was cancelled,
+confirm with `sacct` (gotcha 15) — it shows `CANCELLED` explicitly, which `squeue` silence does not.

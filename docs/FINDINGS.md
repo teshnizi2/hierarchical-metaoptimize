@@ -2502,3 +2502,168 @@ jobs) takes it to n=5 this cycle. Nothing in §8 should be quoted until it does.
 * Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
 * **ImageNet stays scoped out** (489/1000 classes, no devkit). The **language modality** remains
   blocked on the validation-gated optimizer port; TinyStories pretokenization is done.
+
+---
+
+# 19 Aug 2026 (cycle 9) — M1 additive is an ACCURACY method, not a speed method, and its peak moved off both cells cycle 8 was choosing between
+
+## 1. The additive ladder at n=5 — cycle 8's peak was an n=2 artefact, twice over
+
+`ad-l-*` (14 new cells this cycle) takes the two peak candidates to n=5 and adds r=0.05.
+SGDm + Lion, layerwise, α₀=1e-6, guard on, augment on, ≥95 epochs:
+
+| r | n | best test | plateau | final_train | ep→85 | ep→88 |
+|---|---|---|---|---|---|---|
+| plain (no `HIER`) | 11 | 91.23 ± 0.22 | 90.77 | 99.66 | **29.0 ± 0.9** | **36.2 ± 1.6** |
+| 0 (mean only) | 2 | 92.52 ± 0.11 | 92.23 | 97.83 | 35.5 ± 0.7 | 38.0 ± 0.0 |
+| 0.03 | **5** | 92.96 ± 0.15 | 92.64 | 98.93 | 36.4 ± 1.1 | 39.0 ± 0.7 |
+| **0.05** | 2 | **93.41 ± 0.06** | **93.11** | 99.55 | 36.0 ± 1.4 | 39.5 ± 0.7 |
+| 0.1 | **5** | 92.86 ± 0.19 | 92.63 | 99.88 | 32.6 ± 0.9 | 37.4 ± 0.9 |
+| 0.2 | 1 | 91.65 | 91.35 | 99.66 | 30.0 | 35.0 |
+| 0.3 | 2 | 91.44 ± 0.02 | 91.00 | 99.70 | 30.5 ± 0.7 | 36.0 ± 0.0 |
+
+Cycle 8 §1 read the peak as a **tie between r=0.03 (93.01 ± 0.17) and r=0.1 (93.02 ± 0.01)**, both
+at n=2, and put `ad-l-*` in flight to separate them. At n=5 **both cells fell** — to 92.96 and
+92.86 — and the tie broke in favour of r=0.03 by 0.10pp. The n=2 readings were optimistic by 0.05
+and 0.16pp respectively.
+
+The interior optimum is real and now rests on n=5 shoulders. **Its location is not settled.** The
+new r=0.05 cell is +0.45pp over r=0.03 and +0.55pp over r=0.1 against sd 0.06–0.19 — but it is
+n=2, which is exactly the evidence strength that just failed on this same ladder. `ad-l-r005`
+seeds 3–4 and `ad-l-r007` × 3 seeds are in flight (§6). **Do not quote a peak location yet; quote
+the shape** — one maximum, somewhere in r ∈ [0.03, 0.1], rising ~1.7pp over plain and falling back
+to plain by r ≈ 0.2–0.3.
+
+## 2. ⚠ The accuracy peak and the speed optimum sit at OPPOSITE ends of the ladder
+
+Threshold safety first (gotchas 17/18): every arm's plateau is ≥ 90.77, so **ep→88 is the usable
+threshold** and ep→90 is not — plain layerwise spends 50 of 100 epochs inside [89, 91] and its
+ep→90 (56.5 ± 5.1) measures noise. At 88% and at 85% the reading is the same, and it is
+uncomfortable:
+
+* **Accuracy** peaks at r ≈ 0.05 and falls away in both directions.
+* **Speed** is monotone *increasing* in spread — r=0.2/0.3 reach 88% in 35–36 epochs, r=0.05 takes
+  39.5, and the accuracy-optimal cell is the **slowest pooled arm on the ladder**.
+* And the fastest pooled cells (35.0, 36.0) are **statistically indistinguishable from plain
+  layerwise** (36.2 ± 1.6). At 85% every additive cell is strictly *slower* than plain (30.0–36.4
+  vs 29.0 ± 0.9).
+
+**So on the campaign's declared PRIMARY metric — epochs-to-target — M1 additive buys nothing at
+any r.** Its entire measured contribution is on best/final accuracy, the metric the campaign
+demoted to secondary in the unifying result. Cycle 8's paper note ("the method contribution moves
+to M1 additive") is still true about *where the contribution is*, but it must not inherit the
+"granularity buys speed" framing: **the granularity axis buys speed, the pooling axis buys
+accuracy, and they are not the same claim.** Any M1 table in the paper has to carry both columns.
+
+This is the same crossover cycle 8 §5 measured (spread helps early, hurts late) seen at fixed
+budget rather than across budgets, and it is what makes the optimum interior at all.
+
+## 3. Additive DOMINATES shrink at their respective best cells — and the comparison is budget-bounded
+
+Same cell, same α₀, same guard, 100 epochs:
+
+| operator | n | best test | final_train |
+|---|---|---|---|
+| shrink λ=0.1 | 12 | 92.58 ± 0.10 | **97.78** |
+| additive r=0.05 | 2 | **93.41 ± 0.06** | **99.55** |
+
+Additive's best beats shrink's best by **+0.83pp while also fitting 1.8pp better** — a Pareto win,
+not a trade. This sharpens cycle 8 §2 and gotcha 21: the two operators are not two settings of one
+knob. Shrink buys test accuracy by **under-fitting** (97.78 at epoch 100 and still climbing);
+additive buys it while fitting to 99.55.
+
+**Caveat, and it is the load-bearing one:** shrink's 92.58 is measured while shrink is still
+fitting, which is precisely the failure mode gotcha 19 exists to catch. The `e3a` block as first
+submitted had no shrink cell and could not settle it; two matched `e3a-lsh01` cells at 300 epochs
+were added this cycle (§6).
+
+## 4. The additive gain GENERALISES to the Adam meta-optimizer — the sign-artefact hypothesis is REFUTED
+
+Prediction on record from cycle 8 §9: *"if the peak is an artefact of Lion's sign nonlinearity it
+vanishes under Adam."* SGDm base + **Adam** meta, layerwise, α₀=1e-6, guarded:
+
+| arm | n | best test | Δ vs plain | ep→85 | ep→88 |
+|---|---|---|---|---|---|
+| plain | 9 | 90.76 ± 0.14 | — | 15.0 ± 0.5 | 26.7 ± 1.7 |
+| additive r=0.03 | 1 | 91.58 | **+0.82** | 17 | 25 |
+| additive r=0.1 | 1 | 91.41 | **+0.65** | 15 | 26 |
+
+It does not vanish. **The effect is not a sign artefact.** Two riders:
+
+1. It is roughly **half** the Lion-meta effect (+1.73 / +1.63pp on the same cells), so the sign
+   nonlinearity approximately doubles the gain without creating it.
+2. The r=0.03 > r=0.1 ordering is preserved.
+3. **§2 replicates here independently.** Under Adam meta the additive arms are null on ep→88
+   (25, 26 vs 26.7 ± 1.7) and null-or-worse on ep→85 (17, 15 vs 15.0 ± 0.5), while gaining
+   0.65–0.82pp on accuracy. Accuracy-only, on a second meta-optimizer.
+
+n=1 per cell (seed-1 runs are at 18–21 epochs). Direction only; no number here to better than
+~0.2pp.
+
+## 5. `adg-b` (6-block) is still INCOMPLETE — nothing may be read from it yet
+
+`adg-b-r003_s0` (72 ep, 91.56) and `adg-b-r01_s0` (71 ep, 91.36) are mid-flight against a plain
+6-block baseline of 91.69 ± 0.13 (n=5). `best_test` on an unfinished run is a lower bound, and
+plain 6-block is already ~91.4–91.6 by epoch 71, so these tell us nothing about the sign of the
+effect. Shrink *did* generalise to 6-block (+0.47pp, cycle 8); whether additive does is open.
+
+## 6. Queue actions this cycle
+
+The hardware census was re-run first and it is unambiguous: **every GPU node in `gpu-short` has
+`AllocTRES gres/gpu == CfgTRES gres/gpu`** — L4, 2080ti, A100 and MIG alike — and every one of our
+51 pending jobs read `Priority`, not `QOSMaxGRESPerUser`. There was nothing to route around
+(gotcha 23), so this cycle's throughput work was **ordering and hygiene only**, plus new cells that
+queue behind the gate.
+
+* **Submitted `e3a-*` (10 jobs, alice, `bin/e3a_budget.sh` + `bin/e3a_shrink.sh`)** — the additive
+  **budget control**, the top standing item from cycle 8. `{plain, r=0, r=0.05, r=0.1, shrink λ=0.1}`
+  × 2 seeds at **300 epochs, α₀=1e-6**. α₀ is deliberately 1e-6 and *not* ext300's 1e-3: this block
+  must be a *continuation* of the `ad-l-*` ladder, and gotcha 19's no-scheduler argument only makes
+  epochs 1–100 identical if nothing else changes. Seed 0 sweeps at nice=0, shrink at 1000, seed 1
+  backfills at 2000, so the ladder completes before it widens. `--time=03:00:00` from a measured
+  0.31 min/epoch × 4 runs (91–94 min for 300 epochs), ~1.9× headroom and inside the `gpu-short` 4 h
+  cap.
+  *Prediction on record:* if the peak is a fit-rate artefact it moves toward r=0 by 300 epochs; if
+  it is an optimum of the operator it stays near 0.05.
+* **Submitted `ad-l-r005` s3–s4 + `ad-l-r007` × 3 (5 jobs, alice2, `bin/ad7_peak.sh`)** — §1's peak
+  cell to n=5, plus r=0.07 to test whether the maximum is a smooth cap or a spike between 0.05
+  and 0.1.
+* **Widened the `zb-*` identity gate to `gpu-l4-24g,gpu-short`** (5 jobs, 50 min each). It is the
+  oldest nice=0 block on alice, so it now takes the first L4 slot that frees.
+* **`nice=5000` on `a0h-*` (15 jobs, alice) and `a0A-*` pending (6 jobs, alice2)** — the α₀ ladders.
+  Priority item 2 closed in cycle 8 §3 (every arm flat to ≤0.38pp across α₀ at 100 epochs) and
+  gotcha 24 says the headline grid does not need re-running at larger α₀, so extra seeds on a
+  closed question must not sit in front of the gate. `nice`, not `scancel` (gotcha 14).
+* **`nice=500` on `adg-*` pending** (3 jobs) — third seeds behind a gate.
+* **`scancel` on `z2-*` (6 jobs, alice2).** Cycle 8 §7 recorded this block as "cancelled before it
+  ran". **It was not** — all 6 were still queued, and queued *ahead of `z3-*`, their own
+  replacement*. It is the void 4-epoch identity design (gotcha 25) and can only reproduce a
+  measurement already known to carry zero information. This is the one block this cycle worth
+  cancelling rather than nicing.
+* **Dual-partitioned `z3-*` into `gpu-2080ti-11g,gpu-short`** (7 jobs, 35–60 min, inside the 4 h cap).
+
+## 7. What this cycle changes about the paper
+
+* **The M1 result must be stated on accuracy, with the speed column shown and null.** Writing M1
+  into the "granularity buys speed" frame would be a genuine misreport: §2 measures it null on the
+  primary metric at every r, on two meta-optimizers independently.
+* **Additive vs shrink becomes a real methods contribution** (§3) rather than two points on one
+  dial — but only if `e3a-lsh01` shows shrink's advantage was not simply budget-starved.
+* **The sign-nonlinearity objection to M1 is answered** (§4), which was the strongest cheap
+  refutation available to a reviewer.
+* Cycle 8's "the method contribution moves to M1 additive" survives, with its metric corrected.
+
+## 8. Standing caveats after this cycle
+
+* **§1's peak location is n=2, and n=2 on this exact ladder has already been shown to move by up
+  to 0.16pp and to reverse a ranking.** Five cells are in flight to fix it.
+* §3's Pareto claim is n=2 vs n=12 and **budget-bounded on the shrink side** by gotcha 19.
+* §4 is **n=1 per cell**.
+* §5 is unreadable until `adg-b` finishes.
+* **No m=n pooling result is claimed.** The `zb-*` β-spread gate has not run (§6); the λ→effective-
+  pooling table stays flagged as confounded.
+* §2's threshold reading uses **ep→88 and ep→85 only**. ep→90 is noise on plain layerwise
+  (band 50/100) and must not be quoted for that arm at any seed count.
+* Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
+* **ImageNet stays scoped out.** The **language modality** remains blocked on the validation-gated
+  optimizer port; TinyStories pretokenization is done.
