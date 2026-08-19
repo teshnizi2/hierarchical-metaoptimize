@@ -114,7 +114,8 @@ DATA_CACHE_DIR = os.environ.get("TINYSTORIES_DATA", "/data1/salehkaleybars/metao
 Staged on `alice` (login nodes have internet; compute nodes do not — see gotcha 5):
 `data/tinystories/TinyStories_all_data/` — **50 shards, 6.97 GB**, receipt in `STAGED.txt`.
 
-**THREE things remain before TinyStories can run** (was two; the third was found 19 Aug 2026):
+**THREE things remained before TinyStories could run** (was two; the third was found 19 Aug 2026).
+**Two are now cleared; the optimizer port is the only one left.**
 1. **Pretokenization has not been done** and must be a Slurm CPU job, not a login-node job.
 2. **`tinystories/HF.py` is a SEPARATE COPY** of the optimizer and carries **neither the
    `BETA_CLIP` guard nor the `HIER` hierarchy patch** — both live only in `cifar10/Optimizers/HF.py`.
@@ -125,9 +126,10 @@ Staged on `alice` (login nodes have internet; compute nodes do not — see gotch
    both import it and it was never installed. Fixed 19 Aug 2026 with
    `pip install --no-deps sentencepiece` (0.2.2) into `envs/mo`; `--no-deps` so that nothing the
    ~85 in-flight CIFAR jobs depend on could be upgraded underneath them. Pretokenization is now
-   running as a `cpu-short` Slurm job (`bin/ts_pretok.sh`, vocab_size=0 → the shipped Llama-2
-   tokenizer, `.bin` written beside each `.json`, which is what `train.py`'s
-   `vocab_source="llama2"` path globs for).
+   **DONE** (job 4680828, `bin/ts_pretok.sh`, cpu-short, 16 cores, ~6 min): vocab_size=0 → the
+   shipped Llama-2 tokenizer, `.bin` written beside each `.json`, which is what `train.py`'s
+   `vocab_source="llama2"` path globs for. **Receipt: 50/50 `.bin` shards, tree now 8.5 GB,
+   `PRETOK_DONE`, no traceback.** Blocker 1 is cleared.
 
 ### Correction to blocker 2 — the port is bigger than "add the guard and the hierarchy"
 
