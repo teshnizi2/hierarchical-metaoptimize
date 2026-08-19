@@ -1323,3 +1323,277 @@ The distinction is now sharp and should be preserved in the draft:
 4. **The ±0.02pp determinism floor does not transfer to epochs-to-target.** On a flat curve it
    becomes ~6 epochs (§1). Effect sizes in epochs must be judged against the *arm's own*
    threshold jitter, not against the accuracy floor.
+
+---
+
+# 19 Aug 2026 (cycle 5) — the decisive SGDm α₀ ladder lands, and the train curves expose a budget confound in BOTH headline claims
+
+216 runs aggregated (up from 182): 34 new, 7 in-flight completed. The experiment cycle 3
+identified as decisive — the α₀ ladder under **SGDm + Lion**, the configuration where
+granularity actually buys accuracy and where the project's proposal lives — is **complete at
+seed 0 on all twelve cells**. It answers the fairness objection in the campaign's favour.
+
+Then a routine check of the *train* accuracy column shows that both of the campaign's headline
+claims are measured at a budget where the losing arm has not finished fitting the training set,
+which is the same confound the campaign's own unifying result is built on. That is not fatal to
+either claim, but neither can be written up until it is controlled, and the control is now
+running.
+
+## 1. The SGDm + Lion α₀ ladder — COMPLETE at seed 0, and granularity survives per-arm tuning
+
+`a0L-*`, all twelve cells at 100 epochs, guard on, augmented, L4, **n=1 (seed 0)**. Seed 1 is
+in flight on all twelve. Per the cycle-4 threshold rule, ep→85/88/90 are quoted together and
+each arm's plateau (mean test accuracy over the last 20 epochs) beside them:
+
+| α₀ | arm | ep→85 | ep→88 | ep→90 | plateau | final train |
+|---|---|---|---|---|---|---|
+| 1e-6 | scalar | 39 | **never** | **never** | 87.73 | 93.74 |
+| 1e-6 | 6-block | 29 | 38 | 41 | 91.43 | 99.09 |
+| 1e-6 | layerwise plain | 28 | 38 | 52 | 90.84 | 99.69 |
+| 1e-6 | layerwise + shrink λ=0.1 | 35 | 38 | 41 | **92.46** | 97.76 |
+| 1e-4 | scalar | 27 | **never** | **never** | 87.73 | 93.77 |
+| 1e-4 | 6-block | 20 | 27 | 33 | 91.55 | 99.22 |
+| 1e-4 | layerwise plain | 19 | 26 | 45 | 90.89 | 99.78 |
+| 1e-4 | layerwise + shrink λ=0.1 | 24 | 26 | 31 | **92.28** | 97.99 |
+| 1e-3 | scalar | 24 | 66 | **never** | 87.89 | 94.03 |
+| 1e-3 | 6-block | 15 | 21 | 29 | 91.64 | 99.30 |
+| 1e-3 | layerwise plain | **13** | 23 | 38 | 91.23 | 99.88 |
+| 1e-3 | layerwise + shrink λ=0.1 | 18 | 20 | **24** | **92.44** | 98.18 |
+
+**The scalar arm does not reach 90% at any α₀ across three decades.** Its plateau is
+87.73 / 87.73 / 87.89 — flat to 0.16pp while α₀ moves by a factor of 1000. Independently
+replicated: `g4-sgdmLion-scal` (a separate submission, α₀=1e-6, n=2) gives plateaus 87.66 and
+87.76 and never reaches 90% either, so the α₀=1e-6 scalar cell is effectively n=3.
+
+**So the AdamW result does not transfer, and the fairness objection is answered.** Under
+AdamW + Adam, giving each arm its own best α₀ erased the granularity advantage entirely and
+left scalar best on accuracy (cycle 3 §1b). Under SGDm + Lion, giving the scalar arm its own
+best α₀ moves its *speed* a lot (ep→85 39 → 27 → 24) and its *asymptote* not at all. The
+granularity gap under SGDm is a plateau gap of 3.3–3.9pp, and α₀ does not touch it.
+
+**The controlling variable is the base optimizer, not α₀** — which is the H4 story the campaign
+has told since Gate 1, now measured on both sides of the contrast.
+
+### The threshold-safe comparison
+
+ep→90 is undefined for the SGDm scalar arm at every α₀, so it cannot be the metric here. At
+**85%** — below all four plateaus — with every arm at its own best α₀ (which is 1e-3 for all
+four, see §3):
+
+| arm | ep→85 @ its best α₀ | plateau |
+|---|---|---|
+| layerwise plain | **13** | 91.23 |
+| 6-block | 15 | 91.64 |
+| layerwise + shrink λ=0.1 | 18 | 92.44 |
+| scalar | 24 | 87.89 |
+
+Granularity is a genuine acceleration under SGDm as well: layerwise reaches 85% in 13 epochs
+against scalar's 24, **46% fewer**, at each arm's own best α₀. And pooling is *slower* than
+plain (18 vs 13) while plateauing 1.21pp higher — the same speed/plateau split cycle 4's second
+pass established at α₀=1e-6, now reproduced at α₀=1e-3.
+
+## 2. ⚠ BOTH headline claims are measured while the losing arm is still fitting
+
+The train column above is the new fact. Reading the last-20-epoch slope of *train* accuracy at
+epoch 100:
+
+| arm | train @ ep 100 | Δtrain per 10 ep | epoch train first ≥ 99% |
+|---|---|---|---|
+| SGDm+Lion scalar (α₀ 1e-6 / 1e-4 / 1e-3) | 93.74 / 93.77 / 94.03 | **+0.46 / +0.31 / +0.40** | **never reaches 97%** |
+| layerwise plain (Lion, n=3) | 99.69 ± 0.06 | +0.16 | **ep 70** |
+| layerwise + shrink λ=0.1 (Lion, n=4) | 97.81 ± 0.06 | **+0.34** | **never reaches 99%** |
+| layerwise plain (Adam, n=3) | 99.75 ± 0.03 | +0.08 | ep 58 |
+| layerwise + shrink λ=0.1 (Adam, n=3) | 97.98 ± 0.08 | **+0.22** | **never reaches 99%** |
+
+Two claims are affected, in the same way, and it is the campaign's own unifying logic turned on
+the campaign:
+
+**(a) "Granularity beats scalar under SGDm" may be a RATE claim, not a CEILING claim.** The
+scalar arm has never fit the training set — 94% train at epoch 100, still climbing at ~0.4pp
+per 10 epochs, at every α₀. Its 87.7% test plateau is flat, but a *train* curve that is still
+rising means the run was stopped mid-optimisation. Whether scalar converges to the granular
+arms given more epochs is untested.
+
+**(b) Pooling's +1.4pp may be a REGULARISATION gain or merely a slower fit.** The shrink arm's
+*test* accuracy has converged (Δtest per 10 ep = −0.10 to +0.17, i.e. noise) while its *train*
+accuracy is still climbing and never reaches 99%; the plain arm has finished fitting (99.7%,
+99% crossed by epoch 58–70). The observed trade at a 100-epoch budget is a clean −1.9pp train
+for +1.4pp test, and it reproduces almost exactly across two very different meta-optimizers
+(Lion −1.88/+1.44, Adam −1.77/+1.52), which is what one mechanism looks like. But
+"constrains the fit and generalises better" and "fits more slowly and generalises better *along
+the way*" are not distinguishable while the train curve is still moving.
+
+**Neither (a) nor (b) may go in a draft as an asymptotic statement until the budget control
+reports.** The campaign has spent four cycles explaining the parent paper's ImageNet null as a
+budget artifact; it would be indefensible to leave the same artifact unexamined in its own
+headline.
+
+### The control this forced — `ext300`, submitted this cycle
+
+{scalar, layerwise plain, layerwise + shrink λ=0.1} × 2 seeds at **300 epochs**, SGDm + Lion,
+guard on, augmented, **α₀=1e-3** (the best value for every SGDm+Lion arm, so the scalar arm is
+given its best shot rather than the campaign's handicapping 1e-6). Six cells, L4, `bin/ext300.sh`.
+
+**The extension is exactly comparable to the existing runs**, and this was verified rather than
+assumed: `train.py` has **no learning-rate scheduler** — the only epoch-dependent terms in the
+whole training loop are the loop bound and the time-based break, and the latter is neutralised
+by `--max-time 999:00:00`. So epochs 1–100 of an `ext300` run are the identical computation to
+the corresponding `a0L` α₀=1e-3 cell, and the 300-epoch runs read as continuations of them.
+
+Predictions on record, so the result cannot be rationalised after the fact:
+* If scalar converges toward the granular arms by epoch 300, the SGDm granularity gain is a
+  **speed** effect and the campaign's unifying result covers *every* configuration it has
+  measured, strengthening the §7.3 ImageNet explanation.
+* If scalar stalls near 88%, granularity buys something **asymptotic** under SGDm that it does
+  not buy under AdamW, and the unifying result needs a second clause.
+* If the shrink arm's train reaches ~99.9% while it keeps its test advantage, pooling is a
+  genuine generalisation gain.
+* If its test advantage decays as it finishes fitting, the +1.4pp is a snapshot of a slower
+  trajectory and the project's proposal has to be restated a third time.
+
+## 3. The cycle-3 rule "optimal α₀ falls as the partition gets finer" is AdamW-ONLY — refuted under SGDm at 12/12 cells
+
+Cycle 3 confirmed at n=3, on AdamW + Adam, that layerwise is U-shaped in α₀ and uniquely hurt
+at 1e-3. Cycle 4 flagged that this might not generalise. It does not:
+
+| arm | ep→85 across α₀ (1e-6 → 1e-4 → 1e-3) | shape under SGDm+Lion | shape under AdamW+Adam |
+|---|---|---|---|
+| scalar | 39 → 27 → 24 | monotone improving | monotone improving |
+| 6-block | 29 → 20 → 15 | monotone improving | monotone improving |
+| layerwise plain | 28 → 19 → 13 | **monotone improving** | **U-shaped (best 1e-4)** |
+| layerwise + shrink | 35 → 24 → 18 | monotone improving | *(not measured)* |
+
+Under SGDm + Lion **every arm, at every threshold, improves monotonically up to α₀=1e-3**, and
+the plateaus move the same way or not at all (layerwise plain 90.84 → 90.89 → 91.23). The
+U-shape that made "finer partitions want lower α₀" look mechanistic is a property of
+AdamW + Adam, not of granularity.
+
+**Restated correctly:** under AdamW + Adam the optimal α₀ falls as the partition gets finer;
+under SGDm + Lion it does not, and 1e-3 is best for all four arms. The protocol consequence
+from cycle 3 survives untouched and is if anything stronger — a single shared α₀ is not a
+neutral choice, and *which* arm it flatters depends on the base optimizer.
+
+## 4. The headline Lion pooling contrast reaches n=4
+
+`hs-l-lam01` seeds 2 and 3 completed (92.50, 92.65); seed 4 is at 72 epochs.
+
+| SGDm + Lion, layerwise, α₀=1e-6, guard | n | ep→85 | ep→88 | ep→90 | plateau | final train |
+|---|---|---|---|---|---|---|
+| plain (`h2-base`) | 3 | 28.7 ± 0.6 | 35.7 ± 0.6 | 58.3 ± 2.3 | 90.83 ± 0.13 | 99.69 ± 0.06 |
+| **+ shrink λ=0.1** | **4** | 35.8 ± 0.5 | 38.2 ± 1.0 | **41.2 ± 0.5** | **92.27 ± 0.07** | 97.81 ± 0.06 |
+
+The fourth seed does not move anything: plateau gain **+1.44pp** at ~13σ, and pooling is
+**7.1 epochs slower to 85%** (24%, t ≈ −18). Cycle 4's correction — pooling is a plateau effect,
+not an acceleration — holds at n=4 and the sign flip between 85% and 90% is now very tight.
+
+## 5. Pooling at m=6 is NOT the same phenomenon as at m=62
+
+Separating the train and test columns splits the 6-block result away from the layerwise one:
+
+| contrast | Δtrain (shrink − plain) | Δplateau | reading |
+|---|---|---|---|
+| layerwise m=62, Lion (n=3→4) | **−1.88** | **+1.44** | trades fit for test accuracy |
+| layerwise m=62, Adam (n=3→3) | **−1.77** | **+1.52** | same trade, same size |
+| 6-block m=6 (n=2→6) | **+0.32** | +0.34 | **no trade — both rise slightly** |
+| weightwise m=11.17M (ladder) | train **falls with pooling**: 82.0 → 81.3 → 70.9 → 66.6 → 50.1 → ~47 | falls in lockstep, gap stays 2–4pp | **optimisation failure** |
+
+Three distinct regimes, and only the middle one is the effect the project is claiming:
+* At **m=62** pooling gives up training fit and gains test accuracy, identically under two
+  meta-optimizers. Whether that is a constraint or a delay is what `ext300` decides (§2b).
+* At **m=6** there is no trade at all — train and test both edge up by ~0.3pp. Whatever the
+  small 6-block gain is, it is not the m=62 mechanism, and the two should not be described
+  together.
+* At **m=11.17M** train and test collapse *together* down the entire pooling ladder with the
+  generalisation gap shrinking, which is neither overfitting nor regularisation — the model
+  simply never fits the data. This is the cleanest statement yet of why the cycle-4 negative is
+  a negative: pooling does not fail to help per-weight step sizes, it destroys their ability to
+  optimise at all.
+
+## 6. Under AdamW every arm fully fits, which is why granularity has nothing to add
+
+The same train column on the completed AdamW + Adam ladder (n=3, all 27 runs at 100 epochs):
+**every arm at every α₀ ends at 99.6–99.9% train.** Scalar, 6-block and layerwise all fit the
+training set completely, so the only thing left to differ on is generalisation and speed — and
+they barely differ. Under SGDm the scalar arm ends at 94%.
+
+That is H4 stated as a measurement rather than an argument: **AdamW's per-coordinate
+normalisation already lets the scalar arm fit the training set, so a learned per-block step size
+has nothing left to contribute; SGDm's scalar arm cannot fit it within the budget, and
+granularity supplies what is missing.** The one exception is instructive — AdamW + Adam,
+layerwise, α₀=1e-3 reaches 99.88% train and plateaus at 90.83, the worst generalisation gap in
+the whole sweep (9.05pp), which is the U-shape of §3 showing up as overfitting.
+
+## 7. Threshold safety is now mechanical, not a rule to remember
+
+`analysis/aggregate.py` now emits two columns on every run:
+* **`plateau`** — mean test accuracy over the last 20 epochs (blank for runs under 20 epochs);
+* **`ep_in_band_90`** — how many epochs the curve spends inside [89, 91].
+
+Cycle 4 made "check the threshold against every arm's plateau before quoting it" a
+methodological rule; it is now a column, so the check cannot be skipped by forgetting. It pays
+immediately — in the a0L block, plain layerwise sits in the 90% band for **46–58 of 100 epochs**
+at every α₀ while the shrink arm sits there for **4–9**, and the scalar arm's count is **0**
+because its plateau is 87.7. A metric with that property is not measuring speed on the plain and
+scalar arms.
+
+## 8. Queue actions — a wrong cap model was found and corrected, and it was costing throughput
+
+**Gotcha 13 was wrong, in a way that had silently halved both accounts' effective allowance.**
+It recorded the concurrency caps as attached to **GPU types** ("2× A100 / 8× L4 / 12× 2080ti,
+additive"). Reading the QOS table directly (`sacctmgr show qos`) they are attached to
+**partitions**:
+
+| QOS | partition | cap |
+|---|---|---|
+| `qos-short-gpu` | `gpu-short` | **gres/gpu=12, across all GPU types in it** |
+| `qos-gpu-l4` | `gpu-l4-24g` | gres/gpu=8 |
+| `qos-gpu-2080ti` | `gpu-2080ti-11g` | gres/gpu=12 |
+| `qos-gpu-a100` | `gpu-a100-80g` | gres/gpu=2 |
+| `qos-gpu-mig` | `gpu-mig-40g` | gres/gpu=8 |
+
+The numbers in gotcha 13 are real, but they are the *dedicated-partition* caps. `gpu-short` has
+its own separate 12-GPU cap that is **shared across L4 and 2080ti alike** — so cycle 4's action
+of widening every job to `--partition=<dedicated>,gpu-short` moved almost all of the campaign's
+work into one 12-GPU pool, collapsing what was believed to be two additive allowances into one.
+
+`alice2` was the demonstration: **12 running jobs (7 L4 + 5 2080ti), all in `gpu-short`, and all
+17 pending jobs hard-blocked with `QOSMaxGRESPerUser`** — while its `gpu-2080ti-11g` allowance
+(12) and `gpu-l4-24g` allowance (8) sat *entirely unused*.
+
+Verified by experiment rather than inference: restricting one pending job to
+`Partition=gpu-2080ti-11g` flipped its reason from **`QOSMaxGRESPerUser` → `Priority`** — from
+"cannot start whatever frees" to "eligible, waiting for a node".
+
+Actions taken:
+* **`alice2`: 11 more pending `a0A` cells moved to `gpu-2080ti-11g` only** (12 total). Five were
+  deliberately left dual-partition so `gpu-short` slots still backfill as they drain. Pending
+  jobs blocked by QOS went **17 → 0**.
+* **`alice`: all 15 pending `a0h` cells moved to `gpu-2080ti-11g` only.** `a0h` is demoted to
+  cross-GPU-type replication (cycle 4 §7), so it should not be competing with the decisive `a0L`
+  and `ext300` L4 work for the single `qos-short-gpu` pool. Running jobs on `alice` went
+  **6 → 10** over the cycle.
+* GRES stayed pinned to its original type in every case, so within-block timing comparability is
+  untouched (gotcha 3). Only partition *eligibility* changed — no cancels, no resubmits, job IDs
+  and names preserved.
+
+**The cluster itself is still fully saturated** — every L4, 2080ti, A100 *and* MIG node reports
+`AllocTRES gres/gpu` equal to `CfgTRES gres/gpu`. Cycle 3 recorded MIG as having "one free slice";
+it now has none. Throughput continues to come from queue *eligibility and ordering*, never from
+submitting more.
+
+## 9. Standing caveats after this cycle
+
+* Every number remains **CIFAR-10 / ResNet-18**. The three `sm_ResNet{34,50,101}` scale smokes
+  ran but are 2-epoch probes at chance accuracy — they establish that the deeper models *execute*,
+  nothing more. The scale ladder proper has not run.
+* §1 is **n=1** (seed 0) on all twelve a0L cells; seed 1 is in flight on all twelve. The α₀=1e-6
+  scalar cell is effectively n=3 via the independent `g4-sgdmLion-scal` replication, but the rest
+  are single-seed and must not be quoted as settled.
+* §2 is the binding caveat on the whole campaign: **the two headline claims are not yet
+  established as asymptotic**, and `ext300` (6 cells, queued) decides both.
+* **ImageNet stays scoped out** — 489/1000 classes and no devkit, so the 50,000 flat `val` JPEGs
+  cannot be labelled from anything on disk.
+* The **language modality** is still blocked on the validation-gated optimizer port;
+  pretokenization is done (50/50 shards, 8.5 GB).
+* `a0A` (20 cells — the α₀ control for the campaign's largest effect) is now unblocked but has
+  three complete cells and no complete seed.

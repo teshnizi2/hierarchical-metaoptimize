@@ -182,9 +182,62 @@ headroom over the slowest run ever recorded) and setting
 `scontrol update jobid=<id> TimeLimit=... Partition=...` does all of this on already-pending
 jobs — no cancel, no resubmit, job IDs and names preserved.
 
-## 13. The concurrency cap is per GPU *type*, so the two caps are additive
+## 13. The concurrency cap is per *partition*, NOT per GPU type — and `gpu-short` has its own
 
-Caps are 2× A100 / 8× L4 / 12× 2080ti **per user**. An account whose jobs are all
+> **CORRECTED 19 Aug 2026 (cycle 5). The original version of this gotcha said the caps attach to
+> GPU types and are additive. They attach to PARTITIONS. Acting on the wrong model silently
+> halved both accounts' effective allowance for a full cycle.** The corrected rule is below; the
+> original text is kept after it because the *numbers* were right and only their owner was wrong.
+
+Read the caps directly rather than inferring them from behaviour:
+
+```
+sacctmgr -n show qos format=Name%20,MaxTRESPU%40
+```
+
+| QOS | partition | cap |
+|---|---|---|
+| `qos-short-gpu` | `gpu-short` | **gres/gpu=12, shared across every GPU type in it** |
+| `qos-gpu-l4` | `gpu-l4-24g` | gres/gpu=8 |
+| `qos-gpu-2080ti` | `gpu-2080ti-11g` | gres/gpu=12 |
+| `qos-gpu-a100` | `gpu-a100-80g` | gres/gpu=2 |
+| `qos-gpu-mig` | `gpu-mig-40g` | gres/gpu=8 |
+
+**The trap.** Gotcha 12 says to submit multi-partition (`--partition=<dedicated>,gpu-short`) so
+Slurm takes whichever frees first. Do that to *everything* and Slurm places nearly all of it in
+`gpu-short`, where a single 12-GPU cap now governs your L4 and 2080ti jobs **together**. The two
+allowances you thought you were adding (8 + 12 = 20) collapse into one 12.
+
+`alice2` on 19 Aug 2026: **12 running (7 L4 + 5 2080ti), all in `gpu-short`, all 17 pending jobs
+`QOSMaxGRESPerUser`** — while its `gpu-2080ti-11g` (12) and `gpu-l4-24g` (8) allowances were
+*completely* unused. It was not out of allowance; it was queued entirely inside the wrong one.
+
+**The fix, and how to confirm it worked.** Move a self-contained block to the dedicated partition
+*only*, then read the pending reason — that is the diagnostic, not the job count:
+
+```
+scontrol update jobid=$jid Partition=gpu-2080ti-11g
+squeue -h -j $jid -o '%i %j %T %r %P'
+```
+
+`QOSMaxGRESPerUser` → `Priority` means the job went from *cannot start whatever frees* to
+*eligible, waiting for a node*. That flip is the whole point.
+
+**Keep some jobs dual-partition.** If you move every pending job off `gpu-short`, nothing
+backfills the `gpu-short` slots your own running jobs release. Split the block — dedicated-only
+up to the dedicated cap, the remainder left dual.
+
+**`QOSMaxGRESPerUser` vs `Priority` is the reading that matters.** The first is a cap you can
+often route around in one `scontrol` call; the second means the cluster is genuinely full and
+nothing but waiting helps. Do not treat them as the same "pending".
+
+GRES must stay pinned to its original type throughout (gotcha 3) — only partition *eligibility*
+changes, so within-block timing comparability is untouched, and no cancel or resubmit is needed.
+
+### Original text (numbers correct, attribution wrong)
+
+Caps are 2× A100 / 8× L4 / 12× 2080ti **per user** — these are the *dedicated-partition*
+caps. An account whose jobs are all
 `gpu-l4-24g` saturates at 8 and stops, with the 2080ti allowance completely unused —
 which is exactly where `alice2` sat (26 jobs, all L4, 8 running, 18 pending).
 
@@ -282,3 +335,49 @@ epochs on one arm and not at all on the other.
 * Judge an effect in epochs against the arm's own threshold jitter, not against the ±0.02pp
   accuracy floor. At 88% (below every layerwise plateau) both Adam-meta arms have **zero** seed
   variance; at 90% the plain arm has ±5.6.
+
+
+## 18. The plateau and band columns are emitted, so the threshold check cannot be skipped
+
+Gotcha 17 made "check the threshold against every arm's plateau before quoting it" a rule to
+remember. `analysis/aggregate.py` now emits it as data on every run:
+
+* **`plateau`** — mean test accuracy over the last 20 epochs (blank under 20 epochs);
+* **`ep_in_band_90`** — epochs spent inside [89, 91].
+
+**Read them before quoting any epochs-to-target number.** A large `ep_in_band_90` means the
+threshold is drawn through that arm's own asymptote and its crossing epoch is noise; a `plateau`
+below the threshold means the metric is undefined for that arm and no amount of seeds will fix
+it.
+
+Worked example from the `a0L` block: plain layerwise has `ep_in_band_90` of 46–58 out of 100 at
+every α₀, the shrink arm has 4–9, and the SGDm scalar arm has **0** with a plateau of 87.7 — so
+ep→90 measures noise on the first arm and does not exist on the third. The comparison has to
+move to 85%, which sits below all four plateaus.
+
+## 19. Check the TRAIN accuracy column before calling any result asymptotic
+
+The campaign spent four cycles explaining the parent paper's ImageNet null as a budget artifact
+and then very nearly published two headline claims carrying the same artifact.
+
+At epoch 100, on runs whose *test* curve is flat and looks converged:
+
+| arm | train @ 100 | Δtrain / 10 ep | train ≥ 99% |
+|---|---|---|---|
+| SGDm+Lion scalar | 93.7–94.0 | **+0.3 to +0.46** | never reaches 97% |
+| layerwise + shrink λ=0.1 | 97.8–98.2 | **+0.22 to +0.37** | **never** |
+| layerwise plain | 99.7 | +0.16 | epoch 58–70 |
+
+A flat *test* curve does not mean the run converged — it means the test curve converged. If the
+*train* curve is still climbing, the run was stopped mid-optimisation and any statement of the
+form "arm A plateaus below arm B" is a statement about the budget, not the method.
+
+**Rule: before writing "plateau", "asymptote", "ceiling" or "converged", check `final_train` and
+its last-20-epoch slope. If train is still rising, the honest claim is bounded by the budget, and
+the fix is a longer run — not more seeds.**
+
+Cheap here, because `train.py` has **no learning-rate scheduler**: the only epoch-dependent terms
+in the training loop are the loop bound and the time-based break (neutralised by
+`--max-time 999:00:00`). So a 300-epoch run's first 100 epochs are bitwise the same computation
+as the 100-epoch run, and the extension reads as a continuation rather than a new experiment.
+Verify this before extending any *other* task — it is a property of this code, not a general one.

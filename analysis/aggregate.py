@@ -10,7 +10,7 @@ FIELDS = ["run", "job_id", "account", "granularity", "base", "meta", "meta_steps
           "alpha0", "gamma", "augment", "beta_clip", "hier", "lam", "eta_ratio",
           "seed", "epochs_done", "epochs_requested",
           "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance",
-          "ep_to_85", "ep_to_88", "ep_to_90"]
+          "ep_to_85", "ep_to_88", "ep_to_90", "plateau", "ep_in_band_90"]
 
 
 def parse_args_line(line):
@@ -66,6 +66,25 @@ def ep_to(tests, target):
     return ""
 
 
+def plateau_of(tests, k=20):
+    """Mean test accuracy over the last k epochs -- the arm's asymptote.
+
+    A threshold drawn through an arm's own plateau measures noise, not speed
+    (OPERATIONS gotcha 17), so every epochs-to-target figure must be read
+    against this. Undefined for runs shorter than k epochs.
+    """
+    return round(sum(tests[-k:]) / len(tests[-k:]), 3) if len(tests) >= k else ""
+
+
+def in_band(tests, target, half=1.0):
+    """How many epochs the curve spends inside +-half of target.
+
+    Large means the threshold sits on the asymptote and the crossing epoch is
+    a coin-flip; small means the curve crosses decisively.
+    """
+    return sum(1 for v in tests if target - half <= v <= target + half)
+
+
 def parse_out(path):
     txt = open(path, errors="replace").read()
     m = re.search(r"^ARGS: (.+)$", txt, re.M)
@@ -104,6 +123,9 @@ def parse_out(path):
         # PRIMARY metric: epochs to reach a target test accuracy (first crossing).
         "ep_to_85": ep_to(tests, 85.0), "ep_to_88": ep_to(tests, 88.0),
         "ep_to_90": ep_to(tests, 90.0),
+        # Threshold-safety companions (see OPERATIONS gotcha 17): a crossing epoch
+        # is only a speed measurement if 90 is comfortably below the plateau.
+        "plateau": plateau_of(tests), "ep_in_band_90": in_band(tests, 90.0),
     }
 
 

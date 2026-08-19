@@ -65,18 +65,29 @@
 ### base=SGDm  meta=Lion  alpha0=1e-3  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
-| scalar | plain | 1 | 24.0 | 65.0 | never | 88.28 | 87.98 |
-| layerwise | plain | 1 | 14.0 | 23.0 | 40.0 | 91.76 | 91.76 |
-| layerwise | shrink(lam=0.1) | 1 | 18.0 | 20.0 | 24.0 | 92.50 | 92.28 |
+| scalar | plain | 2 | 24.0 | 65.5 | never | 88.25±0.05 | 88.00±0.03 |
+| resnet18_blocks | plain | 1 | 15.0 | 21.0 | 29.0 | 91.85 | 91.72 |
+| layerwise | plain | 2 | 13.5 | 23.0 | 39.0 | 91.68±0.11 | 91.46±0.42 |
+| layerwise | shrink(lam=0.1) | 2 | 18.0 | 20.0 | 24.0 | 92.58±0.11 | 92.35±0.10 |
+
+### base=SGDm  meta=Lion  alpha0=1e-4  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| scalar | plain | 1 | 27.0 | never | never | 87.96 | 87.69 |
+| resnet18_blocks | plain | 1 | 20.0 | 27.0 | 33.0 | 91.78 | 91.67 |
+| layerwise | plain | 1 | 19.0 | 26.0 | 45.0 | 91.23 | 90.90 |
+| layerwise | shrink(lam=0.1) | 1 | 24.0 | 26.0 | 31.0 | 92.74 | 92.48 |
 
 ### base=SGDm  meta=Lion  alpha0=1e-6  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
-| resnet18_blocks | shrink(lam=0.1) | 4 | 31.2 | 39.5 | 53.2 | 92.13±0.10 | 91.77±0.15 |
-| layerwise | plain | 7 | 28.7 | 35.7 | 55.7 | 91.32±0.16 | 90.92±0.34 |
+| scalar | plain | 3 | 38.0 | 98.0 (2/3) | never | 88.00±0.05 | 87.79±0.23 |
+| resnet18_blocks | plain | 3 | 29.3 | 36.3 | 42.7 | 91.69±0.15 | 91.50±0.28 |
+| resnet18_blocks | shrink(lam=0.1) | 6 | 31.2 | 39.8 | 53.0 | 92.08±0.15 | 91.77±0.12 |
+| layerwise | plain | 8 | 28.6 | 36.0 | 55.2 | 91.32±0.14 | 90.90±0.32 |
 | layerwise | shrink(lam=0.001) | 2 | 31.5 | 39.0 | 48.0 | 92.60±0.24 | 92.34±0.16 |
 | layerwise | shrink(lam=0.01) | 2 | 36.0 | 37.0 | 41.0 | 92.73±0.07 | 92.67±0.15 |
-| layerwise | shrink(lam=0.1) | 3 | 36.0 | 38.0 | 41.7 | 92.53±0.03 | 92.25±0.18 |
+| layerwise | shrink(lam=0.1) | 6 | 35.8 | 38.2 | 41.3 | 92.59±0.11 | 92.34±0.26 |
 | layerwise | shrink(lam=0.5) | 2 | 35.5 | 38.0 | 41.5 | 92.57±0.08 | 92.36±0.22 |
 | layerwise | shrink(lam=1.0) | 2 | 35.5 | 37.5 | 41.5 | 92.62±0.08 | 92.37±0.21 |
 | weightwise | additive(r=0.1) | 2 | never | never | never | 51.30±2.03 | 51.30±2.03 |
@@ -96,4 +107,4 @@
 | layerwise | plain | 4 | 28.2 | 36.0 | 54.2 | 91.31±0.09 | 91.06±0.10 |
 | weightwise | plain | 10 | never | never | never | 67.23±3.40 | 10.00±0.00 |
 
-(158 runs with >= 100 epochs, of 182 total)
+(178 runs with >= 100 epochs, of 216 total)
