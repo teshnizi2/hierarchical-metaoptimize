@@ -157,3 +157,57 @@ This matters twice over:
 * **For the paper.** The released code advertises `layerwise`/`nodewise`/`weightwise` in the argument
   parser of **both** task copies and can execute them in **neither**. The defect is systematic, not a
   slip in one file, which is a materially stronger version of the reproduction finding.
+
+## 12. An over-provisioned `--time` silently locks a job out of the idle partition
+
+`gpu-short` has a **4:00:00** cap and is the only GPU partition that is regularly idle —
+it holds a mix of 2080ti/L4/A100 nodes that the dedicated partitions do not drain. A job
+asking for more than 4 h can never be placed there, however empty it is.
+
+The `a0h-*` α₀ control (15 jobs) was submitted with `--time=5:00:00` against a **measured
+89-minute** 100-epoch 2080ti run — a 3.4× over-provision — and sat pending at the bottom of a
+46-deep queue behind two 2080ti nodes in `maint`. Cutting the limit to `3:45:00` (still 2.5×
+headroom over the slowest run ever recorded) and setting
+`Partition=gpu-2080ti-11g,gpu-short` started **five cells within seconds**.
+
+**Rules:**
+* Size `--time` from `wallclock_min` in `results/all_runs.csv`, not from a round number.
+  100 epochs ≈ 40 min on L4, ≈ 90 min on 2080ti.
+* Submit GPU work multi-partition — `--partition=<dedicated>,gpu-short` — so Slurm takes
+  whichever frees first.
+* Keep `--gres=gpu:<type>:1` pinned when doing so. The partition list may widen; the **GPU
+  type must not**, or timing comparability inside the block is lost (gotcha 3). `gpu-short`
+  is heterogeneous, so an unpinned `--gres=gpu:1` there will hand out whatever is free.
+
+`scontrol update jobid=<id> TimeLimit=... Partition=...` does all of this on already-pending
+jobs — no cancel, no resubmit, job IDs and names preserved.
+
+## 13. The concurrency cap is per GPU *type*, so the two caps are additive
+
+Caps are 2× A100 / 8× L4 / 12× 2080ti **per user**. An account whose jobs are all
+`gpu-l4-24g` saturates at 8 and stops, with the 2080ti allowance completely unused —
+which is exactly where `alice2` sat (26 jobs, all L4, 8 running, 18 pending).
+
+Moving a **self-contained family** of pending jobs onto the other type draws on the other
+cap and runs them in parallel with the L4 work. Move whole comparison blocks, never a
+subset, or the block ends up split across GPU types.
+
+**Do the GRES change first and verify it took, then the partition** — a job left asking for
+`gpu:l4:1` inside `gpu-2080ti-11g` is valid to submit and will simply never schedule:
+
+```
+scontrol update jobid=$jid TresPerNode=gres:gpu:2080_ti:1
+squeue -h -j $jid -o '%b'          # must show 2080_ti before touching Partition
+scontrol update jobid=$jid Partition=gpu-2080ti-11g,gpu-short
+```
+
+Applied to the six `g4-sgdmLion` cells, this took `alice2` from 7 running to 8 with the
+2080ti allowance now working in parallel; combined with the `a0h` fix, total running jobs
+across both accounts went **10 → 16**.
+
+## 14. `nice` deprioritises without discarding
+
+`scontrol update jobid=<id> nice=5000` pushes a job down the queue but leaves it queued, so
+redundant-but-not-worthless work still runs once the valuable work drains. Prefer it to
+`scancel` whenever the job would be worth having eventually — 17 jobs (λ-plateau re-measures
+and scale smokes) were deprioritised this way rather than cancelled.
