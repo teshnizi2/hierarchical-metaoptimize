@@ -409,3 +409,52 @@ ambiguous between the two and cannot support a causal claim about either.
 has a half-life ≤ 693 steps against ~50,000, so all of them are full pooling (gotcha 9). Use
 `HIER=additive` with `ETA_RATIO` when a genuinely interior pooling strength is wanted: it rescales
 the per-group deviation of every realised update for the whole run and does not saturate.
+
+## 21. `HIER=shrink` and `HIER=additive` are NOT two settings of one knob
+
+Both operators were designed as "pooling strength" dials and have been swept as if λ and
+`ETA_RATIO` were interchangeable. They are not. Read `_apply_hier()` in `patches/HF_patched.py`
+(both the layerwise branch and the global weightwise/nodewise branch):
+
+```
+M0 shrink  : β ← β − λ·(β − mean(β))
+M1 additive: β ← β_prev + dm + r·(d − dm),   d = β − β_prev,  dm = mean(d)
+             ⇒ mean(β_new) = mean(β_prev) + dm,  EXACTLY independent of r
+```
+
+**Additive has no direct channel to the shared β's drift rate — it varies only the spread.
+Shrink varies both.** So the two ladders answer different questions, and a result that reproduces
+across them is a *spread* result, while one that appears only under shrink is a *drift* result
+(FINDINGS cycle 7 §2 uses exactly this to separate them).
+
+Two riders:
+* The invariance is per-step given identical state. Over a trajectory r changes the spread → the
+  base updates → the next `d`, so *realised* drift can still differ. Measure it (`PROBE=100`,
+  `beta_true_min/max`), do not assume it.
+* **The `BETA_CLIP` clamp runs AFTER `_apply_hier`** (`step()`, lines 86–90), so a binding clip
+  breaks mean-preservation by truncating the bottom of the distribution. `p2-lay-plain` sits pinned
+  at the −15 floor with a spread of 8.7, so at large spread this is not hypothetical.
+
+Corollary for sweep design: quoting a λ half-life (gotcha 9) tells you when *shrink* saturates and
+says nothing about additive, which is genuinely partial for the whole run at every r.
+
+## 22. The probe's `snr` column changes meaning with granularity — do not compare it across arms
+
+`_probe()` builds its per-group vector two different ways:
+
+```python
+if self.stepsize_type in ('scalar', 'layerwise', 'blockwise'):
+    zv = z[0].reshape(-1)                       # one entry per real group
+else:
+    zv = stack([zi.mean() for zi in z])         # one entry per TENSOR (62), not per group
+```
+
+For `nodewise` and `weightwise` the `beta`, `z_mean`, `z_std` and `snr` lists are therefore
+**per-tensor means over the 62 parameter tensors**, not per-group quantities — which is why
+`p2-w-L1p0` reports a *high* median SNR (1.12) despite having 11.17M groups. `snr` is also a
+**temporal** ratio (`_z_sum` / `_z_sqsum` accumulate over steps), not a within-group spatial one.
+
+Two columns are safe to compare across every arm because they are computed over the full
+coordinate set: **`frac_neg`/`frac_zero`** (built from `zall`, all coordinates) and
+**`beta_true_min`/`beta_true_max`** (true extremes over every β tensor). Cycle 7 §1 uses only
+those. Cycle 6 §2's per-group SNR table was scalar/6-block/layerwise only, so it stays valid.

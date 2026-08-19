@@ -1,5 +1,18 @@
 # Paper Strategy — Hierarchical MetaOptimize
 
+> **⚠ SUPERSEDED IN PART BY FINDINGS CYCLE 7 (19 Aug 2026). Read `docs/FINDINGS.md` §6 of cycle 7
+> before drafting from this file.** Three changes, none of which this document reflects yet:
+> 1. The **granularity** claim is now budget-controlled and survives intact (+3.43pp at E=100 →
+>    +3.47pp at E=205, `ext300`). It is the paper's spine and it is stronger than when this file
+>    was written.
+> 2. The **pooling-beats-plain** claim (~+1.5pp) does **not** survive the budget control — +0.29pp
+>    at E=205, inside seed noise. Do not build a section on it.
+> 3. Cycle 6's proposed replacement framing ("finer partitioning improves the *estimator*",
+>    drift ∝ 1/√N) is **refuted by measurement** — exponent −0.113, and the weightwise collapse is
+>    a spread effect, not a drift effect. The surviving mechanism fact is that per-coordinate
+>    meta-gradient signs are strongly positively correlated (53.1% agree across 11.17M coordinates).
+
+
 ## 0. Executive summary
 
 **The proposal's premise is dead at the tested scale, but a better paper is sitting inside the wreckage.** The interesting phenomenon is not "layerwise hurts" — it's that **step-size granularity has a hard failure boundary, not a gentle degradation curve**, and that the failure has a specific, diagnosable mechanism (collapse → freeze → absorbing state, made permanent by a sign-based meta-optimizer). That is a more novel and more defensible claim than the one you set out to make.

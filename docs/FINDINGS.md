@@ -1892,3 +1892,238 @@ a confident mechanism that a control then corrected.
 * The **language modality** is still blocked on the validation-gated optimizer port; TinyStories
   pretokenization is done (50/50 shards, 8.5 GB).
 * `a0A` (the α₀ control for the campaign's largest effect) still has no complete seed.
+
+---
+
+# 19 Aug 2026 (cycle 7) — the β-drift mechanism is measured, and it explains the COST of pooling, not the benefit
+
+255 runs aggregated (up from 235). Three things landed at once: the six `p2-*` β-drift probes
+that cycle 6 §2 was waiting on, the `ext300` budget control at ~2× the epochs it had last cycle,
+and the layerwise λ ladder at n=3 across seven values.
+
+**All three cut against cycle 6's headline reading, and the campaign's two oldest open questions
+both close.** Cycle 6 put four numerical predictions on record before these ran. One is confirmed,
+two are refuted by one to three orders of magnitude, and the fourth is now measurable and wrong.
+
+## 1. The β-drift measurement — direction confirmed, the 1/√N law refuted
+
+Every `p2-*` arm below uses `HIER=shrink LAM=1.0`, so the base optimiser ends every step with
+**exactly one** step size (probe confirms `beta_true_max − beta_true_min = 0.000` throughout);
+only N, the number of pooled meta-gradient estimates, differs. SGDm + Lion, α₀=1e-6, guard on,
+augmented, 20 epochs, `PROBE=100`. Drift is `|Δβ|/step` measured over steps 1000–7500;
+`frac_neg` is the fraction of **all** meta-gradient coordinates sharing a sign, averaged over the
+same window (probe reads `zall`, the full coordinate set, not a subsample).
+
+| arm | N | drift/step | ÷η | i.i.d. prediction | **× i.i.d.** | frac_neg | acc @20ep |
+|---|---|---|---|---|---|---|---|
+| scalar | 1 | 1.000e-3 | 1.000 | 7.98e-1 | 1.3 | 0.955 | 70.73 |
+| 6-block | 6 | 9.828e-4 | 0.983 | 3.26e-1 | 3.0 | 0.848 | 68.45 |
+| layerwise | 62 | 7.997e-4 | 0.800 | 1.01e-1 | 7.9 | 0.832 | 53.14 |
+| nodewise | ~4,800 | 5.503e-4 | 0.550 | 1.15e-2 | 47.8 | 0.622 | 33.03 |
+| weightwise | 11,173,962 | 1.668e-4 | 0.167 | 2.39e-4 | **698.8** | 0.531 | 14.80 |
+| *layerwise plain (unpooled)* | *62* | *7.742e-5* | *0.077* | — | — | *0.777* | *74.29* |
+
+**Log-log slope of drift vs N over the five pooled arms: −0.113. The prediction was −0.500.**
+
+* **CONFIRMED** — cycle 6's prediction that drift falls monotonically with N, and that
+  `nodewise` lands between layerwise and weightwise and closer to the collapse (33.03, between
+  53.14 and 14.80). `nodewise` had never had a run longer than 3 epochs before this.
+* **REFUTED** — the magnitude. Cycle 6 predicted nodewise's shared β would move **~70× slower**
+  than scalar's; measured **1.8×**. It predicted weightwise **~3,300× slower**; measured **6.0×**.
+
+**Why the i.i.d. model fails.** It assumed the per-group signs are near-unbiased coin flips, so
+that pooling N of them shrinks the update as 1/√N. The probe measures the assumption directly and
+it is false: at N = 11,173,962, **53.1% of all 11.17M per-weight meta-gradients agree on the
+sign.** Independence would put that at 50.0000 ± 0.0015%. The signs are strongly positively
+correlated, so the pooled estimate does not average toward zero — it converges to a population
+bias. Drift is set by *how much the coordinates actually agree*, which is a property of the
+partition, not by N through a sampling-noise channel.
+
+(The realised drift runs ~2.4× above `|2·frac_neg − 1|` at weightwise because Lion steps on the
+sign of the meta-*momentum*, which is smoothed over time and therefore more aligned than the
+instantaneous z. Direction and ordering are unaffected.)
+
+## 2. The measured mechanism predicts the WRONG SIGN for the campaign's headline
+
+The 20-epoch column above is monotone in drift, and it is monotone the *opposite* way from the
+100-epoch result. Pooled layerwise is **17.6pp behind scalar at 20 epochs** (53.14 vs 70.73) and
+**4.5pp ahead at 100** (92.29 vs 87.78).
+
+The 20-epoch ordering is fully accounted for by startup cost. β must climb 6.9 log units from
+`ln(1e-6)` to a useful `α ≈ 1e-3`, which at each arm's measured drift takes:
+
+| arm | steps to climb | epochs | β actually reached @ 9,900 steps |
+|---|---|---|---|
+| scalar | 6,900 | 13.8 | −6.53 |
+| 6-block | 7,020 | 14.0 | −6.03 |
+| layerwise | 8,630 | 17.3 | −6.18 |
+| nodewise | 12,540 | 25.1 | −8.59 |
+| weightwise | 41,400 | 82.8 | −12.26 |
+
+The three arms that got there inside 20 epochs score 53–71%; the two that did not score 33% and
+15%. **So `p2-*` measures a transient out of the α₀=1e-6 hole, not the mechanism behind the
+100-epoch win.** Cycle 6 §2 offered drift as the explanation of the *benefit* of pooling. It is
+the explanation of its *cost*.
+
+### And the weightwise collapse is a SPREAD effect, not a drift effect
+
+Cycle 6 §2's strongest claim was unification: "the weightwise-pooled collapse is predicted by the
+same mechanism that predicts the layerwise-pooled win", via drift extrapolated as 1/√N. That
+extrapolation is refuted above (6× not 3,300×), and the campaign already holds a control that
+settles it independently.
+
+Reading the M1 additive operator out of `HF.py` (`_apply_hier`, both the layerwise branch and the
+global weightwise/nodewise branch):
+
+```
+β_new = β_prev + dm + r·(d − dm)      where  dm = mean(d)
+⇒ mean(β_new) = mean(β_prev) + dm     — EXACTLY independent of r
+```
+
+**`ETA_RATIO` has no direct channel to the shared β's drift rate. It varies only the spread.**
+M0 shrink and M1 additive are therefore not two settings of one knob: shrink changes drift *and*
+spread; additive changes spread *only*. Comparing the two ladders on weightwise separates them:
+
+| operator | setting | drift channel | plateau (n=2) |
+|---|---|---|---|
+| plain | — | full | 77.82 ± 0.45 (n=3) |
+| M1 additive | r = 0.3 | **unchanged by construction** | 64.17 ± 0.28 |
+| M1 additive | r = 0.1 | **unchanged by construction** | 48.71 ± 1.92 |
+| M0 shrink | λ = 0.1 | slowed 6× | 45.26 ± 3.63 |
+
+Additive at r=0.1 collapses weightwise to 48.71 **with the drift channel held fixed by
+construction**, landing within 3.5pp of shrink at λ=0.1, which slows drift as well. The two
+operators agree while disagreeing about drift. **The weightwise collapse is caused by suppressing
+the per-group spread, not by slowing the shared step size.** Cycle 6 §2's unification does not
+hold.
+
+*Caveat.* Mean-preservation is exact per step given identical state; over a trajectory r changes
+the spread, hence the base updates, hence the next d. And the guard clamp runs *after*
+`_apply_hier`, so a binding clip breaks mean-preservation — `p2-lay-plain` shows β pinned at the
+−15 floor with a spread of 8.7, so at large r the clip does bind. `p4-*` (§5) measures the
+realised drift and spread across r directly and tests both.
+
+## 3. `ext300` resolves cycle 5 §2 — granularity is budget-invariant, pooling is not
+
+The budget control has gone from ~25% to 205–287 of 300 epochs. Comparing at a **matched** epoch
+(E=205, the shortest of the six runs; window = mean test over the last 20 epochs of that prefix),
+α₀=1e-3, n=2 per arm:
+
+| arm | E=100 | E=205 | train @E=205 |
+|---|---|---|---|
+| scalar | 87.94 (87.83/88.04) | 88.27 (88.24/88.30) | 95.16 |
+| layerwise plain | 91.36 (91.54/91.19) | 91.74 (92.02/91.46) | 99.98 |
+| layerwise λ=0.1 | 92.21 (92.27/92.15) | 92.03 (92.08/91.97) | 99.05 |
+
+| contrast | E=100 | E=205 |
+|---|---|---|
+| **granularity** (scalar → layerwise) | **+3.43pp** | **+3.47pp** |
+| **pooling** (plain → λ=0.1) | +0.84pp | +0.29pp |
+
+**The granularity claim is not a budget artefact.** Doubling the budget moves the contrast by
+0.04pp. Cycle 5 §2(a) — "both headline claims are measured while the losing arm is still fitting"
+— is answered for this one, and answered more strongly than a null: at 205 epochs the scalar arm's
+**training** accuracy is 95.16% against layerwise's 99.98%, and it gained only 1.2pp of train
+accuracy over the extra 105 epochs. It is not behind on the way to the same place; it is
+converging to a worse one.
+
+**The pooling claim is substantially a budget artefact.** +0.84pp at E=100 decays to +0.29pp at
+E=205, against a seed-to-seed spread of 0.56pp within the plain arm. At 2× budget it is no longer
+resolvable. This is the correct reading of cycle 6 §1's "pooling recovers what granularity costs":
+the recovery is real at 100 epochs and mostly gone by 205.
+
+## 4. The λ ladder at n=3 — pooling strength moves the generalisation gap, not the test accuracy
+
+SGDm + Lion, α₀=1e-6, guard on, layerwise, ≥95 epochs:
+
+| λ | half-life (steps) | n | plateau | final train | **train − test** |
+|---|---|---|---|---|---|
+| plain | ∞ | 11 | 90.77 ± 0.18 | 99.66 ± 0.07 | 8.89 |
+| 0.001 | 693 | 3 | 92.32 ± 0.16 | 99.92 ± 0.02 | 7.59 |
+| 0.01 | 69 | 3 | **92.47 ± 0.15** | 98.06 ± 0.11 | 5.59 |
+| 0.03 | 23 | 3 | 92.24 ± 0.06 | 97.83 ± 0.06 | 5.59 |
+| 0.1 | 7 | 11 | 92.29 ± 0.08 | 97.78 ± 0.08 | 5.48 |
+| 0.3 | 2 | 2 | 92.29 ± 0.16 | 97.78 ± 0.05 | 5.49 |
+| 0.5 | 1 | 3 | 92.20 ± 0.13 | 97.78 ± 0.02 | 5.59 |
+| 1.0 | <1 | 3 | 92.20 ± 0.23 | 97.76 ± 0.07 | 5.56 |
+
+Test accuracy across all seven λ spans 92.20–92.47 (0.27pp, ~1.7σ at n=3) — flat, as cycle 3 §4
+found. But **final train accuracy spans 97.76–99.92, and the train−test gap halves from 8.89 to
+5.48.** λ=0.001 reaches the same test accuracy as λ=1.0 while still fitting the training set
+completely (99.92 vs 97.76).
+
+So the plateau gain over plain layerwise is **not** simply regularisation: the arm that gains the
+most test accuracy relative to plain (λ=0.001, +1.55pp) does so with *higher* train accuracy than
+plain, not lower. Whatever pooling buys at N=62, it is visible in test accuracy before any
+generalisation gap opens up. Do not write the pooling result up as a regularisation effect.
+
+## 5. Queue actions this cycle
+
+Both accounts' queues were already deep and every pending job reads `Priority`, so the binding
+constraint remains queue depth, not job count (cycle 6 §6). Both new sweeps are therefore
+**short** (20 epochs, `--time=00:45:00`) so they backfill rather than queue (gotcha 12); the
+`p2-*` set turned around in 6–9 minutes each on this footing.
+
+* **Submitted `p3-*` (6 jobs, `alice`, `bin/p3_drift_a0.sh`)** — the α₀ control for §1/§2.
+  Byte-identical to `betadrift.sh` except α₀ = 1e-3. `ln(1e-3) = −6.91` and the pooled arms in
+  `p2-*` all converged to β ∈ [−6.0, −6.5], so **α₀=1e-3 starts essentially at the destination**
+  and there is no hole to climb out of.
+  *Predictions on record:* (a) the 20-epoch ordering 70.7 / 68.5 / 53.1 / 33.0 / 14.8 largely
+  **collapses** for N ≤ 62; (b) nodewise and weightwise still lag, but far less; (c) the measured
+  **drift rate is roughly unchanged from `p2-*`**, because it is set by sign alignment, which is a
+  property of the partition rather than of α₀ — *if drift moves materially with α₀, §1's reading
+  is wrong and the mechanism needs rewriting.*
+* **Submitted `p4-*` (5 jobs, `alice2`, `bin/p4_addit_drift.sh`)** — §2's spread/drift separation,
+  run forward instead of inferred. Layerwise, α₀=1e-6, `HIER=additive` at r ∈ {0, 0.03, 0.1, 0.3,
+  1.0}, probe on.
+  *Predictions on record:* (a) realised mean-β drift is ~equal across all r (the analytic
+  invariance) — falsified if it moves monotonically with r; (b) spread grows monotonically with r,
+  and is exactly 0 at r=0; (c) r=1.0 reproduces `p2-lay-plain` (drift 7.7e-5, spread 8.7,
+  74.29 @20ep); (d) the −15 clip binds only at large r.
+* **Already in flight and unchanged:** `n1-*` (8, `alice`, the 100-epoch nodewise rungs),
+  `lp-l-*` (6, `alice`, the genuinely-partial layerwise λ ladder at half-lives 69k/23k/6.9k steps),
+  `ad-l-*` (8, `alice2`, of which 2 have reported), `a0A-*`, and `ext300`.
+
+## 6. What this cycle changes about the paper
+
+Cycle 6 §7 proposed replacing "granularity buys speed and stability" with "partitioning the
+meta-gradient more finely improves the *estimator* of the shared step size". **That replacement is
+premature and its stated mechanism is refuted.** What survives, and what does not:
+
+* **SURVIVES, and is now budget-controlled** — the campaign's central result. Step-size
+  granularity (scalar → layerwise, m=1 → 62) is worth **+3.4pp under SGDm and is invariant to a
+  2× budget**, with the scalar arm's own training accuracy showing it converges to a worse
+  solution rather than lagging toward the same one (§3). This is the paper.
+* **SURVIVES** — cycle 6 §1's structural observation that the gain is obtainable with the base
+  optimiser using only *one* step size. At E=205 scalar → layerwise+λ=0.1 is still +3.76pp.
+* **DOES NOT SURVIVE** — that pooling beats plain granularity by ~1.5pp. Epoch-matched and
+  budget-controlled it is +0.29pp at E=205, inside seed noise (§3).
+* **DOES NOT SURVIVE** — the 1/√N estimator law and the unification of the layerwise win with the
+  weightwise collapse (§1, §2). The collapse is a spread effect; drift is a startup cost.
+* **NEW, and the strongest mechanism fact the campaign holds** — per-coordinate meta-gradient
+  signs are *strongly positively correlated at every granularity*, 53.1% agreeing across 11.17M
+  coordinates. Any future account of why granularity helps must start there, not from an
+  independence assumption.
+
+The parent paper's §7.3 ImageNet null keeps the budget reading (a long budget lets the scalar arm
+converge) and **loses** the second, drift-based reading cycle 6 added to it.
+
+## 7. Standing caveats after this cycle
+
+* §1 and §2 rest on **n=1 per arm** for the drift probes. Drift is a low-variance quantity
+  (averaged over 6,500 steps) and the effects span a factor of 6, but the 20-epoch *accuracies* in
+  the same table are single seeds and should not be quoted to better than ~1pp.
+* §1's `nodewise` group count (~4,800) is carried from cycle 6 and is **not independently
+  verified** — the probe's `block_sizes.json` was not written for these runs. The log-log slope
+  moves by <0.01 for any N in [2e3, 1e4], so nothing above depends on it.
+* §2's spread conclusion uses weightwise additive at **n=2**; `p4-*` tests the same separation on
+  layerwise with the drift readout attached.
+* §3 is n=2 per arm, and the E=205 window is a *matched prefix*, not a converged asymptote — the
+  scalar arm's train accuracy is still climbing at ~1.2pp/100 epochs.
+* §4's λ=0.01 peak (92.47) is +0.27pp over λ=1.0 at n=3 — not resolvable. Only the train-accuracy
+  and gap columns are being claimed.
+* `a0A` (the α₀ control for SGDm + Adam meta) now has **four complete seeds** where cycle 6 had
+  none, but no cell has n≥2 yet; it is not read in this cycle.
+* Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
+* **ImageNet stays scoped out** (489/1000 classes, no devkit). The **language modality** is still
+  blocked on the validation-gated optimizer port; TinyStories pretokenization is done.

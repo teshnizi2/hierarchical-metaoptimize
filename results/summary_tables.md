@@ -46,6 +46,18 @@
 | scalar | plain | 7 | 12.7 (3/7) | 18.3 (3/7) | 30.7 (3/7) | 80.05±11.67 | 79.66±11.64 |
 | resnet18_blocks | plain | 7 | 11.7 (3/7) | 17.7 (3/7) | 30.7 (3/7) | 78.54±12.82 | 78.09±12.75 |
 
+### base=SGDm  meta=Adam  alpha0=1e-3  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| scalar | plain | 1 | 24.0 | 83.0 | never | 88.24 | 88.08 |
+| resnet18_blocks | plain | 1 | 14.0 | 18.0 | 30.0 | 91.50 | 91.21 |
+| layerwise | plain | 1 | 12.0 | 20.0 | 40.0 | 91.57 | 91.27 |
+
+### base=SGDm  meta=Adam  alpha0=1e-4  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| layerwise | shrink(lam=0.1) | 1 | 14.0 | 14.0 | 17.0 | 92.13 | 91.70 |
+
 ### base=SGDm  meta=Adam  alpha0=1e-6  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
@@ -65,10 +77,10 @@
 ### base=SGDm  meta=Lion  alpha0=1e-3  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
-| scalar | plain | 3 | 24.3 | 73.0 | never | 88.22±0.05 | 87.97±0.05 |
+| scalar | plain | 5 | 24.2 | 76.2 | never | 88.32±0.15 | 88.08±0.16 |
 | resnet18_blocks | plain | 2 | 15.5 | 22.0 | 31.0 | 91.72±0.18 | 91.57±0.21 |
-| layerwise | plain | 3 | 13.3 | 23.0 | 41.0 | 91.66±0.09 | 91.51±0.31 |
-| layerwise | shrink(lam=0.1) | 3 | 18.0 | 20.0 | 23.3 | 92.52±0.13 | 92.26±0.17 |
+| layerwise | plain | 5 | 13.4 | 23.4 | 41.0 | 91.76±0.25 | 91.58±0.31 |
+| layerwise | shrink(lam=0.1) | 5 | 17.6 | 20.2 | 23.4 | 92.52±0.10 | 92.24±0.12 |
 
 ### base=SGDm  meta=Lion  alpha0=1e-4  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
@@ -82,14 +94,16 @@
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
 | scalar | plain | 5 | 37.0 | 90.3 (3/5) | never | 88.08±0.22 | 87.85±0.18 |
-| resnet18_blocks | plain | 4 | 29.2 | 36.2 | 43.5 | 91.72±0.13 | 91.44±0.26 |
+| resnet18_blocks | plain | 5 | 29.4 | 36.6 | 43.8 | 91.69±0.13 | 91.42±0.23 |
 | resnet18_blocks | shrink(lam=0.1) | 6 | 31.2 | 39.8 | 53.0 | 92.08±0.15 | 91.77±0.12 |
 | layerwise | plain | 11 | 29.0 | 36.2 | 56.5 | 91.23±0.22 | 90.85±0.31 |
-| layerwise | shrink(lam=0.001) | 2 | 31.5 | 39.0 | 48.0 | 92.60±0.24 | 92.34±0.16 |
-| layerwise | shrink(lam=0.01) | 2 | 36.0 | 37.0 | 41.0 | 92.73±0.07 | 92.67±0.15 |
-| layerwise | shrink(lam=0.1) | 7 | 35.7 | 38.1 | 41.4 | 92.58±0.10 | 92.29±0.27 |
-| layerwise | shrink(lam=0.5) | 2 | 35.5 | 38.0 | 41.5 | 92.57±0.08 | 92.36±0.22 |
-| layerwise | shrink(lam=1.0) | 2 | 35.5 | 37.5 | 41.5 | 92.62±0.08 | 92.37±0.21 |
+| layerwise | shrink(lam=0.001) | 3 | 32.0 | 39.7 | 48.3 | 92.54±0.20 | 92.37±0.13 |
+| layerwise | shrink(lam=0.01) | 3 | 36.3 | 37.3 | 41.0 | 92.79±0.11 | 92.75±0.17 |
+| layerwise | shrink(lam=0.03) | 2 | 35.5 | 37.5 | 41.0 | 92.56±0.09 | 92.28±0.11 |
+| layerwise | shrink(lam=0.1) | 11 | 35.5 | 38.1 | 41.4 | 92.59±0.09 | 92.34±0.22 |
+| layerwise | shrink(lam=0.3) | 1 | 36.0 | 38.0 | 42.0 | 92.76 | 92.42 |
+| layerwise | shrink(lam=0.5) | 3 | 36.0 | 38.0 | 41.7 | 92.50±0.14 | 92.32±0.16 |
+| layerwise | shrink(lam=1.0) | 3 | 35.7 | 38.0 | 41.3 | 92.53±0.17 | 92.36±0.15 |
 | weightwise | additive(r=0.1) | 2 | never | never | never | 51.30±2.03 | 51.30±2.03 |
 | weightwise | additive(r=0.3) | 2 | never | never | never | 66.61±0.74 | 66.61±0.74 |
 | weightwise | plain | 3 | never | never | never | 79.38±0.46 | 79.38±0.46 |
@@ -107,4 +121,4 @@
 | layerwise | plain | 4 | 28.2 | 36.0 | 54.2 | 91.31±0.09 | 91.06±0.10 |
 | weightwise | plain | 10 | never | never | never | 67.23±3.40 | 10.00±0.00 |
 
-(197 runs with >= 100 epochs, of 235 total)
+(219 runs with >= 100 epochs, of 255 total)
