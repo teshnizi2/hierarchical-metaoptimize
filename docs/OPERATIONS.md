@@ -381,3 +381,31 @@ in the training loop are the loop bound and the time-based break (neutralised by
 `--max-time 999:00:00`). So a 300-epoch run's first 100 epochs are bitwise the same computation
 as the 100-epoch run, and the extension reads as a continuation rather than a new experiment.
 Verify this before extending any *other* task — it is a property of this code, not a general one.
+
+## 20. A "granularity" arm is not defined by its `--stepsize-groups` flag
+
+`--stepsize-groups layerwise` with `HIER=shrink LAM=1.0` gives the base optimiser **one** step size
+for the whole network, not 62. `_apply_hier()` runs after `meta_update()` and before the next
+step's `beta_to_alpha()` (HF.py `step()`), so the pooling has already collapsed β by the time any
+α is read. At λ=0.1 the half-life is 7 steps, so the same is true after the first ~1% of the run.
+
+For a full cycle the campaign compared "scalar vs layerwise+shrink" believing it was varying the
+number of step sizes. It was not: both arms use one. The variable that actually differed was the
+number of meta-gradient estimates pooled into it (1 vs 62) — see FINDINGS cycle 6 §1.
+
+**Rule: every arm must be recorded with BOTH numbers —**
+
+| | # step sizes the base opt uses | N meta-grad estimates pooled |
+|---|---|---|
+| `scalar` | 1 | 1 |
+| `layerwise` plain | 62 | 62 |
+| `layerwise` + `HIER=shrink LAM≥0.01` | **1** | 62 |
+| `weightwise` + `HIER=shrink LAM≥0.01` | **1** | 11.17M |
+
+They coincide only when `HIER` is unset. Any table with a single "granularity" column is
+ambiguous between the two and cannot support a causal claim about either.
+
+**Corollary — the λ sweep never tested partial pooling.** Every λ run on layerwise (0.001 … 1.0)
+has a half-life ≤ 693 steps against ~50,000, so all of them are full pooling (gotcha 9). Use
+`HIER=additive` with `ETA_RATIO` when a genuinely interior pooling strength is wanted: it rescales
+the per-group deviation of every realised update for the whole run and does not saturate.

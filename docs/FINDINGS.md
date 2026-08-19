@@ -1608,3 +1608,246 @@ submitting more.
   pretokenization is done (50/50 shards, 8.5 GB).
 * `a0A` (20 cells — the α₀ control for the campaign's largest effect) is now unblocked but has
   three complete cells and no complete seed.
+
+# 19 Aug 2026 (cycle 6) — the granularity effect is a META-GRADIENT effect, not a step-size effect
+
+235 runs aggregated (up from 216). The `ext300` budget control is running and roughly a quarter
+through; the `a0L` α₀ ladder has reached n=2 on eleven of twelve cells and does not move. Neither
+is the cycle's main result.
+
+The main result comes from re-reading data the campaign already had. **At λ = 1.0 the M0 shrink
+operator sets every group's β to the group mean on every step, so the base optimiser uses exactly
+ONE step size for the entire network — the same parameterisation as the `scalar` arm — and it beats
+`scalar` by 4.5pp.** The benefit the campaign has been attributing to step-size *granularity*
+survives when the granularity is removed.
+
+## 1. Two factors were confounded in every result so far, and they separate cleanly
+
+`_apply_hier()` runs **after** `meta_update()` and before the next step's `beta_to_alpha()`
+(HF.py `step()`, lines 81–90), so at λ=1.0 every base update in the run sees a single scalar α.
+That makes the shrink arm a control the campaign did not realise it had: it holds the number of
+step sizes fixed at one and varies only how finely the meta-gradient was resolved before being
+reduced.
+
+SGDm + Lion, α₀ = 1e-6, guard on, augmented, 100 epochs:
+
+| arm | # step sizes the base opt uses | N meta-grad estimates | n | ep→85 | ep→90 | plateau | final train |
+|---|---|---|---|---|---|---|---|
+| scalar | 1 | 1 | 5 | 37.0 | never | 87.78 ± 0.14 | 93.83 ± 0.21 |
+| 6-block plain | 6 | 6 | 4 | 29.2 | 43.5 | 91.41 ± 0.13 | 99.07 ± 0.02 |
+| 6-block + λ=0.1 | **1** | 6 | 6 | 31.2 | 53.0 | 91.71 ± 0.15 | 99.38 ± 0.05 |
+| layerwise plain | 62 | 62 | 11 | 29.0 | 56.5 | 90.77 ± 0.18 | 99.66 ± 0.07 |
+| layerwise + λ=0.1 | **1** | 62 | 7 | 35.7 | 41.4 | 92.30 ± 0.09 | 97.75 ± 0.09 |
+| layerwise + λ=1.0 | **1 (exact)** | 62 | 2 | 35.5 | 41.5 | **92.32 ± 0.14** | 97.72 ± 0.00 |
+| weightwise plain | 11.17M | 11.17M | 3 | never | never | 77.82 ± 0.45 | 82.02 ± 0.49 |
+| weightwise + λ=0.1 | **1** | 11.17M | 2 | never | never | 45.26 ± 3.63 | 47.98 ± 3.92 |
+
+λ=1.0 (exact pooling, n=2) and λ=0.1 (half-life 7 steps, n=7) agree to 0.02pp, so the residual
+per-layer spread at λ=0.1 contributes nothing and the two can be read as the same arm.
+
+**Read the rows where the base optimiser has exactly one step size (N = 1 → 6 → 62 → 11.17M):**
+
+> 87.78 → 91.71 → 92.30 → 45.26
+
+**The whole 4.5pp gain from `scalar` to the campaign's best arm is obtained without giving the
+network more than one step size.** Whatever the project has been measuring, it is not the value of
+per-layer step sizes.
+
+**And the step-size count on its own is neutral-to-harmful.** Holding N fixed and varying only how
+many step sizes survive:
+
+| N | many step sizes | one step size | Δ from pooling |
+|---|---|---|---|
+| 6 | 91.41 | 91.71 | **+0.30** |
+| 62 | 90.77 | 92.30 | **+1.53** |
+| 11.17M | 77.82 | 45.26 | **−32.56** |
+
+Going from 6 step sizes to 62 *costs* 0.64pp (91.41 → 90.77); pooling them back to one recovers it
+and more. The campaign's own headline (+1.61pp for pooling on layerwise, n=5) is that recovery.
+
+## 2. The mechanism this points at — and it is a hypothesis, not yet a measurement
+
+`block_product` partitions the *same* total meta-gradient: the layerwise vector's 62 entries sum
+to the scalar arm's single entry. The partition changes nothing about the information available.
+What changes is **where the meta-optimiser's nonlinearity sits relative to the reduction**:
+
+* `scalar` computes `sign(Σ_b z_b)` — one Lion sign for the whole network, so β takes a ±η step
+  every step regardless of how weak the evidence is.
+* `layerwise + λ→1` computes `mean_b sign(z_b)` over 62 groups — a *soft* average in [−1, 1], so β
+  moves by a small, well-aimed amount.
+
+Since `mean(sign(·)) ≠ sign(mean(·))`, these are different estimators of the same quantity, and the
+finer one is better conditioned. The same argument covers Adam-meta (per-group normalisation then
+average, vs global normalisation), which is why the win is *larger* without the sign nonlinearity
+(cycle 3 §5) rather than absent — that result refuted "the sign is the cause" but is fully
+consistent with "the reduction granularity is the cause".
+
+**Supporting evidence available now, from existing probes** (`z_mean`, `z_std`, `snr` per group,
+SGDm base, late in training):
+
+| arm | N groups | median per-group SNR | implied E&#124;mean of N signs&#124; |
+|---|---|---|---|
+| scalar | 1 | 0.050 | 1.00 |
+| 6-block | 6 | 0.129 | 0.42 |
+| layerwise | 62 | 0.012 | 0.13 |
+
+Per-group SNR is ~0.01–0.13, i.e. the per-group signs are near-unbiased coin flips, so the pooled
+meta-update shrinks roughly as 1/√N. Extrapolated to weightwise (N = 11.17M) the shared β would
+move ~3,300× slower than `scalar`'s — which is what a run that plateaus at 45% with 48% train
+accuracy looks like. **The weightwise-pooled collapse is predicted by the same mechanism that
+predicts the layerwise-pooled win**, and the two have until now been filed as unrelated results
+(cycle 5 §5's "three distinct regimes").
+
+**This is not yet measured.** The existing probes cover only *unpooled* arms, so the shared β's
+actual drift rate has never been recorded. Six 20-epoch probe-enabled runs (`p2-*`, `bdrift`) were
+submitted this cycle to measure it directly across N ∈ {1, 6, 62, ~4.8k, 11.17M}.
+
+### Predictions on record, before the runs report
+* β's drift rate per step falls monotonically with N, approximately as 1/√N.
+* `nodewise + λ=1.0` (N ≈ 4,800) lands **between** layerwise and weightwise, and closer to the
+  collapse: the shared β should move ~70× slower than scalar's.
+* If instead nodewise matches layerwise, the 1/√N story is wrong and the effect is something about
+  the *layer* as a unit, not about N.
+
+## 3. Consequence: the shrink operator cannot express partial pooling, so the λ curve was never a test of it
+
+Gotcha 9 records that λ is a per-step rate with half-life ln2/λ steps against ~50,000 steps in a
+run. Every λ ever run on layerwise — 0.001, 0.01, 0.1, 0.5, 1.0 — has a half-life of 693 steps or
+fewer, i.e. **all five are full pooling within the first 1.4% of the run.** The campaign's
+conclusion that "the λ curve is flat and the optimum is at full pooling" (cycle 3 §4) is correct,
+but it is flat *because the operator saturates*, not because an interior optimum was searched for
+and not found. The interpolation between "62 independent step sizes" and "one shared step size"
+has never been sampled on layerwise.
+
+The **M1 additive** operator does not have this defect. It rescales the per-group deviation of each
+realised update by `ETA_RATIO` for the whole run:
+
+```
+d = β − β_prev ;  β = β_prev + mean(d) + η_ratio · (d − mean(d))
+```
+
+η_ratio = 1 is exactly plain; η_ratio = 0 freezes the deviations and — since all groups start at
+log α₀ — yields exactly one shared β by a completely different route than shrink. Interior values
+are genuinely partial *for the entire run*. It had been run only on weightwise (`ha-*`, n=2, where
+everything fails anyway) and **never on layerwise, the granularity where hierarchy works.**
+
+Submitted this cycle on `alice2`: `ad-l-r{0,003,01,03}` × 2 seeds, η_ratio ∈ {0, 0.03, 0.1, 0.3},
+otherwise identical to the headline cell. η_ratio = 0 doubles as an independent replication of the
+λ=1.0 exact-pooling number through a different operator — if it does not land near 92.3, the §1
+reading is wrong.
+
+## 4. `ext300` — the budget control is a quarter through, and its comparability is now VERIFIED rather than argued
+
+Cycle 5 argued from code inspection that a 300-epoch run is a continuation of the 100-epoch run
+because `train.py` has no learning-rate scheduler. That is now checked against data. Comparing each
+`e300` run to its matching `a0L` α₀=1e-3 cell (same seed, same config) over the last 20 epochs of
+the overlap:
+
+| pair | overlap | mean Δtest | within-run epoch-to-epoch jitter |
+|---|---|---|---|
+| scalar s0 | 0–64 | +0.00 pp | 0.25 pp |
+| scalar s1 | 0–61 | +0.12 pp | 0.20 pp |
+| layerwise plain s0 | 0–89 | +0.25 pp | 0.19 pp |
+| layerwise plain s1 | 0–74 | −0.09 pp | 0.23 pp |
+| layerwise + λ=0.1 s0 | 0–83 | −0.22 pp | 0.18 pp |
+| layerwise + λ=0.1 s1 | 0–65 | +0.04 pp | 0.25 pp |
+
+Every pair agrees to within its own within-run jitter. **The extension is a valid continuation in
+distribution** — not bitwise, which cuDNN autotuning rules out (gotcha 17), and the pointwise max
+difference over a full overlap is 1.3–4.9pp, so the *windowed* comparison is the one to quote.
+
+Current state (61–89 of 300 epochs), with the slope that decides cycle 5 §2:
+
+| run | last ep | train | test | Δtrain/10ep | Δtest/10ep |
+|---|---|---|---|---|---|
+| scalar s0 | 64 | 92.62 | 87.79 | **+0.82** | +0.25 |
+| scalar s1 | 61 | 92.51 | 87.57 | **+0.88** | +0.37 |
+| layerwise plain s0 | 89 | 99.82 | 91.65 | +0.10 | +0.20 |
+| layerwise plain s1 | 74 | 99.63 | 90.95 | +0.27 | +0.24 |
+| layerwise + λ=0.1 s0 | 83 | 97.68 | 92.34 | +0.31 | +0.04 |
+| layerwise + λ=0.1 s1 | 65 | 97.06 | 92.31 | +0.54 | +0.10 |
+
+Nothing is decidable yet. The scalar arm's train curve is still climbing at ~0.85pp/10 epochs, so
+cycle 5 §2(a) stands exactly as written: **the two headline claims remain non-asymptotic and must
+not be written up as ceiling claims.**
+
+Note that §1 of this cycle does *not* dissolve that caveat — it relocates it. "More pooled
+meta-gradient estimates beat fewer" is subject to the same budget question as "finer granularity
+beats coarser" was.
+
+## 5. `a0L` at n=2 — cycle 5 §1 holds, with one softening
+
+Eleven of twelve cells now have two seeds (the α₀=1e-6 shrink cell is still n=1):
+
+| α₀ | arm | n | ep→85 | ep→88 | ep→90 | plateau | final train |
+|---|---|---|---|---|---|---|---|
+| 1e-6 | scalar | 2 | 36.5 | never | never | 87.73 ± 0.01 | 93.89 ± 0.22 |
+| 1e-6 | 6-block | 2 | 29.0 | 37.0 | 43.5 | 91.45 ± 0.02 | 99.09 ± 0.01 |
+| 1e-6 | layerwise plain | 2 | 28.5 | 37.0 | 56.5 | 90.84 ± 0.01 | 99.70 ± 0.01 |
+| 1e-6 | layerwise + λ=0.1 | 1 | 35.0 | 38.0 | 41.0 | 92.46 | 97.76 |
+| 1e-4 | scalar | 2 | 26.5 | 66.0 (1/2) | never | 87.93 ± 0.28 | 94.01 ± 0.34 |
+| 1e-4 | 6-block | 2 | 20.0 | 27.5 | 34.0 | 91.46 ± 0.12 | 99.25 ± 0.04 |
+| 1e-4 | layerwise plain | 2 | 19.5 | 26.5 | 42.0 | 91.00 ± 0.16 | 99.78 ± 0.01 |
+| 1e-4 | layerwise + λ=0.1 | 2 | 24.5 | 26.5 | 30.0 | 92.30 ± 0.03 | 98.03 ± 0.05 |
+| 1e-3 | scalar | 2 | 24.5 | 77.0 | never | 87.85 ± 0.06 | 94.21 ± 0.25 |
+| 1e-3 | 6-block | 2 | 15.5 | 22.0 | 31.0 | 91.53 ± 0.15 | 99.31 ± 0.01 |
+| 1e-3 | layerwise plain | 2 | 13.0 | 23.0 | 41.5 | 91.22 ± 0.00 | 99.91 ± 0.04 |
+| 1e-3 | layerwise + λ=0.1 | 2 | 18.0 | 20.0 | 23.0 | 92.26 ± 0.26 | 98.19 ± 0.01 |
+
+Unchanged: the scalar plateau is flat to 0.2pp across three decades of α₀ and **never reaches 90%
+at any α₀**; every arm improves monotonically up to α₀=1e-3 (the AdamW U-shape does not transfer);
+the granularity gain survives per-arm tuning.
+
+**Softening:** cycle 5 reported scalar as never reaching 88% at α₀ ∈ {1e-6, 1e-4}. At n=2 it reaches
+88% at α₀=1e-3 on **both** seeds (ep 77) and on one of two seeds at 1e-4 (ep 66). The 90% statement
+is unaffected. Quote ep→88 for scalar as threshold-marginal, not as "never".
+
+## 6. Queue actions this cycle
+
+* **Submitted `n1-*` (8 jobs, `alice`, L4 dedicated)** — the §1 ladder run forward rather than
+  re-read: `nodewise` plain and pooled (the never-measured rung at N ≈ 4,800), plus exact λ=1.0
+  pooling at N=6 and N=11.17M. `nodewise` has never had a run longer than 3 epochs.
+* **Submitted `ad-l-*` (8 jobs, `alice2`, L4 dedicated)** — §3's additive interpolation. `alice2`'s
+  `gpu-l4-24g` allowance (8) was **entirely unused**; this fills it without touching the shared
+  `gpu-short` pool where `ext300` lives.
+* **Submitted `p2-*` (6 jobs, `alice2`, 20 epochs, `--time=00:45:00`)** — §2's direct β-drift
+  measurement. Sized short deliberately so they backfill (gotcha 12) rather than queue behind
+  100-epoch work.
+* **Niced 5 pending `h2-lam*` cells to 5000.** λ ∈ {0.03, 0.1, 0.3} have half-lives of 23/7/2 steps
+  — all full pooling (gotcha 9) — and layerwise λ=0.1 is already at n=7. They re-measure a settled
+  point three times. `nice`, not `scancel` (gotcha 14).
+* **Both accounts now report zero `QOSMaxGRESPerUser`**: `alice` 15 running / 28 pending, `alice2`
+  5 running / 30 pending, every pending job reading `Priority`. The cluster is still saturated;
+  eligibility is correct, so nothing further is buyable by resubmission.
+
+## 7. What this cycle changes about the paper
+
+The framing in `PLAN-appendix-paper.md` — "granularity buys speed and stability" — survives as a
+description of the measurements but is **wrong about the cause**, and the correct cause is a
+stronger and more surprising claim:
+
+> Partitioning the meta-gradient more finely improves the *estimator* of the shared step size.
+> Actually spending those partitions on separate step sizes is neutral at m=6, mildly harmful at
+> m=62, and catastrophic at m=11.17M.
+
+This also gives the parent paper's §7.3 ImageNet null a second, sharper reading alongside the
+budget one: on a network where the per-group meta-gradient SNR is lower, N is effectively larger
+relative to the signal, and the pooled estimator moves too slowly to reach a useful step size
+within the budget — the same failure the weightwise arm shows here in miniature.
+
+**Nothing in §1 may be written up until `p2-*` reports** — the mechanism is currently an
+interpretation of an outcome table, and the campaign has already been burned once (cycle 4 §2) by
+a confident mechanism that a control then corrected.
+
+## 8. Standing caveats after this cycle
+
+* §1's ladder is n=2 at λ=1.0 and n=3 at weightwise-plain. The 4.5pp gap is ~30σ, but the *shape*
+  of the curve between N=62 and N=11.17M rests on the `n1-node-*` runs, which have not reported.
+* §2 is a hypothesis with consistent supporting evidence, **not a measurement**.
+* Cycle 5 §2 is unresolved: both headline claims are still measured at a budget where the scalar
+  arm has not finished fitting. `ext300` is ~25% through.
+* Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
+* **ImageNet stays scoped out** (489/1000 classes, no devkit).
+* The **language modality** is still blocked on the validation-gated optimizer port; TinyStories
+  pretokenization is done (50/50 shards, 8.5 GB).
+* `a0A` (the α₀ control for the campaign's largest effect) still has no complete seed.
