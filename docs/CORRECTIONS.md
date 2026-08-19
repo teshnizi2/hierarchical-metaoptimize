@@ -70,3 +70,67 @@ epochs-to-target; best-of-run is reportable only alongside, never alone.**
 The refuting controls **had already completed** when the draft was written; they were produced
 by the hourly routine and never reviewed. Writing prose from remembered results instead of from
 `results/all_runs.csv` is what caused this. **Re-derive every table from the CSV at write time.**
+
+---
+
+## 8. The three "unreviewed" results, now verified — two are major
+
+### 8a. M1 additive has a genuine interior optimum (plateau metric, n=5–10)
+
+| r | plateau | n |
+|---|---|---|
+| 0 (= scalar) | 92.15 | 5 |
+| 0.03 | 92.14 | 8 |
+| **0.05** | **93.06** | 7 |
+| **0.07** | **93.22** | 5 |
+| 0.1 | 92.28 | 10 |
+| 0.2 | 91.39 | 3 |
+| 0.3 | 90.96 | 3 |
+
+A clean inverted-U peaking at r ≈ 0.05–0.07, **+1.07pp over r=0**, measured on plateau rather
+than best-of-run, at n=5–7. This is the bias–variance optimum in partial pooling that the
+project set out to find, and it is the best-supported positive result we have.
+
+### 8b. The i.i.d. / sqrt(N) noise model is REFUTED by direct measurement
+
+The premise behind "finer granularity is noisier" is that per-coordinate meta-gradients are
+near-independent, so pooling N of them shrinks drift as 1/sqrt(N). The probe measures the
+premise directly:
+
+> **53.1% of all 11,173,962 per-weight meta-gradients agree on sign.**
+> Independence would give 50.0000 ± 0.0015%.
+
+Predicted log-log slope of drift vs N: **−0.500**. Measured: **−0.113**.
+
+The signs are strongly positively correlated, so a pooled estimate does not average toward zero —
+it converges to a population bias. **Drift is governed by how much the coordinates agree, which
+is a property of the partition, not by N through a sampling-noise channel.** This is the
+within-block correlation the prior-art sweep identified as the one unclaimed empirical
+contribution available here, and it is now measured rather than assumed.
+
+### 8c. The alpha0 confound is quantified, and it accounts for the short-budget orderings
+
+Pooled layerwise is 17.6pp *behind* scalar at 20 epochs and 4.5pp *ahead* at 100. The 20-epoch
+ordering is fully explained by startup cost: beta must climb 6.9 log units from ln(1e-6) before
+alpha is useful, and the arms escape at different rates —
+
+| arm | epochs merely to reach a useful alpha |
+|---|---|
+| scalar | 13.8 |
+| 6-block | 14.0 |
+| layerwise | 17.3 |
+| nodewise | 25.1 |
+
+**A substantial part of what earlier tables called "the granularity effect" at short budgets is
+the arms escaping a deliberately crippled initialisation at different rates.** Every
+short-budget comparison at alpha0 = 1e-6 must be read with this in mind, and the alpha0 control
+runs are the correct basis for any steady-state claim.
+
+## 9. Fixes applied this round
+* `analysis/aggregate.py` now emits **plateau** (mean of last 5 epochs) as primary, plus
+  `ep_to_85/88/90` and guard/hier/lambda/eta_ratio provenance. Measured: best-of-run inflates
+  over plateau by **0.37pp median** across 356 runs — the same order as the effects claimed.
+* **Non-meta baseline launched** — plain AdamW at 4 fixed learning rates x 2 seeds. Across the
+  first 275 runs there was *not one* non-meta-learned optimiser to compare against; a reviewer
+  would have asked immediately.
+* **Seeds raised to 5** on the 300-epoch headline cells (plain / zpool r=0.1 / scalar).
