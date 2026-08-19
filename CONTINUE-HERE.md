@@ -65,6 +65,12 @@ MetaOptimize's internals and are untouched; any "our method is better" sentence 
 
 
 ## Gotchas that cost hours — do not rediscover these
+* **`LAM=na` / `ETA_RATIO=na` KILL the job.** `HF.py` lines 24-25 `float()` both env vars
+  unconditionally. `na` is what `run_cifar.sh` *echoes* for an UNSET variable, so healthy runs
+  display it -- copying that into `--export=` cost 48 jobs. Non-hierarchical arms must export
+  **none** of `HIER`/`LAM`/`ETA_RATIO`; under `HIER=additive` use `LAM=0`.
+* **`resnet18_blocks` is ResNet18-only** -- `ZeroDivisionError` at `HF.py:175` on ResNet10/34
+  (6 `sc-*-blk6` jobs died). Use `scalar`/`layerwise` on other architectures.
 * **12 running per account IS the ceiling, not a bug.** Every non-`gpu-short` GPU node reports
   `AllocTRES` = its full GPU count (other users hold them); `qos-gpu-short` caps at
   `gres/gpu=12` per user. Confirm with `scontrol show node <n> | grep AllocTRES` before

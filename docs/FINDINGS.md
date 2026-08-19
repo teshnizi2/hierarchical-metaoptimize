@@ -4058,6 +4058,40 @@ Verified before submitting, per the cycle-19 gotcha: `ResNet10_c100`/`ResNet34_c
 `build_network.py` and `cifar-100-python` is staged on **both** accounts; the queued `sw-cos-*`
 block is *not* a duplicate of `fxcos-*` (differs in `COS_WARMUP`).
 
+## 21.7 A one-word env value silently destroyed 48 jobs
+
+`Optimizers/HF.py` parses two env vars **unconditionally**, before any hierarchy branch:
+
+```python
+self._hier_lam   = float(_os.environ.get('LAM','0')       or 0)   # line 24
+self._hier_ratio = float(_os.environ.get('ETA_RATIO','1') or 1)   # line 25
+```
+
+So exporting **either** as the string `na` raises `ValueError: could not convert string to
+float: 'na'` at optimizer construction and the job dies in seconds.
+
+The trap is that `na` is exactly what a *healthy* run prints. `jobs/run_cifar.sh` echoes
+`ENV: ... LAM=${LAM:-na} ETA_RATIO=${ETA_RATIO:-na}`, so every successful non-hierarchical run
+shows `LAM=na ETA_RATIO=na` in its `.out` — from an **unset** variable. Copying that line into
+an `--export=` list turns a display placeholder into an illegal value.
+
+| block | acct | jobs | exported | outcome |
+|---|---|---|---|---|
+| `amx-*` (Adam-meta additive ladder) | alice2 | 15 | `HIER=additive,LAM=na` | all FAILED |
+| `am4-*` (M1 r-curve at α₀=1e-4) | alice2 | 21 | `HIER=additive,LAM=na` | all FAILED |
+| `cs-*` scalar/layerwise (this cycle) | alice | 12 | `HIER=,ETA_RATIO=na` | caught before running; cancelled + resubmitted |
+
+**Rule: non-hierarchical arms must export NEITHER `HIER` NOR `LAM` NOR `ETA_RATIO`** — the
+defaults (`''`, `0`, `1`) are already correct. Under `HIER=additive` only `ETA_RATIO` is read,
+so `LAM=0` is inert and correct. Verified by reproducing both failures and all three fixes
+against the real `HF.py` parse on a login node before resubmitting.
+
+Unrelated failure found in the same sweep: `sc-ResNet10-blk6-*` and `sc-ResNet34-blk6-*`
+(6 jobs) die with `ZeroDivisionError` at `HF.py:175` — `resnet18_blocks` hard-codes a block
+partition whose sizes must sum to the parameter count, so **it is valid for ResNet18 only**.
+Use `scalar`/`layerwise` (naming-agnostic) on other architectures. This is why `cs-*` carries
+no `blk6` arm.
+
 ## 21.6 Still open
 
 * §21.2 is one CIFAR-100 model size away from being a result rather than a hypothesis.
