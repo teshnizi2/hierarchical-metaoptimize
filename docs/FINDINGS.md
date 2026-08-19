@@ -3746,3 +3746,217 @@ is the ResNet10-scalar pathology again, now on a 100-class problem. The α₀=1e
   `run_cifar_alice2.sh` on that account — that name exists only in the git repo.
 
 Queue at end of cycle 19: **alice 161, alice2 104 = 265 jobs**, 24 running.
+
+---
+
+# Cycle 20
+
+Re-derived from `results/all_runs.csv` at **638 runs** (was 590; 48 new). Every number below
+was recomputed from the CSV in this cycle, not carried over from prose.
+
+## 1. `r` is pooling RETENTION, not pooling strength — r=0 is FULL pooling, r=1 is the identity
+
+`patches/HF_patched.py::_apply_hier`, additive branch:
+
+```
+d   = beta - beta_prev          # realised per-group meta-update
+dm  = d.mean()                  # shared component
+beta = beta_prev + dm + r*(d - dm)
+```
+
+At **r=1** this telescopes to `beta_prev + d = beta` — the exact identity, i.e. **plain
+layerwise**. At **r=0** every group takes the *same* (mean) update — **full pooling**.
+
+Cycles 16–19 read `r=0` as the no-pooling control and quoted the M1 gain against it. That is
+backwards: `r=0` is the *maximally pooled* extreme. **The correct no-pooling control is `r=1`,
+which equals plain layerwise.**
+
+Structural verification (rule 4 — identity checked, not assumed), ResNet18/CIFAR-10, α₀=1e-6,
+plateau, `epochs_done>=100`:
+
+| arm | n | plateau |
+|---|---|---|
+| additive r=1 | 3 | **90.863 ±0.063** |
+| plain layerwise (HIER unset) | 47 | **90.891 ±0.492** |
+
+Difference **0.028pp**, inside the ±0.02–0.05pp reproduction band. The identity holds.
+
+## 2. The M1 curve, restated with both endpoints — ResNet18/CIFAR-10, α₀=1e-6
+
+| r | n | plateau |
+|---|---|---|
+| 0 (full pooling) | 8 | 92.190 ±0.161 |
+| 0.03 | 8 | 92.142 ±0.696 |
+| 0.04 | 5 | 92.862 ±0.129 |
+| 0.05 | 12 | 93.041 ±0.127 |
+| **0.06** | 8 | **93.262 ±0.135** |
+| 0.07 | 9 | 93.192 ±0.152 |
+| 0.1 | 10 | 92.281 ±0.918 |
+| 0.2 | 3 | 91.387 ±0.142 |
+| 0.3 | 3 | 90.957 ±0.079 |
+| 1 (no pooling ≡ layerwise) | 3 | 90.863 ±0.063 |
+
+This is a **fully sampled unimodal curve with both extremes measured**, which is a stronger
+result than the one previously recorded. Partial pooling beats **both** endpoints:
+**+2.40pp over no pooling (r=1)** and **+1.07pp over full pooling (r=0)**.
+
+> Supersedes the cycle-16/19 phrasing "93.06–93.22 vs 92.15 at r=0". The 92.15 figure is the
+> full-pooling extreme, not a no-pooling baseline. **The headline pooling gain at ResNet18,
+> α₀=1e-6 is +2.40pp, not +1.07pp** — but only because the baseline was misidentified, not
+> because any run changed.
+
+## 3. r* moves with the setting — the ladder is not transferable
+
+| setting | α₀ | r=0 | r* (measured best) | r=1 (no pooling) | gain at r* |
+|---|---|---|---|---|---|
+| ResNet18/C10 | 1e-6 | 92.190 (n=8) | **0.06** → 93.262 (n=8) | 90.863 (n=3) | +2.40 |
+| ResNet18/C10 | 1e-3 | — | 0.06 → 92.119 (n=5) | 91.173 (n=15) | +0.95 |
+| ResNet10/C10 | 1e-6 | 82.114 (n=3) | **≥0.1** → 91.619 (n=2) | 90.619 (n=3) | +1.00 |
+| R18_c100/C100 | 1e-6 | — | ≤0.07 → 59.046 (n=2) | 69.886 (n=2) | **−10.84** |
+| R18_c100/C100 | 1e-3 | — | ≤0.07 → 26.383 (n=2) | 70.113 (n=2) | **−43.73** |
+
+Three things fall out:
+
+* **ResNet10's optimum is at r≥0.1, not 0.06**, and its curve is monotone increasing across
+  every sampled point up to 0.1. The ResNet18 optimum does not transfer even one rung down
+  the scale ladder.
+* **On CIFAR-100 pooling is harmful, severely.** At α₀=1e-3, r=0.07 costs **43.7pp** against
+  plain layerwise — it drags layerwise (70.11) most of the way back to scalar (22.47). The
+  r=0.07 setting was tuned on CIFAR-10/ResNet18 and is simply the wrong operating point on
+  a 100-class problem.
+* The ResNet10 "r=0 → 82.11" collapse, which looked like a dramatic pooling gain, is just the
+  full-pooling extreme being bad on a small net — consistent with `sc-ResNet10-scal` = 70.74.
+
+> **Consequence.** No pooling claim may be stated without naming *both* the setting and α₀.
+> "M1 additive pooling helps" is true on CIFAR-10 and false on CIFAR-100 at the same r.
+
+## 4. CIFAR-100 (Axis 2) — now complete, n=2, all four arms, both α₀, all at 100 epochs
+
+Plateau, `epochs_done=100`:
+
+| arm | α₀=1e-6 | α₀=1e-3 |
+|---|---|---|
+| scalar | 22.30 ±0.81 | 22.47 ±0.37 |
+| resnet18_blocks (6) | 52.73 ±0.41 | 51.32 ±1.26 |
+| layerwise | **69.89 ±0.13** | **70.11 ±0.25** |
+| additive r=0.07 | 59.05 ±1.69 | 26.38 ±1.35 |
+| **granularity (layer − scalar)** | **+47.59** | **+47.64** |
+| **pooling (add − layer)** | **−10.84** | **−43.73** |
+
+The epoch counts are now equal, so cross-arm comparison **is** licensed (cycle 19 correctly
+withheld it at unequal epochs).
+
+* **Granularity is worth +47.6pp on CIFAR-100 and is completely insensitive to α₀** (+47.59
+  vs +47.64). On CIFAR-10/ResNet18 the same contrast is +2.87/+3.50. Granularity is
+  monotone in fineness: scalar 22 < 6-block 52 < layerwise 70, at both α₀.
+* This is the **largest and most α₀-robust granularity effect in the campaign**, and it is on
+  the second dataset — exactly the axis the paper was missing.
+
+## 5. Drift vs group size — the sqrt(N) prediction is INVERTED, in 3/3 settings
+
+`bin/drift_extract2.py` over `runs/p4scale/*`, α₀=1e-3, 20 epochs, steps 1000–7500.
+**Design note:** these arms run `HIER=shrink, LAM=1.0`, so β is held *common* across groups
+and only the group size over which the meta-gradient is aggregated varies. That is the
+controlled design the sqrt(N) test wants, and it must be stated when quoting these numbers.
+
+| setting | weightwise | nodewise | layerwise | scalar |
+|---|---|---|---|---|
+| ResNet10/C10 | 4.322e-05 | 2.318e-04 | 1.102e-04 | 6.854e-04 |
+| ResNet34/C10 | 2.497e-06 | 1.120e-04 | 4.737e-05 | 2.317e-04 |
+| R18_c100/C100 | 2.690e-05 | 2.137e-04 | 8.710e-05 | 7.254e-04 |
+
+Group size runs weightwise (N=1) < nodewise (~10²) < layerwise (~10⁴–10⁶) < scalar (~10⁷).
+The sqrt(N) sampling model predicts drift ∝ N^−0.5, i.e. **weightwise highest, scalar lowest**.
+**Measured: weightwise lowest and scalar highest, in all three settings.**
+
+| setting | drift(scalar)/drift(weightwise) | implied log-log slope | predicted |
+|---|---|---|---|
+| ResNet10/C10 | 15.9× | **+0.179** | −0.500 |
+| ResNet34/C10 | 92.8× | **+0.268** | −0.500 |
+| R18_c100/C100 | 27.0× | **+0.203** | −0.500 |
+
+The slope is **positive** where the model requires −0.5. This extends the campaign's central
+refutation from one architecture to **three architectures across two datasets**, and it does so
+at α₀=1e-3, i.e. in the steady-state regime rather than the escape-from-bad-init regime.
+
+Cross-group sign agreement (multi-coordinate arms only), same runs:
+
+| setting | weightwise | nodewise | layerwise |
+|---|---|---|---|
+| ResNet10/C10 | 0.5047 (0.47% excess) | 0.5339 (3.39%) | 0.5219 (2.19%) |
+| ResNet34/C10 | 0.5008 (0.08%) | 0.5132 (1.32%) | 0.5200 (2.00%) |
+| R18_c100/C100 | 0.5026 (0.26%) | 0.5279 (2.79%) | 0.5286 (2.86%) |
+
+**Weightwise coordinates are essentially independent in sign (0.08–0.47% excess) in every
+setting** — confirming across three architectures what CORRECTIONS recorded at ResNet18 alone
+(0.38% at α₀=1e-3). So the sampling model's *premise* (independence) is satisfied at
+weightwise, and its *prediction* still fails. The failure is not an independence violation.
+
+> **Do not quote "53.1% agree on sign" without α₀=1e-6.** At α₀=1e-3 the excess is under 0.5%
+> at weightwise in all three settings.
+
+## 6. Two tooling defects found and fixed
+
+* **`bin/drift_extract.py`'s structural check was vacuous.** It printed
+  `spread = beta_true_max − beta_true_min` as a verification that pooled arms carry one step
+  size. The probe writes those two fields **identically on every arm** (confirmed by reading
+  raw records on `p4-r34-lay`, a 110-group layerwise arm: both = −6.032741069793701), so
+  `spread` read 0.0000 **by construction and could never fail**. This is precisely the
+  failure mode rule 4 names. Replaced in `bin/drift_extract2.py` by `sd_beta`, the real
+  standard deviation across the per-group β vector.
+* **`frac_neg` is meaningless on a scalar arm.** It is computed over a 1-element list, so per
+  record it is 0.0 or 1.0 and its mean is the fraction of *timesteps* the single coordinate
+  was negative — not cross-coordinate agreement. The previously tabulated scalar values
+  (0.3333 at ResNet10, 0.1970 at CIFAR-100) are **not** agreement figures and are now reported
+  as `n/a`. No published claim depended on them.
+
+## 7. Submitted this cycle — queue: alice 153, alice2 125 = **278 jobs**
+
+* **`rc100-*` (alice, 14) promoted from Nice=3000 to the queue front.** Cycle 19 parked it
+  because the first-order CIFAR-100 comparison had not landed. §4 is that comparison, and it
+  says pooling is catastrophic on CIFAR-100 — so the r-ladder is now the single most
+  informative thing in the queue. r ∈ {0, 0.03, 0.05, 0.07, 0.1, 0.2, 1} × 2 seeds, α₀=1e-3.
+* **`m1a3-*` (alice, 15)** — ResNet18/CIFAR-10 pooling ladder at **α₀=1e-3**,
+  r ∈ {0, 0.03, 0.1, 0.2, 0.4} × 3 seeds. Only r=0.06 and r=1 exist at this α₀; the shape of
+  the curve off α₀=1e-6 is unmeasured. Decides whether r*≈0.06 survives α₀.
+* **`p6f-*` (alice, 9)** — the **free-adaptation companion** to `p4scale`. Same three settings
+  and three granularities but with `HIER` **unset**, so groups adapt independently. Closes the
+  §5 design caveat: does sign agreement survive when groups are allowed to diverge?
+* **`rc6-*` (alice2, 14)** — CIFAR-100 ladder at **α₀=1e-6**, r ∈ {0, 0.05, 0.1, 0.2, 0.4,
+  0.7, 1} × 2 seeds. Twin of `rc100`. Separates "CIFAR-100 hates pooling" from "α₀=1e-3 hates
+  pooling" — the penalty is −10.84 at 1e-6 and −43.73 at 1e-3.
+* **`rcg-*` (alice2, 9)** — CIFAR-100 gap-fill, r ∈ {0.4, 0.6, 0.8} × 3 seeds, α₀=1e-3.
+  `rc100` jumps 0.2 → 1 with nothing between; any CIFAR-100 interior optimum lives there.
+* **`r10b-*` (alice2, 15)** — ResNet10 ladder completion, r ∈ {0.08, 0.15, 0.3, 0.4, 0.6} × 3
+  seeds, α₀=1e-6. Brackets a peak that §3 shows is at r≥0.1, not 0.06.
+* **Not submitted, because it already existed:** the α₀=1e-6 probe ladder. `p5-*` (alice2, 12)
+  is exactly that and is already queued. Checked before submitting, per the cycle-19 gotcha.
+* **CIFAR-100 is staged on BOTH accounts** (`.../cifar10/data/cifar-100-python` present on
+  s5014158 as well), and `build_network.py` there supports `ResNet18_c100`/`ResNet34`. The
+  priority-2 axis is no longer single-account bound.
+
+## 8. Operations
+
+* The cluster's `analysis/aggregate.py` was **stale on both accounts** — it lacked the
+  `network`/`dataset`/`batch_size` columns that `results/all_runs.csv` carries, so a naive
+  re-aggregation would have silently dropped the three columns every cross-architecture and
+  cross-dataset claim depends on. Pushed the repo version to both accounts before aggregating.
+* `python` on a login node needs `module load Python/3.10.4-GCCcore-11.3.0` *before*
+  `source envs/mo/bin/activate`, or it dies with
+  `libpython3.10.so.1.0: cannot open shared object file`.
+* Roughly 120 of alice's pending jobs sit at reason `(None)` rather than `(Resources)`. That is
+  the scheduler's per-user evaluation depth, not a hold — jobs beyond the top ~100 are simply
+  not examined each pass. It is a reason to keep the *front* of the queue correctly ordered,
+  not a reason to submit less.
+
+## 9. What is still open
+
+* §3's r* ladder is the live question: r* is 0.06 (R18/C10), ≥0.1 (R10/C10) and apparently >0.2
+  or nonexistent (C100). Six ladders are in flight to map it.
+* §4's CIFAR-100 granularity result is n=2. It is large enough (+47.6pp) that n=2 is not the
+  constraint, but headline cells should reach n≥5.
+* §5's slope is computed from the weightwise↔scalar endpoints only. A proper regression over
+  all four granularities needs the per-granularity group sizes `N`, which the probe records as
+  `param_numels` but the reducer does not yet consume.
+* The non-meta baseline (Axis 4) is still uncorrected AdamW 91.894 (n=4); `fx-e300-*` and
+  `fxcos-*` remain queued.

@@ -273,3 +273,55 @@ four architectures is in FINDINGS cycle 18 §2.
 first two occurrences were controls that sat unread; this one was a control that *was
 deliberately submitted for exactly this purpose* in cycle 7, completed, and then was never
 reduced. Reducing every probe dir that exists should precede submitting new ones.
+
+---
+
+## 13. The M1 pooling baseline was the wrong endpoint (cycle 20)
+
+**What was wrong.** Cycles 16–19 quoted the M1 additive-pooling gain against `r=0`, describing
+it as the no-pooling control — e.g. "interior optimum r ≈ 0.05–0.07, plateau 93.06–93.22 vs
+**92.15 at r=0**".
+
+**What the code actually does.** `patches/HF_patched.py::_apply_hier`, additive branch:
+
+```
+d    = beta - beta_prev
+dm   = d.mean()
+beta = beta_prev + dm + r*(d - dm)
+```
+
+`r` is the **retention of the group-specific part of the update**. At `r=1` the expression
+telescopes to `beta_prev + d = beta`, the exact identity — **plain layerwise**. At `r=0` every
+group takes the mean update — **full pooling**. So `r=0` is the *maximally pooled* extreme and
+was being used as the *un*-pooled baseline.
+
+**Structural verification** (not asserted from the algebra — measured, per Rule 4).
+ResNet18/CIFAR-10, α₀=1e-6, plateau, `epochs_done>=100`:
+
+| arm | n | plateau |
+|---|---|---|
+| additive r=1 | 3 | 90.863 ±0.063 |
+| plain layerwise, `HIER` unset | 47 | 90.891 ±0.492 |
+
+0.028pp apart — inside the ±0.02–0.05pp reproduction band.
+
+**Effect on the claims.** No run changed and no measurement was wrong; only the baseline was
+misnamed. The corrected headline is **larger**, not smaller:
+
+| | old phrasing | corrected |
+|---|---|---|
+| ResNet18/C10, α₀=1e-6, r*=0.06 | +1.07pp "vs r=0" | **+2.40pp vs no pooling (r=1)** |
+| | | (+1.07pp vs full pooling, r=0) |
+
+The curve is unimodal with **both** endpoints now measured, which is a better result than the
+one it replaces. What it costs is transferability: the ResNet10 ladder, read correctly, is
++1.00pp rather than the +8.7pp that "vs r=0" implied, and on CIFAR-100 the same r is
+**−43.7pp**.
+
+**Process note (Rule 4, second occurrence).** The first occurrence was a pooling identity that
+was never checked at all. This one is worse: a check *existed* — `drift_extract.py` printed a
+`spread` column advertised as verifying that pooled arms carry one step size — but it read
+`beta_true_max − beta_true_min`, two probe fields that are written **identically on every arm**.
+It reported 0.0000 by construction and could never have failed. A verification that cannot fail
+is worse than no verification, because it is recorded as evidence. Replaced by `sd_beta` in
+`bin/drift_extract2.py`.

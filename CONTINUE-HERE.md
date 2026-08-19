@@ -17,52 +17,58 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph (rewritten cycle 19)
-The **most defensible result is a refutation, and it now survives its own control**: the
-sqrt(N) noise model predicts a log-log drift-vs-N slope of -0.500; measured **-0.110 at
-alpha0=1e-6 and -0.136 at alpha0=1e-3**. But the *effect size* behind it is much smaller
-than the headline says -- weightwise sign-agreement is **6.20% excess at alpha0=1e-6 and
-only 0.38% at alpha0=1e-3** (16x collapse). **Never quote "53.1% agree on sign" without
-saying alpha0=1e-6.** Cycle 19 found **the same alpha0 asymmetry in the method result**:
-on ResNet18, granularity (layerwise-scalar) is +2.87pp at alpha0=1e-6 and **+3.50pp** at
-alpha0=1e-3 (robust), but M1 pooling (additive-layerwise) is +2.62pp at alpha0=1e-6 and
-only **+0.91pp** at alpha0=1e-3 -- **a 65% loss**. The pooling headline is an alpha0=1e-6
-number; never quote it without naming alpha0. The **scale axis** is the emerging spine:
-granularity buys **+19.88pp at ResNet10, +2.87pp at ResNet18**, and this is driven
-**entirely by the scalar arm improving** (70.74 -> 87.82 -> 89.46 partial at ResNet34)
-while layerwise stays flat (90.62 -> 90.69). So the parent paper's "granularity stops
-helping at scale" is mechanically "**the scalar arm stops failing**". That whole ladder is
-at alpha0=1e-6 and is now under its own control (`sa3-*`). CIFAR-100 has its **first four
-rows** but at unequal epoch counts -- no cross-arm comparison is licensed yet.
+## The state of the science, in one paragraph (rewritten cycle 20)
+Two results now carry the paper, and both got stronger this cycle. **(1) The sqrt(N) noise
+model is refuted with the sign INVERTED, in three architectures across two datasets.** Holding
+beta common (`HIER=shrink, LAM=1.0`) and varying only the group size over which the
+meta-gradient is aggregated, drift *rises* with group size: weightwise is the slowest-drifting
+arm and scalar the fastest, giving log-log slopes of **+0.179 / +0.268 / +0.203** (ResNet10,
+ResNet34, ResNet18_c100) where the model requires **-0.500**. This is at alpha0=1e-3, i.e.
+steady state, and weightwise sign-agreement excess is 0.08-0.47% -- so independence *holds*
+and the prediction *still* fails. **(2) CIFAR-100 gives granularity +47.6pp, and it does not
+care about alpha0** (+47.59 at 1e-6, +47.64 at 1e-3), monotone in fineness: scalar 22 <
+6-block 52 < layerwise 70. That is the second dataset the paper needed, and the largest,
+most robust effect in the campaign. **The correction that reframes everything else:** in
+`_apply_hier`, `r` is the RETENTION of the group-specific update -- **r=1 is plain layerwise
+(verified: 90.863 +-0.063 vs 90.891) and r=0 is FULL pooling**. Cycles 16-19 quoted the M1
+gain against r=0 while calling it the no-pooling control. Corrected, ResNet18/CIFAR-10 at
+alpha0=1e-6 is **+2.40pp over no pooling** (a bigger number), but the ladder does not
+transfer: r*=0.06 at ResNet18, r*>=0.1 at ResNet10, and on CIFAR-100 that same r=0.07 costs
+**-43.7pp**. Never state a pooling claim without naming both the setting and alpha0.
 
-## Running / next (cycle 19)  -- queue: alice 161, alice2 104 = 265 jobs
-* **`sa3-*` (alice2, 18) is the decisive job of the campaign right now.** ResNet10 + ResNet34
-  x {scalar, layerwise, additive r=0.06} x 3 seeds at **alpha0=1e-3**. The entire scale ladder
-  is alpha0=1e-6, and `sc-ResNet10-scal` collapses to 70.74 (never reaches 85%, but *converged*
-  -- plateau == final_test, so it is not an unfinished run). If that collapse is an
-  escape-from-1e-6 artifact, the +19.88pp granularity gain at ResNet10 is too, and the scale
-  trend dies. ResNet18's alpha0=1e-3 column already exists as `mx-a1e3-*` (verified an exact
-  config match to `sc-ResNet18-*`), so those 9 sa3 jobs were cancelled as redundant.
-* **`sc50-*` / `sc101-*` (alice, 24)** -- 4th and 5th rungs, ResNet50/ResNet101 x 3 arms x
-  **both alpha0** x 2 seeds. The real axis is N (layerwise group count): R34 ~36 conv layers,
-  R50 ~53, R101 ~104. Both alpha0 on purpose so they survive whichever way `sa3-*` lands.
-  R101 omits `gpu-short` (needs >4h).
-* **`sc-ResNet34-*` s3,s4 (alice, 6)** -- takes the now-headline ResNet34 row to n=5.
-* **`p6-*` (alice2, 16)** -- M1 r-ladder at alpha0=1e-3, 100 ep, probe on for the full budget.
-  Gives steady-state drift and plateau from the SAME runs. Still the best shot at the
-  missing mechanism.
-* **`p4-*` (alice, 12) / `p5-*` (alice2, 12)** -- agreement/drift vs granularity across
-  {ResNet10, ResNet34, ResNet18_c100}. Question: is agreement a function of **N alone** or of
-  **partition type**? This is what would JOIN the refutation to the scale axis -- if agreement
-  at layerwise rises with scale, it explains why layerwise stops beating scalar.
-* **Axis 2, CIFAR-100:** first four rows landed (layer 69.79 @100ep; add 60.75 @97ep;
-  blk6 52.14 @82ep; scal 23.08 @83ep). **Unequal epochs -- compare nothing yet.** `c100-1e3-*`
-  is at positions 16-23. Watch for pooling *inverting* on CIFAR-100.
-* **Axis 4, non-meta baseline:** uncorrected AdamW 91.894 (lr 3e-4, n=4); `fxcos-*` supersedes.
-* Deprioritised: `rc100-*` (Nice=3000, second-order refinement of an axis with no first-order
-  result yet), `mx-b*`/`mx-add-r007/8`/`mx-h4-*`/`zrn-*` (tier-3, Nice=6000-10000).
+## Running / next (cycle 20)  -- queue: alice 153, alice2 125 = 278 jobs
+* **Six pooling ladders are in flight to map r\*(setting).** This is the live question: r\* is
+  0.06 (ResNet18/C10), >=0.1 (ResNet10/C10), and >0.2-or-nonexistent (CIFAR-100).
+  `rc100-*` (alice, 14, C100 @1e-3, **promoted to the queue front**), `rc6-*` (alice2, 14,
+  C100 @1e-6), `rcg-*` (alice2, 9, C100 gap-fill r in {0.4,0.6,0.8}), `m1a3-*` (alice, 15,
+  R18/C10 @1e-3), `r10b-*` (alice2, 15, R10 r in {0.08,0.15,0.3,0.4,0.6}).
+* **`p6f-*` (alice, 9)** -- free-adaptation companion to `p4scale`: same nets/granularities
+  with `HIER` **unset**, so groups diverge. `p4`/`p5` measured agreement under a COMMON beta
+  (LAM=1.0); this closes that caveat.
+* **`p5-*` (alice2, 12)** -- the alpha0=1e-6 probe ladder. Already queued; do NOT resubmit it.
+* Still open: CIFAR-100 granularity is n=2 (effect is +47.6pp so n is not the constraint, but
+  headline cells want n>=5); the §5 slope uses only the weightwise<->scalar endpoints, and a
+  4-point regression needs `param_numels`, which the probe records but the reducer ignores;
+  Axis 4's non-meta baseline is still uncorrected AdamW 91.894 (n=4), `fx-e300-*` queued.
+* Deprioritised, unchanged: `mx-b*`/`mx-add-r007/8`/`zrn-*` (tier-3, Nice=6000-10000).
 
 ## Gotchas that cost hours — do not rediscover these
+* **`r` in the additive hierarchy is RETENTION: r=1 = plain layerwise, r=0 = FULL pooling.**
+  Three cycles quoted the M1 gain against r=0 as if it were the no-pooling control. See
+  CORRECTIONS 13.
+* **`bin/drift_extract.py`'s `spread` column is a verification that cannot fail** -- it reads
+  `beta_true_max - beta_true_min`, which the probe writes identically on every arm. Use
+  `bin/drift_extract2.py` (`sd_beta`) instead. Its `frac_neg` is also meaningless on scalar
+  arms (1-element list -> it measures a time-fraction, not agreement).
+* **The cluster's `analysis/aggregate.py` drifts stale.** It lost the
+  `network`/`dataset`/`batch_size` columns; re-aggregating without pushing the repo version
+  first silently drops every cross-architecture and cross-dataset claim. `scp` it before use.
+* **Login-node python needs `module load Python/3.10.4-GCCcore-11.3.0` BEFORE
+  `source envs/mo/bin/activate`**, else `libpython3.10.so.1.0: cannot open shared object file`.
+* **CIFAR-100 is staged on BOTH accounts** (`.../cifar10/data/cifar-100-python`), and alice2's
+  `build_network.py` supports `ResNet18_c100`/`ResNet34`. It is not single-account bound.
+* Pending jobs at reason `(None)` are not held -- that is the scheduler's per-user evaluation
+  depth (~top 100). Order the front of the queue; do not submit less.
 * **`HIER=none` is TRUTHY and silently enables the hierarchy branch.** `HF.py` does
   `self._hier = os.environ.get('HIER','')` then `if self._hier:`. Existing `sc-*` runs log
   `HIER=none` **only** because `run_cifar.sh` echoes `${HIER:-none}` over an *unset* variable.
