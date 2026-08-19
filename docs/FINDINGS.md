@@ -4263,3 +4263,116 @@ and `ResNet18_c100` confirmed in `build_network.py`; `cifar-100-python` staged o
 * 22.4 (aggregation vs granularity) is CIFAR-10/alpha0=1e-6 only; `m0c-*` lam=1.0 extends it.
 * Non-meta baseline (`fx-adamw-*`) still absent on CIFAR-10; `fc100-cos-*` pending for C100.
 * Every CIFAR-100 cell in 22.2/22.6 is n=2 until `c1b-*` lands.
+
+---
+
+# Cycle 23 — the pooling gain runs OPPOSITE to the granularity gain in model scale
+
+All numbers below re-derived from `results/all_runs.csv` (733 rows, +20 this cycle),
+`plateau` (mean of last 20 epochs), filtered `epochs_done>=100`, `superseded==0`, `AUGMENT=1`.
+
+## 23.1 Pipeline check
+
+Re-aggregation reproduces the cycle-21 baseline exactly: AdamW+cosine lr=1e-3 =
+**94.093 +-0.036 (n=3)**. The aggregator, merge and plateau column are intact.
+
+## 23.2 The alpha0=1e-3 scale replication landed (`sa3-*`)
+
+22.5 was measured only at alpha0=1e-6 and flagged "in flight". It now replicates.
+CIFAR-10, plain (no hierarchy), 100ep:
+
+| network | a0=1e-6 scalar | a0=1e-6 layer | gain | a0=1e-3 scalar | a0=1e-3 layer | gain |
+|---|---|---|---|---|---|---|
+| ResNet10 | 70.742 +-0.832 (3) | 90.619 +-0.267 (3) | **+19.88** | 70.782 +-1.252 (2) | 91.259 +-0.275 (3) | **+20.48** |
+| ResNet18 | 86.337 +-14.162 (24) | 90.933 +-0.529 (37) | +4.60 | 88.784 +-2.037 (15) | 91.100 +-0.319 (20) | +2.32 |
+| ResNet34 | 89.317 +-0.127 (3) | 90.220 +-0.011 (3) | **+0.90** | 89.727 +-0.276 (2) | 90.237 (n=1) | **+0.51** |
+
+Monotone decay at BOTH alpha0. The cycle-21 mechanism also replicates: the **layerwise arm is
+flat** (1e-3 spread 91.259->90.237 = 1.02pp; 1e-6 spread 0.71pp) while the **scalar arm climbs
+18.6-19.0pp**. The granularity "gain" shrinking with scale is scalar catching up, not layerwise
+degrading — now shown at two alpha0.
+
+Caveat: ResNet34 layerwise @1e-3 is **n=1**; two more seeds are queued on alice2.
+Note ResNet18 scalar @1e-6 has sd **14.16** over n=24 — that cell is bimodal (collapse-prone),
+not a tight mean. Do not quote it as a point estimate.
+
+## 23.3 NEW — M1 additive pooling gain INCREASES with model size
+
+Same runs, additive hierarchy at r=0.06 vs plain layerwise, CIFAR-10:
+
+| network | a0=1e-6 delta | n | a0=1e-3 delta | n |
+|---|---|---|---|---|
+| ResNet10 | +0.17 | 3v3 | **-2.30** | 3v3 |
+| ResNet18 | +2.33 | 8v37 | +0.83 | 17v20 |
+| ResNet34 | **+2.62** | 3v3 | **+3.29** | 1v1 |
+
+Monotone INCREASING at both alpha0, crossing zero at 1e-3. This is the **opposite direction**
+to 23.2's granularity gain (+19.88 -> +0.90). Two mechanisms with opposite scale dependence:
+plain granularity stops paying as models grow; pooling starts paying.
+
+`sa3-ResNet34-add-s0` at **93.522** is the highest single MetaOptimize plateau in the campaign
+(previous best 93.552 `e3a-r01_s1` R18) — still **below** the tuned non-meta 94.093. The
+cycle-21 correction stands: this is a statement about MetaOptimize internals, not a win.
+
+Caveat: both ResNet34 @1e-3 cells are **n=1**. The alpha0=1e-6 R34 pair is n=3 with sd 0.147
+(additive) / 0.011 (plain) and is the defensible cell.
+
+## 23.4 Why 23.3 is not yet reportable — R34 has no r-curve
+
+Rule 3 (report the curve, not the max cell) is currently violated: ResNet34 is sampled at
+**one** r. The two curves we do have, CIFAR-10 @ alpha0=1e-6, delta vs plain layerwise:
+
+| r | ResNet10 (plain 90.619) | ResNet18 (plain 90.933) |
+|---|---|---|
+| 0 (FULL pooling) | **-8.50** (n=3) | **+1.26** (n=8) |
+| 0.03 | -1.39 (3) | +1.21 (8) |
+| 0.04 | — | +1.93 (5) |
+| 0.05 | -0.36 (3) | +2.11 (12) |
+| 0.06 | +0.17 (6) | **+2.33 (8)** |
+| 0.07 | +0.49 (3) | +2.26 (9) |
+| 0.1 | **+0.97 (3)** | +1.35 (10) |
+| 0.2 | +0.46 (3) | +0.45 (3) |
+| 0.3 | — | +0.02 (3) |
+| 1 (identity) | -0.03 (3) | -0.07 (3) |
+
+Both are interior optima, and **r=1 reproduces plain layerwise to -0.03/-0.07pp** — the
+identity control holds at both architectures (structural check, per rule 4).
+
+Two things move together with model size:
+* **peak location** shifts toward LESS pooling as the model shrinks: R18 peaks at r=0.06, R10 at r=0.1
+* **peak amplitude** grows with model size: R10 +0.97, R18 +2.33
+* **full pooling (r=0)** goes from catastrophic at R10 (-8.50) to helpful at R18 (+1.26)
+
+**Prediction to test:** ResNet34's optimum sits at r < 0.06 with peak > +2.62, and r=0 at R34
+should be >= +1.26. If it holds, the claim becomes "the tolerable pooling fraction is set by
+model size", which is mechanistic rather than a single lucky cell.
+
+## 23.5 Submitted this cycle (45 jobs; queues alice 237 / alice2 178 = 415)
+
+| tag | acct | n | what | why |
+|---|---|---|---|---|
+| `r34r-*` | alice | 27 | R34 CIFAR-10 a0=1e-6, r in {0,.02,.03,.04,.05,.08,.1,.2,1} x 3 seeds | THE test of 23.4's prediction; r=0.06 already n=3 so skipped; r=1 = identity control |
+| `r10c-*` | alice2 | 18 | R10 CIFAR-10 a0=1e-3, r in {0,.05,.1,.2,.5,1} x 3 seeds | R10@1e-3 has only r=0.06 and it is NEGATIVE (-2.30); does the optimum shift right at higher alpha0 too? |
+
+Pre-flight: read the real `Optimizers/HF.py` lines 23-25 — `LAM` defaults to `'0'`,
+`ETA_RATIO` to `'1'` when unset, both with an `or` guard. So the additive arm must export
+**only** `HIER` and `ETA_RATIO`. Verified `ETA_RATIO=0` parses to `0.0` (the `or 1` guard does
+not trip: `'0'` is a non-empty string). Matches the working `sc-ResNet34-add-s0` ENV line.
+
+## 23.6 Queue triage
+
+Negative `Nice` is denied, so promotion = niceing others back. Pushed to Nice=20000:
+alice 102 jobs (`sc50` 6, `sc101` 12, `sw-cos` 21, `pp-` 9, `fx-e300` 9, `p6f` 9, `mx-b` 27,
+`mx-add` 9); alice2 58 jobs (`zrn` 13, `amx-` 15, `am4-` 21, `rcg` 9). `sc50`/`sc101` are the
+clearest cut: the CIFAR-10 layerwise arm is flat (23.2), and R50 reaches only 31-34 epochs in
+the 4h `gpu-short` window, so a 100-epoch R50 point cannot be produced there at all.
+
+## 23.7 Still open
+
+* 23.4's prediction — `r34r-*` decides it.
+* `cs-*` (18, alice) CIFAR-100 x R10/R34 granularity ladder: cancelled and **resubmitted**
+  23:54 on 19 Aug (new ids 4683766+, elapsed 0:00 — no data lost). Still the decisive
+  task-difficulty-vs-parameter-count experiment.
+* ResNet34 @ alpha0=1e-3 is n=1 in both arms; seeds queued on alice2.
+* ResNet50 needs a 7-day partition to produce any 100-epoch point.
+* M0 shrink on CIFAR-100 and at scale (`m0c-*`, `m0s-*`) still in flight.

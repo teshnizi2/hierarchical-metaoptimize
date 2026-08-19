@@ -43,26 +43,32 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 21)  -- queue: alice 215, alice2 128 = 343 jobs
-* **`cs-*` (alice, 18)** -- CIFAR-100 x {ResNet10_c100, ResNet34_c100} x {scalar, layerwise,
-  additive r=0.06} x 3 seeds, alpha0=1e-3. THE decisive experiment: fills the 2x2 that
-  separates task-difficulty from parameter-count as the variable ordering the granularity gain.
-* **`fc100-cos-*` (alice, 9)** -- AdamW+cosine on CIFAR-100, lr in {1e-3,3e-4,1e-4} x 3 seeds.
-  There is currently NO non-meta baseline on CIFAR-100, the dataset carrying our largest effect.
-* **`fxcos-*` (alice, 7)** -- lr 1e-3/3e-4 to n=5 plus lr 3e-3 x 3; brackets the baseline optimum
-  at fixed warmup. NOT a duplicate of the queued `sw-cos-*` sweep, which leaves COS_WARMUP unset.
-* **`c100b-*` (alice2, 18)** -- CIFAR-100 granularity ladder, seeds 2-4, both alpha0: takes the
-  headline cells from n=2 to n=5.
-* **`c100f-*` (alice2, 6)** -- CIFAR-100 nodewise + weightwise. "Monotone in fineness" currently
-  stops at layerwise; on CIFAR-10 under SGDm the finest arm collapses to chance (10.000).
-* Still in flight from cycle 20: six pooling ladders (`rc100`, `rc6`, `rcg`, `m1a3`, `r10b`,
-  `p6`), the `p5-*`/`p6f-*` drift probes, `fx-e300-*`, `bg300/bg600` budget-matched cosine, the
-  `sw-cos-*` 7-point LR sweep, `pp-*` (the parent paper's own unaugmented setup), and
-  `sc50-*`/`sc101-*` (ResNet50/101 CIFAR-10 scale -- lower value now that the CIFAR-10 layerwise
-  arm is known to be flat).
-* Still open: §5's 4-point slope regression needs `param_numels` consumed by the reducer.
-* Deprioritised, unchanged: `mx-b*`/`mx-add-r007/8`/`zrn-*` (tier-3, Nice=6000-10000).
+## Running / next (cycle 23)  -- queues: alice 237, alice2 178 = 415 jobs
 
+**Cycle 23's finding (docs/FINDINGS.md 23.3-23.4):** the M1 pooling gain and the plain
+granularity gain run in OPPOSITE directions in model scale. Plain granularity
+(layerwise - scalar) decays +19.88 -> +4.60 -> +0.90 over R10/R18/R34 at alpha0=1e-6 and
++20.48 -> +2.32 -> +0.51 at 1e-3 (both now measured; the 1e-3 replication `sa3-*` landed this
+cycle). M1 additive at r=0.06 does the reverse: +0.17 -> +2.33 -> +2.62 at 1e-6 and
+-2.30 -> +0.83 -> +3.29 at 1e-3. The r-curves explain why: the optimum shifts toward LESS
+pooling as the model shrinks (R18 peaks r=0.06 +2.33; R10 peaks r=0.1 +0.97) and full pooling
+r=0 goes from +1.26 at R18 to -8.50 at R10. **This is not yet reportable: ResNet34 is sampled
+at ONE r.** `r34r-*` fixes that and tests the prediction that R34's optimum is at r<0.06 with
+peak >+2.62.
+
+* **`r34r-*` (alice, 27)** -- R34 CIFAR-10 a0=1e-6, r in {0,.02,.03,.04,.05,.08,.1,.2,1} x 3
+  seeds. THE experiment: completes the r-curve family at three model sizes. r=1 is the identity
+  control (must reproduce plain layerwise 90.220 +-0.011).
+* **`r10c-*` (alice2, 18)** -- R10 CIFAR-10 a0=1e-3, r in {0,.05,.1,.2,.5,1} x 3 seeds.
+  R10@1e-3 has only r=0.06 and it is NEGATIVE (-2.30); does the optimum shift right at 1e-3 too?
+* **`cs-*` (alice, 18)** -- CIFAR-100 x {R10,R34} x {scalar,layerwise,additive} x 3 seeds.
+  Cancelled+resubmitted 23:54 19 Aug (ids 4683766+, elapsed 0:00, no data lost). Separates
+  task difficulty from parameter count.
+* **`m0c-*`/`m0s-*`/`m0l-*`** -- M0 shrink on CIFAR-100 and at scale; still the open question
+  of whether M0 is the paper's method.
+* **`sa3-ResNet34-*` (alice2)** -- fills the n=1 cells at alpha0=1e-3.
+* Niced back to 20000 this cycle: alice 102 jobs, alice2 58. `sc50`/`sc101` cannot produce a
+  100-epoch point on `gpu-short` at all (31-34 epochs in 4h) -- they need a 7-day partition.
 
 ## Gotchas that cost hours — do not rediscover these
 * **`LAM=na` / `ETA_RATIO=na` KILL the job.** `HF.py` lines 24-25 `float()` both env vars
