@@ -672,3 +672,51 @@ swing, i.e. a 35x step-size difference, hiding inside what was labelled a poolin
 Corollary: an endpoint-only conclusion ("no interior cell beats the endpoint") can still survive a
 confounded interior, provided the confound only ever *penalises* the interior. State which of the
 two you are relying on.
+
+## Gotcha 29 — `run` is not a unique key; a resubmission silently shadows a finished run
+
+`--run-name` is reused on resubmission, so the same name can carry a completed run and an
+in-flight one. Any analysis that keys a dict on `run` keeps whichever was parsed last, which
+is usually the *partial* one. Three completed 100-epoch alpha0 controls
+(`a0-{scal,layer,blk6}-1e4_s0`) were shadowed by 30-epoch reruns this way.
+
+`aggregate.py` now emits `dup_group` / `superseded` and warns on stderr.
+**Every analysis must filter `superseded == 0`.** Job id, not run name, identifies a run.
+
+## Gotcha 30 — before resubmitting a batch, check it has not already completed
+
+The entire queued `a0-*` batch (12 jobs) re-ran configurations already finished at 100/100
+epochs. Cheap check, worth doing every time — compare the intended run-names against completed
+artefacts before submitting:
+
+```
+find runs runs_alice2 -name "<name>-*.out" | while read f; do \
+  echo "$f $(grep -c 'Test Accuracy' "$f")"; done
+```
+
+Note that argument *order* differs between submission scripts (`--alpha0 X --stepsize-groups Y`
+vs the reverse) while being semantically identical, so diff the parsed args, not the raw line.
+
+## Gotcha 31 — a blanket partition widen fails on the long jobs
+
+`gpu-short` and `cpu-short` cap at **4 hours**. `scontrol update Partition=<list incl gpu-short>`
+on a 6-hour job (every 300-epoch arm) fails with `Requested time limit is invalid (missing or
+exceeds some limit)` — and `scontrol` returns non-zero *silently* in a loop, so the widen
+reports success while nothing moved. `bin/widen_long.sh` branches on the job's own time limit:
+>4h goes to the four 7-day GPU partitions, everything else also gets `gpu-short`.
+
+Widening the pending queue this way took `salehkaleybars` from 3 running to 8 in one pass.
+
+## Pending verification — carry to next run
+
+The 15 `amx-*` jobs were submitted with `--export=ALL,...,HIER=additive,ETA_RATIO=<r>`, the same
+form as the verified `ad-l-*` runs, but Slurm does not expose a pending job's environment so the
+propagation is **not yet confirmed**. First check next run:
+
+```
+grep -m1 '^ENV:' runs/amx-r07-s0-*.out    # expect HIER=additive ETA_RATIO=0.07
+```
+
+If `HIER=none` / `ETA_RATIO=na` appears, the export failed and every `amx` run is a plain
+layerwise run wearing an additive name — which would pool into the sweep and corrupt it exactly
+as the Adam contamination did. Do not aggregate `amx-*` into any table before this line is read.
