@@ -3073,3 +3073,37 @@ itself a result worth reporting rather than a wrinkle to smooth over.
   `zm0` gate is in flight.
 * The 8 running `zsx` cells are 2080ti and must never be differenced against `zsw` (gotcha 28).
 * Every number remains CIFAR-10 / ResNet-18, 100 epochs unless stated. ImageNet stays scoped out.
+
+---
+
+# Cycle 14 — the M1 sweep was pooling two meta-optimizers
+
+Full detail and the corrected table: `docs/CORRECTIONS.md` §10–11. Summary of what
+changed, so nothing here is read from the superseded version:
+
+* **M1's interior optimum stands, with different numbers.** Restricted to one
+  meta-optimizer (Lion) and one account, `hier=additive`, layerwise, 100 epochs,
+  plateau: 92.20 → 92.64 → **93.09** → **93.22** (r=0.07) → 92.63 → 91.39 → 90.96.
+  Peak is **+1.02pp over r=0**, n=5 on the peak cells, per-cell sd 0.04–0.21.
+  The stratified curve is monotone up to the peak and monotone after it; the old
+  pooled table's ragged shoulder at r=0.03 was Adam-meta contamination, not signal.
+* **`meta` must be a grouping key in every additive analysis.** Adam-meta additive
+  runs sit ~1.3pp below Lion-meta at matched r, and they populated the shoulder
+  cells only. The CSV always carried the `meta` column; the analysis ignored it.
+* **Meta-optimizer is currently confounded with account** — all Lion additive on
+  `s5014158`, all Adam additive on `salehkaleybars` — so the 1.3pp gap cannot be
+  attributed to either. `amx-*` (n=5, Adam meta, on `s5014158`) is in flight to
+  separate them.
+* **`account` was wrong on all 428 rows** until this cycle (see §11), which is
+  precisely why the confound above was invisible. Any earlier per-account
+  statement in this file predates the fix and should be re-derived before use.
+* **`run` is not a unique key.** Filter `superseded == 0`. Three completed alpha0
+  controls were being shadowed by partial reruns of the same name.
+
+## Standing caveats added this cycle
+
+* No additive result may be quoted without naming the meta-optimizer **and** the
+  account, until `amx-*` lands and decouples them.
+* `plateau` in the CSV is the mean of the **last 20** epochs, not the last 5 as
+  several planning docs state. Conclusions are insensitive to the choice (checked:
+  no M1 cell moves >0.15pp at k=5), but the prose is wrong and should be fixed.

@@ -77,6 +77,10 @@ by the hourly routine and never reviewed. Writing prose from remembered results 
 
 ### 8a. M1 additive has a genuine interior optimum (plateau metric, n=5–10)
 
+> **SUPERSEDED BY §10.** The table below pools two meta-optimizers into the same
+> cells and its per-cell numbers and n are wrong. The interior optimum itself
+> survives — see §10 for the corrected, stratified table.
+
 | r | plateau | n |
 |---|---|---|
 | 0 (= scalar) | 92.15 | 5 |
@@ -134,3 +138,102 @@ runs are the correct basis for any steady-state claim.
   first 275 runs there was *not one* non-meta-learned optimiser to compare against; a reviewer
   would have asked immediately.
 * **Seeds raised to 5** on the 300-epoch headline cells (plain / zpool r=0.1 / scalar).
+
+---
+
+## 10. §8a pooled two meta-optimizers; the optimum survives, the table did not
+
+Re-deriving §8a from `results/all_runs.csv` (rule 1) showed its cells were not homogeneous.
+Two different run families were being averaged together:
+
+* `ad-l-*` — `--alg-meta Lion`, account `s5014158`
+* `adg-A-*` — `--alg-meta Adam`, account `salehkaleybars`
+
+The Adam family sits ~1.3pp lower at matched `r`. The pooling was **unbalanced across the
+sweep**: r=0.05 and r=0.07 contain Lion runs only, while r=0.03 and r=0.1 mix in Adam runs.
+That pulled the shoulder cells down and the peak cells not at all — i.e. the pooling
+manufactured part of the contrast it was being used to demonstrate. This is the same
+failure mode as §3 (reporting a heterogeneous max), one level further down.
+
+### The corrected table — one meta-optimizer, one account
+
+`hier=additive`, `granularity=layerwise`, 100 epochs, plateau (mean of last 20 epochs),
+`superseded==0`, `--alg-meta Lion`, account `s5014158`:
+
+| r | n | plateau | sd | Δ vs r=0 |
+|---|---|---|---|---|
+| 0 | 3 | 92.20 | 0.04 | +0.00 |
+| 0.03 | 5 | 92.64 | 0.16 | +0.44 |
+| 0.05 | 5 | 93.09 | 0.10 | +0.89 |
+| **0.07** | **5** | **93.22** | **0.14** | **+1.02** |
+| 0.1 | 5 | 92.63 | 0.21 | +0.43 |
+| 0.2 | 3 | 91.39 | 0.14 | −0.81 |
+| 0.3 | 3 | 90.96 | 0.08 | −1.24 |
+
+**The interior optimum is real and is now cleaner than the pooled version.** Stratifying
+turns the ragged 92.15 / 92.14 / 93.06 opening of the old table into a monotone rise to a
+peak at r=0.07 and a monotone fall after it. The effect at the peak is +1.02pp against a
+per-cell sd of 0.04–0.21, so it is 5–25x the noise. What changed is the shape's credibility,
+not its existence.
+
+Corrections to the individual cells of §8a: r=0.03 was 92.14, is **92.64**; r=0.1 was 92.28,
+is **92.63**; r=0 was 92.15 at n=5, is **92.20 at n=3**; r=0.05 was 93.06 at n=7, is **93.09
+at n=5**. The inflated n came from counting the pooled Adam runs.
+
+### The generalisation claim is not yet testable — meta-optimizer is confounded with account
+
+Every Lion additive run is on `s5014158`; every Adam additive run is on `salehkaleybars`. The
+1.3pp gap is therefore **not attributable to the meta-optimizer** — it could equally be a
+difference in the two accounts' code or environment state. Nothing about "the optimum is
+Lion-specific" can be read off the current data.
+
+Worse, the Adam arm has **no r=0 anchor at all**, so it has no within-arm baseline and cannot
+show an interior optimum even in principle. That is why its Δ column is empty above.
+
+**Launched this round to break it:** `amx-r{0,05,07}-s{0..4}` — 15 jobs, Adam meta, layerwise,
+100 epochs, n=5, submitted on `s5014158`, the *same* account as the Lion sweep and identical
+to it in every argument except `--alg-meta`. Reading the result:
+
+* rises ~92.2 → ~93.2 → the optimum generalises across meta-optimizers, and the old 1.3pp gap
+  was the account, not the method
+* stays ~1.3pp low but still inverted-U → the optimum generalises; the offset is the
+  meta-optimizer
+* flat → the optimum is Lion-specific, and the headline result needs that caveat in the paper
+
+Any of the three is publishable; the current state, which cannot distinguish them, is not.
+
+## 11. Two aggregator bugs found and fixed
+
+**`account` was wrong on every row.** It was inferred from `"/home/s5014158" in path`, which
+holds on the cluster but not in the local backup, where alice2's runs sit under `runs_alice2/`.
+All 428 rows read `salehkaleybars`, so *any* per-account analysis was void — including the
+confound check in §10, which is why that confound went unnoticed until now. It now reads the
+recorded `--save-directory`, which travels with the artefact, and falls back to the path.
+Corrected split: 263 `salehkaleybars` / 165 `s5014158`.
+
+**`run` is not a unique key.** A resubmission reuses `--run-name`, so a finished run and an
+in-flight one can share a name; any analysis keying a dict on `run` silently keeps whichever
+was parsed last. Three completed 100-epoch alpha0 controls (`a0-{scal,layer,blk6}-1e4_s0`,
+plateau 91.75 / 92.05 / 91.75) were being shadowed by 30-epoch reruns this way — the partial
+value would have replaced the real one in any downstream table. The CSV now carries
+`dup_group` and `superseded`, aggregate.py warns on stderr, and **every analysis must filter
+`superseded == 0`**.
+
+### Housekeeping in the same pass
+* **12 redundant jobs cancelled** on `s5014158`. The whole queued `a0-*` batch (2 alpha0
+  values x 3 granularities x 2 seeds) re-ran configurations that had *already completed* at
+  100/100 epochs; each was verified against its finished counterpart before cancelling
+  (argument lists identical up to flag order, ENV lines identical). They were consuming 4
+  running GPU slots and would have created 12 further run-name collisions.
+* **13 pending jobs widened** on `salehkaleybars`. A blanket widen fails on the 6-hour
+  300-epoch arms with "Requested time limit is invalid" — `gpu-short` caps at 4h. Those 9 go
+  to the four 7-day GPU partitions only; `bin/widen_long.sh` now branches on the job's own
+  time limit.
+
+### A documentation mismatch, resolved in favour of the code
+`plateau` in the CSV is the mean of the **last 20 epochs**, but §4 and §9 of this document,
+`PLAN.md` and `PLAN-appendix-research.md` all describe it as the mean of the last 5. The
+20-epoch window is what every number in this repo actually is. Checked rather than assumed:
+recomputing the whole M1 sweep at k=5 moves no cell by more than 0.15pp and leaves the peak at
+r=0.07, so no conclusion depends on the choice — but **the prose is what is wrong, not the
+code**, and it should be corrected to "last 20 epochs" wherever it appears.

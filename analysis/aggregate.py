@@ -9,7 +9,7 @@ import sys, os, glob, re, csv, json
 FIELDS = ["run", "job_id", "account", "granularity", "base", "meta", "meta_stepsize",
           "alpha0", "gamma", "augment", "beta_clip", "hier", "lam", "eta_ratio",
           "seed", "epochs_done", "epochs_requested",
-          "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance",
+          "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance", "dup_group", "superseded",
           "ep_to_85", "ep_to_88", "ep_to_90", "plateau", "ep_in_band_90"]
 
 
@@ -56,6 +56,21 @@ def infer_from_name(name):
                 return {"beta_clip": GUARD, "hier": h, "lam": l, "eta_ratio": r}
     # everything else predates the guard entirely
     return {"beta_clip": "none", "hier": "", "lam": "na", "eta_ratio": "na"}
+
+
+def account_of(path, save_dir):
+    """Which cluster account produced this run.
+
+    The .out path is authoritative on the cluster but NOT in the local backup,
+    where alice2's runs live under runs_alice2/ and no longer contain
+    /home/s5014158. Falling back to the path alone silently relabelled all 168
+    alice2 runs as salehkaleybars, so the recorded --save-directory is checked
+    first -- it travels with the artefact.
+    """
+    for hay in (save_dir, path):
+        if "s5014158" in hay or "runs_alice2" in hay:
+            return "s5014158"
+    return "salehkaleybars"
 
 
 def ep_to(tests, target):
@@ -106,7 +121,7 @@ def parse_out(path):
     jid = (re.search(r"-(\d+)\.out$", base) or [None, ""])[1]
     return {
         "run": a.get("run-name", base), "job_id": jid,
-        "account": "s5014158" if "/home/s5014158" in path else "salehkaleybars",
+        "account": account_of(path, a.get("save-directory", "")),
         "granularity": a.get("stepsize-groups", "?"), "base": a.get("alg-base", a.get("optimizer", "?")),
         "meta": a.get("alg-meta", "?"), "meta_stepsize": a.get("meta-stepsize", ""),
         "alpha0": a.get("alpha0", ""), "gamma": a.get("gamma", ""), "augment": aug,
@@ -135,9 +150,33 @@ for d in sys.argv[1:]:
         r = parse_out(f)
         if r:
             rows.append(r)
+# A resubmission reuses --run-name, so `run` is NOT a unique key: the same name
+# can carry a finished run and an in-flight one. Any analysis that keys a dict on
+# `run` then silently keeps whichever came last -- which is how three completed
+# 100-epoch alpha0 controls were shadowed by partial reruns. Flag them here so a
+# collision is visible in the CSV instead of being discovered downstream.
+by_name = {}
+for r in rows:
+    by_name.setdefault(r["run"], []).append(r)
+dups = {k: v for k, v in by_name.items() if len(v) > 1}
+for name, group in dups.items():
+    best = max(group, key=lambda r: int(r["epochs_done"] or 0))
+    for r in group:
+        r["dup_group"] = name
+        r["superseded"] = 0 if r is best else 1
+
 rows.sort(key=lambda r: (r["base"], r["granularity"], r["seed"]))
-w = csv.DictWriter(sys.stdout, fieldnames=FIELDS)
+w = csv.DictWriter(sys.stdout, fieldnames=FIELDS, extrasaction="ignore")
 w.writeheader()
 for r in rows:
+    r.setdefault("dup_group", "")
+    r.setdefault("superseded", 0)
     w.writerow(r)
 print(f"# {len(rows)} runs aggregated", file=sys.stderr)
+if dups:
+    print(f"# WARNING: {len(dups)} duplicated run-name(s); "
+          f"filter superseded==0 before any per-run analysis:", file=sys.stderr)
+    for name, group in sorted(dups.items()):
+        detail = ", ".join(f"{r['job_id']}({r['epochs_done']}ep"
+                           f"{'' if not r['superseded'] else ', superseded'})" for r in group)
+        print(f"#   {name}: {detail}", file=sys.stderr)
