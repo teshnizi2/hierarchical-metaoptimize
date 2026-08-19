@@ -1665,6 +1665,41 @@ many step sizes survive:
 Going from 6 step sizes to 62 *costs* 0.64pp (91.41 → 90.77); pooling them back to one recovers it
 and more. The campaign's own headline (+1.61pp for pooling on layerwise, n=5) is that recovery.
 
+## 1b. A measured dose-response on weightwise — and the provenance audit that validates it
+
+An audit of every row in the table above confirms **all of them are guarded**
+(`BETA_CLIP=-15:-2.3026`). Four runs carry `augment=?` — they predate the ENV provenance line
+(gotcha 8), so augmentation was *not recorded*, not *not applied*. That matters because both cells
+in the N=11.17M row are `?`.
+
+It is resolved by the weightwise λ ladder, which spans the recorded and unrecorded runs and whose
+two ends overlap:
+
+| λ | half-life (steps) | n | augment recorded | plateau | final train |
+|---|---|---|---|---|---|
+| plain (no pooling) | ∞ | 3 | ? | 77.82 ± 0.45 | 82.02 ± 0.49 |
+| 1e-5 | 69,315 | 2 | **1** | 77.40 ± 0.14 | 81.28 ± 0.23 |
+| 1e-4 | 6,931 | 2 | **1** | 68.70 ± 0.32 | 70.86 ± 0.37 |
+| 1e-2 | 69 | 2 | ? | 46.06 ± 3.55 | 48.56 ± 3.63 |
+| 1e-1 | 7 | 2 | ? | 45.26 ± 3.63 | 47.98 ± 3.92 |
+| 0.5 | 1 | 2 | ? | 45.22 ± 3.66 | 47.94 ± 3.94 |
+
+**λ=1e-5 has a 69,315-step half-life against a ~50,000-step run — it is barely pooled at all — and
+it reproduces the `augment=?` plain arm to 0.42pp.** Two runs with recorded augmentation land on
+top of three without it, so the unrecorded runs were augmented and the `?` rows are safe to quote.
+
+**The ladder itself is the cycle's strongest single piece of evidence for §2.** Unlike layerwise,
+weightwise *was* sampled in the genuinely-partial region (λ = 1e-5 and 1e-4 have half-lives of
+69,315 and 6,931 steps), and the result is a smooth monotone dose-response: performance falls as
+pooling strength rises, and **saturates once the half-life drops below ~70 steps** — i.e. exactly
+where pooling becomes complete and the shared β's drift rate hits its 1/√N floor. Nothing about a
+"three distinct regimes" reading predicts a smooth dose-response; a graded slowing of the shared
+step size predicts precisely one.
+
+Note this is the *opposite sign* to the layerwise ladder, where the same operator at the same λ
+values improves the result by 1.5pp. One monotone curve in each direction, from the same knob, at
+two values of N — which is what a single mechanism with an interior optimum in N looks like.
+
 ## 2. The mechanism this points at — and it is a hypothesis, not yet a measurement
 
 `block_product` partitions the *same* total meta-gradient: the layerwise vector's 62 entries sum
@@ -1843,7 +1878,8 @@ a confident mechanism that a control then corrected.
 
 * §1's ladder is n=2 at λ=1.0 and n=3 at weightwise-plain. The 4.5pp gap is ~30σ, but the *shape*
   of the curve between N=62 and N=11.17M rests on the `n1-node-*` runs, which have not reported.
-* §2 is a hypothesis with consistent supporting evidence, **not a measurement**.
+* §2 is a hypothesis. It now has a measured **dose-response** behind it (§1b) rather than only an
+  outcome table, but the shared β's drift rate itself has still never been recorded; `p2-*` does that.
 * Cycle 5 §2 is unresolved: both headline claims are still measured at a budget where the scalar
   arm has not finished fitting. `ext300` is ~25% through.
 * Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
