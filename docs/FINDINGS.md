@@ -2203,3 +2203,265 @@ holds, the m=n column measures an implementation artifact, not granularity.
 The layerwise and 6-block results above are unaffected: there the number of groups is small, the
 sum-vs-mean factor is 62 or 6 rather than 11 million, and the effect is confirmed at 3 seeds
 across seven lambda values and two meta-optimizers.
+
+---
+
+# 19 Aug 2026 (cycle 8) — M1 additive produces the campaign's first genuine interior optimum, and the α₀ confound closes
+
+**Headline.** Swept over its *own* knob rather than shrink's, the M1 additive operator on layerwise
+is **non-monotone with an interior maximum**, and at its peak it beats plain layerwise by **+1.90pp**
+while *also* fitting the training set better. Every previous pooling result in this campaign was
+either full pooling (gotcha 9) or monotone; this is the first cell where partial pooling beats both
+endpoints, which is the thing the project set out to find.
+
+Separately, three priority items close on data already on disk: the **α₀ confound is dead at 100
+epochs**, the **300-epoch budget control completes**, and the **guarded plain granularity ladder is
+complete at n≥5** — and that ladder turns out to be **non-monotone with its peak at nodewise, not
+layerwise**.
+
+## 1. The M1 additive ladder on layerwise — an interior optimum, at n=2
+
+SGDm base + Lion meta, α₀=1e-6, guard on, augmented, 100 epochs. `ETA_RATIO = r` rescales the
+per-group deviation of every realised β update, so unlike shrink's λ it is genuinely partial for
+the whole run (gotcha 21).
+
+| r | best test | Δ vs plain | final_train | ep→85 | ep→90 | plateau | band₉₀ |
+|---|---|---|---|---|---|---|---|
+| plain (no hier, n=5) | 91.12 ± 0.26 | — | 99.66 | **29.4** | 58.6 | 90.67 | 50.8 |
+| 0 (spread frozen) | 92.52 ± 0.11 | +1.40 | 97.83 | 35.5 | 41.0 | 92.23 | 5.0 |
+| 0.03 | 93.01 ± 0.17 | +1.89 | 98.94 | 36.5 | 40.5 | 92.71 | 1.5 |
+| **0.1** | **93.02 ± 0.01** | **+1.90** | **99.88** | 32.5 | 41.0 | **92.81** | 5.0 |
+| 0.3 | 91.44 ± 0.02 | +0.32 | 99.70 | 30.5 | 50.5 | 91.00 | 47.5 |
+| 1.0 (≡ plain by construction) | — | — | — | — | — | — | — |
+
+**Non-monotone.** r=0.3 is +0.32pp over plain — inside noise — while r=0.1 is +1.90pp. The
+maximum is interior, somewhere in r ∈ [0.03, 0.1], and it falls off sharply above it. That is a
+qualitatively different shape from the shrink λ curve, which is flat across three orders of
+magnitude because every λ ≥ 0.001 is full pooling.
+
+**Two independent operators agree at their shared endpoint.** Full pooling is reachable two ways —
+shrink at λ=1.0, and additive at r=0 (deviations frozen, so one shared β for the whole run):
+
+| operator | setting | best test |
+|---|---|---|
+| M0 shrink | λ=1.0 | 92.53 ± 0.17 (n=3) |
+| M1 additive | r=0 | 92.52 ± 0.11 (n=2) |
+
+**0.01pp apart.** Two separately-written code paths reaching the same number at the same physical
+configuration is the strongest implementation cross-check the campaign has produced, and it is
+worth reporting as one.
+
+## 2. The additive peak is NOT the regulariser that shrink is
+
+Cycle 7's λ-curve analysis concluded shrinkage behaves like a regulariser: better test accuracy
+bought with *worse* fit. The additive peak does not do that.
+
+| arm | best test | final_train |
+|---|---|---|
+| plain layerwise | 91.12 | 99.66 |
+| shrink λ=0.01 (best shrink cell) | 92.79 | **98.06** ← fit sacrificed |
+| shrink λ=0.1 | 92.55 | **97.78** ← fit sacrificed |
+| **additive r=0.1** | **93.02** | **99.88** ← fit *improved* |
+
+Additive at r=0.1 is above plain on test **and** above plain on train. There is no fit trade. This
+is exactly the split gotcha 21 predicts on mechanism grounds — shrink moves both the shared β's
+drift rate and the spread, additive moves only the spread — and it means the two operators must be
+reported as different methods with different mechanisms, not two settings of a pooling dial.
+
+**Caveat, stated plainly: it is not a speed win.** On the threshold-safe primary metric — ep→85,
+which is below every arm's plateau, unlike ep→90 where plain and r=0.3 sit inside their own
+asymptotes (band₉₀ of 50.8 and 47.5, gotcha 18) — **plain layerwise is fastest at 29.4 epochs and
+every additive arm is slower**. The honest reading is *"reaches a strictly better solution with
+strictly better fit, more slowly"*, not *"dominates"*.
+
+## 3. The α₀ confound is DEAD at 100 epochs — priority item 2 CLOSED
+
+The worry was that at α₀=1e-6 many epochs go into merely growing the step size, confounding every
+headline. The `a0L` ladder settles it (100 epochs, SGDm+Lion, guard on, n=2 per cell):
+
+| α₀ | scalar | 6-block | layerwise plain | layerwise shrink λ=0.1 |
+|---|---|---|---|---|
+| 1e-3 | 88.19 ± 0.02 | 91.72 ± 0.18 | 91.61 ± 0.01 | 92.53 ± 0.18 |
+| 1e-4 | 88.19 ± 0.32 | 91.67 ± 0.16 | 91.41 ± 0.25 | 92.72 ± 0.04 |
+| 1e-6 | 87.95 ± 0.00 | 91.76 ± 0.04 | 91.23 ± 0.13 | 92.73 ± 0.08 |
+| **within-arm spread** | **0.24** | **0.09** | **0.38** | **0.20** |
+
+**Every arm is flat to ≤0.38pp across three orders of magnitude of α₀**, and the granularity gap
+(scalar → layerwise) is +3.3 to +3.4pp at *every* α₀. There is no α₀ confound in any 100-epoch
+number. The headline does not need re-running at a "sane" α₀; it has been run there.
+
+## 4. But at SHORT horizon α₀ dominates everything — and that is where the fine-granularity catastrophe lives
+
+The same comparison at **20** epochs (`p2-*` at α₀=1e-6 vs `p3-*` at α₀=1e-3, n=1, full pooling
+where pooled):
+
+| arm | α₀=1e-6 | α₀=1e-3 | Δ | lag vs scalar @1e-6 | lag vs scalar @1e-3 |
+|---|---|---|---|---|---|
+| scalar | 70.73 | 84.16 | +13.4 | — | — |
+| 6-block + pool | 68.45 | 86.79 | +18.3 | −2.3 | +2.6 |
+| layerwise + pool | 53.14 | 88.34 | **+35.2** | −17.6 | +4.2 |
+| layerwise plain | 74.29 | 88.23 | +13.9 | +3.6 | +4.1 |
+| nodewise + pool | 33.03 | 83.77 | **+50.7** | −37.7 | −0.4 |
+| weightwise + pool | 14.80 | 77.46 | **+62.7** | −55.9 | −6.7 |
+
+Cycle 7 put two predictions on record for this block. Both are **confirmed**:
+
+* *(a) "the 20-epoch ordering largely collapses for N ≤ 62"* — the spread over
+  {scalar, 6-block, layerwise×2} goes from **21.2pp at α₀=1e-6 to 4.2pp at α₀=1e-3**, a 5× collapse.
+* *(b) "nodewise and weightwise still lag, but far less"* — nodewise goes from 37.7pp behind scalar
+  to **0.4pp**; weightwise from 55.9pp behind to **6.7pp**.
+
+**The short-horizon fine-granularity catastrophe is overwhelmingly an α₀ startup artefact.** The
+finer the partition, the longer β takes to climb out of ln(1e-6), and at 20 epochs that startup
+cost is most of what the number measures. It is *not* an artefact at 100 epochs (§3), where the
+weightwise deficit survives at 79.38 vs 91.23 — but any short-horizon granularity comparison at
+α₀=1e-6 is measuring the transient, and none should be quoted.
+
+## 5. Spread helps early and hurts late — the crossover that produces the interior optimum
+
+`p4-*` runs the additive ladder at 20 epochs (α₀=1e-6, n=1) against the 100-epoch ladder of §1:
+
+| r | 20 epochs | 100 epochs |
+|---|---|---|
+| 0 | 52.87 | 92.52 |
+| 0.03 | 53.61 | 93.01 |
+| 0.1 | 56.17 | **93.02** |
+| 0.3 | 62.11 | 91.44 |
+| 1.0 | 73.58 | 91.12 (≡ plain) |
+| | **monotone ↑ in r** | **peak at r ≈ 0.03–0.1** |
+
+**The ordering inverts completely.** More spread is monotonically better at 20 epochs and
+monotonically worse above r≈0.1 at 100. The interior optimum in §1 is the balance point of that
+trade, which is a satisfying mechanistic account of *why* it is interior and predicts that the
+peak should move with the budget — a testable claim, and the next control to run.
+
+Cycle 7 prediction *(c)* was that additive r=1.0 reproduces `p2-lay-plain` (74.29 @20ep) since
+`β_prev + dm + 1·(d−dm) = β` is an exact identity. Measured 73.58 — **0.71pp off**, which is 8×
+the cross-GPU-type reproduction floor of gotcha 17. On a curve this steep the 20-epoch `best` is a
+poor identity probe (the `plateau` columns agree far better: 32.93 vs 33.05), but the discrepancy
+is **not** dismissed: the `zv-*` block (§7) is the proper identity test.
+
+## 6. The 300-epoch budget control COMPLETES — granularity is budget-invariant, pooling is not
+
+At matched α₀=1e-3, SGDm+Lion, guard on:
+
+| arm | 100 epochs | 300 epochs | Δ |
+|---|---|---|---|
+| scalar | 88.22 ± 0.05 (n=3), train 94.1 | 88.49 ± 0.08 (n=2), train 95.4 | +0.26 |
+| layerwise plain | 91.66 ± 0.09 (n=3), train 99.9 | 91.91 ± 0.41 (n=2), train 100.0 | +0.25 |
+| layerwise shrink λ=0.1 | 92.52 ± 0.13 (n=3), train 98.2 | 92.51 ± 0.08 (n=2), train 99.3 | −0.01 |
+
+| effect | 100 ep | 300 ep |
+|---|---|---|
+| **granularity** (scalar → layerwise) | **+3.44pp** | **+3.42pp** |
+| **pooling** (shrink λ=0.1 − plain) | +0.86pp | +0.60pp |
+
+**Granularity is invariant to a 3× budget to within 0.02pp. Pooling's advantage decays.** These are
+two different effects with two different budget signatures, and they must be reported separately.
+
+Two riders that matter more than the headline numbers:
+
+* **The scalar arm has still not converged at 300 epochs.** Its train accuracy is 95.4% and rising
+  at ~+0.6pp/100 epochs and decelerating. Per gotcha 19 the claim is therefore bounded: *the scalar
+  arm converges to a worse solution* is supported at 3× budget, but "never converges" is not, and
+  extrapolating to ImageNet's budget regime is not licensed by this control.
+* **This weakens the campaign's ImageNet story.** Cycles 6–7 read the parent paper's §7.3 ImageNet
+  null as a budget artefact — a long budget lets the coarse arm catch up. At 3× budget on CIFAR-10
+  granularity does *not* narrow at all. That reading now applies to **pooling** (which does decay)
+  and not to **granularity**. The paper should say so rather than keep the stronger claim.
+
+## 7. The sum-vs-mean confound is fixed in code, and its identity block is running
+
+The last cycle flagged the per-weight pooling column as confounded: the scalar arm aggregates the
+meta-gradient as a **sum** over coordinates while `_apply_hier` pools β toward a **mean**, a
+factor-of-11.17M discrepancy in effective meta-step scale. The evidence that this is real, not
+theoretical, arrived this cycle from `n1-*`:
+
+| arm | best test |
+|---|---|
+| weightwise + shrink λ=1.0 (full pooling) | **34.56 ± 2.73** |
+| genuine scalar arm | 88.08 ± 0.22 |
+
+Full pooling at m=n *should* reduce to the scalar arm. It lands 53pp below it. The m=n pooling
+column measures an implementation artefact.
+
+**Fix implemented (`bin/patch_zpool.py`, `HIER=zpool`).** Pool in **meta-gradient space** instead,
+using the exact identity `Σ_b z_b == z_scalar`:
+
+```
+z'_b = (1 − r)·Σ_j z_j  +  r·z_b
+   r = 0 → every group receives the scalar arm's meta-gradient  ⇒ EXACTLY scalar
+   r = 1 → every group receives its own                          ⇒ EXACTLY plain per-group
+```
+
+Both endpoints are exact identities rather than limits, `_apply_hier` is a verified no-op for
+`zpool`, and the operator is **gated behind a numerical identity check before any science run**
+(PLAN §5). `zv-*` (7 jobs, 4 epochs, α₀=1e-6) tests all four: layerwise r=0 ≡ scalar,
+layerwise r=1 ≡ plain layerwise, weightwise r=0 ≡ scalar, weightwise r=1 ≡ plain weightwise.
+**No m=n pooling number will be quoted until those pass.**
+
+## 8. The guarded plain granularity ladder is COMPLETE — and it is NON-MONOTONE
+
+Priority items 3 (guard standard on all arms) and 4 (5 seeds on headline cells) are effectively
+closed. Every run family in the current campaign carries `BETA_CLIP=-15:-2.3026`; the unguarded
+rows in `all_runs.csv` are the superseded `g1`/`g3`/`gate0*`/`d1`–`d3` blocks. The guarded ladder,
+all at α₀=1e-6, SGDm+Lion, ≥95 epochs:
+
+| granularity | m | n | best test | final_train |
+|---|---|---|---|---|
+| scalar | 1 | 5 | 88.08 ± 0.22 | 93.83 |
+| 6-block | 6 | 5 | 91.69 ± 0.13 | 99.09 |
+| layerwise | 62 | 11 | 91.23 ± 0.22 | 99.66 |
+| **nodewise** | **≈4,800** | **1** | **92.10** | 99.76 |
+| weightwise | 11.17M | 3 | 79.38 ± 0.46 | 82.02 |
+
+**The ladder is not "finer is worse".** It is a broad plateau from m=6 to m≈4,800 with a cliff only
+at m=n — and its **peak is at nodewise, above layerwise by +0.87pp**. If that survives seeds, the
+paper's ladder claim changes shape: there is no interior granularity optimum at m=62 to explain,
+there is a plateau and one catastrophic endpoint.
+
+**The nodewise cell is n=1 and is the highest-value seed in the campaign right now.** `nd-*` (3
+jobs) takes it to n=5 this cycle. Nothing in §8 should be quoted until it does.
+
+## 9. Queue actions this cycle
+
+* **Unblocked `zv-*`** (the identity gate). All 7 read `QOSMaxGRESPerUser` on `gpu-l4-24g` behind a
+  saturated 8-GPU cap. `Partition=gpu-l4-24g,gpu-short` with `--gres=gpu:l4:1` still pinned flipped
+  all 7 to `Priority` — the diagnostic flip of gotcha 13 — and the first started within minutes.
+  `gpu-short` was verified to contain L4 nodes (node880/881/882/885) before pinning into it.
+* **Deprioritised `lp-l-*`** (5 pending, `nice=3000`): the genuinely-partial *shrink* λ ladder is
+  now the less interesting of the two partial-pooling operators, since §1 shows additive expresses
+  a true interior optimum and §2 shows the operators differ in mechanism.
+* **Dual-partitioned `a0A-*` on alice2** (11 jobs). All were `gpu-2080ti-11g`-only and 11-deep on
+  `Priority` while alice2's separate 12-GPU `gpu-short` cap sat **completely unused**. Running jobs
+  on that account went **1 → 4** immediately.
+* **Submitted `ad-l-*` extension (14 jobs, alice2, `bin/ad5_sweep.sh`)** — §1 to n=5 on the two
+  peak cells, new r ∈ {0.05, 0.2} at n=3 to locate the maximum, n=3 on the shoulders.
+* **Submitted `adg-*` + `nd-*` (15 jobs, alice, `bin/adg_sweep.sh`)** — does the interior optimum
+  generalise off the cell it was found on (6-block, and the *paper's* Adam meta-optimizer, at
+  r ∈ {0.03, 0.1} × 3 seeds), plus nodewise plain to n=5 for §8.
+  *Prediction on record:* if the peak is an artefact of Lion's sign nonlinearity it vanishes under
+  Adam. Shrink generalised across both axes (+0.47 on 6-block, +1.51 under Adam), so this is the
+  matched contrast.
+* Right-sized `--time` on everything new from measured `wallclock_min` (01:15 for 100-epoch
+  layerwise against a measured 31 min) so it backfills into `gpu-short` rather than queues
+  (gotcha 12).
+
+## 10. Standing caveats after this cycle
+
+* **§1's peak is n=2** and the two peak cells are 0.01pp apart, i.e. unresolved between r=0.03 and
+  r=0.1. `ad-l-*` at n=5 plus r ∈ {0.05, 0.2} is in flight; do not quote a peak *location* yet.
+* **§2's "no fit trade" is n=2** on one cell. The train-accuracy difference (99.88 vs 99.66) is
+  small in absolute terms even if the direction is opposite to shrink's.
+* **§8's nodewise cell is n=1** and its group count (≈4,800) is still carried from cycle 6 without
+  independent verification (`block_sizes.json` was never written for these runs).
+* §4's table is **n=1 per cell**. The 13–63pp effects dwarf seed noise, but no individual number
+  there should be quoted to better than ~1pp.
+* §6 is n=2 at 300 epochs and n=3 at 100.
+* **No m=n pooling result is claimed** pending `zv-*` (§7). The λ→effective-pooling table from the
+  previous cycle stays flagged as confounded.
+* The additive peak has **no budget control**. §5 predicts the peak location moves with the budget;
+  a 300-epoch run at r ∈ {0, 0.1} and plain is the top item for next cycle.
+* Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
+* **ImageNet stays scoped out** (489/1000 classes, no devkit). The **language modality** remains
+  blocked on the validation-gated optimizer port; TinyStories pretokenization is done.

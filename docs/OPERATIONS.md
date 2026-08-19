@@ -458,3 +458,55 @@ Two columns are safe to compare across every arm because they are computed over 
 coordinate set: **`frac_neg`/`frac_zero`** (built from `zall`, all coordinates) and
 **`beta_true_min`/`beta_true_max`** (true extremes over every β tensor). Cycle 7 §1 uses only
 those. Cycle 6 §2's per-group SNR table was scalar/6-block/layerwise only, so it stays valid.
+
+## 23. Dual-partitioning does not create capacity when the GPU *type* is cluster-saturated
+
+Gotcha 13 says to draw on `gpu-short`'s separate 12-GPU cap by dual-partitioning. That works only
+when the bottleneck is your own QOS cap. It does nothing when the bottleneck is the hardware.
+
+`gpu-short`'s L4 nodes **are the same physical nodes as `gpu-l4-24g`** — node880/881/882/885, four
+nodes × 4 GPUs = **16 L4 GPUs in the entire cluster**. Adding `gpu-short` to an `--gres=gpu:l4:1`
+job widens *eligibility*, not *supply*. On 19 Aug 2026 the `zv-*` identity block flipped correctly
+from `QOSMaxGRESPerUser` to `Priority` (the gotcha-13 diagnostic), started one job, and then stalled
+— because all 16 L4 GPUs were allocated and only 2 of them were ours.
+
+**Read the reason code together with the hardware census, not either alone:**
+
+```
+squeue -h -j $jid -o '%r'                                   # QOSMaxGRESPerUser vs Priority
+for n in node880 node881 node882 node885; do                # is the TYPE actually free?
+  scontrol show node $n | tr ' ' '\n' | grep -E 'CfgTRES|AllocTRES'
+done
+```
+
+`QOSMaxGRESPerUser` → route around it with `Partition=`. `Priority` **plus** `CfgTRES == AllocTRES`
+on every node of that type → nothing you can do with partitions; the only levers are freeing your
+*own* running jobs, or moving the block to a different GPU type (whole block at once, gotcha 3).
+
+**Corollary:** when a small gating block is stuck behind a saturated type, the cheapest fix is
+usually to cancel one of *your own* long-running jobs whose result is already known to be
+superseded — a slot you release is a slot you can immediately re-take, whereas a queue position
+behind other users is not something you can shorten.
+
+## 24. Never quote a granularity comparison at short horizon and small α₀ — it measures the startup transient
+
+At α₀=1e-6 the log step size starts at ln(1e-6) = −13.8 and must climb to its operating point
+(β ≈ −6 to −6.5). The finer the partition, the longer that climb takes, so at short horizon most of
+what the number measures is the startup cost. Measured at 20 epochs (FINDINGS cycle 8 §4):
+
+| arm | α₀=1e-6 | α₀=1e-3 | Δ |
+|---|---|---|---|
+| scalar | 70.73 | 84.16 | +13.4 |
+| layerwise + pool | 53.14 | 88.34 | +35.2 |
+| nodewise + pool | 33.03 | 83.77 | +50.7 |
+| weightwise + pool | 14.80 | 77.46 | **+62.7** |
+
+The spread across {scalar, 6-block, layerwise} collapses from **21.2pp to 4.2pp** purely by moving
+α₀. Weightwise goes from 55.9pp behind scalar to 6.7pp behind.
+
+**Rules:**
+* Any 20-epoch probe at α₀=1e-6 is a *mechanism* probe (drift, spread, sign statistics) and its
+  accuracy column is not a granularity result. Do not put it in a table next to 100-epoch numbers.
+* At **100** epochs the confound is gone — every arm is flat to ≤0.38pp across α₀ ∈ {1e-3, 1e-4,
+  1e-6} (cycle 8 §3) — so the headline grid does *not* need re-running at a larger α₀.
+* If a short probe is needed, run it at α₀=1e-3, which starts essentially at the destination.
