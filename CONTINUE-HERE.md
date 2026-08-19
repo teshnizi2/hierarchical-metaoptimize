@@ -17,28 +17,40 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph
-Granularity in MetaOptimize buys **convergence speed** and **stability**, and converts into final
-accuracy only when the budget is too short for the coarser arm to catch up — which explains the
-parent paper's own unexplained ImageNet null (§7.3). Partially pooling the per-group step sizes
-beats every fixed granularity (+1.46pp on layerwise) and is insensitive to the pooling strength
-across three orders of magnitude. The per-weight collapse is a float32 overflow and a
-rediscovery of a guard published in 1992/2012/2024; a real ~12pp deficit survives the fix.
+## The state of the science, in one paragraph (rewritten cycle 16)
+The **most defensible result is a refutation**: the sqrt(N) noise model fails direct
+measurement — 53.1% of 11.17M per-weight meta-gradients agree on sign against a 50.0000%
+null, and the predicted drift slope of -0.500 measures -0.113. Drift is set by coordinate
+**agreement**, a property of the partition, not by N through sampling noise. The **best
+positive result** is M1 additive pooling: a unimodal r-curve peaking at r~0.07 (93.21,
+n=6) — **+2.29pp over no pooling** (r=1 == plain layerwise, gate-confirmed twice) and
+**+1.01pp over maximal pooling** (r=0). Granularity itself interacts with the base
+optimizer: a 3.84pp span under SGDm, a 0.15pp null under AdamW. All of it is
+CIFAR-10 / ResNet-18 so far; model scale and CIFAR-100 are queued, not measured.
 
-## Running / next
-* **DONE — the 36-cell `zsw` sweep completed (cycle 12).** Meta-gradient-space pooling has **no
-  interior optimum**: on layerwise the unpooled endpoint r=1 wins on both accuracy (91.35) and
-  speed (28.7 ep→85). On weightwise any r<1 prevents the collapse (88.1-88.4 vs 79.35) but never
-  beats scalar by more than +0.36pp. **The layerwise interior is confounded** — it runs at 3-35x
-  smaller step size (see FINDINGS cycle 12 §2 and gotcha 30); quote the endpoints only.
-* **In flight:** `zrn-*` (30 jobs, alice2/2080ti) fills the unsampled r in (0.7, 1) and locates
-  the weightwise collapse threshold, currently bracketed only as sd(beta) in (0.167, 0.802).
-  Self-anchoring, so it carries its own endpoints.
-* **In flight:** `zm0-*` (7 jobs, alice/2080ti) — identity gate for the new `zmpool` operator
-  (mean-normalised pooling; holds the common mode exactly fixed so r is a pure pooling axis).
-  **Do not launch the `zmp` ladder until this gate passes.**
-* Then: the `zmp` ladder on L4 (same hardware as `zsw`, so the two operators are comparable);
-  seeds -> 5 on headline cells; CIFAR-100 as the second dataset; finish the draft.
+## Running / next (cycle 16)
+* **Blocking a headline number:** `fxcos-*` (9 jobs, alice) — the non-meta AdamW baseline
+  with its cosine schedule correctly scaled to 50k steps. The uncorrected baseline is
+  91.894 (lr 3e-4, n=4); it was denied its decay and can only move **up**. **Quote no
+  pooling-vs-baseline margin until these land.**
+* **The headline's one untested confound:** `am4-*` (21 jobs, alice2) — the M1 r-curve at
+  **alpha0=1e-4**. The whole §1 curve lives at alpha0=1e-6, which costs 14-25 epochs of
+  arm-dependent startup. If the inverted-U flattens at 1e-4 the headline needs an alpha0
+  qualifier or withdrawal.
+* **Axis 1, model scale:** `sc-*` (36 jobs) — ResNet10/18/34 x {scalar, blocks, layerwise,
+  additive} x 3 seeds. Directly tests the parent paper's premise. Was 100% starved on a
+  single partition; widened to all five in cycle 16.
+* **Axis 2, second dataset:** `c100-*` (18 jobs) — CIFAR-100 at alpha0 {1e-6, 1e-3} x 4
+  granularities x 2 seeds. Data is staged and integrity-checked on alice; alice2 still
+  lacks the patch and the data.
+* **Axis 3, n->5:** `mx-*` (89 jobs, both accounts) — M1 peak refinement r in
+  {0.04..0.08}, batch-size axis {25,50,200}, H4 at n=5, alpha0 controls.
+* **Axis 5, meta-optimizer:** `amx-*` (15 jobs, alice2) — Adam-meta additive at r
+  {0, 0.05, 0.07}, n=5, on the SAME account as the Lion sweep, to break the
+  meta-optimizer/account confound.
+* **Throughput is cluster-capped, not queue-capped.** 2 genuinely free GPUs cluster-wide;
+  229 of our jobs pending on `Priority`. Deepening the queue buys nothing; **re-ordering
+  and widening partition eligibility is the only lever.**
 
 ## Gotchas that cost hours — do not rediscover these
 * Helper scripts go in `/data1/salehkaleybars/metaopt/bin`, **never `/tmp`** (node-local; the
