@@ -4279,22 +4279,37 @@ Re-aggregation reproduces the cycle-21 baseline exactly: AdamW+cosine lr=1e-3 =
 ## 23.2 The alpha0=1e-3 scale replication landed (`sa3-*`)
 
 22.5 was measured only at alpha0=1e-6 and flagged "in flight". It now replicates.
-CIFAR-10, plain (no hierarchy), 100ep:
+CIFAR-10, plain (no hierarchy), 100ep. **One collapsed run excluded** — see 23.2b:
 
 | network | a0=1e-6 scalar | a0=1e-6 layer | gain | a0=1e-3 scalar | a0=1e-3 layer | gain |
 |---|---|---|---|---|---|---|
 | ResNet10 | 70.742 +-0.832 (3) | 90.619 +-0.267 (3) | **+19.88** | 70.782 +-1.252 (2) | 91.259 +-0.275 (3) | **+20.48** |
-| ResNet18 | 86.337 +-14.162 (24) | 90.933 +-0.529 (37) | +4.60 | 88.784 +-2.037 (15) | 91.100 +-0.319 (20) | +2.32 |
+| ResNet18 | 89.201 +-1.974 (23) | 90.933 +-0.529 (37) | +1.73 | 88.784 +-2.037 (15) | 91.100 +-0.319 (20) | +2.32 |
 | ResNet34 | 89.317 +-0.127 (3) | 90.220 +-0.011 (3) | **+0.90** | 89.727 +-0.276 (2) | 90.237 (n=1) | **+0.51** |
 
-Monotone decay at BOTH alpha0. The cycle-21 mechanism also replicates: the **layerwise arm is
-flat** (1e-3 spread 91.259->90.237 = 1.02pp; 1e-6 spread 0.71pp) while the **scalar arm climbs
-18.6-19.0pp**. The granularity "gain" shrinking with scale is scalar catching up, not layerwise
-degrading — now shown at two alpha0.
+Monotone decay at BOTH alpha0, and once the collapse is excluded the two alpha0 ladders
+**agree closely** (+19.88/+1.73/+0.90 vs +20.48/+2.32/+0.51) — they did not before.
+The cycle-21 mechanism also replicates: the **layerwise arm is flat** (1e-3 spread
+91.259->90.237 = 1.02pp; 1e-6 spread 0.71pp) while the **scalar arm climbs 18.5-19.0pp**.
+The granularity "gain" shrinking with scale is scalar catching up, not layerwise degrading —
+now shown at two alpha0.
 
 Caveat: ResNet34 layerwise @1e-3 is **n=1**; two more seeds are queued on alice2.
-Note ResNet18 scalar @1e-6 has sd **14.16** over n=24 — that cell is bimodal (collapse-prone),
-not a tight mean. Do not quote it as a point estimate.
+
+## 23.2b The `collapsed` column does not work — it cost 2.9pp on the middle cell
+
+`ResNet18 / scalar / a0=1e-6` contains 24 completed runs, one of which plateaus at **20.5**
+(the other 23 span 86.0-91.7). That single run drags the cell mean from 89.201 to 86.333 and
+the sd from 1.97 to **14.16**, inflating the reported granularity gain from **+1.73 to +4.60**
+— i.e. a single run out of 24 more than doubles the headline middle cell of the scale ladder.
+
+`all_runs.csv`'s `collapsed` column is **`0` on every row in the file**, including this one, so
+it flags nothing and must not be relied on. Until it is fixed, filter on `plateau > 50`
+explicitly. Only this one cell in the CIFAR-10 plain ladder is affected (drop counts are 0
+everywhere else), so 23.2's other numbers are unchanged.
+
+The bulk of that cell is also genuinely two-clustered (14 runs at ~87.7, 9 at ~91.6) — worth a
+look on its own, but that spread is *not* what produced the sd=14.16.
 
 ## 23.3 NEW — M1 additive pooling gain INCREASES with model size
 

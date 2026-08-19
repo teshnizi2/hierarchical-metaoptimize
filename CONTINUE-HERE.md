@@ -47,7 +47,7 @@ MetaOptimize's internals and are untouched; any "our method is better" sentence 
 
 **Cycle 23's finding (docs/FINDINGS.md 23.3-23.4):** the M1 pooling gain and the plain
 granularity gain run in OPPOSITE directions in model scale. Plain granularity
-(layerwise - scalar) decays +19.88 -> +4.60 -> +0.90 over R10/R18/R34 at alpha0=1e-6 and
+(layerwise - scalar) decays +19.88 -> +1.73 -> +0.90 over R10/R18/R34 at alpha0=1e-6 and
 +20.48 -> +2.32 -> +0.51 at 1e-3 (both now measured; the 1e-3 replication `sa3-*` landed this
 cycle). M1 additive at r=0.06 does the reverse: +0.17 -> +2.33 -> +2.62 at 1e-6 and
 -2.30 -> +0.83 -> +3.29 at 1e-3. The r-curves explain why: the optimum shifts toward LESS
@@ -75,6 +75,11 @@ peak >+2.62.
   unconditionally. `na` is what `run_cifar.sh` *echoes* for an UNSET variable, so healthy runs
   display it -- copying that into `--export=` cost 48 jobs. Non-hierarchical arms must export
   **none** of `HIER`/`LAM`/`ETA_RATIO`; under `HIER=additive` use `LAM=0`.
+* **The `collapsed` column in `all_runs.csv` is `0` on EVERY row — it flags nothing.** One
+  ResNet18/scalar/a0=1e-6 run plateaus at 20.5; it inflated that cell's sd to 14.16 and the
+  reported granularity gain from +1.73 to **+4.60**. Filter `plateau > 50` explicitly until the
+  aggregator is fixed. Audited cycle 23: this is the only affected cell in the CIFAR-10 plain
+  ladder, and the additive r-curves have no collapses at all.
 * **`resnet18_blocks` is ResNet18-only** -- `ZeroDivisionError` at `HF.py:175` on ResNet10/34
   (6 `sc-*-blk6` jobs died). Use `scalar`/`layerwise` on other architectures.
 * **12 running per account IS the ceiling, not a bug.** Every non-`gpu-short` GPU node reports
