@@ -3178,7 +3178,21 @@ a 1.31pp gap between two cells that are *not* the same configuration.
 is None on step 1; it is therefore neither scalar nor layerwise.)
 
 `zad-{plain,r1,r007,r0}-s{0,1,2}` submitted with `PROBE=25` to test both endpoints.
-**Gate: `zad-r1` must reproduce `zad-plain`.** Until it does, the M1 axis is unanchored.
+
+**GATE PASSED — the identity is confirmed empirically.** `zad-plain` vs `zad-r1`,
+seed 0, test accuracy by epoch:
+
+| ep | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| plain | 12.87 | 12.93 | 13.17 | 13.49 | 13.74 | 14.48 | 15.50 | 17.81 | 20.98 | 24.02 |
+| r=1 | 12.87 | 12.93 | 13.20 | 13.48 | 13.75 | 14.48 | 15.52 | 17.81 | 20.96 | 24.05 |
+
+Max deviation **0.03pp**, at run-to-run reproducibility. So `r=1` is plain layerwise
+and **`r=0` is the maximally-pooled end, confirmed by measurement and not only by
+reading the source.** Every M1 statement of the form "+X pp over r=0" is a gain over
+*full pooling*; the no-pooling comparison is against r=1 / plain layerwise (90.89, n=14),
+against which the r=0.07 optimum (93.22, n=5) is **+2.33pp**. r=0.07 vs r=0 is +1.02pp.
+Both are real; they answer different questions and must not be quoted interchangeably.
 
 ## 4. Sign agreement across granularities (axis 6) — with the correct null
 
