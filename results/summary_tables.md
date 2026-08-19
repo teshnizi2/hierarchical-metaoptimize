@@ -4,6 +4,21 @@
 |---|---|---|---|---|---|---|---|
 | ? | plain | 1 | never | never | never | 59.98 | 57.26 |
 
+### base=AdamW  meta=Adam  alpha0=1e-3  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| scalar | plain | 1 | 10.0 | 12.0 | 18.0 | 92.76 | 92.56 |
+
+### base=AdamW  meta=Adam  alpha0=1e-4  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| scalar | plain | 1 | 10.0 | 14.0 | 27.0 | 92.37 | 91.98 |
+
+### base=AdamW  meta=Adam  alpha0=1e-6  guard
+| granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
+|---|---|---|---|---|---|---|---|
+| scalar | plain | 1 | 10.0 | 19.0 | 30.0 | 92.12 | 91.41 |
+
 ### base=AdamW  meta=Adam  alpha0=1e-6  noguard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
@@ -37,9 +52,13 @@
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
 | layerwise | plain | 3 | 28.7 | 36.0 | 54.7 | 91.39±0.19 | 90.98±0.42 |
+| layerwise | shrink(lam=0.001) | 1 | 30.0 | 38.0 | 48.0 | 92.43 | 92.23 |
+| layerwise | shrink(lam=0.01) | 1 | 36.0 | 37.0 | 41.0 | 92.68 | 92.57 |
 | layerwise | shrink(lam=0.1) | 2 | 35.5 | 38.0 | 41.5 | 92.53±0.04 | 92.31±0.22 |
-| weightwise | additive(r=0.1) | 1 | never | never | never | 49.87 | 49.87 |
-| weightwise | additive(r=0.3) | 1 | never | never | never | 67.13 | 67.13 |
+| layerwise | shrink(lam=0.5) | 1 | 36.0 | 38.0 | 42.0 | 92.51 | 92.51 |
+| layerwise | shrink(lam=1.0) | 1 | 36.0 | 38.0 | 42.0 | 92.68 | 92.51 |
+| weightwise | additive(r=0.1) | 2 | never | never | never | 51.30±2.03 | 51.30±2.03 |
+| weightwise | additive(r=0.3) | 2 | never | never | never | 66.61±0.74 | 66.61±0.74 |
 | weightwise | plain | 3 | never | never | never | 79.38±0.46 | 79.38±0.46 |
 | weightwise | shrink(lam=0.01) | 2 | never | never | never | 49.73±3.51 | 49.73±3.51 |
 | weightwise | shrink(lam=0.1) | 2 | never | never | never | 49.07±3.75 | 49.07±3.75 |
@@ -53,4 +72,4 @@
 | layerwise | plain | 4 | 28.2 | 36.0 | 54.2 | 91.31±0.09 | 91.06±0.10 |
 | weightwise | plain | 10 | never | never | never | 67.23±3.40 | 10.00±0.00 |
 
-(90 runs with >= 100 epochs, of 118 total)
+(99 runs with >= 100 epochs, of 127 total)

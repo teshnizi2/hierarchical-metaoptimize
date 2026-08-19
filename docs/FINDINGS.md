@@ -419,3 +419,118 @@ give nearly identical (bad) weightwise numbers. A per-step lam is a *rate*, not 
 the honest reading is that this sweep varied the time constant (1/lam steps), not the amount of
 pooling. Runs at lam = 1e-4 and 1e-5 are queued to probe the regime where the time constant is
 comparable to the run length.
+
+---
+
+# 19 Aug 2026 — four new results, one of which threatens the headline
+
+## 1. The λ curve is FLAT across three decades — and λ = 1.0 is at the top
+
+SGDm + Lion, guard on, augmented, α₀ = 1e-6, 100 epochs, all cells complete:
+
+| λ | half-life (steps) | ep→90 | best | final | n |
+|---|---|---|---|---|---|
+| plain (no pooling) | ∞ | 54.7 | 91.39 ± 0.19 | 90.98 ± 0.42 | 3 |
+| 0.001 | 693 | 48 | 92.43 | 92.23 | 1 |
+| 0.01 | 69 | 41 | **92.68** | **92.57** | 1 |
+| 0.1 | 7 | 41.5 | 92.53 ± 0.04 | 92.31 ± 0.22 | 2 |
+| 0.5 | 1 | 42 | 92.51 | 92.51 | 1 |
+| **1.0** | **0 (exact)** | 42 | **92.68** | 92.51 | 1 |
+
+**λ = 1.0 sets every group's β to the group mean every step — that is not partial
+pooling, it is exact full pooling — and it ties for the best number in the campaign.**
+Everything from λ=0.01 to λ=1.0 is indistinguishable (92.51–92.68, spread 0.17pp against
+a ±0.02pp determinism floor and a ~0.19pp seed sd). Only λ=0.001, whose 693-step half-life
+is the first value that is genuinely partial over a 50,000-step run, sits lower (92.43,
+ep→90 = 48) — i.e. *closer to plain*.
+
+**So the effect is monotone in pooling strength and maximal at full pooling.** The
+"partial pooling / hierarchical shrinkage" framing is wrong as an explanation: nothing in
+the data prefers an interior λ. What wins is *pooling per se*, and the M0 shrink operator
+at λ→1 is just an expensive way of writing "one shared β, updated from 62 per-group
+meta-gradients."
+
+**This should be reported as what it is.** The contribution is not "a hierarchical
+estimator with a tunable shrinkage coefficient"; it is "**averaging the meta-gradient over
+a partition beats both the scalar arm and the unpooled partition**," with λ as a knob that
+is flat wherever it matters. The λ ∈ {0.03, 0.1, 0.3} × 3-seed confirmation sweep
+(`h2-lam*`) plus a matched `h2-base` plain baseline on the same seeds is queued to nail
+the plateau down at n=3.
+
+## 2. The sign-based explanation is REFUTED (preliminary)
+
+The prediction on record: the win comes from scalar taking `sign(Σ z_b)` (magnitude
+discarded) while pooled-layerwise takes `η · mean(sign(z_b))` over 62 groups (a bounded
+consensus estimate) — **so it should shrink or vanish under a non-sign meta-optimizer.**
+
+SGDm + **Adam** meta, guard on, α₀ = 1e-6, seed 0, *both runs still in flight*:
+
+| arm | epochs so far | ep→90 | best so far |
+|---|---|---|---|
+| `h2A-l-plain` | 61 | 56 | 90.07 |
+| `h2A-l-L0p1` | 66 | **20** | **91.96** |
+
+The win does not shrink — on epochs-to-90% it is *larger* under Adam (20 vs 56) than under
+Lion (41.5 vs 54.7). **The sign explanation as stated is wrong.** Whatever pooling is
+buying, it is not specific to the sign nonlinearity, so the account has to be about the
+variance of the per-group meta-gradient estimate itself rather than about how the
+meta-optimizer consumes it. Seeds 1–2 of both arms are queued; do not write the sign
+mechanism into a draft, and do not write its refutation in either until n=3.
+
+## 3. Pooling does NOT help an already-coarse partition (preliminary)
+
+`h2-b-L0p1` (6-block + shrink λ=0.1), 56 epochs so far: best 90.52, ep→90 = 54, against
+plain 6-block's 91.55 ± 0.13 / ep→90 = 43.5. Pooling m=6 looks neutral-to-harmful.
+
+Combined with the weightwise result (pooling m=11.17M is catastrophic: 79.4 → ~49) this
+gives a coherent shape: **pooling helps only at intermediate granularity.** Too coarse and
+there is nothing to average; too fine and the per-group estimates being averaged are
+themselves worthless. m=62 is where the partition is fine enough to have per-group signal
+and coarse enough for that signal to be estimable. Seeds 1–2 queued.
+
+## 4. ⚠ THE α₀ CONFOUND IS REAL AND IT THREATENS THE SPEED CLAIM
+
+AdamW + Adam (the paper's exact CIFAR-10 config), guard on, augmented, seed 0. **The
+scalar arm is complete at 100 epochs in all three cells:**
+
+| α₀ | ep→85 | ep→88 | **ep→90** | best | final |
+|---|---|---|---|---|---|
+| 1e-6 (the campaign's value) | 10 | 19 | **30** | 92.12 | 91.41 |
+| 1e-4 | 10 | 14 | **27** | 92.37 | 91.98 |
+| 1e-3 | 10 | 12 | **18** | **92.76** | **92.56** |
+
+**Raising α₀ alone buys the scalar arm 12 epochs to 90% — more than twice the 5.7-epoch
+gap that the campaign's headline speed claim rests on** (layerwise 24.0 vs scalar 29.7 at
+α₀=1e-6). And α₀=1e-3 scalar reaches **92.76 best / 92.56 final**, the highest number
+measured anywhere in this campaign — above the hierarchical layerwise result (92.68/92.57).
+
+The mechanism is the obvious one: at α₀=1e-6 the step size starts ~3 orders of magnitude
+below useful, so the early epochs are spent growing it rather than optimising. A finer
+partition has more parallel meta-gradient signal with which to grow it, so **granularity
+may be winning a race that a sane initialisation makes unnecessary.**
+
+**Consequences, stated before the confirming seeds land:**
+- The headline "granularity buys 19% fewer epochs to 90%" is measured at a step-size
+  initialisation that handicaps every arm, and the handicap is larger than the effect.
+- The stability claim, the speed claim and the hierarchical win are *all* currently
+  measured only at α₀=1e-6.
+- **No speed or final-accuracy claim should enter a draft until it is shown at α₀ ≥ 1e-4.**
+
+Caveats held honestly: these are n=1 per cell and the 6-block/layerwise cells of this sweep
+are still running (23–82 of 100 epochs), so the *ordering across granularities* at high α₀
+is not yet measured — only the scalar arm's own α₀ dependence is. Seeds 1–2 of all nine
+cells are queued.
+
+### The control this forced
+
+Every hierarchical result in the campaign lives at α₀ = 1e-6, so the same threat applies to
+the project's own proposal. `a0h-*` — {scalar, layerwise plain, layerwise shrink λ=0.1} ×
+α₀ ∈ {1e-3, 1e-4} × 2 seeds, plus a 1-seed α₀=1e-6 anchor — was submitted to decide it.
+**If the shrink win survives at α₀=1e-3, the proposal is real; if it collapses to the
+scalar arm's 92.76, the campaign's best result is an initialisation artifact.**
+
+Run on `gpu-2080ti-11g` rather than L4 (both L4 queues were 59 jobs deep and the 2080ti
+partition was idle). All 15 cells share one GPU type so they are mutually comparable; the
+α₀=1e-6 row doubles as a cross-GPU-type anchor against the existing L4 numbers. Per
+gotcha 3 this is safe because the primary metric is *epochs*-to-target and accuracy, both
+GPU-type-independent — but `wallclock_min` for these runs must not be compared to L4 runs.
