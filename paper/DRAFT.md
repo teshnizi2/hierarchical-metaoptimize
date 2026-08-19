@@ -1,3 +1,14 @@
+> # ⛔ SUPERSEDED — DO NOT CIRCULATE
+> An adversarial review (`REVIEW-hmkhd2.md`, run on the second subscription) checked every
+> headline claim against `results/all_runs.csv` and found several refuted **by controls in this
+> same repo** that had completed while the draft was being written. Verified independently; the
+> review is substantially correct. See `docs/CORRECTIONS.md` for what actually holds.
+> Principal failures: (§4) the +1.46pp pooling gain is a 100-epoch artefact — at 300 epochs it is
+> +0.25pp on plateau accuracy; (§6) the sweep called "in flight" was complete and **refutes**
+> pooling at 100 epochs; (§3) the speed table used unguarded runs; (§3.1) quoted a 2/3 collapse
+> that FINDINGS had already corrected to 1/3; (§5) printed a trace-overflow mechanism my own
+> gamma=0.999 control refuted.
+
 # Step-Size Granularity in Online Meta-Gradient Optimisation is an Estimation Problem
 
 *Working draft. Numbers marked ✅ are confirmed (≥3 seeds); ⏳ are in flight; ⚠️ are not yet
