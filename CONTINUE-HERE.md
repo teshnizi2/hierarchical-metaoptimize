@@ -17,44 +17,48 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph (rewritten cycle 16)
-The **most defensible result is a refutation**: the sqrt(N) noise model fails direct
-measurement — 53.1% of 11.17M per-weight meta-gradients agree on sign against a 50.0000%
-null, and the predicted drift slope of -0.500 measures -0.113. Drift is set by coordinate
-**agreement**, a property of the partition, not by N through sampling noise. The **best
-positive result** is M1 additive pooling: a unimodal r-curve peaking at r~0.07 (93.21,
-n=6) — **+2.29pp over no pooling** (r=1 == plain layerwise, gate-confirmed twice) and
-**+1.01pp over maximal pooling** (r=0). Granularity itself interacts with the base
-optimizer: a 3.84pp span under SGDm, a 0.15pp null under AdamW. All of it is
-CIFAR-10 / ResNet-18 so far; model scale and CIFAR-100 are queued, not measured.
+## The state of the science, in one paragraph (rewritten cycle 18)
+The **most defensible result is a refutation, and it now survives its own control**: the
+sqrt(N) noise model predicts a log-log drift-vs-N slope of -0.500; measured **-0.110 at
+alpha0=1e-6 and -0.136 at alpha0=1e-3**. But the *effect size* behind it is much smaller
+than the headline says -- weightwise sign-agreement is **6.20% excess at alpha0=1e-6 and
+only 0.38% at alpha0=1e-3** (16x collapse), because much of the agreement is the shared
+climb out of a 7-log-unit hole. **Never quote "53.1% agree on sign" without saying
+alpha0=1e-6.** The **best positive result** is M1 additive pooling: a unimodal r-curve whose
+plateau region r in [0.05, 0.07] reaches **93.09-93.31** (n=3-8) vs **90.86 at r=1** (plain
+layerwise, gate-confirmed) and **92.23 at r=0** (full pooling). It has **no measured
+mechanism** -- drift is flat across the whole r-ladder where accuracy moves 2.44pp.
+Granularity interacts with the base optimizer (3.84pp span under SGDm, 0.15pp null under
+AdamW) and with **scale**, in opposite directions: granularity buys +19.88pp at ResNet10
+but +2.87pp at ResNet18, while pooling buys +0.19pp at ResNet10 and +2.62pp at ResNet18.
+ResNet34 is running and decides whether that is a trend. CIFAR-100 has **no usable data
+yet** -- it was queue-starved, not blocked, and is now unblocked.
 
-## Running / next (cycle 16)
-* **Blocking a headline number:** `fxcos-*` (9 jobs, alice) — the non-meta AdamW baseline
-  with its cosine schedule correctly scaled to 50k steps. The uncorrected baseline is
-  91.894 (lr 3e-4, n=4); it was denied its decay and can only move **up**. **Quote no
-  pooling-vs-baseline margin until these land.**
-* **The headline's one untested confound:** `am4-*` (21 jobs, alice2) — the M1 r-curve at
-  **alpha0=1e-4**. The whole §1 curve lives at alpha0=1e-6, which costs 14-25 epochs of
-  arm-dependent startup. If the inverted-U flattens at 1e-4 the headline needs an alpha0
-  qualifier or withdrawal.
-* **Axis 1, model scale:** `sc-*` (36 jobs) — ResNet10/18/34 x {scalar, blocks, layerwise,
-  additive} x 3 seeds. **ResNet10 is DONE (cycle 17)**; ResNet18 running, ResNet34 queued.
-  Headline: granularity buys +19.9pp at ResNet10 vs +3.0pp at ResNet18, but **M1 pooling
-  is a null at ResNet10** (+0.19pp, t=0.66). `r10-*` (24 jobs, alice2) sweeps r there to
-  tell "pooling fails at ResNet10" apart from "r* moved".
-* **Axis 2, second dataset:** `c100-*` (18 jobs) — CIFAR-100 at alpha0 {1e-6, 1e-3} x 4
-  granularities x 2 seeds, plus `rc100-*` (14 jobs) the r-curve at alpha0=1e-3.
-  Data is staged and integrity-checked on **both** accounts (cycle 17 verified alice2's
-  md5 and build_network.py are identical to alice's — the earlier "alice2 lacks the
-  patch" note was wrong, see FINDINGS cycle 17 §5).
-* **Axis 3, n->5:** `mx-*` (89 jobs, both accounts) — M1 peak refinement r in
-  {0.04..0.08}, batch-size axis {25,50,200}, H4 at n=5, alpha0 controls.
-* **Axis 5, meta-optimizer:** `amx-*` (15 jobs, alice2) — Adam-meta additive at r
-  {0, 0.05, 0.07}, n=5, on the SAME account as the Lion sweep, to break the
-  meta-optimizer/account confound.
-* **Throughput is cluster-capped, not queue-capped.** 2 genuinely free GPUs cluster-wide;
-  229 of our jobs pending on `Priority`. Deepening the queue buys nothing; **re-ordering
-  and widening partition eligibility is the only lever.**
+
+## Running / next (cycle 18)  -- queue: alice 124, alice2 99 = 223 jobs
+* **Queue ORDER is the lever, not depth.** Cluster is contended; ~11-12 of our jobs run at a
+  time. Axis 2 (CIFAR-100, 33 jobs) had sat at positions **73-105 of 105** for four cycles
+  behind tier-3 refinement and had therefore produced nothing. Users cannot raise their own
+  priority but **can lower it**: `scontrol update JobId=<j> Nice=<n>`. After demoting tier-3,
+  c100 moved to 24-55 and `sc-ResNet34` from 62 to 16 (3 promptly started).
+  **Check queue POSITION every cycle, not just depth.**
+* **Decides the headline's last confound:** `p6-*` (16 jobs, alice2) -- the M1 r-ladder at
+  **alpha0=1e-3, 100 ep, with the probe on for the full budget**. Gives steady-state drift and
+  plateau from the SAME runs, so it tests both the missing mechanism and whether the
+  inverted-U survives at alpha0=1e-3. The whole cycle-16 curve is alpha0=1e-6.
+* **The theoretical core, extended:** `p4-*` (12, alice, alpha0=1e-3) and `p5-*` (12, alice2,
+  alpha0=1e-6) -- {ResNet10, ResNet34, ResNet18_c100} x {scalar, layerwise, nodewise,
+  weightwise}, 20 ep. With ResNet18's existing p2/p3 this completes a 4-architecture x
+  2-alpha0 grid. **Question:** is agreement/drift a function of **N alone** or of the
+  **partition type**? layerwise spans N=38/62/110 across nets while layerwise->nodewise jumps
+  ~200x, which separates the hypotheses.
+* **Axis 1, scale:** `sc-ResNet34-*` running. ResNet10 and ResNet18 are done (numbers above).
+* **Axis 2, CIFAR-100:** `c100-*` (18) + `rc100-*` (14), unblocked this cycle, data staged and
+  verified on both accounts. Still **zero** usable rows -- treat any c100 claim as unmeasured.
+* **Axis 4, non-meta baseline:** uncorrected AdamW is 91.894 (lr 3e-4, n=4); the cosine-corrected
+  `fxcos-*` supersedes it. **Quote no pooling-vs-baseline margin until those land.**
+* Deprioritised on purpose (tier-3): `mx-b*` batch-size axis, `mx-add-r007/8`, `mx-h4-*`, `zrn-*`.
+
 
 ## Gotchas that cost hours — do not rediscover these
 * Helper scripts go in `/data1/salehkaleybars/metaopt/bin`, **never `/tmp`** (node-local; the
@@ -72,6 +76,18 @@ CIFAR-10 / ResNet-18 so far; model scale and CIFAR-100 are queued, not measured.
   killed on this misreading.
 * Runs reproduce to ~**±0.02pp, not bitwise** (cuDNN autotuning). Effects under ~0.05pp need more
   seeds.
+* **Reduce every probe dir that already exists BEFORE submitting new ones.** Cycle 18 found
+  two complete, never-analysed drift series (`bdrift3/p3-*`, `bdrift4/p4-ad-*`); one of them
+  downgraded a headline effect 16x and the other showed the headline has no mechanism. Sweep:
+  `find <runs> -name probe.jsonl -size +1k`. Reducer: `bin/drift_extract.py` (validated -- it
+  reproduces the published p2 table exactly).
+* **`plateau` is the mean of the last 20 epochs, not 5** (code wins over prose; see
+  CORRECTIONS 11). Filter `epochs_done >= 100` before comparing plateaus -- in-flight runs
+  carry a plateau value that is not comparable.
+* Pin GPUs **only** when timing matters. For epochs-to-target/plateau claims mix freely and
+  always submit all five partitions; `gpu-short` caps at 4h so 300-epoch arms must omit it.
+* Name new probe batches carefully: `p4-*` already existed on alice2 (`runs/bdrift4`) and was
+  unrelated to cycle 18's `p4-*` on alice.
 * ImageNet on `/data1` is **489 of 1000 classes** — scoped out; do not train on it and call it
   ImageNet.
 
