@@ -4098,3 +4098,168 @@ no `blk6` arm.
 * §5's 4-point slope regression still needs `param_numels` consumed by the reducer.
 * CIFAR-100 headline cells are n=2 until `c100b-*` lands.
 * No non-meta baseline exists on CIFAR-100 at all until `fc100-*` lands.
+
+---
+
+# 22. Cycle 22 — the pooling identity is at r=1, not r=0; M0 overtakes M1
+
+CSV: 713 runs (+34 completed since cycle 21). All numbers below re-derived from
+`results/all_runs.csv` at write time, `superseded==0`, **completed runs only**
+(`epochs_done == epochs_requested`), metric = `plateau`.
+
+## 22.1 STRUCTURAL CORRECTION — M1's baseline has been the wrong arm
+
+`HF.py:273-277`, additive branch:
+
+```python
+d  = b - self._beta_prev                                  # realised per-group update
+dm = d.mean()                                             # shared component
+self.beta[0] = self._beta_prev + dm + self._hier_ratio * (d - dm)
+```
+
+* **r=1** → `beta_prev + dm + (d - dm)` = `beta_prev + d` = `b`. **Plain layerwise, exactly.**
+* **r=0** → `beta_prev + dm`: every group receives the *same* update. From a uniform init
+  (`beta = log alpha0` for all groups) beta stays **uniform forever** — a single effective
+  step size driven by the *mean* per-layer meta-gradient. This is a **different algorithm**,
+  not the no-op.
+
+Empirical identity check (r=1 vs plain layerwise, completed 100ep):
+
+| dataset | alpha0 | additive r=1 | plain layerwise | delta |
+|---|---|---|---|---|
+| CIFAR-10 | 1e-3 | 91.15 (n=2) | 91.15 (n=8) | +0.00 |
+| CIFAR-10 | 1e-6 | 90.86 (n=3) | 90.82 (n=24) | +0.05 |
+| CIFAR-100 | 1e-3 | 69.92 (n=2) | 70.11 (n=2) | -0.20 |
+
+(like-for-like: `base=SGDm, meta=Lion, layerwise, 100ep` on both sides.)
+
+Identity holds to <=0.20pp. **Every "M1 gain vs r=0" figure in this repo — including the
+93.06-93.22 vs 92.15 headline — is anchored to a degenerate arm rather than to the method
+it must beat.** Re-anchored to r=1 below.
+
+## 22.2 M1 additive, re-anchored to r=1
+
+| r | C10 a0=1e-6 | vs r=1 | C10 a0=1e-3 | vs r=1 | C100 a0=1e-3 | vs r=1 |
+|---|---|---|---|---|---|---|
+| 0 | 92.23 (n=6) | +1.36 | 92.10 (n=2) | +0.95 | 8.98 (n=2) | **-60.93** |
+| 0.03 | 92.14 (n=8) | +1.28 | 92.15 (n=2) | +1.00 | 13.91 (n=2) | -56.01 |
+| 0.05 | 93.05 (n=10) | +2.18 | 92.12 (n=2) | +0.96 | 17.64 (n=2) | -52.28 |
+| 0.06 | **93.26 (n=8)** | **+2.40** | 92.01 (n=14) | +0.85 | -- | -- |
+| 0.07 | 93.19 (n=9) | +2.33 | 92.18 (n=1) | +1.03 | 26.54 (n=4) | -43.38 |
+| 0.1 | 92.03 (n=8) | +1.17 | -- | -- | 42.76 (n=2) | -27.16 |
+| 0.2 | 91.39 (n=3) | +0.52 | -- | -- | 68.32 (n=2) | -1.59 |
+| 0.3 | 90.96 (n=3) | +0.09 | 91.76 (n=2) | +0.61 | -- | -- |
+| 1 | 90.86 (n=3) | 0.00 | 91.15 (n=2) | 0.00 | 69.92 (n=2) | 0.00 |
+
+* The **interior optimum is real but alpha0-specific**: a clean inverted-U peaking at
+  r=0.06 (+2.40) at alpha0=1e-6; at alpha0=1e-3 the curve is **flat** at +0.85..+1.03 across
+  r in [0, 0.07] — partial pooling still helps ~1pp, but there is no interior optimum.
+* **On CIFAR-100 M1 is monotone harm.** Every r<1 is worse than plain layerwise; the curve
+  only climbs back to the r=1 asymptote. No interior optimum at either alpha0
+  (r=0.07 at alpha0=1e-6 = 59.05, n=2, still 10.8pp below plain layerwise 69.89).
+
+## 22.3 M0 (shrink) is the more robust method
+
+`beta <- b - lam*(b - b.mean())`. vs plain layerwise, CIFAR-10 ResNet18 100ep:
+
+| alpha0 | plain | M0 shrink | delta |
+|---|---|---|---|
+| 1e-3 | 91.15 (n=8, sd .19) | 92.25 (n=3, sd .18) | **+1.10** |
+| 1e-4 | 90.84 (n=8, sd .18) | 92.28 (n=3, sd .04) | **+1.44** |
+| 1e-6 | 90.82 (n=24, sd .16) | 92.02 (n=36, sd .60) | **+1.21** |
+
+lambda curve at alpha0=1e-6 (SGDm/Lion, layerwise):
+
+| lam | 1e-5 | 3e-5 | 1e-4 | 1e-3 | 0.01 | 0.03 | 0.1 | 0.3 | 0.5 | 1.0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| plateau | 90.80 | 90.79 | 90.62 | 92.32 | **92.47** | 92.25 | 92.29 | 92.22 | 92.20 | 92.20 |
+| n | 2 | 2 | 2 | 3 | 3 | 3 | 12 | 3 | 3 | 3 |
+
+* **Identity verified at the other end**: lam<=1e-4 recovers plain layerwise (90.62-90.80 vs
+  90.82). Both hierarchy branches now have a verified no-op limit.
+* Sharp **threshold** between lam=1e-4 (90.62) and lam=1e-3 (92.32), then a **flat plateau
+  across three orders of magnitude** (lam 1e-3..1.0, all 92.20-92.47, sd<=0.23).
+* M1's peak is higher at alpha0=1e-6 (+2.40 vs +1.65) but needs r in [0.04,0.07] and decays to
+  zero by r=0.3. M0 is lower-peak, far wider, and alpha0-independent. **Correction to an
+  earlier draft of this section: M1 layerwise is NOT unstable at r=0.1/0.3 — the sd=16pp I
+  first computed came from failing to filter `granularity==layerwise`, which pulled in
+  collapsing weightwise/nodewise arms.**
+
+## 22.4 The win is meta-gradient AGGREGATION, not step-size granularity
+
+CIFAR-10, alpha0=1e-6, 100ep. Both "fully pooled" arms hold **one** effective step size, as
+does native scalar — they differ only in how the meta-gradient is aggregated:
+
+| arm | effective step sizes | plateau |
+|---|---|---|
+| native `scalar` | 1 | 87.77 (n=17) |
+| plain `layerwise` | N | 90.82 (n=24) |
+| M0 shrink lam=1.0 (= mean every step) | 1 | 92.20 (n=3) |
+| M1 additive r=0 (= mean update) | 1 | 92.23 (n=6) |
+
+**Both single-step-size pooled arms beat plain per-layer step sizes by ~1.4pp and beat the
+native scalar parameterisation by ~4.4pp.** Per-layer adaptivity is not what is buying the
+gain; averaging the meta-gradient across layers is. This is the mechanism the refuted
+sqrt(N) noise model was reaching for, and it is measurable without any noise assumption.
+
+## 22.5 Model scale — the granularity benefit collapses with size (COMPLETE, n=3-24)
+
+CIFAR-10, alpha0=1e-6, 100ep, plain (no hierarchy):
+
+| network | params | scalar | layerwise | layerwise - scalar |
+|---|---|---|---|---|
+| ResNet10 | 4.9M | 70.74 (n=3) | 90.62 (n=3) | **+19.88** |
+| ResNet18 | 11.2M | 87.77 (n=17) | 90.82 (n=24) | **+3.05** |
+| ResNet34 | 21.3M | 89.32 (n=3) | 90.22 (n=3) | **+0.90** |
+
+Monotone decay over a 4.3x parameter range. This is the parent paper's premise measured
+directly, and it is the cleanest scale result in the repo. The alpha0=1e-3 replication
+(`sa3-*`) is in flight; its completed cells so far agree in sign (ResNet10 scalar 71.67
+vs layerwise 91.40).
+
+## 22.6 CIFAR-100 granularity ordering (plain, 100ep) — same direction, larger
+
+| granularity | a0=1e-3 | a0=1e-6 |
+|---|---|---|
+| scalar | 22.47 (n=2) | 22.30 (n=2) |
+| resnet18_blocks | 51.32 (n=2) | 52.73 (n=2) |
+| layerwise | 70.11 (n=2) | 69.89 (n=2) |
+
+Granularity is worth **+47.6pp** on CIFAR-100 vs +3.05pp on CIFAR-10 (ResNet18, same alpha0).
+Task difficulty amplifies the granularity benefit as strongly as small model size does.
+
+## 22.7 Cluster reality — 24 GPUs is the ceiling, not 84
+
+Every GPU node is fully allocated (`gpu_alloc` 4/4, 2/2, 3/3; one free L4 cluster-wide).
+`sinfo` "mix" denotes free **CPUs**, not GPUs. `gpu-short` is an *overlay* partition over the
+same physical nodes 851-887 as the four 7-day partitions, so the per-user quotas
+(short 12 + l4 8 + 2080ti 12 + mig 8 + a100 2 = 42/account) are **not** 42 independent GPUs.
+Both accounts run exactly 12, all on `gpu-short`; the other 246 pending jobs sit at
+reason=Priority behind other users' 7-day jobs. **Queue depth is not the binding
+constraint — composition is.** At ~24 slots and ~1h/job, a 391-job queue is ~16h deep.
+
+## 22.8 Submitted this cycle (48 jobs; queues alice 219 / alice2 172)
+
+M0 had **zero** jobs queued on either account while M1 — the method that just failed on
+CIFAR-100 — held ~150. That was the gap.
+
+| tag | acct | n | what | why |
+|---|---|---|---|---|
+| `m0c-*` | alice2 | 18 | CIFAR-100 M0 shrink, lam {0.01,0.1,1.0} x a0 {1e-3,1e-6} x 3 seeds, 100ep | does our best method generalise where M1 is actively harmful? lam=1.0 doubles as the 22.4 aggregation probe (C100 native scalar = 22.47) |
+| `c1b-*` | alice2 | 6 | CIFAR-100 plain layerwise, seeds 2-4, both a0 | the baseline all of 22.2/22.6 rests on is n=2 |
+| `m0l-*` | alice | 12 | CIFAR-10 M0 lambda {1e-3,0.01,0.3,1.0} at a0=1e-3, 3 seeds | the flat lambda plateau exists only at a0=1e-6; only lam=0.1 was run at 1e-3 |
+| `m0s-*` | alice | 12 | ResNet10/34 x lam {0.01,0.1} x 3 seeds, a0=1e-6, 100ep | every R10/R34 shrink run so far is 20-epoch. Does M0 survive scale when plain granularity does not (22.5)? ResNet18 already has both lam. |
+
+Pre-flight (cycle-21 lesson): `HIER=shrink,LAM=<l>` parsed against the real `HF.py` lines
+23-25 on a login node for every lam in {0.001,0.01,0.1,0.3,1.0} plus the no-export plain arm
+— all clean. `ETA_RATIO` deliberately **not** exported (shrink never reads it). ResNet10/34
+and `ResNet18_c100` confirmed in `build_network.py`; `cifar-100-python` staged on alice2.
+`resnet18_blocks` avoided on R10/R34 (hard-coded partition, ResNet18-only).
+
+## 22.9 Still open
+
+* M0 on CIFAR-100 and at scale — the two cells that decide whether M0 is the paper's method.
+* The `sa3-*` alpha0=1e-3 scale replication is ~30% complete.
+* 22.4 (aggregation vs granularity) is CIFAR-10/alpha0=1e-6 only; `m0c-*` lam=1.0 extends it.
+* Non-meta baseline (`fx-adamw-*`) still absent on CIFAR-10; `fc100-cos-*` pending for C100.
+* Every CIFAR-100 cell in 22.2/22.6 is n=2 until `c1b-*` lands.
