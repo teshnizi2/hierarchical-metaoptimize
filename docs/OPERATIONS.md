@@ -720,3 +720,68 @@ grep -m1 '^ENV:' runs/amx-r07-s0-*.out    # expect HIER=additive ETA_RATIO=0.07
 If `HIER=none` / `ETA_RATIO=na` appears, the export failed and every `amx` run is a plain
 layerwise run wearing an additive name — which would pool into the sweep and corrupt it exactly
 as the Adam contamination did. Do not aggregate `amx-*` into any table before this line is read.
+
+## 31. Multi-partition submission does NOT spread jobs — it funnels them
+
+`--partition=gpu-short,gpu-l4-24g,gpu-2080ti-11g,gpu-mig-40g,gpu-a100-80g` was adopted to
+spread load. It does the opposite: Slurm places the job in the **first partition of the list
+it can run in**, so every job landed in `gpu-short`. Each partition carries its own per-user
+QoS GPU cap (`qos-short-gpu`=12, `qos-gpu-l4`=8, `qos-gpu-2080ti`=12, `qos-gpu-mig`=8,
+`qos-gpu-a100`=2 — 42 total). Everything competed for the first 12 while **30 GPUs of
+entitlement sat unused**. Both accounts were pinned at exactly 12 running for days.
+
+**Diagnosis:** `squeue -h -u $USER -t RUNNING -o "%P" | sort | uniq -c`. One partition =
+this bug. **Fix:** pin whole blocks to distinct partitions with
+`scontrol update JobId=<j> Partition=<one>`. Move blocks **wholesale** so every internal
+contrast stays on one GPU type (gotcha 28). alice2 went 12 → 15 running immediately.
+
+Note this contradicts the older advice "if jobs sit PENDING on one partition, widen to all".
+Widening helps a *single* job find any pool; it actively hurts a *queue*, which needs its
+blocks distributed.
+
+## 32. `max(frac_neg, 1-frac_neg)` is a folded statistic — its null is NOT 0.5
+
+Sign agreement was compared against "independence = 50%". That is only right when the
+coordinate count is huge. The statistic is folded, so under perfectly independent fair signs
+`E[max(p,1-p)] > 0.5`, and badly so at small n:
+
+| n_coord | granularity | null |
+|---|---|---|
+| 6 | resnet18_blocks | **65.63%** |
+| 62 | layerwise | **55.06%** |
+| ~14k | nodewise | 50.33% |
+| 11.17M | weightwise | 50.00% |
+
+Layerwise steady-state agreement is 55.84% — against the correct null that is **+0.78pp,
+not +5.84pp**. The weightwise 53.10% result is unaffected (its null really is 50.00%).
+Simulate the null at the actual coordinate count before calling any agreement "far above chance".
+
+Related: agreement varies strongly over training, so **agreement must be stage-matched**.
+Unmatched per-seed means spanned 60.6–79.4% *within* layerwise purely because the runs had
+different lengths; restricted to a common step window they are 86.9–87.5%.
+
+## 33. The non-meta AdamW baseline's LR schedule is sized for a run 8x longer
+
+`AdamW_optimizer` hard-codes `total_steps=422000, warmup_steps=10000`. A 100-epoch CIFAR run
+at batch 100 is **50,000 steps**, so the baseline gets a 20-epoch warmup and an LR that has
+decayed only to **97.7% of base** at the final step — i.e. effectively no decay, which is
+where the last 1–2pp on CIFAR-10 normally comes from. Any "meta beats baseline" margin
+measured against the default is measured against a baseline denied its main lever.
+Now overridable via `COS_TOTAL` / `COS_WARMUP` (defaults unchanged); both are echoed on the
+`ENV:` line, per gotcha 8.
+
+## 34. Staging a dataset is not the same as extracting it
+
+`cifar-100-python.tar.gz` sat in `cifar10/data/` for a day looking staged. It was never
+extracted, and compute nodes have no internet (gotcha 5), so every CIFAR-100 job would have
+hung on `download=True` rather than failed fast. **The check that actually means something is
+`datasets.CIFAR100(root=..., download=False)._check_integrity() == True`** — that is what makes
+`download=True` a no-op. File presence proves nothing; run the integrity check from a login node.
+
+## 35. `sed -i` on a live runner script can break ~200 in-flight jobs
+
+Appending to the `ENV:` echo line with `sed` produced an unbalanced quote in
+`jobs/run_cifar.sh`, which `set -e` would have turned into an immediate failure for every job
+launching in that window. Caught by `bash -n`; `sacct` confirmed no job started in the gap.
+**Always `bash -n <script>` after editing a runner, and prefer a Python line-rewrite over
+`sed` when the replacement text contains quotes.**
