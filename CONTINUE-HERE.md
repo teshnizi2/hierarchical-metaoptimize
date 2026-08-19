@@ -17,42 +17,62 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph (rewritten cycle 20)
-Two results now carry the paper, and both got stronger this cycle. **(1) The sqrt(N) noise
-model is refuted with the sign INVERTED, in three architectures across two datasets.** Holding
-beta common (`HIER=shrink, LAM=1.0`) and varying only the group size over which the
-meta-gradient is aggregated, drift *rises* with group size: weightwise is the slowest-drifting
-arm and scalar the fastest, giving log-log slopes of **+0.179 / +0.268 / +0.203** (ResNet10,
-ResNet34, ResNet18_c100) where the model requires **-0.500**. This is at alpha0=1e-3, i.e.
-steady state, and weightwise sign-agreement excess is 0.08-0.47% -- so independence *holds*
-and the prediction *still* fails. **(2) CIFAR-100 gives granularity +47.6pp, and it does not
-care about alpha0** (+47.59 at 1e-6, +47.64 at 1e-3), monotone in fineness: scalar 22 <
-6-block 52 < layerwise 70. That is the second dataset the paper needed, and the largest,
-most robust effect in the campaign. **The correction that reframes everything else:** in
-`_apply_hier`, `r` is the RETENTION of the group-specific update -- **r=1 is plain layerwise
-(verified: 90.863 +-0.063 vs 90.891) and r=0 is FULL pooling**. Cycles 16-19 quoted the M1
-gain against r=0 while calling it the no-pooling control. Corrected, ResNet18/CIFAR-10 at
-alpha0=1e-6 is **+2.40pp over no pooling** (a bigger number), but the ladder does not
-transfer: r*=0.06 at ResNet18, r*>=0.1 at ResNet10, and on CIFAR-100 that same r=0.07 costs
-**-43.7pp**. Never state a pooling claim without naming both the setting and alpha0.
+## The state of the science, in one paragraph (rewritten cycle 21)
+Three results now carry the paper. **(1) The sqrt(N) noise model is refuted with the sign
+INVERTED**, in three architectures across two datasets: holding beta common (`HIER=shrink,
+LAM=1.0`) and varying only the group size, drift *rises* with group size (log-log slopes
++0.179 / +0.268 / +0.203 where the model requires -0.500), at alpha0=1e-3 and with
+weightwise sign-agreement excess of only 0.08-0.47% -- so independence *holds* and the
+prediction *still* fails. **(2) The granularity gain tracks TASK DIFFICULTY, not parameter
+count.** On CIFAR-10 at alpha0=1e-6 the gain (layerwise - scalar) falls 19.88 -> 2.87 -> 0.90
+across ResNet10/18/34, which looks like the parent paper's premise -- but the LAYERWISE arm is
+flat (90.220-90.686, a 0.47pp spread) while the SCALAR arm moves 18.58pp; the whole trend is
+scalar catching up. CIFAR-100 at the *middle* model size then gives **+47.6pp**, the campaign's
+largest effect, and it does not care about alpha0 (+47.59 at 1e-6, +47.64 at 1e-3). `cs-*`
+(submitted cycle 21) supplies the missing CIFAR-100 model sizes that turn this from hypothesis
+into result. **(3) Pooling inverts between datasets.** `r` is the RETENTION of the
+group-specific update -- **r=1 is plain layerwise (verified: 90.863 +-0.063 vs 90.891) and r=0
+is FULL pooling**. On CIFAR-10/ResNet18 the optimum is interior at r~0.07 (+2.31pp over plain
+layerwise) and even full pooling helps (+1.39pp); on CIFAR-100 the same r=0.07 costs -43.7pp
+and full pooling **collapses the model to 8.98%** (100-class chance is 1%), a -61.13pp penalty.
+**The correction that bounds all method claims:** a tuned non-meta baseline now WINS. AdamW +
+cosine at lr 1e-3 reaches **94.093 +-0.036** under matched budget (100ep, AUGMENT=1, ResNet18,
+CIFAR-10) against the best MetaOptimize arm's **93.306 +-0.140** -- a 0.79pp deficit. Earlier
+cycles compared against *constant-LR* AdamW (91.86), which MetaOptimize does beat by +1.38pp.
+The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
+MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
-## Running / next (cycle 20)  -- queue: alice 153, alice2 125 = 278 jobs
-* **Six pooling ladders are in flight to map r\*(setting).** This is the live question: r\* is
-  0.06 (ResNet18/C10), >=0.1 (ResNet10/C10), and >0.2-or-nonexistent (CIFAR-100).
-  `rc100-*` (alice, 14, C100 @1e-3, **promoted to the queue front**), `rc6-*` (alice2, 14,
-  C100 @1e-6), `rcg-*` (alice2, 9, C100 gap-fill r in {0.4,0.6,0.8}), `m1a3-*` (alice, 15,
-  R18/C10 @1e-3), `r10b-*` (alice2, 15, R10 r in {0.08,0.15,0.3,0.4,0.6}).
-* **`p6f-*` (alice, 9)** -- free-adaptation companion to `p4scale`: same nets/granularities
-  with `HIER` **unset**, so groups diverge. `p4`/`p5` measured agreement under a COMMON beta
-  (LAM=1.0); this closes that caveat.
-* **`p5-*` (alice2, 12)** -- the alpha0=1e-6 probe ladder. Already queued; do NOT resubmit it.
-* Still open: CIFAR-100 granularity is n=2 (effect is +47.6pp so n is not the constraint, but
-  headline cells want n>=5); the §5 slope uses only the weightwise<->scalar endpoints, and a
-  4-point regression needs `param_numels`, which the probe records but the reducer ignores;
-  Axis 4's non-meta baseline is still uncorrected AdamW 91.894 (n=4), `fx-e300-*` queued.
+
+## Running / next (cycle 21)  -- queue: alice 215, alice2 128 = 343 jobs
+* **`cs-*` (alice, 18)** -- CIFAR-100 x {ResNet10_c100, ResNet34_c100} x {scalar, layerwise,
+  additive r=0.06} x 3 seeds, alpha0=1e-3. THE decisive experiment: fills the 2x2 that
+  separates task-difficulty from parameter-count as the variable ordering the granularity gain.
+* **`fc100-cos-*` (alice, 9)** -- AdamW+cosine on CIFAR-100, lr in {1e-3,3e-4,1e-4} x 3 seeds.
+  There is currently NO non-meta baseline on CIFAR-100, the dataset carrying our largest effect.
+* **`fxcos-*` (alice, 7)** -- lr 1e-3/3e-4 to n=5 plus lr 3e-3 x 3; brackets the baseline optimum
+  at fixed warmup. NOT a duplicate of the queued `sw-cos-*` sweep, which leaves COS_WARMUP unset.
+* **`c100b-*` (alice2, 18)** -- CIFAR-100 granularity ladder, seeds 2-4, both alpha0: takes the
+  headline cells from n=2 to n=5.
+* **`c100f-*` (alice2, 6)** -- CIFAR-100 nodewise + weightwise. "Monotone in fineness" currently
+  stops at layerwise; on CIFAR-10 under SGDm the finest arm collapses to chance (10.000).
+* Still in flight from cycle 20: six pooling ladders (`rc100`, `rc6`, `rcg`, `m1a3`, `r10b`,
+  `p6`), the `p5-*`/`p6f-*` drift probes, `fx-e300-*`, `bg300/bg600` budget-matched cosine, the
+  `sw-cos-*` 7-point LR sweep, `pp-*` (the parent paper's own unaugmented setup), and
+  `sc50-*`/`sc101-*` (ResNet50/101 CIFAR-10 scale -- lower value now that the CIFAR-10 layerwise
+  arm is known to be flat).
+* Still open: §5's 4-point slope regression needs `param_numels` consumed by the reducer.
 * Deprioritised, unchanged: `mx-b*`/`mx-add-r007/8`/`zrn-*` (tier-3, Nice=6000-10000).
 
+
 ## Gotchas that cost hours — do not rediscover these
+* **12 running per account IS the ceiling, not a bug.** Every non-`gpu-short` GPU node reports
+  `AllocTRES` = its full GPU count (other users hold them); `qos-gpu-short` caps at
+  `gres/gpu=12` per user. Confirm with `scontrol show node <n> | grep AllocTRES` before
+  "fixing" anything. **Negative `Nice` is denied** to unprivileged users -- the only way to
+  promote a block is to nice *other* jobs back.
+* **Compare against a SCHEDULED baseline, not a constant-LR one.** AdamW+cosine 94.09 beats
+  the best MetaOptimize arm 93.31; constant-LR AdamW 91.86 loses to it by 1.38pp. Which
+  baseline you pick flips the sign of the headline method claim.
 * **`r` in the additive hierarchy is RETENTION: r=1 = plain layerwise, r=0 = FULL pooling.**
   Three cycles quoted the M1 gain against r=0 as if it were the no-pooling control. See
   CORRECTIONS 13.

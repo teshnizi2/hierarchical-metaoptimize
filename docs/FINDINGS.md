@@ -3960,3 +3960,107 @@ weightwise, and its *prediction* still fails. The failure is not an independence
   `param_numels` but the reducer does not yet consume.
 * The non-meta baseline (Axis 4) is still uncorrected AdamW 91.894 (n=4); `fx-e300-*` and
   `fxcos-*` remain queued.
+
+---
+
+# Cycle 21 — the tuned non-meta baseline landed, and it wins
+
+CSV re-aggregated from both accounts: **679 runs** (was 638). All numbers below are `plateau`
+(mean of the last 20 epochs) over runs with `epochs_done >= 100`, re-derived from
+`results/all_runs.csv` at write time.
+
+## 21.1 Axis 4 is answered, and the answer is unfavourable — record it plainly
+
+`fxcos-*` completed. Matched budget throughout: ResNet18 / CIFAR-10 / batch 100 / 100 epochs /
+`AUGMENT=1`. `fxcos` = plain `--optimizer AdamW` with `COS_TOTAL=50000, COS_WARMUP=2500`
+(i.e. cosine over exactly the 100-epoch budget); `fx_adamw` = the same at constant LR.
+
+| arm | plateau | n |
+|---|---|---|
+| **AdamW + cosine, lr 1e-3** | **94.093 ± 0.036** | 3 |
+| AdamW + cosine, lr 3e-4 | 94.062 ± 0.043 | 3 |
+| AdamW + cosine, lr 1e-4 | 92.851 ± 0.239 | 3 |
+| *best MetaOptimize arm* (`sc-ResNet18-add`, additive r=0.06) | *93.306 ± 0.140* | 3 |
+| MetaOptimize additive r=0.06, n=5 (`mx-add-r006`) | 93.236 ± 0.141 | 5 |
+| MetaOptimize plain layerwise | 90.686 ± 0.137 | 3 |
+| AdamW constant lr 3e-4 | 91.858 ± 0.131 | 5 |
+| AdamW constant lr 1e-4 | 91.188 ± 0.223 | 5 |
+
+**A tuned non-meta baseline beats the best MetaOptimize arm by 0.79pp under matched budget.**
+Earlier cycles compared against *constant-LR* AdamW (91.86), which MetaOptimize does beat by
++1.38pp. The gap is created by the cosine schedule, not by the optimizer. Every "our method
+helps" sentence must name which baseline it beats. This does not touch §5 (the sqrt(N)
+refutation) or §4 (the granularity ordering) — both are statements about MetaOptimize's
+internals, not about reaching good accuracy — but it does bound what the method section may
+claim.
+
+Caveat carried forward: `fxcos` and the queued 7-point `sw-cos-*` sweep differ in warmup
+(`COS_WARMUP=2500` vs unset). They cannot be pooled into one grid.
+
+## 21.2 Granularity gain tracks task difficulty, not parameter count
+
+The gain (layerwise − scalar) on CIFAR-10 at α₀=1e-6 falls monotonically with model size, which
+reads as support for the parent paper's premise — until the CIFAR-100 row is put beside it.
+
+| setting | scalar | layerwise | gain | n |
+|---|---|---|---|---|
+| ResNet10 / C10 (4.9M) | 70.742 ± 0.832 | 90.619 ± 0.267 | **+19.88** | 3 |
+| ResNet18 / C10 (11.2M) | 87.819 ± 0.173 | 90.686 ± 0.137 | **+2.87** | 3 |
+| ResNet34 / C10 (21.3M) | 89.317 ± 0.127 | 90.220 ± 0.011 | **+0.90** | 3 |
+| ResNet18 / C100, α₀=1e-3 | 22.468 | 70.113 | **+47.65** | 2 |
+| ResNet18 / C100, α₀=1e-6 | 22.300 | 69.886 | **+47.59** | 2 |
+
+**The layerwise arm is flat across all three CIFAR-10 architectures (90.220–90.686, a 0.47pp
+spread) while the scalar arm moves 18.58pp (70.74 → 89.32).** The entire "scale trend" is the
+scalar arm catching up, not the fine-grained arm degrading. CIFAR-100 at the *middle* model
+size then gives the largest gain in the campaign. So the ordering variable looks like **how
+badly a single scalar step size can do on the task**, not parameter count.
+
+Status: **hypothesis, not result.** It rests on one CIFAR-100 model size. `cs-*` (submitted
+this cycle) supplies the other two.
+
+## 21.3 Pooling inverts between datasets (r = RETENTION; r=1 plain layerwise, r=0 full pooling)
+
+| arm | CIFAR-10 / R18, α₀=1e-6 | | CIFAR-100 / R18, α₀=1e-3 | |
+|---|---|---|---|---|
+| r = 1 (plain layerwise) | `zad-r1` 90.863 ± 0.063 | n=3 | `c100-1e3-layer` 70.113 ± 0.247 | n=2 |
+| r ≈ 0.07 | `zad-r007` **93.171 ± 0.225** | n=3 | `c100-1e3-add` **26.383 ± 1.346** | n=2 |
+| r = 0 (full pooling) | `zad-r0` 92.256 ± 0.122 | n=3 | `rc100-r0` **8.982 ± 0.146** | n=2 |
+
+New this cycle: `rc100-r0`. Full pooling on CIFAR-100 collapses to **8.98%** — 100-class chance
+is 1%, so the model is barely learning — against 70.11 for plain layerwise, a **−61.13pp**
+penalty. On CIFAR-10 the same operation is *beneficial* (+1.39pp over plain layerwise) and the
+optimum is interior at r≈0.07 (+2.31pp). The pooling result does not transfer across datasets
+in magnitude or in sign of the derivative. Never state a pooling claim without naming the
+dataset, the model, and α₀.
+
+## 21.4 Throughput
+
+12 running per account, both accounts, all on `gpu-short`. This is the **real ceiling, not a
+misconfiguration**: `scontrol show node` reports `AllocTRES` = full GPU count on every
+`gpu-l4-24g` / `gpu-2080ti-11g` / `gpu-mig-40g` / `gpu-a100-80g` node (one free L4 on node886
+cluster-wide). The non-`gpu-short` pending jobs sit at reason `Priority` because other users
+hold the GPUs, and `qos-gpu-short` caps at `gres/gpu=12` per user. 24 concurrent GPUs is ≈23%
+of the cluster's ~103 GPUs. Negative `Nice` is denied to unprivileged users
+(`Access/permission denied`); re-ordering is only possible by nicing *other* jobs back.
+
+## 21.5 Submitted this cycle (58 jobs; queues now alice 215 / alice2 128)
+
+| tag | acct | n | what | why |
+|---|---|---|---|---|
+| `cs-r10-*`, `cs-r34-*` | alice | 18 | CIFAR-100 × {ResNet10_c100, ResNet34_c100} × {scalar, layerwise, additive r=0.06} × 3 seeds, α₀=1e-3 | fills the 2×2 in §21.2 — decides task-difficulty vs parameter-count |
+| `fc100-cos-*` | alice | 9 | AdamW+cosine on CIFAR-100, lr ∈ {1e-3, 3e-4, 1e-4} × 3 seeds | §21.1 on the dataset where our largest effect lives |
+| `fxcos-*` | alice | 7 | lr 1e-3 / 3e-4 to n=5, plus lr 3e-3 × 3 | the baseline optimum is not yet bracketed at fixed warmup |
+| `c100b-*` | alice2 | 18 | CIFAR-100 granularity ladder, seeds 2–4, both α₀ | takes the headline §21.2 cells from n=2 to n=5 |
+| `c100f-*` | alice2 | 6 | CIFAR-100 nodewise + weightwise, α₀=1e-3 × 3 seeds | "monotone in fineness" stops at layerwise; on CIFAR-10 under SGDm the finest arm collapses to chance (10.000) |
+
+Verified before submitting, per the cycle-19 gotcha: `ResNet10_c100`/`ResNet34_c100` exist in
+`build_network.py` and `cifar-100-python` is staged on **both** accounts; the queued `sw-cos-*`
+block is *not* a duplicate of `fxcos-*` (differs in `COS_WARMUP`).
+
+## 21.6 Still open
+
+* §21.2 is one CIFAR-100 model size away from being a result rather than a hypothesis.
+* §5's 4-point slope regression still needs `param_numels` consumed by the reducer.
+* CIFAR-100 headline cells are n=2 until `c100b-*` lands.
+* No non-meta baseline exists on CIFAR-100 at all until `fc100-*` lands.
