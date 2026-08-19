@@ -583,3 +583,59 @@ queue or the docs flagged the discrepancy for a full cycle.
 script in `bin/` now ends by printing the affected jobs' state (`squeue -h -o '%i %j %T %r %y %P'`),
 so the receipt is in the same output as the action. When a write-up says a block was cancelled,
 confirm with `sacct` (gotcha 15) — it shows `CANCELLED` explicitly, which `squeue` silence does not.
+
+## 28. A sweep measured on one GPU type must be read only against itself
+
+`zsx-*` runs on 2080ti; `zsw-*`, and essentially every other block in this campaign, runs on L4.
+Differencing a `zsx` number against an L4-measured number silently mixes a hardware term into an
+effect size (gotcha 3 is about timing; this is about *accuracy*, which the ±0.02pp determinism
+floor does not bound across GPU types because it was only ever measured *within* one).
+
+A sweep is safe to relocate to a different GPU type **only if it carries its own anchors**. The
+zpool sweep does: `r=0` is exactly the scalar arm and `r=1` is exactly the plain per-group arm
+(both identities verified — FINDINGS cycle 10 §1), so every contrast it makes is internal.
+
+```bash
+# a relocated block must contain its own endpoints. Check before submitting:
+#   does the sweep include the arms it will be compared against?  if not, do not relocate it.
+```
+
+The corollary bit the `ad-l-r007` s3–s4 cells this cycle: they are members of an all-L4 ladder
+resolving a **0.12pp** difference, so they were deliberately left queued on the saturated L4 pool
+rather than run sooner on 2080ti. Waiting is cheaper than an uninterpretable number.
+
+## 29. An empty `AllocTRES` does NOT mean the node is free — read `State` in the same breath
+
+Gotcha 16 said to check `AllocTRES` rather than `sinfo` state. That is right for the question
+"is this GPU in use?" and **wrong on its own** for "can I run here?". This cycle three 2080ti
+nodes reported a completely empty `AllocTRES`:
+
+```
+NodeName=node854  AllocTRES=
+NodeName=node856  AllocTRES=
+NodeName=node857  AllocTRES=
+```
+
+which reads as 12 idle GPUs. They were not idle, they were **unavailable**:
+
+```
+$ sinfo -h -n node854,node855,node856,node857 -o '%N %T %G %C'
+node857 drained$   gpu:2080_ti:4  0/0/48/48
+node[854,856] maint gpu:2080_ti:4 0/96/0/96
+node855 allocated  gpu:2080_ti:4  48/0/0/48     # 1 GPU free, but 0 free CPUs
+```
+
+`node857` was `drained` for `GPU fail`, `node854`/`node856` were in `maint`, and `node855` had a
+free GPU but no free CPU to pair with it. Empty allocation and unusable are the same string.
+
+**Always join the two:**
+
+```bash
+sinfo -h -N -p <partition> -o '%N %T'        # state:  idle / mixed / allocated / drained / maint
+scontrol show node | grep -A1 'Gres=.*l4'    # alloc:  AllocTRES
+# free == state in {idle, mixed} AND AllocTRES gres < CfgTRES gres AND CPUs remain
+```
+
+The failure mode is not wasted jobs — Slurm just queues them — it is **a wasted decision**. A
+"there are 13 idle GPUs over there" reading nearly moved the headline sweep onto hardware that
+did not exist. State the capacity claim with the state column attached, or do not state it.

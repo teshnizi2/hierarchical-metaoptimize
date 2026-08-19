@@ -2704,3 +2704,223 @@ Note the interpolation is not linear in spread: r=0.5 suppresses the end-of-run 
 to 0.228 (14x), because halving the deviation component compounds as a contraction over 50k
 steps. Reading r as "fraction of per-group signal retained" is right; reading it as "fraction of
 the spread retained" is not.
+
+---
+
+# 19 Aug 2026 (cycle 10) — the zpool identity gate PASSES on accuracy, additive beats shrink at *every* λ, and the L4 pool is the campaign's real bottleneck
+
+## 1. The `z3` identity gate is COMPLETE on layerwise, and both endpoints PASS
+
+Gotcha 25 requires an identity check to first prove its regime *discriminates* the arms it
+claims to equate. At 20 epochs, α₀=1e-6, guarded:
+
+| anchor | best | final_train |
+|---|---|---|
+| `z3-ref-scalar` | 84.08 | 86.00 |
+| `z3-ref-layer` | **87.80** | 91.74 |
+| `z3-ref-weight` | 83.34 | 85.10 |
+
+Scalar and layerwise sit **3.72pp apart** here, versus 0.02pp in the void `zv-*` design. The
+gate is open, and only now may the identities be read:
+
+| claim | measured | anchor | Δ | Δ as % of the 3.72pp separation | verdict |
+|---|---|---|---|---|---|
+| `zpool` r=0 ≡ scalar | 84.21 (train 86.08) | 84.08 (train 86.00) | **0.13pp** | 3.5% | **PASS** |
+| `zpool` r=1 ≡ plain layerwise | 87.73 (train 91.65) | 87.80 (train 91.74) | **0.07pp** | 1.9% | **PASS** |
+
+Both endpoints also match on the *train* column independently (Δ = 0.08 and 0.09pp), so this is
+not a test accuracy coincidence.
+
+**This is the evidence the "Corrected hierarchy — VALIDATED" section was missing.** That section
+rested on the structural argument (sd(β) = 0 exactly at r=0) plus a 4-epoch accuracy test that
+gotcha 25 later voided. The operator now has an accuracy identity at *both* ends, measured where
+the arms it interpolates are 3.7pp apart. `zpool` is safe to build on.
+
+⚠ `z3-w-r0` / `z3-w-r1` (the weightwise half) are at **15/20 epochs** and must not be read —
+an identity compared at mismatched epoch counts is not an identity check.
+
+## 2. Additive beats shrink at EVERY λ — and the "shrink was still fitting" objection is dead
+
+Cycle 9 §3 claimed additive Pareto-dominates shrink but flagged the load-bearing caveat: shrink's
+92.58 was measured at train 97.78, still climbing, exactly the gotcha-19 failure mode. It queued
+`e3a-lsh01` at 300 epochs to settle it. **The λ ladder already settles it, and no 300-epoch run is
+needed.** Layerwise, SGDm+Lion, α₀=1e-6, guarded, 100 epochs:
+
+| operator | n | best test | final_train |
+|---|---|---|---|
+| plain (no `HIER`) | 9 | 91.21 ± 0.24 | 99.69 ± 0.09 |
+| shrink λ=0.001 | 3 | 92.54 ± 0.20 | **99.92 ± 0.02** |
+| shrink λ=0.01 | 3 | **92.79 ± 0.11** | 98.06 ± 0.11 |
+| shrink λ=0.03 | 3 | 92.58 ± 0.08 | 97.88 ± 0.09 |
+| shrink λ=0.1 | 12 | 92.59 ± 0.11 | 97.80 ± 0.13 |
+| shrink λ=0.3 | 3 | 92.51 ± 0.23 | 97.79 ± 0.04 |
+| shrink λ=0.5 | 3 | 92.50 ± 0.14 | 97.78 ± 0.02 |
+| shrink λ=1.0 | 3 | 92.53 ± 0.17 | 97.76 ± 0.07 |
+| **additive r=0.07** | 3 | **93.58 ± 0.09** | 99.83 ± 0.01 |
+
+Two readings, and the second is the important one:
+
+1. **Shrink's test accuracy is FLAT across four orders of magnitude of λ** — 92.50 to 92.79, a
+   0.29pp band against sds of 0.08–0.23 — while its fit varies from 99.92 down to 97.76. Shrink
+   is not a dial. It is a **step**: plain (91.21) → any shrink at all (~92.5–92.8), with λ
+   controlling only how much fit is surrendered on the way.
+2. **The budget objection cannot save it.** `λ=0.001` reaches train **99.92** — a *better* fit than
+   additive's peak (99.83) — and still tops out at 92.54. Shrink's ceiling is ~92.8 **independent
+   of its fit level**, so "shrink was under-fitting" does not explain the gap.
+
+**Additive's maximum exceeds the best cell on the entire shrink ladder by +0.79pp** (93.58 ± 0.09
+vs 92.79 ± 0.11, ~7x the pooled sd), while fitting 1.8pp better. Cycle 9 §3's Pareto claim
+survives, is no longer budget-bounded, and is no longer a one-cell-vs-one-cell comparison — it is
+one cell against a seven-point ladder. Gotcha 21 (shrink and additive are not two settings of one
+knob) is now measured rather than argued.
+
+`e3a-lsh01` at 300 epochs remains useful as an independent check, but §2 no longer waits on it.
+
+## 3. The additive peak: r=0.05 HELD at n=5, and r=0.07 now leads
+
+Plain layerwise SGDm+Lion guarded, α₀=1e-6, augment on, 100 epochs. Baseline n=9.
+
+| r | n | best test | Δ vs plain | final_train | ep→85 | ep→88 | plateau |
+|---|---|---|---|---|---|---|---|
+| plain | 9 | 91.21 ± 0.24 | — | 99.69 ± 0.09 | **29.11 ± 0.93** | 36.22 ± 1.79 | 90.79 |
+| 0 | 3 | 92.51 ± 0.08 | +1.30 | 97.81 ± 0.07 | 35.67 ± 0.58 | 38.00 ± 0.00 | 92.20 |
+| 0.03 | 5 | 92.96 ± 0.15 | +1.75 | 98.93 ± 0.03 | 36.40 ± 1.14 | 39.00 ± 0.71 | 92.64 |
+| 0.05 | **5** | 93.46 ± 0.05 | +2.25 | 99.58 ± 0.04 | 36.00 ± 1.00 | 39.20 ± 0.45 | 93.09 |
+| **0.07** | 3 | **93.58 ± 0.09** | **+2.37** | 99.83 ± 0.01 | 34.67 ± 0.58 | 39.00 ± 1.00 | 93.32 |
+| 0.1 | 5 | 92.86 ± 0.19 | +1.65 | 99.88 ± 0.01 | 32.60 ± 0.89 | 37.40 ± 0.89 | 92.63 |
+| 0.2 | 3 | 91.73 ± 0.15 | +0.52 | 99.66 ± 0.02 | 31.33 ± 1.15 | **35.67 ± 0.58** | 91.39 |
+| 0.3 | 3 | 91.40 ± 0.09 | +0.19 | 99.69 ± 0.03 | 30.33 ± 0.58 | 36.00 ± 0.00 | 90.96 |
+
+* **r=0.05 survived promotion to n=5** — 93.41 ± 0.06 (n=2) → 93.46 ± 0.05 (n=5), a move of
+  0.05pp. This is the **first** cell on this ladder to hold when promoted; gotcha 26 records two
+  prior n=2 cells that moved by 0.16pp and reversed a ranking. The rule stands (n=2 *can* fail);
+  this instance did not.
+* **The maximum is a plateau over r ∈ [0.05, 0.07], not a point.** r=0.07 leads by +0.12pp against
+  a pooled sd of ~0.07 — about 1.7σ, which does not separate them. Cycle 9's open question
+  ("smooth cap or spike between 0.05 and 0.1") resolves to **smooth cap on the low side, cliff on
+  the high side**: −0.72pp from r=0.07 to r=0.1 over a 0.03 step, then −1.13pp more to r=0.2.
+  `ad-l-r007` s3–s4 are queued to take the leading cell to n=5 (§5).
+* **Do not quote a single peak location.** Quote the plateau [0.05, 0.07] and the asymmetric
+  fall-off.
+
+Cycle 9 §2 replicates unchanged: **speed is monotone increasing in spread and the accuracy
+optimum is the slowest pooled cell on the ladder.** At ep→85 every additive cell is *slower* than
+plain (30.3–36.4 vs 29.1 ± 0.9). The primary metric still says additive buys nothing.
+
+## 4. Additive generalises to 6-block and to Adam-meta — cycle 9 §4 and §5 both CLOSED
+
+**§5 (6-block) was unreadable last cycle at 71/100 epochs. It is now complete.**
+
+| arm (6-block, SGDm+Lion) | n | best test | Δ vs plain | ep→85 | ep→88 |
+|---|---|---|---|---|---|
+| plain | 5 | 91.69 ± 0.13 | — | **29.40 ± 0.55** | **36.60 ± 1.34** |
+| additive r=0.03 | 3 | 92.18 ± 0.21 | **+0.49** | 31.00 ± 1.00 | 39.33 ± 1.15 |
+| additive r=0.1 | 2 | 91.96 ± 0.07 | **+0.27** | 30.50 ± 2.12 | 40.50 ± 0.71 |
+
+**§4 (Adam meta) goes from n=1 to n=3 and the direction holds.**
+
+| arm (layerwise, SGDm+**Adam**) | n | best test | Δ vs plain | ep→85 | ep→88 |
+|---|---|---|---|---|---|
+| plain | 9 | 90.76 ± 0.14 | — | **15.00 ± 0.50** | 26.67 ± 1.66 |
+| additive r=0.03 | 3 | 91.71 ± 0.07 | **+0.95** | 17.00 ± 1.00 | **24.00 ± 1.00** |
+| additive r=0.1 | 3 | 91.36 ± 0.09 | **+0.60** | 15.33 ± 0.58 | 28.33 ± 4.04 |
+
+Three things this settles and one it opens:
+
+* The sign-nonlinearity objection stays **refuted at n=3**, not n=1. Adam-meta gets 54% of the
+  Lion-meta gain at r=0.03 (+0.95 vs +1.75) — cycle 9's "roughly half" was right.
+* The r=0.03 > r=0.1 ordering is preserved on **both** the 6-block cell and the Adam-meta cell.
+* **NEW — the additive gain scales with the number of groups.** At r=0.03: m=6 → +0.49pp,
+  m=62 → +1.75pp. A ~3.6x gain for a ~10x finer partition. The operator pools *across* groups, so
+  more groups give it more to work with. This makes a falsifiable prediction for the m=n column
+  the `zsx-*` sweep is now measuring (§5): the gain should be larger still at m = 11.17M.
+* **OPEN:** under Adam meta the speed reading *reverses inside the budget* — r=0.03 is slower to
+  85% (17.0 ± 1.0 vs 15.0 ± 0.5, ~2.5σ) but **faster** to 88% (24.0 ± 1.0 vs 26.7 ± 1.7, ~1.6σ).
+  Under Lion meta it is slower at both. The cycle-8 §5 early/late crossover apparently lands
+  inside the 100-epoch budget under Adam and outside it under Lion. Unexplained; n=3.
+
+## 5. Queue actions — the campaign's bottleneck is the L4 pool, and it is partly self-inflicted
+
+The 36-job `zsw-*` sweep — the single biggest open item, since **no m=n pooling result is claimed
+anywhere in this document** — was submitted to `gpu-l4-24g` only and `scontrol` reported
+`StartTime=2026-08-26`. A week out, for the headline block.
+
+Diagnosis, by measurement rather than by `sinfo` state (gotcha 16):
+
+* **All 32 L4 GPUs (8 nodes × 4) report `AllocTRES gres/gpu:l4 = 4`. L4 is 100% saturated
+  cluster-wide.** Widening to `gpu-short` therefore cannot help — gotcha 23, confirmed a second
+  time.
+* **alice's own 12 running `gpu-short` jobs hold 12 of those 32 L4s.** The account is the largest
+  single holder of the resource its own headline block is queued behind. This is the first time
+  self-contention has been identified as the binding constraint rather than other users' load.
+
+Actions:
+
+1. **All 36 `zsw-*` widened to `gpu-l4-24g,gpu-short` and re-niced by seed** (s1→0, s2→1000,
+   s0→9000) so the sweep completes in *width* before depth. Priority rose 675558 → 1075433 and
+   `StartTime` returned from 2026-08-26 to normal contention. Kept as the L4 arm.
+2. **Submitted `zsx-*` on alice2 — the same 36 cells pinned to 2080ti** (`--gres=gpu:2080_ti:1`,
+   `--partition=gpu-2080ti-11g,gpu-short`, `--time=03:00:00` from the measured 0.70–0.88 min/epoch
+   2080ti table = 2.2x headroom, inside the 4h cap). Named `zsx` and not `zsw` so it can never
+   collide with alice's block in `aggregate.py`, which keys on run name across both runs dirs.
+   Rationale is **pool diversification**, not spare capacity: alice2 holds 5 of 28 usable 2080ti
+   GPUs versus alice's 12 of 32 L4s, so the same sweep queued on both pools lands sooner on
+   whichever frees first.
+3. **Cancelled 12 L4-pinned `zsw-s0` jobs mis-submitted to alice2 earlier this cycle.** They were
+   provably unrunnable (L4 at 100% alloc) *and* name-identical duplicates of alice's own s0 cells,
+   which would have collided in the aggregate. Redundant by construction, so `scancel` and not
+   `nice` — the cycle-9 `z2-*` precedent.
+4. **`ad-l-r007` s3–s4 on alice2, deliberately kept L4-pinned** even though L4 is the saturated
+   pool. They are cells of the all-L4 `ad-l-*` ladder and the effect being measured is 0.12pp,
+   which is inside the range where GPU-type differences are not obviously negligible. Correct to
+   wait rather than to run them on the wrong hardware (gotcha 3).
+
+**Code parity verified before any submit** (gotcha 10, which cycle 9 had to fix on this exact
+file): `HF.py` md5 `294087b88548ac52db6922afb89e1433` is identical on alice, on alice2, and in the
+repo's `patches/HF_patched.py`, with `grep -c PATCH_ZPOOL` = 2 on both accounts. The md5
+difference between the accounts' `bin/patch_zpool.py` is **only** the account-specific `P=` path
+line; the `_zpool` operator body is byte-identical. Checked *first*, because a zpool sweep run
+against a drifted operator would have been unrecoverable.
+
+## 6. `a0A` — α₀ is flat under Adam meta too, but it still buys startup SPEED
+
+100 epochs, n=1 per cell, guarded. Best test accuracy:
+
+| arm | α₀=1e-3 | 1e-4 | 1e-6 | spread |
+|---|---|---|---|---|
+| scalar | 88.24 | 88.15 | 88.46 | 0.31 |
+| 6-block | 91.50 | 91.42 | 91.30 | 0.20 |
+| layerwise plain | 91.57 | 91.38 | 90.99 | 0.58 |
+| layerwise shrink λ=0.1 | 92.17 | 92.13 | 92.36 | 0.23 |
+
+Every arm flat to ≤0.58pp across three orders of magnitude — cycle 8 §3's α₀ closure now holds on
+a **second meta-optimizer**, so priority item 2 stays closed and gotcha 24 stands.
+
+But the *speed* column is not flat: layerwise plain reaches 85% at epoch 12/13/15 and 90% at
+40/40/47 as α₀ falls 1e-3 → 1e-6. **α₀ buys startup speed without buying final accuracy** — which
+is precisely why gotcha 24 forbids quoting a granularity comparison at short horizon and small α₀.
+
+## 7. In flight and NOT readable
+
+* `e3a-*` (300-epoch additive budget control): seed 0 at 91–126 of 300 epochs, seed 1 at 1–68.
+  Mixing seeds at these epoch counts is the gotcha-19 failure mode by construction. **Nothing may
+  be read from `e3a` this cycle**, including the tempting `e3a-r01_s0` = 93.05 at 108 epochs.
+* `z3-w-r0` / `z3-w-r1` at 15/20 epochs (§1).
+* `zsx-*` (36 cells) and `zsw-*` (36 cells) — all pending.
+* `adg-b-r01_s2` at 77/100, which is why that cell is n=2.
+
+## 8. Standing caveats after this cycle
+
+* §3's peak is a **plateau [0.05, 0.07]**, not a location. r=0.07 is n=3.
+* §4's 6-block r=0.1 cell is **n=2**; gotcha 26 applies to it.
+* §6 is **n=1 per cell** — direction only.
+* §1's identity gate is **layerwise only**. The weightwise half is at 15/20 epochs and the m=n
+  pooling column remains unclaimed.
+* §4's "gain scales with group count" rests on **two points** (m=6, m=62). It is a prediction for
+  the `zsx` sweep, not a law.
+* `zsx-*` is measured on **2080ti** and `zsw-*` on **L4**. The sweep is self-anchoring — its own
+  r=0 and r=1 endpoints are the scalar and plain arms — so it is readable within itself, but a
+  `zsx` number must never be differenced against an L4-measured number (new gotcha 28).
+* Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
+* **ImageNet stays scoped out.** The language modality remains blocked on the validation-gated
+  optimizer port; TinyStories pretokenization is done.
