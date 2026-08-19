@@ -534,3 +534,51 @@ partition was idle). All 15 cells share one GPU type so they are mutually compar
 α₀=1e-6 row doubles as a cross-GPU-type anchor against the existing L4 numbers. Per
 gotcha 3 this is safe because the primary metric is *epochs*-to-target and accuracy, both
 GPU-type-independent — but `wallclock_min` for these runs must not be compared to L4 runs.
+
+---
+
+# 19 Aug 2026 — infrastructure findings (zero GPU)
+
+## The ImageNet copy is a genuine half-dataset, and `val` is the real blocker
+
+Audit job 4680826, full table in `docs/PLAN-appendix-infra.md` §3.4. Headline:
+**489/1000 classes, 627,329/1,281,167 images, per-class counts spanning the canonical
+732–1300 with 0/300 sampled images corrupt.** The classes that are present are intact —
+the earlier "capped/derived copy, treat as untrusted" worry is refuted.
+
+But **the devkit is absent**, so the 50,000 `val` JPEGs (flat, no class subdirs) cannot be
+labelled from anything on disk. That blocks ImageNet at *any* number of classes and is
+independent of the missing 511 training classes. The suspected "second ImageNet copy"
+turned out to contain no data at all — it is the authors' training code.
+
+Net effect on the plan: unchanged. **ImageNet-64×64 remains the default scale point**; this
+audit only removes the option of quietly using the on-disk copy as-is.
+
+## The dead-granularity defect is in BOTH task copies, not just CIFAR-10
+
+`tinystories/HF.py` accepts `layerwise`/`nodewise`/`weightwise` into `self.stepsize_type` but
+assigns `self.beta` only on the `scalar` and `blockwise` branches, so `len(self.beta)` on the
+next line raises `AttributeError`. Same defect, different file, found independently.
+
+**The released code advertises three granularities in the argument parser of both task copies
+and can execute them in neither.** That is a systematic defect rather than a slip in one file,
+and it is a stronger form of the reproduction finding than what is currently written up.
+
+## A question for Saber got much sharper
+
+The authors' own ImageNet launcher on scratch (`cedar_arg_iterator_HF.sh`, 27 Jan 2024) has
+
+```bash
+for stepsize_groups in scalar; do # scalar layerwise nodewise weightwise resnet18_blocks
+```
+
+i.e. **as configured on disk it sweeps `scalar` only**, with `resnet18_blocks` commented out.
+Our unifying result currently *predicts* the paper's §7.3 ImageNet blockwise null — so the
+provenance of that blockwise arm should be established before we keep explaining it.
+PLAN §4 question (c) is upgraded from "was it the same 6-block partition?" to **"the launcher
+on scratch sweeps scalar only — where did the ImageNet blockwise arm come from?"**
+
+This is evidence about unpublished work sitting in the PI's directory, so it is a question to
+ask, not a finding to publish. The ~50 Jan-2024 run-output directories next to it were
+deliberately **not** read — that needs his permission first (PLAN §4 item (g)) — and nothing
+of his has been copied off ALICE.

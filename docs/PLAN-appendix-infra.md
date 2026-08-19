@@ -567,3 +567,73 @@ Sustained: **~20–30 concurrent CIFAR runs per account** is a realistic steady 
 - **Whether the 489-class ImageNet is an accident or a decision** (§3.1). The scattered-WNID evidence rules out a simple interrupted extraction and points at something deliberate or at a partial source. Asking is cheaper than any amount of forensics.
 - **Compute-node internet access** (§5.4). I assumed no outbound access, which drove the files-first recommendation. That recommendation is robust either way — it is the correct architecture even *with* internet — but if nodes are online, adding a hosted tracker as a *view* becomes cheap.
 - **Checkpoint size estimate** (~150–250 MB) is inferred from parameter count plus β/H/Y/Lion state, not measured. It only affects retention policy sizing, not the policy itself.
+---
+
+## 3.4 ImageNet audit — RESOLVED 19 Aug 2026 (job 4680826, `audit/in-audit-4680826.out`)
+
+The §3.2 procedure ran as a `cpu-short` job. Read-only on the PI's tree; nothing copied off ALICE.
+
+| measurement | result | canonical | verdict |
+|---|---|---|---|
+| train class dirs | **489** | 1000 | 511 missing |
+| train images | **627,329** | 1,281,167 | 49.0% present |
+| per-class counts | min **732**, max **1300**, mean 1282.9 | 732–1300 | **matches the canonical histogram** |
+| classes at exactly 1300 | 442 of 489 | ~440 of 1000 | consistent, not capped |
+| decode test | **300 sampled, 0 corrupt** | — | intact |
+| `val/` | 50,000 flat JPEGs, 0 class subdirs | 50,000 | present, **wrong layout** |
+| devkit / `ILSVRC2012_validation_ground_truth.txt` | **not found anywhere under `/data1/salehkaleybars`** | required | **absent** |
+| second ImageNet path | **contains no data at all** — it is the authors' *code* (`train_imagenet.py`, `build_network.py`, `cedar_arg_iterator_HF.sh`) | — | dead end |
+
+**Verdict — decision rule branch 2: a genuine partial copy whose present classes are individually intact.**
+The earlier worry that it might be a capped/derived copy is **refuted**: the 10-class sample that
+showed 10/10 at exactly 1300 was a sampling accident. The full histogram spans 732–1300 with the
+canonical shape, and the minimum is exactly the canonical 732. So the 489 classes that are present
+are trustworthy; the copy is simply half a dataset.
+
+**Consequences:**
+1. **Refilling means re-acquiring 511 classes (~75 GB), not re-acquiring everything.** The existing
+   489 need no re-download and no integrity remediation.
+2. **`val/` is a harder blocker than `train/`.** The images are all there but the devkit ground-truth
+   file is absent, so there is no way to assign labels to the 50,000 val JPEGs from what is on disk.
+   Without the devkit, the val split is unusable at any number of classes. It is a small download,
+   but it must be on the list.
+3. **The "second ImageNet copy" avenue is closed** — that path was never data.
+4. The `[RULING on B8]` default of **ImageNet-64×64** is unaffected and remains the right call; this
+   audit removes the option of quietly using the on-disk copy as-is, because a 489-class run is not
+   comparable to any published number and the val labels are missing regardless.
+
+## 3.5 Found during the audit: the authors' own ImageNet launcher
+
+`/data1/salehkaleybars/MetaStep/MetaStep/imagenet/cedar_arg_iterator_HF.sh` (dated 27 Jan 2024,
+i.e. days before the arXiv v1 of 2402.02342). Line 67:
+
+```bash
+for stepsize_groups in scalar; do # scalar layerwise nodewise weightwise resnet18_blocks
+```
+
+**As configured on disk, the ImageNet sweep iterates `scalar` only.** Every other granularity —
+including `resnet18_blocks`, the 6-block partition the paper's CIFAR-10 blockwise results use — sits
+in the trailing comment, i.e. disabled.
+
+Two observations, both of which are **questions for Saber, not findings to publish**:
+
+1. If this is the state that produced the paper's ImageNet numbers, then §7.3's "the blockwise
+   versions showed no improvement over the scalar versions" was not produced by *this* launcher, and
+   the provenance of the ImageNet blockwise arm needs to be established before we explain its null.
+   Our unifying result currently *predicts* that null; it would be careless to keep predicting it
+   without checking the run existed in the form assumed.
+2. The disabled list is `layerwise nodewise weightwise` — **exactly the three paths our `patch_hf2.py`
+   had to implement because they are non-executable in the released code.** So had they been
+   un-commented, the sweep would have crashed rather than run. That is consistent with them being
+   aspirational rather than executed, and it strengthens the reproduction-study contribution.
+
+**Ask before relying on either point.** This is one file, on scratch, in the PI's directory; it is
+evidence about his unpublished work, not a result of ours. It sharpens PLAN §4 question (c) from
+"was the ImageNet run the same 6-block partition?" to the far more precise **"the launcher on scratch
+sweeps scalar only — where did the ImageNet blockwise arm come from?"**
+
+**Not read, deliberately.** `/data1/salehkaleybars/MetaStep/MetaStep/outputs/` holds ~50 run-output
+directories from Jan 2024. These are the PI's unpublished results and are exactly the "zero-GPU move"
+the plan ranks highest (PLAN §4 item 2 of §3.3) — but reading them needs his explicit permission
+(PLAN §4 question (g)), so this audit listed the directory names and stopped there. **Nothing of his
+has been copied off ALICE.**

@@ -114,9 +114,44 @@ DATA_CACHE_DIR = os.environ.get("TINYSTORIES_DATA", "/data1/salehkaleybars/metao
 Staged on `alice` (login nodes have internet; compute nodes do not — see gotcha 5):
 `data/tinystories/TinyStories_all_data/` — **50 shards, 6.97 GB**, receipt in `STAGED.txt`.
 
-**Two things remain before TinyStories can run:**
+**THREE things remain before TinyStories can run** (was two; the third was found 19 Aug 2026):
 1. **Pretokenization has not been done** and must be a Slurm CPU job, not a login-node job.
 2. **`tinystories/HF.py` is a SEPARATE COPY** of the optimizer and carries **neither the
    `BETA_CLIP` guard nor the `HIER` hierarchy patch** — both live only in `cifar10/Optimizers/HF.py`.
    Porting them is a prerequisite for any guarded or hierarchical language-modality run, and a
    run launched without the port would silently be plain and unguarded (see gotcha 10).
+
+3. **`sentencepiece` was missing from the venv** — `tinystories.py pretokenize` and `tokenizer.py`
+   both import it and it was never installed. Fixed 19 Aug 2026 with
+   `pip install --no-deps sentencepiece` (0.2.2) into `envs/mo`; `--no-deps` so that nothing the
+   ~85 in-flight CIFAR jobs depend on could be upgraded underneath them. Pretokenization is now
+   running as a `cpu-short` Slurm job (`bin/ts_pretok.sh`, vocab_size=0 → the shipped Llama-2
+   tokenizer, `.bin` written beside each `.json`, which is what `train.py`'s
+   `vocab_source="llama2"` path globs for).
+
+### Correction to blocker 2 — the port is bigger than "add the guard and the hierarchy"
+
+`tinystories/HF.py` is 267 lines against `cifar10/Optimizers/HF.py`'s 444, and they differ by 232
+diff-lines. Inspecting it directly:
+
+```python
+self.stepsize_type = stepsize_groups if stepsize_groups in ['scalar','layerwise','nodewise','weightwise'] else 'blockwise'
+...
+if   self.stepsize_type == 'scalar':    self.beta = [...]
+elif self.stepsize_type == 'blockwise': self.beta = [...]
+self.len_beta_list = len(self.beta)     # <-- AttributeError for layerwise/nodewise/weightwise
+```
+
+`self.beta` is assigned **only** on the `scalar` and `blockwise` branches, so any of the three fine
+granularities raises `AttributeError` on the very next line. **The dead-granularity defect is present
+in the language-modality copy too, independently of the CIFAR-10 one.**
+
+This matters twice over:
+
+* **For the port.** TinyStories needs *all three* of our patches — granularity (`patch_hf2.py`),
+  guard, hierarchy — re-derived against a substantially different file, not two patches copied over.
+  That is a validation-gated change (PLAN §5), so it was **not** done autonomously: shipping an
+  unvalidated optimizer port is precisely the failure mode PLAN §5 exists to prevent.
+* **For the paper.** The released code advertises `layerwise`/`nodewise`/`weightwise` in the argument
+  parser of **both** task copies and can execute them in **neither**. The defect is systematic, not a
+  slip in one file, which is a materially stronger version of the reproduction finding.
