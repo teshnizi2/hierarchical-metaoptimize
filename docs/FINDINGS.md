@@ -2667,3 +2667,40 @@ queue behind the gate.
 * Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
 * **ImageNet stays scoped out.** The **language modality** remains blocked on the validation-gated
   optimizer port; TinyStories pretokenization is done.
+
+---
+
+# Corrected hierarchy (meta-gradient-space pooling) — VALIDATED
+
+The beta-space `HIER=shrink` had no exact endpoint at m=n (fully-pooled per-weight landed at 49
+while the true scalar arm reaches 88.09 — a sum-vs-mean mismatch of factor m). Replaced by
+pooling in **meta-gradient space**, exploiting the exact identity `sum_b z_b == z_scalar`:
+
+    z'_b = (1 - r) * sum_j z_j  +  r * z_b        (HIER=zpool, ETA_RATIO=r)
+
+    r = 0  -> every group receives the scalar arm's meta-gradient  => EXACTLY scalar
+    r = 1  -> every group receives its own                          => EXACTLY plain per-group
+
+## Validation — structural, not just numerical
+
+Accuracy identities over 4 epochs all held within the ±0.02pp floor, but that test is weakly
+discriminating (all granularities agree early, since beta starts uniform). The decisive check is
+the spread of beta across groups, which differentiates immediately:
+
+| run | sd(beta) @25% | sd(beta) @end | verdict |
+|---|---|---|---|
+| layerwise r=0 | **0.000e+00** | **0.000e+00** | exactly uniform — is the scalar arm |
+| weightwise r=0 | 9.4e-07 | 2.2e-07 | uniform to float32 precision |
+| layerwise r=1 | 0.942 | 3.120 | — |
+| plain layerwise (no hierarchy) | 0.944 | 3.126 | **r=1 reproduces plain** |
+| layerwise r=0.5 | 0.000 | 0.228 | genuine intermediate |
+
+At r=0 the beta vector stays *exactly* uniform for all 200 probe records, which is only possible
+if every group truly receives an identical meta-gradient. Both endpoints are therefore exact by
+construction and confirmed by measurement, and r interpolates between them. The m=n column is
+now meaningful and the definitive sweep can proceed.
+
+Note the interpolation is not linear in spread: r=0.5 suppresses the end-of-run spread from 3.12
+to 0.228 (14x), because halving the deviation component compounds as a contraction over 50k
+steps. Reading r as "fraction of per-group signal retained" is right; reading it as "fraction of
+the spread retained" is not.
