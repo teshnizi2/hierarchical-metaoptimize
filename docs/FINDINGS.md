@@ -2127,3 +2127,79 @@ converge) and **loses** the second, drift-based reading cycle 6 added to it.
 * Every number remains **CIFAR-10 / ResNet-18**, 100 epochs unless stated.
 * **ImageNet stays scoped out** (489/1000 classes, no devkit). The **language modality** is still
   blocked on the validation-gated optimizer port; TinyStories pretokenization is done.
+
+---
+
+# M0 shrinkage: the full lambda curve (3 seeds per cell)
+
+SGDm base + Lion meta, SwiftTD guard on, augmented, 100 epochs.
+
+| lambda | best test acc | delta vs plain |
+|---|---|---|
+| plain layerwise + guard | 91.33 ± 0.17 (n=6) | — |
+| 0.001 | 92.54 ± 0.20 | +1.21 |
+| **0.01** | **92.79 ± 0.11** | **+1.46** |
+| 0.03 | 92.58 ± 0.08 | +1.25 |
+| 0.1 | 92.54 ± 0.08 (n=6) | +1.21 |
+| 0.3 | 92.51 ± 0.23 | +1.18 |
+| 0.5 | 92.50 ± 0.14 | +1.17 |
+| 1.0 | 92.53 ± 0.17 | +1.20 |
+
+**The curve is flat across three orders of magnitude.** The method nominally introduces a
+hyperparameter, but the outcome is insensitive to it over lambda in [0.001, 1.0] — so in
+practice it removes a decision rather than adding one. That is the strongest property of the
+result and should be stated as such.
+
+## It generalises across granularity and across meta-optimizer
+
+| setting | plain | + shrinkage (lam=0.1) | delta |
+|---|---|---|---|
+| 6-block, SGDm+Lion | 91.56 ± 0.03 | 92.03 ± 0.20 | +0.47 |
+| layerwise, SGDm+**Adam** (paper's meta) | 90.71 ± 0.17 | **92.22 ± 0.08** | **+1.51** |
+
+## The mechanism looks like regularisation, not acceleration
+
+Epochs to reach a target (layerwise, SGDm+Lion):
+
+| target | plain | shrinkage lam=0.01 |
+|---|---|---|
+| 85% | **27.7** | 35.3 |
+| 90% | 55.5 | **40.0** |
+| 91% | 83.5 | **42.3** |
+| 92% | **never (0/6 runs)** | **51.7 (3/3)** |
+
+Shrinkage is *slower* to fit early and decisively better later, crossing over around 88–90%,
+and it reaches a level plain layerwise never reaches within the budget. That is the classic
+signature of a regulariser, not of a better-conditioned optimiser — and it means the earlier
+"granularity buys speed" framing does **not** transfer to the hierarchical variant. The two
+effects are different and must be reported separately.
+
+## Per-weight: monotone in effective pooling, but the comparison is CONFOUNDED
+
+Effective pooling over T=50,000 steps is `1-(1-lam)^T`:
+
+| effective pooling | best | delta |
+|---|---|---|
+| 0% (baseline, guard only) | 79.38 ± 0.46 | — |
+| 39% (lam=1e-5) | 78.98 ± 0.17 | −0.40 |
+| 99.3% (lam=1e-4) | 70.23 ± 0.15 | −9.15 |
+| ~100% (lam >= 0.01) | ~49.1 ± 3.8 | **−30.3** |
+
+Monotone, which confirms the saturation analysis — a per-step lambda is a *rate* (time constant
+1/lam steps), not a *strength*.
+
+**DO NOT yet report this as "pooling hurts at m=n".** Fully-pooled per-weight lands at ~49 while
+the genuine scalar arm reaches 88.09. If pooling did what it claims, those two should converge.
+They do not, and the likely reason is an aggregation mismatch in the current M0 implementation:
+the scalar arm aggregates the meta-gradient as a **sum** over weights (`z = sum_i h_i g_i`),
+whereas `_apply_hier` pools beta toward a **mean**. That is a factor-of-n = 11.17M discrepancy in
+effective meta-step scale, which is more than enough to explain a 39pp gap.
+
+**Required follow-up before any claim about per-weight pooling:** re-implement pooling at m=n so
+that the pooled arm reduces *exactly* to the scalar arm at full pooling, and verify that identity
+numerically (the same way `LAM=0` was verified to reduce to plain layerwise). Until that identity
+holds, the m=n column measures an implementation artifact, not granularity.
+
+The layerwise and 6-block results above are unaffected: there the number of groups is small, the
+sum-vs-mean factor is 62 or 6 rather than 11 million, and the effect is confirmed at 3 seeds
+across seven lambda values and two meta-optimizers.
