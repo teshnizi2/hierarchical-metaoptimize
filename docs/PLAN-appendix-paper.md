@@ -23,6 +23,11 @@
 | Collapse mechanism is α→0 freeze, not β runaway | **Well-supported by the probe**; kills H3 |
 | SNR ∝ √n_b (H1) | **Not supported.** Slope +0.114 vs predicted +0.50, r=0.40, 1400 steps, and n_b is confounded with layer type and depth. Currently this is *evidence against the stated magnitude* |
 | "Layerwise hurts at scale" (the proposal's premise) | **Untested.** You tested CIFAR-10. The parent claim was ImageNet. Not reproducing it at CIFAR-10 is not refuting it |
+| Granularity survives per-arm α₀ tuning under SGDm; it does not under AdamW | **Supported, n=1 per cell** (FINDINGS cycle 5 §1). SGDm scalar never reaches 90% at any α₀ in three decades and its plateau moves 0.16pp. Seed 1 in flight on all 12 cells |
+| Pooling (m=62) raises the accuracy plateau by 1.4–1.5pp | **Supported at n=3–4, budget-bounded.** Reproduces under both meta-optimizers. Whether it is asymptotic is what `ext300` decides |
+| Pooling accelerates training | **REFUTED** (cycle 4 second pass, confirmed n=4 in cycle 5). It is 24% *slower* to 85% under Lion. The ep→90 speed-up was an artifact of the unpooled arm's plateau sitting on the 90% line |
+| Hierarchy rescues per-weight granularity — the project's founding proposal | **CLOSED, negative** (cycle 4 §1). Monotone in pooling strength across six decades of λ, two independent operators, no interior optimum, no beneficial regime |
+| The released code can execute the granularities it advertises | **Refuted, and systematically** — the dead-granularity defect is present independently in *both* task copies (cifar10 and tinystories). See §6 for how to say this |
 
 That last row is the single most important honesty constraint in this document. You have not contradicted the parent paper. You have shown its *proposed extrapolation* does not appear one scale down. Those are different statements and reviewers will punish the conflation.
 
@@ -173,6 +178,23 @@ The third row is where a paper gets retracted or a relationship gets destroyed. 
 8. **Theory-flavored justification of hierarchical pooling.** James–Stein / empirical-Bayes shrinkage is a *motivation*. Unless you prove something about the online meta-gradient setting specifically, do not let analogy wear the costume of a guarantee. Reviewers of optimizer papers are unusually good at spotting this.
 9. **"Adaptive optimizers make per-block α redundant" (H4)** as a general claim from one dead heat (91.86 vs 91.83). It's a hypothesis with one supporting data point.
 10. **Compute or scale claims** contingent on ImageNet before the dataset is verified complete.
+11. **Any word from the family "plateau", "asymptote", "ceiling", "converges to" — about the
+    SGDm scalar arm or the unpooled layerwise arm.** Added 19 Aug 2026 (FINDINGS cycle 5 §2).
+    Both are still climbing in **training** accuracy at epoch 100 (scalar 94%, +0.4pp/10ep, never
+    reaching 97%; pooled layerwise 97.8%, never reaching 99%) while their *test* curves are flat.
+    A converged test curve is not a converged run. Until `ext300` reports, the only defensible
+    form is **"within a 100-epoch budget"** — and note that the campaign's entire explanation of
+    the parent paper's §7.3 ImageNet null is that a longer budget dissolves this kind of gap, so
+    a reviewer will apply the campaign's own argument to the campaign. Say it first.
+12. **"Hierarchical pooling regularises the step-size field."** The trade is real and reproduces
+    across two meta-optimizers (−1.9pp train for +1.4pp test, Lion and Adam within 0.15pp of each
+    other), but "constrains the fit" and "fits more slowly and generalises better along the way"
+    are not separable while the pooled arm's train curve is still rising. `ext300` decides it.
+    Related: do **not** present m=6, m=62 and m=11.17M pooling as one curve. They are three
+    phenomena — no trade at m=6 (train and test both rise ~0.3pp), a fit-for-generalisation trade
+    at m=62, and outright optimisation failure at m=11.17M (train and test collapse *together*
+    with the gap shrinking). The single-curve framing is the one the first sweep invited and it
+    is wrong twice over.
 
 ---
 
