@@ -380,3 +380,42 @@ whether a genuinely *weak* pool helps before it hurts.
 **So the two granularities respond to the same intervention in opposite directions.** Whatever
 per-weight step sizes are failing at, it is not insufficient sharing — and that is a substantive
 constraint on any account of the failure.
+
+---
+
+# THE PROPOSAL WORKS — hierarchical shrinkage beats every plain granularity
+
+SGDm base + Lion meta, SwiftTD guard on, augmented, 100 epochs. M0 = shrink each group's beta
+toward the group mean every step: `beta_b <- beta_b - lam (beta_b - mean beta)`.
+
+| arm | best test accuracy | n |
+|---|---|---|
+| scalar | 88.09 ± 0.16 | 3 |
+| 6-block (previous best plain arm) | 91.56 ± 0.03 | 3 |
+| layerwise + guard | 91.39 ± 0.19 | 3 |
+| **layerwise + M0 shrink, lam = 0.1** | **92.53 (92.55 / 92.50)** | 2 |
+
+**+1.14pp over plain layerwise (~8x the pooled sd) and +0.97pp over the best plain arm.** This
+is the project's proposal doing what it was designed to do, and it is the best number measured
+anywhere in the campaign. Confirmation at 3 seeds plus a lambda curve is running.
+
+## But it does NOT rescue per-weight — it makes it worse
+
+| weightwise (m = 11.17M) variant | best |
+|---|---|
+| plain + guard (baseline) | **79.4** |
+| M1 additive, r = 0.3 | 66.6 |
+| M1 additive, r = 0.1 | 51.3 |
+| M0 shrink, lam = 0.01 / 0.1 / 0.5 | 49.7 / 49.1 / 49.1 |
+
+Every hierarchical variant is worse than plain weightwise, and **less** pooling is better
+(r=0.3 > r=0.1). So partial pooling helps where there is real per-group signal to regularise
+(m=62) and hurts where the per-group estimates are hopeless to begin with (m=n).
+
+**Caveat on the parameterisation, stated plainly:** the shrinkage is applied *every step*, so
+the effective pooling over T steps is `1 - (1 - lam)^T`, which saturates at 1 for any lam > 0
+over 50,000 steps. All three lam values therefore end up near-fully pooled, which is why they
+give nearly identical (bad) weightwise numbers. A per-step lam is a *rate*, not a *strength* —
+the honest reading is that this sweep varied the time constant (1/lam steps), not the amount of
+pooling. Runs at lam = 1e-4 and 1e-5 are queued to probe the regime where the time constant is
+comparable to the run length.
