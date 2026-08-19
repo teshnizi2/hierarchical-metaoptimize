@@ -3654,3 +3654,95 @@ Final queue state this cycle: **alice 124, alice2 99 = 223 jobs.**
 |---|---|
 | alice | `a0h` → `sc-ResNet34` → `c100`/`rc100` → `p4` → `fx-e300` → tier-3 (`mx-b*`, `mx-add-r007/8`) |
 | alice2 | `mx-a1e3`/`amx` → `r10` → `p5`/`p6` → `zrn` → `mx-h4` |
+
+---
+
+# Cycle 19 — the scale trend is real but single-α₀, and the α₀ confound hits pooling, not granularity
+
+## 9. The scale ladder, re-derived from `results/all_runs.csv` (590 runs)
+
+All cells: CIFAR-10, SGDm+Lion, meta-stepsize 1e-3, batch 100, AUGMENT=1, guard on,
+100 epochs, **plateau = mean of last 20 epochs**, completed runs only (`epochs_done >= 100`).
+
+**α₀=1e-6** (`sc-*`):
+
+| net | params | scalar | layerwise | additive r=0.06 | granularity (L−S) | pooling (A−L) |
+|---|---|---|---|---|---|---|
+| ResNet10 | 4.9M | 70.74 ±0.83 (n=3) | 90.62 ±0.27 (n=3) | 90.81 ±0.42 (n=3) | **+19.88** | +0.19 |
+| ResNet18 | 11.2M | 87.82 ±0.17 (n=3) | 90.69 ±0.14 (n=3) | 93.31 ±0.14 (n=3) | **+2.87** | +2.62 |
+| ResNet34 | 21.3M | 89.46 (n=1) | *3 in flight* | *3 in flight* | — | — |
+
+**The trend is driven entirely by the SCALAR arm, not by layerwise.** Scalar climbs
+70.74 → 87.82 → 89.46 while layerwise is flat 90.62 → 90.69 → (≈90.4 partial). So
+"granularity stops helping at scale" is, mechanically, "**the scalar arm stops failing**
+at scale" — a materially different sentence from the parent paper's framing, and the one
+the data actually supports.
+
+`sc-ResNet10-scal` **never reaches 85%** (ep_to_85 = never, n=3) and its plateau equals its
+final_test (70.74 vs 70.8) — it is *converged*, not still climbing. So this is not an
+unfinished run; it is a genuine scalar-arm collapse on the smallest net.
+
+## 10. ⚠️ The whole scale ladder is at α₀=1e-6 — and the matched control shows why that matters
+
+`mx-a1e3-*` is an exact match to `sc-ResNet18-*` (verified field-by-field: net, granularity,
+hier, r, meta-stepsize, batch, epochs, augment, beta_clip all identical) differing **only in
+α₀**. That makes the ResNet18 column a clean α₀ contrast:
+
+| ResNet18 arm | α₀=1e-6 | α₀=1e-3 | Δ |
+|---|---|---|---|
+| scalar    | 87.82 ±0.17 (n=3) | 87.71 ±0.14 (n=3) | −0.11 |
+| layerwise | 90.69 ±0.14 (n=3) | 91.21 ±0.05 (n=3) | +0.52 |
+| additive r=0.06 | 93.31 ±0.14 (n=3) | 92.12 ±0.14 (n=4) | **−1.19** |
+| **granularity (L−S)** | **+2.87** | **+3.50** | +0.63 |
+| **pooling (A−L)** | **+2.62** | **+0.91** | **−1.71 (−65%)** |
+
+**Granularity survives the α₀ change; pooling loses about two-thirds of its benefit.** This is
+the same asymmetry CORRECTIONS records for sign-agreement (6.20% excess at α₀=1e-6 vs 0.38% at
+α₀=1e-3, a 16× collapse): the α₀=1e-6 regime flatters *pooling* specifically, because a shared
+component helps most while every group is making the same 7-log-unit climb.
+
+> **Consequence for the paper.** The M1 pooling headline (+2.62pp at ResNet18) is an
+> **α₀=1e-6 number**. At α₀=1e-3 it is **+0.91pp**. Never quote the pooling margin without
+> naming α₀. The granularity numbers are comparatively robust.
+
+## 11. Submitted this cycle
+
+* **`sa3-*` (alice2, 18 jobs) — the decisive control.** ResNet10 and ResNet34 ×
+  {scalar, layerwise, additive r=0.06} × 3 seeds at **α₀=1e-3**, 100 ep. Completes a
+  3-net × 2-α₀ ladder (ResNet18's α₀=1e-3 column already exists as `mx-a1e3-*`, so those
+  9 jobs were submitted and then **cancelled as redundant** once the match was verified).
+  Decides whether "granularity gain collapses with scale" survives, or was an
+  escape-from-α₀=1e-6 artifact concentrated in `sc-ResNet10-scal`.
+* **`sc50-*` / `sc101-*` (alice, 24 jobs) — 4th and 5th rungs.** ResNet50 and ResNet101 ×
+  3 arms × **both α₀** × 2 seeds. The axis that matters is N (layerwise group count):
+  R34 ≈36 conv layers, R50 ≈53, R101 ≈104. Submitted at both α₀ deliberately so they stay
+  informative whichever way `sa3-*` lands. R101 omits `gpu-short` (needs >4h).
+* **`sc-ResNet34-*` seeds 3,4 (alice, 6 jobs)** — takes the now-headline ResNet34 row to n=5.
+
+## 12. CIFAR-100 — first rows, not yet usable
+
+| arm (α₀=1e-6) | epochs done | best_test |
+|---|---|---|
+| c100-1e6-layer | 100 | 70.12 (plateau 69.79, n=1) |
+| c100-1e6-add   | 97  | 60.75 |
+| c100-1e6-blk6  | 82  | 52.14 |
+| c100-1e6-scal  | 83  | 23.08 |
+
+Epoch counts differ, so **no cross-arm comparison is licensed yet**. Two things to watch:
+layerwise leads add by ~9pp (pooling may *invert* on CIFAR-100), and the scalar arm at 23.08%
+is the ResNet10-scalar pathology again, now on a 100-class problem. The α₀=1e-3 arm
+(`c100-1e3-*`) is at queue positions 16–23 and will settle whether that is real.
+
+## 13. Operations
+
+* **`HIER=none` is truthy and would have silently corrupted 18 control runs.** `HF.py` does
+  `self._hier = os.environ.get('HIER','')` then `if self._hier:`. The existing `sc-*` runs log
+  `HIER=none` **only** because `run_cifar.sh` echoes `${HIER:-none}` over an *unset* variable.
+  Non-hierarchical arms must leave `HIER` **unset**, never set it to `none`.
+* `rc100-*` (14 jobs, the M1 r-ladder *on* CIFAR-100) demoted to `Nice=3000`: it is a
+  second-order refinement of an axis whose first-order comparison (§12) has not landed.
+  `c100-*` itself was left at the queue front.
+* On alice2 the runner is `jobs/run_cifar.sh` (already the s5014158 variant); there is no
+  `run_cifar_alice2.sh` on that account — that name exists only in the git repo.
+
+Queue at end of cycle 19: **alice 161, alice2 104 = 265 jobs**, 24 running.

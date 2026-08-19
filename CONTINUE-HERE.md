@@ -17,50 +17,64 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph (rewritten cycle 18)
+## The state of the science, in one paragraph (rewritten cycle 19)
 The **most defensible result is a refutation, and it now survives its own control**: the
 sqrt(N) noise model predicts a log-log drift-vs-N slope of -0.500; measured **-0.110 at
 alpha0=1e-6 and -0.136 at alpha0=1e-3**. But the *effect size* behind it is much smaller
 than the headline says -- weightwise sign-agreement is **6.20% excess at alpha0=1e-6 and
-only 0.38% at alpha0=1e-3** (16x collapse), because much of the agreement is the shared
-climb out of a 7-log-unit hole. **Never quote "53.1% agree on sign" without saying
-alpha0=1e-6.** The **best positive result** is M1 additive pooling: a unimodal r-curve whose
-plateau region r in [0.05, 0.07] reaches **93.09-93.31** (n=3-8) vs **90.86 at r=1** (plain
-layerwise, gate-confirmed) and **92.23 at r=0** (full pooling). It has **no measured
-mechanism** -- drift is flat across the whole r-ladder where accuracy moves 2.44pp.
-Granularity interacts with the base optimizer (3.84pp span under SGDm, 0.15pp null under
-AdamW) and with **scale**, in opposite directions: granularity buys +19.88pp at ResNet10
-but +2.87pp at ResNet18, while pooling buys +0.19pp at ResNet10 and +2.62pp at ResNet18.
-ResNet34 is running and decides whether that is a trend. CIFAR-100 has **no usable data
-yet** -- it was queue-starved, not blocked, and is now unblocked.
+only 0.38% at alpha0=1e-3** (16x collapse). **Never quote "53.1% agree on sign" without
+saying alpha0=1e-6.** Cycle 19 found **the same alpha0 asymmetry in the method result**:
+on ResNet18, granularity (layerwise-scalar) is +2.87pp at alpha0=1e-6 and **+3.50pp** at
+alpha0=1e-3 (robust), but M1 pooling (additive-layerwise) is +2.62pp at alpha0=1e-6 and
+only **+0.91pp** at alpha0=1e-3 -- **a 65% loss**. The pooling headline is an alpha0=1e-6
+number; never quote it without naming alpha0. The **scale axis** is the emerging spine:
+granularity buys **+19.88pp at ResNet10, +2.87pp at ResNet18**, and this is driven
+**entirely by the scalar arm improving** (70.74 -> 87.82 -> 89.46 partial at ResNet34)
+while layerwise stays flat (90.62 -> 90.69). So the parent paper's "granularity stops
+helping at scale" is mechanically "**the scalar arm stops failing**". That whole ladder is
+at alpha0=1e-6 and is now under its own control (`sa3-*`). CIFAR-100 has its **first four
+rows** but at unequal epoch counts -- no cross-arm comparison is licensed yet.
 
-
-## Running / next (cycle 18)  -- queue: alice 124, alice2 99 = 223 jobs
-* **Queue ORDER is the lever, not depth.** Cluster is contended; ~11-12 of our jobs run at a
-  time. Axis 2 (CIFAR-100, 33 jobs) had sat at positions **73-105 of 105** for four cycles
-  behind tier-3 refinement and had therefore produced nothing. Users cannot raise their own
-  priority but **can lower it**: `scontrol update JobId=<j> Nice=<n>`. After demoting tier-3,
-  c100 moved to 24-55 and `sc-ResNet34` from 62 to 16 (3 promptly started).
-  **Check queue POSITION every cycle, not just depth.**
-* **Decides the headline's last confound:** `p6-*` (16 jobs, alice2) -- the M1 r-ladder at
-  **alpha0=1e-3, 100 ep, with the probe on for the full budget**. Gives steady-state drift and
-  plateau from the SAME runs, so it tests both the missing mechanism and whether the
-  inverted-U survives at alpha0=1e-3. The whole cycle-16 curve is alpha0=1e-6.
-* **The theoretical core, extended:** `p4-*` (12, alice, alpha0=1e-3) and `p5-*` (12, alice2,
-  alpha0=1e-6) -- {ResNet10, ResNet34, ResNet18_c100} x {scalar, layerwise, nodewise,
-  weightwise}, 20 ep. With ResNet18's existing p2/p3 this completes a 4-architecture x
-  2-alpha0 grid. **Question:** is agreement/drift a function of **N alone** or of the
-  **partition type**? layerwise spans N=38/62/110 across nets while layerwise->nodewise jumps
-  ~200x, which separates the hypotheses.
-* **Axis 1, scale:** `sc-ResNet34-*` running. ResNet10 and ResNet18 are done (numbers above).
-* **Axis 2, CIFAR-100:** `c100-*` (18) + `rc100-*` (14), unblocked this cycle, data staged and
-  verified on both accounts. Still **zero** usable rows -- treat any c100 claim as unmeasured.
-* **Axis 4, non-meta baseline:** uncorrected AdamW is 91.894 (lr 3e-4, n=4); the cosine-corrected
-  `fxcos-*` supersedes it. **Quote no pooling-vs-baseline margin until those land.**
-* Deprioritised on purpose (tier-3): `mx-b*` batch-size axis, `mx-add-r007/8`, `mx-h4-*`, `zrn-*`.
-
+## Running / next (cycle 19)  -- queue: alice 161, alice2 104 = 265 jobs
+* **`sa3-*` (alice2, 18) is the decisive job of the campaign right now.** ResNet10 + ResNet34
+  x {scalar, layerwise, additive r=0.06} x 3 seeds at **alpha0=1e-3**. The entire scale ladder
+  is alpha0=1e-6, and `sc-ResNet10-scal` collapses to 70.74 (never reaches 85%, but *converged*
+  -- plateau == final_test, so it is not an unfinished run). If that collapse is an
+  escape-from-1e-6 artifact, the +19.88pp granularity gain at ResNet10 is too, and the scale
+  trend dies. ResNet18's alpha0=1e-3 column already exists as `mx-a1e3-*` (verified an exact
+  config match to `sc-ResNet18-*`), so those 9 sa3 jobs were cancelled as redundant.
+* **`sc50-*` / `sc101-*` (alice, 24)** -- 4th and 5th rungs, ResNet50/ResNet101 x 3 arms x
+  **both alpha0** x 2 seeds. The real axis is N (layerwise group count): R34 ~36 conv layers,
+  R50 ~53, R101 ~104. Both alpha0 on purpose so they survive whichever way `sa3-*` lands.
+  R101 omits `gpu-short` (needs >4h).
+* **`sc-ResNet34-*` s3,s4 (alice, 6)** -- takes the now-headline ResNet34 row to n=5.
+* **`p6-*` (alice2, 16)** -- M1 r-ladder at alpha0=1e-3, 100 ep, probe on for the full budget.
+  Gives steady-state drift and plateau from the SAME runs. Still the best shot at the
+  missing mechanism.
+* **`p4-*` (alice, 12) / `p5-*` (alice2, 12)** -- agreement/drift vs granularity across
+  {ResNet10, ResNet34, ResNet18_c100}. Question: is agreement a function of **N alone** or of
+  **partition type**? This is what would JOIN the refutation to the scale axis -- if agreement
+  at layerwise rises with scale, it explains why layerwise stops beating scalar.
+* **Axis 2, CIFAR-100:** first four rows landed (layer 69.79 @100ep; add 60.75 @97ep;
+  blk6 52.14 @82ep; scal 23.08 @83ep). **Unequal epochs -- compare nothing yet.** `c100-1e3-*`
+  is at positions 16-23. Watch for pooling *inverting* on CIFAR-100.
+* **Axis 4, non-meta baseline:** uncorrected AdamW 91.894 (lr 3e-4, n=4); `fxcos-*` supersedes.
+* Deprioritised: `rc100-*` (Nice=3000, second-order refinement of an axis with no first-order
+  result yet), `mx-b*`/`mx-add-r007/8`/`mx-h4-*`/`zrn-*` (tier-3, Nice=6000-10000).
 
 ## Gotchas that cost hours — do not rediscover these
+* **`HIER=none` is TRUTHY and silently enables the hierarchy branch.** `HF.py` does
+  `self._hier = os.environ.get('HIER','')` then `if self._hier:`. Existing `sc-*` runs log
+  `HIER=none` **only** because `run_cifar.sh` echoes `${HIER:-none}` over an *unset* variable.
+  Non-hierarchical arms must leave `HIER` **unset**. This nearly corrupted 18 control runs.
+* **On alice2 the runner is `jobs/run_cifar.sh`** (already the s5014158 variant, with
+  `/home/s5014158` paths baked in). `run_cifar_alice2.sh` exists only in the git repo, not on
+  that account -- using that name gives `sbatch: error: Unable to open file`.
+* **`gpu-short` caps at 4:00:00** (`sinfo`); the other four GPU partitions allow 7 days. Use
+  `--time=03:50:00` to stay eligible, and drop `gpu-short` for anything longer.
+* **Check whether an "alpha0 control" already exists before submitting one.** `mx-a1e3-*` was
+  an exact match to `sc-ResNet18-*` on every field but alpha0; 9 of 27 submitted jobs were
+  redundant and had to be cancelled. Grep the CSV for the config, not the run-name prefix.
 * Helper scripts go in `/data1/salehkaleybars/metaopt/bin`, **never `/tmp`** (node-local; the
   login nodes round-robin between nodelogin03/04, so scp'd files vanish between calls).
 * Pattern that works: write locally → `scp` to that dir → `ssh alice 'bash <path>' 2>&1 | tail -N`.
