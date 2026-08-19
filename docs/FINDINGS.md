@@ -1473,18 +1473,29 @@ under SGDm + Lion it does not, and 1e-3 is best for all four arms. The protocol 
 from cycle 3 survives untouched and is if anything stronger — a single shared α₀ is not a
 neutral choice, and *which* arm it flatters depends on the base optimizer.
 
-## 4. The headline Lion pooling contrast reaches n=4
+## 4. The headline Lion pooling contrast reaches **n=5** — priority item 4 closed on this cell
 
-`hs-l-lam01` seeds 2 and 3 completed (92.50, 92.65); seed 4 is at 72 epochs.
+Both arms completed seeds 3 and 4 during this cycle, so the campaign's central pooling contrast
+is now at the five-seed target:
 
-| SGDm + Lion, layerwise, α₀=1e-6, guard | n | ep→85 | ep→88 | ep→90 | plateau | final train |
-|---|---|---|---|---|---|---|
-| plain (`h2-base`) | 3 | 28.7 ± 0.6 | 35.7 ± 0.6 | 58.3 ± 2.3 | 90.83 ± 0.13 | 99.69 ± 0.06 |
-| **+ shrink λ=0.1** | **4** | 35.8 ± 0.5 | 38.2 ± 1.0 | **41.2 ± 0.5** | **92.27 ± 0.07** | 97.81 ± 0.06 |
+| SGDm + Lion, layerwise, α₀=1e-6, guard | n | ep→85 | ep→90 | plateau | final train |
+|---|---|---|---|---|---|
+| plain (`h2-base`) | **5** | 29.4 | 58.6 | 90.67 ± 0.23 | 99.66 ± 0.06 |
+| **+ shrink λ=0.1** (`hs-l-lam01`) | **5** | 35.6 | 41.4 | **92.28 ± 0.06** | 97.78 ± 0.09 |
 
-The fourth seed does not move anything: plateau gain **+1.44pp** at ~13σ, and pooling is
-**7.1 epochs slower to 85%** (24%, t ≈ −18). Cycle 4's correction — pooling is a plateau effect,
-not an acceleration — holds at n=4 and the sign flip between 85% and 90% is now very tight.
+Nothing moves. Plateau gain **+1.61pp** against a pooled sd of ~0.17 (~9σ); pooling is **6.2
+epochs slower to 85%**; the fit-vs-plateau trade is **−1.88pp train for +1.61pp test**. Cycle 4's
+correction — pooling is a plateau effect, not an acceleration — holds at n=5, and the sign flip
+between 85% and 90% is now measured on five seeds per arm rather than two.
+
+The matching Adam-meta cell is n=3 plain / n=4 shrink (plateau 90.34 ± 0.08 vs 91.86 ± 0.09,
+train 99.75 ± 0.03 vs 98.00 ± 0.07) — the same trade to within 0.1pp on both axes, from a
+different meta-optimizer. Its fifth seeds are in flight.
+
+The SGDm + Lion **scalar** arm also reached n=3 on an independent submission
+(`g4-sgdmLion-scal`): plateau **87.81 ± 0.19**, final train **93.78 ± 0.24**, and **0 of 3 seeds
+reach 90%** — which is the §1 α₀=1e-6 scalar cell replicated, and the direct evidence for §2(a)
+that this arm has not finished fitting.
 
 ## 5. Pooling at m=6 is NOT the same phenomenon as at m=62
 

@@ -52,7 +52,7 @@
 | scalar | plain | 3 | 50.5 (2/3) | 69.0 (1/3) | never | 65.26±38.43 | 65.10±38.29 |
 | resnet18_blocks | plain | 3 | 15.3 | 20.3 | 42.0 | 90.94±0.12 | 90.81±0.15 |
 | layerwise | plain | 6 | 14.8 | 26.7 | 60.3 | 90.75±0.12 | 90.44±0.13 |
-| layerwise | shrink(lam=0.1) | 3 | 15.0 | 16.0 | 19.3 | 92.22±0.08 | 91.89±0.16 |
+| layerwise | shrink(lam=0.1) | 4 | 15.2 | 16.2 | 19.8 | 92.23±0.07 | 91.78±0.26 |
 
 ### base=SGDm  meta=Adam  alpha0=1e-6  noguard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
@@ -81,13 +81,13 @@
 ### base=SGDm  meta=Lion  alpha0=1e-6  guard
 | granularity | hierarchy | n | ep→85 | ep→88 | ep→90 | best | final |
 |---|---|---|---|---|---|---|---|
-| scalar | plain | 3 | 38.0 | 98.0 (2/3) | never | 88.00±0.05 | 87.79±0.23 |
+| scalar | plain | 4 | 37.8 | 90.3 (3/4) | never | 88.11±0.23 | 87.83±0.20 |
 | resnet18_blocks | plain | 3 | 29.3 | 36.3 | 42.7 | 91.69±0.15 | 91.50±0.28 |
 | resnet18_blocks | shrink(lam=0.1) | 6 | 31.2 | 39.8 | 53.0 | 92.08±0.15 | 91.77±0.12 |
-| layerwise | plain | 8 | 28.6 | 36.0 | 55.2 | 91.32±0.14 | 90.90±0.32 |
+| layerwise | plain | 10 | 29.0 | 36.2 | 56.0 | 91.24±0.23 | 90.83±0.32 |
 | layerwise | shrink(lam=0.001) | 2 | 31.5 | 39.0 | 48.0 | 92.60±0.24 | 92.34±0.16 |
 | layerwise | shrink(lam=0.01) | 2 | 36.0 | 37.0 | 41.0 | 92.73±0.07 | 92.67±0.15 |
-| layerwise | shrink(lam=0.1) | 6 | 35.8 | 38.2 | 41.3 | 92.59±0.11 | 92.34±0.26 |
+| layerwise | shrink(lam=0.1) | 7 | 35.7 | 38.1 | 41.4 | 92.58±0.10 | 92.29±0.27 |
 | layerwise | shrink(lam=0.5) | 2 | 35.5 | 38.0 | 41.5 | 92.57±0.08 | 92.36±0.22 |
 | layerwise | shrink(lam=1.0) | 2 | 35.5 | 37.5 | 41.5 | 92.62±0.08 | 92.37±0.21 |
 | weightwise | additive(r=0.1) | 2 | never | never | never | 51.30±2.03 | 51.30±2.03 |
@@ -107,4 +107,4 @@
 | layerwise | plain | 4 | 28.2 | 36.0 | 54.2 | 91.31±0.09 | 91.06±0.10 |
 | weightwise | plain | 10 | never | never | never | 67.23±3.40 | 10.00±0.00 |
 
-(178 runs with >= 100 epochs, of 216 total)
+(183 runs with >= 100 epochs, of 221 total)
