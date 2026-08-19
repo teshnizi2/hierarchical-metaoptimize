@@ -329,3 +329,54 @@ Fixed on both accounts: every job now prints
 `aggregate.py` parses it, and reconstructs the setting from the run name for the 109 older runs
 while marking those rows `provenance=inferred`, so no analysis can silently treat a
 reconstruction as a recorded fact.
+
+---
+
+# REPLICATED — partial pooling on layerwise is the campaign's best result
+
+Seed 1 finished and reproduces seed 0. SGDm + Lion, guard ON, augmented, α₀=1e-6, 100 epochs:
+
+| granularity | hierarchy | n | ep→85 | ep→88 | **ep→90** | best | final |
+|---|---|---|---|---|---|---|---|
+| layerwise | plain | 3 | 28.7 | 36.0 | 54.7 | 91.39 ± 0.19 | 90.98 ± 0.42 |
+| layerwise | **shrink λ=0.1** | **2** | 35.5 | 38.0 | **41.5** | **92.53 ± 0.04** | **92.31 ± 0.22** |
+
+Seeds: **92.55** and **92.50** — they agree to 0.05pp, against a plain-arm spread of 91.55 /
+91.44 / 91.18. **+1.14pp best, +1.33pp final**, six times the pooled sd, and on the primary
+metric **24% fewer epochs to 90%** (41.5 vs 54.7). Seed 2 (`h2-l-L0p1-s2`) is queued.
+
+**The comparison is single-variable and was verified rather than assumed:** the `ARGS:` lines of
+`d4-clipL-s0` (plain) and `hs-l-lam01-s0` (shrink) are byte-identical apart from the seed and
+granularity flags, both are `--stepsize-groups layerwise`, and both ran with the guard. The only
+difference is `HIER=shrink LAM=0.1`.
+
+This also beats every other arm in the campaign, including 6-block (91.55 ± 0.13) and the AdamW
+ceiling (92.09 ± 0.10). It is the first time hierarchy has bought anything in this project.
+
+## What still has to hold before this goes in a draft
+
+1. **Seed 2**, for n=3 (queued).
+2. **The λ sweep** — λ ∈ {0.001, 0.01, 0.5, 1.0} × 3 seeds is running. If the effect is flat in
+   λ across three decades, it is *pooling per se*; if it peaks, there is a real optimum to
+   report. Given the half-life arithmetic (§ "λ is a PER-STEP rate"), λ = 0.1 and λ = 0.5 are
+   both full pooling, so a flat top between them would be expected and is not evidence of
+   robustness.
+3. **The mechanism test** — `h2A-l-L0p1` vs `h2A-l-plain` under meta = **Adam**. The proposed
+   mechanism is that under a *sign* meta-optimizer, scalar throws away magnitude
+   (`sign(Σ gᵢ)`) while pooled-layerwise keeps it (`η · mean(sign(gᵢ))` over 62 groups). If
+   that is right, the win should shrink or vanish without the sign. **If it survives under Adam,
+   the sign explanation is wrong and the effect needs a different account.**
+4. **6-block** (`h2-b-L0p1`) — does pooling help a partition that is already coarse?
+
+## Weightwise, now n=2 on every cell — the negative result is firm
+
+`plain 79.38 ± 0.46 → additive r=0.3 67.1 → additive r=0.1 49.9 → shrink (λ ≥ 0.01) ≈ 49`
+
+λ = 0.01, 0.1 and 0.5 now sit at 49.73 ± 3.51 / 49.07 ± 3.75 / 49.06 ± 3.80 — statistically
+indistinguishable, exactly as the saturation argument predicts. **Pooling toward a global mean
+does not close the per-weight deficit; it triples it.** λ ∈ {1e-4, 1e-5} is queued to test
+whether a genuinely *weak* pool helps before it hurts.
+
+**So the two granularities respond to the same intervention in opposite directions.** Whatever
+per-weight step sizes are failing at, it is not insufficient sharing — and that is a substantive
+constraint on any account of the failure.
