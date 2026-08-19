@@ -237,3 +237,39 @@ value would have replaced the real one in any downstream table. The CSV now carr
 recomputing the whole M1 sweep at k=5 moves no cell by more than 0.15pp and leaves the peak at
 r=0.07, so no conclusion depends on the choice — but **the prose is what is wrong, not the
 code**, and it should be corrected to "last 20 epochs" wherever it appears.
+
+## 12. The sign-agreement headline is measured in the regime Rule 5 warns about (cycle 18)
+
+`runs/bdrift3/p3-*` — cycle 7's own α₀=1e-3 control for the β-drift/sign-agreement probe — had
+been sitting in this repo unreduced since it ran. Reduced now with the published methodology
+(drift = |Δβ̄|/step over steps 1000–7500, `frac_neg` averaged over the same window).
+
+**What survives.** The √N noise model predicts a log-log drift-vs-N slope of −0.500. Measured
+**−0.110 at α₀=1e-6 and −0.136 at α₀=1e-3**. The refutation holds in *both* regimes and is now
+robust to the α₀ confound rather than merely asserted against it. This remains the campaign's
+most defensible result.
+
+**What must be qualified.** Weightwise sign-agreement (excess over a balanced split,
+|2·frac_neg − 1|) is **6.20% at α₀=1e-6 and 0.38% at α₀=1e-3 — a 16× collapse.** Much of the
+"coordinates strongly agree" reading is the shared climb out of a 7-log-unit hole: coordinates
+being driven the same way by a bad init agree trivially. At steady state the excess is 0.38%,
+which over 11.17M coordinates is still **+12.7σ** from independence — genuinely non-independent,
+but a *small* bias, not a strong one.
+
+> **The "53.1% of 11.17M meta-gradients agree on sign" number is an α₀=1e-6 measurement and
+> must never be quoted without that qualifier.** At the steady-state control it is 50.19%.
+
+**What is withdrawn.** Cycle 6 predicted and cycle 7 marked **CONFIRMED** that "drift falls
+monotonically with N". At α₀=1e-3 it does not: scalar 3.04e-4 > nodewise 1.84e-4 > layerwise
+1.57e-4 > 6-block 1.03e-4 > weightwise 1.70e-5. Monotonicity is an α₀=1e-6 artefact; only the
+endpoints (scalar highest, weightwise ~18× lower) survive at both α₀.
+
+**Also corrected:** ResNet18 `nodewise` N has been recorded as "~4,800" since cycle 7. Measured
+by direct instantiation it is **14,420**. Refitting the slope with the corrected N moves it from
+−0.1130 to −0.1095 — immaterial, but the wrong N should not be re-quoted. Full N ladder for all
+four architectures is in FINDINGS cycle 18 §2.
+
+**Process note (Rule 1, third occurrence).** The refuting artefact was already in the repo. The
+first two occurrences were controls that sat unread; this one was a control that *was
+deliberately submitted for exactly this purpose* in cycle 7, completed, and then was never
+reduced. Reducing every probe dir that exists should precede submitting new ones.

@@ -3457,3 +3457,200 @@ at 0.05-0.07. A null at one r cannot distinguish "pooling does not work at ResNe
 
 **Consequence: both top-priority axes (model scale, CIFAR-100) can run on either account.**
 Effective capacity for them roughly doubles.
+
+# 19 Aug 2026 (cycle 18) — the α₀ control of the *drift* measurement was on disk and unread; it costs the headline 16× of its effect size
+
+561 runs aggregated (up from 532; 29 new). Two things this cycle: a **queue pathology** that
+explains why axis 2 has no data, and a **re-derivation of the campaign's most defensible result
+at its own α₀ control**, which was already sitting in `runs/bdrift3/` from cycle 7 and had never
+been analysed. Rule 1 again: the refuting artefact was in the repo, unread.
+
+## 1. Why CIFAR-100 has produced nothing in four cycles — it was never near a GPU
+
+Queue position is not queue depth. Measured position of each family in our *own* pending
+ordering (alice, 105 pending):
+
+| family | axis | jobs | position (of 105) |
+|---|---|---|---|
+| `mx-*` refinement (b25/b50/b200, add-r007/8) | 3 | 47 | 1–61 |
+| `sc-ResNet34-*` | **1** | 11 | 62–72 |
+| `c100-*`, `rc100-*`, `c100pin-*` | **2** | 33 | **73–105** |
+
+With ~11 concurrent slots, the axis-2 block was unreachable. `mx-add-r007` (5 jobs) sat ahead of
+it to add a **6th–10th seed to a cell that already has n=8**. Same pathology on alice2:
+`mx-h4-*` (20 jobs, n≥5 refinement of an already-solid result) sat ahead of `r10-*` (21 jobs,
+the open ResNet10 r-question).
+
+**Fix (user-side lever, no admin):** `scontrol update JobId=<j> Nice=<n>` — users may only
+*lower* their own priority, which is sufficient. After demoting tier-3:
+
+| family | before | after |
+|---|---|---|
+| `sc-ResNet34` | 62 | **16** (3 started within the cycle) |
+| `c100`+`rc100` | 73–105 | **24–55** |
+| `mx-*` tier-3 | 1–61 | 77–105 |
+
+Partition eligibility was **not** the problem — every family already carried all five
+partitions. The one exception, `fx-e300-*`, correctly omits `gpu-short` (300 epochs > 4 h).
+
+## 2. N measured structurally, not assumed (zero-GPU, CPU instantiation only)
+
+All four generic granularities instantiate on all four architectures. FINDINGS has recorded
+ResNet18 `nodewise` as **~4,800** since cycle 7; it is **14,420**.
+
+| net | params | layerwise N | nodewise N | weightwise N |
+|---|---|---|---|---|
+| ResNet10 | 4,903,242 | 38 | 8,660 | 4,903,242 |
+| ResNet18 | 11,173,962 | 62 | **14,420** (was "~4,800") | 11,173,962 |
+| ResNet34 | 21,282,122 | 110 | 25,556 | 21,282,122 |
+| ResNet18_c100 | 11,220,132 | 62 | 14,600 | 11,220,132 |
+
+**Impact on the published slope: none.** Refitting drift-vs-N with the corrected N moves the
+log-log slope from **−0.1130 to −0.1095** against an i.i.d. prediction of −0.500. The
+refutation is insensitive to the error. Recorded so the wrong N is not re-quoted.
+
+## 3. The refutation SURVIVES its α₀ control — but the agreement effect does not
+
+`runs/bdrift3/p3-*` (cycle 7's α₀=1e-3 control) had never been reduced. Re-derived here with the
+published methodology (drift = |Δβ̄|/step over steps 1000–7500; `frac_neg` averaged over the same
+window). **Structural check passes:** every pooled arm reports
+`max|β_true_max − β_true_min| = 0.0000` (genuinely one step size), and the unpooled control
+`p3-lay-plain` reports **8.93** — the pooling identity is verified structurally, not by accuracy.
+
+| arm | N | drift/step @1e-6 | drift/step @1e-3 | agreement @1e-6 | agreement @1e-3 | σ vs 50% @1e-3 |
+|---|---|---|---|---|---|---|
+| scalar | 1 | 1.000e-3 | 3.043e-4 | 91.00% | 12.12% | −0.1 |
+| 6-block | 6 | 9.828e-4 | 1.027e-4 | 69.60% | 1.52% | +0.0 |
+| layerwise | 62 | 7.997e-4 | 1.567e-4 | 66.40% | 5.14% | +0.4 |
+| nodewise | 14,420 | 5.503e-4 | 1.844e-4 | 24.40% | 4.04% | +4.9 |
+| weightwise | 11,173,962 | 1.668e-4 | 1.698e-5 | **6.20%** | **0.38%** | **+12.7** |
+| log-log slope | | **−0.1095** | **−0.1363** | | | (pred. −0.500) |
+
+(`agreement` = |2·frac_neg − 1|, the excess over a balanced sign split. The headline's "53.1%
+agree on sign" is `frac_neg = 0.531`, i.e. a **6.2%** excess.)
+
+Three consequences, in decreasing comfort:
+
+* **KEPT — the core refutation.** The √N law predicts slope −0.500. Measured **−0.110 at
+  α₀=1e-6 and −0.136 at α₀=1e-3**: ~4× too shallow in *both* regimes. This is the campaign's
+  most defensible claim and it is now robust to the α₀ confound, not just asserted against it.
+* **DOWNGRADED — the effect size.** Weightwise sign-agreement is **6.20% at α₀=1e-6 but 0.38%
+  at α₀=1e-3**, a **16× collapse**. Much of the "coordinates strongly agree" story is the shared
+  climb out of a 7-log-unit hole: when every coordinate is being driven the same direction by a
+  bad init, they trivially agree. At steady state the excess is 0.38% — still **+12.7σ** over
+  11.17M coordinates, so genuinely non-independent, but a *small* bias, not a strong one.
+  **Any statement of the 53.1% number must name α₀=1e-6.**
+* **WITHDRAWN — "drift falls monotonically with N."** Cycle 6 predicted it and cycle 7 marked it
+  CONFIRMED. At α₀=1e-3 drift is **non-monotone**: scalar 3.04e-4 > nodewise 1.84e-4 >
+  layerwise 1.57e-4 > 6-block 1.03e-4 > weightwise 1.70e-5. The monotonicity is an α₀=1e-6
+  artefact. Only the *endpoints* (scalar high, weightwise ~18× lower) survive at both α₀.
+
+## 4. M1 r-curve, re-derived (SGDm+Lion, α₀=1e-6, layerwise, 100 ep **complete only**, augmented)
+
+r=0.04 completed to n=4 this cycle; r=0.05/0.06 have 9 more in flight.
+
+| r | 0 | 0.03 | 0.04 | 0.05 | 0.06 | 0.07 | 0.1 | 0.2 | 0.3 | 1.0 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| plateau | 92.228 | 92.637 | 92.886 | 93.086 | **93.306** | **93.200** | 92.626 | 91.387 | 90.957 | 90.864 |
+| sd | 0.087 | 0.165 | 0.136 | 0.096 | 0.140 | 0.161 | 0.214 | 0.142 | 0.079 | 0.062 |
+| n | 6 | 5 | 4 | 5 | 3 | 8 | 5 | 3 | 3 | 3 |
+
+Unimodal and now densely sampled on the rising limb. **Report the plateau region r ∈ [0.05, 0.07]
+(93.09–93.31), not the max cell** — r=0.06 is the argmax at n=3 while r=0.07 sits 0.11pp lower at
+n=8, a gap inside their sds.
+
+## 5. Scale axis, within the `sc-*` family only (all contrasts internally matched)
+
+| net | scalar | layerwise | additive r=0.06 | granularity gain | pooling gain |
+|---|---|---|---|---|---|
+| ResNet10 (4.9M) | 70.742 | 90.619 | 90.808 | **+19.88** | **+0.19** |
+| ResNet18 (11.2M) | 87.819 | 90.686 | 93.306 | **+2.87** | **+2.62** |
+| ResNet34 (21.3M) | — | — | — | — | — |
+
+n=3 per cell. The two gains move in **opposite** directions with scale. ResNet34 (now at queue
+position 16, 3 running) is the third point that decides whether this is a trend or two points.
+
+## 6. Submitted — axis 6 across axes 1–2 (the theoretical core, extended)
+
+The sign-agreement/drift law exists **only** at ResNet18+CIFAR-10, and nothing in the 190-job
+queue extended it. 24 probes submitted (20 epochs each, ~1/5 the cost of a training cell):
+
+| batch | account | α₀ | arms |
+|---|---|---|---|
+| `p4-*` | alice | 1e-3 (steady state) | {ResNet10, ResNet34, ResNet18_c100} × {scalar, layerwise, nodewise, weightwise} |
+| `p5-*` | alice2 | 1e-6 (matches p2) | same 12 |
+
+ResNet18 already has both α₀ (p2-*/p3-*), so the pair completes a 4-architecture × 2-α₀ grid.
+**The question they decide:** is agreement/drift a function of **N alone** (all architectures
+collapse onto one curve) or of the **partition type** (points cluster by layerwise/nodewise/
+weightwise regardless of N)? layerwise spans N = 38/62/110 across the three nets while
+layerwise→nodewise jumps ~200×, which separates the hypotheses cleanly. The p4/p5 pair also
+gives the α₀-inflation factor from §3 across architectures rather than at ResNet18 alone.
+
+Queue after this cycle: **alice 124, alice2 85 = 209 jobs**, ordered
+a0h → sc-ResNet34 → c100 → p4 → fx-e300 → tier-3.
+
+## 7. Acting on §3's process note: two more probe series were unreduced — one is mechanistic
+
+Enumerated every `probe.jsonl` on both accounts (108 dirs). Two drift series had never been
+reduced.
+
+**(a) Extractor validated against the published series.** Reducing `runs/bdrift/p2-*` (alice2)
+reproduces cycle 7's table **exactly** — drift 1.000e-3 / 9.828e-4 / 7.997e-4 / 5.503e-4 /
+1.668e-4 and frac_neg 0.9545 / 0.8485 / 0.8319 / 0.6221 / 0.5312 against published 0.955 /
+0.848 / 0.832 / 0.622 / 0.531. The §3 α₀=1e-3 numbers come from the same code path and are
+therefore trustworthy.
+
+**(b) `runs/bdrift4/p4-ad-*` (alice2) — the drift probe run across the M1 additive r-ladder.**
+Never reduced. α₀=1e-6, 20 ep, layerwise, `HIER=additive`. (Name clash warning: these predate
+and are unrelated to the `p4-*` batch submitted this cycle on alice.)
+
+| r | 0 | 0.03 | 0.1 | 0.3 | 1.0 |
+|---|---|---|---|---|---|
+| drift/step | 7.991e-4 | 7.988e-4 | 7.979e-4 | 7.955e-4 | 8.022e-4 |
+| frac_neg | 0.8355 | 0.8299 | 0.8297 | 0.8272 | 0.7739 |
+| β spread | **0.0000** | 0.3648 | 1.1920 | 3.6087 | **8.6877** |
+
+**The additive identity is verified structurally at both ends (Rule 4).** r=0 gives
+`sd(β) = 0.0000` — genuinely one step size, full pooling. r=1 gives spread **8.6877**, which
+matches `p2-lay-plain`'s **8.6877** to four decimals, and its drift (8.022e-4) matches
+p2-lay-plain's (8.033e-4) to 0.14%. r=1 *is* plain layerwise, confirmed on the β geometry rather
+than on accuracy.
+
+**The mechanistic finding: drift is FLAT across the r-ladder where accuracy is not.** Drift spans
+7.955e-4–8.022e-4 — a **0.8%** range — across the entire ladder, while the 100-epoch r-curve
+(§4) spans **2.44pp** of plateau over the same r values and has its optimum at r≈0.06.
+Sign-agreement does move (67.1% → 54.8% excess), but not with the accuracy optimum: it is
+monotone in r while accuracy is unimodal.
+
+> **The β-drift mechanism explains the COST of pooling (cycle 7) but does NOT explain the
+> BENEFIT of the M1 interior optimum.** The campaign's headline positive result currently has
+> *no* measured mechanism. This is a gap to state plainly, not to paper over.
+
+Caveat on regime: drift here is measured over steps 1000–7500 (epochs 2–15) at α₀=1e-6, i.e.
+inside the startup window, whereas the r-curve is a 100-epoch plateau. The comparison shows the
+proposed mechanism does not track the benefit *in the window where the mechanism was defined*;
+a steady-state version needs a 100-epoch probe at α₀=1e-3, which is **not** currently queued and
+is the natural cycle-19 submission.
+
+## 8. Submitted for the mechanism gap — `p6-*` (alice2, 16 jobs)
+
+The §7 caveat is directly testable, so it was queued the same cycle rather than deferred.
+M1 additive r-ladder r ∈ {0, 0.03, 0.05, 0.06, 0.07, 0.1, 0.3, 1} × 2 seeds, **α₀=1e-3,
+100 epochs, `PROBE=100`** — the probe runs for the full budget, so **drift and plateau come from
+the same runs** and can be compared in the regime where the accuracy claim actually lives
+(bdrift4 compared a startup-window drift against a 100-epoch plateau).
+
+Two payoffs from one batch:
+1. **Mechanism.** If drift stays flat across r at steady state while plateau stays unimodal, the
+   M1 benefit is confirmed to have no drift explanation and the paper must say so.
+2. **The headline's untested α₀ confound.** This is also the **α₀=1e-3 r-ladder on CIFAR-10**.
+   The entire cycle-16 r-curve lives at α₀=1e-6; `mx-a1e3-*` covers only 3 granularity arms, not
+   an r-ladder. If the inverted-U flattens at α₀=1e-3, the headline needs a qualifier.
+
+Final queue state this cycle: **alice 124, alice2 99 = 223 jobs.**
+
+| account | order (front → back) |
+|---|---|
+| alice | `a0h` → `sc-ResNet34` → `c100`/`rc100` → `p4` → `fx-e300` → tier-3 (`mx-b*`, `mx-add-r007/8`) |
+| alice2 | `mx-a1e3`/`amx` → `r10` → `p5`/`p6` → `zrn` → `mx-h4` |
