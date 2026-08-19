@@ -211,3 +211,46 @@ across both accounts went **10 → 16**.
 redundant-but-not-worthless work still runs once the valuable work drains. Prefer it to
 `scancel` whenever the job would be worth having eventually — 17 jobs (λ-plateau re-measures
 and scale smokes) were deprioritised this way rather than cancelled.
+
+## 15. Audit a job block with `sacct`, never with `squeue | tail`
+
+Reading a queue through the SSH gateway means tailing (gotcha 7), and `tail -N` on a deep queue
+silently drops the rows above the cut. On 19 Aug 2026 a `squeue -u ... | tail -40` against a
+31-deep queue appeared to show that **9 of the 20 `a0h` cells — the campaign's decisive
+experiment — had vanished**, i.e. failed or been cancelled without a trace. They had not: all 20
+were `PENDING`, just above the tail cut.
+
+The near-miss was resubmitting nine duplicate jobs onto a saturated cluster.
+
+**Fix:** audit a named block by name, with the state column, over a bounded window:
+
+```
+sacct -u $USER -S 2026-08-17 --format=JobID%12,JobName%22,State%14,Elapsed,ExitCode,Partition%16 -X | grep -E '<prefix>|JobName'
+```
+
+`sacct` shows completed, failed and cancelled jobs too, which `squeue` cannot — so it answers
+"is this block intact?" and `squeue` never can, at any tail depth.
+
+## 16. The A100 and MIG allowances are not spare capacity — check `AllocTRES`, not `sinfo` state
+
+`sinfo` reports A100 and MIG nodes as `mix`, which reads as "partially free", and neither
+account had ever submitted to them — so they looked like an untapped pool worth moving a block
+onto. They are not. Per-node `AllocTRES` shows every A100 node at full `gres/gpu` allocation
+and `gpu-mig-40g` with exactly **one** free slice across six nodes.
+
+`mix` means *some resource* on the node is free — usually CPU or memory — and says nothing
+about whether a **GPU** is. A GPU job placed on a `mix` node with zero free `gres/gpu` simply
+queues forever.
+
+**Check before targeting a partition:**
+
+```
+scontrol show node <node> | tr ' ' '\n' | grep -E 'CfgTRES|AllocTRES'
+```
+
+and compare `gres/gpu=` on the two lines. Equal means full, whatever `sinfo` says.
+
+**Standing conclusion (19 Aug 2026): every GPU partition on ALICE is saturated.** Throughput is
+bought by queue *ordering* — right-sized `--time` into `gpu-short` (gotcha 12), the additive
+per-GPU-type caps (gotcha 13), and `nice` on low-value work (gotcha 14) — never by submitting
+more jobs.

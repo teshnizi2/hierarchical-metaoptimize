@@ -761,3 +761,202 @@ Only m=62 is helped on both axes. Seeds 1–2 are queued (s1 running); this is n
   that a stability claim will eventually need its own α₀ control too.
 * The **language modality** is still blocked on the validation-gated optimizer port
   (`tinystories/HF.py` carries neither patch and has the dead-granularity defect independently).
+
+---
+
+# 19 Aug 2026 (cycle 3) — the α₀ control completes at n=3, and the sign refutation becomes the campaign's largest effect
+
+23 new runs landed and 10 in-flight runs completed. Three things resolve; one preliminary
+result points the opposite way to the last cycle's headline, which is the point of it.
+
+## 1. α₀ control under AdamW + Adam — COMPLETE at n=3, and the n=2 reading holds
+
+The paper's exact CIFAR-10 config, SwiftTD guard on, augmented, 100 epochs, L4, **all nine
+cells now n=3 and all 27 runs at a full 100 epochs.** PRIMARY metric ep→90, ± seed sd:
+
+| α₀ | scalar | 6-block | layerwise |
+|---|---|---|---|
+| 1e-6 | 32.3 ± 2.5 | 30.7 ± 2.1 | **27.0 ± 1.0** |
+| 1e-4 | 27.3 ± 1.5 | 29.3 ± 4.5 | **19.3 ± 2.5** |
+| 1e-3 | **17.0 ± 1.0** | 18.7 ± 0.6 | 33.0 ± 4.6 |
+
+Best test accuracy over the same 27 runs:
+
+| α₀ | scalar | 6-block | layerwise |
+|---|---|---|---|
+| 1e-6 | 92.09 ± 0.06 | 92.03 ± 0.18 | 91.98 ± 0.12 |
+| 1e-4 | 92.29 ± 0.09 | 92.03 ± 0.18 | 92.25 ± 0.18 |
+| 1e-3 | **92.94 ± 0.16** | 92.19 ± 0.06 | 91.07 ± 0.17 |
+
+**Both of the previous cycle's readings survive the third seed, with one sharpened.**
+
+**(a) At fixed α₀ ≤ 1e-4 the granularity speed win is real and larger than the campaign
+reported.** At α₀=1e-4, layerwise 19.3 ± 2.5 against scalar 27.3 ± 1.5 — **29% fewer epochs**,
+a ~3.4σ separation, versus the 19% quoted at α₀=1e-6. Raising α₀ off the campaign's value
+*strengthens* the effect. (The n=2 snapshot said 36%; the third seed pulls it to 29%, still
+comfortably outside noise.)
+
+**(b) At each arm's own best α₀ the speed advantage is a three-way tie — and accuracy favours
+the scalar arm outright.** Tuned per arm: scalar **17.0 ± 1.0** (@1e-3), 6-block 18.7 ± 0.6
+(@1e-3), layerwise 19.3 ± 2.5 (@1e-4). The scalar-vs-layerwise gap is 2.3 epochs against a
+pooled se of 1.6 (Welch t = 1.5, n=3) — **not resolvable at this seed count**, so this must be
+reported as a tie and not, as the raw means invite, as a monotone penalty in m.
+
+Accuracy is a different story and is *not* a tie: **92.94 ± 0.16 (scalar) vs 92.25 ± 0.18
+(layerwise) and 92.19 ± 0.06 (6-block)** — a 0.69pp scalar advantage at ~4σ. So under an equal
+per-arm α₀ tuning budget on AdamW + Adam, granularity buys **nothing on speed and loses
+0.7pp on accuracy.**
+
+## 2. Optimal α₀ falls as the partition gets finer — CONFIRMED at n=3
+
+The α₀ response has a different *shape* per arm, and the third seed does not soften it:
+
+| arm | ep→90 across α₀ (1e-6 → 1e-4 → 1e-3) | shape | best α₀ |
+|---|---|---|---|
+| scalar | 32.3 → 27.3 → **17.0** | monotone improving | 1e-3 (or higher) |
+| 6-block | 30.7 → 29.3 → **18.7** | monotone improving | 1e-3 (or higher) |
+| layerwise | 27.0 → **19.3** → 33.0 | **U-shaped** | 1e-4 |
+
+Layerwise is the only arm *hurt* by α₀=1e-3, and the damage is far outside noise: 33.0 ± 4.6
+epochs and 91.07 ± 0.17 accuracy, the worst cell in the sweep on both metrics. **The finer the
+partition, the lower the step-size initialisation it wants** — mechanistically coherent, since
+a finer partition has more parallel meta-gradient signal to grow α with and needs less help
+from the initialisation, while a high start overshoots per-group before the meta-optimizer can
+pull individual groups back.
+
+**Protocol consequence, now measured rather than argued.** A single shared α₀ across
+granularities is not a neutral choice: it necessarily favours whichever arm's optimum it sits
+nearest, which is exactly why layerwise looked best at the campaign's α₀=1e-6. Every headline
+comparison from here must either fix α₀ *and say so*, or tune α₀ per arm at equal budget.
+
+## 3. The sign refutation is now the campaign's largest effect (n=3 on the shrink arm)
+
+SGDm base + **Adam** meta (non-sign), layerwise, guard on, α₀=1e-6, augmented:
+
+| meta | plain ep→90 | shrink λ=0.1 ep→90 | speed-up | plain best | shrink best |
+|---|---|---|---|---|---|
+| Lion (sign) | 54.7 ± 7.5 (n=3) | 41.5 ± 0.7 (n=2) | 13.2 ep (24%) | 91.39 ± 0.19 | 92.53 ± 0.04 |
+| **Adam (non-sign)** | **58.0 ± 2.8** (n=2) | **19.3 ± 0.6** (n=3) | **38.7 ep (67%)** | 90.79 (n=2) | **92.22 ± 0.08** |
+
+The prediction on record was that the pooling win should *shrink or vanish* without the sign
+nonlinearity. It is **2.9× larger** — 38.7 epochs at ~14σ, plus +1.4pp accuracy. **The sign
+explanation is refuted**, and this is now the strongest single result in the campaign. Whatever
+pooling buys is a property of the per-group meta-gradient estimate itself — its variance — not
+of how the meta-optimizer consumes it. (Shrink is n=3 with seeds 20/19/19; plain is n=2 with
+56/60, its third seed in flight at epoch 24.)
+
+**And it is the result with no α₀ control at all** — which is what this cycle's launch fixes
+(§6).
+
+## 4. Pooling on 6-block — CONFIRMED at n=3, and it is a genuine speed/accuracy trade
+
+`h2-b-L0p1` reached n=3. The n=1 reading was right in both directions and now has error bars:
+
+| 6-block (m=6), SGDm+Lion | ep→90 | best |
+|---|---|---|
+| plain | 43.0 ± 2.0 | 91.56 ± 0.03 |
+| + shrink λ=0.1 | **53.3 ± 3.1** | **92.12 ± 0.12** |
+
+Pooling m=6 **costs 10.3 epochs of speed (~3σ) and buys +0.56pp of accuracy (~6σ)**. Both
+effects are real. The granularity-dependence of pooling therefore stands as:
+
+| m | pooling effect on **speed** | pooling effect on **accuracy** |
+|---|---|---|
+| 6 | **hurts** (43.0 → 53.3) | helps (+0.56pp) |
+| 62 | **helps** (54.7 → 41.5 Lion; 58.0 → 19.3 Adam) | helps (+1.1 / +1.4pp) |
+| 11.17M | n/a (never reaches 90%) | **catastrophic** (79.4 → ~49) |
+
+Only m=62 is helped on both axes, and only m=62 is helped a lot.
+
+## 5. The guard does NOT rescue the diverging scalar arm — the stability claim survives its confound
+
+`g4-sgdmAdam-*` is the guard-on rerun of `g3` (guard off), same base/meta/α₀/augmentation.
+This was flagged as the outstanding confound on the stability claim: if the SwiftTD guard alone
+rescued the collapsing seeds, "granularity stabilises training" would have been a numerical
+artifact. **It does not.**
+
+| SGDm + Adam, scalar, α₀=1e-6 | best test per seed |
+|---|---|
+| g3, guard **off** (100 ep each) | 88.45 / **18.47** / **20.71** |
+| g4, guard **on** (in flight, 56/37/11 ep) | 87.76 / **19.06** / **20.81** |
+
+Two of three seeds collapse to ~19–21% **with the guard on**, reproducing the unguarded
+pattern almost value-for-value. Meanwhile the granular arms in the same guarded block are
+healthy (layerwise 89.87 / 88.58; 6-block 90.60 / 89.19, both still climbing).
+
+**So the collapse the granular arms are immune to is not the β-overflow artifact the guard
+fixes.** This de-confounds the stability claim rather than weakening it. Caveat: g4 is
+in-flight (11–56 epochs); g3's seeds stayed collapsed through all 100 epochs, so the pattern is
+stable once established, but this should be restated at completion.
+
+## 6. The decisive SGDm α₀ ladder — first seeds, and they point the OTHER way from §1
+
+`a0h-*` is the α₀ control under **SGDm + Lion**, the configuration where granularity actually
+buys accuracy and where the hierarchical proposal lives. **n=1 per cell, runs still in flight**
+(61–77 of 100 epochs), so this is preliminary — but the direction is already opposite to §1(b):
+
+| α₀ | scalar | layerwise plain | layerwise + shrink λ=0.1 | shrink gain |
+|---|---|---|---|---|
+| 1e-6 | (in flight) | 51 | **42** | −9 ep (−18%) |
+| 1e-3 | **no 90% by ep 61** (best 87.70) | 40 | **24** | −16 ep (−40%) |
+
+**The shrink win does not merely survive a saner α₀ under SGDm — it grows**, from 18% to 40%
+fewer epochs, while the scalar arm at α₀=1e-3 has not reached 90% at all by epoch 61. This is
+the mirror image of the AdamW result in §1(b), where per-arm α₀ tuning erased the granularity
+advantage entirely.
+
+If it holds at n=2 (seeds queued, plus the four 6-block cells and the 1e-4 row), the campaign's
+unifying claim survives its own fairness objection in the configuration that matters, and the
+**base optimizer — not α₀ — is the controlling variable.** That is the H4 story the campaign
+already tells: AdamW's per-coordinate normalisation leaves granularity nothing to contribute,
+so the AdamW null in §1(b) is a *prediction landing*, not a refutation.
+
+**Do not write up §1(b) as "granularity buys nothing" without §6 beside it.** They are the same
+experiment on two base optimizers and they disagree, which is the finding.
+
+## 7. Queue actions this cycle
+
+* **All 20 `a0h` jobs verified alive** — 5 running, 15 pending, none failed. An earlier
+  `squeue | tail` reading that appeared to show 9 missing cells was a truncated listing;
+  `sacct` confirms the full block is intact.
+* **`a0A-*` (20 jobs) launched on `alice2`** — the α₀ ladder for the **Adam-meta** arm, which
+  §3 just made the campaign's largest effect and which has no α₀ control whatsoever. Mirrors
+  `a0h` cell-for-cell (SGDm base, guard, augment, 100 epochs, 2080ti pin, 3:45:00, dual-partition
+  per gotcha 12) with Adam meta substituted, **and with the 6-block arm included from the
+  start** — `a0h` had to be patched later to add it. Design: {scalar, 6-block, layerwise plain,
+  layerwise shrink λ=0.1} × α₀ ∈ {1e-3, 1e-4} × 2 seeds, plus a 4-cell α₀=1e-6 anchor row at
+  seed 0 that ties the block back to the L4 `h2A` numbers across GPU types.
+  Launcher: `bin/a0A_sweep.sh` on `alice2`.
+* **Placed on `alice2` deliberately.** Its 2080ti allowance (cap 12) was entirely unused while
+  its L4 allowance sat at the cap (8 running, `QOSMaxGRESPerUser` on the 9th) — the additive-cap
+  situation of gotcha 13.
+* **Pre-flight checks passed before submitting:** `HF.py` is byte-identical across the local
+  canonical copy and *both* accounts (md5 `6d10d14b…`, 444 lines), and `alice2`'s `run_cifar.sh`
+  emits the `ENV:` provenance line. Gotcha 10 says to check this every time; it cost one SSH
+  round-trip and would have invalidated 20 runs silently.
+
+## 8. The cluster is saturated — queue depth, not job count, is the binding constraint
+
+Every GPU partition ALICE offers is fully allocated: `gpu-l4-24g` 7/7 nodes, `gpu-2080ti-11g`
+6 usable of 9 (2 `maint`, 1 `drain$`), **all four `gpu-a100-80g` nodes at full `gres/gpu`
+allocation, and `gpu-mig-40g` with exactly one free slice across six nodes.** Both accounts are
+at or near their effective limits (alice 8 running, alice2 8 + cap-blocked).
+
+**Consequence for this campaign: submitting more jobs does not add throughput, it adds queue
+depth.** The A100 and MIG allowances, which no earlier cycle had touched and which looked like
+free capacity, are not free. The levers that *do* work are the ones already recorded — right-size
+`--time` into `gpu-short` (gotcha 12), use the additive per-GPU-type caps (gotcha 13), and `nice`
+the low-value work rather than cancelling it (gotcha 14). This cycle's 20-job launch is queued
+against those caps and will drain as capacity frees, which is the intended behaviour.
+
+## 9. Standing caveats unchanged by this cycle
+
+* Every number above is **CIFAR-10 / ResNet-18 only**. The scale ladder has not started.
+* **ImageNet stays scoped out.** The on-disk copy is 489/1000 classes and, decisively, the
+  devkit is absent, so the 50,000 flat `val` JPEGs cannot be labelled from anything on disk.
+* The **language modality** is still blocked on the validation-gated optimizer port.
+  `tinystories/HF.py` carries neither patch and has the dead-granularity defect independently;
+  pretokenization is done (50/50 shards, 8.5 GB).
+* `h2-w-L1e4` / `h2-w-L1e5` — the only *genuinely partial* λ values on weightwise (half-lives
+  6,931 and 69,315 steps against ~50,000 steps in a run) — are 1 running / 3 pending. The λ
+  curve is otherwise confirmed flat with the optimum at full pooling.
