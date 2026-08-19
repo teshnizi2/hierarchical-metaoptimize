@@ -807,3 +807,20 @@ launching in that window. Caught by `bash -n`; `sacct` confirmed no job started 
   Blocks pinned to one saturated partition sit at 0 running indefinitely. Widen with
   `scontrol update JobId=<j> Partition=<all five>` — legitimate whenever the block is
   self-anchoring, since GPU type does not affect `plateau` or epochs-to-target.
+
+## Gotchas from cycle 17
+
+* **`find . -name X | head -1` is not "the file the job uses."** Both accounts carry a
+  `cifar10/` and an `imagenet/` copy of `build_network.py`. `jobs/run_cifar.sh` `cd`s into
+  `cifar10/`, but `find` returns `imagenet/` first. Grepping the wrong copy produced a
+  confident, wrong "alice2 does not support ResNet10" — which would have moved 24 jobs to
+  the wrong account. **Grep the path the runner cd's into**, or `diff` the two copies.
+* **The results CSV must carry the architecture.** Until cycle 17 `all_runs.csv` keyed only
+  on `granularity`, so ResNet10 and ResNet18 rows merged silently into one cell. Any new
+  axis (network, dataset, batch size) needs its own column in `aggregate.py` *before* its
+  first runs land, or every table quietly pools across it.
+* **Check partition breadth, not just queue depth.** 130 of 170 pending jobs were pinned to
+  one partition — a deep queue that cannot start is not throughput.
+  `squeue -h -t PENDING -o "%P" | sort | uniq -c` shows this in one line.
+* **`gpu-short` caps at 4:00:00.** Jobs at `--time=03:50:00` are eligible; anything longer
+  must be widened to the four long partitions instead, or the `scontrol update` fails.

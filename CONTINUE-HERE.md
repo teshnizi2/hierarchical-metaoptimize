@@ -38,11 +38,15 @@ CIFAR-10 / ResNet-18 so far; model scale and CIFAR-100 are queued, not measured.
   arm-dependent startup. If the inverted-U flattens at 1e-4 the headline needs an alpha0
   qualifier or withdrawal.
 * **Axis 1, model scale:** `sc-*` (36 jobs) — ResNet10/18/34 x {scalar, blocks, layerwise,
-  additive} x 3 seeds. Directly tests the parent paper's premise. Was 100% starved on a
-  single partition; widened to all five in cycle 16.
+  additive} x 3 seeds. **ResNet10 is DONE (cycle 17)**; ResNet18 running, ResNet34 queued.
+  Headline: granularity buys +19.9pp at ResNet10 vs +3.0pp at ResNet18, but **M1 pooling
+  is a null at ResNet10** (+0.19pp, t=0.66). `r10-*` (24 jobs, alice2) sweeps r there to
+  tell "pooling fails at ResNet10" apart from "r* moved".
 * **Axis 2, second dataset:** `c100-*` (18 jobs) — CIFAR-100 at alpha0 {1e-6, 1e-3} x 4
-  granularities x 2 seeds. Data is staged and integrity-checked on alice; alice2 still
-  lacks the patch and the data.
+  granularities x 2 seeds, plus `rc100-*` (14 jobs) the r-curve at alpha0=1e-3.
+  Data is staged and integrity-checked on **both** accounts (cycle 17 verified alice2's
+  md5 and build_network.py are identical to alice's — the earlier "alice2 lacks the
+  patch" note was wrong, see FINDINGS cycle 17 §5).
 * **Axis 3, n->5:** `mx-*` (89 jobs, both accounts) — M1 peak refinement r in
   {0.04..0.08}, batch-size axis {25,50,200}, H4 at n=5, alpha0 controls.
 * **Axis 5, meta-optimizer:** `amx-*` (15 jobs, alice2) — Adam-meta additive at r

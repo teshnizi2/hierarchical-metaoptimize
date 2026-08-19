@@ -6,7 +6,8 @@ Usage:  python aggregate.py <runs_dir> [<runs_dir> ...] > results.csv
 """
 import sys, os, glob, re, csv, json
 
-FIELDS = ["run", "job_id", "account", "granularity", "base", "meta", "meta_stepsize",
+FIELDS = ["run", "job_id", "account", "network", "dataset", "batch_size",
+          "granularity", "base", "meta", "meta_stepsize",
           "alpha0", "gamma", "augment", "beta_clip", "hier", "lam", "eta_ratio",
           "seed", "epochs_done", "epochs_requested",
           "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance", "dup_group", "superseded",
@@ -122,6 +123,8 @@ def parse_out(path):
     return {
         "run": a.get("run-name", base), "job_id": jid,
         "account": account_of(path, a.get("save-directory", "")),
+        "network": a.get("NN-name", "?"), "dataset": a.get("dataset", "?"),
+        "batch_size": a.get("batch-size", ""),
         "granularity": a.get("stepsize-groups", "?"), "base": a.get("alg-base", a.get("optimizer", "?")),
         "meta": a.get("alg-meta", "?"), "meta_stepsize": a.get("meta-stepsize", ""),
         "alpha0": a.get("alpha0", ""), "gamma": a.get("gamma", ""), "augment": aug,
@@ -165,7 +168,7 @@ for name, group in dups.items():
         r["dup_group"] = name
         r["superseded"] = 0 if r is best else 1
 
-rows.sort(key=lambda r: (r["base"], r["granularity"], r["seed"]))
+rows.sort(key=lambda r: (r["network"], r["dataset"], r["base"], r["granularity"], r["seed"]))
 w = csv.DictWriter(sys.stdout, fieldnames=FIELDS, extrasaction="ignore")
 w.writeheader()
 for r in rows:

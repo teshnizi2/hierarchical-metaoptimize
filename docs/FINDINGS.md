@@ -3355,3 +3355,105 @@ quote**; the corrected baseline can only move up.
 * Pending reasons on alice: 131 `Priority`, 3 `QOSMaxGRESPerUser`. FairShare 0.341.
 * **Throughput is capped by the cluster, not by queue depth or composition.** Queue
   ordering, not queue size, is the only remaining lever; hence §6's widening.
+
+---
+
+# 19 Aug 2026, cycle 17 — the scale axis opens, and it splits the two headlines apart
+
+## 0. Aggregator defect: the CSV could not tell architectures apart
+
+`all_runs.csv` had **no `network` / `dataset` / `batch_size` column**. Every table was
+keyed on `granularity` alone, so a ResNet10 row and a ResNet18 row with the same
+granularity landed in **one cell**. With the scale axis landing this cycle that is fatal:
+the pooled `scalar` cell read **83.111 (n=11)**, a number belonging to no architecture —
+it is 70.7 and 87.8 averaged together.
+
+* Fixed in `analysis/aggregate.py` (`--NN-name`, `--dataset`, `--batch-size` now parsed
+  from the ARGS line; sort key is network-major). CSV regenerated: **532 runs**.
+* **No previously published table was contaminated.** Census of non-ResNet18 rows before
+  this cycle: `sm_ResNet34`, `sm_ResNet50`, `sm_ResNet101`, `c100smoke_*` — all 2-5 epoch
+  smoke tests with **empty `plateau`**, so every plateau-filtered table already excluded
+  them. The hazard was closed before it did damage, not after.
+
+## 1. Model scale, ResNet10 complete (n=3, 100 ep, α₀=1e-6, SGDm/Lion, ms=1e-3, guard on)
+
+ResNet18 column is matched-protocol runs pooled from other families (the `sc-ResNet18-*`
+arm is still running); ResNet34 is queued, not measured.
+
+| arm | ResNet10 (4.9M) | ResNet18 (11.2M) |
+|---|---|---|
+| scalar | 70.742 ± 0.832 (3) | 87.750 ± 0.142 (8) |
+| layerwise plain | 90.619 ± 0.267 (3) | 90.792 ± 0.172 (13) |
+| additive r=0.05 | — | 93.086 ± 0.096 (5) |
+| additive r=0.06 | 90.808 ± 0.419 (3) | — |
+| additive r=0.07 | — | 93.237 ± 0.132 (7) |
+
+**The two headline effects move in opposite directions with scale:**
+
+| effect | ResNet10 | ResNet18 |
+|---|---|---|
+| granularity (scalar → layerwise) | **+19.877pp** (t=39.4) | **+3.042pp** (t=43.0) |
+| M1 pooling (layerwise → best r) | **+0.189pp (t=0.66, NULL)** | **+2.445pp** (t=34.1) |
+
+1. **Granularity helps ~6.5x more at the smaller model.** Direction is consistent with the
+   parent paper's premise that the granularity benefit decays with scale — but the
+   mechanism here is that *scalar gets much worse when small*, not that layerwise improves.
+2. **The M1 pooling gain does not reproduce at ResNet10.** +0.19pp against a pooled sd of
+   0.35 is indistinguishable from zero. **The campaign's best positive result is, so far,
+   demonstrated at exactly one architecture.**
+
+## 2. Rule-5 check — both scalar arms are converged, so §1 is not a startup artefact
+
+Test accuracy by epoch (seed 0):
+
+| run | ep20 | ep40 | ep60 | ep80 | ep99 |
+|---|---|---|---|---|---|
+| `sc-ResNet10-scal-s0` | 63.23 | 71.62 | 71.71 | 71.70 | 71.79 |
+| `a0L-scal-1e6-s0` (R18) | 73.32 | 85.48 | 86.78 | 87.34 | 87.64 |
+
+ResNet10-scalar is **flat from epoch 30** (71.58 → 71.79 over 70 epochs): it converged to a
+bad point, it is not still escaping α₀=1e-6. ResNet18-scalar still gains ~0.3pp over the
+last 20 epochs, i.e. *less* converged — which would bias against the measured gap, not
+toward it. The 17pp scalar difference is real.
+
+## 3. Caveat that bounds §1's second row
+
+ResNet10 was tested at **r=0.06 only** — a value tuned on ResNet18, where the optimum sits
+at 0.05-0.07. A null at one r cannot distinguish "pooling does not work at ResNet10" from
+"r* moved". §4 resolves this.
+
+## 4. What was decided this cycle
+
+* **`r10-*` (24 jobs, alice2)** — M1 additive r-curve at **ResNet10**, r ∈ {0, 0.03, 0.05,
+  0.06, 0.07, 0.1, 0.2, 1} × 3 seeds, otherwise byte-identical to the ResNet18 sweep.
+  **Rationale:** §1 row 2 is the single biggest threat to the paper's positive result, and
+  §3 is its only escape. Self-anchoring: carries **r=1** (the identity gate — additive r=1
+  must equal plain layerwise, verified twice on ResNet18) and **r=0.06** (replicates the
+  alice `sc-ResNet10-add` cell **across accounts**, breaking the account confound for free).
+  **Read-out:** interior optimum appears at some r → the operator generalises and r* is
+  scale-dependent (a *stronger* result, and one the agreement story should predict);
+  curve is flat → M1 is a ResNet18 artefact and the headline must say so.
+* **`rc100-*` (14 jobs, alice)** — M1 additive r-curve on **CIFAR-100**, r ∈ {0, 0.03, 0.05,
+  0.07, 0.1, 0.2, 1} × 2 seeds, ResNet18_c100, **α₀=1e-3**. **Rationale:** the queued
+  `c100-*` family samples only r=0.07, so it can show a point, never a curve. α₀=1e-3 skips
+  the 14-25 epoch startup entirely, so this reads steady state (Rule 5); it connects to the
+  existing `c100-1e3-add` (r=0.07) and `c100-1e3-layer` cells **on the same account**.
+* **Widened 170 pending jobs to all five partitions** (alice 99→5-way + 9→4-way, alice2
+  62→5-way). Before: 68 of 108 alice and **all 62** alice2 pending jobs were pinned to a
+  single partition. `gpu-short` caps at 4:00:00 and our jobs request 3:50:00, so they are
+  eligible; the 9 four-way jobs are the ones that are not.
+
+## 5. Operational correction — alice2 is NOT behind on patches
+
+`CONTINUE-HERE.md` stated alice2 "still lacks the patch and the data" for CIFAR-100. **False.**
+
+* `cifar10/build_network.py` on alice2 is **byte-identical** to alice's (diff empty) and has
+  ResNet10 / ResNet34 / `*_c100`.
+* CIFAR-100 is staged and extracted at `cifar10/data/cifar-100-python/`, tarball md5
+  `eb9058c3a382ffc7106e4002c42a8d85` = the official CIFAR-100 md5. `c100.stamp` reads `DONE`.
+* The false negative came from `find . -name build_network.py | head -1` resolving to the
+  **imagenet** copy, which is unpatched and which `jobs/run_cifar.sh` never uses (it `cd`s
+  into `cifar10/`). **Always grep the copy the runner cd's into, not the first `find` hit.**
+
+**Consequence: both top-priority axes (model scale, CIFAR-100) can run on either account.**
+Effective capacity for them roughly doubles.
