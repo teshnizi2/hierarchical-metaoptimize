@@ -510,3 +510,40 @@ The spread across {scalar, 6-block, layerwise} collapses from **21.2pp to 4.2pp*
 * At **100** epochs the confound is gone — every arm is flat to ≤0.38pp across α₀ ∈ {1e-3, 1e-4,
   1e-6} (cycle 8 §3) — so the headline grid does *not* need re-running at a larger α₀.
 * If a short probe is needed, run it at α₀=1e-3, which starts essentially at the destination.
+
+## 25. An identity check must be run where the arms it distinguishes are DISTINGUISHABLE — verify that first
+
+The `zv-*` block was built to gate every per-weight claim in the paper: it checks that
+`HIER=zpool` at `ETA_RATIO=0` reduces *exactly* to the scalar arm. All 7 jobs completed and every
+arm agreed to ~0.03pp. Read casually that is a pass. It is worthless.
+
+The block ran **4 epochs at α₀=1e-6**, where the step size has barely left ln(1e-6) and nothing has
+trained. Every arm sat at ~13% against a 10% chance baseline — *including the two reference arms
+that are supposed to differ*:
+
+| pair | 4 ep @ α₀=1e-6 | 20 ep @ α₀=1e-6 | 100 ep |
+|---|---|---|---|
+| scalar vs weightwise | **0.02pp** | 55.9pp | 8.7pp |
+
+A test that cannot separate `scalar` from `weightwise` cannot certify that `weightwise + zpool(r=0)`
+*equals* `scalar`. Both a correct implementation and a completely broken one produce the same
+output. The configs were fine — the `ENV:` lines (gotcha 8) confirmed every variable propagated —
+so nothing downstream would have flagged it.
+
+**Rule: every identity/equivalence check ships with a discriminating-power anchor, evaluated
+BEFORE the identity, and the checker refuses to report a verdict if the anchor fails.**
+
+```
+# anchors that MUST differ; if they don't, the regime is void and nothing else may be read
+pow = |ref_A - ref_B|
+if pow < threshold:  print("TEST VOID"); exit
+# only now compare the pairs that must MATCH
+```
+
+Corollaries:
+* Pick the regime from a **measured** separation, not from cost. `z3-*` runs at α₀=1e-3 / 20 epochs
+  because `p3-*` had already recorded an ~11pp spread across those exact arms there.
+* Cheap and early is the wrong instinct for an identity test. The failure mode of running it too
+  early is a *false pass*, which is worse than no test — it retires the question.
+* Prefer the direct quantity where one exists. Accuracy is a proxy; `PROBE=100` gives the β
+  trajectories, which is what the identity is actually about.

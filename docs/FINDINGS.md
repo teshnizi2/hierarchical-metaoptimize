@@ -2396,9 +2396,46 @@ z'_b = (1 − r)·Σ_j z_j  +  r·z_b
 
 Both endpoints are exact identities rather than limits, `_apply_hier` is a verified no-op for
 `zpool`, and the operator is **gated behind a numerical identity check before any science run**
-(PLAN §5). `zv-*` (7 jobs, 4 epochs, α₀=1e-6) tests all four: layerwise r=0 ≡ scalar,
+(PLAN §5). `zv-*` (7 jobs, 4 epochs, α₀=1e-6) tested all four: layerwise r=0 ≡ scalar,
 layerwise r=1 ≡ plain layerwise, weightwise r=0 ≡ scalar, weightwise r=1 ≡ plain weightwise.
 **No m=n pooling number will be quoted until those pass.**
+
+### ⚠ The `zv-*` block completed and its result is VOID — the test had no discriminating power
+
+All 7 ran to completion and every arm agreed to ~0.03pp. That is **not** a pass. The first four
+test accuracies:
+
+| arm | ep1 | ep2 | ep3 | ep4 |
+|---|---|---|---|---|
+| ref-scalar | 12.87 | 12.94 | 13.20 | **13.50** |
+| ref-layer | 12.87 | 12.94 | 13.19 | 13.51 |
+| **ref-weight** | 12.87 | 12.95 | 13.19 | **13.52** |
+| l-r0 / l-r1 / w-r0 / w-r1 | 12.87 | 12.93–12.95 | 13.19–13.20 | 13.49–13.52 |
+
+`ref-scalar` and `ref-weight` are **reference arms that must differ** — they are 8.7pp apart at 100
+epochs (88.08 vs 79.38) and 55.9pp apart at 20 (70.73 vs 14.80). Here they are **0.02pp apart**.
+Chance is 10% and every arm is at 13%.
+
+At 4 epochs with α₀=1e-6 the step size has barely left ln(1e-6) and no arm has begun to train, so
+the block cannot separate configurations that are known to be massively different. **Agreement
+between `w-r0` and `ref-scalar` therefore carries zero information about the identity.** The
+configurations themselves were correct — the `ENV:` provenance lines (gotcha 8) confirm
+`HIER=zpool`, `ETA_RATIO` and `--stepsize-groups` all propagated distinctly to all seven — so this
+is a design fault in the test, not a bug in the code under test.
+
+**This was a near-miss.** The block gates every per-weight claim in the paper, and read casually
+("all seven agree") it would have unblocked the whole story on a measurement with no content.
+
+**Replacement submitted — `z3-*` (7 jobs, alice2, `bin/zval3.sh`).** Same seven arms at
+**α₀=1e-3, 20 epochs**, the regime where `p3-*` already measured an ~11pp spread across these arms
+(scalar 84.16 / layerwise-plain 88.23 / weightwise+pool 77.46), with `PROBE=100` so the β
+trajectories can be compared directly rather than only the accuracy proxy. `bin/zcheck3.sh` now
+**computes discriminating power first** — |ref-scalar − ref-weight|, which must be ≥1.0pp — and
+refuses to print an identity verdict at all if the anchors do not separate. Identity tolerance is
+0.30pp, ~3× the cross-GPU reproduction floor of gotcha 17.
+
+`z2-*` (a re-run of the same 4-epoch design queued on alice2 for capacity reasons) was **cancelled
+before it ran**: it would have reproduced the same void result.
 
 ## 8. The guarded plain granularity ladder is COMPLETE — and it is NON-MONOTONE
 
