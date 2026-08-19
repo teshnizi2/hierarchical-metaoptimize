@@ -3107,3 +3107,128 @@ changed, so nothing here is read from the superseded version:
 * `plateau` in the CSV is the mean of the **last 20** epochs, not the last 5 as
   several planning docs state. Conclusions are insensitive to the choice (checked:
   no M1 cell moves >0.15pp at k=5), but the prose is wrong and should be fixed.
+
+---
+
+# Cycle 15 — the non-meta baseline lands, and two reference points are wrong
+
+All numbers re-derived from `results/all_runs.csv` (465 rows, +37 this cycle),
+filtered `superseded==0`, `epochs_done>=100`, `epochs_requested==100`, `augment==1`,
+metric = `plateau`.
+
+## 1. Non-meta baseline (axis 4) — FIRST RESULT
+
+Plain AdamW, no meta-learning (`--optimizer AdamW --alpha0 <lr>`), ResNet-18 /
+CIFAR-10 / 100 ep / AUGMENT=1. Verified non-meta by reading the `ARGS:` line.
+
+| lr | n | plateau |
+|---|---|---|
+| 3e-4 | 2 | **91.81** |
+| 1e-4 | 2 | 91.33 |
+| 1e-3 | 2 | 90.26 |
+| 3e-3 | 2 | 85.96 |
+
+Against it (same filter):
+
+| arm | n | plateau | vs baseline |
+|---|---|---|---|
+| SGDm+Lion layerwise additive r=0.07 | 5 | 93.22 | +1.41 |
+| AdamW+Adam scalar | 12 | 91.88 | +0.07 |
+| SGDm+Lion layerwise (plain) | 14 | 90.89 | **−0.92** |
+| SGDm+Lion scalar | 15 | 87.79 | **−4.02** |
+
+**MetaOptimize at the granularities the parent paper uses does not beat a tuned
+non-meta AdamW.** Only M1 additive pooling clears it. Extended to n=5 (`fx-adamw-*-s{2,3,4}`).
+
+## 2. The baseline's LR schedule is mis-scaled — margin is NOT yet safe
+
+`AdamW_optimizer` hard-codes `total_steps=422000, warmup_steps=10000` into a
+cosine-with-warmup scheduler. A 100-epoch run at batch 100 is **50,000 steps**:
+
+* warmup occupies the first **20 epochs**;
+* by the final step the cosine has decayed the LR only to **97.7% of base**.
+
+So the "baseline" is warmup-then-effectively-constant LR — it never receives the
+decay that normally supplies the last 1–2pp on CIFAR-10. The +1.41pp margin in §1
+is measured against a baseline denied its main tuning lever.
+
+`build_optimizer.py` patched (backwards-compatible, defaults unchanged, in-flight
+jobs unaffected) to read `COS_TOTAL`/`COS_WARMUP`; both echoed on the `ENV:` line.
+`fxcos-{1e-4,3e-4,1e-3}-s{0,1,2}` submitted at `COS_TOTAL=50000, COS_WARMUP=2500`.
+**No pooling-vs-baseline claim should be written until these land.**
+
+## 3. `additive` r is inverted relative to how the M1 tables read it
+
+From `Optimizers/HF.py::_apply_hier`:
+
+```
+d = b - beta_prev;  dm = d.mean();  beta = beta_prev + dm + r*(d - dm)
+```
+
+* `r=1` → `beta_prev + d = b` — **exact identity with plain layerwise**.
+* `r=0` → every group gets the same mean increment — **maximal pooling**.
+
+The M1 sweep spans r ∈ {0, 0.03, 0.05, 0.07, 0.1, 0.2, 0.3} and treats **r=0 as its
+reference**. r=0 is the *fully pooled* end, not "no pooling"; **r=1 was never run**.
+The measured plateaus are unaffected, but "+1.02pp over r=0" describes an optimum
+relative to maximal pooling, not relative to no pooling. Note plain layerwise is
+90.89 (n=14) while additive r=0 is 92.20 (n=3) at matched alpha0/meta-stepsize/clip —
+a 1.31pp gap between two cells that are *not* the same configuration.
+(r=0 preserves per-group offsets established at the first step, since `beta_prev`
+is None on step 1; it is therefore neither scalar nor layerwise.)
+
+`zad-{plain,r1,r007,r0}-s{0,1,2}` submitted with `PROBE=25` to test both endpoints.
+**Gate: `zad-r1` must reproduce `zad-plain`.** Until it does, the M1 axis is unanchored.
+
+## 4. Sign agreement across granularities (axis 6) — with the correct null
+
+`frac_neg` is over group-level values for scalar/layerwise/blockwise and over all
+coordinates for nodewise/weightwise. Agreement = `max(frac_neg, 1-frac_neg)`.
+
+**This statistic is folded: its expectation exceeds 0.5 under independence, badly so
+at small coordinate counts.** Comparing it to 50% is invalid except at huge n.
+Null below is simulated (40k trials) at each granularity's coordinate count.
+
+| granularity | n_coord | null | early (ep 0–5) | steady (ep 50–100) | steady excess |
+|---|---|---|---|---|---|
+| resnet18_blocks | 6 | 65.63% | 94.61% | 71.54% | **+5.91pp** |
+| layerwise | 62 | 55.06% | 87.55% | 55.84% | **+0.78pp** |
+| nodewise | ~14420 (inferred) | 50.33% | 65.85% | — | — |
+| weightwise | 11,173,962 | 50.00% | — | 53.10% (whole-run, prior) | +3.10pp |
+
+* **Early training: agreement is far above the null at every granularity** (+15 to +32pp).
+  Robust; per-seed spread <1pp when stage-matched.
+* **At steady state the layerwise excess nearly vanishes (+0.78pp).** The weightwise
+  +3.10pp survives because its null has negligible sampling error.
+* Agreement **decays monotonically with training** (blocks 94.6→80.3→69.3→71.5;
+  layerwise 87.6→73.0→56.3→55.8 across bands 0-5/5-20/20-50/50-100).
+* **Stage-matching is mandatory here.** Unmatched per-seed means ranged 60.6–79.4%
+  *within* layerwise purely from unequal run lengths; stage-matched they are 86.9–87.5%.
+* `scalar` is degenerate (1 coordinate → agreement ≡ 100%) and is not a data point.
+
+**Consequence for the refutation.** "Coordinates agree on sign, so drift is set by
+partition agreement rather than by N" holds strongly in early training and at
+weightwise granularity. It is **not** currently supported at layerwise granularity in
+steady state. The claim must carry both a granularity and a training-stage qualifier.
+nodewise/weightwise steady-state cells are still running.
+
+## 5. Infrastructure
+
+* **CIFAR-100 unblocked (axis 2).** Tarball was staged but never extracted; compute
+  nodes have no internet, so every C100 job would have hung on `download=True`.
+  Extracted on alice; `_check_integrity()` True for both splits (50k/10k, 100 classes,
+  labels 0–99), so download is now a no-op. Smoke ran end-to-end on ResNet18_c100
+  with and without the probe ("Files already downloaded and verified"). 3 epochs sit
+  at chance (~1.1%), consistent with the documented alpha0=1e-6 startup, but 3 epochs
+  cannot separate that from breakage — `c100disc-{c100,c10}` submitted at alpha0=1e-3
+  (must clear chance by epoch 5; the CIFAR-10 arm is the harness control).
+  alice2 lacks both the patch and the data; its download is in progress.
+* **Partition funnel found and fixed.** Multi-partition submission does *not* spread
+  jobs: Slurm places them in the first-listed partition (`gpu-short`), whose per-user
+  QoS cap is 12 GPUs, leaving l4(8)/2080ti(12)/mig(8)/a100(2) — 30 GPUs — unused.
+  Both accounts sat at exactly 12. Fixed by pinning whole blocks to distinct
+  partitions (wholesale, so contrasts stay within one GPU type). alice2 went 12 → 15
+  running immediately. Ceiling per account is now 42 rather than 12.
+* Cluster is genuinely saturated (`TRULY_FREE` 0–2 GPUs per pool); three 2080ti nodes
+  are held by maintenance reservation `root_28` until 2026-12-01. Partition totals
+  from `sinfo` include those nodes and overstate free capacity — count at node level.
