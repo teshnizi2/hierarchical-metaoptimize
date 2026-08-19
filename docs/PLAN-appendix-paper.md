@@ -286,7 +286,7 @@ Cycle 8 §1–2 changes which operator the method section is about.
 |---|---|---|
 | λ / r curve shape | **flat** over λ ∈ [0.001, 1.0] | **non-monotone, interior peak** at r ∈ [0.03, 0.1] |
 | why | every λ ≥ 0.001 is full pooling (gotcha 9) | genuinely partial for the whole run |
-| best cell vs plain layerwise | +1.67pp (λ=0.01) | **+1.90pp** (r=0.1) |
+| best cell vs plain layerwise | +1.67pp (λ=0.01) | **+2.18pp** (r=0.05, n=2) / +1.73pp (r=0.03, n=5) |
 | effect on training fit | **worse** (97.8–98.1 vs 99.66) | **better** (99.88 vs 99.66) |
 | mechanism | drift rate *and* spread | spread only |
 | character | regulariser | finds a better solution, more slowly |
@@ -300,6 +300,36 @@ shared value regularises; rescaling the per-group deviation of the update finds 
 adds a hyperparameter but whose outcome is insensitive to it over three orders of magnitude removes
 a decision rather than adding one. Additive does *not* have that property (r=0.3 is already back
 near plain), so additive's peak must be reported with its sensitivity, not without.
+
+### ⚠ CORRECTED cycle 9 — M1's contribution is on ACCURACY, and it is NULL on the primary metric
+
+Two things in the table above were written from n=2 cells and have since moved (FINDINGS cycle 9
+§1–2). Both corrections tighten the paper rather than weaken it, but neither is optional:
+
+1. **The "+1.90pp (r=0.1)" cell was optimistic.** At n=5, r=0.1 is 92.86 ± 0.19 (+1.63pp) and
+   r=0.03 is 92.96 ± 0.15 (+1.73pp); the r=0.1 n=2 reading carried a 0.01pp sd that was ~20× too
+   tight (gotcha 26). The leading cell is now r=0.05 at 93.41 ± 0.06 (+2.18pp) — **at n=2, i.e. the
+   same evidence strength that just failed.** Report the ladder's *shape* until `ad-l-r005` s3–s4
+   and `ad-l-r007` land; do not print an argmax.
+
+2. **M1 must not be written into the "granularity buys speed" frame.** On epochs-to-target — the
+   metric this paper declares primary — additive is **null at every r**: at ep→88 the accuracy-optimal
+   cell is the *slowest* pooled arm (39.5 vs plain's 36.2 ± 1.6) and the fastest cells (r=0.2/0.3,
+   35–36) are indistinguishable from plain; at ep→85 every additive cell is strictly slower than
+   plain. This replicates independently under the Adam meta-optimizer. The row "character | finds a
+   better solution, more slowly" was right, and it is the whole story: **the granularity axis buys
+   speed, the pooling axis buys accuracy, and they are separate claims that must not share a
+   sentence.** Every M1 table needs both columns, with the speed column shown and null.
+
+One objection is now answered rather than open: the additive gain **survives the Adam
+meta-optimizer** (+0.82 / +0.65pp over a 9-seed plain baseline, n=1 per cell), so it is not an
+artefact of Lion's sign nonlinearity — the cheapest refutation a reviewer had. It arrives at roughly
+half the Lion-meta size, so the sign nonlinearity doubles the effect without creating it.
+
+Still open before this section can be drafted: `e3a-*` (the 300-epoch budget control, 10 cells) must
+confirm the peak does not migrate toward r=0, and its matched `e3a-lsh01` cells must confirm that
+shrink's apparent inferiority to additive is not simply shrink being budget-starved (its 97.78 train
+accuracy at epoch 100 is still climbing — gotcha 19).
 
 **The cross-operator agreement at full pooling** (shrink λ=1.0 → 92.53 ± 0.17; additive r=0 →
 92.52 ± 0.11, two separately-written code paths 0.01pp apart) belongs in the paper as an
