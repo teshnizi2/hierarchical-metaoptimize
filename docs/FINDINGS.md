@@ -5800,7 +5800,7 @@ Consequence for the queue-depth rule: **depth is not the lever here, ordering is
 more cannot raise throughput above 24 concurrent jobs; it can only push decisive work back.
 This cycle therefore added the single cheapest decisive batch (46 × 15 min ≈ 11.5 GPU-hours,
 which clears in ~1 h of wall-clock at 12 slots) and cancelled nothing, because nothing dead was
-running. Queue after: **alice 198 pending / 12 running, alice2 210 / 12.**
+running. Queue after: **alice 198 pending / 12 running, alice2 222 / 12.**
 
 ## 31.7 Still open
 
