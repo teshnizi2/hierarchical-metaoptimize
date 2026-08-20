@@ -7493,3 +7493,119 @@ beta_clip deconfound, 36.3) is on the other account and untouched.
 the reason. The justification is that it is the campaign's core figure at n=5, not breadth — and
 that alice1 had drained to 4 pending and was hours from idle. **Status: 106 submitted, 5 running
 within a minute, 0 failed.** Not read until complete (36.8 partial-row trap).
+
+# Cycle 41 — COLLECTION ONLY, nothing submitted (FairShare below floor on both accounts)
+
+Queues at read time: alice 94 PENDING / 19 RUNNING, FairShare **0.3331**; alice2 50 PENDING /
+12 RUNNING, FairShare **0.3356**. Both below the 0.35 submission floor and both above the
+40-pending cap, so **0 jobs submitted**. CSV re-aggregated from artefacts on both accounts:
+1307 runs (778 alice + 529 alice2), +26 rows since cycle 40.
+
+## 41.1 The scalar meta-step response curve is now bracketed over 3.5 decades — and it has a cliff
+
+`msa-*` was submitted as a collapse test and 36.6 correctly ruled that design **not identified**.
+36.6 also stated it would be reported as a scalar meta-step response curve instead. It is, and it
+turns out to supply exactly the extra scalar grid points the c40 `rs-*` surface needs.
+
+R18/CIFAR-10, SGDm+Lion, **a0=1e-3**, 100 ep, AUGMENT=1, guard on, plain (non-hierarchical),
+metric = `plateau`, `epochs_done>=100` and `epochs_requested==100` enforced:
+
+| granularity | ms | n | plateau | source |
+|---|---|---|---|---|
+| scalar | 3.307e-7 | 2 | 90.257 ±0.036 | `msa-weq` |
+| scalar | 1.520e-5 | 1 | 91.074 | `msa-nodeeq` |
+| scalar | **1.000e-4** | 3 | **92.255 ±0.264** | `ms-scalA-1e4` |
+| scalar | 1.277e-4 | 4 | 91.872 ±0.084 | `msa-layeq` |
+| scalar | 3.947e-4 | 2 | 87.468 ±0.086 | `msa-blk6eq` |
+| scalar | 1.000e-3 | 12 | 87.749 ±0.229 | `a0L`,`a0h`,`ms-scalA-1e3`,`mx-a1e3-scal` |
+
+* **A cliff, then a floor.** 1e-4 → 3.947e-4 costs **−4.787pp** (Welch t=29.2, df=2.6). From
+  3.947e-4 → 1e-3 the curve moves **+0.416pp** (t=−2.72): it has bottomed out, it is not still
+  decaying. The scalar arm's usable meta-step window is narrower than one decade.
+* The scalar peak is now bracketed on **both** sides (91.07 below, 91.87 and 87.47 above) at
+  ms≈1e-4, plateau ≈92.3. `rs-scal-1e5`/`3e5` (in flight, s0 at 96–97/100) close the last gap
+  between 1.5e-5 and 1e-4 next cycle.
+* Caveat carried from 36.6: `msa-weq`'s nominal ms=3.307e-7 realises **4.768e-7** (float32 ulp of
+  |log a0| at a0=1e-3, 1.44× nominal). That row is a rounding result on the x-axis, not the y-axis;
+  its plateau is sound, its abscissa is not exactly as labelled.
+
+## 41.2 Layerwise is far more robust to meta-step overshoot — the granularity gain shrinks 5.5×
+
+Same config, layerwise arm:
+
+| granularity | ms | n | plateau |
+|---|---|---|---|
+| layerwise | 1e-5 | 1 | 90.787 |
+| layerwise | 3e-5 | 1 | 91.745 |
+| layerwise | **1e-4** | 3 | **92.872 ±0.041** |
+| layerwise | 3e-4 | — | in flight (`rs-lay-3e4`, s0 at 72/100) |
+| layerwise | 1e-3 | 12 | 91.141 ±0.171 |
+| resnet18_blocks | 1e-3 | 4 | 91.548 ±0.108 |
+
+| comparison | Δ (lay − scal) | Welch t | df | 95% CI |
+|---|---|---|---|---|
+| at ms=**1e-3** (n=12 / n=12) | **+3.392pp** | — | — | — |
+| at ms=**1e-4** (n=3 / n=3) | **+0.617pp** | 4.00 | 2.1 | [+0.308, +0.925] |
+| at ms=1e-4 vs scalar@1.277e-4 (n=3/n=4) | +1.000pp | 20.73 | 4.5 | [+0.903, +1.096] |
+
+* **The granularity gain shrinks 5.5× (3.392 → 0.617pp) when both arms move from ms=1e-3 to
+  ms=1e-4.** This is the reparameterisation claim's strongest evidence to date and the ms=1e-3
+  end of it now rests on n=12 per arm, not n=3.
+* **The gain is NOT monotone in m at ms=1e-3.** blk6 (m=6) 91.548 ±0.108 beats layerwise (m=62)
+  91.141 ±0.171 by **+0.407pp** (se 0.073, t=5.6). The ordering is scalar ≪ blk6 ≳ layerwise, so
+  "finer is better" is already false at the coarse end of the ladder at this meta-step.
+
+## 41.3 The 40.1 pre-registration is under strain, in the falsification direction
+
+40.1 pre-registered: *if granularity is a reparameterised meta-step, every granularity's
+ms-response curve is the same curve shifted along log(ms), with **peak heights equal to within
+seed noise**.* Status of that prediction on present data:
+
+* Scalar's peak is bracketed at ≈**92.26 ±0.264** (ms≈1e-4).
+* Layerwise at ms=1e-4 is already **92.872 ±0.041**, and its own peak is ≥ that (3e-4 unread).
+* Provisional peak-height gap **≥ +0.617pp**, CI [+0.308, +0.925].
+
+That excludes 0 but does **not** clear the campaign standard (PLAN.md: Δ ≥ 0.5pp with a 95% CI
+excluding 0 — the lower bound is +0.308). **No verdict is declared.** The deciding cells are all
+in flight: `rs-scal-1e4-s3/s4` and `rs-lay-1e4-s3/s4` (n=3 → n=5 on the diagonal),
+`rs-scal-3e5`/`rs-scal-1e5` (can scalar's peak hide between 3e-5 and 1e-4?), and `rs-lay-3e4`
+(where is layerwise's peak?). Also note the curve **shapes** already differ — scalar falls 4.79pp
+over 0.6 of a decade (1e-4 -> 3.947e-4), layerwise 1.73pp over a full decade (1e-4 -> 1e-3) — which is the second half of the same
+pre-registration and points the same way.
+
+## 41.4 The 300-epoch baseline lands: 94.999 ±0.164 — the meta arm's half is 3 epochs short
+
+Priority-1 question (does the baseline's deficit close at the long horizon MetaOptimize's
+objective targets?). The 100-epoch deficit for **this exact pairing**, re-derived from the CSV, is
+**1.732pp** (94.093 vs 92.361) -- not the 0.787pp quoted elsewhere, which pairs the baseline
+against a *different*, better meta arm (SGDm+Lion additive, 93.306). R18/CIFAR-10, AUGMENT=1, `epochs_done==300` enforced:
+
+| arm | n | plateau (300 ep) | same arm at 100 ep | Δ from horizon |
+|---|---|---|---|---|
+| `bg300_cos` — AdamW+cosine, lr 1e-3 | 3 | **94.999 ±0.164** | 94.093 ±0.036 (`fxcos_1e-3`) | **+0.906pp** |
+| `bg300_meta` — AdamW+Adam, layerwise, a0=1e-4, ms=1e-3 | 0 | in flight (250–254/300) | 92.361 ±0.433 (`a0-layer-1e4`,`dc-aw-a1e4`) | — |
+
+* **The baseline half of the comparison is now fixed.** For MetaOptimize to reach parity at 300
+  epochs it must gain **+2.638pp** over its own 100-epoch value. The baseline gained +0.906pp.
+* **94.999 is a LOWER bound on the 300-epoch baseline.** `bg300_cos` runs at lr=1e-3, and 39.2
+  established the cosine argmax is **2e-3–3e-3 (94.387 ±0.126 at 100 ep, +0.29pp above 1e-3)**.
+  The long-horizon baseline was therefore run off its own argmax — an error in MetaOptimize's
+  favour, so it does not threaten a baseline-wins conclusion, but any *parity* conclusion would
+  have to be re-tested at lr 2e-3–3e-3.
+* `bg300_meta` sits at 250–254/300 and `bg600_*` at 80–255/600. **Not read** (36.8 partial-row
+  trap). `bg300` completes next cycle; `bg600` needs two to three more.
+
+## 41.5 Batch health and ops
+
+* **`rs-*` (the c40 surface): 106 submitted, 0 failed, 5 complete, 11 running, 90 pending.**
+  Composition verified intact against the submitting script — 25 `rs-blk6` jobs are PENDING at
+  `--nice=50`, not missing (a `squeue` prefix-bucketing error in this cycle's first pass reported
+  them absent; `sacct` with a left-aligned `JobName%-24` shows all 25). *`sacct -o JobName%22`
+  RIGHT-justifies — `grep "^rs-"` silently returns 0 against it. Use `%-24`.*
+* **`msa-*`: 20 submitted, 11 complete, 9 running.** `fz-*` (beta_clip deconfound): 50 pending,
+  1 started. Nothing on either account is failing.
+* **No unreduced probe batches.** Swept both accounts: 234 probe dirs on alice, 124 on alice2,
+  across 28 top-level batch names; every one is referenced in FINDINGS or CORRECTIONS.
+* **Submitted nothing, deliberately.** Both accounts sit below the FairShare floor and above the
+  pending cap, and every open question named above already has its deciding cell queued and — for
+  the two headline curves — *running*. Adding jobs could not have started anything sooner.

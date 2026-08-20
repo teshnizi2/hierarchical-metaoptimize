@@ -48,6 +48,38 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 41) -- COLLECTION CYCLE, nothing submitted
+
+Queues: alice 94 PENDING / 19 RUNNING (FairShare **0.3331**), alice2 50 / 12 (**0.3356**). Both
+below the 0.35 floor and above the 40-pending cap -> **0 submitted**, deliberately. CSV
+re-aggregated: **1307 runs** (778 alice + 529 alice2), +26 since cycle 40.
+
+* **The scalar meta-step curve now has a measured cliff** (FINDINGS 41.1). `msa-*` -- built as a
+  collapse test, ruled not-identified by 36.6 -- turns out to be exactly the extra scalar grid
+  points the `rs-*` surface needs. Scalar peaks at ms~1e-4 (92.255 +-0.264) and falls **4.787pp**
+  by ms=3.947e-4, then flattens onto a floor (87.47 -> 87.75 out to 1e-3). Usable window < 1 decade.
+* **The granularity gain shrinks 5.5x with meta-step** (41.2): +3.392pp at ms=1e-3 (n=12 vs n=12)
+  -> +0.617pp at ms=1e-4 (n=3 vs n=3). Strongest reparameterisation evidence so far, and the
+  ms=1e-3 end is now n=12 per arm.
+* **"Finer is better" is already false at the coarse end**: at ms=1e-3, blk6 (m=6) 91.548 +-0.108
+  beats layerwise (m=62) 91.141 +-0.171 by +0.407pp (t=5.6).
+* **40.1's pre-registration is under strain in the FALSIFICATION direction** (41.3). Scalar's peak
+  is bracketed at ~92.26; layerwise at ms=1e-4 is already 92.872 +-0.041 and its own peak is not
+  yet located. Gap >= +0.617pp, CI [+0.308,+0.925] -- excludes 0, does NOT clear PLAN.md's
+  Delta>=0.5pp standard. **No verdict declared.** Deciding cells all in flight.
+* **`bg300_cos` = 94.999 +-0.164 (n=3, 300 ep)**, +0.906pp over its own 100-epoch 94.093. The
+  meta half (`bg300_meta`) is at 250-254/300 -- NOT read. For parity it must gain **+2.638pp**
+  over its own 100-epoch 92.361 +-0.433. Also: `bg300_cos` runs at lr=1e-3, off the cosine argmax
+  of 2e-3-3e-3 (39.2), so 94.999 is a LOWER bound -- conservative in MetaOptimize's favour.
+* **Batch health: 0 failures anywhere.** `rs-*` 106 submitted / 5 complete / 11 running / 90
+  pending (all 25 `rs-blk6` present at nice 50 -- they were mis-reported absent by a squeue
+  bucketing error; `sacct -o JobName%22` RIGHT-justifies, so `grep "^rs-"` returns 0. Use `%-24`).
+* **No unreduced probe batches**: 234 dirs on alice + 124 on alice2 across 28 batch names, all
+  referenced in FINDINGS/CORRECTIONS.
+* **Next cycle reads, in order:** `bg300_meta` (priority 1, ~3 epochs out); `rs-scal-3e5`/`1e5`
+  (does scalar's peak hide between 3e-5 and 1e-4?); `rs-lay-3e4` (where is layerwise's peak?);
+  then the n=5 diagonal top-ups that decide 41.3.
+
 ## Running / next (cycle 38) -- COLLECTION CYCLE, nothing submitted
 
 **The pre-registered meta-step control fired against granularity (FINDINGS 38.1).** At a0=1e-3,
