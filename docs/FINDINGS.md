@@ -6567,3 +6567,102 @@ actively misdirects manual cleanups. Suggested replacement:
 > 2. `bg300`/`bg600`, `pp-*` — meaningful only **after** 1 reports; if 33.1 holds they compare
 >    arms differing only in effective meta-LR.
 > 3. scale axis / CIFAR-100 replication.
+
+---
+
+# Cycle 35 — the interior optimum does not survive the alpha0 control
+
+Operator directive: choose the best experiments for the project and run until the results support
+a paper; time is not a constraint; power everything properly. The 40-pending cap is therefore
+relaxed to the task file's own QUEUE DISCIPLINE guidance (60-120 pending), on the condition that
+**every queued job answers a named open question** — which is what buried decisive work before,
+not depth itself.
+
+## 35.1 THE HEADLINE POSITIVE RESULT IS LARGELY AN a0=1e-6 ARTEFACT
+
+The campaign's only positive method result is M1's additive interior optimum at r ≈ 0.05–0.07.
+Re-derived from `all_runs.csv` (R18/CIFAR-10, SGDm+Lion, augment=1, 100 ep, ms=1e-3, layerwise,
+not superseded), the SAME curve at both initialisations:
+
+| r | a0=1e-6 | a0=1e-3 |
+|---|---|---|
+| 0 | 92.228 ±0.087 (n=6) | 92.181 ±0.089 (n=5) |
+| 0.03 | 92.637 ±0.164 (n=5) | 92.182 ±0.105 (n=5) |
+| 0.04 | 92.862 ±0.129 (n=5) | — |
+| 0.05 | 93.048 ±0.136 (n=10) | 92.115 ±0.010 (n=2) |
+| **0.06** | **93.262 ±0.135 (n=8)** | **92.160 ±0.104 (n=12)** |
+| 0.07 | 93.192 ±0.152 (n=9) | 92.178 ±0.007 (n=2) |
+| 0.1 | 92.626 ±0.215 (n=5) | 92.441 ±0.138 (n=5) |
+| 0.2 | 91.387 ±0.142 (n=3) | 92.075 ±0.128 (n=3) |
+| 0.3 | 90.957 ±0.079 (n=3) | 91.764 ±0.086 (n=2) |
+| 0.4 | — | 91.434 ±0.063 (n=3) |
+| 1 | 90.863 ±0.063 (n=3) | 91.151 ±0.046 (n=2) |
+
+* **a0=1e-6:** sharp interior peak. r=0.06 beats r=0 by **+1.034pp** and r=1 by **+2.399pp**.
+* **a0=1e-3:** flat over r ∈ [0, 0.07] — four cells spanning **0.067pp**, i.e. inside one seed
+  band. r=0.06 vs r=0 is **−0.021pp**.
+
+The two best-powered cells carry this on their own: **r=0.06 at n=12 (92.160 ±0.104) does not
+beat r=0 at n=5 (92.181 ±0.089)** under the a0 control. The +1.03pp peak exists only at a0=1e-6.
+
+**Interpretation.** Consistent with 33.1 + CORRECTIONS 22: at a0=1e-6 the run must travel
+ln(0.05/1e-6) = 10.82 in log-space before it trains at all, and r sets the rate at which the
+shared component makes that trip. The "interior optimum" is the optimum of an **escape-rate
+tradeoff**, not a steady-state pooling benefit. At a0=1e-3 only 3.9 of travel is needed, escape
+stops binding, and the dial goes flat.
+
+**Not yet a CORRECTION.** Five of the a0=1e-3 cells are n=2–3, and per R7 a sub-0.3pp effect
+needs n≥5. `ac-*` (42 jobs, submitted this cycle, alice) powers the entire a0=1e-3 curve to
+seeds 0–4 and adds r = 0.02 / 0.04 / 0.08 / 0.15 to resolve the shape and locate any shallow
+peak near r=0.1 (the only cell that rises: 92.441 ±0.138, n=5, +0.26pp over r=0 — ~2σ, unresolved).
+
+Pre-registered, two-sided: **(a)** the curve stays flat over r ∈ [0,0.1] to ±0.3pp at n=5 ⇒ the
+interior optimum is an a0=1e-6 escape artefact and the campaign has **no** positive method
+result; **(b)** a ≥0.5pp peak survives ⇒ the optimum is real and a0=1e-6 merely exaggerates it.
+
+**Precedent.** 28.4 already found "the ResNet10 interior optimum does not survive a0=1e-3". That
+was recorded as a scale-axis curiosity. It was the same effect, at the headline setting, and it
+sat unread — R1's failure mode exactly.
+
+## 35.2 The m=1 control has an escape confound of its own — the a0=1e-3 rows carry it
+
+Smoke-checking the resubmitted `ms-scal-1e5-s0` (correctly configured: `--meta-stepsize 1e-5
+--alpha0 1e-6 --stepsize-groups scalar`, `HIER=none`, BETA_CLIP guard, AUGMENT=1) showed 12.8 →
+13.3% over epochs 0–8. That is not a bug, and it matters for the design.
+
+At a0=1e-6 the scalar arm's ONLY step-size moves at `ms`, so its total log-space travel over
+50,000 steps is `ms`·5e4 against the 10.82 needed:
+
+| `ms` | travel | escapes a0=1e-6? |
+|---|---|---|
+| 1e-5 | 0.5 | no |
+| 3e-5 | 1.5 | no |
+| 1e-4 | 5.0 | **no** |
+| 3e-4 | 15.0 | yes |
+| 1e-3 | 50.0 | yes |
+
+But `additive` r=0 layerwise at ms=1e-3 has `ms_eff` = 1.28e-4 for its **shared** component while
+each group's individual component still moves at ±1e-3 (travel 50) — so it escapes and *then*
+behaves like a small effective meta-step. **At a0=1e-6 the two arms are not comparable at
+matched `ms_eff`**: the scalar arm fails to escape where the additive arm does not. A low plateau
+for `ms-scal-1e4` at a0=1e-6 would therefore NOT refute the reparameterisation thesis.
+
+**Consequence for 34.5's pre-registration.** The decisive comparison is the **a0=1e-3** rows
+(`ms-scalA-*`), not the a0=1e-6 rows. At a0=1e-3 the travel needed is ln(0.05/1e-3) = 3.9, so
+ms=1e-4 (travel 5.0) clears it. The a0=1e-6 rows remain useful as the escape-rate curve — they
+are simply a different measurement from the one 34.5 predicts.
+
+**34.5 is hereby amended**: the prediction "plain scalar at ms=1e-4 plateaus at 92.2 ±0.3"
+applies at **a0=1e-3**, against the a0=1e-3 comparison arm `additive` r=0 layerwise
+(92.181 ±0.089, n=5), not against the a0=1e-6 cell. `ms-scalA-*` currently carries n=3 at two ms
+values; it needs the full grid at n=5 — queued next as alice2 drains.
+
+## 35.3 Submitted this cycle
+
+| batch | acct | n jobs | question |
+|---|---|---|---|
+| `ms-scal-*` / `ms-scalA-*` | alice2 | 26 | the m=1 control (34.4); resubmission of the destroyed batch |
+| `ms-lay-*` / `ms-layA-*` | alice2 | 26 | does the plain-layerwise ms curve reach additive r=0.06's plateau? |
+| `ac-*` | alice | 42 | does the interior optimum survive a0=1e-3 at n=5? (35.1) |
+
+Queue after: **alice 77 pending / 11 running, alice2 50 / 2.** All of it answers a named question.
