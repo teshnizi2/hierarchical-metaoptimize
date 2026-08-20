@@ -7107,3 +7107,74 @@ probe dir, no nodewise clip-off run exists, 25 unattributable).
 | `bx-` | alice | 12 | bracket the baseline: lr {2e-3, 5e-3} at n=5 + 3e-3 to n=5, giving a 7-point curve {1e-4 … 1e-2}. No dominance number may be quoted until the argmax is interior |
 
 Queue: **alice 87 pending / 12 running, alice2 113 / 13.** 188 jobs submitted this session.
+
+---
+
+# Cycle 37 — the `ac-` verdict: the interior optimum is 76% an alpha0 artefact
+
+1144 runs aggregated (+58). 20 of 42 `ac-` jobs complete. Analysed under the cycle-36 corrections:
+**completed runs only** (`epochs_done >= epochs_requested`, `collapsed != 1`), **seed-level n**
+(replicates averaged within a seed first — 36.2), plateau = mean of last 20 epochs, and
+**PLAN.md's materiality threshold Δ ≥ 0.5pp** rather than the 0.3pp cycles 34–35 drifted to.
+
+## 37.1 The result
+
+`additive` layerwise r-curve, R18/CIFAR-10, SGDm+Lion, ms=1e-3, 100 ep. k = distinct seeds.
+
+| r | a0=1e-6 | a0=1e-3 |
+|---|---|---|
+| 0 | 92.228 ±0.049 (k=3) | 92.191 ±0.026 (k=5) |
+| 0.03 | 92.637 ±0.164 (k=5) | 92.112 ±0.096 (k=5) |
+| 0.04 | 92.862 ±0.129 (k=5) | — |
+| 0.05 | 93.048 ±0.118 (k=5) | 92.151 ±0.122 (k=5) |
+| **0.06** | **93.239 ±0.138 (k=5)** | 92.161 ±0.016 (k=5) |
+| 0.07 | 93.167 ±0.127 (k=5) | 92.122 ±0.072 (k=5) |
+| **0.1** | 92.626 ±0.215 (k=5) | **92.431 ±0.097 (k=5)** |
+| 0.2 | 91.387 ±0.142 (k=3) | 91.981 ±0.158 (k=5) |
+| 0.3 | 90.957 ±0.079 (k=3) | 91.615 ±0.242 (k=5) |
+| 0.4 | — | 91.344 ±0.132 (k=5) |
+| 1 | 90.863 ±0.063 (k=3) | 91.159 ±0.035 (k=3) |
+
+| contrast | a0=1e-6 | a0=1e-3 |
+|---|---|---|
+| argmax | r = 0.06 | **r = 0.1** |
+| peak vs r=0 | **+1.011pp**, t=14.88, material | **+0.239pp**, t=5.36, **NOT material** |
+| peak vs r=1 | +2.376pp, t=33.14, material | +1.272pp, t=26.72, material |
+
+## 37.2 Verdict against 35.1's pre-registration
+
+35.1 pre-registered: **(a)** the a0=1e-3 curve stays flat over r ∈ [0,0.1] to ±0.3pp ⇒ the
+interior optimum is an escape artefact; **(b)** a ≥0.5pp peak survives ⇒ it is real.
+
+**Branch (a) fires.** Over r ∈ [0, 0.07] the a0=1e-3 curve spans **0.079pp** — four cells inside
+one seed band. The peak-vs-r=0 gain falls from **+1.011pp to +0.239pp: 76% of the effect is
+gone**, and what remains is below the campaign's own materiality threshold. The argmax also
+moves, 0.06 → 0.1, which a real optimum should not do under a change of initialisation.
+
+**The sharp interior optimum at r ≈ 0.05–0.07 is an alpha0=1e-6 escape-rate artefact.** It is
+now measured at k=5 seeds on both sides, with completion and collapse filters applied.
+
+## 37.3 What survives, and what it is not
+
+`r = 0.1` still beats `r = 1` by **+1.272pp (t=26.72)** at a0=1e-3 — material, well-powered, and
+robust to the a0 control. **But this is not a pooling result.** Two established findings forbid
+reading it as one:
+
+* **33.1**: under Lion every realised increment is exactly ±`ms`, so moving r rescales the
+  effective meta-step by |2p−1|. The r-axis *is* a meta-step axis.
+* **CORRECTIONS 21**: `additive` r=0 is not true full pooling — it spans 47.582pp across
+  granularities where true `zpool` r=0 spans 0.032pp.
+
+So the surviving statement is: **performance declines monotonically as the effective meta-step
+rises toward its unpooled value**, which is a statement about meta-step tuning, not about
+hierarchy. Consistent with 34.3's single-peaked `ms_eff` response.
+
+## 37.4 Standing gaps on this axis
+
+* a0=1e-6 at r = 0, 0.2, 0.3, 1 is **k=3**; needs k=5 for symmetry with the a0=1e-3 side.
+* a0=1e-3 at r = 0.02 / 0.04 / 0.08 / 0.15 is still in flight (22 of 42 `ac-` jobs outstanding).
+  **Their current CSV rows are partials at 27–65 of 100 epochs and must not be read** — the same
+  trap that produced the withdrawn 35.4 ResNet34 "chasm" (36.8). They are excluded here by the
+  completion filter and will be re-read on completion.
+* Nothing here addresses the `beta_clip` confound (36.3): both curves are measured on a clipped
+  process, and the guard binds in 100% of layerwise arms. `fz-` and `clp-` are the arms for that.
