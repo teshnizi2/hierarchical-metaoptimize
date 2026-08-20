@@ -7178,3 +7178,131 @@ hierarchy. Consistent with 34.3's single-peaked `ms_eff` response.
   completion filter and will be re-read on completion.
 * Nothing here addresses the `beta_clip` confound (36.3): both curves are measured on a clipped
   process, and the guard binds in 100% of layerwise arms. `fz-` and `clp-` are the arms for that.
+
+---
+
+# CYCLE 38 (2026-08-20) — the pre-registered meta-step control fires: granularity contributes 0.04pp
+
+Collection cycle. **No jobs submitted** (see 38.6). All numbers below re-derived this cycle from
+`results/all_runs.csv` (1192 rows, +47 since c37), completed rows only (`epochs_done ==
+epochs_requested`), `collapsed=0`, `superseded!=1`, metric = `plateau`.
+
+## 38.1 THE DECISIVE RESULT — tuning the meta-step makes plain SCALAR match the best hierarchical arm
+
+SGDm+Lion, ResNet18, CIFAR-10, 100 ep, AUGMENT=1, **alpha0=1e-3 throughout** (no escape confound):
+
+| arm | granularity | ms | n | plateau |
+|---|---|---|---|---|
+| plain scalar | scalar | 1e-3 | 5 | 87.577 ±0.218 |
+| **plain scalar, meta-step tuned** | **scalar** | **1e-4** | **2** | **92.405 ±0.071** |
+| plain layerwise | layerwise | 1e-3 | 5 | 91.093 ±0.220 |
+| `additive` r=0 | layerwise | 1e-3 | 2 | 92.203 ±0.041 |
+| `additive` r=0.1 (best r on the curve) | layerwise | 1e-3 | 3 | 92.449 ±0.192 |
+
+**Cycle 33 pre-registered:** "`scalar` at ms=1e-4 lands 92.2–92.6 ⇒ the whole M0/M1 family is
+meta-LR tuning and granularity contributes nothing. Staying near 87.8 saves the pooling arms."
+
+**Measured: 92.405 — inside [92.2, 92.6]. The branch fires against granularity.**
+
+* tuned scalar vs the **best** hierarchical arm: **Δ = 0.044pp**, well inside one seed sd (±0.19).
+* tuned scalar vs plain layerwise: **scalar WINS by 1.312pp**.
+* the entire scalar→layerwise "granularity gain" at a0=1e-3 (87.577 → 92.449 = +4.87pp) is
+  reproduced to within 0.04pp by changing one scalar hyperparameter, `ms` 1e-3 → 1e-4.
+
+Read with 33.1 (M1's `r` rescales the effective meta-step by |2p−1| ≈ 0.097, i.e. ms=1e-3 →
+~1e-4) this is now a closed loop: **the hierarchy's only measured contribution is that it
+divides the meta-step by ~10.** Doing that directly, with one group, is equal or better.
+
+**Status: n=2 on the decisive cell.** `ms-scalA-1e4-s2` is at 89/100 (partial, NOT read — 36.8
+trap). Needs n=5 before this is stated as final.
+
+## 38.2 The cell that could still rescue granularity is queued, not yet run
+
+`ms-layA-1e4` — **layerwise** at the tuned ms=1e-4 with a0=1e-3 — is the matched counterpart.
+If it lands materially above 92.405 the hierarchy earns back a contribution at its own tuned
+meta-step; if it lands level, 38.1 is the whole story. 3 seeds PENDING on alice2. **This is now
+the single most informative outstanding job in the campaign.**
+
+## 38.3 The alpha0=1e-6 escape confound, quantified: 51pp
+
+`ms-scal` is now **n=5 complete at every cell** (a0=1e-6):
+
+| ms | n | plateau |
+|---|---|---|
+| 1e-5 | 5 | 19.097 ±1.658 |
+| 3e-5 | 5 | 21.848 ±0.818 |
+| 1e-4 | 5 | 41.368 ±0.847 |
+| 3e-4 | 5 | 87.491 ±0.223 |
+| 1e-3 | 12 | 87.772 (established) |
+
+The same ms=1e-4 cell scores **41.368 at a0=1e-6 and 92.405 at a0=1e-3 — a 51.04pp gap from
+initialisation alone.** Standing Rule 5 now has a number: on the ms axis, a0=1e-6 does not
+merely cost 14–25 startup epochs, it *inverts the shape of the curve* (monotone-collapsing at
+a0=1e-6, single-peaked at a0=1e-3). **No ms-axis claim may be read off a0=1e-6 runs.**
+
+## 38.4 The tuned baseline's win holds across architecture — R34 now n=3
+
+CIFAR-10, 100 ep, AUGMENT=1, plateau. Baseline = non-meta AdamW + cosine (`COS_TOTAL=50000,
+COS_WARMUP=2500`), lr=1e-3. Method = best SGDm+Lion arm at that architecture.
+
+| net | tuned AdamW+cosine | best SGDm+Lion arm | deficit |
+|---|---|---|---|
+| ResNet18 | 94.093 ±0.036 (n=3) | 93.306 ±0.140 (n=3) `sc-ResNet18-add` | **0.787** |
+| ResNet34 | **94.674 ±0.026 (n=3)** | 93.930 ±0.143 (n=3) `r34f-r0025` | **0.744** |
+| ResNet50 | 94.970 (n=1) | 92.634 ±0.222 (n=2) `sc50-1e3-add` | 2.336 |
+
+* **ResNet34 is new this cycle at n=3 on both sides.** The deficit is stable at 0.74–0.79pp
+  across a 1.9x parameter range — it is not a ResNet18 artefact, and it does not close at scale.
+* ResNet50 is **n=1 on the baseline; do not state it.** `f5cos-r50-*` s1/s2 are running now.
+* lr=1e-3 beats lr=3e-4 at **all three** architectures, so the baseline's single tuned LR
+  transfers across a 4.8x parameter range. This weakens the "MetaOptimize is tuning-free and
+  that is worth the deficit" defence: the tuning being avoided is one number, found once.
+
+## 38.5 The LR grid is no longer censored — the baseline peak is bracketed
+
+Cycle 36 objected that the baseline's 94.093 sat at the **right edge** of the searched grid
+{1e-4, 3e-4, 1e-3} and was therefore grid-censored. `bl-adw-1e-2` lands and closes it:
+
+| cosine lr | n | plateau |
+|---|---|---|
+| 1e-4 | 3 | 92.851 ±0.239 |
+| 3e-4 | 3 | 94.062 ±0.043 |
+| **1e-3** | 3 | **94.093 ±0.036** |
+| 1e-2 | 4 | 92.728 ±0.196 |
+
+**1e-3 is an interior maximum.** Across a 100x LR span the baseline's worst cell is 92.728.
+The best matched-a0 (1e-3) meta arm is 92.449 — so **a 10x-mistuned cosine still beats the best
+matched MetaOptimize arm by 0.28pp**, and the a0=1e-6 meta arm (93.306) beats a 10x-mistuned
+cosine by at most 0.58pp. `bx-2e-3/3e-3/5e-3` are in flight to fill 1e-3 → 1e-2.
+
+## 38.6 Queue and ops — NOTHING SUBMITTED THIS CYCLE, deliberately
+
+| | alice1 | alice2 |
+|---|---|---|
+| FairShare | **0.3356** | **0.3381** |
+| PENDING | 59 | 94 |
+| RUNNING | 12 | 13 |
+
+Both accounts are **below the 0.35 FairShare floor** and **above the 40-pending cap**, so the
+standing rule is submit nothing and let usage decay. 93 of alice2's 94 pending are blocked on
+`QOSMaxGRESPerUser` — we are **GPU-cap-bound, not priority-bound**, so adding jobs could not
+have started anything sooner. Every open question in 38.1–38.5 already has its deciding cell
+in the queue.
+
+**Priority inversion noted and deliberately NOT corrected.** The LR sweep (`bl-*`, `bx-*`,
+`fxcos-*`, prio ~1.07M) runs ahead of `bg300`/`bg600` (prio 669k), inverting the campaign's
+written 1-2-3 order. That order predates 36.1. Now that a tuned baseline *beats* the method,
+the sweep — which decides whether that win requires tuning — is the decisive line, and
+`bg300/bg600` (does the deficit close at 300/600 epochs?) is downstream of it. Cancel-and-
+resubmit to promote `bg` would have cost the sweep its place for no scientific gain.
+
+## 38.7 Data-quality notes
+
+* The aggregator parks the **cosine LR in the `alpha0` column** for non-meta baseline runs
+  (`fxcos`/`f5cos`/`bl-`/`bx-`), and leaves `granularity`/`meta` as `?`. Not a bug, but any
+  filter on `alpha0` silently mixes baselines into meta cells. Filter on `meta != '?'` first.
+* `a0-scal-1e3` (92.684) and `a0-layer-1e3` (90.826) are **AdamW+Adam**, not SGDm+Lion, despite
+  sitting in the same name family as the SGDm+Lion `a0A-/a0L-/a0h-` cells. Checked this cycle
+  after they appeared to contradict the ~87.8 scalar plateau; they do not. The correct SGDm+Lion
+  comparators are `mx-a1e3-scal` (87.577, n=5) and `mx-a1e3-layer` (91.093, n=5).
+* Re-aggregation recovered **0 lost runs** (old ∖ new = ∅); 1145 → 1192 rows.
