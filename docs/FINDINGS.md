@@ -6292,3 +6292,161 @@ front instead of sitting at rank 110+.
   nice-0 submission (prio 670575 on alice) ranks *below* month-old nice-400 jobs that have
   accrued age. Promotion by `scontrol update Nice=` cannot raise priority; the only lever for
   an old low-priority batch is cancel-and-resubmit, which is what `zrn-*` → `zp-*` did.
+
+---
+
+# Cycle 34 — no-submit cycle (fair-share gate); the granularity axis measured as an effective-meta-step axis
+
+**Gate status at cycle open.** alice FairShare **0.337248** (RawUsage 17.42M), 39 pending / 8
+running. alice2 FairShare **0.339765** (RawUsage 15.89M), 159 pending / 12 running. Both below
+the 0.35 floor; alice also at the ~40-pending cap. **Zero jobs submitted this cycle.** No jobs
+cancelled either — nothing in either queue was submitted by this session.
+
+Aggregation: alice1 643 runs, alice2 443 runs, `results/all_runs.csv` = **1086** rows (+11 vs
+cycle 33). All 11 are in-flight partials (`f5cos-r34`, `kb-c100-r05`, `r34f-*`); **no new
+completed runs since cycle 33.** This cycle is therefore analysis + damage control.
+
+## 34.1 THE CYCLE-33 DECISIVE BATCH WAS DESTROYED 19 MINUTES AFTER SUBMISSION
+
+`ms-scal-*` (20) + `ms-scalA-*` (6) — the pre-registered meta-stepsize sweep that 33.6 called
+"the campaign's largest open confound" — submitted **2026-08-20T11:58:18**, cancelled
+**2026-08-20T12:17:43**, `Elapsed 00:00:00`. They never ran.
+
+The 12:17:43 event cancelled **86 alice jobs** at one instant:
+
+| family | n | what was lost |
+|---|---|---|
+| `ms-scal-*`, `ms-scalA-*` | 26 | the decisive meta-stepsize sweep (33.8 pre-registration) |
+| `kc-r18-*` | 21 | R18 additive r-curve |
+| `sc50-*` | 18 | pending seeds of the ResNet50 scale rung |
+| `r34r-*` | 9 | R34 r-curve |
+| `fc100-cos-*` | 9 | CIFAR-100 non-meta baseline — **promoted to Nice=200 by `c32_trim.sh` 
+  as "axis 4 on the second dataset, currently zero coverage"**, then cancelled |
+| `p7-*` stragglers | 3 | a **PROTECTED** prefix |
+
+**Mechanism — PROTECTED.txt is a comment file.** Only `bin/safe_trim.sh` reads it. `safe_trim.sh`
+would have refused all 86: its rule 2 (never cancel at Nice < 1000) protects fresh nice-0
+submissions, and its rule 1 honours the prefix list. The 12:17:43 sweep was a bare `scancel`
+over a JobID range, which consults neither. This is the **third** repeat of the same failure
+(cycle 29 → cycle 30 "our own trim destroyed cycle 29's decisive batches"; the 08:33:15 sweep;
+now 12:17:43). Writing the guard did not stop it because nothing forces its use.
+
+**Actions taken (no GPU cost).** `ms-`, `zp-`, `fc100-cos-` appended to `bin/PROTECTED.txt` on
+alice; `ms-`, `zp-` on alice2. `bin/c33_ms.sh` is intact and ready to fire unchanged.
+**`bash bin/c33_ms.sh` is the first command of cycle 35**, ahead of any other submission.
+
+Surviving half: alice2's `ms-lay-*` / `ms-layA-*` (26 jobs) are all PENDING and intact. Without
+the scalar arm the comparison is unanswerable — `ms-lay` alone gives the layerwise ms response
+curve but not the m=1 control that separates granularity from meta-LR.
+
+## 34.2 |2p−1| measured per granularity — 33.4's assertion quantified
+
+33.4 asserted "\|2p−1\| falls with m" from the algebra. Measured, from the `p7` STEADY window
+(`results/p7_c31.txt`, ResNet18 / CIFAR-10), `p` = `step%` (per-step cross-group sign agreement):
+
+| granularity | m | `step%` (n seeds) | null% | \|2p−1\| | `ms_eff` = 1e-3·\|2p−1\| |
+|---|---|---|---|---|---|
+| `resnet18_blocks` | 6 | 69.7333 (10) | 66.2868 | 0.394667 | 3.947e-4 |
+| `layerwise` | 62 | 56.3871 (3) | 55.0666 | 0.127742 | 1.277e-4 |
+| `nodewise` | 14,420 | 50.7600 (3) | 50.3322 | 0.015200 | 1.520e-5 |
+| `weightwise` | 11,173,962 | 50.0165 (3) | 50.0119 | 0.000331 | 3.307e-7 |
+
+Strictly monotone over **six decades of m**. 33.1 quoted \|2p−1\| = 0.0968 for layerwise from
+`runs/zb`'s `frac_neg`; the `p7` steady `step%` gives **0.1277**. Both ≈1e-4 effective; the
+33.1 headline ("10.3× reduction") becomes **7.8×** on the `p7` scale. Minor, but quote the
+scale with the number — 28.2 and 31.8 both bit on exactly this.
+
+## 34.3 The granularity axis traces a single-peaked curve in effective meta-step-size
+
+Re-derived from `all_runs.csv` under one tight filter (ResNet18 / CIFAR-10 / a0=1e-6 / SGDm+Lion
+/ augment=1 / 100 ep / ms=1e-3 / not superseded), plateau metric:
+
+| arm | m | `ms_eff` | plateau | n |
+|---|---|---|---|---|
+| plain `scalar` (native, no pooling) | 1 | 1.000e-3 | 87.772 ±0.139 | 12 |
+| `additive` r=0 `resnet18_blocks` | 6 | 3.947e-4 | 91.730 ±0.071 | 3 |
+| `additive` r=0 `layerwise` | 62 | 1.277e-4 | **92.228 ±0.087** | 6 |
+| `additive` r=0 `nodewise` | 14,420 | 1.520e-5 | 91.984 ±0.103 | 3 |
+| `additive` r=0 `weightwise` | 11,173,962 | 3.307e-7 | 45.005 ±2.603 | 3 |
+
+Ordered by `ms_eff` the five points are **unimodal**: 87.772 → 91.730 → 92.228 → 91.984 →
+45.005, peak at `ms_eff` ≈ 1.3e-4. Five arms that differ **only in the partition** lie on one
+smooth meta-step response curve. This is what 33.1 predicts.
+
+**REVISION of 33.4.** Its layerwise cell read 92.587 ±0.674 (n=8). Under the tight filter the
+cell is **92.228 ±0.087 (n=6)** — the ±0.674 was heterogeneous pooling, not seed noise. The
+33.4 blk6 cell (91.767, n=2) becomes 91.730 ±0.071 (n=3). Directions unchanged.
+
+## 34.4 The collapse is CONSISTENT WITH 33.1 but cannot decide it — and why
+
+Within a fixed (architecture, dataset), \|2p−1\| is **monotone in m** (34.2). So `ms_eff` and
+granularity are **rank-identical**, and 34.3's curve is equally consistent with "granularity
+is a reparameterisation of meta-LR" (33.1) and with "granularity genuinely helps, and agreement
+happens to co-vary". Observational data cannot separate them.
+
+Trying to break the tie with the architecture axis fails too: across R10/R18/R34 layerwise,
+m = 38 / 62 / 110 against `ms_eff` = 1.789e-4 / 1.277e-4 / 1.064e-4 — still anti-correlated.
+The near-matched pairs that *do* decouple m from `ms_eff` (`r18-node` m=14,420 `ms_eff`=1.52e-5
+vs `c100-node` m=14,600 `ms_eff`=3.478e-5; `r18-lay` vs `c100-lay`, both m=62, `ms_eff` 1.49×
+apart) are **cross-dataset**, so their plateaus are not comparable.
+
+**Only the direct ms sweep at m=1 decides it.** `ms-scal-*` is the campaign's highest-value
+pending experiment, and it is the one that was destroyed.
+
+## 34.5 Sharpened pre-registration for `ms-scal-*` (replaces 33.8's estimate)
+
+33.8 pre-registered "scalar at ms=1e-4 lands 92.2–92.6" as a judgement call. 34.3 derives it:
+interpolating the curve at `ms_eff` = 1e-4 gives
+
+> **PREDICTED: plain `scalar` (m=1, no hierarchy of any kind) at `--meta-stepsize 1e-4`
+> plateaus at 92.2 ± 0.3** — statistically indistinguishable from `additive` r=0 layerwise
+> (92.228 ±0.087) and **above** plain layerwise (90.784 ±0.169, n=17).
+
+If it lands there, granularity contributes nothing beyond the effective meta-step it induces,
+and the M0/M1 positive result is meta-LR tuning. If it stays near 87.8, granularity does
+something a meta-LR change cannot. The prediction is now quantitative and falsifiable at n=5.
+
+## 34.6 REFUTED — the weightwise collapse is not explained by shared-term travel
+
+A tempting sentence for the paper: "at `weightwise`, `additive` r=0's shared step size advances
+at `ms`·\|2p−1\| = 3.3e-7, so over 50,000 steps β travels 0.017 in log-space against the
+ln(0.05/1e-6) = **10.82** it needs to escape a0=1e-6 — hence 45.005." The arithmetic, with the
+startup window weighted in (`p7` STARTUP `step%`, first 20% of records):
+
+| granularity | steady \|2p−1\| | startup \|2p−1\| | β travel (mixed) | ≥ 10.82? | plateau |
+|---|---|---|---|---|---|
+| `resnet18_blocks` | 0.394667 | 0.501666 | 20.80 | yes | 91.730 |
+| `layerwise` | 0.127742 | 0.336099 | 8.47 | marginal | 92.228 |
+| `nodewise` | 0.015200 | 0.070630 | **1.31** | **no** | **91.984** |
+| `weightwise` | 0.000331 | 0.003500 | 0.05 | no | 45.005 |
+
+It predicts blk6 escapes and weightwise does not — both correct — and predicts **nodewise
+cannot escape**, when nodewise plateaus at 91.984. **The model is refuted.** The reason is
+33.4's own result: `additive` r=0 is not exact full pooling (it spans 47.58pp across
+granularities where true `zpool` r=0 spans 0.032pp). Its pooled term is an **offset**; each
+group's individual component still moves at ±`ms` per step and can escape on its own.
+Weightwise fails not because the shared term is slow but because at 50.0165% vs a 50.0119%
+null each group's own meta-gradient is indistinguishable from noise, so its β random-walks
+(RMS 1e-3·√5e4 = 0.22) instead of drifting.
+
+**No shared-term-travel sentence may be written to explain the weightwise collapse.**
+CORRECTIONS 22.
+
+## 34.7 Operations
+
+* Both accounts remain capped at 12 concurrent jobs on `gpu-short`; 33.9's finding that the
+  long-partition QOS pools are unreachable is unchanged. 24 concurrent jobs across both.
+* GPUs are **not** idle during this no-submit cycle: 20 running, 198 pending across the two
+  accounts. Queue depth is sufficient to absorb every freed slot without new submissions, so
+  the fair-share hold costs no throughput.
+* Provisional, **do not quote**: in-flight `r34f-*` (R34 layerwise additive) shows a sharp
+  instability boundary — r=0.0005 → plateau 93.109 at 72 ep, r=0.001 → 67–72 at ~35 ep,
+  r=0.0015 → 46.9 at 27 ep, r=0.0025 → chance at 1–2 ep. Mid-flight plateaus at different
+  epoch counts are not comparable; wait for completion.
+
+## 34.8 Cycle 35 opening order
+
+1. `bash bin/c33_ms.sh` on alice — resubmit the destroyed 26 (unchanged, already protected).
+2. Verify `ms-lay-*` on alice2 is still PENDING and still in `PROTECTED.txt`.
+3. Only then consider anything else, and only if FairShare ≥ 0.35.
+4. **Never trim with bare `scancel`. `bash bin/safe_trim.sh <n>` (dry run first) or nothing.**

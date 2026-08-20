@@ -653,3 +653,38 @@ the second checked it with a statistic that could not fail; this one checked **o
 two** and inferred the other from algebra that was locally correct. The general lesson: verify
 a dial at *both* extremes, and for an invariance claim, vary the thing the invariance is over —
 here, the granularity.
+
+---
+
+## 22. The `weightwise` `additive` r=0 collapse is NOT explained by shared-term travel (cycle 34)
+
+**The tempting sentence.** "At `weightwise`, `additive` r=0's shared step size advances at
+`ms`·|2p−1| = 3.307e-7, so over 50,000 steps β travels 0.017 in log-space against the
+ln(0.05/1e-6) = 10.82 it needs to escape a0=1e-6 — hence the 45.005 plateau."
+
+**Why it is wrong.** The same arithmetic, run across the granularity ladder (FINDINGS 34.6,
+startup window weighted in), predicts `nodewise` cannot escape either — β travel **1.31** vs
+10.82 required — when `nodewise` plateaus at **91.984 ±0.103 (n=3)**. The model is refuted by
+a case it gets backwards, not by a marginal one.
+
+**What is actually going on.** CORRECTIONS 21 / FINDINGS 33.4 already established that
+`additive` r=0 is **not** exact full pooling: it spans 47.582pp across granularities where true
+`zpool` r=0 spans 0.032pp. Its pooled term is an **offset added to** each group's own update,
+not a constraint replacing it. Every group's individual component still moves at ±`ms` per step
+(travel 50 over a 100-epoch run) and can escape on its own. `weightwise` fails for a different
+reason: at `step%` = 50.0165 against a 50.0119 null, each group's own meta-gradient is
+statistically indistinguishable from noise, so β **random-walks** (RMS 1e-3·√5e4 = 0.22)
+instead of drifting.
+
+**Effect on the claims.**
+
+| claim | status |
+|---|---|
+| `weightwise` `additive` r=0 = 45.005, "β cannot escape a0=1e-6" | **the number stands; the shared-term-travel explanation is REFUTED** |
+| FINDINGS 33.4 "|2p−1| falls with m, so `additive` r=0 shrinks the meta-step further at finer partitions until β cannot escape" | **first clause verified (34.2), second clause REFUTED as the mechanism** |
+| FINDINGS 34.3's `ms_eff` collapse curve | **stands** — it is a statement about where the five arms land, not about why weightwise dies |
+
+**Process note (Rule 4 again).** The refuted model was checked at both *ends* of the ladder
+(blk6 escapes ✓, weightwise does not ✓) and passed. It failed only at an **interior** rung.
+Verifying a monotone mechanism at its two extremes is not verification — the interior is where
+a wrong monotone story shows itself.
