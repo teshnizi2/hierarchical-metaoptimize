@@ -5420,9 +5420,15 @@ still right, and this cycle measured the mechanism.
 * **12 of alice's top-25 backfill slots were `bg300`/`bg600` at 8:30:00 and 13:30:00** —
   jobs far too long to fit any backfill gap, occupying half the window permanently while
   the 20-epoch probes that *can* fit sat at Nice=5000–40000, far below it.
-  **Fixed: 90 short (≤3:50) jobs on alice and 39 on alice2 renamed to Nice=0.** The top of
-  both queues is now entirely ≤3:50:00. `bg*` left at Nice=400 — demoted within the window,
-  not demoted absolutely, since they still need main-scheduler position.
+  **Fixed: 90 short (≤3:50) jobs on alice and 39 on alice2 reniced to Nice=0**, then `cw`/`kc`
+  to 1000 so the 16 `p7`/`p8` probes take the front. alice's top-25 is now 16 x 1:30:00
+  probes + 9 `bg*`; alice2's is 25 x 3:50:00.
+  **The two schedulers want opposite things and `bg*` is NOT simply dead weight.** Backfill
+  wants short jobs in the top 25; the main scheduler wants our long jobs holding position on
+  the four long partitions, which is the ONLY route to the 30 cap slots we never use
+  (L4 8 + 2080ti 12 + MIG 8 + A100 2, all at 0 running). Demoting `bg*` would forfeit that.
+  They are left at Nice=400 deliberately: behind the probes inside the window, still ahead of
+  everything else for the main scheduler.
 * **Priority decomposition** (`sprio`): partition 400000, fairshare 270697, age ~917,
   **QOS 0**. `PriorityWeightQOS=1000000` is a full million points we never collect —
   every job runs at `QOS=normal` and the partition QOS is applied at schedule time.
