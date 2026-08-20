@@ -5640,3 +5640,182 @@ on alice and Nice 0 on alice2, with 103 alice2 jobs demoted 0 → 300 to clear t
 * `r34r` r ∈ {0.05, 0.08, 0.1, 0.2} landed truncated (11–95 of 100 epochs) and is **excluded**
   from 30.1; resubmissions are pending.
 * Everything still open from 28.8 remains open: `cw`, `kc`, `bo`, `gp`, `ap`, `ag`.
+
+---
+
+# Cycle 31 — 20 Aug 2026
+
+Landed since cycle 30: **35 runs** (986 total, 957 complete). `p8-*` (14 probes, both m=6
+cells to n=10), `r34r-r1` + the `r34r` r∈{0.05,0.08,0.1} resubmissions (the R34 r-curve is
+now complete), `gp-w-*` and `kb-*` still running. Re-aggregated:
+`results/agg_alice1.c31.csv` (573 runs) + `results/agg_alice2.c31.csv` (413) →
+`results/all_runs.csv` (986). Probes re-reduced to `results/p7_c31.txt`.
+
+## 31.1 29.2 RESOLVED at n=10 — the contrast is REAL, HALF the size, and its stated mechanism is REFUTED
+
+`p8-*` took both m=6 cells from n=3 to n=10. Identical architecture, identical 6-block
+partition, identical config; only the dataset changes. Welch, unpooled:
+
+| statistic | CIFAR-10 (n=10) | CIFAR-100 (n=10) | diff | se | t | df | p |
+|---|---|---|---|---|---|---|---|
+| step−null excess | +3.447 ± 1.917 | +1.013 ± 2.039 | +2.433 | 0.885 | 2.75 | 17.9 | **0.013** |
+| sys% (one-signedness) | 66.467 ± 3.112 | 60.500 ± 2.162 | +5.967 | 1.198 | 4.98 | 16.1 | **1.4e-4** |
+| drift/step | 4.5424e-4 ± 1.28e-5 | 2.9267e-4 ± 1.31e-5 | +1.616e-4 | 5.79e-6 | **27.9** | 18.0 | **2.9e-16** |
+| sd_beta | 2.254 ± 0.104 | 2.090 ± 0.008 | +0.164 | 0.033 | 4.96 | 9.1 | 7.6e-4 |
+
+**Three things follow, and the third contradicts 29.2.**
+
+1. **The dataset effect on the meta-gradient is real** and is cleanest in the *systematic*
+   statistic (p=1.4e-4) and in **drift/step (t=27.9)**, not in the per-step excess that
+   29.2 was written on. Prefer `sys%` and `drift` for dataset claims; the per-step excess
+   carries a 2pp seed sd at m=6 and needs n≈10 to see a 2.4pp effect.
+2. **The n=3 estimate was inflated 2.0x.** 29.2 measured +4.889; at n=10 it is **+2.433**.
+   The n=3 cells happened to draw C10's high seeds and C100's low ones. This is the second
+   time a cycle-scale claim shrank on replication (cf. CORRECTIONS 3). **Treat any n=3
+   effect size in this campaign as an upper bound.**
+3. **REFUTED: "CIFAR-100 sits at or below the independence null at m=6".** At n=10 it is
+   **+1.013**, positive, with 2 of 10 seeds negative (−1.2868, −2.9534 — both from the
+   original n=3 draw). C100's m=6 rung is *lower* than C10's, not *null*. 29.2's headline
+   sentence must not be used.
+
+## 31.2 THE PAPER CORE REPLICATES ON A SECOND DATASET — and the local slopes are data-dependent
+
+Same probes, STEADY window, ResNet18 body on both datasets, m spanning 6 → 11.2M (6.3 decades).
+
+| dataset | m=6 | m=62 | m≈14.5k | m≈11.2M | fit d log10(drift)/d log10(m) | R² |
+|---|---|---|---|---|---|---|
+| CIFAR-10 (n=10/3/3/3) | 4.5424e-4 | 2.1247e-4 | 8.8280e-5 | 5.5573e-5 | **−0.1393** | 0.919 |
+| CIFAR-100 (n=10/2/2/1) | 2.9267e-4 | 2.5505e-4 | 8.9350e-5 | 7.1400e-5 | **−0.1061** | 0.902 |
+
+**The sqrt(N) noise model predicts −0.500 on both.** It is refuted on CIFAR-100 by the same
+margin as on CIFAR-10 (−0.106 and −0.139 vs −0.500). The campaign's headline is no longer a
+one-dataset result. Adding 30.2's three-architecture CIFAR-10 fit (−0.1228, n=10 cells), the
+refutation now holds across **3 architectures × 2 datasets × 6.3 decades of m**.
+
+Local slopes, however, are **not** the same function of m on the two datasets:
+
+| rung → rung | CIFAR-10 | CIFAR-100 |
+|---|---|---|
+| 6 → 62 | **−0.3254** | **−0.0589** |
+| 62 → ~14.5k | −0.1612 | −0.1920 |
+| ~14.5k → ~11.2M | −0.0696 | −0.0338 |
+
+C10 loses 53% of its drift going from 6 groups to 62; C100 loses 13%. The coarse end of the
+ladder is where the datasets differ, which is the same place 31.1's contrast lives. Consistent
+with 30.3: this is a curve, not a power law, and now demonstrably not a *universal* curve
+either. **Caveat: C100's m=62 and nodewise rungs are n=2 and weightwise is n=1** — `p9-*`
+(31.5) takes the whole ladder to n=10 on both datasets before any of this is stated as final.
+
+## 31.3 The ResNet34 r-curve is COMPLETE — the interior optimum survives to 21.3M parameters
+
+`r34r`, one family (Rule 5), CIFAR-10 / ResNet34 / layerwise m=110 / SGDm+Lion / a0=1e-6 /
+100 epochs, **complete runs only** (`wallclock_min` present and `epochs_done==100`), plateau:
+
+| r | n | plateau | sd |
+|---|---|---|---|
+| 0 (full pooling) | 3 | 93.098 | 0.072 |
+| **0.02** | 3 | **93.884** | 0.194 |
+| 0.03 | 3 | 93.813 | 0.100 |
+| 0.04 | 3 | 93.365 | 0.151 |
+| 0.05 | 3 | 93.015 | 0.185 |
+| 0.08 | 3 | 92.301 | 0.272 |
+| 0.1 | 3 | 91.722 | 0.430 |
+| 0.2 | 2 | 90.653 | 0.077 |
+| 1 (plain layerwise) | — | still running (85–87/100 ep) | |
+
+Interior optimum at r=0.02, **+0.786pp over full pooling** against a pooled sd of ~0.16 —
+about 5x the noise and ~40x the ±0.02pp reproducibility floor. Monotone decline for r>0.03.
+Cycle 30's exclusion of the truncated r∈{0.05,0.08,0.1} cells is now moot: the resubmissions
+completed 100/100 and reproduce the same monotone tail.
+
+## 31.4 MODEL SCALE — the granularity ORDERING flips with model size; the pooling gain does NOT vanish
+
+All CIFAR-10 / SGDm+Lion / layerwise / a0=1e-6 / 100 epochs, **each row one job family**
+(r=0 is maximal pooling, r=1 is the verified plain-layerwise identity — see cycle-14 §3):
+
+| net | params | m | family | r=0 (full pool) | r\* | plateau(r\*) | r=1 (plain layerwise) | r\*·m |
+|---|---|---|---|---|---|---|---|---|
+| ResNet10 | 4.90M | 38 | `r10` | 82.114 | 0.10 | **91.590** | 90.586 | 3.80 |
+| ResNet18 | 11.17M | 62 | `zad` | 92.256 | 0.07 | **93.171** | 90.863 | 4.34 |
+| ResNet18 | 11.17M | 62 | `ad` | 92.200 | 0.07 | **93.218** | — | 4.34 |
+| ResNet34 | 21.28M | 110 | `r34r` | 93.098 | 0.02 | **93.884** | pending | 2.20 |
+
+**(a) The endpoint ordering INVERTS between ResNet10 and ResNet18.**
+
+| net | r=1 (plain) − r=0 (pooled) |
+|---|---|
+| ResNet10 | **+8.472** — finer granularity wins by a mile |
+| ResNet18 | **−1.393** — pooling wins |
+| ResNet34 | −3.2 (provisional, r=1 truncated at 85–87 ep) |
+
+This is the parent paper's premise — *granularity stops helping at scale* — **reproduced on
+CIFAR-10 by changing model size alone**, at fixed dataset, optimizer, budget and partition
+rule. It is the cleanest support for the premise the campaign has produced, and it arrives
+without needing ImageNet.
+
+**(b) The method's gain over the BETTER endpoint declines only mildly, and does not vanish:**
+
+| net | params | better endpoint | interior optimum | gain |
+|---|---|---|---|---|
+| ResNet10 | 4.90M | 90.586 (r=1) | 91.590 | **+1.004** |
+| ResNet18 | 11.17M | 92.256 (r=0) | 93.171 | **+0.915** |
+| ResNet34 | 21.28M | 93.098 (r=0) | 93.884 | **+0.786** |
+
+A 4.3x parameter increase costs the method 0.22pp of its 1.00pp gain. **The headline is not
+"granularity helps"; it is "the OPTIMAL AMOUNT of granularity is interior at every scale, and
+which endpoint it beats changes with scale."**
+
+**(c) `r*·m` is NOT scale-invariant and is NOT monotone**: 3.80 → 4.34 → 2.20. Cycle 30.6's
+pre-registration ("r\*·m keeps DECLINING with scale") is **already inconsistent with its own
+R10→R18 leg**, which rises. `r34f-*` (r ∈ {0.005,0.01,0.015,0.025}, pending, nice 0) resolves
+whether R34's r\* is below the current 0.02 grid point; until it lands, 2.20 is an upper bound
+on r\*·m for R34 and the non-monotonicity could be a grid artefact at either end.
+
+## 31.5 Submitted this cycle — 46 jobs, one batch, one question
+
+| batch | n | account | nice | what | open question |
+|---|---|---|---|---|---|
+| `p9-*` (written as `p7-{r18,c100}-{lay,node,w}-s*`) | 46 | alice | 0 | the ENTIRE ResNet18 agreement/drift ladder to n=10 on BOTH datasets, 4 granularities | 31.2's C100 rungs are n=1–2; 31.1 showed n=3 inflates effects 2x |
+
+Cheapest decisive jobs on the board: 20-epoch probes, `--time=01:30:00`, ~15 min each,
+`--alpha0 1e-3` (matching `p7`, so Rule 5 holds against the existing s0–s2 cells). Written
+into `runs/p7free/` with the `p7-` prefix so `bin/agree2.py runs/p7free/p7-*` picks them up
+unchanged. Script: `bin/c31_p9.sh`.
+
+**Nothing else was submitted.** All 24 running slots on both accounts were already occupied by
+decisive work (alice: `kb-*` a0=1e-3 M1 r-curve on both datasets, `r34r-r1`, `r34r-r02-s2`;
+alice2: the full `gp-w-*` weightwise r-curve), and the pre-registered `r34f-*` sits at nice 0
+at the front of alice2. Adding a second batch would have queued behind, not beside, the work
+that answers the open questions.
+
+## 31.6 Operations — the cluster is GPU-bound, not queue-bound
+
+`sinfo` at submit time: **every GPU on `gpu-l4-24g`, `gpu-2080ti-11g`, `gpu-mig-40g` and
+`gpu-a100-80g` is allocated** (GRES_USED == GRES on every non-drained node). Our 152/222
+pending jobs on those partitions are behind `Reason=Priority` against a full cluster, not
+behind our own cap. The only slots we actually get are the **12 `gpu-short` jobs per account**,
+and both accounts were at 12/12 all cycle. Fair-share is 0.338 (was 0.42 at cycle 29).
+
+Consequence for the queue-depth rule: **depth is not the lever here, ordering is.** Submitting
+more cannot raise throughput above 24 concurrent jobs; it can only push decisive work back.
+This cycle therefore added the single cheapest decisive batch (46 × 15 min ≈ 11.5 GPU-hours,
+which clears in ~1 h of wall-clock at 12 slots) and cancelled nothing, because nothing dead was
+running. Queue after: **alice 198 pending / 12 running, alice2 210 / 12.**
+
+## 31.7 Still open
+
+* `p9-*` — submitted this cycle, nothing landed. **31.2's C100 slope is n=2/n=1 at three of
+  four rungs until it does.**
+* `r34f-*` — pending at nice 0 on alice2. 31.4(c) cannot be stated until it lands.
+* `r34r-r1` — running at 85–87/100 epochs; 31.4(a)'s ResNet34 row is provisional.
+* `kb-*` — running (67–75/100 ep). This is the 26.3 falsification test at a0=1e-3, m=6, both
+  datasets; 8 of 24 have started.
+* `gp-w-*` — running. Note `gp-w-r0-s0` completed 100/100 at plateau **42.6** — M1 pooling at
+  the weightwise partition does not rescue the collapse, but the curve is not yet complete and
+  **no gp-w cell may be quoted from a still-running run** (the aggregator reports partial
+  TensorBoard scalars for in-flight jobs; 29 of 986 rows are in-flight and were excluded from
+  every table above by requiring `wallclock_min` non-empty AND `epochs_done==epochs_requested`).
+* CIFAR-100 still has **no ResNet10 or ResNet34 rung at all** — the model-scale × dataset grid
+  is one row deep. Next cycle's candidate, once `p9-*` lands.
+* Non-meta baselines (axis 4) remain queued behind everything on alice at nice 20000–40000.
+* Everything still open from 30.7 that `p9-*` does not touch remains open.
