@@ -4893,3 +4893,219 @@ previous cycle has had.
   `p6f` covers only layer/node/weight, so the m=6 end of the ladder is single-setting.
 * **R34 r-curve** (`r34r-*`, 27, alice) still pending; 25.6's third row is one point.
 * n=1-2 on every zpool cell at r>=0.9 (25.5), which is where 26.3's weightwise gain comes from.
+
+---
+
+# Cycle 27 (20 Aug 2026) — the pooling gain is non-monotone in the layerwise-minus-scalar gap, and the agreement ladder is now three settings deep
+
+43 new runs (alice 465 -> 492, alice2 349 -> 365; `all_runs.csv` 812 -> 855 rows). Landed:
+all nine `p6f-*` agreement probes, `cs-*` (CIFAR-100 x R10/R34), `r10c-*` (partial),
+`c1b-*`, `m1a3-r04-s2`.
+
+## 27.1 NEW — the p6f agreement ladder: fineness beats setting, in 3/3 settings
+
+`runs/p6free/p6f-*`, reduced with `bin/agree2.py`. SGDm+Lion, meta-stepsize 1e-3,
+**a0=1e-3, 20 epochs**, AUGMENT=1, guard on, `HIER` unset (free adaptation), PROBE=100.
+STEADY window = last 50% of records. **n=1 per cell** (`p7-*` takes it to n=3).
+
+| setting | granularity | N | `sys%` | step-null (pp) | sd_beta | drift/step |
+|---|---|---|---|---|---|---|
+| R10 / C10 | layerwise | 38 | **60.47** | +5.05 | 2.388 | 3.14e-04 |
+| R10 / C10 | nodewise | 8,660 | 52.04 | +1.67 | 1.722 | 1.20e-04 |
+| R10 / C10 | weightwise | 4,903,242 | 50.0039 | +0.034 | 1.401 | 7.03e-05 |
+| R18_c100 / C100 | layerwise | 62 | **57.48** | +4.80 | 2.417 | 2.68e-04 |
+| R18_c100 / C100 | nodewise | 14,600 | 52.03 | +1.70 | 1.724 | 9.47e-05 |
+| R18_c100 / C100 | weightwise | 11,220,132 | 50.0124 | +0.012 | 1.517 | 6.85e-05 |
+| R34 / C10 | layerwise | 110 | **51.13** | +1.00 | 1.612 | 1.91e-04 |
+| R34 / C10 | nodewise | 25,556 | 50.31 | +0.12 | 0.602 | 8.86e-05 |
+| R34 / C10 | weightwise | 20,000,000 | 50.0022 | +0.004 | 0.503 | 5.51e-05 |
+
+**One reducer caveat.** `agree2.py` infers `n_tot` as the denominator of the observed
+`frac_neg` rationals, and for `p6f-r34-w` it returns exactly **20,000,000** where
+`bin/blkchk.py` independently gives ResNet34 = **21,282,122** parameters. The inference is
+saturating on the printed precision of `frac_neg` at that magnitude. It does not move the
+reading (the independence null is 50.0089% at 20.0M and 50.0086% at 21.3M, against a
+measured 50.0022%), but `n_tot` from the reducer is not trustworthy above ~1e7 and the
+structurally-measured group count should be used instead. The other eight cells match
+`blkchk.py` exactly.
+
+Three independent replications of 26.3's ordering: **agreement falls monotonically with
+partition fineness, in every setting, over five orders of magnitude in N.** `sd_beta` falls
+with N in 3/3 as well. The weightwise cells are within 0.013pp of the 50.0000% independence
+value in 3/3.
+
+Second, **agreement at layerwise falls with model size**: R10 (N=38) 60.47 -> R18 (N=62,
+pending `p7`) -> R34 (N=110) 51.13, and `sd_beta` 2.39 -> 1.61. CIFAR-100 at R18 sits at
+57.48, **higher** than CIFAR-10 at R18 will need to be for 24.3's null pooling gain to be
+explained by agreement — that comparison cannot be made until `p7-r18-lay` lands (27.2).
+
+## 27.2 CORRECTION — 26.3's R18 row is not in the p6f family and must not be tabulated with it
+
+26.3's R18/CIFAR-10 rung comes from `mx/probe_sig_*`: **a0=1e-6, 100 epochs**. p6f is
+**a0=1e-3, 20 epochs**. Reading them as one ladder is a cross-a0, cross-budget comparison —
+Rule 5 exactly. Everything 26.3 says about R18 stands on its own; what does NOT stand is the
+four-row model-scale ladder implied by placing 53.26 between R10's 60.47 and R34's 51.13.
+`p7-r18-{blk6,lay,node,w}` x 3 seeds (submitted, 27.7) runs the missing rung at p6f's config.
+
+## 27.3 STRUCTURAL — `resnet18_blocks` exists only on ResNet18
+
+`bin/blkchk.py` (CPU, seconds, no GPU) instantiates every net x granularity:
+
+| net | tensors | params | resnet18_blocks | layerwise | nodewise | weightwise |
+|---|---|---|---|---|---|---|
+| ResNet10 | 38 | 4,903,242 | **ZeroDivisionError** | 38 | 8,660 | 4,903,242 |
+| ResNet18 | 62 | 11,173,962 | 6 | 62 | 14,420 | 11,173,962 |
+| ResNet34 | 110 | 21,282,122 | **ZeroDivisionError** | 110 | 25,556 | 21,282,122 |
+| ResNet18_c100 | 62 | 11,220,132 | 6 | 62 | 14,600 | 11,220,132 |
+| ResNet10_c100 | 38 | 4,949,412 | **ZeroDivisionError** | 38 | 8,840 | 4,949,412 |
+| ResNet34_c100 | 110 | 21,328,292 | **ZeroDivisionError** | 110 | 25,736 | 21,328,292 |
+
+The m=6 partition is hard-coded to ResNet18's tensor layout and dies at optimizer
+construction on any other net. **26.9's open item "no matched blocks probe outside R18/C10"
+is not a scheduling gap, it is unreachable without new code.** The m=6 rung can be extended
+to the second DATASET only (`p7-c100-blk6`, submitted). No currently-queued job is affected.
+
+## 27.4 The M1 interior optimum is a0-dependent — it shrinks 4x from a0=1e-6 to a0=1e-3
+
+R18 / CIFAR-10 / layerwise / SGDm+Lion / 100ep, **plateau** (mean of last 5 epochs):
+
+| r | a0=1e-6 | n | a0=1e-3 | n |
+|---|---|---|---|---|
+| 0 (full pooling) | 92.23±0.09 | 6 | 92.18±0.09 | 5 |
+| 0.03 | 92.64±0.16 | 5 | 92.18±0.11 | 5 |
+| 0.05 | 93.05±0.14 | 10 | 92.12±0.01 | 2 |
+| **0.06** | **93.26±0.14** | 8 | 92.16±0.10 | 12 |
+| 0.07 | 93.19±0.15 | 9 | 92.18±0.01 | 2 |
+| **0.1** | 92.63±0.21 | 5 | **92.44±0.14** | 5 |
+| 0.2 | 91.39±0.14 | 3 | 92.08±0.13 | 3 |
+| 0.3 | 90.96±0.08 | 3 | 91.76±0.09 | 2 |
+| 0.4 | — | — | 91.40±0.04 | 2 |
+| 1 (identity) | 90.86±0.06 | 3 | 91.15±0.05 | 2 |
+| plain layerwise | 90.82±0.16 | 24 | 91.13±0.19 | 9 |
+
+Identity control holds at both a0 (r=1 vs plain: 0.04pp and 0.02pp, against a ±0.02pp
+reproducibility floor and sds of 0.16 / 0.19).
+
+* **a0=1e-6:** interior optimum r*=0.06, **+2.40pp over identity** and **+1.03pp over full
+  pooling (r=0)** — a genuine interior optimum, both endpoints beaten, n=8.
+* **a0=1e-3:** r*=0.1, **+1.29pp over identity** but only **+0.26pp over r=0**
+  (92.44±0.14 n=5 vs 92.18±0.09 n=5; Welch t=3.5, so real but small). The curve is flat
+  within noise from r=0 to r=0.07.
+
+**Reading: at a0=1e-3 nearly the entire M1 gain is "pool at all", not "pool partially".** The
+interior optimum survives but is 4x smaller and moves from r=0.06 to r=0.1. Any claim that
+M1's hierarchy beats both endpoints must name a0. `am4-*` (a0=1e-4, 21 jobs) and `amx-*`
+(meta=Adam, 15 jobs) are queued on alice2 and fill the a0 and meta-optimizer axes.
+
+## 27.5 NEW — the M1 gain is NON-MONOTONE in the layerwise-minus-scalar gap
+
+M1 shrinks each group's step size toward the arm's r->0 limit, and that limit **is** the
+scalar arm. So the gain should depend on two things: whether the groups genuinely want to
+differ (gap = plain layerwise − plain scalar), and whether the thing they are pooled toward
+is itself sound. Re-derived from `all_runs.csv`, plateau, 100ep, `gain` = best measured
+interior r minus the r=1 identity (plain layerwise where no r=1 cell exists):
+
+| setting | scalar | plain layer | gap | r* | plateau at r* | gain |
+|---|---|---|---|---|---|---|
+| R18/C10 AdamW+Adam a0=1e-3 | 92.68±0.18 (3) | 90.86±0.17 (8) | **−1.82** | 0.06 | 91.37±0.17 (5) | +0.51 |
+| R18/C10 AdamW+Adam a0=1e-4 | 91.74±0.04 (3) | 91.86±0.16 (3) | **+0.12** | 0.06 | 92.66±0.14 (5) | +0.79 |
+| R34/C10 SGDm+Lion a0=1e-3 | 89.69±0.21 (3) | 90.42±0.16 (3) | **+0.74** | 0.06 | 93.35±0.15 (3) | **+2.93** |
+| R34/C10 SGDm+Lion a0=1e-6 | 89.31±0.09 (5) | 90.15±0.13 (5) | **+0.83** | 0.06 | 92.74±0.19 (5) | **+2.59** |
+| R18/C10 SGDm+Lion a0=1e-6 | 87.77±0.12 (18) | 90.82±0.16 (24) | **+3.04** | 0.06 | 93.26±0.14 (8) | +2.40 |
+| R18/C10 SGDm+Lion a0=1e-3 | 87.70±0.22 (9) | 91.13±0.19 (9) | **+3.42** | 0.1 | 92.44±0.14 (5) | +1.29 |
+| R10/C10 SGDm+Lion a0=1e-6 | 70.74±0.83 (3) | 90.62±0.27 (3) | **+19.88** | 0.1 | 91.59±0.05 (3) | +1.00 |
+| R18/C100 SGDm+Lion a0=1e-6 | 22.78±0.70 (5) | 69.17±0.60 (6) | **+46.39** | 0.2 | 69.89±0.02 (2) | +0.35 |
+| R18/C100 SGDm+Lion a0=1e-3 | 22.57±0.46 (5) | 69.53±0.49 (7) | **+46.96** | 0.2 | 68.32±0.30 (2) | **−1.59** |
+
+Rising then falling, with a maximum at gap ~0.7–0.8pp. Both tails have a reading:
+* **gap <= 0** (AdamW: per-coordinate normalisation already does the job, H4) — the groups do
+  not want to differ, so there is little for a hierarchy to allocate. Gain +0.5 to +0.8.
+* **gap large** (CIFAR-100, ResNet10) — the groups differ enormously *because the pooled
+  step size cannot train the network at all*. Pooling toward it is pooling toward a broken
+  estimator. Gain goes to zero and then negative.
+
+**This is a hypothesis, not a measured curve, and must not be reported as one.** The nine
+rows differ in base optimizer, meta optimizer, model, dataset AND alpha0 simultaneously; gap
+and gain are also computed from arms of the same runs. `bo-*` (27.7) is the controlled test:
+the base optimizer moves the gap with everything else held fixed.
+
+Two cells are **grid-limited, not measured optima**, and are excluded from the table above:
+R10/C10 a0=1e-3 (only r in {0, 0.06} exist; `r10c-*` is filling it) and R10/C100 (only
+r=0.06 exists — see 27.6).
+
+## 27.6 NEW — small r on CIFAR-100 is worse than BOTH endpoints, not an interpolation
+
+`cs-*` landed (CIFAR-100 x ResNet10/ResNet34, a0=1e-3, 100ep). ResNet10_c100:
+
+| arm | plateau | best | n |
+|---|---|---|---|
+| plain layerwise | 68.27±0.33 | 68.92±0.30 | 3 |
+| plain scalar | 12.85±0.02 | 13.05±0.05 | 2 |
+| **M1 additive r=0.06** | **5.58±0.01** | 12.27±0.23 | 2 |
+
+The pooled arm plateaus **below both endpoints** — 7.3pp under the scalar arm it is being
+shrunk toward, with plateau far under `best` (12.27), i.e. it peaks and then collapses,
+which the scalar arm does not do. The same signature is already in the R18/C100 curve:
+r=0 plateaus at 8.98±0.15 against a scalar endpoint of 22.57±0.46.
+
+So M1 at small r is **not** a convex interpolation between plain-layerwise and scalar; on
+CIFAR-100 it is actively unstable. This is the sharpest limitation of the method found so
+far and every cell of it is n=2 — `kc-*` (39 jobs, 27.7) takes the R18/C100 curve to n=5 and
+gives ResNet10/C100 a real r-curve so the collapse boundary is a curve, not two points.
+
+Note also that the CIFAR-100 identity control is 0.37–0.39pp off (r=1 69.54±0.03 n=2 vs
+plain 69.17±0.60 n=6 at a0=1e-6; 69.92±0.42 n=2 vs 69.53±0.49 n=7 at a0=1e-3) — inside the
+plain arms' own sd but well outside the ±0.02pp reproducibility floor. `kc-r18-r1-s{2,3,4}`
+raises both to n=5.
+
+## 27.7 Submitted this cycle — 123 jobs
+
+| batch | acct | n | what | why |
+|---|---|---|---|---|
+| `p7-*` | alice | 33 | agreement probes, p6f config (a0=1e-3, 20ep, PROBE=100): R18/C10 x {blk6,lay,node,w} x s0-2; C100 x blk6 x s0-2; p6f's nine cells x s1-2 | closes 27.2's hole and takes the ladder to n=3 in ONE matched family |
+| `kc-*` | alice | 39 | R18_c100 r in {0,.03,.05,.07,.1,.2,1} x s2-4; R10_c100 r in {.06,.1,.2,.4,.7,1} x s0-2 | 27.6 at n>=5 plus the ResNet10 rung |
+| `bo-*` | alice2 | 39 | R18/C10, meta=Lion, a0=1e-6, base in {Lion, RMSProp} x {plain scalar, plain layer, r in 0/.06/.2} x s0-2; base=AdamW x r in 0/.06/.2 x s0-2 | **pre-registered** controlled test of 27.5 |
+| `bp-*` | alice2 | 12 | agreement probes at p6f config, base in {Lion, RMSProp, AdamW, SGDm} x s0-2 | the other half of 27.5's discriminator, in the p7 family; `bp-sgdm` doubles as a cross-account reproducibility control for `p7-r18-lay` |
+
+**Pre-registration for `bo-*`.** Measure the gap per base from its own plain arms, then read
+the gain off the r-grid {0, 0.06, 0.2}.
+> **PREDICTED:** gain is non-monotone in the gap across the four bases, peaking at
+> gap ~1–3pp; a base with gap <= 0 gives gain < +1pp.
+> **FALSIFIED IF:** gain is monotone in the gap, or flat across all four bases.
+
+Lion and RMSProp bases are new to this campaign. Both were checked structurally on CPU
+first (`bin/basechk.py`: all four bases x {plain, additive} construct and take three finite
+steps, alpha finite) — cycle-18 gotcha 5.
+
+## 27.8 Operations
+
+* **Throughput is ~24 concurrent GPUs and ~21 finished runs/hour (~500/day).** 100-epoch
+  runs are 0.3–1.2 h wall (R10 0.3, R18 0.5–0.8, R34 1.0–1.2, R50 2.3). A 431-job backlog
+  was under **one day** of compute — we were UNDER-queued, not over-queued. Queue depth
+  after this cycle: **alice 322, alice2 226 = 548**.
+* **The 12+12 ceiling is cluster contention, not our configuration.** Each GPU partition
+  carries its own PartitionQOS (`gpu-short` 12 GPUs, `gpu-l4` 8, `gpu-2080ti` 12, `gpu-mig`
+  8, `gpu-a100` 2 = 42/account), and our jobs are submitted to all five. But the cluster had
+  **77 GPU jobs running against 442 pending**, of which **24 were ours** — we are the two
+  largest users on it, at fairshare 0.338. Genuinely free GPUs at the time of checking: 7
+  (node882 x2, node883 x3, node866 x1, node873 x1); node[854,856,857] (12 GPUs) sit under a
+  permanent MAINT reservation to 1 Dec. There is no configuration change that raises this.
+* **alice2 has much the better fairshare** (job priorities ~1,072,000 vs alice's ~671,000).
+  Put latency-sensitive batches there.
+* Reprioritised on alice: `m0l-*`, `m0s-*` (24) and `zmg-*` (30) niced to 5000, moving
+  `p7-*` from queue position 130 to 76, behind `r34r-*` (27) and `cw-*` (36) which stay
+  ahead deliberately — `cw-*` is 26.7's pre-registered falsification test.
+
+## 27.9 Still open
+
+* **`p7-r18-lay` is the single missing number** for both the model-scale agreement ladder and
+  the CIFAR-10-vs-CIFAR-100 agreement contrast that 26.7's `cw-*` prediction rests on.
+* **27.5 is a scatter over nine incomparable cells.** `bo-*` is the controlled test; until it
+  lands, "the gain is non-monotone in the gap" is a hypothesis with a pre-registration.
+* **26.3's gain column** still rests on three run families; `gp-*` (48, alice2, positions
+  4–51) makes it one.
+* `cw-*` (36, alice, positions 40–75) — the falsification test for 26.3.
+* `r34r-*` (27, alice, position 13) — R34 has a gain of +2.6/+2.9 measured at **r=0.06
+  only**; 25.6's third row is still one point.
+* R10/C10 a0=1e-3 has no r-curve (`r10c-*`, 7 left, alice2 position 1).
+* Every CIFAR-100 M1 cell is n=2 until `kc-*` lands.
