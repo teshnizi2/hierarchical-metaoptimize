@@ -5448,3 +5448,195 @@ still right, and this cycle measured the mechanism.
 * CIFAR-100 at m=62 and m≈14.5k is n=1 (`p7-c100-{lay,node}-s2`, `p7-c100-w-s*` in flight).
 * Everything still open from 28.8 remains open: `cw`, `kc`, `bo`, `gp`, `r34r`, `ap`, `ag`.
 * `bo-*` landed 12 rows this cycle but only 3 at ≥100 epochs — not read.
+
+---
+
+# Cycle 30 — 2026-08-20
+
+Every number below re-derived this cycle from `results/all_runs.csv` (951 rows, +24) and from
+`bin/agree2.py` over `runs/p7free/` (32 probes, **all now 100/100 records**).
+
+## 30.0 OPERATIONS — cycle 29's two decisive batches were destroyed by our own trim
+
+`kb-*` (36) and `p8-*` (14, submitted under the `p7-*-blk6-s{3..9}` names) were submitted
+2026-08-20T07:54:42 and **all 50 were cancelled at 08:33:15/16 by uid 2344 = salehkaleybars**,
+39 minutes later. **None had started.** They were 50 of the 177 jobs an ad-hoc `scancel` sweep
+removed to reduce queue depth. 29.7 had named them, in writing, as "the two things this cycle
+turns on"; the cycle produced no data from either.
+
+Mechanism: the sweep selected by **recency** (newest job IDs). A decisive experiment is by
+construction the newest thing in the queue, so recency-ordered trimming cancels exactly what it
+must never touch. The loss was invisible for a day because the trim reported only a count.
+
+**Fixed.** Both scripts survived intact and both batches were resubmitted this cycle (30.6).
+`bin/safe_trim.sh` + `bin/PROTECTED.txt` are installed on **both** accounts and enforce:
+never cancel a protected name-prefix; never cancel at `Nice < 1000`; never cancel RUNNING;
+trim from the BACK (highest Nice first); print every name, never just a count.
+
+## 30.1 MODEL SCALE — the pooling optimum moves, the gain does not vanish
+
+Axis 1. **M1 additive, layerwise, CIFAR-10, a0=1e-6, 100 epochs, `epochs_done==100` only,
+not collapsed, and — new this cycle — WITHIN ONE JOB FAMILY (see 30.5).** Plateau = mean of
+last 5 epochs.
+
+| net | params | m | family | r=0 plateau | **r\*** | plateau at r\* | gain | r\*·m |
+|---|---|---|---|---|---|---|---|---|
+| ResNet10 | 4.90M | 38 | `r10` | 82.114 ±0.073 (n=3) | **0.10** | 91.590 ±0.051 (n=3) | +9.476 | 3.80 |
+| ResNet18 | 11.17M | 62 | `ad-l` | 92.200 ±0.044 (n=3) | **0.07** | 93.218 ±0.138 (n=5) | +1.017 | 4.34 |
+| ResNet34 | 21.28M | 110 | `r34r` | 93.098 ±0.072 (n=3) | **0.02** | 93.884 ±0.194 (n=3) | +0.786 | 2.20 |
+
+**r\* falls monotonically with model size: 0.10 → 0.07 → 0.02.** Full ResNet34 curve (n=3 each,
+one family, all 100/100 epochs): r=0 → 93.098, r=0.02 → 93.884, r=0.03 → 93.813, r=0.04 → 93.365.
+The r=0 → r\* gain is significant (diff +0.786, se 0.119, t=6.6); r=0.02 vs 0.03 is **not**
+(diff 0.071, se 0.126, t=0.56) — the R34 peak is a *plateau over [0.02, 0.03]*, not a located
+point. r=0.04 is genuinely down (t=3.66).
+
+**The gain does not shrink toward zero at scale** — ResNet34 (+0.786) sits within noise of
+ResNet18 (+1.017) despite 1.9x the parameters and 1.8x the groups. This is the axis the parent
+paper's premise turns on, and at 21.3M parameters granularity still pays, *provided r is
+retuned*. A practitioner holding R18's r=0.07 fixed at R34 would land between the 0.04 (+0.267)
+and 0.06 (−0.355, `sc-ResNet34-add`, n=5) cells — i.e. would measure the gain away.
+
+**Two things this table does NOT support.**
+* **ResNet10's +9.476 is not comparable to the other two and must never be quoted beside them.**
+  Its r=0 baseline (82.114) is 10pp below R18's and R34's — a degenerate arm, not a healthy
+  one. *Any* pooling rescues it: even r=1.0 scores 90.586 (+8.472). The interior optimum's
+  advantage over full pooling is only 91.590 − 90.586 = **+1.004** at R10, against
+  93.218 − 90.863 = **+2.355** at R18 (`zad`, r=1.0 n=3). Report against BOTH ends.
+* **r\*·m is not constant** (3.80, 4.34, 2.20). A constant-pooling-mass law predicts
+  r\*(R34) ≈ 0.04, and 0.04 is measurably below the peak. `r34f-*` (30.6) tests r<0.02.
+
+## 30.2 THE PAPER CORE, EXTENDED TO A THIRD ARCHITECTURE AND TO 21.3M PARAMETERS
+
+All 32 `p7` probes are now at 100/100 records (the ResNet34 arms were at 75–91 at cycle 29's
+read, which is why 29.3 could not be settled). STEADY window (last 50% of records), CIFAR-10,
+pooled across **ResNet10 + ResNet18 + ResNet34**, m spanning **6 → 21,282,122 (5.5 decades)**:
+
+| arm | m | drift/step |
+|---|---|---|
+| r18-blk6 | 6 | 4.509e-04 |
+| r10-lay | 38 | 2.996e-04 |
+| r18-lay | 62 | 2.125e-04 |
+| r34-lay | 110 | 1.752e-04 |
+| r10-node | 8,660 | 1.204e-04 |
+| r18-node | 14,420 | 8.828e-05 |
+| r34-node | 25,556 | 8.525e-05 |
+| r10-w | 4,903,242 | 7.088e-05 |
+| r18-w | 11,173,962 | 5.557e-05 |
+| r34-w | 21,282,122 | 5.665e-05 |
+
+**d log10(drift) / d log10(m) = −0.1228, R²=0.902, n=10.** The sqrt(N) noise model predicts
+**−0.500**. ResNet34 on its own (m 110 → 21.28M) gives **−0.0927**. The campaign's headline
+refutation, previously measured at −0.113 on ResNet18 alone, now holds across three
+architectures and to 21.3M parameters, monotone, with no architecture term needed.
+
+## 30.3 The agreement ladder is NOT a power law — and the pooled fit hides it
+
+Same probes, statistic = STEADY `step% − null%` (excess of per-step sign agreement over its
+own independence null).
+
+| dataset / net | granularity | m | n | excess | sd |
+|---|---|---|---|---|---|
+| C10 / ResNet18 | resnet18_blocks | 6 | 3 | +4.1577 | 2.2195 |
+| C10 / ResNet10 | layerwise | 38 | 2 | +2.4756 | 0.5955 |
+| C10 / ResNet18 | layerwise | 62 | 3 | +1.3205 | 0.8946 |
+| C10 / ResNet34 | layerwise | 110 | 2 | **+1.5145** | 0.0643 |
+| C10 / ResNet10 | nodewise | 8,660 | 2 | +1.3711 | 0.0875 |
+| C10 / ResNet18 | nodewise | 14,420 | 3 | +0.4278 | 0.0517 |
+| C10 / ResNet34 | nodewise | 25,556 | 2 | **+0.2442** | 0.0873 |
+| C10 / ResNet10 | weightwise | 4,903,242 | 2 | +0.0260 | 0.0041 |
+| C10 / ResNet18 | weightwise | 11,173,962 | 3 | +0.0046 | 0.0008 |
+| C10 / ResNet34 | weightwise | 21,282,122 | 2 | **+0.0033** | 0.0006 |
+| C100 / ResNet18_c100 | resnet18_blocks | 6 | 3 | −0.7312 | 2.5459 |
+| C100 / ResNet18_c100 | layerwise | 62 | 2 | **+4.4496** | 0.0913 |
+| C100 / ResNet18_c100 | nodewise | 14,600 | 2 | **+1.4087** | 0.1805 |
+| C100 / ResNet18_c100 | weightwise | 11,220,132 | 1 | +0.0126 | — |
+
+A pooled log-log fit over the 10 CIFAR-10 cells gives slope **−0.4492, R²=0.906** — seductively
+close to the sqrt(N) exponent −0.500. **It is an artefact of fitting a straight line to a curve
+over 6.5 decades.** The *local* slopes are not constant, and they bend the same way in all three
+architectures — shallow in the middle of the ladder, steep at the fine end:
+
+| net | rung → rung | local slope |
+|---|---|---|
+| ResNet18 | 6 → 62 | −0.491 |
+| ResNet18 | 62 → 14,420 | −0.207 |
+| ResNet18 | 14,420 → 11.17M | −0.681 |
+| ResNet10 | 38 → 8,660 | −0.109 |
+| ResNet10 | 8,660 → 4.90M | −0.626 |
+| ResNet34 | 110 → 25,556 | −0.335 |
+| ResNet34 | 25,556 → 21.28M | −0.642 |
+
+A power law would give the same local slope everywhere. **Do not quote the pooled −0.449 as
+"consistent with sqrt(N)".** Rule 3 in a new guise: report the curve, not the fit.
+
+## 30.4 29.3 RESOLVED — model size does not move agreement at fixed granularity; ResNet10 does
+
+29.3 flagged that the one available R34/layerwise point (+1.4690, n=1) "runs the other way".
+With the rung complete at n=2 across all three granularities, Welch R18 vs R34:
+
+| granularity | R18 − R34 | se | t | df | |
+|---|---|---|---|---|---|
+| layerwise | −0.1939 | 0.5185 | −0.37 | 2.03 | ns |
+| nodewise | +0.1837 | 0.0686 | +2.68 | 1.48 | ns |
+| weightwise | +0.0013 | 0.0006 | +2.10 | 2.70 | ns |
+
+**None reach significance.** 29.3's apparent inversion was noise (R18/layerwise carries seed s0
+as an outlier: 2.3528 vs 0.7721, 0.8367). Residuals about the pooled m-curve locate the signal:
+**ResNet10 +0.284 dex, ResNet18 −0.136, ResNet34 −0.103.** The "agreement falls with model
+scale" reading of 25.6 is really **"ResNet10 is anomalously high"** — it is not a monotone trend
+across three sizes, and R18/R34 are indistinguishable from each other and from the m-curve.
+25.6 is **not confirmed at three model sizes**; the model-size term at fixed granularity is
+below our resolution.
+
+## 30.5 MEASUREMENT CAUTION — pooling job families silently mixes base optimizers
+
+The R18 r-curve pooled across all families reads r\*=0.06, gain +0.636, with r=0 at
+92.587 ±0.674 (n=8) and r=0.03 *below* r=0. All three are wrong. The r=0 cell was a mixture of
+`ad-l` (SGDm base, 92.12–92.36, n=3+3) and `bo-lion` (**Lion base**, 93.50/93.83) — a
+cross-config read of exactly the kind Rule 5 forbids. Split by family, `ad-l` is monotone and
+tight (30.1) and `zad` replicates it at r=0.07 (+0.915 vs +1.017).
+
+**Always group by job family before averaging an r-cell.** `run` name minus the r-tag and seed
+is a sufficient key. This is the fourth measurement-layer defect after CORRECTIONS 16, 17 and 29.4.
+
+## 30.6 Submitted this cycle — 66 jobs, all pre-registered, all at the front of the queue
+
+| batch | n | account | Nice | what | open question |
+|---|---|---|---|---|---|
+| `p8-*` (`p7-*-blk6-s{3..9}`) | 14 | alice | 0 | 7 more seeds/dataset at m=6, 20ep | 29.2 is p≈0.07 at n=3 → n=10 |
+| `kb-*` | 36 | alice | 100 | M1 r-curve at m=6, both datasets, a0=1e-3, 100ep | the 26.3 falsification test |
+| `r34f-*` | 16 | alice2 | 0 | R34 r ∈ {0.005,0.01,0.015,0.025} ×s0-2, + r∈{0,0.02} ×s3-4 | 30.1: where is r\*(R34), and is r\*·m scale-invariant? |
+
+`p8-*` and `kb-*` are cycle 29's batches, resubmitted unchanged (30.0). `r34f-*` is new.
+
+**PRE-REGISTERED for `r34f-*`, from 30.1.** r\*·m = 3.80 (R10), 4.34 (R18), 2.20 (R34 at 0.02).
+> **PREDICTED:** the peak stays in [0.015, 0.03] and r\*·m keeps DECLINING with scale — total
+> pooling mass is **not** scale-invariant; larger models want proportionally less pooling than
+> one power of m allows.
+> **FALSIFIED IF:** r=0.005 or 0.01 matches or beats 0.02 — r\* is then still falling fast and
+> the shrink rule needs a steeper exponent than m^−1.
+> **ALSO FALSIFIED IF:** 0.005–0.03 is flat within noise — the R34 "interior optimum" is then a
+> plateau starting at 0.005, and 30.1's r\*-falls-with-scale reading is far weaker than it looks.
+
+Queue after this cycle: **alice 189 pending / 12 running, alice2 243 / 12.** Depth is above the
+60–120 band deliberately: nothing left in either queue is speculative (alice's tail is the
+non-meta cosine baselines, axis 4; alice2's is base-optimizer coverage, axis 5), and the
+ordering goal the band exists to serve is met directly — the 66 decisive jobs hold Nice 0–100
+on alice and Nice 0 on alice2, with 103 alice2 jobs demoted 0 → 300 to clear the front.
+
+## 30.7 Still open
+
+* `p8-*`, `kb-*`, `r34f-*` — none landed; all three were submitted this cycle.
+* **29.2 still must not be stated at p≈0.07.** Unchanged: `p8-*` has now been queued twice.
+* **NEW and strong: the dataset contrast at m=62 and nodewise runs OPPOSITE to m=6.**
+  Matched seeds (C100 lay/node have no s0, so C10 is restricted to s1,s2):
+  m=6 C10−C100 = **+4.889** (se 1.95, t=2.51, n=3/3); layerwise m=62 = **−3.645**
+  (se 0.072, n=2/2); nodewise = **−0.952** (se 0.128, n=2/2). The m=62 gap is 40x the pooled
+  seed sd, but n=2 per cell — **treat the t as indicative only, not as a p-value.** Needs n≥5.
+* C100/weightwise is still n=1. C100 has no ResNet10/ResNet34 rung at all.
+* ResNet34 has no r=1.0 identity control at 100 epochs (`r34r-r1` still pending), so the
+  "advantage over full pooling" statistic in 30.1 exists for R10 and R18 only.
+* `r34r` r ∈ {0.05, 0.08, 0.1, 0.2} landed truncated (11–95 of 100 epochs) and is **excluded**
+  from 30.1; resubmissions are pending.
+* Everything still open from 28.8 remains open: `cw`, `kc`, `bo`, `gp`, `ap`, `ag`.

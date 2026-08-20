@@ -1,0 +1,9 @@
+# Job-name prefixes that NO trim may cancel.
+# A prefix goes here the moment its batch is submitted as a decisive experiment,
+# in the same command that submits it -- not afterwards.
+# Remove a prefix only once the batch has COMPLETED and been aggregated.
+#
+# cycle 30 (resubmitted after the 08:33:15 sweep destroyed them):
+p8-
+kb-
+p7-
