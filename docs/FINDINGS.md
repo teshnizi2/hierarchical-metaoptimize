@@ -7609,3 +7609,203 @@ against a *different*, better meta arm (SGDm+Lion additive, 93.306). R18/CIFAR-1
 * **Submitted nothing, deliberately.** Both accounts sit below the FairShare floor and above the
   pending cap, and every open question named above already has its deciding cell queued and — for
   the two headline curves — *running*. Adding jobs could not have started anything sooner.
+
+# Cycle 42 — the long-horizon question is answered, and direction C inverts
+
+Queues at read time: alice 10 PENDING / 25 RUNNING, FairShare **0.3331**; alice2 **0 / 0**,
+FairShare **0.3356**. Both below the 0.35 floor -> **0 jobs submitted**. CSV re-aggregated
+from both accounts: **1434 runs** (866 alice + 618 alice2), +127 rows since cycle 41.
+
+Cycle 41's read list is now cleared: `bg300_meta` complete, `bg600_cos` complete, the `rs-*`
+surface is n=5 on the diagonal, and the two batches cycle 41 left unreduced (`fz-*`, 50 dirs;
+`p7free`, 92 dirs) are reduced here. Cycle 42's own submissions (`I1-*`, `PP-*`, `SW-*`,
+24 jobs) are in flight and **not** read.
+
+## 42.1 The baseline deficit does NOT close at the long horizon — priority-1 question, ANSWERED
+
+R18/CIFAR-10, AUGMENT=1, `epochs_done == epochs_requested` enforced, plateau primary.
+`bg*_cos` = AdamW+cosine lr 1e-3; `bg*_meta` = AdamW+Adam, layerwise, a0=1e-4, ms=1e-3.
+
+| horizon | baseline (cos) | n | MetaOptimize | n | deficit |
+|---|---|---|---|---|---|
+| 100 ep | 94.093 ±0.036 | 3 | 92.361 ±0.433 | 8 | **1.732pp** |
+| 300 ep | 94.999 ±0.164 | 3 | 93.033 ±0.168 | 3 | **1.966pp** |
+| 600 ep | 95.138 ±0.108 | 3 | 93.189 | 1 | **1.949pp** |
+
+* **The gap does not close; it widens slightly and then flattens.** Over 100 -> 600 epochs the
+  baseline gains +1.045pp and MetaOptimize gains +0.828pp. Six-fold more compute buys
+  MetaOptimize 0.22pp less than it buys a cosine schedule.
+* 41.4 pre-registered that parity at 300 ep required MetaOptimize to gain **+2.638pp** over its
+  own 100-epoch value. It gained **+0.672pp**. Missed by a factor of 3.9.
+* `bg600_meta` is **n=1** (s1 at 385/600, s2 at 66/600); the 600-epoch row is directional. The
+  300-epoch row is n=3 on both sides and carries the conclusion on its own.
+* Caveat carried from 41.4, unchanged and still in MetaOptimize's favour: `bg*_cos` runs at
+  lr=1e-3, off the cosine argmax of 2e-3–3e-3 (39.2), so both baseline numbers are **lower
+  bounds**. Correcting that widens the deficit further.
+
+## 42.2 The granularity x meta-step surface: peak heights are NOT equal — 40.1 is FALSIFIED
+
+The `rs-*` surface (c40, 106 jobs) is complete enough to read peak heights. Pooled with
+`ms-*`/`msa-*`/`a0*` at matched config — R18/CIFAR-10, SGDm+Lion, a0=1e-3, 100 ep, AUGMENT=1,
+plain, `epochs_done>=100 and epochs_requested==100`, plateau, `plateau>50`:
+
+| granularity | m | ms=1e-5 | 3e-5 | **1e-4** | 3e-4 | 1e-3 | 3e-3 |
+|---|---|---|---|---|---|---|---|
+| scalar | 1 | 90.699 (5) | 91.555 (5) | **92.231 ±0.190 (5)** | 88.743 (5) | 87.764 (16) | — |
+| resnet18_blocks | 6 | — | 91.444 (2) | **92.581 ±0.057 (2)** | 91.939 (1) | 91.437 (7) | 91.375 (1) |
+| layerwise | 62 | 90.874 (5) | 91.658 (5) | **92.795 ±0.177 (5)** | 91.885 (5) | 91.112 (16) | — |
+| nodewise | 14,420 | — | — | 92.088 (1) | 92.515 (1) | **92.547 (1)** | 91.310 (1) |
+
+Peak heights, each an **interior** maximum with both adjacent cells measured (CORRECTIONS 25):
+
+| comparison | Δ | Welch t | df | 95% CI |
+|---|---|---|---|---|
+| layerwise − scalar | **+0.563pp** | 4.85 | 8.0 | [+0.296, +0.831] |
+| blk6 − scalar | +0.349pp | 3.71 | 5.0 | [+0.107, +0.591] |
+| layerwise − blk6 | +0.214pp | 2.41 | 5.0 | [−0.015, +0.443] |
+
+* **40.1's pre-registration ("peak heights equal to within seed noise") is falsified.** The
+  point estimate +0.563pp clears PLAN.md's Δ≥0.5pp standard and the CI excludes 0. Granularity
+  is not a pure reparameterisation of the meta-step-size. **Verdict declared.**
+* **But the gain is non-monotone in m and has an interior optimum at m=62.** blk6 (m=6) already
+  captures 62% of the scalar->layerwise gain, and nodewise (m=14,420) falls back to 92.547 —
+  below layerwise. "Finer is better" is false at both ends of the ladder.
+* **What survives from the reparameterisation claim** is the weaker, still-large statement:
+  at ms=1e-3 the scalar->layerwise gap is +3.348pp and at each arm's own tuned meta-step it is
+  +0.563pp, so **83% of the apparent granularity gain is meta-step tuning.**
+* **The peak meta-step shifts right with m**: 1e-4 for scalar/blk6/layerwise, ~1e-3 for
+  nodewise. The nodewise row is n=1 at every cell and its peak is not resolved.
+
+## 42.3 Idea 2 kill-test: DEAD. The sign-agreement excess does not cross architectural boundaries
+
+`analysis/killtest_idea2.py`, on `mx/probe_sig_*` (100 ep, free-adapting, n=3). Statistic is
+the pairwise same-sign rate between tensors, whose null is **exactly 0.5** with no
+finite-sample bias — unlike the cross-sectional majority the campaign has been quoting.
+
+| arm | all tensor pairs | within 6-block | across 6-block | across-block 95% CI |
+|---|---|---|---|---|
+| layerwise (m=62) | 50.882 ±0.124 | 52.529 ±0.286 | 50.461 ±0.083 | [50.29, 50.66] |
+| nodewise (m=14,420) | 51.840 ±0.228 | 52.727 ±0.453 | 51.614 ±0.183 | [51.32, 51.96] |
+| **weightwise (m=11.17M)** | 50.143 ±0.062 | 50.690 ±0.134 | **50.003 ±0.081** | [49.86, 50.18] |
+
+* **On the arm the headline was measured on, across-block agreement is 50.003% — the null
+  exactly.** Idea 2's distinguishing claim against SGG (arXiv:2506.01049) is that measured
+  clusters would *cross* architectural boundaries. On the weightwise arm there is nothing
+  there to cross with.
+* Spectral clustering of the agreement matrix into k=6 scores ARI **0.046–0.242** against the
+  true 6-block partition and **0.013–0.179** against a random *contiguous* partition of the
+  same block sizes. The clusters are not recovering architecture and are not recovering
+  anything else either.
+* Agreement excess does not vary usefully with block size: OLS gives **−0.074pp per decade**
+  of n_b (layerwise arm) and **−0.117pp** (weightwise), Pearson r = −0.07 / −0.34.
+* **Idea 2 is dropped.** Recorded, not pursued.
+
+## 42.4 Direction C, done under control: the correlation is what ADAPTATION CONSUMES
+
+This is the cycle's main result and it **inverts** the premise direction C was chosen on.
+
+`fz-*` (alice2, 50 runs, complete, never reduced) freezes β (`--alg-meta fixed`). With β
+frozen the partition cannot affect the parameter update, so all five granularity arms run the
+*same* optimizer and differ only in how the meta-gradient is aggregated — the controlled
+version of the measurement every earlier agreement batch got wrong.
+
+**Rule-4 structural check (passes).** At matched seed the five arms' 20-epoch accuracies
+agree to **0.010–0.030pp** at a0=1e-6 and show no systematic ordering at a0=1e-3 (arm means
+76.35–76.76 against a within-seed spread of 0.15–2.19pp, i.e. chaotic divergence at lr=1e-3,
+not a partition effect). Every one of 2000 records has `beta_true_max == beta_true_min`.
+
+**Statistic.** Per record, n = m·(1−frac_zero) coordinates have a nonzero meta-gradient and a
+fraction p are negative; we report A = mean_t max(p, 1−p) and invert the **exact** binomial
+null to get the effective independent count N_eff. Validated in `analysis/neff_validate.py`:
+independent signs return N/N_eff = 1.005 / 1.025 / 0.997 / 0.989 at n = 6 / 62 / 14,420 /
+11.17M, the block model recovers K to ±4% for K≥8, and the estimator is monotone in a
+common-mode weight with both limits correct.
+
+**Frozen β, a0=1e-3 (network healthy: 76% test at 20 ep), n=5:**
+
+| granularity | m | agree% | null% | N_eff | N/N_eff |
+|---|---|---|---|---|---|
+| resnet18_blocks | 6 | 66.333 ±0.624 | 65.625 | 5.8 ±0.2 | 1.04 |
+| layerwise | 62 | 58.942 ±1.011 | 55.046 | 20.4 ±4.1 | 3.16 |
+| nodewise | 14,420 | 52.475 ±0.198 | 50.332 | 264 ±42 | 55.8 |
+| weightwise | 11,173,962 | 50.169 ±0.010 | 50.012 | **56,544 ±6,667** | **199.8** |
+
+**N_eff ~ m^(0.629 ±0.013)** (per-seed fit, n=5; independence requires the exponent to be
+1.000). Averaging all 11.17M per-weight meta-gradients buys the variance reduction of ~56,500
+independent samples, not 11.17M — the 1/√N model overstates the noise reduction by **14.1x in
+standard deviation**.
+
+**Free β, identical config except `--alg-meta Lion` (`p7-r18-*`, n=10):**
+
+| granularity | m | agree% | N_eff | N/N_eff |
+|---|---|---|---|---|
+| resnet18_blocks | 6 | 69.733 | 4.2 | 1.5 |
+| layerwise | 62 | 56.019 | 45.2 | 1.4 |
+| nodewise | 14,420 | 50.732 | 3,005 | 4.9 |
+| weightwise | 11,173,962 | 50.017 | 5,876,813 | 2.0 |
+
+**N_eff ~ m^(0.963 ±0.015)**, n=10. The two batches match on every field — SGDm base, ms=1e-3,
+a0=1e-3, CIFAR-10, ResNet18, 20 ep, AUGMENT=1, BETA_CLIP=−15:−2.3026, PROBE=100 — **except
+`--alg-meta`**. The design is identified.
+
+**The free runs separate the two readings by themselves**, because at step 0 every free arm
+has β uniform at ln(a0), exactly like the frozen arm (`analysis/neff_timecourse.py`):
+
+| records | epochs | FREE: exponent s | FREE: sd(β) | FROZEN: exponent s |
+|---|---|---|---|---|
+| 0–2 | 0.0–0.4 | 0.654 ±0.093 | 0.020 | 0.586 ±0.028 |
+| 4–6 | 0.8–1.2 | 0.661 ±0.031 | 0.231 | 0.605 ±0.059 |
+| 10–15 | 2–3 | 0.818 ±0.057 | 0.631 | 0.623 ±0.041 |
+| 20–30 | 4–6 | 0.878 ±0.052 | 0.979 | 0.672 ±0.025 |
+| 50–100 | 10–20 | **0.963 ±0.015** | 2.051 | **0.629 ±0.013** |
+
+* **The free arm starts at the frozen arm's exponent and climbs; the frozen arm never moves.**
+  sd(β) is identically 0.0000 on every frozen row (design check) and rises 0.02 -> 2.05 on the
+  free rows. The frozen exponent is flat across the whole 20 epochs while the network trains
+  from 10% to 76%, so the correlation is **not** a startup transient — it persists for as long
+  as the step size is held uniform.
+* **Conclusion: the correlated component of the meta-gradient is exactly the component that
+  step-size adaptation consumes.** Off equilibrium (uniform step sizes) the coordinates are
+  strongly correlated and the 1/√N assumption is wrong by up to 200x in variance. At the
+  adapted equilibrium the residual is near-independent and the assumption is approximately
+  right (s = 0.963, i.e. within 4% of independence — though 0.963 is 7.8 sem below 1.000, so a
+  small real residual remains).
+* **This inverts direction C's headline.** "The 1/√N assumption underpinning the Adam-mini /
+  Adalayer / SGG line is quantitatively false" is **not** supportable at the operating point
+  those methods run at. What is supportable, and is new, is the *conditional*: the assumption
+  fails badly before adaptation and is restored by adaptation, and the size of the failure is
+  measured here across 6 decades of m.
+* It also explains 42.2 without a new mechanism: the correlation is consumed in the first
+  ~3 epochs, so granularity has only the small residual to exploit — hence +0.563pp and not
+  more, and hence nothing beyond m=62.
+
+**Model-size and dataset generalisation** (`p7free`/`p6free`, all free-adapting, a0=1e-3,
+20 ep — so all measure the *post-adaptation* exponent):
+
+| family | m span | n | exponent s |
+|---|---|---|---|
+| ResNet18 / CIFAR-10 | 6 – 11,173,962 | 10 | 0.963 ±0.015 |
+| ResNet18 / CIFAR-100 | 6 – 11,219,984 | 10 | 0.911 ±0.021 |
+| ResNet10 / CIFAR-10 | 38 – 4,899,992 | 2 | 0.912 ±0.028 |
+| ResNet34 / CIFAR-10 | 110 – 20,000,000 | 2 | 1.012 ±0.006 |
+| ResNet18 / CIFAR-10, 100 ep (`mx`) | 62 – 11,125,461 | 3 | 0.899 ±0.007 |
+
+The post-adaptation exponent is 0.90–1.01 everywhere. **The controlled frozen-β measurement
+exists only at ResNet18/CIFAR-10 — every other row is post-adaptation and cannot speak to the
+off-equilibrium exponent.** That is the campaign's largest open cell.
+
+## 42.5 Batch health and ops
+
+* **Submitted nothing.** FairShare 0.3331 (alice) / 0.3356 (alice2), both below the 0.35 floor.
+  alice2 has been at **0 pending / 0 running** since ~00:30, which is the fastest available
+  FairShare recovery; alice is GPU-cap-bound (25 running, 1 pending).
+* **`I1-*` / `PP-*` / `SW-*` (24 jobs, submitted cycle 42 before this session) are in flight
+  and not read.** `SW-*` = AdamW+cosine LR sweep, 7 LRs x 2 seeds, `COS_TOTAL=50000`.
+  `I1-*` = the α_t = cosine(t)·exp(β_t) arm at {scalar, blk6, layerwise} x 3 seeds plus
+  `I1-inert`. `PP-*` = {scal, blk6, layer} x 3 seeds, AdamW+Adam, a0=1e-6, **AUGMENT=0** —
+  see CORRECTIONS 28; those nine rows must not be pooled with augmented rows.
+* **No unreduced probe batches remain.** Swept both accounts at depth 4: alice 11 batch names
+  (216 dirs), alice2 11 names (168 dirs). `fz` and `p7free` were the two unreferenced ones and
+  are reduced above. `zad`/`zval3`/`zrn`/`zsx`/`zsw`/`zb`/`zm0`/`d1`–`d4`/`det` are all
+  referenced in FINDINGS or CORRECTIONS.
+* Local probe copies now under `analysis/killtest_data/{mx,gate3,fz,p7free,p6free}` (66 MB).

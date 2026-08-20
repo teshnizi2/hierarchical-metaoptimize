@@ -733,3 +733,103 @@ against the best MetaOptimize arm (93.306 ±0.140) is **1.461pp, not 0.787pp.**
 **Process note (Rule 3, restated).** One bracketing point on one side does not locate a peak. A
 maximum may be called interior only when the cells *adjacent to the argmax on both sides* are
 measured — not merely when some point further out is lower.
+
+## 26. "53.1% of 11.17M per-weight meta-gradients agree in sign (independence = 50.0000 ±0.0015%)" — a conflation of two arms, and the null is wrong (cycle 42)
+
+**The sentence in circulation** (used to justify making the sign-agreement measurement the
+project) puts the 53.1% figure and the 11.17M coordinate count in the same claim. They come
+from different arms, and the quoted null belongs to neither.
+
+**What the data says** (`analysis/killtest_idea2.py`, reproduction check on `mx/probe_sig_*`,
+steady window, n=3):
+
+| arm | m | measured agreement | its own independence null | excess |
+|---|---|---|---|---|
+| layerwise | 62 | 55.85% | **55.07%** | +0.79pp |
+| nodewise | 14,420 | 51.18% | 50.33% | +0.85pp |
+| **weightwise** | **11,173,962** | **50.028%** | **50.012%** | **+0.016pp** |
+
+* **53.1% is the layerwise arm's system-level figure (m=62), not a per-weight one.** The
+  weightwise arm reads 50.005–50.028%.
+* **The null is not 50.0000%.** The cross-sectional majority statistic max(p, 1−p) has
+  expectation 0.5 + √(2/π)/(2√n) under independence — 55.07pp at n=62, 50.012pp at n=11.17M.
+  Quoting 53.1% against a 50.0000% null reports an arm that is **1.9pp BELOW its own floor**
+  as if it were 3.1pp above it. CONTINUE-HERE's cycle-26 table (53.26 / 50.0053) had the two
+  arms right; the damage was done when they were merged into one sentence.
+* The honest per-arm statement is the *excess over that arm's own floor*, and the honest
+  cross-arm statement is the effective sample size (FINDINGS 42.4), which is scale-free.
+
+**Effect on the claims.**
+
+| claim | status |
+|---|---|
+| "53.1% of 11.17M per-weight meta-gradients agree in sign" | **REFUTED as stated.** Two arms merged; the weightwise value is 50.028%. |
+| "independence = 50.0000 ±0.0015%" | **WRONG.** The null for this statistic is n-dependent; at m=62 it is 55.07%. |
+| "the 1/√N assumption is refuted" | **survives, but only off-equilibrium** — see FINDINGS 42.4, and see CORRECTIONS 27 for the sign of the correction. |
+
+**Process note (Rule 3).** Both numbers were individually correct in FINDINGS. The error was
+introduced by summarising them into one sentence in a handoff document, and that sentence then
+selected the project's direction for two cycles. **A summary line that merges two rows of a
+table must carry the row labels.**
+
+## 27. The direction-C headline points the wrong way: adaptation RESTORES the 1/√N assumption (cycle 42)
+
+**The premise the project was steered on.** "The 1/√N noise-averaging assumption that
+justifies coarse granularity across the Adam-mini / Adalayer / SGG literature is
+quantitatively false; nobody in that line has measured it."
+
+**What the controlled measurement shows** (FINDINGS 42.4). The exponent s in N_eff ~ m^s,
+where s=1 is exactly the independence assumption, on two batches identical in every field
+except `--alg-meta`:
+
+| design | s | n |
+|---|---|---|
+| β frozen (`fz-*-a3`) | **0.629 ±0.013** | 5 |
+| β free (`p7-r18-*`) | **0.963 ±0.015** | 10 |
+
+and within the free runs, s climbs 0.654 -> 0.963 over the first ~10 epochs as sd(β) rises
+0.02 -> 2.05, while the frozen runs sit flat at 0.59–0.68 for the whole 20 epochs.
+
+**The correlation is the part step-size adaptation consumes.** So the assumption is badly
+wrong at uniform step sizes (N/N_eff up to 200 at m=11.17M) and approximately right at the
+adapted equilibrium — which is where every method in that literature operates.
+
+**Effect on the claims.**
+
+| claim | status |
+|---|---|
+| "the 1/√N assumption is quantitatively false" (unconditional) | **REFUTED at the operating point.** s = 0.963 ±0.015 post-adaptation. |
+| "the 1/√N assumption fails off-equilibrium, by a measured amount" | **STANDS**, n=5, 6 decades of m, with a validated estimator and a passing structural check. |
+| "nobody in that line has measured it" | **stands** — the prior-art scout found no measurement, and this one is new either way. |
+| the granularity gain should be large because coordinates are correlated | **REFUTED.** They are near-independent at equilibrium, which is *why* 42.2's gain is only +0.563pp. |
+
+**Decision recorded.** Direction C is kept as the project but **restated**: the contribution is
+the conditional result (fails before adaptation, restored by it) plus the measurement method,
+not the unconditional refutation. The largest open cell is the frozen-β measurement at any
+model or dataset other than ResNet18/CIFAR-10.
+
+**Process note (Rule 4).** The frozen-β design was verified at both extremes before its
+numbers were used: `beta_true_max == beta_true_min` on all 2000 records, and the five arms'
+20-epoch accuracies agree to 0.010–0.030pp at matched seed. A partition that provably cannot
+affect training is the only way to compare partitions.
+
+## 28. Three process failures inherited from cycle 42's submission (cycle 42, second session)
+
+Recorded so they are not repeated, not to relitigate the submissions.
+
+1. **24 jobs (`I1-*`, `PP-*`, `SW-*`) were submitted with no saved submit script.** Every prior
+   batch has one under `bin/c<NN>_*.sh`. Non-interactive `ssh` does not write bash history, so
+   the exact `--export=` lines are recoverable **only** from the `ARGS:`/`ENV:` lines of a
+   started job's `.out`, and not at all for a job that never starts. Reconstruct-and-save
+   before the next cycle reads them.
+2. **`PP-*` runs with `AUGMENT=0`**, against the standing rule. The nine rows are config-matched
+   to `mx/probe_sig_*` (AdamW+Adam, a0=1e-6) so they are presumably a deliberate replication of
+   that batch, but they carry no probe directory, so what they measure is unclear from the
+   artefacts alone. **Do not pool them with augmented rows.**
+3. **The `N_eff` estimator's first version used the CLT null** 0.5+√(2/π)/(2√K) and was biased
+   1.571x at K=1 and 0.74x at K=2 (`analysis/neff_validate.py`, VALIDATION 1). It was caught by
+   the synthetic block-model check *before* any number was published, and replaced with exact
+   binomial inversion. This changed the a0=1e-6 frozen exponent from 0.395 to 0.364 and the
+   m=6 N_eff from 0.70 (impossible) to 1.1. **Validate an estimator against simulated ground
+   truth before reducing real data with it** — the CLT floor is the same approximation that
+   produced the CORRECTIONS 26 error.
