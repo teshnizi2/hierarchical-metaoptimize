@@ -4391,3 +4391,141 @@ the 4h `gpu-short` window, so a 100-epoch R50 point cannot be produced there at 
 * ResNet34 @ alpha0=1e-3 is n=1 in both arms; seeds queued on alice2.
 * ResNet50 needs a 7-day partition to produce any 100-epoch point.
 * M0 shrink on CIFAR-100 and at scale (`m0c-*`, `m0s-*`) still in flight.
+
+# Cycle 24 (20 Aug 2026)
+
+Re-aggregated both accounts with the repo aggregator (760 runs, +27 since cycle 23:
+`rc6` 9, `r10b` 12, `a0h` 6). Every number below re-derived from `results/all_runs.csv`.
+
+## 24.1 CORRECTION — two r-cells were mixtures of incompatible run families
+
+Grouping the M1 ladder by `(network, dataset, alpha0, eta_ratio)` alone is **wrong**. Three
+separators are invisible in that key, and two cells were pooling across them:
+
+| family | augment | meta | epochs_req | plateau @ r=0.1 |
+|---|---|---|---|---|
+| `ad-l-*`  | 1 | Lion | 100 | 92.626 (n=5) |
+| `adg-b-*` | 1 | Lion | 100 | 91.598 (n=3) |
+| `adg-A-*` | 1 | **Adam** | 100 | 91.043 (n=3) |
+| `ha-w-*`  | **unrecorded** | Lion | 100 | 48.712 (n=2) |
+| `e3a-*`   | 1 | Lion | **300** | 93.28 (n=2) |
+| `p4-ad-*` | 1 | Lion | **20** | 26.71 (n=1) |
+
+`ha-w-*` is the no-augmentation family the OPERATIONS gotcha warns about; it plateaus ~48.
+Effect of restricting to the canonical config (`bs=100, SGDm, Lion, mstep=1e-3, gamma=1,
+AUGMENT=1, guard on, 100ep`):
+
+| cell | was reported | corrected |
+|---|---|---|
+| R18/C10/1e-6 r=0.1 | 89.120 +-11.269 (n=14) | **92.240 +-0.556 (n=8)** |
+| R18/C10/1e-6 r=0.3 | 80.244 +-14.670 (n=5) | **90.957 +-0.079 (n=3)** |
+
+**Rule added:** the config key is eight fields, not four. `epochs_requested` must be in it —
+`epochs_done >= 100` admits 300-epoch runs whose plateau is not comparable.
+
+**Unresolved anomaly:** `ad-l` (92.626, n=5) and `adg-b` (91.598, n=3) agree on *every*
+recorded field yet differ by **1.03pp**, ~50x the +-0.02pp reproduction tolerance. Something
+that determines a 1pp effect is not being logged. The r=0.1 cell stays heterogeneous
+(sd 0.556) until this is found; the peak cells (r=0.05/0.06/0.07) are unaffected.
+
+## 24.2 The corrected CIFAR-10 M1 r-curve is clean and unimodal (n>=3 everywhere)
+
+ResNet18 / CIFAR-10 / a0=1e-6, canonical config. `r` is RETENTION (r=1 = plain layerwise).
+
+| r | plateau | n | vs plain layerwise |
+|---|---|---|---|
+| 0 (full pooling) | 92.228 +-0.087 | 6 | +1.44 |
+| 0.03 | 92.310 +-0.483 | 8 | +1.53 |
+| 0.04 | 92.862 +-0.129 | 5 | +2.08 |
+| 0.05 | 93.048 +-0.136 | 10 | +2.26 |
+| **0.06** | **93.262 +-0.135** | 8 | **+2.48** |
+| 0.07 | 93.192 +-0.152 | 9 | +2.41 |
+| 0.1 | 92.240 +-0.556 | 8 | +1.46 |
+| 0.2 | 91.387 +-0.142 | 3 | +0.60 |
+| 0.3 | 90.957 +-0.079 | 3 | +0.17 |
+| 1 (identity) | 90.863 +-0.063 | 3 | +0.08 |
+| plain layerwise | 90.784 +-0.169 | 17 | — |
+
+**Identity control holds** (rule 4): r=1 reproduces plain layerwise to +0.08pp.
+
+## 24.3 NEW — CIFAR-100 has NO interior pooling optimum (`rc6-*` landed)
+
+Same architecture family, same alpha0, same budget. ResNet18_c100 / CIFAR-100 / a0=1e-6:
+
+| r | plateau | n | vs plain layerwise |
+|---|---|---|---|
+| 0 (full pooling) | 11.205 +-0.569 | 2 | **-58.68** |
+| 0.05 | 43.507 +-1.404 | 2 | -26.38 |
+| 0.07 | 59.046 +-1.691 | 2 | -10.84 |
+| 0.1 | 69.145 | 1 | -0.74 |
+| 0.2 | 69.890 +-0.018 | 2 | +0.00 |
+| 0.4 | 69.453 | 1 | -0.43 |
+| 0.7 | 69.617 +-0.045 | 2 | -0.27 |
+| 1 (identity) | 69.542 +-0.032 | 2 | -0.34 |
+| plain layerwise | 69.886 +-0.134 | 2 | — |
+
+The curve rises monotonically and **saturates flat** from r~0.1; the best cell (r=0.2) is
++0.004pp over plain layerwise. Pooling on CIFAR-100 never helps — it is neutral above
+r~0.1 and catastrophic below it. Note the CIFAR-10 optimum (r=0.06, +2.48) lands exactly
+where CIFAR-100 has lost 10-26pp.
+
+**This supersedes "pooling inverts between datasets."** It does not invert, it *vanishes*:
+CIFAR-10 has an interior optimum worth +2.48pp, CIFAR-100 has none. The earlier "-43.7pp at
+r=0.07" was the **a0=1e-3** cell (26.538 +-0.844, n=4); at a0=1e-6 the same r costs -10.84.
+
+Caveat: n=1-2 on every CIFAR-100 cell. `c6f-*` (submitted below) takes the flat region to
+n=3-5. The r=1 identity control also sits 0.34pp *below* plain layerwise here vs +0.08pp
+above on CIFAR-10 — within n=2 noise, but it is the structural check and it needs the seeds.
+
+## 24.4 NEW — the plain granularity ORDERING also inverts between datasets
+
+Plain arms (no hierarchy), a0=1e-6, canonical config:
+
+| granularity | CIFAR-10 / R18 | CIFAR-100 / R18_c100 |
+|---|---|---|
+| scalar | 87.769 +-0.145 (11) | 22.300 +-0.808 (2) |
+| layerwise | 90.784 +-0.169 (17) | **69.886 +-0.134 (2)** |
+| resnet18_blocks | 91.346 +-0.148 (11) | 52.728 +-0.407 (2) |
+| **nodewise** | **91.593 +-0.138 (8)** | pending (`c100f-node`) |
+| weightwise | 77.822 +-0.351 (3) | pending (`c100f-w`) |
+
+CIFAR-10 is monotone-finer-is-better up to nodewise, then collapses at weightwise — an
+interior optimum in granularity. On CIFAR-100 **blocks and layerwise swap**: finer than
+layerwise already costs 17.2pp. Both dataset effects (24.3, 24.4) point the same way —
+CIFAR-100 tolerates far less sharing *and* far less splitting than CIFAR-10.
+
+The unifying prediction is the agreement measurement: coordinate sign-agreement should be
+markedly lower on CIFAR-100. `p6f-*` measures exactly this and was promoted this cycle.
+
+## 24.5 Operations — two handoff claims corrected
+
+* **`sc50` is ResNet50 and it finishes fine on `gpu-short`.** CONTINUE-HERE claimed R50
+  "cannot produce a 100-epoch point on gpu-short at all (31-34 epochs in 4h)". Measured from
+  the live TensorBoard scalars: 54/61/69/78/78/80 epochs at 1:14-1:52 elapsed = **~44
+  epochs/hour, 100 epochs in ~2:20** inside the 3:50 limit. Six healthy jobs were nearly
+  cancelled on the stale prose. `sc50`/`sc101` extend the scale ladder to R50 (23.5M) and
+  R101 (42.5M) — keep them.
+* **`scontrol update JobId=<j> Nice=0` IS permitted and is a large promotion.** CONTINUE-HERE
+  and 23.6 say "negative Nice is denied, so promotion = niceing others back". Resetting a
+  previously-niced job to 0 is not negative and is accepted: `p6f` went 651704 -> 671710,
+  from the bottom of the queue to #2. Niceing others back is not required.
+
+## 24.6 Queue actions this cycle
+
+| action | acct | n | why |
+|---|---|---|---|
+| `p6f-*` Nice=0 (promote to #2) | alice | 9 | agreement/drift on {C100,R10,R34} x {layer,node,weight} — the mechanism 24.3+24.4 both need; it was niced to the back |
+| `sw-cos`/`fxcos`/`fc100` Nice=40000 | alice | 37 | baseline LR tuning; the baseline is settled at 94.093 +-0.036 |
+| **submitted `c6f-*`** | alice2 | 21 | CIFAR-100 R18 a0=1e-6, r in {.1,.15,.2,.3,.5,1} + plain layerwise x seeds 2,3,4 — takes 24.3's flat region to n=3-5 |
+
+Queues after: alice 232, alice2 179 = **411 jobs**, 22 running (12+10, the qos ceiling).
+alice2 order is now all-CIFAR-100 at the front (`c100f` -> `c6f` -> `c100b` -> `c1b` -> `m0c`).
+
+## 24.7 Still open
+
+* **The `ad-l` vs `adg-b` 1.03pp gap on identical recorded config** — a logging gap that
+  bounds confidence in any n-pooled cell. Highest-value integrity item.
+* `r34r-*` (27, alice) still pending — R34 r-curve, completes the scale family.
+* CIFAR-100 nodewise/weightwise (`c100f-*`, alice2, high priority) completes 24.4.
+* `cs-*` (18, alice) CIFAR-100 x R10/R34 — task difficulty vs parameter count.
+* R50/R101 rungs in flight (`sc50` running, `sc101` on a 7:30 partition).

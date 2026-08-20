@@ -43,32 +43,40 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 23)  -- queues: alice 237, alice2 178 = 415 jobs
+## Running / next (cycle 24)  -- queues: alice 232, alice2 179 = 411 jobs
 
-**Cycle 23's finding (docs/FINDINGS.md 23.3-23.4):** the M1 pooling gain and the plain
-granularity gain run in OPPOSITE directions in model scale. Plain granularity
-(layerwise - scalar) decays +19.88 -> +1.73 -> +0.90 over R10/R18/R34 at alpha0=1e-6 and
-+20.48 -> +2.32 -> +0.51 at 1e-3 (both now measured; the 1e-3 replication `sa3-*` landed this
-cycle). M1 additive at r=0.06 does the reverse: +0.17 -> +2.33 -> +2.62 at 1e-6 and
--2.30 -> +0.83 -> +3.29 at 1e-3. The r-curves explain why: the optimum shifts toward LESS
-pooling as the model shrinks (R18 peaks r=0.06 +2.33; R10 peaks r=0.1 +0.97) and full pooling
-r=0 goes from +1.26 at R18 to -8.50 at R10. **This is not yet reportable: ResNet34 is sampled
-at ONE r.** `r34r-*` fixes that and tests the prediction that R34's optimum is at r<0.06 with
-peak >+2.62.
+**Cycle 24's finding (docs/FINDINGS.md 24.3-24.4): the interior pooling optimum does not
+invert between datasets, it VANISHES.** On CIFAR-10/R18/a0=1e-6 the M1 r-curve is clean and
+unimodal, peaking at r=0.06 with **93.262 +-0.135 (n=8), +2.48pp** over plain layerwise
+(90.784 +-0.169, n=17), and r=1 reproduces plain layerwise to +0.08pp (identity control
+holds). On CIFAR-100 at the same alpha0 the curve rises monotonically and **saturates flat**
+from r~0.1 -- best cell r=0.2 is **+0.004pp**, i.e. nothing -- while at CIFAR-10's optimum
+(r=0.05-0.07) CIFAR-100 has already lost 10-26pp. The plain granularity ORDERING inverts too:
+CIFAR-10 runs scalar < layerwise < blocks < nodewise (weightwise collapses), but on CIFAR-100
+blocks and layerwise **swap** (52.7 vs 69.9). Both say CIFAR-100 tolerates far less sharing
+*and* far less splitting.
 
-* **`r34r-*` (alice, 27)** -- R34 CIFAR-10 a0=1e-6, r in {0,.02,.03,.04,.05,.08,.1,.2,1} x 3
-  seeds. THE experiment: completes the r-curve family at three model sizes. r=1 is the identity
-  control (must reproduce plain layerwise 90.220 +-0.011).
-* **`r10c-*` (alice2, 18)** -- R10 CIFAR-10 a0=1e-3, r in {0,.05,.1,.2,.5,1} x 3 seeds.
-  R10@1e-3 has only r=0.06 and it is NEGATIVE (-2.30); does the optimum shift right at 1e-3 too?
-* **`cs-*` (alice, 18)** -- CIFAR-100 x {R10,R34} x {scalar,layerwise,additive} x 3 seeds.
-  Cancelled+resubmitted 23:54 19 Aug (ids 4683766+, elapsed 0:00, no data lost). Separates
-  task difficulty from parameter count.
-* **`m0c-*`/`m0s-*`/`m0l-*`** -- M0 shrink on CIFAR-100 and at scale; still the open question
-  of whether M0 is the paper's method.
-* **`sa3-ResNet34-*` (alice2)** -- fills the n=1 cells at alpha0=1e-3.
-* Niced back to 20000 this cycle: alice 102 jobs, alice2 58. `sc50`/`sc101` cannot produce a
-  100-epoch point on `gpu-short` at all (31-34 epochs in 4h) -- they need a 7-day partition.
+Also this cycle: **two r-cells were mixtures of incompatible run families** (no-augmentation
+`ha-w`, meta=Adam `adg-A`, and 300/20-epoch budgets). The config key is **eight** fields, not
+four -- see 24.1. Corrected, r=0.1 went 89.120 +-11.269 -> 92.240 +-0.556.
+
+* **`p6f-*` (alice, 9) -- PROMOTED to #2.** Agreement/drift on {CIFAR-100, R10, R34} x
+  {layerwise, nodewise, weightwise}. THE experiment: sign-agreement should be markedly lower
+  on CIFAR-100, which would explain 24.3 and 24.4 with one mechanism. It had been niced to
+  the back of the queue.
+* **`c6f-*` (alice2, 21) -- submitted this cycle.** CIFAR-100 R18 a0=1e-6, r in
+  {.1,.15,.2,.3,.5,1} + plain layerwise x seeds 2,3,4. Every CIFAR-100 cell in 24.3 is n=1-2;
+  this takes the flat region to n=3-5 and settles the r=1 identity control there.
+* **`c100f-node`/`c100f-w` (alice2, 6)** -- completes the CIFAR-100 granularity ladder (24.4).
+* **`r34r-*` (alice, 27)** -- R34 r-curve, completes the scale family. Still pending.
+* **`cs-*` (alice, 18)** -- CIFAR-100 x R10/R34: task difficulty vs parameter count.
+* **`sc50` running / `sc101` queued** -- R50 and R101 rungs of the scale ladder.
+* Niced to 40000: `sw-cos`/`fxcos`/`fc100` (37) -- baseline LR tuning, and the baseline is
+  already settled at 94.093 +-0.036.
+
+**Top integrity item:** `ad-l` (92.626, n=5) and `adg-b` (91.598, n=3) share every recorded
+field yet differ by **1.03pp**, ~50x the reproduction tolerance. Something that moves a 1pp
+effect is not being logged. Find it before trusting any n-pooled cell.
 
 ## Gotchas that cost hours — do not rediscover these
 * **`LAM=na` / `ETA_RATIO=na` KILL the job.** `HF.py` lines 24-25 `float()` both env vars
@@ -85,8 +93,9 @@ peak >+2.62.
 * **12 running per account IS the ceiling, not a bug.** Every non-`gpu-short` GPU node reports
   `AllocTRES` = its full GPU count (other users hold them); `qos-gpu-short` caps at
   `gres/gpu=12` per user. Confirm with `scontrol show node <n> | grep AllocTRES` before
-  "fixing" anything. **Negative `Nice` is denied** to unprivileged users -- the only way to
-  promote a block is to nice *other* jobs back.
+  "fixing" anything. Negative `Nice` is denied, **but `scontrol update JobId=<j> Nice=0` on a
+  previously-niced job IS accepted and is a large promotion** (cycle 24: `p6f` went 651704 ->
+  671710, back of the queue to #2). You do NOT have to nice other blocks back to promote one.
 * **Compare against a SCHEDULED baseline, not a constant-LR one.** AdamW+cosine 94.09 beats
   the best MetaOptimize arm 93.31; constant-LR AdamW 91.86 loses to it by 1.38pp. Which
   baseline you pick flips the sign of the headline method claim.
@@ -113,6 +122,13 @@ peak >+2.62.
 * **On alice2 the runner is `jobs/run_cifar.sh`** (already the s5014158 variant, with
   `/home/s5014158` paths baked in). `run_cifar_alice2.sh` exists only in the git repo, not on
   that account -- using that name gives `sbatch: error: Unable to open file`.
+* **`sc50` = ResNet50, `sc101` = ResNet101 -- and R50 DOES finish inside `gpu-short`.**
+  Measured cycle 24 from live TensorBoard scalars: ~44 epochs/hour, 100 epochs in ~2:20
+  inside the 3:50 limit. The cycle-23 prose "31-34 epochs in 4h, needs a 7-day partition"
+  was wrong and nearly cost six healthy running jobs. Read the event files, not the prose.
+* **A running job's progress is readable without `probe.jsonl`.** `sc50` had no probe dir;
+  `EventAccumulator` over `runs/<b>/Tensorboard_outputs/<run>/events*` gives the epoch count
+  directly (`len(a.Scalars('Performance/train_accuracy'))`). Use it before cancelling anything.
 * **`gpu-short` caps at 4:00:00** (`sinfo`); the other four GPU partitions allow 7 days. Use
   `--time=03:50:00` to stay eligible, and drop `gpu-short` for anything longer.
 * **Check whether an "alpha0 control" already exists before submitting one.** `mx-a1e3-*` was
