@@ -7714,6 +7714,15 @@ agree to **0.010–0.030pp** at a0=1e-6 and show no systematic ordering at a0=1e
 76.35–76.76 against a within-seed spread of 0.15–2.19pp, i.e. chaotic divergence at lr=1e-3,
 not a partition effect). Every one of 2000 records has `beta_true_max == beta_true_min`.
 
+**Second structural check: `--alg-meta fixed` does NOT also freeze the eligibility trace.**
+The worry is that the frozen arm might compute a stale meta-gradient, which would invalidate
+the whole frozen-vs-free contrast. `HF.py:57-58` shows `alg-meta fixed` swaps **only**
+`meta_update -> no_meta_update`; the trace recursion
+`h_condenced[i] = gamma*(1-wd*a)*h_condenced[i] - delta_w` lives inside the **base_update**
+functions (`SGD_base_update`, HF.py:465-469, and the four sibling updates), which run in both
+arms. `HtT_gradft = block_product(h_condenced, g)` is therefore the same computation in both;
+the only difference is that alpha stays uniform in the frozen arm -- which is the treatment.
+
 **Statistic.** Per record, n = m·(1−frac_zero) coordinates have a nonzero meta-gradient and a
 fraction p are negative; we report A = mean_t max(p, 1−p) and invert the **exact** binomial
 null to get the effective independent count N_eff. Validated in `analysis/neff_validate.py`:
