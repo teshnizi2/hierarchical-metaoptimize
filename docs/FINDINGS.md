@@ -6938,3 +6938,172 @@ nothing. (It does, however, **confirm CORRECTIONS 15's structural check** — wh
 `shrink` lam=1.0 are structurally different operators that 33.1 predicts collapse to the *same*
 `ms_eff`. They agree at **all four granularities** to **0.029 / 0.045 / 0.087 / 0.186pp**. That
 is an R4-compliant interior check and it passes.
+
+---
+
+# Cycle 36 (part 2) — the theory core rebuilt; the refutation stands on a sign test, not on the CIs
+
+Second workflow: rebuild the agreement ladder from raw probe data, author and independently
+verify the beta-schedule patch, design the corrected matrix. 6 agents, 884k tokens.
+Artefacts: `results/p7_c36.txt` (supersedes `p7_c31.txt`), `results/p7_c36.json`,
+`results/c36_beta_schedule/`.
+
+## 36.11 The rebuild — and an independent reproduction of the audit
+
+Two agents reached the corrected ladder by different routes and **agree to the digit**:
+R18/C10 STEADY |2p−1| = 0.394667 / 0.120387 / 0.014647 / 0.000335; corrected STEADY slopes
+−0.2262…−0.2940; legacy −0.0915…−0.1398; pooled |2p−1| exponent −0.4704, R² 0.968.
+
+Control: a from-scratch reimplementation of `agree2` diffed field-by-field against the published
+extractor over all 92 arms × 2 windows × 7 fields — **max absolute discrepancy 0**. `p7_c31.txt`
+is a pure 46-of-92 subset per window; every row in it is bit-identical.
+
+The weighting fix is validated independently: summing per-tensor group counts obtained by
+instantiating `build_network` reproduces the `n_tot` inferred from `frac_neg` rational
+denominators **exactly** for all 12 cells (8,660 / 14,420 / 14,600 / 25,556 nodes;
+4,903,242 / 11,173,962 / 11,220,132 / 21,282,122 weights), and the fix is a provable no-op at
+blk6/layerwise — confirmed numerically at ratio exactly 1.000 on all 44 such arms. Effect:
+nodewise ×1.10–1.47, weightwise **×0.089–0.173** (a 5.8–11.2× *reduction*) in STEADY.
+
+Exact binomial null via de Moivre's MAD, `1/2 + ⌈m/2⌉·C(m,⌈m/2⌉)/(m·2^m)`, evaluated with
+`lgamma` so it is exact at m=11M: **m=6 → 65.625000%** (asymptotic overstates by 0.66175pp),
+m=62 → 55.046184%, negligible above. Applied **per record** at that record's integer nonzero
+count, which matters in STARTUP where `frac_zero` ≈ 0.016.
+
+## 36.12 CORRECTION TO 36.5 — "all eight CIs exclude −0.500" is an artefact of the bootstrap scheme
+
+36.5 reported that the √N refutation survives with all eight corrected bootstrap CIs excluding
+−0.500. **That is the seed bootstrap, and it is optimistic.** Resampling seeds within rungs
+propagates only seed noise: it treats the power law as exact and the rung positions as fixed, so
+with m spanning six decades the slope comes out absurdly precise (typical CI half-width 0.002).
+
+Under a conservative rung-level interval (OLS on rung geometric means, SE from residual scatter,
+R−2 df), **only 2 of 8 exclude −0.500** — both the 4-rung, 10-seed R18 STEADY cells.
+
+Worse, **the log–log relation is not a power law.** Adjacent-rung local exponents, R18/C10
+STEADY: −0.318, −0.132, −0.415; R18/C100 STEADY: −0.049, −0.127, −0.371. The middle rung is
+systematically flatter. A single fitted b is a summary, not a model, and quoting it to four
+decimals — as `p7_c31.txt`, the audit and 36.5 all did — overstates what 3–4 points support.
+
+**What the refutation should actually rest on: a form-free sign test on adjacent-rung local
+exponents.** Drift: **18 of 20 shallower than −0.500, p = 2.0×10⁻⁴**; STEADY alone **10 of 10,
+p = 9.8×10⁻⁴**; 8 of 8 global fits shallower, p = 3.9×10⁻³. **The same counts hold under the OLD
+equal-weight drift**, so the direction does not depend on the weighting fix at all. By contrast
+|2p−1| gives 14 of 20 (p = 0.058) and STEADY alone splits **5/5 (p = 0.62)** — dead on the null.
+
+## 36.13 The |2p−1| tension resolved — it is not a coincidence, it is near-tautological
+
+Decomposing |2p−1| at each rung into its pure-noise term (2·null_exact − 1) and its excess:
+the noise share is **45.4–83.8%** across the four R18/C10 STEADY rungs and 17.9–90.3% across all
+14 STEADY cells. **Fitting the pure-noise term alone against m gives b = −0.4978 to −0.5007**,
+with adjacent-rung local exponents −0.479, −0.484, −0.499, −0.500, −0.502. The floor **is**
+m^−1/2 to three decimals *by construction, not by measurement*.
+
+So |2p−1| does not refute √N and cannot: a statistic whose null baseline is exactly m^−1/2, and
+which sits 18–90% on that baseline, will read m^−1/2 whether or not the underlying noise model
+holds. A reader seeing "−0.4816, indistinguishable from −0.5" beside "√N refuted" would conclude
+the paper contradicts itself, **and would be half right — the two claims are about different
+observables and the campaign has never said so.**
+
+**Required wording, main text, not a footnote:** (1) drift per meta-step falls strictly more
+slowly than √N — 8/8 settings shallower, 18/20 local exponents, sign test p = 2×10⁻⁴; seed
+bootstrap excludes −0.500 in 8/8, a misspecification-tolerant interval in 2/8; (2) |2p−1| does
+**not** support this — it falls as m^−0.4704 [−0.4753, −0.4654], indistinguishable from −1/2;
+(3) that is expected, because |2p−1| carries an exact m^−1/2 binomial floor accounting for
+45–84% of its value, so its exponent is near-uninformative. Rest the claim on drift; report
+|2p−1| as a consistency check this design cannot sharpen.
+
+**And state the collinearity plainly:** granularity and the 1/√m axis cannot be separated in this
+design. `fz-` (below) and an AdamW-base ladder are the two experiments that break it.
+
+## 36.14 Further defects found in the rebuild
+
+* **`analysis/agree2.py` and `bin/agree2.py` have diverged** on `limit_denominator`
+  (20,000,000 vs 100,000,000). The repo copy returns a **wrong `n_tot` for ResNet-34 weightwise**
+  (21,282,122 > the 20M cap) and would silently corrupt any future rebuild run from `analysis/`.
+  Use `bin/`. **Fix before anyone reruns the ladder.**
+* `agree2`'s drift is a **two-point estimator** (|β_last − β_first| / Δstep), discarding the other
+  48 records. An OLS-over-window drift agrees to <0.005 in 7 of 8 settings — but
+  **R18/C100/STARTUP moves −0.4569 → −0.5073, crossing −0.500 purely on estimator choice.**
+  Do not quote that setting as evidence either way.
+* **Corrected weightwise STEADY drift is 11–25 float32 ulps per step** (5.2e-6…1.2e-5 against a
+  4.77e-7 ulp at a0=1e-3), and the weighting fix moved it a further 5.8–11.2× *down* toward that
+  floor. The largest-m rung has the most leverage in the regression **and** is closest to
+  numerical resolution. `f64-` (P2) tests this directly.
+* **R10/C10 and R34/C10 have n=2 seeds and only 3 rungs** (no blk6 arm exists — `resnet18_blocks`
+  is R18-specific). Their CIs are resampled from 2 values per rung; rung-level CIs have 1 df.
+  Either restrict ladder claims to the two R18 families or seed them up.
+* All 92 arms are a0=1e-3, ms=1e-3, Lion meta, 20 epochs. **The ladder is a single point in
+  (a0, ms, optimizer) space.** ms-invariance of |2p−1| is untested; no AdamW-base probe exists.
+
+## 36.15 The beta-schedule patch — code safe, experiment not identified
+
+Both verifiers independently confirmed **`identity_preserved = true`** (all three insertion points
+guarded on a `False` bool / `None`; pure insertion; the only channel from β to the network is
+`self.alpha`), and one verified the live file's sha256 and that the diff applies clean. Both
+returned **`needs-changes`**, and verifier 2 found the design **blocking**:
+
+* **The collapse arm discards the treatment it claims to control.** Granularity's entire causal
+  content is the cross-group variation of β, and reducing to a scalar is exactly the projection
+  that annihilates it. On the real donor `p7-r18-lay-s0` at step 9900 the 62-entry β vector spans
+  [−15.000, −5.621] — a 1.2e4× spread in per-layer α — with parameter-weighted sd 0.488. The
+  retained scalar signal is 0.578 nats of total drift; **the discarded cross-layer sd is 2.397,
+  ~4× the kept part.**
+* **At nodewise and weightwise a non-uniform replay is impossible**: `_probe` stores only 62
+  per-tensor *means* (HF.py:344) and `BETA_TRACE` only two scalars per step. The sole driver is a
+  1-D broadcast, which makes β uniform — so **every replay arm there is behaviourally the scalar
+  arm**, at precisely the two rungs where m is largest and the clip binds hardest.
+* **The scalar summary determines the answer.** Both `pw` and `gw` average in *log* space, i.e.
+  impose the parameter-weighted *geometric* mean of per-group learning rates. At blk6 step 9900,
+  block 4 (8,393,728 params = 75.1% of the network) sits at β = −12.865 while blocks 0–3 sit at
+  ≈−7.4: pw geometric mean −11.504 vs log of the pw *arithmetic* mean −8.762, **Jensen gap 2.742
+  nats** — the replay runs at 1/15.5 of the donor's aggregate rate. A different optimizer, for
+  reasons having nothing to do with granularity.
+* **No open-loop gate**, so a non-null in any replay arm is uninterpretable — and a null equally
+  so, since open-loop damage could cancel a real effect.
+
+Verdict adopted: **apply the code, redesign the experiment.** The identified replacement is
+`dsp-`, a dispersion dose-response at **fixed m=62** — replay β_i(t;c) = β̄(t) + c·(β_i(t) − β̄(t))
+per-group into a layerwise arm, c ∈ {0, 0.25, 0.5, 0.75, 1}. Holding m fixed decouples granularity
+from the 1/√m axis **for the first time in the campaign**. It is gated on `slf-`, the open-loop
+gate (replay a donor's own trajectory into itself at the same seed; paired TOST at δ=0.3pp).
+
+## 36.16 THE PAPER, RESTATED
+
+**"Meta-learned per-parameter step sizes: a diagnostic negative result with one measured
+mechanism."** Four legs:
+
+1. **Dominance.** Tuned AdamW+cosine beats the best MetaOptimize cell by ≥0.831pp
+   (t = −15.99), and the grid is right-censored so that is a **lower bound**. `bx-` converts it
+   into a valid one.
+2. **Theory.** The √N model is refuted **on the drift axis** (sign test p = 2×10⁻⁴), stated
+   beside the |2p−1| null result and its explanation.
+3. **Scope.** Three named artefacts entangle everything called a "granularity effect": a
+   `beta_clip` floor binding in 100% of fine arms and never for scalar; an `ms_eff` that is a
+   schedule whose decay factor is itself ordered by m; and a pooling identity holding only for
+   Lion, i.e. 1 of the parent paper's 4 optimizer rows.
+4. **Mechanism.** The only unambiguously load-bearing component is the β **ceiling** — a
+   stability guard against a single-epoch runaway at weightwise (+67.8pp; 10/10 rows collapse
+   without it) — **not** a learning-rate adaptation.
+
+**The one positive result still available.** At layerwise the meta-learner drives exactly 3
+tensors (512/512/512 elements, BN/bias-scale, **0.0687% of parameters**) onto the clip floor and
+leaves the rest graded — it may be discovering a **freezing partition**. "Meta-learning discovers
+which few tensors to freeze" is sharper, more useful and more defensible than "granularity
+helps", and if it holds it needs no meta-learning at all in deployment. `frz-` is the arm that
+would earn it. **If `frz-` fails the paper is purely negative and should be written that way.**
+
+**Formally abandoned:** the interior optimum in m (as a research question, not merely as an
+unproven claim); the "pooling helps" framing; the positive-method-result story; constant-`ms`
+matching as an identification strategy; replay arms at nodewise/weightwise and blk6; and the
+111 existing `beta_clip=none` rows as a ready-made deconfounded arm (all a0=1e-6, none with a
+probe dir, no nodewise clip-off run exists, 25 unattributable).
+
+## 36.17 Submitted
+
+| batch | acct | jobs | question |
+|---|---|---|---|
+| `fz-` | alice2 | 50 | **the empirical null for \|2p−1\|.** `--alg-meta fixed` → `no_meta_update` (HF.py:477) returns without touching β while `_probe` (HF.py:95) still fires, so α is identical across groups, the weight trajectory is provably m-invariant, clip duty is identically zero, and the five arms differ **only** in how the same meta-gradient is partitioned. 5 granularities × a0 {1e-3,1e-6} × 5 seeds × 20 ep |
+| `bx-` | alice | 12 | bracket the baseline: lr {2e-3, 5e-3} at n=5 + 3e-3 to n=5, giving a 7-point curve {1e-4 … 1e-2}. No dominance number may be quoted until the argmax is interior |
+
+Queue: **alice 87 pending / 12 running, alice2 113 / 13.** 188 jobs submitted this session.
