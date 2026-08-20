@@ -364,3 +364,68 @@ scalar vs 6-block vs layerwise, n=3.
 **Never report a comparison until budget, search budget, and setup are all matched — or until
 each mismatch is stated in the same breath as the number.** Two of these three flaws were caught
 by the operator, not by us.
+
+---
+
+## 14. The config key omitted `granularity`, and a "logging gap" was invented to explain it (cycle 25)
+
+**What was wrong.** Cycle 24 (FINDINGS 24.1) recorded, as the campaign's "highest-value
+integrity item":
+
+> **Unresolved anomaly:** `ad-l` (92.626, n=5) and `adg-b` (91.598, n=3) agree on *every*
+> recorded field yet differ by **1.03pp**, ~50x the +-0.02pp reproduction tolerance. Something
+> that determines a 1pp effect is not being logged.
+
+**What is true.** They do not agree on every recorded field. They differ in
+`--stepsize-groups` — `layerwise` vs `resnet18_blocks` — which is in the ARGS line of both
+`.out` files and in the `granularity` column of both CSV rows. The aggregator was correct.
+Cycle 24's *analysis* grouped by an 8-field key that left out `granularity`, the single most
+important field in the project, and so pooled two granularities into one cell.
+
+**Effect on the claims.** The r=0.1 cell of the M1 ladder goes from 92.240 +-0.556 (n=8,
+two granularities) to **92.626 +-0.214 (n=5, layerwise only)** — sd down 2.6x. The peak cells
+(r=0.05/0.06/0.07) contained no 6-block runs and are unchanged. The curve is now monotone on
+both sides of r=0.06. Nothing about the interior optimum changes; one ragged cell becomes clean.
+
+Discharged: 24.1's standing caveat that "the r=0.1 cell stays heterogeneous until this is found."
+
+**Rule amended.** The canonical config key is **nine** fields:
+`network, dataset, batch_size, base, meta, meta_stepsize, alpha0, gamma, augment, beta_clip,
+epochs_requested, granularity, hier, eta_ratio, lam` — and `granularity` is never optional.
+
+**Process note.** The failure mode is new and worth naming separately from Rule 1. Rule 1 says
+re-derive numbers from the CSV; this *was* re-derived from the CSV. The defect was in the
+**grouping**, and the symptom — an unexplained gap between two supposedly-identical cells — was
+attributed to the instrument (a missing log field) rather than to the analysis. **When two cells
+that "should" match do not, check the grouping before concluding the data is incomplete.** The
+raw artefacts answered it in one diff.
+
+---
+
+## 15. `_zpool`'s pooling parameter is not comparable across granularities (cycle 25)
+
+**What was wrong.** The zpool sweep has been read across granularities as though its `r` meant
+the same thing at each — e.g. comparing the layerwise and weightwise r-curves directly.
+
+**What the code does.**
+
+```
+_zpool:            z'_b = (1-r)*SUM(z)  + r*z_b          <- SUM, scales with m
+_zmpool:           z'_b = (1-r)*MEAN(z) + r*z_b          <- MEAN, m-invariant
+_apply_hier (M1):  beta_prev + MEAN(d) + r*(d - MEAN(d)) <- MEAN, m-invariant
+```
+
+`_zpool`'s pooled term scales with the group count m, so the scalar->plain transition is
+compressed against r=1 by a factor of m. Its **endpoints remain exact** and are verified
+(FINDINGS 25.4: r=0 reproduces plain scalar to 0.009-0.032pp, r=1 reproduces plain to
+0.099-0.149pp, at both layerwise and weightwise). Only the path between them is m-dependent.
+
+**Consequence.** At weightwise (m=11.17M) the region equivalent to layerwise's interesting
+r in [0.9, 1] sits at `1-r ~ 5e-8`, **below float32 eps (1.19e-7)**. `_zpool` cannot express
+weak pooling at weightwise. The entire 11.13pp weightwise transition is squeezed into the two
+measured cells r=0.99 and r=1, and its optimum is unlocated.
+
+**What survives.** M1 (`additive`) and `_zmpool` are both mean-based, so *their* `r` is
+comparable across granularities. Every cross-granularity pooling claim must use one of those
+two operators, never `_zpool`. FINDINGS 25.3 (M1) and the `zmg-*` batch (zmpool) are built on
+that basis.

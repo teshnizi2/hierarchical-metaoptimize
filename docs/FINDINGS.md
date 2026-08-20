@@ -4529,3 +4529,183 @@ alice2 order is now all-CIFAR-100 at the front (`c100f` -> `c6f` -> `c100b` -> `
 * CIFAR-100 nodewise/weightwise (`c100f-*`, alice2, high priority) completes 24.4.
 * `cs-*` (18, alice) CIFAR-100 x R10/R34 — task difficulty vs parameter count.
 * R50/R101 rungs in flight (`sc50` running, `sc101` on a 7:30 partition).
+
+---
+
+# Cycle 25 (20 Aug 2026) — the cycle-24 "logging gap" was an analysis bug, and pooling strength is not comparable across granularities
+
+Re-aggregated both accounts (787 runs, +27 since cycle 24: `c100b` 14, `m1a3` 4, `r10b` 3,
+`sc-ResNet34` 6). Every number below re-derived from `results/all_runs.csv` with
+`superseded==0` and the canonical config filter.
+
+## 25.1 RESOLVED — cycle 24's "highest-value integrity item" was ours, not the logger's
+
+24.1 recorded an unexplained 1.03pp gap between `ad-l-*` (92.626) and `adg-b-*` (91.598),
+stating they "agree on *every* recorded field yet differ by 1.03pp" and concluding
+"something that determines a 1pp effect is not being logged."
+
+**They do not agree. They differ in `--stepsize-groups`, and it was recorded correctly.**
+
+| family | `--stepsize-groups` in the ARGS line | CSV `granularity` |
+|---|---|---|
+| `ad-l-*`  | `layerwise` | `layerwise` |
+| `adg-b-*` | `resnet18_blocks` | `resnet18_blocks` |
+
+Verified from the raw artefacts: `runs_alice2/ad-l-r01-s0-4681040.out` vs
+`runs/adg-b-r01-s0-4681164.out`. The aggregator had it right in both rows all along; the
+cycle-24 **config key omitted `granularity`** — the single most important field in the project —
+so two different granularities were pooled into one cell.
+
+**Rule amended:** the config key is **nine** fields, not eight. `granularity` is mandatory in it.
+No logging gap exists and nothing needs to be instrumented.
+
+## 25.2 Consequence — the M1 r-curve's one ragged cell was the contamination
+
+ResNet18 / CIFAR-10 / a0=1e-6 / 100ep / SGDm+Lion, `hier=additive`, **layerwise only**:
+
+| r | plateau | sd | n | was reported (24.2) |
+|---|---|---|---|---|
+| 0 (full pooling) | 92.228 | 0.087 | 6 | 92.228 (unchanged) |
+| 0.03 | 92.637 | 0.165 | 5 | 92.310 ±0.483 (n=8) |
+| 0.04 | 92.862 | 0.130 | 5 | unchanged |
+| 0.05 | 93.047 | 0.136 | 10 | unchanged |
+| **0.06** | **93.262** | **0.135** | 8 | unchanged |
+| 0.07 | 93.192 | 0.152 | 9 | unchanged |
+| 0.1 | **92.626** | **0.214** | 5 | **92.240 ±0.556 (n=8)** |
+| 0.2 | 91.387 | 0.142 | 3 | unchanged |
+| 0.3 | 90.957 | 0.079 | 3 | unchanged |
+| 1 (identity) | 90.864 | 0.062 | 3 | unchanged |
+
+The r=0.1 cell's sd falls **2.6x** (0.556 -> 0.214) and it rises 0.39pp. The curve is now
+monotone up to r=0.06 and monotone down after it, with no ragged cell. The peak cells were
+never affected. 24.1's caveat "the r=0.1 cell stays heterogeneous until this is found" is
+discharged.
+
+## 25.3 NEW — the M1 pooling gain depends on GRANULARITY, and M1's r is comparable across granularities
+
+`_apply_hier` (M1, additive) pools the **mean** of the realised beta update
+(`dm = d.mean()`; for nodewise/weightwise `dm = tot/cnt`). Its `r` is therefore
+**m-invariant** and the same `r` means the same thing at every granularity.
+
+R18 / C10 / a0=1e-6 / 100ep:
+
+| granularity | m (groups) | plain | M1 identity r=1 | best r | best plateau | gain |
+|---|---|---|---|---|---|---|
+| resnet18_blocks | 6 | 91.350 ±0.142 (12) | *not yet run* | 0.03 | 91.765 ±0.222 (3) | +0.415 vs **plain** |
+| layerwise | 62 | 90.784 ±0.169 (17) | 90.864 ±0.062 (3) | 0.06 | 93.262 ±0.135 (8) | **+2.399 vs identity** |
+| nodewise | 14,420 | 91.593 ±0.138 (8) | — | — | — | submitted (`gp-node-*`) |
+| weightwise | 11,173,962 | 77.822 ±0.351 (3) | — | — | — | submitted (`gp-w-*`) |
+
+6-block has only 2 r-points (0.03, 0.1) and **no r=1 identity anchor**, so its +0.415 is
+against plain, not against the identity — not the same comparison as layerwise's +2.399.
+`gp-blk6-r1` supplies the anchor. Direction is nonetheless clear: a 6-group partition gains
+~0.4pp from pooling where a 62-group partition gains ~2.4pp.
+
+## 25.4 NEW — `_zpool` is NOT m-invariant, and the existing zpool granularity comparison is confounded
+
+```
+_zpool:   z'_b = (1-r)*SUM(z) + r*z_b      <- SUM
+_zmpool:  z'_b = (1-r)*MEAN(z) + r*z_b     <- MEAN
+_apply_hier (M1): beta_prev + MEAN(d) + r*(d - MEAN(d))   <- MEAN
+```
+
+The pooled term in `_zpool` scales with **m**, so its `r` means something different at every
+granularity. Endpoints are still exact and are verified below, but the **path between them is
+compressed against r=1 by a factor of m**.
+
+**Structural verification of all six endpoints** (Rule 4 — measured, not asserted):
+
+| arm | n | plateau | should equal | Δ |
+|---|---|---|---|---|
+| zpool r=0, layerwise | 5 | 87.740 ±0.139 | plain scalar 87.772 | 0.032 |
+| zpool r=0, weightwise | 5 | 87.763 ±0.036 | plain scalar 87.772 | 0.009 |
+| zpool r=1, layerwise | 5 | 90.933 ±0.177 | plain layerwise 90.784 | 0.149 |
+| zpool r=1, weightwise | 5 | 77.921 ±0.332 | plain weightwise 77.822 | 0.099 |
+| M1 r=1, layerwise | 3 | 90.864 ±0.062 | plain layerwise 90.784 | 0.080 |
+| M1 r=1, ResNet10 layerwise | 3 | 90.586 ±0.166 | plain R10 90.619 | 0.033 |
+
+All six hold. `r=0 -> scalar` and `r=1 -> plain` are both exact for zpool, at two granularities.
+
+**Why the compression matters.** For layerwise (m=62) the interesting region is r in [0.9, 1].
+The m-equivalent region at weightwise (m=11.17M) is `1-r ~ 5e-8` — **below float32 resolution
+(eps = 1.19e-7)**. `_zpool` therefore *cannot express weak pooling at weightwise at all*. Any
+cross-granularity reading of the zpool sweep is measuring m, not pooling.
+
+## 25.5 UNREDUCED RESULT — zpool weightwise has an interior optimum beating BOTH endpoints; layerwise does not
+
+Present in the repo since the `zsw`/`zsx`/`zrn` families ran; never reduced.
+R18 / C10 / a0=1e-6 / 100ep:
+
+| r | layerwise | n | weightwise | n |
+|---|---|---|---|---|
+| 0 (= scalar) | 87.740 ±0.139 | 5 | 87.763 ±0.036 | 5 |
+| 0.1 | 89.471 ±0.137 | 5 | 87.847 ±0.081 | 5 |
+| 0.3 | 89.476 ±0.170 | 5 | 87.950 ±0.165 | 5 |
+| 0.5 | 89.170 ±0.104 | 4 | 87.870 ±0.122 | 4 |
+| 0.7 | 89.100 ±0.172 | 6 | 88.064 ±0.152 | 6 |
+| 0.9 | 90.196 ±0.209 | 2 | 88.510 ±0.105 | 2 |
+| 0.95 | 90.435 ±0.117 | 2 | 88.798 ±0.011 | 2 |
+| 0.99 | 90.971 | 1 | **89.052 ±0.317** | 2 |
+| 1 (= plain) | 90.933 ±0.177 | 5 | **77.921 ±0.332** | 5 |
+
+* **layerwise: monotone.** No interior point beats r=1. zpool only ever costs accuracy.
+* **weightwise: interior optimum.** r=0.99 (89.052) beats *both* endpoints — plain weightwise
+  (77.921, **+11.13pp**) and scalar (87.763, **+1.29pp**).
+
+Read against 25.4 this is not a "flat region then a jump": it is the scalar->plain
+interpolation compressed by m, and **the entire 11pp transition lives inside r in [0.99, 1]**,
+where only two cells exist. The weightwise optimum's true location and height are unmeasured.
+Because float32 cannot resolve the region, the fix is the operator, not more r values —
+hence 25.7.
+
+**Caveat:** the r>=0.9 cells are n=1-2. Nothing here is stated at the n>=3 headline standard yet.
+
+## 25.6 Model-scale ladder — the ResNet10 r-curve is complete (13 r-points)
+
+CIFAR-10 / a0=1e-6 / 100ep / layerwise, gain measured against the **r=1 identity**:
+
+| network | params | plain | identity r=1 | r* | peak plateau | gain | r-points |
+|---|---|---|---|---|---|---|---|
+| ResNet10 | 4.9M | 90.619 ±0.267 (3) | 90.586 ±0.166 (3) | **0.10** | 91.590 ±0.051 (3) | **+1.004** | 12 |
+| ResNet18 | 11.2M | 90.784 ±0.169 (17) | 90.864 ±0.062 (3) | **0.06** | 93.262 ±0.135 (8) | **+2.399** | 9 |
+| ResNet34 | 21.3M | 90.220 (3) | *not yet run* | 0.06 (only point) | 92.838 ±0.147 (3) | +2.618 vs plain | **1** |
+
+**r\* moves left and the gain grows as the model grows.** R34 still rests on a single r value
+with no identity anchor — `r34r-*` (27 jobs, alice, 9 r-values x 3 seeds incl. r=1) fixes both.
+Do not state the R34 row as a curve until it lands.
+
+## 25.7 Submitted this cycle (78 jobs)
+
+| batch | acct | n | why |
+|---|---|---|---|
+| `gp-{node,w,blk6}-*` | alice2 | 48 | 25.3 — M1 r-curve at nodewise / weightwise / 6-block. M1's r is m-invariant, so this is the clean test of "does pooling help more when the partition is finer?". Includes the r=1 identity anchor at every granularity. Prediction: weightwise, whose plain arm collapses to 77.8, gains most. |
+| `zmg-{l,w}-*` | alice | 30 | 25.4 — `_zmpool` (MEAN-based, m-invariant) r-curve at layerwise vs weightwise, r in {0,0.06,0.2,0.6,0.9} x 3 seeds. The only M2 form in which r is comparable across granularities. Only 4 zmpool runs exist and all are 20-epoch endpoint gates. |
+
+Queue actions: `c6f-*` (21, alice2) niced to 30000 — 24.3 already answered CIFAR-100 pooling
+("no interior optimum, saturates flat") at n=2; raising a null to n=5 is the lowest-value work
+in the queue. Queues after: alice 239, alice2 207 = **446 jobs**, 24 running (12+12).
+
+## 25.8 CIFAR-100 granularity ordering is now alpha0-robust
+
+`c100b-*` landed, supplying the a0=1e-3 replication of 24.4. Plain arms, ResNet18_c100, 100ep:
+
+| granularity | a0=1e-6 | a0=1e-3 |
+|---|---|---|
+| scalar | 22.300 ±0.808 (2) | 22.461 ±0.456 (4) |
+| resnet18_blocks | 52.728 ±0.407 (2) | 51.276 ±0.892 (3) |
+| layerwise | **69.886 ±0.134 (2)** | **69.850 ±0.487 (3)** |
+
+The blocks/layerwise inversion vs CIFAR-10 (where blocks 91.350 > layerwise 90.784) reproduces
+at both alpha0, and the a0 dependence is <1.5pp everywhere. **24.4's dataset inversion is not an
+alpha0 artefact.** Contrast with 24.3's pooling result, which *is* strongly a0-dependent.
+
+## 25.9 Still open
+
+* **6-block, nodewise, weightwise M1 identity anchors** — `gp-*-r1` in flight. Until they land,
+  25.3's cross-granularity gain column is not all measured against the same baseline.
+* **R34 r-curve** — `r34r-*` (27, alice) still pending; 25.6's third row is one point.
+* **zpool weightwise r in [0.99, 1]** — unmeasurable in float32; superseded by `zmg-*`.
+* **p6f-*** (9, alice, rank ~31) — sign-agreement/drift on {C100, R10, R34} x {layer, node,
+  weight}. This is the mechanism that 25.3 and 25.5 both predict: pooling should help in
+  proportion to how much a partition's coordinates disagree.
+* n=1-2 on every zpool cell at r>=0.9 (25.5).
