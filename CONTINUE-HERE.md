@@ -43,6 +43,50 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 32)  -- queues: alice 189, alice2 214 = 403 jobs
+
+**Cycle 32 found two batches that finished cycles ago and were never tabulated** (`sc50-*` =
+ResNet50 n=1; `cs-r10/cs-r34-*` = CIFAR-100 x model scale n=3). Reducing them gives a
+FOUR-architecture model-scale ladder on CIFAR-10 and a THREE-row one on CIFAR-100, and the two
+scale effects run in OPPOSITE directions (FINDINGS 32.5-32.6):
+
+| | R10 4.9M | R18 11.2M | R34 21.3M | R50 23.5M |
+|---|---|---|---|---|
+| M1 pooling gain (r=0.06 vs r=1), a0=1e-6 | +0.166 (null) | +2.446 | +2.594 | +3.237 (n=1) |
+| plain granularity gain (layerwise - scalar) | +19.877 | +3.043 | +0.835 | **-1.394 (n=1)** |
+
+**ResNet50 at a0=1e-6 is the first architecture where the parent paper's premise reproduces**
+-- layerwise loses to scalar. It is ONE SEED. `sc50` s1-s4 are queued at nice 50; do not state
+it until they land.
+
+**The paper core got stronger.** `p9-*` landed: the agreement/drift ladder is n=10 at all four
+rungs on BOTH datasets, and all 8 slopes have bootstrap 95% CIs that exclude -0.500 (32.1).
+A 9th fit at a0=1e-6/100ep gives -0.2363 and shows the drift-vs-m curve is **non-monotone**
+(rises 6 -> 62, then falls), so sqrt(N) has the wrong FUNCTIONAL FORM, not just the wrong
+exponent (32.2). 31 of 32 leave-one-rung-out sub-spans also stay above -0.500; the one
+exception (-0.5248, R10/STARTUP/node->weight, n=2) is anchored on the weightwise startup drift,
+which is a near-cancellation biased toward zero and therefore biases that slope steep (32.3).
+
+**26.3's mechanism is refuted.** `gp-node-*` landed at M1 gain +1.204 against a LOWER agreement
+than layerwise's +2.446. Agreement is monotone in m; the gain is not (32.8). The campaign has
+no single mechanism right now.
+
+* **`p7-c100r10-*` / `p7-c100r34-*` (30, alice, nice 0) -- PRE-REGISTERED.** C100 x {R10,R34}
+  agreement ladder; predicts every slope stays above -0.500. 20-ep probes, ~15 min each.
+* **`sc50-*-s{2,3,4}` (18, nice 50)** + s1 promoted -> n=5 on the ResNet50 rung.
+* **`f5cos-r34-*` / `f5cos-r50-*` (12, nice 150).** The tuned non-meta baseline exists only at
+  ResNet18 (94.093). Our best arm is 93.884 at **R34** -- currently a cross-architecture
+  comparison. Until these land, no "wins/loses by X" sentence may name R34 or R50.
+* **`r34r-r{0005,001,0015}` (9, nice 150) -- PRE-REGISTERED.** R34's optimum r=0.02 is the
+  smallest non-zero point on its grid. Candidate law r* ~ 1/N (r*.N = 0.5M +-0.12M): predicts
+  all three land below 93.884 and above 93.098; a peak at r<=0.01 refutes the 1/N form.
+* **Cancelled `sw-cos-*` (21)** -- duplicate of the already-complete `fxcos-*` sweep.
+* **Not touched: `kc-*` (39)** -- inspected first (30.0's lesson); it is the C100 M1 r-curve
+  (R18_c100 to n=5, plus a new R10_c100 curve) and is the n>=5 follow-up to 32.6(d).
+* Ops: throughput is still capped at 24 concurrent `gpu-short` jobs on a full cluster.
+  `scontrol update Nice=` must EXCEED the job's accrued age (~700 points per half-day), not
+  just beat the other job's nice -- see 32.10.
+
 ## Running / next (cycle 28)  -- queues: alice 299, alice2 250 = 549 jobs
 
 **Cycle 28 found three more unreduced probe batches, and one of them inverts the mechanism.**

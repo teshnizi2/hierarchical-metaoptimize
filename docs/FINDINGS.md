@@ -5869,3 +5869,264 @@ architecture we can construct reaches −0.5."**
 
 Both caveats are re-checkable at n=10 per rung once `p9-*` lands; the C100 rows above are
 n=10 only at m=6.
+
+## 32.1 31.7 ITEM 1 RESOLVED — the agreement/drift ladder at n=10 on BOTH datasets
+
+`p9-*` (submitted cycle 31 as `p7-{r18,c100}-*`) landed complete: 92 dirs, 100 probe records
+each. The CIFAR-100 ladder was n=1–2 at three of four rungs; it is now n=10 at all four.
+20-epoch probes, a0=1e-3, free adaptation, `bin/agree2.py` statistics, reduced by
+`bin/ladder32.py` (new this cycle; per-seed OLS + 2000-sample seed bootstrap).
+
+**STEADY window (last 50% of records):**
+
+| family | rung | m | n | drift/step | sys% | step−null |
+|---|---|---|---|---|---|---|
+| R18/C10 | blk6 | 6 | 10 | 4.5424e-4 ±1.28e-5 | 66.467 ±3.112 | +3.447 |
+| | lay | 62 | 10 | 2.1664e-4 ±1.29e-5 | 52.452 ±0.963 | +0.953 |
+| | node | 14,420 | 10 | 8.9741e-5 ±2.04e-6 | 50.638 ±0.072 | +0.400 |
+| | w | 11,173,962 | 10 | 5.5428e-5 ±9.54e-7 | 50.004 ±0.003 | +0.005 |
+| R18/C100 | blk6 | 6 | 10 | 2.9267e-4 ±1.31e-5 | 60.500 ±2.162 | +1.013 |
+| | lay | 62 | 10 | 2.6103e-4 ±1.20e-5 | 57.516 ±1.551 | +4.101 |
+| | node | 14,600 | 10 | 9.1195e-5 ±2.19e-6 | 51.839 ±0.162 | +1.518 |
+| | w | 11,220,132 | 10 | 6.9666e-5 ±1.47e-6 | 50.012 ±0.003 | +0.010 |
+
+**All eight full-ladder slopes, with bootstrap 95% CI (new — cycle 31 reported point
+estimates only):**
+
+| family | window | slope | R² | 95% CI | reaches −0.500? |
+|---|---|---|---|---|---|
+| R18/C10 | STEADY | −0.1398 | 0.923 | [−0.1414, −0.1383] | no |
+| R18/C100 | STEADY | −0.1082 | 0.910 | [−0.1100, −0.1065] | no |
+| R10/C10 | STEADY | −0.1214 | 0.961 | [−0.1234, −0.1194] | no |
+| R34/C10 | STEADY | −0.0915 | 0.951 | [−0.0951, −0.0879] | no |
+| R18/C10 | STARTUP | −0.2122 | 0.973 | [−0.2182, −0.2069] | no |
+| R18/C100 | STARTUP | −0.3775 | 0.887 | [−0.4053, −0.3546] | no |
+| R10/C10 | STARTUP | −0.3512 | 0.907 | [−0.3649, −0.3376] | no |
+| R34/C10 | STARTUP | −0.1739 | 0.909 | [−0.1831, −0.1647] | no |
+
+**The n=10 slopes are indistinguishable from cycle 31's n=1–3 ones** (C100 STEADY −0.1082 vs
+−0.1061; C100 STARTUP −0.3775 vs −0.3605). The thin rungs were not distorting the fit. Every
+CI excludes −0.500 by ≥0.09 in log-slope; the most favourable fit's upper bound is −0.3546.
+
+## 32.2 A NINTH FIT, at a different a0 and budget — and the curve is not a power law
+
+`runs/mx/probe_sig_*` is the free-adaptation, **a0=1e-6, 100-epoch** series (config-matched to
+the a0=1e-6 r-curves, i.e. to the accuracy claims in 32.4–32.6, unlike the a0=1e-3 20-epoch
+`p7free` probes above). Reducing it verifies 26.3's agreement column exactly and adds a fit:
+
+| m | drift/step (STEADY) | sys% |
+|---|---|---|
+| 6 | 4.4917e-5 ±1.55e-6 | 70.867 ±0.797 |
+| 62 | **5.8057e-5** ±7.26e-6 | 53.262 ±0.191 |
+| 14,420 | 2.3097e-5 ±2.31e-6 | 51.031 ±0.119 |
+| 11,173,962 | 2.1799e-6 ±1.48e-6 | 50.0053 ±0.0003 |
+
+Slope **−0.2363, R²=0.815 (N=12)** — above −0.500 like the other eight. But note the drift
+**RISES from m=6 to m=62** and falls only after: 4.49 → 5.81 → 2.31 → 0.218 (×1e−5). **The
+drift-vs-m relation is non-monotone at this config, so it is not a power law at all** — which
+is why R²=0.815 is the weakest of the nine fits. A sqrt(N) model does not merely have the
+wrong exponent here; it has the wrong functional form.
+
+## 32.3 ROBUSTNESS — 31 of 32 leave-one-rung-out sub-spans stay above −0.500; report the one that does not
+
+Rule 3 cuts both ways: do not report the max cell, and do not hide the cell that hurts.
+`bin/robust32.py` refits every family with each rung dropped in turn (32 sub-span fits).
+
+| | STEADY | STARTUP |
+|---|---|---|
+| R18/C10 | −0.111 … −0.200 | −0.163 … −0.236 |
+| R18/C100 | −0.101 … −0.157 | −0.171 … −0.441 |
+| R10/C10 | −0.084 … −0.168 | −0.138 … **−0.525** |
+| R34/C10 | −0.061 … −0.132 | −0.092 … −0.282 |
+
+**The single exception is R10 / STARTUP / node→weight, −0.5248 (n=2 seeds, 2 rungs).**
+It should not be read as support for the model, for a reason visible in the data:
+
+**MEASUREMENT CAUTION — the weightwise STARTUP drift is a near-cancellation and is biased
+toward zero.** `drift = |mean(β_last) − mean(β_first)| / Δsteps` on the *group mean*. In the
+startup window the weightwise rung reads 3.0112e-5 (R18/C10), **3.9993e-6 ±1.74e-6**
+(R18/C100) and 1.0767e-5 (R10) — one to two orders below its own steady value, because the
+11.17M per-weight β's have not yet developed a common direction and their mean barely moves.
+A downward-biased endpoint on a log-log fit biases the slope STEEP. Dropping that rung:
+C100 STARTUP −0.3775 → −0.1706, R10 STARTUP −0.3512 → −0.1378, R18 STARTUP −0.2122 → −0.1633.
+**Every steep startup slope in the campaign is produced by the weightwise startup point.**
+The −0.5248 sub-span is exactly the two-point fit anchored on it. Net: the refutation is
+stronger than cycle 31 stated, not weaker.
+
+## 32.4 THE DATASET CONTRAST, PER RUNG — (m=6, STEADY) is the ONLY cell that flips
+
+29.2 and 31.1 chased "the m=6 rung inverts between datasets"; 31.8 showed the flip is
+window-dependent. At n=10 on all four rungs the structure is finally readable (C10 − C100, sys%):
+
+| rung | m | STEADY | STARTUP |
+|---|---|---|---|
+| blk6 | 6 | **+5.967** | −6.583 |
+| lay | 62 | −5.064 | −7.492 |
+| node | 14.4k | −1.201 | −0.406 |
+| w | 11.2M | −0.008 | −0.022 |
+
+**CIFAR-100 has MORE coordinate agreement than CIFAR-10 at every rung in every window, with
+exactly one exception: m=6 in the steady window.** The contrast two cycles chased is a single
+cell, not a dataset property. 31.8's instruction stands and hardens: **do not put a mechanism
+on the dataset contrast.** The defensible statement is that the coarsest partition is the only
+one whose steady-state ordering reverses, and n=10 does not tell us why.
+
+## 32.5 UNREAD DATA, AGAIN — `sc50-*` and `cs-r10/cs-r34-*` completed cycles ago and were never tabulated
+
+Rule 1's failure mode recurred. Two batches finished and were mentioned only as "submitted" or
+"in flight" (FINDINGS 3716, 4051, 4531); neither has a results row anywhere in `docs/`:
+
+* **`sc50-*`** — ResNet50 (23.5M) on CIFAR-10, all six arms, **n=1**, complete. Wallclock 138 min
+  mean / 141 max, i.e. `gpu-short`-eligible, contradicting the note at FINDINGS 4392.
+* **`cs-r10-*` / `cs-r34-*`** — CIFAR-100 × {ResNet10_c100, ResNet34_c100} × {scalar, layerwise,
+  additive r=0.06}, **n=3**, complete. The CIFAR-100 × model-scale grid was never one row deep
+  for the *accuracy* runs; only the probe/agreement grid is.
+
+Reducing them turns the model-scale ladder from 3 architectures into 4 on CIFAR-10 and from 1
+into 3 on CIFAR-100. Everything in 32.6–32.7 comes from data that was already on disk.
+
+## 32.6 MODEL SCALE — the two effects run in OPPOSITE directions, on both datasets
+
+All cells re-derived from `results/all_runs.csv` by matched config (SGDm+Lion, batch 100,
+AUGMENT=1, 100 ep, `epochs_done == epochs_requested`), plateau = mean of last 5 epochs.
+Pooling is compared at **matched r=0.06** so no cell is a per-model argmax (Rule 3).
+
+**(a) CIFAR-10, a0=1e-6 — the M1 pooling gain RISES with model size:**
+
+| net | params | plain layerwise (r=1) | M1 r=0.06 | gain |
+|---|---|---|---|---|
+| ResNet10 | 4,903,242 | 90.619 ±0.267 (n=3) | 90.786 ±0.312 (n=6) | **+0.166 (t=0.8 — NULL)** |
+| ResNet18 | 11,173,962 | 90.817 ±0.158 (n=24) | 93.262 ±0.135 (n=8) | **+2.446 (t=42.5)** |
+| ResNet34 | 21,282,122 | 90.149 ±0.135 (n=5) | 92.743 ±0.192 (n=5) | **+2.594 (t=24.7)** |
+| ResNet50 | 23,520,842 | 87.710 (n=1) | 90.947 (n=1) | +3.237 (n=1) |
+
+**(b) same at a0=1e-3** — same direction, and negative at the smallest model:
+−2.297 (R10, t=−12.9) / +1.031 (R18, t=15.0) / +2.929 (R34, t=22.9) / +2.504 (R50, n=1).
+
+**(c) the PLAIN granularity gain (layerwise − scalar) FALLS with model size**, on both a0:
+
+| net | a0=1e-6 | a0=1e-3 |
+|---|---|---|
+| ResNet10 | +19.877 (t=39.4) | +20.623 (t=37.2) |
+| ResNet18 | +3.043 (t=70.6) | +3.425 (t=35.7) |
+| ResNet34 | +0.835 (t=11.5) | +0.735 (t=4.8) |
+| ResNet50 | **−1.394 (n=1)** | +0.815 (n=1) |
+
+**ResNet50 at a0=1e-6 is the first architecture in the campaign where the parent paper's
+premise reproduces — layerwise LOSES to scalar (87.710 vs 89.104).** It rests on one seed
+(R10's seed sd runs 0.27–0.83pp, so −1.394 at n=1 is not safe). `sc50` seeds s1–s4 are queued
+this cycle; **do not state (c)'s last row until they land.**
+
+**(d) CIFAR-100, a0=1e-3 — the pooling PENALTY shrinks with model size (same direction as (a)):**
+
+| net | params | scalar | layerwise | M1 r=0.06 | pool effect | gran gain |
+|---|---|---|---|---|---|---|
+| ResNet10_c100 | 4,949,412 | 12.968 ±0.202 | 68.266 ±0.329 | 5.558 ±0.042 | **−62.708** | +55.298 |
+| ResNet18_c100 | 11,220,132 | 22.571 ±0.465 | 69.488 ±0.468 | — | — | +46.918 |
+| ResNet34_c100 | 21,328,292 | 30.868 ±0.689 | 67.835 ±0.951 | 57.499 ±1.039 | **−10.336** | +36.967 |
+
+n=3 except R18 (n=5 scalar / n=8 layerwise). Two datasets, four and three rungs: **a larger
+model makes pooling more favourable and plain granularity less so.** In both (c) and (d) the
+granularity gain collapses because the SCALAR arm catches up (C10 a0=1e-6: 70.742 → 87.774 →
+89.314 → 89.104; C100: 12.968 → 22.571 → 30.868) while the layerwise arm is flat
+(90.619 / 90.817 / 90.149 / 87.710 and 68.266 / 69.488 / 67.835).
+
+## 32.7 The R34 r-curve is complete at n=3 including r=1 — and r* falls as the model grows
+
+| net | best r | plateau at best | r=1 | gain at own optimum | r* × params |
+|---|---|---|---|---|---|
+| ResNet10 | 0.10 | 91.590 ±0.051 | 90.586 ±0.166 | +1.004 | 0.49M |
+| ResNet18 | 0.06 | 93.262 ±0.135 | 90.863 ±0.063 | +2.399 | 0.67M |
+| ResNet34 | **0.02** | 93.884 ±0.194 | 90.269 ±0.163 | **+3.615** | 0.43M |
+
+(a0=1e-6, CIFAR-10, layerwise, 100 ep, n=3–10 per cell.) `r34r-r1` reached n=3 this cycle, so
+the R34 reference is no longer provisional. **Candidate law: r* ∝ 1/N, i.e. r*·N ≈ 0.5M ±0.12M
+retained coordinates.** CAUTION: **r=0.02 is the smallest non-zero point on the R34 grid**
+(r=0 gives 93.098, r=0.03 gives 93.813), so the optimum is interior but its LOCATION is
+grid-limited. `r34r-r{0005,001,0015}` submitted this cycle to close it — see 32.9.
+
+## 32.8 26.3's MECHANISM IS REFUTED AT THE NODEWISE RUNG — by the runs 26.3 listed as in flight
+
+`gp-node-*` completed. Matched config throughout (CIFAR-10, ResNet18, SGDm+Lion, a0=1e-6,
+100 ep); agreement from `runs/mx/probe_sig_*` at the SAME config (32.2), not from the
+a0=1e-3 probes:
+
+| granularity | m | sys% (STEADY) | plain plateau | best-r plateau | M1 gain |
+|---|---|---|---|---|---|
+| resnet18_blocks | 6 | 70.867 ±0.797 | 91.335 ±0.142 (n=18) | 91.765 ±0.223 (r=0.03) | +0.430 |
+| layerwise | 62 | 53.262 ±0.191 | 90.817 ±0.158 (n=24) | 93.262 ±0.135 (r=0.06) | **+2.446** |
+| nodewise | 14,420 | 51.031 ±0.119 | 91.593 ±0.138 (n=8) | 92.797 ±0.048 (r=0.06) | **+1.204** |
+| weightwise | 11.17M | 50.0053 ±0.0003 | 35.433 **±33.911** (n=16) | 64.174 ±0.284 (r=0.3) | NOT QUOTABLE |
+
+**Agreement falls monotonically across all four rungs; the gain rises then falls, peaking at
+layerwise.** 26.3 claimed "the pooling gain runs OPPOSITE to agreement" with the nodewise cell
+marked *in flight*. That cell has now landed at +1.204, half the layerwise gain, against a
+LOWER agreement. **One mechanism no longer covers 25.3, 25.5 and 24.3.**
+
+**Rule 4 caution on the last row:** the plain weightwise reference has sd 33.9 over n=16 —
+it is bimodal (collapse vs no-collapse, D1), not a distribution with a mean. No weightwise M1
+gain may be quoted until the arms are conditioned on collapse. The `gp-w-*` curve is also
+monotone INCREASING over its measured span (r=0 45.005 ±2.603 → r=0.3 64.174 ±0.284), i.e.
+pooling *hurts* at the weightwise partition on CIFAR-10 — the opposite of 26.3's prediction —
+but `gp-w-r1` is still running and no gp-w cell may be quoted from an in-flight run.
+
+## 32.9 Submitted this cycle — 69 jobs on alice, 4 batches, each with one open question
+
+| batch | n | nice | what | open question / pre-registration |
+|---|---|---|---|---|
+| `p7-c100r10-*`, `p7-c100r34-*` | 30 | 0 | C100 × {R10, R34} × {lay, node, w} × 5 seeds, 20 ep probes | 31.7 last bullet: the drift refutation's model-scale × dataset grid is one row deep. **Pre-reg: every slope stays above −0.500 in both windows.** ~15 min/job |
+| `sc50-*-s{2,3,4}` | 18 | 50 | ResNet50, 6 arms, seeds 2–4 (s1 promoted from nice 20000 → n=5) | 32.6(c): R50 is the only architecture where the parent paper's premise reproduces, at n=1 |
+| `f5cos-r34-*`, `f5cos-r50-*` | 12 | 150 | tuned AdamW+cosine at R34/R50, lr ∈ {3e-4, 1e-3} × 3 seeds | axis 4: the non-meta baseline exists at ONE architecture (R18, 94.093). Our best arm is 93.884 at **R34** — the comparison is currently cross-architecture and inadmissible |
+| `r34r-r{0005,001,0015}` | 9 | 150 | R34 r-curve below its grid edge | 32.7: **pre-reg — if r*∝1/N, all three fall below 93.884 and above 93.098; a peak at r≤0.01 refutes the 1/N form** |
+
+**Cancelled: `sw-cos-*` (21).** A 7-point AdamW+cosine LR sweep on R18/C10 that duplicates
+`fxcos-*`, which is complete at n=3 with a flat top (3e-4 → 94.062, 1e-3 → 94.093) and a
+collapsing high side (constant-LR 3e-3 → 85.962). Its only new points (1e-5, 3e-5, 1e-2) lie
+far outside the plateau. No open question was attached to it.
+
+**Promoted:** `sc50-*-s1` 20000 → 50; `fc100-cos-*` (C100 non-meta baseline, axis 4, zero
+coverage) 40000 → 1500; `fxcos-*` (R18 baseline to n=5 + the 3e-3 turn-over) 40000 → 1500.
+The two baseline batches were then set behind `p7-c100r*` because 30 × 15 min of probes clears
+in ~40 min of the 12-slot allocation and answers the theoretical core.
+
+**Not touched: `kc-*` (39).** Inspected before trimming (30.0's lesson) — it is the CIFAR-100
+M1 r-curve: R18_c100 seeds 2–4 (takes the n=2 C100 r-curve to n=5) and an entirely new
+R10_c100 r-curve. It is the natural n≥5 follow-up to 32.6(d) and stays at nice 1000.
+
+## 32.10 Operations
+
+Queue after this cycle: **alice 189 pending / 12 running, alice2 214 / 12.** Both accounts sit
+at 12/12 on `gpu-short` and 0 elsewhere; every pending job reports `Reason=Priority` against a
+cluster whose L4 / 2080ti / MIG / A100 nodes are all `mix` or `alloc`. 31.6's conclusion holds:
+**throughput is capped at 24 concurrent jobs and ordering, not depth, is the lever.**
+
+Front-of-queue order on alice is now sc50 → (bg300/bg600, long-partition-only, do not compete
+for `gpu-short`) → kb → **p7-c100r** (rank 36) → r34r → f5cos → fxcos → fc100 → kc → fx →
+sc101. alice2 needed no reordering: `r34f` (nice 0) → gp/bp/bo/ap/ag (nice 300) → tail.
+Nothing was submitted to alice2 — its 73 front jobs are all pre-registered and cannot start
+any faster.
+
+**`scontrol update Nice=` must clear the job's ACCRUED AGE, not just match it.** Setting
+`fc100-cos` from nice 200 to 600 left it ahead of a brand-new nice-0 job, because Slurm
+priority = base + age − nice and the older job had ~660 points of age. Nice 1500 was needed.
+Budget ~700 nice points per half-day of queue age when demoting.
+
+**`sc101` (ResNet101, 12 jobs) cannot use `gpu-short`.** R50 measures 138 min at 100 ep, so
+R101 is ~4.7 h against the 3:50 limit; its 7:30 request is correct and it will only start when
+a long partition frees. The 5th scale rung is therefore not obtainable this cycle.
+
+## 32.11 Still open
+
+* `p7-c100r*` — submitted, nothing landed. **32.6(d) has no drift/agreement ladder of its own
+  until it does; the C100 side of the paper core is still one model size.**
+* `sc50` seeds — 32.6(c)'s last row and 32.6(a)'s last row are n=1. The most interesting single
+  cell in the campaign (layerwise finally losing to scalar) is one seed.
+* `f5cos-*` — until it lands, **no "our method wins/loses by X" sentence may name ResNet34 or
+  ResNet50**; the only tuned baseline we own is ResNet18's 94.093 ±0.036.
+* `r34r-r{0005,001,0015}` — 32.7's r*∝1/N law is a 3-point fit with one point at a grid edge.
+* `gp-w-r1` — running. 32.8's last row stays NOT QUOTABLE until it lands *and* the collapse
+  conditioning is done.
+* `kc-*` — the C100 r-curve is n=2 everywhere (32.6(d) middle row is a hole).
+* 26.3 needs replacing, not patching: agreement is monotone in m and the M1 gain is not, so
+  the campaign currently has **no** single mechanism linking granularity, pooling and dataset.
+* Everything still open from 31.7 that this cycle did not touch.
