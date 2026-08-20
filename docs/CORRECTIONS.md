@@ -429,3 +429,64 @@ measured cells r=0.99 and r=1, and its optimum is unlocated.
 comparable across granularities. Every cross-granularity pooling claim must use one of those
 two operators, never `_zpool`. FINDINGS 25.3 (M1) and the `zmg-*` batch (zmpool) are built on
 that basis.
+
+## 16. `block_sizes.json` reports the wrong coordinate count for nodewise (cycle 26)
+
+`HF._probe_init` builds `n_b` with an if/elif over `layerwise` / `scalar` / `blockwise` and
+falls through to `nb = self.param_numels` for **everything else** — which lumps nodewise in
+with weightwise. So for a nodewise arm `block_sizes.json` records **11,173,962** coordinates
+when the arm actually has **14,420** nodes.
+
+Nothing in the record flags this, and the wrong number is silently plausible. Any significance
+statement about nodewise sign-agreement computed against `block_sizes.json` overstates its
+z-score by `sqrt(11173962/14420)` = **27.8x**.
+
+**The count is recoverable and must be recovered, not trusted.** `frac_neg` is a rational
+`k/n_tot`, so the smallest denominator consistent with the observed fractions IS `n_tot`.
+Verified against independently recorded counts:
+
+| arm | inferred `n_tot` | independently recorded |
+|---|---|---|
+| `probe_sig_resnet18_blocks_s0` | 6 | 6 blocks |
+| `probe_sig_layerwise_s0` | 62 | 62 layers |
+| `probe_sig_nodewise_s0` | **14,420** | 14,420 nodes (25.3) |
+| `probe_sig_weightwise_s0` | 11,173,962 | 11.17M params (25.3) |
+| `p5-r34-w` | 21,282,122 | ResNet34 = 21.3M |
+
+All five match. `bin/agree2.py` infers `n_tot` this way and never reads `block_sizes.json`.
+
+**Standing rule:** a probe field that was *derived* at write time (group counts, block sizes,
+`beta_true_min/max`) is a claim, not a measurement. Re-derive it from the raw record before
+using it in a significance statement. This is the same defect class as `drift_extract.py`'s
+`spread` column — a verification that could not fail — and as the `collapsed` column, which is
+`0` on every row.
+
+## 17. `drift/step` is censored by Lion's sign update, and two published slopes sit on the ceiling (cycle 26)
+
+The meta-optimizer is **Lion**, whose update is `sign(...) * lr`. So `|d beta|` per step is
+EXACTLY the meta-stepsize (1e-3), and therefore
+
+```
+drift/step  <=  meta_stepsize            (hard ceiling, not an empirical bound)
+drift/step / meta_stepsize  =  net temporal sign-consistency of the meta-gradient
+```
+
+`p4-r10-scal` and `p4-c100-scal` both read **exactly 1.000e-03** — pinned at the ceiling, i.e.
+the scalar step size moved in one direction on every single step. A censored point cannot
+carry a regression, but both were included in the published log-log fits.
+
+Refitting the `p4scale` drift-vs-group-size slopes without the saturated arm:
+
+| setting | published (all 4) | unsaturated | R^2 all 4 -> unsat |
+|---|---|---|---|
+| ResNet10 / CIFAR-10 | +0.238 | **+0.177** | 0.68 -> 0.41 |
+| ResNet18 / CIFAR-100 | +0.290 | **+0.150** | 0.36 -> **0.08** |
+| ResNet34 / CIFAR-10 | +0.205 | +0.205 (none saturated) | 0.70 -> 0.70 |
+
+**What survives:** the sqrt(N) refutation. The slope is POSITIVE in 6/6 fits across two
+alpha0 (`p4scale` 1e-3, `p5scale` 1e-6) and three settings, where the model requires -0.500.
+A sign inversion that robust does not depend on one censored point.
+
+**What does not survive:** the slope magnitudes as point values, and the CIFAR-100 / a0=1e-3
+cell as evidence of a *trend* at all — its R^2 falls to 0.08 once the ceiling point is
+dropped. Quote the slopes as a positive range, and normalise drift by the meta-stepsize.

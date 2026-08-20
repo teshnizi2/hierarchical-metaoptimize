@@ -17,7 +17,7 @@ Nothing below depends on prior conversation context.
 4. `docs/PAPER-CONFIG.md` — the parent paper's exact config, extracted from its PDF
 5. `docs/PRIOR-ART.md`  — what is novel vs a rediscovery (read before claiming anything)
 
-## The state of the science, in one paragraph (rewritten cycle 21)
+## The state of the science, in one paragraph (rewritten cycle 21; see cycle 26 above for the mechanism)
 Three results now carry the paper. **(1) The sqrt(N) noise model is refuted with the sign
 INVERTED**, in three architectures across two datasets: holding beta common (`HIER=shrink,
 LAM=1.0`) and varying only the group size, drift *rises* with group size (log-log slopes
@@ -43,42 +43,68 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 24)  -- queues: alice 232, alice2 179 = 411 jobs
+## Running / next (cycle 26)  -- queues: alice 271, alice2 184 = 455 jobs
 
-**Cycle 24's finding (docs/FINDINGS.md 24.3-24.4): the interior pooling optimum does not
-invert between datasets, it VANISHES.** On CIFAR-10/R18/a0=1e-6 the M1 r-curve is clean and
-unimodal, peaking at r=0.06 with **93.262 +-0.135 (n=8), +2.48pp** over plain layerwise
-(90.784 +-0.169, n=17), and r=1 reproduces plain layerwise to +0.08pp (identity control
-holds). On CIFAR-100 at the same alpha0 the curve rises monotonically and **saturates flat**
-from r~0.1 -- best cell r=0.2 is **+0.004pp**, i.e. nothing -- while at CIFAR-10's optimum
-(r=0.05-0.07) CIFAR-100 has already lost 10-26pp. The plain granularity ORDERING inverts too:
-CIFAR-10 runs scalar < layerwise < blocks < nodewise (weightwise collapses), but on CIFAR-100
-blocks and layerwise **swap** (52.7 vs 69.9). Both say CIFAR-100 tolerates far less sharing
-*and* far less splitting.
+**Cycle 26 found the mechanism, in data that was already on disk.** Three probe batches had
+never been reduced (`mx/probe_sig_*`, `p5scale`, `p6mech` -- 43 dirs, zero mentions in
+FINDINGS or CORRECTIONS). Reducing `mx/probe_sig_*` (the only free-adaptation, 100-epoch,
+dense-probe granularity series, config-matched to the 25.3 r-curve) gives:
 
-Also this cycle: **two r-cells were mixtures of incompatible run families** (no-augmentation
-`ha-w`, meta=Adam `adg-A`, and 300/20-epoch budgets). The config key is **eight** fields, not
-four -- see 24.1. Corrected, r=0.1 went 89.120 +-11.269 -> 92.240 +-0.556.
+| granularity | m | sign agreement | M1 pooling gain |
+|---|---|---|---|
+| resnet18_blocks | 6 | **70.87 ±0.80 %** | +0.415 |
+| layerwise | 62 | **53.26 ±0.19 %** | +2.399 |
+| nodewise | 14,420 | **51.03 ±0.12 %** | in flight (`gp-node-*`) |
+| weightwise | 11,173,962 | **50.0053 ±0.0003 %** | +11.13 (zpool, 25.5) |
 
-* **`p6f-*` (alice, 9) -- PROMOTED to #2.** Agreement/drift on {CIFAR-100, R10, R34} x
-  {layerwise, nodewise, weightwise}. THE experiment: sign-agreement should be markedly lower
-  on CIFAR-100, which would explain 24.3 and 24.4 with one mechanism. It had been niced to
-  the back of the queue.
-* **`c6f-*` (alice2, 21) -- submitted this cycle.** CIFAR-100 R18 a0=1e-6, r in
-  {.1,.15,.2,.3,.5,1} + plain layerwise x seeds 2,3,4. Every CIFAR-100 cell in 24.3 is n=1-2;
-  this takes the flat region to n=3-5 and settles the r=1 identity control there.
-* **`c100f-node`/`c100f-w` (alice2, 6)** -- completes the CIFAR-100 granularity ladder (24.4).
-* **`r34r-*` (alice, 27)** -- R34 r-curve, completes the scale family. Still pending.
-* **`cs-*` (alice, 18)** -- CIFAR-100 x R10/R34: task difficulty vs parameter count.
-* **`sc50` running / `sc101` queued** -- R50 and R101 rungs of the scale ladder.
-* Niced to 40000: `sw-cos`/`fxcos`/`fc100` (37) -- baseline LR tuning, and the baseline is
-  already settled at 94.093 +-0.036.
+**Agreement falls monotonically with partition fineness and the pooling gain runs OPPOSITE
+to it.** One mechanism for three previously unrelated results: 25.3's granularity-dependent
+gain, 25.5's weightwise interior optimum, and 24.3's null on CIFAR-100. See FINDINGS 26.3.
 
-**Top integrity item:** `ad-l` (92.626, n=5) and `adg-b` (91.598, n=3) share every recorded
-field yet differ by **1.03pp**, ~50x the reproduction tolerance. Something that moves a 1pp
-effect is not being logged. Find it before trusting any n-pooled cell.
+Also this cycle: **the full-pooling identity is verified STRUCTURALLY at last** -- `p6mech`
+shows `sd_beta` = exactly 0.0000 at r=0 on both seeds, and 2.47 at r=1 against plain
+layerwise's 2.39 (26.4). Rule 4 satisfied; CORRECTIONS 13's open item closed.
+
+* **`cw-*` (alice, 36) -- submitted this cycle. THE falsification test.** CIFAR-100 x
+  {weightwise, nodewise} M1 r-curve, with agreement probes on the r=1 seed so gain and
+  agreement come from the SAME run family. Pre-registered prediction: pooling is useless at
+  C100/layerwise (already measured, 24.3) but LARGE at C100/weightwise. If it is not, 26.3
+  dies. See FINDINGS 26.7.
+* **`gp-node-*` / `gp-w-*` (alice2, 48) -- PROMOTED rank ~40 -> 25** by niceing `m0c-*` to
+  30000. These supply the two missing cells of the gain column above and make it one run
+  family instead of three.
+* **`p6f-*` (alice, rank 1-9)** -- free-adaptation agreement on {C100, R10, R34} x
+  {layer, node, weight}. Pairs with `mx/probe_sig_*` for the model-scale agreement ladder,
+  which 25.6 predicts should FALL with model size.
+* **`r34r-*` (alice, 27)** -- R34 r-curve; 25.6's third row is still one point.
+* Niced to 30000: `m0c-*` (15, M0 shrink on CIFAR-100 -- raises a null 24.3 settled).
+
+**Two corrections this cycle, both in the measurement layer, both recorded (CORRECTIONS
+16-17):** `block_sizes.json` reports 11,173,962 coordinates for nodewise arms that have
+14,420 (a 27.8x significance inflation if trusted); and `drift/step` is **censored** by
+Lion's sign update at exactly the meta-stepsize, with two published `p4scale` slopes sitting
+on that ceiling. The sqrt(N) refutation survives both (positive slope in 6/6 fits across two
+alpha0); the slope magnitudes do not.
 
 ## Gotchas that cost hours — do not rediscover these
+* **Three probe batches sat unreduced for multiple cycles and one of them was the
+  mechanism.** Before submitting ANY new probe run, sweep both accounts with
+  `find <runs> -name probe.jsonl -size +1k` and grep every dir name against FINDINGS and
+  CORRECTIONS. Cycle 26 found 43 unreduced dirs, including the only free-adaptation
+  100-epoch granularity series in the campaign.
+* **`block_sizes.json`'s `n_b` is WRONG for nodewise** (reports total params, 11.17M, for a
+  14,420-node arm). Infer `n_tot` from the `frac_neg` rational denominators instead --
+  `analysis/infer_ntot.py`. Verified against five independently recorded counts.
+* **`drift/step` is censored at the meta-stepsize.** Lion's update is sign-based, so
+  `|d beta|` per step is exactly `meta_stepsize`; `drift/step = 1.000e-03` means "pinned at
+  the ceiling", not "very fast". Two published slopes were fitted through such a point.
+  Normalise by the meta-stepsize before regressing.
+* **`drift_extract2.py`'s window (steps 1000-7500) is the a0=1e-6 STARTUP transient** on any
+  100-epoch run (50k steps). Use `analysis/agree2.py`, which reports a steady window (last
+  50%) and startup separately.
+* **Sign-agreement excess must be read against its own noise floor.** At n_tot=62 the
+  per-record independence floor is 6.35pp, at n_tot=11.17M it is 0.015pp -- a 400x
+  difference. Raw excess is NOT comparable across granularities without it.
 * **`LAM=na` / `ETA_RATIO=na` KILL the job.** `HF.py` lines 24-25 `float()` both env vars
   unconditionally. `na` is what `run_cifar.sh` *echoes* for an UNSET variable, so healthy runs
   display it -- copying that into `--export=` cost 48 jobs. Non-hierarchical arms must export

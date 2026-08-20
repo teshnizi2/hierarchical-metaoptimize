@@ -4709,3 +4709,187 @@ alpha0 artefact.** Contrast with 24.3's pooling result, which *is* strongly a0-d
   weight}. This is the mechanism that 25.3 and 25.5 both predict: pooling should help in
   proportion to how much a partition's coordinates disagree.
 * n=1-2 on every zpool cell at r>=0.9 (25.5).
+
+## 26.1 Three never-reduced probe batches were sitting in the repo
+
+Sweeping `find <runs> -name probe.jsonl -size +1k` on both accounts and grepping every dir
+name against `docs/FINDINGS.md` + `docs/CORRECTIONS.md`:
+
+| batch | acct | dirs | config | mentioned in docs? |
+|---|---|---|---|---|
+| `mx/probe_sig_*` | alice | 15 | R18/C10, a0=1e-6, **100ep, free adaptation**, PROBE=25 -> 2000 recs | **no** |
+| `p5scale/p5-*` | alice2 | 12 | {R10/C10, R18/C100, R34/C10} x {scal,lay,node,w}, `HIER=shrink LAM=1.0`, a0=**1e-6**, 20ep | **no** |
+| `p6mech/p6-*` | alice2 | 16 | R18/C10 layerwise, a0=**1e-3**, 100ep, M1 r-sweep x 2 seeds | **no** |
+
+`mx/probe_sig_*` is the one that matters: it is the ONLY free-adaptation, 100-epoch,
+dense-probe granularity series, and its config matches the 25.3 M1 r-curve exactly
+(SGDm+Lion, meta-stepsize 1e-3, a0=1e-6, AUGMENT=1, guard on, `HIER` unset).
+
+## 26.2 CORRECTION — three defects in how the probes were being read
+
+Reducer: `bin/agree2.py` (new). `bin/drift_extract2.py` mis-reads all three batches.
+
+1. **`block_sizes.json` reports the wrong `n_tot` for nodewise.** `_probe_init` falls through
+   to `nb = self.param_numels` for BOTH nodewise and weightwise, so it claims **11,173,962**
+   coordinates for nodewise, which has **14,420** nodes. `frac_neg` is a rational `k/n_tot`,
+   so the true denominator is recoverable: it returns **62 / 6 / 14,420 / 11,173,962** for
+   layerwise / blocks / nodewise / weightwise and **21,282,122** for ResNet34 — matching the
+   independently recorded group and parameter counts exactly. Trusting `block_sizes.json`
+   inflates nodewise's significance by `sqrt(11173962/14420)` = **27.8x**.
+2. **Zeros are counted in neither sign.** `frac_neg = (z<0)/n_tot` with `frac_zero` separate,
+   so agreement must be taken among NONZERO coordinates, `p = frac_neg/(1-frac_zero)`.
+   `frac_zero` reaches 0.3 early in training and 0.005 at weightwise.
+3. **The window is the startup transient.** `drift_extract2` hard-codes steps 1000-7500 —
+   the first 15% of a 50k-step run, i.e. exactly the 14-25 epochs of a0=1e-6 startup.
+   All 26.x numbers use a STEADY window (last 50% of records); startup is reported separately.
+
+Two agreement statistics are reported because neither alone is sign-agreement:
+`sys%` = `mean_t(frac_neg)` then `max(p,1-p)` — a persistent common direction; and
+`step%` = `mean_t max(p_t, 1-p_t)` — agreement within a step, which is biased UP by sampling
+noise, so its independence null `0.5 + sqrt(2/pi)/(2 sqrt(n))` is printed beside it.
+
+## 26.3 NEW — sign agreement falls monotonically with partition fineness, and the pooling gain runs OPPOSITE to it
+
+`mx/probe_sig_*`, R18 / CIFAR-10 / a0=1e-6 / 100ep / free adaptation, steady window,
+mean +- sd over seeds 0,1,2:
+
+| granularity | m | agreement `sys%` | per-step excess over null (pp) | sd_beta | drift/step |
+|---|---|---|---|---|---|
+| resnet18_blocks | 6 | **70.87 ±0.80** | +5.51 ±0.82 | 3.11 | 4.49e-05 |
+| layerwise | 62 | **53.26 ±0.19** | +0.95 ±0.28 | 2.39 | 5.81e-05 |
+| nodewise | 14,420 | **51.03 ±0.12** | +0.83 ±0.09 | 1.92 | 2.31e-05 |
+| weightwise | 11,173,962 | **50.0053 ±0.0003** | +0.0156 ±0.0015 | 0.76 | 2.18e-06 |
+| scalar | 1 | n/a (1 coord) | n/a | n/a | 5.40e-05 |
+
+Agreement falls **monotonically** across five orders of magnitude in m, and the excess over
+independence falls by a factor of **353** from blocks to weightwise. Both statistics agree in
+ordering, and every cell is tight across three seeds.
+
+Set against the measured M1 pooling gains (25.3, 25.5) the two run in OPPOSITE directions:
+
+| granularity | agreement | M1 pooling gain | source |
+|---|---|---|---|
+| resnet18_blocks (6) | 70.87% | **+0.415** (vs plain; no identity anchor) | 25.3 |
+| layerwise (62) | 53.26% | **+2.399** (vs r=1 identity) | 25.3 |
+| weightwise (11.2M) | 50.0053% | **+11.13** (zpool r=0.99 vs plain) | 25.5 |
+
+**Claim: pooling buys the most exactly where the partition's coordinates agree the least.**
+This is one mechanism for three results that were previously unrelated — 25.3's
+granularity-dependent gain, 25.5's weightwise interior optimum, and 24.3's null on CIFAR-100.
+`gp-node-*` / `gp-w-*` (in flight, alice2, promoted this cycle) supply the two missing M1
+gains and turn the third column into a measured curve rather than three points from three
+different families.
+
+`sd_beta` falling with m (3.11 -> 0.76) is the same story seen from the other side: the finer
+the partition, the LESS its group step sizes actually spread out.
+
+## 26.4 NEW — the full-pooling identity is verified STRUCTURALLY, and agreement is a function of r
+
+`p6mech/p6-*`, R18 / CIFAR-10 / **a0=1e-3** / 100ep / layerwise / M1, steady window, 2 seeds:
+
+| r | sd_beta | `sys%` | excess over null (pp) | drift/step |
+|---|---|---|---|---|
+| 0 (FULL pooling) | **0.0000** | 50.05 | -0.52 | 2.93e-05 |
+| 0.03 | 0.750 | 50.26 | -0.22 | 3.73e-05 |
+| 0.05 | 1.214 | 50.67 | -0.15 | 4.38e-05 |
+| 0.06 | 1.435 | 51.33 | +0.19 | 4.62e-05 |
+| 0.07 | 1.641 | 51.87 | +0.12 | 5.04e-05 |
+| 0.1 | 2.116 | 55.97 | +2.59 | 7.59e-05 |
+| 0.3 | 2.205 | 61.65 | +7.16 | 9.11e-05 |
+| 1 (plain layerwise) | 2.473 | 57.81 | +5.33 | 1.34e-04 |
+
+**`sd_beta` is exactly 0.0000 at r=0, on both seeds.** This is the structural verification
+Rule 4 demands and that CORRECTIONS 13 flagged as missing — full pooling really does collapse
+the 62 group step sizes onto one number, rather than merely producing indistinguishable
+accuracy. At r=1 `sd_beta` is 2.47, reproducing plain layerwise's 2.39 from 26.3 (a different
+batch, a different account, a different a0). **Both endpoints of the M1 hierarchy are now
+verified structurally.**
+
+**Caveat, stated because it bounds the reading:** at n_tot=62 the per-record independence
+noise floor is 6.35pp, so an excess under ~1pp is not distinguishable from independence. The
+defensible statement is that r <= 0.07 is **indistinguishable from independence** and r >= 0.1
+**clearly agrees**; the small negative excesses at r <= 0.05 are noise, not anti-correlation.
+The M1 accuracy optimum on this axis is r ~ 0.06 (25.3, at a0=1e-6) — the largest r that still
+looks independent — but p6mech is a0=1e-3 and the r-curve is a0=1e-6, so this is a
+suggestive alignment across two a0, not a matched measurement. `cw-*` probes fix that.
+
+## 26.5 The sqrt(N) refutation replicates at a second alpha0 (`p5scale`)
+
+`HIER=shrink LAM=1.0` (beta held common — confirmed structurally, `sd_beta = 0.0000` on every
+arm), a0=**1e-6**, 20ep. Log-log OLS of drift/step against **group size** N_b = params/group,
+over {scalar, layerwise, nodewise, weightwise}:
+
+| setting | slope | R^2 | sqrt(N) model requires |
+|---|---|---|---|
+| ResNet10 / CIFAR-10 | **+0.075** | 0.72 | -0.500 |
+| ResNet18 / CIFAR-100 | **+0.110** | 0.66 | -0.500 |
+| ResNet34 / CIFAR-10 | **+0.081** | 0.69 | -0.500 |
+
+Sign inverted in 3/3, at an a0 the earlier `p4scale` measurement did not cover.
+**Caveat:** 20 epochs at a0=1e-6 lies entirely inside the 14-25 epoch startup transient, so
+this is a startup-regime replication, not a steady-state one. `p4scale` (a0=1e-3) remains the
+steady-state evidence.
+
+## 26.6 CORRECTION — the published `p4scale` slopes include a SATURATED arm
+
+The meta-optimizer is **Lion, whose update is sign-based**, so `|d beta|` per step equals the
+meta-stepsize (1e-3) EXACTLY. Therefore `drift/step <= 1e-3` is a **hard ceiling**, and
+`drift/step / 1e-3` is precisely the net temporal sign-consistency of the meta-gradient.
+
+`p4-r10-scal` and `p4-c100-scal` both read **exactly 1.000e-03** — pinned at the ceiling.
+Refitting without them:
+
+| setting | slope, all 4 points | R^2 | slope, unsaturated only | R^2 |
+|---|---|---|---|---|
+| ResNet10 / CIFAR-10 | +0.238 | 0.68 | **+0.177** | 0.41 |
+| ResNet18 / CIFAR-100 | +0.290 | 0.36 | **+0.150** | **0.08** |
+| ResNet34 / CIFAR-10 | +0.205 | 0.70 | +0.205 (none saturated) | 0.70 |
+
+The previously published `+0.179 / +0.268 / +0.203` are all-4-point fits and so inherit the
+saturated scalar arm. **The refutation itself is untouched — the slope is positive in 6/6 fits
+across two alpha0 and three settings, where the model requires -0.500.** But the slope
+MAGNITUDES must not be quoted as point values, and the CIFAR-100 / a0=1e-3 cell has
+essentially no log-log trend at all once the saturated point is dropped (R^2 = 0.08).
+Normalise drift by the meta-stepsize in future; raw drift/step is a censored statistic.
+
+## 26.7 Submitted this cycle — `cw-*` (36 jobs, alice), a pre-registered falsifiable test
+
+The mechanism of 26.3 is so far a *fit* to three points. `cw-*` makes it a **prediction**.
+
+24.3 measured NO interior pooling optimum on CIFAR-100 at layerwise (best cell +0.004pp —
+nothing), which read as a flat contradiction of the CIFAR-10 result. 26.3 explains it:
+CIFAR-100 layerwise agreement is HIGH. But agreement must collapse toward 50% at weightwise on
+*any* dataset — 11.2M coordinates cannot agree. Hence:
+
+> **PREDICTED:** on CIFAR-100, M1 pooling is useless at layerwise (already measured) but
+> produces a LARGE gain at weightwise, and an intermediate/small gain at nodewise.
+> **FALSIFIED IF:** CIFAR-100 weightwise shows no pooling gain — then agreement does not
+> drive the gain and 26.3 dies.
+
+`cw-{w,node}-{r0,r003,r006,r01,r02,r1}-s{0,1,2}`, CIFAR-100 / ResNet18_c100 / a0=1e-6 / 100ep
+/ `HIER=additive`. r=1 is the identity control (must reproduce `c100f-w` / `c100f-node`,
+landing now); r=0 is full pooling and must show `sd_beta`=0. **Probes on the r=1 seed of each
+granularity** put the agreement measurement and the gain in the SAME run family — which no
+previous cycle has had.
+
+## 26.8 Queue actions
+
+* `gp-node-*` / `gp-w-*` (alice2) **promoted rank ~40 -> 25** by niceing `m0c-*` (15 jobs,
+  M0 shrink on CIFAR-100) to 30000. `gp-*` supplies the two missing cells of 26.3's gain
+  column; `m0c-*` raises a null that 24.3 already established.
+* Queues after this cycle: **alice 271, alice2 184 = 455 jobs**, 24 running (12+12 — the
+  per-account `qos-gpu-short` ceiling, not a bug).
+
+## 26.9 Still open
+
+* **26.3's gain column** rests on three different run families (25.3 M1, 25.5 zpool). `gp-*`
+  makes it one family. Until then the mechanism is a fit to three points, not a curve.
+* **`cw-*` is the falsification test** — if C100 weightwise shows no pooling gain, 26.3 dies.
+* **`p6f-*` (alice, rank 1-9)** — free-adaptation agreement on {C100, R10, R34} x
+  {layer, node, weight}. Pairs with `mx/probe_sig_*` (R18/C10) to give the model-scale
+  agreement ladder, which 25.6 predicts should FALL with model size (gain grows R10 +1.00 ->
+  R18 +2.40 -> R34 +2.62).
+* **No matched free-adaptation agreement probe at `resnet18_blocks` outside R18/C10** —
+  `p6f` covers only layer/node/weight, so the m=6 end of the ladder is single-setting.
+* **R34 r-curve** (`r34r-*`, 27, alice) still pending; 25.6's third row is one point.
+* n=1-2 on every zpool cell at r>=0.9 (25.5), which is where 26.3's weightwise gain comes from.
