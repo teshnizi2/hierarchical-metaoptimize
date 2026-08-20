@@ -7306,3 +7306,125 @@ resubmit to promote `bg` would have cost the sweep its place for no scientific g
   after they appeared to contradict the ~87.8 scalar plateau; they do not. The correct SGDm+Lion
   comparators are `mx-a1e3-scal` (87.577, n=5) and `mx-a1e3-layer` (91.093, n=5).
 * Re-aggregation recovered **0 lost runs** (old ∖ new = ∅); 1145 → 1192 rows.
+
+---
+
+# CYCLE 39 (2026-08-20) — the harness is validated, the baseline peak moved, and granularity survives at +0.617pp
+
+Collection cycle, **no jobs submitted** (39.6). All numbers re-derived from `results/all_runs.csv`
+(1282 rows, +90 since c38), completed rows only, `collapsed=0`, `superseded!=1`, metric `plateau`.
+**Two cycle-38 claims are refuted below by their own pre-registered follow-up cells.**
+
+## 39.1 CORRECTION to 38.1 — granularity contributes +0.617pp, not 0.04pp
+
+38.2 named `ms-layA-1e4` as the cell that could rescue granularity. It ran. It did.
+Full 2x2, a0=1e-3, R18/CIFAR-10, SGDm+Lion, 100 ep, AUGMENT=1, **n=3 in every cell, all complete**:
+
+| | ms=1e-3 | ms=1e-4 | Δ(ms) |
+|---|---|---|---|
+| **scalar** | 87.884 ±0.243 | 92.255 ±0.264 | +4.371 |
+| **layerwise** | 91.176 ±0.148 | **92.872 ±0.041** | +1.696 |
+| **Δ(granularity)** | **+3.291** | **+0.617** | **−2.675** (interaction) |
+
+* Granularity at the tuned meta-step: **+0.617pp, Welch t=4.00 (n=3 v 3)**. It is real.
+* **81% of the apparent granularity gain (+3.291 → +0.617) is meta-step tuning.** Not 100%.
+* 38.1 reported the scalar cell as 92.405 ±0.071 at **n=2**; `ms-scalA-1e4-s2` has since completed
+  at 91.956, moving the cell to **92.255 ±0.264 (n=3)**. The n=2 mean was optimistic by 0.15pp.
+* **M1's `additive` pooling is now strictly dominated.** Plain layerwise at tuned ms scores
+  92.872 ±0.041; the best pooled arm (`additive` r=0.1 at ms=1e-3) scores 92.449 ±0.192.
+  Δ = **+0.423pp for doing nothing but setting the meta-step**. Pooling is a worse route to a
+  small effective meta-step than simply choosing one.
+
+**What 38.1 got wrong and why.** It read a 0.044pp scalar-vs-layerwise gap off cells that were
+n=2 on one side and *ms-matched only on the scalar side* — the layerwise arm it compared against
+was at ms=1e-3, not at its own tuned ms. The correct comparison is the 2x2 diagonal, and it
+required the cell 38.2 had already flagged as missing. **The conclusion was drawn one cell early.**
+
+## 39.2 CORRECTION to 38.5 — the baseline LR peak is 2e-3–3e-3, not 1e-3
+
+38.5 declared 1e-3 "an interior maximum" on a four-point grid. `bx-2e-3/3e-3/5e-3` and
+`fxcos-3e-3` landed and moved the peak right. AdamW + cosine, R18/CIFAR-10, 100 ep, seeds pooled
+across the `fxcos`/`bl-adw`/`bx` batches:
+
+| lr | n | plateau |
+|---|---|---|
+| 1e-4 | 3 | 92.851 ±0.239 |
+| 3e-4 | 7 | 93.949 ±0.110 |
+| 1e-3 | 7 | 94.067 ±0.102 |
+| **2e-3** | 5 | **94.393 ±0.139** |
+| **3e-3** | 5 | **94.387 ±0.126** |
+| 5e-3 | 5 | 94.143 ±0.072 |
+| 1e-2 | 5 | 92.783 ±0.210 |
+
+The top is **flat over 2e-3–3e-3 at ≈94.39**, +0.33pp above the 1e-3 cell that cycle 36 adopted
+as "the baseline". **The grid was still censored at cycle 38 and I called an interior maximum on
+the strength of one bracketing point (1e-2). Two points do not locate a peak.**
+
+## 39.3 THE HARNESS IS VALIDATED — and the deficit nearly doubles
+
+`bl-sgd-*` was pre-registered by c35 as a **platform validation**, not a baseline: *"if SGD+cosine
+at lr~0.1 does not land in 94.5–95.5, the harness is the finding."*
+
+| SGD-momentum + cosine, lr | n | plateau |
+|---|---|---|
+| 0.01 | 5 | 94.149 ±0.036 |
+| **0.03** | 5 | **94.767 ±0.097** |
+| 0.1 | 5 | 94.682 ±0.088 |
+| 0.3 | 5 | 92.672 ±0.187 |
+
+**lr=0.1 → 94.682 and lr=0.03 → 94.767, both inside 94.5–95.5. Branch (a): the harness is
+validated.** It does not under-train. Every arm in this campaign was trained competently, so the
+method's deficit is a property of the method, not of our platform. This closes the largest
+standing threat to the whole campaign.
+
+**Restated headline, with the best baseline now measured rather than assumed:**
+
+| arm | n | plateau |
+|---|---|---|
+| **SGD-momentum + cosine, lr=0.03** | 5 | **94.767 ±0.097** |
+| AdamW + cosine, lr=2e-3 | 5 | 94.393 ±0.139 |
+| best MetaOptimize (a0=1e-6, `sc-ResNet18-add`) | 3 | 93.306 ±0.140 |
+| best MetaOptimize (a0=1e-3, layerwise @ tuned ms) | 3 | 92.872 ±0.041 |
+
+**Deficit vs the best non-meta baseline: 1.461pp** — up from the 0.787pp of cycle 36/38, which
+compared against an AdamW baseline at a censored LR. **Every "0.79pp deficit" sentence is stale.**
+
+## 39.4 Baseline across architecture, now n=3 everywhere
+
+| net | AdamW+cosine lr=1e-3 | n |
+|---|---|---|
+| ResNet18 | 94.067 ±0.102 | 7 |
+| ResNet34 | 94.674 ±0.026 | 3 |
+| ResNet50 | 94.855 ±0.155 | 3 |
+
+R50 was n=1 in 38.4 and is now n=3 at 94.855 ±0.155 (38.4's single seed read 94.970 — inside the
+band). The ResNet50 row may now be stated. Note these are all at lr=1e-3, which 39.2 shows is
+**not** the AdamW optimum at R18; the R34/R50 LR curves have not been swept, so the
+cross-architecture deficits are lower bounds on the baseline and therefore **upper bounds have
+not been established** — do not quote a per-architecture deficit until those sweeps exist.
+
+## 39.5 What is now the most informative next experiment
+
+The 2x2 in 39.1 has only two `ms` points and the layerwise optimum is **unbracketed on the left**:
+92.872 at ms=1e-4 could still be rising toward ms=3e-5. The obvious cell set is
+**{scalar, layerwise} x ms {3e-5, 3e-4} at a0=1e-3, n=5** — 4 cells, 20 jobs — which brackets both
+curves and turns 39.1's two-point Δ into a proper response surface. Until that runs, "+0.617pp"
+is the gain at *one arbitrary* meta-step, not at each arm's own optimum.
+
+## 39.6 Queue and ops — again nothing submitted
+
+| | alice1 | alice2 |
+|---|---|---|
+| FairShare | **0.3347** | **0.3356** |
+| PENDING | 4 | 60 |
+| RUNNING | 15 | 13 |
+
+Both accounts remain **below the 0.35 FairShare floor**, so the standing rule holds and nothing
+was submitted. alice1 has drained to 4 pending and is now running `bg300`/`bg600` — **the queue
+self-ordered into the campaign's priority-1 experiment without intervention**, which is the
+retrospective justification for cycle 38's decision not to cancel-and-resubmit to promote it.
+
+**Standing tension to flag:** alice1 will go idle in a few hours when `bg600` finishes, and the
+39.5 bracket experiment is ready to submit but blocked by the FairShare floor. The floor exists
+because over-submission cost us priority twice; it was not written for a drained queue. This is
+the one rule worth revisiting with the operator.

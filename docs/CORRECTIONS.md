@@ -688,3 +688,48 @@ instead of drifting.
 (blk6 escapes ✓, weightwise does not ✓) and passed. It failed only at an **interior** rung.
 Verifying a monotone mechanism at its two extremes is not verification — the interior is where
 a wrong monotone story shows itself.
+
+## 24. "Granularity contributes 0.04pp" (FINDINGS 38.1) — WRONG, it is +0.617pp
+
+**Claimed (cycle 38):** at a0=1e-3, plain `scalar` with ms tuned to 1e-4 (92.405 ±0.071, n=2)
+matches the best hierarchical arm (`additive` r=0.1 at ms=1e-3, 92.449 ±0.192) to 0.044pp, so
+the hierarchy's only contribution is dividing the meta-step by ~10.
+
+**Measured (cycle 39):** the comparison was not ms-matched. It put the scalar arm at *its* tuned
+meta-step and the layerwise arm at ms=1e-3. With `ms-layA-1e4` complete, the 2x2 at n=3 reads:
+
+| | ms=1e-3 | ms=1e-4 |
+|---|---|---|
+| scalar | 87.884 ±0.243 | 92.255 ±0.264 |
+| layerwise | 91.176 ±0.148 | **92.872 ±0.041** |
+
+**Granularity at the tuned meta-step is +0.617pp, Welch t=4.00.** It survives. What is true is the
+weaker claim: **81% of the apparent granularity gain (+3.291 → +0.617) is meta-step tuning.**
+
+**Also corrected:** the scalar cell was n=2 in 38.1; seed 2 completed at 91.956 and moved it from
+92.405 ±0.071 to 92.255 ±0.264.
+
+**What survives from 38.1:** `additive` pooling is **strictly dominated** — plain layerwise at a
+tuned meta-step (92.872 ±0.041) beats the best pooled arm (92.449 ±0.192) by +0.423pp. Pooling is
+a worse route to a small effective meta-step than choosing one.
+
+**Process note.** 38.2 *itself* named `ms-layA-1e4` as the cell that could overturn 38.1, and 38.1
+was written anyway. A conclusion must not be stated in the same cycle that its own text identifies
+the deciding experiment as unrun. **Name the missing cell, then wait for it.**
+
+## 25. "The baseline LR peak is an interior maximum at 1e-3" (FINDINGS 38.5) — WRONG
+
+**Claimed (cycle 38):** `bl-adw-1e-2` (92.728) brackets the baseline peak from the right, so
+1e-3 (94.093) is an interior maximum and cycle 36's grid-censoring objection is answered.
+
+**Measured (cycle 39):** with 2e-3, 3e-3 and 5e-3 in hand, AdamW+cosine peaks **flat over
+2e-3–3e-3 at ≈94.39**, +0.33pp above the 1e-3 cell. The grid was still censored; 1e-3 was still
+on a rising edge.
+
+**Cost of the error:** every deficit computed against 94.093 understates the gap. With the true
+best non-meta baseline — **SGD-momentum + cosine at lr=0.03, 94.767 ±0.097 (n=5)** — the deficit
+against the best MetaOptimize arm (93.306 ±0.140) is **1.461pp, not 0.787pp.**
+
+**Process note (Rule 3, restated).** One bracketing point on one side does not locate a peak. A
+maximum may be called interior only when the cells *adjacent to the argmax on both sides* are
+measured — not merely when some point further out is lower.
