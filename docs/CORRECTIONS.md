@@ -529,3 +529,66 @@ was not (see CORRECTIONS 16 on `block_sizes.json`'s `n_b`).
 in log space against `mx`'s 2.39 — and its `z_mean` agreement pins at exactly 100.0000% on all
 three seeds at m=6. It is excluded from every agreement claim rather than reported as a low
 outlier.
+
+## 19. `agree2.py` censored every coordinate count above 20,000,000 (cycle 29)
+
+`infer_ntot` recovered the coordinate count as the denominator of the observed `frac_neg`
+rationals:
+
+```python
+best = max(best, Fraction(v).limit_denominator(20_000_000).denominator)
+```
+
+**The 20,000,000 is the tool's ceiling, not the model's.** Any arm with more coordinates than
+that is reported AT the ceiling, silently.
+
+Measured this cycle on `p7-*`: ResNet34/weightwise has **21,282,122** coordinates — summed
+directly from `block_sizes.json`'s `n_b` over its 110 tensors, which for *weightwise* is the
+one thing that field is reliable for, since weightwise groups ARE the parameters (contrast
+CORRECTIONS 16, where the same field is wrong by 775x for nodewise). `agree2.py` reported
+exactly `20,000,000`.
+
+**What it corrupted.** The independence null is `E = 0.5 + sqrt(2/pi) / (2 sqrt(n))`, so a
+censored `n` gives a null that is too HIGH and an excess-over-null that is too LOW:
+
+| | reported n | null% | R34/weightwise excess (s1, s2) |
+|---|---|---|---|
+| before | 20,000,000 | 50.00892 | 0.0029, 0.0038 |
+| after | 21,282,122 | 50.00865 | 0.0033, 0.0052 |
+
+~10–35% relative on the affected cells. **No sign flipped and no ordering changed**, so
+29.1's ladder is unaffected in shape — but the numbers published before this cycle for any
+arm above 20M coordinates were wrong.
+
+**Fixed** by raising the cap to `100_000_000` (`bin/agree2.py`; backup `bin/agree2.py.bak`).
+Verified unaffected because they sit under the OLD cap and reproduce exactly: ResNet18
+11,173,962 / ResNet10 4,903,242 / ResNet18_c100 11,220,132.
+
+**The rule.** `infer_ntot`'s cap must exceed the largest arm's parameter count with margin.
+Check it before adding any architecture above ~20M parameters — ResNet50 (25.6M) and
+anything larger would be censored at the current 100M only above 100M, but the failure is
+silent either way. Cross-check `infer_ntot`'s answer against `sum(block_sizes.json["n_b"])`
+on every new weightwise arm; they must agree exactly.
+
+This is the third defect in the coordinate-count layer (16: `n_b` wrong for nodewise; 17:
+Lion sign-censoring of `drift/step`; 19: this). **Every one of them was silent and every one
+of them moved a published number.**
+
+## 20. Reducing an in-flight probe returns a moving number (cycle 29)
+
+`agree2.py`'s STEADY window is "the last 50% of the records that exist", so a probe read at
+89 records and again at 100 reports two different steady states. Measured on `p7-r34-lay-s1`:
+
+| records | sys% | step% | excess |
+|---|---|---|---|
+| 89 | 51.4962 | 54.7917 | 0.9879 |
+| 100 | 51.6727 | 55.2727 | 1.4690 |
+
+A 49% change in the headline statistic, from nothing but reading it early. The `.out` file
+shows 0 epochs while a job runs (stdout buffering), so an in-flight probe does not announce
+itself the way an in-flight training run does.
+
+**The rule.** Tabulate a probe only at its full record count — `PROBE=100` over 20 epochs
+gives exactly **100 records, last step 9900**. Gate on `wc -l probe.jsonl` equal to the
+expected count, exactly as the run tables gate on `epochs_done >= 100`. Cycle 29's 29.1
+tabulates 24 of 32 `p7` dirs for this reason; the other 8 were at 49–96 records.

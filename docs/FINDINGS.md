@@ -5282,3 +5282,163 @@ the M1 identity/pooling structure is verified structurally on these arms before 
   should be stated until they land.
 * The `frac_neg` value of `gate2` can never be recovered — the format predates the field. If
   the AdamW inversion matters to the paper it rests on `ap-*`/`bp-*`, not on `gate2`.
+
+# Cycle 29
+
+## 29.1 The agreement ladder, complete probes only, in ONE matched family
+
+`p7-*` closes what 26.3 could only assemble across configs. Every row below is a0=1e-3,
+20 epochs, free adaptation, SGDm base + Lion meta, AUGMENT=1 — one family, no cross-config
+reads. Statistic is the STEADY window (last 50% of records) **excess of the per-step
+agreement over its own independence null**, `step% − null%`, in percentage points.
+
+**Only probes with 100/100 records are tabulated.** Reducing an in-flight probe moves the
+number (the STEADY window is defined on the records that exist): `p7-r34-lay-s1` read
+excess 0.9879 at 89 records and 1.4690 at 100. See 29.4.
+
+| dataset / net | granularity | m | n | excess mean | sd |
+|---|---|---|---|---|---|
+| CIFAR-10 / ResNet18 | resnet18_blocks | 6 | 3 | **+4.1577** | 2.2195 |
+| CIFAR-10 / ResNet18 | layerwise | 62 | 3 | +1.3205 | 0.8946 |
+| CIFAR-10 / ResNet18 | nodewise | 14,420 | 3 | +0.4278 | 0.0517 |
+| CIFAR-10 / ResNet18 | weightwise | 11,173,962 | 3 | +0.0046 | 0.0008 |
+| CIFAR-10 / ResNet10 | layerwise | 38 | 2 | +2.4756 | 0.5955 |
+| CIFAR-10 / ResNet10 | nodewise | 8,660 | 2 | +1.3711 | 0.0875 |
+| CIFAR-10 / ResNet10 | weightwise | 4,903,242 | 2 | +0.0260 | 0.0041 |
+| CIFAR-10 / ResNet34 | layerwise | 110 | 1 | +1.4690 | — |
+| CIFAR-100 / ResNet18 | resnet18_blocks | 6 | 3 | **−0.7312** | 2.5459 |
+| CIFAR-100 / ResNet18 | layerwise | 62 | 1 | +4.5141 | — |
+| CIFAR-100 / ResNet18 | nodewise | 14,600 | 1 | +1.2811 | — |
+
+**Within an architecture on CIFAR-10 the fall with m is monotone, 3 orders of magnitude**
+(R18: 4.16 → 1.32 → 0.43 → 0.005 over m = 6 → 62 → 14,420 → 11.17M, n=3 at every rung;
+R10: 2.48 → 1.37 → 0.026 over m = 38 → 8,660 → 4.90M, n=2). 26.3 replicates in the matched
+family. The `weightwise` rungs are 0.005–0.026pp above a null of 50.0086–50.0180% — at the
+resolution limit, and consistent with the campaign's headline refutation that independence
+essentially holds coordinate-wise.
+
+## 29.2 The m=6 rung INVERTS between datasets — the coarsest partition is the only one that does
+
+Same architecture, same 6-block partition, same config, only the dataset changed:
+
+| | m=6 | m=62 | m≈14.5k |
+|---|---|---|---|
+| CIFAR-10 | **+4.1577** (n=3) | +1.3205 (n=3) | +0.4278 (n=3) |
+| CIFAR-100 | **−0.7312** (n=3) | +4.5141 (n=1) | +1.2811 (n=1) |
+
+CIFAR-10's ladder is monotone decreasing. **CIFAR-100's is not**: it is at or below the
+independence null at m=6 (2 of 3 seeds negative: −1.2868, +2.0466, −2.9534), rises to the
+largest coarse-rung agreement in the campaign at m=62, then falls again. At the two finer
+rungs CIFAR-100 sits *above* CIFAR-10; at m=6 it sits *below*. `sd_beta` at C100/blk6 is
+2.07–2.09, i.e. the betas do spread — this is not a degenerate run.
+
+**This contrast is NOT yet significant.** Welch on the two n=3 blk6 cells: diff 4.8889pp,
+se 1.9500, t=2.507, df=3.93, two-sided p≈0.07. The seed sd (2.2–2.5pp) is half the effect.
+`p8-*` (14 jobs, submitted this cycle, 29.5) takes both cells to n=10. **Do not state 29.2
+as a result until they land.** The m=62 and m≈14.5k CIFAR-100 rungs are n=1 and are listed
+for shape only.
+
+## 29.3 Model scale: R10 sits above R18 at every matched granularity, by 1.9–5.7x
+
+| granularity | ResNet10 | ResNet18 | ratio |
+|---|---|---|---|
+| layerwise | +2.4756 (n=2) | +1.3205 (n=3) | 1.87x |
+| nodewise | +1.3711 (n=2) | +0.4278 (n=3) | 3.21x |
+| weightwise | +0.0260 (n=2) | +0.0046 (n=3) | 5.65x |
+
+3/3 granularities, in the predicted direction (25.6). **The confound is named and not
+removable at fixed granularity:** ResNet10 has *fewer* groups than ResNet18 at every
+granularity (38 vs 62, 8,660 vs 14,420, 4.90M vs 11.17M), so "smaller model" and "coarser
+partition" push the same way here and this table cannot separate them. The ratio *growing*
+with fineness (1.87x → 3.21x → 5.65x) is the part a pure-m story does not obviously predict.
+
+**The ResNet34 rung does not yet exist and its one available point runs the other way**:
+R34/layerwise is +1.4690 (n=1, m=110) against R18's +1.3205 (n=3, m=62) — higher, where both
+the model-scale and the m reading require lower. `p7-r34-{node,w}-s*` and `p7-r34-lay-s2`
+were at 75–91 of 100 records at aggregation time. 25.6 is not confirmed at three model sizes.
+
+## 29.4 CORRECTION — `agree2.py` censored every n_tot above 20,000,000
+
+`infer_ntot` inferred the coordinate count as
+`Fraction(frac_neg).limit_denominator(20_000_000).denominator`. The cap is the tool's, not
+the model's. ResNet34/weightwise has **21,282,122** parameters (summed from
+`block_sizes.json`'s `n_b`, 110 tensors) and was reported as exactly `20,000,000`.
+
+Effect: the independence null `E = 0.5 + sqrt(2/pi)/(2 sqrt(n))` was computed at the wrong n,
+giving 50.00892% instead of 50.00865%, and the R34/weightwise excess was understated by
+~10% relative (0.0029 → 0.0033 on s1). **No sign flips and no ordering changes**, but the
+number was wrong. Cap raised to 100,000,000 in `bin/agree2.py` (backup at `agree2.py.bak`);
+all 29.1 numbers are post-fix. Verified unaffected: R18 11,173,962 / R10 4,903,242 /
+R18_c100 11,220,132 all reproduce exactly and sit under the old cap.
+
+This is the third measurement-layer defect in the coordinate count, after CORRECTIONS 16
+(`block_sizes.json` claiming 11.17M nodes for nodewise) and 17 (Lion sign-censoring of
+`drift/step`). **Any new architecture above 20M parameters read before this cycle carries
+the censored null.**
+
+## 29.5 Submitted this cycle — 50 jobs, all on alice, pre-registered
+
+| batch | n | what | why |
+|---|---|---|---|
+| `kb-*` | 36 | M1 additive r-curve at **m=6** (`resnet18_blocks`), r ∈ {0, .03, .07, .2, .5, 1} x s0-2 x {CIFAR-10/ResNet18, CIFAR-100/ResNet18_c100}, a0=1e-3, 100ep | the falsification test 29.2 turns on |
+| `p8-*` | 14 | `p7-{r18,c100}-blk6-s{3..9}` — 7 more seeds per dataset at m=6, 20ep | 29.2 is p≈0.07 at n=3; this takes it to n=10 |
+
+`kb-*` mirrors `bin/c27_alice.sh`'s `kc()` field for field — same base/meta optimizers, same
+a0=1e-3, same 100 epochs, same AUGMENT, same BETA_CLIP — with exactly two changes:
+`--stepsize-groups resnet18_blocks` instead of `layerwise`, and the dataset/net pair swept.
+`resnet18_blocks` is hard-coded to ResNet18's 62-tensor layout; `ResNet18_c100` shares it
+(verified — `p7-c100-blk6-s{0,1,2}` all completed at m=6). **Do not extend `kb` to R10/R34**;
+per the cycle-27 structural check it raises ZeroDivisionError at optimizer construction.
+
+**PRE-REGISTERED, from 29.2.** 26.3 reads the M1 pooling gain as running OPPOSITE to
+agreement — coarse/high-agreement rungs gain little, fine/low-agreement rungs gain a lot.
+Applied at m=6, where 29.2 says CIFAR-10 has the campaign's highest coarse agreement and
+CIFAR-100 has none:
+> **PREDICTED (a):** CIFAR-10 at m=6 shows a SMALL M1 gain. (26.3 already reports +0.415,
+> but from `mx/probe_sig_*` at a0=1e-6/100ep — a cross-config read. `kb-c10-*` redoes it
+> in-family.)
+> **PREDICTED (b):** CIFAR-100 at m=6 shows a LARGE M1 gain.
+> **FALSIFIED IF:** CIFAR-100 at m=6 collapses the way it does at layerwise (r=0 plateau
+> 8.98 vs 69.92 at r=1, 24.3/26.7). 26.3's "gain runs opposite to agreement" reading is
+> then dead, and the DATASET, not the partition, sets the sign of the pooling effect.
+
+Every CIFAR-100 pooling measurement in the campaign so far is at layerwise (m=62). This is
+the first at m=6, and it is the rung where the two datasets disagree.
+
+## 29.6 Operations — the backfill window, not the queue depth, is the throughput lever
+
+28.7 concluded "12 running per account is cluster contention, not configuration." That is
+still right, and this cycle measured the mechanism.
+
+* **Genuinely free GPUs cluster-wide: 5** (node883 IDLE with 4 free L4, node882 with 1).
+  Counted per the cycle-16 rule — node-level `CfgTRES − AllocTRES`, non-idle states excluded.
+  A naive `sinfo` read suggested ~50 free; the `mix-` suffix is PLANNED, not available.
+* **`SchedulerParameters` = `bf_interval=60, bf_window=10810, bf_max_job_start=100,`
+  `bf_max_job_user=25, bf_max_job_test=1000`.** Backfill tests **at most 25 jobs per user
+  per cycle**. With 269 pending on alice, queue depth past the top 25 buys nothing from
+  backfill — it only holds main-scheduler position.
+* **12 of alice's top-25 backfill slots were `bg300`/`bg600` at 8:30:00 and 13:30:00** —
+  jobs far too long to fit any backfill gap, occupying half the window permanently while
+  the 20-epoch probes that *can* fit sat at Nice=5000–40000, far below it.
+  **Fixed: 90 short (≤3:50) jobs on alice and 39 on alice2 renamed to Nice=0.** The top of
+  both queues is now entirely ≤3:50:00. `bg*` left at Nice=400 — demoted within the window,
+  not demoted absolutely, since they still need main-scheduler position.
+* **Priority decomposition** (`sprio`): partition 400000, fairshare 270697, age ~917,
+  **QOS 0**. `PriorityWeightQOS=1000000` is a full million points we never collect —
+  every job runs at `QOS=normal` and the partition QOS is applied at schedule time.
+  FairShare for salehkaleybars is **0.338** (RawUsage 15.35M, half-life 14 days), i.e. we
+  have drawn more than our share and the scheduler is correctly throttling us. 24 GPUs
+  across the two accounts is close to what fairshare currently entitles us to.
+* A nice=0, 5-minute, 1-GPU control job pinned to `gpu-l4-24g` would not start against an
+  IDLE 4-GPU node — confirming the block is priority against 511 pending cluster GPU jobs,
+  not anything in our submission. Cancelled after the test.
+* Queue after this cycle: **alice 320, alice2 240 = 560.**
+
+## 29.7 Still open
+
+* `kb-*` and `p8-*` are the two things this cycle turns on. Neither has landed.
+* **29.2 must not be stated as a result at p≈0.07.** Wait for `p8-*`.
+* The ResNet34 agreement rung (29.3) is 5 probes short and its one point contradicts 25.6.
+* CIFAR-100 at m=62 and m≈14.5k is n=1 (`p7-c100-{lay,node}-s2`, `p7-c100-w-s*` in flight).
+* Everything still open from 28.8 remains open: `cw`, `kc`, `bo`, `gp`, `r34r`, `ap`, `ag`.
+* `bo-*` landed 12 rows this cycle but only 3 at ≥100 epochs — not read.
