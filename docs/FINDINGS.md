@@ -6666,3 +6666,53 @@ values; it needs the full grid at n=5 — queued next as alice2 drains.
 | `ac-*` | alice | 42 | does the interior optimum survive a0=1e-3 at n=5? (35.1) |
 
 Queue after: **alice 77 pending / 11 running, alice2 50 / 2.** All of it answers a named question.
+
+## 35.4 The interior optimum does not replicate across architecture or dataset
+
+35.1 checked one setting. Re-deriving the same `additive` layerwise r-curve at both
+initialisations for every (network, dataset) with coverage (SGDm+Lion, augment=1, 100 ep,
+ms=1e-3, not superseded):
+
+| setting | a0 | curve shape | peak | peak vs r=0 | peak vs r=1 |
+|---|---|---|---|---|---|
+| **R10 / C10** | 1e-6 | interior | r=0.1 → 91.590 ±0.051 (n=3) | +9.476 | +1.00 |
+| **R10 / C10** | 1e-3 | **monotone ↑ to the boundary** | **r=1** → 91.167 ±0.272 (n=3) | +8.974 | 0 (peak *is* r=1) |
+| **R18 / C10** | 1e-6 | sharp interior | r=0.06 → 93.262 ±0.135 (n=8) | +1.034 | +2.399 |
+| **R18 / C10** | 1e-3 | flat then ↓ | r=0.1 → 92.441 ±0.138 (n=5) | +0.260 | +1.290 (r=1 n=2) |
+| **R34 / C10** | 1e-6 | interior at r=0.02, with a **collapse chasm** at r=0.01 (69.12 ±, n=3) and r=0.005 (90.24, n=3) | r=0.02 → 93.884 ±0.194 (n=3) | +0.786 | +3.61 |
+| **R34 / C10** | 1e-3 | **UNMEASURED — only r=0.06 exists (93.350 ±0.150, n=3)** | — | — | — |
+| **R18 / C100** | 1e-6 | **monotone ↑** | r=0.2 → 69.890 ±0.018 (n=2) | +58.685 | +0.35 |
+| **R18 / C100** | 1e-3 | **monotone ↑ to the boundary** | **r=1** → 69.916 ±0.418 (n=2) | +60.934 | 0 (peak *is* r=1) |
+
+**The interior optimum is specific to ResNet18 / CIFAR-10 at a0=1e-6.**
+
+* On **CIFAR-100 it does not exist at either a0** — the curve rises monotonically in r and peaks
+  at the boundary. A "pooling helps at intermediate strength" claim is false on the second dataset.
+* On **ResNet10 the a0 control moves the peak to r=1**, i.e. no pooling at all is best. This is
+  28.4's finding, confirmed here at the layerwise setting rather than as a scale-axis footnote.
+* On **ResNet34 at a0=1e-6 the curve is not merely non-monotone but discontinuous**: r=0.005 →
+  90.24, r=0.01 → **69.12**, r=0.02 → 93.88, all n=3. An optimum quoted from a curve with a 25pp
+  chasm two grid-points away is not a stable optimum. (The in-flight `r34f-*` batch is measuring
+  exactly this boundary at finer spacing.)
+
+**Combined with 35.1**, the honest statement is: *the additive interior optimum appears in one
+architecture, on one dataset, at one initialisation, and shrinks from +1.03pp to +0.26pp when
+that initialisation is corrected.* It is not a method result. **The campaign has no surviving
+positive method result** pending `ac-*`.
+
+**Power caveats (R7).** CIFAR-100 cells are n=2 — adequate for a *shape* claim (monotone vs
+interior; the effects are 50+pp) but not for any fine comparison. ResNet10 a0=1e-3 is n=3
+throughout, and its shape (82.19 → 91.17, monotone over 7 grid points) is unambiguous.
+**ResNet34 at a0=1e-3 is a genuine hole** — one r value. That curve is the highest-priority
+replication gap and is queued next.
+
+## 35.5 Queue state
+
+| account | pending | running | batches |
+|---|---|---|---|
+| alice | 77 | 11 | `ac-*` (42, a0 control of the interior optimum), `bg300`/`bg600`/`pp-*`/`f5cos`/`fxcos` |
+| alice2 | 82 | 12 | `ms-scal`/`ms-lay` (52, the m=1 control), `gc-*` (12) + `msa-*` (20, strong-form collapse test) |
+
+126 jobs submitted this session; every one carries a named open question and a two-sided
+pre-registration in its submitting script. Prefixes `ms-`, `ac-`, `gc-`, `msa-`, `zp-`,
+`fc100-cos-` are in `bin/PROTECTED.txt` on both accounts.
