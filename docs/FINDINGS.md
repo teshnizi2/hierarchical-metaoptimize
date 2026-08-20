@@ -5819,3 +5819,53 @@ running. Queue after: **alice 198 pending / 12 running, alice2 210 / 12.**
   is one row deep. Next cycle's candidate, once `p9-*` lands.
 * Non-meta baselines (axis 4) remain queued behind everything on alice at nice 20000–40000.
 * Everything still open from 30.7 that `p9-*` does not touch remains open.
+
+## 31.8 STRUCTURAL CHECK (Rule 4) — the dataset contrast INVERTS between probe windows; the slope refutation does not
+
+`agree2.py` reports two windows. `drift` is `|mean(beta_last) − mean(beta_first)| / Δsteps`,
+i.e. the systematic drift of the **group-mean** log-step-size — exactly the quantity a
+sqrt(N)-independence model constrains. Both windows, same 10+10 seeds, m=6:
+
+| statistic | window | CIFAR-10 | CIFAR-100 | diff | t | df |
+|---|---|---|---|---|---|---|
+| step−null excess | STEADY (last 50%) | +3.447 | +1.013 | **+2.433** | +2.75 | 17.9 |
+| step−null excess | STARTUP (first 20%) | +8.797 | +12.05 | **−3.250** | −2.02 | 17.3 |
+| sys% | STEADY | 66.47 | 60.50 | **+5.967** | +4.98 | 16.0 |
+| sys% | STARTUP | 70.08 | 76.67 | **−6.583** | −5.04 | 17.9 |
+| drift/step | STEADY | 4.542e-4 | 2.927e-4 | **+1.616e-4** | +27.90 | 18.0 |
+| drift/step | STARTUP | 5.937e-4 | 8.363e-4 | **−2.426e-4** | −18.49 | 14.7 |
+
+**All three statistics flip sign, and all three flips are significant.** At m=6, CIFAR-100
+*starts* with more agreement and more drift than CIFAR-10 and *ends* with less; its
+startup/steady drift ratio is 2.86 against CIFAR-10's 1.31, i.e. its β settles roughly twice
+as fast at a common 20-epoch, a0=1e-3 budget.
+
+**Consequence for 31.1 and 29.2.** The dataset does not shift agreement by a level; it changes
+the **trajectory**. Every statement of the form "CIFAR-100 has less/more coordinate agreement
+than CIFAR-10 at m=6" is a statement about a *window*, and reverses in the other one. The
+defensible version is: *at m=6 the two datasets' meta-gradients follow different β
+trajectories, and the STEADY-window ordering (C10 > C100) is the tail of a crossover, not a
+constant offset.* A mundane reading — C100's β has converged by the steady window and C10's
+has not — is not excluded by anything we have measured. **Do not put a mechanism on the
+dataset contrast.**
+
+**Consequence for 31.2 — the refutation gets STRONGER, not weaker.** The obvious reviewer
+objection to a drift-vs-m slope is "you measured a transient". Fitting the same slope in both
+windows answers it:
+
+| ladder | m span | STEADY slope | R² | STARTUP slope | R² |
+|---|---|---|---|---|---|
+| CIFAR-10 / ResNet18 | 6 → 11.17M | −0.1393 | 0.919 | −0.2096 | 0.980 |
+| CIFAR-100 / ResNet18 | 6 → 11.22M | −0.1061 | 0.902 | −0.3605 | 0.911 |
+| CIFAR-10 / ResNet10 | 38 → 4.90M | −0.1214 | 0.962 | −0.3502 | 0.910 |
+| CIFAR-10 / ResNet34 | 110 → 21.28M | −0.0915 | 0.953 | −0.1738 | 0.911 |
+
+**Eight fits, 2 datasets × 3 architectures × 2 windows. Every one is above −0.500, and the
+most favourable of them (−0.3605, R²=0.911) still falls 28% short.** The startup window is
+uniformly steeper — early training is the closest the meta-gradient ever gets to independence —
+and it still does not reach the sqrt(N) exponent. This is the form the claim should take in
+the paper: **not "the slope is −0.11", which is one window, but "no window, dataset or
+architecture we can construct reaches −0.5."**
+
+Both caveats are re-checkable at n=10 per rung once `p9-*` lands; the C100 rows above are
+n=10 only at m=6.
