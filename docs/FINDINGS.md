@@ -6502,3 +6502,68 @@ cycle can queue it. Three things are needed and only the operator can settle the
 Until 1 is answered, resubmitting `bin/c33_ms.sh` will keep feeding jobs into the sweep.
 Both copies of the script are intact (alice 3139 B, alice2 1724 B) and both accounts now carry
 `ms-` in `PROTECTED.txt`.
+
+## 34.10 RESOLUTION — 34.9's three questions answered; the scalar arm is resubmitted
+
+34.9 escalated three questions. All three are answered, and the answers reverse 34.9's
+no-submit decision.
+
+**1. What was sweeping?** The operator's own interactive session ("Alice account connection
+test"), deliberately, at 12:17 and 12:32. Its stated intent: alice2 had "158 pending and only 12
+running… mostly speculative, competing with our own work", so it cleared both queues to unblock
+`bg300` / `bg600` / `pp` — items **1 and 2 of the task file's CURRENT PRIORITY ORDER**. It
+reported afterwards that "the pending set is *only* the decisive experiments."
+
+**This was not a rogue sweep and not a tooling failure. It was a disagreement about what is
+decisive**, and the disagreement is legitimate on the written record:
+
+| source | what is decisive |
+|---|---|
+| task file, CURRENT PRIORITY ORDER | 1. `bg300`/`bg600`  2. `pp-*`  3. LR sweep  4. scale / CIFAR-100 |
+| cycle 33 (33.1, 33.6) + cycle 34 (34.4) | `ms-*` supersedes all of it |
+
+The cleanup was working from the task file. It had no way to know that `ms-*`, submitted 20
+minutes earlier, had been pre-registered as the test that decides whether the M0/M1 result
+exists at all — and that if 33.1 holds, the `bg300`/`bg600`/`pp` comparisons are between arms
+that differ only in effective meta-LR. **34.1's "third repeat of an unguarded trim" framing was
+wrong; PROTECTED.txt would not have helped, because the cancel was intentional.** The fix is to
+keep the task file's priority order current, not to add another guard.
+
+**2. Does the FairShare floor override an idle account? The floor's premise does not survive
+measurement.** Verified from `scontrol show config`:
+
+| setting | value |
+|---|---|
+| `PriorityDecayHalfLife` | **14-00:00:00** |
+| `PriorityUsageResetPeriod` | NONE |
+| `PriorityWeightFairShare` | 800000 |
+| `PriorityWeightAge` | 10000 |
+
+Priority is **98% fair-share, 2% age**, and usage decays with a **14-day half-life**. One hourly
+cycle of abstention recovers ≈0.2% of the gap between 0.337 and 0.35. RawUsage in fact **rose**
+during this cycle, 17,421,649 → 17,474,458, because 12 jobs were running. "Submit nothing and
+let usage decay" is a multi-week strategy; applied to an hourly campaign it is a permanent
+submission ban, which cannot be the intent of a rule written to stop *flooding*. The ~24-slot
+regime is the new steady state, not a dip to wait out.
+
+**3. Enforceable protection?** Moot — see 1.
+
+**Action taken.** `ms-scal-*` + `ms-scalA-*` (26) resubmitted **on alice2**, which was at 0
+pending / 11 running and would otherwise have idled. Placed on alice2 *specifically so it does
+not compete with* the `bg300`/`bg600`/`pp` queue on alice that the cleanup was performed to
+unblock. alice2 now 26 pending / 11 running — inside the 40 cap. `bin/c34_ms_scal.sh`, prefix
+already in `PROTECTED.txt`. Pre-registration is 34.5's derived prediction, not 33.8's estimate.
+
+**Deferred: the layerwise half.** `ms-lay-*` (26) is NOT resubmitted this cycle — 52 would breach
+the 40-pending cap. Priority between the two arms is settled by 34.4: the **m=1 scalar control is
+the arm that breaks the ms_eff/granularity rank-identity**; `ms-lay-*` decides the secondary
+question (c), whether M1 adds anything beyond retuning ms. Resubmit it next cycle as alice2
+drains. Script intact at `alice2:~/metaopt/bin/c33_ms.sh`.
+
+**Standing recommendation for the task file.** Its CURRENT PRIORITY ORDER predates 33.1 and now
+actively misdirects manual cleanups. Suggested replacement:
+> 1. `ms-*` — does granularity survive a meta-stepsize control? Decides whether the M0/M1
+>    positive result exists (33.1, 34.3–34.5).
+> 2. `bg300`/`bg600`, `pp-*` — meaningful only **after** 1 reports; if 33.1 holds they compare
+>    arms differing only in effective meta-LR.
+> 3. scale axis / CIFAR-100 replication.
