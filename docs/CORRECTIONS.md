@@ -592,3 +592,64 @@ itself the way an in-flight training run does.
 gives exactly **100 records, last step 9900**. Gate on `wc -l probe.jsonl` equal to the
 expected count, exactly as the run tables gate on `epochs_done >= 100`. Cycle 29's 29.1
 tabulates 24 of 32 `p7` dirs for this reason; the other 8 were at 49–96 records.
+
+---
+
+## 21. M1's `r` dial changes the meta-step-size as well as the pooling (cycle 33)
+
+**What was wrong.** Two claims, both carried in `CONTINUE-HERE.md` and both built on reading
+`additive` r=0 as a controlled full-pooling baseline:
+
+1. "even full pooling helps (+1.39pp)" — CIFAR-10/ResNet18.
+2. CORRECTIONS 13's framing that `r=0` is "the *maximally pooled* extreme", used as the
+   endpoint against which the M1 curve is reported.
+
+**What the code actually does** (`HF.py:265-293`, additive branch):
+
+```
+d    = beta - beta_prev          # realised Lion increment, |d_b| == ms EXACTLY
+dm   = d.mean()                  # == ms*(2p-1),  p = fraction agreeing in sign
+beta = beta_prev + dm + r*(d - dm)
+```
+
+CORRECTIONS 13 is right that r=0 gives every group the same increment. It is wrong that this
+is a *controlled* baseline. Because Lion's increment has constant magnitude `ms`, averaging the
+increments shrinks the shared step's advance to `ms·|2p−1|`. Moving r from 1 to 0 therefore
+does two things at once: it pools the groups **and** it divides the meta-step-size by
+`|2p−1|`. At layerwise `frac_neg` = 0.5484 → `|2p−1|` = 0.0968, a **10.3× reduction**.
+
+**Structural verification** (measured, per Rule 4 — the r=0 endpoint that CORRECTIONS 13
+inferred but never checked). A true full-pooling arm collapses every partition to one step
+size, so its score cannot depend on the partition:
+
+| granularity | m | `additive` r=0 | `zpool` r=0 |
+|---|---|---|---|
+| `resnet18_blocks` | 6 | 91.767 ±0.042 | — |
+| `layerwise` | 62 | 92.587 ±0.674 | 87.740 ±0.138 |
+| `nodewise` | 14,420 | 91.984 ±0.103 | — |
+| `weightwise` | 11,173,962 | 45.005 ±2.603 | 87.763 ±0.036 |
+| plain `scalar` reference | 1 | — | 87.772 ±0.139 |
+
+`zpool` r=0 is granularity-invariant to **0.032pp** across 180,000× in m. `additive` r=0 spans
+**47.582pp**. Probe evidence: `runs/zb/probe_zb-{l,w}-r0` show `z_mean` identical across all
+reported tensors; `zb-l-r1` and `zb-plain` agree on `frac_neg` = 0.5483870967741935.
+
+**Effect on the claims.**
+
+| claim | status |
+|---|---|
+| "even full pooling helps (+1.39pp)" | **REFUTED.** True full pooling is −3.044pp vs plain layerwise. |
+| M1 interior optimum, layerwise, +2.359pp vs r=1 (n=10) | **stands as an empirical curve**; its mechanism is not pooling |
+| M1 interior optimum, nodewise, +1.140pp vs r=1 (n=3) | as above |
+| 26.3's search for an agreement→gain mechanism | **explained as a confound.** The M1 gain depends on agreement because the effective meta-step-size is `ms·|2p−1|`. |
+| CORRECTIONS 15's "cross-granularity pooling claims must use `additive` or `zmpool`" | **amended.** `additive`'s r is m-comparable as a formula, but its effect is dominated by the meta-LR rescaling, so it is not a pooling operator at all. |
+
+**What decides it.** `ms-*` (52 jobs, cycle 33): a meta-step-size sweep on plain `scalar` and
+plain `layerwise`. Pre-registered — if `scalar` at ms=1e-4 reaches 92.2–92.6, the whole M0/M1
+family is meta-LR tuning and granularity contributes nothing to the win.
+
+**Process note (Rule 4, third occurrence).** The first occurrence never checked the identity;
+the second checked it with a statistic that could not fail; this one checked **one endpoint of
+two** and inferred the other from algebra that was locally correct. The general lesson: verify
+a dial at *both* extremes, and for an invariance claim, vary the thing the invariance is over —
+here, the granularity.

@@ -30,11 +30,16 @@ flat (90.220-90.686, a 0.47pp spread) while the SCALAR arm moves 18.58pp; the wh
 scalar catching up. CIFAR-100 at the *middle* model size then gives **+47.6pp**, the campaign's
 largest effect, and it does not care about alpha0 (+47.59 at 1e-6, +47.64 at 1e-3). `cs-*`
 (submitted cycle 21) supplies the missing CIFAR-100 model sizes that turn this from hypothesis
-into result. **(3) Pooling inverts between datasets.** `r` is the RETENTION of the
-group-specific update -- **r=1 is plain layerwise (verified: 90.863 +-0.063 vs 90.891) and r=0
-is FULL pooling**. On CIFAR-10/ResNet18 the optimum is interior at r~0.07 (+2.31pp over plain
-layerwise) and even full pooling helps (+1.39pp); on CIFAR-100 the same r=0.07 costs -43.7pp
-and full pooling **collapses the model to 8.98%** (100-class chance is 1%), a -61.13pp penalty.
+into result. **(3) M1's `r` is NOT a pooling dial (cycle 33; CORRECTIONS 21).** `r=1` is plain layerwise
+(verified: 90.863 +-0.063 vs 90.891). `r=0` was believed to be FULL pooling; it is not. Under
+Lion every group's realised beta increment has magnitude exactly `ms`, so `additive`'s mean-of-
+increments shrinks the shared step to `ms*|2p-1|` -- a 10.3x meta-step-size cut at layerwise.
+`additive` r=0 therefore spans 47.58pp across granularities (45.005 weightwise -> 92.587
+layerwise) where a true pooling arm must be granularity-invariant; `zpool` r=0 is, to 0.032pp.
+**"Even full pooling helps" is REFUTED**: true full pooling is -3.044pp vs plain layerwise.
+The M1 interior optimum survives as an EMPIRICAL curve (layerwise +2.359pp n=10, nodewise
++1.140pp n=3, absent at blk6 and weightwise) but has no pooling interpretation. On CIFAR-100
+the same r=0.07 costs -43.7pp. **Do not write any "pooling helps" sentence.**
 **The correction that bounds all method claims:** a tuned non-meta baseline now WINS. AdamW +
 cosine at lr 1e-3 reaches **94.093 +-0.036** under matched budget (100ep, AUGMENT=1, ResNet18,
 CIFAR-10) against the best MetaOptimize arm's **93.306 +-0.140** -- a 0.79pp deficit. Earlier
@@ -42,6 +47,43 @@ cycles compared against *constant-LR* AdamW (91.86), which MetaOptimize does bea
 The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
+
+## Running / next (cycle 33)  -- queues: alice 174, alice2 164 = 338 jobs
+
+**Cycle 33 refuted the campaign's pooling story and found the mechanism 26.3 was missing.**
+Three arms that all end in ONE uniform step size score 4.85pp apart, ordered by their
+EFFECTIVE meta-step-size and nothing else (FINDINGS 33.1):
+
+| arm | effective meta-step | n | plateau |
+|---|---|---|---|
+| `zpool` r=0 / plain `scalar` | `ms` = 1e-3 | 5 / 12 | 87.740 / 87.772 |
+| `shrink` lam=1.0 | `ms`*\|2p-1\| ~ 9.7e-5 | 3 | 92.199 |
+| `additive` r=0 | `ms`*\|2p-1\| ~ 9.7e-5 | 8 | 92.587 |
+
+`_zpool` pools the meta-GRADIENT before Lion (magnitude survives); `_apply_hier` pools the
+REALISED increments after Lion (magnitude collapses to the sign-agreement excess). So M1's `r`
+moves pooling and meta-step-size together. **The M1 gain depends on agreement because the
+effective meta-LR does** -- that is the mechanism, and it is a confound, not a result.
+
+**The meta-step-size axis is unexplored: 1042 of 1075 runs sit at `ms`=1e-3.**
+
+* **`ms-scal-*` (26, alice) / `ms-lay-*` (26, alice2) -- PRE-REGISTERED, DECISIVE.**
+  `scalar` and plain `layerwise` x ms in {1e-5, 3e-5, 1e-4, 3e-4}, n=5, plus a0=1e-3 controls.
+  **Pre-reg: `scalar` at ms=1e-4 lands 92.2-92.6** (on `shrink` lam=1 / `additive` r=0) => the
+  whole M0/M1 family is meta-LR tuning and granularity contributes nothing. Staying near 87.8
+  saves the pooling arms. Whether the layerwise ms curve reaches 93.222 decides M1.
+* **`zp-w-*` / `zp-l-*` (17, alice2) -- PRE-REGISTERED.** True-pooling curve: weightwise
+  r in {0.9,0.95,0.99} to n=5, NEW cells r in {0.995,0.999}, layerwise r=0.99 to n=3.
+  33.2's weightwise interior optimum (+11.130pp at r=0.99) is n=2 and its cliff is unlocated.
+* Still front-of-queue from cycle 32: `p7-c100r*` (30), `sc50-*` (18+6 running), `r34r-*` (9),
+  `f5cos-*` (12) on alice; `r34f-*` (11), `bp-*`/`bo-*` (~39), `ag-*`/`ap-*` (36),
+  `mx-h4-*` (20) on alice2. All pre-registered; none is blocked by this cycle's submissions.
+* **Cancelled 97 jobs**, each with a reason recorded in FINDINGS 33.8. Net queue change -45.
+* Ops: throughput is STILL 24 concurrent. The per-account cap of 42 GPUs is not reachable --
+  the QOS pools are per-partition and every long partition is fully allocated by other users,
+  so multi-partition submission cannot spread into them (FINDINGS 33.9). Also: fair-share has
+  fallen far enough that a fresh nice-0 job now ranks BELOW old nice-400 jobs; the only way to
+  promote an old low-priority batch is cancel-and-resubmit.
 
 ## Running / next (cycle 32)  -- queues: alice 189, alice2 214 = 403 jobs
 

@@ -6130,3 +6130,165 @@ a long partition frees. The 5th scale rung is therefore not obtainable this cycl
 * 26.3 needs replacing, not patching: agreement is monotone in m and the M1 gain is not, so
   the campaign currently has **no** single mechanism linking granularity, pooling and dataset.
 * Everything still open from 31.7 that this cycle did not touch.
+
+---
+
+# CYCLE 33
+
+All numbers below re-derived from `results/all_runs.csv` (1075 runs, re-aggregated this cycle
+from both accounts) with `superseded==0` and `epochs_done>=100`. Metric is `plateau`.
+Unless stated: ResNet18 / CIFAR-10 / a0=1e-6 / 100 ep / AUGMENT=1 / SGDm base + Lion meta /
+`meta-stepsize 1e-3` / `BETA_CLIP=-15:-2.3026`.
+
+## 33.1 THE MECHANISM 26.3 WAS MISSING — "pooling" and meta-step-size are confounded in M1
+
+Three arms in the campaign all end in **one uniform step size across groups**. They score
+4.85pp apart, and they are ordered by their *effective meta-step-size*, not by anything
+hierarchical.
+
+| arm | uniform step size? | effective meta-step | n | plateau |
+|---|---|---|---|---|
+| `zpool` r=0 (layerwise) | yes | `ms` = 1e-3 | 5 | 87.740 ±0.138 |
+| `zpool` r=0 (weightwise) | yes | `ms` = 1e-3 | 5 | 87.763 ±0.036 |
+| plain `scalar` | yes (native) | `ms` = 1e-3 | 12 | 87.772 ±0.139 |
+| `shrink` lam=1.0 (layerwise) | yes | `ms`·\|2p−1\| ≈ 9.7e-5 | 3 | 92.199 ±0.226 |
+| `additive` r=0 (layerwise) | yes (+1-step offset) | `ms`·\|2p−1\| ≈ 9.7e-5 | 8 | 92.587 ±0.674 |
+
+**Why (`HF.py:231-293`).** The two operator families act at different points in the meta-update:
+
+* `_zpool` pools the meta-GRADIENT *before* Lion: at r=0 every group receives `sign(sum_b z_b)`.
+  Lion's update magnitude is exactly `ms`, so the shared step size advances at rate `ms`.
+* `_apply_hier` (`additive`, `shrink`) pools the REALISED beta increments *after* Lion. Under
+  Lion every group's realised increment is exactly `±ms`, so
+  `mean_b(d_b) = ms·(2p−1)`, p = fraction of groups agreeing in sign. The shared step size
+  therefore advances at rate **`ms·|2p−1|`**.
+
+Measured layerwise `frac_neg` = 0.5483870967741935 (`runs/zb/probe_zb-plain`, `zb-l-r1`;
+identical in both) → \|2p−1\| = 0.0968 → effective `ms` ≈ 9.7e-5, a **10.3× reduction**.
+
+**Consequence.** M1's `r` is not a clean pooling dial: moving r from 1 to 0 simultaneously
+pools the groups *and* divides the meta-step-size by \|2p−1\|. Because \|2p−1\| is the
+sign-agreement, the M1 gain inherits a dependence on agreement — which is why 26.3 kept finding
+an agreement/gain relation it could not make monotone. **This is a confound, not a mechanism.**
+
+## 33.2 The true-pooling curves — pooling RESCUES over-fine granularity, never improves good granularity
+
+`zpool` is the operator whose endpoints are exact (CORRECTIONS 15, re-verified this cycle:
+r=1 layerwise 90.933 ±0.177 vs plain 90.784 ±0.169; r=1 weightwise 77.922 ±0.331 vs plain
+77.822 ±0.351; r=0 lands on `scalar` at both granularities, 0.032pp). Probe confirmation:
+`runs/zb/probe_zb-{l,w}-r0` report `z_mean` **identical across all reported tensors**
+(−0.07720036059617996 / −0.07795713096857071), `frac_neg` 1.0 / 0.0.
+
+| r | 0 | 0.1 | 0.3 | 0.5 | 0.7 | 0.9 | 0.95 | 0.99 | 1 |
+|---|---|---|---|---|---|---|---|---|---|
+| **layerwise** | 87.740 | 89.470 | 89.476 | 89.170 | 89.100 | 90.196 | 90.435 | 90.971 | 90.933 |
+| n | 5 | 5 | 5 | 4 | 6 | 2 | 2 | 1 | 5 |
+| **weightwise** | 87.763 | 87.847 | 87.950 | 87.870 | 88.064 | 88.510 | 88.798 | 89.052 | 77.922 |
+| n | 5 | 5 | 5 | 4 | 6 | 2 | 2 | 2 | 5 |
+
+* **layerwise: no interior optimum.** Max (r=0.99) is +0.038pp over r=1 — inside the ±0.177
+  seed band. Full pooling costs **−3.044pp** vs plain layerwise.
+* **weightwise: interior optimum at r=0.99, +11.130pp over r=1 (plain).** n=2 at that cell.
+* The best true-pooling number anywhere (89.052) is still **below** plain `resnet18_blocks`
+  (91.350 ±0.142, n=12) and plain layerwise (90.784).
+
+**Admissibility (CORRECTIONS 15).** These are two *within-granularity* shape statements. The
+r-axes are NOT comparable between the rows — `_zpool`'s pooled term is a SUM and its path is
+compressed by m — so no claim of the form "pooling of strength r helps weightwise more than
+layerwise" is licensed by this table.
+
+## 33.3 CORRECTION — "even full pooling helps" is refuted
+
+Carried since cycle ~20 (`CONTINUE-HERE.md`): "on CIFAR-10/ResNet18 the optimum is interior at
+r~0.07 (+2.31pp over plain layerwise) and **even full pooling helps (+1.39pp)**."
+
+That sentence reads `additive` r=0. Under the true pooling operator, full pooling **hurts**:
+
+| | plateau | vs plain layerwise (90.784 ±0.169, n=17) |
+|---|---|---|
+| `additive` r=0 (what was quoted) | 92.587 ±0.674 (n=8) | +1.803 |
+| `zpool` r=0 = true full pooling | 87.740 ±0.138 (n=5) | **−3.044** |
+
+The +1.8pp is the 10.3× meta-step-size reduction of 33.1, not pooling. **No "full pooling
+helps" sentence may be written.** CORRECTIONS 21.
+
+## 33.4 `additive` r=0 is not granularity-invariant — the missing half of Rule 4
+
+A true full-pooling arm collapses every partition to the same single step size, so its score
+must not depend on the partition. `zpool` r=0 satisfies this to **0.032pp across a 180,000×
+range in group count**. `additive` r=0 spans **47.582pp** over the same range:
+
+| granularity | m | `additive` r=0 | `zpool` r=0 |
+|---|---|---|---|
+| `resnet18_blocks` | 6 | 91.767 ±0.042 (n=2) | — |
+| `layerwise` | 62 | 92.587 ±0.674 (n=8) | 87.740 ±0.138 (n=5) |
+| `nodewise` | 14,420 | 91.984 ±0.103 (n=3) | — |
+| `weightwise` | 11,173,962 | 45.005 ±2.603 (n=3) | 87.763 ±0.036 (n=5) |
+
+The spread is what 33.1 predicts: \|2p−1\| falls with m, so `additive` r=0 shrinks the
+meta-step further at finer partitions until beta cannot escape a0=1e-6 at all (weightwise,
+45.005). CORRECTIONS 13 verified the r=1 endpoint and **inferred** r=0 from the algebra; the
+algebra is right that r=0 shares the update and wrong that this is a controlled baseline.
+
+## 33.5 What survives — the M1 interior optimum, as an empirical curve only
+
+| granularity | best interior r | plateau at r* | plateau at r=1 | gain | n |
+|---|---|---|---|---|---|
+| `resnet18_blocks` | none (flat) | 91.767 (r=0) | — | — | 2 |
+| `layerwise` | 0.06 | 93.222 ±0.150 | 90.863 ±0.063 | **+2.359** | 10 / 3 |
+| `nodewise` | 0.06 | 92.797 ±0.048 | 91.657 ±0.196 | **+1.140** | 3 / 3 |
+| `weightwise` | none (monotone ↑) | 78.046 (r=1) | 78.046 ±0.024 | 0 | 2 |
+
+The interior optimum is real and well-powered at layerwise and nodewise, absent at both ends of
+the granularity ladder. It is a **measured method result**; it is **not** a pooling result.
+
+## 33.6 The meta-step-size axis is unexplored — 1042 of 1075 runs sit at one value
+
+`meta_stepsize` over the whole CSV: `1e-3` ×1042, blank ×26, `1e-2` ×4. Given 33.1, this is now
+the campaign's largest open confound: every "hierarchy helps" cell may be a meta-LR effect.
+
+## 33.7 `kb-*` landed — the blk6 additive r-curve inverts between datasets (a0=1e-3)
+
+| r | 0 | 0.03 | 0.07 | 0.2 |
+|---|---|---|---|---|
+| **CIFAR-10** (R18, blk6) | 92.144 ±0.107 (3) | 91.995 ±0.238 (3) | 91.893 ±0.088 (2) | in flight |
+| **CIFAR-100** (R18_c100, blk6) | 27.302 ±0.941 (3) | 29.781 ±0.776 (3) | 34.732 ±2.043 (3) | 42.872 (n=1) |
+
+CIFAR-10 falls with r; CIFAR-100 rises monotonically with r over the whole measured grid. The
+r=0.2 CIFAR-100 cell is **n=1 — do not quote it**. Direction is consistent with the layerwise
+dataset inversion already on record.
+
+## 33.8 Submitted this cycle — 69 jobs, 3 batches, each with one open question
+
+| batch | acct | n | what | open question / pre-registration |
+|---|---|---|---|---|
+| `ms-scal-*`, `ms-scalA-*` | alice | 26 | `scalar` × meta-stepsize {1e-5,3e-5,1e-4,3e-4}, n=5, + a0=1e-3 control n=3 | **Pre-reg: scalar at ms=1e-4 lands 92.2–92.6, i.e. on `shrink` lam=1 / `additive` r=0.** If so the entire M0/M1 family is meta-LR tuning on a single step size and granularity contributes nothing. If it stays near 87.8, the pooling arms do something a meta-LR change cannot. |
+| `ms-lay-*`, `ms-layA-*` | alice2 | 26 | `layerwise` plain × same grid | **Pre-reg: does the plain-layerwise ms curve reach `additive` r=0.06's 93.222 ±0.150?** Reaching it ⇒ M1 adds nothing beyond retuning ms. |
+| `zp-w-*`, `zp-l-*` | alice2 | 17 | `zpool` weightwise r∈{0.9,0.95,0.99} to n=5; **new** r∈{0.995,0.999} n=3; layerwise r=0.99 to n=3 | 33.2's weightwise interior optimum is n=2 and its cliff (89.052 → 77.922 between r=0.99 and r=1) is unlocated. **Pre-reg: a continuous collapse interpolates; a discontinuity leaves both new cells near 89.** |
+
+**Cancelled, with reasons (97 jobs).** `sc101-*` (12) — R101 needs ~4.7h against `gpu-short`'s
+3:50 cap and the long partitions are permanently full; 32.10 already ruled the 5th scale rung
+unobtainable. `kc-r10-*` (18) — an entirely new `additive` r-curve at a new model size, whose
+dial 33.1 shows to be confounded. `am4-*` (21) — superseded by the focused `amx-*` (kept).
+`c6f-*` (21) — duplicate of `kc-r18-*` (kept). `m0c-*` (13), `rcg-*` (9) — `shrink`/`additive`
+CIFAR-100 ladders superseded by the `ms-*` test. `zrn-*` (13) — resubmitted as `zp-*` at the
+front instead of sitting at rank 110+.
+
+## 33.9 Operations
+
+* **Both accounts run exactly 12 jobs, all on `gpu-short`, and the other 30 GPUs of the
+  per-account cap are unreachable.** The QOS pools are per-partition
+  (`qos-short-gpu` 12, `qos-gpu-l4` 8, `qos-gpu-2080` 12, `qos-gpu-mig` 8, `qos-gpu-a100` 2).
+  Multi-partition submission does **not** spread across them: Slurm places the job in one
+  partition and it consumes only that QOS. Every long partition is `mix`/`alloc` for other
+  users (`gpu-l4-24g` 7/7 nodes allocated, `gpu-mig-40g` 7/7, `gpu-a100-80g` 5/6 with one
+  drained), so the long-partition QOS pools cannot be entered at all. **Throughput remains 24
+  concurrent jobs across both accounts; 31.6 and 32.10 hold.**
+* Queue after this cycle: **alice 174 pending / 12 running, alice2 164 / 12.** Above the 60–120
+  guidance. Net change is −45 jobs; the justification for the remainder is that `ms-*` and
+  `zp-*` sit ahead of the entire speculative tail on both accounts (alice rank 73, alice2 rank
+  51, both behind only pre-registered work), so nothing decisive is queued behind speculation.
+* **New jobs no longer start at the front.** Fair-share has fallen far enough that a fresh
+  nice-0 submission (prio 670575 on alice) ranks *below* month-old nice-400 jobs that have
+  accrued age. Promotion by `scontrol update Nice=` cannot raise priority; the only lever for
+  an old low-priority batch is cancel-and-resubmit, which is what `zrn-*` → `zp-*` did.
