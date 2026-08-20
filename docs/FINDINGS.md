@@ -7428,3 +7428,68 @@ retrospective justification for cycle 38's decision not to cancel-and-resubmit t
 39.5 bracket experiment is ready to submit but blocked by the FairShare floor. The floor exists
 because over-submission cost us priority twice; it was not written for a drained queue. This is
 the one rule worth revisiting with the operator.
+
+---
+
+# CYCLE 40 (2026-08-20) — submitted: the granularity x meta-step RESPONSE SURFACE
+
+**106 jobs on alice1**, `rs-*`, all a0=1e-3, R18/CIFAR-10, SGDm+Lion, 100 ep, AUGMENT=1, guard on.
+Submitted on the operator's explicit instruction to choose what the paper needs over what is
+cheapest, which supersedes the standing 40-pending cap for this batch.
+
+## 40.1 Why this and not the 20-job bracket
+
+39.5 proposed a 4-cell bracket. That patches a gap; it does not build the paper. 39.1's +0.617pp
+is a **pairwise** number measured at one meta-step neither arm chose. The paper's claim is
+structural — *the granularity axis is largely a reparameterisation of the meta-step axis* — and a
+structural claim needs a surface, not two points.
+
+**PRE-REGISTRATION.** If granularity is a reparameterised meta-step, every granularity's
+ms-response curve is **the same curve shifted along log(ms)**, with peak heights equal to within
+seed noise. **Falsified if** peak heights vary systematically with m, or the curve shapes differ.
+This is a prediction that can fail, stated before the data.
+
+## 40.2 The design
+
+| granularity | ms grid | n | nice |
+|---|---|---|---|
+| scalar | frz(1e-8), 1e-5, 3e-5, 1e-4*, 3e-4, 1e-3* | 5 (frz 3) | 0 |
+| layerwise | frz(1e-8), 1e-5, 3e-5, 1e-4*, 3e-4, 1e-3* | 5 (frz 3) | 0 |
+| resnet18_blocks | 3e-5, 1e-4, 3e-4, 1e-3, 3e-3 | 5 | 50 |
+| nodewise | 1e-4, 3e-4, 1e-3, 3e-3, 1e-2 | 5 | 50 |
+| weightwise | 3e-4, 1e-3, 3e-3, 1e-2 | 3 | 100 |
+
+`*` = existing `ms-scalA`/`ms-layA` cells at n=3, topped up to n=5 with seeds 3,4.
+
+**The grid is deliberately not uniform.** 33.1 established the realised increment is |2p−1|·ms and
+34.2 verified |2p−1| falls with m, so a finer partition has a *smaller effective step at the same
+nominal ms* and its optimum must sit higher. The grid shifts up for finer arms; a common grid
+would spend most cells below every fine arm's optimum.
+
+**Frozen-beta anchor** (`rs-*-frz`, ms=1e-8, log-space travel 5e-4 over 50k steps): the ms→0
+limit, which is constant-LR SGDm at alpha0=1e-3. It is **granularity-independent by construction**,
+so `rs-scal-frz` and `rs-lay-frz` must agree to within seed noise — a Rule-4 structural check on
+the harness, not a fifth data point. Verified `1e-8` trips no positivity assert (only `-1` is
+special-cased in `train.py`).
+
+**Tiering.** `--nice` 0/50/100 orders the batch internally so the two headline curves finish
+first, the collapse test second, and the known-degenerate weightwise boundary case last. Nothing
+speculative sits behind anything decisive — it is one experiment. alice2's `fz-*` batch (the
+beta_clip deconfound, 36.3) is on the other account and untouched.
+
+## 40.3 What each tier buys the paper
+
+* **Tier 0** turns "+0.617pp at ms=1e-4" into "granularity gain **at matched optima**", and
+  brackets both curves on the left, where 39.5 showed the layerwise optimum is still open.
+* **Tier 1** is the collapse figure. Four granularities on one rescaled axis either lie on a
+  common curve (the claim is structural) or they do not (the claim is pairwise only).
+* **Tier 2** asks whether `weightwise` — which sits at 68.471 ±0.245 (n=10) at ms=1e-3 — recovers
+  at *any* meta-step. If it does not, the reparameterisation claim has a measured boundary, which
+  is a stronger and more honest statement than omitting the arm.
+
+## 40.4 Cost, stated plainly
+
+106 jobs x ~1 GPU-hour. FairShare was 0.3347 at submission and will fall further; this batch is
+the reason. The justification is that it is the campaign's core figure at n=5, not breadth — and
+that alice1 had drained to 4 pending and was hours from idle. **Status: 106 submitted, 5 running
+within a minute, 0 failed.** Not read until complete (36.8 partial-row trap).
