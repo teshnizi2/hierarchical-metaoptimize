@@ -43,6 +43,36 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 28)  -- queues: alice 299, alice2 250 = 549 jobs
+
+**Cycle 28 found three more unreduced probe batches, and one of them inverts the mechanism.**
+`gate1`/`gate2`/`gate3` (Aug 18, 33 dirs across both accounts) had zero mentions in FINDINGS
+or CORRECTIONS. `gate2` is base **AdamW**, and its sign-agreement RISES with partition
+fineness (m=6 71.20 -> m=62 79.96) where every SGDm batch in the campaign has it FALL
+(`gate1`: 63.64 -> 54.69). 26.3's monotone fall is base-optimizer-specific, and that is the
+mechanism H4 has been missing since cycle 12. See FINDINGS 28.4.
+
+**Do not tabulate those numbers with 26.3's.** `gate1`/`gate2` predate the probe's `frac_neg`
+field; the recovered `z_mean` statistic disagrees with the published one by 7.2pp at m=6.
+Validated and recorded as CORRECTIONS 18. `gate3` is divergent (`sd_beta` 20.5) and excluded.
+
+**Also this cycle:** `r10c-*` landed and the ResNet10 M1 interior optimum **disappears** at
+a0=1e-3 -- the r-curve is monotone increasing over the whole grid and its best interior point
+is 0.21pp BELOW plain layerwise, against a clean +1.00pp interior optimum at a0=1e-6 (28.5).
+With 27.4 (R18: +2.40 -> +1.29) the a0-dependence of the M1 gain is now a pattern, and on
+ResNet10 it goes to zero.
+
+* **`ap-*` (9) + `ag-*` (27), alice2, submitted this cycle -- PRE-REGISTERED.** The AdamW
+  agreement ladder in the modern probe format ({blk6, node, weight}; layerwise is the already
+  queued `bp-adamw-s*`), plus the AdamW M1 r-curve that mirrors `sub_gp.sh` field for field
+  with only the base changed. Predicts (a) the ladder inverts on `frac_neg` too, (b) the gain
+  ladder therefore runs the opposite way to SGDm's. See FINDINGS 28.6.
+* **`p7-*` (33) promoted to the front of alice**, `bp-*` (12) to the front of alice2. Both are
+  20-epoch probe blocks; together they cost ~40 min of the 24-GPU allocation and they are what
+  makes this cycle's contrast readable.
+* `r34r-*` and `gp-*` rows are now in the CSV at 3-75 epochs -- IN FLIGHT, correctly excluded
+  by the `epochs_done >= 100` filter. Do not read them yet.
+
 ## Running / next (cycle 26)  -- queues: alice 271, alice2 184 = 455 jobs
 
 **Cycle 26 found the mechanism, in data that was already on disk.** Three probe batches had
@@ -87,6 +117,16 @@ on that ceiling. The sqrt(N) refutation survives both (positive slope in 6/6 fit
 alpha0); the slope magnitudes do not.
 
 ## Gotchas that cost hours — do not rediscover these
+* **A probe directory with no `frac_zero` field is on the LEGACY statistic.** `gate1`/`gate2`
+  carry only `beta`/`z_mean`/`z_std`/`snr`. `z_mean` is a per-TENSOR running mean (62 entries
+  on every arm, including the 14,420-node and 11.17M-weight ones) and its agreement disagrees
+  with the published `frac_neg` one by **7.2pp at m=6**. `analysis/agree_legacy.py` prints the
+  same columns as `agree2.py` deliberately -- that makes the two easy to paste into one table.
+  Do not. CORRECTIONS 18.
+* **The Aug-18 `gate*` batches were STILL unread at cycle 27**, two cycles after the sweep
+  that was supposed to catch exactly this. Sweeping by `find -name probe.jsonl` is not enough
+  -- grep every top-level probe DIRECTORY name against FINDINGS and CORRECTIONS and reduce the
+  ones that come back zero. Cycle 28 did that and found 33 dirs, one of which inverts 26.3.
 * **Three probe batches sat unreduced for multiple cycles and one of them was the
   mechanism.** Before submitting ANY new probe run, sweep both accounts with
   `find <runs> -name probe.jsonl -size +1k` and grep every dir name against FINDINGS and

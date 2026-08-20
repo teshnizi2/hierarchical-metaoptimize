@@ -490,3 +490,42 @@ A sign inversion that robust does not depend on one censored point.
 **What does not survive:** the slope magnitudes as point values, and the CIFAR-100 / a0=1e-3
 cell as evidence of a *trend* at all — its R^2 falls to 0.08 once the ceiling point is
 dropped. Quote the slopes as a positive range, and normalise drift by the meta-stepsize.
+
+## 18. `z_mean` is not the meta-gradient whose signs make `frac_neg` (cycle 28)
+
+**What was nearly claimed.** `gate1` (alice, Aug 18) is field-for-field identical in its ARGS
+line to `mx/probe_sig_*`, the series 26.3's published sign-agreement ladder is built from —
+same base, meta, momenta, weight decay, meta-stepsize, alpha0, network, dataset, batch size,
+epochs, seeds. It had never been reduced. The obvious move was to reduce it and report it as
+an independent n=3 replication of the published ladder.
+
+**Why that is wrong.** `gate1` predates the probe's `frac_neg`/`frac_zero` fields. Its records
+carry `beta`, `z_mean`, `z_std`, `snr` only. A reducer built to recover agreement from
+`sign(z_mean)` (`analysis/agree_legacy.py`) was validated against `mx`, which carries BOTH
+formats — same records, same window, same code path — and disagreed:
+
+| rung | `frac_neg` (agree2.py) | `z_mean` (agree_legacy.py) | delta |
+|---|---|---|---|
+| resnet18_blocks (m=6) | 70.87±0.80 | 63.70±0.78 | **−7.17** |
+| layerwise (m=62) | 53.26±0.19 | 54.77±1.26 | +1.51 |
+
+`z_mean` is a per-TENSOR running mean: it has 62 entries on EVERY arm, including the
+14,420-node and 11,173,962-weight arms, whose true coordinate counts `agree2.py` infers from
+the `frac_neg` denominators. It is a different quantity at a different resolution, and its
+disagreement is 7pp — roughly the size of the whole m=6-to-m=62 fall the ladder reports.
+
+**The rule.** Any probe directory whose records lack `frac_zero` is on the LEGACY statistic.
+Its numbers may be compared to other legacy numbers and to nothing else. `agree_legacy.py`
+prints the same column layout as `agree2.py` on purpose, which makes the two easy to paste
+into one table — do not. This is the second time a probe field has looked interchangeable and
+was not (see CORRECTIONS 16 on `block_sizes.json`'s `n_b`).
+
+**What survives.** Within the legacy statistic, read consistently, `gate1` reproduces `mx` to
+0.055pp (m=6) and 0.083pp (m=62) — a genuine cross-batch reproducibility result (28.3) — and
+`gate2` vs `gate1` is a like-for-like base-optimizer contrast (28.4). Neither may be placed on
+26.3's table.
+
+**Also recorded:** `gate3` (SGDm base, meta Adam, no beta clip) is DIVERGENT — `sd_beta` 20.5
+in log space against `mx`'s 2.39 — and its `z_mean` agreement pins at exactly 100.0000% on all
+three seeds at m=6. It is excluded from every agreement claim rather than reported as a low
+outlier.

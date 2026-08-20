@@ -5109,3 +5109,176 @@ steps, alpha finite) — cycle-18 gotcha 5.
   only**; 25.6's third row is still one point.
 * R10/C10 a0=1e-3 has no r-curve (`r10c-*`, 7 left, alice2 position 1).
 * Every CIFAR-100 M1 cell is n=2 until `kc-*` lands.
+
+# CYCLE 28
+
+## 28.1 THREE MORE UNREDUCED PROBE BATCHES — `gate1`, `gate2`, `gate3` (Aug 18)
+
+The cycle-26 sweep that found `mx/probe_sig_*` stopped at the batches whose names appear in
+this file. Re-run with the mention-count filter applied to EVERY top-level probe directory on
+both accounts, three more come back with zero mentions in FINDINGS or CORRECTIONS:
+
+| batch | acct | dirs | config | status before this cycle |
+|---|---|---|---|---|
+| `gate1` | alice | 12 | SGDm+Lion, R18/C10, a0=1e-6, 100ep, {scal, blk6, layer, weight} x s0-2 | never read |
+| `gate2` | alice2 | 12 | **AdamW**+Adam, R18/C10, a0=1e-6, 100ep, {scal, blk6, layer} x s0-2 | never read |
+| `gate3` | alice | 9 | SGDm+**Adam**, R18/C10, a0=1e-6, 100ep, {scal, blk6, layer} x s0-2 | never read |
+
+`gate1`'s ARGS line is field-for-field identical to `mx/probe_sig_*` — the series 26.3's
+published ladder is built from — including seeds. Also unmentioned and checked this cycle:
+`d2` (4), `det` (2). Both are 25-record smoke probes; nothing in them.
+
+## 28.2 CORRECTION — `z_mean` and `frac_neg` are DIFFERENT statistics (see CORRECTIONS 18)
+
+`gate1`/`gate2` predate the probe's `frac_neg`/`frac_zero` fields; they carry only
+`beta`/`z_mean`/`z_std`/`snr`. `analysis/agree_legacy.py` (new) recovers a sign-agreement
+statistic from `sign(z_mean)` instead. **It was validated against `mx`, which carries both
+formats, and it FAILED**: on the same records, same window,
+
+| rung | `frac_neg` (agree2.py, published) | `z_mean` (agree_legacy.py) |
+|---|---|---|
+| blk6 (m=6) | 70.87±0.80 | 63.70±0.78 |
+| layerwise (m=62) | 53.26±0.19 | 54.77±1.26 |
+
+7.2pp apart at m=6. `z_mean` is a per-TENSOR running mean (62 entries on every arm, including
+the 14,420-node and 11.17M-weight arms) — it is not the per-coordinate meta-gradient whose
+signs make `frac_neg`. **Legacy-format numbers can never be placed on the published ladder,
+and the two rungs `gate1` can supply are therefore not a replication of 26.3's values.** They
+are still a valid statistic read consistently within itself, which is what 28.3 uses them for.
+
+## 28.3 The agreement MEASUREMENT reproduces across batches to 0.08pp — and does not care about the beta spread
+
+Same statistic (`z_mean`), same window, R18/C10, SGDm+Lion, a0=1e-6, 100ep, n=3 each:
+
+| rung | `gate1` (Aug 18) | `mx/probe_sig` (Aug 19) | delta |
+|---|---|---|---|
+| blk6 (m=6) | 63.64±0.54 | 63.70±0.78 | **−0.055** |
+| layerwise (m=62) | 54.69±1.23 | 54.77±1.26 | **−0.083** |
+
+Two batches, two days, different nodes, different job IDs: agreement to under 0.1pp on both
+rungs. **And `gate1` ran WITHOUT the beta clip** — its `sd_beta` is 9.61±0.27 against `mx`'s
+2.39±0.02, a 4x wider spread of log step sizes — yet the agreement statistic is unmoved. So
+sign-agreement of the meta-gradient is a property of the partition, not of how far the betas
+have spread. That is the same conclusion 26.2 reached from the drift slopes, by an
+independent route. The m=6 > m=62 ordering also holds on this second statistic (63.6 -> 54.7),
+though the magnitude differs from the `frac_neg` scale (70.9 -> 53.3).
+
+## 28.4 NEW — the agreement ladder INVERTS under an AdamW base
+
+Same statistic, same window, same config except the optimizers, n=3:
+
+| batch | base | meta | m=6 | m=62 | direction | sd_beta (layer) |
+|---|---|---|---|---|---|---|
+| `gate1` | SGDm | Lion | 63.64±0.54 | **54.69±1.23** | FALLS | 9.61±0.27 |
+| `gate2` | **AdamW** | Adam | 71.20±2.55 | **79.96±1.82** | **RISES** | 1.88±0.02 |
+| `gate3` | SGDm | Adam | (degenerate) | 51.82±1.20 | — | **20.52±3.58** |
+
+**Under AdamW the layerwise meta-gradients agree 80% of the time and agreement RISES with
+partition fineness — the opposite of every SGDm measurement in this campaign.** 26.3's
+monotone fall is not a law about partitions; it is base-optimizer-specific.
+
+This is the mechanism H4 has been missing since cycle 12. H4 says granularity helps under
+SGDm and is null under AdamW. If under AdamW the groups' meta-gradients already point the
+same way, there is nothing for a finer partition to allocate — and 26.3's "the pooling gain
+runs opposite to agreement" then predicts a SMALL M1 gain under AdamW, which is what 27.5's
+two AdamW rows measure (+0.51 and +0.79, the smallest in that table).
+
+**Three caveats, all of which the jobs submitted this cycle remove:**
+1. `gate1` -> `gate2` changes the base AND the meta optimizer at once.
+2. These are `z_mean` numbers (28.2), not on the published `frac_neg` scale.
+3. `gate3` (SGDm+Adam), which would have separated base from meta, is **divergent** —
+   `sd_beta` 20.5 in log space, and its `z_mean` agreement pins at exactly 100.0000% on all
+   three seeds at m=6. It is excluded from every claim here. Its `frac_neg` layerwise value
+   (50.33±0.33, i.e. chance) is reported for completeness only.
+
+## 28.5 NEW — the ResNet10 interior optimum does NOT survive a0=1e-3; it disappears
+
+`r10c-*` landed. R10/CIFAR-10, SGDm+Lion, M1 additive, plateau (mean of last 20 epochs),
+`epochs_done >= 100` only:
+
+| r | a0=1e-6 | n | a0=1e-3 | n |
+|---|---|---|---|---|
+| 0 (full pooling) | 82.114±0.060 | 3 | 82.192±0.119 | 3 |
+| 0.03 | 89.232±0.231 | 3 | — | |
+| 0.05 | 90.264±0.318 | 3 | 88.667±0.015 | 3 |
+| 0.06 | 90.786±0.285 | 6 | 88.962±0.115 | 3 |
+| 0.07 | 91.105±0.295 | 3 | — | |
+| 0.08 | 91.389±0.223 | 3 | — | |
+| **0.1** | **91.590±0.042** | 3 | 89.790±0.132 | 3 |
+| 0.15 | 91.374±0.087 | 3 | — | |
+| 0.2 | 91.080±0.186 | 3 | 90.709±0.035 | 2 |
+| 0.3 | 90.781±0.163 | 3 | — | |
+| 0.4 | 90.557±0.128 | 3 | — | |
+| 0.5 | — | | 91.046±0.073 | 3 |
+| 0.6 | 90.492±0.252 | 3 | — | |
+| 1 (identity) | 90.586±0.136 | 3 | 91.171 | 1 |
+| plain layerwise | 90.619±0.218 | 3 | 91.259±0.224 | 3 |
+| plain scalar | 70.742±0.679 | 3 | 70.636±0.752 | 3 |
+
+* **a0=1e-6:** genuine interior optimum at r=0.1 — **+1.00pp over the identity** and +9.48pp
+  over full pooling, both endpoints beaten. Identity control holds (r=1 90.586±0.136 vs
+  plain 90.619±0.218, a 0.03pp gap).
+* **a0=1e-3: the curve is MONOTONE INCREASING over the whole measured grid.** Its best
+  interior point, r=0.5 at 91.046±0.073, is **0.21pp BELOW plain layerwise** (91.259±0.224,
+  n=3). There is no r at which pooling pays.
+
+Together with 27.4 (R18: the optimum shrinks 4x from a0=1e-6 to a0=1e-3 but survives, +2.40
+-> +1.29) this makes the a0-dependence a pattern rather than one model's quirk, and on
+ResNet10 it goes all the way to zero. **The a0=1e-6 M1 gain is partly, and on ResNet10
+entirely, a repair of a bad initialisation.** Note the one thing that cuts the other way:
+R10's a0=1e-6 optimum (91.590) also exceeds the *well-initialised* a0=1e-3 plain arm
+(91.259) by 0.33pp, which pure startup-repair does not explain.
+
+Grid caveat: the a0=1e-3 arm is measured at r in {0, .05, .06, .1, .2, .5, 1} only, so an
+optimum hiding above r=0.5 and worth under 0.2pp is not excluded; and its r=1 cell is n=1
+(two seeds were still in flight at 75 and 50 epochs and are correctly excluded by the
+`epochs_done >= 100` filter). Plain layerwise at n=3 is the anchor used above.
+
+## 28.6 Submitted this cycle — 36 jobs, all on alice2, pre-registered
+
+| batch | n | what | why |
+|---|---|---|---|
+| `ap-*` | 9 | AdamW base, meta=Lion, R18/C10, a0=1e-3, 20ep, PROBE=100, {blk6, nodewise, weightwise} x s0-2 | the AdamW agreement ladder in the MODERN probe format. Layerwise is NOT submitted — the queued `bp-adamw-s*` already runs that cell at this identical config |
+| `ag-*` | 27 | AdamW base, meta=Lion, R18/C10, a0=1e-6, 100ep, {blk6, nodewise, weightwise} x r in {0, 0.06, 1} x s0-2 | the gain ladder that must mirror it. Mirrors `sub_gp.sh` field for field with ONLY the base changed, so `gp` vs `ag` is a one-variable contrast |
+
+**PRE-REGISTERED, from 28.4.**
+> **PREDICTED (a):** on the `frac_neg` scale, AdamW agreement at m=62 EXCEEDS AdamW
+> agreement at m=6 — the ladder inverts, as `gate2` says on the `z_mean` scale.
+> **PREDICTED (b):** because 26.3 asserts the M1 gain runs OPPOSITE to agreement, the AdamW
+> gain must FALL from m=6 to m=11.17M, the reverse of the SGDm ordering `gp-*` is measuring.
+> **FALSIFIED IF:** the AdamW agreement ladder falls with fineness like SGDm's (28.4 is then
+> an artifact of the `z_mean` statistic), OR agreement and gain both rise with fineness
+> (26.3 is then not a mechanism).
+
+Structural check before queueing (cycle-18 gotcha 5), `bin/agchk.py` + `bin/blkchk28.py` on
+CPU: AdamW base x {resnet18_blocks, nodewise, weightwise} x {plain, additive r=0.06,
+additive r=1} — all nine construct and take three finite steps. r=1 reproduces plain's beta
+range exactly ([-13.8175, -13.8135]) while r=0.06 collapses it to [-13.8139, -13.8137], so
+the M1 identity/pooling structure is verified structurally on these arms before any GPU time.
+
+## 28.7 Operations
+
+* **12 running per account is confirmed again as cluster contention, not configuration.**
+  Every GPU node on all five partitions reports `AllocTRES` gres/gpu equal to its `CfgTRES`
+  gres/gpu; `node[854,856,857]` remain under the MAINT reservation. Nothing to fix.
+* **Queue after this cycle: alice 299, alice2 250 = 549.** 29 runs finished since the last
+  aggregation (~1 h of compute).
+* **Promoted `p7-*` (33 jobs) to the front of alice.** p7 is 20-epoch (~10 min/job), so the
+  whole block is ~28 min of the 12-GPU allocation, and it is the SGDm comparator for this
+  cycle's AdamW ladder plus 27.9's single missing number. `bin/prio28a.sh` niced only jobs
+  already at `Nice=0` (102 of them) — `m0c-*` (30000) and `zmg-*`/`m0l-*`/`m0s-*` (5000) are
+  deliberately parked and a blanket `Nice=400` would have PROMOTED them.
+* **Promoted `bp-*` (12) to the front of alice2**, by niceing the 39 `gp-*` jobs ahead of it
+  by 250. `bp-adamw-s*` is the layerwise rung of `ap-*`; without it the AdamW ladder has a
+  hole exactly where 28.4's claim lives.
+
+## 28.8 Still open
+
+* Every 27.9 item is still open — `p7`, `cw`, `kc`, `bo`, `gp`, `r34r` are all still in
+  flight. `r34r-*` and `gp-*` rows are now IN the CSV but at 3–75 epochs; they are correctly
+  excluded by the `epochs_done >= 100` filter and must not be read yet.
+* **28.4 is a two-batch contrast with the meta optimizer confounded**, on a statistic that is
+  not the published one. `ap-*`/`bp-*` remove both problems; nothing about the AdamW ladder
+  should be stated until they land.
+* The `frac_neg` value of `gate2` can never be recovered — the format predates the field. If
+  the AdamW inversion matters to the paper it rests on `ap-*`/`bp-*`, not on `gate2`.
