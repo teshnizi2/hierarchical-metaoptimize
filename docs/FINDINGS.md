@@ -6450,3 +6450,55 @@ CORRECTIONS 22.
 2. Verify `ms-lay-*` on alice2 is still PENDING and still in `PROTECTED.txt`.
 3. Only then consider anything else, and only if FairShare ≥ 0.35.
 4. **Never trim with bare `scancel`. `bash bin/safe_trim.sh <n>` (dry run first) or nothing.**
+
+## 34.9 ADDENDUM (mid-cycle) — the SURVIVING half was destroyed too, and alice2 is now empty
+
+Written after 34.1. During this cycle, between two of its own queue reads, a **second**
+unguarded sweep hit the other account:
+
+| time | account | jobs cancelled | decisive work lost |
+|---|---|---|---|
+| 11:57:35–36 | alice2 | 64 | — |
+| 12:00:22 | alice2 | 13 | — |
+| **12:17:43** | **alice** | **86** | **`ms-scal-*` + `ms-scalA-*` (26)**, `fc100-cos-*` (9), PROTECTED `p7-*` |
+| **12:32:04–05** | **alice2** | **157** | **`ms-lay-*` + `ms-layA-*` (26)** |
+
+`ms-lay-*` was submitted 11:58:43 and cancelled 12:32:04 — **33 minutes, never ran**. 234 alice2
+jobs and 362 alice jobs were cancelled today in total.
+
+**Both halves of the campaign's decisive experiment are now destroyed.** 34.4 shows no
+observational analysis can substitute for it: within a fixed setting `ms_eff` and m are
+rank-identical, so the m=1 control is the only thing that separates 33.1 from a real
+granularity effect. The campaign's central open question is currently **unaddressed and has no
+queued experiment**.
+
+**alice2 is now at 0 pending / 11 running.** It goes idle as those 11 finish. This is the
+opposite of the failure the queue-discipline rules were written against — they were written to
+stop *flooding* (305 pending, decisive work queued behind speculation), not to drive an account
+to zero.
+
+**Not resubmitted this cycle, deliberately.** Two reasons, in order:
+1. FairShare is 0.337 / 0.340, below the 0.35 hard floor. The rule is explicit and it
+   specifically anticipates the "but this one is important" override.
+2. Even setting the gate aside, resubmitting into an actively-sweeping queue is futile —
+   two sweeps 15 minutes apart destroyed exactly these job names on both accounts. A third
+   submission would most likely be destroyed too, at the cost of more fair-share.
+
+Running jobs survived both sweeps (`sc50-*-s1` ran through 12:17:43). Whatever is sweeping
+targets PENDING only.
+
+**FOR THE OPERATOR — a standing-policy conflict that needs a decision, not a workaround.**
+"Submit nothing below FairShare 0.35" and "never let the accounts idle" now point opposite ways,
+and something is cancelling pending work on both accounts every ~15 minutes faster than any
+cycle can queue it. Three things are needed and only the operator can settle them:
+1. **Who or what is sweeping?** No cycle-34 action cancelled anything. If it is a concurrent
+   scheduled-task run, the two are fighting each other and one must stop.
+2. **Does the FairShare floor override an idle account?** If an idle account should always be
+   refilled, say so — the gate as written forbids it.
+3. **Make protection enforceable.** `PROTECTED.txt` is honoured only by `bin/safe_trim.sh`.
+   Three destructions in three cycles say an advisory file does not work; a bare `scancel` over
+   a JobID range ignores it completely.
+
+Until 1 is answered, resubmitting `bin/c33_ms.sh` will keep feeding jobs into the sweep.
+Both copies of the script are intact (alice 3139 B, alice2 1724 B) and both accounts now carry
+`ms-` in `PROTECTED.txt`.
