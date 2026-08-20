@@ -6716,3 +6716,225 @@ replication gap and is queued next.
 126 jobs submitted this session; every one carries a named open question and a two-sided
 pre-registration in its submitting script. Prefixes `ms-`, `ac-`, `gc-`, `msa-`, `zp-`,
 `fc100-cos-` are in `bin/PROTECTED.txt` on both accounts.
+
+---
+
+# Cycle 36 — a 13-agent audit of the whole campaign; six standing rules and three of cycle 35's own claims are wrong
+
+A five-axis independent audit (granularity ladder / optimizer coverage / baselines / agreement
+probes / budget+a0), three competing experiment matrices, three judges and two adversarial
+critics. 2.9M tokens, 438 tool calls. **Every number in 33.1 / 33.2 / 33.4 / 34.2 / 34.3 / 35.1
+reproduces exactly from `all_runs.csv`** — the arithmetic is sound. What is not sound is the
+cell hygiene, six of the standing rules, and the identifiability of the central design.
+
+## 36.1 THE BASELINE BEATS THE METHOD
+
+| arm | plateau | n |
+|---|---|---|
+| AdamW + cosine, lr=1e-3 (`fxcos`, correctly scaled COS_TOTAL=50000/COS_WARMUP=2500) | **94.093 ±0.036** | 3 |
+| best MetaOptimize cell with n≥5 (R18/C10/100ep, layerwise `additive` r=0.06, a0=1e-6) | 93.262 ±0.135 | 8 |
+
+Deficit **−0.831pp**, Welch t = −15.99, df 8.8. Same sign on `best_test` (−0.764) and
+`final_test` (−0.967), so it is not a metric artefact. The baseline also reaches 90% in
+**21.3 ±3.8** epochs against **42.0 ±1.3**.
+
+Two defects make even that an understatement:
+1. The cosine grid is {1e-4, 3e-4, 1e-3} and **the peak is at the right edge — unbracketed.**
+   The true baseline optimum is ≥94.093.
+2. Only 25 of 1086 runs are non-meta baselines and **all 25 are AdamW.** There was no non-meta
+   SGD code path in the harness at all, so the standard SGD+momentum+cosine ResNet18/CIFAR-10
+   reference (~94.5–95.5%) has **never been reproduced here**.
+
+`bl-*` (30 jobs, alice) closes both: an SGD path was added to
+`Optimizers/build_optimizer.py` (additive branch + `SGD_optimizer` class, backups at
+`.bak-c35`, syntax-verified, gated behind a 2-epoch `afterok` smoke job), and the AdamW cosine
+grid is extended to 1e-2 with the two best cells topped to n=5. **This is platform validation,
+not a baseline**: if SGD+cosine at lr≈0.1 does not land in 94.5–95.5, the harness under-trains
+every arm and every cross-arm claim in the campaign needs re-examining.
+
+## 36.2 SIX STANDING RULES ARE WRONG
+
+| rule as written | truth | source |
+|---|---|---|
+| **R2** "plateau = mean of last **5** epochs" | **last 20** (`analysis/aggregate.py:85`, `k=20`) — 20% of a 100-ep run, 6.7% of a 300-ep run | audit 5 |
+| **R6** "pooling gains **INVERT** between 100 and 300 epochs" | **FALSE.** On plateau nothing inverts; gains **attenuate** (+1.444→+0.279, +2.264→+1.210, +1.504→+0.086). Un-pooled arms gain +0.53–0.88pp from the longer budget while every pooled arm is flat or loses — at 100 epochs the baseline is simply not converged | audit 5 |
+| **R7** "runs reproduce to ±0.02pp" | wrong by ~6×: same-config same-seed spread is **0.119pp median, 0.243pp p90** | audit 5 |
+| **R5** "a0=1e-6 costs 14–25 epochs" | floor is ~11, not 14 (+11.4 to +19.0 on `ep_to_85`). The damaging part is the **differential**: up to 7.6 epochs between arms being directly compared | audit 5 |
+| **"n≥5"** | **n has been counted in ROWS, not SEEDS.** `layerwise` plain a0=1e-6 is 17 rows / **5 seeds** (SE inflation 2.33×); blk6 plain 12 rows / **3 seeds**; 35.1's "best-powered pair, n=12 vs n=5" is **5 seeds vs 3** | critic 2 |
+| **R3/R4** | stand | — |
+
+**CORRECTIONS 1's 300-epoch table — the source of R6 and of what CORRECTIONS 6 calls "the
+strongest result in the project" — is unsupported.** It is measured on `best_test` (violating
+CORRECTIONS 4, written two sections later), mixes a0 (`e3a-*` are 1e-6, `e300-*` are 1e-3), and
+labels `additive` r=0/0.05/0.1 as "scalar"/"z-pool r=0.05"/"z-pool r=0.1" when **there are zero
+`zpool` runs at 300 epochs anywhere in the CSV**. Its "scalar 92.68 at 300ep" matches no run:
+the actual 300-epoch scalar cell is **88.287 ±0.120 (n=2)**, i.e. **3.450pp behind** plain
+layerwise (91.737). "Scalar overtakes plain layerwise at 300 epochs" is **refuted**.
+There are 16 runs at 300 epochs, **zero at 600**, and all 8 cells are n=2.
+
+## 36.3 GRANULARITY AND beta_clip ARE PERFECTLY CONFOUNDED
+
+Measured from the probes, not inferred. In `runs/p7free` (a0=1e-3, 20 ep) `beta_true_min` is
+**exactly −15.0000 in 100% of layerwise, nodewise and weightwise arms** across all three
+architectures and both datasets, and `beta_true_max` is **exactly −2.3026 in every weightwise
+arm** and in every CIFAR-100 nodewise and layerwise arm — both bounds saturated within 20
+epochs. In `runs/mx` (a0=1e-6, 100 ep) `beta_true_min` = −15.0 for blk6, layerwise, nodewise and
+weightwise, while **the scalar arm sits at −10.618, far inside the box**.
+
+So at the initialisation that carries the published collapse curve, **the scalar reference is the
+only arm that never touches a bound**, and clip-activity is monotone in m. Every
+granularity-vs-scalar comparison in this campaign is confounded with how hard the guard is
+biting. The `BETA_CLIP=-15:-2.3026` guard was added to prevent divergence; it is also an active
+part of the dynamics of every fine-granularity arm.
+
+## 36.4 THE 33.1 MECHANISM IS LION-SPECIFIC
+
+From `patches/HF_patched.py`: `Lion_meta_update` gives |Δβ_i| = `ms` **exactly**, for every group
+at every step — that is the sole reason pooling realised increments equals rescaling `ms` by the
+sign agreement |2p−1|. `Adam_meta_update` gives |Δβ_i| = `ms`·|m_i/√v̂_i|, which at μ=0.9 ranges
+2.294·`ms` (white noise) to 10·`ms` (persistent); `additive` r=0 pooling then yields
+`ms`·|mean_i(u_i)|, a **magnitude-weighted mean in which |2p−1| does not appear at all**.
+
+The parent paper tests (AdamW,Adam), (Lion,Lion), (RMSProp,Adam), (SGDm,Adam). **The central
+mechanism claim does not hold in functional form for three of those four rows**, and
+(RMSProp,Adam) has **zero runs**. 84% of the corpus is (SGDm,Lion) — a pair the paper does not
+test. There is **not one `additive` r=0 run under any non-Lion meta-optimizer**, and the
+in-flight `ms-*` sweep is Lion-only, so 34.4/34.5 will answer a **Lion-scoped** question.
+
+**H4 is also confounded with a0.** "Null under AdamW" holds only at a0=1e-6 (+0.11/+0.15pp);
+at a0=1e-3 granularity is strongly **negative** under AdamW (scalar 92.684 ±0.178 n=3 →
+layerwise 90.860 ±0.174 n=8, Δ = **−1.824**, t = −15.2). And (Lion,Lion) is null too
+(Δ −0.116, t −0.6), so the dichotomy is **"SGDm vs everything else"**, not "SGDm vs AdamW".
+
+## 36.5 THE THEORETICAL CORE — the refutation survives, but by a much thinner margin, and there is a tension to state
+
+1. **`results/p7_c31.txt` is a 09:47 partial snapshot covering 46 of 92 probe dirs.** All 92 are
+   complete at n=10. 34.2's ladder was computed at n=3 (n=1 for c100/w). At n=10 the R18/C10
+   values are **0.394667 / 0.120387 / 0.014647 / 0.000335** against the published
+   0.394667 / 0.127742 / 0.015200 / 0.000331.
+2. **`agree2.py`'s drift statistic is mis-weighted.** It averages the 62/38/110 per-tensor β
+   means with **equal weight**, which is the true group mean only for blk6 and layerwise —
+   and OPERATIONS gotcha 22 already forbids cross-arm β comparison at nodewise/weightwise.
+   Re-weighting by node-count/numel moves weightwise drift by **3.3–10.8×** and takes the four
+   STEADY slopes from −0.0915…−0.1398 to **−0.2262…−0.2940**. **The sqrt(N) refutation survives
+   — all eight corrected bootstrap CIs still exclude −0.500** — but 32.1's "most favourable
+   upper bound −0.3546" becomes **−0.4328**. The headline is intact; the margin is not what
+   was published.
+3. **The null is wrong at m=6.** `agree2` uses the asymptotic 0.5+√(2/π)/(2√n); the exact
+   binomial null at m=6 is **65.6250%**, not 66.2868%, biasing every m=6 excess down 0.662pp.
+   R18/C10 blk6 STEADY is **+4.108**, not +3.447.
+4. **A tension that must be stated in the paper, not buried.** |2p−1| itself falls as
+   **m^−0.4816** (R18/C10 STEADY; pooled over four families −0.4704, R²=0.968) —
+   **statistically indistinguishable from the √N exponent** — and 45–84% of the raw |2p−1| at
+   every rung is the pure-noise term. So 34.3/34.4's `ms_eff` axis is very nearly a
+   **relabelling of m^−1/2**. A paper that refutes the √N noise model and then builds its
+   positive mechanism on a quantity that scales as m^−1/2 owes the reader that sentence
+   explicitly.
+5. **Zero AdamW-base probes exist.** The mechanism has never been measured in the one condition
+   (H4) where the effect is known to vanish, and the `ms`-invariance of |2p−1| that 33.1/34.4
+   assume has **never been tested at all**.
+
+## 36.6 THE COLLAPSE-TEST DESIGN IS NOT IDENTIFIED — including the batch submitted this session
+
+**`ms_eff` is not a constant of an arm; it is a schedule.** Measured from `runs/mx` probes
+(R18/C10, a0=1e-6, 100ep, seed 0), STARTUP → STEADY drift/step:
+
+| arm | startup | steady | decay |
+|---|---|---|---|
+| scalar | 7.267e-4 | 4.955e-5 | 14.7× |
+| blk6 | 7.329e-4 | 4.365e-5 | 16.8× |
+| layerwise | 6.404e-4 | 5.442e-5 | 11.8× |
+| nodewise | 3.910e-4 | 2.472e-5 | 15.8× |
+| weightwise | 1.977e-4 | 2.527e-6 | **78.3×** |
+
+The decay factor is **itself ordered by m**. A pooled arm does not run at an effective meta-step;
+it runs at an effective meta-step **schedule** whose shape depends on the partition. A scalar arm
+held at constant `ms` cannot in principle reproduce that — **so the residual `msa-*` measures is
+guaranteed non-zero**, and 35.3's pre-registered branch (b) ("a residual >0.3pp is the paper's
+positive result") would fire on a schedule mismatch. `ms_eff` and m also remain rank-identical
+after the "fix", because m orders the decay rate as well as the level.
+
+**Consequence for `msa-*` (20 jobs, in flight).** It is not the collapse test. It remains a valid
+**scalar meta-step response curve** and will be reported as such. Two of its cells are further
+compromised: β is float32, so the smallest representable meta-step is the ulp of |log α0| —
+**4.7684e-7 at a0=1e-3**. `msa-weq` at `ms`=3.307e-7 therefore realises **4.768e-7 (1.44×
+nominal)**, and at a0=1e-6 the same value is bit-frozen. Its "ms→0 limit" reading is a rounding
+result, not a dynamical one.
+
+**What the test actually requires** (critic 1's fix, adopted): patch `HF_patched.step()` to let β
+be driven by an **externally supplied per-step schedule** (`PROBE` already records exactly that
+array), then match **trajectories** rather than constants. Three arms off one patch: frozen-β,
+an imposed cosine β, and an imposed replay of a pooled arm's own recorded β trajectory. If
+replaying layerwise's β schedule into a scalar arm reproduces layerwise's plateau, granularity
+contributes nothing beyond the β trajectory it induces — and that comparison **is** identified.
+
+## 36.7 CELL CONTAMINATION FOUND IN PUBLISHED TABLES
+
+* **33.5's layerwise peak** (93.222 ±0.150, n=10) pools two `base=Lion` runs (`bo-lion-r006-s0/s1`)
+  into an SGDm cell. Tight: **93.262 ±0.135, n=8** (which is what 34.3/35.1 used).
+* **33.5's weightwise r=1 cell** (78.046 ±0.024, n=2) is a **2-of-3 subset**; complete it is
+  **77.803 ±0.421 (n=3)** — the published sd understates the seed band **17-fold**.
+* Four more layerwise cells (`additive` r=0.03, r=0.1, r=0.2, `shrink` lam=0.1) are contaminated
+  by `meta=Adam` or `base=Lion` pooling, shifting means **0.34–0.59pp**.
+* **Cycle 33's own declared filter, `epochs_done>=100`, silently pools the 300-epoch runs into
+  eight 100-epoch cells**, roughly doubling the reported sd in each — the exact disease 34.3
+  named, still live in the stated methodology.
+* 24 runs have `epochs_done < epochs_requested`, contaminating 15 cells. The `collapsed` flag is
+  under-inclusive (`tests[-1]<=11.0 and max>20.0`) and misses 20 further sub-20% runs, including
+  an SGDm/Adam scalar a0=1e-6 run at 18.34 that alone drives its cell to 70.650 ±33.468 (n=4).
+
+## 36.8 CORRECTION TO 35.4 — the ResNet34 "collapse chasm" is an in-flight artefact
+
+35.4 reported the R34 a0=1e-6 curve as *discontinuous*: r=0.005 → 90.24, r=0.01 → **69.12**,
+r=0.015 → 46.9, r=0.02 → 93.88, and called an optimum near such a chasm unstable.
+
+**Those low cells are partial runs.** The nine `r34f-*` reductions at r=0.01/0.015 were read at
+34–36 and 18–27 epochs of 100 while their completed neighbours sit at 93.297 (r=0.005) and
+93.884 (r=0.02). Audit 5 flagged this independently as "a live trap for a false instability
+window", and 35.5 had already noted the same runs as in-flight. **The chasm claim is withdrawn.**
+The R34 curve may or may not be non-monotone; it cannot be read until those runs finish.
+
+The rest of 35.4 stands — it does not depend on the R34 rows: CIFAR-100 is monotone in r at both
+a0 with the peak at the boundary (n=2), and ResNet10's a0=1e-3 peak is at r=1 across seven grid
+points at n=3.
+
+## 36.9 THE ANALYSIS PLAN — the central claims are equivalence claims and have been tested as difference tests
+
+Every headline branch is of the form "X reproduces Y to within ±0.3pp ⇒ collapse confirmed",
+i.e. **accepting the null**. That requires **TOST**, and the required n is set by the noisier arm.
+The scalar reference — on one side of every forward-collapse comparison — has the **largest sd of
+any healthy R18/C10 cell**: 0.220 at a0=1e-3 (n=9), 0.286 at a0=1e-4, against a 0.142 median.
+
+n per arm for 80% TOST power at δ=0.3pp: sd 0.089 → 3, 0.142 → 5, **0.220 → 11**, 0.286 → 17,
+0.351 → 25, 0.468 → 43, **2.603 → 1291**.
+
+* `gc-*` and `msa-*` at n=5 are **short of the n=11** an equivalence claim needs against the
+  scalar arm.
+* **The weightwise rung cannot support ±0.3pp at any feasible n** (sd 2.603 on raw values
+  42.619 / 47.781 / 44.614). A ±0.3pp CI there needs n≈420. No ±0.3pp claim may ever be made at
+  weightwise, and `gc-w-*` (n=5) will be reported as a **point estimate with its interval**, not
+  as a test.
+* `docs/PLAN.md:104` already fixes the campaign standard at **Δ ≥ 0.5pp with a 95% PAIRED CI
+  excluding 0**. Cycles 34–35 quietly used 0.3pp on unpaired point estimates. **PLAN.md's
+  standard is reinstated**, and every pre-registration from here names its test, its δ, and
+  whether it is a difference or an equivalence claim.
+* Variance is genuinely **two-level**: within-seed replicate |max−min| on plateau is median
+  0.151, p90 0.335, max 0.493 over 84 groups — comparable to the between-seed effect. Neither a
+  row-level nor a seed-mean analysis is correct on its own; a random-effects model over
+  (seed, replicate) is.
+
+## 36.10 The negative control that cannot fail
+
+`zpool` r=0 and `zmpool` r=0 are **algebraically identical to plain scalar**: both replace every
+coordinate's meta-gradient with the same quantity (total vs mean), and under Lion (sign), Adam
+(m/√v) and RMSProp (z/rms) the uniform m-factor cancels. Verified on disk —
+`runs/zb/probe_zb-l-r0`, `probe_zb-w-r0` and `runs/zm0/probe_zm0-l-r0` all have
+`beta_true_min == beta_true_max` at every record, terminal mean β −6.474 / −6.418 / −6.498
+against the scalar reference −6.46. Any "identity gate" built on this can never fail and proves
+nothing. (It does, however, **confirm CORRECTIONS 15's structural check** — which is why 33.2's
+`zpool` endpoints are trustworthy.)
+
+**The strongest structural support 33.1 has, which the docs never ran:** `additive` r=0 and
+`shrink` lam=1.0 are structurally different operators that 33.1 predicts collapse to the *same*
+`ms_eff`. They agree at **all four granularities** to **0.029 / 0.045 / 0.087 / 0.186pp**. That
+is an R4-compliant interior check and it passes.
