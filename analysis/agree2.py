@@ -49,7 +49,7 @@ def infer_ntot(recs):
         for k in ("frac_neg", "frac_zero"):
             v = r.get(k)
             if v is not None and 0 < v < 1:
-                best = max(best, Fraction(v).limit_denominator(20_000_000).denominator)
+                best = max(best, Fraction(v).limit_denominator(100_000_000).denominator)
                 seen += 1
         if seen > 400:
             break
