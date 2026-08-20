@@ -48,6 +48,70 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 42) -- COLLECTION + REDUCTION, nothing submitted
+
+Queues: alice 0 PENDING / 25 RUNNING (FairShare **0.3331**), alice2 **0 / 0** (**0.3356**).
+Both below the 0.35 floor -> **0 submitted**. CSV re-aggregated: **1434 runs** (866 + 618),
++127 since cycle 41. Cycle 41's entire read list is cleared and its two unreduced probe
+batches (`fz-*` 50 dirs, `p7free` 92 dirs) are reduced.
+
+**THE DIRECTION CHANGED. Read CORRECTIONS 26 and 27 before writing any sentence about
+sign agreement.** The handoff line "53.1% of 11.17M per-weight meta-gradients agree in sign,
+independence = 50.0000 +-0.0015%" merges two different arms and quotes a null that belongs to
+neither: 53.1% is the LAYERWISE arm (m=62) whose own independence floor is **55.07%**, so that
+arm sits 1.9pp *below* its floor; the weightwise arm reads 50.028% against a 50.012% floor.
+
+**What replaces it (FINDINGS 42.4), and it is stronger.** Effective independent count
+N_eff ~ m^s, s=1 being exactly the 1/sqrt(N) assumption the Adam-mini / Adalayer / SGG line
+makes. Two batches identical in every field except `--alg-meta`:
+
+| design | s | n | N/N_eff at m=11.17M |
+|---|---|---|---|
+| beta FROZEN (`fz-*-a3`, `--alg-meta fixed`) | **0.629 +-0.013** | 5 | **199.8** |
+| beta FREE (`p7-r18-*`, `--alg-meta Lion`) | **0.963 +-0.015** | 10 | 2.0 |
+
+and inside the free runs s climbs 0.654 -> 0.963 over the first ~10 epochs as sd(beta) rises
+0.02 -> 2.05, while the frozen runs stay flat at 0.59-0.68 for all 20 epochs. **The correlated
+part of the meta-gradient is exactly the part step-size adaptation consumes.** So the 1/sqrt(N)
+assumption is wrong by up to 200x in variance at uniform step sizes and approximately right at
+the adapted equilibrium -- the *opposite* of the unconditional refutation the project was
+steered on. Structural check passed: all 2000 records have `beta_true_max == beta_true_min`,
+and the five arms' 20-epoch accuracies agree to 0.010-0.030pp at matched seed.
+
+* **42.1 -- the long-horizon question is ANSWERED and it is a clean negative.** AdamW+cosine vs
+  AdamW+Adam-layerwise: deficit **1.732pp @100ep -> 1.966 @300ep (n=3/n=3) -> 1.949 @600ep
+  (n=3/n=1)**. 41.4 pre-registered that parity at 300ep needed MetaOptimize to gain +2.638pp;
+  it gained +0.672pp. Both baseline numbers are lower bounds (lr=1e-3 is off the 2e-3-3e-3
+  cosine argmax), so the true deficit is larger.
+* **42.2 -- granularity SURVIVES meta-step tuning; 40.1's pre-registration is FALSIFIED.** At
+  each arm's own tuned meta-step: scalar 92.231 +-0.190 (n=5), blk6 92.581 +-0.057 (n=2),
+  layerwise **92.795 +-0.177 (n=5)**, nodewise 92.547 (n=1). layerwise-scalar = **+0.563pp**,
+  t=4.85, CI [+0.296,+0.831] -- clears PLAN.md's standard. **Verdict declared.** But the gain
+  is non-monotone with an **interior optimum at m=62**, and 83% of the raw +3.348pp gain at
+  ms=1e-3 is meta-step tuning.
+* **42.3 -- IDEA 2 IS DEAD.** Across-architectural-block pairwise agreement on the weightwise
+  arm is **50.003 +-0.081%** -- the null exactly (pairwise null is exactly 0.5, unbiased).
+  Spectral clusters score ARI 0.05-0.24 vs the 6-block partition, no better than a random
+  contiguous partition. Dropped, not pursued.
+* **IDEA 1 is in flight and its schedule status is UNVERIFIED.** `I1-*` (9 jobs) was submitted
+  by the previous session with **no saved script**, and `run_cifar.sh` did not echo `SCHED`, so
+  nothing on disk proves the cosine prior was actually enabled. The discriminator is ready:
+  exact matched non-scheduled controls exist at n=3/3/8 -- scalar **92.684 +-0.178**
+  (`a0-scal-1e3`), blk6 **92.002 +-0.138**, layerwise **90.860 +-0.174**. If I1 lands on those,
+  SCHED was off and the batch is a duplicate; if it departs, the delta IS the Idea-1 effect.
+  `run_cifar.sh` on both accounts now echoes SCHED/SCHED_TOTAL/PROBE (backup `.bak_c42`).
+* **Next cycle, in order.** (1) `bash bin/c43_frozen_ladder.sh --submit` on alice2 -- 30 jobs,
+  prepared and dry-run-validated, self-guarded on FairShare>=0.35 and pending<=10. It carries
+  the frozen-beta measurement to ResNet10/ResNet34/CIFAR-100 and is the campaign's largest open
+  cell: 42.4's frozen half exists at ResNet18/CIFAR-10 ONLY. Pre-registered predictions and the
+  refutation condition are in the script header. (2) Read `I1-*` against the controls above.
+  (3) `rs-node-*` seeds 1-2 (nodewise peak is n=1 at every cell) and `rs-blk6-1e4` seeds 2-4,
+  to close 42.2's interior optimum. (4) `bg600-meta` s1/s2.
+* Local probe copies: `analysis/killtest_data/{mx,gate3,fz,p7free,p6free}` (66 MB). Reducers:
+  `analysis/frozen_agreement.py`, `neff_ladder.py`, `neff_timecourse.py`, `neff_validate.py`
+  (synthetic ground-truth validation -- run it before trusting any N_eff number),
+  `killtest_idea2.py`.
+
 ## Running / next (cycle 41) -- COLLECTION CYCLE, nothing submitted
 
 Queues: alice 94 PENDING / 19 RUNNING (FairShare **0.3331**), alice2 50 / 12 (**0.3356**). Both
