@@ -48,6 +48,36 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 38) -- COLLECTION CYCLE, nothing submitted
+
+**The pre-registered meta-step control fired against granularity (FINDINGS 38.1).** At a0=1e-3,
+R18/CIFAR-10, SGDm+Lion: plain `scalar` with ms tuned 1e-3 -> 1e-4 scores **92.405 +-0.071
+(n=2)** -- inside cycle 33's pre-registered [92.2,92.6] window. That matches the BEST
+hierarchical arm (`additive` r=0.1, 92.449 +-0.192, n=3) to **0.044pp** and beats plain
+layerwise (91.093 +-0.220, n=5) by 1.312pp. The whole +4.87pp scalar->layerwise "granularity
+gain" is reproduced by changing one scalar hyperparameter. With 33.1 (r rescales the effective
+meta-step by |2p-1| ~ 0.097) this closes the loop: **the hierarchy's only measured contribution
+is dividing the meta-step by ~10, and doing that directly with one group is equal or better.**
+
+* **`ms-layA-1e4` (3 seeds, PENDING alice2) is now the most informative job in the campaign.**
+  Layerwise at the tuned ms=1e-4 / a0=1e-3. Above 92.405 => granularity earns something back at
+  its own tuned meta-step. Level => 38.1 is the whole story.
+* `ms-scalA-1e4` is **n=2**; s2 sits at 89/100 and must not be read. Needs n=5.
+* **alpha0=1e-6 escape confound quantified: 51.04pp** (ms=1e-4 scores 41.368 at a0=1e-6 vs
+  92.405 at a0=1e-3). It inverts the SHAPE of the ms curve. No ms claim off a0=1e-6 runs.
+* **Baseline win holds across architecture.** R34 now n=3 both sides: 94.674 +-0.026 vs 93.930
+  +-0.143 = 0.744pp, matching R18's 0.787pp. Not a ResNet18 artefact; does not close at scale.
+  lr=1e-3 is argmax at R18/R34/R50 -- the baseline's tuning transfers. R50 baseline is n=1.
+* **LR grid decensored** (answers 36's objection): 1e-4 92.851 / 3e-4 94.062 / 1e-3 94.093 /
+  1e-2 92.728. 1e-3 is an INTERIOR maximum. A 10x-mistuned cosine still beats the best matched-a0
+  meta arm by 0.28pp.
+* **Ops: submitted NOTHING.** FairShare 0.3356 / 0.3381 (below the 0.35 floor); pending 59 / 94
+  (above the 40 cap); 93 of 94 alice2 pendings blocked on `QOSMaxGRESPerUser` = GPU-cap-bound,
+  not priority-bound, so extra jobs could not have started anything sooner. Every open question
+  above already has its deciding cell queued.
+* Priority inversion (LR sweep ahead of `bg300`/`bg600`) noted and **deliberately not corrected**
+  -- post-36.1 the sweep is the decisive line and `bg` is downstream of it.
+
 ## Running / next (cycle 33)  -- queues: alice 174, alice2 164 = 338 jobs
 
 **Cycle 33 refuted the campaign's pooling story and found the mechanism 26.3 was missing.**
