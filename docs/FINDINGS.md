@@ -9783,3 +9783,45 @@ verified rather than assumed.
 
 **The two numbers at risk are the two that set the LOW end of the published "16% to 55%" range.**
 Nothing in the frozen half, and nothing in direction C's foundational measurement, is affected.
+
+## 51.7 PRE-REGISTERED ADDENDUM TO `uc5` / `cl5`, COMMITTED WHILE THE JOBS ARE STILL RUNNING
+
+Written and committed **before either batch landed** (13 of 18 `uc5` jobs still queued at the time
+of writing), so the outcome below cannot be fitted afterwards. Derived from the ff5/fr5 controls
+already on disk: the climb rate of the TOP coordinate, and the record at which a ceiling of 0.0
+would be reached at that same rate. `vmax` = 0.005 log-units/record at ms=1e-3; 2000 records exist.
+
+| family | rung | climb / vmax | 1st record at HI=−2.3026 | **projected record at HI=0.0** |
+|---|---|---|---|---|
+| r10 | w | **1.00 / 0.95** | 925 / 972 | **1388 / 1458 — WILL BIND** |
+| c100 | w | 0.92 / 0.98 | 1003 / 942 | **1505 / 1413 — WILL BIND** |
+| c100 | node | 0.98 / 0.91 | 939 / 1012 | **1409 / 1518 — WILL BIND** |
+| c100 | lay | **1.00 / 1.00** | 921 / 921 | **1382 / 1382 — WILL BIND** |
+| r10 | node | 0.43 / 0.60 | never / 1543 | 2315 — will not bind |
+| r10 | lay | 0.33 / 0.32 | never | will not bind |
+| r18 (`cl5`) | w | 0.69–0.74 | 1247–1338 | **1871–2007 — BORDERLINE at the 2000 edge** |
+| r34 (the null) | w / node / lay | 0.42 / 0.31 / 0.13 | never | will not bind |
+
+**THEREFORE, PREDICTED NOW:** `uc5`'s U0.4 dose bar (Q4 occupancy < 5%) will **FAIL** at r10-w,
+c100-w, c100-node and c100-lay, and **PASS** at r10-node, r10-lay and all six r34 arms. `cl5`'s
+X0.3 "<5%" for the HI=0.0 arm is **borderline** and may land either side.
+
+**AND THAT IS THE POINT, NOT A DESIGN FAULT.** The reason no ceiling works is the finding: at
+weightwise the top coordinate climbs at **92–100% of the maximum Lion speed** in r10 and c100 —
+a fully persistent sign, i.e. genuine ballistic divergence, not diffusion. To be provably
+unreachable a ceiling would need to sit at **+3.1** (alpha_max ≈ 22), which is not a step size any
+optimizer would run. **There is no box-free configuration of this algorithm at this budget.**
+FINDINGS 51.2 established that at ms=1e-2; this extends it to **ms=1e-3, the regime the headline
+lives in**, and shows it is granularity- and family-dependent (weightwise 0.42–1.00 of vmax across
+families; r18 layerwise only 0.12).
+
+**HOW TO SCORE THE BATCHES GIVEN THIS.** U0.4 / X0.3 were written as binary bars and must be
+reported as written — where they fail, U1/U2 are UNINTERPRETABLE **as pre-registered**. But the
+intervention is a genuine 2.3-log-unit dose, so score U1 additionally as a **dose-response**,
+labelled POST-HOC: if N_eff/m does not move despite the ceiling moving 2.3 log units and the
+occupancy falling substantially, that is evidence the box does not set the number even though it
+binds. Report the binary verdict first, the dose-response second, and never let the second
+overwrite the first.
+
+**The `r34` arms and `r10`-node / `r10`-lay are unaffected and remain fully interpretable**, which
+preserves the built-in null U0.3 was built on.
