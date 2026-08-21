@@ -9455,3 +9455,191 @@ weightwise, variance instrument, steady half:
 per-weight meta-gradients carry the independent information of 5.6M.** Half the
 noise-averaging the 1/sqrt(N) assumption promises is not there. Off equilibrium, 96% of it
 is not there.
+
+---
+
+# CYCLE 50 — both cycle-49 batches landed (54 jobs); the FILTER IS A DIAL and the headline is 4-family
+
+Queues were 0 P / 0 R on both accounts at tick start: `ff5-*` (18, alice) and `ml5-*` (36, alice2)
+had all completed. Reducer selftests before use: `probe5_window` 41/41, `probe5_time_ladder` 32/32,
+`neff_instrument` 19/19, `probe5_floor` 15/15, new `c50_dial` 24/24. Window = STEADY HALF throughout
+unless a row says otherwise. CSV 1611 runs (+87).
+
+## 50.1 `ml5-*` — THE META-STEPSIZE LADDER. CORRECTIONS 53's "switch" is WITHDRAWN: it is a DIAL
+
+R18/CIFAR-10, steady half, weightwise m = 11,173,962. Frozen anchor re-derived from `../probes_p5`,
+not quoted from prose: b = 0.343, rho_w(k=1) = 3.200e-06, N_eff = 470,049.6.
+
+| meta-stepsize | b (steady) | rho_w k=1 | gain@k=1 | gain@node | gain@lay | **N_eff/m** | s (var) | clip %rec (w/node/lay/blk6) |
+|---|---|---|---|---|---|---|---|---|
+| frozen (anchor) | 0.343 | 3.200e-06 | 1.00x | 1.00x | 1.00x | **0.042** | 0.759 | — (beta never moves) |
+| 1e-4 | 0.219 | 9.492e-07 | 3.37x | 1.65x | 0.75x | **0.129** | 0.836 | 0 / 0 / 0 / 0 |
+| 1e-3 | 0.081 | 1.517e-07 | **21.09x** | 5.68x | 0.86x | **0.481** | 0.944 | 0 / 0 / 16.8 / 4.8 |
+| 1e-2 ⚠ | 0.328 | 2.654e-06 | 1.21x | 2.84x | 0.94x | 0.050 | 0.785 | **29.0 / 11.5 / 88.0 / 86.8** |
+
+* **(L0) VALIDITY GATE PASSES.** The ms=1e-3 rung reproduces the c48 `fr5-*-a3` config:
+  rho_s(weightwise) = **9.657e-08** against **8.888e-08**, a factor **1.087** (gate: within 3x);
+  b = 0.081 against 0.065. **The headline number now has THREE independent measurements** —
+  44.3's 8.458e-08, c48's 8.888e-08, ml5's 9.657e-08 — agreeing to **−5.9% / +7.5%** about their
+  geometric mean 8.99e-08. That is the cross-batch instrument drift CORRECTIONS 51 worried about,
+  measured rather than feared, and it is small.
+* **(L1) NON-MONOTONE AS IT STANDS — BUT AT THE PRE-REGISTERED CONFOUNDED RUNG.** b runs
+  0.343 → 0.219 → 0.081 → **0.328**. The rise at the end is entirely the ms=1e-2 column, which
+  `c49_ms_ladder_p5.sh` named IN ADVANCE as the KNOWN RISK with the rule *"if it binds on >50% of
+  steps, that column is CONFOUNDED and L1 is decided on {1e-4, 1e-3} plus the frozen anchor only."*
+  It binds on **88.0% / 86.8%** of records at layerwise / blk6. The fallback applies.
+* **ON {frozen, 1e-4, 1e-3} THE LADDER IS SMOOTH AND MONOTONE: 0.343 → 0.219 → 0.081.**
+  b(1e-4) = 0.219 lands inside the pre-registered [0.10, 0.30] band and cleanly between the two
+  old anchors. **A third point between two states is a DIAL. CORRECTIONS 53 is withdrawn (→ 58).**
+* **THE CONFOUNDED RUNG CONFIRMS ITS OWN PREDICTED ARTEFACT.** A clip-saturated arm was
+  pre-registered as measuring "a CLIPPED process, not a faster-adapting one" — i.e. it should look
+  frozen. It does: b(1e-2) = **0.328** against frozen **0.343**, agreeing to **0.015**, and
+  N_eff/m = **0.050** against frozen **0.042**. This is not a discovery; it was named in advance.
+  It is a validity check on the reading, and it passes.
+* **(L2) SCALE-SELECTIVITY HOLDS AT EVERY UNCONFOUNDED RUNG,** and the suppression itself is the
+  dial: gain@k=1 goes **1.00x → 3.37x → 21.09x** while gain@layerwise stays **0.75 / 0.86 / 0.94**,
+  i.e. ~1 throughout. Monotone decreasing in k at 1e-4 and 1e-3 (3.37>1.65>0.75; 21.09>5.68>0.86);
+  non-monotone only at the confounded 1e-2. **The adapter is a high-pass filter whose gain is set
+  by the meta-stepsize and whose corner is at the channel, not a two-state switch.**
+* **QUOTE THIS ROW.** N_eff/m at weightwise: **0.042 frozen → 0.129 at 1e-4 → 0.481 at 1e-3**, an
+  11.4x span over two decades of drive, one instrument, one batch, n=3 per rung.
+* **THE PRE-REGISTERED STATISTIC WAS AMBIGUOUS, AND BOTH READINGS ARE REPORTED.** "The fraction of
+  steps at which the guard binds" does not fix a denominator. Per (record,tensor) CELL the ms=1e-2
+  column is 0.19–28.1% — under 50%, so *not* confounded. Per RECORD-with-any-tensor-bound it is
+  11.5–88.0% — over 50% at the coarse rungs, so confounded. **They fall on opposite sides of the
+  threshold.** `c50_dial.py` prints both and the conservative (per-record) reading is taken.
+  **STANDING RULE (5), the fifth after thresholds/nulls/windows/sign-ranges:** *a registered
+  fraction must name its denominator.*
+
+## 50.2 `ff5-*` — THE FREE-BETA FAMILY LADDER. C0 passes 18/18; C1 and C3 confirm 3/3
+
+**C0 VALIDITY GATE: PASS 18/18.** beta moved on the last record in every arm (the inverse of fz3's
+check, run not assumed); weightwise n_tot byte-matches fz3 exactly in all three families
+(r10 4,903,242 / r34 21,282,122 / c100 11,220,132); n_records = 2000 in 18/18.
+
+* **(C1) THE HEADLINE GENERALISES — CONFIRMED 3 of 3.** Free weightwise rho_s resolves above its
+  own rho_min on the steady half in every family (`probe5_window` excluded nothing at any rung, in
+  any window). **Both rungs named in advance as thin cleared**: c100 weightwise (predicted margin
+  ~1.5x) and r10 layerwise (predicted ~0.5x, i.e. predicted NOT to resolve) both resolved. That is
+  better than pre-registered, and it is worth saying that the pre-registration was pessimistic.
+* **N_eff/m at weightwise, variance instrument, steady half — the paper's sentence, 4-family:**
+
+  | family | m | frozen N_eff/m | **free N_eff/m** | free/frozen | s var frozen → free |
+  |---|---|---|---|---|---|
+  | r10 / CIFAR-10 | 4,903,242 | 0.033 | **0.163** | 4.96x | 0.722 → 0.885 |
+  | r18 / CIFAR-10 | 11,173,962 | 0.042 | **0.481** | 11.4x | 0.759 → 0.944 |
+  | r34 / CIFAR-10 | 21,282,122 | 0.054 | **0.552** | 10.1x | 0.823 → 0.992 |
+  | c100 (R18) | 11,220,132 | 0.082 | **0.305** | 3.73x | 0.803 → 0.954 |
+
+  *At the adapted equilibrium — the regime Adam-mini / Adalayer / SGG run in — per-weight
+  meta-gradients carry between **16% and 55%** of the independent information their count implies,
+  in every architecture and dataset tested.* The 1/sqrt(N) assumption is wrong by 2–6x free and by
+  12–30x frozen. **This is no longer a ResNet18 result.**
+* **(C3) THE EQUILIBRIUM PROFILE FLATTENS — CONFIRMED 3 of 3, and all three go NEGATIVE.**
+  Per-leg exponents, steady half (derivation reproduces FINDINGS 48.18's frozen b1 to <5e-4 —
+  `c50_dial` selftest checks exactly this):
+
+  | family | b1 w→ch frozen | **b1 w→ch free** | b2 ch→lay frozen | **b2 ch→lay free** |
+  |---|---|---|---|---|
+  | c100 | 0.150 | **−0.045** | 0.393 | **0.236** |
+  | r10 | 0.181 | **−0.013** | 0.816 | **0.424** |
+  | r34 | 0.069 | **−0.099** | 0.431 | **0.173** |
+  | r18 (ref) | 0.156 | **−0.059** | — | — |
+
+  Free b1 < frozen b1 in 3/3 and ≤0.05 in 3/3 (all negative). **b2 > b1 in 3/3 free and 3/3
+  frozen.** FINDINGS 48.18's *"correlation is nearly scale-free WITHIN a channel and collapses
+  beyond it — the correlation length is approximately the channel"* was a FROZEN, 4-family
+  statement. It now holds AT THE ADAPTED EQUILIBRIUM in 4 families, and **adaptation SHARPENS it**:
+  the within-channel leg goes from +0.07…+0.18 to −0.10…−0.01, i.e. exactly flat, while the
+  beyond-channel leg stays clearly positive.
+* **(C4) EXCHANGEABILITY — 2 of 3 pass, 1 undecided, asymmetry confirmed 3/3.** One-factor
+  over-prediction factor, free vs frozen: c100 **2.6x** vs 18.5x, r34 **1.3x** vs 13.6x,
+  r10 **7.8x** vs 127x. The pre-registered pass bar was <5x in 3/3 and the refutation bar was
+  ≥10x in any family; **r10 at 7.8x is in neither** and is reported as undecided, not as a pass.
+  The frozen→free weakening is 7.1x / 16.3x / 10.5x — the CORRECTIONS 47 asymmetry is general.
+* **(C2) SHAPE REPLICATES 3/3; MAGNITUDE DOES NOT — the pre-registration bundled two claims.**
+  Frozen/free gain on the steady half:
+
+  | family | gain k=1 | gain nodewise | gain layerwise | monotone in k? | k=1 in [8,60]? |
+  |---|---|---|---|---|---|
+  | c100 | 4.93x | 1.35x | 0.57x | **yes** | no |
+  | r10 | 5.80x | 1.70x | 0.20x | **yes** | no |
+  | r34 | 21.84x | 7.06x | 1.74x | **yes** | **yes** |
+  | r18 (ref) | 22.9x | 5.49x | 0.77x | **yes** | **yes** |
+
+  The pre-registered REFUTATION (non-monotone in ≥2 families) **did not fire**: monotone in 4 of 4.
+  The pre-registered band [8x, 60x] at k=1 **fails in 2 of 3**. **Report these separately.** The
+  honest sentence: *the transfer function's SHAPE is architecture-independent — monotone decreasing
+  in block size, ≈1 at layer scale in 3 of 4 — while its DEPTH at the weight scale is not
+  (≈5x for R10 and CIFAR-100, ≈22x for R18 and R34).* Layerwise within 3x of 1.0 in 2 of 3
+  (r10's 0.20x is 4.96x from unity and misses).
+
+## 50.3 THE GAIN RATIO DECOMPOSED — the 2-vs-2 family split lives entirely in the FREE arm
+
+50.2's magnitude spread is not a spread in the filter; it is a late-training effect, and the
+decomposition is arithmetic on measured levels, not a fit. rho_w at k=1, Q2 → Q4:
+
+| family | frozen Q2 → Q4 | frozen change | free Q2 → Q4 | free change | gain Q2 → Q4 |
+|---|---|---|---|---|---|
+| c100 | 2.699e-06 → 1.421e-06 | ÷1.90 | 1.068e-07 → 3.067e-07 | **×2.87 RISE** | 25.28 → 4.63 |
+| r10 | 1.515e-05 → 7.649e-06 | ÷1.98 | 7.645e-07 → 2.086e-06 | **×2.73 RISE** | 19.81 → 3.67 |
+| r34 | 2.272e-06 → 1.050e-06 | ÷2.16 | 1.223e-07 → 4.332e-08 | ÷2.82 fall | 18.57 → 24.24 |
+| r18 | 6.411e-06 → 2.717e-06 | ÷2.36 | 2.582e-07 → 1.148e-07 | ÷2.25 fall | 24.83 → 23.67 |
+
+* **The frozen control decays ÷1.90–2.36 in 4 of 4** — uniform, and that is training progress
+  behaving as a control should.
+* **The free arm splits 2–2.** In r18/r34 it tracks the frozen decay, so the gain is flat. In
+  r10/c100 **meta-gradient correlation at the weight scale REBOUNDS ×2.7–2.9 in the last quarter**
+  while the frozen control keeps falling. The gain "decay" is 2.87×1.90 = 5.45 (c100, observed
+  5.46) and 2.73×1.98 = 5.41 (r10, observed 5.40) — the decomposition closes to <1%.
+* **Q1 is the internal control and it fires in 3 of 3 new families**: gain 0.89 / 0.93 / 1.61 at
+  k=1 before beta has moved. Measured, not assumed.
+* **Two mechanisms were tested and BOTH FAIL to explain the rebound.** (i) BETA_CLIP saturation:
+  **0.0%** of tensor betas at either guard in every weightwise arm, every quarter, every family
+  — the clip is not binding where the rebound happens. (ii) beta velocity collapse: mean |Δbeta|
+  per record is flat to ±30% across quarters in all four families (0.00032–0.00067) against a 5x
+  gain move. **The rebound is unexplained.** Caveat that cannot be removed from this data: the
+  per-coordinate clipped FRACTION is not written to the probe (only per-tensor beta and the global
+  min/max), so (i) is *unsupported*, not *excluded*.
+* **POST-HOC, n=4 families, flagged as a hypothesis and NOT a result:** the two rebound families
+  are exactly the two whose free b1 ends at ≈0.000 (c100 −0.001, r10 +0.004) while the two
+  non-rebound families end clearly negative (r34 −0.120, r18 −0.081). Do not quote this without a
+  pre-registered replication.
+
+## 50.4 The instrument contamination is itself a monotone function of how hard the adapter is driven
+
+CORRECTIONS 56 established that the agreement instrument's bias channel falls almost entirely on
+the frozen arm (weightwise bias share 0.659 frozen vs 0.003 free, R18). That generalises, and it is
+a curve, not a two-state fact. Weightwise bias share, steady half:
+
+| | frozen | ms 1e-4 | ms 1e-3 | across families (free) |
+|---|---|---|---|---|
+| bias share | 0.659 | 0.498 | 0.002 | c100 0.073 / r10 0.045 / r34 0.002 |
+| raw−debiased |gap| in s | 0.141 | 0.106 | 0.017 | mean **0.028 → 0.003** debiased |
+
+* **E1 CONFIRMED AGAIN on a second root**: debiasing moves s toward the variance instrument in
+  3 of 3 ff5 families; mean |gap| **0.028 → 0.003** (target <0.05).
+* **E2 NOT APPLICABLE on the free root** — the raw ordering (r10 < c100 < r34) already matches the
+  variance ordering, so there is no reversal to fix. `neff_instrument` says so itself rather than
+  scoring a pass. The reversal E2 was written for is a FROZEN-arm phenomenon.
+* **CORRECTIONS 56's ~48% reattribution is NOT R18-specific**: frozen weightwise bias share is
+  0.831 (c100) / 0.756 (r10) / 0.503 (r34) / 0.659 (r18). Every frozen `s` in the draft is
+  contaminated; no free `s` needs debiasing in any family.
+
+## 50.5 NEGATIVE, exploratory — b does NOT collapse onto beta displacement
+
+Tested because it was free: if b were a single function of how far beta has travelled, the
+meta-stepsize axis and the training-time axis would be the same axis. Pooling all free arms and
+quarters (ml5 × 3 rungs, ff5 × 3 families, fr5 × 1) against per-quarter beta span:
+span ≈ 0 → b 0.22–0.47; span 0.2–1.5 → 0.22–0.43; span 2.2–2.5 → 0.21–0.38; span 5.4–8.1 →
+0.018–0.121; span 10–12.6 → −0.007–0.204. Broadly monotone but **the scatter at matched span is
+±0.2, comparable to the whole effect**. **No collapse. Do not re-run this.** The clip-confounded
+ms=1e-2 arm sits at span ≈11 with b ≈ 0.33 against 0.05–0.20 for unconfounded arms at the same
+span, which is a second, independent sign that it is measuring a different process.
+
+## 50.6 Status
+
+| batch | jobs | verdict |
+|---|---|---|
+| `ml5-*` (alice2) | 36 | L0 PASS; **L1 → DIAL** on unconfounded rungs; L2 PASS; 1e-2 column CONFOUNDED as pre-registered |
+| `ff5-*` (alice) | 18 | C0 PASS 18/18; **C1 3/3**; **C3 3/3**; C4 2/3 + 1 undecided; C2 shape 3/3, magnitude 1/3 |

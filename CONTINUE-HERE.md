@@ -48,6 +48,80 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 50) -- THE FILTER IS A **DIAL**; THE HEADLINE IS NOW **4-FAMILY**
+
+**Read `docs/CORRECTIONS.md` 58-61 and `docs/FINDINGS.md` 50.1-50.6 before quoting any `b`,
+any gain, or any N_eff. 58 WITHDRAWS CORRECTIONS 53. 59 replaces the "one architecture"
+caveat everywhere.**
+
+> **NOTE ON DOC NUMBERING.** The cycle-49 concurrent session left FINDINGS with TWO blocks
+> numbered 49.1-49.4 (merge damage, warned about in the cycle-49 handoff). Cycle 50 uses
+> 50.x, which is unambiguous. Do not renumber 49.x -- both blocks are real and cited.
+
+* **BOTH CYCLE-49 BATCHES LANDED (54 jobs) AND BOTH WERE SCORED AGAINST THEIR
+  PRE-REGISTRATIONS.** Queues were 0/0 at tick start. CSV 1611 runs (+87).
+* **CORRECTIONS 53's "SWITCH" IS WITHDRAWN -- IT IS A DIAL (CORRECTIONS 58).** `ml5-*`
+  supplied the eta_meta axis 53 explicitly deferred to. Steady half, R18/CIFAR-10,
+  weightwise, n=3/rung: **b = 0.343 frozen -> 0.219 at ms=1e-4 -> 0.081 at ms=1e-3**, and
+  suppression at k=1 **1.00x -> 3.37x -> 21.09x** while layerwise stays **0.75/0.86/0.94**,
+  i.e. ~1 throughout. b(1e-4) landed INSIDE its pre-registered [0.10,0.30] band.
+  **Write "the suppression grows with the meta-stepsize and is confined to scales below the
+  channel."** CORRECTIONS 49(2)'s "distance from the meta-optimum" is REINSTATED.
+* **THE ms=1e-2 RUNG IS CONFOUNDED, EXACTLY AS PRE-REGISTERED.** b(1e-2) = 0.328 is back at
+  the frozen 0.343 -- but the BETA_CLIP guard binds on **88.0%/86.8%** of records at
+  lay/blk6, and `c49_ms_ladder_p5.sh` named that hazard in advance WITH the fallback rule
+  that was then applied. A named hazard firing in the predicted direction is a validity
+  check, not a discovery. **Do not write it up as a non-monotonicity.**
+* **NEW STANDING RULE (5), the fifth: A REGISTERED FRACTION MUST NAME ITS DENOMINATOR.**
+  "Fraction of steps at which the guard binds" is **0.19-28.1%** per (record,tensor) cell
+  and **11.5-88.0%** per record -- opposite sides of the pre-registered 50% line. The
+  conservative reading was taken. `analysis/c50_dial.py` (selftest **24/24**) prints both.
+* **THE HEADLINE IS NO LONGER A ResNet18 RESULT (CORRECTIONS 59).** `ff5-*` passed C0
+  **18/18** (beta moved everywhere, n_tot byte-matches fz3, 2000 records). **C1 and C3
+  confirmed 3/3**, and BOTH rungs named in advance as thin (c100 weightwise, r10 layerwise)
+  cleared. **QUOTE THIS:** *at the adapted equilibrium per-weight meta-gradients carry
+  **16%-55%** of the independent information their count implies* --
+  **N_eff/m = 0.163 (R10) / 0.481 (R18) / 0.552 (R34) / 0.305 (CIFAR-100)** against
+  **0.033-0.082 frozen**. Variance instrument, steady half, weightwise.
+* **THE CORRELATION LENGTH IS THE CHANNEL, AND ADAPTATION SHARPENS THAT.** Free b1
+  (within-channel) = **-0.045 / -0.013 / -0.099 / -0.059** across the four families -- flat
+  in 4 of 4, against frozen +0.069..+0.181 -- while b2 (beyond-channel) stays **0.17-0.42**.
+  **Quote the per-leg exponents, never the pooled b.**
+* **C2 SPLITS, AND THE PRE-REGISTRATION BUNDLED TWO CLAIMS.** The transfer function's
+  SHAPE replicates (monotone in k, 4 of 4; the non-monotone refutation did NOT fire) but its
+  DEPTH does not (k=1 gain **4.93x c100 / 5.80x r10 / 21.84x r34 / 22.9x r18**; the
+  pre-registered [8x,60x] band fails 2 of 3). **Never write "the transfer function is 23x".**
+  C4 is 2/3 pass with **r10 at 7.8x UNDECIDED** (between the 5x pass bar and 10x refutation
+  bar) -- do not count it as a pass.
+* **AN UNEXPLAINED EFFECT, RECORDED AS UNEXPLAINED (CORRECTIONS 60).** In R10 and CIFAR-100
+  free rho_w at k=1 **REBOUNDS x2.7-2.9 in Q4** while the byte-matched frozen control keeps
+  decaying /1.9-2.0; in R18/R34 it does not. The decomposition closes to <1%. **Two
+  mechanisms tested and BOTH FAIL**: clip saturation (0.0% of tensor betas at either guard
+  in every weightwise arm) and beta-velocity collapse (flat to +-30% against a 5x gain move).
+  The b1~0 separator is POST-HOC at n=4 families and is labelled as one.
+* **NEGATIVE, do not re-run:** b does NOT collapse onto beta displacement (FINDINGS 50.5).
+* **INSTRUMENTATION GAP worth one line of PROBE5:** the per-coordinate clipped FRACTION is
+  not written (only per-tensor beta + global min/max), so the clip mechanism is
+  *unsupported*, not *excluded*. Adding a count of coordinates within eps of either guard
+  would close it permanently at zero run-time cost.
+* **SUBMITTED: 18 jobs on alice2, `wc5-*`** -- `bin/c50_wideclip_ladder.sh`, the WIDE-CLIP
+  control. It closes the one refuted prediction of the tick by making the clip an
+  EXPERIMENTAL VARIABLE instead of a fixed confound. **The binding guard is the LOW one**
+  (HI is at 0.00% in all 36 ml5 arms; a large meta-stepsize overshoots DOWNWARD and pins
+  groups at alpha~3e-7, i.e. kills them), so **only the low bound moves: -15 -> -30**.
+  ms {1e-3, 1e-2} x {w,node,lay} x 3 seeds. The ms=1e-3 arm is the NULL CONTROL -- the guard
+  binds on 0.00% of its weightwise cells, so widening it cannot matter, and if it does
+  nothing in the batch is quotable. W0-W3 pre-registered in the script header before submission.
+* **NEXT TICK, in order.** (a) **Score W2 BEFORE W1** -- W1 is meaningless if the guard was
+  not actually relieved. (b) Then W0.3 (the null control), then W1: wide-clip b(1e-2) <=0.15
+  confirms the dial across all four rungs; >=0.25 with the guard relieved means the dial is
+  genuinely NON-MONOTONE with an interior optimum near ms=1e-3 -- a different and more
+  interesting claim, and CORRECTIONS 58 must then be rewritten rather than retreating to
+  "confounded" a second time. (c) Still deferred, and it is bookkeeping not science:
+  re-derive every raw-instrument `s` scattered through FINDINGS 42.4 / 48.19 under the clean
+  instrument; CORRECTIONS 59 states the quoting rule that makes it mechanical.
+* Queues at tick end: alice **0 P / 0 R**, alice2 **18 P / 0 R** (`wc5`).
+
 ## Running / next (cycle 49) -- TWO ZERO-COMPUTE RESULTS; A PUBLISHED MAGNITUDE IS HALVED; TWO AGENTS ARE RUNNING
 
 **Read `docs/CORRECTIONS.md` 53-57 and `docs/FINDINGS.md` 49.1-49.4 before quoting any `s`

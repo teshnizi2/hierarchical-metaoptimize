@@ -1763,3 +1763,119 @@ Supersedes §54's items 1 and 6(d); items 2, 3, 4 and 5 stand unchanged.
    instrument and mark each occurrence with the instrument it came from — §55's rule is
    not retroactive by itself and the raw numbers are scattered through 42.4, 48.19 and
    earlier. (d) §53's switch-vs-dial question, on `ml5`'s eta_meta axis.
+
+---
+
+## 58. CORRECTIONS 53 IS WITHDRAWN — the high-pass filter is a DIAL, not a switch (cycle 50)
+
+**What 53 said.** *"The high-pass filter is a SWITCH, not a dial... write 'present before the step
+size has adapted, absent after', NOT 'varies with distance from the meta-optimum' until `ml5-*`
+supplies the eta_meta axis."* It was an honest reading of TWO points (beta frozen, beta free at
+ms=1e-3) plus a time axis, and it explicitly deferred to this batch.
+
+**`ml5-*` supplied the axis, and the third point lands between the two.** Steady half, R18/CIFAR-10,
+weightwise, one batch, one instrument, n=3 per rung (FINDINGS 50.1):
+
+| | frozen | ms 1e-4 | ms 1e-3 |
+|---|---|---|---|
+| b (steady) | 0.343 | **0.219** | 0.081 |
+| suppression at k=1 | 1.00x | **3.37x** | 21.09x |
+| suppression at layerwise | 1.00x | 0.75x | 0.86x |
+| N_eff/m | 0.042 | **0.129** | 0.481 |
+
+Smooth, monotone, and b(1e-4) = 0.219 falls inside the pre-registered [0.10, 0.30] band. **Write
+"the suppression grows with the meta-stepsize and is confined to scales below the channel."** The
+"two-state contrast" language is withdrawn. CORRECTIONS 49(2)'s original "distance from the
+meta-optimum" wording is REINSTATED, with the drive named: the distance is set by the meta-stepsize.
+
+**Why this is not a reversal-of-a-reversal to be embarrassed about.** 53 was written with two
+points and said so, named the experiment that would decide it, and pre-registered the band the
+answer had to fall in. The answer fell in the band. That is the process working.
+
+**The ms=1e-2 rung does NOT refute this, and the reason was written down in advance.**
+`c49_ms_ladder_p5.sh` pre-registered BETA_CLIP saturation as a KNOWN RISK with the explicit
+fallback "decide L1 on {1e-4, 1e-3} plus the frozen anchor only" if the guard binds on >50% of
+steps. It binds on 88.0% / 86.8% of records at layerwise / blk6. And the confounded arm behaves
+exactly as the pre-registration predicted a clipped arm would — like a FROZEN one: b = 0.328
+against frozen 0.343 (Δ0.015), N_eff/m = 0.050 against 0.042. **A named hazard that fires in the
+predicted direction with the predicted magnitude is a validity check, not a discovery, and must
+not be written up as one.**
+
+**STANDING RULE (5)** — the fifth, after thresholds / nulls / windows / sign-ranges:
+*a registered fraction must name its DENOMINATOR.* "The fraction of steps at which the guard binds"
+is 0.19–28.1% per (record,tensor) cell and 11.5–88.0% per record — **opposite sides of the
+pre-registered 50% line**. `analysis/c50_dial.py` (selftest 24/24) prints both and takes the
+conservative reading. Had only the favourable denominator been reported, this tick would have
+claimed a genuine non-monotonicity in b.
+
+## 59. THE HEADLINE IS NO LONGER A ResNet18 RESULT (cycle 50)
+
+`ff5-*` passed C0 18/18 and confirmed C1 and C3 in 3 of 3 families. The sentence the project is
+for now carries four architecture/dataset combinations (FINDINGS 50.2):
+
+> At the adapted equilibrium, per-weight meta-gradients carry between **16% and 55%** of the
+> independent information their count implies — N_eff/m = 0.163 (R10) / 0.481 (R18) / 0.552 (R34) /
+> 0.305 (CIFAR-100), against 0.033–0.082 with beta frozen.
+
+**What to quote and what not to.**
+* **QUOTE** N_eff/m, the variance instrument, the steady half, and the family. Never a bare `s`,
+  never a raw-instrument `s`, never `s` to three decimals.
+* **QUOTE** the per-leg exponents, not the pooled b. Free b1 (within-channel) is −0.045 / −0.013 /
+  −0.099 / −0.059 across the four families — flat, in 4 of 4 — while b2 (beyond-channel) stays
+  0.17–0.42. *The correlation length is approximately the channel, and adaptation SHARPENS that.*
+* **DO NOT** write "the transfer function is 23x". Its SHAPE is architecture-independent (monotone
+  in k, ≈1 at layer scale, 4 of 4); its DEPTH is not (≈5x for R10/CIFAR-100, ≈22x for R18/R34).
+  The pre-registered [8x,60x] band fails in 2 of 3. Report shape and magnitude separately —
+  `c49_free_family_ladder.sh` bundled them into one prediction and that was the defect.
+* **DO NOT** count C4 as 3/3. r10's 7.8x is between the 5x pass bar and the 10x refutation bar.
+  It is UNDECIDED and is written that way.
+
+## 60. AN UNEXPLAINED EFFECT IS RECORDED AS UNEXPLAINED — the late-training rebound (cycle 50)
+
+In R10/CIFAR-10 and R18/CIFAR-100, free-arm rho_w at k=1 **rises ×2.7–2.9 in the last quarter**
+while the byte-matched frozen control keeps decaying ÷1.9–2.0. In R18 and R34 it does not. The
+decomposition closes to <1% (FINDINGS 50.3), so the effect is arithmetic on measured levels, not a
+fit artefact.
+
+**Two candidate mechanisms were tested at zero compute and both fail.** (i) BETA_CLIP saturation:
+0.0% of tensor betas at either guard in every weightwise arm, every quarter, every family.
+(ii) beta velocity collapse: flat to ±30% across quarters against a 5x gain move. **This is written
+down as an open effect with two mechanisms excluded, not as a finding with a story attached.** The
+post-hoc b1≈0 separator in FINDINGS 50.3 is a hypothesis at n=4 families and is labelled as one.
+
+**Instrumentation gap, for whoever runs the next probe:** the per-coordinate clipped fraction is
+not written — only per-tensor beta and the global beta_true_min/max — so (i) is *unsupported*
+rather than *excluded*. A one-line addition to PROBE5 (count of coordinates within eps of either
+guard) would close it permanently and costs nothing at run time.
+
+## 61. DECISION RECORD — cycle 50
+
+**Data state.** Both queues 0 P / 0 R at tick start; all 54 cycle-49 jobs complete. 18 ff5 + 36 ml5
+probe dirs synced (703 MB + 704 MB). CSV regenerated to 1611 runs. Five reducers selftested before
+use (41/41, 32/32, 19/19, 15/15, and the new `c50_dial` 24/24).
+
+**Decisions taken, and why.**
+1. **CORRECTIONS 53 WITHDRAWN, filter re-described as a dial.** Three unconfounded points, monotone,
+   with the middle one inside its pre-registered band. → §58.
+2. **The ms=1e-2 column is reported as CONFOUNDED**, per the batch's own pre-registered fallback,
+   under the conservative denominator. Not quoted in any b or gain claim. → §58.
+3. **The headline is promoted from 1 family to 4.** C1 and C3 confirmed 3/3; both rungs named in
+   advance as thin cleared. → §59.
+4. **C2 is SPLIT into shape (confirmed 4/4) and magnitude (fails 2/3)** rather than scored as one
+   prediction. C4's r10 is recorded as UNDECIDED, not as a pass. → §59.
+5. **The late-training rebound is recorded as UNEXPLAINED** with two mechanisms excluded. → §60.
+6. **The beta-displacement collapse is recorded as a NEGATIVE** so it is not re-run. → FINDINGS 50.5.
+7. **STANDING RULE (5) added**: a registered fraction must name its denominator. → §58.
+8. **NOT DONE, and deferred deliberately:** the "re-derive every `s` in FINDINGS and the draft under
+   the clean instrument" sweep (cycle 49's item (c)). It is a documentation pass over scattered raw
+   numbers, it produces no new science, and this tick had 54 jobs of fresh data to score against
+   pre-registrations. §59 states the quoting rule that makes the sweep mechanical when it happens.
+
+**Submitted.** `bin/c50_wideclip_ladder.sh` — 18 jobs on alice2, the ONE experiment that closes the
+one refuted prediction of the tick. See §58: b(1e-2) = 0.328 is attributed to the clip guard, and
+that attribution is currently an inference from a pre-registered hazard, not a measurement. The
+batch re-runs ms=1e-2 and ms=1e-3 with BETA_CLIP widened, so the clip becomes an experimental
+variable instead of a fixed confound. Pre-registration W0-W3 in the script header, written before
+submission.
+
+**Queues at tick end.** alice 0 P / 0 R. alice2 18 P / 0 R.
