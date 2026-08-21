@@ -1093,6 +1093,16 @@ FairShare by less than the 4th decimal — consistent with the two readings abov
 0.35 is a **multi-day** process at best, and it is not under our control: FairShare is
 relative, so it also depends on other `liacs` users continuing to accrue.
 
+**Decay measured within this tick, not inferred.** With both queues at zero throughout:
+
+| | RawUsage at tick start | at tick end | change | FairShare |
+|---|---|---|---|---|
+| alice | 24,375,279 | 24,354,340 | **−0.0859%** | 0.333054 → 0.333054 |
+| alice2 | 20,035,200 | 20,017,989 | **−0.0859%** | 0.335570 → 0.335570 |
+
+Both accounts decay at exactly the same rate, which is the 14-day half-life
+(0.206%/hour) and nothing else. **FairShare did not move in the 6th decimal.**
+
 **The rule's premise is that waiting works. On a 14-day half-life it works very slowly.**
 Two facts that bound the other side of the trade, recorded for the operator to decide with:
 * the 4-job `PATCH_PROBE5` batch below would add ~9 600 GPU-seconds, i.e. **0.04% of
