@@ -48,6 +48,46 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 46) -- IDEA 3 CONVERGENCE CONTROL SUBMITTED, 16 jobs at 300 ep
+
+**The cycle-45 sweep runs at 100 epochs and 100 epochs is not converged.** FINDINGS 44.1:
+94.417 -> 94.999 -> 95.138 (cosine) and 92.795 -> 93.033 -> 93.201 (meta) at 100/300/600.
+Worse, the under-convergence is DIFFERENTIAL and it is differential in the worst possible
+place: at alpha0=1e-6 arm B must first grow its own step size, costing **+11.4 to +19.0
+epochs** on `ep_to_85` (audit 5's correction to standing rule R5 -- the floor is ~11, not the
+"14-25" this project used to quote, and the damaging part is the DIFFERENTIAL, up to 7.6 epochs
+between two arms compared directly). So a 100-epoch budget understates arm B at exactly the
+extreme the robustness claim is about, and **a negative IDEA 3 verdict at 100 epochs would not
+be falsifiable** -- "not robust" would be indistinguishable from "not enough budget".
+This project has already had a budget change move a shape: audit 5's rule R6 (FINDINGS 36.2).
+
+* **`bin/c46_idea3_budget_control.sh`, 16 jobs, 300 epochs.** alpha0 in
+  {1e-6, 1e-5, 1e-2, 1e-1} -- **the four EXTREMES only** -- x both arms x seeds {0,1}.
+  alice `4700666-4700673` (seed 0), alice2 `4700674-4700681` (seed 1); every cell is
+  `{alice x1, alice2 x1}` so account cannot confound the 100-vs-300 contrast either.
+  Pending after submit: alice 24, alice2 9. Nothing cancelled; all 45 c45 jobs untouched.
+* **The middle of the grid is NOT re-run at 300 ep, on purpose.** The startup tax is a
+  bottom-end effect and the guard is a top-end effect; the interior is where a budget artefact
+  CANNOT flip the shape. Extremes-only is the design, not a compromise on it.
+* **`gpu-short` is dropped for this batch** -- it caps at 4:00:00 and `bg600-meta-s1` on a
+  2080ti ran 7:41:51/600ep = ~3:51 for 300. `--time=08:30:00` on the four long partitions,
+  exactly what `bg300-*` used. This is the one deviation from "all five partitions".
+* **Run names are `i3a300-*` / `i3b300-*`, and that matters.** They do NOT match
+  `startswith("i3a-")`/`("i3b-")`, so a 300-epoch row cannot be pooled into a 100-epoch cell.
+  The reducer now ALSO filters per-arm on `epochs_done` (>=300 for these). Two independent
+  mechanisms, both unit-tested.
+* **Arm A is still a genuinely fixed LR at 300 ep -- verified against the live scheduler
+  object** out to 150,000 steps: 1.000000000e-3 -> 9.999944484e-4, i.e. constant to **5.55e-6**
+  relative, no warmup. The 50,000-step column reproduces the c45 check exactly.
+* **The reducer reports every metric at BOTH budgets and prints an explicit shape verdict.**
+  `analysis/idea3_robustness.py --selftest` is **22/22 PASS**. Budget stability is judged on the
+  matched 4-point sub-grid (100ep metrics RECOMPUTED there, never 7 points vs 4) and requires
+  all three: band membership unchanged, both widths unchanged, A-vs-B ordering unchanged.
+  **If it prints NOT BUDGET-STABLE, the 100-epoch sweep is not a valid basis for the robustness
+  claim -- do not patch it with a caveat.** Full rationale: `docs/IDEA3-robustness.md` §7.
+* FairShare overridden again (0.333054 / 0.335570, unchanged -- CORRECTIONS 35's 14-day
+  half-life), recorded as `--force-fairshare` in the script's own log.
+
 ## Running / next (cycle 45) -- IDEA 3 SUBMITTED, 45 jobs, both accounts
 
 **The project stopped measuring peak accuracy and started measuring the thing the paper

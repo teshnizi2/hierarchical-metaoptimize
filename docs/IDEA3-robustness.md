@@ -1,8 +1,15 @@
 # IDEA 3 — the alpha0-robustness tradeoff
 
-**Status: SUBMITTED, cycle 45. 45 jobs, 28 on alice + 17 on alice2. Nothing read yet.**
-Submit script: `bin/c45_idea3_alpha0_robustness.sh` (runs unchanged on both accounts).
-Reducer: `analysis/idea3_robustness.py` (self-test 9/9 PASS, written before the data).
+**Status: SUBMITTED. 61 jobs total, nothing read yet.**
+
+| batch | cycle | jobs | budget | grid | script |
+|---|---|---|---|---|---|
+| main sweep | 45 | 45 (28 alice + 17 alice2) | 100 ep | full 7-point + clip control | `bin/c45_idea3_alpha0_robustness.sh` |
+| **convergence control** | **46** | **16 (8 + 8)** | **300 ep** | **the 4 extremes only** | `bin/c46_idea3_budget_control.sh` |
+
+Reducer: `analysis/idea3_robustness.py` (self-test **22/22 PASS**, written before the data,
+extended for the two-budget comparison before the 300-epoch data landed). **Section 7 is the
+convergence control and it gates everything else in this document.**
 
 ---
 
@@ -56,6 +63,9 @@ project has not yet been able to make, because a tradeoff survives a peak-accura
 
 Held fixed across all 42 main-grid jobs: ResNet18 / CIFAR-10 / batch 100 / **100 epochs** /
 `AUGMENT=1` / `gamma 1` / `--max-time 999:00:00` / 3 seeds {0,1,2} / all five GPU partitions.
+
+**100 epochs is not a converged budget and §7 is the control for that.** Read §7 before
+quoting any width number from this section.
 
 **Peak reference, not re-run:** tuned AdamW+cosine **94.417 ±0.113 (n=5)** (CORRECTIONS 30).
 Note this is the corrected value — *not* 94.093, 94.24 or "94.4".
@@ -120,9 +130,11 @@ under the 40-PENDING cap, so no wave split was needed.
 ## 3. The analysis, pre-registered
 
 Primary metric: **`plateau`** (mean of the last 20 epochs — code wins over prose,
-CORRECTIONS 11), read only at `epochs_done >= 100` and `superseded == 0`.
+CORRECTIONS 11), read at `superseded == 0` and at the arm's **own** epoch floor —
+`epochs_done >= 100` for the 100-epoch arms, `>= 300` for §7's 300-epoch arms. The filter is
+per-arm, not global, so a 300-epoch row can never be pooled into a 100-epoch cell.
 
-For each arm, `analysis/idea3_robustness.py` reports:
+For each arm **and each budget**, `analysis/idea3_robustness.py` reports:
 
 * **(i) WIDTH** — the span, in decades, of the largest **contiguous** run of grid points within
   1pp / 2pp of *that arm's own best*.
@@ -134,11 +146,16 @@ For each arm, `analysis/idea3_robustness.py` reports:
 longest contiguous run, so a lone in-band cell has width **0 decades** and is not padded out to
 half a grid spacing. If the in-band set is non-contiguous the reducer prints a WARNING and
 reports only the longest run — a gapped in-band set means the curve is not a plateau and the
-width is not a meaningful summary of it. All six rules are unit-tested (`--selftest`, 9/9).
+width is not a meaningful summary of it. All six rules are unit-tested (`--selftest`, **22/22**
+— the extra tests cover the extremes sub-grid, the per-arm epoch filter and the budget-stability
+verdict added in §7).
 
 The output sentence, if the effect is there, is:
 
 > MetaOptimize costs **X pp** of peak accuracy and buys **N decades** of alpha0 insensitivity.
+
+**That sentence may only be written once §7's shape verdict reads BUDGET-STABLE.** If it reads
+NOT BUDGET-STABLE, the width above is budget-confounded and the sentence is not available.
 
 ## 4. Pre-registered predictions — write the verdict against these
 
@@ -154,7 +171,10 @@ The output sentence, if the effect is there, is:
 1. If arm B's within-1pp width is **not strictly wider** than arm A's, then the parent paper's
    own robustness claim fails on its own configuration (m=6, ResNet18, CIFAR-10, matched
    budget). Write it as the negative result it is — it is a direct refutation of a published
-   claim, not a null.
+   claim, not a null. **But this refutation is only available if §7's shape verdict reads
+   BUDGET-STABLE.** At 100 epochs alone it is not falsifiable: a null width would be
+   indistinguishable from arm B's ~11–19-epoch startup tax at the bottom of the grid (§7.2).
+   That is precisely why §7 exists.
 2. If arm A at lr=1e-6 does **not** collapse, the premise that a small fixed step size cannot
    train is wrong and the tradeoff has no denominator. The whole framing goes.
 
@@ -177,6 +197,8 @@ The output sentence, if the effect is there, is:
   point is 1e-6.
 * **Nothing about peak accuracy changes.** CORRECTIONS 30's 1.622pp deficit stands and must be
   reported in the same breath as any width claim.
+* **One budget — and that one is not converged.** This was the gap that §7 closes; see §7.5 for
+  what remains open even with the control.
 
 ## 6. Operational record
 
@@ -194,3 +216,165 @@ The output sentence, if the effect is there, is:
   `--save-directory` only receives TensorBoard output.
 * No probe directories: this batch measures plateaus, not meta-gradient statistics, so
   `PROBE` is unset and nothing here adds to the unreduced-probe backlog.
+
+### 6.1 Cycle 46 — the convergence control (§7)
+
+* **Submitted:** 16 jobs, 8 per account. alice `4700666-4700673` (seed 0), alice2
+  `4700674-4700681` (seed 1). Verified in `squeue` on both accounts after submission.
+* **Queue state at submit:** alice 16 PENDING / 12 RUNNING → **24 pending** after;
+  alice2 1 / 16 → **9 pending** after. Both well under the 40-PENDING cap, and the cycle-45
+  batch already in flight was not displaced — the 16 new jobs went to the back of the queue.
+* **FairShare floor overridden again**, same grounds as above: **0.333054** / **0.335570**,
+  unchanged from cycle 45 (consistent with CORRECTIONS 35's 14-day half-life — an idle cycle
+  moves it by <1e-4). Recorded as `--force-fairshare` in the script's own log.
+* **`gpu-short` deliberately omitted** — see §7.3. `--time=08:30:00` on the four long
+  partitions, matching `bg300-*` which completed in 01:31–02:01.
+* Batch cost ≈ 16 × ~2h ≈ **32 GPU-hours**, slightly more than the whole 45-job 100-epoch
+  sweep. That is the price of making §4's refutation condition falsifiable.
+* No probe directories here either.
+* **Nothing was cancelled.** All 45 cycle-45 jobs are untouched and still in flight.
+
+## 7. The convergence control (cycle 46) — 16 jobs, 300 epochs, extremes only
+
+**This section exists because §2's 100-epoch budget cannot, on its own, produce a falsifiable
+robustness verdict.** It is not a robustness check on the result; it is the thing that decides
+whether §3's width is a measurement or an artefact.
+
+### 7.1 Neither arm is converged at 100 epochs, and we measured that ourselves
+
+FINDINGS 44.1, the matched-budget horizon ladder (n=3 at 300 and 600, plateau, R18/CIFAR-10,
+`AUGMENT=1`):
+
+| budget | AdamW + cosine | AdamW + Adam meta | deficit |
+|---|---|---|---|
+| 100 ep | 94.417 ±0.113 (n=5) | 92.795 ±0.177 (n=5) | 1.622 |
+| 300 ep | 94.999 ±0.164 (n=3) | 93.033 ±0.168 (n=3) | 1.967 |
+| 600 ep | 95.138 ±0.108 (n=3) | 93.201 ±0.286 (n=3) | 1.937 |
+
+Both arms are still climbing at 100 and only saturate between 300 and 600 (+0.14 / +0.17pp over
+that last leg). Note the meta arm there is **layerwise (m=62)**, not §2's blk6 (m=6), so those
+numbers are the right order of magnitude for arm B and not a matched prediction for it.
+
+### 7.2 The under-convergence is DIFFERENTIAL, and it is differential in the worst place
+
+Uniform under-convergence would be tolerable — it would shift both curves down and leave the
+*shape* alone, and the shape is what §3 measures. It is not uniform.
+
+* **This campaign has already had a budget change move a shape.** Audit 5 (FINDINGS 36.2,
+  standing rule R6) found that over 100 → 300 epochs "un-pooled arms gain +0.53–0.88pp while
+  every pooled arm is flat or loses", which **attenuated** three measured effects
+  (+1.444 → +0.279, +2.264 → +1.210, +1.504 → +0.086). R6 as previously written claimed those
+  gains *inverted*; they do not — but they move enough to change a conclusion. That is the
+  precedent, in this project, on this hardware.
+* **At alpha0=1e-6 arm B must grow its own step size before the base optimizer does useful
+  work.** `ep_to_85` runs **+11.4 to +19.0 epochs** higher than at a0=1e-3. (That is audit 5's
+  correction to standing rule R5: the floor is ~11, not the "14–25" this project used to quote,
+  **and the damaging part is the differential — up to 7.6 epochs between two arms being compared
+  directly.**)
+
+So a 100-epoch budget charges arm B a ~11–19-epoch startup tax at the **bottom** of the grid and
+approximately nothing at the top. It systematically **understates arm B's robustness at exactly
+the extreme the parent paper's claim is about** — "even for initial step sizes several orders of
+magnitude smaller than the optimal fixed step-size".
+
+**The consequence is that §4's refutation condition is not falsifiable at 100 epochs alone.** If
+arm B's width comes out no wider than arm A's, we cannot distinguish
+
+* "MetaOptimize is not robust to alpha0" (the publishable negative), from
+* "100 epochs was not enough budget for the arm that has to grow its own step size first"
+  (a budget artefact wearing the negative's clothes).
+
+Shipping the first when the truth is the second would be worse than shipping nothing.
+
+### 7.3 Design — the extremes only, and that is the point rather than a compromise
+
+| | value |
+|---|---|
+| grid | alpha0 ∈ {1e-6, 1e-5, **1e-2, 1e-1**} — the four extremes |
+| arms | A `i3a300-*` fixed-lr AdamW; B `i3b300-*` AdamW base + Adam meta, m=6, guard ON |
+| seeds | {0, 1} → 4 × 2 × 2 = **16 jobs** |
+| budget | **300 epochs** (~2h/job on l4; 3:51 worst case on 2080ti) |
+| partitions | `gpu-l4-24g, gpu-2080ti-11g, gpu-mig-40g, gpu-a100-80g`, `--time=08:30:00` |
+| everything else | byte-matched to §2 except `--num-epochs`/`--seed`/`--run-name` |
+
+**The middle of the grid {1e-4, 3e-4, 1e-3} is deliberately not re-run.** That would be 12 more
+jobs to re-measure a region the 100-epoch sweep already covers and where under-convergence is
+*not* differential: the startup tax is a bottom-end effect and the guard is a top-end effect.
+The extremes are where a budget artefact can flip the shape; the interior is where it cannot.
+
+**`gpu-short` is dropped, and this is the one deviation from "always submit all five
+partitions".** It caps at 4:00:00. The slowest measured 300-epoch-equivalent rate in this
+campaign is `bg600-meta-s1` on `gpu-2080ti-11g` — 7:41:51 for 600 epochs, i.e. ~3:51 for 300,
+over the cap once startup is counted. `train.py`'s own truncation break makes a truncation
+quiet, so a 300-epoch arm on `gpu-short` is a coin-flip on silent data loss. The four long
+partitions all allow 7 days; `--time=08:30:00` is exactly what `bg300-*` used and completed
+under (slowest 02:00:43).
+
+**Run-name prefixes are `i3a300-` / `i3b300-`, which do NOT match `startswith("i3a-")` /
+`startswith("i3b-")`.** This is deliberate and it is a near-miss worth recording: the reducer's
+only epoch filter was `epochs_done >= 100`, so a 300-epoch row named `i3a-*` would have been
+silently **pooled into the 100-epoch cell** and would have destroyed the very comparison this
+batch exists to make. The reducer now also filters each arm on `epochs_done` explicitly (≥300
+for the 300-epoch arms), so the two budgets are kept apart by two independent mechanisms. A
+unit test covers it, including a truncated 150-epoch row being excluded.
+
+**Arm A is still a genuinely fixed LR at 300 epochs — verified against the real scheduler
+object, not the algebra**, out to 150,000 steps:
+
+| step | 0 | 50 000 | 150 000 |
+|---|---|---|---|
+| lr | 1.000000000e-3 | 9.999993831e-4 | 9.999944484e-4 |
+| rel. deviation | 0 | 6.17e-7 | **5.55e-6** |
+
+Constant to 5.6e-6 relative over the full 300-epoch run, no warmup ramp. The 50,000-step column
+reproduces §2.1's published value exactly, which cross-checks both measurements.
+
+**Account balance, same rule as §2.3 — split by seed, never by arm.** alice runs seed 0 of both
+arms (8 jobs), alice2 runs seed 1 of both arms (8 jobs). Every cell has composition
+`{alice ×1, alice2 ×1}`, so account cannot confound any alpha0 contrast, the A-vs-B contrast,
+**or the 100-vs-300 contrast**.
+
+### 7.4 The analysis, pre-registered — report the metric at BOTH budgets
+
+`analysis/idea3_robustness.py` now reports (i) width within 1pp/2pp of own best, (ii) worst
+case, (iii) peak **at 100 and at 300 epochs**, and prints an explicit shape verdict.
+
+Budget stability is judged on the **matched 4-point extremes sub-grid**, with the 100-epoch
+metrics *recomputed on that sub-grid* — never 7 points at 100ep against 4 points at 300ep.
+
+> **The shape is BUDGET-STABLE iff all three hold, at 1pp and at 2pp, for both arms:**
+> 1. every cell keeps its in-band / out-of-band status vs its own arm's sub-grid best;
+> 2. the sub-grid width is unchanged;
+> 3. the A-vs-B width **ordering** (which arm is flatter) is unchanged.
+
+**If any check fails, the reducer prints `THE SHAPE IS NOT BUDGET-STABLE` and names the cell or
+the width that moved, and the 100-epoch sweep is not a valid basis for the robustness claim.**
+Do not patch that with a caveat. The width must then be re-measured on the full grid at 300
+epochs, and every 100-epoch width number must be reported as budget-confounded.
+
+Pre-registered predictions for this batch:
+
+* **(B1)** The shape is budget-stable by all three checks above.
+* **(B2)** Both arms gain roughly the measured horizon premium (+0.58pp cosine, +0.24pp meta
+  from 100 to 300 — §7.1, and the meta figure is at layerwise not blk6), so the deltas are
+  near-uniform across the sub-grid.
+* **(B3)** Arm B's 1e-6 cell gains **more** than its 1e-2 cell — the startup tax being refunded.
+  If it does, the 100-epoch sweep understated arm B's bottom-end robustness and the 100-epoch
+  width is a **lower** bound on the true width. The reducer prints this differential directly.
+
+### 7.5 What the control still cannot say
+
+* **300 epochs is not converged either.** §7.1 shows both arms still moving at 600. This tests
+  whether the shape moves *between two budgets*, which is the falsifiable question; it does not
+  establish the asymptotic width.
+* **n=2 per cell.** Audit 5 measured same-config same-seed spread at 0.119pp median / 0.243pp
+  p90 (standing rule R7's "±0.02pp" was wrong by ~6×). A per-cell 100-vs-300 delta below
+  **0.3pp** is not resolvable; the reducer marks those rows "do not interpret".
+* **The sub-grid width jumps an unmeasured interior.** A 300-epoch in-band run from 1e-5 to 1e-2
+  spans three decades that were not measured at 300 epochs. The reducer flags any such run as
+  `[UPPER BOUND: spans unmeasured interior]` and the number must be quoted that way.
+* **`plateau` is the mean of the last 20 epochs at both budgets** (CORRECTIONS 11), so the
+  window is 20% of a 100-epoch run and 6.7% of a 300-epoch one — same statistic, different
+  fraction of the run.
+* **No clip control at 300 epochs.** `i3bc-*` is 100-epoch only, so if the guard turns out to be
+  doing the work at the top end, that finding is not itself budget-controlled.
