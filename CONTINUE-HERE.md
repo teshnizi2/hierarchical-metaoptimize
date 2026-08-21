@@ -48,6 +48,55 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 45) -- IDEA 3 SUBMITTED, 45 jobs, both accounts
+
+**The project stopped measuring peak accuracy and started measuring the thing the paper
+actually claims.** Full design, predictions and limits: **`docs/IDEA3-robustness.md`** -- read
+that before touching any `i3*` row.
+
+Queues at submit: alice **0/0** (FairShare 0.333054), alice2 **0/0** (0.335570). Both below the
+0.35 floor; **the floor was overridden by explicit operator instruction**, recorded in the
+script as `--force-fairshare` so the deviation is visible in its own log. CORRECTIONS 35 is why
+the rule could not be waited out (14-day half-life; an idle cycle moved FairShare by <1e-4).
+
+* **What is in flight.** `bin/c45_idea3_alpha0_robustness.sh`, 45 jobs, 100 ep, R18/CIFAR-10,
+  AUGMENT=1, guard on, `--max-time 999:00:00`, all five partitions.
+  **Arm A `i3a-*`** = plain AdamW at a **genuinely fixed** lr; **arm B `i3b-*`** = AdamW base +
+  Adam meta at `resnet18_blocks` (m=6, the paper's setting); alpha0/lr in
+  {1e-6,1e-5,1e-4,3e-4,1e-3,1e-2,1e-1} x 3 seeds. Plus **`i3bc-*`** (3 jobs), the clip control.
+  Split by SEED, never by arm: alice seeds 0,1 (28 jobs), alice2 seed 2 + the clip controls
+  (17). Every cell is `{alice x2, alice2 x1}` so **account cannot confound anything** here
+  (the failure mode that cost CORRECTIONS 10 a whole claim).
+* **Arm A is a NEW arm and this is not obvious.** `AdamW_optimizer` ALWAYS builds a
+  `CosineDecayWithWarmupScheduler` -- there is no un-scheduled path -- so every "fixed-LR
+  AdamW" row already in the CSV (`fx_adamw_*`, `bl-adw-*`, `fxcos-*`) carries a **10,000-step
+  (20-epoch) linear warmup**, and `SW_*` is a true cosine. Arm A sets `COS_WARMUP=0`,
+  `COS_TOTAL=100000000`, **verified against the live scheduler object**: lr holds at
+  1.000000e-3 -> 9.999994e-4 over all 50,000 steps. Do NOT compare `i3a-*` to the older
+  "fixed" rows -- they are warmed-up arms.
+* **`i3bc-*` exists because `BETA_CLIP` caps alpha at 0.0999998**, so arm B's top grid point
+  (alpha0=1e-1) starts pinned at its own ceiling. `i3bc-1e1-s{0,1,2}` re-runs that one cell at
+  `BETA_CLIP=-15:0`. Lands on `i3b-1e1` -> the guard is not doing the work; lands far below ->
+  arm B's top-end flatness is partly the guard. Rule 4: measure the dial, do not write the
+  caveat.
+* **Pre-registered, in `docs/IDEA3-robustness.md` §4.** (P1) arm A collapses at the bottom
+  (1e-6 < 60, 1e-5 < 85) and its within-1pp width is <= 1.5 decades; (P2) arm B is within 1pp
+  of its own best across all of [1e-6,1e-3] -- **nearly forced** by three cells already in the
+  CSV (`a0-blk6-*`: 91.663 / 91.638 / 92.071 at 1e-6 / 1e-4 / 1e-3), so the sweep's real
+  information is at **1e-5, 3e-4, 1e-2, 1e-1**; (P3) both peaks below 94.417.
+  **Refutation (publishable either way): if arm B is NOT strictly flatter than arm A, the
+  parent paper's own robustness claim fails on its own configuration.** Write it as that.
+* **Reducer is written and unit-tested BEFORE the data** -- `analysis/idea3_robustness.py`,
+  `--selftest` **9/9 PASS**. It reports, per arm, (i) width within 1pp/2pp of that arm's own
+  best in decades, (ii) worst case, (iii) peak, then the tradeoff line. The width convention
+  (longest **contiguous** in-band run; a lone cell is 0 decades, not half a grid spacing;
+  gapped in-band sets are flagged) is the only judgement call and it is what the tests cover.
+* **Nothing about peak accuracy changed.** CORRECTIONS 30's **1.622pp** deficit stands and must
+  appear in the same breath as any width claim. Reference peak is **94.417 +-0.113 (n=5)** --
+  not 94.093, 94.24 or "94.4".
+* **Read with:** `epochs_done >= 100`, `superseded == 0`. `.out` files land in the ROOT of
+  `runs/`, not `runs/i3/`. No probe dirs in this batch.
+
 ## Running / next (cycle 44) -- ZERO COMPUTE, and it produced the campaign's best result
 
 Queues: alice **0 PENDING / 0 RUNNING**, alice2 **0 / 0** -- nothing in flight anywhere.
