@@ -9015,3 +9015,112 @@ quantities **from the same runs**, at three new families, with `PROBE5=1` so the
 and uncorrected nulls can be compared on identical data and the window can be matched
 exactly. Run `analysis/neff_ladder.py fz3` and `analysis/probe5_window.py` on the same dirs
 and put the two s values in one table. That is a next-tick task, not a claim.
+
+## 48.14 B1 IS REFUTED — the short-range structure is an OFF-EQUILIBRIUM phenomenon, and the free/frozen contrast is scale-dependent
+
+All 12 `fr5-*` jobs completed at n_records = 2000. Structural check #1 **inverted** for this
+batch (beta must MOVE, not be frozen): **12/12 PASS**, beta_true_max drifts 2.56–4.60 in log
+units over each run. Reduced with `analysis/probe5_window.py` (**41/41**).
+
+**(B0) THE VALIDITY GATE PASSES, and it is the strongest calibration evidence yet.**
+Steady-half rho_s at weightwise = **8.888e-08** against FINDINGS 44.3's independently
+measured free-beta value **8.458e-08** — **+5.1%**, from a different batch, different seeds
+and a different reducer. Together with the frozen arm's +3.4% / +8.3% (48.6), the instrument
+now reproduces *both* published arms of the 44.3 contrast to under 10%.
+
+**(B1) REFUTED, and not marginally.** Pre-registered: the k=1 → k=775 leg falls **>= 2x**,
+as it does frozen (2.82x). Measured:
+
+| leg | frozen | free | pre-registered |
+|---|---|---|---|
+| rho_w implied, k=1 | 3.200e-06 | **1.396e-07** | — |
+| rho_w implied, k=775 | 1.133e-06 | **2.062e-07** | — |
+| ratio (>1 = falls) | **2.82x** | **0.68x — it RISES** | >= 2x |
+
+The free ratio is 0.677 with a ~16% relative sd on the k=1 point and ~3% on k=775, so the
+pre-registered 2.0 is **~12 sd away**. This is a refutation, not a failure to confirm.
+
+Whole-profile, steady half: span **3.4x**, **b = 0.065**, and non-monotone
+(1.396e-07 → 2.062e-07 → 6.026e-08). Against the c44 pre-registration that is
+outcome **NEITHER** — just outside (a)'s 3x and far below (b)'s 10x.
+
+**The parameter-free check agrees, and it is the cleaner statement.** Calibrated on the
+weightwise rung alone, the exchangeable one-factor model over-predicts by **0.7x (nodewise)
+and 2.3x (layerwise)** under free beta, against **2.8x and 45.4x** frozen. **The
+exchangeable model is REJECTED off equilibrium and NOT REJECTED at it.**
+
+**THE MECHANISM — adaptation suppresses correlation in a strongly SCALE-DEPENDENT way.**
+Steady half, geometric mean over seeds, both arms byte-matched except `--alg-meta`:
+
+| rung | m (groups) | frozen rho_s | rho_min | free rho_s | rho_min | frozen / free |
+|---|---|---|---|---|---|---|
+| weightwise | 11,173,962 | 2.037e-06 | 8.24e-09 | 8.888e-08 | 2.90e-08 | **22.92x** |
+| nodewise | 14,420 | 5.585e-04 | 6.93e-06 | 1.017e-04 | 7.03e-06 | **5.49x** |
+| layerwise | 62 | 5.257e-03 | 1.34e-03 | 6.840e-03 | 1.61e-03 | **0.77x** (free is HIGHER) |
+| blk6 | 6 | −2.825e-02 | 5.42e-02 | −2.087e-02 | 1.64e-02 | **unresolved in both** |
+
+All three fine rungs resolve in both arms. The weightwise ratio **22.92x** reproduces
+FINDINGS 44.3's independently measured **22.8x** on a different batch.
+
+**What adaptation removes is the FINE-scale correlation; the coarse-scale component
+survives untouched.** A step-size adapter acts on this system like a high-pass filter on
+meta-gradient co-fluctuation. **Offered as a hypothesis for the mechanism, not as a
+measurement:** with 11.17M adapted step sizes the meta-optimisation has enough degrees of
+freedom to cancel nearly all shared structure; with 62 it does not. That is a capacity
+argument and this batch does not test it.
+
+## 48.15 The free-beta verdict is NOT window-stable — and the window dependence IS the mechanism
+
+`probe5_window.py` prints **NOT WINDOW-STABLE** for the free arm on its first use against
+new data:
+
+| window | span | b | verdict |
+|---|---|---|---|
+| full | 25.8x | 0.263 | (b) RANGE IS REAL |
+| **steady .5–1** | **3.4x** | **0.065** | **NEITHER** |
+| startup 0–.25 | 124.7x | 0.331 | (b) RANGE IS REAL |
+
+**The window scan built this cycle earned its keep immediately.** Reducing the full run —
+which is what `probe5_floor.py --profile` does by default — would have reported
+*"the profile survives adaptation"*. It does not.
+
+**And the dependence is not noise, it is the result.** The free arm's STARTUP window
+(124.7x, b = 0.331) is quantitatively the frozen arm's STEADY window (69.3x, b = 0.343):
+same exponent to 0.012. Before beta adapts, the free arm *is* the frozen arm. FINDINGS 44.3
+recorded exactly this from a different statistic ("in the STARTUP window the free arm reads
+N/N_eff = 130.4, i.e. before beta adapts it behaves like the frozen arm"); this is the same
+fact in the scale profile.
+
+**So the correct reading of the whole cycle is a single coherent mechanism:** the short-range
+correlation structure is present **whenever the step size is far from its meta-optimum** —
+in the frozen arm throughout, and in the free arm only during startup — and it is
+progressively erased, fine scales first, as beta adapts.
+
+## 48.16 CONSEQUENCE — what Direction C can and cannot claim, restated on both arms
+
+| claim | status after the free-beta batch |
+|---|---|
+| per-weight meta-gradients are NOT independent | **STANDS AT THE ADAPTED EQUILIBRIUM.** free rho_s(weightwise) = 8.888e-08 at 3.1x its own rho_min, reproducing 44.3's 8.458e-08 to 5.1%. The Adam-mini / Adalayer / SGG line assumes exactly 0. This is the core refutation and adaptation does not remove it. |
+| the correlation is SHORT-RANGE; rho_w ~ k^-0.343 over 5.3 decades (48.5) | **NARROWED TO OFF-EQUILIBRIUM.** b = 0.343 frozen, **0.065** at the adapted equilibrium. Every "the violation is scale-dependent" sentence must carry "before the step size adapts". |
+| the exchangeable one-factor model is rejected by 45x (48.11) | **NARROWED THE SAME WAY.** 45.4x frozen, **2.3x** free — not rejected at equilibrium. |
+| adaptation consumes the correlated component (CORRECTIONS 27, FINDINGS 44.3) | **CONFIRMED AND REFINED: it consumes it SCALE-SELECTIVELY** — 22.9x at k=1, 5.5x at k=775, and **not at all** at k=180,225. That is new and it is measured, not inferred. |
+
+**The paper's framing changes and the batch header said in advance that it would.** The
+claim is no longer "the noise model is violated and the violation is scale-dependent". It is
+two claims, and the second is the more interesting one:
+
+> (1) Per-weight meta-gradients carry a small but decisively non-zero shared component that
+> **survives step-size adaptation** (rho ~ 9e-8, 3.1x resolution, reproduced to 5% across
+> two independent batches), so the independence assumed across the Adam-mini / Adalayer /
+> SGG line is false in the regime those methods actually run in.
+> (2) The **structure** of that correlation is set by distance from the meta-optimum. Far
+> from it, correlation is strong and short-range (rho ~ 3e-6, b = 0.343, exchangeability
+> rejected 45x); at the meta-optimum the adapter has erased the fine-scale component
+> specifically, leaving a weak and approximately scale-free remainder (b = 0.065,
+> exchangeability not rejected). A step-size adapter is a high-pass filter on meta-gradient
+> correlation.
+
+**Written as the pre-registration required.** `bin/c48_free_profile_p5.sh` said: *"REFUTATION:
+flat to within 1.3x -> the correlation length is an OFF-EQUILIBRIUM phenomenon only ...
+materially weaker, still publishable, and it changes the paper's framing. Write it as that,
+not as a null result."* The measured 0.68x on the pre-registered leg is past even that bar.

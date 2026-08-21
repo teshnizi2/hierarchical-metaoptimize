@@ -1435,3 +1435,86 @@ published a rho_s 4.2x above its own earlier measurement without noticing.
    arm. (c) Run `analysis/neff_ladder.py fz3` for A3. (d) `ep_to_85` has not been re-derived
    with arm C's two new extreme cells; 47.12's arm-C column is still n=2 and still
    warmup-confounded. (e) Nothing else in IDEA 3.
+
+## 47. §45 and §46(2) are NARROWED by their own pre-registered test, within the same cycle (cycle 48, later in the tick)
+
+§45 (written earlier this tick) said the scale profile is *"now CLAIMED rather than
+withheld"* and §46(2) called it the project's structural result. The 12-job free-beta batch
+submitted alongside it — designed precisely to attack that claim — has landed and it
+refutes the generalisation. Recorded here rather than by editing §45, because §45's
+measurement is correct; only its scope was too wide.
+
+**What the pre-registered test said and what it measured.** `bin/c48_free_profile_p5.sh`
+(B1) predicted the k=1 → k=775 leg would fall **>= 2x** at the adapted equilibrium as it
+does frozen (2.82x). Measured: **0.68x — it rises**, roughly 12 sd from the prediction.
+
+| | frozen (`--alg-meta fixed`) | free (`--alg-meta Lion`) |
+|---|---|---|
+| profile span, steady half | **69.3x** | **3.4x** |
+| exponent b in rho_w ~ k^-b | **0.343** | **0.065** |
+| exchangeable model over-predicts by | **45.4x — REJECTED** | **2.3x — NOT rejected** |
+| rho_s at weightwise | 2.037e-06 | 8.888e-08 |
+
+| claim | status |
+|---|---|
+| "per-weight meta-gradients are not independent" | **STANDS AT THE ADAPTED EQUILIBRIUM** — free rho_s(weightwise) = 8.888e-08 at 3.1x its own rho_min, reproducing FINDINGS 44.3's 8.458e-08 to **+5.1%**. This is the core refutation of the Adam-mini / Adalayer / SGG independence assumption and it is untouched. |
+| "the correlation is short-range, rho_w ~ k^-0.343" (§45, FINDINGS 48.5) | **NARROWED to OFF-EQUILIBRIUM.** True with beta frozen; b = 0.065 at the adapted equilibrium. Every scale-dependence sentence must carry *"before the step size adapts"*. |
+| "the exchangeable one-factor model is rejected by 45x" (FINDINGS 48.11) | **NARROWED identically** — 2.3x free, not rejected. |
+| "adaptation consumes the correlated component" (§27, FINDINGS 44.3) | **CONFIRMED AND REFINED, and this is the cycle's new positive result: it consumes it SCALE-SELECTIVELY** — 22.92x at k=1, 5.49x at k=775, **0.77x (none) at k=180,225**. The 22.92x independently reproduces 44.3's 22.8x. |
+
+**The B0 validity gate passed at +5.1%**, so none of this is an instrument failure: the same
+reducer reproduces the frozen arm to +3.4%/+8.3% (48.6) and the free arm to +5.1%.
+
+## 48. The WINDOW rule of §45 was vindicated on its first contact with new data (cycle 48, same tick)
+
+§45 introduced the standing rule that *a time window is a dial exactly like a threshold*,
+and `analysis/probe5_window.py` was written to enforce it. On the free-beta batch it printed
+**NOT WINDOW-STABLE** immediately:
+
+| window | span | b | verdict |
+|---|---|---|---|
+| full | 25.8x | 0.263 | (b) RANGE IS REAL |
+| steady .5–1 | 3.4x | 0.065 | **NEITHER** |
+| startup 0–.25 | 124.7x | 0.331 | (b) RANGE IS REAL |
+
+**`probe5_floor.py --profile`, the pre-registered reducer, defaults to the full run and
+would have reported "the profile survives adaptation".** It does not. Without the scan this
+cycle would have published the opposite of §47.
+
+**And the window dependence is not noise — it is the mechanism.** The free arm's STARTUP
+window (b = 0.331) is the frozen arm's STEADY window (b = 0.343) to **0.012**. Before beta
+adapts, the free arm *is* the frozen arm — which FINDINGS 44.3 had already recorded from a
+different statistic. The single coherent reading: **the short-range structure is present
+whenever the step size is far from its meta-optimum, and is erased fine-scales-first as beta
+adapts.**
+
+## 49. DECISION RECORD — cycle 48, amended after the free-beta batch landed
+
+Amends §46, which was written before this batch reported. Items 1, 5 and 6 are unchanged.
+
+2. **(AMENDED) Direction C's claim splits in two, and the second half is the better paper.**
+   (a) Per-weight meta-gradient correlation is non-zero **in the regime the target methods
+   actually run in** — free rho ~ 9e-8, reproduced to 5% across two independent batches.
+   (b) Its *structure* is set by distance from the meta-optimum: short-range and strong off
+   equilibrium (b = 0.343, exchangeability rejected 45x), weak and approximately scale-free
+   at it (b = 0.065, not rejected). **A step-size adapter is a high-pass filter on
+   meta-gradient correlation**, suppressing 22.9x at k=1 and 0x at k=180,225.
+   Do not write "the violation is scale-dependent" without "before the step size adapts".
+3. **(RESOLVED, was "the single biggest threat")** The threat was real and it fired. The
+   12-job batch was worth every one of them: it converted a claim that would have been
+   refuted by the first reviewer into a two-part result with a measured mechanism.
+4. **(UNCHANGED, and now more valuable than when it was submitted)** The 20-job `fz3-*`
+   ladder is still in flight. Its frozen profile now has a **specific** thing to test:
+   whether b ~ 0.34 off equilibrium replicates on R10 / R34 / CIFAR-100. And because it
+   carries PROBE5 it also settles FINDINGS 48.13's open cross-check from the same runs.
+7. **(AMENDED) Next tick, in order.** (a) Reduce `fz3-*` per family with
+   `probe5_window.py`, scoring A0/A1/A2 — each family's n_weights from its OWN weightwise
+   arm (R10 4,903,242 / R18 11,173,962 / R18_c100 11,220,132 / R34 21,282,122, all
+   confirmed from live `n_tot`). (b) `analysis/neff_ladder.py fz3` for A3, then put its `s`
+   next to the variance-derived `s` on the same runs and settle FINDINGS 48.13.
+   (c) **The obvious next experiment, and it is cheap:** the free arm was measured at ONE
+   distance from the meta-optimum. §47's mechanism predicts b should vary CONTINUOUSLY with
+   that distance. A meta-stepsize ladder (`--meta-stepsize` 1e-4 / 1e-3 / 1e-2 at the four
+   rungs, ~12 jobs) would turn "frozen vs free" into a curve and make the high-pass-filter
+   reading testable rather than a hypothesis. **Not submitted this tick** — 32 jobs are
+   already in flight and the ladder must report first.
