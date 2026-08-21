@@ -9249,3 +9249,57 @@ denominator of `frac_neg` and reports **20,000,000** for the ResNet34 weightwise
 the true **21,282,122** read from `n_tot` — a 6% error, worth ~0.5% on a slope fitted over
 5 decades, so it does not affect anything above. `probe5_window.py` reads `n_tot` directly
 and does not have this problem.
+
+---
+
+# Cycle 49 — SUBMITTED: the meta-stepsize ladder (CORRECTIONS 52.4's named next experiment)
+
+36 jobs on alice2, `ml5-*`. Both queues were 0/0 when this tick started. Pre-registration is in
+`bin/c49_ms_ladder_p5.sh` and was written **before** submission; the summary here does not
+supersede it.
+
+## 49.1 What it decides
+
+Cycle 48 measured the scale profile at exactly two distances from the meta-optimum: frozen
+(b = 0.343) and free at ms=1e-3 (b = 0.065). CORRECTIONS 47 reads that as a **high-pass filter**
+(suppression 22.92x at k=1, 5.49x at k=775, 0.77x at k=180,225). A filter has a strength.
+**Two points cannot distinguish a dial from a switch.** This ladder varies `--meta-stepsize` over
+{1e-4, 1e-3, 1e-2} x the four rungs x 3 seeds, byte-for-byte the c48 `fr5-*-a3` recipe with that
+one field changed.
+
+**L1, the prediction that can fail:** b falls monotonically with meta-stepsize,
+`b(1e-4) > b(1e-3) > b(1e-2)`, with b(1e-4) in [0.10, 0.30]. **Refuted if** b is non-monotone in
+ms, or the three values are flat to within seed spread — in which case "frozen vs free" is a
+switch, not a dial, and CORRECTIONS 47's filter language must be withdrawn and rewritten as a
+two-state contrast. That is a real outcome, to be written as such and not as a null.
+
+**L0 is the validity gate:** the ms=1e-3 rung re-runs the c48 config at full n=3 and must
+reproduce rho_s(weightwise) = 8.888e-08 within 3x and b = 0.065 within seed spread. It is
+re-run rather than reused so that all three rungs are measured by **one instrument in one batch**
+— cross-batch instrument drift is exactly what CORRECTIONS 51 found in `s`. If L0 fails, nothing
+else in the batch is quoted.
+
+## 49.2 Two things pre-registered so they cannot later be read as results
+
+* **Clip saturation.** `BETA_CLIP=-15:-2.3026` is on every arm. At ms=1e-2 beta moves ~10x faster
+  than the calibrated recipe and may saturate the guard — a clip-saturated arm measures a
+  **clipped process**, not a faster-adapting one (FINDINGS 36.3's confound on a new axis).
+  Mandatory check before quoting the ms=1e-2 column: guard-binding fraction per arm. If it binds
+  on >50% of steps, that column is **CONFOUNDED** and L1 is decided on {1e-4, 1e-3} + the frozen
+  anchor only.
+* **Resolution.** rho_min is set by T and m, not by ms, so c48's floors carry over: weightwise
+  8.5e-09 (resolves), nodewise 7.0e-06 (resolves, thin), layerwise 1.3e-03 (**will not resolve —
+  report as a bound**), blk6 >8.6e-02 (did not resolve even frozen; retained only so b is not a
+  3-point fit). **A layerwise null means "no correlation above rho_s = 1.3e-03", not "no
+  correlation".**
+
+## 49.3 Deviation from the spec, and why
+
+CORRECTIONS 52.4 sized this at "~12 jobs" (n=1). Submitted at **n=3 (36 jobs)** because the
+resolution floors above are quoted for 3 pooled seeds: at n=1 the layerwise bound does not hold
+and every b is a single-draw fit. Still inside the 40-pending cap; queues were empty.
+
+## 49.4 Status
+
+36 submitted, 9 running within a minute, 0 failed. FairShare 0.3339 at submission (the c49/c48
+guard treats it as informational). **Not read until complete** — 36.8 partial-row trap.
