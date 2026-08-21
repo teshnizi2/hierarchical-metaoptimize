@@ -8439,3 +8439,47 @@ nothing, i.e. the gate really is a gate. Blast radius of the patch was checked b
   cosine over the exact 50,000-step horizon.
 * Several arm-B cells are still n=2 because seed 1 was in flight (`i3b-1e6-s2`, `i3b-1e1-s1`,
   `i3bc-1e1-s1` and the 100-ep stragglers). Cells marked n=2 above are provisional.
+
+## 47.7 CONTROL — arm C is single-account, and that is safe (the account effect is +0.11 ±0.08pp)
+
+Arms A and B are split by seed across both accounts (alice s0/s1, alice2 s2) by cycle 45's
+design. **Arm C is not** — `SW_*` and the new `i3c-*` both ran entirely on `salehkaleybars`.
+That is the exact asymmetry that cost CORRECTIONS 10 a whole claim, so it is measured rather
+than assumed. Within-cell, alice2 minus alice, plateau, `epochs_done >= 100`, collapsed seeds
+(`plateau > 50`) excluded:
+
+| stratum | cells | delta (alice2 − alice) | s.e. | t |
+|---|---|---|---|---|
+| arm B only | 5 | **+0.076** | 0.047 | +1.60 |
+| arm A, excluding the unstable 1e-2 cell | 5 | +0.119 | 0.140 | +0.85 |
+| both arms, excluding 1e-2 | 9 | **+0.114** | 0.076 | +1.49 |
+
+**No resolvable account effect**, and the point estimate (+0.11pp) is an order of magnitude
+below what the three-arm comparison turns on (a 0.678pp peak gap, 1–2 decade width
+differences). Arm C's single-account provenance is therefore not a confound at this
+resolution. The one cell excluded, `i3a-1e2`, carries a +3.434pp within-cell spread and a
+cell sd of 2.428 — arm A at lr=1e-2 is simply unstable, on either account.
+
+**Stated as a bound, per CORRECTIONS 33:** this test would resolve an account effect of
+~0.15pp at 2 s.e. It does not exclude one smaller than that. Nothing in 47.1 depends on
+differences that small.
+
+## 47.8 An asymmetry to fix BEFORE extending the three-arm comparison to 300 epochs
+
+Arm C is **horizon-matched**: `COS_TOTAL=50000` is the exact step count of a 100-epoch run.
+Arms A and B carry no schedule at all, so "the same arm at 300 epochs" is well defined for
+them and simply means `--num-epochs 300`. **It is not well defined for arm C.** Running arm C
+for 300 epochs with `COS_TOTAL=50000` finishes the anneal at epoch 100 and then trains at the
+floor LR for 200 more; running it with `COS_TOTAL=150000` is a *different schedule*, not the
+same arm run longer.
+
+So the c46 convergence control (§7 of `docs/IDEA3-robustness.md`) covers arms A and B and
+**cannot be extended to arm C without choosing which of those two things "arm C at 300
+epochs" means.** The defensible choice is `COS_TOTAL=150000` — a practitioner given a
+300-epoch budget re-scales the schedule to it, which is the whole point of a schedule — but
+it must be *chosen and stated*, not defaulted into. Recorded now so the next tick does not
+discover it after submitting.
+
+**Consequence for this cycle:** the three-arm table in 47.1 is a **100-epoch** result and is
+stated as such. If the c46 control returns NOT BUDGET-STABLE for arms A and B, 47.1 does not
+survive by itself either, and the fix is a re-designed arm-C-at-300 batch, not a caveat.
