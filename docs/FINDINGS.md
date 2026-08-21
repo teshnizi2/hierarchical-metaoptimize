@@ -8612,3 +8612,243 @@ So the bottom-end rescue in 47.9 is corroborated by a second, independent metric
 top-end one is too. **The general "MetaOptimize converges faster than a schedule" reading is
 withdrawn** — it is not measurable on this data without a no-warmup cosine arm, which does
 not exist and is not worth 6 jobs to build.
+
+## 48.1 IDEA 3 IS BUDGET-STABLE — the c46 300-epoch convergence control landed complete
+
+All 16 c46 jobs finished. `analysis/idea3_robustness.py` (selftest **37/37**) prints
+**THE SHAPE IS BUDGET-STABLE**, on the matched 4-point extremes sub-grid with the 100-epoch
+metrics RECOMPUTED there (never 7 points against 4):
+
+| alpha0 | A 100ep | A 300ep | delta | B 100ep | B 300ep | delta |
+|---|---|---|---|---|---|---|
+| 1e-6 | 68.680 (n=3) | 78.506 (n=2) | +9.826 | 91.496 (n=3) | 92.154 (n=2) | +0.658 |
+| 1e-5 | 84.518 (n=3) | 86.754 (n=2) | +2.236 | 91.535 (n=3) | 92.347 (n=2) | +0.811 |
+| 1e-2 | 70.541 (n=3) | 70.891 (n=2) | +0.350 | 89.987 (n=3) | 90.417 (n=2) | +0.430 |
+| 1e-1 | no survivor (0/3) | no survivor (0/2) | — | 83.596 (n=2, 1 div) | 86.001 (n=2, 0 div) | +2.406 |
+
+| | A 100ep | A 300ep | B 100ep | B 300ep |
+|---|---|---|---|---|
+| width ≤1pp of own best | 0.0 | 0.0 | 1.0 | 1.0 |
+| width ≤2pp of own best | 0.0 | 0.0 | 4.0 | 4.0 |
+
+Band membership, **both** widths and the A-vs-B ordering are identical at the two budgets.
+Per `docs/IDEA3-robustness.md` §7 this was the gate on everything: **the 100-epoch sweep is
+now a valid basis for the robustness claim**, and CORRECTIONS 38/41's "NOT FINAL" is lifted.
+
+**(B3) the startup-tax refund is NOT resolvable.** Arm B's 300ep gain is +0.658pp at
+alpha0=1e-6 against +0.430pp at 1e-2 — a differential of **+0.228pp**, inside the reducer's
+own 0.3pp resolution floor at n=2. The predicted mechanism (arm B must first grow its own
+step size, so a longer budget should help it MORE at the bottom) is **not measurable here**,
+and is recorded as a null with its resolution, not as an absence.
+
+## 48.2 THE THREE-ARM VERDICT FLIPS AGAIN, IN ARM B's FAVOUR — and 47.9 is superseded
+
+The 10 c47 arm-C jobs landed. **Arm C now has all seven grid points**, so the shared
+sub-grid is the FULL grid, not {1e-5..1e-2}. Re-derived with `analysis/idea3_threearm.py`
+(selftest **34/34 → 45/45**), diverged seeds excluded from cell means and from every band:
+
+| full 7-point shared grid | A fixed | B meta m=6 | C cosine |
+|---|---|---|---|
+| peak plateau | 91.796 | 93.304 | **94.077** |
+| worst plateau | 68.680 | **83.596** | 53.051 |
+| width ≤1pp of own best | 0.477 | 0.000 | **0.523** |
+| width ≤2pp / ≤3pp | 1.000 | **3.000** | 2.000 |
+| width above 90 | 0.477 | **3.000** | 2.000 |
+| width above 85 | 1.000 | **4.000** | 2.000 |
+| cells with a divergence | 1 | 1 | 0 |
+
+**WHAT CHANGED, AND IT IS NOT NEW ARM-B DATA.** Every arm-B cell is byte-identical to
+47.9's. The widths moved because a cross-arm width is only defined on the **shared** grid,
+and when arm C had no cell at 1e-6 arm B's in-band run `[1e-6 .. 1e-3]` was **truncated** to
+`[1e-5 .. 1e-3]`. Arm C's two new extreme cells do not enter any band themselves (63.333 and
+53.051, both far out of every band) — they simply let arm B's own 1e-6 cell be counted.
+
+**This is a general trap and it has now bitten this campaign once.** An incomplete arm is
+not only a measurement about itself: it silently shortens every other arm's band. Recorded
+as a standing rule in CORRECTIONS 43.
+
+Threshold scan on the complete grid — and it is far more stable than 47.9's:
+
+| floor | A fixed | B meta | C cosine | ranking |
+|---|---|---|---|---|
+| ≥84.0 | 2.000 | **4.000** | 2.000 | B>C |
+| ≥86.0 / ≥88.0 / ≥89.0 / ≥89.5 | 1.000 | **4.000** | 2.000 | B>C |
+| ≥90.0 | 0.477 | **3.000** | 2.000 | B>C |
+| ≥91.0 | 0.477 | **3.000** | 2.000 | B>C |
+| ≥92.0 | 0.000 | 0.523 | **2.000** | C>B |
+
+**7 of 8 rows say B>C**; only the ≥92 row, which is above arm B's entire curve except its
+peak, says C>B. The scan must still be shown (the ranking is not literally invariant), but
+"B=C at 90–91", the reading 47.9 was built on, is **gone**.
+
+## 48.3 THE THRESHOLD-FREE COMPARISON — the one number in this file with no dial on it
+
+Both width families have a free parameter (a tolerance, or a floor), and CORRECTIONS 41(c)
+requires a scan for each. Two statistics have no parameter at all, and they are what a
+practitioner drawing alpha0 blind actually faces. Added to `idea3_threearm.py` this cycle
+with 11 new selftest assertions:
+
+| | A fixed | B meta | C cosine |
+|---|---|---|---|
+| grid mean, survivors (6 pts, 1e-6..1e-2) | 82.793 | **91.723** | 86.782 |
+| grid worst, survivors | 68.680 | **89.987** | 63.333 |
+| grid mean, face value (7 pts, collapses at their actual score) | 72.765 | **87.058** | 81.963 |
+| grid worst, face value | 12.598 | **59.064** | 53.051 |
+
+**B − C = +4.941 pp (survivors) and +5.094 pp (face value).** The two conventions differ in
+whether a collapsed seed is averaged in, and they agree to 0.15pp — so the conclusion does
+not depend on that choice either. `1e-1` is dropped from the survivor grid because arm A has
+no surviving seed there; the drop is printed, not silent.
+
+**The honest headline for IDEA 3, and it now has no caveat about a dial:** *MetaOptimize's
+peak is 0.773pp below a tuned cosine on-grid and 1.113pp below the true tuned baseline
+94.417 ±0.113 (n=5), but averaged over a 7-decade alpha0 grid it is ~5pp AHEAD of that same
+cosine. You pay ~1.1pp of peak for ~5pp of expected accuracy under an unlucky step size.*
+
+## 48.4 The c47 pre-registration C1/C2/C3, scored
+
+| | predicted | measured | verdict |
+|---|---|---|---|
+| C1 | C(1e-6) < 70 | **63.333 ±0.554 (n=3)** | CONFIRMED — but 47.4 flagged it as near-forced, so it is not scored as a success |
+| C2 | C(1e-1) ∈ [20, 85] | **53.051 ±3.231 (n=3)** | CONFIRMED |
+| C3 | B 4.0 vs C 2.0 decades above 90 | B **3.000** vs C **2.000** | invalidated mid-flight by a 0.013pp move in `i3b-1e2`, already recorded in 47.11; the DIRECTIONAL part (B>C above 90 by ≥1 decade) is **CONFIRMED on the full grid** |
+
+**C2 also produced an unpredicted contrast worth its own line.** At alpha0 = 1e-1 arm A has
+**3 of 3 seeds collapse** and no survivor at all, while arm C has **0 of 3** and scores
+53.051. The two arms differ only in the schedule, so the 20-epoch linear warmup is what
+prevents outright divergence at a catastrophic peak LR — it does not make the run usable.
+
+## 48.5 DIRECTION C HEADLINE — the scale profile SURVIVES the heterogeneity correction: outcome (b)
+
+All 8 c47 PROBE5 jobs completed and wrote `neg_counts.json` at n_records = 2000.
+`analysis/probe5_floor.py` (selftest **15/15**), written and validated before the data:
+
+| rung | n_tot | H (tau=1) | H (tau pooled) | rho_s corrected | rho_min | resolved |
+|---|---|---|---|---|---|---|
+| blk6 s0/s1 | 6 | 0.9116 / 0.9059 | 0.9400 / 0.9399 | 2.372e-02 / 2.571e-02 | 9.50e-02 / 1.04e-01 | **NO** |
+| layerwise s0/s1 | 62 | 0.8066 / 0.8032 | 0.8323 / 0.8281 | 2.780e-02 / 3.003e-02 | 6.94e-03 / 6.80e-03 | YES |
+| nodewise s0/s1 | 14,420 | 0.9809 / 0.9807 | 1.0000 | 1.496e-03 / 1.901e-03 | 3.81e-05 | YES |
+| weightwise s0/s1 | 11,173,962 | 0.9975 / 0.9974 | 1.0000 | 8.073e-06 / 9.945e-06 | 5.48e-08 | YES |
+
+**Pre-registered sanity check (0) PASSES:** H ≤ 1 on every rung, and
+H(weightwise) = 0.9975 > H(blk6) = 0.9116 — the coarse arm is the more heterogeneous one,
+as the confound argument required.
+
+**Two things the table says that the pre-registration did not anticipate.**
+1. **The confound is BOUNDED, not just corrected, at the two fine rungs.** Even at tau = 1,
+   which deliberately *over*-states heterogeneity, H(weightwise) = 0.9975 and
+   H(nodewise) = 0.9809. So the floor bias can be at most **0.25%** and **1.9%** there —
+   the k=1 → k=775 leg of the profile is essentially uncontaminated by construction.
+2. **Heterogeneity is NOT monotone in group size.** It peaks at layerwise (H = 0.803–0.807),
+   not at blk6 (H = 0.906–0.912). That contradicts the intuition the confound argument was
+   built on — but blk6's H is estimated from **6 coordinates**, where the estimator's own
+   sd is ~1.26× its sampling term, so it is not resolvable and must not be read as a
+   reversal. Recorded as unresolved, not as evidence.
+
+**The verdict, against the c44 pre-registration.** Uncorrected → corrected on the SAME data,
+steady half, geometric mean over seeds:
+
+| | k=1 | k=775 | k=180,225 | span | b in rho_w ~ k^-b |
+|---|---|---|---|---|---|
+| uncorrected floor | 3.200e-06 | 1.130e-06 | 1.934e-08 | 165.5x | 0.412 |
+| **corrected floor** | 3.200e-06 | 1.133e-06 | **4.620e-08** | **69.3x** | **0.343** |
+
+The correction bites only at layerwise (it is below resolution at the two fine rungs and
+unresolvable at blk6), and it removes **58% of the excess log-span** — exactly the direction
+FINDINGS 44.5 refused to claim a profile without. **It does not remove the profile.**
+69.3x is 23x above the pre-registered (a) "flat to within 3x" and 6.9x above the (b)
+threshold of 10x. **OUTCOME (b): the correlation length is REAL.** FINDINGS 44.5's
+provisional short-range reading is no longer provisional.
+
+## 48.6 The 4.2x disagreement with FINDINGS 44.3 is a WINDOW, and the steady half REPRODUCES it to 3–8%
+
+`probe5_floor.py --profile` reduces the FULL run and reported rho_s(weightwise) =
+8.073e-06 / 9.945e-06. FINDINGS 44.3 reported **1.925e-06** for `fz-w-a3`, whose `ARGS` are
+byte-matched to `p5-w-a3` except `PROBE=100` vs `PROBE=5`. A 4.2x disagreement between two
+byte-matched configurations is not something to quote around.
+
+**It is entirely the window.** 44.3 reduced the STEADY HALF; probe5_floor defaults to the
+whole run, which includes the startup transient.
+
+| | rho_s (weightwise) | vs 44.3's 1.925e-06 |
+|---|---|---|
+| p5-w-a3-s0, steady half | **1.991e-06** | +3.4% |
+| p5-w-a3-s1, steady half | **2.085e-06** | +8.3% |
+| p5-w-a3, full run | 8.073e-06 / 9.945e-06 | +319% / +417% |
+
+So this is an **independent-batch reproduction** of a published campaign number to within
+3–8%, from a different job, a different sampling rate and a different reducer — the
+strongest calibration evidence the instrument has. And the full-run inflation is measured,
+not assumed: **~4.2x**.
+
+## 48.7 The WINDOW SCAN — the profile verdict does not depend on the window
+
+`analysis/probe5_window.py`, new this cycle, selftest **33/33 PASS** (window slicing,
+dirname parsing for both layouts, per-family n_weights, geometric means, power-law recovery
+on synthetic k^-b data, the pre-registered (a)/(b) boundaries checked ON the boundary, and
+the exclusion-and-report of unresolved rungs):
+
+| window | span | b | k=1 | k=775 | k=180,225 | k=1,862,327 |
+|---|---|---|---|---|---|---|
+| full | 53.4x | 0.324 | 1.408e-05 | 3.428e-06 | 2.637e-07 | not resolved |
+| **steady .5–1** | **69.3x** | **0.343** | 3.200e-06 | 1.133e-06 | 4.620e-08 | not resolved |
+| startup 0–.25 | 520.0x | 0.413 | 3.322e-05 | 6.778e-06 | 5.882e-07 | 6.387e-08 |
+
+**Outcome (b) in every window** → STABLE ACROSS WINDOWS; no window choice is a selection.
+**Quote the steady half**: it is the window 44.3 used, it is the regime the 1/√N noise model
+is a claim about, and it is the most conservative of the three that resolves every rung.
+
+**The blk6 rung is a null WITH ITS RESOLUTION, per CORRECTIONS 33.** On the steady half its
+rho_s goes *negative* (−3.07e-02, −2.58e-02) against rho_min = 2.28e-02 / 8.57e-02 — 6
+coordinates is simply too few. It resolves only on the startup window, where the profile
+extends to **four rungs over 6.3 decades of k**. Do not report a blk6 absence.
+
+**Also fixed in the new reducer, before it can bite:** `probe5_floor.py` hardcodes
+`N_WEIGHTS_R18 = 11,173,962`. `k = n_weights / n_tot` is the profile's x-axis, so that
+constant would rescale the whole ResNet10 and ResNet34 curves in the batch submitted this
+cycle. `probe5_window.py` takes each family's n_weights from **that family's own weightwise
+arm's n_tot** (the weightwise partition has one group per parameter) and REFUSES a family
+that has no weightwise arm rather than substituting another model's count. It never reads
+`block_sizes.json` (CORRECTIONS 16).
+
+## 48.8 Ops — PATCH_PROBE5 is now on both accounts, and 32 jobs are in flight
+
+* `patches/patch_probe5.py` + `patches/patch_probe5_fix.py` applied to **alice**'s HF.py
+  (backed up to `HF.py.bak.pre_probe5` first). `tests/test_probe5_block.py` run against the
+  **live** file, which executes the shipped bytes rather than reading them: **10/10 PASS**.
+  Both accounts can now run PROBE5.
+* **Submitted 32 jobs, both queues were at 0/0 beforehand, nothing cancelled.**
+  `bin/c48_frozen_ladder_p5.sh` **20 on alice** (`4701789-4701808`) — the frozen ladder,
+  finally submittable because it now carries `PROBE5=1` and `PROBE=5` (c43 as written
+  exported `PROBE=100` and no PROBE5, so its 30 runs could not have carried the floor
+  correction and could not have been corrected afterwards).
+  `bin/c48_free_profile_p5.sh` **12 on alice2** (`4701809-4701820`) — the FREE-beta profile.
+* **Account assignment is by comparator, and it is the reverse of c43's.** The frozen ladder
+  goes to alice because its comparators are the free-beta families `p7-r18-*` / `p7-c100-*`,
+  which ran on alice. The free-beta profile goes to alice2 because its comparator is the
+  frozen `p5-*-a3` batch, which ran on alice2. c43 specified alice2 to match `fz-*`, which
+  is the wrong pairing for the question the batch now answers.
+* **Seeds: 2 on the ladder (not c43's 3), 3 on the free batch (not 2).** Measured seed
+  spread of rho_w on the R18 batch is 3% at layerwise and 21% at weightwise against a 69x
+  effect, so the ladder's third seed buys nothing and costs 10 jobs. The free batch needs 3
+  because pooling seeds is the only lever on its layerwise resolution (see 48.9).
+* CSV **1525 runs** (985 + 690), +20 since cycle 47. Queues after submit: alice 8P/12R,
+  alice2 3P/9R. FairShare 0.333054 / 0.333893 — informational only per CORRECTIONS 37.
+
+## 48.9 The free-beta batch's resolution, computed BEFORE it ran
+
+Per CORRECTIONS 33's standing rule. Taking the measured frozen steady-half rho_s and
+dividing by FINDINGS 44.3's measured free/frozen ratio of 22.8x:
+
+| rung | rho_min (measured, T=1000 steady) | predicted free rho_s | verdict |
+|---|---|---|---|
+| weightwise | 8.5e-09 | 8.7e-08 | ~10 sigma — RESOLVES |
+| nodewise | 7.1e-06 | 2.4e-05 | ~3.4x — RESOLVES |
+| layerwise | 1.3e-03 | 2.3e-04 | **0.18x — WILL NOT RESOLVE** |
+| blk6 | >8.6e-02 | n/a | did not resolve even FROZEN |
+
+**So prediction B1 was deliberately written on the k=1 → k=775 leg**, where resolution is
+assured (frozen, that leg falls 2.82x). Pooling the 3 seeds improves the layerwise rho_min
+to ~7.4e-04, still 3x above the predicted value. **A layerwise null in that batch will mean
+"no correlation above rho_s = 1.3e-03", not "no correlation"**, and must not be written as
+an absence. This is the resolution stated next to the null before the null exists.

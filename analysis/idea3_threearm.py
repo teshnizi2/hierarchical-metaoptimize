@@ -215,6 +215,47 @@ def summarise(arm, subgrid, out=sys.stdout, floors=(90.0, 85.0)):
     return res
 
 
+def threshold_free(raw, subgrid, survivable):
+    """The two robustness statistics with NO tolerance and NO floor to choose.
+
+    WHY.  CORRECTIONS 41(c) made it a standing rule that a threshold result must carry its
+    sensitivity scan.  The B-vs-C absolute-floor ranking does not survive that scan (B>C at
+    floors <=91, C>B at 92), and the scale-free family has its own free parameter, the
+    tolerance.  Every number in the head-to-head table therefore has a dial on it.  These
+    two do not, and they are what a practitioner actually faces:
+
+      GRID MEAN (survivors)  -- mean of the per-cell survivor means over the sub-grid where
+        every arm has at least one surviving seed.  This is the campaign's standing
+        `plateau > 50` convention (CORRECTIONS 39) applied unchanged, so it is comparable
+        to every cell mean printed above.
+      GRID MEAN (face value) -- mean over ALL seeds at the number they actually scored,
+        collapses included, over the whole shared sub-grid.  This is the expected accuracy
+        of drawing alpha0 blind from the grid.  A method that collapses on some seeds
+        SHOULD be punished here; that is the point of reporting it.
+
+    The two answer different questions and can disagree, so both are returned and both are
+    printed.  Returns None if any arm is missing a cell on the requested sub-grid.
+    """
+    surv, face = [], []
+    for g in survivable:
+        vals = raw.get(g)
+        if not vals:
+            return None
+        ok = [v for v in vals if v > DIVERGED]
+        if not ok:
+            return None
+        surv.append(sum(ok) / len(ok))
+    for g in subgrid:
+        vals = raw.get(g)
+        if not vals:
+            return None
+        face.append(sum(vals) / len(vals))
+    if not surv or not face:
+        return None
+    return dict(surv_mean=sum(surv) / len(surv), surv_min=min(surv), surv_n=len(surv),
+                face_mean=sum(face) / len(face), face_min=min(face), face_n=len(face))
+
+
 def main(path):
     rows = load(path)
     A = collect(rows, ("i3a-",), 100)
@@ -278,6 +319,37 @@ def main(path):
         print("     threshold and show this scan.  Quoting one row of it is a selection.")
     else:
         print(f"  -> the B-vs-C ranking is threshold-stable at {distinct[0]} over 84..92.")
+
+    # ---- threshold-FREE statistics.  The scan above shows the absolute-floor ranking is
+    # not threshold-stable and the own-best family has a tolerance dial.  These have no
+    # dial at all, so they cannot be selected -- report them next to any width claim.
+    survivable = [g for g in shared
+                  if all(any(v > DIVERGED for v in raw.get(g, [])) for raw in (A, B, C))]
+    tfA = threshold_free(A, shared, survivable)
+    tfB = threshold_free(B, shared, survivable)
+    tfC = threshold_free(C, shared, survivable)
+    print("\n=== THRESHOLD-FREE (no tolerance, no floor -- nothing here can be selected) ===")
+    if not (tfA and tfB and tfC):
+        print("  NOT DECIDABLE -- an arm is missing a cell on the shared sub-grid.")
+    else:
+        dropped = [g for g in shared if g not in survivable]
+        print(f"  survivor sub-grid ({tfA['surv_n']} pts): "
+              f"{' '.join(survivable) if survivable else '(none)'}"
+              + (f"   DROPPED (an arm has no survivor): {' '.join(dropped)}" if dropped else ""))
+        print(f"  face-value sub-grid ({tfA['face_n']} pts): {' '.join(shared)}")
+        hdr2 = f"{'':26}{'A fixed':>10}{'B meta':>10}{'C cosine':>10}"
+        print(hdr2)
+        for key, lab in (("surv_mean", "grid mean, survivors"),
+                         ("surv_min", "grid worst, survivors"),
+                         ("face_mean", "grid mean, face value"),
+                         ("face_min", "grid worst, face value")):
+            print(f"{lab:26}{tfA[key]:10.3f}{tfB[key]:10.3f}{tfC[key]:10.3f}")
+        for key, lab in (("surv_mean", "survivors"), ("face_mean", "face value")):
+            d = tfB[key] - tfC[key]
+            print(f"  B - C on grid mean ({lab}): {d:+.3f} pp "
+                  f"-- {'MetaOptimize' if d > 0 else 'the tuned cosine'} is ahead "
+                  f"averaged over the grid.")
+        print("  This is the one robustness comparison in this file with no free parameter.")
 
     print("\n=== VERDICT ===")
     # B vs C is the claim that matters: does meta-learning the step size buy
@@ -395,6 +467,36 @@ def _selftest():
     mh = {"1e-6": 91.0, "1e-5": 91.0, "1e-4": 99.0}
     chk("floor width ignores peak", width(mh, GRID, 90.0)[0], 2.0)
     chk("own-best width punishes peak", width(mh, GRID, 99.0 - 1.0)[0], 0.0)
+
+    # ---- threshold-free statistics (cycle 48).  These exist because the absolute-floor
+    # ranking is not threshold-stable; if THEY could be gamed by a dial the fix would be
+    # worthless, so the cases below are the ones where a careless implementation differs.
+    A_ = {"1e-6": [90.0, 90.0], "1e-5": [92.0, 92.0], "1e-1": [10.0, 10.0]}
+    B_ = {"1e-6": [80.0, 80.0], "1e-5": [82.0, 82.0], "1e-1": [70.0, 90.0]}
+    sub = ["1e-6", "1e-5", "1e-1"]
+    survivable = [g for g in sub
+                  if all(any(v > DIVERGED for v in raw.get(g, [])) for raw in (A_, B_))]
+    chk("TF survivable drops the all-collapsed cell", survivable, ["1e-6", "1e-5"])
+    tfa = threshold_free(A_, sub, survivable)
+    tfb = threshold_free(B_, sub, survivable)
+    # A: survivors over {1e-6,1e-5} = mean(90, 92) = 91.  Face value over all three
+    # includes the 10.000 collapses: mean(90, 92, 10) = 64.
+    chk("TF A survivor mean", round(tfa["surv_mean"], 6), 91.0)
+    chk("TF A face mean", round(tfa["face_mean"], 6), 64.0)
+    chk("TF A survivor grid uses 2 pts", tfa["surv_n"], 2)
+    chk("TF A face grid uses 3 pts", tfa["face_n"], 3)
+    # B has ONE surviving seed at 1e-1 (90.0), so that cell is survivable-for-B but the
+    # sub-grid is shared, so it is still dropped -- the comparison must be like for like.
+    chk("TF B survivor mean on the SHARED survivor grid", round(tfb["surv_mean"], 6), 81.0)
+    # ...and B's face value keeps the 70/90 pair at face value: (80+82+80)/3 = 80.667
+    chk("TF B face mean", round(tfb["face_mean"], 6), round((80 + 82 + 80) / 3, 6))
+    chk("TF worst is over the same sub-grid as the mean", round(tfa["surv_min"], 6), 90.0)
+    chk("TF face worst includes collapses", round(tfa["face_min"], 6), 10.0)
+    # a cell missing from an arm makes the statistic undefined rather than silently
+    # averaging over a different grid than the other arm
+    chk("TF missing cell -> None", threshold_free({"1e-6": [90.0]}, sub, survivable), None)
+    chk("TF all-collapsed survivable cell -> None",
+        threshold_free({"1e-6": [10.0], "1e-5": [92.0], "1e-1": [10.0]}, sub, survivable), None)
 
     print(f"selftest: {ok}/{ok + fail} PASS")
     return 0 if fail == 0 else 1

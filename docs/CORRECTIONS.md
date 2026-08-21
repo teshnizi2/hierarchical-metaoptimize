@@ -1281,3 +1281,157 @@ been.
 is material (**H = 0.833 at m=6**), and could not be corrected afterwards. Header now carries
 the required change and the resolution table that motivates it. Held deliberately so the
 8-job PROBE5 batch reports first.
+
+## 42. IDEA 3 is BUDGET-STABLE — the "NOT FINAL" hold on §38 and §41 is LIFTED (cycle 48)
+
+CORRECTIONS 38 and 41 both closed with the same caveat: *"nothing about IDEA 3 is final
+until `analysis/idea3_robustness.py` prints BUDGET-STABLE"*, and
+`docs/IDEA3-robustness.md` §7 said a NOT BUDGET-STABLE verdict would invalidate the
+100-epoch sweep outright rather than merely qualify it. All 16 c46 jobs have now landed and
+the reducer prints **THE SHAPE IS BUDGET-STABLE**: on the matched 4-point extremes sub-grid,
+band membership, both widths and the A-vs-B ordering are identical at 100 and 300 epochs
+(FINDINGS 48.1). The 100-epoch grid stands.
+
+The pre-registered mechanism it was designed to catch — arm B's startup tax, which should
+make a longer budget help arm B *more* at the bottom of the grid — reads **+0.228pp**
+differential, inside the reducer's own **0.3pp** resolution floor at n=2. Recorded as a null
+with its resolution, not as an absence (§33's standing rule).
+
+## 43. §41(b)'s successor claim is WITHDRAWN: a cross-arm width is only defined on the SHARED grid, and an incomplete arm truncates the OTHER arms (cycle 48)
+
+**What FINDINGS 47.9 concluded, and what is wrong with it.** 47.9, written on the
+{1e-5..1e-2} sub-grid that was all arm C then had, said: *"MetaOptimize is not more robust
+than a tuned cosine on any threshold-stable measure"* — losing at 1pp, tying at 2pp/3pp,
+and tying at absolute floors 90–91. Arm C's two extreme cells landed this cycle. On the
+complete 7-point grid the same reducer, on **byte-identical arm-B data**, gives:
+
+| | A fixed | B meta | C cosine |
+|---|---|---|---|
+| width ≤2pp / ≤3pp of own best | 1.000 | **3.000** | 2.000 |
+| width above 90 / above 91 | 0.477 | **3.000** | 2.000 |
+| threshold scan 84→92 | — | B>C on 7 of 8 rows | C>B only at ≥92 |
+
+**The cause is not new arm-B data — it is the shared-grid restriction.** Arm B's in-band run
+`[1e-6 .. 1e-3]` was silently truncated to `[1e-5 .. 1e-3]` while arm C had no cell at
+1e-6. Arm C's new cells (63.333 at 1e-6, 53.051 at 1e-1) are far outside every band and
+enter none of them; they only make arm B's own 1e-6 cell countable.
+
+| claim | status |
+|---|---|
+| "MetaOptimize is not more robust than a tuned cosine on any threshold-stable measure" (47.9 / §41) | **WITHDRAWN.** It wins at 2pp and 3pp tolerance and at every absolute floor from 84 to 91. |
+| "B=C at floors 90–91" (§41's scan) | **SUPERSEDED** — B>C at both, by 1.0 decade. |
+| "the B-vs-C ranking is not threshold-stable" (§41(c)) | **STANDS**, weakened: 7 of 8 rows now agree. The scan must still be shown. |
+| "MetaOptimize loses at the 1pp tolerance" | **STANDS** — 0.000 vs 0.523 decades. Its curve has a sharp peak at 3e-4 and is flat only in the tails. |
+| MetaOptimize's peak cost | **STANDS at 1.113pp** below 94.417 ±0.113 (n=5). Unchanged. |
+
+**NEW STANDING RULE, and it generalises §33 and §41(c) again.** *A cross-arm width, band or
+ranking is defined only on the sub-grid where every arm has a measurement. An arm with a
+missing cell is therefore not only an incomplete measurement of itself — it silently
+shortens every other arm's band. Before comparing widths, print the shared grid and the
+union grid, and treat any difference between them as a pending correction to the table.*
+`idea3_threearm.py` already prints both lines; nobody had read them against each other.
+
+This is the third revision of the IDEA 3 verdict (47.1 → 47.9 → 48.2). All three were
+arithmetic on incomplete grids, and each is superseded by more data rather than by a
+mistake. That is not a defect in the method — but it is why §44's dial-free statistic
+should be the one quoted.
+
+## 44. The IDEA 3 comparison now has a statistic with NO free parameter, and it favours MetaOptimize by ~5pp (cycle 48)
+
+Every width in §38, §41 and §43 has a dial on it — a tolerance, or a floor — and each
+revision above moved a band edge without moving any underlying accuracy. §41(c) demanded a
+sensitivity scan; the better answer is a statistic that cannot be scanned.
+
+`analysis/idea3_threearm.py` (selftest 34/34 → **45/45**) now reports the grid mean and grid
+worst under two conventions, over the shared grid (FINDINGS 48.3):
+
+| | A fixed | B meta | C cosine |
+|---|---|---|---|
+| grid mean, survivors (6 pts) | 82.793 | **91.723** | 86.782 |
+| grid mean, face value (7 pts, collapses at their actual score) | 72.765 | **87.058** | 81.963 |
+
+**B − C = +4.941 pp and +5.094 pp.** The two conventions differ in whether a collapsed seed
+is averaged in and they agree to 0.15pp, so the conclusion does not depend on that choice
+either.
+
+**The sentence to write, and it needs no caveat about a threshold:** *MetaOptimize's peak is
+0.773pp below a tuned cosine on-grid and 1.113pp below the true tuned baseline
+94.417 ±0.113, but averaged over a 7-decade alpha0 grid it is ~5pp ahead of that same
+cosine. You pay ~1.1pp of peak for ~5pp of expected accuracy under an unlucky step size.*
+
+## 45. FINDINGS 44.5's "NOT CLAIMED" scale profile is now CLAIMED — outcome (b), corrected and window-scanned (cycle 48)
+
+FINDINGS 44.5 and CORRECTIONS 34 both refused to read the falling scale profile as a
+correlation length, because the pooled independence floor is biased in exactly the direction
+that manufactures one. The 8-job PROBE5 batch measures the bias and removes it. Steady half,
+geometric mean over seeds, `analysis/probe5_floor.py` (15/15) and the new
+`analysis/probe5_window.py` (**33/33**):
+
+| | k=1 | k=775 | k=180,225 | span | b in rho_w ~ k^-b |
+|---|---|---|---|---|---|
+| uncorrected floor | 3.200e-06 | 1.130e-06 | 1.934e-08 | 165.5x | 0.412 |
+| **corrected floor** | 3.200e-06 | 1.133e-06 | **4.620e-08** | **69.3x** | **0.343** |
+
+| claim | status |
+|---|---|
+| "the scale profile is confounded and is NOT claimed" (FINDINGS 44.5, CORRECTIONS 34) | **RESOLVED — the confound is real and it is not enough.** It removes 58% of the excess log-span and leaves 69.3x, against a pre-registered (a) threshold of 3x and (b) threshold of 10x. |
+| pre-registered outcome (b), "the correlation length is REAL" | **CONFIRMED**, and window-stable: (b) in all three of full / steady / startup (53.4x / 69.3x / 520x). |
+| "heterogeneity grows with group size", the premise of the confound argument | **PARTLY REFUTED and it does not matter.** H peaks at layerwise (0.803), not blk6 (0.906). But blk6's H is estimated from 6 coordinates and is unresolvable, so this is recorded as unresolved, not as a reversal. |
+| the two fine rungs are contaminated | **BOUNDED AWAY.** At tau=1, which over-states heterogeneity, H = 0.9975 (weightwise) and 0.9809 (nodewise) — the bias is at most 0.25% and 1.9%, so the k=1→775 leg is uncontaminated by construction. |
+| the blk6 rung | **NULL WITH ITS RESOLUTION.** Steady-half rho_s goes negative (−3.07e-02) against rho_min 2.28e-02. Do not report a blk6 absence. |
+
+**And the instrument is now calibrated against a previously published campaign number.**
+`probe5_floor.py --profile` reduces the FULL run and disagreed with FINDINGS 44.3 by 4.2x on
+a byte-matched configuration. That disagreement is **entirely the window**: on the steady
+half, `p5-w-a3` reads 1.991e-06 / 2.085e-06 against 44.3's independently measured
+**1.925e-06** — **+3.4% / +8.3%**, from a different job, a different sampling rate and a
+different reducer (FINDINGS 48.6).
+
+**NEW STANDING RULE.** *A time window is a dial exactly like a threshold. A statistic
+computed on a window may not be reported until it has been recomputed across the campaign's
+window set (full / steady half / startup quarter) and either shown stable or reported as a
+scan.* This is §41(c) extended from thresholds to windows, and it is enforced in code:
+`analysis/probe5_window.py` prints the scan and refuses to declare a verdict stable unless
+every window agrees. Had the full-run window been quoted alone, the campaign would have
+published a rho_s 4.2x above its own earlier measurement without noticing.
+
+## 46. DECISION RECORD — cycle 48
+
+1. **IDEA 3 IS FINISHED at R18/CIFAR-10/m=6 and it is a POSITIVE result, not a split.**
+   The budget gate cleared (§42), the grid completed, and the dial-free statistic says
+   MetaOptimize is **+4.94pp ahead of a tuned cosine averaged over the alpha0 grid** while
+   paying 1.113pp of peak (§44). Every earlier "not more robust" sentence is withdrawn
+   (§43). **No further IDEA 3 jobs at this configuration** — the remaining question is
+   whether it generalises to another model or optimizer, which is a bigger spend than the
+   evidence currently justifies against Direction C.
+2. **Direction C IS the project, and its structural result is now claimed rather than
+   withheld.** Per-weight meta-gradient sign correlation is nonzero and **short-range**:
+   rho_w ~ k^-0.343 over 5.3 decades of block size, 69.3x fall, corrected for the
+   heterogeneity confound that FINDINGS 44.5 refused to publish without, and stable across
+   the window scan (§45). The 1/sqrt(N) noise-averaging assumption that justifies coarse
+   granularity across the Adam-mini / Adalayer / SGG line is violated, and the violation is
+   scale-dependent.
+3. **The single biggest threat to that claim is that it is measured with beta FROZEN**, i.e.
+   off the meta-optimum, while every method it is aimed at adapts. FINDINGS 44.3 measured
+   that adaptation changes the system qualitatively (85%/15%/0.7% bias/common/independent →
+   4%/46%/52%, rho down 22.8x). **12 jobs on alice2 test whether the profile survives
+   adaptation** — with the refutation, its consequence for the paper's framing, and the
+   layerwise rung's resolution all pre-registered in the script header before submission
+   (FINDINGS 48.9). If it refutes, the claim narrows to "before the step size adapts" and
+   that is still publishable; it must be written as that, not as a null.
+4. **The second threat is that it is one architecture and one dataset.** **20 jobs on alice**
+   carry the corrected profile and the frozen N_eff exponent to ResNet10, ResNet34 and
+   CIFAR-100. This is c43's batch, finally submittable because it now exports `PROBE5=1` and
+   `PROBE=5`; as written it could not have carried the correction and could not have been
+   corrected afterwards.
+5. **Ideas 1 and 2 stay dead.** Zero jobs spent on either, this cycle and the previous four.
+6. **Submitted 32 jobs across two accounts, both queues were empty beforehand, nothing
+   cancelled.** PATCH_PROBE5 + its fix were applied to alice and verified against the live
+   file with `tests/test_probe5_block.py` (10/10, executes the shipped bytes).
+7. **Next tick, in order.** (a) Reduce `fr5-*` with `probe5_window.py` and score B0/B1/B2 —
+   **B0 is a validity gate: if steady-half rho_s(weightwise) is not within 3x of 8.458e-08,
+   nothing else in that batch may be quoted.** (b) Reduce `fz3-*` per family, scoring
+   A0/A1/A2, and remember that each family's n_weights must come from its own weightwise
+   arm. (c) Run `analysis/neff_ladder.py fz3` for A3. (d) `ep_to_85` has not been re-derived
+   with arm C's two new extreme cells; 47.12's arm-C column is still n=2 and still
+   warmup-confounded. (e) Nothing else in IDEA 3.

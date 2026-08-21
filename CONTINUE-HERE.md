@@ -48,6 +48,77 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 48) -- IDEA 3 CLOSES POSITIVE; DIRECTION C's PROFILE IS CLAIMED
+
+**Read `docs/CORRECTIONS.md` 42-46 and `docs/FINDINGS.md` 48.1-48.9 before quoting any
+number below. 48.2 SUPERSEDES 47.9's table and 48.6 supersedes any full-run rho_s.**
+
+* **IDEA 3 is BUDGET-STABLE and it is FINISHED at R18/CIFAR-10/m=6.** All 16 c46 300-epoch
+  jobs landed; `analysis/idea3_robustness.py` (37/37) prints **THE SHAPE IS BUDGET-STABLE**.
+  CORRECTIONS 38/41's "NOT FINAL" hold is lifted. **No further IDEA 3 jobs.**
+* **THE VERDICT FLIPPED AGAIN, IN ARM B's FAVOUR, and NOT because of new arm-B data.**
+  Arm C completed at 1e-6 and 1e-1, so the shared sub-grid is now the FULL 7 points. Arm B's
+  in-band run `[1e-6..1e-3]` had been silently TRUNCATED to `[1e-5..1e-3]` while arm C had
+  no 1e-6 cell. On complete data, n=3 (A,B) / n=2-4 (C):
+
+  | full 7-pt grid | A fixed | B meta m=6 | C cosine |
+  |---|---|---|---|
+  | peak | 91.796 | 93.304 | **94.077** |
+  | worst | 68.680 | **83.596** | 53.051 |
+  | width <=1pp of own best | 0.477 | 0.000 | **0.523** |
+  | width <=2pp / <=3pp | 1.000 | **3.000** | 2.000 |
+  | width above 90 / 91 | 0.477 | **3.000** | 2.000 |
+  | **grid mean, survivors (no dial)** | 82.793 | **91.723** | 86.782 |
+  | **grid mean, face value (no dial)** | 72.765 | **87.058** | 81.963 |
+
+  47.9's *"not more robust than a tuned cosine on any threshold-stable measure"* is
+  **WITHDRAWN** (CORRECTIONS 43). Threshold scan: **B>C on 7 of 8 rows**, C>B only at >=92.
+* **QUOTE THE DIAL-FREE ROW.** Every width has a tolerance or a floor on it and three
+  successive revisions moved band edges without moving any accuracy. The threshold-free
+  statistic (new in `idea3_threearm.py`, selftest **45/45**) says **B - C = +4.941pp
+  (survivors) / +5.094pp (face value)**. The honest sentence: *MetaOptimize's peak is
+  1.113pp below the tuned baseline 94.417 +-0.113 (n=5), but averaged over a 7-decade
+  alpha0 grid it is ~5pp AHEAD of a tuned cosine. ~1.1pp of peak buys ~5pp of expected
+  accuracy under an unlucky step size.*
+* **DIRECTION C HEADLINE -- the scale profile is now CLAIMED, not withheld.** All 8 PROBE5
+  jobs landed. Steady half, corrected floor, geometric mean over seeds:
+  **rho_w = 3.200e-06 (k=1) -> 1.133e-06 (k=775) -> 4.620e-08 (k=180,225)**, span **69.3x**,
+  **rho_w ~ k^-0.343**. Pre-registered outcome **(b): the correlation length is REAL**.
+  The heterogeneity correction removes 58% of the excess log-span (165.5x -> 69.3x) and does
+  NOT remove the profile. FINDINGS 44.5's "NOT CLAIMED" is resolved (CORRECTIONS 45).
+* **The instrument is calibrated against a published campaign number.** `probe5_floor.py
+  --profile` defaults to the FULL run and disagreed with FINDINGS 44.3 by 4.2x on a
+  byte-matched config. That is **entirely the window**: on the steady half `p5-w-a3` reads
+  1.991e-06 / 2.085e-06 against 44.3's **1.925e-06** -- **+3.4% / +8.3%**.
+  **NEW STANDING RULE: a time window is a dial exactly like a threshold.** Enforced in code
+  by `analysis/probe5_window.py` (**33/33**), which prints full / steady / startup and
+  refuses to call a verdict stable unless all three agree. They do: 53.4x / 69.3x / 520x,
+  all outcome (b).
+* **`probe5_floor.py` hardcodes `N_WEIGHTS_R18` and that would rescale the ResNet10 and
+  ResNet34 curves of the batch now in flight.** `probe5_window.py` takes each family's
+  n_weights from **that family's own weightwise n_tot** and REFUSES a family with no
+  weightwise arm. Never `block_sizes.json` (CORRECTIONS 16).
+* **PATCH_PROBE5 + PATCH_PROBE5_FIX are now on BOTH accounts.** Applied to alice this cycle
+  (backup `HF.py.bak.pre_probe5`); `tests/test_probe5_block.py` **10/10** against the live
+  file, which executes the shipped bytes.
+* **SUBMITTED 32 jobs, both queues were 0/0 beforehand, nothing cancelled.**
+  `bin/c48_frozen_ladder_p5.sh` **20 on alice** (`4701789-4701808`) -- the corrected profile
+  + frozen N_eff exponent on **R10 / R34 / CIFAR-100**, pre-registered A0/A1/A2/A3.
+  Supersedes `bin/c43_frozen_ladder.sh`, which exported `PROBE=100` and no `PROBE5=1` and
+  therefore could not have carried the correction.
+  `bin/c48_free_profile_p5.sh` **12 on alice2** (`4701809-4701820`) -- does the profile
+  survive at the ADAPTED equilibrium (`--alg-meta Lion`, one field changed from the frozen
+  recipe)? Pre-registered B0/B1/B2 **with the layerwise rung's resolution computed before
+  submission** (FINDINGS 48.9): weightwise and nodewise resolve, **layerwise will NOT** --
+  so B1 is written on the k=1->775 leg and a layerwise null is a bound, not an absence.
+  **B0 is a validity gate**: steady-half rho_s(weightwise) must land within 3x of 44.3's
+  8.458e-08 or nothing else in that batch may be quoted.
+* Account assignment is BY COMPARATOR and it is the reverse of c43's: the frozen ladder goes
+  to alice (its comparators `p7-r18-*` / `p7-c100-*` are there), the free batch to alice2
+  (its comparator `p5-*-a3` is there).
+* CSV **1525 runs** (985 + 690). Queues after submit: alice 8P/12R, alice2 3P/9R.
+  FairShare 0.333054 / 0.333893 -- informational only per CORRECTIONS 37.
+
 ## Running / next (cycle 47) -- IDEA 3 GOES THREE-ARMED, and the verdict changes
 
 **Read `docs/CORRECTIONS.md` 37-41 and `docs/FINDINGS.md` 47.1-47.12 before quoting any IDEA 3
