@@ -2013,3 +2013,180 @@ report the per-(record, coordinate) denominator alongside the per-record one for
 under the clean instrument (§59 makes it mechanical).
 
 **Queues at tick end.** alice **18 P / 0 R** (`uc5`). alice2 **15 P / 3 R** (`cl5`).
+
+---
+
+## 67. FINDINGS 51.7's "THERE IS NO BOX-FREE CONFIGURATION" IS WITHDRAWN — it extrapolated a startup velocity (cycle 52)
+
+51.7 was a pre-registered addendum, committed before the batches landed so it could not be fitted
+afterwards. That discipline worked exactly as intended: it is now scoreable, and **it is wrong**.
+
+It predicted that at HI=0.0 the ceiling would still bind at r10 weightwise (record ~1388/1458) and
+be borderline at r18 weightwise (1871–2007), concluding: *"There is no box-free configuration of
+this algorithm at this budget."* Measured (FINDINGS 52.1/52.2): **0.0% of records and 0.0000% of
+coordinates at either guard**, in r10-w, r34-w and all three r18 rungs. r18's top coordinate ends
+at −2.158 against a ceiling of 0.0 — the projection missed by 2.16 log units.
+
+**THE ERROR, and it is the same family as the one 51.7 itself was written to fix.** The
+"92–100% of maximum Lion speed" is the velocity of the **startup segment**. The top coordinate
+decelerates ~9x at R18 (0.076 vmax in Q4) and ~3.3x at R10 (0.289). CORRECTIONS 62 established
+that a *fraction* must be measured at the resolution the mechanism operates at; this is the same
+mistake in the time axis instead of the parameter axis.
+
+**STANDING RULE (7)**, the seventh, after thresholds / nulls / windows / sign-ranges /
+denominators / resolutions:
+
+> *A rate used to extrapolate must be measured on the segment being extrapolated FROM, not on the
+> whole run. Startup velocities are not steady velocities, and this campaign's own transients run
+> 3–12x the steady rate. Quote the window with every rate, exactly as with every fraction.*
+
+**WHAT REPLACES IT.** A box-free configuration exists at ms=1e-3 and it is `BETA_CLIP=-30:0.0`.
+**Worst-seed headroom at R18 weightwise is 22.8 epochs and at R10 5.6.** **Report the worst seed,
+never the mean** — a mean of per-seed records-to-hit is a mean of ratios and one slow seed sends it
+to infinity; the mean trajectory says 56.6 epochs where the worst seed says 22.8.
+
+**AND THE MARGIN IS THIN, SO SAY THIN.** `bl5-*` spends 20 extra epochs at R18 against 22.8 of
+worst-seed headroom. That is MARGINAL. It is fundable because the projection is an **upper bound**
+— the climb velocity has fallen from 0.95 vmax at startup to 0.17 in Q4 and is still falling — but
+"upper bound" is exactly the reasoning 51.7 got wrong in the other direction, so it earns a gate
+and not a presumption. B0.3 is scored first for precisely this reason.
+
+51.7's *scoring instructions* were sound and are kept: score the binary bar first, the
+dose-response second, never let the second overwrite the first. Only its projection is withdrawn.
+
+## 68. THE HEADLINE IS BOX-FREE. CORRECTIONS 59 NEEDS NO BOX COLUMN. (cycle 52)
+
+The threat CORRECTIONS 62–66 opened is closed. N_eff/m (weightwise, variance, steady half):
+
+| family | published box | BOX-FREE (−30:0.0) | Δ |
+|---|---|---|---|
+| R18 | 0.4808 | **0.5045** | +0.024 |
+| R10 | 0.1632 | **0.1571** | −0.006 |
+| R34 (the null) | 0.5517 | **0.5474** | −0.004 |
+| CIFAR-100 | 0.3047 | **in flight (`uc6-*`)** | — |
+
+Across FOUR boxes at R18 — spanning 15 log units of floor and 4.6 of ceiling — the total span is
+**0.076** against a ±0.10 bar registered three times independently. At R10 the entire box was
+removed from an arm whose Q4 ceiling occupancy was **100.0%**, and the number moved **−0.006**,
+which is no more than the null's own **−0.004**. The exponent agrees: b(steady) span 0.039 across
+the same four boxes (bar 0.05).
+
+**QUOTE THIS, unchanged, and without a box caveat for R10/R18/R34:** *at the adapted operating
+point per-weight meta-gradients carry 16%–55% of the independent information their count implies.*
+**Add the box to the methods, not to the claim.** The one number still owed a box test is
+CIFAR-100's 0.305, and it is the worst one to be missing (Q4 ceiling occupancy 100.0%) — until
+`uc6-*` lands, write "three of the four families are measured box-free" rather than four.
+
+**A DIRECTIONAL PREDICTION FAILED AND IS RECORDED AS FAILED.** `c51_unclipped_family.sh`
+registered "unpinning should move N_eff/m UP, because coordinates frozen against a common wall
+agree for a reason that has nothing to do with the meta-gradient." It did not move at all. The
+pass is a pass on the ±0.10 bar, **not** a confirmation of the mechanism story, and the mechanism
+story is not to be repeated.
+
+**AND A NON-RESULT WORTH BANKING.** X3's "the ceiling is load-bearing for stability" branch did
+not fire: nothing collapsed at alpha_max = 1.0, and the top coordinate stops at alpha ≈ 0.12 at
+R18 on its own. **At ms=1e-3 the operating point is INTERIOR.** The box was never doing the work
+anyone feared it was doing.
+
+## 69. CORRECTIONS 61(5) IS REINSTATED — on evidence this time, not on the wrong denominator (cycle 52)
+
+The bookkeeping arc, in full, because it is instructive:
+
+1. **60** recorded the Q4 rebound as unexplained, with two mechanisms tested and both failing —
+   and correctly noted the honest status of mechanism (i), clip saturation, was *"unsupported,
+   not excluded"*.
+2. **61(5)** then wrote it up as "both mechanisms fail".
+3. **64** WITHDREW 61(5): (i) had been rejected on the per-TENSOR column, which reads 0.00%
+   everywhere, so it had never actually been tested. At coordinate resolution the four families
+   separated **perfectly** (rebound YES ⇔ 100.0% Q4 ceiling occupancy), making (i) the *leading*
+   candidate.
+4. **This tick tested it.** r10's Q4 ceiling occupancy went **100.0% → 0.0%** and the rebound
+   ratio went **2.690 → 2.701** — unchanged to within 0.5% (FINDINGS 52.4).
+
+**61(5)'s conclusion was right and its evidence was wrong.** It is reinstated with the correct
+evidence: clip saturation is **excluded by test**. FINDINGS 51.3's perfect separation is a
+**coincidence at n=4 families**, and 64's "leading candidate" reading is withdrawn in turn.
+
+The rebound remains **OPEN**, now with two mechanisms genuinely dead rather than one dead and one
+untested. That is a worse scientific outcome than a confirmation and a better record than 61(5).
+`uc6-*` supplies the second family (c100, the other 100%-occupancy arm) as a replication: V3
+predicts the ratio stays above 2.0 there too.
+
+## 70. A NEW POSITIVE RESULT, SCOPED TO ms=1e-3: THE INFORMATION FRACTION IS WORST AT NODEWISE (cycle 52)
+
+N_eff/m is **non-monotone in the group count**, with its minimum at **nodewise**, in **8 of 8**
+(family × box) cells at ms=1e-3 — R10 / R18 / R34 / CIFAR-100 crossed with four clip boxes
+including the box-free one (FINDINGS 52.5). R18 box-free: lay **0.726** / node **0.402** /
+w **0.504**.
+
+**THREE CONSTRAINTS ON HOW THIS MAY BE WRITTEN, all of them load-bearing:**
+
+1. **Scope it to ms=1e-3.** At ms=1e-4 the argmin is weightwise (ml5 m4: 0.700 / 0.170 / 0.129).
+   That is a **genuine counterexample** and must be reported, not omitted. The shape is a property
+   of the ms=1e-3 operating point, not of the partition alone. (ml5 m2 also has argmin w, but it
+   is boundary-dominated per 62 and is quoted by nothing.)
+2. **It is a FRACTION.** N_eff itself rises with m — 45 → 5,791 → 5,636,970 at R18. Never write
+   "nodewise carries the least information"; write "retains the smallest fraction of the
+   information its count implies".
+3. **It is not yet budget-tested.** `bl5-*` registers the ordering `node < w < lay` as prediction
+   B2.5. If it fails at 40 epochs, the shape is budget-specific and must not be written as a
+   property of the partition at all.
+
+Subject to those, this is the most directly paper-relevant thing the campaign has produced since
+the sign-agreement measurement itself: **the Adam-mini / Adalayer / SGG line places its blocks at
+nodewise-or-coarser on the premise that within-block averaging recovers independent information,
+and at the operating point our headline is quoted at, that is the worst available partition.**
+
+## 71. DECISION RECORD — cycle 52
+
+**What the data said.** All 18 `cl5` and 12 of 18 `uc5` jobs landed and were scored against their
+written pre-registrations by `analysis/c52_boxfree.py` (selftest 27/27).
+
+1. **X0 / U0 validity, X0.3 / U0.4 dose, X0.3(3) / U0.3 nulls, X3 stability, U3 / X2 accuracy and
+   profile: EVERY gate PASSES.** The dose checks passed at both ends of both ladders, so nothing
+   this tick is uninterpretable — the first tick since 49 of which that is true.
+2. **X1 and U1 PASS: the headline is not a box artefact** (→ 68).
+3. **U2's refutation branch fires: clip saturation is excluded** (→ 69).
+4. **51.7's projection is refuted; a box-free configuration exists** (→ 67).
+5. **A new, box-invariant, ms=1e-3-scoped positive result: the nodewise minimum** (→ 70).
+6. **6 jobs void on a `--NN-name` bug in uc5's own header** (FINDINGS 52.8).
+
+**Decisions taken, and why.**
+
+* **STOP SPENDING ON THE BOX.** Four boxes at R18 and full removal at R10/R34 move the number by
+  less than the null's reproducibility. Further box arms would buy precision on a settled
+  question. The one exception is CIFAR-100, which has never been box-tested and whose ceiling
+  occupancy is 100.0% — that is `uc6-*`, 6 jobs, and it closes the axis.
+* **THE BUDGET IS NOW THE ONLY UNTESTED THREAT TO THE HEADLINE, so it gets the larger batch.**
+  Every N_eff/m the campaign has quoted is from a 20-epoch run, in a system CORRECTIONS 65 showed
+  is still descending at 89–100% of max Lion speed in its last quarter. `bl5-*` (9 jobs, alice2)
+  is a 40-epoch box-free rung against the 20-epoch `cl5-*-cU-*` control already on disk. **It is
+  fundable only because 52.1 refuted 51.7** — under the old projection a 40-epoch run was
+  guaranteed to bind. Registered: B0, B0.3 (box-free gate, scored first), **B1.5 (the same
+  ABSOLUTE window as the control, which is what makes B1 a budget contrast rather than a seed
+  contrast)**, B1 with a stated direction (down), B2, B2.5, B3, B4.
+  **Its header's affordability claim was WRONG AT SUBMISSION TIME and has been amended in place,
+  struck rather than quietly edited**: it said "a 17-epoch margin" from the MEAN trajectory, where
+  the worst seed gives 22.8 epochs of headroom against 20 spent — marginal. The B0-B4 predictions
+  are untouched; only the justification changed, and the amendment is timestamped as post-hoc.
+* **R10 IS EXCLUDED FROM THE BUDGET LADDER, deliberately.** Worst-seed headroom is ~6 epochs; a
+  40-epoch R10 run binds around epoch 26 and would be measuring the box again. Running it anyway
+  and reporting it as a budget result is precisely the cycle-50 error.
+* **NEW GUARD, adopted in both scripts: "byte-matched" is a CLAIM and must be DIFFED.** The uc5
+  bug and cycle 50's "the HIGH bound provably never binds" are the same failure — an unchecked
+  assertion in a batch header. `c52_c100_boxfree.sh` guard 4 greps c49 for the NN-name it claims
+  to match; `c52_budget_ladder.sh` guard 3 does the same against cl5.
+* **SECOND NEW GUARD: count what Slurm ACCEPTED, not what we tried.** The first `--submit` of
+  `c52_budget_ladder.sh` printed "9 jobs (SUBMITTED)" while sbatch had rejected all 9 on an
+  invalid `--time=05:50:00` (gpu-short caps below 5h). A batch script that reports its intent
+  instead of its outcome is how a tick scores a pre-registration against an empty queue. Fixed to
+  03:50:00 and to counting exit status; resubmitted and verified 9/9 pending.
+* **STANDING RULE (7) added**: a rate used to extrapolate must be measured on the segment being
+  extrapolated from. → §67.
+* **NOT DONE, and still unspent:** the raw-instrument `s` re-derivation sweep (bookkeeping,
+  carried since 51); a granularity CURVE with intermediate block sizes, which would turn 70's
+  three-point non-monotone shape into a real curve — `blockwise` accepts arbitrary group
+  specifications, so this is a design question and not a code one, and it is the natural next
+  batch once `bl5` reports.
+
+**Queues at tick end:** alice **6 P** (`uc6-*`), alice2 **9 P** (`bl5-*`). FairShare 0.333 / 0.334.

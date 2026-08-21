@@ -9825,3 +9825,213 @@ overwrite the first.
 
 **The `r34` arms and `r10`-node / `r10`-lay are unaffected and remain fully interpretable**, which
 preserves the built-in null U0.3 was built on.
+
+---
+
+# CYCLE 52 — THE BOX THREAT IS CLOSED. A COMPLETELY BOX-FREE MEASUREMENT EXISTS AND THE HEADLINE SURVIVES IT.
+
+Both cycle-51 batches landed (36 jobs submitted, **30 valid**, 6 void on a script bug — 52.8).
+Both queues were 0/0 at tick start. CSV **1659 runs (+30)**. Every number below is re-derived
+from `results/all_runs.csv` and the probe dirs by `analysis/c52_boxfree.py` (selftest **27/27**);
+the full printout is saved at `results/c52_boxfree.txt`.
+
+## 52.1 THE CYCLE-51 ADDENDUM IS REFUTED BY MEASUREMENT — the climb rate it extrapolated is a STARTUP rate
+
+FINDINGS 51.7 was committed before the batches landed, precisely so it could not be fitted
+afterwards. It predicted, from the ff5/fr5 controls: *"at weightwise the top coordinate climbs at
+**92–100% of the maximum Lion speed** … To be provably unreachable a ceiling would need to sit at
++3.1 … **There is no box-free configuration of this algorithm at this budget.**"*
+
+Scored as written, on the arms that ran:
+
+| arm | 51.7 predicted | MEASURED %rec at HI | final max | verdict |
+|---|---|---|---|---|
+| r10 w (uc5) | **WILL BIND** at record ~1388/1458 | **0.0%** | −0.975 | **PREDICTION FAILS** |
+| r18 w (cl5 cU) | BORDERLINE at 1871–2007 | **0.0%** | −2.158 | **PREDICTION FAILS**, by 2.16 log units |
+| r10 node, r10 lay | will not bind | 0.0% | — | correct |
+| r34 w/node/lay | will not bind | 0.0% | −2.566 | correct |
+| c100 (4 rows) | WILL BIND | — | — | **untestable, jobs void (52.8)** |
+
+The cause is a window error, not a modelling error. 92–100% of vmax is the velocity of the
+**startup segment**. The top coordinate **decelerates by ~9x at R18 and ~3.3x at R10**:
+
+| arm | v_Q4/vmax (worst seed) | final max | headroom to HI=0.0 | extra epochs (worst seed) |
+|---|---|---|---|---|
+| cl5 w cU (R18) | 0.174 | −1.984 | 1.984 | **22.8** |
+| cl5 node cU (R18) | 0.065 | −3.313 | 3.313 | 102.7 |
+| cl5 lay cU (R18) | **−0.130 (descending)** | −5.527 | 5.527 | ∞ |
+| uc5 r10 w (R10) | 0.345 | −0.964 | 0.964 | **5.6** |
+| uc5 r34 w (R34) | 0.074 | −2.524 | 2.524 | 68.1 |
+
+**Report the WORST SEED, never the mean.** A mean of per-seed records-to-hit is a mean of ratios;
+one seed with a near-zero Q4 velocity sends it to infinity and hides the seed about to bind. The
+mean trajectory gives 56.6 epochs for R18-w where the worst seed gives **22.8** — a 2.5x
+difference, and the smaller number is the one that governs whether a batch is affordable.
+
+**WHAT REPLACES THE ADDENDUM'S SENTENCE:** *a box-free configuration exists at ms=1e-3 and it is
+BETA_CLIP=−30:0.0.* **State the margin honestly: a 40-epoch R18 run spends 20 extra epochs against
+22.8 of worst-seed headroom, which is MARGINAL, not comfortable.** The one thing that makes it
+fundable anyway is that the projection is an **upper bound on the climb** — the velocity has
+fallen from 0.95 vmax at startup to 0.17 in Q4 and is still falling — so the true headroom is
+longer than the linear extrapolation. That is an argument for running it **with a box-free gate
+scored first** (`bl5`'s B0.3), not an argument that the gate is a formality. R10 is not fundable
+past ~26 epochs at any margin.
+
+## 52.2 THE DOSE, AT FOUR DENOMINATORS — X0.3 and U0.4 both PASS, and three arms are BOX-FREE
+
+`%coord` columns are new this tick (PATCH_CLIPCOUNT, CORRECTIONS 63): the per-(record,
+COORDINATE) denominator no earlier probe could supply.
+
+| arm | box | %rec LO | %rec HI | %Q4 LO | %Q4 HI | 1st HI | %coordLO | %coordHI |
+|---|---|---|---|---|---|---|---|---|
+| ml5 w m3 (published) | −15:−2.3026 | 8.2 | 7.4 | 32.6 | 27.5 | 1523 | — | — |
+| wc5 w m3 (floor moved) | −30:−2.3026 | 0.0 | 8.9 | 0.0 | 31.0 | 1367 | — | — |
+| cl5 w cD (ceiling DOWN) | −30:−4.6052 | 0.0 | **75.9** | 0.0 | **100.0** | 481 | 0.0000 | 0.0917 |
+| **cl5 w cU (ceiling OFF)** | −30:0.0 | **0.0** | **0.0** | **0.0** | **0.0** | — | **0.0000** | **0.0000** |
+| ff5 r10 w (narrow) | −15:−2.3026 | 18.5 | 52.0 | 74.0 | **100.0** | 948 | — | — |
+| **uc5 r10 w (WALLS OFF)** | −30:0.0 | **0.0** | **0.0** | **0.0** | **0.0** | — | **0.0000** | **0.0000** |
+| ff5 r34 w (narrow NULL) | −15:−2.3026 | 0.2 | 0.0 | 0.8 | 0.0 | — | — | — |
+| **uc5 r34 w (NULL, OFF)** | −30:0.0 | 0.0 | 0.0 | 0.0 | 0.0 | — | **0.0000** | **0.0000** |
+| ff5 c100 w (narrow) | −15:−2.3026 | 18.7 | 50.9 | 74.7 | **100.0** | 972 | — | — |
+
+* **X0.3** cD %rec at HI = **75.9%** (bar >40%) → PASS. cU = **0.0%** (bar <5%) → PASS.
+* **U0.4** r10 Q4 occupancy LO/HI **74.0%/100.0% → 0.0%/0.0%** (bar <5%) → PASS.
+* Both ladders have a dose at both ends, so X1/X2 and U1/U2 are **interpretable** — the check
+  cycle 50 skipped and paid 18 jobs for.
+* **`cl5-*-cU-*`, `uc5-r10-*` and `uc5-r34-*` are the campaign's first BOX-FREE runs**: neither
+  wall touched on any of 2000 records, and 0.0000% of coordinates at either guard.
+
+## 52.3 X1 / U1 — THE HEADLINE IS NOT A BOX ARTEFACT. FOUR BOXES, THREE FAMILIES, ALL PASS.
+
+N_eff/m, weightwise, VARIANCE instrument, STEADY half — the only quotable combination
+(CORRECTIONS 55/59). Bar ±0.10 in all three pre-registrations, deliberately identical.
+
+| family | box | N_eff/m (w) | Δ vs control | verdict |
+|---|---|---|---|---|
+| R18 | −15:−2.3026 (published) | **0.4808** | — | the control |
+| R18 | −30:−2.3026 | 0.5189 | +0.0381 | PASS |
+| R18 | −30:−4.6052 | 0.5572 | +0.0764 | PASS |
+| **R18** | **−30:0.0 BOX-FREE** | **0.5045** | **+0.0236** | **PASS** |
+| R10 | −15:−2.3026 | **0.1632** | — | the control |
+| **R10** | **−30:0.0 BOX-FREE** | **0.1571** | **−0.0061** | **PASS** |
+| R34 (the null) | −15:−2.3026 | **0.5517** | — | the control |
+| **R34** | **−30:0.0 BOX-FREE** | **0.5474** | **−0.0043** | **PASS (U0.3)** |
+| C100 | −15:−2.3026 | 0.3047 | — | **BOX-UNTESTED** (52.8) |
+
+* **X1 PASSES.** The published 0.4808 sits inside a 0.481–0.557 span across FOUR boxes spanning
+  15 log units of floor and 4.6 of ceiling. Total span **0.076**, against a ±0.10 bar.
+* **U1 PASSES.** r10 moves **−0.006** with its entire box removed, while the r34 NULL moves
+  **−0.004**. The box sensitivity is bounded by the null's own reproducibility.
+* **THE DIRECTIONAL PREDICTION IS NOT SUPPORTED.** `c51_unclipped_family.sh` registered
+  "unpinning should move N_eff/m **UP**". It did not move. Record that, not a pass.
+* **X2 PASSES**: b(steady) across the four R18 boxes = 0.081 / 0.061 / 0.042 / 0.071, span
+  **0.039** (bar 0.05). R10 0.183 → 0.186; R34 0.018 → 0.008.
+* **X3 did NOT fire.** No arm collapsed at HI=0.0 (alpha_max = 1.0). At ms=1e-3 the operating
+  point is **INTERIOR**: the top coordinate reaches alpha ≈ 0.12 at R18 and stops climbing on
+  its own. The ceiling is **not** load-bearing for stability at any granularity tested.
+
+## 52.4 U2 — CLIP SATURATION IS NOW GENUINELY EXCLUDED AS THE Q4-REBOUND MECHANISM
+
+rho_w(k=1) Q4/Q3, free weightwise arm. Registered prediction: **ratio < 1.5** once the box is
+relieved. The r10 arm went from **100.0%** Q4 ceiling occupancy to **0.0%**.
+
+| family | box | rho_w Q3 | rho_w Q4 | **Q4/Q3** | %Q4 at ceiling |
+|---|---|---|---|---|---|
+| r10 | −15:−2.3026 | 7.756e−07 | 2.086e−06 | **2.690** | 100.0% |
+| r10 | −30:0.0 BOX-FREE | 8.181e−07 | 2.210e−06 | **2.701** | **0.0%** |
+| r34 | −15:−2.3026 | 7.012e−08 | 4.332e−08 | 0.618 | 0.0% |
+| r34 | −30:0.0 BOX-FREE | 6.884e−08 | 4.717e−08 | 0.685 | 0.0% |
+
+**The rebound is unchanged to within 0.5% while the entire ceiling occupancy was removed.**
+U2's refutation branch fires: *"the ratio stays > 2.0 with U0.4 passed"*. Mechanism (i) is
+**excluded by test**, not merely unsupported. The FINDINGS 51.3 perfect 4-family separation
+(rebound YES ⇔ 100% Q4 occupancy) is a **coincidence at n=4 families**. The rebound stays OPEN
+with one more mechanism dead — a worse outcome than a confirmation, a better record than 61(5).
+
+## 52.5 THE FREE RESULT: N_eff/m IS NON-MONOTONE IN THE GROUP COUNT, WITH ITS MINIMUM AT NODEWISE
+
+| root | family | lay | node | w | argmin |
+|---|---|---|---|---|---|
+| ml5 | m2 (ms=1e−2) | 0.8258 | 0.2568 | 0.0499 | w |
+| ml5 | m3 (ms=1e−3) | 0.7226 | **0.4105** | 0.4808 | **node** |
+| ml5 | m4 (ms=1e−4) | 0.7000 | 0.1697 | 0.1287 | w |
+| wc5 | m3 | 0.7113 | **0.4081** | 0.5189 | **node** |
+| cl5 | cD | 0.6952 | **0.4207** | 0.5572 | **node** |
+| cl5 | cU (BOX-FREE) | 0.7258 | **0.4016** | 0.5045 | **node** |
+| ff5 | c100 | 0.5500 | **0.2457** | 0.3047 | **node** |
+| ff5 | r10 | 0.6553 | **0.1540** | 0.1632 | **node** |
+| ff5 | r34 | 0.6282 | **0.3888** | 0.5517 | **node** |
+| uc5 | r10 (BOX-FREE) | 0.6526 | **0.1518** | 0.1571 | **node** |
+| uc5 | r34 (BOX-FREE) | 0.5909 | **0.3977** | 0.5474 | **node** |
+
+**SCOPE IT TO ms=1e−3, AND SAY SO.** At ms=1e−3 the argmin is `node` in **8 of 8** cells —
+4 families (R10/R18/R34/C100) × 4 boxes. The two `w` rows are at OTHER meta-stepsizes: ml5 m2
+(boundary-dominated per CORRECTIONS 62, quoted by no claim) and **ml5 m4, which is a genuine
+counterexample and is not swept under the rug**. The shape is a property of the ms=1e−3
+operating point, not of the partition alone.
+
+**READ IT AS A FRACTION.** N_eff itself RISES with m (45 → 5,791 → 5,636,970 at R18). This is a
+statement about the fraction **retained**, never about absolute information. **Do not write
+"nodewise carries the least information."**
+
+**WHY IT MATTERS.** The Adam-mini / Adalayer / SGG line places its blocks at nodewise-or-coarser
+on the premise that within-block averaging recovers independent information. At the operating
+point the headline is quoted at, the nodewise partition retains the **smallest** fraction of the
+information its count implies.
+
+## 52.6 EVERY VALIDITY GATE, NULL AND ACCURACY CHECK PASSES
+
+| gate | control | new | Δ pp | bar | verdict |
+|---|---|---|---|---|---|
+| X0.3(3) layerwise null | wc5-lay-m3 74.443 (n=3) | cl5-lay-cD 74.630 (n=3) | +0.187 | ±0.6 | PASS |
+| X0.3(3) layerwise null | wc5-lay-m3 74.443 (n=3) | cl5-lay-cU 74.426 (n=3) | −0.017 | ±0.6 | PASS |
+| U0.3 r34 NULL | ff5-r34-w 70.281 (n=2) | uc5-r34-w 70.137 (n=2) | −0.144 | ±0.6 | PASS |
+| U3 r10 w | 61.419 | 61.447 | +0.029 | ±1.0 | PASS |
+| U3 r10 node | 69.798 | 69.553 | −0.245 | ±1.0 | PASS |
+| U3 r10 lay | 70.767 | 70.560 | −0.207 | ±1.0 | PASS |
+| U3 r34 node | 71.054 | 71.143 | +0.089 | ±1.0 | PASS |
+| U3 r34 lay | 74.185 | 74.209 | +0.024 | ±1.0 | PASS |
+| X3 w stability | wc5-w-m3 68.536 | cl5-w-cU 68.578 | +0.042 | ±5.0 | PASS |
+| X3 node stability | wc5-node-m3 73.048 | cl5-node-cU 72.787 | −0.261 | ±5.0 | PASS |
+
+X0.2/U0.2 byte-match: `n_beta` = 11,173,962 / 14,420 / 62 (cl5), 4,903,242 (uc5 r10),
+21,282,122 (uc5 r34); `n_records` = 2000 on all 30 valid arms.
+
+**The box is accuracy-neutral over 18 matched cells across 4 families**: |Δ| ≤ 0.27 pp everywhere,
+mean +0.03 pp (wc5) / −0.08 pp (this tick).
+
+## 52.7 THE CEILING BIT THE LAYERWISE RUNG TOO, AND THE NULL STILL HELD
+
+At cD the layerwise HI guard binds on **29.4% of records** (first at 625) and on **0.6019% of
+coordinates** — but **0.0% of Q4** records, and the final max is −5.627, i.e. **below** the
+−4.6052 ceiling. The layerwise tensor touches the ceiling early and then retreats under it on
+its own. X0.3(3) said the layerwise arms must reproduce the control; they do (+0.187 / −0.017 pp,
+rho_w(k=1,steady) within 1.08x / 0.93x, bar 2x). **A guard that binds transiently and is then
+abandoned is not the same as one that pins** — record the retreat, not just the occupancy.
+
+## 52.8 SIX JOBS VOID: `uc5` BUILT CIFAR-100 WITH A 10-CLASS HEAD
+
+`bin/c51_unclipped_family.sh` claimed *"Everything else is byte-matched to
+`c49_free_family_ladder.sh`"*. It was not. ff5 builds the c100 arm with `--NN-name ResNet18_c100`;
+uc5 wrote `--NN-name ResNet18` against `--dataset CIFAR100`. All 6 c100 jobs died in ~5 minutes at
+the first backward pass with
+
+```
+Loss.cu:240: nll_loss_forward_reduce_cuda_kernel_2d: Assertion `t >= 0 && t < n_classes` failed
+```
+
+writing `block_sizes.json` but never a `probe.jsonl`. Receipts:
+`runs/uc5-c100-{lay,node,w}-s{0,1}-47023{68,69,70,77,78,79}.out`. The r10 and r34 legs were
+unaffected and are scored above. **Consequence: CIFAR-100 is the one headline family with no box
+test, and it is the worst one to be missing — its Q4 ceiling occupancy is 100.0%, the same
+saturation r10 had.** Re-submitted this tick as `uc6-*` (6 jobs, alice) with the fix and with a
+guard that DIFFS the NN-name against c49 rather than asserting the match.
+
+## 52.9 Status
+
+* Queues at tick end: alice **6 P** (`uc6-*`), alice2 **9 P** (`bl5-*`). FairShare 0.333 both.
+* CSV 1659 runs. New scorer `analysis/c52_boxfree.py` (27/27), output `results/c52_boxfree.txt`.
+* **The box threat to the headline is CLOSED in 3 of 4 families and the 4th is in flight.**
+* **The remaining untested threat is the BUDGET**: every N_eff/m ever quoted is from a 20-epoch
+  run, in a system CORRECTIONS 65 showed is not converged. `bl5-*` is that test, and 52.1 is what
+  made it fundable.

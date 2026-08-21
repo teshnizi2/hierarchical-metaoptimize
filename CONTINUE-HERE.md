@@ -48,6 +48,67 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 52) -- **THE BOX THREAT IS CLOSED; A BOX-FREE MEASUREMENT EXISTS**
+
+**Read `docs/CORRECTIONS.md` 67-71 and `docs/FINDINGS.md` 52.1-52.9 before quoting any N_eff/m,
+any headroom number, or the phrase "there is no box-free configuration". 67 WITHDRAWS FINDINGS
+51.7's projection. 68 says the headline needs no box caveat. 69 REINSTATES 61(5). 70 is a new
+positive result.**
+
+* **BOTH QUEUES WERE 0/0 AT TICK START. All 18 `cl5` landed; 12 of 18 `uc5` landed and 6 are
+  VOID on a script bug (52.8). CSV 1659 runs (+30).**
+* **THE FINDING OF THE TICK: a COMPLETELY BOX-FREE CONFIGURATION EXISTS, and the headline
+  survives it.** `cl5-*-cU-*` (R18), `uc5-r10-*` and `uc5-r34-*` touch NEITHER guard: 0 of 2000
+  records and **0.0000% of coordinates**, confirmed by PATCH_CLIPCOUNT's per-coordinate counter.
+  **N_eff/m at R18 goes 0.4808 (published box) -> 0.5045 (no box at all).** R10 goes 0.1632 ->
+  0.1571 (-0.006) against a NULL moving -0.004. Across FOUR boxes at R18 the span is 0.076 on a
+  +-0.10 bar. **X1, U1, X2, U0.3, U0.4, X0.3, X3, U3 -- every gate PASSES.** This is the first
+  tick since 49 with nothing uninterpretable.
+* **QUOTE THIS, without a box caveat for R10/R18/R34:** *at the adapted operating point per-weight
+  meta-gradients carry 16%-55% of the independent information their count implies.* Until `uc6`
+  lands, write **"three of the four families are measured box-free"**, not four.
+* **FINDINGS 51.7 IS REFUTED BY ITS OWN BATCHES (67).** Its "92-100% of max Lion speed, therefore
+  there is no box-free configuration at this budget" used the **STARTUP** velocity. The top
+  coordinate decelerates ~9x at R18 (Q4 velocity 0.076-0.174 vmax). **STANDING RULE (7): a rate
+  used to extrapolate must be measured on the segment being extrapolated FROM.**
+* **REPORT THE WORST SEED, NEVER THE MEAN, for headroom.** Mean trajectory says 56.6 epochs at
+  R18-w; worst seed says **22.8**. The 2.5x gap is the difference between "comfortable" and
+  "marginal", and `bl5` is marginal.
+* **CORRECTIONS 61(5) IS REINSTATED ON EVIDENCE (69).** r10's Q4 ceiling occupancy went
+  **100.0% -> 0.0%** and the rebound ratio went **2.690 -> 2.701**, unchanged to 0.5%. Clip
+  saturation is **excluded by test**, not merely unsupported. FINDINGS 51.3's perfect 4-family
+  separation is a coincidence at n=4. The rebound stays OPEN with two mechanisms now dead.
+* **A NEW POSITIVE RESULT, SCOPED TO ms=1e-3 (70).** N_eff/m is **non-monotone in the group count
+  with its MINIMUM AT NODEWISE** -- 8 of 8 (family x box) cells at ms=1e-3, R18 box-free
+  lay 0.726 / node 0.402 / w 0.504. **ms=1e-4 is a genuine counterexample and must be reported.**
+  It is a FRACTION (N_eff itself rises with m); never write "nodewise carries the least".
+  This is the most paper-relevant thing since the sign-agreement measurement: Adam-mini /
+  Adalayer / SGG place their blocks exactly where the retained fraction is smallest.
+* **6 JOBS VOID (52.8):** `uc5` built CIFAR-100 with `--NN-name ResNet18` (10-class head) where
+  ff5 used `ResNet18_c100`. CUDA device-side assert at step 0. **Both new scripts now DIFF the
+  claim "byte-matched to X" against X instead of asserting it.**
+* **SUBMITTED, 15 jobs.** (1) **`uc6-*` on alice, 6 jobs** -- `bin/c52_c100_boxfree.sh`, the
+  CIFAR-100 box-free arm with the NN-name fixed. Closes the one headline family never box-tested,
+  and it is the worst one to be missing (Q4 ceiling occupancy 100.0%). V0-V4 pre-registered.
+  (2) **`bl5-*` on alice2, 9 jobs** -- `bin/c52_budget_ladder.sh`, the **BOX-FREE BUDGET LADDER**,
+  40 epochs at R18 against the 20-epoch `cl5-*-cU-*` control on disk. **The budget is now the only
+  untested threat to the headline** -- every N_eff/m ever quoted is from a 20-epoch run in a system
+  CORRECTIONS 65 showed is not converged. Fundable ONLY because 67 refuted 51.7. B0-B4
+  pre-registered; its affordability claim was amended post-submission and labelled as such.
+* **NEXT TICK, in order.** (a) `bl5`: **B0.3 (the box-free gate) FIRST** -- at 22.8 epochs of
+  worst-seed headroom against 20 spent, this may genuinely bind, and if it does the `first_hi`
+  record IS the result. Then **B1.5** (records 1000-2000 of the 40-epoch run, the SAME absolute
+  window as the control -- without it B1 is a seed contrast, not a budget contrast), then B1,
+  then B2.5. B1.5 needs one new option: `neff_instrument.py --window 0.25-0.5`; `reduce_dir`
+  already takes fractional windows, so do NOT change its default.
+  (b) `uc6`: **V0.1 (did they survive at all -- `ls probe_c100_*/probe.jsonl`) BEFORE anything**,
+  then V0.4 dose, then V1, then V3 (the rebound replication).
+  (c) The natural batch after `bl5`: a **granularity CURVE** with intermediate block sizes to turn
+  70's three-point non-monotone shape into a real curve. `blockwise` accepts arbitrary group
+  specs, so this is a design question, not a code one.
+  (d) Still unspent, still bookkeeping: the raw-instrument `s` re-derivation sweep.
+* Queues at tick end: alice **6 R** (`uc6`), alice2 **9 R** (`bl5`). FairShare 0.333 / 0.334.
+
 ## Running / next (cycle 51) -- **EVERY CLIP FRACTION THIS CAMPAIGN QUOTED WAS AT THE WRONG RESOLUTION**
 
 **Read `docs/CORRECTIONS.md` 62-66 and `docs/FINDINGS.md` 51.1-51.5 before quoting any clip

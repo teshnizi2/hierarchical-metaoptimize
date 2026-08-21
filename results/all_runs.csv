@@ -2,6 +2,7 @@ run,job_id,account,network,dataset,batch_size,granularity,base,meta,meta_stepsiz
 sc-ResNet10-add-s0,4683077,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.06,0,100,100,91.59,91.29,96.1,0,node881,21,env,,0,37,41,45,91.133,35
 sc-ResNet10-layer-s0,4683076,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,91.16,91.02,99.52,0,node882,21,env,,0,32,37,56,90.726,45
 fz3-r10-lay-s0,4701789,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,63.41,63.41,64.28,0,node851,13,env,,0,,,,50.053,0
+uc5-r10-lay-s0,4702365,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,86.3,86.22,88.99,0,node887,4,env,,0,17,,,71.086,0
 p4-r10-lay,4683366,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,75.97,75.97,76.12,0,node887,4,env,,0,,,,59.337,0
 p6f-r10-lay,4683583,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,86.81,86.81,89.21,0,node886,4,env,,0,17,,,71.282,0
 ff5-r10-lay-s0,4702123,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,86.65,86.57,89.25,0,node864,6,env,,0,17,,,71.342,0
@@ -31,6 +32,7 @@ sc-ResNet10-layer-s1,4683080,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,
 sc-ResNet10-add-s1,4683081,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.06,1,100,100,90.74,90.44,95.21,0,node886,21,env,,0,37,41,57,90.335,55
 ff5-r10-lay-s1,4702132,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,86.39,86.39,88.87,0,node864,6,env,,0,20,,,70.192,0
 p7-r10-lay-s1,4685327,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,86.49,86.49,88.94,0,node885,4,env,,0,20,,,70.488,0
+uc5-r10-lay-s1,4702374,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,86.21,86.21,88.87,0,node885,4,env,,0,20,,,70.034,0
 fz3-r10-lay-s1,4701799,salehkaleybars,ResNet10,CIFAR10,100,layerwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,62.04,61.3,63.93,0,node887,4,env,,0,,,,50.436,0
 r10-r1-s1,4683338,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,1,100,100,90.96,90.75,99.46,0,node851,64,env,,0,34,46,61,90.451,43
 r10c-r1-s1,4684280,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,1,1,100,100,91.62,91.23,99.79,0,node881,21,env,,0,20,26,36,91.172,47
@@ -77,6 +79,7 @@ r10b-r008-s2,4683618,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6
 r10-r005-s2,4683324,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.05,2,100,100,91.19,90.84,95.29,0,node858,61,env,,0,37,42,58,90.62,53
 r10b-r015-s2,4683621,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.15,2,100,100,91.76,91.58,99.3,0,node883,21,env,,0,34,37,44,91.47,30
 r10c-r01-s2,4684272,s5014158,ResNet10,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.1,2,100,100,90.12,89.61,94.65,0,node887,21,env,,0,19,28,90,89.701,44
+uc5-r10-node-s0,4702366,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,86.81,86.81,88.72,0,node887,6,env,,0,17,,,69.784,0
 p6f-r10-node,4683584,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,86.44,86.44,88.72,0,node880,5,env,,0,17,,,69.77,0
 ff5-r10-node-s0,4702124,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,86.42,86.18,88.87,0,node886,6,env,,0,18,,,70.064,0
 fz3-r10-node-s0,4701790,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,63.73,63.73,64.21,0,node851,14,env,,0,,,,50.055,0
@@ -85,6 +88,7 @@ p5-r10-node,4683379,s5014158,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1
 p7-r10-node-s1,4685328,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,85.99,85.99,88.37,0,node886,5,env,,0,20,,,69.739,0
 fz3-r10-node-s1,4701800,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,62.67,62.67,63.48,0,node887,5,env,,0,,,,50.383,0
 ff5-r10-node-s1,4702133,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,86.18,86.18,88.47,0,node864,6,env,,0,20,,,69.532,0
+uc5-r10-node-s1,4702375,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,86.33,86.33,88.35,0,node885,6,env,,0,20,,,69.323,0
 p7-r10-node-s2,4685331,salehkaleybars,ResNet10,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,86.25,85.87,88.49,0,node881,5,env,,0,17,,,70.096,0
 sc-ResNet10-scal-s0,4683074,salehkaleybars,ResNet10,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,71.86,71.79,72.14,0,node882,30,env,,0,,,,71.697,0
 p4-r10-scal,4683365,salehkaleybars,ResNet10,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,71.57,71.42,71.93,0,node887,6,env,,0,,,,62.148,0
@@ -97,10 +101,12 @@ sa3-ResNet10-scal-s2,4683460,s5014158,ResNet10,CIFAR10,100,scalar,SGDm,Lion,1e-3
 fz3-r10-w-s0,4701791,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,63.92,63.92,64.32,0,node880,5,env,,0,,,,50.206,0
 p6f-r10-w,4683585,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,77.94,77.94,78.04,0,node885,4,env,,0,,,,61.366,0
 p4-r10-w,4683368,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,68.22,68.22,67.87,0,node882,6,env,,0,,,,51.285,0
+uc5-r10-w-s0,4702367,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,77.62,77.62,77.75,0,node887,5,env,,0,,,,61.424,0
 ff5-r10-w-s0,4702125,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,77.17,77.17,77.87,0,node886,5,env,,0,,,,61.343,0
 p5-r10-w,4683380,s5014158,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,12.91,12.91,12.63,0,node882,6,env,,0,,,,10.913,0
 ff5-r10-w-s1,4702134,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,76.97,76.97,77.75,0,node886,5,env,,0,,,,61.495,0
 p7-r10-w-s1,4685329,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,76.63,76.54,77.68,0,node882,4,env,,0,,,,61.448,0
+uc5-r10-w-s1,4702376,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,77.25,77.25,77.78,0,node885,5,env,,0,,,,61.471,0
 fz3-r10-w-s1,4701801,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,62.14,60.81,63.43,0,node886,5,env,,0,,,,50.532,0
 p7-r10-w-s2,4685332,salehkaleybars,ResNet10,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,78.26,78.26,78.41,0,node880,4,env,,0,,,,62.19,0
 sm_ResNet101,4680737,salehkaleybars,ResNet101,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,2,2,10.45,10.45,10.2,0,node885,4,env,,0,,,,,0
@@ -509,6 +515,7 @@ z3-ref-layer,4681224,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3
 mx-a1e3-layer-s0,4682944,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,100,100,91.61,91.29,99.88,0,node864,36,env,,0,15,23,40,91.159,52
 z3-l-r1,4681227,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,zpool,na,1,0,20,20,87.73,87.73,91.65,0,node859,14,env,,0,14,,,75.087,0
 zsx-l-r0_s0,4681811,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0,0,100,100,87.75,87.41,93.6,0,node851,77,env,,0,38,,,87.519,0
+cl5-lay-cD-s0,4702347,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,0,20,20,87.33,87.33,91.85,0,node859,15,env,,0,13,,,75.034,0
 p4-ad-r03,4681091,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.3,0,20,20,62.11,62.11,59.32,0,node885,6,env,,0,,,,28.215,0
 ml5-lay-m3-s0,4702095,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,87.17,87.12,91.6,0,node882,6,env,,0,14,,,74.822,0
 p4-ad-r0,4681088,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,0,20,20,52.87,52.87,51.39,0,node887,6,env,,0,,,,25.908,0
@@ -536,6 +543,7 @@ a0A-lsh01-1e6_s0,4680917,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Adam,1e-3,
 z3-l-r0,4681226,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,zpool,na,0,0,20,20,84.21,84.21,86.08,0,node851,15,env,,0,,,,71.815,0
 ad-l-r003_s0,4681039,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.03,0,100,100,92.89,92.45,98.96,0,node881,30,env,,0,37,39,41,92.554,1
 p4-ad-r003,4681089,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.03,0,20,20,53.61,53.61,52.26,0,node887,6,env,,0,,,,26.128,0
+cl5-lay-cU-s0,4702350,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,87.98,87.98,91.81,0,node851,16,env,,0,15,,,74.709,0
 fz-lay-a6-s0,4687492,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,fixed,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,20,20,13.71,13.71,13.8,0,node859,14,env,,0,,,,13.269,0
 zrn-l-r1_s0,4682653,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,1,0,100,100,91.24,91.06,99.62,0,node851,77,env,,0,28,37,52,90.836,50
 ad-l-r0_s0,4681038,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,0,100,100,92.44,92.35,97.76,0,node885,31,env,,0,36,38,41,92.222,5
@@ -628,6 +636,7 @@ p6-r1-s1,4683404,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1
 g4-sgdmAdam-layer_s1,4680747,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,90.86,90.55,99.75,0,node881,31,env,,0,15,26,60,90.289,61
 ms-lay-1e5-s1,4687158,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-5,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,21.13,21.13,19.95,0,node851,76,env,,0,,,,20.398,0
 ms-lay-1e4-s1,4687160,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-4,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,48.96,48.96,47.34,0,node851,77,env,,0,,,,42.633,0
+cl5-lay-cU-s1,4702351,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,87.95,87.95,91.6,0,node851,16,env,,0,15,,,74.184,0
 p6-r005-s1,4683394,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.05,1,100,100,92.47,92.05,98.65,0,node887,31,env,,0,18,20,22,92.122,4
 ms-layA-1e4-s1,4687176,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-4,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,93.27,92.77,99.74,0,node858,71,env,,0,25,34,42,92.909,15
 p6-r003-s1,4683392,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.03,1,100,100,92.48,91.61,98.41,0,node887,32,env,,0,17,20,23,92.105,4
@@ -640,6 +649,7 @@ zad-r007_s1,4683236,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,
 ml5-lay-m2-s1,4702099,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-2,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.77,87.77,91.93,0,node887,6,env,,0,13,,,78.044,0
 a0A-lsh01-1e4_s1,4680913,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Adam,1e-3,1e-4,1,1,-15:-2.3026,shrink,0.1,na,1,100,100,92.13,91.7,98.01,0,node851,76,env,,0,14,14,17,91.837,15
 p6-r006-s1,4683396,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.06,1,100,100,92.7,92.5,98.73,0,node883,31,env,,0,18,20,22,92.235,2
+cl5-lay-cD-s1,4702348,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,1,20,20,88.07,88.07,91.66,0,node851,16,env,,0,15,20,,74.423,0
 fr5-lay-a3-s1,4701813,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.15,87.06,91.65,0,node883,6,env,,0,14,,,74.184,0
 zsx-l-r0_s1,4681823,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0,1,100,100,87.96,87.95,93.97,0,node851,77,env,,0,34,,,87.704,0
 mx-a1e4-layer-s1,4682932,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-4,1,1,-15:-2.3026,,na,na,1,100,100,91.27,91.08,99.75,0,node866,41,env,,0,18,29,49,90.84,58
@@ -721,6 +731,7 @@ zsw-l-r1_s2,4681708,salehkaleybars,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3
 m1a3-r04-s2,4683582,salehkaleybars,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.4,2,100,100,91.69,91.62,99.87,0,node858,72,env,,0,14,21,34,91.501,41
 h2-l-L0p5_s2,4680692,salehkaleybars,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,0.5,na,2,100,100,92.36,92.26,97.8,0,node881,31,env,,0,37,38,42,92.049,9
 zad-plain_s2,4683238,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,100,100,91.33,91.25,99.57,0,node851,78,env,,0,28,35,58,90.977,46
+cl5-lay-cD-s2,4702349,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,2,20,20,87.11,87.11,91.35,0,node851,16,env,,0,14,,,74.432,0
 ml5-lay-m2-s2,4702100,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-2,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,86.69,86.36,91.6,0,node887,6,env,,0,14,,,77.881,0
 zad-r1_s2,4683239,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,2,100,100,91.39,91.12,99.67,0,node858,71,env,,0,28,36,56,90.876,47
 ad-l-r01_s2,4681150,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.1,2,100,100,92.91,92.88,99.86,0,node885,31,env,,0,32,38,40,92.672,5
@@ -735,6 +746,7 @@ ad-l-r003_s2,4681149,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6
 ms-lay-1e4-s2,4687164,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-4,1e-6,1,1,-15:-2.3026,,na,na,2,100,100,48.02,48.02,46.99,0,node886,31,env,,0,,,,42.306,0
 g4-sgdmAdam-layer_s2,4680752,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,100,100,90.74,90.28,99.7,0,node885,31,env,,0,15,27,59,90.331,62
 zad-r007_s2,4683240,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.07,2,100,100,93.24,92.97,99.84,0,node851,78,env,,0,34,38,41,92.94,5
+cl5-lay-cU-s2,4702352,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,2,20,20,87.45,86.8,91.59,0,node884,6,env,,0,15,,,74.385,0
 ad-l-r007_s2,4681649,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.07,2,100,100,93.55,93.45,99.82,0,node880,30,env,,0,35,39,42,93.304,4
 ad-l-r03_s2,4681162,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.3,2,100,100,91.3,91.3,99.67,0,node880,30,env,,0,30,36,58,90.874,48
 zad-r0_s2,4683241,s5014158,ResNet18,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,2,100,100,92.73,92.61,97.8,0,node858,71,env,,0,36,38,42,92.361,6
@@ -851,6 +863,7 @@ rs-node-1e2-s0,4700408,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e
 p7-r18-node-s0,4685314,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,87.08,86.06,90.69,0,node886,8,env,,0,15,,,73.058,0
 rs-node-3e4-s0,4700405,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,3e-4,1e-3,1,1,-15:-2.3026,,na,na,0,100,100,92.99,92.09,99.48,0,node880,41,env,,0,21,29,38,92.515,17
 rs-node-3e3-s0,4700407,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,3e-3,1e-3,1,1,-15:-2.3026,,na,na,0,100,100,91.59,91.46,99.73,0,node881,41,env,,0,13,19,33,91.31,44
+cl5-node-cD-s0,4702353,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,0,20,20,87.65,87.65,90.95,0,node884,8,env,,0,15,,,73.03,0
 wc5-node-m2-s0,4702301,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,0,20,20,88.36,88.36,91.46,0,node886,9,env,,0,13,20,,78.713,0
 gp-node-r0-s0,4685191,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,0,100,100,92.52,92.52,97.5,0,node851,93,env,,0,50,60,64,91.984,13
 wc5-node-m3-s0,4702298,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-2.3026,,na,na,0,20,20,87.77,87.01,90.87,0,node885,9,env,,0,15,,,73.047,0
@@ -861,6 +874,7 @@ fz-node-a3-s0,4687493,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-
 fr5-node-a3-s0,4701815,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,87.77,87.54,90.78,0,node884,9,env,,0,15,,,72.796,0
 gp-node-r1-s0,4685206,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,0,100,100,92.17,91.95,99.85,0,node887,44,env,,0,30,35,44,91.883,16
 p5-node-a3-s0,4700708,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,75.47,75.07,77.39,0,node887,8,env,,0,,,,60.034,0
+cl5-node-cU-s0,4702356,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,87.46,87.46,90.64,0,node885,8,env,,0,15,,,72.917,0
 ml5-node-m4-s0,4702101,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-4,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,80.68,80.68,82.46,0,node887,8,env,,0,,,,63.366,0
 ml5-node-m2-s0,4702107,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-2,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,87.78,87.78,91.33,0,node880,8,env,,0,12,,,78.681,0
 gp-node-r01-s0,4685200,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.1,0,100,100,93.14,93.13,99.77,0,node851,93,env,,0,49,56,57,92.63,14
@@ -879,6 +893,7 @@ rs-node-1e3-s1,4700416,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e
 p7-r18-node-s1,4685318,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.97,87.97,90.6,0,node886,8,env,,0,16,,,72.953,0
 gp-node-r01-s1,4685201,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.1,1,100,100,93.36,93.25,99.76,0,node887,44,env,,0,46,55,61,92.777,11
 ml5-node-m4-s1,4702102,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-4,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,80.53,80.53,82.25,0,node864,8,env,,0,,,,63.605,0
+cl5-node-cU-s1,4702357,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,88.06,88.06,90.52,0,node885,8,env,,0,15,20,,72.862,0
 ml5-node-m3-s1,4702105,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.86,87.86,90.56,0,node885,8,env,,0,16,,,72.928,0
 p5-node-a3-s1,4700709,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,77.41,77.41,77.92,0,node882,8,env,,0,,,,60.915,0
 gp-node-r1-s1,4685207,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,1,100,100,91.81,91.59,99.67,0,node887,44,env,,0,30,36,47,91.549,26
@@ -887,6 +902,7 @@ gp-node-r003-s1,4685195,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e
 gc-node-s1,4687224,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0,1,100,100,93.46,92.95,99.02,0,node885,46,env,,0,21,29,38,93.117,10
 gp-node-r02-s1,4685204,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.2,1,100,100,92.46,92.33,99.59,0,node859,87,env,,0,43,52,61,91.921,14
 fz-node-a6-s1,4687504,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,20,20,10.14,10.14,10.15,0,node884,7,env,,0,,,,9.864,0
+cl5-node-cD-s1,4702354,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,1,20,20,88.09,88.09,90.73,0,node884,8,env,,0,16,20,,72.993,0
 wc5-node-m3-s1,4702299,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-2.3026,,na,na,1,20,20,87.79,87.79,90.67,0,node885,9,env,,0,15,,,73.191,0
 wc5-node-m2-s1,4702302,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,1,20,20,87.32,86.88,91.32,0,node887,9,env,,0,14,,,78.484,0
 fz-node-a3-s1,4687503,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,77.75,77.75,78.15,0,node851,16,env,,0,,,,60.983,0
@@ -903,6 +919,7 @@ ml5-node-m3-s2,4702106,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-
 fr5-node-a3-s2,4701817,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,87.28,87.28,90.59,0,node884,8,env,,0,15,,,72.85,0
 gp-node-r01-s2,4685202,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.1,2,100,100,92.97,92.74,99.66,0,node858,88,env,,0,49,58,61,92.412,12
 ml5-node-m4-s2,4702103,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-4,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,80.63,80.05,82.16,0,node880,8,env,,0,,,,63.558,0
+cl5-node-cU-s2,4702358,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,2,20,20,87.8,87.8,90.87,0,node886,8,env,,0,16,,,72.583,0
 fz-node-a3-s2,4687513,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,77.55,77.55,77.75,0,node873,6,env,,0,,,,60.474,0
 wc5-node-m3-s2,4702300,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-2.3026,,na,na,2,20,20,87.0,86.72,90.72,0,node886,9,env,,0,14,,,72.907,0
 ml5-node-m2-s2,4702109,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-2,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,87.04,86.96,90.76,0,node887,8,env,,0,14,,,78.266,0
@@ -911,6 +928,7 @@ gp-node-r0-s2,4685193,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6
 gp-node-r1-s2,4685208,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,2,100,100,91.81,91.8,99.78,0,node851,93,env,,0,30,36,47,91.538,29
 wc5-node-m2-s2,4702303,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,2,20,20,87.37,87.37,90.97,0,node887,9,env,,0,13,,,78.311,0
 fz-node-a6-s2,4687514,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,20,20,10.68,10.62,10.77,0,node859,15,env,,0,,,,10.399,0
+cl5-node-cD-s2,4702355,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,2,20,20,87.88,87.88,90.62,0,node885,8,env,,0,15,,,72.686,0
 p7-r18-node-s3,4685655,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,3,20,20,87.24,86.62,90.45,0,node880,8,env,,0,17,,,72.392,0
 nd-node-plain_s3,4681176,salehkaleybars,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,3,100,100,92.05,91.53,99.83,0,node855,83,env,,0,30,39,50,91.659,22
 gc-node-s3,4687228,s5014158,ResNet18,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0,3,100,100,93.23,93.06,99.05,0,node851,93,env,,0,23,32,43,92.947,13
@@ -1238,6 +1256,7 @@ gp-w-r02-s0,4685221,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6
 zsx-w-r05_s0,4681816,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.5,0,100,100,88.2,87.66,94.1,0,node851,89,env,,0,39,92,,87.703,0
 gp-w-r006-s0,4685215,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.06,0,100,100,47.69,47.69,46.23,0,node859,86,env,,0,,,,44.968,0
 p2-w-L1p0,4681051,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,14.8,14.8,15.5,0,node887,9,env,,0,,,,13.61,0
+cl5-w-cU-s0,4702362,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,83.62,83.62,85.38,0,node886,8,env,,0,,,,68.662,0
 wc5-w-m3-s0,4702304,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-2.3026,,na,na,0,20,20,83.83,83.83,85.17,0,node864,9,env,,0,,,,68.697,0
 p5-w-a3-s0,4700710,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,76.13,76.13,77.26,0,node853,16,env,,0,,,,60.049,0
 z3-w-r0,4681228,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,zpool,na,0,0,20,20,84.32,84.32,86.1,0,node851,18,env,,0,,,,71.984,0
@@ -1245,6 +1264,7 @@ zrn-w-r1_s0,4682652,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6
 fz-w-a3-s0,4687495,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,75.92,75.15,77.16,0,node886,7,env,,0,,,,59.986,0
 wc5-w-m2-s0,4702307,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,0,20,20,86.12,86.07,89.14,0,node887,8,env,,0,17,,,74.363,0
 zrn-w-r099_s0,4682650,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.99,0,100,100,89.26,89.02,96.37,0,node858,86,env,,0,38,50,,88.827,7
+cl5-w-cD-s0,4702359,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,0,20,20,83.48,83.25,85.4,0,node866,10,env,,0,,,,68.749,0
 zrn-w-r09_s0,4682646,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.9,0,100,100,88.97,88.39,96.44,0,node858,87,env,,0,34,63,,88.584,0
 fz-w-a6-s0,4687496,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,20,20,13.71,13.71,13.8,0,node851,16,env,,0,,,,13.269,0
 zsx-w-r07_s0,4681818,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.7,0,100,100,88.72,88.19,94.81,0,node859,87,env,,0,38,71,,88.28,0
@@ -1282,6 +1302,7 @@ wc5-w-m3-s1,4702305,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3
 fr5-w-a3-s1,4701819,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,83.42,83.42,85.11,0,node887,9,env,,0,,,,68.848,0
 zrn-w-r09_s1,4682656,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.9,1,100,100,89.02,88.31,96.39,0,node859,86,env,,0,34,71,,88.436,1
 gp-w-r1-s1,4685225,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,1,100,100,79.5,79.29,82.48,0,node881,47,env,,0,,,,78.028,0
+cl5-w-cD-s1,4702360,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,1,20,20,83.34,83.34,85.16,0,node868,8,env,,0,,,,68.795,0
 zsx-w-r01_s1,4681824,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.1,1,100,100,88.08,88.05,94.04,0,node858,86,env,,0,34,84,,87.84,0
 gc-w-s1,4687225,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0,1,100,100,91.47,90.45,95.44,0,node883,48,env,,0,33,43,51,90.545,46
 zsx-w-r0_s1,4681822,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0,1,100,100,88.13,88.11,93.95,0,node851,89,env,,0,35,96,,87.756,0
@@ -1296,6 +1317,7 @@ gp-w-r01-s1,4685219,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6
 gp-w-r0-s1,4685210,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,1,100,100,51.67,51.67,50.72,0,node851,91,env,,0,,,,47.782,0
 gp-w-r006-s1,4685216,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.06,1,100,100,50.45,50.45,48.85,0,node851,92,env,,0,,,,47.82,0
 gp-w-r02-s1,4685222,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.2,1,100,100,60.79,60.79,59.81,0,node883,47,env,,0,,,,58.123,0
+cl5-w-cU-s1,4702363,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,83.43,83.43,84.94,0,node884,9,env,,0,,,,68.826,0
 wc5-w-m2-s1,4702308,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,1,20,20,86.15,86.15,89.08,0,node887,8,env,,0,18,,,74.31,0
 fz-w-a3-s1,4687505,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,78.13,78.13,78.38,0,node858,14,env,,0,,,,60.986,0
 zrn-w-r099_s1,4682660,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,zpool,na,0.99,1,100,100,89.67,89.67,97.1,0,node858,86,env,,0,35,49,,89.276,23
@@ -1314,8 +1336,10 @@ gc-w-s2,4687227,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1
 fr5-w-a3-s2,4701820,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,83.14,83.01,85.07,0,node880,9,env,,0,,,,68.182,0
 ml5-w-m2-s2,4702118,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-2,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,85.71,85.71,88.89,0,node885,9,env,,0,18,,,73.853,0
 gp-w-r1-s2,4685226,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,2,100,100,78.84,78.75,81.49,0,node851,91,env,,0,,,,77.317,0
+cl5-w-cD-s2,4702361,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-4.6052,,na,na,2,20,20,82.85,82.44,85.2,0,node886,9,env,,0,,,,68.213,0
 wc5-w-m3-s2,4702306,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:-2.3026,,na,na,2,20,20,83.07,83.07,85.28,0,node853,17,env,,0,,,,68.168,0
 wc5-w-m2-s2,4702309,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-2,1e-3,1,1,-30:-2.3026,,na,na,2,20,20,85.62,85.62,88.73,0,node885,8,env,,0,19,,,73.706,0
+cl5-w-cU-s2,4702364,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,2,20,20,82.48,82.46,85.14,0,node884,9,env,,0,,,,68.247,0
 fz-w-a3-s2,4687515,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,77.41,77.41,77.51,0,node858,14,env,,0,,,,60.514,0
 gp-w-r006-s2,4685217,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.06,2,100,100,48.63,48.63,47.56,0,node887,47,env,,0,,,,45.736,0
 gp-w-r02-s2,4685223,s5014158,ResNet18,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.2,2,100,100,59.95,59.95,58.96,0,node882,48,env,,0,,,,57.208,0
@@ -1522,6 +1546,7 @@ sc-ResNet34-add-s0,4683101,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Li
 sm_ResNet34,4680735,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,2,2,10.0,10.0,10.0,0,node880,1,env,,0,,,,,0
 r34r-r008-s0,4684252,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.08,0,100,100,92.61,92.11,99.84,0,node886,60,env,,0,32,37,45,92.389,8
 p6f-r34-lay,4683586,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,88.19,88.19,92.32,0,node886,12,env,,0,14,20,,74.821,0
+uc5-r34-lay-s0,4702371,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,87.72,87.29,92.28,0,node887,12,env,,0,14,,,74.514,0
 r34r-r0-s0,4684237,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,0,100,100,93.36,93.15,98.97,0,node887,61,env,,0,37,46,47,93.132,2
 r34f-r0005-s0,4685602,s5014158,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0.005,0,100,100,93.52,93.18,99.04,0,node881,60,env,,0,40,45,47,93.297,2
 p5-r34-lay,4683382,s5014158,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,55.01,55.01,52.97,0,node880,12,env,,0,,,,24.865,0
@@ -1542,6 +1567,7 @@ r34r-r01-s1,4684256,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3
 r34r-r0-s1,4684238,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,0,1,100,100,93.21,92.96,99.0,0,node851,104,env,,0,36,43,46,93.015,2
 fz3-r34-lay-s1,4701802,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,81.37,81.37,82.35,0,node884,12,env,,0,,,,63.359,0
 sc-ResNet34-layer-s1,4683104,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,90.73,90.19,99.62,0,node881,60,env,,0,29,39,70,90.208,55
+uc5-r34-lay-s1,4702380,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,87.54,87.54,92.16,0,node868,10,env,,0,15,,,73.905,0
 ff5-r34-lay-s1,4702135,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.18,87.18,92.15,0,node880,12,env,,0,15,,,73.865,0
 r34r-r1-s1,4684262,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,additive,na,1,1,100,100,90.7,90.28,99.65,0,node880,60,env,,0,29,39,68,90.149,51
 sa3-ResNet34-layer-s1,4683458,s5014158,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,90.9,90.49,99.8,0,node858,104,env,,0,14,25,54,90.548,65
@@ -1574,11 +1600,13 @@ sc-ResNet34-add-s4,4683498,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Li
 sc-ResNet34-layer-s4,4683497,salehkaleybars,ResNet34,CIFAR10,100,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,4,100,100,90.45,90.14,99.66,0,node886,60,env,,0,29,39,90,89.91,49
 fz3-r34-node-s0,4701793,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,81.18,80.66,82.73,0,node885,13,env,,0,,,,64.347,0
 ff5-r34-node-s0,4702127,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,86.48,86.48,90.04,0,node883,13,env,,0,17,,,71.363,0
+uc5-r34-node-s0,4702372,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,87.1,87.1,90.33,0,node866,13,env,,0,17,,,71.593,0
 p4-r34-node,4683371,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,84.14,80.84,84.19,0,node887,14,env,,0,,,,67.559,0
 p6f-r34-node,4683587,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,87.07,87.07,90.13,0,node886,13,env,,0,17,,,71.542,0
 p5-r34-node,4683383,s5014158,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,27.04,27.04,25.43,0,node858,25,env,,0,,,,15.156,0
 p7-r34-node-s1,4685334,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,86.64,86.64,89.98,0,node880,13,env,,0,16,,,70.881,0
 ff5-r34-node-s1,4702136,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,87.33,87.33,89.86,0,node881,13,env,,0,16,,,70.746,0
+uc5-r34-node-s1,4702381,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,86.35,86.35,89.97,0,node887,14,env,,0,18,,,70.693,0
 fz3-r34-node-s1,4701803,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,81.01,81.01,82.03,0,node883,13,env,,0,,,,63.133,0
 p7-r34-node-s2,4685337,salehkaleybars,ResNet34,CIFAR10,100,nodewise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,86.91,86.89,90.36,0,node886,13,env,,0,16,,,72.198,0
 sc-ResNet34-scal-s0,4683098,salehkaleybars,ResNet34,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,89.81,89.44,98.66,0,node882,64,env,,0,30,42,,89.464,31
@@ -1593,11 +1621,13 @@ sc-ResNet34-scal-s3,4683493,salehkaleybars,ResNet34,CIFAR10,100,scalar,SGDm,Lion
 sc-ResNet34-scal-s4,4683496,salehkaleybars,ResNet34,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,4,100,100,89.62,89.47,98.62,0,node859,120,env,,0,29,48,,89.297,28
 fz3-r34-w-s0,4701794,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,80.86,80.83,83.01,0,node885,13,env,,0,,,,64.061,0
 ff5-r34-w-s0,4702128,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,85.28,85.28,88.2,0,node883,14,env,,0,20,,,70.28,0
+uc5-r34-w-s0,4702373,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,0,20,20,85.18,85.18,88.59,0,node884,14,env,,0,20,,,70.376,0
 p4-r34-w,4683372,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,80.79,80.79,82.42,0,node883,14,env,,0,,,,63.919,0
 p6f-r34-w,4683588,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,20,20,85.38,85.38,88.56,0,node886,13,env,,0,20,,,70.206,0
 p5-r34-w,4683384,s5014158,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,shrink,1.0,na,0,20,20,14.2,14.2,13.77,0,node859,26,env,,0,,,,10.912,0
 p7-r34-w-s1,4685335,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,85.34,85.34,88.46,0,node882,13,env,,0,18,,,69.977,0
 ff5-r34-w-s1,4702137,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,84.93,84.93,88.73,0,node885,14,env,,0,,,,70.281,0
+uc5-r34-w-s1,4702382,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-30:0.0,,na,na,1,20,20,85.03,85.03,88.26,0,node887,14,env,,0,20,,,69.898,0
 fz3-r34-w-s1,4701804,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,fixed,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,20,20,81.58,81.58,82.45,0,node883,13,env,,0,,,,63.607,0
 p7-r34-w-s2,4685338,salehkaleybars,ResNet34,CIFAR10,100,weightwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,20,20,85.14,85.14,88.12,0,node885,13,env,,0,20,,,70.488,0
 cs-r34-add-s0,4683717,salehkaleybars,ResNet34_c100,CIFAR100,100,layerwise,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.06,0,100,100,57.38,56.75,71.0,0,node886,61,env,,0,,,,56.676,0
