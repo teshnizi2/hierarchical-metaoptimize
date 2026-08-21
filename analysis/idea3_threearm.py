@@ -1,0 +1,314 @@
+#!/usr/bin/env python3
+"""Three-arm alpha0/LR robustness reducer  (cycle 47).
+
+Cycle 45/46 compared MetaOptimize (arm B) against a GENUINELY FIXED learning rate
+(arm A) and asked which is flatter in alpha0.  That contrast is the parent paper's
+own framing, but it is not the one a practitioner faces: nobody ships a constant LR.
+The honest competitor is the tuned schedule, and the campaign ALREADY HAS IT --
+`SW_*` (cycle 43) is a horizon-matched AdamW+cosine peak-LR sweep at the identical
+network / dataset / batch size / augmentation / budget / account, 7 points x n=2.
+
+This reducer adds it as ARM C and reports all three on the SHARED sub-grid only, so
+no arm is ever credited with a width measured on grid points the others lack.
+
+    arm A  i3a-*  AdamW, genuinely fixed lr  (COS_WARMUP=0, COS_TOTAL=1e8)
+    arm B  i3b-*  AdamW base + Adam meta, resnet18_blocks (m=6), alpha0 varied
+    arm C  SW_*   AdamW + horizon-matched cosine (COS_TOTAL=50000), peak lr varied
+           i3c-*  the SAME recipe, extending arm C onto the i3 grid extremes
+
+STRUCTURAL FACTS VERIFIED BEFORE USE (cycle 47, against the live source):
+  * `COS_TOTAL`/`COS_WARMUP` are read ONLY by `AdamW_optimizer` and `SGD_optimizer`
+    in build_optimizer.py.  Arm B is `--optimizer HF --alg-base AdamW`, which routes
+    to `HF.AdamW_base_update` -- a hand-written update with NO scheduler attached.
+    So arm B carries no hidden cosine and the `COS_TOTAL=default` its .out echoes is
+    an unread variable.
+  * arm C's ENV is `COS_TOTAL=50000 COS_WARMUP=default`, i.e. a 10,000-step (20-epoch)
+    linear warmup then cosine to ~0 over the exact 50,000-step horizon.
+  * arms A and C both ran on the `salehkaleybars` account; arm B is split across both
+    accounts by seed, which is what cycle 45's design intended.
+
+WIDTH CONVENTION is inherited from analysis/idea3_robustness.py and is the same
+judgement call: the longest CONTIGUOUS in-band run, measured in decades between the
+end points, so a lone in-band cell is 0 decades.  Gapped in-band sets are flagged.
+
+WHY TWO WIDTH FAMILIES ARE REPORTED, and this is the cycle's main methodological point:
+  "within X pp of its OWN best" is scale-free and is what a robustness claim means,
+  but it PENALISES a sharp high peak.  "above an ABSOLUTE floor" is what a practitioner
+  actually cares about (will this run be usable at all?).  The two disagree in sign on
+  this data, so reporting only one is a selection.  Both are printed.
+
+Run `--selftest` before trusting any number this prints.
+"""
+import csv
+import math
+import sys
+
+# the c45 grid, in order
+GRID = ["1e-6", "1e-5", "1e-4", "3e-4", "1e-3", "1e-2", "1e-1"]
+GRIDV = {g: float(g) for g in GRID}
+
+
+def _fnum(s):
+    try:
+        return float(s)
+    except (TypeError, ValueError):
+        return None
+
+
+def load(path):
+    with open(path) as fh:
+        return list(csv.DictReader(fh))
+
+
+def _a0key(raw):
+    """Map a CSV alpha0 string onto a grid label, tolerating 1e-06 / 1E-6 / 0.0001."""
+    v = _fnum(raw)
+    if v is None:
+        return None
+    for g, gv in GRIDV.items():
+        if gv != 0 and abs(v / gv - 1.0) < 1e-6:
+            return g
+    return None
+
+
+def collect(rows, prefixes, min_epochs):
+    """{alpha0_label: [plateau, ...]} over rows whose run name starts with any prefix."""
+    out = {}
+    for r in rows:
+        name = r.get("run", "")
+        if not any(name.startswith(p) for p in prefixes):
+            continue
+        if r.get("superseded", "0") != "0":
+            continue
+        ep = _fnum(r.get("epochs_done"))
+        if ep is None or ep < min_epochs:
+            continue
+        pl = _fnum(r.get("plateau"))
+        if pl is None:
+            continue
+        k = _a0key(r.get("alpha0"))
+        if k is None:
+            continue
+        out.setdefault(k, []).append(pl)
+    return out
+
+
+def cellstats(vals):
+    n = len(vals)
+    m = sum(vals) / n
+    if n < 2:
+        return m, float("nan"), n
+    var = sum((v - m) ** 2 for v in vals) / (n - 1)
+    return m, math.sqrt(var), n
+
+
+def width(means, subgrid, lo):
+    """Longest CONTIGUOUS run of subgrid points with mean >= lo.
+
+    Returns (decades, first_label, last_label, gapped) where `gapped` is True when
+    some in-band point lies outside the returned run -- i.e. the band is not an
+    interval and the single number under-reports it.
+    """
+    inband = [g for g in subgrid if g in means and means[g] >= lo]
+    if not inband:
+        return 0.0, None, None, False
+    best = (0.0, None, None)
+    i = 0
+    idx = {g: k for k, g in enumerate(subgrid)}
+    present = [g for g in subgrid if g in means]
+    while i < len(present):
+        if present[i] not in inband:
+            i += 1
+            continue
+        j = i
+        while j + 1 < len(present) and present[j + 1] in inband:
+            j += 1
+        dec = abs(math.log10(GRIDV[present[j]]) - math.log10(GRIDV[present[i]]))
+        if dec > best[0] or best[1] is None:
+            best = (dec, present[i], present[j])
+        i = j + 1
+    run = present[idx[best[1]]: idx[best[2]] + 1] if best[1] else []
+    gapped = len(inband) > len([g for g in run if g in inband])
+    return best[0], best[1], best[2], gapped
+
+
+def report_arm(label, cells, subgrid, out=sys.stdout):
+    means = {}
+    print(f"\n=== {label} ===", file=out)
+    print(f"{'alpha0':>8} {'n':>3} {'plateau':>9} {'sd':>7}", file=out)
+    for g in subgrid:
+        if g not in cells:
+            print(f"{g:>8} {'-':>3} {'-':>9} {'-':>7}", file=out)
+            continue
+        m, sd, n = cellstats(cells[g])
+        means[g] = m
+        sds = "  n/a " if math.isnan(sd) else f"{sd:7.3f}"
+        print(f"{g:>8} {n:>3} {m:9.3f} {sds}", file=out)
+    missing = [g for g in subgrid if g not in means]
+    if missing:
+        print(f"  INCOMPLETE on this sub-grid -- missing {', '.join(missing)}", file=out)
+    return means
+
+
+def summarise(means, subgrid, out=sys.stdout, floors=(90.0, 85.0)):
+    if not means:
+        return None
+    peak_g = max(means, key=lambda g: means[g])
+    peak = means[peak_g]
+    worst = min(means[g] for g in subgrid if g in means)
+    print(f"  peak  {peak:8.3f} at alpha0={peak_g}    worst {worst:8.3f}"
+          f"    span {peak - worst:7.3f} pp", file=out)
+    res = {"peak": peak, "peak_at": peak_g, "worst": worst}
+    for tol in (1.0, 2.0, 3.0):
+        d, a, b, gap = width(means, subgrid, peak - tol)
+        span = f"[{a} .. {b}]" if a else "[none]"
+        flag = "  (GAPPED -- band is not an interval)" if gap else ""
+        print(f"  width within {tol:.0f}pp of own best : {d:4.1f} decades  {span}{flag}", file=out)
+        res[f"w{int(tol)}"] = d
+    for fl in floors:
+        d, a, b, gap = width(means, subgrid, fl)
+        span = f"[{a} .. {b}]" if a else "[none]"
+        flag = "  (GAPPED)" if gap else ""
+        print(f"  width above absolute {fl:.0f}   : {d:4.1f} decades  {span}{flag}", file=out)
+        res[f"f{int(fl)}"] = d
+    return res
+
+
+def main(path):
+    rows = load(path)
+    A = collect(rows, ("i3a-",), 100)
+    B = collect(rows, ("i3b-",), 100)
+    C = collect(rows, ("SW_", "SW-", "i3c-"), 100)
+
+    shared = [g for g in GRID if g in A and g in B and g in C]
+    full = [g for g in GRID if g in A or g in B or g in C]
+
+    print("THREE-ARM alpha0 / LR ROBUSTNESS  --  ResNet18 / CIFAR-10 / bs100 / AUGMENT=1 / 100 ep")
+    print("  A = AdamW at a genuinely fixed lr        (i3a-*)")
+    print("  B = MetaOptimize, AdamW base, m=6        (i3b-*)")
+    print("  C = AdamW + horizon-matched cosine       (SW_* / i3c-*)")
+    print(f"\nfull union grid : {' '.join(full)}")
+    print(f"SHARED sub-grid : {' '.join(shared) if shared else '(none)'}"
+          "   <- every cross-arm width below is measured HERE and nowhere else")
+
+    resA = summarise(report_arm("A  fixed-lr AdamW", A, full), shared) if A else None
+    resB = summarise(report_arm("B  MetaOptimize m=6", B, full), shared) if B else None
+    resC = summarise(report_arm("C  AdamW + cosine", C, full), shared) if C else None
+
+    print("\n=== HEAD TO HEAD, shared sub-grid only ===")
+    if not (resA and resB and resC):
+        print("  NOT DECIDABLE -- at least one arm has no cell on the shared sub-grid.")
+        return
+    if len(shared) < 4:
+        print(f"  WARNING: shared sub-grid has only {len(shared)} points; widths are coarse.")
+    hdr = f"{'':26}{'A fixed':>10}{'B meta':>10}{'C cosine':>10}"
+    print(hdr)
+    for key, lab in (("peak", "peak plateau"), ("worst", "worst plateau"),
+                     ("w1", "width <=1pp of own best"), ("w2", "width <=2pp of own best"),
+                     ("w3", "width <=3pp of own best"),
+                     ("f90", "width above 90"), ("f85", "width above 85")):
+        print(f"{lab:26}{resA[key]:10.3f}{resB[key]:10.3f}{resC[key]:10.3f}")
+
+    print("\n=== VERDICT ===")
+    # B vs C is the claim that matters: does meta-learning the step size buy
+    # robustness that a tuned schedule does not already have?
+    own = [(t, resB[f"w{t}"], resC[f"w{t}"]) for t in (1, 2, 3)]
+    b_wins_own = [t for t, b, c in own if b > c + 1e-9]
+    c_wins_own = [t for t, b, c in own if c > b + 1e-9]
+    tied_own = [t for t, b, c in own if abs(b - c) <= 1e-9]
+    abs_b = resB["f90"] > resC["f90"] + 1e-9
+    print(f"  B peak is {resC['peak'] - resB['peak']:+.3f} pp vs C "
+          f"(negative = MetaOptimize is AHEAD).")
+    print(f"  B worst is {resB['worst'] - resC['worst']:+.3f} pp vs C "
+          f"(positive = MetaOptimize degrades less at the grid extremes).")
+    print(f"  own-best width, B vs C:  B wider at {b_wins_own or '[none]'} pp,"
+          f"  C wider at {c_wins_own or '[none]'} pp,  TIED at {tied_own or '[none]'} pp.")
+    if b_wins_own and not c_wins_own:
+        print("  -> B is flatter than C at every tolerance where they differ: the parent "
+              "paper's robustness claim SURVIVES against a tuned schedule.")
+    elif c_wins_own and not b_wins_own:
+        print("  -> C is flatter than B at every tolerance where they differ, and ties "
+              "elsewhere.  MetaOptimize does NOT buy scale-free robustness that a tuned "
+              "cosine lacks, and it costs peak accuracy on top.  Note this is a WIN-OR-TIE "
+              "for C, not a sweep -- do not write it as 'C is flatter at every tolerance'.")
+    else:
+        print("  -> SPLIT: the two curves have different shapes and the verdict depends on "
+              "the tolerance chosen.  A split is NOT a tie.  Report the whole row.")
+    print(f"  On the ABSOLUTE floor (>=90): B {resB['f90']:.1f} dec vs C {resC['f90']:.1f} dec"
+          f" -> {'B' if abs_b else 'C'} is usable over a wider range.")
+    print("\n  Peak reference OFF this grid: the tuned cosine's true argmax is 3e-3, giving")
+    print("  94.417 +-0.113 (n=5, CORRECTIONS 30).  Arm C's on-grid peak therefore UNDER-states")
+    print("  the baseline, and every deficit quoted against arm C is a LOWER bound.")
+
+
+# ------------------------------------------------------------------ selftest
+def _selftest():
+    ok = fail = 0
+
+    def chk(name, got, want):
+        nonlocal ok, fail
+        good = (got == want) or (isinstance(want, float) and isinstance(got, float)
+                                 and abs(got - want) < 1e-9)
+        if good:
+            ok += 1
+        else:
+            fail += 1
+            print(f"  FAIL {name}: got {got!r} want {want!r}")
+
+    # --- width convention
+    m = {"1e-4": 91.0, "3e-4": 91.5, "1e-3": 90.9}
+    chk("w contiguous 3pt", width(m, GRID, 89.0)[0], 1.0)
+    chk("w lone cell is 0 dec", width(m, GRID, 91.2)[0], 0.0)
+    chk("w empty band", width(m, GRID, 99.0)[0], 0.0)
+    chk("w endpoints", width(m, GRID, 89.0)[1:3], ("1e-4", "1e-3"))
+    # gap detection: two separated in-band cells
+    mg = {"1e-6": 91.0, "1e-5": 10.0, "1e-4": 91.0}
+    d, a, b, gap = width(mg, GRID, 90.0)
+    chk("w gapped flagged", gap, True)
+    chk("w gapped returns 0 dec run", d, 0.0)
+    # a gap that is NOT a gap once the low cell is in band
+    d2, _, _, gap2 = width(mg, GRID, 5.0)
+    chk("w no false gap", gap2, False)
+    chk("w full span 2 dec", d2, 2.0)
+
+    # --- alpha0 label mapping
+    chk("a0 1e-06", _a0key("1e-06"), "1e-6")
+    chk("a0 0.0001", _a0key("0.0001"), "1e-4")
+    chk("a0 3e-04", _a0key("3e-04"), "3e-4")
+    chk("a0 off grid", _a0key("3e-3"), None)
+    chk("a0 junk", _a0key("na"), None)
+
+    # --- collect: filters
+    rows = [
+        {"run": "i3a-1e3-s0", "superseded": "0", "epochs_done": "100", "plateau": "90.0", "alpha0": "1e-3"},
+        {"run": "i3a-1e3-s1", "superseded": "0", "epochs_done": "99", "plateau": "50.0", "alpha0": "1e-3"},   # short
+        {"run": "i3a-1e3-s2", "superseded": "1", "epochs_done": "100", "plateau": "50.0", "alpha0": "1e-3"},  # superseded
+        {"run": "i3a300-1e3-s0", "superseded": "0", "epochs_done": "300", "plateau": "95.0", "alpha0": "1e-3"},
+        {"run": "SW_1e-3_s0", "superseded": "0", "epochs_done": "100", "plateau": "94.0", "alpha0": "1e-3"},
+    ]
+    a = collect(rows, ("i3a-",), 100)
+    chk("collect drops short run", len(a["1e-3"]), 1)
+    chk("collect drops superseded", a["1e-3"][0], 90.0)
+    chk("collect prefix excludes i3a300", "i3a300-1e3-s0" not in str(a), True)
+    c = collect(rows, ("SW_", "SW-", "i3c-"), 100)
+    chk("collect arm C prefix", c["1e-3"], [94.0])
+
+    # --- cellstats
+    m_, sd_, n_ = cellstats([1.0, 3.0])
+    chk("cellstats mean", m_, 2.0)
+    chk("cellstats sd (n-1)", round(sd_, 9), round(math.sqrt(2.0), 9))
+    chk("cellstats n=1 sd nan", math.isnan(cellstats([5.0])[1]), True)
+
+    # --- absolute-floor width is independent of the peak
+    mh = {"1e-6": 91.0, "1e-5": 91.0, "1e-4": 99.0}
+    chk("floor width ignores peak", width(mh, GRID, 90.0)[0], 2.0)
+    chk("own-best width punishes peak", width(mh, GRID, 99.0 - 1.0)[0], 0.0)
+
+    print(f"selftest: {ok}/{ok + fail} PASS")
+    return 0 if fail == 0 else 1
+
+
+if __name__ == "__main__":
+    if "--selftest" in sys.argv:
+        sys.exit(_selftest())
+    main(sys.argv[1] if len(sys.argv) > 1 else "results/all_runs.csv")

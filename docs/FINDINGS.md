@@ -8281,3 +8281,161 @@ heterogeneity signature, not anti-correlation.
   **1e-3** on all 92 dirs (β at step 0 = ln a0 = −6.9078). Corrected in place. This matters:
   it is what makes `fz-*-a3` and `p7-r18-*` a0-matched, so CORRECTIONS 27's controlled pair is
   sound and 44.3's contrast is clean.
+
+## 47.1 HEADLINE — the IDEA 3 robustness verdict INVERTS once the competitor is a tuned schedule
+
+Cycles 45/46 compared MetaOptimize's `alpha0` robustness (arm B) against a **genuinely
+fixed** learning rate (arm A). Arm B wins that contest easily. But nobody ships a constant
+LR, and the campaign **already had** the right competitor sitting unread in the CSV: `SW_*`
+(cycle 43) is an AdamW + horizon-matched-cosine peak-LR sweep at the identical network /
+dataset / batch size / augmentation / budget / **account**. Adding it as **arm C** cost zero
+compute and it changes the answer.
+
+Reducer: `analysis/idea3_threearm.py` (`--selftest` **22/22 PASS** — run it first).
+All widths below are measured on the **shared** sub-grid {1e-5, 1e-4, 3e-4, 1e-3, 1e-2}
+only, so no arm is credited with a width measured on grid points the others lack.
+
+| shared sub-grid, 100 ep, R18/CIFAR-10 | A fixed lr | B meta m=6 | C cosine |
+|---|---|---|---|
+| peak plateau | 91.796 | 93.350 | **94.028** |
+| worst plateau | 69.898 | **90.095** | 83.884 |
+| width ≤1pp of own best (decades) | 0.477 | **0.000** | 0.523 |
+| width ≤2pp of own best | 1.000 | 2.000 | 2.000 |
+| width ≤3pp of own best | 1.000 | 2.000 | 2.000 |
+| width above **absolute** 90 | 0.477 | **3.000** | 2.000 |
+| width above **absolute** 85 | 1.000 | **3.000** | 2.000 |
+
+**The verdict is a SPLIT and must never be written as one number.**
+
+* **Scale-free robustness ("within X pp of what tuning would have given you"): MetaOptimize
+  does NOT win.** It *loses* at 1pp (0.000 vs 0.523 decades) and *ties* at 2pp and 3pp. It
+  loses at 1pp because its own peak is sharp — 93.350 at 3e-4 against 91.700 at 1e-4 and
+  92.209 at 1e-3 — so its 1pp band contains exactly one grid point.
+* **Absolute robustness ("will this run be usable at all"): MetaOptimize wins, by 1 decade
+  on this sub-grid and by a pre-registered 2 decades on the full grid (47.4).** It holds
+  ≥90 across 1e-5…1e-2 where the cosine holds it across 1e-4…1e-2 only.
+* **And it costs peak accuracy either way.** On-grid it is 0.678pp below arm C. Against the
+  true tuned baseline of **94.417 ±0.113 (n=5, CORRECTIONS 30)** — whose argmax 3e-3 is off
+  this grid — it is **1.067pp** below. Every deficit quoted against arm C is a LOWER bound.
+
+**Write it as:** *MetaOptimize buys insensitivity to catastrophic mis-setting of the step
+size, not freedom from tuning it, and it pays ~1.1pp of peak accuracy for that insurance.*
+
+## 47.2 The mechanism of arm B's advantage is bottom-end RESCUE, and `ep_to_85` shows it directly
+
+The plateau table understates how different the two failure modes are. Epochs-to-85%:
+
+| alpha0 | A fixed lr | B meta m=6 |
+|---|---|---|
+| 1e-5 | **89.3** (n=3) | **8.7** (n=3) |
+| 1e-4 | 14.7 (n=3) | 8.5 (n=2) |
+| 3e-4 | 10.7 (n=3) | 12.0 (n=2) |
+| 1e-3 | 10.7 (n=3) | 9.0 (n=2) |
+| 1e-2 | never reached (n=0) | 13.0 (n=2) |
+
+At a step size 100× too small the fixed arm needs **89.3 epochs** of a 100-epoch budget to
+reach 85%; MetaOptimize needs **8.7**. That is the whole of arm B's robustness claim in one
+row, and it is a *rate* effect — the meta-learner grows `alpha` back to a usable scale — not
+a generalisation effect. Arm C at the same point is 83.884 plateau, i.e. it also fails to
+recover, because a cosine can only scale an already-too-small peak LR **down**.
+
+## 47.3 The clip control's verdict is CONFOUNDED BY A DIVERGENT SEED and its sign inverts
+
+`analysis/idea3_robustness.py` prints *"BETA_CLIP=-15:-2.3026 48.429 / BETA_CLIP=-15:0 76.532,
+delta +28.103pp — the guard IS part of arm B's top-end flatness."* **Do not quote that.**
+
+| alpha0=1e-1, 100 ep | seeds landed | mean as printed | after the `plateau > 50` collapse filter |
+|---|---|---|---|
+| `i3b-1e1` guard ON (alpha ≤ 0.0999998) | {10.000, 86.858} | 48.429 (sd 54.3) | **86.858, n=1** |
+| `i3bc-1e1` guard OFF (alpha ≤ 1.0) | {72.719, 80.345} | 76.532 (sd 5.4) | **76.532, n=2** |
+
+The −28.1pp is one fully collapsed seed (`i3b-1e1-s2`, plateau 10.000 = chance) dragging a
+2-seed mean. On the surviving seeds the guard is worth **+10.3pp**, i.e. the *opposite* sign.
+The honest reading of the cell as it stands is that the guard makes the top end **bimodal** —
+either 86.9 or dead — while removing it gives a tighter but lower 72.7–80.3. **This cell is
+NOT decidable at n=2** and both third seeds (`i3b-1e1-s1`, `i3bc-1e1-s1`) were still running
+at this tick. Re-read before any sentence about the guard.
+
+This is the standing `collapsed`-column trap (CONTINUE-HERE gotchas) firing again: the column
+is `0` on every row and flags nothing, so the filter must be applied by hand.
+
+## 47.4 Pre-registered, before the arm-C extension lands
+
+Arm C has no cell at 1e-6 or 1e-1 — precisely the two grid points where arm B's advantage is
+claimed. The head-to-head above is therefore decided on 5 of 7 points, with the missing 2
+chosen by which arm happened to be swept first. `bin/c47_idea3_armC_cosine.sh` (10 jobs,
+alice) closes that. Pre-registered in the script header and repeated here:
+
+* **(C1) near-forced, and flagged as such so it is not scored as a success.** Arm C at peak
+  LR 1e-6 warms up to 1e-6 then decays, so its mean LR is strictly below arm A's constant
+  1e-6. Predict **C(1e-6) < 70**, vs A(1e-6) = 68.680 ±0.530 and B(1e-6) = 91.396.
+  *Refutation:* C(1e-6) > 85 deletes MetaOptimize's bottom-end advantage outright.
+* **(C2) the informative one.** Predict **C(1e-1) ∈ [20, 85]**. A(1e-1) = 13.896; the 20-epoch
+  warmup is the only thing arm C has that arm A does not.
+* **(C3) the deciding arithmetic, computable in advance.** Under C1+C2 arm C's ≥90 width
+  stays at **2.0 decades** [1e-4..1e-2], while arm B's grows from 3.0 to **4.0 decades**
+  because B(1e-6) = 91.396 is already ≥90 and adjacent to its existing run. So the
+  pre-registered full-grid result is **B 4.0 vs C 2.0 decades above 90 — MetaOptimize's
+  genuine advantage, quantified, and worth exactly 2 decades of alpha0.**
+  *Refutation:* C(1e-1) ≥ 90, or B's 1e-6 cell dropping below 90 when its third seed lands.
+* **Resolution.** Arm C cell sd is 0.086–0.170pp at n=2 (s.e. ≈ 0.1pp). Differences below
+  ~0.3pp between arm C cells are NOT resolvable and must not move a band edge. Which is why
+  `1e-4` is being topped up n=2→4: it reads 92.962 against a 1pp band edge of 93.028 and
+  **misses by 0.066pp, below its own s.e.** Arm C's `width ≤1pp` is 0.523 or 1.000 decades on
+  a coin flip until that cell has more seeds.
+
+## 47.5 A patch that would have returned nothing from 8 jobs, caught before submission
+
+`patches/patch_probe5.py` (prepared cycle 44, never run) writes the per-group negative counts
+with `_np.save(_tmp, ...)` where `_tmp` ends in `.npy.tmp`. **`numpy.save` appends `.npy` to
+a string path that does not already end in it**, so it writes `neg_counts.npy.tmp.npy` and
+the next line's `os.replace(_tmp, _dst)` raises `FileNotFoundError`. Measured, not inferred:
+
+```
+>>> np.save('/tmp/d/neg_counts.npy.tmp', np.zeros(3)); sorted(os.listdir('/tmp/d'))
+['neg_counts.npy.tmp.npy']
+```
+
+The write fires at probe record 500 = 2,500 steps = **5 epochs of a 20-epoch run**, so all 8
+jobs would have died a quarter of the way in, and `neg_counts.json` — which the batch's own
+structural check #2 requires — would never have existed. Fixed by
+`patches/patch_probe5_fix.py` (hand numpy an open file **object**; no extension is appended).
+
+**A second suspected bug was investigated and is NOT one**, recorded so it is not "fixed"
+later: `os` and `json` are not module-level imports in `HF.py`, and the `import os` at line
+298 is inside `_probe_init`, a *different* function from `_probe` where the PROBE5 block sits.
+That looks fatal. It is not — `_probe` does its own `import json, os` at line 335, which runs
+before the block at line 363 on every record. Established by checking the executing scope,
+not by grepping for `import os`.
+
+New regression test **`tests/test_probe5_block.py` — 10/10 PASS**. It does not read the block;
+it lifts the block **verbatim out of the live HF.py** and executes it against a stub, then
+asserts (i) the file lands at the intended path with no stray `.tmp.npy`, (ii) counts written
+== counts accumulated, (iii) the batch's own structural check #3 —
+`sum(neg)/(n_rec·n_tot) == time-mean of frac_neg` — holds, and (iv) `PROBE5` unset writes
+nothing, i.e. the gate really is a gate. Blast radius of the patch was checked before applying:
+`_probe` returns at line 321 when `PROBE=0`, so no in-flight job could reach the new code.
+
+## 47.6 Ops and hygiene
+
+* CSV re-aggregated: **1505 runs** (956 alice + 672 alice2), **+59** since cycle 46.
+* Queues at tick start: alice **2 PENDING / 13 RUNNING**, alice2 **0 / 10**. After submitting:
+  alice **2 / 18**, alice2 **8 / 9**. FairShare **0.333054 / 0.333893** — overridden by the
+  revised batch-size rule, logged as `--force-fairshare` in both scripts' own output.
+* **Submitted 18 jobs**, ~0.2% of RawUsage combined, inside the revised cycle-44 budget rule:
+  `c47_idea3_armC_cosine.sh` 10 on alice (`4700694-4700703`),
+  `c44_probe5_heterogeneity.sh` 8 on alice2 (`4700704-4700711`). **Nothing cancelled.**
+* **The c46 300-epoch convergence control has NOT landed** — 16 jobs, 8 per account, running
+  ~3.2 epochs/min, so ~95 min each. `analysis/idea3_robustness.py` correctly prints
+  **NOT YET DECIDABLE** and the 100-epoch shape above is therefore still uncontrolled for
+  budget. **No robustness claim is final until it prints BUDGET-STABLE.**
+* **Structural check on arm B, done this cycle against the live source.** Arm B's `.out`
+  echoes `COS_TOTAL=default COS_WARMUP=default`, which reads as though a cosine is attached.
+  It is not: `COS_TOTAL`/`COS_WARMUP` are consumed **only** by `AdamW_optimizer` and
+  `SGD_optimizer` in `build_optimizer.py:60-62,94-96`. Arm B is `--optimizer HF --alg-base
+  AdamW`, which routes to `HF.AdamW_base_update` — a hand-written update with no scheduler.
+  **Arm B carries no hidden schedule**; the echoed variables are unread. Arm C's
+  `COS_TOTAL=50000 COS_WARMUP=default` maps to a 10,000-step (20-epoch) linear warmup then
+  cosine over the exact 50,000-step horizon.
+* Several arm-B cells are still n=2 because seed 1 was in flight (`i3b-1e6-s2`, `i3b-1e1-s1`,
+  `i3bc-1e1-s1` and the 100-ep stragglers). Cells marked n=2 above are provisional.

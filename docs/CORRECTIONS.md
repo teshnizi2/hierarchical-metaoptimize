@@ -1134,3 +1134,99 @@ it this tick was zero.
    the "how does agreement vary with block size" question the project is pointed at. 4 jobs,
    ~40 min each. **Prepared and self-guarded; NOT submitted** (§35).
 5. **Submitted nothing**, per the standing FairShare rule. Both queues empty; no job in flight.
+
+## 37. The FairShare floor is formally RETIRED and replaced with a batch-size rule (cycle 47)
+
+CORRECTIONS 35 measured that the rule could not work and left the decision to the operator.
+The operator has now revised it explicitly. Recorded here because §35 says "flagged so the
+operator can revise it with numbers", and this is that revision:
+
+| | old rule | new rule |
+|---|---|---|
+| gate | FairShare ≥ 0.35, else submit nothing | batch adds < ~0.5% of RawUsage (≈ ≤20 jobs of ~40 min) |
+| hard stop | — | PENDING > 40, or a single batch > ~40 jobs |
+
+Rationale, all of it already measured in this repo: `PriorityDecayHalfLife = 14 days` so
+0.35 is unreachable on any useful timescale (§35); FairShare is *relative* to other `liacs`
+users so it is not under our control; and 93 of 94 pendings were `QOSMaxGRESPerUser`-bound,
+not priority-bound (FINDINGS 33.9/38), so FairShare was not gating job starts at these queue
+depths. The incident that set the original rule was 300+ jobs — a different order of
+magnitude from anything since. **Judge by batch size and queue depth, not by the number.**
+Both scripts this cycle log the deviation as `--force-fairshare` in their own output.
+
+## 38. The IDEA 3 verdict INVERTS against a tuned schedule, and "flatter" needs a stated metric (cycle 47)
+
+**What cycles 45/46 set up, and what was missing.** The sweep compared MetaOptimize (arm B)
+against a genuinely fixed learning rate (arm A) and `analysis/idea3_robustness.py` printed
+*"REFUTED: MetaOptimize is NOT flatter than a fixed step size."* That verdict came from a
+single metric — width within 1pp of each arm's own best — and it is fragile in a way the
+binary print hides. On the **absolute** ≥90 criterion the same data says arm B is flatter by
+2.5 decades. **A robustness verdict without its metric named is not a result.**
+
+**The bigger omission: arm A is the wrong competitor.** Nobody ships a constant LR. The
+campaign already held the right one — `SW_*`, an AdamW+cosine peak-LR sweep, config- and
+account-matched — and it had never been put in the same table. Adding it as arm C (FINDINGS
+47.1, `analysis/idea3_threearm.py`, selftest 22/22) gives, on the shared sub-grid:
+
+| | A fixed | B meta | C cosine |
+|---|---|---|---|
+| peak | 91.796 | 93.350 | **94.028** |
+| worst | 69.898 | **90.095** | 83.884 |
+| width ≤1pp of own best | 0.477 | **0.000** | 0.523 |
+| width ≤2pp / ≤3pp | 1.000 | 2.000 | 2.000 |
+| width above absolute 90 | 0.477 | **3.000** | 2.000 |
+
+| claim | status |
+|---|---|
+| "MetaOptimize is more robust to alpha0 than a fixed step size" | **STANDS** — 3.255pp span vs 21.898pp |
+| "MetaOptimize is more robust than the alternative a practitioner would use" | **FAILS on the scale-free metric** (loses at 1pp, ties at 2pp and 3pp) and **HOLDS on the absolute one** (3.0 vs 2.0 decades ≥90). Report both rows or neither. |
+| "the parent paper's robustness claim survives" | **SPLIT, not a tie.** The two curves have different shapes; the verdict depends on the tolerance. |
+| MetaOptimize's peak cost | **1.067pp** below the tuned baseline 94.417 ±0.113 (n=5), and that is a LOWER bound — arm C's argmax 3e-3 is off this grid. |
+
+**The honest sentence, and it is a real result either way:** *MetaOptimize buys insensitivity
+to catastrophic mis-setting of the step size — at alpha0 = 1e-5 it reaches 85% in 8.7 epochs
+where a fixed LR needs 89.3 and a cosine never gets there — but it does not remove the need to
+tune, and it pays ~1.1pp of peak accuracy for that insurance.*
+
+**Not final.** The c46 300-epoch convergence control has not landed; the reducer prints
+NOT YET DECIDABLE. Per `docs/IDEA3-robustness.md` §7, if it prints NOT BUDGET-STABLE the
+100-epoch sweep is not a valid basis for any of the above and must not be patched with a
+caveat.
+
+## 39. `idea3_robustness.py`'s clip-control line is wrong in SIGN (cycle 47)
+
+It prints *"delta +28.103 pp — the guard IS part of arm B's top-end flatness. State it."*
+That delta is one fully collapsed seed (`i3b-1e1-s2`, plateau 10.000 = chance) inside a
+2-seed mean. Applying the standing `plateau > 50` collapse filter — necessary by hand because
+the `collapsed` column is `0` on every row and flags nothing — inverts it: guard ON 86.858
+(n=1) vs guard OFF 76.532 (n=2), i.e. the guard is worth **+10.3pp**, not −28.1pp. The cell is
+**not decidable at n=2**; both third seeds were still running. FINDINGS 47.3.
+
+**Withdrawn:** any sentence of the form "the guard is doing arm B's top-end work."
+**Standing rule reaffirmed:** apply `plateau > 50` before every mean in this campaign.
+
+## 40. DECISION RECORD — cycle 47
+
+1. **IDEA 3 is the strongest live result and it is now three-armed.** The cycle-45/46 design
+   was measuring MetaOptimize against a competitor nobody uses. Arm C fixes that at zero
+   compute and it changes the verdict from "refuted" to a documented split (§38). Continue.
+2. **Direction C remains the project.** The `PATCH_PROBE5` batch — the one experiment that
+   de-confounds the scale profile, i.e. "how does agreement vary with block size" — is
+   **submitted** (8 jobs, alice2), which cycle 44 could not do under the old FairShare rule.
+3. **Ideas 1 and 2 stay dead.** Nothing this cycle touches either; zero jobs spent on them.
+4. **Submitted 18 jobs, ~0.2% of RawUsage, nothing cancelled.**
+   `c47_idea3_armC_cosine.sh` 10 on alice (`4700694-4700703`) — arm C at the two grid extremes
+   plus band-edge seed top-ups, pre-registered C1/C2/C3 in FINDINGS 47.4.
+   `c44_probe5_heterogeneity.sh` 8 on alice2 (`4700704-4700711`) — per-group marginals.
+5. **A fatal bug in the prepared PROBE5 patch was caught before submission** and would have
+   returned nothing from all 8 jobs (§FINDINGS 47.5). Fixed, and covered by a new regression
+   test that executes the shipped bytes rather than reading them: `tests/test_probe5_block.py`,
+   **10/10 PASS**. A second suspected bug was investigated and shown NOT to be one; recorded so
+   it is not "fixed" later.
+6. **Next tick, in order.** (a) Read the c46 300-epoch control and run
+   `analysis/idea3_robustness.py` — **nothing about IDEA 3 is final until it prints
+   BUDGET-STABLE**. (b) Read `i3c-*` against the C1/C2/C3 pre-registration and re-run
+   `analysis/idea3_threearm.py`. (c) Reduce the `p5-*` probe dirs with the corrected floor and
+   settle FINDINGS 44.5 outcome (a) vs (b). (d) Re-read the alpha0=1e-1 clip cell once its
+   third seeds land (§39). (e) `bin/c43_frozen_ladder.sh` (30 jobs) — frozen-beta to
+   R10/R34/CIFAR-100 — remains prepared and is the largest untouched cell.
