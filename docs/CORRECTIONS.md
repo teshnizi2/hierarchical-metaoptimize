@@ -892,6 +892,12 @@ allowed to use, which MetaOptimize's meta-learner does not find."
 
 ## 31. The sign-agreement excess is MARGINAL BIAS, not correlation — 8b's mechanism sentence is wrong (cycle 43)
 
+> **PARTLY SUPERSEDED BY §33, written the same cycle.** The measurement below is right and
+> the *headline-statistic* conclusion survives with quantified power. The inference drawn from
+> the pairwise nulls — "there is no correlation, therefore pooling is bias-limited" — is
+> **withdrawn**: that test is under-powered for the correlation the tensor-level data already
+> implies, by one to three orders of magnitude. Read §33 before quoting anything here.
+
 CORRECTIONS 8b wrote: *"The signs are strongly positively correlated, so a pooled estimate does
 not average toward zero — it converges to a population bias."* The conclusion is right; the
 stated cause is not. `kt2_ww_a1e-3_s0` measures both channels separately at **true coordinate
@@ -952,3 +958,58 @@ should now be checked against the same two-channel decomposition — the frozen 
    it is 2 jobs; (c) `rs-node-*` / `rs-blk6-1e4` seed top-ups.
 5. **Submitted nothing.** FairShare 0.3331 / 0.3356, both below the 0.35 floor, per the
    standing rule. Queues are at 1 running job total, which is the fastest available recovery.
+
+
+## 33. §31's inference was under-powered — a per-weight null is what a real depth-local correlation LOOKS like (cycle 43, same tick)
+
+**What §31 concluded, and what is wrong with it.** §31 read kt2's per-weight pairwise nulls
+(across-tensor Δ = +0.0001 pp, p=0.225) as "there is no measurable correlation between
+per-weight meta-gradients", and inferred that the variance channel of `1/sqrt(N)` is exact and
+the surviving effect is entirely bias. **The measurement is right; the inference does not
+follow**, and the arithmetic that shows why was not done before the sentence was written.
+
+**Why.** A group meta-gradient is the **sum** of its members (`HF.py:149`). In a one-factor
+model, `ρ_means = ρn / (1 + (n−1)ρ)`, so aggregating `n` coordinates amplifies a shared
+component by ~`n`. Inverting KILLTEST §3's measured tensor-level within-block excess of
++1.0 pp (`ρ_means = 0.0314`) gives the per-weight correlation that produces it:
+
+| tensor size n | per-weight ρ needed | per-weight sign excess it produces | kt2 measurement sd |
+|---|---|---|---|
+| 1e4 | 3.24e-6 | 0.000103 pp | **0.00017 pp** |
+| 1e5 | 3.24e-7 | 0.000010 pp | 0.00017 pp |
+| 1e6 | 3.24e-8 | 0.000001 pp | 0.00017 pp |
+
+kt2's 95% upper bound is **ρ ≤ 1.68e-5**. The structure that KILLTEST already measured sits at
+**ρ ~ 1e-6 to 1e-8** — 2x to 170x below the noise floor of the per-weight test. **A null at
+per-weight granularity is exactly what a real depth-local correlation looks like through this
+instrument.** Validated against simulated ground truth, not against any estimator in this repo:
+`analysis/power_coord_vs_tensor.py`, FINDINGS 43.3c.
+
+**What survives, with power quantified.** The tracked-subsample *majority* test (observed vs
+the marginal-preserving null) has a replicate sd of 0.010–0.014 pp and would show a global
+common mode of ρ = 3e-5 at +0.051 pp (~5 sd). A common mode large enough to produce the whole
+headline excess needs ρ ≈ 4e-5. Measured: **+0.0047 ±0.010 pp (a0=1e-3), −0.0006 pp
+(a0=1e-6)**. So:
+
+| claim | status |
+|---|---|
+| the headline majority-agreement excess is **marginal bias, not a global common mode** | **STANDS**, ~5 sd |
+| per-weight pairwise dependence is bounded by ρ ≤ 1.7e-5 | **STANDS** — a bound, not an absence |
+| "the variance channel is essentially exact; pooling is bias-limited" (§31) | **WITHDRAWN** |
+| "Idea 2 is dead" | **STANDS**, on the TENSOR-level across-block null, where the test has power |
+| "Idea 2 dies by 1000x" (FINDINGS 43.3, first draft) | **WITHDRAWN** — that ratio compared an observation to a threshold, not to the test's resolution |
+
+**Process note (Rule 3, and this is the third time).** CORRECTIONS 26 was a summary sentence
+that merged two rows of a table. §31 is a null read without a power calculation. Both were
+written from a single statistic without asking what the statistic could have detected.
+**New standing rule: a null may not be reported as evidence of absence until the minimum
+effect the test could resolve has been computed and stated next to it.** The reducer already
+prints a p-value; a p-value is not a power bound.
+
+**Consequence for the next experiment.** `bin/c44_frozen_probe4.sh` (prepared this cycle) is
+still the right batch — it applies the same instrument to the frozen-beta runs — but its
+pre-registered thresholds must be read against this resolution: it can only resolve
+ρ > ~1.7e-5, i.e. an across-tensor excess above ~0.0005 pp. Its prediction (a) is written at
+>= 0.05 pp, which is 100x the resolution, so the batch **can** discriminate outcome (a) from
+(b); but a null result means "no correlation above ρ = 1.7e-5", **not** "no correlation".
+The header of that script has been amended to say so.

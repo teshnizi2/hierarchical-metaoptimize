@@ -30,6 +30,14 @@
 #     (b) If it is BIAS: across-tensor delta stays <= 0.01 pp (indistinguishable from the
 #         free runs), while the excess over the INDEPENDENCE FLOOR is much larger than the
 #         free runs' +0.194 pp.
+#   RESOLUTION LIMIT -- read this before writing any verdict (CORRECTIONS 33, FINDINGS 43.3c).
+#   This instrument resolves a per-weight correlation only down to rho ~ 1.7e-5, i.e. an
+#   across-tensor sign-agreement excess of ~0.0005 pp.  Prediction (a) above is written at
+#   >= 0.05 pp = 100x that resolution, so the batch CAN discriminate (a) from (b).  But a NULL
+#   result means "no correlation above rho = 1.7e-5" and NOT "no correlation" -- the
+#   depth-local structure KILLTEST sec.3 already measured between tensor MEANS sits at
+#   rho ~ 1e-6 to 1e-8 and is invisible to this test by construction.
+#
 #   REFUTATION of CORRECTIONS 27's mechanism sentence: outcome (b).  In that case s=0.629
 #   must be restated as an off-equilibrium BIAS measurement and every "the coordinates are
 #   correlated" sentence withdrawn -- including the one in FINDINGS 42.4.

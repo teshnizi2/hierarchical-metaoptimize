@@ -7909,12 +7909,15 @@ bias and autocorrelation and destroys only cross-coordinate dependence:
 | across_block | 1.58e8 | 50.0000 % | 50.0001 % | **−0.0001 pp** | 0.795 |
 | all pairs | 3.98e8 | 50.0002 % | 50.0001 % | +0.0001 pp | 0.195 |
 
-**IDEA 2 IS DEAD AT THE DECIDING GRANULARITY.** §5's pre-registered rule was "≤ 0.1pp above
-the shift null → dead outright". Across-tensor dependence is **+0.0001pp** — a thousand times
-below the kill threshold, and across-block is negative. The tensor-level result (cycle 42:
-across-block +0.03pp, within-block +0.9pp) was already a null; at coordinate granularity even
-the *within-block* signal is gone. The +1.0pp within-block dependence measured between tensors
-is an aggregation effect of the tensor means, not agreement between weights.
+**Idea 2 stays dead — but read 43.3c before quoting the size of this null.** §5's
+pre-registered rule was "≤ 0.1pp above the shift null → dead outright", and across-tensor
+dependence is +0.0001pp. **That is NOT a thousandfold-strong refutation**: the power
+calculation in 43.3c shows this test can only exclude a per-weight correlation
+ρ > 1.7e-5, whereas the depth-local structure KILLTEST §3 measured between tensor *means*
+needs only ρ ≈ 3e-6 to 3e-8. The per-weight test is under-powered for that structure by one
+to three orders of magnitude. **The kill therefore continues to rest on the TENSOR-level
+across-block null (−0.04 pp, cycle 42), which is measured at the aggregation level where the
+test has power** — the coordinate-level null is consistent with it and adds no new strength.
 
 **Same-size random-grouping control:** architecture − random = **+0.0002 pp, p=0.29**. At
 coordinate granularity **architecture buys nothing at all** — weaker than the +0.5pp it carried
@@ -7927,16 +7930,15 @@ a0=1e-6 `mx` arm reads +0.016pp). But on the same run, the *same statistic* rest
 tracked coordinates reads **50.2948 %** against a **circular-shift null of 50.2902 %** —
 **excess +0.0047 pp, p=0.235**.
 
-> **The entire agreement excess over the independence floor is each weight's own persistent
-> sign preference. It is not correlation between weights.**
+> **The agreement excess over the independence floor is each weight's own persistent sign
+> preference, not a global common mode.** (This is the claim the test HAS power for — see
+> 43.3c. It is *not* the claim "the coordinates are independent", which this test cannot make.)
 
-This matters for the noise model and it sharpens CORRECTIONS 27 rather than contradicting it.
 Marginal bias and correlation break `1/sqrt(N)` in *different* ways: correlation inflates the
 variance of a pooled estimate, whereas marginal bias means the pooled mean converges to a
-population bias instead of to zero. Our measured off-equilibrium `N_eff ~ m^0.629` therefore
-needs its interpretation restated: at the adapted equilibrium the *variance* channel is
-essentially exact (no pairwise dependence at all, Δ ≤ 0.001pp), and what survives is a **bias**
-channel. Pooling more coordinates does not help against a bias, however many you pool.
+population bias instead of to zero. What is established here is that the **bias channel is
+real and is large enough to account for the whole headline excess**. What is **not**
+established is that the correlation channel is absent — see 43.3c.
 
 **Agreement vs block size, at coordinate granularity, inside one run** (the characterisation
 the paper is about — 62 tensors spanning `n_t` = 10 to 2.36e6, five decades):
@@ -7994,6 +7996,68 @@ anywhere near 53.1 % — CORRECTIONS 26's diagnosis (that 53.1 % is the m=62 lay
 confirmed by a purpose-built run. a0 moves the weightwise excess by **2.0x** here
 (0.098 -> 0.194 pp, *rising* with a0), not the 16x of CORRECTIONS 12, which compared a
 different statistic in a different window.
+
+## 43.3c POWER: what the per-weight test can and cannot exclude — and why 43.3's first reading was wrong
+
+A group meta-gradient is the **sum** of its members (`HF.py:149`), so averaging `n`
+coordinates amplifies any shared component by ~`n` relative to the idiosyncratic part. A
+per-weight correlation far too small to detect can therefore dominate the aggregate. Ground
+truth is simulated, so this does not depend on any estimator in this repo:
+`analysis/power_coord_vs_tensor.py` (output `results/power_coord_vs_tensor.txt`,
+`results/power_part4.txt`).
+
+For jointly Gaussian coordinates, `P(sign X = sign Y) = 1/2 + arcsin(ρ)/π`, and in a
+one-factor model `ρ_means = ρn / (1 + (n−1)ρ)`:
+
+| per-weight ρ | n | ρ between tensor MEANS | per-weight sign excess | tensor-mean sign excess |
+|---|---|---|---|---|
+| 1e-7 | 1e5 | 0.0099 | 0.00000 pp | 0.315 pp |
+| 1e-6 | 1e5 | 0.0909 | 0.00003 pp | 2.898 pp |
+| 1e-5 | 1e5 | 0.5000 | 0.00032 pp | 16.667 pp |
+| 1e-4 | 1e5 | 0.9091 | 0.00318 pp | 36.323 pp |
+
+**kt2's measured standard error.** The across-tensor excess is +0.0002pp at **1.17 sd**, so
+1 sd = 0.00017pp and the 95% upper bound is +0.00054pp → **ρ_cross ≤ 1.68e-5**. Simulation at
+kt2's exact sample size (R=1000 records, ~322 tracked coords/tensor) confirms the estimator's
+noise floor is 0.005pp per replicate, and that it first resolves ρ at ~1e-3.
+
+**Inverting KILLTEST §3's tensor-level result.** The +1.0pp within-block excess between tensor
+means is `ρ_means = sin(π·0.010) = 0.0314`. Reproducing that requires a per-weight ρ of:
+
+| tensor size n | per-weight ρ needed | per-weight sign excess it produces |
+|---|---|---|
+| 1e4 | 3.24e-6 | 0.000103 pp |
+| 1e5 | 3.24e-7 | 0.000010 pp |
+| 1e6 | 3.24e-8 | 0.000001 pp |
+
+against a measurement sd of **0.00017 pp**. **The per-weight test is under-powered for the
+structure that is actually there by a factor of 2 to 170.** A null at this granularity is
+what a real depth-local correlation *looks like*, so it is not evidence against one.
+
+**What the per-weight data DOES have power for: a global common mode.** The tracked-subsample
+majority test (observed vs the marginal-preserving null) has a replicate sd of 0.010–0.014pp
+and responds as:
+
+| global common-mode ρ | majority excess | sd (6 reps) |
+|---|---|---|
+| 0 | +0.0002 pp | 0.0139 |
+| 1e-6 | +0.0112 pp | 0.0102 |
+| 1e-5 | +0.0215 pp | 0.0089 |
+| **3e-5** | **+0.0506 pp** | 0.0110 |
+| 1e-4 | +0.1412 pp | 0.0077 |
+
+A common mode large enough to produce the whole headline excess would need
+`ρ ≈ 0.5·(0.00194/0.318)^2 ≈ 4e-5`, which this test would show at **+0.05 pp, ~5 sd**.
+Measured: **+0.0047 ±0.010 pp (a0=1e-3)** and **−0.0006 pp (a0=1e-6)**. **Excluded.**
+
+**Net effect on cycle 43's claims:**
+
+| claim | status |
+|---|---|
+| the headline agreement excess is marginal bias, not a global common mode | **STANDS**, with quantified power (~5 sd) |
+| the per-weight meta-gradients show no detectable pairwise dependence | **STANDS** as stated — a bound of ρ ≤ 1.7e-5, nothing more |
+| therefore pooling is bias-limited and no partition can help | **WITHDRAWN.** The test cannot see the ρ ~ 1e-6–1e-8 that the tensor-level data already implies. |
+| Idea 2 is dead | **STANDS**, on the tensor-level across-block null where the test has power |
 
 ## 43.4 The baseline LR curve is CLOSED: an interior maximum at 3e-3, and horizon-matching the cosine does not help
 

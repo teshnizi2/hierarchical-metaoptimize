@@ -68,7 +68,10 @@ what C says.**
   quoting it.** The `I1-*` schedule is *unidentified* (no saved script, no `SCHED` echo, no
   alpha/beta in TensorBoard) and is provably NOT a matched-horizon cosine: the arm is **+7.2pp
   ahead at epoch 2**, where a matched cosine multiplier is 0.9978.
-* **43.3 -- IDEA 2 IS DEAD AT THE DECIDING GRANULARITY, by 1000x.** `kt2_ww_*` carry
+* **43.3 -- IDEA 2 STAYS DEAD, now also at per-weight granularity** (but read 43.3c /
+  CORRECTIONS 33 before quoting the SIZE of this null -- the per-weight test is under-powered
+  by 1-3 orders of magnitude for the structure that is actually there, so the kill still rests
+  on the TENSOR-level across-block null).** `kt2_ww_*` carry
   `PATCH_PROBE4` (raw per-coordinate signs, 20k tracked weights) -- the one experiment
   KILLTEST-idea2 sec.5 pre-registered and no earlier run could answer. Estimator validated
   16/16 against synthetic ground truth *before* use. Pairwise same-sign rate between
@@ -76,15 +79,18 @@ what C says.**
   **+0.0001pp**, across-block **-0.0001pp**, architecture - random same-size **+0.0002pp
   (p=0.29)**. Kill threshold was 0.1pp. **Replicated at a0=1e-6** (43.3b) where all four
   strata flip sign -- i.e. pure noise.
-* **43.3/31 -- THE HEADLINE MECHANISM IS WRONG AND THIS IS THE NEW RESULT.** The whole
-  **+0.194pp** majority-agreement excess over the independence floor is **each weight's own
-  persistent sign preference**, not correlation between weights (excess over the
-  marginal-preserving null: +0.0047pp, p=0.235; at a0=1e-6, **-0.0006pp, p=0.55**).
-  CORRECTIONS 8b's sentence "the signs are strongly positively correlated" is **wrong**.
-  This is not cosmetic: **correlation inflates the variance of a pooled estimate; marginal bias
-  moves its mean, and does not average away at ANY N.** Direction C's contribution is now the
-  **two-channel decomposition** (correlation vs bias) at per-weight granularity, plus the
-  frozen/free contrast of CORRECTIONS 27.
+* **43.3/43.3c -- THE HEADLINE MECHANISM IS PARTLY WRONG, AND THE POWER CALCULATION IS THE
+  REAL RESULT.** The **+0.194pp** majority-agreement excess over the independence floor is
+  **marginal bias, not a global common mode** -- a common mode big enough to produce it would
+  show at ~5 sd and does not (+0.0047 +-0.010pp; -0.0006pp at a0=1e-6). CORRECTIONS 8b's
+  "the signs are strongly positively correlated" is wrong for THAT statistic.
+  **But do NOT extend it to "there is no correlation".** A group meta-gradient is a SUM, so
+  aggregation amplifies a shared component by ~n: the depth-local structure KILLTEST sec.3
+  measured between tensor MEANS needs only rho ~ 1e-6..1e-8 per weight, against a per-weight
+  detection limit of rho = 1.7e-5. **The per-weight null is 2x-170x under-powered.**
+  CORRECTIONS 31's inference is WITHDRAWN by CORRECTIONS 33, same tick.
+  **New standing rule: a null may not be reported as evidence of absence until the minimum
+  effect the test could resolve is computed and stated next to it.**
 * **43.4/30 -- the baseline is re-tuned and the LR curve is CLOSED.** `SW-*` (horizon-matched
   `COS_TOTAL=50000`) gives 83.88 / 88.81 / 92.96 / 93.99 / 94.03 / **94.36** / 92.58 across
   lr 1e-5..1e-2. **3e-3 is a bracketed interior maximum**; pooled with `fxcos-3e-3` the tuned

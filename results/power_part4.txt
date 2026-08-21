@@ -1,0 +1,9 @@
+PART 4 -- power of the tracked-subsample majority test for a GLOBAL COMMON MODE
+K=19956 tracked coords, R=1000 records, per-coord marginal-bias sd=0.02
+ common-mode rho    majority excess   sd over 6 reps
+         0.0e+00          0.00024pp         0.01394pp
+         1.0e-07         -0.00469pp         0.00829pp
+         1.0e-06          0.01123pp         0.01016pp
+         1.0e-05          0.02145pp         0.00886pp
+         3.0e-05          0.05057pp         0.01099pp
+         1.0e-04          0.14123pp         0.00768pp

@@ -1,0 +1,59 @@
+==============================================================================
+PART 1 -- analytic: what a per-weight rho does to the TENSOR MEAN
+==============================================================================
+corr of two tensor means, one-factor model, rho_within = rho_cross = rho:
+    rho_means = rho*n / (1 + (n-1)*rho)
+
+  rho (per weight)         n  rho_means   per-weight excess   tensor-mean excess
+           1.0e-07     1e+04     0.0010            0.00000pp               0.032pp
+           1.0e-07     1e+05     0.0099            0.00000pp               0.315pp
+           1.0e-07     1e+06     0.0909            0.00000pp               2.898pp
+
+           1.0e-06     1e+04     0.0099            0.00003pp               0.315pp
+           1.0e-06     1e+05     0.0909            0.00003pp               2.898pp
+           1.0e-06     1e+06     0.5000            0.00003pp              16.667pp
+
+           1.0e-05     1e+04     0.0909            0.00032pp               2.898pp
+           1.0e-05     1e+05     0.5000            0.00032pp              16.667pp
+           1.0e-05     1e+06     0.9091            0.00032pp              36.322pp
+
+           1.0e-04     1e+04     0.5000            0.00318pp              16.668pp
+           1.0e-04     1e+05     0.9091            0.00318pp              36.323pp
+           1.0e-04     1e+06     0.9901            0.00318pp              45.517pp
+
+           1.0e-03     1e+04     0.9092            0.03183pp              36.329pp
+           1.0e-03     1e+05     0.9901            0.03183pp              45.519pp
+           1.0e-03     1e+06     0.9990            0.03183pp              48.578pp
+
+==============================================================================
+PART 2 -- simulation check of the per-weight estimator at kt2's sample size
+==============================================================================
+R=1000 records, 322 tracked coords per tensor (kt2's actual density)
+  true rho_cross   measured per-weight excess    sd over 20 reps
+         0.0e+00                  -0.00048pp           0.00525pp
+         1.0e-06                   0.00054pp           0.00569pp
+         1.0e-05                   0.00009pp           0.00520pp
+         1.0e-04                   0.00221pp           0.00467pp
+         1.0e-03                   0.03178pp           0.00540pp
+
+==============================================================================
+PART 3 -- what kt2's measured standard error EXCLUDES
+==============================================================================
+observed across-tensor excess = 0.00020pp = 1.17 sd  ->  1 sd = 0.00017pp
+95% upper bound on the excess  = 0.00054pp  ->  rho_cross <= 1.681e-05
+
+  a per-weight rho of 1.68e-05 in tensors of n=1e+04 gives tensor-mean corr 0.144 -> mean-sign excess 4.60pp
+  a per-weight rho of 1.68e-05 in tensors of n=1e+05 gives tensor-mean corr 0.627 -> mean-sign excess 21.57pp
+  a per-weight rho of 1.68e-05 in tensors of n=1e+06 gives tensor-mean corr 0.944 -> mean-sign excess 39.28pp
+
+KILLTEST sec.3 measured a tensor-level WITHIN-BLOCK excess of +1.0pp over the same
+shift null.  Inverting: rho_means = sin(pi*0.010) = 0.0314
+  reproducing it in tensors of n=1e+04 needs per-weight rho = 3.24e-06  -> per-weight excess 0.000103pp
+  reproducing it in tensors of n=1e+05 needs per-weight rho = 3.24e-07  -> per-weight excess 0.000010pp
+  reproducing it in tensors of n=1e+06 needs per-weight rho = 3.24e-08  -> per-weight excess 0.000001pp
+
+==============================================================================
+PART 4 is slow (6 reps x 1000 x 19956) and is run separately; its output is stored at
+results/power_part4.txt and tabulated in FINDINGS 43.3c.  It measures the power of the
+tracked-subsample MAJORITY test against a GLOBAL COMMON MODE, which is the test that
+carries the marginal-bias conclusion.  Reproduce with the snippet in FINDINGS 43.3c.
