@@ -8948,3 +8948,27 @@ refuted for coarse granularity."** The defensible two-sided reading is:
 > pooling is therefore much closer to the independence idealisation than fine pooling is —
 > which is the opposite of the intuition that motivates coarse granularity as a
 > noise-averaging device.
+
+## 48.12 The c44 batch header's structural checks, run on the completed data
+
+The batch header requires three checks before any number from it is quoted (Rule 4). Cycle
+47 verified them on the live canary at 500 records; run on all 8 completed dirs at the full
+2000:
+
+| check | result |
+|---|---|
+| #1 `beta_true_max == beta_true_min` on every record (beta really is frozen) | **8/8 PASS**, max spread exactly 0.0 |
+| #2 `neg_counts.json` has `n_records == 2000` and `n_tot` matching the arm | **8/8 PASS** (6 / 62 / 14,420 / 11,173,962) |
+| #3 `sum(neg_counts)/(n_records*n_tot)` equals the time-mean of `frac_neg` | **8/8 PASS**, deviation 0.0 to 4.2e-08, all < 1e-06 |
+
+Check #3 is the one that matters: the two sides are the same quantity computed by two
+different code paths (a per-coordinate accumulator on GPU vs a per-record scalar), so
+agreement to 1e-16..1e-8 means PATCH_PROBE5's counter is measuring what the pooled statistic
+measures, and the heterogeneity correction is built on the same numbers as the floor it
+corrects.
+
+**Parameter counts confirmed from the live `n_tot` of each weightwise arm** (48.7's reason
+for taking n_weights per family rather than from a constant): ResNet10 **4,903,242**,
+ResNet18 **11,173,962**, ResNet18_c100 **11,220,132**, ResNet34 **21,282,122**. Using the
+R18 constant for the ResNet34 family would have made `k` wrong by 1.9x at every rung of that
+family's curve.
