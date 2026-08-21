@@ -1230,3 +1230,54 @@ the `collapsed` column is `0` on every row and flags nothing — inverts it: gua
    settle FINDINGS 44.5 outcome (a) vs (b). (d) Re-read the alpha0=1e-1 clip cell once its
    third seeds land (§39). (e) `bin/c43_frozen_ladder.sh` (30 jobs) — frozen-beta to
    R10/R34/CIFAR-100 — remains prepared and is the largest untouched cell.
+
+## 41. Both IDEA 3 reducers are now divergence-aware, and the absolute-floor width is not threshold-stable (cycle 47, later in the tick)
+
+Three changes, all made BEFORE the c46 300-epoch data landed so the budget-stability verdict
+could not be tuned to it.
+
+**(a) Divergence is a first-class outcome in both reducers.** `analysis/idea3_robustness.py`
+(selftest **22/22 → 37/37**) and `analysis/idea3_threearm.py` (**22/22 → 34/34**) now (i)
+compute cell means over surviving seeds only (`plateau > 50`), (ii) report the divergence
+count as its own column, (iii) treat a cell with **no** survivor as missing rather than as a
+low score, and (iv) **exclude any cell containing a divergence from every width band at every
+tolerance**. A step size that collapses on some seeds is not one the method is robust at,
+whatever the surviving seeds averaged to. This is §39 fixed in code, not just documented.
+
+Immediate effect — the clip control now reads, and refuses to decide:
+
+```
+BETA_CLIP=-15:-2.3026 (alpha<=0.1)    86.858   n=1  diverged=1
+BETA_CLIP=-15:0       (alpha<=1.0)    78.705   n=3  diverged=0
+DIVERGENCE RATES DIFFER (1/2 vs 0/3) ... the two settings fail in DIFFERENT WAYS
+NOT DECIDABLE: n=1 surviving seed(s) on one side.
+```
+
+And **arm A at alpha0=1e-1 has no surviving seed at all** (3 of 3 collapse) — a cleaner and
+stronger statement than the 13.896 mean previously reported.
+
+**(b) §38's "absolute floor" leg is WITHDRAWN as a standalone claim.** Arm B completed to n=3
+during the tick; `i3b-1e2` moved 90.095 → **89.987**, i.e. 0.013pp under the 90 line and 7×
+inside its own sd, which alone moved arm B's ">=90 width" from 3.0 decades to 2.0. The
+reducer now prints a threshold scan, and the B-vs-C ranking **flips across it**: B>C at floors
+≤89.5, B=C at 90–91, C>B at 92. FINDINGS 47.9.
+
+| claim | status |
+|---|---|
+| "MetaOptimize is flatter than a tuned cosine on an absolute floor" (§38) | **WITHDRAWN as stated.** True only for floors ≤89.5. Must name its threshold and show the scan. |
+| "MetaOptimize is not flatter on the scale-free metric" (§38) | **STANDS and strengthens** — loses at 1pp, ties at 2pp and 3pp, on complete n=3 data. |
+| MetaOptimize's peak cost | **1.113pp** below 94.417 ±0.113 (was 1.067 at n=2). |
+| the bottom-end rescue | **STANDS, and it is the one durable advantage.** At alpha0=1e-5: 91.535 vs the cosine's 83.884 (**+7.65pp**), and 8.7 epochs to 85% vs 89.3 for a fixed LR. |
+
+**(c) New standing rule, and it generalises §33's.** *A width, count, or ranking measured
+against an absolute threshold may not be reported until it has been recomputed across a range
+of thresholds and shown to be stable. If the ranking flips, report the scan, not a row.*
+§33 required a null to carry its resolution; this requires a threshold result to carry its
+sensitivity. Both failures are the same failure — a number quoted without what it could have
+been.
+
+**Also amended, not submitted: `bin/c43_frozen_ladder.sh`.** It exports `PROBE=100` and no
+`PROBE5=1`, so its 30 runs could not carry the heterogeneity correction the live canary shows
+is material (**H = 0.833 at m=6**), and could not be corrected afterwards. Header now carries
+the required change and the resolution table that motivates it. Held deliberately so the
+8-job PROBE5 batch reports first.

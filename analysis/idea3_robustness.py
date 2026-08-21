@@ -102,6 +102,20 @@ def cells(rows, prefix, min_epochs):
     return acc
 
 
+# A run at or below this plateau has COLLAPSED (the campaign has seeds at exactly
+# 10.000 = chance).  It is a different outcome, not a low score, and averaging it into a
+# cell produces a number no seed is near.  `i3b-1e1` = {10.000, 86.858} averaged to
+# 48.429 +-54.3 and that flipped the SIGN of this file's own clip-control verdict --
+# CORRECTIONS 39.  The `collapsed` column in all_runs.csv is 0 on every row and flags
+# nothing, so the filter has to live here.
+DIVERGED = 50.0
+
+
+def split_div(v):
+    """(survivors, n_diverged)."""
+    return [x for x in v if x > DIVERGED], sum(1 for x in v if x <= DIVERGED)
+
+
 def mean_sd(v):
     m = sum(v) / len(v)
     if len(v) < 2:
@@ -110,18 +124,24 @@ def mean_sd(v):
     return m, math.sqrt(var)
 
 
-def band_flags(grid, means, tol):
-    """In-band status over the PRESENT grid points, vs that arm's own best."""
+def band_flags(grid, means, tol, divs=None):
+    """In-band status over the PRESENT grid points, vs that arm's own best.
+
+    A grid point with ANY diverged seed is never in band, at any tolerance: a step size
+    that collapses on some seeds is not one the method is robust at, whatever the
+    surviving seeds averaged to.
+    """
+    divs = divs or {}
     present = [g for g in grid if g in means]
     if not present:
         return [], []
     best = max(means[g] for g in present)
-    return present, [means[g] >= best - tol for g in present]
+    return present, [means[g] >= best - tol and not divs.get(g) for g in present]
 
 
-def width_decades(grid, means, tol):
+def width_decades(grid, means, tol, divs=None):
     """Largest contiguous in-band run, in decades.  Returns (decades, lo, hi, gapped)."""
-    present, flags = band_flags(grid, means, tol)
+    present, flags = band_flags(grid, means, tol, divs)
     if not present:
         return float("nan"), None, None, False
     gapped = False
@@ -155,19 +175,24 @@ def crosses_unmeasured_interior(lo, hi):
 
 def arm_stats(acc, grid):
     """Peak / worst / widths / band vectors for one arm at one budget on one grid."""
-    means = {a: mean_sd(v)[0] for a, v in acc.items() if a in grid}
+    surv = {a: split_div(v)[0] for a, v in acc.items() if a in grid}
+    divs = {a: split_div(v)[1] for a, v in acc.items() if a in grid}
+    # a cell with NO surviving seed has no mean; it is reported as missing, not as a low
+    # score.  Arm A at alpha0=1e-1 is exactly this: 3 of 3 seeds collapse.
+    means = {a: mean_sd(v)[0] for a, v in surv.items() if v}
     if not means:
         return None
-    st = {"means": means,
-          "sds": {a: mean_sd(acc[a])[1] for a in means},
-          "ns": {a: len(acc[a]) for a in means},
+    st = {"means": means, "divs": divs,
+          "sds": {a: mean_sd(surv[a])[1] for a in means},
+          "ns": {a: len(surv[a]) for a in means},
           "peak": max(means.values()),
           "worst": min(means.values()),
           "peak_a0": max(means, key=lambda k: means[k]),
-          "missing": [g for g in grid if g not in means]}
+          "missing": [g for g in grid if g not in means],
+          "allgone": [g for g in grid if g in divs and g not in means]}
     for tol in (1.0, 2.0):
-        w, lo, hi, gapped = width_decades(grid, means, tol)
-        present, flags = band_flags(grid, means, tol)
+        w, lo, hi, gapped = width_decades(grid, means, tol, divs)
+        present, flags = band_flags(grid, means, tol, divs)
         key = f"w{int(tol)}"
         st[key] = w
         st[key + "_lo"] = lo
@@ -182,12 +207,21 @@ def arm_stats(acc, grid):
 
 def print_arm(label, budget, st):
     print(f"\n=== {label}  @ {budget} epochs ===")
-    print(f"{'alpha0':>8} {'n':>3} {'plateau':>9} {'sd':>7}")
+    print(f"{'alpha0':>8} {'n':>3} {'plateau':>9} {'sd':>7} {'diverged':>9}")
     for a in sorted(st["means"]):
-        print(f"{a:>8.0e} {st['ns'][a]:>3} {st['means'][a]:>9.3f} {st['sds'][a]:>7.3f}")
+        nd = st.get("divs", {}).get(a, 0)
+        print(f"{a:>8.0e} {st['ns'][a]:>3} {st['means'][a]:>9.3f} "
+              f"{st['sds'][a]:>7.3f} {(nd if nd else '.'):>9}")
+    for a in sorted(st.get("allgone", [])):
+        print(f"{a:>8.0e} {0:>3} {'  no survivor':>9} {'':>7} "
+              f"{st['divs'][a]:>9}   <- EVERY seed collapsed")
     if st["missing"]:
         print("  INCOMPLETE -- missing grid points: "
               + ", ".join(f"{g:.0e}" for g in st["missing"]))
+    bad = [g for g in sorted(st.get("divs", {})) if st["divs"][g]]
+    if bad:
+        print("  DIVERGED seeds at " + ", ".join(f"{g:.0e}" for g in bad)
+              + " -- excluded from every width band below.")
     print(f"  (iii) PEAK      {st['peak']:.3f} at alpha0={st['peak_a0']:.0e}")
     print(f"  (ii)  WORST     {st['worst']:.3f}   (grid span {st['peak']-st['worst']:.3f} pp)")
     for tol in (1.0, 2.0):
@@ -322,13 +356,35 @@ def report(path):
         top = 1e-1
         if b and top in b["means"] and top in bc["means"]:
             d = bc["means"][top] - b["means"][top]
+            nb = b["ns"][top]
+            nbc = bc["ns"][top]
+            db = b.get("divs", {}).get(top, 0)
+            dbc = bc.get("divs", {}).get(top, 0)
             print("\n=== CLIP CONTROL (alpha0=1e-1, 100 epochs) ===")
-            print(f"  BETA_CLIP=-15:-2.3026 (alpha<=0.1)  {b['means'][top]:.3f}")
-            print(f"  BETA_CLIP=-15:0       (alpha<=1.0)  {bc['means'][top]:.3f}")
-            print(f"  delta {d:+.3f} pp -- "
-                  + ("guard is NOT doing the work at the top end; arm B's top-end "
-                     "flatness is real." if abs(d) < 1.0 else
-                     "the guard IS part of arm B's top-end flatness. State it."))
+            print("  Means are over SURVIVING seeds only.  CORRECTIONS 39: the previous "
+                  "version of")
+            print("  this block averaged a collapsed seed in and reported the delta with "
+                  "the WRONG SIGN.")
+            print(f"  BETA_CLIP=-15:-2.3026 (alpha<=0.1)  {b['means'][top]:8.3f}"
+                  f"   n={nb}  diverged={db}")
+            print(f"  BETA_CLIP=-15:0       (alpha<=1.0)  {bc['means'][top]:8.3f}"
+                  f"   n={nbc}  diverged={dbc}")
+            print(f"  delta {d:+.3f} pp on survivors.")
+            if db or dbc:
+                print(f"  DIVERGENCE RATES DIFFER ({db}/{nb + db} vs {dbc}/{nbc + dbc}). "
+                      "That, not the delta, is the")
+                print("  result at this alpha0: the two settings fail in DIFFERENT WAYS. "
+                      "Do not quote the")
+                print("  delta alone.")
+            if min(nb, nbc) < 2:
+                print(f"  NOT DECIDABLE: n={min(nb, nbc)} surviving seed(s) on one side. "
+                      "Re-read when the")
+                print("  third seeds land.")
+            elif abs(d) < 1.0:
+                print("  Guard is NOT doing the work at the top end; arm B's top-end "
+                      "flatness is real.")
+            else:
+                print("  The guard IS part of arm B's top-end behaviour. State it.")
 
 
 def report_budget_stability(sub):
@@ -458,6 +514,32 @@ def selftest():
     chk("boundary-inclusive", width_decades(g, m, 1.0)[0], 5.0)
 
     # mean/sd
+    # --- divergence handling (added cycle 47; CORRECTIONS 39) ---
+    # `chk` compares numerically, so every assertion below is reduced to a number.
+    chk("split_div survivor kept", split_div([10.0, 86.858])[0][0], 86.858)
+    chk("split_div survivor count", len(split_div([10.0, 86.858])[0]), 1)
+    chk("split_div diverged count", split_div([10.0, 86.858])[1], 1)
+    chk("split_div boundary 50 is diverged", split_div([50.0, 91.0])[1], 1)
+    chk("split_div boundary 50.001 survives", split_div([50.001, 91.0])[1], 0)
+    gd = [1e-6, 1e-5, 1e-4]
+    md = {1e-6: 91.0, 1e-5: 91.0, 1e-4: 91.0}
+    chk("width ignores divs when none given", width_decades(gd, md, 1.0)[0], 2.0)
+    chk("width excludes a diverged cell", width_decades(gd, md, 1.0, {1e-5: 1})[0], 0.0)
+    chk("band_flags: diverged cell is out of band",
+        int(band_flags(gd, md, 1.0, {1e-5: 1})[1][1]), 0)
+    chk("band_flags: neighbours stay in band",
+        int(band_flags(gd, md, 1.0, {1e-5: 1})[1][0]), 1)
+    stx = arm_stats({1e-6: [91.0, 92.0], 1e-5: [10.0, 10.0], 1e-4: [10.0, 91.0]},
+                    [1e-6, 1e-5, 1e-4])
+    chk("arm_stats: all-diverged cell has no mean", int(1e-5 in stx["means"]), 0)
+    chk("arm_stats: all-diverged cell is in allgone", len(stx["allgone"]), 1)
+    chk("arm_stats: partial-diverged mean is survivor-only", stx["means"][1e-4], 91.0)
+    chk("arm_stats: divergence counted", stx["divs"][1e-4], 1)
+    chk("arm_stats: partial-diverged cell out of band",
+        int(band_flags([1e-6, 1e-4], stx["means"], 1.0, stx["divs"])[1][1]), 0)
+    chk("arm_stats: sd is over survivors only",
+        int(math.isnan(stx["sds"][1e-4])), 1)
+
     mm, ss = mean_sd([1.0, 2.0, 3.0])
     assert abs(mm - 2.0) < 1e-12 and abs(ss - 1.0) < 1e-12
     ok += 1
