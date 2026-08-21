@@ -9124,3 +9124,128 @@ two claims, and the second is the more interesting one:
 flat to within 1.3x -> the correlation length is an OFF-EQUILIBRIUM phenomenon only ...
 materially weaker, still publishable, and it changes the paper's framing. Write it as that,
 not as a null result."* The measured 0.68x on the pre-registered leg is past even that bar.
+
+## 48.17 THE LADDER LANDS — A0 PASS, A1 CONFIRMED IN 4/4 FAMILIES, A2 SPLIT
+
+All 20 `fz3-*` jobs completed at n_records = 2000. Reduced with `probe5_window.py`
+(**41/41**), steady half, each family's n_weights from **its own** weightwise `n_tot`.
+
+**(A0) SANITY — PASS in all four families**, so the batch is valid:
+
+| family | H weightwise | H nodewise | H layerwise | H blk6 |
+|---|---|---|---|---|
+| c100 | 0.996 | 0.958 | 0.729 | 0.821 |
+| r10 | 0.993 | 0.940 | 0.692 | — |
+| r18c10 | 0.997 | 0.981 | 0.814 | 0.924 |
+| r34 | 0.999 | 0.994 | 0.915 | — |
+
+H <= 1 everywhere and H(weightwise) >= H(layerwise) in every family. The non-monotonicity
+first seen at R18 (48.5) **replicates on CIFAR-100**: H(blk6) > H(layerwise) there too. And
+the bound of 48.5 holds universally — heterogeneity is <= 0.7% of the floor at weightwise
+and <= 6% at nodewise in all four families, so the fine end of every profile is
+uncontaminated by construction.
+
+**(A1) CONFIRMED IN ALL FOUR FAMILIES.** The refutation was "any family flat to within 3x":
+
+| family | n_weights | span | b | verdict |
+|---|---|---|---|---|
+| r10 (ResNet10/C10) | 4,903,242 | **264.6x** | 0.466 | (b) RANGE IS REAL |
+| r18c10 (ResNet18/C10) | 11,173,962 | **69.3x** | 0.343 | (b) RANGE IS REAL |
+| c100 (ResNet18/C100) | 11,220,132 | **23.3x** | 0.256 | (b) RANGE IS REAL |
+| r34 (ResNet34/C10) | 21,282,122 | **16.6x** | 0.224 | (b) RANGE IS REAL |
+
+Window-stable in every family — (b) on full, steady and startup, 4/4. The parameter-free
+check rejects the exchangeable model in all four: over-predicting the layerwise correlation
+by **127.0x (r10), 45.4x (r18), 18.5x (c100), 13.6x (r34)**.
+
+**FINDINGS 44.5 / CORRECTIONS 34's refusal to claim the profile is now fully discharged**:
+corrected for heterogeneity, scanned across windows, and replicated on three further
+architecture/dataset pairs.
+
+**(A2) SPLIT, and it must be reported as one.** b = 0.224 .. 0.466, so:
+
+| clause | result |
+|---|---|
+| every b in [0.2, 0.6] | **PASS** (0.224 .. 0.466) |
+| across-family spread < within-family rung spread | **PASS** — 2.08x vs 6.26x |
+| stated refutation "b varies more than 2x across families" | **TRIGGERED by 3.8%** (2.08x) |
+
+The bright line is crossed by 3.8% with `b` a 3-point fit at n=2 seeds. **This is exactly
+the CORRECTIONS 41 pathology** — a threshold sitting inside the noise of the quantity it
+judges — and the standing rule applies to our own pre-registration: **A2 is NOT DECIDABLE at
+the stated threshold.** Report the two clauses that do resolve and the 2.08x, not a verdict.
+
+## 48.18 THE SHARPEST FORM OF THE RESULT — the correlation length is approximately the CHANNEL, in 4 of 4 families
+
+Fitting one exponent per family hides the thing the data is actually saying. The per-leg
+slopes, steady half:
+
+| family | k=1 → ~channel | ~channel → layer | ratio |
+|---|---|---|---|
+| r10 | 1 → 566: **0.181** | 566 → 129,033: **0.816** | 4.5x |
+| r18c10 | 1 → 775: **0.156** | 775 → 180,225: **0.587** | 3.8x |
+| c100 | 1 → 769: **0.150** | 769 → 180,970: **0.393** | 2.6x |
+| r34 | 1 → 833: **0.069** | 833 → 193,474: **0.431** | 6.3x |
+
+**The second leg is steeper than the first in 4 of 4 families**, and the within-family
+contrast (up to 6.3x) is three times the across-family contrast in the single fitted b
+(2.08x). So the *shape* is a property of the network's structural hierarchy, not of the
+architecture — which is the opposite of what a single exponent per family suggests.
+
+The nodewise partition groups a unit's incoming weights, i.e. **one output channel**
+(k = 566–833 across these models). So:
+
+> **Per-weight meta-gradient correlation is nearly scale-free WITHIN a channel
+> (b = 0.07–0.18) and collapses BEYOND it (b = 0.39–0.82). The correlation length is
+> approximately the channel, in every architecture and dataset measured.**
+
+That is the direct answer to "how does agreement vary with block size", and it says
+something a granularity method can act on: pooling *within* a channel averages
+strongly-shared signals (so 1/sqrt(N) over-promises most there), while pooling *across*
+channels is much closer to the independence idealisation.
+
+**Caveat that travels with it (48.16):** this is measured with beta FROZEN. At the adapted
+equilibrium the R18 profile flattens to b = 0.065 and exchangeability is not rejected. The
+channel-scale structure is an off-equilibrium statement until a free-beta ladder says
+otherwise, and only R18 has been measured free.
+
+## 48.19 (A3) CONFIRMED — the frozen N_eff exponent generalises; and 48.13's cross-check is settled but NOT closed
+
+`analysis/neff_ladder.py fz3`, frozen beta, 2 seeds per rung:
+
+| family | free-beta comparator | predicted | **measured frozen s** | verdict |
+|---|---|---|---|---|
+| r10 | 0.912 ±0.028 | <= 0.75 | **0.613 ±0.005** | CONFIRMED |
+| r34 | 1.012 ±0.006 | <= 0.80 | **0.738 ±0.008** | CONFIRMED |
+| c100 | 0.911 ±0.021 | <= 0.75 | **0.572 ±0.000** | CONFIRMED |
+| r18c10 (reference, 42.4) | — | — | 0.629 ±0.013 | — |
+
+Both A3 clauses hold: every frozen family is well below its own free value, and all four sit
+inside the pre-registered [0.55, 0.75]. The refutation (any family at s >= 0.85) does not
+fire. **FINDINGS 42.4's frozen/free mechanism is NOT a ResNet18/CIFAR-10 artefact.**
+
+**48.13's cross-check, now on the SAME RUNS in four families:**
+
+| family | agreement-derived s | variance-derived s (full) | variance-derived s (steady) |
+|---|---|---|---|
+| c100 | 0.572 | 0.808 | 0.826 |
+| r10 | 0.613 | 0.630 | 0.722 |
+| r18c10 | 0.629 | 0.706 | 0.765 |
+| r34 | 0.738 | 0.796 | 0.823 |
+
+**One candidate cause is eliminated: it is NOT the null.** Recomputing the variance-derived
+s with the UNCORRECTED pooled floor, matching what `frozen_agreement.py` uses, moves the
+mean gap from +0.097 to **+0.090** — i.e. the heterogeneity correction accounts for
+essentially none of it (per-family: +0.228, +0.003, +0.072, +0.057).
+
+**And the two instruments do not agree on the ORDERING.** By agreement, c100 is the lowest
+of the four (0.572); by variance it is the highest (0.808–0.826). **So `s` must not be used
+to compare architectures.** Recorded as a caution, and 48.13 stays OPEN on its remaining two
+candidate causes: the window `frozen_agreement.py` reduces has still not been matched, and
+`N_eff = m/(1+(m-1)rho_s)` is first-order.
+
+**A separate, smaller instrument note.** `neff_ladder.py` INFERS m from the rational
+denominator of `frac_neg` and reports **20,000,000** for the ResNet34 weightwise arm against
+the true **21,282,122** read from `n_tot` — a 6% error, worth ~0.5% on a slope fitted over
+5 decades, so it does not affect anything above. `probe5_window.py` reads `n_tot` directly
+and does not have this problem.

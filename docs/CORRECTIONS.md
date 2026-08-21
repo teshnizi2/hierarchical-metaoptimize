@@ -1518,3 +1518,90 @@ Amends §46, which was written before this batch reported. Items 1, 5 and 6 are 
    rungs, ~12 jobs) would turn "frozen vs free" into a curve and make the high-pass-filter
    reading testable rather than a hypothesis. **Not submitted this tick** — 32 jobs are
    already in flight and the ladder must report first.
+
+## 50. The frozen profile GENERALISES (4/4 families) and its shape is CHANNEL-SCALED — §47's narrowing is to the beta regime only, not to the architecture (cycle 48, end of tick)
+
+All 20 `fz3-*` jobs landed. Scored against the pre-registration in
+`bin/c48_frozen_ladder_p5.sh`:
+
+| | result |
+|---|---|
+| **(A0)** H <= 1 and H(w) >= H(lay) in every family | **PASS — batch valid.** Heterogeneity is <= 0.7% of the floor at weightwise and <= 6% at nodewise in all four families. |
+| **(A1)** profile falls >= 10x in every family | **CONFIRMED 4/4**: r10 264.6x, r18 69.3x, c100 23.3x, r34 16.6x. Window-stable in all four. |
+| **(A2)** b architecture-insensitive | **NOT DECIDABLE at the stated threshold.** Both testable clauses PASS (all b in [0.2,0.6]; across-family spread 2.08x < within-family 6.26x) but the stated refutation "varies more than 2x" is crossed **by 3.8%**, with b a 3-point fit at n=2. §41(c) applies to our own pre-registration. |
+| **(A3)** frozen s below each family's free value, all in [0.55,0.75] | **CONFIRMED**: r10 0.613, r34 0.738, c100 0.572 (R18 0.629). FINDINGS 42.4's frozen/free mechanism is not a ResNet18 artefact. |
+| parameter-free exchangeability rejection | **4/4**: over-predicts layerwise by 127.0x / 45.4x / 18.5x / 13.6x. |
+
+**So §47's narrowing is to the BETA REGIME and nothing else.** Off equilibrium the profile
+is real, corrected, window-stable and replicated across three further architecture/dataset
+pairs. At the adapted equilibrium it flattens (b = 0.065, R18 only).
+
+**The sharpest form of the result, and it is new (FINDINGS 48.18).** A single exponent per
+family hides the structure. Per-leg:
+
+| | weight -> channel | channel -> layer |
+|---|---|---|
+| b, across all four families | **0.069 – 0.181** | **0.393 – 0.816** |
+
+Steeper in **4 of 4**, and the within-family contrast (6.3x) is 3x the across-family
+contrast in the fitted b (2.08x). **Correlation is nearly scale-free within a channel and
+collapses beyond it: the correlation length is approximately the channel.** That is the
+direct answer to "how does agreement vary with block size" and it is architecture- and
+dataset-independent in shape, where the single fitted exponent is not.
+
+## 51. `s` is INSTRUMENT-DEPENDENT and must not be used to compare architectures (cycle 48)
+
+§48.13 recorded a gap between the agreement-derived and variance-derived `N_eff ~ m^s` and
+named two candidate causes. With all four families measured on the SAME RUNS, **one is
+eliminated**: matching the null (recomputing the variance-derived s with the uncorrected
+pooled floor, as `frozen_agreement.py` uses) moves the mean gap only from +0.097 to
+**+0.090**.
+
+| family | agreement s | variance s |
+|---|---|---|
+| c100 | **0.572** (lowest) | **0.808** (highest) |
+| r10 | 0.613 | 0.630 |
+| r18c10 | 0.629 | 0.706 |
+| r34 | 0.738 | 0.796 |
+
+**The two instruments reverse the family ordering** — c100 goes from last to first.
+
+**NEW STANDING RULE.** *`s` is a summary of a curve that is not a power law (its per-leg
+slopes differ by up to 6.3x, FINDINGS 48.18) and it differs by up to 0.24 between two
+functionals of the same probe series. Quote it only within one instrument and one family.
+Never use `s` to rank architectures, and never quote it to three decimals.* This does not
+disturb A3 above, which compares frozen to free **within** a family and **within** one
+instrument — the only comparison `s` supports.
+
+## 52. DECISION RECORD — cycle 48, final
+
+Supersedes §46 and §49. All 32 submitted jobs completed within the tick; both queues are
+back to 0/0 and nothing was cancelled.
+
+1. **IDEA 3 is CLOSED at R18/CIFAR-10/m=6, budget-stable and positive** on the only
+   statistic with no dial: **B − C = +4.941pp / +5.094pp** on grid mean, against a 1.113pp
+   peak deficit (§42, §44). Coverage corroborates it from an independent metric — arm B
+   reaches 85% and 90% at **6 of 7** grid points against C's 4 and A's 3 (FINDINGS 48.10).
+   No further IDEA 3 jobs at this configuration.
+2. **Direction C is the project, and it is now TWO results, both measured this tick.**
+   (a) **Survives adaptation:** per-weight meta-gradients are not independent at the
+   meta-optimum — free rho_s(w) = 8.888e-08, reproducing FINDINGS 44.3 to +5.1% — and that
+   is the regime Adam-mini / Adalayer / SGG run in.
+   (b) **Structure is set by distance from the meta-optimum:** short-range and
+   **channel-scaled** off equilibrium (b = 0.07–0.18 within a channel, 0.39–0.82 beyond it,
+   4/4 families, exchangeability rejected 13.6–127x), weak and approximately scale-free at
+   it (b = 0.065, not rejected). A step-size adapter is a high-pass filter on meta-gradient
+   correlation, suppressing 22.92x at k=1 and 0x at k=180,225.
+3. **Ideas 1 and 2 stay dead.** Zero jobs, this cycle and the previous five.
+4. **THE NEXT EXPERIMENT, and it is now sharply defined by the mechanism rather than by a
+   gap in coverage.** The free arm was measured at ONE distance from the meta-optimum.
+   §47's high-pass-filter reading predicts b varies CONTINUOUSLY with that distance. A
+   **meta-stepsize ladder** — `--meta-stepsize` in {1e-4, 1e-3, 1e-2} x the four rungs,
+   ~12 jobs on the frozen recipe with `--alg-meta Lion` — turns "frozen vs free" into a
+   curve and makes the filter reading testable rather than a hypothesis. **Not submitted:**
+   it should be pre-registered against a predicted monotone b(meta-stepsize) before it runs,
+   and this tick has already put 32 jobs through.
+5. **Second priority: the free-beta ladder.** Everything in 2(b) off-equilibrium is now
+   4-family; everything at equilibrium is R18 only. 12 jobs would match them.
+6. **Third: close FINDINGS 48.13** by matching `frozen_agreement.py`'s window — zero
+   compute, and §51 makes it a question about the instrument rather than about the science.
