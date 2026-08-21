@@ -10035,3 +10035,71 @@ guard that DIFFS the NN-name against c49 rather than asserting the match.
 * **The remaining untested threat is the BUDGET**: every N_eff/m ever quoted is from a 20-epoch
   run, in a system CORRECTIONS 65 showed is not converged. `bl5-*` is that test, and 52.1 is what
   made it fundable.
+
+## 52.10 `uc6-*` LANDED WITHIN THE SAME TICK. CIFAR-100 IS BOX-FREE TOO — THE HEADLINE IS NOW 4 OF 4.
+
+All 6 jobs ran in 7–10 minutes and were scored against `bin/c52_c100_boxfree.sh`'s V0–V4 in the
+pre-registered order. CSV **1665 runs (+6)**.
+
+* **V0.1 PASS 6/6.** Every arm wrote a 2000-record `probe.jsonl` and reached `RUN_DONE`. The
+  `--NN-name ResNet18_c100` fix works; the uc5 crash (52.8) does not recur.
+* **V0.2 PASS.** `n_beta` = 11,220,132 / 14,600 / 62, byte-matching `ff5-c100-*` exactly.
+
+**V0.4 — THE DOSE, SCORED BEFORE V1, AND IT IS THE LARGEST OF THE CAMPAIGN:**
+
+| arm | box | %rec LO | %rec HI | %Q4 LO | %Q4 HI | %coordLO | %coordHI | final min | final max |
+|---|---|---|---|---|---|---|---|---|---|
+| ff5 c100 w | −15:−2.3026 | 18.7 | 50.9 | 74.7 | **100.0** | — | — | −15.000 | −2.303 |
+| **uc6 c100 w** | −30:0.0 | **0.0** | **0.0** | **0.0** | **0.0** | **0.0000** | **0.0000** | −16.865 | −1.773 |
+| ff5 c100 node | −15:−2.3026 | 18.9 | 50.4 | 75.7 | **100.0** | — | — | −15.000 | −2.303 |
+| **uc6 c100 node** | −30:0.0 | **0.0** | **0.0** | **0.0** | **0.0** | **0.0000** | **0.0000** | −16.890 | −1.640 |
+| ff5 c100 lay | −15:−2.3026 | 14.5 | 42.7 | 57.8 | 70.6 | — | — | −15.000 | −2.347 |
+| **uc6 c100 lay** | −30:0.0 | **0.0** | **0.0** | **0.0** | **0.0** | **0.0000** | **0.0000** | −16.429 | −0.762 |
+
+All three rungs go from **100%/70.6% Q4 ceiling occupancy to 0.0%**, at **0.0000%** of coordinates.
+
+**V1 — THE PRIMARY TEST. PASS, AND THE REGISTERED DIRECTION IS CONFIRMED THIS TIME.**
+
+| family | box | N_eff/m (w) | Δ | bar | verdict |
+|---|---|---|---|---|---|
+| C100 | −15:−2.3026 | 0.3047 | — | — | the control |
+| **C100** | **−30:0.0 BOX-FREE** | **0.3124** | **+0.0077** | ±0.10 | **PASS** |
+
+The script registered *"DIRECTION, stated before the run: I predict **no move**, |Δ| < 0.02,
+because that is what r10 did (−0.006) from the same 100%-occupancy starting point."* Measured
+**+0.0077**. Unlike uc5's directional prediction, this one is **confirmed**, and it was
+registered *after* uc5's failed — i.e. it is a prediction learned from a miss, not a lucky guess.
+
+* **V2 PASS.** b(steady) 0.078 → **0.068**, Δ 0.010 (bar 0.05).
+* **V3 — THE REBOUND REPLICATES, AND CLIP SATURATION IS NOW EXCLUDED IN BOTH FAMILIES.**
+
+| family | box | rho_w Q3 | rho_w Q4 | **Q4/Q3** | %Q4 at ceiling |
+|---|---|---|---|---|---|
+| c100 | −15:−2.3026 | 1.190e−07 | 3.067e−07 | **2.577** | 100.0% |
+| c100 | −30:0.0 BOX-FREE | 1.134e−07 | 2.929e−07 | **2.583** | **0.0%** |
+
+  Unchanged to **0.2%** while the entire ceiling occupancy was removed — the same result r10 gave
+  at 0.5% (52.4). **Two independent families, two independent tests, same answer.**
+* **V4 PASS.** Plateau: w 26.846 → 26.816 (−0.030), node 37.252 → 37.390 (+0.139), lay
+  38.226 → 38.282 (+0.056). All ≤ 0.14 pp.
+* **THE NODEWISE MINIMUM HOLDS BOX-FREE AT CIFAR-100.** lay **0.532** / node **0.246** /
+  w **0.312** → argmin `node`. FINDINGS 52.5's count goes from 8 of 8 to **9 of 9 cells at
+  ms=1e−3**, now including a box-free CIFAR-100 arm.
+
+**THE FULL HEADLINE, MEASURED BOX-FREE IN ALL FOUR FAMILIES:**
+
+| family | published box | **BOX-FREE (−30:0.0)** | Δ |
+|---|---|---|---|
+| R10 | 0.1632 | **0.1571** | −0.0061 |
+| R18 | 0.4808 | **0.5045** | +0.0236 |
+| R34 (null) | 0.5517 | **0.5474** | −0.0043 |
+| **CIFAR-100** | 0.3047 | **0.3124** | **+0.0077** |
+
+**Write it without a box caveat: *at the adapted operating point per-weight meta-gradients carry
+16%–55% of the independent information their count implies.*** Box-free range 15.7%–54.7%; the
+"16% to 55%" phrasing survives to the significant figures it was quoted at.
+
+**AND 51.7 IS NOW SCOREABLE IN FULL.** Its ten rows: **0 of 5** "WILL BIND" / "BORDERLINE" rows
+were correct (r10-w, r18-w, c100-w, c100-node, c100-lay — all measured at 0.0%), and **5 of 5**
+"will not bind" rows were correct. A perfectly one-sided failure, which is the signature of a
+systematically over-fast rate — exactly what extrapolating a startup velocity produces.

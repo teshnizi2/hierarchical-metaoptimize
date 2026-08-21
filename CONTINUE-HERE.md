@@ -87,9 +87,15 @@ positive result.**
 * **6 JOBS VOID (52.8):** `uc5` built CIFAR-100 with `--NN-name ResNet18` (10-class head) where
   ff5 used `ResNet18_c100`. CUDA device-side assert at step 0. **Both new scripts now DIFF the
   claim "byte-matched to X" against X instead of asserting it.**
+* **`uc6-*` LANDED AND WAS SCORED INSIDE THE SAME TICK -- EVERY GATE PASSES (52.10).** CIFAR-100
+  goes from **100.0% Q4 ceiling occupancy to 0.0%** on all three rungs (0.0000% of coordinates)
+  and N_eff/m moves **0.3047 -> 0.3124**. **THE HEADLINE IS NOW BOX-FREE IN 4 OF 4 FAMILIES:**
+  R10 0.1571 / R18 0.5045 / R34 0.5474 / C100 0.3124, box-free range **15.7%-54.7%**. The rebound
+  replicates (2.577 -> 2.583, +0.2%), so clip saturation is excluded in BOTH rebound families.
+  The nodewise minimum goes to **9 of 9**. uc6's registered direction ("no move, |d| < 0.02") was
+  CONFIRMED at +0.0077 -- registered AFTER uc5's opposite prediction failed.
 * **SUBMITTED, 15 jobs.** (1) **`uc6-*` on alice, 6 jobs** -- `bin/c52_c100_boxfree.sh`, the
-  CIFAR-100 box-free arm with the NN-name fixed. Closes the one headline family never box-tested,
-  and it is the worst one to be missing (Q4 ceiling occupancy 100.0%). V0-V4 pre-registered.
+  CIFAR-100 box-free arm with the NN-name fixed. **COMPLETE AND SCORED, see above.** V0-V4 all pass.
   (2) **`bl5-*` on alice2, 9 jobs** -- `bin/c52_budget_ladder.sh`, the **BOX-FREE BUDGET LADDER**,
   40 epochs at R18 against the 20-epoch `cl5-*-cU-*` control on disk. **The budget is now the only
   untested threat to the headline** -- every N_eff/m ever quoted is from a 20-epoch run in a system
@@ -101,13 +107,14 @@ positive result.**
   window as the control -- without it B1 is a seed contrast, not a budget contrast), then B1,
   then B2.5. B1.5 needs one new option: `neff_instrument.py --window 0.25-0.5`; `reduce_dir`
   already takes fractional windows, so do NOT change its default.
-  (b) `uc6`: **V0.1 (did they survive at all -- `ls probe_c100_*/probe.jsonl`) BEFORE anything**,
-  then V0.4 dose, then V1, then V3 (the rebound replication).
+  (b) `uc6` is DONE -- nothing left to score there.
   (c) The natural batch after `bl5`: a **granularity CURVE** with intermediate block sizes to turn
   70's three-point non-monotone shape into a real curve. `blockwise` accepts arbitrary group
   specs, so this is a design question, not a code one.
   (d) Still unspent, still bookkeeping: the raw-instrument `s` re-derivation sweep.
-* Queues at tick end: alice **6 R** (`uc6`), alice2 **9 R** (`bl5`). FairShare 0.333 / 0.334.
+* Queues at tick end: alice **0** (`uc6` complete and scored), alice2 **9 R** (`bl5`).
+  FairShare 0.333 / 0.334. **`bl5` is the only open batch, and the BUDGET is the only remaining
+  untested threat to the headline.**
 
 ## Running / next (cycle 51) -- **EVERY CLIP FRACTION THIS CAMPAIGN QUOTED WAS AT THE WRONG RESOLUTION**
 

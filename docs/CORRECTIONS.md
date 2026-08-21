@@ -2063,7 +2063,7 @@ The threat CORRECTIONS 62–66 opened is closed. N_eff/m (weightwise, variance, 
 | R18 | 0.4808 | **0.5045** | +0.024 |
 | R10 | 0.1632 | **0.1571** | −0.006 |
 | R34 (the null) | 0.5517 | **0.5474** | −0.004 |
-| CIFAR-100 | 0.3047 | **in flight (`uc6-*`)** | — |
+| **CIFAR-100** | 0.3047 | **0.3124** | **+0.008** |
 
 Across FOUR boxes at R18 — spanning 15 log units of floor and 4.6 of ceiling — the total span is
 **0.076** against a ±0.10 bar registered three times independently. At R10 the entire box was
@@ -2073,9 +2073,11 @@ the same four boxes (bar 0.05).
 
 **QUOTE THIS, unchanged, and without a box caveat for R10/R18/R34:** *at the adapted operating
 point per-weight meta-gradients carry 16%–55% of the independent information their count implies.*
-**Add the box to the methods, not to the claim.** The one number still owed a box test is
-CIFAR-100's 0.305, and it is the worst one to be missing (Q4 ceiling occupancy 100.0%) — until
-`uc6-*` lands, write "three of the four families are measured box-free" rather than four.
+**Add the box to the methods, not to the claim.** `uc6-*` landed inside the same tick and closed
+the fourth family (FINDINGS 52.10): CIFAR-100 goes from 100.0% Q4 ceiling occupancy to **0.0%** on
+all three rungs and N_eff/m moves **+0.008**. **All four families are now measured box-free**, with
+a box-free range of 15.7%–54.7% — the published "16% to 55%" survives to the significant figures it
+was quoted at.
 
 **A DIRECTIONAL PREDICTION FAILED AND IS RECORDED AS FAILED.** `c51_unclipped_family.sh`
 registered "unpinning should move N_eff/m UP, because coordinates frozen against a common wall
@@ -2109,15 +2111,17 @@ evidence: clip saturation is **excluded by test**. FINDINGS 51.3's perfect separ
 
 The rebound remains **OPEN**, now with two mechanisms genuinely dead rather than one dead and one
 untested. That is a worse scientific outcome than a confirmation and a better record than 61(5).
-`uc6-*` supplies the second family (c100, the other 100%-occupancy arm) as a replication: V3
-predicts the ratio stays above 2.0 there too.
+**THE REPLICATION LANDED IN THE SAME TICK.** `uc6-*`'s V3: c100's Q4 ceiling occupancy went
+**100.0% → 0.0%** and the rebound ratio went **2.577 → 2.583**, unchanged to 0.2%. Two independent
+families, two independent tests, same answer. Clip saturation is excluded at n=2 families, not n=1.
 
 ## 70. A NEW POSITIVE RESULT, SCOPED TO ms=1e-3: THE INFORMATION FRACTION IS WORST AT NODEWISE (cycle 52)
 
-N_eff/m is **non-monotone in the group count**, with its minimum at **nodewise**, in **8 of 8**
-(family × box) cells at ms=1e-3 — R10 / R18 / R34 / CIFAR-100 crossed with four clip boxes
-including the box-free one (FINDINGS 52.5). R18 box-free: lay **0.726** / node **0.402** /
-w **0.504**.
+N_eff/m is **non-monotone in the group count**, with its minimum at **nodewise**, in **9 of 9**
+(family × box) cells at ms=1e-3 — R10 / R18 / R34 / CIFAR-100 crossed with the clip boxes tested,
+including a box-free arm in every one of the four families (FINDINGS 52.5, 52.10). R18 box-free:
+lay **0.726** / node **0.402** / w **0.504**. CIFAR-100 box-free: lay **0.532** / node **0.246** /
+w **0.312**.
 
 **THREE CONSTRAINTS ON HOW THIS MAY BE WRITTEN, all of them load-bearing:**
 
@@ -2189,4 +2193,16 @@ written pre-registrations by `analysis/c52_boxfree.py` (selftest 27/27).
   specifications, so this is a design question and not a code one, and it is the natural next
   batch once `bl5` reports.
 
-**Queues at tick end:** alice **6 P** (`uc6-*`), alice2 **9 P** (`bl5-*`). FairShare 0.333 / 0.334.
+**LATE ADDENDUM, SAME TICK.** `uc6-*` ran in 7–10 minutes and was scored before the tick closed.
+V0.1 6/6, V0.2, V0.4, V1, V2, V3, V4 — **every gate passes** (FINDINGS 52.10). Consequences already
+folded into §68/§69/§70 above: the headline is box-free in **4 of 4** families, clip saturation is
+excluded in **both** rebound families, and the nodewise minimum is **9 of 9**. `uc6`'s registered
+direction ("no move, |Δ| < 0.02") was **confirmed** at +0.0077 — notable because it was registered
+*after* uc5's opposite directional prediction failed, so it is a prediction corrected by a miss
+rather than a lucky guess. **FINDINGS 51.7 is now scoreable in full: 0 of 5 "WILL BIND" rows
+correct, 5 of 5 "will not bind" rows correct** — a perfectly one-sided failure, the signature of a
+systematically over-fast rate, which is what §67's STANDING RULE (7) exists to prevent.
+
+**Queues at tick end:** alice **0** (`uc6-*` complete and scored), alice2 **9 R** (`bl5-*`).
+FairShare 0.333 / 0.334. **The only open batch is the budget ladder, and the budget is the only
+remaining untested threat to the headline.**
