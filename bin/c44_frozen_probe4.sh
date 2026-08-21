@@ -5,10 +5,14 @@
 # OPEN QUESTION IT ANSWERS  (CORRECTIONS 31, the one question cycle 43 opened)
 #   FINDINGS 43.3/43.3b decomposed the meta-gradient sign-agreement excess into its two
 #   channels, at TRUE per-weight granularity, on FREE-adapting runs:
-#       correlation between individual weights  ->  +0.0001 pp  (a null, at both alpha0)
-#       each weight's own persistent direction  ->  the WHOLE +0.194 / +0.098 pp excess
-#   i.e. at the adapted equilibrium the failure of 1/sqrt(N) is a BIAS failure, not a
-#   correlation failure -- and bias does not average away at ANY N.
+#       correlation between individual weights  ->  +0.0001 pp  (a BOUNDED null, both alpha0;
+#                                                    it excludes only rho > 1.7e-5 -- see the
+#                                                    RESOLUTION LIMIT block below)
+#       global common mode                      ->  EXCLUDED at ~5 sd, so the whole
+#                                                    +0.194 / +0.098 pp headline excess is
+#                                                    each weight's own persistent direction
+#   i.e. the headline agreement statistic is driven by MARGINAL BIAS.  It does NOT follow that
+#   pooling is bias-limited -- CORRECTIONS 33 withdrew that inference.
 #
 #   CORRECTIONS 27 measured the OFF-equilibrium exponent N_eff ~ m^0.629 (beta frozen, n=5)
 #   against the post-adaptation 0.963, and read it as "the coordinates are correlated
