@@ -74,6 +74,29 @@ read them before quoting the b = 0.343 exponent.**
 > (b = 0.343) to 0.012 -- before beta adapts, the free arm IS the frozen arm.
 > **Never quote a profile number without naming its window and its beta regime.**
 
+> **FINAL STATE OF THIS TICK. All 32 jobs completed; both queues are back to 0/0.**
+> **The frozen profile GENERALISES: A1 CONFIRMED in 4 of 4 families** (span **264.6x** r10 /
+> **69.3x** r18 / **23.3x** c100 / **16.6x** r34, window-stable in every one), exchangeability
+> rejected **13.6x-127x**, and **A3 CONFIRMED** (frozen s = 0.613 / 0.738 / 0.572 against free
+> 0.912 / 1.012 / 0.911) -- so FINDINGS 42.4's frozen/free mechanism is not a ResNet18 artefact
+> either. **A2 is NOT DECIDABLE**: its stated "b varies >2x across families" refutation is
+> crossed by **3.8%** with b a 3-point fit at n=2.
+> **THE SHARPEST FORM OF THE RESULT (FINDINGS 48.18), and it is new:** a single exponent per
+> family hides the structure. Per-leg, **weight -> channel b = 0.069-0.181** and
+> **channel -> layer b = 0.393-0.816**, steeper in **4 of 4**, with the within-family contrast
+> (6.3x) three times the across-family one (2.08x). **Correlation is nearly scale-free WITHIN
+> a channel and collapses beyond it -- the correlation length is approximately the channel**,
+> and that shape is architecture- and dataset-independent where the single fitted b is not.
+> **CAUTION (CORRECTIONS 51): `s` is INSTRUMENT-DEPENDENT.** The agreement-derived and
+> variance-derived `N_eff ~ m^s` differ by up to 0.24 on the SAME runs and **reverse the
+> family ordering** (c100 last by one, first by the other). Matching the null does not explain
+> it (+0.097 -> +0.090). Never use `s` to rank architectures; never quote it to 3 decimals.
+> **NEXT EXPERIMENT (CORRECTIONS 52.4), pre-register it before running:** a **meta-stepsize
+> ladder** ({1e-4, 1e-3, 1e-2} x 4 rungs, ~12 jobs) turns "frozen vs free" into a curve and
+> makes the high-pass-filter reading testable rather than a hypothesis. Second priority: a
+> free-beta LADDER -- everything off-equilibrium is now 4-family, everything at equilibrium is
+> R18 only.
+
 * **IDEA 3 is BUDGET-STABLE and it is FINISHED at R18/CIFAR-10/m=6.** All 16 c46 300-epoch
   jobs landed; `analysis/idea3_robustness.py` (37/37) prints **THE SHAPE IS BUDGET-STABLE**.
   CORRECTIONS 38/41's "NOT FINAL" hold is lifted. **No further IDEA 3 jobs.**
