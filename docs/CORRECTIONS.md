@@ -1681,3 +1681,85 @@ own output — so the substitution cannot later be mistaken for the registered t
    is ~1 at 1e-4 and ~24x at both 1e-3 and 1e-2, the switch reading is confirmed on a
    second, independent axis. (d) CORRECTIONS 52.6 (close FINDINGS 48.13 by matching
    `frozen_agreement.py`'s window) remains unspent and is still zero compute.
+
+## 55. FINDINGS 48.13 CLOSES, and CORRECTIONS 51's standing rule is REPLACED by a better one (cycle 49)
+
+§51 forbade using `s` to rank architectures because two functionals of the same probe
+series differed by up to 0.24 and reversed the family ordering, with no cause identified.
+The cause is now identified, tested against a pre-registration committed before first
+contact with the data (3f9fd69), and it is neither of the two candidates §51 left open.
+
+**The agreement instrument reads the BIAS CHANNEL; the variance instrument does not.**
+`neff_from_agreement` inverts `mean_t max(p_t, 1−p_t)` = 0.5 + `mean_t|p_t − 0.5|`,
+i.e. deviation from the FIXED POINT 0.5. `twochannel.decompose` uses `np.var(p_t)`,
+i.e. deviation from the SAMPLE MEAN. The difference is exactly b = pbar − 0.5, which
+FINDINGS 44.3 measured at 85% of frozen total deviation.
+
+| claim | status |
+|---|---|
+| "the window `frozen_agreement.py` reduces has not been matched" (48.19, §52.6) | **ELIMINATED BY READING THE CODE.** `arm_stats` defaults to `window=0.5`. The table was window-matched all along. |
+| "the two instruments differ by up to 0.24 on the same runs" (§51) | **EXPLAINED.** Debiasing cuts the mean gap 0.143 → **0.019**, 3/3 families (FINDINGS 49.3). |
+| "the two reverse the family ordering; never use `s` to rank architectures" (§51) | **REPLACED, not upheld.** The reversal is an artefact of the raw instrument. Debiased and variance orderings are identical (`r10 < c100 < r34`). |
+| residual disagreement after debiasing | **NAMED AND SMALL.** First vs second absolute moment; they coincide only for Gaussian p_t. 0.019 is non-Gaussianity, not a bug. |
+
+**NEW STANDING RULE, replacing §51's.** *`s` may be compared across families, but only
+within a bias-free instrument. The RAW agreement estimator (`frozen_agreement.py`,
+`neff_ladder.py`) is contaminated by a granularity-dependent bias channel and must not be
+used for any cross-family or cross-regime comparison. Use the debiased agreement statistic
+or the variance statistic; they agree to 0.019.* §51's caution against quoting `s` to three
+decimals stands — the residual is at the second decimal.
+
+## 56. ~HALF of the published frozen/free `s` gap was the instrument — FINDINGS 42.4 and A3 are AMENDED, not withdrawn (cycle 49)
+
+The contamination §55 identifies is **one-sided**, and it falls on the arm the campaign's
+mechanism claim is built from. Weightwise bias share: **0.659 frozen, 0.003 free**. Frozen
+beta sits off the meta-optimum and carries a large b; free beta sits at it and carries
+almost none. Every published frozen/free `s` contrast was therefore measured with an
+instrument that is badly contaminated in one arm and clean in the other.
+
+On the controlled, byte-matched R18/CIFAR-10 pair (`p5` vs `fr5`, FINDINGS 49.4):
+
+| instrument | frozen s | free s | gap |
+|---|---|---|---|
+| agreement RAW — what FINDINGS 42.4 and 48.19's A3 quote | 0.618 | 0.961 | **0.343** |
+| agreement DEBIASED | 0.754 | 0.932 | **0.178** |
+| variance | 0.759 | 0.947 | **0.188** |
+
+| claim | status |
+|---|---|
+| "frozen `s` is well below its own free value" (42.4, A3) | **STANDS**, on two independent clean instruments that agree to 0.010. |
+| the SIZE of that gap, 0.343 (R18) | **AMENDED to ~0.18.** About **48% of the published effect was the bias channel.** Any sentence quoting the magnitude must be re-derived; sentences quoting the direction need not. |
+| A3's pre-registered band "frozen s in [0.55, 0.75], 4/4" | **INSTRUMENT-SPECIFIC.** True raw (0.572–0.738); **fails in 2 of 3 families debiased** (0.690 / 0.783 / 0.819). Quote the band only with the instrument named. |
+| A3's *verdict* (frozen below free in every family) | **UNAFFECTED** — free-arm raw and debiased agree to 0.029, so the free comparators were approximately clean already. |
+
+**AND THE HEADLINE GETS A BETTER STATEMENT OUT OF THIS, not a worse one.** `N_eff/m` at
+weightwise, variance instrument, steady half: **0.501 free, 0.042 frozen**. *At the adapted
+equilibrium — the regime Adam-mini / Adalayer / SGG actually run in — 11.17M per-weight
+meta-gradients carry the independent information of 5.6M. Half the noise-averaging the
+1/sqrt(N) assumption promises is not there.* That is one number, on the clean instrument,
+in the right regime, and it does not need `rho` or an exponent to say it.
+
+## 57. DECISION RECORD — cycle 49, final
+
+Supersedes §54's items 1 and 6(d); items 2, 3, 4 and 5 stand unchanged.
+
+1. **Two zero-compute results this tick, and the second one corrected a published
+   magnitude.** (a) The filter's transfer function with an internal control (§53).
+   (b) FINDINGS 48.13 closed and ~48% of the frozen/free `s` gap reattributed to the
+   instrument (§55, §56). Neither needed a job. **The lesson for the next tick is explicit:
+   before submitting, ask what the bytes already on disk have not been asked.**
+2. **The campaign's most-quoted mechanism number is now smaller and better founded.**
+   Nothing about the direction, sign or significance of the frozen/free contrast changed;
+   its magnitude halved and it gained a second, independent, clean instrument that agrees
+   to 0.010. Report it as an amendment (§56), never as a withdrawal, and never quote the
+   0.343 again.
+3. **Queues at tick end: alice 18 PENDING (`ff5-*`, this session), alice2 25 PENDING /
+   11 RUNNING (`ml5-*`, the concurrent session).** Nothing cancelled. 18 jobs submitted by
+   this session, all on alice.
+4. **Next tick, in order.** (a) Reduce `ff5-*`, scoring C0–C4, and run `neff_instrument.py`
+   on it — the free family arms are the missing half of §56's table and will say whether
+   the ~48% reattribution is R18-specific. (b) Score `ml5-*` against L0–L3, clip-saturation
+   fraction FIRST. (c) Re-derive every `s` in FINDINGS and the draft under the clean
+   instrument and mark each occurrence with the instrument it came from — §55's rule is
+   not retroactive by itself and the raw numbers are scattered through 42.4, 48.19 and
+   earlier. (d) §53's switch-vs-dial question, on `ml5`'s eta_meta axis.

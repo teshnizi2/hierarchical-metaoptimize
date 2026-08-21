@@ -9372,3 +9372,86 @@ in both).
 
 **Submitted instead: 18 jobs on alice, `ff5-*` (4702123–4702140)** — the free-beta FAMILY
 ladder, which `ml5` does not touch (it is R18/CIFAR-10 throughout).
+
+## 49.3 FINDINGS 48.13 IS CLOSED — the two `s` instruments disagree because one of them reads the BIAS CHANNEL
+
+`analysis/neff_instrument.py` (**19/19**), pre-registered and committed (3f9fd69) before it
+touched real data. E1/E2 scored on the fz3 frozen ladder, steady half:
+
+**The window candidate is eliminated by reading the code, not by measurement.**
+`frozen_agreement.arm_stats` defaults to `window=0.5` — it *already* reduces the steady
+half. 48.19's table was window-matched all along, and matching makes the gap larger
+(+0.146) than the full-run comparison (+0.097). CORRECTIONS 52.6 is answered: not the
+window.
+
+**The cause is that the two estimators measure deviation from different points.**
+
+| | statistic | bias b = pbar − 0.5 |
+|---|---|---|
+| agreement (`neff_from_agreement`) | `mean_t max(p_t, 1−p_t)` = 0.5 + `mean_t|p_t − 0.5|` | **included** |
+| variance (`twochannel` → `recompute_rho`) | `Var_t(p_t)` (`np.var`, ddof=1) | **excluded by construction** |
+
+FINDINGS 44.3 measured the frozen bias share at 85% of total deviation. Measured here per
+rung, the bias share of the *raw agreement deviation* is 0.16–0.83 and **rises with rung
+coarseness**, family-dependently (c100 0.194→0.831, r34 0.162→0.503) — a granularity-
+dependent contaminant, which is exactly what corrupts a slope.
+
+**(E1) CONFIRMED.** Replacing `mean|p−0.5|` with `mean|p−pbar|` — same inversion, same
+window, same runs:
+
+| family | s raw | s debiased | s variance | \|gap\| raw | \|gap\| debiased |
+|---|---|---|---|---|---|
+| c100 | 0.572 | 0.783 | 0.803 | 0.231 | **0.020** |
+| r10 | 0.613 | 0.690 | 0.722 | 0.109 | **0.032** |
+| r34 | 0.734 | 0.819 | 0.823 | 0.090 | **0.004** |
+| **mean** | | | | **0.143** | **0.019** |
+
+Moves toward the variance instrument in 3/3; mean gap 0.143 → 0.019 against a
+pre-registered target of < 0.05.
+
+**(E2) CONFIRMED.** Raw ordering `c100 < r10 < r34`; debiased `r10 < c100 < r34`, which is
+the variance ordering exactly. The reversal CORRECTIONS 51 built its standing rule on is
+an artefact of the raw instrument.
+
+**What is left, and it is small and named:** the debiased agreement statistic is a FIRST
+absolute moment and the variance one a SECOND, so they coincide only for Gaussian p_t. The
+residual 0.019 is non-Gaussianity in p_t, not a defect. The selftest asserts the two agree
+to 5% on synthetic Gaussian input.
+
+## 49.4 CONSEQUENCE — ~half of the published frozen/free `s` gap was the instrument, not the mechanism
+
+The contamination is one-sided: frozen beta sits off the meta-optimum and carries a large
+bias b; free beta sits at it and carries almost none (weightwise bias share **0.659 frozen
+vs 0.003 free**). The published frozen/free contrast was therefore measured with an
+instrument that is heavily contaminated in one arm and clean in the other. On the
+controlled R18/CIFAR-10 pair — `p5` vs `fr5`, byte-matched except `--alg-meta`:
+
+| instrument | frozen s | free s | **gap** |
+|---|---|---|---|
+| agreement, RAW (what 42.4 / 48.19 used) | 0.618 | 0.961 | **0.343** |
+| agreement, DEBIASED | 0.754 | 0.932 | **0.178** |
+| variance | 0.759 | 0.947 | **0.188** |
+
+**The frozen/free mechanism SURVIVES and is confirmed by two independent clean instruments
+that agree with each other to 0.010 — but the gap is roughly HALVED.** About 48% of the
+published effect was the bias channel. The direction, the sign and the significance are
+untouched; the magnitude is not.
+
+**A3's numeric band is instrument-specific and must not be quoted bare.** Its pre-registered
+`frozen s in [0.55, 0.75]` holds for the raw instrument (0.572–0.738) and **fails in 2 of 3
+families under the clean ones** (0.690 / 0.783 / 0.819). A3's *conclusion* — every frozen
+family well below its own free value — stands, because free-arm raw and debiased agree to
+0.029 so the free comparators (0.911–1.012) are approximately clean already.
+
+**The cleanest way to state the headline is N_eff/m, and it is stronger than rho.** At
+weightwise, variance instrument, steady half:
+
+| | m | N_eff | N_eff / m |
+|---|---|---|---|
+| frozen (p5) | 11,173,962 | 470,050 | **0.042** |
+| free (fr5) | 11,173,962 | 5,595,255 | **0.501** |
+
+**At the adapted equilibrium — the regime Adam-mini / Adalayer / SGG run in — 11.17M
+per-weight meta-gradients carry the independent information of 5.6M.** Half the
+noise-averaging the 1/sqrt(N) assumption promises is not there. Off equilibrium, 96% of it
+is not there.
