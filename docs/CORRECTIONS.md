@@ -1605,3 +1605,79 @@ back to 0/0 and nothing was cancelled.
    4-family; everything at equilibrium is R18 only. 12 jobs would match them.
 6. **Third: close FINDINGS 48.13** by matching `frozen_agreement.py`'s window — zero
    compute, and §51 makes it a question about the instrument rather than about the science.
+
+## 53. The high-pass filter is a SWITCH, not a dial — and CORRECTIONS 49(2)'s "distance from the meta-optimum" wording is too strong (cycle 49)
+
+CORRECTIONS 49(2) and 52(2) both say the structure is *"set by distance from the
+meta-optimum"*, which reads as a continuous dependence. The four-quarter reduction of the
+c48 runs (FINDINGS 49.1, `analysis/probe5_time_ladder.py` **32/32**, zero compute) measures
+that dependence directly for the first time, with the frozen arm as a training-progress
+control, and it is not continuous:
+
+| gain (frozen rho_w / free rho_w), R18 | k=1 | channel | layer |
+|---|---|---|---|
+| Q1, before beta moves | **1.26x** | 0.80x | 0.70x |
+| Q2 | 24.83x | 7.67x | 2.17x |
+| Q3 | 28.26x | 6.38x | 0.84x |
+| Q4 | 23.67x | 4.57x | 0.61x |
+
+| claim | status |
+|---|---|
+| "a step-size adapter is a high-pass filter on meta-gradient correlation" | **STANDS, and is now measured as a transfer function rather than inferred from two exponents.** Monotone decreasing in k in 3 of 3 adapted quarters; ~1 at layer scale. |
+| "the structure is set by DISTANCE from the meta-optimum" (49(2), 52(2)) | **TOO STRONG.** The gain saturates within one quarter and is then flat to ±10% over the remaining three. On the time axis this is a switch. Write *"present before the step size has adapted, absent after"*, not *"varies with distance"*, until `ml5-*` supplies the eta_meta axis. |
+| Q1 gain ~1 at every scale | **NEW, and it is the instrument's internal control.** The reducer reads 1.0 when there is nothing to measure, on the same runs that later read 24x. Not assumed — measured. |
+| the 22.8x / 22.92x per-weight suppression | **REPRODUCED a third time** at 23.67x (Q4), from a third window and a third statistic. |
+
+**And this cycle's own pre-registration failed, in a way worth recording.** The b1(t) trend
+test was written as a RATIO b1(Q1)/b1(Q4). The free arm's weight→channel exponent changes
+sign across the run (+0.170 → −0.081), so the ratio is undefined and the reducer printed a
+meaningless −2.10x. Scored on the difference, the free arm moves −0.252 against the frozen
+control's −0.073 — **3.4x the control, and the only arm that crosses zero** — so training
+progress is a real but minority contributor, not the cause.
+
+**NEW STANDING RULE, and it is the fourth of this family after thresholds (§41c), nulls
+(§33) and windows (§45).** *A pre-registered test statistic must be defined over the full
+range the quantity can take. A ratio may only be registered for a quantity that cannot
+change sign; register a difference otherwise.* The b1 ratio was registered without checking
+that b1 is a slope and slopes cross zero. The reducer now detects the sign change, refuses
+the ratio, prints the difference, and labels the difference-based reading POST-HOC in its
+own output — so the substitution cannot later be mistaken for the registered test.
+
+## 54. DECISION RECORD — cycle 49
+
+1. **The zero-compute experiment was the right first move and it produced the cycle's
+   result.** Before spending a job, the same bytes that produced CORRECTIONS 45–52 were
+   re-reduced on a finer time axis with a control that had never been used as one. That
+   gave the filter's transfer function, the Q1 internal control, and §53's narrowing —
+   none of which needed the compute CORRECTIONS 52.4 had budgeted for.
+2. **A CONCURRENT SESSION is operating on this repo and it submitted the meta-stepsize
+   ladder first** (`ml5-*`, 36 jobs on alice2, FINDINGS 49.2). Its script is strictly
+   better resourced than this session's, so this session's ladder was **retired unrun**
+   rather than duplicated. Nothing was cancelled. **Whoever reviews this must know that two
+   agents were writing to `docs/` and submitting to the same accounts in the same hour** —
+   check for merge damage in FINDINGS/CORRECTIONS numbering before trusting any section
+   ordering.
+3. **Submitted: 18 jobs on alice, `ff5-*` (4702123–4702140)** — the free-beta FAMILY
+   ladder, R10 / R34 / CIFAR-100, three rungs, 2 seeds, byte-matched to `fz3` with
+   `--alg-meta fixed` -> Lion. It is the complement of `ml5`, which is R18/CIFAR-10
+   throughout, and it attacks the campaign's largest remaining asymmetry: **half (a) — the
+   headline, that per-weight meta-gradients are not independent AT the adapted equilibrium
+   — is measured in exactly one architecture**, while its off-equilibrium half is 4-family.
+   Pre-registered C0–C4 in the script header, with the resolution of all nine rungs
+   computed from the fz3 arms BEFORE submission and the **two thin rungs named in advance**
+   (c100 weightwise at ~1.5x, r10 layerwise at ~0.5x) so that a null in either cannot later
+   be read as a discovery.
+4. **C2 makes §53's gain table pre-registered and 4-family.** The table in FINDINGS 49.1 is
+   one family and its b1 reading was post-hoc; `ff5` scores it against fz3 as a
+   registered prediction (gain in [8x,60x] at k=1, monotone decreasing in k, ~1 at layer).
+5. **Ideas 1 and 2 stay dead.** Zero jobs, this cycle and the previous six.
+6. **Next tick, in order.** (a) Reduce `ff5-*` with `probe5_window.py` and
+   `probe5_time_ladder.py ../probes_ff5 ../probes_fz3`, scoring C0–C4; C0.2 (weightwise
+   n_tot must equal fz3's exactly) is a per-family gate. (b) Score `ml5-*` against ITS
+   header's L0–L3, and **check L0's clip-saturation fraction before quoting the 1e-2
+   column** — a pinned beta mimics a frozen one and would read as the filter switching off.
+   (c) Put §53's switch-vs-dial question to the eta_meta axis: if the gain at k=1 varies
+   smoothly across `ml5`'s three rungs it IS a dial and §53's narrowing is lifted; if it
+   is ~1 at 1e-4 and ~24x at both 1e-3 and 1e-2, the switch reading is confirmed on a
+   second, independent axis. (d) CORRECTIONS 52.6 (close FINDINGS 48.13 by matching
+   `frozen_agreement.py`'s window) remains unspent and is still zero compute.

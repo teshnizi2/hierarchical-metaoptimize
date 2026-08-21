@@ -9303,3 +9303,72 @@ and every b is a single-draw fit. Still inside the 40-pending cap; queues were e
 
 36 submitted, 9 running within a minute, 0 failed. FairShare 0.3339 at submission (the c49/c48
 guard treats it as informational). **Not read until complete** — 36.8 partial-row trap.
+
+## 49.1 THE FILTER'S TRANSFER FUNCTION — measured, with an internal control, at zero compute
+
+`analysis/probe5_time_ladder.py` (**32/32**) reduces the c48 free arm (`fr5-*`, n=3) and its
+byte-matched frozen partner (`p5-*`, n=2) over four non-overlapping quarters instead of one
+half. Both arms are R18/CIFAR-10, `alpha0=1e-3`, T=2000, differing in `--alg-meta` alone.
+
+**Gain = frozen rho_w / free rho_w, per quarter and scale.** 1.0 means adaptation did
+nothing at that scale in that quarter:
+
+| quarter | k=1 | k=775 (channel) | k=180,225 (layer) | k=1,862,327 (blk6) |
+|---|---|---|---|---|
+| Q1 0–.25 | **1.26x** | **0.80x** | **0.70x** | 0.30x |
+| Q2 .25–.5 | 24.83x | 7.67x | 2.17x | — |
+| Q3 .5–.75 | **28.26x** | 6.38x | 0.84x | — |
+| Q4 .75–1 | 23.67x | 4.57x | **0.61x** | — |
+
+**Q1 is an internal control and it was not assumed.** Before beta has moved, the free arm
+*is* the frozen arm at every scale (gain 0.70–1.26). The instrument therefore reads 1.0
+when there is nothing to measure, on the same runs that later read 24x. FINDINGS 48.15 said
+this from the exponent; this says it from the levels, scale by scale.
+
+**The filter is a SWITCH, not a ramp.** The gain goes from ~1 to ~24x inside one quarter
+and is then flat to ±10% over Q2–Q4 (24.83 / 28.26 / 23.67). Nothing about the remaining
+three quarters is a gradual approach to equilibrium.
+
+**Scale-selectivity holds in every adapted quarter**: gain is monotone decreasing in k in
+Q2, Q3 and Q4 (3/3), and layerwise sits at 0.61–2.17, i.e. no suppression at layer scale.
+The Q4 k=1 gain **23.67x** reproduces 48.14's steady-half **22.92x** and 44.3's
+independently measured **22.8x**.
+
+**The pre-registered b1(t) trend test is UNDEFINED and is reported as such.** It was
+written as a ratio b1(Q1)/b1(Q4); the free arm's weight→channel exponent **changes sign**
+(+0.170 → −0.028 → −0.071 → −0.081), and a ratio through zero is not a magnitude. That is a
+defect in this cycle's pre-registration, found by the data. Scored on the difference
+instead, and flagged post-hoc in the reducer's own output:
+
+| | Q1 | Q2 | Q3 | Q4 | delta |
+|---|---|---|---|---|---|
+| free b1 | 0.170 | −0.028 | −0.071 | −0.081 | **−0.252** |
+| frozen b1 (control) | 0.239 | 0.148 | 0.153 | 0.166 | **−0.073** |
+
+**The frozen control DOES move**, so training progress is not inert: it accounts for
+−0.073 of the free arm's −0.252. The free arm moves **3.4x** the control and is the only
+one that crosses zero. Both arms drop sharply Q1→Q2 in *level* (frozen 5.2x at k=1, free
+102x), which is why the level ratio, not the exponent, is the statistic to quote.
+
+**Status: the gain table is a REPLICATION TARGET, not yet a result.** It is one family and
+the difference-based reading of b1 was arrived at after seeing the numbers. Both are
+pre-registered for `ff5-*` (C2) before that batch reports.
+
+## 49.2 Ops — a CONCURRENT SESSION is running on the same repo, and it submitted first
+
+Both queues were 0/0 at tick start. Mid-tick, alice2 went to 36 jobs (`ml5-*`,
+4702083–4702118) from `bin/c49_ms_ladder_p5.sh`, timestamped 16:11 — a meta-stepsize ladder
+written independently by another session against the same CORRECTIONS 52.4. It is a strict
+superset of this session's `bin/c49_meta_stepsize_ladder.sh` (36 jobs vs 14; 4 rungs vs 3;
+n=3 throughout; and it re-runs the 1e-3 rung as an L0 validity gate rather than reusing
+`fr5`, which removes the cross-batch instrument drift CORRECTIONS 51 found in `s`).
+
+**This session's ladder was NOT submitted.** 27 pending + 14 would also have breached the
+40-job cap. Nothing was cancelled. The file is kept with a superseded header because the
+two pre-registrations were written blind to each other and agree on both hazards that could
+have wrecked the batch: the monotone-b prediction, and BETA_CLIP saturation at
+eta_meta = 1e-2 confounding a fast adapter with a pinned one (same >50%-of-steps threshold
+in both).
+
+**Submitted instead: 18 jobs on alice, `ff5-*` (4702123–4702140)** — the free-beta FAMILY
+ladder, which `ml5` does not touch (it is R18/CIFAR-10 throughout).
