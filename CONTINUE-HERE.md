@@ -48,6 +48,75 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 47) -- IDEA 3 GOES THREE-ARMED, and the verdict changes
+
+**Read `docs/CORRECTIONS.md` 37-41 and `docs/FINDINGS.md` 47.1-47.12 before quoting any IDEA 3
+number. 47.9 SUPERSEDES 47.1's table** (arm B completed to n=3 mid-tick and one cell crossed a
+threshold).
+
+* **THE HEADLINE.** Cycles 45/46 measured MetaOptimize's alpha0 robustness against a
+  *genuinely fixed* LR (arm A). Nobody ships a constant LR. The campaign already held the right
+  competitor -- **`SW_*`, an AdamW+cosine peak-LR sweep, config- and account-matched** -- and it
+  had never been put in the same table. Added as **arm C** at zero compute, it changes the
+  answer. On the shared sub-grid {1e-5..1e-2}, all cells n=3 (A, B) / n=2 (C):
+
+  | | A fixed | B meta m=6 | C cosine |
+  |---|---|---|---|
+  | peak | 91.796 | 93.304 | **94.028** |
+  | worst | 70.541 | **89.987** | 83.884 |
+  | width <=1pp of own best | 0.477 | **0.000** | 0.523 |
+  | width <=2pp / <=3pp | 1.000 | 2.000 | 2.000 |
+
+  **MetaOptimize is not more robust than a tuned cosine on any threshold-stable measure**
+  (loses at 1pp, ties at 2pp/3pp) and its peak is **1.113pp** below the tuned baseline
+  94.417 +-0.113. **Its one durable advantage is the bottom end:** at alpha0=1e-5 it scores
+  **91.535 vs the cosine's 83.884 (+7.65pp)**, and the cosine **never reaches 85%** there while
+  MetaOptimize does in 8.7 epochs. Write it as *insurance against a step size set far too
+  small, bought for ~1.1pp of peak* -- not as robustness.
+* **The "absolute floor" leg is WITHDRAWN as a standalone claim (CORRECTIONS 41).** `i3b-1e2`
+  landed at **89.987**, 0.013pp under the 90 line and 7x inside its own sd, which alone moved
+  arm B's ">=90 width" 3.0 -> 2.0 decades. The B-vs-C ranking **flips across the threshold
+  scan**: B>C at floors <=89.5, B=C at 90-91, C>B at 92. **New standing rule: a threshold
+  result must carry its sensitivity scan, exactly as a null must carry its resolution.**
+* **Both reducers are now divergence-aware.** `analysis/idea3_robustness.py` **37/37** and
+  `analysis/idea3_threearm.py` **34/34** -- run both before trusting any number. Cell means are
+  over survivors (`plateau > 50`), divergence counts are their own column, and a cell with any
+  divergence is excluded from every width band. This is CORRECTIONS 39 fixed in code: the clip
+  control now reports `NOT DECIDABLE` instead of a sign-flipped delta. **Arm A at alpha0=1e-1
+  has no surviving seed at all** (3 of 3 collapse).
+* **NOTHING ABOUT IDEA 3 IS FINAL** until `analysis/idea3_robustness.py` prints
+  **BUDGET-STABLE**. The c46 300-epoch control was still running at tick end. Per
+  `docs/IDEA3-robustness.md` §7, a NOT BUDGET-STABLE verdict invalidates the 100-epoch sweep --
+  do not patch it with a caveat. **Also read FINDINGS 47.8:** "arm C at 300 epochs" is not
+  well defined (it is horizon-matched), and that choice must be made explicitly before any
+  three-arm claim is extended to 300 ep.
+* **SUBMITTED 18 jobs, ~0.2% of RawUsage, nothing cancelled.**
+  `bin/c47_idea3_armC_cosine.sh` **10 on alice** (`4700694-4700703`) -- arm C at the two grid
+  extremes 1e-6/1e-1 plus band-edge seed top-ups. Pre-registered C1/C2/C3 in FINDINGS 47.4;
+  **C3's arithmetic was invalidated mid-tick by new data, not by being wrong -- see 47.11.**
+  `bin/c44_probe5_heterogeneity.sh` **8 on alice2** (`4700704-4700711`) -- per-group marginals,
+  the one experiment that de-confounds the scale profile (FINDINGS 44.5).
+* **A fatal bug in the prepared PROBE5 patch was caught before submission.** `np.save` appends
+  `.npy` to a string path lacking it, so the atomic write's `os.replace` would have raised
+  `FileNotFoundError` at record 500 = **5 epochs into every one of the 8 jobs**. Fixed by
+  `patches/patch_probe5_fix.py`; regression test `tests/test_probe5_block.py` **10/10 PASS**
+  executes the block lifted verbatim out of the live HF.py rather than reading it. **Verified
+  end-to-end on the live canary**, which wrote `neg_counts.json` at record 500 and kept running.
+  A second suspected bug (`os` scope) was investigated and shown NOT to be one -- FINDINGS 47.5.
+* **`bin/c43_frozen_ladder.sh` is AMENDED, still not submitted.** It exports `PROBE=100` and no
+  `PROBE5=1`, so its 30 runs could not carry the heterogeneity correction and could not be
+  corrected afterwards. The live canary reads **H = 0.833 at m=6** -- 17% of the pooled floor
+  is heterogeneity, so this matters. Header now carries the required change plus the resolution
+  table. Held until the PROBE5 batch reports.
+* **New reducer, written and validated BEFORE its data:** `analysis/probe5_floor.py`
+  (**selftest 15/15**, including the case where a true global common mode must NOT be read as
+  heterogeneity). Structural check #3 already passes on live canary data to 1.1e-16.
+* **CONTROL: no resolvable account effect** (+0.114 +-0.076pp, t=1.49, 9 cells), so arm C being
+  single-account is safe at the resolution that matters. FINDINGS 47.7.
+* CSV **1505 runs** (956 + 672). Queues at tick end: alice 2P/16R, alice2 5P/11R.
+  FairShare 0.333054 / 0.333893 -- overridden per **CORRECTIONS 37**, which formally retires the
+  0.35 floor and replaces it with a batch-size rule.
+
 ## Running / next (cycle 46) -- IDEA 3 CONVERGENCE CONTROL SUBMITTED, 16 jobs at 300 ep
 
 **The cycle-45 sweep runs at 100 epochs and 100 epochs is not converged.** FINDINGS 44.1:
