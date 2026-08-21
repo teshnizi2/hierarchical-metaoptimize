@@ -1879,3 +1879,137 @@ variable instead of a fixed confound. Pre-registration W0-W3 in the script heade
 submission.
 
 **Queues at tick end.** alice 0 P / 0 R. alice2 18 P / 0 R.
+
+---
+
+## 62. THE WIDE-CLIP BATCH MOVED THE WRONG WALL — W2 fails, W1 is uninterpretable, and the cause is an instrument-resolution error, not the science (cycle 51)
+
+`c50_wideclip_ladder.sh` chose which bound to move from one sentence in its own header:
+
+> "The HIGH bound is at 0.00% in EVERY arm of the whole 36-job batch. So a large meta-stepsize does
+> not blow the step size UP — it overshoots DOWNWARD ... Therefore: LOW bound −15 → −30. HIGH bound
+> UNCHANGED at −2.3026, **because it provably never binds**."
+
+That 0.00% came from the probe's per-TENSOR `beta[]` list. **The clamp is applied per COORDINATE.**
+Read at the resolution the clamp operates at — from `beta_true_max`, already present in the same
+records — the high guard binds on **95.4% of records** at weightwise ms=1e-2, from record **92**,
+against the low guard's 91.9% from record 162 (FINDINGS 51.1). The batch widened the wall that was
+binding *less*.
+
+| pre-registered item | verdict |
+|---|---|
+| W0.1 / W0.2 validity | **PASS** 18/18 |
+| W0.3 null control at ms=1e-3 | **PASS on four independent statistics** |
+| **W2** (relief must reach <5% of layerwise records) | **FAIL: 88.0% → 71.7%** |
+| **W1** (the primary test) | **UNINTERPRETABLE** — W2's own text: *"If it does NOT fall ... W1 is UNINTERPRETABLE rather than refuted."* Honoured |
+| W3 | not scorable |
+
+**The batch's instruction to score W2 before W1 is what saved the tick.** Read in the registered
+order, b(1e-2) = 0.364 ≥ 0.25 fires W1's REFUTATION branch and this cycle would have announced *"the
+dial is non-monotone with an interior optimum near ms=1e-3"* — a bigger, more interesting, and
+wrong claim. **A pre-registered ordering is a control, not paperwork.**
+
+**CORRECTIONS 58 is NOT disturbed.** Its dial rests on {frozen, 1e-4, 1e-3}, and 51.2 strengthens
+its treatment of the fourth rung: ms=1e-2 is not a confounded point on the dial, it is **not a point
+on the dial at all**, because the log-stepsize distribution there spreads ballistically at ~99% of
+the maximum Lion speed and exactly fills whatever box it is given (12.70 → 12.70; 27.70 → 27.70).
+Write **"boundary-dominated"**, not "confounded", and do not quote it in any b or gain claim.
+
+## 63. THE INSTRUMENTATION GAP CORRECTIONS 60 NAMED IS NOW CLOSED — PATCH_CLIPCOUNT (cycle 51)
+
+CORRECTIONS 60 wrote, one tick before it cost us a batch:
+
+> "the per-coordinate clipped FRACTION is not written — only per-tensor beta and the global
+> beta_true_min/max — so (i) is *unsupported* rather than *excluded*. A one-line addition to PROBE5
+> ... would close it permanently and costs nothing at run time."
+
+It was named, priced at zero, and not done. **Done now.** `PATCH_CLIPCOUNT` writes `n_at_lo`,
+`n_at_hi` and `n_beta` per probe record — the per-(record, coordinate) denominator, which no probe
+written before this tick can supply. Applied to **both** accounts' `HF.py`, backed up to
+`HF.py.pre_clipcount.bak`, compile-checked, idempotent, and verified writing on a live `cl5` job
+(`n_beta=62, n_at_lo=0, n_at_hi=0` at step 0). Both new batches guard on its presence.
+
+**STANDING RULE (6)**, the sixth, after thresholds / nulls / windows / sign-ranges / denominators:
+*a fraction must be measured at the resolution the mechanism operates at.* Rule 5 forced a
+denominator to be named; it did not stop a correctly-named denominator from being computed over the
+wrong objects. Three denominators are now distinguishable and disagree by two orders of magnitude
+on the same bytes (0.47% of tensor cells / 29.0% of tensor-records / 95.4% of coordinate-records).
+
+## 64. CORRECTIONS 61(5) IS AMENDED — mechanism (i) for the late-training rebound was never tested (cycle 51)
+
+61(5) recorded the Q4 rebound as *"UNEXPLAINED with two mechanisms excluded"*. Mechanism (i), clip
+saturation, was rejected on "0.0% of tensor betas at either guard" — the §63 error. At coordinate
+resolution the four families separate perfectly (FINDINGS 51.3): the two that rebound (r10 ×2.73,
+c100 ×2.87) are the two with **100% of Q4 records at the ceiling**; the two that do not are at
+28.5% (r18) and **0.0%** (r34).
+
+| claim | status |
+|---|---|
+| "the rebound is unexplained" | **STANDS** — a 4-family post-hoc separation is a hypothesis, not a cause |
+| "mechanism (i) FAILS" (61(5)) | **WITHDRAWN.** It was measured at the wrong resolution and is now the *leading* candidate |
+| "mechanism (ii), beta-velocity collapse, fails" | **STANDS** — flat to ±30%, unaffected by resolution |
+| CORRECTIONS 60's own "*unsupported*, not *excluded*" | **This was the correct wording all along.** 61(5) over-stated it when summarising |
+
+`uc5-*` is the first actual test, with U2 pre-registered in both directions.
+
+## 65. "AT THE ADAPTED EQUILIBRIUM" IS A STATEMENT ABOUT THE BULK, AND MUST NOT BE READ AS CONVERGENCE (cycle 51)
+
+The headline sentence (§59) opens *"At the adapted equilibrium…"*. With the floor moved out of the
+way so nothing stops it, the minimum log-stepsize is **still descending at 89–100% of the maximum
+Lion speed in the last quarter of the run, in 9 of 9 arms** (FINDINGS 51.2). Nothing has converged.
+
+The bulk *has* approximately settled — per-tensor mean betas drift at a median 3–21% of max speed in
+the last quarter, with 0–9.7% of tensors above 90%. So the phrase is defensible for the bulk and
+false for the tail, and the correlation statistics are computed over **all** coordinates.
+
+**Quoting rule.** Write *"with beta free"* or *"at the adapted operating point"*. Do not write
+*"at the adapted equilibrium"* without this caveat, and never use it to argue that the measurement
+is budget-independent — that has not been shown at any budget.
+
+**This does not touch the measurement.** N_eff/m is what it is over the steady half; only the word
+"equilibrium" over-claims.
+
+## 66. DECISION RECORD — cycle 51
+
+**Data state.** Both queues 0 P / 0 R at tick start; all 18 `wc5-*` jobs complete. Probes synced
+(458 MB). CSV regenerated to **1629 runs** (+18). Five reducers selftested before use
+(26/26 new `c51_wideclip`, 41/41, 19/19, 32/32, 24/24).
+
+**Decisions taken, and why.**
+1. **W2 scored FIRST and honoured when it failed.** W1 is recorded UNINTERPRETABLE, not refuted.
+   The registered ordering prevented a false headline. → §62.
+2. **The ms=1e-2 rung is re-described as BOUNDARY-DOMINATED, not confounded** — measured
+   (box-filling at ~99% of max Lion speed in two boxes), not inferred. CORRECTIONS 58 stands. → §62.
+3. **STANDING RULE (6) added**: a fraction must be measured at the resolution the mechanism
+   operates at. → §63.
+4. **PATCH_CLIPCOUNT applied to both accounts** — the zero-cost close CORRECTIONS 60 named and 61
+   deferred. Deferring it cost 18 jobs. → §63.
+5. **CORRECTIONS 61(5) amended**: mechanism (i) was never tested, and is now the leading
+   candidate for the rebound. → §64.
+6. **The headline gains its first box-sensitivity number and keeps its meaning:** N_eff/m
+   0.4808 → 0.5189 for a 2.2× deeper box; clip accuracy-neutral at +0.027 pp over 6 matched cells.
+   This sets the ±0.10 bar both new batches use. → FINDINGS 51.4.
+7. **"At the adapted equilibrium" is narrowed to the bulk.** The tail does not converge. → §65.
+8. **Ideas 1 and 2 stay dead.** Zero jobs, this cycle and the previous eight.
+
+**Submitted, 36 jobs, 18 per account, both queues within the 40-pending cap.**
+* **`cl5-*`, 18 on alice2** (`bin/c51_ceiling_ladder.sh`) — the CEILING ladder at R18/ms=1e-3, where
+  the headline lives. LO fixed at −30 (measured non-binding); HI ∈ {−4.6052, **0.0**} with wc5's
+  HI=−2.3026 as the free middle point. The predicted-never-to-bind HI=0.0 arm is the **first
+  completely unclipped measurement of N_eff/m** this campaign has taken. X0–X3 pre-registered, with
+  **X0.3 (did the ceiling bite?) scored before X1** — the W2 lesson, applied deliberately.
+* **`uc5-*`, 18 on alice** (`bin/c51_unclipped_family.sh`) — the UNCLIPPED FAMILY control, both
+  walls out to −30:0.0, on the two families whose Q4 ceiling occupancy is 100% (r10, c100) plus
+  **r34 as the built-in null** (0.0% occupancy; it must not move). It tests whether the two numbers
+  setting the LOW end of the published "16% to 55%" range are partly the box, and it is the first
+  test of mechanism (i) for the rebound. U0–U3 pre-registered, U0.3 and U0.4 scored first.
+
+**NEXT TICK, in order.** (a) `cl5`: X0.3 dose, then X0 null (layerwise), then **X1** — if either
+new arm leaves [0.42, 0.62], §59's 4-family headline needs a box column before it is written down.
+(b) `uc5`: U0.3 (r34 null) **before** anything else, then U0.4, then U1, then U2 against
+`probe5_time_ladder.py ../probes_uc5 ../probes_fz3`. (c) Both batches carry `n_at_lo`/`n_at_hi`, so
+report the per-(record, coordinate) denominator alongside the per-record one for the first time.
+(d) Still unspent, still bookkeeping not science: re-derive every raw-instrument `s` in FINDINGS
+under the clean instrument (§59 makes it mechanical).
+
+**Queues at tick end.** alice **18 P / 0 R** (`uc5`). alice2 **15 P / 3 R** (`cl5`).

@@ -9643,3 +9643,119 @@ span, which is a second, independent sign that it is measuring a different proce
 |---|---|---|
 | `ml5-*` (alice2) | 36 | L0 PASS; **L1 → DIAL** on unconfounded rungs; L2 PASS; 1e-2 column CONFOUNDED as pre-registered |
 | `ff5-*` (alice) | 18 | C0 PASS 18/18; **C1 3/3**; **C3 3/3**; C4 2/3 + 1 undecided; C2 shape 3/3, magnitude 1/3 |
+
+## 51.1 THE CLIP OCCUPANCY THIS CAMPAIGN HAS BEEN QUOTING IS AT THE WRONG RESOLUTION
+
+`BETA_CLIP` is applied **per coordinate** (`HF.py:94`, `self.beta[_i].clamp(lo, hi)`). Every clip
+fraction the campaign has quoted — CORRECTIONS 58's 88.0%/86.8%, `c50_wideclip_ladder.sh`'s "the
+HIGH bound is at 0.00% in EVERY arm", FINDINGS 50.3's "0.0% of tensor betas at either guard" — was
+read from the probe's `beta[]` list, which stores **one mean per tensor** (62 entries for R18,
+whatever the granularity). A tensor mean reaches a guard only when essentially all of its
+coordinates do.
+
+`beta_true_min` / `beta_true_max` were already in the same records and give the coordinate-level
+reading. `analysis/c51_wideclip.py` (selftest **26/26**) prints all three derivable denominators
+side by side. R18/CIFAR-10, ms as marked, n=3:
+
+| arm | ms | rung | %cells (tensor) | %rec (tensor) | **%rec LO (coord)** | **%rec HI (coord)** | 1st LO | 1st HI |
+|---|---|---|---|---|---|---|---|---|
+| ml5 | 1e-4 | w | 0.00 | 0.0 | 0.0 | 0.0 | – | – |
+| ml5 | 1e-3 | w | 0.00 | 0.0 | **8.2** | **7.4** | 1836 | 1523 |
+| ml5 | 1e-3 | lay | 0.78 | 16.8 | 16.8 | 0.0 | 1663 | – |
+| ml5 | 1e-2 | w | 0.47 | 29.0 | **91.9** | **95.4** | 162 | **92** |
+| ml5 | 1e-2 | node | 0.19 | 11.5 | 90.8 | **95.3** | 184 | 94 |
+| ml5 | 1e-2 | lay | 11.31 | 88.0 | 88.0 | 0.0 | 237 | – |
+| wc5 | 1e-3 | w | 0.00 | 0.0 | **0.0** | 8.9 | – | 1367 |
+| wc5 | 1e-2 | w | 0.24 | 15.0 | 76.7 | **95.4** | 466 | **92** |
+| wc5 | 1e-2 | lay | 7.56 | 71.7 | 71.7 | 0.0 | 567 | – |
+
+**At weightwise and nodewise the HIGH guard binds MORE (95.4% vs 91.9%) and EARLIER (record 92 vs
+162) than the LOW guard**, and reads 0.00% in the column the campaign was using. At layerwise and
+blk6 the ceiling never binds and only the floor does — the two granularities behave oppositely,
+which is why one summary number was never going to serve.
+
+**Consequence: `wc5-*` widened the wall that was binding less and left the dominant one shut.**
+
+## 51.2 THE MECHANISM — BALLISTIC, TWO-SIDED, BOX-FILLING; AND NO EQUILIBRIUM IN THE TAIL
+
+Under Lion every realised beta increment has magnitude exactly the meta-stepsize, so
+`meta_stepsize × 5 steps/record` is the **fastest a coordinate can possibly travel**. A coordinate
+at ~100% of that is receiving the same sign every step: it is not diffusing, it is running.
+
+| arm | ms | rung | box | final span | fill % | v_pre/v_max | v_last/v_max | bulk median | % tensors hot |
+|---|---|---|---|---|---|---|---|---|---|
+| ml5 | 1e-2 | w | 12.70 | 12.70 | **100.0** | **0.998** | 0.000 (pinned) | 0.017 | 0.0 |
+| wc5 | 1e-2 | w | 27.70 | 27.70 | **100.0** | **0.990** | 0.000 (pinned) | 0.036 | 0.0 |
+| ml5 | 1e-3 | w | 12.70 | 12.64 | 99.6 | 0.882 | 0.640 | 0.028 | 1.6 |
+| wc5 | 1e-3 | w | 27.70 | 13.37 | 48.3 | 0.884 | **0.938** | 0.029 | 1.6 |
+| wc5 | 1e-3 | node | 27.70 | 13.06 | 47.2 | 0.950 | **0.978** | 0.120 | 0.0 |
+| wc5 | 1e-3 | lay | 27.70 | 11.05 | 39.9 | 0.977 | **0.998** | 0.208 | 9.7 |
+
+* **At ms=1e-2 the spread fills 100% of a 12.70-wide box AND 100% of a 27.70-wide box, at the same
+  velocity** (0.0499 vs 0.0498 log-units/record — identical to 0.2%). Doubling the box only delays
+  the floor from record 162 to 466. There is no equilibrium spread to measure, only the wall.
+  **`beta_true_max` sits exactly at the ceiling in both**, so the spreading is two-sided.
+* **At ms=1e-3 the descent is STILL RUNNING at 89–100% of the maximum Lion speed in the LAST
+  QUARTER, in 9 of 9 wide-clip arms.** The narrow arm's apparent settling at −15.000 is the floor,
+  not convergence.
+* **BULK vs TAIL.** Per-tensor means are near-stationary in the last quarter (median 3–21% of max
+  speed; 0–9.7% of tensors above 90%). So *"at the adapted equilibrium"* is true of the bulk and
+  **false of the tail**. It must not be read as a convergence claim.
+
+## 51.3 CORRECTIONS 60's MECHANISM (i) IS REINSTATED — it was excluded at the wrong resolution
+
+FINDINGS 50.3 rejected clip saturation as the cause of the Q4 rebound on "**0.0%** of tensor betas
+at either guard in every weightwise arm". That is the 51.1 column. At coordinate resolution, on the
+same bytes, the four families separate **perfectly**:
+
+| family | rebound (rho_w Q4/Q3, k=1) | %rec HI (coord), weightwise | **Q4 %rec HI** | Q4 %rec LO |
+|---|---|---|---|---|
+| r10 | **×2.73 YES** | 52.0 | **100.0** | 74.0 |
+| c100 | **×2.87 YES** | 50.9 | **100.0** | 74.7 |
+| r18 | no | 8.2 | 28.5 | 32.4 |
+| r34 | no | 0.0 | **0.0** | 0.8 |
+
+The two rebound families are exactly the two whose ceiling is occupied on **100% of last-quarter
+records**; the two non-rebound families are at 28.5% and 0.0%. Mechanism: coordinates frozen
+against a common wall agree with each other for a reason that has nothing to do with the
+meta-gradient, which inflates measured cross-coordinate correlation.
+
+**This is a 4-family, post-hoc separation and is labelled as one.** It is not proof. It is enough
+to say that mechanism (i) was **never tested** — CORRECTIONS 60's own wording ("*unsupported*, not
+*excluded*") was right and CORRECTIONS 61(5)'s "both fail" was too strong. `uc5-*` tests it.
+
+## 51.4 `wc5-*` SCORED AGAINST W0–W3 (18 jobs, alice2, all landed)
+
+| | result |
+|---|---|
+| **(W0.1)** beta moves | **PASS 18/18** |
+| **(W0.2)** n_records 2000, n_tot matches ml5 per rung | **PASS** (w 11,173,962 / node 14,420 / lay 62) |
+| **(W0.3)** ms=1e-3 null control | **PASS on four statistics**: b 0.081→0.061 (bar 0.05); rho_s(w) 9.657e-08→8.234e-08 (0.85×, bar 2×); plateau +0.05pp; N_eff/m 0.481→0.519 |
+| **(W2)** layerwise record-binding must fall below 5% | **FAIL — 88.0% → 71.7%.** Cause in 51.1: the dominant guard was not moved |
+| **(W1)** primary test | **UNINTERPRETABLE**, per W2's own fallback text. Not scored |
+| **(W3)** suppression curve | **NOT SCORABLE** (conditional on W1) |
+
+**Post-hoc, and labelled as such:** b(1e-2) 0.328 → 0.364 under a box 2.2× deeper, i.e. the
+registered "fraction explained by the clip" is **−0.146** — the widening moved b *away* from the
+free value. With accuracy neutral (+0.027pp) and N_eff/m neutral (−6.8%), the LOW guard is not what
+makes ms=1e-2 resemble a frozen arm. This is consistent with 51.2 (the arm is boundary-dominated at
+*both* walls) and is not evidence for a non-monotone dial.
+
+**WHAT THE BATCH DELIVERS ANYWAY, and it outweighs W1:**
+
+| statistic | narrow LO=−15 | wide LO=−30 | change |
+|---|---|---|---|
+| **N_eff/m, w, ms=1e-3** (the headline) | **0.4808** | **0.5189** | **+0.038 (+7.9%)** |
+| N_eff/m, w, ms=1e-2 | 0.0499 | 0.0465 | −0.003 (−6.8%) |
+| plateau, mean of 6 matched cells (n=3 each) | — | — | **+0.027 pp** |
+
+**The headline is FLOOR-ROBUST and the clip is ACCURACY-NEUTRAL.** That is the first box-sensitivity
+number the campaign has ever had, and it sets the ±0.10 bar used by `cl5` and `uc5`.
+
+## 51.5 Status
+
+| batch | acct | jobs | verdict |
+|---|---|---|---|
+| `wc5-*` | alice2 | 18 | W0 PASS; **W2 FAIL → W1 uninterpretable**; headline floor-robust (+0.038); clip accuracy-neutral |
+| `cl5-*` | alice2 | 18 | **IN FLIGHT** — ceiling ladder at R18/ms=1e-3, X0–X3 pre-registered |
+| `uc5-*` | alice | 18 | **IN FLIGHT** — unclipped family control r10/c100/r34, U0–U3 pre-registered, r34 = null |

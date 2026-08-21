@@ -1,0 +1,77 @@
+====================================================================================================
+CYCLE 51 -- (W2, SCORED FIRST) WAS THE GUARD RELIEVED?  THREE DENOMINATORS
+====================================================================================================
+  wc5 moved LO -15 -> -30 and held HI at -2.3026, on the premise that HI 'provably
+  never binds'.  That premise came from the per-TENSOR column.  Read the per-COORDINATE
+  columns next to it.
+
+  arm  ms    rung   %cell(tens)  %rec(tens)  %rec LO(coord)  %rec HI(coord)  1st LO  1st HI
+  -----------------------------------------------------------------------------------------
+  ml5  m4    w             0.00         0.0             0.0             0.0       -       -
+  ml5  m4    node          0.00         0.0             0.0             0.0       -       -
+  ml5  m4    lay           0.00         0.0             0.0             0.0       -       -
+  ml5  m4    blk6          0.00         0.0             0.0             0.0       -       -
+  ml5  m3    w             0.00         0.0             8.2             7.4    1836    1523
+  ml5  m3    node          0.00         0.0            13.8             0.0    1725       -
+  ml5  m3    lay           0.78        16.8            16.8             0.0    1663       -
+  ml5  m3    blk6          0.80         4.8             4.8             0.0    1856       -
+  ml5  m2    w             0.47        29.0            91.9            95.4     162      92
+  ml5  m2    node          0.19        11.5            90.8            95.3     184      94
+  ml5  m2    lay          11.31        88.0            88.0             0.0     237       -
+  ml5  m2    blk6         28.14        86.8            86.8             0.0     264       -
+  wc5  m3    w             0.00         0.0             0.0             8.9       -    1367
+  wc5  m3    node          0.00         0.0             0.0             0.0       -       -
+  wc5  m3    lay           0.00         0.0             0.0             0.0       -       -
+  wc5  m2    w             0.24        15.0            76.7            95.4     466      92
+  wc5  m2    node          0.06         3.6            71.5            95.3     565      94
+  wc5  m2    lay           7.56        71.7            71.7             0.0     567       -
+
+  W2 VERDICT (its bar: layerwise record-binding must fall below 5%, from 88.0%).
+    layerwise ms=1e-2, records with any tensor bound: 88.0% -> 71.7%   --> FAIL (bar 5%)
+    W2 FAILS.  Per its own text: 'W1 is UNINTERPRETABLE rather than refuted.'
+    The reason is above: at weightwise/nodewise the HIGH guard binds MORE and
+    EARLIER than the LOW one, and wc5 did not move it.
+
+====================================================================================================
+THE MECHANISM -- BALLISTIC, TWO-SIDED, BOX-FILLING
+====================================================================================================
+  Under Lion every realised beta increment has magnitude exactly the meta-stepsize,
+  so meta_stepsize x 5 steps/record is the FASTEST a coordinate can travel.
+
+  arm  ms    rung      box  final span   fill%  v_pre/vmax  v_last/vmax  bulk med  %tens hot
+  ------------------------------------------------------------------------------------------
+  ml5  m3    w       12.70       12.64    99.6       0.882        0.640     0.028        1.6
+  ml5  m3    node    12.70       11.56    91.1       0.939        0.439     0.120        0.0
+  ml5  m3    lay     12.70        9.35    73.7       0.973        0.327     0.177        4.8
+  ml5  m2    w       12.70       12.70   100.0       0.998        0.000     0.017        0.0
+  ml5  m2    node    12.70       12.70   100.0       0.879        0.000     0.019        0.0
+  ml5  m2    lay     12.70        9.30    73.2       0.682        0.000     0.029        0.0
+  wc5  m3    w       27.70       13.37    48.3       0.884        0.938     0.029        1.6
+  wc5  m3    node    27.70       13.06    47.2       0.950        0.978     0.120        0.0
+  wc5  m3    lay     27.70       11.05    39.9       0.977        0.998     0.208        9.7
+  wc5  m2    w       27.70       27.70   100.0       0.990        0.000     0.036        0.0
+  wc5  m2    node    27.70       27.70   100.0       0.821        0.000     0.031        0.0
+  wc5  m2    lay     27.70       25.03    90.4       0.815        0.000     0.029        0.0
+
+  READ THE TWO BOXES AGAINST EACH OTHER AT ms=1e-2: the spread fills 100% of a
+  12.70-wide box and 100% of a 27.70-wide box, at the SAME velocity.  There is no
+  equilibrium spread to measure -- only the wall you happened to put up.
+  READ v_last AT ms=1e-3 IN wc5: the descent is still running at ~90-100% of the
+  maximum Lion speed in the LAST QUARTER, in every arm where no floor stops it.
+  The BULK (per-tensor means) is near-stationary; the TAIL is not.  'At the adapted
+  equilibrium' is a statement about the bulk and must not be read as convergence.
+
+====================================================================================================
+W0.3 -- THE NULL CONTROL AT ms=1e-3 (the one thing that makes the batch quotable)
+====================================================================================================
+  rung     ml5 plateau (n)    wc5 plateau (n)  delta pp
+  w/m3           68.508 (3)        68.536 (3)     0.028
+  node/m3        72.969 (3)        73.048 (3)     0.079
+  lay/m3         74.390 (3)        74.443 (3)     0.052
+  w/m2           74.356 (3)        74.126 (3)    -0.229
+  node/m2        78.540 (3)        78.503 (3)    -0.037
+  lay/m2         78.068 (3)        78.337 (3)     0.270
+  mean delta over 6 matched cells: +0.027 pp   --> the clip is ACCURACY-NEUTRAL
+
+  Run `probe5_window.py ../probes_wc5` and `neff_instrument.py ../probes_wc5` for
+  the profile and N_eff halves of W0.3 -- they are that file's job, not this one's.
