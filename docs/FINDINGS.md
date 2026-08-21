@@ -8576,3 +8576,39 @@ forecast — that B(1e-6) would be ≥90 and extend the run downward — is **co
 **The lesson is about the metric, not the forecast.** A prediction stated as "N decades above
 an absolute floor" inherits the knife-edge of 47.9. C1 and C2 (arm C at the two extremes) are
 unaffected and remain open — those runs are still in flight.
+
+## 47.12 `ep_to_85` at n=3 with arm C added — and the arm-C column is CONFOUNDED by its own warmup
+
+47.2's table was n=2 on four arm-B cells and had no arm C. Re-derived at n=3, diverged seeds
+excluded, `epochs_done >= 100`:
+
+| alpha0 | A fixed lr | B meta m=6 | C cosine |
+|---|---|---|---|
+| 1e-5 | 89.3 (n=3) | **8.7** (n=3) | **never** (n=2 runs, neither reaches 85) |
+| 1e-4 | 14.7 (n=3) | **9.0** (n=3) | 23.0 (n=2) |
+| 3e-4 | **10.7** (n=3) | 12.0 (n=3) | 17.0 (n=2) |
+| 1e-3 | 10.7 (n=3) | **8.7** (n=3) | 14.5 (n=2) |
+| 1e-2 | **never** (n=3) | **13.7** (n=3) | 59.0 (n=2) |
+
+**B vs A is a clean comparison and it is decisive.** Neither arm has a schedule or a warmup,
+so epochs-to-target measures the same thing on both. MetaOptimize is faster at four of five
+grid points and the two it wins hugely are the two extremes: at 1e-5 it is **10.3× faster**
+(8.7 vs 89.3) and at 1e-2 arm A never reaches 85 at all. Arm A is faster only at 3e-4
+(10.7 vs 12.0), which is arm A's own optimum.
+
+**B vs C is NOT a clean comparison and 47.2 should not have implied it was.** Arm C carries a
+**10,000-step (20-epoch) linear warmup** by construction (`COS_WARMUP=default`, verified in
+`build_optimizer.py:61`). Its learning rate is below peak for the first fifth of the run, so
+its epochs-to-target is inflated by the schedule's own shape, not by any property of
+scheduling versus meta-learning. The 1e-4 cell reading 23.0 against a 20-epoch warmup is
+essentially "immediately after warmup ends".
+
+**What survives the confound.** Two things, and they are enough:
+* At **1e-5 arm C never reaches 85% in 100 epochs**, while arm B reaches it in 8.7. A warmup
+  cannot explain a target that is never reached — arm C's plateau there is 83.884.
+* At **1e-2 arm A never reaches it either**, while arm B does in 13.7.
+
+So the bottom-end rescue in 47.9 is corroborated by a second, independent metric, and the
+top-end one is too. **The general "MetaOptimize converges faster than a schedule" reading is
+withdrawn** — it is not measurable on this data without a no-warmup cosine arm, which does
+not exist and is not worth 6 jobs to build.
