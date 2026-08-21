@@ -8483,3 +8483,96 @@ discover it after submitting.
 **Consequence for this cycle:** the three-arm table in 47.1 is a **100-epoch** result and is
 stated as such. If the c46 control returns NOT BUDGET-STABLE for arms A and B, 47.1 does not
 survive by itself either, and the fix is a re-designed arm-C-at-300 batch, not a caveat.
+
+## 47.9 SUPERSEDES 47.1's NUMBERS — arm B completed to n=3 mid-tick, and one cell crossed the line
+
+The c45 arm-B stragglers landed during this cycle. Every arm-A and arm-B cell is now n=3
+(except alpha0=1e-1, below). **The 47.1 table was computed at n=2 on five arm-B cells and is
+superseded by this one.** Re-derived with `analysis/idea3_threearm.py` (selftest **34/34**).
+
+| shared sub-grid {1e-5..1e-2} | A fixed lr | B meta m=6 | C cosine |
+|---|---|---|---|
+| peak plateau | 91.796 | 93.304 | **94.028** |
+| worst plateau | 70.541 | **89.987** | 83.884 |
+| width ≤1pp of own best | 0.477 | **0.000** | 0.523 |
+| width ≤2pp / ≤3pp | 1.000 | 2.000 | 2.000 |
+| width above 90 | 0.477 | 2.000 | 2.000 |
+| width above 85 | 1.000 | **3.000** | 2.000 |
+
+**What moved, and why.** `i3b-1e2-s1` completed at 89.773, taking the arm-B 1e-2 cell from
+90.095 (n=2) to **89.987 (n=3, sd 0.187)** — i.e. **0.013pp below the 90 line**, which is
+7× smaller than the cell's own sd. That single 0.013pp moved arm B's "width above 90" from
+3.0 decades to 2.0. Nothing about the science changed; a threshold happened to sit inside the
+noise of one cell.
+
+**Consequence, and it is the methodological point of this cycle.** An absolute-floor width is
+only meaningful if it does not hinge on where the floor falls relative to a single cell. Here
+it does. The reducer now prints the full scan and refuses to let one row be quoted alone:
+
+| floor | A fixed | B meta | C cosine | ranking |
+|---|---|---|---|---|
+| ≥84.0 | 2.000 | **3.000** | 2.000 | B>C |
+| ≥86.0 / ≥88.0 / ≥89.0 / ≥89.5 | 1.000 | **3.000** | 2.000 | B>C |
+| ≥90.0 | 0.477 | 2.000 | 2.000 | **B=C** |
+| ≥91.0 | 0.477 | 2.000 | 2.000 | **B=C** |
+| ≥92.0 | 0.000 | 0.523 | **2.000** | **C>B** |
+
+**The B-vs-C ranking is NOT threshold-stable: B>C, B=C and C>B all occur on the same data.**
+Any sentence of the form "MetaOptimize is flatter on an absolute floor" must name its
+threshold and show this scan. 47.1 quoted the ≥90 row alone; that was a selection, and it is
+withdrawn as a standalone claim.
+
+**The verdict, restated on the complete data.** Combining both width families:
+
+* on the **scale-free** measure (within X pp of own best) MetaOptimize loses at 1pp and ties
+  at 2pp and 3pp — it never wins;
+* on the **absolute** measure it wins only at floors ≤89.5, ties at 90–91, and loses at 92;
+* its peak is **0.724pp** below arm C on-grid and **1.113pp** below the true tuned baseline
+  94.417 ±0.113 (n=5).
+
+**So: MetaOptimize is not more robust than a tuned cosine on any threshold-stable measure.**
+Its one real advantage is the bottom of the grid — at alpha0=1e-5 it scores 91.535 against
+the cosine's 83.884 (**+7.65pp**) and reaches 85% in 8.7 epochs against 89.3 for a fixed LR
+(47.2). That is a genuine and specific result: *MetaOptimize rescues a step size set far too
+small; it does not otherwise beat a schedule, and it costs ~1.1pp of peak.*
+
+## 47.10 The 1e-1 cell is a DIVERGENCE result, not a low score, and the reducer now says so
+
+At alpha0 = 1e-1 the plateau means the campaign has been quoting are meaningless because the
+runs do not converge, they collapse:
+
+| arm | seeds landed | diverged (plateau ≤ 50) | surviving mean |
+|---|---|---|---|
+| A fixed lr | 3 | **3 of 3** (11.841, 10.000, 15.952) | none — the cell has no survivors |
+| B meta m=6 | 2 | **1 of 2** (10.000) | 86.858, n=1 |
+| B, clip relaxed (`i3bc`) | 2 | 0 of 2 | 76.532, n=2 |
+
+`analysis/idea3_threearm.py` now (i) excludes diverged seeds from cell means, (ii) reports the
+divergence count as its own column, and (iii) **excludes any cell containing a divergence from
+every width band at every tolerance** — a step size that collapses on some seeds is not a step
+size the method is robust at, whatever the surviving seeds averaged to. 12 of the selftest's
+34 assertions cover this, including the exact `{10.000, 86.858}` case that produced
+CORRECTIONS 39's sign error.
+
+**Arm A does not merely score badly at 1e-1 — it has no surviving seed at all.** That is a
+stronger and cleaner statement than the 13.896 mean previously reported, and it is the
+correct one.
+
+## 47.11 The pre-registration in 47.4 was invalidated by new data, NOT by being wrong — recorded so it is not scored as a hit or a miss
+
+47.4(C3) predicted, in advance: *"arm B's ≥90 width grows from 3.0 to 4.0 decades, because
+B(1e-6) = 91.396 is already ≥90 and adjacent to its existing [1e-5..1e-2] run."*
+
+Its **arithmetic was correct given the data available when it was written**. It is now wrong,
+because the input changed underneath it: B(1e-2) went 90.095 (n=2) → 89.987 (n=3) while the
+prediction was in flight, breaking the `[1e-5..1e-2]` run the prediction was anchored on. On
+the full grid arm B's ≥90 width is therefore **3.0 decades [1e-6..1e-3]**, not 4.0.
+
+**This is not a failed prediction and must not be written up as one.** C3 was a deduction from
+a table, and one entry of that table moved by 0.013pp. The part of C3 that was a genuine
+forecast — that B(1e-6) would be ≥90 and extend the run downward — is **confirmed**: B(1e-6)
+= 91.496 ±0.180 at n=3.
+
+**The lesson is about the metric, not the forecast.** A prediction stated as "N decades above
+an absolute floor" inherits the knife-edge of 47.9. C1 and C2 (arm C at the two extremes) are
+unaffected and remain open — those runs are still in flight.

@@ -93,23 +93,49 @@ def collect(rows, prefixes, min_epochs):
     return out
 
 
+DIVERGED = 50.0   # plateau at or below this is a collapse, not a slow run
+
+
 def cellstats(vals):
-    n = len(vals)
-    m = sum(vals) / n
+    """Mean/sd over SURVIVING seeds, plus the divergence count.
+
+    A collapsed run (plateau <= DIVERGED; the campaign has seeds at exactly 10.000 =
+    chance) is not a low score, it is a different outcome, and averaging it in produces a
+    number that describes neither.  `i3b-1e1` reads 48.429 +-54.3 from {10.000, 86.858} --
+    a "mean" no seed is anywhere near, and it is what made analysis/idea3_robustness.py
+    report the clip control with the wrong SIGN (CORRECTIONS 39).
+
+    The `collapsed` column in all_runs.csv is 0 on every row and flags nothing, so this
+    filter must be applied here.
+
+    Returns (mean_of_survivors, sd_of_survivors, n_survivors, n_diverged).
+    """
+    div = [v for v in vals if v <= DIVERGED]
+    ok = [v for v in vals if v > DIVERGED]
+    n = len(ok)
+    if n == 0:
+        return float("nan"), float("nan"), 0, len(div)
+    m = sum(ok) / n
     if n < 2:
-        return m, float("nan"), n
-    var = sum((v - m) ** 2 for v in vals) / (n - 1)
-    return m, math.sqrt(var), n
+        return m, float("nan"), n, len(div)
+    var = sum((v - m) ** 2 for v in ok) / (n - 1)
+    return m, math.sqrt(var), n, len(div)
 
 
-def width(means, subgrid, lo):
-    """Longest CONTIGUOUS run of subgrid points with mean >= lo.
+def width(means, subgrid, lo, divs=None):
+    """Longest CONTIGUOUS run of subgrid points with mean >= lo AND no diverged seed.
 
     Returns (decades, first_label, last_label, gapped) where `gapped` is True when
     some in-band point lies outside the returned run -- i.e. the band is not an
     interval and the single number under-reports it.
+
+    A cell with any diverged seed is never in band, at any tolerance.  Robustness to a
+    step size means it works at that step size, not that it works on the seeds where it
+    did not collapse.
     """
-    inband = [g for g in subgrid if g in means and means[g] >= lo]
+    divs = divs or {}
+    inband = [g for g in subgrid
+              if g in means and means[g] >= lo and not divs.get(g)]
     if not inband:
         return 0.0, None, None, False
     best = (0.0, None, None)
@@ -133,40 +159,55 @@ def width(means, subgrid, lo):
 
 
 def report_arm(label, cells, subgrid, out=sys.stdout):
-    means = {}
+    """Returns (means_over_survivors, diverged_counts). A cell with ANY divergence is
+    reported but is NOT eligible for a width band -- see `width_ok` in summarise()."""
+    means, divs = {}, {}
     print(f"\n=== {label} ===", file=out)
-    print(f"{'alpha0':>8} {'n':>3} {'plateau':>9} {'sd':>7}", file=out)
+    print(f"{'alpha0':>8} {'n':>3} {'plateau':>9} {'sd':>7}  {'diverged':>8}", file=out)
     for g in subgrid:
         if g not in cells:
-            print(f"{g:>8} {'-':>3} {'-':>9} {'-':>7}", file=out)
+            print(f"{g:>8} {'-':>3} {'-':>9} {'-':>7}  {'-':>8}", file=out)
             continue
-        m, sd, n = cellstats(cells[g])
-        means[g] = m
+        m, sd, n, nd = cellstats(cells[g])
+        divs[g] = nd
+        if n:
+            means[g] = m
         sds = "  n/a " if math.isnan(sd) else f"{sd:7.3f}"
-        print(f"{g:>8} {n:>3} {m:9.3f} {sds}", file=out)
+        ms = "      -  " if math.isnan(m) else f"{m:9.3f}"
+        flag = f"{nd:>8}" if nd else f"{'.':>8}"
+        print(f"{g:>8} {n:>3} {ms} {sds}  {flag}", file=out)
     missing = [g for g in subgrid if g not in means]
     if missing:
         print(f"  INCOMPLETE on this sub-grid -- missing {', '.join(missing)}", file=out)
-    return means
+    bad = [g for g in subgrid if divs.get(g)]
+    if bad:
+        print(f"  DIVERGED seeds at {', '.join(bad)} -- these cells are excluded from every",
+              file=out)
+        print("  width band below: a step size that collapses on some seeds is not robust at",
+              file=out)
+        print("  that step size, whatever the surviving seeds averaged to.", file=out)
+    return means, divs
 
 
-def summarise(means, subgrid, out=sys.stdout, floors=(90.0, 85.0)):
+def summarise(arm, subgrid, out=sys.stdout, floors=(90.0, 85.0)):
+    means, divs = arm
     if not means:
         return None
     peak_g = max(means, key=lambda g: means[g])
     peak = means[peak_g]
     worst = min(means[g] for g in subgrid if g in means)
+    ndiv = sum(1 for g in subgrid if divs.get(g))
     print(f"  peak  {peak:8.3f} at alpha0={peak_g}    worst {worst:8.3f}"
-          f"    span {peak - worst:7.3f} pp", file=out)
-    res = {"peak": peak, "peak_at": peak_g, "worst": worst}
+          f"    span {peak - worst:7.3f} pp    cells with a divergence: {ndiv}", file=out)
+    res = {"peak": peak, "peak_at": peak_g, "worst": worst, "ndiv": ndiv}
     for tol in (1.0, 2.0, 3.0):
-        d, a, b, gap = width(means, subgrid, peak - tol)
+        d, a, b, gap = width(means, subgrid, peak - tol, divs)
         span = f"[{a} .. {b}]" if a else "[none]"
         flag = "  (GAPPED -- band is not an interval)" if gap else ""
         print(f"  width within {tol:.0f}pp of own best : {d:4.1f} decades  {span}{flag}", file=out)
         res[f"w{int(tol)}"] = d
     for fl in floors:
-        d, a, b, gap = width(means, subgrid, fl)
+        d, a, b, gap = width(means, subgrid, fl, divs)
         span = f"[{a} .. {b}]" if a else "[none]"
         flag = "  (GAPPED)" if gap else ""
         print(f"  width above absolute {fl:.0f}   : {d:4.1f} decades  {span}{flag}", file=out)
@@ -191,9 +232,14 @@ def main(path):
     print(f"SHARED sub-grid : {' '.join(shared) if shared else '(none)'}"
           "   <- every cross-arm width below is measured HERE and nowhere else")
 
-    resA = summarise(report_arm("A  fixed-lr AdamW", A, full), shared) if A else None
-    resB = summarise(report_arm("B  MetaOptimize m=6", B, full), shared) if B else None
-    resC = summarise(report_arm("C  AdamW + cosine", C, full), shared) if C else None
+    armA = report_arm("A  fixed-lr AdamW", A, full) if A else ({}, {})
+    armB = report_arm("B  MetaOptimize m=6", B, full) if B else ({}, {})
+    armC = report_arm("C  AdamW + cosine", C, full) if C else ({}, {})
+    arms = (armA, armB, armC)
+    resA = summarise(armA, shared) if A else None
+    resB = summarise(armB, shared) if B else None
+    resC = summarise(armC, shared) if C else None
+    # divergence is a first-class robustness outcome, so it appears in the head-to-head
 
     print("\n=== HEAD TO HEAD, shared sub-grid only ===")
     if not (resA and resB and resC):
@@ -206,8 +252,32 @@ def main(path):
     for key, lab in (("peak", "peak plateau"), ("worst", "worst plateau"),
                      ("w1", "width <=1pp of own best"), ("w2", "width <=2pp of own best"),
                      ("w3", "width <=3pp of own best"),
-                     ("f90", "width above 90"), ("f85", "width above 85")):
+                     ("f90", "width above 90"), ("f85", "width above 85"),
+                     ("ndiv", "cells with a divergence")):
         print(f"{lab:26}{resA[key]:10.3f}{resB[key]:10.3f}{resC[key]:10.3f}")
+
+    # ---- threshold sensitivity.  An absolute-floor width is only meaningful if it does
+    # not hinge on where the floor sits relative to a single cell.  Cycle 47: arm B's
+    # 1e-2 cell landed at 89.987, i.e. 0.013pp under the 90 line -- far inside the ~0.1pp
+    # seed noise -- and that alone moved its >=90 width by a whole decade.  So the scan is
+    # printed, not just one row, and the caller is told when the ranking is unstable.
+    print("\n  threshold sensitivity of the ABSOLUTE-floor width (decades):")
+    print(f"{'    floor':26}{'A fixed':>10}{'B meta':>10}{'C cosine':>10}   ranking")
+    flips = []
+    for fl in (84.0, 86.0, 88.0, 89.0, 89.5, 90.0, 91.0, 92.0):
+        wa = width(arms[0][0], shared, fl, arms[0][1])[0]
+        wb = width(arms[1][0], shared, fl, arms[1][1])[0]
+        wc = width(arms[2][0], shared, fl, arms[2][1])[0]
+        rank = ("B>C" if wb > wc + 1e-9 else "C>B" if wc > wb + 1e-9 else "B=C")
+        flips.append(rank)
+        print(f"{'    >= ' + format(fl, '.1f'):26}{wa:10.3f}{wb:10.3f}{wc:10.3f}   {rank}")
+    distinct = sorted(set(flips))
+    if len(distinct) > 1:
+        print(f"  -> the B-vs-C ranking is NOT threshold-stable ({', '.join(distinct)} all occur).")
+        print("     Any 'MetaOptimize is flatter on an absolute floor' sentence MUST name its")
+        print("     threshold and show this scan.  Quoting one row of it is a selection.")
+    else:
+        print(f"  -> the B-vs-C ranking is threshold-stable at {distinct[0]} over 84..92.")
 
     print("\n=== VERDICT ===")
     # B vs C is the claim that matters: does meta-learning the step size buy
@@ -294,10 +364,32 @@ def _selftest():
     chk("collect arm C prefix", c["1e-3"], [94.0])
 
     # --- cellstats
-    m_, sd_, n_ = cellstats([1.0, 3.0])
-    chk("cellstats mean", m_, 2.0)
+    m_, sd_, _n, nd_ = cellstats([91.0, 93.0])
+    chk("cellstats mean", m_, 92.0)
     chk("cellstats sd (n-1)", round(sd_, 9), round(math.sqrt(2.0), 9))
-    chk("cellstats n=1 sd nan", math.isnan(cellstats([5.0])[1]), True)
+    chk("cellstats no divergence", nd_, 0)
+    chk("cellstats n=1 sd nan", math.isnan(cellstats([95.0])[1]), True)
+
+    # --- divergence handling.  This is CORRECTIONS 39: the campaign's own
+    # `i3b-1e1` = {10.000, 86.858} was averaged to 48.429 +-54.3 and that number
+    # flipped the SIGN of a published verdict.
+    m2, sd2, n2, nd2 = cellstats([10.0, 86.858])
+    chk("diverged seed excluded from mean", round(m2, 3), 86.858)
+    chk("diverged seed counted", nd2, 1)
+    chk("survivor count excludes it", n2, 1)
+    chk("all-diverged cell -> nan mean", math.isnan(cellstats([10.0, 10.0])[0]), True)
+    chk("all-diverged cell counts both", cellstats([10.0, 10.0])[3], 2)
+    chk("boundary: exactly 50 is diverged", cellstats([50.0, 91.0])[3], 1)
+    chk("boundary: 50.001 survives", cellstats([50.001, 91.0])[3], 0)
+
+    # a cell whose SURVIVORS are in band must still be excluded from the width
+    md = {"1e-6": 91.0, "1e-5": 91.0, "1e-4": 91.0}
+    chk("width without divergence", width(md, GRID, 90.0)[0], 2.0)
+    chk("width excludes a diverged cell",
+        width(md, GRID, 90.0, {"1e-5": 1})[0], 0.0)
+    chk("width splits the run at a diverged cell",
+        width(md, GRID, 90.0, {"1e-5": 1})[1:3], ("1e-6", "1e-6"))
+    chk("divs=None behaves as no divergence", width(md, GRID, 90.0, None)[0], 2.0)
 
     # --- absolute-floor width is independent of the peak
     mh = {"1e-6": 91.0, "1e-5": 91.0, "1e-4": 99.0}
