@@ -204,6 +204,81 @@ def analyse_dir(d):
                 counts_mean=float(np.mean(counts) / T5))
 
 
+N_WEIGHTS_R18 = 11_173_962   # ResNet18 parameter count (CORRECTIONS 16: do NOT trust
+                             # block_sizes.json's n_b, it reports this for nodewise too)
+
+
+def profile(root, n_weights=N_WEIGHTS_R18):
+    """The pre-registered scale-profile verdict, with the CORRECTED floor.
+
+    FINDINGS 44.5 measured rho_w^implied falling 2.7x-85.4x from k=1 to k~1.8e5 and refused
+    to call it a correlation length, because the pooled floor is biased in exactly the
+    direction that produces a falling profile.  This recomputes the same inversion with the
+    heterogeneity-corrected floor and scores the batch's own pre-registration:
+
+      (a) ARTEFACT -- rho_w^implied is flat across resolved rungs to within 3x.
+      (b) REAL RANGE -- it still falls >= 10x after correction.
+
+    Rungs below their own rho_min are EXCLUDED and printed, never silently dropped
+    (CORRECTIONS 33).  The pre-registered blk6 rung is not expected to resolve.
+    """
+    try:
+        from corr_range import implied_rho_w
+    except ImportError:
+        print("cannot import corr_range.implied_rho_w -- run from the repo root")
+        return
+    dirs = sorted(d for d in glob.glob(os.path.join(root, "*"))
+                  if os.path.isdir(d) and os.path.exists(os.path.join(d, "neg_counts.json")))
+    rows = []
+    for d in dirs:
+        r = analyse_dir(d)
+        if r is None:
+            continue
+        band = r["bands"]["tau=pooled"]
+        c = band.get("corr")
+        if not c:
+            continue
+        k = max(n_weights / r["n_tot"], 1.0)
+        rows.append(dict(name=os.path.basename(d), n_tot=r["n_tot"], k=k, H=band.get("H"),
+                         rho_s=c["rho_s"], rho_min=c["rho_min"], resolved=c["resolved"],
+                         rho_w=implied_rho_w(c["rho_s"], k) if c["resolved"] else float("nan")))
+    if not rows:
+        print("no reducible PROBE5 dirs found")
+        return
+    print("\nSCALE PROFILE with the HETEROGENEITY-CORRECTED floor")
+    hdr = (f"{'rung':26}{'n_tot':>12}{'k':>12}{'H':>8}{'rho_s':>11}{'rho_min':>11}"
+           f"{'res':>5}{'rho_w implied':>15}")
+    print(hdr)
+    print("-" * len(hdr))
+    for r in sorted(rows, key=lambda x: x["k"]):
+        print(f"{r['name'][:25]:26}{r['n_tot']:>12,}{r['k']:>12,.0f}"
+              f"{(r['H'] if r['H'] is not None else float('nan')):>8.3f}"
+              f"{r['rho_s']:>11.3e}{r['rho_min']:>11.3e}"
+              f"{('YES' if r['resolved'] else 'NO'):>5}{r['rho_w']:>15.3e}")
+    ok = [r for r in rows if r["resolved"] and np.isfinite(r["rho_w"]) and r["rho_w"] > 0]
+    unres = [r["name"] for r in rows if not r["resolved"]]
+    if unres:
+        print(f"  EXCLUDED as below their own rho_min: {', '.join(unres)}")
+        print("  (a null at these rungs means 'no correlation above rho_min', not 'none').")
+    if len(ok) < 2:
+        print("  NOT DECIDABLE -- fewer than 2 resolved rungs; the profile needs at least two.")
+        return
+    lo = min(ok, key=lambda r: r["k"])
+    hi = max(ok, key=lambda r: r["k"])
+    ratio = lo["rho_w"] / hi["rho_w"] if hi["rho_w"] else float("inf")
+    print(f"\n  rho_w implied changes {ratio:,.2f}x from k={lo['k']:,.0f} to k={hi['k']:,.0f}")
+    if ratio < 3.0:
+        print("  -> OUTCOME (a): the profile is FLAT after correction to within 3x.")
+        print("     FINDINGS 44.5's provisional short-range reading is WITHDRAWN; the honest")
+        print("     claim is a single scale-free per-weight rho.")
+    elif ratio >= 10.0:
+        print("  -> OUTCOME (b): rho_w implied still falls >=10x after correction.")
+        print("     The correlation length is REAL and is the paper's structural result.")
+    else:
+        print(f"  -> NEITHER pre-registered outcome: {ratio:,.2f}x is between 3x and 10x.")
+        print("     Report it as an inconclusive middle, NOT as the nearer of the two.")
+
+
 def main(root):
     dirs = sorted(d for d in glob.glob(os.path.join(root, "*"))
                   if os.path.isdir(d) and os.path.exists(os.path.join(d, "neg_counts.json")))
@@ -359,4 +434,8 @@ def _selftest():
 if __name__ == "__main__":
     if "--selftest" in sys.argv:
         sys.exit(_selftest())
-    main(sys.argv[1] if len(sys.argv) > 1 else "analysis/killtest_data/p5")
+    _root = next((a for a in sys.argv[1:] if not a.startswith("--")),
+                 "analysis/killtest_data/p5")
+    main(_root)
+    if "--profile" in sys.argv:
+        profile(_root)
