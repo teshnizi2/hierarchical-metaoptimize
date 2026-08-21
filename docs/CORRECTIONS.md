@@ -2187,11 +2187,24 @@ written pre-registrations by `analysis/c52_boxfree.py` (selftest 27/27).
   03:50:00 and to counting exit status; resubmitted and verified 9/9 pending.
 * **STANDING RULE (7) added**: a rate used to extrapolate must be measured on the segment being
   extrapolated from. → §67.
-* **NOT DONE, and still unspent:** the raw-instrument `s` re-derivation sweep (bookkeeping,
-  carried since 51); a granularity CURVE with intermediate block sizes, which would turn 70's
-  three-point non-monotone shape into a real curve — `blockwise` accepts arbitrary group
-  specifications, so this is a design question and not a code one, and it is the natural next
-  batch once `bl5` reports.
+* **A CLAIM MADE EARLIER IN THIS SAME DECISION RECORD IS WITHDRAWN (FINDINGS 52.12).** It said a
+  granularity curve is "a design question and not a code one, because `blockwise` accepts arbitrary
+  group specifications". `blockwise` groups consecutive parameter TENSORS and can only reach
+  granularities **coarser than layerwise**; the nodewise minimum sits between layerwise and
+  weightwise, where nothing in the current vocabulary lands. Nor is it recoverable offline — the
+  k-profile takes one k per ARM. **Filling that interval needs a new `stepsize_type` in `HF.py`,
+  i.e. a code change to the optimizer under study, and that is flagged for an operator decision
+  rather than made unsupervised.**
+* **A THIRD BATCH WAS SUBMITTED after `uc6` freed alice: `ns5-*`, 12 jobs** (FINDINGS 52.13). It
+  attacks the stated weakness of §70 — that the nodewise minimum is scoped to ms=1e-3 with a
+  counterexample at ms=1e-4 — by locating the boundary. First it was checked that the
+  counterexample is not itself a box artefact: **it is not** (0.0% at both guards in all three m4
+  rungs, FINDINGS 52.11). The ladder goes DOWN from 1e-3 because measured travel (0.978 log units
+  at 1e-4, 4.751 at 1e-3) says there is no box-free configuration ABOVE 1e-3 at this budget.
+  N2 registers a mechanism — **adaptation extent rather than meta-stepsize** — which, if confirmed,
+  makes §70 a transferable statement and yields a prediction testable against `bl5`.
+* **NOT DONE, and still unspent:** the raw-instrument `s` re-derivation sweep (bookkeeping, carried
+  since 51).
 
 **LATE ADDENDUM, SAME TICK.** `uc6-*` ran in 7–10 minutes and was scored before the tick closed.
 V0.1 6/6, V0.2, V0.4, V1, V2, V3, V4 — **every gate passes** (FINDINGS 52.10). Consequences already

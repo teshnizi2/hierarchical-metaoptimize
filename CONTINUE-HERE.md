@@ -108,13 +108,25 @@ positive result.**
   then B2.5. B1.5 needs one new option: `neff_instrument.py --window 0.25-0.5`; `reduce_dir`
   already takes fractional windows, so do NOT change its default.
   (b) `uc6` is DONE -- nothing left to score there.
-  (c) The natural batch after `bl5`: a **granularity CURVE** with intermediate block sizes to turn
-  70's three-point non-monotone shape into a real curve. `blockwise` accepts arbitrary group
-  specs, so this is a design question, not a code one.
+  (c) `ns5-*` (12 jobs, alice, submitted this tick): **N0.3 box-free gate FIRST**, then N1 (the
+  argmin at ms=2e-4 and 5e-4 -- refutation is `(node, w)`), then **N2, the mechanism**: does the
+  flip track BETA SPAN rather than ms? Report beta span per arm. If it tracks span, rewrite
+  CORRECTIONS 70 in terms of ADAPTATION EXTENT, which transfers across optimizers and predicts the
+  nodewise minimum should appear at ms=1e-4 given a longer run -- testable against `bl5`.
+  (c2) **DO NOT attempt a granularity curve between layerwise and weightwise without asking the
+  operator.** This tick claimed it was config-only and that was WRONG (FINDINGS 52.12): `blockwise`
+  groups consecutive TENSORS and only reaches COARSER than layerwise, and the k-profile takes one k
+  per ARM so it cannot be recovered offline. It needs a new `stepsize_type` in `HF.py` -- a code
+  change to the optimizer under study. **Flagged for an operator decision.**
   (d) Still unspent, still bookkeeping: the raw-instrument `s` re-derivation sweep.
-* Queues at tick end: alice **0** (`uc6` complete and scored), alice2 **9 R** (`bl5`).
-  FairShare 0.333 / 0.334. **`bl5` is the only open batch, and the BUDGET is the only remaining
-  untested threat to the headline.**
+* **`ns5-*` (12 jobs, alice) submitted after uc6 freed the queue** -- the onset ladder for
+  CORRECTIONS 70. First checked that the ms=1e-4 counterexample is NOT a box artefact: it is not
+  (0.0% at both guards, all three m4 rungs, FINDINGS 52.11). **There is also no box-free
+  configuration ABOVE ms=1e-3 at this budget** (measured travel 0.978 log units at 1e-4 vs 4.751
+  at 1e-3), which is why the ladder goes DOWN and why ms=1e-2 was boundary-dominated all along.
+* Queues at tick end: alice **12 P** (`ns5`), alice2 **9 R** (`bl5`). FairShare 0.333 / 0.334.
+  **The BUDGET (`bl5`) is the only remaining untested threat to the headline; `ns5` characterises
+  the scope of the tick's new result.**
 
 ## Running / next (cycle 51) -- **EVERY CLIP FRACTION THIS CAMPAIGN QUOTED WAS AT THE WRONG RESOLUTION**
 

@@ -10103,3 +10103,76 @@ registered *after* uc5's failed — i.e. it is a prediction learned from a miss,
 were correct (r10-w, r18-w, c100-w, c100-node, c100-lay — all measured at 0.0%), and **5 of 5**
 "will not bind" rows were correct. A perfectly one-sided failure, which is the signature of a
 systematically over-fast rate — exactly what extrapolating a startup velocity produces.
+
+## 52.11 THE ms=1e-4 COUNTEREXAMPLE TO THE NODEWISE MINIMUM IS **CLEAN**, NOT A BOX ARTEFACT
+
+CORRECTIONS 70 scopes the nodewise minimum to ms=1e-3 because ml5's m4 arm (ms=1e-4) has argmin
+`w`. The obvious suspicion, after this tick, is that the counterexample is itself a box artefact.
+Checked at coordinate resolution — **it is not**:
+
+| arm | box | %rec LO | %rec HI | %Q4 LO | %Q4 HI | final min | final max |
+|---|---|---|---|---|---|---|---|
+| ml5 w m4 | −15:−2.3026 | **0.0** | **0.0** | 0.0 | 0.0 | −7.891 | −5.931 |
+| ml5 node m4 | −15:−2.3026 | **0.0** | **0.0** | 0.0 | 0.0 | −7.899 | −5.912 |
+| ml5 lay m4 | −15:−2.3026 | **0.0** | **0.0** | 0.0 | 0.0 | −7.888 | −5.907 |
+| ml5 w m3 (same box) | −15:−2.3026 | 8.2 | 7.4 | 32.6 | 27.5 | **−15.000** | −2.359 |
+
+The m4 arms never approach either wall even in the narrow box. **The counterexample must be taken
+at face value, and the m4 rung is a valid BOX-FREE control despite its nominal box.**
+
+**AND THE ms AXIS HAS A HARD CEILING, MEASURED RATHER THAN EXTRAPOLATED.** Travel of the top
+coordinate in 20 epochs from beta0 = −6.909: **0.978** log units at ms=1e−4, **4.751** at ms=1e−3
+— sublinear, 4.9x for 10x. Projecting to ms=3e−3 gives ~10 log units, i.e. final max ≈ +3.4, past
+any usable ceiling. **There is no box-free configuration above ms=1e−3 at this budget.** That is
+the same sentence 51.7 got wrong at ms=1e−3, and it is asserted here only because the travel is
+measured at two stepsizes rather than extrapolated from a startup velocity (STANDING RULE 7). It
+is also why ms=1e−2 has been boundary-dominated all along (CORRECTIONS 62).
+
+## 52.12 CORRECTION TO THIS TICK'S OWN HANDOFF: THE GRANULARITY CURVE IS **NOT** A CONFIG-ONLY BATCH
+
+CONTINUE-HERE and CORRECTIONS 71 both said a granularity curve with intermediate block sizes is
+"a design question, not a code one, because `blockwise` accepts arbitrary group specifications".
+**That is wrong and is withdrawn.** `polish_the_stepsize_groups` groups **consecutive parameter
+TENSORS** into blocks — a list of integers summing to 62 at ResNet18. It can therefore only reach
+granularities **coarser than layerwise** (m ∈ 1..62). The non-monotone minimum sits **between**
+layerwise (m=62) and weightwise (m=11.2M), at nodewise (m=14,420), and nothing in the current
+`stepsize_type` vocabulary lands in that interval.
+
+Nor can the curve be recovered offline: `probe5_window`'s k-profile takes one k **per arm**, from
+`n_tot/m` of the granularity that was actually run, and `rho_s` is derived from that arm's
+`frac_neg` time series — it is not a post-hoc re-blocking of stored per-coordinate counts.
+
+**So filling the layerwise↔weightwise interval requires a new `stepsize_type` in `HF.py`** (e.g.
+channel-groups of size g), which is a code change to the optimizer under study and is **not** being
+made unsupervised. It is flagged here as the one place where the C-direction programme needs an
+operator decision rather than another batch.
+
+## 52.13 `ns5-*` SUBMITTED — locating the onset of the nodewise minimum (12 jobs, alice)
+
+`bin/c52_nodemin_onset.sh`. Box-free (−30:0.0) R18/CIFAR-10, rungs w/node/lay, seeds 0–1, at
+**ms ∈ {2e−4, 5e−4}** — the interval between the two controls already on disk. With them it is a
+**four-point box-free ladder**: ms=1e−4 (ml5 m4, argmin **w**) / 2e−4 / 5e−4 / 1e−3 (cl5 cU, argmin
+**node**). It goes DOWN from 1e−3 because 52.11 shows up is not box-fundable.
+
+N0–N3 pre-registered in the header before submission. The two that matter:
+
+* **N1** — argmin of N_eff/m. Registered: the flip is **monotone** in ms, so (2e−4, 5e−4) may be
+  (w,w), (w,node) or (node,node). **Refutation is (node,w)** — a return to `w` at the higher
+  stepsize — which would mean 70's one-line scoping is inadequate and the result holds at a point
+  rather than on an interval. An unresolved layerwise rung makes that arm's argmin **UNDECIDABLE**,
+  not defaulted.
+* **N2, the mechanism, registered so it cannot be fitted afterwards** — the governing variable may
+  be **adaptation extent**, not meta-stepsize: at ms=1e−4 beta travels only 0.978 log units, which
+  may simply be too close to the frozen limit for the shape to form. Prediction: the argmin flips
+  to `node` where the weightwise beta **span** first exceeds ~5 log units, and tracks span better
+  than ms. The four-point ladder can separate the two because span grows **sublinearly** in ms
+  (4.9x for 10x), so the orderings differ. If confirmed, CORRECTIONS 70 should be rewritten in
+  terms of adaptation extent — a better statement, because it transfers across optimizers and
+  budgets and it predicts the nodewise minimum should also appear at ms=1e−4 **given a longer run**,
+  which is directly testable against `bl5-*`.
+
+Deliberate rule-break, stated: the controls (ml5, cl5) are on alice2 and this batch runs on alice,
+against CORRECTIONS 46(6)'s by-comparator rule. Justification: the comparison is via N_eff/m from a
+shared selftested instrument on probe files, not raw accuracy, and both accounts' `HF.py` are
+byte-identical after PATCH_CLIPCOUNT (63). **N0's `n_beta` byte-match is the check on that
+assumption; if it fails the batch is void.**
