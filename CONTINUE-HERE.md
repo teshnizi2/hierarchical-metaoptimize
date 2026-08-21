@@ -48,6 +48,59 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 44) -- ZERO COMPUTE, and it produced the campaign's best result
+
+Queues: alice **0 PENDING / 0 RUNNING**, alice2 **0 / 0** -- nothing in flight anywhere.
+FairShare **0.333054 / 0.335570**, both below the 0.35 floor -> **0 submitted**.
+CSV re-aggregated: **1446 runs** (878 + 618), +1 since cycle 43 (`bg600-meta-s2`).
+Probe sweep: **no unreduced probe data on either account** (`fzp4`, `fz2` are empty dry-run
+artefacts of cycle 43's prepared batches).
+
+**Direction C now has a measured mechanism, obtained entirely from data already on disk.**
+
+* **44.3 -- THE HEADLINE. The frozen-beta N/N_eff deficit is 85% MARGINAL BIAS, 15% common
+  mode, 0.7% independent noise.** `fz-w-a3` vs `p7-r18-w` are byte-matched `ARGS` except
+  `--alg-meta fixed` vs `Lion` (both a0=1e-3 -- verified from beta at step 0; `neff_ladder.py`
+  said 1e-6 and was wrong):
+
+  | arm | n | bias pp | rho_s | t | %bias | %com | %indep | N/N_eff |
+  |---|---|---|---|---|---|---|---|---|
+  | beta FROZEN | 5 | 0.1680 | 1.925e-6 | 11.7 | **85.1** | 14.6 | **0.7** | **148.6** |
+  | beta FREE | 10 | 0.0032 | 8.458e-8 | 6.8 | 4.0 | 45.6 | **52.4** | **1.99** |
+
+  Independent confirmation of CORRECTIONS 27 from a different statistic (that one got
+  199.8 -> 2.0 via `N_eff ~ m^s`). Window-robust; in the STARTUP window the free arm reads
+  130.4, i.e. before beta adapts it behaves like the frozen arm.
+  **Adaptation consumes the BIAS (52.7x) more than the correlation (22.8x)** -- mechanically
+  what a step-size adapter is, since E[meta-gradient] = 0 at the meta-optimum. So the
+  marginal-bias channel measures distance from meta-stationarity.
+* **44.4 -- per-weight correlation is MEASURED, not bounded, and CORRECTIONS 33 was right.**
+  §33 predicted the true rho is ~1e-6..1e-8 and that kt2's pairwise test (resolution 1.7e-5)
+  could not see it. Five cells now measured, **all inside that band and all below 1.7e-5**.
+  CORRECTIONS 31's "there is no measurable correlation" is **REFUTED**; §33's diagnosis
+  **CONFIRMED**. `mx` and `kt2` agree to 5% at matched config across independent batches.
+* **44.1 -- the long-horizon question is CLOSED.** `bg600-meta-s2` landed; n=3/n=3 at 600 ep
+  gives a **1.937pp** deficit (was 1.797 at n=2). 1.622 / 1.967 / 1.937 at 100/300/600.
+  Both arms saturating. **No further `bg` jobs.**
+* **44.5 -- the SCALE PROFILE is NOT claimed.** The raw profile falls (85x on `fz/a6`, 25x on
+  `mx`), which looks like short-range correlation -- but the estimator's floor bias grows with
+  group size and produces exactly that signature. Recorded as an open question with the
+  confound named. Per-rung `rho_s` values are unaffected and are **lower bounds**.
+* **The instrument.** `analysis/twochannel.py` (+ `corr_range.py`), validated
+  `tests/test_twochannel.py` **11/11** and `tests/test_corr_range.py` **3/3** --
+  **run both before trusting any number they print.** Two estimator bugs and one *validation*
+  bug were caught this way; see CORRECTIONS 34.
+* **Next cycle, in order.** (1) **Re-check FairShare first** -- see CORRECTIONS 35: the
+  half-life is **14 days**, so recovery to 0.35 is a multi-day process and a full idle cycle
+  moved it by <1e-4. The operator should decide whether the rule stands as written.
+  (2) `bash bin/c44_probe5_heterogeneity.sh --submit` on alice2 (8 jobs, dry-run-validated,
+  self-guarded) -- **first apply `patches/patch_probe5.py`**; the script refuses to submit
+  without it. This de-confounds 44.5, the one question cycle 44 opened.
+  (3) `bin/c43_frozen_ladder.sh` (30 jobs) -- frozen-beta to R10/R34/CIFAR-100.
+  (4) **Do NOT submit `bin/c44_frozen_probe4.sh`** -- superseded; its instrument is 50x
+  coarser than the correlation 44.3 already measured, so it would return an uninformative null.
+* Local probe copies: `analysis/killtest_data/{mx,gate3,fz,p7free,p6free,kt2}` (118 MB).
+
 ## Running / next (cycle 43) -- COLLECTION + REDUCTION, nothing submitted
 
 Queues: alice **0 PENDING / 1 RUNNING** (`bg600-meta-s2`, 479/600 -- do not read), alice2

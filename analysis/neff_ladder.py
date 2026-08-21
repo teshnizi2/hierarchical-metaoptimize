@@ -19,10 +19,14 @@ import numpy as np
 from frozen_agreement import arm_stats
 
 BATCHES = {
-    "p7free": "20-ep free-adaptation ladder, a0=1e-6, AdamW+Adam",
-    "p6free": "20-ep free-adaptation ladder (earlier batch)",
+    # a0 is READ FROM THE RUNS (beta at step 0 = ln a0), not from prose.  This dict said
+    # p7free was a0=1e-6; all 92 dirs are a0=1e-3 (cycle 44).  The distinction matters:
+    # a0=1e-3 is what makes p7free byte-matched to fz-*-a3 except --alg-meta, which is the
+    # controlled frozen/free pair CORRECTIONS 27 and FINDINGS 44.3 both rest on.
+    "p7free": "20-ep free-adaptation ladder, a0=1e-3, SGDm+Lion",
+    "p6free": "20-ep free-adaptation ladder (earlier batch), a0=1e-3",
     "mx":     "100-ep free-adaptation ladder, R18/CIFAR-10, a0=1e-6",
-    "gate3":  "20-ep, R18/CIFAR-10",
+    "gate3":  "20-ep, R18/CIFAR-10, a0=1e-6",
 }
 ROOT = os.path.join(os.path.dirname(__file__), "killtest_data")
 

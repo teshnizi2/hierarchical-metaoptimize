@@ -8124,3 +8124,160 @@ Total spread 0.98pp on runs that all sit ~18pp below the augmented arms.
 * Local probe copies now `analysis/killtest_data/{mx,gate3,fz,p7free,p6free,kt2}` (118 MB).
 * `analysis/killtest2_coords.py` + `tests/test_killtest2_coords.py` were untracked working
   files at tick start; both are now committed.
+
+# Cycle 44 — the frozen-β N_eff deficit is decomposed, and the correlation is MEASURED
+
+Zero jobs submitted (FairShare 0.3331 / 0.3356, both below the 0.35 floor; both queues empty).
+Everything below comes from probe data already on disk, reduced with a new instrument.
+New reducers: `analysis/twochannel.py`, `analysis/corr_range.py`.
+Validation suites: `tests/test_twochannel.py` (11/11), `tests/test_corr_range.py` (3/3).
+**Run both before trusting any number in this section.**
+
+## 44.1 `bg600-meta-s2` landed — the long-horizon ladder is n=3/n=3 and it does NOT close
+
+| budget | AdamW+cosine | n | AdamW + Adam-layerwise | n | deficit | t |
+|---|---|---|---|---|---|---|
+| 100 ep | 94.417 ±0.113 | 5 | 92.795 ±0.177 | 5 | **1.622** | — |
+| 300 ep | 94.999 ±0.164 | 3 | 93.033 ±0.168 | 3 | **1.967** | 14.5 |
+| 600 ep | 95.138 ±0.108 | 3 | 93.201 ±0.286 | 3 | **1.937** | 11.0 |
+
+`bg600_meta` = 93.189 / 93.493 / 92.921. 43.5 reported 1.797pp at n=2; the third seed moves it
+to **1.937pp**. Both arms are saturating (cos +0.14pp from 300→600, meta +0.17pp) and the
+deficit is flat at ~1.95pp. **The long-horizon question is closed: the deficit does not close
+at any budget tested.** All six `bg600` jobs COMPLETED; nothing is in flight.
+
+## 44.2 The instrument: a two-channel decomposition that has power where kt2 had none
+
+CORRECTIONS 33 withdrew CORRECTIONS 31's "there is no correlation between per-weight
+meta-gradients" as **under-powered** — kt2's per-weight *pairwise* test resolves only
+ρ ≥ 1.7e-5, while the structure implied by the tensor-level data sits at ρ ~ 1e-6…1e-8 — and
+left the frozen-β runs explicitly undecomposed ("this is an open question, not a settled one").
+
+`PATCH_PROBE2` already writes, per record, `frac_neg` and `frac_zero` over the arm's *n_tot*
+coordinates, computed on the **instantaneous** meta-gradient (`HF_patched.py:360`), not on the
+cumulative `z_mean` (CORRECTIONS 18). With `n_t = n_tot(1−frac_zero)` and `p_t` the negative
+fraction among nonzero coordinates, the agreement signal has an exact variance budget:
+
+| channel | term | does pooling more coordinates help? |
+|---|---|---|
+| marginal bias | `b² = (E[p]−½)²` | **never**, at any N |
+| common mode | `V_common = Var_t(p_t) − E[p(1−p)/n]` | **never** |
+| independent noise | `V_indep = E[p(1−p)/n]` | yes, as 1/n — the 1/√N assumption |
+
+and `ρ_s = V_common / E[p(1−p)]`. **`frac_neg` is an average over all n coordinates, so a
+shared component is amplified ~n while independent noise falls as 1/n** — the amplification
+CORRECTIONS 33 identified. Resolution is `ρ_min = 2√(2/T_eff)/n`, which *improves* with n:
+4.6e-3 at n=62, **3.7e-8 at n=11.17M**, i.e. ~450× finer than kt2's pairwise bound.
+
+Estimator corrections found during validation, both material at the coarse rungs:
+* the plug-in floor `p(1−p)/n` is biased low (`E[p(1−p)] = P(1−P)(1−1/n)`); dividing by `n−1`
+  is exactly unbiased. At n=62 this is 26% of a ρ=1e-3 signal; at n=6 it is 20% of the floor.
+* probe records are 25 steps apart and `p_t` is autocorrelated, so the χ² sampling sd
+  overstates significance. `T` is deflated by the integrated autocorrelation time τ
+  (τ = 1.0–1.5 on most arms, **36.3** on `kt2`). This changes only significance, never ρ_s.
+
+**Conservative direction, and it is what makes a positive reading safe.** Real coordinates are
+heterogeneous (each weight has its own persistent sign preference), and independent-but-
+heterogeneous coordinates have `Var(frac_neg) = mean_i p_i(1−p_i)/n ≤ p̄(1−p̄)/n`. The
+estimator therefore **cannot manufacture a positive common mode** from heterogeneity
+(VALIDATION 11, simulated). **Every ρ_s below is a LOWER BOUND.**
+
+## 44.3 HEADLINE — the frozen-β N/N_eff deficit is 85% marginal bias, 15% common mode
+
+`fz-w-a3` vs `p7-r18-w`: **byte-matched `ARGS` except `--alg-meta fixed` vs `Lion`** (verified
+from the `.out` lines), both a0=1e-3, ResNet18/CIFAR-10, 20 ep, ms=1e-3, AUGMENT=1, weightwise.
+Steady half of the record sequence.
+
+| arm | n | bias (pp) | ρ_s | ρ_min | t | %bias | %common | %indep | N/N_eff |
+|---|---|---|---|---|---|---|---|---|---|
+| **β FROZEN** (`--alg-meta fixed`) | 5 | 0.1680 ±0.0044 | **1.925e-6** ±1.6e-7 | 3.7e-8 | 11.7 | **85.1** | 14.6 | **0.7** | **148.6 ±6.7** |
+| **β FREE** (`--alg-meta Lion`) | 10 | 0.0032 ±0.0010 | **8.458e-8** ±1.2e-8 | 4.3e-8 | 6.8 | 4.0 | 45.6 | **52.4** | **1.99 ±0.16** |
+
+* **Off equilibrium, only 0.7% of the agreement signal is the channel 1/√N models.** 85% is a
+  marginal bias that no amount of coordinate pooling removes.
+* **At the adapted equilibrium the budget flips to 52% independent noise**, and N/N_eff = 1.99
+  — 1/√N is right to within a factor of 2.
+* **Independent confirmation of CORRECTIONS 27.** That result got N/N_eff 199.8 → 2.0 from a
+  completely different statistic (`N_eff ~ m^s`, s = 0.629 → 0.963). This one gets
+  **148.6 → 1.99** from the variance budget. Two statistics, same conclusion.
+* **What adaptation consumes is mostly the BIAS**: 52.7× on bias vs 22.8× on ρ_s. This is
+  mechanically what a step-size adapter *is* — it moves β until the meta-gradient has no
+  persistent sign, and at the meta-stationary point E[meta-gradient] = 0 by first-order
+  optimality. **The marginal-bias channel is a measure of distance from meta-stationarity.**
+  The common mode is not removed by that mechanism and does not vanish (free arm still
+  t = 6.8 above its own floor).
+
+**Window-robust.** Over the last 75% / 50% / 25% of records the frozen arm gives N/N_eff
+164.6 / 148.6 / 144.7 and the free arm 2.61 / 1.99 / 1.79. In the **startup** window (first
+half) the free arm reads **130.4** — i.e. before β adapts it behaves like the frozen arm,
+a within-run replication of 42.4's s = 0.654 → 0.963 timecourse.
+
+## 44.4 CORRECTIONS 33's power calculation is CONFIRMED by direct measurement
+
+§33 predicted that the per-weight correlation needed to explain the tensor-level structure is
+ρ ~ 3.24e-6 (tensors of 1e4) down to 3.24e-8 (1e6), and that kt2 could not see it because its
+pairwise resolution was ρ ≤ 1.68e-5. Measured now, on the **same runs**:
+
+| batch | design | a0 | n | ρ_s | ρ_min |
+|---|---|---|---|---|---|
+| `fz-w-a3` | frozen | 1e-3 | 5 | 1.925e-6 | 3.7e-8 |
+| `p7-r18-w` | free | 1e-3 | 10 | 8.458e-8 | 4.3e-8 |
+| `kt2 ww` | free | 1e-3 | 1 | 2.392e-6 | 4.9e-8 |
+| `kt2 ww` | free | 1e-6 | 1 | 4.048e-7 | 8.0e-9 |
+| `mx w` | free | 1e-6 | 3 | 3.868e-7 | 8.0e-9 |
+
+**All five sit inside §33's predicted band and all five are below its 1.7e-5 bound.** The
+correlation between per-weight meta-gradients is **real and non-zero** — CORRECTIONS 31's
+withdrawn sentence was wrong, and §33's diagnosis of *why* the null appeared was right. The
+bound is now a measurement. `mx` (a0=1e-6, free, n=3) and `kt2` (a0=1e-6, n=1) agree to 5%
+(3.868e-7 vs 4.048e-7) at matched config across independent batches — an instrument check.
+
+Note `kt2 a0=1e-3` (100 ep) reads 28× above `p7-r18-w` (20 ep) at otherwise identical config;
+the only differing field is `--num-epochs`. **n=1, horizon-confounded, not a result** — flagged
+for a seeded replication, not quoted.
+
+## 44.5 The SCALE PROFILE is confounded and is NOT claimed
+
+Inverting the one-factor relation `ρ_group(k) = ρ_w k/(1+(k−1)ρ_w)` at each rung asks whether
+one global factor explains all granularities (flat `ρ_w` implied) or correlation is
+short-range (falling). Measured `ρ_w` implied, resolved rungs only:
+
+| batch | k=1 | k=775 (node) | k≈180k (tensor) | ratio |
+|---|---|---|---|---|
+| `fz/a3` frozen a0=1e-3 | 3.02e-6 | 1.12e-6 | *unresolved* | 2.7× |
+| `fz/a6` frozen a0=1e-6 | 2.61e-4 | 3.06e-6 | *unresolved* | 85.4× |
+| `p7free/r18` free a0=1e-3 | 1.33e-7 | 1.49e-7 | *unresolved* | 0.9× |
+| `p7free/c100` free a0=1e-3 | 2.75e-7 | 3.87e-7 | 1.09e-7 | 2.5× |
+| `mx` free a0=1e-6 | 6.08e-7 | 6.33e-7 | 2.39e-8 | 25.5× |
+
+**This is NOT reported as a correlation length, because it is confounded in exactly the
+direction that would produce it.** The estimator's floor uses the cross-sectional `p̄(1−p̄)`;
+with heterogeneous groups the true floor is the smaller `mean_b p_b(1−p_b)`, so the common
+mode is under-stated — and heterogeneity **grows with group size** (a whole tensor has a far
+more persistent sign than a single weight). The bias is therefore strongest at the coarse
+rungs, which depresses ρ_s(coarse) and makes ρ_w implied fall with k. That is precisely the
+short-range signature. **A falling profile here is not evidence of a correlation length.**
+
+The correction needs per-group marginals, which the probe does not write — it emits only the
+pooled `frac_neg` scalar. `PATCH_PROBE5` (below) is the one-array change that fixes it.
+Also note the layerwise rung of the controlled batch (`fz/a3`) is **below its own resolution**
+(ρ_s 3.44e-3 vs ρ_min 7.38e-3) and the m=6 rung is unresolvable on every batch
+(ρ_min 0.07–0.08), where the sub-binomial readings (ρ_s < 0, |t| up to 82) are the
+heterogeneity signature, not anti-correlation.
+
+## 44.6 Ops and hygiene
+
+* **Submitted nothing.** FairShare **0.333054 / 0.335570** against the 0.35 floor, and
+  `PriorityDecayHalfLife = 14-00:00:00` — see CORRECTIONS 35 for what that implies.
+* **Both queues fully empty** (0 PENDING / 0 RUNNING on each). No job is in flight anywhere.
+* **Full probe sweep, both accounts.** alice 57 top-level run dirs, alice2 39. Zero-mention
+  dirs: 18 on alice, 11 on alice2 — **all checked, none holds probe data** (all are
+  TensorBoard-only training dirs already in the CSV, or empty). `fzp4` (alice) and `fz2`
+  (alice2) are **empty dry-run artefacts** of cycle 43's prepared-but-unsubmitted batches.
+  **There is no unreduced probe data on either account.**
+* CSV re-aggregated: **1446 runs** (878 alice + 618 alice2), +1 since cycle 43
+  (`bg600-meta-s2`, the only new `.out` on either account).
+* **`neff_ladder.py`'s docstring is wrong about `p7free`'s a0** — it says 1e-6, the runs say
+  **1e-3** on all 92 dirs (β at step 0 = ln a0 = −6.9078). Corrected in place. This matters:
+  it is what makes `fz-*-a3` and `p7-r18-*` a0-matched, so CORRECTIONS 27's controlled pair is
+  sound and 44.3's contrast is clean.

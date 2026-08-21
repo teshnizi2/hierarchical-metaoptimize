@@ -1013,3 +1013,114 @@ pre-registered thresholds must be read against this resolution: it can only reso
 >= 0.05 pp, which is 100x the resolution, so the batch **can** discriminate outcome (a) from
 (b); but a null result means "no correlation above ρ = 1.7e-5", **not** "no correlation".
 The header of that script has been amended to say so.
+
+## 34. The frozen-β deficit is DECOMPOSED, and per-weight correlation is measured, not bounded (cycle 44)
+
+**What §33 left open, in its own words:** *"the frozen runs have no `PATCH_PROBE4` data, so
+this is an open question, not a settled one."* It is now answered, from data already on disk,
+with an instrument that has ~450× the resolution of the one that failed.
+
+**Why kt2 could not see it and this can.** kt2 asked whether two *individual* weights agree;
+a shared component of size ρ is invisible per-pair. `frac_neg` is an **average over all n
+coordinates**, so a shared component is amplified ~n while independent noise falls as 1/n.
+That is the same aggregation amplification §33 used to *predict* the failure. Resolution is
+`ρ_min = 2√(2/T_eff)/n`, which **improves** with granularity: 3.7e-8 at n=11.17M against
+kt2's pairwise 1.7e-5.
+
+**The measurement** (`fz-w-a3` vs `p7-r18-w`, byte-matched `ARGS` except `--alg-meta`, both
+a0=1e-3, R18/CIFAR-10, weightwise, steady half; FINDINGS 44.3):
+
+| arm | n | bias (pp) | ρ_s | t | %bias | %common | %indep | N/N_eff |
+|---|---|---|---|---|---|---|---|---|
+| β frozen | 5 | 0.1680 | 1.925e-6 | 11.7 | **85.1** | 14.6 | **0.7** | 148.6 |
+| β free | 10 | 0.0032 | 8.458e-8 | 6.8 | 4.0 | 45.6 | **52.4** | 1.99 |
+
+| claim | status |
+|---|---|
+| "there is no measurable correlation between per-weight meta-gradients" (§31) | **REFUTED.** ρ_s = 1.9e-6, t = 11.7 over 5 seeds. §33 had already withdrawn the inference; this replaces the withdrawal with a number. |
+| "the per-weight null is under-powered; the true ρ is ~1e-6…1e-8" (§33) | **CONFIRMED.** All five measured cells fall inside that band and below §33's 1.7e-5 bound. |
+| the off-equilibrium N/N_eff deficit is a *bias* failure | **STANDS, and is now quantified: 85% bias / 15% common mode.** Only 0.7% of the signal is the channel 1/√N models. |
+| 1/√N is approximately restored at the adapted equilibrium (§27) | **STANDS**, independently: N/N_eff = 1.99 ±0.16 from the variance budget vs 2.0 from `N_eff ~ m^s`. Two different statistics. |
+| "the correlated part is what adaptation consumes" (§27) | **REFINED.** Adaptation consumes the **bias** 52.7× and the common mode only 22.8×. The bias channel is distance from meta-stationarity (E[meta-gradient] = 0 at the meta-optimum); the common mode is not removed by that mechanism and survives at t = 6.8. |
+
+**A positive reading here is safe in a way a null would not be.** Independent-but-
+heterogeneous coordinates give `Var(frac_neg) = mean_i p_i(1−p_i)/n ≤ p̄(1−p̄)/n`, so the
+estimator **cannot manufacture** a common mode from heterogeneity (VALIDATION 11, simulated).
+Every ρ_s is a **lower bound**.
+
+**Two estimator bugs caught by validation before any number was published** (Rule 4, and the
+same discipline that caught the CLT-floor bug in §28.3):
+1. the plug-in floor `p(1−p)/n` is biased low by `(1−1/n)`; dividing by `n−1` is unbiased.
+   Worth 26% of a ρ=1e-3 signal at n=62 and 20% of the floor at n=6.
+2. probe records are autocorrelated (τ up to 36.3 on `kt2`), so the χ² sd overstated
+   significance. `T` is now deflated by τ. Point estimates unaffected.
+
+**And one bug caught in the VALIDATION itself, which is the reason to write validations that
+can fail.** The first VALIDATION 2 of `corr_range` reported that a *true global factor*
+produced a 19× spurious scale dependence. The fault was the simulation, not the estimator:
+proxying 11.17M coordinates with 30 000 explicit columns injects sampling variance
+0.25/30 000, which at n = 11.17M is 375× the true binomial floor. Conditioning on the latent
+factor and drawing `Binom(m, P(u<τ|f))` is exact at any m. **A validation that had merely
+been asserted to pass would have hidden this.**
+
+**What is NOT claimed.** The scale profile — whether correlation is short-range — is
+confounded in exactly the direction that would produce it (FINDINGS 44.5): the floor bias
+grows with group size, depressing the coarse rungs and making ρ_w implied fall with k.
+Reported as an open question with the confound named, **not** as a correlation length.
+Per §33's standing rule, every rung below its own ρ_min is printed as `NO` and excluded —
+including the layerwise rung of the controlled batch, which a hand calculation had wrongly
+treated as a 67× result before the power gate caught it.
+
+## 35. FairShare cannot recover on the timescale the standing rule assumes (cycle 44)
+
+**Recorded because it is now the campaign's binding constraint, not because it changes a
+result.** The standing rule is "if FairShare < 0.35, submit nothing and let usage decay."
+The measured facts:
+
+| | alice | alice2 |
+|---|---|---|
+| FairShare, cycle 43 | 0.3331 | 0.3356 |
+| FairShare, cycle 44 | **0.333054** | **0.335570** |
+| RawUsage | 24,375,279 | 20,035,200 |
+| queue | 0 PENDING / 0 RUNNING | 0 PENDING / 0 RUNNING |
+
+`scontrol show config`: **`PriorityDecayHalfLife = 14-00:00:00`**, `PriorityUsageResetPeriod =
+NONE`, `PriorityWeightFairShare = 800000`, `PriorityWeightPartition = 1000000`,
+`PriorityWeightQOS = 1000000`, `PriorityWeightAge = 10000`.
+
+**Consequences.** Usage decays 4.9%/day, so a full cycle with both queues at zero moved
+FairShare by less than the 4th decimal — consistent with the two readings above. Recovery to
+0.35 is a **multi-day** process at best, and it is not under our control: FairShare is
+relative, so it also depends on other `liacs` users continuing to accrue.
+
+**The rule's premise is that waiting works. On a 14-day half-life it works very slowly.**
+Two facts that bound the other side of the trade, recorded for the operator to decide with:
+* the 4-job `PATCH_PROBE5` batch below would add ~9 600 GPU-seconds, i.e. **0.04% of
+  RawUsage** — about 12 minutes of natural decay. The incident that set the rule (cycle 41)
+  involved 300+ jobs, a different order of magnitude.
+* FINDINGS 33.9/38 measured that this campaign's pendings were **`QOSMaxGRESPerUser`-bound,
+  not priority-bound** (93 of 94 on alice2), so at these queue depths FairShare was not what
+  decided when jobs started.
+
+**Decision this tick: the rule was followed as written — nothing was submitted.** It is an
+explicit hard limit and the operator is away; reasoning around it unsupervised is not mine to
+do. Flagged here so the operator can revise it with numbers rather than have it silently
+broken. The whole of cycle 44's science was obtained at zero compute, so the cost of obeying
+it this tick was zero.
+
+## 36. DECISION RECORD — cycle 44
+
+1. **Direction C is the project and it just got its strongest result.** The contribution is
+   now a *measured two-channel decomposition* of the noise model — 85% marginal bias / 15%
+   common mode off equilibrium, flipping to 52% independent noise at the adapted equilibrium
+   — plus the first direct measurement of per-weight meta-gradient correlation (ρ_s = 1.9e-6,
+   t = 11.7), which the Adam-mini / Adalayer / SGG line assumes is zero. §34.
+2. **The long-horizon question is CLOSED as a clean negative.** n=3/n=3 at 600 epochs:
+   deficit 1.937pp, flat across 300→600. No further `bg` jobs. FINDINGS 44.1.
+3. **Ideas 1 and 2 remain dead.** Nothing this cycle touches them; no jobs spent on either.
+4. **Next experiment, and it is now sharply defined.** `PATCH_PROBE5` — emit per-group
+   negative *counts* alongside the pooled `frac_neg`, one array per run. That is the single
+   change that de-confounds the scale profile (§34, FINDINGS 44.5), and the scale profile is
+   the "how does agreement vary with block size" question the project is pointed at. 4 jobs,
+   ~40 min each. **Prepared and self-guarded; NOT submitted** (§35).
+5. **Submitted nothing**, per the standing FairShare rule. Both queues empty; no job in flight.

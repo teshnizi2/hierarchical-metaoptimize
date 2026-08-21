@@ -203,7 +203,7 @@ g2_mAdam_layer_s1,4679382,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-
 a0-layer-1e6_s1,4680719,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,92.12,92.1,99.77,0,node882,39,env,,0,10,15,26,91.752,23
 dc-awscal-a1e3-s2,4683419,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,100,100,91.43,91.05,99.91,0,node887,40,env,,0,10,17,32,91.062,67
 pp_layer_s2,4683705,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,0,-15:-2.3026,,na,na,2,100,100,73.96,73.25,99.98,0,node884,35,env,,0,,,,73.34,0
-bg600_meta_s2,4683675,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,additive,na,0.06,2,479,600,93.17,92.92,99.99,0,node866,,env,,0,8,9,12,92.999,6
+bg600_meta_s2,4683675,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,additive,na,0.06,2,600,600,93.17,92.96,100.0,0,node866,258,env,,0,8,9,12,92.921,6
 bg300_meta_s2,4683669,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,additive,na,0.06,2,300,300,93.08,93.04,99.99,0,node884,120,env,,0,8,9,12,92.873,9
 PP_layer_s2,4700556,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,0,-15:-2.3026,,na,na,2,100,100,74.19,73.42,99.97,0,node884,36,env,,0,,,,73.71,0
 dc-aw-a1e3-s2,4683417,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,additive,na,0.06,2,100,100,91.72,91.5,99.9,0,node880,39,env,,0,8,14,22,91.335,46
