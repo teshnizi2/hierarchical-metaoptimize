@@ -8972,3 +8972,46 @@ for taking n_weights per family rather than from a constant): ResNet10 **4,903,2
 ResNet18 **11,173,962**, ResNet18_c100 **11,220,132**, ResNet34 **21,282,122**. Using the
 R18 constant for the ResNet34 family would have made `k` wrong by 1.9x at every rung of that
 family's curve.
+
+## 48.13 OPEN — the two instruments do not quite agree, and `N_eff ~ m^s` is not a power law
+
+**A cross-check that had never been run.** The campaign measures the same physics two ways
+and had never mapped one onto the other:
+
+* `neff_ladder.py` / `frozen_agreement.py` fit `N_eff ~ m^s` from the majority-**agreement**
+  excess with the UNCORRECTED pooled null. FINDINGS 42.4, frozen: **s = 0.629 ±0.013 (n=5)**.
+* PROBE5 measures `rho_s`, the mean pairwise sign correlation among the m groups, from
+  `Var_t(frac_neg)` with the heterogeneity-CORRECTED floor.
+
+Within a single rung the m groups are exchangeable by construction — `rho_s` *is* their mean
+pairwise correlation — so `N_eff = m / (1 + (m-1) rho_s)` is the right first-order map.
+(The exchangeability rejected in 48.11 is ACROSS rungs, not within one; these are different
+uses of the word.) On the p5 data:
+
+| window | m=62 | m=14,420 | m=11,173,962 | fitted s | per-leg slopes |
+|---|---|---|---|---|---|
+| steady .5–1 | N_eff 46.9 | 1,592.9 | 470,168 | **0.765** | 0.647, 0.855 |
+| full | 22.4 | 569.6 | 110,496 | **0.706** | 0.593, 0.792 |
+
+**Two things follow, and only the second is safe to use yet.**
+
+1. **The two instruments differ by 0.08–0.14 in s**, against a quoted ±0.013 on 42.4's
+   value. **This is recorded as OPEN, not as a correction to 42.4**, because two obvious
+   causes have not been eliminated: the window `frozen_agreement.py` reduces has not been
+   matched to the one above, and the two use different nulls (uncorrected pooled vs
+   heterogeneity-corrected). Either could account for the gap. What it does establish is
+   that **±0.013 is seed scatter, not an accuracy bound**, and s should not be quoted to
+   three decimals as though it were.
+2. **`N_eff ~ m^s` is not a power law over this range.** The per-leg slopes differ by
+   **0.21** (0.647 → 0.855 on the steady half; 0.593 → 0.792 on the full run) and both
+   curves are convex in log-log. A single exponent is a summary, not a description, and any
+   argument that uses `s` as a constant across granularities is under-specified. The
+   direction is consistent across both windows: the deficit is **worst at the coarse end**,
+   which is the same statement as the falling scale profile, reached through a different
+   statistic.
+
+**How to settle it, and it is already paid for.** The `fz3-*` batch in flight produces both
+quantities **from the same runs**, at three new families, with `PROBE5=1` so the corrected
+and uncorrected nulls can be compared on identical data and the window can be matched
+exactly. Run `analysis/neff_ladder.py fz3` and `analysis/probe5_window.py` on the same dirs
+and put the two s values in one table. That is a next-tick task, not a claim.
