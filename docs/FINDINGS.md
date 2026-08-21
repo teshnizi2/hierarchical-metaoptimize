@@ -7818,3 +7818,205 @@ off-equilibrium exponent.** That is the campaign's largest open cell.
   are reduced above. `zad`/`zval3`/`zrn`/`zsx`/`zsw`/`zb`/`zm0`/`d1`–`d4`/`det` are all
   referenced in FINDINGS or CORRECTIONS.
 * Local probe copies now under `analysis/killtest_data/{mx,gate3,fz,p7free,p6free}` (66 MB).
+
+---
+
+# Cycle 43 — Idea 1 decided; the kill-test repeated at TRUE coordinate granularity
+
+Queues at tick start: alice **0 PENDING / 1 RUNNING** (`bg600-meta-s2`, 479/600), alice2 **0/0**.
+FairShare **0.3331 / 0.3356**, both below the 0.35 floor → **0 jobs submitted**.
+CSV re-aggregated: **1446 runs** (878 alice + 618 alice2), +12 since cycle 42.
+All numbers below re-derived from `results/all_runs.csv` at write time, `plateau > 50`,
+`epochs_done == 100` (or the stated horizon), `superseded == 0`.
+
+## 43.1 IDEA 1 IS DEAD. The schedule prior does not reach the baseline, and it never could.
+
+`I1-*` (10 jobs) completed. Against **exact field-for-field matched non-scheduled controls**
+(same `--alg-base AdamW --alg-meta Adam`, `ms=1e-3`, `a0=1e-3`, `gamma=1`, ResNet18/CIFAR-10,
+batch 100, 100 ep, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, `HIER` unset):
+
+| granularity | I1 (n=3) | matched control | n | delta | t | 95% CI |
+|---|---|---|---|---|---|---|
+| layerwise | 92.544 ±0.207 | `dc-awscal-a1e3` 90.880 ±0.179 (**same account**) | 5 | **+1.664** | +11.56 | [+1.35, +1.98] |
+| layerwise | 92.544 ±0.207 | `a0-layer-1e3` 90.826 ±0.199 (alice2) | 3 | +1.719 | +10.35 | [+1.35, +2.08] |
+| resnet18_blocks | 92.140 ±0.191 | `a0-blk6-1e3` 92.002 ±0.138 | 3 | +0.137 | +1.01 | [−0.16, +0.44] |
+| scalar | 92.218 ±0.095 | `a0-scal-1e3` 92.684 ±0.178 | 3 | **−0.465** | −3.99 | [−0.72, −0.21] |
+
+**Account is calibrated, not assumed:** the layerwise control exists on both accounts and they
+agree to **+0.055pp** (90.880 vs 90.826), so the alice2 controls are usable for the two arms
+that lack an alice twin.
+
+**Verdict against the pre-registered decision rule.** The best I1 arm is layerwise at
+**92.544**. The tuned non-meta baseline at the same 100-epoch budget is **94.417 ±0.113 (n=5**,
+`lr=3e-3`, 43.4). Deficit **−1.873pp**. It also fails the weaker test: the best plain
+MetaOptimize arm already on record (42.2, layerwise at its own tuned meta-step) is
+**92.795 ±0.177 (n=5)**, so I1 is **−0.251pp** below an arm we already had. Idea 1 does not
+beat the baseline, does not beat our own best arm, and prior art puts its ceiling at a tie.
+**Stop spending on it.** No further I1 jobs will be submitted.
+
+## 43.2 What I1 *did* show: the schedule prior is granularity-EQUALISING
+
+Read the three deltas in 43.1 in order of partition coarseness — the effect is monotone and
+changes sign:
+
+| | scalar (m=1) | blk6 (m=6) | layerwise (m=62) | spread |
+|---|---|---|---|---|
+| no schedule | **92.684** | 92.002 | 90.880 | **1.803 pp** |
+| with schedule | 92.218 | 92.140 | **92.544** | **0.405 pp** |
+| delta | −0.465 | +0.137 | +1.664 | — |
+
+Without the prior, coarse wins and the granularity spread is 1.80pp. With it, the spread
+collapses **4.5x to 0.40pp** and the ordering inverts. The prior helps exactly where the
+meta-learner is worst and hurts where it is already good. **The granularity effect in this
+configuration is largely the finer partition's failure to recover a decay trajectory on its
+own** — which is a mechanism statement for direction C, not a method.
+
+**CAVEAT, and it is serious (CORRECTIONS 29).** The `I1-*` batch was submitted with no saved
+script and `run_cifar.sh` did not yet echo `SCHED*`, so **the schedule's parameters are
+unrecoverable**. Two facts bound what can be claimed:
+* A schedule *was* active. `HF.py.bak_sched` is timestamped **00:07:37**, the batch was
+  submitted at **00:08:10**, so `PATCH_SCHED` was in the loaded code; and the arm departs from
+  a byte-matched control by 1.664pp at t=11.6.
+* It was **not** a 100-epoch-horizon cosine. The departure is already **+7.2pp at epoch 2**
+  (78.46 ±0.67 vs 71.29 ±1.07, n=3/5), i.e. at step ~1 500 of 50 000 where a matched cosine
+  multiplier is 0.9978. A 0.2% change in alpha cannot move epoch-2 test accuracy by 7pp.
+
+So 43.2's numbers are "some unrecorded member of the schedule-prior family", and the table
+above is a **provisional** mechanism observation, not a measured cosine-prior effect. It does
+not change 43.1 — the arm loses to the baseline by 1.9pp whatever schedule it ran.
+
+## 43.3 THE KILL TEST AT TRUE COORDINATE GRANULARITY — Idea 2 dies by 1000x, and the headline agreement excess is MARGINAL BIAS, not correlation
+
+`kt2_ww_*` (2 runs, weightwise ResNet18/CIFAR-10, 100 ep, `PROBE=25`, free adaptation) carry
+the cycle-42 `PATCH_PROBE4` fields — exact within-tensor sign splits and **raw signs of a fixed
+20 000-coordinate subsample**. This is the single experiment KILLTEST-idea2 §5 pre-registered,
+and it answers item (a), which **no run in the campaign could previously answer**.
+
+Estimator validated against synthetic ground truth first (CORRECTIONS 28.3's rule):
+`tests/test_killtest2_coords.py` — 16/16 PASS, including exactness of the O(R·K) group-sum
+identity against brute-force pair enumeration, and a null case where dependence that ignores
+blocks must NOT let architecture beat a random same-size grouping.
+
+**Pairwise same-sign rate between INDIVIDUAL WEIGHTS** (a0=1e-3, steady window = last 50% of
+100 epochs, 1000 records, 19 956 tracked coords after dropping 44 that are ever exactly zero),
+each stratum against a **circular-shift null** that preserves every coordinate's own marginal
+bias and autocorrelation and destroys only cross-coordinate dependence:
+
+| stratum | pairs | observed | shift null | **Δ** | p |
+|---|---|---|---|---|---|
+| within_tensor | 6.15e7 | 50.0009 % | 50.0002 % | **+0.0007 pp** | 0.005 |
+| across_tensor_within_block | 1.79e8 | 50.0002 % | 50.0001 % | **+0.0001 pp** | 0.225 |
+| across_block | 1.58e8 | 50.0000 % | 50.0001 % | **−0.0001 pp** | 0.795 |
+| all pairs | 3.98e8 | 50.0002 % | 50.0001 % | +0.0001 pp | 0.195 |
+
+**IDEA 2 IS DEAD AT THE DECIDING GRANULARITY.** §5's pre-registered rule was "≤ 0.1pp above
+the shift null → dead outright". Across-tensor dependence is **+0.0001pp** — a thousand times
+below the kill threshold, and across-block is negative. The tensor-level result (cycle 42:
+across-block +0.03pp, within-block +0.9pp) was already a null; at coordinate granularity even
+the *within-block* signal is gone. The +1.0pp within-block dependence measured between tensors
+is an aggregation effect of the tensor means, not agreement between weights.
+
+**Same-size random-grouping control:** architecture − random = **+0.0002 pp, p=0.29**. At
+coordinate granularity **architecture buys nothing at all** — weaker than the +0.5pp it carried
+at tensor granularity (KILLTEST §4).
+
+**And the headline statistic is explained.** The cross-sectional majority agreement is
+**50.2056 % ±0.0025** against an independence floor of **50.0119 %** — an excess of
+**+0.194 pp**, 16x the floor, which is the largest weightwise excess in the campaign (the
+a0=1e-6 `mx` arm reads +0.016pp). But on the same run, the *same statistic* restricted to the
+tracked coordinates reads **50.2948 %** against a **circular-shift null of 50.2902 %** —
+**excess +0.0047 pp, p=0.235**.
+
+> **The entire agreement excess over the independence floor is each weight's own persistent
+> sign preference. It is not correlation between weights.**
+
+This matters for the noise model and it sharpens CORRECTIONS 27 rather than contradicting it.
+Marginal bias and correlation break `1/sqrt(N)` in *different* ways: correlation inflates the
+variance of a pooled estimate, whereas marginal bias means the pooled mean converges to a
+population bias instead of to zero. Our measured off-equilibrium `N_eff ~ m^0.629` therefore
+needs its interpretation restated: at the adapted equilibrium the *variance* channel is
+essentially exact (no pairwise dependence at all, Δ ≤ 0.001pp), and what survives is a **bias**
+channel. Pooling more coordinates does not help against a bias, however many you pool.
+
+**Agreement vs block size, at coordinate granularity, inside one run** (the characterisation
+the paper is about — 62 tensors spanning `n_t` = 10 to 2.36e6, five decades):
+
+| `n_t` decade | tensors | exact within-tensor majority excess over its own floor |
+|---|---|---|
+| 1e0–1e2 | 11 | −0.376 pp |
+| 1e2–1e3 | 30 | +0.966 pp |
+| 1e3–1e4 | 3 | **+6.324 pp** |
+| 1e4–1e5 | 6 | +0.012 pp |
+| 1e5–1e8 | 12 | +0.089 pp |
+
+Pearson r(log10 `n_t`, excess) = **+0.023**, OLS slope +0.057 pp/decade — i.e. **no trend**.
+The pairwise version over the 18 tensors with ≥30 tracked coords gives r = −0.278, slope
+−0.005 pp/decade. **Within-tensor agreement does not rise with tensor size**, replicating
+KILLTEST §4's tensor-level finding one level down. The 1e3–1e4 decade is 3 tensors and is not
+a trend; it is flagged for follow-up, not reported as an effect.
+
+## 43.4 The baseline LR curve is CLOSED: an interior maximum at 3e-3, and horizon-matching the cosine does not help
+
+`SW-*` (14 jobs, `--optimizer AdamW`, **`COS_TOTAL=50000`** = horizon-matched to 100 epochs,
+`AUGMENT=1`) was in the CSV since cycle 42 and had never been read.
+
+| lr | 1e-5 | 3e-5 | 1e-4 | 3e-4 | 1e-3 | **3e-3** | 1e-2 |
+|---|---|---|---|---|---|---|---|
+| plateau (n=2) | 83.884 | 88.814 | 92.962 | 93.986 | 94.028 | **94.356 ±0.131** | 92.581 |
+
+**3e-3 is an interior maximum, bracketed on both sides across 3 decades.** This closes
+CORRECTIONS 25, which withdrew the earlier "interior maximum at 1e-3" claim: 1e-3 was the
+*edge* of the old grid, 3e-3 is a genuine peak.
+
+Pooling with the `fxcos-3e-3` seeds gives the campaign's tuned 100-epoch baseline:
+**94.417 ±0.113 (n=5)**. Every method claim must be written against this number, not 94.093.
+
+**Horizon-matching the cosine is worth nothing measurable.** `fxcos` runs `COS_TOTAL=422000`,
+so over 50 000 steps its multiplier only falls to 0.977 — it is warmup-then-near-constant. At
+lr=3e-3 it scores 94.458 ±0.103 (n=3) against the true anneal's 94.356 ±0.131 (n=2):
+**Δ = +0.10 ±0.10 pp, unresolvable.** The baseline's advantage over MetaOptimize is therefore
+*not* the anneal; it is the peak LR. That is a sharper statement than "the gap is the
+schedule" and it is the correct framing for CORRECTIONS 27's operating-point argument.
+
+## 43.5 Long-horizon deficit, now n=3 on both sides at 600 epochs
+
+| budget | AdamW+cosine | n | AdamW + Adam-layerwise | n | deficit |
+|---|---|---|---|---|---|
+| 100 ep | 94.417 ±0.113 | 5 | 92.795 ±0.177 (42.2, best arm) | 5 | **1.622** |
+| 300 ep | 94.999 ±0.164 | 3 | 93.033 ±0.168 | 3 | **1.966** |
+| 600 ep | 95.138 ±0.108 | 3 | 93.341 ±0.215 | 2 | **1.797** |
+
+`bg600_cos` reached n=3 this cycle (95.162 / 95.020 / 95.233). `bg600-meta-s2` is at **479/600
+and must not be read**. The deficit is 1.6–2.0pp at every budget and does not close; 42.1's
+conclusion is unchanged and now rests on n=3 baseline seeds at every horizon.
+
+## 43.6 `PP-*` read: without augmentation the granularity ordering inverts again
+
+`PP-*` (9 jobs, AdamW+Adam, a0=1e-6, **`AUGMENT=0`** — against the standing rule, see
+CORRECTIONS 28.2; these rows are NOT pooled with any augmented row):
+
+| granularity | plateau | n |
+|---|---|---|
+| scalar | 73.717 ±0.239 | 3 |
+| resnet18_blocks | **74.349 ±0.566** | 3 |
+| layerwise | 73.365 ±0.380 | 3 |
+
+layerwise − scalar = **−0.352pp**; blk6 − scalar = **+0.631pp**. The interior optimum at m=6
+survives without augmentation while the layerwise arm loses, which is a third setup in which
+"finer is better" is false at the coarse end (cf. 41: blk6 beats layerwise at ms=1e-3).
+Total spread 0.98pp on runs that all sit ~18pp below the augmented arms.
+
+## 43.7 Ops and hygiene
+
+* **Submitted nothing.** FairShare 0.3331 / 0.3356 against the 0.35 floor. Both queues are
+  effectively empty (1 running job total), which is the fastest possible recovery; `sshare`
+  had not moved by the end of the tick.
+* `bin/c43_frozen_ladder.sh` remains prepared, dry-run-validated and **unsubmitted**. Its own
+  guards (FairShare ≥ 0.35, pending ≤ 10) would have refused it anyway.
+* **Probe sweep, both accounts, depth 3.** alice 18 batch names / 240 dirs, alice2 11 names /
+  168 dirs. Two came back unreferenced: **`kt2`** (reduced above) and **`probe_layerwise`** —
+  the latter is a 15-record Aug-18 smoke test of the probe patch in the pre-`frac_zero` legacy
+  format. **It is not a result; recorded here so future sweeps stop re-chasing it.**
+* Local probe copies now `analysis/killtest_data/{mx,gate3,fz,p7free,p6free,kt2}` (118 MB).
+* `analysis/killtest2_coords.py` + `tests/test_killtest2_coords.py` were untracked working
+  files at tick start; both are now committed.

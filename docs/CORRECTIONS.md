@@ -833,3 +833,116 @@ Recorded so they are not repeated, not to relitigate the submissions.
    m=6 N_eff from 0.70 (impossible) to 1.1. **Validate an estimator against simulated ground
    truth before reducing real data with it** — the CLT floor is the same approximation that
    produced the CORRECTIONS 26 error.
+
+## 29. The `I1-*` schedule is UNIDENTIFIED — the +1.664pp cannot be called a cosine-prior effect (cycle 43)
+
+**What is solid.** `I1_layer` (n=3) beats a byte-matched, same-account, non-scheduled control
+(`dc-awscal-a1e3`, n=5) by **+1.664pp, t=11.6, CI [+1.35,+1.98]**. Every field of the two
+`ARGS:`/`ENV:` lines is identical. A schedule was active: `HF.py.bak_sched` is timestamped
+`2026-08-21 00:07:37` and the batch was submitted at `00:08:10`, so `PATCH_SCHED` was in the
+loaded code. (The later `HF.py` mtime of `00:42:29` is `PATCH_PROBE4`, not `PATCH_SCHED`.)
+
+**What is NOT solid, and must not be written.** The batch ran with no saved submit script and
+`run_cifar.sh` did not yet echo `SCHED*` (that echo was added at `00:43:05`, after the jobs
+started), so the schedule's **type, horizon, warmup and floor are unrecoverable from anything
+on disk**. Non-interactive `ssh` writes no bash history. TensorBoard logs only
+`Performance/{train_loss,train_accuracy,test_accuracy}` — no `alpha`/`beta` trace — so the
+multiplier cannot be reconstructed from the run either.
+
+**And the obvious reconstruction is refuted.** It was not a cosine matched to the 100-epoch
+horizon. The arm is already **+7.2pp ahead at epoch 2** (78.46 ±0.67 vs 71.29 ±1.07, n=3/5),
+i.e. at step ~1 500 of 50 000, where a matched cosine multiplier is **0.9978**. A 0.2% change
+in alpha cannot produce a 7pp change in epoch-2 test accuracy. Whatever ran departed from the
+control from the first epoch.
+
+| claim | status |
+|---|---|
+| "`I1_layer` departs from its matched control by +1.664pp" | **STANDS**, n=3/5, t=11.6 |
+| "the cosine-prior alpha_t = cosine(t)·exp(beta_t) gains +1.664pp" | **NOT SUPPORTED.** The schedule is unidentified and is provably not the matched-horizon cosine. |
+| "Idea 1 loses to the tuned baseline" | **STANDS** and is schedule-independent: the arm is 1.873pp below the baseline whatever multiplier it ran. |
+
+**Consequence.** FINDINGS 43.2's granularity-equalising table is a **provisional** mechanism
+observation. Reproducing it requires a re-run from a saved script with `SCHED*` echoed — which
+is NOT scheduled, because 43.1 already closed the method question. This is the second cycle in
+a row damaged by CORRECTIONS 28.1; the rule is now: **a batch with no `bin/c<NN>_*.sh` submit
+script is not readable as evidence about the intervention it was supposed to test.**
+
+## 30. The tuned baseline is 94.417, not 94.093/94.24, and 3e-3 IS an interior maximum (cycle 43)
+
+CORRECTIONS 25 withdrew "the baseline LR peak is an interior maximum at 1e-3" because 1e-3 was
+the edge of the grid. `SW-*` (read this cycle, `--optimizer AdamW`, `COS_TOTAL=50000`,
+`AUGMENT=1`, 100 ep) extends the grid and closes it:
+
+| lr | 1e-5 | 3e-5 | 1e-4 | 3e-4 | 1e-3 | **3e-3** | 1e-2 |
+|---|---|---|---|---|---|---|---|
+| plateau (n=2) | 83.884 | 88.814 | 92.962 | 93.986 | 94.028 | **94.356** | 92.581 |
+
+**3e-3 is bracketed on both sides.** Pooled with `fxcos-3e-3` the tuned 100-epoch baseline is
+**94.417 ±0.113 (n=5)**. Every "loses by X" sentence must be recomputed against it — the
+deficit for the best MetaOptimize arm (92.795) is **1.622pp**, not 1.30.
+
+**Also: the anneal is not what the baseline is winning with.** `fxcos` uses
+`COS_TOTAL=422000`, so over 50 000 steps its multiplier falls only to 0.977 — warmup then
+near-constant. At lr=3e-3 it scores 94.458 ±0.103 (n=3) vs the horizon-matched anneal's
+94.356 ±0.131 (n=2): **Δ = +0.10 ±0.10pp, unresolvable.** So "the gap is the schedule"
+(CONTINUE-HERE, cycle 21) is **too strong**. The gap is the **peak learning rate**: at lr=1e-3
+the baseline scores 94.03–94.11 and at 3e-3 it scores 94.36–94.46, while MetaOptimize's own
+alpha never gets there. Rewrite the sentence as "the gap is the step size the baseline is
+allowed to use, which MetaOptimize's meta-learner does not find."
+
+## 31. The sign-agreement excess is MARGINAL BIAS, not correlation — 8b's mechanism sentence is wrong (cycle 43)
+
+CORRECTIONS 8b wrote: *"The signs are strongly positively correlated, so a pooled estimate does
+not average toward zero — it converges to a population bias."* The conclusion is right; the
+stated cause is not. `kt2_ww_a1e-3_s0` measures both channels separately at **true coordinate
+granularity** (FINDINGS 43.3), which no earlier run could:
+
+| channel | measurement | value |
+|---|---|---|
+| correlation between individual weights | pairwise same-sign rate vs a marginal-preserving circular-shift null | **+0.0001 pp across tensors (p=0.225), +0.0007 pp within a tensor** |
+| each weight's own persistent direction | majority-agreement excess vs the same shift null | the whole of the **+0.194 pp** excess over the independence floor |
+
+**There is no measurable correlation between per-weight meta-gradients.** The excess that the
+project has been quoting since cycle 18 is each coordinate's own sign preference, which the
+independence floor does not model and the circular-shift null does.
+
+**Why this is not cosmetic.** The two channels break `1/sqrt(N)` in different ways:
+* *Correlation* inflates the **variance** of a pooled estimate — more coordinates do not help
+  as fast as `1/N`.
+* *Marginal bias* moves the **mean** — the pooled estimate converges to a non-zero population
+  bias, and pooling more coordinates does not help **at all**, at any N.
+
+Our measurement says the variance channel is essentially exact at the adapted equilibrium
+(Δ ≤ 0.001pp) and the surviving effect is entirely the bias channel. **Restate direction C's
+mechanism accordingly**: the failure of noise-averaging in this network is a bias failure, not
+a correlation failure. CORRECTIONS 27's `N_eff ~ m^0.629` frozen-beta result is untouched as a
+*measurement*, but its interpretation as "the coordinates are correlated off-equilibrium"
+should now be checked against the same two-channel decomposition — the frozen runs have no
+`PATCH_PROBE4` data, so **this is an open question, not a settled one**.
+
+## 32. DECISION RECORD — cycle 43
+
+**Decided, with reasons, from the data above.**
+
+1. **Idea 1: STOP.** Pre-registered rule was "worse than the 94.24 plateau → record and stop".
+   Best arm 92.544 vs a tuned baseline of 94.417 ±0.113 (n=5) = **−1.873pp**, and −0.251pp
+   against our own best existing arm. Prior art caps it at a tie. No further I1 jobs. The
+   short-horizon-bias prediction is **not** cleanly confirmed, because the schedule that ran is
+   unidentified (§29) — recorded as untested rather than as a confirmed mechanism.
+2. **Idea 2: DEAD, restated with the decisive evidence.** Cycle 42 killed it at *tensor*
+   granularity. `kt2` kills it at *coordinate* granularity, which is the level the idea was
+   actually about: across-tensor dependence **+0.0001pp** against a pre-registered kill
+   threshold of 0.1pp, and architecture − random = +0.0002pp (p=0.29). Dropped.
+3. **Direction C IS the project, and 43.3 changes what it says.** The contribution is now a
+   **two-channel decomposition** of the noise model — correlation vs marginal bias — measured
+   at per-weight granularity, plus the frozen/free contrast of CORRECTIONS 27. The
+   `PATCH_PROBE4` probe is the instrument and it works; the estimator is validated against
+   synthetic ground truth (16/16).
+4. **Next experiment, when FairShare allows.** Unchanged in rank order: (a)
+   `bin/c43_frozen_ladder.sh --submit` on alice2 — carries the frozen-beta measurement to
+   ResNet10/ResNet34/CIFAR-100, still the campaign's largest open cell; (b) a `PATCH_PROBE4`
+   probe on a **frozen-beta** run, which is new this cycle and is what §31 says is missing —
+   it would decompose the off-equilibrium `s=0.629` into its bias and correlation parts, and
+   it is 2 jobs; (c) `rs-node-*` / `rs-blk6-1e4` seed top-ups.
+5. **Submitted nothing.** FairShare 0.3331 / 0.3356, both below the 0.35 floor, per the
+   standing rule. Queues are at 1 running job total, which is the fastest available recovery.
