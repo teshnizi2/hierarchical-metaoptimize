@@ -8852,3 +8852,99 @@ assured (frozen, that leg falls 2.82x). Pooling the 3 seeds improves the layerwi
 to ~7.4e-04, still 3x above the predicted value. **A layerwise null in that batch will mean
 "no correlation above rho_s = 1.3e-03", not "no correlation"**, and must not be written as
 an absence. This is the resolution stated next to the null before the null exists.
+
+## 48.10 `ep_to_85` and `ep_to_90` re-derived on the COMPLETE grid — and COVERAGE, not speed, is the result
+
+FINDINGS 47.12's arm-C column was n=2 and had no cell at 1e-6 or 1e-1. Re-derived on the
+full grid, survivors only (`plateau > 50`), `epochs_done >= 100`, `superseded == 0`:
+
+| alpha0 | A fixed lr | B meta m=6 | C cosine |
+|---|---|---|---|
+| **ep_to_85** | | | |
+| 1e-6 | never (n=3) | **9.7** (n=3) | never (n=3) |
+| 1e-5 | 89.3 (n=3) | **8.7** (n=3) | never (n=2) |
+| 1e-4 | 14.7 (n=3) | **9.0** (n=3) | 23.2 (n=4) |
+| 3e-4 | **10.7** (n=3) | 12.0 (n=3) | 17.0 (n=3) |
+| 1e-3 | 10.7 (n=3) | **8.7** (n=3) | 14.0 (n=3) |
+| 1e-2 | never (n=3) | **13.7** (n=3) | 59.0 (n=2) |
+| 1e-1 | no survivor | 32.0 (1 of 2 reach) | never (n=3) |
+| **ep_to_90** | | | |
+| 1e-6 | never (n=3) | **26.0** (n=3) | never (n=3) |
+| 1e-5 | never (n=3) | **27.7** (n=3) | never (n=2) |
+| 1e-4 | 36.7 (n=3) | **28.3** (n=3) | 41.5 (n=4) |
+| 3e-4 | 25.3 (n=3) | **22.0** (n=3) | 31.3 (n=3) |
+| 1e-3 | 26.7 (n=3) | **18.3** (n=3) | 30.3 (n=3) |
+| 1e-2 | never (n=3) | **67.7** (n=3) | 79.5 (n=2) |
+| 1e-1 | no survivor | never (n=2) | never (n=3) |
+
+**COVERAGE, counted rather than measured as a width:**
+
+| target reached within 100 epochs | A fixed | B meta | C cosine |
+|---|---|---|---|
+| 85% | 3 of 7 | **6 of 7** | 4 of 7 |
+| 90% | 3 of 7 | **6 of 7** | 4 of 7 |
+
+**Why this is the strongest form of the IDEA 3 result.** 47.12 correctly withdrew the
+general "MetaOptimize converges faster than a schedule" reading, because arm C carries a
+20-epoch linear warmup that inflates its epochs-to-target by construction. **That confound
+cannot touch a target that is never reached at all in 100 epochs.** Arm C fails to reach 85%
+at three of seven grid points (1e-6, 1e-5, 1e-1) where arm B reaches it at two of them in
+under 10 epochs; arm A fails at four. The coverage counts are also **identical at both
+thresholds**, so this reading does not depend on which target is chosen — unlike the width
+family, whose ranking moves with the floor (48.2).
+
+`i3c-1e4` moved 23.0 (n=2) → **23.2 (n=4)** with its seed top-up, i.e. the band-edge cell
+47.4 flagged as a coin flip is stable to +0.2 epochs. The `ep_to_85 = 23.2` against a
+20-epoch warmup is still essentially "immediately after warmup ends" and remains
+uninterpretable as a speed; only the never-reached cells are.
+
+## 48.11 A PARAMETER-FREE form of the structural claim — the exchangeable model over-predicts by 45x
+
+**The objection this answers.** `rho_w^implied` is `rho_s` pushed through the one-factor
+inversion, so "it falls 69.3x with block size" (48.5) is a statement about a
+reparametrisation, and a reader can fairly ask whether the fall is an artefact of the model
+that defines the y-axis. This removes the objection: the model is CALIBRATED on the finest
+rung alone — one number, no fit — and then used to PREDICT the directly measured quantity at
+every coarser rung. `analysis/probe5_window.py` (selftest **33/33 → 41/41**), steady half,
+geometric mean over seeds:
+
+calibration: rho_s(k=1) = **2.037e-06** → rho_w = **3.200e-06**   (this is the whole model)
+
+| k | rho_s predicted by the uniform model | rho_s measured | over-predicts by |
+|---|---|---|---|
+| 775 (nodewise) | 1.575e-03 | 5.585e-04 | **2.8x** |
+| 180,225 (layerwise) | 2.384e-01 | 5.257e-03 | **45.4x** |
+
+**The exchangeable one-factor model is rejected by 45x with no free parameter anywhere.**
+That is the model under which "pool N coordinates and the meta-gradient noise falls as
+1/sqrt(N) with a single correlation rho" is stated; the Adam-mini / Adalayer / SGG line
+assumes the stronger rho = 0 exactly.
+
+**The validation that makes a positive reading safe here.** The check is only worth anything
+if it can FAIL to reject. Selftest U2 generates rho_s at all three rungs FROM the uniform
+model with a known rho_w and requires every ratio to land within 2% of 1.0; U3 takes the
+same data, divides the coarse rung by 50, and requires rejection. Both pass. An estimator
+that rejected everything would prove nothing.
+
+**What this licenses, stated narrowly.**
+* Per-weight meta-gradients are **not independent**: rho_s(weightwise) = 1.991e-06 /
+  2.085e-06 against a resolution floor of 8.5e-09 / 8.0e-09, i.e. **234x its own rho_min**
+  (and rho_min is itself defined as 2 sd). The literature's assumption is exactly zero.
+* The correlation **does not reach across a tensor**: the between-group correlation at
+  layerwise is 45x below what the per-weight value would imply if the shared component were
+  global.
+
+**What it does NOT license, and this bounds the paper's claim.** The estimator measures
+correlation *between* groups. What limits the gain from pooling is correlation *within* a
+group. Under exchangeability these are the same number, which is why the rejection above is
+meaningful — but once exchangeability is rejected, they are not, and the within-group
+quantity is bounded by this data rather than measured by it. **Do not write "1/sqrt(N) is
+refuted for coarse granularity."** The defensible two-sided reading is:
+
+> Per-weight meta-gradients carry a small but decisively non-zero shared component
+> (rho ~ 3e-6, 234x resolution), so the independence assumed across the Adam-mini /
+> Adalayer / SGG line is false at fine granularity. That shared component is **local**: it
+> is 45x weaker than exchangeability predicts once the group is a whole tensor. Coarse
+> pooling is therefore much closer to the independence idealisation than fine pooling is —
+> which is the opposite of the intuition that motivates coarse granularity as a
+> noise-averaging device.
