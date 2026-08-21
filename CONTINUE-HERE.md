@@ -48,10 +48,31 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 48) -- IDEA 3 CLOSES POSITIVE; DIRECTION C's PROFILE IS CLAIMED
+## Running / next (cycle 48) -- IDEA 3 CLOSES POSITIVE; DIRECTION C's PROFILE IS OFF-EQUILIBRIUM ONLY
 
-**Read `docs/CORRECTIONS.md` 42-46 and `docs/FINDINGS.md` 48.1-48.9 before quoting any
-number below. 48.2 SUPERSEDES 47.9's table and 48.6 supersedes any full-run rho_s.**
+**Read `docs/CORRECTIONS.md` 42-49 and `docs/FINDINGS.md` 48.1-48.16 before quoting any
+number below. 48.2 SUPERSEDES 47.9's table; 48.6 supersedes any full-run rho_s; and
+48.14-48.16 / CORRECTIONS 47-49 NARROW the profile bullet further down this section --
+read them before quoting the b = 0.343 exponent.**
+
+> **AMENDMENT, made later in the same tick.** The 12-job free-beta batch landed and
+> **REFUTED its own pre-registered B1**. The scale profile is an **off-equilibrium**
+> phenomenon: b = **0.343** with beta frozen, **0.065** at the adapted equilibrium, and
+> the exchangeable model is rejected 45.4x frozen but only 2.3x free (not rejected).
+> **What SURVIVES adaptation is the thing that matters most:** per-weight meta-gradients
+> are still not independent at the meta-optimum -- free rho_s(weightwise) = **8.888e-08**
+> at 3.1x its own resolution, reproducing FINDINGS 44.3's 8.458e-08 to **+5.1%** -- and
+> that is the regime Adam-mini / Adalayer / SGG actually run in.
+> **The new positive result is the mechanism:** adaptation suppresses correlation
+> **scale-selectively** -- **22.92x** at k=1 (reproducing 44.3's 22.8x independently),
+> **5.49x** at k=775, and **0.77x, i.e. not at all**, at k=180,225. A step-size adapter
+> behaves as a high-pass filter on meta-gradient co-fluctuation.
+> **The window scan added earlier this tick fired on its first new data** and printed
+> NOT WINDOW-STABLE for the free arm; `probe5_floor.py --profile` defaults to the FULL run
+> and would have reported "the profile survives adaptation", which is the opposite of the
+> truth. The free arm's STARTUP window (b = 0.331) is the frozen arm's STEADY window
+> (b = 0.343) to 0.012 -- before beta adapts, the free arm IS the frozen arm.
+> **Never quote a profile number without naming its window and its beta regime.**
 
 * **IDEA 3 is BUDGET-STABLE and it is FINISHED at R18/CIFAR-10/m=6.** All 16 c46 300-epoch
   jobs landed; `analysis/idea3_robustness.py` (37/37) prints **THE SHAPE IS BUDGET-STABLE**.
