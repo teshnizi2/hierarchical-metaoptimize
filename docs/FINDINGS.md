@@ -9759,3 +9759,27 @@ number the campaign has ever had, and it sets the ±0.10 bar used by `cl5` and `
 | `wc5-*` | alice2 | 18 | W0 PASS; **W2 FAIL → W1 uninterpretable**; headline floor-robust (+0.038); clip accuracy-neutral |
 | `cl5-*` | alice2 | 18 | **IN FLIGHT** — ceiling ladder at R18/ms=1e-3, X0–X3 pre-registered |
 | `uc5-*` | alice | 18 | **IN FLIGHT** — unclipped family control r10/c100/r34, U0–U3 pre-registered, r34 = null |
+
+## 51.6 THE DAMAGE IS BOUNDED: the FROZEN half of the campaign is clip-clean, 28/28
+
+Checked at coordinate resolution across every frozen-arm probe dir on disk (`fz3-*` 4 families ×
+4 rungs, `p5-*` R18 × 4 rungs): **0 of 28 have any coordinate at either guard, in any record.**
+With beta frozen, beta cannot travel, so the clamp is never reached — trivially true, and now
+verified rather than assumed.
+
+**So the contamination is confined to the FREE arms, and there it is family-dependent** (weightwise,
+%rec with any coordinate at HI): r34 **0.0** / r18 **8.2** / c100 **50.9** / r10 **52.0**.
+
+| result | clip status |
+|---|---|
+| the 53.1% per-weight sign-agreement measurement (direction C's foundation) | **CLEAN** — frozen arm |
+| CORRECTIONS 50's 4-family frozen profile, spans 16.6–264.6×, exchangeability rejected 13.6–127× | **CLEAN** — frozen arms |
+| CORRECTIONS 50's per-leg frozen exponents (b1 0.069–0.181, b2 0.393–0.816) | **CLEAN** |
+| CORRECTIONS 56's frozen/free `s` gap, frozen side | **CLEAN**; free side is the R18 arm at 8.2% |
+| §59's N_eff/m headline: r34 0.552 | **CLEAN** (0.0% occupancy) |
+| §59's N_eff/m headline: r18 0.481 | mild (8.2%); **floor-robust to +0.038**, `cl5` tests the ceiling |
+| §59's N_eff/m headline: **r10 0.163, c100 0.305** | **AT RISK** — 100% Q4 ceiling occupancy; `uc5` tests them |
+| CORRECTIONS 60's Q4 rebound | **at risk in exactly the two at-risk families** (FINDINGS 51.3) |
+
+**The two numbers at risk are the two that set the LOW end of the published "16% to 55%" range.**
+Nothing in the frozen half, and nothing in direction C's foundational measurement, is affected.
