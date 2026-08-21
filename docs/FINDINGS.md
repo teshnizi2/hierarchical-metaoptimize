@@ -7885,7 +7885,7 @@ So 43.2's numbers are "some unrecorded member of the schedule-prior family", and
 above is a **provisional** mechanism observation, not a measured cosine-prior effect. It does
 not change 43.1 — the arm loses to the baseline by 1.9pp whatever schedule it ran.
 
-## 43.3 THE KILL TEST AT TRUE COORDINATE GRANULARITY — Idea 2 dies by 1000x, and the headline agreement excess is MARGINAL BIAS, not correlation
+## 43.3 THE KILL TEST AT TRUE COORDINATE GRANULARITY — Idea 2 stays dead, and the headline agreement excess is MARGINAL BIAS, not a global common mode  (read 43.3c: this test's power is bounded)
 
 `kt2_ww_*` (2 runs, weightwise ResNet18/CIFAR-10, 100 ep, `PROBE=25`, free adaptation) carry
 the cycle-42 `PATCH_PROBE4` fields — exact within-tensor sign splits and **raw signs of a fixed
