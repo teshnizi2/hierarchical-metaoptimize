@@ -48,6 +48,76 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 49) -- TWO ZERO-COMPUTE RESULTS; A PUBLISHED MAGNITUDE IS HALVED; TWO AGENTS ARE RUNNING
+
+**Read `docs/CORRECTIONS.md` 53-57 and `docs/FINDINGS.md` 49.1-49.4 before quoting any `s`
+or any frozen/free gap. 56 AMENDS FINDINGS 42.4 and 48.19's A3 magnitude.**
+
+> **FIRST, AN OPS WARNING.** A **CONCURRENT SESSION** was operating on this repo and these
+> accounts during cycle 49 (FINDINGS 49.2). It submitted `bin/c49_ms_ladder_p5.sh` --
+> **36 jobs, `ml5-*`, 4702083-4702118 on alice2** -- a meta-stepsize ladder written
+> independently against the same CORRECTIONS 52.4. **Check FINDINGS/CORRECTIONS section
+> numbering for merge damage before trusting any section ordering.** Nothing was cancelled.
+> This session's own ladder (`bin/c49_meta_stepsize_ladder.sh`) was **retired unrun** as a
+> strict subset; its header says so and is kept because the two pre-registrations were
+> written blind and agree on both hazards (monotone b, and BETA_CLIP saturation at
+> eta_meta=1e-2 mimicking a frozen arm -- score that fraction BEFORE quoting the 1e-2 column).
+
+* **THE `s` INSTRUMENT GAP IS CLOSED, AND IT COST NOTHING (CORRECTIONS 55).** FINDINGS
+  48.13's open item is not the window -- `frozen_agreement.arm_stats` already defaults to
+  the steady half. It is the **BIAS CHANNEL**: the agreement estimator inverts
+  `mean|p_t - 0.5|` (deviation from the fixed point, **b included**) while the variance
+  estimator uses `Var(p_t)` (**b excluded**). Debiasing cuts the mean gap **0.143 -> 0.019**
+  in 3/3 families and **reconciles the ordering** the raw instrument reversed. E1/E2 were
+  pre-registered and committed (3f9fd69) before first contact with data.
+  **CORRECTIONS 51's "never use `s` to rank architectures" is REPLACED**: rank freely, but
+  only within a bias-free instrument. `frozen_agreement.py` / `neff_ladder.py` are the
+  contaminated ones. Use `analysis/neff_instrument.py` (**19/19**).
+* **~48% OF THE PUBLISHED FROZEN/FREE `s` GAP WAS THE INSTRUMENT (CORRECTIONS 56).** The
+  contamination is one-sided -- weightwise bias share **0.659 frozen vs 0.003 free** -- so
+  it falls entirely on the arm the mechanism claim is built from. Controlled R18 pair:
+  gap **0.343 raw -> 0.178 debiased / 0.188 variance**. The direction, sign and
+  significance are UNTOUCHED and now carry two clean instruments agreeing to 0.010.
+  **Never quote 0.343 again.** A3's band `[0.55,0.75]` is raw-instrument-only and fails in
+  2 of 3 families debiased.
+* **QUOTE `N_eff/m`, NOT rho.** Weightwise, variance instrument, steady half:
+  **0.501 free / 0.042 frozen**. *At the adapted equilibrium -- the regime Adam-mini /
+  Adalayer / SGG run in -- 11.17M per-weight meta-gradients carry the independent
+  information of 5.6M.* One number, clean instrument, right regime, no exponent needed.
+* **THE HIGH-PASS FILTER IS A SWITCH, NOT A DIAL (CORRECTIONS 53).**
+  `analysis/probe5_time_ladder.py` (**32/32**) reduces the c48 runs over four quarters with
+  the frozen arm as a training-progress control. Gain = frozen rho_w / free rho_w:
+  **Q1 1.26x / 0.80x / 0.70x** (k=1 / channel / layer) -- before beta moves the free arm IS
+  the frozen arm, which is the instrument's **internal control, measured not assumed** --
+  then **24.83 / 28.26 / 23.67** at k=1 across Q2-Q4, flat to +-10%. Monotone in k in 3/3
+  adapted quarters. **Write "present before the step size has adapted, absent after", NOT
+  "varies with distance from the meta-optimum"** until `ml5-*` supplies the eta_meta axis.
+* **This tick's own pre-registration failed, usefully.** The b1(t) trend test was registered
+  as a RATIO; b1 crosses zero (+0.170 -> -0.081) and a ratio through zero is not a
+  magnitude. **NEW STANDING RULE (53), the fourth after thresholds/nulls/windows:** *a
+  registered statistic must be defined over the full range the quantity can take; register
+  a difference, not a ratio, for anything that can change sign.* On the difference the free
+  arm moves **3.4x** the frozen control and is the only arm crossing zero.
+* **SUBMITTED: 18 jobs on alice, `ff5-*` (4702123-4702140)** -- the free-beta FAMILY ladder
+  (R10 / R34 / CIFAR-100 x lay/node/w x 2 seeds), byte-matched to `fz3` with
+  `--alg-meta fixed` -> Lion. It attacks the campaign's largest asymmetry: **the headline --
+  correlation survives adaptation -- is measured in ONE architecture** while its
+  off-equilibrium half is 4-family. `ml5` does not touch it (R18/CIFAR-10 throughout).
+  C0-C4 pre-registered in the script header, resolution of all nine rungs computed from
+  `fz3` BEFORE submission, and the **two thin rungs named in advance** (c100 weightwise
+  ~1.5x, r10 layerwise ~0.5x) so a null in either cannot later be read as a discovery.
+* **NEXT TICK, in order.** (a) Reduce `ff5-*`: `probe5_window.py`, then
+  `probe5_time_ladder.py ../probes_ff5 ../probes_fz3` for C2, then **`neff_instrument.py`
+  on it** -- the free family arms are the missing half of CORRECTIONS 56's table and say
+  whether the ~48% reattribution is R18-specific. (b) Score `ml5-*` against L0-L3,
+  clip-saturation fraction FIRST. (c) **Re-derive every `s` in FINDINGS and the draft under
+  the clean instrument, tagging each with its instrument** -- rule 55 is not retroactive by
+  itself and raw numbers are scattered through 42.4, 48.19 and earlier. (d) Switch-vs-dial
+  on `ml5`'s eta_meta axis: smooth across the three rungs = a dial, 53's narrowing lifts;
+  ~1x at 1e-4 and ~24x at both 1e-3 and 1e-2 = the switch confirmed on a second axis.
+* Queues at tick end: alice **18 P / 0 R** (`ff5`, this session), alice2 **25 P / 11 R**
+  (`ml5`, the other session). CSV 1525 runs -- unchanged, no new runs landed this tick.
+
 ## Running / next (cycle 48) -- IDEA 3 CLOSES POSITIVE; DIRECTION C's PROFILE IS OFF-EQUILIBRIUM ONLY
 
 **Read `docs/CORRECTIONS.md` 42-49 and `docs/FINDINGS.md` 48.1-48.16 before quoting any
