@@ -1,5 +1,47 @@
 #!/bin/bash
 # =============================================================================
+# !! AMENDED CYCLE 47 -- DO NOT SUBMIT AS WRITTEN.  READ THIS BLOCK FIRST. !!
+#
+# This batch measures the frozen-beta N_eff exponent `s` on R10/R34/CIFAR-100 using
+# `twochannel.py`, whose independence floor is the POOLED p_bar(1-p_bar)/n.  Cycle 47
+# established from live PROBE5 data that this floor is materially wrong at the coarse
+# rungs: the canary `p5-blk6-a3-s0` reads **H = 0.833 at 500 records**, i.e. 17% of the
+# pooled floor at m=6 is heterogeneity, not sampling noise.  FINDINGS 44.5 is the standing
+# statement that this confound runs in exactly the direction that fakes a correlation
+# length.
+#
+# As written this batch exports `PROBE=100` and NOT `PROBE5=1` (line ~64), so it would
+# produce 30 runs' worth of data that **cannot be corrected after the fact** -- there are
+# no per-group marginals to correct it with.  It would then have to be re-run.
+#
+# WHAT TO CHANGE BEFORE SUBMITTING, and why PROBE=100 is not enough on its own.
+#   Add `PROBE5=1,PROBE5_WRITE_EVERY=500` AND drop `PROBE=100` to `PROBE=5`.  The record
+#   count is not a detail: the heterogeneity estimator subtracts a sampling term
+#   mean_b[p_b(1-p_b)]*tau/T, so its resolution in sd_b(P_b) is (computed cycle 47)
+#
+#       rung          n            T=100, tau=1.2      T=2000, tau=2.1
+#       blk6          6            0.0551              0.0163
+#       layerwise     62           0.0295              0.0087
+#       nodewise      14,420       0.0075              0.0022
+#       weightwise    11,173,962   0.0014              0.0004
+#
+#   At T=100 the fine rungs can only see sign-bias spread above ~0.03 (layerwise), which is
+#   large; the correction this batch needs would sit below its own resolution and the batch
+#   would report a null it cannot support (CORRECTIONS 33's standing rule).  PROBE=5 over
+#   20 epochs gives T=2000 and buys back a factor of ~3.4 in sd.
+#   Cost: 4 dumps/run instead of 5, ~180 MB I/O on a weightwise arm -- the same budget the
+#   c44 PROBE5 batch already runs at.
+#
+#   ALSO REQUIRED: apply `patches/patch_probe5.py` **and** `patches/patch_probe5_fix.py`
+#   on the target account first.  The unfixed patch crashes at record 500 (FINDINGS 47.5).
+#
+#   Then reduce with `analysis/probe5_floor.py` (selftest 15/15), not `twochannel.py` alone.
+#
+# STATUS: still the campaign's largest open cell, still worth running, still NOT submitted.
+# Cycle 47 deliberately held it so the 8-job PROBE5 batch could establish whether the floor
+# correction matters at every rung before 30 jobs were committed to a design that cannot
+# carry it.
+# =============================================================================
 # Cycle 43 -- PREPARED, NOT SUBMITTED (FairShare below the 0.35 floor at cycle 42).
 #
 # OPEN QUESTION IT ANSWERS
