@@ -7955,6 +7955,46 @@ The pairwise version over the 18 tensors with ≥30 tracked coords gives r = −
 KILLTEST §4's tensor-level finding one level down. The 1e3–1e4 decade is 3 tensors and is not
 a trend; it is flagged for follow-up, not reported as an effect.
 
+## 43.3b The coordinate-granularity null REPLICATES at a0=1e-6, and the a0=1e-6 weightwise headline is re-established
+
+`kt2_ww_a1e-6_s0` is the pre-registered rider from KILLTEST-idea2 sec.5 ("add the a0=1e-3
+twin... **Do both**"). It is the same run at a0 1000x smaller — the regime CORRECTIONS 12 warns
+about, and the regime whose original headline run KILLTEST sec.1 could not find on disk.
+
+| stratum | a0=1e-3 delta vs shift null | p | a0=1e-6 delta vs shift null | p |
+|---|---|---|---|---|
+| within_tensor | +0.0007 pp | 0.005 | **−0.0008 pp** | 1.000 |
+| across_tensor_within_block | +0.0001 pp | 0.225 | **−0.0000 pp** | 0.535 |
+| across_block | −0.0001 pp | 0.795 | **+0.0002 pp** | 0.140 |
+| architecture − random same-size | +0.0002 pp | 0.290 | **−0.0002 pp** | 0.655 |
+
+**Every stratum is a null at both a0, and the two runs disagree in sign on every one of them** —
+which is what independent noise at the 1e-3 pp scale looks like. The a0=1e-3 within-tensor
++0.0007pp (p=0.005) does not replicate and should be read as the one nominal hit in eight
+tests, not as a within-tensor effect.
+
+**The marginal-bias decomposition replicates too, and more sharply:**
+
+| | a0=1e-3 | a0=1e-6 |
+|---|---|---|
+| headline agreement, m=11 173 962 | 50.2056 % ±0.0025 | **50.1101 % ±0.0016** |
+| independence floor | 50.0119 % | 50.0119 % |
+| excess over floor | +0.194 pp | **+0.098 pp** |
+| same statistic on tracked coords, vs **circular-shift null** | +0.0047 pp (p=0.235) | **−0.0006 pp (p=0.550)** |
+
+At a0=1e-6 the excess over the independence floor is +0.098pp and the excess over the
+marginal-preserving null is **−0.0006pp**. The floor accounts for none of it and the marginal
+bias accounts for all of it, to within measurement error.
+
+**This also re-establishes the lost weightwise headline.** KILLTEST sec.1 recorded that the
+a0=1e-6 weightwise run behind the "53.1 %" sentence no longer existed on the cluster and that
+the claim was *unsupported* rather than refuted. It is now measured directly: weightwise
+agreement at a0=1e-6, steady window, 100 epochs = **50.1101 %**, floor 50.0119 %. It was never
+anywhere near 53.1 % — CORRECTIONS 26's diagnosis (that 53.1 % is the m=62 layerwise arm) is
+confirmed by a purpose-built run. a0 moves the weightwise excess by **2.0x** here
+(0.098 -> 0.194 pp, *rising* with a0), not the 16x of CORRECTIONS 12, which compared a
+different statistic in a different window.
+
 ## 43.4 The baseline LR curve is CLOSED: an interior maximum at 3e-3, and horizon-matching the cosine does not help
 
 `SW-*` (14 jobs, `--optimizer AdamW`, **`COS_TOTAL=50000`** = horizon-matched to 100 epochs,

@@ -48,6 +48,66 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 43) -- COLLECTION + REDUCTION, nothing submitted
+
+Queues: alice **0 PENDING / 1 RUNNING** (`bg600-meta-s2`, 479/600 -- do not read), alice2
+**0/0**. FairShare **0.3331 / 0.3356**, both below the 0.35 floor -> **0 submitted**.
+CSV re-aggregated: **1446 runs** (878 + 618), +12 since cycle 42. Cycle 42's read list is
+cleared: `I1-*`, `SW-*` and `PP-*` are all read, and the two `kt2` probe runs are reduced.
+
+**BOTH REMAINING SIDE-IDEAS ARE NOW DEAD. Direction C is the project, and cycle 43 changed
+what C says.**
+
+* **43.1 -- IDEA 1 IS DEAD.** `I1-*` read against **byte-matched, same-account** controls.
+  Best arm (layerwise) **92.544 +-0.207 (n=3)**; tuned baseline **94.417 +-0.113 (n=5)** ->
+  **-1.873pp**. It is also **-0.251pp** below our own best existing arm (42.2's 92.795). Prior
+  art caps it at a tie. Stop; no further I1 jobs.
+* **43.2 -- but the schedule prior is granularity-EQUALISING**, and that is a mechanism result
+  for C: +1.664 layerwise / +0.137 blk6 / **-0.465 scalar**, collapsing the granularity spread
+  **1.803 -> 0.405pp** and inverting the ordering. **PROVISIONAL -- read CORRECTIONS 29 before
+  quoting it.** The `I1-*` schedule is *unidentified* (no saved script, no `SCHED` echo, no
+  alpha/beta in TensorBoard) and is provably NOT a matched-horizon cosine: the arm is **+7.2pp
+  ahead at epoch 2**, where a matched cosine multiplier is 0.9978.
+* **43.3 -- IDEA 2 IS DEAD AT THE DECIDING GRANULARITY, by 1000x.** `kt2_ww_*` carry
+  `PATCH_PROBE4` (raw per-coordinate signs, 20k tracked weights) -- the one experiment
+  KILLTEST-idea2 sec.5 pre-registered and no earlier run could answer. Estimator validated
+  16/16 against synthetic ground truth *before* use. Pairwise same-sign rate between
+  **individual weights**, vs a marginal-preserving circular-shift null: across-tensor
+  **+0.0001pp**, across-block **-0.0001pp**, architecture - random same-size **+0.0002pp
+  (p=0.29)**. Kill threshold was 0.1pp. **Replicated at a0=1e-6** (43.3b) where all four
+  strata flip sign -- i.e. pure noise.
+* **43.3/31 -- THE HEADLINE MECHANISM IS WRONG AND THIS IS THE NEW RESULT.** The whole
+  **+0.194pp** majority-agreement excess over the independence floor is **each weight's own
+  persistent sign preference**, not correlation between weights (excess over the
+  marginal-preserving null: +0.0047pp, p=0.235; at a0=1e-6, **-0.0006pp, p=0.55**).
+  CORRECTIONS 8b's sentence "the signs are strongly positively correlated" is **wrong**.
+  This is not cosmetic: **correlation inflates the variance of a pooled estimate; marginal bias
+  moves its mean, and does not average away at ANY N.** Direction C's contribution is now the
+  **two-channel decomposition** (correlation vs bias) at per-weight granularity, plus the
+  frozen/free contrast of CORRECTIONS 27.
+* **43.4/30 -- the baseline is re-tuned and the LR curve is CLOSED.** `SW-*` (horizon-matched
+  `COS_TOTAL=50000`) gives 83.88 / 88.81 / 92.96 / 93.99 / 94.03 / **94.36** / 92.58 across
+  lr 1e-5..1e-2. **3e-3 is a bracketed interior maximum**; pooled with `fxcos-3e-3` the tuned
+  100-ep baseline is **94.417 +-0.113 (n=5)**, not 94.093/94.24. **Recompute every "loses by X"
+  sentence.** Also: horizon-matching the cosine is worth **+0.10 +-0.10pp -- unresolvable**, so
+  "the gap is the schedule" is too strong. **The gap is the peak LR.**
+* **43.5 -- long-horizon deficit, n=3 baseline seeds at every horizon:** 1.622pp @100ep /
+  1.966 @300 / 1.797 @600. Does not close.
+* **43.6 -- `PP-*` read** (AUGMENT=0, kept separate per CORRECTIONS 28.2): blk6 74.349 >
+  scalar 73.717 > layerwise 73.365. A third setup where "finer is better" fails at the coarse end.
+* **Next cycle, in order.** (1) **Re-check FairShare first** -- both queues are at 1 job total,
+  which is the fastest possible recovery; the moment either clears 0.35, submit. (2)
+  `bash bin/c43_frozen_ladder.sh --submit` on alice2 (30 jobs, prepared + dry-run-validated +
+  self-guarded) -- frozen-beta to R10/R34/CIFAR-100, still the largest open cell. (3) **NEW and
+  cheap: a `PATCH_PROBE4` probe on a FROZEN-beta run (2 jobs).** CORRECTIONS 31 leaves the
+  off-equilibrium `s=0.629` undecomposed -- we do not know whether the off-equilibrium failure
+  is bias or correlation, and `kt2`'s instrument answers it directly. This is now the single
+  most informative cheap experiment in the campaign. (4) `rs-node-*` / `rs-blk6-1e4` seed
+  top-ups. (5) `bg600-meta-s2` when it lands.
+* Local probe copies: `analysis/killtest_data/{mx,gate3,fz,p7free,p6free,kt2}` (118 MB).
+  Reducer for the new data: `analysis/killtest2_coords.py` (tests in
+  `tests/test_killtest2_coords.py` -- **run them before trusting any number it prints**).
+
 ## Running / next (cycle 42) -- COLLECTION + REDUCTION, nothing submitted
 
 Queues: alice 0 PENDING / 25 RUNNING (FairShare **0.3331**), alice2 **0 / 0** (**0.3356**).

@@ -912,8 +912,14 @@ independence floor does not model and the circular-shift null does.
 * *Marginal bias* moves the **mean** — the pooled estimate converges to a non-zero population
   bias, and pooling more coordinates does not help **at all**, at any N.
 
+**Replicated at a0=1e-6** (FINDINGS 43.3b): every stratum is a null at both a0 values and the
+two runs disagree in sign on all four, which is what independent noise at the 1e-3 pp scale
+looks like. At a0=1e-6 the excess over the independence floor is +0.098pp and the excess over
+the marginal-preserving null is **−0.0006pp (p=0.55)** — the bias accounts for all of it.
+
 Our measurement says the variance channel is essentially exact at the adapted equilibrium
-(Δ ≤ 0.001pp) and the surviving effect is entirely the bias channel. **Restate direction C's
+(Δ ≤ 0.001pp, replicated across a 1000x range of a0) and the surviving effect is entirely the
+bias channel. **Restate direction C's
 mechanism accordingly**: the failure of noise-averaging in this network is a bias failure, not
 a correlation failure. CORRECTIONS 27's `N_eff ~ m^0.629` frozen-beta result is untouched as a
 *measurement*, but its interpretation as "the coordinates are correlated off-equilibrium"
