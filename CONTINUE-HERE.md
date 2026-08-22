@@ -108,10 +108,20 @@ MetaOptimize's internals and are untouched; any "our method is better" sentence 
   within-clamp binding, which reads R_cor=1 by construction. Gated, clean hits went to 0/1,008.
   The same clamp then falsified one of this tick's own selftests; **the assertion was wrong, not
   the code**, and it was rewritten to assert the flag FIRES. 74 -> 81 selftests.
+* **AND IT REPRODUCES ON THE COMPLEMENTARY STATISTIC (60.7).** Repeated at the NODEWISE arms,
+  where each stored coordinate already IS a row mean so no aggregation happens: median
+  noise-corrected `var(row means)` gives **V(conv1)/V(conv2) = 0.17-98.42, median 48.39** in the
+  8 inverted arms vs **0.02-4.97, median 0.55** in 49 normal arms. **7 of 8 inverted arms exceed
+  the MAXIMUM of all 49 normal arms**; Mann-Whitney **p=5.2e-4**. The single dissenter
+  (`bo6/probe_node_adw_s0`, 0.17) is the arm the other method PREDICTS -- `bo6` holds all 5 of
+  the corpus's weightwise `conv2` hits. Different runs, different stored quantity, no shared code
+  path beyond the architecture map. **87/87 selftests.**
 * **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `rw9` (18,
   alice) all remain written, validated, UNSUBMITTED. Cycle 58's order stands unchanged.
+  **`docs/` was NOT rsynced to the cluster this tick -- do it on the next reachable tick.**
 
-**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (a2) **rsync `docs/` to
+the cluster -- it is two cycles behind.** (b) Submit **`sp8`
 (alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. (c) Score `hz9` **H0 -> H0.3 ->
 H0.5 -> H1 -> H1b -> H2, in that order**; H0.5 can only VOID. (d) If bo7/bd7 landed, cycle 54's
 scoring order stands with 55.2's measured per-seed sd. (e) **DONE, do not re-run:** the row
