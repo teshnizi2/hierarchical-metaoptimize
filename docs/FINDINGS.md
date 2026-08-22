@@ -11012,3 +11012,176 @@ every partitioned arm peaks at 1e-4 and is flat above it.
 
 W-C is the actionable finding of this tick: **the highest-ranked resubmission was, as written,
 mis-specified for the question it was ranked to answer.**
+
+---
+
+## 58.0 CYCLE 58 — ALICE DOWN A **THIRD** CONSECUTIVE TICK. A ZERO-JOB TICK THAT MOVED THE HEADLINE.
+
+**OUTAGE, localised not assumed.** `2026-08-22T16:25Z`: `ssh alice-gw` is up and answers; from
+it `nc -z -w 8 login.alice.universiteitleiden.nl 22` → DOWN, and both `132.229.104.230` and
+`132.229.104.231` → DOWN. `ssh alice`/`ssh alice2` both fail at banner exchange.
+**No queue read, nothing synced, nothing submitted. CSV unchanged at 1707 rows.** `bo7-*` (12,
+alice) and `bd7-*` (12, alice2) were RUNNING at the end of cycle 54; **whether they survived is
+still UNKNOWN and is still not guessed.** No ssh config touched, no retry loop run.
+
+Everything below is derived from data already on this Mac plus three arXiv full texts fetched
+this tick. Two things changed: a load-bearing GATE was discharged, and the campaign's own new
+headline was generalised and then scoped by its own data.
+
+## 58.1 NEW INSTRUMENT `analysis/c58_horizon_reversal.py` — 42/42 selftests, AND IT REPRODUCES 86.3 EXACTLY
+
+Modes `--control` `--inventory` `--slopes` `--crossing` `--curve FAM` `--selftest`. Metric is
+CORRECTIONS 86.2's matched-k plateau, k=5: `plateau_at(e) = mean(tests[e-5:e])` on the 1-indexed
+test series parsed with `aggregate.py:110`'s own regex. Cells are keyed on 14 config columns;
+`granularity` and `seed` are excluded because they are the contrast and the pairing key.
+
+`--control` re-derives CORRECTIONS 86.3 from the raw `.out` files independently of whatever
+produced 86.3 (STANDING RULE 1):
+
+| epoch | re-derived | sd | n | favouring node | published 86.3 | delta |
+|---|---|---|---|---|---|---|
+| 10 | **−3.946** | 0.801 | 7 | 0/7 | −3.946 | −0.000 |
+| 15 | **−1.194** | 0.277 | 7 | 0/7 | −1.194 | 0.000 |
+| 20 | +0.035 | 0.286 | 7 | 4/7 | +0.035 | 0.000 |
+| 25 | **+0.725** | 0.317 | 7 | 7/7 | +0.725 | −0.000 |
+| 30 | +1.067 | 0.230 | 7 | 7/7 | +1.067 | −0.000 |
+| 40 | **+1.258** | 0.207 | 7 | 7/7 | +1.258 | 0.000 |
+
+**86.3 is confirmed to three decimals at every epoch.** This tick did not overturn it; it
+re-derived it and then asked the two questions it did not ask.
+
+## 58.2 **GATE 86.4 IS DISCHARGED, AND IT RESOLVES AGAINST OUR OWN PROSE**
+
+CORRECTIONS 86.4 forbade any document asserting what Adam-mini / Adalayer / SGG assume until
+the papers were read locally and the sentence quoted. All three are now on local disk at
+`paper/refs/` (arXiv **full text**, fetched via the arXiv MCP, not a summariser's paraphrase —
+`2406.16793` v7, `2407.07972` v2, `2506.01049` v1; HTML rendering of the paper's own text, not
+the PDF binary, which is the one residual caveat).
+
+Term counts over the three full texts: `"law of large"` **0/0/0**, `"effective sample"`
+**0/0/0**, `"variance reduc"` 0/0/1 (a bibliography title), `"noise"` 2/1/1 — **every hit is a
+bibliography entry, a diffusion training objective, or an unrelated aside.**
+
+| paper | what it ACTUALLY argues, quoted | verdict |
+|---|---|---|
+| Adam-mini 2406.16793 | *"partition the parameters into blocks following our proposed principle on **Hessian structure**"*; blocks are the *"smallest dense sub-block in Hessian"* | no noise argument |
+| Adam-mini, on why it AVERAGES `v` | three stated reasons: *"grid-search is too expensive"*, average of `v` *"can be borrowed from Adam"*, and — decisively — *"for all entries in the i-th row of G, they all share the same BP error term e_i … Therefore, G usually has **similar entries within a row**"* | **argues from CORRELATION, the opposite of independence** |
+| Adalayer 2407.07972 | Adam → Adafactor → Adalayer is an explicit ladder of *"coarser and coarser"* **second-moment storage**; Adalayer *"stores a single scalar which is the average of the second moment"* | storage coarseness, no noise argument |
+| SGG 2506.01049 | *"parameters in LLMs exhibit **non-independent** optimization behaviors, inherently forming **intra-correlated groups**"* | **asserts the OPPOSITE of independence** |
+
+> **THE ATTRIBUTION IS FALSE FOR ALL THREE. No paper in that line justifies coarse granularity
+> by √N noise-averaging over independent coordinates.** Every sentence in our documents of the
+> form *"the Adam-mini / Adalayer / SGG line assumes exactly 0"* or *"the core refutation"* is
+> WITHDRAWN — at least `CORRECTIONS.md:1460`, `FINDINGS.md:8920/8945/9103/9114`,
+> `CONTINUE-HERE.md:475/917`. The audit 86.4 could not verify was RIGHT.
+
+**What survives, and it is most of it.** The measurement is untouched; only its framing as a
+refutation *of those papers* dies. 86.3 never depended on it. **And the correct target is
+strictly better than the strawman:** Adam-mini's actual premise — *the mean of a block
+represents the block, because a row of `G = e·zᵀ` shares its BP error term* — is a claim our
+corpus can test directly, and **a "row of G" is exactly our `nodewise` partition.**
+
+## 58.3 THE U IN TRAINING TIME IS **GENERAL**; 86.3's EPOCH WINDOW IS NOT
+
+`--inventory`: **41 config cells** on disk carry ≥1 within-seed nodewise/layerwise pair, across
+5 independent batch families, ResNet10/18/34, CIFAR-10/100, ms 1e-4…1e-2. `--slopes 10 20`, the
+paired rise of (node − lay) from epoch 10 to 20:
+
+| stratum | cells | rise 10→20 | seeds up |
+|---|---|---|---|
+| ms=1e-3, α₀=1e-3, adapting | 24 of 29 with \|@10\|≥1 | **+2.5 to +5.7** | near-unanimous (p7-R18 10/10, p7-C100 10/10) |
+| ms ≤ 5e-4, α₀=1e-3 | 3 of 3 | **−1.2 to −2.0** (still DESCENDING at 20) | 0/3, 0/3, 0/2 |
+| α₀=1e-6 | 3 of 3 | **−8.1, −14.4, −20.7** | 0/1 each, all n=1 |
+| frozen-β (`fz`, `fz3`) | 5 | −0.24 to +0.38, \|@10\|<0.5 | near-null **by construction** |
+
+`--crossing`, the epoch at which the paired mean turns positive and stays positive:
+
+| ms | crossing epoch | evidence |
+|---|---|---|
+| 1e-4 | not by 20 (still falling) | `ml5` n=3 |
+| 2e-4 | not by 20 (still falling) | `ns5` n=3 |
+| 3e-4 | **47** | `rs`, 100-epoch runs, paired n=2 |
+| 5e-4 | not by 20 (min at 13, rising) | `ns5` n=2 |
+| 1e-3 | **20** | `br6`+`bl5` paired n=7; `bo6` 10; `p7`-R18 20 |
+
+And at a FIXED 20-epoch horizon the crossing has already happened on CIFAR-100, sits at zero on
+ResNet18/CIFAR-10, and has NOT happened on ResNet34 — **−1.08 / −1.45 / −1.13 / −1.11 / −1.19
+in 5 independent batches** (`ff5` `p6f` `p7` `uc5` `p4`).
+
+> **The shape is universal; the TIMESCALE is not. The crossing epoch falls with the
+> meta-stepsize, rises with depth, and falls with task difficulty. 86.3's "between epoch 15 and
+> 25" is a ResNet18 / CIFAR-10 / ms=1e-3 number and may not be written as general.**
+> **[LABELLED POST-HOC — new cuts of data already on disk.]**
+
+## 58.4 THE CROSSING-EPOCH SCALING, WITH ONE OUT-OF-SAMPLE HIT
+
+Two MEASURED crossings (ms=1e-3 → 20, ms=3e-4 → 47) give `crossing ≈ 20·(1e-3/ms)^0.71`. That
+is a description fitted on **two points**; STANDING RULE 7 forbids funding a batch on it, and
+nothing here does. It has one out-of-sample check available on disk:
+
+| ms | predicted crossing | measured (node − lay), unpaired, matched-k=5 | reading |
+|---|---|---|---|
+| 1e-4 | **102** | −1.662 @20 → −1.578 @50 → **−0.476 @100**, rising | not crossed by 100, close |
+| 3e-4 | 47 (fitted) | −3.403 @20 → +0.506 @50 → +0.730 @100 | crossed ~47 ✓ |
+| 1e-3 | 20 (fitted) | +0.431 @20 → +1.637 @50 → **+1.594 @100** | crossed <20, and **PERSISTS to 100** |
+
+The ms=1e-3 row also says the reversal is **not a 40-epoch transient**: nodewise is still
++1.59pp ahead at epoch 100. (n=1 nodewise, unpaired — `hz9`'s H2 makes it paired at n=2.)
+
+## 58.5 **AND UNDER PER-ARM TUNING THE CURVE IS MIRRORED.** THE REVERSAL MAY BE A SHARED-ms ARTEFACT.
+
+Every cell in 58.3 holds ms **fixed and shared** across the two arms. ms=1e-3 is above the 1e-4
+joint optimum (57.2), so at that cell layerwise sits **1.86pp off its own peak** while nodewise
+sits **0.10pp off its own**. Let each arm sit at ITS OWN optimum instead — layerwise@1e-4
+against nodewise@3e-4, `rs`, complete-to-100 runs only (P0 hard drop), matched-k=5:
+
+| epoch | 10 | 20 | 30 | 40 | 50 | 60 | 80 | 100 |
+|---|---|---|---|---|---|---|---|---|
+| node − lay | **+3.286** | +1.800 | +1.809 | +0.891 | +0.317 | −0.121 | −0.199 | **−0.168** |
+
+**Nodewise starts AHEAD and fades to a tie — the exact mirror of the fixed-ms curve.** Under
+tuning there is no reversal to have. **n=1 nodewise vs n=2 layerwise, UNPAIRED. It cannot carry
+the claim.** It is registered as `hz9`'s H1 pilot with direction T-B declared in advance.
+
+## 58.6 THE TUNED PEAK ROW AT 100 EPOCHS: AMONG PARTITIONS, GRANULARITY IS UNRESOLVABLE
+
+`rs`, epoch 100, matched-k=5, **P0 hard drop (`epochs_done ≥ 100`)**, each arm at its own best ms:
+
+| granularity | plateau | at ms | n | sd |
+|---|---|---|---|---|
+| layerwise | **92.824** | 1e-4 | 2 | 0.291 |
+| nodewise | 92.656 | 3e-4 | 1 | — |
+| resnet18_blocks | 92.652 | 1e-4 | 2 | 0.079 |
+| scalar | **92.198** | 1e-4 | 2 | 0.028 |
+
+* The three **partitioned** arms span **0.172pp — inside layerwise's own seed sd (0.291).**
+* **Partition-vs-none is 0.454–0.626pp** and is the only resolvable granularity effect here.
+* Layerwise at its own optimum still wins the whole grid.
+
+> **This independently confirms 57.2's mechanism sentence by a different cut** (horizon/crossing
+> rather than pp-per-decade falloff): **partitioning buys tolerance to an over-large
+> meta-stepsize; which partition you choose buys nothing measurable once each is tuned.**
+> The +1.59pp nodewise advantage at ms=1e-3 is a TOLERANCE gap, not an accuracy gap.
+
+## 58.7 `bin/c58_tuned_horizon.sh` — WRITTEN, VALIDATED, **NOT SUBMITTED** (cluster down)
+
+9 jobs, alice, tag `hz9-*`, 100 epochs, operating point byte-diffed against `c40_surface.sh`.
+`hz9-node-3e4-s{1,2,3,4}` (tuned nodewise, n=1→5) + `hz9-lay-1e4-s{0,1,2}` (tuned layerwise,
+n=2→5) + `hz9-node-1e3-s{3,4}` (the fixed-ms cell, PAIRED, at 100 epochs). Seeds chosen so
+nothing collides with the corpus and H2 pairs against `rs-lay-1e3-s{3,4}`.
+
+Gates **H0** (epochs_done==100, hard drop — this batch is nodewise-heavy and nodewise is the arm
+the c40 surface lost 60% of), **H0.3** (guard live), **H0.5** (POOLING GATE, can only VOID:
+`hz9` must reproduce `rs` within 3sd or the roots are not matched and H1 is not scored),
+**H1** (slope D = Δ@100 − Δ@50; ≥+0.30 T-A the reversal survives tuning / ≤−0.30 T-B it is a
+shared-ms effect), **H1b** (level vs a ±0.50 bar = 2.7 SE, STANDING RULE 9; TIED is a RESULT),
+**H2** (paired ms=1e-3 at 100 epochs; registered expectation +1.0…+2.0 and 2/2).
+
+**A DIRECTION IS REGISTERED, deliberately** — the pilot gives D=−0.485 and points at T-B, so a
+T-B result is scored as a REPLICATION and a T-A result visibly overturns this cycle's own read.
+7 guards; `bash -n` clean; guards 3b and 4 re-run standalone and passing; the 9-job construction
+loop verified to emit exactly the 9 intended names.
+
+**These are not new cells.** `c40_surface.sh` requested `rs-node` at seeds 0–4 × 5 stepsizes =
+25 jobs; the corpus holds 10, of which 6 are truncated. **15 nodewise jobs never landed.** `hz9`
+is the tuned half of the surface that never arrived.

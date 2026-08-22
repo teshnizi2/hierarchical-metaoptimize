@@ -54,6 +54,69 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 58) -- **ALICE DOWN A THIRD TICK. THE GATE IS DISCHARGED AND THE HEADLINE IS SCOPED.**
+
+**Read `docs/CORRECTIONS.md` 87 and `docs/FINDINGS.md` 58.0-58.7 before quoting CORRECTIONS 86.3's
+horizon reversal, its epoch window, or ANY sentence about what Adam-mini / Adalayer / SGG assume.
+87.1 WITHDRAWS a whole class of sentences. 87.4 and 87.6 scope the headline.**
+
+* **BOTH LOGIN NODES DOWN FOR A THIRD CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering, `132.229.104.230/.231` refuse :22 from it (`LOGIN_DOWN`, 2026-08-22T16:25Z and
+  again at 16:41Z). **No queue read, nothing synced, nothing submitted. CSV unchanged at 1707.**
+  `bo7-*` (12, alice) and `bd7-*` (12, alice2) were RUNNING at the end of cycle 54;
+  **whether they survived is UNKNOWN and is not guessed.**
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **GATE 86.4 IS DISCHARGED AND IT RESOLVES AGAINST OUR OWN PROSE.** All three papers are on
+  local disk now (`paper/refs/`, arXiv full text). `"law of large"` 0, `"effective sample"` 0 in
+  all three. **Adam-mini argues from Hessian block structure** and justifies averaging by
+  *"they all share the same BP error term e_i ... G usually has similar entries within a row"* --
+  a CORRELATION argument. **Adalayer** argues from second-moment storage coarseness. **SGG says
+  the opposite of independence**: *"non-independent optimization behaviors, inherently forming
+  intra-correlated groups"*. **No sqrt(N) noise-averaging anywhere. Every "the Adam-mini /
+  Adalayer / SGG line assumes exactly 0" sentence is WITHDRAWN.** The measurement survives; only
+  its framing as a refutation OF THOSE PAPERS dies, and 86.3 never depended on it.
+* **THE BETTER TARGET, AND IT IS NOW RANKED:** Adam-mini's ACTUAL premise -- the mean of a block
+  represents the block because a row of `G = e z^T` shares its BP error term -- is testable on our
+  corpus, and **a "row of G" is exactly our `nodewise` partition.**
+* **86.3 REPRODUCES TO THREE DECIMALS** under a new independent instrument
+  (`analysis/c58_horizon_reversal.py --control`, 42/42 selftests). It was generalised, then scoped.
+* **THE U IN TRAINING TIME IS GENERAL: 41 CELLS, 5 BATCH FAMILIES, R10/R18/R34, C10/C100.**
+  **THE CROSSING EPOCH IS NOT.** It falls with ms (**47 MEASURED at 3e-4** vs 20 at 1e-3; still
+  descending at epoch 20 at ms<=2e-4), **rises with depth** (R34 still -1.1pp at epoch 20 in
+  **5 of 5** batches), falls with task difficulty (C100 crossed by ~16). **"between epoch 15 and
+  25" is a R18/C10/ms=1e-3 number.** At fixed ms=1e-3 the reversal PERSISTS to epoch 100 (+1.594).
+* **BUT UNDER PER-ARM TUNING THE CURVE IS MIRRORED.** lay@1e-4 vs node@3e-4: **+3.286 @10 ->
+  +0.317 @50 -> -0.168 @100.** Nodewise starts AHEAD and fades to a tie. Every cell above shares
+  ONE ms across both arms, and at ms=1e-3 layerwise is 1.86pp off its own peak while nodewise is
+  0.10pp off its own -- **so the "reversal" may be measuring distance-from-optimum.** n=1 vs n=2,
+  unpaired; **it cannot carry the claim and is not written as one.**
+* **TUNED PEAK ROW @100ep:** lay 92.824(1e-4) / node 92.656(3e-4) / blk6 92.652(1e-4) / scal
+  92.198(1e-4). **The three partitioned arms span 0.172pp, INSIDE layerwise's own sd (0.291);
+  partition-vs-none is 0.454-0.626pp.** Independently confirms 57.2 by a different cut:
+  **partitioning buys TOLERANCE to an over-large ms; which partition buys nothing once tuned.**
+* **SUBMITTED: NOTHING.** `bin/c58_tuned_horizon.sh` is **written, validated, UNSUBMITTED** --
+  9 jobs, alice, tag `hz9-*`, 100 epochs: node@3e-4 s1-4 (n=1->5) + lay@1e-4 s0-2 (n=2->5) +
+  node@1e-3 s3-4 (the fixed-ms cell, PAIRED, at 100 ep). Gates H0 (epochs_done==100 hard drop) ->
+  H0.3 -> **H0.5 POOLING GATE, CAN ONLY VOID** -> **H1 slope: >=+0.30 T-A the reversal survives
+  tuning / <=-0.30 T-B it is a shared-ms effect** -> H1b (level, +-0.50 = 2.7 SE, **TIED is a
+  RESULT**) -> H2 (paired ms=1e-3 @100, expect +1.0..+2.0, 2/2). **A DIRECTION IS REGISTERED
+  deliberately** (pilot D=-0.485 -> T-B), so T-B replicates and T-A overturns this cycle's own
+  read. 7 guards, `bash -n` clean, guards 3b/4 standalone-passing. **Not new cells:** c40 asked
+  for 25 `rs-node` jobs, 10 landed, 6 truncated -- **15 never arrived.**
+* **`bin/c55_span_dissociation.sh` (sp8, 9, alice2) and `bin/c57_rsw_peak.sh` (rw9, 18, alice)
+  ARE STILL UNSUBMITTED and BOTH STILL GO.** Only the ALICE order changes.
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
+(alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)** -- hz9 first because it decides whether
+the current headline is about granularity or about a shared over-large ms, at half rw9's cost;
+nothing is cancelled. (c) Score `hz9` **H0 -> H0.3 -> H0.5 -> H1 -> H1b -> H2, in that order.**
+(d) If bo7/bd7 landed, cycle 54's scoring order stands with 55.2's measured per-seed sd.
+(e) The 12 truncated `rs-blk6`/`rs-node` reruns are ranked LAST. (f) Still unspent: the
+raw-instrument `s` re-derivation, carried since 51 -- now ranked BELOW testing Adam-mini's actual
+within-row-similarity premise at the `nodewise` partition.
+
 ## Running / next (cycle 57) -- **ALICE STILL DOWN. THE HIGHEST-RANKED BATCH WAS MIS-SPECIFIED.**
 
 **Read `docs/CORRECTIONS.md` 86 and `docs/FINDINGS.md` 57.0-57.3 before quoting the c40

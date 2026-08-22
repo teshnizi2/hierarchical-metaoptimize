@@ -2924,3 +2924,118 @@ exactly 0."*
 three PDFs have been read locally and the specific sentence quoted.** If the attribution fails,
 the measurement survives untouched — only its framing as a refutation *of those papers* dies,
 and 86.3 does not depend on it at all.
+
+## 87. DECISION RECORD — cycle 58 (ALICE DOWN, **THIRD** CONSECUTIVE TICK, ZERO JOBS)
+
+**OUTAGE, localised not assumed.** `2026-08-22T16:25Z`: `ssh alice-gw` up and answering; from it
+`nc` to `login.alice.universiteitleiden.nl:22` and to both `132.229.104.230` / `.231` returns
+DOWN. `ssh alice` and `ssh alice2` fail at banner exchange. **No queue read, nothing synced,
+nothing submitted. CSV unchanged at 1707 rows.** `bo7-*` (12, alice) and `bd7-*` (12, alice2)
+were RUNNING at the end of cycle 54; **whether they survived is still UNKNOWN and still not
+guessed.** No ssh config touched, no retry loop run.
+
+1. **GATE 86.4 IS DISCHARGED, AND IT RESOLVES AGAINST OUR OWN PROSE.** All three papers are now
+   on local disk (`paper/refs/`, arXiv full text, not a summariser). Across all three:
+   `"law of large"` 0, `"effective sample"` 0, and every `"noise"` hit is a bibliography entry
+   or an unrelated aside. **Adam-mini argues from Hessian block structure**, and its stated
+   reasons for AVERAGING are *"grid-search is too expensive"*, borrowability from Adam, and —
+   decisively — that *"they all share the same BP error term e_i … G usually has **similar
+   entries within a row**"*, which is a **CORRELATION** argument. **Adalayer** argues from
+   *"coarser and coarser"* second-moment **storage**. **SGG asserts the opposite of
+   independence**: *"parameters in LLMs exhibit non-independent optimization behaviors,
+   inherently forming intra-correlated groups."*
+   > **No paper in that line justifies coarse granularity by √N noise-averaging. Every
+   > sentence of the form "the Adam-mini / Adalayer / SGG line assumes exactly 0" or "the core
+   > refutation" is WITHDRAWN** (≥ `CORRECTIONS.md:1460`, `FINDINGS.md:8920/8945/9103/9114`,
+   > `CONTINUE-HERE.md:475/917`). The measurement survives; its framing as a refutation *of
+   > those papers* does not. 86.3 never depended on it. → 58.2
+
+2. **AND THE REAL TARGET IS BETTER THAN THE STRAWMAN.** Adam-mini's actual premise — the mean of
+   a block represents the block because a row of `G = e·zᵀ` shares its BP error term — is
+   directly testable on our corpus, and **a "row of G" is exactly our `nodewise` partition.**
+   This is a live research direction and it is recorded as one, not acted on this tick.
+
+3. **86.3 IS CONFIRMED TO THREE DECIMALS** by an instrument written this tick that re-derives it
+   from the raw `.out` series independently (`--control` prints REPRODUCED EXACTLY at all six
+   epochs). **This tick did not overturn 86.3; it generalised it and then scoped it.** → 58.1
+
+4. **THE U IN TRAINING TIME IS GENERAL — 41 CELLS, 5 BATCH FAMILIES, 3 NETWORKS, 2 DATASETS.**
+   86.3 rested on 2 batches at 1 meta-stepsize. **The CROSSING EPOCH is what is not general:**
+   it falls with ms (**47 measured at 3e-4** against 20 at 1e-3; still descending at epoch 20 at
+   ms ≤ 2e-4), **rises with depth** (ResNet34 still −1.1pp at epoch 20 in **5 of 5** independent
+   batches), and falls with task difficulty (CIFAR-100 crossed by ~16).
+   > **"between epoch 15 and 25" is a ResNet18 / CIFAR-10 / ms=1e-3 number and may not be
+   > written as a general property of granularity.** [LABELLED POST-HOC.] → 58.3
+
+5. **THE REVERSAL PERSISTS TO 100 EPOCHS AT FIXED ms** (+1.594 at epoch 100, unpaired n=1), so
+   it is not a 40-epoch window artefact. → 58.4
+
+6. **BUT UNDER PER-ARM TUNING THE CURVE IS MIRRORED, AND THAT THREATENS THE HEADLINE.** Each arm
+   at its own optimum (lay@1e-4 vs node@3e-4): **+3.286 @10 → +0.317 @50 → −0.168 @100.**
+   Nodewise starts AHEAD and fades to a tie. **Every cell in item 4 shares a single ms across
+   both arms, and at ms=1e-3 layerwise is 1.86pp off its own peak while nodewise is 0.10pp off
+   its own — so the "reversal" may be measuring distance-from-optimum, not granularity.**
+   n=1 vs n=2 and unpaired; **it cannot carry the claim, and it is not being written as one.**
+   → 58.5
+
+7. **THE TUNED PEAK ROW AT 100 EPOCHS SAYS GRANULARITY-AMONG-PARTITIONS IS UNRESOLVABLE.**
+   layerwise 92.824 (1e-4, n=2, sd 0.291) / nodewise 92.656 (3e-4, n=1) / blk6 92.652 (1e-4,
+   n=2) / scalar 92.198 (1e-4, n=2). **The three partitioned arms span 0.172pp — inside
+   layerwise's own sd. Partition-vs-none is 0.454–0.626pp and is the only resolvable effect.**
+   This **independently confirms 57.2 by a different cut**: partitioning buys TOLERANCE to an
+   over-large meta-stepsize; the +1.59pp nodewise advantage at ms=1e-3 is a tolerance gap, not
+   an accuracy gap. → 58.6
+
+8. **WRITTEN, VALIDATED, NOT SUBMITTED: `bin/c58_tuned_horizon.sh`** — 9 jobs, alice, `hz9-*`,
+   100 epochs. Gates H0 (epochs_done==100 hard drop) → H0.3 → **H0.5 (POOLING GATE, CAN ONLY
+   VOID)** → **H1** (slope; ≥+0.30 T-A the reversal survives tuning, ≤−0.30 T-B it is a
+   shared-ms effect) → H1b (level, ±0.50 = 2.7 SE, **TIED is a RESULT**) → H2 (paired ms=1e-3 at
+   100 epochs). **A DIRECTION IS REGISTERED, deliberately** — the pilot gives D=−0.485 and points
+   at T-B, written down in advance so T-B REPLICATES rather than discovers and T-A visibly
+   overturns this cycle's own read. This is the opposite of `rw9`'s "no direction registered";
+   the difference is that `rw9`'s one point was consistent with both branches and this one is
+   not. 7 guards, `bash -n` clean, guards 3b/4 re-run standalone, loop verified to emit exactly
+   9 names. **Not new cells:** c40 requested 25 `rs-node` jobs, 10 reached the corpus, 6 of those
+   are truncated — **15 nodewise jobs never landed** and `hz9` is the tuned half that never
+   arrived. → 58.7
+
+9. **SUBMISSION ORDER IS RE-RANKED ON ALICE, AND BOTH OLDER BATCHES STILL GO.** `sp8` (9, alice2)
+   is unaffected and unranked against these — different account. On alice: **`hz9` (9) BEFORE
+   `rw9` (18)**. Reason, stated so it can be overruled: `rw9` decides D2, a question about the
+   weightwise arm; `hz9` decides whether the campaign's CURRENT HEADLINE is a claim about
+   granularity or a claim about a shared, over-large meta-stepsize. More load-bearing, half the
+   cost. **Nothing is cancelled and nothing is dropped.** The 12 truncated `rs-blk6`/`rs-node`
+   reruns remain LAST.
+
+10. **IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous fourteen.
+
+11. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE** and is re-flagged for the operator
+    (76.9, 71, 81.10, 83.11, 86.10). Not done unsupervised.
+
+12. **HOUSEKEEPING — A NUMBERING COLLISION IN THIS FILE.** There are **two `## 86` sections**
+    (cycle 57's decision record at ~2751 and cycle 56's window/accuracy-reversal entry at
+    ~2850). Both are cited elsewhere as "86". This record is 87; the collision is left in place
+    rather than silently renumbered, because renumbering would break existing cross-references.
+    Cite cycle-56's as **86 (cycle 56)** and cycle-57's as **86 (cycle 57)**.
+
+13. **ORPHANS.** No new sweep this tick; the standing item from 86.11 is unchanged and is NOT
+    re-discovered. Three families were retired last cycle (`rs`, `a0`, `gate0c`); this cycle
+    **cites `rs` again** (58.4–58.6), and additionally cites `ml5`, `ns5`, `p7`, `ff5`, `fz3`,
+    `p6f`, `uc5`, `uc6`, `fr5`, `wc5`, `p4`, `p5`, `p2`, `p3`, `bo6`, `fz` through 58.3's
+    41-cell inventory. **`analysis/c58_horizon_reversal.py --inventory` is now the cheap way to
+    show a family is cited**, alongside `c57_surface_truncation.py --audit`.
+
+**NEXT TICK, in order.**
+(a) **Reachability first**, one line:
+    `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`.
+(b) **If up: `squeue` BOTH accounts before anything else** — `bo7`/`bd7` survived or must be
+    resubmitted. Do not assume either.
+(c) Submit **`sp8` (alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. Each re-runs its
+    own guards; `hz9`'s guard 3 is the precondition for its own H1 and must not be skipped.
+(d) **Score `hz9` H0 → H0.3 → H0.5 → H1 → H1b → H2, IN THAT ORDER.** H0.5 can only VOID.
+(e) If `bo7`/`bd7` landed, cycle 54's scoring order stands with 55.2's measured per-seed sd.
+(f) **Still unspent:** the raw-instrument `s` re-derivation, carried since 51. **New and ranked
+    above it:** test Adam-mini's ACTUAL premise (item 2) — within-row similarity of `G = e·zᵀ`
+    at the `nodewise` partition — against our own probes.
+
+**Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.
