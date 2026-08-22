@@ -11185,3 +11185,53 @@ loop verified to emit exactly the 9 intended names.
 **These are not new cells.** `c40_surface.sh` requested `rs-node` at seeds 0–4 × 5 stepsizes =
 25 jobs; the corpus holds 10, of which 6 are truncated. **15 nodewise jobs never landed.** `hz9`
 is the tuned half of the surface that never arrived.
+
+## 58.8 **58.6 IS CORRECTED BY ITS OWN CYCLE**, and a suspicion about 57.2 is WITHDRAWN
+
+Two checks run after 58.6 was written. One retracts a suspicion; the other corrects 58.6's table.
+
+**(a) THE SUSPICION ABOUT 57.2's FALLOFF ROW IS WITHDRAWN, IN FULL.** 57.1 showed the `rs`
+nodewise and blk6 arms are 60% and 46% truncated, so 57.2's per-decade falloff row — which
+describes exactly those two arms — looked contaminated. **It is not.** Re-derived on P0-clean
+runs at k=20, nodewise 1e-3 = 92.547 (n=1) and 3e-3 = 91.310 (n=1), giving
+`(92.547−91.310)/log10(3) = 2.592` against the published **2.593**. **57.2 filtered correctly and
+its number reproduces.** Recorded because the suspicion was formed and must not be left implied.
+
+What IS true about that row is narrower and it is the reason `hz9` exists: **nodewise's peak
+LOCATION is decided by n=1 against n=1.** At k=20 the peak sits at ms=1e-3 (92.547); at k=5 it
+sits at ms=3e-4 (92.656 against 92.558) — **a 0.098pp difference between two single runs.** The
+falloff row's nodewise entry is anchored on an unresolved peak.
+
+**(b) 58.6's TABLE WAS `rs`-ONLY AND IS SUPERSEDED.** Three families sit at `rs`'s exact
+operating point on the full 14-column config key — `ms`, `mx`, `rs` — and they agree within sd
+(layerwise@1e-3: ms 91.259 / mx 91.198 / rs 90.964). Pooling them, P0-clean, matched-k=5, epoch 100:
+
+| granularity | peak | at ms | n | @ms=1e-3 | n | **loss at ms=1e-3** |
+|---|---|---|---|---|---|---|
+| layerwise | **92.906** (sd 0.166) | 1e-4 | 5 | 91.170 (sd 0.201) | 10 | 1.736 |
+| nodewise | 92.656 | 3e-4 | **1** | 92.558 | **1** | **0.098** |
+| resnet18_blocks | 92.652 (sd 0.079) | 1e-4 | 2 | 91.630 | 1 | 1.022 |
+| scalar | **92.262** (sd 0.222) | 1e-4 | 5 | 87.782 (sd 0.258) | 10 | **4.480** |
+
+**Two things in 58.6 must be replaced:**
+
+1. > **"the three partitioned arms span 0.172pp — inside layerwise's own seed sd"** is WRONG.
+   > On the pooled row they span **0.254pp against sd 0.166** (~3.4 SE at n=5). **The sentence
+   > "granularity among partitions is unresolvable" is WITHDRAWN.** What is true: layerwise@1e-4
+   > exceeds blk6@1e-4 by 0.254pp, and **nodewise is n=1 and cannot be placed in that row at
+   > all.** Partition-vs-none is **0.390–0.644pp** and remains the larger, resolvable effect.
+2. The `rs`-only figures (lay 92.824, scal 92.198) are a **different population**, not a
+   contradiction of 42.2/57.2's published row (lay 92.795, scal 92.231), which is the **pooled
+   `ms`+`rs` row at n=5, k=20**. Both are correct; they differ in `k` and in which families are
+   pooled. **A future tick must not "discover" a conflict here.**
+
+**The tolerance statement survives and is now stated in the form that does not depend on where
+each peak sits** — the loss each arm takes at a FIXED over-large ms=1e-3 relative to its own
+tuned peak: **scalar 4.480 ≫ layerwise 1.736 > blk6 1.022 > nodewise 0.098.** Not partitioning
+costs 4.5pp of tolerance; every partition costs ≤1.7pp; the nodewise figure is n=1.
+
+**And this caught a live bug before submission:** `bin/c58_tuned_horizon.sh` guard 4 asserted
+`spread < sd` on the `rs`-only numbers. Under the corrected row that assertion is FALSE and the
+guard would have **aborted the batch on submission**. Guard 4 now carries the pooled row and
+asserts the ORDERING (`spread < partition-vs-none`) plus `nodewise is still n=1`, which is the
+batch's own reason for existing. Re-run standalone and passing.

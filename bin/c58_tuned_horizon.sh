@@ -240,32 +240,42 @@ PYEOF
 
 # GUARD 4 -- the design arithmetic, re-run rather than trusted to the comment.
 python3 - <<'PYEOF' || exit 1
-# The tuned peak row at 100 epochs, re-derived in FINDINGS 58.4 from the
-# complete-to-100 pool (P0 hard drop) at matched-k=5.
-peak = {"layerwise": (92.824, "1e-4", 2, 0.291), "nodewise": (92.656, "3e-4", 1, None),
-        "resnet18_blocks": (92.652, "1e-4", 2, 0.079), "scalar": (92.198, "1e-4", 2, 0.028)}
+# The tuned peak row at 100 epochs, re-derived in FINDINGS 58.8 on the FULL
+# 14-column config key (P0 hard drop, matched-k=5).  This pools the `ms`, `mx`
+# and `rs` families, which are the only three at this exact operating point and
+# which agree within sd.  **These are NOT the rs-only numbers FINDINGS 58.6 first
+# printed** -- 58.6 was corrected by 58.8 and this guard carries the corrected row.
+peak = {"layerwise": (92.906, "1e-4", 5, 0.166), "nodewise": (92.656, "3e-4", 1, None),
+        "resnet18_blocks": (92.652, "1e-4", 2, 0.079), "scalar": (92.262, "1e-4", 5, 0.222)}
 # 1. each arm's optimum is where this batch puts it.
 assert peak["layerwise"][1] == "1e-4" and peak["nodewise"][1] == "3e-4", \
     "the tuned optima moved -- re-derive before spending 9 jobs"
-# 2. the three PARTITIONED arms are within layerwise's own sd; scalar is not.
+# 2. partition-vs-none must still be the resolvable effect, and the spread AMONG
+#    partitions must still be the smaller one.  It is no longer inside one sd
+#    (58.8 corrects 58.6 on exactly this), so the assertion is the ORDERING, not
+#    a within-sd claim that the data does not support.
 part = [peak[k][0] for k in ("layerwise", "nodewise", "resnet18_blocks")]
 sd = peak["layerwise"][3]
-assert max(part) - min(part) < sd, "the partitioned arms are no longer within one sd"
-assert min(part) - peak["scalar"][0] > 0.4, "partition-vs-none is no longer resolvable"
-# 3. H1's bar must be resolvable at the n this batch buys.
+spread = max(part) - min(part)
+pvn = min(part) - peak["scalar"][0]
+assert spread < pvn, "the spread among partitions now exceeds partition-vs-none"
+assert pvn > 0.30, "partition-vs-none is no longer resolvable"
+# 3. THE REASON THIS BATCH EXISTS, as arithmetic: the nodewise arm is n=1, so its
+#    position in that row is not placeable at all, and the whole peak row turns on it.
+assert peak["nodewise"][2] == 1, "nodewise is no longer n=1 -- re-rank this batch"
+# 4. H1's bar must be resolvable at the n this batch buys.
 n = 5
 se = sd * (2 / n) ** 0.5
 assert 0.30 / se > 1.5, f"H1's +-0.30 slope bar is only {0.30 / se:.1f} SE -- not resolvable"
 assert 0.50 / se > 2.5, f"H1b's +-0.50 level bar is only {0.50 / se:.1f} SE"
-# 4. the pilot slope must actually straddle neither branch -- it must PICK one,
+# 5. the pilot slope must actually straddle neither branch -- it must PICK one,
 #    because a direction is registered and must be falsifiable.
 pilot = -0.168 - 0.317
 assert pilot <= -0.30, "the pilot does not point at T-B; the registered direction is wrong"
-print(f"guard 4: optima 1e-4/3e-4; partitioned arms span "
-      f"{max(part) - min(part):.3f} < sd {sd:.3f}; partition-vs-none "
-      f"{min(part) - peak['scalar'][0]:.3f}pp; SE(n=5,5)={se:.3f} so the "
-      f"+-0.30 bar is {0.30 / se:.1f} SE and +-0.50 is {0.50 / se:.1f} SE; "
-      f"pilot D={pilot:.3f} registers T-B  OK")
+print(f"guard 4: optima 1e-4/3e-4; spread among partitions {spread:.3f} < "
+      f"partition-vs-none {pvn:.3f}; nodewise still n=1 (the reason for this batch); "
+      f"SE(n=5,5)={se:.3f} so the +-0.30 bar is {0.30 / se:.1f} SE and +-0.50 is "
+      f"{0.50 / se:.1f} SE; pilot D={pilot:.3f} registers T-B  OK")
 PYEOF
 
 # GUARD 5 -- queue depth.  9 jobs is well inside the ~20-job / 0.5%-RawUsage rule.

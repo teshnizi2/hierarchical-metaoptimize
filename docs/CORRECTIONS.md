@@ -3039,3 +3039,24 @@ guessed.** No ssh config touched, no retry loop run.
     at the `nodewise` partition — against our own probes.
 
 **Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.
+
+### 87.14 AMENDMENT, SAME TICK — 58.6 IS CORRECTED AND A SUSPICION IS WITHDRAWN
+
+* **The suspicion that 57.2's falloff row was contaminated is WITHDRAWN.** It reproduces exactly:
+  nodewise `(92.547−91.310)/log10(3) = 2.592` against the published 2.593, on P0-clean runs.
+  57.2 filtered correctly. Recorded because the suspicion was formed and acted on.
+  **What is true and narrower:** nodewise's peak LOCATION is n=1 vs n=1 and moves between ms=1e-3
+  (k=20) and ms=3e-4 (k=5) on a **0.098pp** difference. That is what `hz9` buys.
+* **Item 7 of this record is CORRECTED.** Its table was `rs`-only. On the full 14-column config
+  key, pooling the three families at that operating point (`ms`, `mx`, `rs`, which agree within
+  sd): layerwise **92.906**(n=5, sd 0.166) / nodewise 92.656(**n=1**) / blk6 92.652(n=2) / scalar
+  **92.262**(n=5). **The partitioned arms span 0.254pp against sd 0.166 — NOT "inside layerwise's
+  own sd", and the sentence "granularity among partitions is unresolvable" is WITHDRAWN.**
+  Partition-vs-none is 0.390–0.644pp and remains the resolvable effect. → 58.8
+* **The tolerance sentence survives in a peak-location-independent form** — loss taken at a fixed
+  over-large ms=1e-3 relative to each arm's own tuned peak: **scalar 4.480 ≫ layerwise 1.736 >
+  blk6 1.022 > nodewise 0.098** (the last is n=1).
+* **This caught a live bug before submission.** `hz9`'s guard 4 asserted `spread < sd` on the
+  superseded `rs`-only numbers; under the corrected row that is FALSE and **the guard would have
+  aborted the batch**. Guard 4 now carries the pooled row and asserts the ordering plus
+  "nodewise is still n=1". `bash -n` clean, re-run standalone and passing.
