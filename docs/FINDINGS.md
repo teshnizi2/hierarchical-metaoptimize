@@ -11445,3 +11445,46 @@ spatial **~0.000–0.010 pp**. Two readings, and only the second is claimed:
 
 This STRENGTHENS 59.3 rather than adding a caveat to it: 59.3 could in principle have been
 "rows are weak but the best available grouping"; 59.7 removes that reading.
+
+## 59.8 THE COMPLEMENTARY HALF, AT THE ARM THAT ACTUALLY ADAPTS PER ROW
+
+59.3/59.7 aggregate per-weight counts offline. The **nodewise arms** need no aggregation at
+all: their `neg_counts` is already one entry per row, and that row is the unit the optimizer
+adapts. 59.3 asked whether a row mean REPRESENTS its weights. This asks the complementary
+question — are rows DISTINGUISHABLE from each other beyond their tensor?
+
+    R_tensor = SS_tensor / (SS_tensor + SS_row-within-tensor)      [noise-corrected]
+
+    R_tensor -> 1 : rows inside a tensor are interchangeable; layerwise loses nothing.
+    R_tensor -> 0 : rows are distinct units; nodewise has information layerwise lacks.
+
+58 unique nodewise arms (same symlink dedupe as 88.11); identity error <= 1.0e-14; **50 clean**,
+8 in the same ms=1e-2 / AdamW configs that were the 59.4 exceptions.
+
+| family | n | R_tensor raw | R_tensor corrected | regroup null |
+|---|---|---|---|---|
+| r10  |  6 | 90.15–91.98% | 90.84–96.14% | 0.41% |
+| r18  | 32 | 73.42–89.82% | 91.73–94.58% | 0.33% |
+| r34  |  6 | 45.93–84.81% | 86.88–93.54% | 0.36% |
+| c100 |  6 | 91.04–93.33% | 92.05–97.06% | 0.45% |
+
+**ALL 50 clean arms: R_tensor_cor 86.88%–97.06%, median 93.50%**, against a null (rows permuted
+across tensors, tensor row-counts preserved) of **0.19%–0.50%**.
+
+> **QUOTE THIS, TOGETHER WITH 59.3.** *The nodewise partition fails from both sides at once. A
+> row mean does not represent its weights — 97–99% of per-weight sign-preference structure is
+> WITHIN the row (59.3). And rows are not distinguishable from one another either — ~93% of
+> row-level sign-preference structure is explained by the row's TENSOR (59.8). The row is
+> neither a representative unit nor a distinct one.*
+
+The 8 exception-config arms invert (R_tensor_cor **7.80%–51.42%**) — in the ms=1e-2 and
+AdamW-base regimes rows DO become distinguishable. Same configs, opposite direction, same
+verdict as 59.4: **that regime is separately behaved and separately unquotable, and its
+mechanism is OPEN.**
+
+**Why this matters more than either half alone.** 59.3 on its own left open that nodewise might
+still help by giving 232× more *adaptable* units even if each is a poor summary. 59.8 closes
+that: the units are nearly redundant with their tensors. Both halves independently predict
+58.8's measured ordering (nodewise 92.656 vs layerwise 92.906, partitioned arms spanning
+0.254pp against partition-vs-none's 0.390–0.644pp). It remains a CONSISTENCY, not a proof —
+these measure `z` sign preference and 58.8 measures plateau accuracy.

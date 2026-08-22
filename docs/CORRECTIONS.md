@@ -3184,3 +3184,22 @@ the best available grouping. They are not. → 59.7
 (>0.999) and `spatial` is blind to (<0.01). A packaging bug was caught and fixed in-tick: the
 direction functions were appended AFTER the `__main__` guard, so `--selftest` raised
 `NameError` rather than silently skipping them; the guard now sits at end of file.
+
+### 88.16 SAME TICK — THE COMPLEMENTARY HALF LANDS, AND THE MECHANISM STORY CLOSES
+
+Run at the **nodewise arms**, where the row is the unit the optimizer actually adapts and no
+offline aggregation is involved. **50 clean arms: R_tensor_cor 86.88%–97.06%, median 93.50%**,
+null 0.19%–0.50%; identity error <= 1.0e-14.
+
+**The nodewise partition fails from BOTH sides.** A row mean does not represent its weights
+(59.3: 97–99% of per-weight structure is within-row) **and** rows are not distinguishable from
+one another either (59.8: ~93% of row-level structure is explained by the tensor). 59.3 alone
+left open that nodewise might still help by supplying 232× more adaptable units even if each
+were a poor summary; **59.8 closes that reading.**
+
+The 8 arms in the ms=1e-2 / AdamW configs INVERT (7.80%–51.42%) — the same configs as the 59.4
+exceptions, opposite direction, same verdict: separately behaved, separately unquotable,
+mechanism OPEN. → 59.8
+
+Still a CONSISTENCY with 58.8 and not a proof of it: these measure `z` sign preference,
+58.8 measures plateau accuracy. Unchanged from item 10.

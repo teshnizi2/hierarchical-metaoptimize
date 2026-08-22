@@ -826,5 +826,79 @@ def direction_R(p, shapes, n_rec, mode, regroup_seed=None):
     return (float(cr / (cr + cw)) if (cr + cw) > 0 else float("nan"),
             float(keep.sum()) / p.size, ng)
 
+
+# --------------------------------------------------------------------------------------
+# NODEWISE-ARM MODE (cycle 59 follow-on).  On a NODEWISE arm `neg_counts` is already one
+# entry per row, and that row is the unit the optimizer ACTUALLY adapts -- no offline
+# aggregation is involved.  59.3 asked whether the row mean REPRESENTS its weights; this
+# asks the complementary question, whether rows are DISTINGUISHABLE from each other beyond
+# their tensor:
+#
+#     R_tensor = SS_tensor / (SS_tensor + SS_row-within-tensor)      [noise-corrected]
+#
+#     R_tensor -> 1 : rows inside a tensor are interchangeable; layerwise loses nothing.
+#     R_tensor -> 0 : rows are distinct units; nodewise HAS information layerwise lacks.
+#
+# The two questions are independent: a row can be a distinguishable unit without being a
+# representative one.
+# --------------------------------------------------------------------------------------
+
+def nodewise_rows(shapes):
+    """Tensor id per ROW, for a nodewise arm (tensor t contributes p_size[0] rows)."""
+    return np.concatenate([np.full(int(sh[0]), t, dtype=np.int64)
+                           for t, (_nm, sh) in enumerate(shapes)])
+
+
+def nodewise_decompose(p, shapes, n_rec, regroup_seed=None):
+    tid = nodewise_rows(shapes)
+    if tid.size != p.size:
+        raise ValueError(f"nodewise size {p.size} != reconstructed rows {tid.size}")
+    q = p
+    if regroup_seed is not None:
+        # permute rows ACROSS tensors, preserving each tensor's row count exactly
+        q = np.random.default_rng(regroup_seed).permutation(p)
+    nt = len(shapes)
+    grand = float(q.mean())
+    cnt = np.bincount(tid, minlength=nt).astype(np.float64)
+    tsum = np.bincount(tid, weights=q, minlength=nt)
+    nz = cnt > 0
+    tmean = np.zeros(nt); tmean[nz] = tsum[nz] / cnt[nz]
+    ss_total = float(np.sum((q - grand) ** 2))
+    ss_between = float(np.sum(cnt[nz] * (tmean[nz] - grand) ** 2))
+    ss_within = float(np.sum((q - tmean[tid]) ** 2))
+    s2 = q * (1.0 - q) / float(n_rec)
+    t_s2 = np.bincount(tid, weights=s2, minlength=nt)
+    n_within = float(np.sum((1.0 - 1.0 / cnt[nz]) * t_s2[nz]))
+    n_between = float(np.sum(t_s2[nz] / cnt[nz]))
+    cb = max(ss_between - n_between, 0.0)
+    cw = max(ss_within - n_within, 0.0)
+    return dict(n_rows=int(p.size), n_tensors=nt,
+                R_tensor_raw=ss_between / max(ss_between + ss_within, 1e-30),
+                R_tensor_cor=cb / max(cb + cw, 1e-30),
+                identity_err=abs(ss_total - (ss_between + ss_within))
+                             / max(ss_total, 1e-30),
+                sd_p=float(q.std()))
+
+
+def find_nodewise(root):
+    out, seen = [], set()
+    for f in sorted(glob.glob(os.path.join(root, "probes_*", "*", "neg_counts.json"))):
+        try:
+            m = json.load(open(f))
+        except Exception:
+            continue
+        if m.get("stepsize_type") != "nodewise":
+            continue
+        d = os.path.dirname(f)
+        rp = os.path.realpath(d)
+        if rp in seen:
+            continue
+        seen.add(rp)
+        out.append((d, int(m["n_tot"])))
+    return out
+
+
+NODE_COUNT_TO_FAMILY = {8660: "r10", 14420: "r18", 25556: "r34", 14600: "c100"}
+
 if __name__ == "__main__":
     main()
