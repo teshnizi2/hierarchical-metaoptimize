@@ -54,6 +54,57 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 57) -- **ALICE STILL DOWN. THE HIGHEST-RANKED BATCH WAS MIS-SPECIFIED.**
+
+**Read `docs/CORRECTIONS.md` 86 and `docs/FINDINGS.md` 57.0-57.3 before quoting the c40
+response surface, CORRECTIONS 85's weightwise comparison, or any granularity gain. 86.4
+WITHDRAWS a CORRECTIONS 85 sentence. 86.5 says the 12 `rs-w` jobs 85 ranked first must NOT be
+resubmitted as specified.**
+
+* **BOTH LOGIN NODES DOWN FOR A SECOND CONSECUTIVE TICK**, localised not assumed: gateway up,
+  `132.229.104.230/.231` refuse :22 from it (`LOGIN_DOWN`, 2026-08-22T13:26Z).
+  **No queue read, nothing synced, nothing submitted. CSV unchanged at 1707.**
+  `bo7-*` (12, alice) and `bd7-*` (12, alice2) were RUNNING at the end of cycle 54;
+  **whether they survived is UNKNOWN and is not guessed.**
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **A SECOND CONTAMINANT OF CORRECTIONS 85's CLASS, THIS TIME INSIDE THE SURFACE.** 17 of 1707
+  rows have `epochs_done < epochs_requested`. In `rs` the loss is **granularity-asymmetric**:
+  0/22 scalar, 0/22 layerwise, **6/13 blk6, 6/10 nodewise**, down to 24/100 epochs. The `blk6`
+  row INVERTS when they are dropped (envelope 91.171@1e-3 -> **92.581@1e-4**). Not a cost
+  effect -- throughput is equal across arms; the truncations sit in seeds 1-2.
+* **FINDINGS 42.2 IS VINDICATED.** It already filtered `epochs_done>=100` and re-derives
+  **exactly** (92.231/92.581/92.795/92.547; layerwise-scalar +0.563 t=4.85). This tick
+  re-derived a doc rather than overturning one.
+* **THE GRANULARITY GAIN IS A STEP FUNCTION IN ms.** layerwise-scalar = **-0.109 / +0.175 /
+  +0.103 / +0.563 / +3.142 / +3.339** at ms 1e-8 / 1e-5 / 3e-5 / **1e-4 (joint optimum)** /
+  3e-4 / 1e-3. Below the optimum it is <=0.18pp and not resolvable; above it ~3.2pp at t>13.
+  **Both arms peak at the SAME ms**; only the falloff differs (scalar **5.871 pp/decade** vs
+  blk6 1.060, lay 1.801, node 2.593). **Partitioning buys TOLERANCE TO AN OVER-LARGE
+  META-STEPSIZE. The granularity sentence is a ROBUSTNESS sentence, not an accuracy one.**
+* **CORRECTIONS 85's "+3.10pp above the surface's own scalar cell" IS WITHDRAWN.** That cell is
+  scalar's WORST on the grid. Against the tuned peak row the one weightwise run is **1.32-1.88pp
+  BELOW every arm** and ranks **4th of 5** at ms=1e-3. **D2 survives on better evidence:**
+  weightwise and layerwise differ by **0.18pp** at ms=1e-3. Still n=1; **nothing may cite 90.913.**
+* **SUBMITTED: NOTHING.** `bin/c57_rsw_peak.sh` is **written, dry-run-validated, UNSUBMITTED**
+  -- 18 jobs, alice, tag `rw9-*`. **`rs-w`'s original grid starts at 3e-4, ABOVE the 1e-4
+  optimum every other arm peaks at, so it could never measure the peak height D2 turns on.**
+  New grid **3e-5/1e-4/3e-4/1e-3/3e-3/1e-2** x 3 seeds makes the peak INTERIOR. **W-A >=92.0 =>
+  the structural-failure claim is FALSE; W-B <=90.0 or falloff >5.871 => TRUE but scoped to
+  weightwise alone. NO DIRECTION REGISTERED.** 7 guards, `bash -n` clean; guard 7 is new and
+  refuses the batch unless 100 epochs fit the wall at the slowest measured weightwise rate.
+* **`bin/c55_span_dissociation.sh` (sp8, 9 jobs, alice2) IS STILL UNSUBMITTED** and unaffected.
+* **NEW INSTRUMENT `analysis/c57_surface_truncation.py`, 43/43 selftests**, modes `--audit`
+  `--surface` `--envelope` `--weightwise`. `--audit` makes the orphan sweep a one-liner.
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
+(alice2, 9) then `rw9` (alice, 18)** -- different accounts, they do not compete. (c) If bo7/bd7
+landed, cycle 54's scoring order stands with 55.2's measured sd beside every verdict. (d) Score
+`rw9` **P0 (epochs_done==100, hard drop) BEFORE P1** -- a short run read as a long one is the
+failure this cycle documented twice. (e) The 12 truncated `rs-blk6`/`rs-node` reruns are ranked
+LAST. (f) Still unspent: the raw-instrument `s` re-derivation, carried since 51.
+
 ## Running / next (cycle 55) -- **ALICE WAS DOWN ALL TICK. THE NODEWISE MINIMUM IS A TRANSIENT.**
 
 **Read `docs/CORRECTIONS.md` 82-84 and `docs/FINDINGS.md` 55.0-55.8 before quoting the nodewise

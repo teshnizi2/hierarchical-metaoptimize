@@ -10863,3 +10863,152 @@ one. `guard 3b` diffs the claim against `br6`'s own script rather than asserting
 standalone and passing.** Guards 3/3b/5/6 need a live cluster (`sinfo`, `squeue`, the remote
 `HF.py`) and are **unverified** — they run at submit time. 9 jobs, alice2, inside the ~20-job
 rule. **Not submitted: both login nodes are down.**
+
+## 57.0 CYCLE 57 — ALICE STILL DOWN. A ZERO-JOB TICK ON THE RESPONSE SURFACE.
+
+Both login nodes unreachable for the second consecutive cycle (`132.229.104.230/.231` refuse
+:22 from the gateway, which is itself up; `LOGIN_DOWN` at 2026-08-22T13:26Z). No queue read,
+nothing synced, nothing submitted. **CSV unchanged at 1707 rows.** `bo7`/`bd7` survival still
+UNKNOWN and still not guessed.
+
+New instrument `analysis/c57_surface_truncation.py`, **43/43 selftests**, modes `--audit`
+`--surface` `--envelope` `--weightwise`.
+
+## 57.1 A **TRUNCATION** CONTAMINANT IN THE c40 SURFACE, AND IT IS GRANULARITY-ASYMMETRIC
+
+Same error class as CORRECTIONS 85 (a short-budget plateau read as a long-budget one), but
+**inside** the surface rather than in a citation of it. A run with `epochs_done` <
+`epochs_requested` was killed early, so its `plateau` is a plateau at `epochs_done`.
+
+Corpus-wide: **17 of 1707 rows (1.0%)**, confined to three families.
+
+| family | truncated | total | pct | severity (done/req) min, med |
+|---|---|---|---|---|
+| `rs` | 12 | 67 | 18% | 0.24, 0.59 |
+| `a0` | 3 | 30 | 10% | 0.50, 0.50 |
+| `gate0c` | 2 | 8 | 25% | 0.81, 0.85 |
+
+**`a0` and `gate0c` are contaminated SYMMETRICALLY** (1 of 10 in each of scalar/blk6/layerwise;
+1 of 4 in each of scalar/blk6) — they lose power, not validity. **`rs` is not:**
+
+| arm | truncated | total | pct |
+|---|---|---|---|
+| scalar | 0 | 22 | **0%** |
+| layerwise | 0 | 22 | **0%** |
+| `resnet18_blocks` | 6 | 13 | **46%** |
+| nodewise | 6 | 10 | **60%** |
+
+**IT IS NOT A COST EFFECT OF GRANULARITY.** Median throughput is 2.38–3.23 epochs/min across
+all four arms (layerwise is the *fastest*, scalar and blk6 the slowest and identical). The
+truncations concentrate in seeds 1–2 (8 of 12 are seed 1) — a submission-wave/scheduling
+artifact orthogonal to the science. The exclusion criterion is defined on execution
+(budget not completed), never on outcome.
+
+**WHAT IT DOES TO THE `blk6` ROW**, whose shape inverts:
+
+| `resnet18_blocks` | 3e-5 | 1e-4 | 3e-4 | 1e-3 | 3e-3 | envelope |
+|---|---|---|---|---|---|---|
+| as published (13 runs) | 88.36 | 87.96 | 86.62 | 91.17 | 90.73 | 91.171 @1e-3 |
+| full-100 only (7 runs) | 91.44 | 92.58 | 91.94 | 91.61 | 91.38 | **92.581 @1e-4** |
+
+Every low value is a truncated run and the depression is monotone in severity (24ep→76.81,
+29ep→78.73, 36ep→82.18, 44ep→90.09, 60ep→90.73). **The published `blk6` arm's apparent
+optimum at large ms, and its apparent 4.55pp sensitivity to ms, are truncation artifacts.**
+
+**FINDINGS 42.2 IS NOT AFFECTED AND WAS RIGHT.** It filtered `epochs_done>=100 and
+epochs_requested==100` and its table re-derives **exactly** — scalar 92.231, blk6 92.581,
+layerwise 92.795, nodewise 92.547; layerwise−scalar +0.563 t=4.85; blk6−scalar +0.349 t=3.71;
+layerwise−blk6 +0.214 t=2.41. **The instrument agrees with the doc; this is a re-derivation,
+not a correction of 42.2.** One cell differs: 42.2's scalar ms=1e-3 reads 87.764 (16); the
+config-matched re-derivation gives **87.758 (n=14)**, which is the number of record.
+
+## 57.2 THE GRANULARITY GAIN IS A **STEP FUNCTION IN ms**, AND IT LIVES ENTIRELY ABOVE THE OPTIMUM
+
+42.2 concluded "83% of the apparent granularity gain is meta-step tuning". This resolves the
+remaining 17% by *where in ms it sits*. Config-matched pool (R18/CIFAR-10, SGDm+Lion,
+alpha0=1e-3, AUGMENT=1, plain, `BETA_CLIP=-15:-2.3026`, 100 epochs COMPLETE, plateau>50) —
+no run-name prefix filter, so this is the maximum-power version of 42.2's comparison:
+
+| ms | scalar | layerwise | layerwise−scalar | SE | Welch t |
+|---|---|---|---|---|---|
+| 1e-8 (frozen anchor) | 90.190 (n3) | 90.081 (n3) | **−0.109** | 0.093 | −1.17 |
+| 1e-5 | 90.699 (n5) | 90.874 (n5) | **+0.175** | 0.081 | 2.16 |
+| 3e-5 | 91.555 (n5) | 91.658 (n5) | **+0.103** | 0.071 | 1.45 |
+| **1e-4 (joint optimum)** | 92.231 (n5) | 92.795 (n5) | **+0.563** | 0.116 | 4.85 |
+| 3e-4 | 88.743 (n5) | 91.885 (n5) | **+3.142** | 0.235 | 13.37 |
+| 1e-3 | 87.758 (n14) | 91.097 (n14) | **+3.339** | 0.077 | 43.15 |
+
+**BELOW the joint optimum the gain is ≤0.18pp and not consistently resolvable** (t = −1.17,
+2.16, 1.45 — two of three under 2.2, and the frozen anchor is correctly negative, which is
+40.1's Rule-4 structural check passing). **ABOVE it the gain is ~3.2pp at t>13.** The
+transition is an 11-fold jump across a single half-decade of ms.
+
+**THE MECHANISM IS PEAK SHARPNESS, NOT PEAK HEIGHT.** Both arms peak at the *same* ms=1e-4.
+What differs is the falloff above it:
+
+| arm | peak | @ms | pp lost per decade above peak |
+|---|---|---|---|
+| scalar | 92.231 | 1e-4 | **5.871** |
+| `resnet18_blocks` | 92.581 | 1e-4 | 1.060 |
+| layerwise | 92.795 | 1e-4 | 1.801 |
+| nodewise | 92.547 | 1e-3 | 2.593 (n=1 cells) |
+
+Matched cell by cell, scalar's drop below its own peak is **3.8x** layerwise's at ms=3e-4 and
+**2.6x** at ms=1e-3. **Partitioning buys TOLERANCE TO AN OVER-LARGE META-STEPSIZE. The
+peak-height difference (+0.563pp) is a separate and much smaller effect** — and it is the
+same ~0.5pp the campaign has already declared setup-dependent and dead.
+
+**SO THE CORRECT SENTENCE ABOUT GRANULARITY IS A ROBUSTNESS SENTENCE, NOT AN ACCURACY ONE.**
+Any partition (m=6 already suffices) flattens the meta-stepsize response; going finer than
+m=6 buys +0.214pp (t=2.41) and going to m=14,420 buys nothing. **LABELLED POST-HOC** — these
+are new cuts of data already on disk, and 42.2's verdict is unchanged, only localised.
+
+## 57.3 CORRECTIONS 85's WEIGHTWISE COMPARISON USED A **MIS-TUNED BASELINE** — AND THE FORK SURVIVES ON BETTER EVIDENCE
+
+CORRECTIONS 85 placed the one matched 100-epoch weightwise run at **+3.10pp above the
+surface's own scalar cell at the same meta-step**. That cell is `scalar @ ms=1e-3` — and per
+57.2 it is **scalar's WORST cell on the entire grid**, 4.47pp below scalar's own tuned peak,
+sitting in exactly the over-large-ms regime where scalar collapses and every partitioned arm
+does not. Comparing an arm against a baseline at the baseline's worst operating point is the
+mirror image of METRIC RULES' "never report the max cell of a sweep as the effect".
+
+**THE HONEST PLACEMENT.** At ms=1e-3, the config-matched 100-epoch pool ranks all five arms:
+
+| arm @ ms=1e-3 | plateau | n |
+|---|---|---|
+| nodewise | 92.547 | 1 |
+| `resnet18_blocks` | 91.560 | 5 |
+| layerwise | 91.097 | 14 |
+| **weightwise** | **90.913** | **1** |
+| scalar | 87.758 | 14 |
+
+**Weightwise ranks 4th of 5 — above scalar only.** And against the *tuned peak row*
+(92.231 / 92.581 / 92.795 / 92.547) it is **1.32–1.88pp BELOW every other arm**, not
++3.10pp above anything.
+
+**BUT THE D2 FORK IS STILL LIVE, AND NOW FOR A BETTER REASON.** At the one ms where weightwise
+has a matched 100-epoch run it is **indistinguishable from layerwise** — 90.913 vs 91.097, a
+gap of **0.18pp** (n=1 vs n=14, and 42.2's own layerwise seed sd at this cell is ~0.16). That
+is the behaviour of a *partitioned* arm, not of a collapsing one, and it is a far stronger
+argument for the fork than a comparison against scalar's worst cell. The n=1 caveat from
+CORRECTIONS 85 stands in full: **nothing in the paper may cite 90.913.**
+
+**PRE-REGISTRATION FOR `rs-w`, WRITTEN BEFORE IT IS SUBMITTED.** `rs-w`'s grid is
+3e-4/1e-3/3e-3/1e-2 (`bin/c40_surface.sh:85`) at `--alpha0 1e-3` — the surface's own operating
+point, so it is NOT alpha0-confounded. Basis: the single 90.913 point plus 57.2's finding that
+every partitioned arm peaks at 1e-4 and is flat above it.
+
+* **W-A. If weightwise behaves like a partitioned arm** — plateau ≥ 91.0 across 3e-4…3e-3 and
+  falloff under ~2.6 pp/decade — then **"per-weight granularity fails structurally" is FALSE**,
+  and the contribution is a tuning-budget analysis (PLAN.md D2's first branch).
+* **W-B. If weightwise falls below ~90.0 and drops faster than scalar's 5.87 pp/decade**, the
+  structural-failure claim is TRUE **but scoped to weightwise alone**, since 57.2 shows m=6
+  already buys the whole robustness effect.
+* **W-C (VOID).** `rs-w`'s grid does not contain **1e-4, where every other arm peaks.** As
+  specified, `rs-w` cannot measure weightwise's peak height and therefore **cannot settle D2's
+  peak-height question at all** — it can only measure the falloff. **`rs-w` must be extended
+  with ms=1e-4 (and 3e-5 to bracket it) before it is submitted**, or its result will be
+  uninterpretable against the tuned peak row it needs to be compared with.
+
+W-C is the actionable finding of this tick: **the highest-ranked resubmission was, as written,
+mis-specified for the question it was ranked to answer.**

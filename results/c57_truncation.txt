@@ -1,0 +1,19 @@
+CORPUS-WIDE TRUNCATION AUDIT  (epochs_done < epochs_requested)
+rows=1707  truncated=17 (1.0%)
+
+family        trunc  total    pct  severity done/req
+rs               12     67    18%  min=0.24 med=0.59
+a0                3     30    10%  min=0.50 med=0.50
+gate0c            2      8    25%  min=0.81 med=0.85
+
+GRANULARITY ASYMMETRY within each affected family
+family       granularity         trunc  total    pct
+rs           scalar                  0     22     0%
+rs           resnet18_blocks         6     13    46%
+rs           layerwise               0     22     0%
+rs           nodewise                6     10    60%
+a0           scalar                  1     10    10%
+a0           resnet18_blocks         1     10    10%
+a0           layerwise               1     10    10%
+gate0c       scalar                  1      4    25%
+gate0c       resnet18_blocks         1      4    25%

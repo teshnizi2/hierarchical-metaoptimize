@@ -2747,3 +2747,102 @@ the arm is still climbing.
 compute. (b) The 12 `rs-w-*` jobs are the highest-value resubmission on reconnect; they are
 ranked in the reconnect list rather than submitted, because the cluster is down.
 **Until they land, "per-weight granularity fails structurally" may not be written.**
+
+## 86. DECISION RECORD — cycle 57 (ALICE DOWN, SECOND CONSECUTIVE TICK, ZERO JOBS)
+
+**OUTAGE, localised not assumed.** `2026-08-22T13:26Z`: the gateway is up and answers; from
+it, `nc` to `login.alice.universiteitleiden.nl:22` and to both `132.229.104.230` / `.231`
+returns DOWN. `ssh alice` and `ssh alice2` fail at banner exchange. **No queue read, nothing
+synced, nothing submitted. CSV unchanged at 1707 rows.** `bo7-*` (12, alice) and `bd7-*` (12,
+alice2) were RUNNING at the end of cycle 54; **whether they survived is still UNKNOWN and is
+still not guessed.** No ssh config was touched and no retry loop was run.
+
+1. **A SECOND CONTAMINANT OF THE SAME CLASS AS 85, AND THIS ONE IS INSIDE THE SURFACE.**
+   17 of 1707 corpus rows have `epochs_done < epochs_requested`. In `a0` (3/30) and `gate0c`
+   (2/8) the loss is granularity-SYMMETRIC — power, not validity. **In `rs` it is not:
+   0/22 scalar, 0/22 layerwise, 6/13 `blk6` (46%), 6/10 nodewise (60%)**, severity down to
+   24/100 epochs. The `blk6` row's published shape INVERTS when they are dropped (envelope
+   91.171@1e-3 → **92.581@1e-4**); every low value in it is a truncated run and the depression
+   is monotone in severity. **It is not a cost effect** — throughput is 2.38–3.23 ep/min across
+   all four arms and the truncations concentrate in seeds 1–2, a scheduling artifact. → 57.1
+
+2. **FINDINGS 42.2 IS VINDICATED, NOT CORRECTED.** It already filtered `epochs_done>=100` and
+   its table re-derives **exactly** (92.231 / 92.581 / 92.795 / 92.547; layerwise−scalar +0.563
+   t=4.85; blk6−scalar +0.349 t=3.71; layerwise−blk6 +0.214 t=2.41). **This tick did not
+   overturn a doc; it re-derived one and found the contaminant 42.2's filter was already
+   blocking.** One cell moves: 42.2's scalar ms=1e-3 reads 87.764 (16); config-matched
+   re-derivation gives **87.758 (n=14)**, the number of record (STANDING RULE 1). → 57.1
+
+3. **42.2's "83% OF THE GAIN IS TUNING" IS LOCALISED: THE GAIN IS A STEP FUNCTION IN ms.**
+   layerwise−scalar across the shared grid: **−0.109 (t −1.17) / +0.175 (2.16) / +0.103 (1.45)
+   / +0.563 (4.85) / +3.142 (13.37) / +3.339 (43.15)** at ms = 1e-8 / 1e-5 / 3e-5 / **1e-4
+   (the joint optimum)** / 3e-4 / 1e-3. Below the optimum the gain is ≤0.18pp and not
+   consistently resolvable; above it, ~3.2pp at t>13. **Both arms peak at the SAME ms.** What
+   differs is falloff: scalar loses **5.871 pp/decade** above its peak against blk6 1.060,
+   layerwise 1.801, nodewise 2.593. → **Partitioning buys TOLERANCE TO AN OVER-LARGE
+   META-STEPSIZE; peak height is a separate effect ~10x smaller, and it is the same ~0.5pp the
+   campaign already declared dead.** The correct granularity sentence is a ROBUSTNESS sentence,
+   not an accuracy one. **LABELLED POST-HOC** — new cuts of data already on disk. → 57.2
+
+4. **CORRECTIONS 85's WEIGHTWISE COMPARISON IS WITHDRAWN; ITS CONCLUSION IS NOT.** 85 placed
+   the one matched 100-epoch weightwise run at "+3.10pp above the surface's own scalar cell".
+   That cell is `scalar @ ms=1e-3` — **scalar's WORST cell on the entire grid**, 4.47pp below
+   scalar's own peak, in exactly the regime where scalar collapses and no partitioned arm does.
+   Against the *tuned peak row* the run is **1.32–1.88pp BELOW every arm**, and at ms=1e-3 it
+   ranks **4th of 5** (node 92.547 > blk6 91.560 > lay 91.097 > **w 90.913** > scal 87.758).
+   > **The sentence "+3.10pp above the surface's own scalar cell" may not be used again.**
+   **BUT D2 SURVIVES ON BETTER EVIDENCE:** at ms=1e-3, weightwise and layerwise differ by
+   **0.18pp**, inside layerwise's own seed sd — the behaviour of a partitioned arm, not a
+   collapsing one. 85's n=1 caveat stands in full; **nothing may cite 90.913.** → 57.3
+
+5. **AND THE HIGHEST-RANKED RESUBMISSION WAS MIS-SPECIFIED FOR ITS OWN QUESTION.** `rs-w`'s
+   grid (`c40_surface.sh:85`) is 3e-4/1e-3/3e-3/1e-2 — **it starts ABOVE the 1e-4 optimum where
+   every other arm peaks.** As written it measures weightwise's falloff and **cannot measure
+   its peak height, which is the whole of D2.** 85 ranked it correctly and specified it wrongly.
+   **This is the tick's actionable finding, and it was worth more than the 12 jobs it saves.**
+
+6. **WRITTEN, DRY-RUN-VALIDATED, NOT SUBMITTED: `bin/c57_rsw_peak.sh`** — 18 jobs, alice, tag
+   `rw9-*`, grid **3e-5 / 1e-4 / 3e-4 / 1e-3 / 3e-3 / 1e-2** × 3 seeds, so the peak can come out
+   INTERIOR (CORRECTIONS 25). Branches **W-A ≥92.0 ⇒ "per-weight granularity fails structurally"
+   is FALSE**; **W-B ≤90.0 or falloff >5.871 pp/decade ⇒ TRUE but scoped to weightwise alone**;
+   else UNDECIDED. **NO DIRECTION REGISTERED** — the single 90.913 point is 0.18pp from
+   layerwise (W-A) and 1.88pp below its peak (W-B), and one run at one ms cannot choose
+   (CORRECTIONS 68). 7 guards; `bash -n` clean; guards 3b, 4 and 7 re-run standalone and passing.
+   **Guard 7 is new and encodes 57.1**: it refuses the batch unless 100 epochs fit the wall at
+   the SLOWEST measured weightwise rate (46 min median / 95 slowest vs a 230 min wall, 2.4x).
+   **P0 is a hard drop gate** — any job with `epochs_done < 100` is dropped, never averaged in.
+
+7. **`bin/c55_span_dissociation.sh` (sp8, 9 jobs, alice2) IS STILL WRITTEN AND UNSUBMITTED**
+   and is unaffected by anything here. On reconnect the order is: `squeue` both accounts →
+   `bo7`/`bd7` survival → **`sp8` before `rw9`** (sp8 is on alice2 and 9 jobs; rw9 is on alice
+   and 18; they do not compete), then the 12 truncated `rs-blk6`/`rs-node` reruns LAST.
+
+8. **"PER-WEIGHT GRANULARITY FAILS STRUCTURALLY" REMAINS UNWRITABLE**, now for two reasons
+   rather than 85's one: the arm is still unmeasured at 100 epochs beyond n=1, **and** the
+   comparison 85 used to argue about it was against a mis-tuned baseline.
+
+9. **IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous thirteen.
+
+10. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE** and is re-flagged for the operator
+    (76.9, 71, 81.10, 83.11). Not done unsupervised.
+
+11. **ORPHAN DEBT — PARTIALLY PAID, AND THE METHOD IS NOW CHEAP.** `analysis/c57_surface_truncation.py
+    --audit` classifies every row by family in one call, so the recurring "≈290 uncited runs"
+    sweep no longer needs re-deriving by hand each tick. This cycle retires three families from
+    that list by citing them: **`rs` (67)** → 57.1/57.2, **`a0` (30)** → 57.1 (symmetric
+    truncation, power-only), **`gate0c` (8)** → 57.1. The remainder stays open and is NOT
+    re-discovered next tick: it is a standing item, not a finding.
+
+**NEXT TICK, in order.**
+(a) **Reachability first**, one line: `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22'`.
+    If still down, the unspent offline work is the raw-instrument `s` re-derivation (carried
+    since 51) and the rest of the orphan sweep via `--audit`.
+(b) **If up: `squeue` BOTH accounts before anything else** — `bo7`/`bd7` survived or must be
+    resubmitted. Do not assume either.
+(c) Submit **`sp8` (alice2, 9)** then **`rw9` (alice, 18)**; both re-run their own guards.
+(d) If `bo7`/`bd7` landed, cycle 54's scoring order stands, with 55.2's measured per-seed sd
+    beside every verdict rather than ±0.10.
+(e) **Score `rw9` P0 BEFORE P1.** The failure this cycle documented is a short run read as a
+    long one, twice, in two different documents.
+
+**Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.
