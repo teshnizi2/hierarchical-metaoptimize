@@ -90,6 +90,15 @@ hazard that silently double-counts 9 arms.**
   ahead in 8 of 10 cells but two column excesses are NEGATIVE and the largest single excess is
   a COLUMN -- **that ordering is explicitly NOT claimed.** What is claimed: no direction carries
   structure a group mean could exploit.
+* **AND THE COMPLEMENTARY HALF LANDED IN THE SAME TICK (59.8) -- THE PARTITION FAILS FROM BOTH
+  SIDES.** Run at the **nodewise arms themselves**, where the row IS the adapted unit and no
+  offline aggregation is involved: **50 clean arms, R_tensor_cor 86.88%-97.06%, median 93.50%**,
+  null 0.19%-0.50%, identity error <=1.0e-14. **~93% of ROW-level sign-preference structure is
+  explained by the row's TENSOR** -- rows inside a tensor are nearly interchangeable. So the row
+  is **neither a representative unit (59.3) nor a distinct one (59.8)**. This closes the one
+  reading 59.3 left open, that nodewise might still help by supplying 232x more adaptable units
+  even if each were a poor summary. The 8 ms=1e-2 / AdamW arms INVERT (7.80%-51.42%) -- same
+  configs as the 59.4 exceptions, opposite direction, same verdict.
 * **THE MAP IS MEASURED, NOT ASSUMED.** A0 reconstructs (tensors, nodes, weights) exactly
   against three on-disk numbers in 4 of 4 families; A2 separates 1-D from conv coordinates at
   **z=38.8-135.3** against a random-subset null, 4 of 4, same sign.
@@ -114,11 +123,12 @@ hazard that silently double-counts 9 arms.**
 **NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
 (alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. (c) Score `hz9` **H0 -> H0.3 ->
 H0.5 -> H1 -> H1b -> H2, in that order**; H0.5 can only VOID. (d) If bo7/bd7 landed, cycle 54's
-scoring order stands with 55.2's measured per-seed sd. (e) **NEW and cheap, the natural
-follow-on to 59.3:** run the same decomposition on the **nodewise** arms' own `neg_counts`
-(67 exist, `n_tot` 8660-25556) -- that measures the row-level statistic the optimizer ACTUALLY
-adapts on, needs no mapping work, and says whether near-zero R_row survives when the row is the
-adapted unit. (f) The 12 truncated `rs-blk6`/`rs-node` reruns remain LAST. (g) Still unspent:
+scoring order stands with 55.2's measured per-seed sd. (e) **DONE THIS TICK, do not re-run:** the nodewise-arm
+decomposition (59.8). **The next ranked offline item is instead the MECHANISM OF THE
+EXCEPTIONS** -- 10 weightwise / 8 nodewise arms in the ms=1e-2 and AdamW-base configs behave
+oppositely to all others on BOTH statistics, clipping is refuted as the cause (`cl5-cD`, 76%
+pinned, at the null), and the 3/3 "modal ceiling exactly 0.000" pattern is n=3 and post-hoc.
+`c59_row_premise.py` already has every primitive needed. (f) The 12 truncated `rs-blk6`/`rs-node` reruns remain LAST. (g) Still unspent:
 the raw-instrument `s` re-derivation, carried since 51.
 
 ## Running / next (cycle 58) -- **ALICE DOWN A THIRD TICK. THE GATE IS DISCHARGED AND THE HEADLINE IS SCOPED.**
