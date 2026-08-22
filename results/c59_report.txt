@@ -1,0 +1,31 @@
+UNIQUE WEIGHTWISE ARMS: 58   clean 48   exceptions 10
+
+=== THE MAIN RESULT: row share of within-tensor structure, clean arms ===
+family    n  R_row_raw%  R_row_cor%   null%  tensor%  within%
+r10       6 0.208-0.402 0.232-0.563   0.147     1.56    98.10
+r18      30 0.127-0.271 0.127-0.543   0.092     1.92    97.87
+r34       6 0.094-0.116 0.083-0.098   0.076     0.80    99.11
+c100      6 0.266-0.429 0.284-0.612   0.159     2.55    96.96
+
+  ALL 48 clean arms: R_row_cor 0.083%-0.612% (median 0.190%)
+                    R_row_raw 0.094%-0.429%  -- raw and corrected AGREE, so the reading is bound on both sides
+                    regroup null 0.069%-0.175% (median 0.091%)
+
+=== THE EXCEPTIONS, and the control that refuses to explain them ===
+arm                          R_row_cor%  pin_lo%  pin_hi%   mode_hi
+bo6/probe_w_adw_s0                49.37     0.15    23.40     0.000
+ml5/probe_w_m2_s2                 44.06    91.90    95.40    -2.303
+ml5/probe_w_m2_s1                 43.80    91.90    95.40    -2.303
+wc5/probe_w_m2_s2                 43.24    76.60    95.40    -2.303
+wc5/probe_w_m2_s0                 42.65    76.80    95.40    -2.303
+ml5/probe_w_m2_s0                 42.33    91.90    95.40    -2.303
+wc5/probe_w_m2_s1                 41.55    76.65    95.40    -2.303
+bo6/probe_w_adw_s1                36.83     0.10    17.50     0.000
+bl5/probe_w_e40_s0                22.23     0.10    24.05     0.000
+br6/probe_w_c2_s1                  7.17     0.12     0.27    -1.982
+
+  COUNTEREXAMPLES that kill 'clipping manufactures row structure':
+  cl5/probe_w_cD_s0            R_row_cor  0.164%  pin_hi  76.35%  mode_hi -4.605
+  cl5/probe_w_cD_s1            R_row_cor  0.196%  pin_hi  75.75%  mode_hi -4.605
+  cl5/probe_w_cD_s2            R_row_cor  0.192%  pin_hi  75.70%  mode_hi -4.605
+  ff5/probe_r10_w_s0           R_row_cor  0.563%  pin_hi  52.70%  mode_hi -2.303

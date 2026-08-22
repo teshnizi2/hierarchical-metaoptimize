@@ -54,6 +54,73 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 59) -- **ALICE DOWN A FOURTH TICK. ADAM-MINI'S REAL PREMISE IS TESTED, AND IT FAILS.**
+
+**Read `docs/CORRECTIONS.md` 88 and `docs/FINDINGS.md` 59.0-59.7 before writing anything about
+`nodewise`, about what Adam-mini assumes, or about why partitioning helps. 88.11 names a sweep
+hazard that silently double-counts 9 arms.**
+
+* **BOTH LOGIN NODES DOWN FOR A FOURTH CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering (`p-cfer-016105`), `132.229.104.230/.231` refuse :22 from it, `ssh alice`/`alice2`
+  fail at banner exchange (`LOGIN_DOWN`, 2026-08-22T19:26Z). **No queue read, nothing synced,
+  nothing submitted. CSV unchanged at 1707.** `bo7-*` (12, alice) and `bd7-*` (12, alice2) were
+  RUNNING at the end of cycle 54; **whether they survived is UNKNOWN and is not guessed.**
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **THE TICK'S RESULT, ALL OF IT ZERO-COMPUTE, FROM PROBES ALREADY ON THIS MAC.** It discharges
+  the item 87.2 ranked FIRST among offline work. New instrument
+  `analysis/c59_row_premise.py`, **46/46 selftests**, modes `--selftest --verify --decompose
+  --sweep --report`.
+* **OUR `nodewise` PARTITION *IS* A ROW OF `G`** -- verified in the optimizer source
+  (`HF_patched.py:147` groups by `p_size[0]`, sums all trailing dims), not inferred from a name.
+  So Adam-mini's ACTUAL premise -- *"they all share the same BP error term e_i ... G usually has
+  similar entries within a row"* -- is directly testable here.
+* **SCOPE, AND IT IS NOT OPTIONAL:** Adam-mini's premise is about `G`, the BASE gradient; we
+  measure `z`, the META-gradient. The structural argument transfers, the quantities differ.
+  **No document may write "we refuted Adam-mini."**
+* **THE RESULT: THE ROW MEAN DOES NOT REPRESENT THE ROW.** In **48 of 58 unique weightwise
+  arms** the row explains **0.083%-0.612%** (median **0.190%**) of the WITHIN-TENSOR structure
+  in per-weight meta-gradient sign preference, against a size-preserving regroup null of
+  **0.069%-0.175%**. **97-99% of that structure is WITHIN the row.** Raw and noise-corrected
+  agree, so it is bounded on both sides. 4 of 4 families, 2 datasets, frozen and free beta,
+  across the clip ladder. **The tensor explains little either (0.80%-2.55%).**
+* **AND THE ROW DIRECTION IS NOT SPECIAL (59.7).** Excess over each direction's own null:
+  **row 0.008-0.448 pp, column -0.133-0.788 pp, spatial ~0.000-0.010 pp.** Row is nominally
+  ahead in 8 of 10 cells but two column excesses are NEGATIVE and the largest single excess is
+  a COLUMN -- **that ordering is explicitly NOT claimed.** What is claimed: no direction carries
+  structure a group mean could exploit.
+* **THE MAP IS MEASURED, NOT ASSUMED.** A0 reconstructs (tensors, nodes, weights) exactly
+  against three on-disk numbers in 4 of 4 families; A2 separates 1-D from conv coordinates at
+  **z=38.8-135.3** against a random-subset null, 4 of 4, same sign.
+* **THIS PREDICTS AN ORDERING WE ALREADY MEASURED, AND THAT IS ALL.** If a partition's value
+  came from its group mean representing its members, nodewise (14,420 groups) should dominate
+  layerwise (62). **58.8 says it does not** (partitioned arms span 0.254pp vs partition-vs-none
+  0.390-0.644pp). Consistent with 57.2/87.14's TOLERANCE reading. **A surviving mechanism
+  candidate, never proof.**
+* **THE 10 EXCEPTIONS ARE OPEN, AND THE OBVIOUS EXPLANATION IS REFUTED BY OUR OWN CONTROL.**
+  6 are the ms=1e-2 rung (already unquotable per 62), 2 AdamW-base, 1 is `bl5`'s single
+  documented bound seed, 1 unexplained. **"Clipping manufactures row structure" is FALSE:**
+  `cl5-cD` is 76% pinned with R_row 0.16-0.20%, at the null.
+* **THE PINNING DETECTOR VALIDATED ITSELF** against a published number: bl5 per-seed HIGH-guard
+  binding **24.05% / 0.4% / 0.5%** vs CORRECTIONS 53's recorded **24.07% / 0.00% / 0.00%**.
+* **SWEEP HAZARD FOR EVERY FUTURE TICK (88.11):** `probes_ml5_m{2,3,4}/*` are **SYMLINKS into
+  `probes_ml5/*`** (identical md5). A naive glob reports **67** weightwise arms where there are
+  **58**. Deduplicate by `os.path.realpath`. This tick's first grouped table was wrong on
+  exactly this.
+* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `rw9` (18,
+  alice) all remain written, validated, UNSUBMITTED. Cycle 58's order stands unchanged.
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
+(alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. (c) Score `hz9` **H0 -> H0.3 ->
+H0.5 -> H1 -> H1b -> H2, in that order**; H0.5 can only VOID. (d) If bo7/bd7 landed, cycle 54's
+scoring order stands with 55.2's measured per-seed sd. (e) **NEW and cheap, the natural
+follow-on to 59.3:** run the same decomposition on the **nodewise** arms' own `neg_counts`
+(67 exist, `n_tot` 8660-25556) -- that measures the row-level statistic the optimizer ACTUALLY
+adapts on, needs no mapping work, and says whether near-zero R_row survives when the row is the
+adapted unit. (f) The 12 truncated `rs-blk6`/`rs-node` reruns remain LAST. (g) Still unspent:
+the raw-instrument `s` re-derivation, carried since 51.
+
 ## Running / next (cycle 58) -- **ALICE DOWN A THIRD TICK. THE GATE IS DISCHARGED AND THE HEADLINE IS SCOPED.**
 
 **Read `docs/CORRECTIONS.md` 87 and `docs/FINDINGS.md` 58.0-58.7 before quoting CORRECTIONS 86.3's

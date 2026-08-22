@@ -3060,3 +3060,127 @@ guessed.** No ssh config touched, no retry loop run.
   superseded `rs`-only numbers; under the corrected row that is FALSE and **the guard would have
   aborted the batch**. Guard 4 now carries the pooled row and asserts the ordering plus
   "nodewise is still n=1". `bash -n` clean, re-run standalone and passing.
+
+## 88. DECISION RECORD — cycle 59 (ALICE DOWN, **FOURTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**OUTAGE, localised not assumed.** `2026-08-22T19:26Z`: `ssh alice-gw` up and answering
+(`p-cfer-016105`); from it `nc` to `login.alice.universiteitleiden.nl:22` and to both
+`132.229.104.230` / `.231` returns DOWN; `ssh alice` and `ssh alice2` fail at banner exchange.
+**No queue read, nothing synced, nothing submitted. CSV unchanged at 1707 rows.** `bo7-*` (12,
+alice) and `bd7-*` (12, alice2) were RUNNING at the end of cycle 54; whether they survived is
+still UNKNOWN and still not guessed. No ssh config touched, no retry loop run.
+
+1. **DECISION: spend the tick on the highest-ranked OFFLINE item rather than idling.**
+   87.2 ranked "test Adam-mini's ACTUAL within-row-similarity premise at the `nodewise`
+   partition" above the carried-since-51 `s` re-derivation. It needs only probes already on
+   this Mac. Cycles 55 and 58 both produced real results under the same outage; this follows
+   that precedent. → 59.0
+
+2. **THE PREMISE IS TESTABLE BECAUSE OUR `nodewise` PARTITION *IS* A ROW OF `G`** — verified in
+   the optimizer source (`HF_patched.py:147` groups by `p_size[0]` and sums all trailing dims),
+   not inferred from the name. → 59.1
+
+3. **SCOPE WRITTEN INTO THE INSTRUMENT ITSELF, SO IT CANNOT DRIFT.** Adam-mini's premise is
+   about `G`; PATCH_PROBE5 recorded the sign of `z`, the META-gradient. The structural argument
+   transfers but the quantities differ. **No document may write "we refuted Adam-mini".** The
+   claim is about the premise AS IT APPLIES TO THE QUANTITY OUR PARTITION AGGREGATES. → 59.1
+
+4. **THE COORDINATE→ROW MAP IS MEASURED, NOT ASSUMED.** A0 reconstructs
+   (tensors, nodes, weights) exactly against three independent on-disk numbers in **4 of 4**
+   families. A2 separates 1-D coordinates from conv coordinates at **z = 38.8–135.3** against a
+   random-subset null, 4 of 4, same sign. A1 (3×3 spatial signature) is present but weak and
+   the map is certified on A0+A2, with A1 reported rather than leaned on. → 59.2
+
+5. **THE RESULT, AND IT IS A CLEAN NEGATIVE.** In **48 of 58 unique weightwise arms** the row
+   explains **0.083%–0.612%** (median **0.190%**) of the within-tensor structure in per-weight
+   meta-gradient sign preference, against a size-preserving within-tensor regroup null of
+   **0.069%–0.175%** (median 0.091%). **97–99% of the structure is WITHIN the row.** Raw and
+   noise-corrected readings agree, so the conclusion is bounded on both sides. 4 of 4 families,
+   2 datasets, frozen and free beta, across the clip ladder. **The row mean does not represent
+   the row.** → 59.3
+
+6. **AND NEITHER DOES THE TENSOR** — 0.80%–2.55% of the corrected total. Per-weight sign
+   preference is overwhelmingly idiosyncratic at every partition level we can form. → 59.3
+
+7. **A STATISTIC-CONFUSION HAZARD, NAMED BEFORE IT BITES.** `p_i` (temporal persistence per
+   coordinate) is NOT the campaign's 53.1% sign-agreement headline (cross-sectional imbalance
+   at one step). They are different quantities, they do not conflict, and neither supersedes
+   the other. Do not let 59.3's "~0.2%" be read as a retraction of 8b. → 59.3
+
+8. **THE OBVIOUS EXPLANATION OF THE 10 EXCEPTIONS IS REFUTED BY OUR OWN CONTROL.** Six are the
+   ms=1e-2 rung CORRECTIONS 62 already ruled unquotable; two are AdamW-base; one is `bl5`'s
+   single documented bound seed. But **"clipping manufactures row structure" is FALSE**:
+   `cl5-cD` is 75.7–76.4% pinned with R_row 0.164–0.196%, at the null. **The mechanism of the
+   exceptions is OPEN and is recorded as open.** The 3/3 "modal ceiling exactly 0.000" pattern
+   is n=3, POST-HOC, and labelled as not a finding. → 59.4
+
+9. **THE PINNING DETECTOR VALIDATED ITSELF AGAINST A PUBLISHED NUMBER.** It returns bl5's
+   per-seed HIGH-guard binding as 24.05% / 0.4% / 0.5% against CORRECTIONS 53's recorded
+   **24.07% / 0.00% / 0.00%** — 3 s.f. on the bound seed. It also carries an explicit
+   `moved` flag so a FROZEN arm (beta constant ⇒ modal fraction trivially 100%) cannot be
+   mis-read as fully pinned; that false positive was caught in this tick and fixed. → 59.4
+
+10. **59.3 CORRECTLY PREDICTS AN ORDERING WE ALREADY MEASURED, AND THAT IS ALL IT DOES.** If a
+    partition's value came from its group mean representing its members, nodewise (14,420
+    groups) should dominate layerwise (62). 58.8 says it does not — partitioned arms span
+    0.254pp against partition-vs-none's 0.390–0.644pp. **Written as a surviving mechanism
+    candidate, never as proof.** → 59.5
+
+11. **A SWEEP HAZARD FOR EVERY FUTURE TICK.** `probes_ml5_m{2,3,4}/*` are **SYMLINKS into
+    `probes_ml5/*`** (identical md5). A naive glob reports **67** weightwise arms where there
+    are **58**. Deduplicate by `os.path.realpath`. This tick's first grouped table was wrong on
+    exactly this and is not the version recorded. → 59.6
+
+12. **ORPHANS.** CSV unchanged, so the SET is unchanged from 87.13; coverage is not.
+    `c59_row_premise.py --report` now cites all 58 unique weightwise arms with per-arm numbers
+    across **13 families** (bl5, bo6, br6, cl5, ff5, fr5, fz3, ml5, ns5, p5, uc5, uc6, wc5),
+    which retires their weightwise arms from orphan status. → 59.6
+
+13. **NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING RE-RUN.** `sp8` (9, alice2), `hz9` (9,
+    alice) and `rw9` (18, alice) remain written, validated and UNSUBMITTED; cycle 58's
+    submission order (sp8 on alice2; hz9 then rw9 on alice) stands unchanged. Ideas 1 and 2
+    stay dead — zero jobs, this cycle and the previous fifteen.
+
+14. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE** and is re-flagged for the operator
+    (76.9, 71, 81.10, 83.11, 86.10, 87.11). Not done unsupervised.
+
+**NEXT TICK, in order.**
+(a) **Reachability first**, one line:
+    `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`.
+(b) **If up: `squeue` BOTH accounts before anything else** — `bo7`/`bd7` survived or must be
+    resubmitted. Do not assume either.
+(c) Submit **`sp8` (alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. Unchanged.
+(d) **Score `hz9` H0 → H0.3 → H0.5 → H1 → H1b → H2, IN THAT ORDER.** H0.5 can only VOID.
+(e) **NEW, and cheap, and it is the natural follow-on to 59.3:** the same nested decomposition
+    is available at the **nodewise** arms' own `neg_counts` (67 arms exist, `n_tot` 8660–25556),
+    which measures the row-level statistic the optimizer ACTUALLY adapts on rather than the
+    per-weight one aggregated offline. It needs no new mapping work — the row index IS the
+    coordinate index there — and would say whether the near-zero R_row survives when the row is
+    the adapted unit.
+(f) **Still unspent:** the raw-instrument `s` re-derivation, carried since 51.
+
+**Queues at tick end.** UNKNOWN — both login nodes unreachable for a fourth consecutive tick.
+FairShare not readable.
+
+### 88.15 SAME TICK — THE SHARPER TEST LANDED TOO, AND IT STRENGTHENS 5
+
+**The ROW DIRECTION is not privileged.** Adam-mini's argument is specifically that a row is
+homogeneous because its entries share the BP error term `e_i`. Scoring row / column / spatial
+groupings with the same nested estimator, each against **its own** size-preserving null, over
+10 arms spanning frozen and free beta, clipped and unclipped, 3 families and 2 datasets:
+excess over null is **row 0.008–0.448 pp, column −0.133–0.788 pp, spatial ~0.000–0.010 pp**.
+
+* **Claimed:** no direction carries structure a group mean could exploit; row ≈ column, both
+  under ~1pp. Spatial (shares neither `e_i` nor `z_j`) at ~0 confirms the estimator is not
+  reading noise as signal.
+* **NOT claimed, and explicitly refused:** the row's nominal 8-of-10 edge over the column. Two
+  column excesses are NEGATIVE and the single largest excess in the table is a COLUMN. That is
+  an estimator scattering around zero, not an ordering.
+
+This closes the one alternative reading item 5 left open — that rows might be weak but still
+the best available grouping. They are not. → 59.7
+
+**Instrument now 46/46 selftests**, including a planted-row-signal test that `row` recovers
+(>0.999) and `spatial` is blind to (<0.01). A packaging bug was caught and fixed in-tick: the
+direction functions were appended AFTER the `__main__` guard, so `--selftest` raised
+`NameError` rather than silently skipping them; the guard now sits at end of file.

@@ -11235,3 +11235,213 @@ costs 4.5pp of tolerance; every partition costs ≤1.7pp; the nodewise figure is
 guard would have **aborted the batch on submission**. Guard 4 now carries the pooled row and
 asserts the ORDERING (`spread < partition-vs-none`) plus `nodewise is still n=1`, which is the
 batch's own reason for existing. Re-run standalone and passing.
+
+## 59.0 CYCLE 59 — ALICE DOWN A **FOURTH** CONSECUTIVE TICK; ZERO JOBS; ONE ZERO-COMPUTE RESULT
+
+`2026-08-22T19:26Z`. `ssh alice-gw` up and answering (`p-cfer-016105`); from it `nc` to
+`login.alice.universiteitleiden.nl:22` and to both `132.229.104.230` / `.231` returns DOWN;
+`ssh alice` and `ssh alice2` both fail at banner exchange. **No queue read, nothing synced,
+nothing submitted. CSV unchanged at 1707 rows.** `bo7-*` (12, alice) and `bd7-*` (12, alice2)
+were RUNNING at the end of cycle 54; whether they survived is still UNKNOWN and still not
+guessed. No ssh config touched, no retry loop.
+
+Everything below is derived from probe data ALREADY ON THIS MAC and cost zero cluster time.
+It discharges the item CORRECTIONS 87.2 ranked **first** among offline work.
+
+## 59.1 ADAM-MINI'S ACTUAL PREMISE IS TESTABLE HERE, AND THE INSTRUMENT IS NEW
+
+CORRECTIONS 87.1 withdrew every "the Adam-mini / Adalayer / SGG line assumes exactly 0"
+sentence: no paper in that line argues from sqrt(N) noise-averaging. What Adam-mini **does**
+argue is a CORRELATION claim — *"they all share the same BP error term e_i ... G usually has
+similar entries within a row"* — i.e. the mean of a block represents the block.
+
+**A "row of G" is exactly our `nodewise` partition**, verified in the optimizer source, not
+assumed: `HF_patched.py:147` computes `nodewise` as
+`(u[i]*v[i]).reshape(u[i].shape[0], -1).sum(dim=1)` — group by `p_size[0]`, sum all trailing
+dims. That is a row.
+
+**SCOPE, STATED ONCE AND NOT HEDGED LATER.** Adam-mini's premise is about `G`, the BASE
+gradient. What PATCH_PROBE5 recorded per coordinate is the sign of `z`, the META-gradient.
+These are different quantities; the structural argument transfers (`z_i` inherits the same
+shared `e_i` through `g_i`) but this is **a test of the premise as it applies to the quantity
+our partition actually aggregates**, not a reproduction of Adam-mini's own figure.
+**Do not write "we refuted Adam-mini".**
+
+New instrument `analysis/c59_row_premise.py`, **39/39 selftests**, modes `--selftest`
+`--verify` `--decompose` `--sweep` `--report`.
+
+## 59.2 THE COORDINATE→ROW MAP IS MEASURED, NOT ASSUMED (GATES A0/A1/A2)
+
+`neg_counts.npy` gives, per coordinate of the arm's own partition,
+`p_i = neg_count_i / n_records` — the coordinate's persistent meta-gradient sign preference.
+On a weightwise arm that is per weight. Mapping a coordinate to its row needs the ordered
+parameter-shape list, so the reconstruction is checked against on-disk data three ways per
+family:
+
+| family | tensors | nodes | weights | A0 |
+|---|---|---|---|---|
+| r10  | 38/38   | 8660/8660   | 4903242/4903242   | OK |
+| r18  | 62/62   | 14420/14420 | 11173962/11173962 | OK |
+| r34  | 110/110 | 25556/25556 | 21282122/21282122 | OK |
+| c100 | 62/62   | 14600/14600 | 11220132/11220132 | OK |
+
+Left number reconstructed (kuangliu CIFAR ResNet), right number read from `neg_counts.json`.
+Block-level order is independently confirmed by the optimizer's own hard-coded
+`resnet18_blocks = [3,12,15,15,15,2]`.
+
+**A2 is the decisive alignment gate.** 1-D (BatchNorm/bias) coordinates must be separable from
+conv coordinates under the reconstructed boundaries; if the boundaries were wrong they would be
+a random subset. Against a 200-draw random-subset null of the same size:
+
+| family | 1-D sd | null sd | z | mean shift |
+|---|---|---|---|---|
+| r18  | 0.02918 | 0.01104±0.00047 | **38.8**  | −0.00837 |
+| c100 | 0.04954 | 0.01839±0.00069 | **44.9**  | −0.00986 |
+| r10  | 0.04592 | 0.01740±0.00021 | **135.3** | −0.00999 |
+| r34  | 0.01750 | 0.01273±0.00008 | **59.9**  | −0.00273 |
+
+4 of 4, same sign, z ≥ 38. A1 (3×3 spatial signature inside conv tensors) is present but weak:
+centre > edge > corner in 3 of 4 families, spread only 2e-5..3.2e-4. A1 is reported, and the
+map is certified on **A0 + A2**, not on A1.
+
+## 59.3 **THE RESULT: THE ROW MEAN DOES NOT REPRESENT THE ROW.**
+
+The decomposition is NESTED, because a flat ICC over 11.17M coordinates would be dominated by
+between-tensor variance that rows inherit for free:
+
+    SS_total = SS_tensor + SS_row|tensor + SS_within      (identity holds to 8e-16)
+
+Headline statistic = the row's share of what the tensor does not already explain,
+`R_row = SS_row|tensor / (SS_row|tensor + SS_within)`, noise-corrected for the binomial
+sampling variance of each `p_i` (exact partition; see the module docstring for why the
+correction is CONSERVATIVE against the premise-holds reading, and why raw is quoted beside it).
+
+**48 of 58 unique weightwise arms** (the 10 exceptions are 59.4):
+
+| family | n | R_row raw | R_row corrected | regroup null | tensor share | within-row share |
+|---|---|---|---|---|---|---|
+| r10  |  6 | 0.208–0.402% | 0.232–0.563% | 0.147% | 1.56% | **98.10%** |
+| r18  | 30 | 0.127–0.271% | 0.127–0.543% | 0.092% | 1.92% | **97.87%** |
+| r34  |  6 | 0.094–0.116% | 0.083–0.098% | 0.076% | 0.80% | **99.11%** |
+| c100 |  6 | 0.266–0.429% | 0.284–0.612% | 0.159% | 2.55% | **96.96%** |
+
+**ALL 48: R_row_cor 0.083%–0.612%, median 0.190%, against a within-tensor random-regroup null
+of 0.069%–0.175%, median 0.091%.** Raw and corrected agree, so the reading is bounded on both
+sides. The null preserves row sizes exactly and permutes membership inside each tensor.
+
+> **QUOTE THIS.** *Grouping per-weight meta-gradients by the row of `G` that Adam-mini's
+> argument names explains **~0.2%** of the within-tensor structure in their sign preference —
+> about twice a random regrouping of the same row sizes, and within a factor of a few of zero
+> on both the raw and the noise-corrected reading. **97–99% of that structure is WITHIN the
+> row.*** 4 of 4 network families, CIFAR-10 and CIFAR-100, frozen and free beta,
+> across the whole clip ladder.
+
+Two further facts from the same table, worth keeping:
+* **The tensor explains little either** — 0.80%–2.55% of the corrected total. Per-weight sign
+  preference is overwhelmingly IDIOSYNCRATIC, at every partition level we can form.
+* **The preference is real but tiny**: noise-corrected sd of `p_i` is 0.006–0.043 around 0.5.
+  This is a DIFFERENT statistic from the campaign's 53.1% sign-agreement headline, which is
+  CROSS-SECTIONAL (imbalance at one step); `p_i` is TEMPORAL (persistence per coordinate).
+  They do not conflict and neither supersedes the other.
+
+## 59.4 THE 10 EXCEPTIONS, AND THE CONTROL THAT REFUSES TO EXPLAIN THEM
+
+| arm | R_row_cor | pin_lo | pin_hi | modal ceiling |
+|---|---|---|---|---|
+| bo6/probe_w_adw_s0 | 49.37% | 0.15% | 23.40% | **0.000** |
+| ml5/probe_w_m2_s2  | 44.06% | 91.90% | 95.40% | −2.303 |
+| ml5/probe_w_m2_s1  | 43.80% | 91.90% | 95.40% | −2.303 |
+| wc5/probe_w_m2_s2  | 43.24% | 76.60% | 95.40% | −2.303 |
+| wc5/probe_w_m2_s0  | 42.65% | 76.80% | 95.40% | −2.303 |
+| ml5/probe_w_m2_s0  | 42.33% | 91.90% | 95.40% | −2.303 |
+| wc5/probe_w_m2_s1  | 41.55% | 76.65% | 95.40% | −2.303 |
+| bo6/probe_w_adw_s1 | 36.83% | 0.10% | 17.50% | **0.000** |
+| bl5/probe_w_e40_s0 | 22.23% | 0.10% | 24.05% | **0.000** |
+| br6/probe_w_c2_s1  |  7.17% | 0.12% |  0.27% | −1.982 |
+
+Six of ten are the **ms=1e-2 rung**, which CORRECTIONS 62 already ruled boundary-dominated and
+unquotable; here both guards are pinned simultaneously on 77–95% of records. Two are
+**AdamW-base** (`bo6`). One is `bl5` seed 0 — **the single documented bound seed**, and the
+pinning detector independently returns **24.05%** against CORRECTIONS 53's recorded per-seed
+binding of **24.07% / 0.00% / 0.00%**, reproducing a published number to 3 s.f.
+
+**THE OBVIOUS EXPLANATION IS REFUTED BY OUR OWN CONTROL.** "Clipping manufactures row
+structure" fails: `cl5/probe_w_cD_*` has the HIGH guard pinned on **75.7–76.4%** of records and
+R_row_cor of **0.164 / 0.196 / 0.192%** — at the null. `ff5/probe_r10_w_s0` is 52.7% pinned at
+0.563%. Pinning alone does not do it, and `br6/probe_w_c2_s1` is an exception at 0.27% pinning.
+**The mechanism of the exceptions is OPEN.**
+
+One POST-HOC observation, labelled as one: exactly **3** arms in the whole corpus have a modal
+beta ceiling of exactly **0.000** (i.e. alpha reached 1), and **all 3 are exceptions** (3/3).
+`uc5`/`uc6`/`cl5-cU` were all *configured* with HI=0.0 and never reached it (modal −1.26 to
+−2.36); they are clean. This is n=3 and is not a finding.
+
+## 59.5 WHAT THIS PREDICTS, AND IT IS SOMETHING WE ALREADY MEASURED
+
+If a partition's value came from its group mean representing its members, `nodewise` (14,420
+groups) should dominate `layerwise` (62) — 232× more groups. **It does not.** FINDINGS 58.8 /
+CORRECTIONS 87.14, on the full 14-column config key at the tuned peak: layerwise 92.906 (n=5,
+sd 0.166) / nodewise 92.656 (n=1) / blk6 92.652 (n=2) / scalar 92.262 (n=5) — partitioned arms
+span **0.254pp**, while partition-vs-none is **0.390–0.644pp**.
+
+59.3 says why the row adds nothing: **there is no row-level structure to exploit.** And it is
+consistent with 57.2 / 87.14's tolerance reading — partitioning buys tolerance to an over-large
+meta-stepsize, which is not a claim about representing coordinate structure at all.
+
+**This is a CONSISTENCY, not a demonstration.** 59.3 measures `z` sign preference; the accuracy
+row measures plateau. Write it as a surviving mechanism candidate that correctly predicts an
+already-measured ordering — never as proof of it.
+
+## 59.6 ORPHANS — 13 FAMILIES RETIRED BY THIS CYCLE'S SWEEP
+
+CSV unchanged at 1707, so the orphan SET is unchanged from 87.13. What changed is coverage:
+`--report` cites every one of 58 unique weightwise arms with per-arm numbers, across
+**bl5, bo6, br6, cl5, ff5, fr5, fz3, ml5, ns5, p5, uc5, uc6, wc5**. Those 13 families are no
+longer uncited at the weightwise arm. `probes_ml5_m{2,3,4}` are **SYMLINKS into `probes_ml5`**
+(identical md5) — a naive glob double-counts 9 arms as 67; `--report` deduplicates by resolved
+path and any future sweep must too.
+
+## 59.7 THE SHARPER TEST: **THE ROW DIRECTION IS NOT SPECIAL**
+
+59.3 says the row explains ~0.2% of within-tensor structure. The sharper question is whether
+the ROW DIRECTION is privileged at all, because that is what Adam-mini's argument actually
+asserts: a row is homogeneous *because its entries share the BP error term `e_i`*. A COLUMN of
+the same tensor shares the input activation `z_j` instead; a SPATIAL position (index mod 9)
+shares neither. Same nested estimator, each direction scored against **its own**
+size-preserving within-tensor regroup null (group sizes differ by direction, so a shared null
+would be wrong). Coverage 99.9% of coordinates in every arm (1-D tensors have no row/column
+structure and are excluded).
+
+| arm | R_row | R_col | R_spatial | null_row | null_col |
+|---|---|---|---|---|---|
+| fz3 r10 (frozen)        | 0.153% | 0.173% | 0.009% | 0.067% | 0.099% |
+| fz3 r34 (frozen)        | 0.037% | 0.085% | 0.001% | 0.029% | 0.076% |
+| fz3 c100 (frozen)       | 0.197% | 0.233% | 0.002% | 0.070% | 0.200% |
+| ff5 r10 (free)          | 0.481% | 1.020% | 0.010% | 0.054% | 0.232% |
+| ff5 r34 (free)          | 0.056% | 0.234% | 0.000% | 0.032% | 0.242% |
+| ff5 c100 (free)         | 0.584% | 0.700% | 0.002% | 0.136% | 0.597% |
+| ml5 r18 ms=1e-3         | 0.115% | 0.316% | 0.003% | 0.039% | 0.294% |
+| cl5 r18 unclipped (cU)  | 0.110% | 0.307% | 0.004% | 0.038% | 0.284% |
+| br6 r18 box-free 40ep   | 0.395% | 0.736% | 0.010% | 0.042% | 0.869% |
+| ml5 r18 ms=1e-4         | 0.076% | 0.182% | 0.003% | 0.033% | 0.144% |
+
+**Excess over each direction's own null** — row **0.008–0.448 pp**, column **−0.133–0.788 pp**,
+spatial **~0.000–0.010 pp**. Two readings, and only the second is claimed:
+
+* The row's excess is nominally larger than the column's in **8 of 10** cells. **This is NOT
+  claimed.** The two cells where the column wins include the largest single excess in the
+  table (r10 free, 0.788), the magnitudes are all far below anything usable, and two of the
+  column excesses are NEGATIVE — an estimator scattering around zero, which is what these
+  numbers look like.
+* **What IS claimed: no direction carries structure a group mean could exploit.** Row and
+  column excesses are the same order as each other and both under ~1pp; the direction that
+  shares NEITHER `e_i` nor `z_j` (spatial position) sits at ~0.00–0.01%, confirming the
+  estimator is not simply reading noise as signal.
+
+> **QUOTE THIS.** *Grouping by the row — the direction Adam-mini's shared-`e_i` argument
+> privileges — is not measurably better than grouping by the column, and both explain under
+> 1% of within-tensor structure in per-weight meta-gradient sign preference.* Frozen and free
+> beta, clipped and unclipped, 3 network families, 2 datasets.
+
+This STRENGTHENS 59.3 rather than adding a caveat to it: 59.3 could in principle have been
+"rows are weak but the best available grouping"; 59.7 removes that reading.
