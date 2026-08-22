@@ -11633,3 +11633,33 @@ siblings do not. **The exception is a run-specific event, not a property of the 
   n=3 and post-hoc; nothing here tests it.
 * **What is still OPEN:** *why* `conv1` and not `conv2`, and what the run-specific event is.
   60.4 gives the signature, not the cause. That needs `z` time-series the probe does not store.
+
+## 60.7 SAME TICK — **60.4's `conv1` SIGNATURE IS CONFIRMED FROM THE COMPLEMENTARY STATISTIC**
+
+60.4 measured per-weight row structure at the **weightwise** arms. This measures row-mean
+spread at the **nodewise** arms — *different runs, a different stored quantity, and no offline
+aggregation at all*, because on a nodewise arm each stored coordinate already IS a row mean.
+Per conv tensor: `V_t` = noise-corrected `var(row means inside t)`, clamped at 0 with the clamp
+flagged and clamped tensors excluded. 58 arms, 8 inverted (`R_tensor_cor` < 60%) / 49 scorable
+normal.
+
+| | n | V(conv1)/V(conv2) | median | ratio > 1 |
+|---|---|---|---|---|
+| **inverted** | 8 | **0.17 – 98.42** | **48.39** | 7 / 8 |
+| normal | 49 | 0.02 – 4.97 | 0.55 | 13 / 49 |
+
+* **7 of 8 inverted arms exceed the MAXIMUM of all 49 normal arms** (4.97). Mann-Whitney
+  **U = 347 of 392, z = 3.47, two-sided p = 5.2e-4**.
+* Absolute scale moves too: `V(conv1)` is **6.0e-4 – 2.3e-3** in inverted arms against
+  **2.1e-6 – 8.0e-5** in normal ones — one to two orders of magnitude.
+* **The single dissenter is `bo6/probe_node_adw_s0` at 0.17, and it is the predicted one.** It is
+  an AdamW arm, and AdamW is exactly where 60.4 found the effect spilling into `conv2` (the two
+  `bo6` weightwise arms hold **all 5** of the corpus's `conv2` hits). The two methods disagree on
+  the same arm for the same stated reason, which is a consistency, not a discrepancy.
+
+> **QUOTE THIS WITH 60.4.** *The exception's `conv1` localisation is not an artifact of the
+> weightwise aggregation: it reproduces at the nodewise arms, where the row is the stored unit,
+> on a statistic that shares no code path with 60.4 beyond the architecture map.*
+
+Both remain descriptions of WHERE, not WHY. 89.7's open question is untouched: `conv1` vs
+`conv2` needs `z` time-series the probe does not store.

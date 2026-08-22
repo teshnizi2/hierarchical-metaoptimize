@@ -1,0 +1,64 @@
+NODEWISE CONFIRMATION -- median noise-corrected var(row means) per conv role
+(independent of 60.4: different arms, different stored quantity)
+arm                                 inv   V(conv1)   V(conv2)    ratio  clmp
+probes_bl5/probe_node_e40_s0          .  2.821e-05  3.662e-05     0.77    16
+probes_bl5/probe_node_e40_s1          .  1.160e-05  5.501e-06     2.11    12
+probes_bl5/probe_node_e40_s2          .  2.271e-06  2.044e-05     0.11    12
+probes_bo6/probe_node_adw_s0        INV  6.404e-04  3.683e-03     0.17     8
+probes_bo6/probe_node_adw_s1        INV  2.291e-03  3.389e-04     6.76     6
+probes_br6/probe_node_c2_s0           .  2.955e-05  5.947e-06     4.97    13
+probes_br6/probe_node_c2_s1           .  1.136e-05  2.150e-05     0.53    16
+probes_br6/probe_node_c2_s2           .  2.322e-05  2.300e-05     1.01    16
+probes_br6/probe_node_c2_s3           .  1.315e-05  3.336e-06     3.94    13
+probes_cl5/probe_node_cD_s0           .  1.210e-05  2.527e-05     0.48    15
+probes_cl5/probe_node_cD_s1           .  1.537e-05  1.080e-05     1.42    16
+probes_cl5/probe_node_cD_s2           .  1.621e-05  1.421e-05     1.14    13
+probes_cl5/probe_node_cU_s0           .  7.964e-06  4.189e-05     0.19    12
+probes_cl5/probe_node_cU_s1           .  4.699e-06  1.012e-05     0.46    12
+probes_cl5/probe_node_cU_s2           .  3.075e-07  1.431e-05     0.02    14
+probes_ff5/probe_c100_node_s0         .  5.148e-06  9.310e-06     0.55    12
+probes_ff5/probe_c100_node_s1         .  8.271e-06  1.199e-05     0.69    12
+probes_ff5/probe_r10_node_s0          .  1.709e-05  5.331e-05     0.32     5
+probes_ff5/probe_r10_node_s1          .  1.232e-05  4.234e-05     0.29     5
+probes_ff5/probe_r34_node_s0          .  1.522e-05  2.784e-05     0.55    31
+probes_ff5/probe_r34_node_s1          .  6.139e-06  2.723e-05     0.23    29
+probes_fr5/probe_node_a3_s0           .  1.208e-05  1.460e-05     0.83    13
+probes_fr5/probe_node_a3_s1           .  1.484e-05  7.854e-06     1.89    11
+probes_fr5/probe_node_a3_s2           .  1.100e-06  1.106e-05     0.10    15
+probes_fz3/probe_c100_node_s0         .  9.281e-05  1.715e-04     0.54     0
+probes_fz3/probe_c100_node_s1         .  7.874e-05  1.650e-04     0.48     0
+probes_fz3/probe_r10_node_s0          .  2.373e-04  6.212e-04     0.38     0
+probes_fz3/probe_r10_node_s1          .  2.313e-04  4.836e-04     0.48     0
+probes_fz3/probe_r34_node_s0          .  2.571e-05  2.800e-05     0.92     8
+probes_fz3/probe_r34_node_s1          .  1.342e-05  2.190e-05     0.61     8
+probes_ml5/probe_node_m2_s0         INV  1.042e-03  3.312e-05    31.47    13
+probes_ml5/probe_node_m2_s1         INV  1.209e-03  1.229e-05    98.42    10
+probes_ml5/probe_node_m2_s2         INV  5.953e-04  8.959e-06    66.45    12
+probes_ml5/probe_node_m3_s0           .  6.375e-06  1.822e-05     0.35    14
+probes_ml5/probe_node_m3_s1           .  4.904e-06  1.215e-05     0.40    13
+probes_ml5/probe_node_m3_s2           .  8.425e-06  1.724e-05     0.49    15
+probes_ml5/probe_node_m4_s0           .  2.831e-05  6.264e-05     0.45     3
+probes_ml5/probe_node_m4_s1           .  4.306e-05  3.193e-05     1.35     5
+probes_ml5/probe_node_m4_s2           .  3.998e-05  3.546e-05     1.13     1
+probes_ns5/probe_node_m2p4_s0         .  1.479e-05  2.194e-05     0.67     1
+probes_ns5/probe_node_m2p4_s1         .  1.367e-05  5.064e-05     0.27     9
+probes_ns5/probe_node_m2p4_s2         .  2.501e-05  2.899e-05     0.86     5
+probes_ns5/probe_node_m5p4_s0         .  2.484e-05  9.062e-06     2.74    14
+probes_ns5/probe_node_m5p4_s1         .  2.113e-06  2.659e-05     0.08    13
+probes_p5/probe_node_a3_s0            .  4.741e-05  7.998e-05     0.59     2
+probes_p5/probe_node_a3_s1            .  4.181e-05  6.209e-05     0.67     0
+probes_uc5/probe_r10_node_s0          .  1.426e-05  3.236e-05     0.44     4
+probes_uc5/probe_r10_node_s1          .  2.566e-05  4.111e-05     0.62     6
+probes_uc5/probe_r34_node_s0          .  2.264e-05  1.256e-05     1.80    29
+probes_uc5/probe_r34_node_s1          .  1.190e-05  1.472e-05     0.81    27
+probes_uc6/probe_c100_node_s0         .  1.506e-05  1.049e-05     1.44    14
+probes_uc6/probe_c100_node_s1         .  2.853e-06  8.178e-06     0.35    11
+probes_wc5/probe_node_m2_s0         INV  1.430e-03  2.956e-05    48.39    13
+probes_wc5/probe_node_m2_s1         INV  9.472e-04  7.250e-05    13.06     9
+probes_wc5/probe_node_m2_s2         INV  6.293e-04  9.487e-06    66.34     9
+probes_wc5/probe_node_m3_s1           .  1.371e-05  8.975e-06     1.53    13
+probes_wc5/probe_node_m3_s2           .  2.044e-06  7.192e-06     0.28    15
+
+  inverted n= 8  V(conv1)/V(conv2) 0.17-98.42  median 48.39  ratio>1 in 7/8
+
+  normal   n=49  V(conv1)/V(conv2) 0.02-4.97  median 0.55  ratio>1 in 13/49

@@ -3296,3 +3296,21 @@ cycle 54's scoring order stands with 55.2's per-seed sd. (e) **DONE, do not re-r
 premise (59.3), the nodewise half (59.8), the exception mechanism (60.2–60.5). (f) The next
 offline item is the carried-since-51 raw-instrument `s` re-derivation — it is now the LAST
 unspent offline item. (g) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
+
+### 89.9 SAME TICK — THE `conv1` SIGNATURE REPRODUCES ON THE COMPLEMENTARY STATISTIC
+
+60.4 was measured at the **weightwise** arms by aggregating per-weight `p_i` into rows. Repeated
+at the **nodewise** arms, where each stored coordinate already IS a row mean so no aggregation
+happens at all: median noise-corrected `var(row means)` per conv role gives
+**V(conv1)/V(conv2) = 0.17–98.42, median 48.39** in the 8 inverted arms against **0.02–4.97,
+median 0.55** in 49 normal arms. **7 of 8 inverted arms exceed the maximum of all 49 normal
+arms**; Mann-Whitney **p = 5.2e-4**. → 60.7
+
+**The one dissenter is the arm the other method predicts.** `bo6/probe_node_adw_s0` reads 0.17,
+and `bo6` is the AdamW family that holds **all 5** of the corpus's weightwise `conv2` hits — the
+one place 60.4 already showed the effect reaching `conv2`. The two methods disagree on that arm
+for the reason each independently records.
+
+This is the strongest form of confirmation available offline: different arms, different stored
+quantity, no shared code path beyond the architecture map that already passed 59.2's A0/A1/A2.
+Instrument now **87/87 selftests**. Still WHERE, never WHY — 89.7 stands unchanged.

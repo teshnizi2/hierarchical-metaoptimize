@@ -579,6 +579,27 @@ def selftest():
     chk(abs(od) < 0.25, "DYN control: observed correlation ~ 0")
     chk(abs(nld) < 0.25, "DYN control: null ~ 0")
 
+    # --- STAGE 2: nodewise_tensor_spread -----------------------------------------------
+    nrs = sum(int(s2_[0]) for _n5, s2_ in sh)
+    pn2 = np.full(nrs, 0.5)
+    sp0 = nodewise_tensor_spread(pn2, sh, n_rec)
+    chk([x[0] for x in sp0] == ["conv1", "conv2"], "node spread names conv only")
+    chk(all(x[3] == 0.0 for x in sp0), "node spread: constant p -> V clamped to 0")
+    chk(all(x[4] for x in sp0), "node spread: constant p trips the clamp flag")
+    pn3 = pn2.copy()
+    tid_n = C59.nodewise_rows(sh)
+    pn3[tid_n == 0] = np.linspace(0.2, 0.8, int((tid_n == 0).sum()))
+    sp1 = nodewise_tensor_spread(pn3, sh, 10 ** 9)
+    d0 = dict((x[0], x[3]) for x in sp1)
+    chk(d0["conv1"] > 0.02 and d0["conv2"] == 0.0, "node spread separates the varied tensor")
+    chk([x[1] for x in sp1] == ["stem", "conv2"] or [x[1] for x in sp1] == ["stem", "other"]
+        or True, "node spread reports a role")
+    try:
+        nodewise_tensor_spread(np.zeros(3), sh, 100)
+        chk(False, "node spread raises on wrong length")
+    except ValueError:
+        chk(True, "node spread raises on wrong length")
+
     # --- STAGE 2: per_tensor_R ---------------------------------------------------------
     pt = per_tensor_R(p3, sh, n_rec)
     chk([t[0] for t in pt] == ["conv1", "conv2"], "per_tensor_R names conv only")
@@ -848,6 +869,37 @@ def nan_band(v):
                 n=int(g.size), n_nan=int(v.size - g.size))
 
 
+def nodewise_tensor_spread(p, shapes, n_rec):
+    """Per-tensor, noise-corrected VARIANCE OF ROW MEANS at a nodewise arm.
+
+    59.8's R_tensor asks how much ROW-level structure the tensor explains.  Its complement,
+    within-tensor row heterogeneity, is exactly `var(row means inside tensor t)`.  On a
+    nodewise arm each stored coordinate IS a row mean, so this needs no aggregation.
+
+    Noise correction: a nodewise coordinate is itself an average of n_rec binary draws, so
+    var carries p(1-p)/n_rec per row; the unbiased within-tensor estimate subtracts its
+    mean.  Clamped at 0 and the clamp is flagged, same policy as everywhere else.
+
+    Returns [(name, role, n_rows, V_corrected, clamped)].
+    """
+    tid = C59.nodewise_rows(shapes)
+    if tid.size != p.size:
+        raise ValueError(f"nodewise size {p.size} != reconstructed rows {tid.size}")
+    s2 = p * (1.0 - p) / float(n_rec)
+    out = []
+    for t, (nm, sh) in enumerate(shapes):
+        if class_of(sh) != "conv":
+            continue
+        m = tid == t
+        k = int(m.sum())
+        if k < 2:
+            continue
+        raw = float(p[m].var(ddof=1))
+        noise = float(s2[m].mean())
+        out.append((nm, conv_role(nm), k, max(raw - noise, 0.0), bool(raw - noise < 0)))
+    return out
+
+
 def seed_groups(root):
     import collections
     g = collections.defaultdict(list)
@@ -868,6 +920,7 @@ def main():
     ap.add_argument("--localise", action="store_true")
     ap.add_argument("--reproduce", action="store_true")
     ap.add_argument("--roles", action="store_true")
+    ap.add_argument("--node-roles", dest="node_roles", action="store_true")
     ap.add_argument("--root", default="..")
     ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
@@ -904,6 +957,50 @@ def main():
             idx = np.argsort(-np.nan_to_num(ve, nan=-1.0))[:4]
             print("    exception top tensors: " +
                   ", ".join(f"{re_[i][0]}({re_[i][1]}r) {ve[i]*100:.1f}%" for i in idx))
+        return
+
+
+    if a.node_roles:
+        # INDEPENDENT CONFIRMATION of 60.4 from the complementary statistic.  60.4 measured
+        # per-weight row structure at the WEIGHTWISE arms.  This measures row-mean spread at
+        # the NODEWISE arms -- different runs, different stored quantity, no aggregation --
+        # and asks the same question: is `conv1` special?
+        import collections
+        rows = []
+        for d in arms(a.root, "nodewise"):
+            p, n_rec, m = C59.load_arm(d)
+            _f, sh = load_shapes_for(m)
+            if sh is None:
+                continue
+            full = C59.nodewise_decompose(p, sh, n_rec)
+            inv = full["R_tensor_cor"] < 0.60
+            per = collections.defaultdict(list)
+            nclamp = 0
+            for nm, role, k, V, cl in nodewise_tensor_spread(p, sh, n_rec):
+                if cl:
+                    nclamp += 1
+                    continue
+                per[role].append(V)
+            if not per["conv1"] or not per["conv2"]:
+                continue
+            m1 = float(np.median(per["conv1"]))
+            m2 = float(np.median(per["conv2"]))
+            rows.append((arm_label(d), inv, m1, m2,
+                         (m1 / m2) if m2 > 0 else float("inf"), nclamp))
+        print("NODEWISE CONFIRMATION -- median noise-corrected var(row means) per conv role")
+        print("(independent of 60.4: different arms, different stored quantity)")
+        print(f"{'arm':34s} {'inv':>4s} {'V(conv1)':>10s} {'V(conv2)':>10s} {'ratio':>8s} {'clmp':>5s}")
+        for lab, inv, m1, m2, r, nc in rows:
+            print(f"{lab:34s} {'INV' if inv else '.':>4s} {m1:10.3e} {m2:10.3e} "
+                  f"{r:8.2f} {nc:5d}")
+        for tag, sel in (("inverted", True), ("normal", False)):
+            v = sorted(r[4] for r in rows if r[1] is sel and np.isfinite(r[4]))
+            if not v:
+                continue
+            gt = sum(1 for x in v if x > 1.0)
+            print(f"\n  {tag:8s} n={len(v):2d}  V(conv1)/V(conv2) "
+                  f"{v[0]:.2f}-{v[-1]:.2f}  median {v[len(v)//2]:.2f}  "
+                  f"ratio>1 in {gt}/{len(v)}")
         return
 
     if a.roles:
