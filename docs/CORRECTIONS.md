@@ -2399,3 +2399,267 @@ carried since 51.
 
 **Queues at tick end.** alice **9 R / 0 P** (`ns6` 3, `bo6` 6). alice2 **12 R / 0 P** (`br6`).
 FairShare 0.333 / 0.334, unchanged from cycle 52.
+
+---
+
+## 77. THE BUDGET THREAT IS CONFIRMED PRE-REGISTERED, BOX-FREE BY CONSTRUCTION (cycle 54)
+
+CORRECTIONS 73 recorded the budget fall on a batch whose primary test failed its own gate, with the
+weightwise leg resting on a post-hoc window at n=2. `br6-*` replaces all of that. **Every gate
+passes**: box-free on **12 of 12** seeds (0.0000% of records, 0.00000% of coordinates), C0.4
+stability PASS, C2 PASS, C1 PASS, C2.5 PASS (FINDINGS 54.1).
+
+| rung | 20 ep | 40 ep (br6, n=4) | Δ | status |
+|---|---|---|---|---|
+| lay | 0.7262 | 0.6903 | −0.036 | stationary — **a BOUND** (m=62 marginal), never an absence |
+| node | 0.4056 | 0.2796 | −0.126 | **DRIFTING**, replicated |
+| w | 0.5064 | 0.1508 | **−0.356** | **COLLAPSING**, replicated |
+
+**CORRECTIONS 73's quoting rule is upgraded from post-hoc to pre-registered.** Write *"over epochs
+10–20"* or *"at a 20-epoch budget"* wherever the 16%–55% range appears — that instruction is
+unchanged, but it now rests on n=4 box-free evidence rather than an n=2 window.
+
+**C2.5 replicates the ordering flip**: at 40 epochs it is `w < node < lay`. The nodewise minimum is
+**budget-specific** and may not be written as a property of the partition (74 stands, reinforced).
+
+**A LICENCE THIS CAMPAIGN HAD BEEN USING WITHOUT MEASURING IT IS NOW MEASURED.** `br6` (HI=+2.0)
+and `bl5` (HI=0.0) agree to **0.0009** (lay) and **0.0022** (node) at 40 epochs where both are
+box-free. Comparing N_eff/m across *box-free* ceilings is therefore safe at the 0.002 level. Both
+new batches carry a ceiling-invariance gate rather than inheriting this.
+
+## 78. STANDING RULE (9): A TOLERANCE MUST BE SCALED TO THE NOISE OF WHAT IT MEASURES (cycle 54)
+
+The campaign's ±0.10 N_eff/m bar came from a **box**-sensitivity measurement at weightwise (±0.038,
+CORRECTIONS 62) and has been applied to all three rungs at all budgets ever since. Measured
+per-seed sd this tick (FINDINGS 54.2): weightwise **0.0377 at 20 ep** but **0.0035 at 40 ep** — a
+10.8× collapse — against nodewise 0.0492 → 0.0196 and layerwise 0.0227 → 0.0361.
+
+So ±0.10 is ~2.7 sd at 20-epoch weightwise (appropriate) and **~29 sd at 40-epoch weightwise**
+(not a bar at all). One number has been serving three rungs whose noise differs by 10× and two
+budgets across which it moves by another 10×.
+
+> **STANDING RULE (9):** *a registered tolerance must be stated against the measured noise of the
+> statistic at the budget and unit it is applied to. A bar imported from another rung, another
+> budget, or another source of variation is not a bar. Report the sd alongside the verdict.*
+
+**NOTHING IS RE-DERIVED, AND THAT WAS CHECKED RATHER THAN ASSUMED.** Every gate ±0.10 has decided
+was re-read against the sd at its own budget: cycle-52's cross-box span 0.076 is **2.0 sd** at 20
+epochs, so **CORRECTIONS 68's box conclusion STANDS and is not re-opened**; C2 layerwise 1.0 sd
+(already a bound); C2 nodewise 6.4 sd; C1 ~9 sd. The bar was conservative in the safe direction
+everywhere it has been used. It is retired going forward, not retroactively.
+
+The rule has a second, opposite instance in the same tick: N1's **0.02** argmin tolerance is
+*tighter* than the gap it must resolve is large relative to n=3 noise (78 and 80 are the same rule
+firing in both directions — too loose, and too tight).
+
+## 79. V2 WAS READ PAST ITS OWN GATE. THE ADAM-MINI SENTENCE IS **SUSPENDED**, NOT DELETED (cycle 54)
+
+`c54_score.py` printed **"V2 REFUTED (argmin = w) … the Adam-mini sentence must be DELETED, not
+hedged."** It is not adopted (FINDINGS 54.3).
+
+bo6's V0.3 **failed on 2 of 3 rungs, per seed** — node and w bind at epochs 15.3–18.2, up to 93.8%
+of Q4 records — and those are precisely the two rungs whose values produce V2's argmin, while
+`lay`, the only box-free rung, is the one V2 calls the maximum. The scorer applied the gate to V1
+(correctly UNINTERPRETABLE) and not to V2. **An argmin inherits the interpretability of every rung
+it ranks, not just the one it selects.** bo6's own registration says so in its resolution note:
+an untrustworthy rung makes the argmin undecidable *"rather than defaulting it to one of the other
+two. Say which."*
+
+**Fourth occurrence of the same failure** (CORRECTIONS 75: `s` in 51, the pooled clip fraction in
+62, the argmin in 74, this). The flag was computed and displayed correctly and the conclusion
+ignored it — again. Fixed as a **tested function** (`argmin_blockers`, 5 new selftests encoding the
+literal bo6 shape, including "a bound rung that is NOT the argmin still blocks"); `c54_score`
+17/17.
+
+**THE POST-HOC WINDOW DOES NOT RESCUE IT EITHER, AND THAT IS THE POINT.** On records 1000–1500
+(box-free on all six arms) the ordering is identical and the gap is 0.100 vs a 0.02 bar. That is
+strong — and it is still post-hoc. CORRECTIONS 76(1) forbade overturning a registered gate with a
+post-hoc rescue, and **the rule is symmetric: it binds a rescue that strengthens a REFUTATION
+exactly as much as one that saves a confirmation.** Deleting a claim on unregistered evidence is
+the same error as keeping one.
+
+> **THE ADAM-MINI SENTENCE IS SUSPENDED.** It may not be written and it may not be deleted until
+> `bo7-*` scores. It carries three scopes — ms=1e−3, 20 epochs (§74, replicated by C2.5), and SGDm
+> — and the third is now under direct pre-registered test.
+
+## 80. N1 IS UNDECIDED AT n=3 AND THE GAP SHRANK. NOT BOUGHT — SEQUENCING, NOT COST. (cycle 54)
+
+`ns6` delivered the third seed and it **did not decide N1**: the node−w gap at ms=2e−4 went
+**0.0190 (n=2) → 0.0142 (n=3)** against a 0.020 tolerance (FINDINGS 54.4). The refutation branch
+**(node, w)** stays live alongside the admissible (w, w).
+
+The cost of deciding it is **measured, not guessed**: this rung's own pooled per-seed sd is
+**0.0131**, so **n=7 per rung resolves the gap at 2 SE** — about 8 more jobs, entirely affordable.
+(An earlier estimate of ~40 seeds used the cl5 sd at ms=1e−3, which is 3× looser; using the rung's
+own seeds corrected it.)
+
+**IT IS NOT BOUGHT THIS TICK, AND THE REASON IS ORDER, NOT PRICE.** N1 characterises how the
+argmin flip depends on the meta-stepsize. The *only* thing the nodewise minimum has ever been for
+is the Adam-mini / Adalayer / SGG sentence — and §79 has just suspended that sentence pending
+`bo7`. Spending jobs to map the ms-dependence of a phenomenon that may have no surviving
+application is premature. **If `bo7`'s W1 refutes (argmin stays `node` under AdamW), the sentence
+lives and N1's four extra seeds become the next batch. If W1 confirms, the nodewise minimum is an
+SGDm-only, 20-epoch-only, ms=1e−3-only curiosity and N1 should not be bought at all.**
+
+This is recorded so the next tick can execute it without re-deriving it: **8 jobs, seeds 3–6 on
+`node` and `w` at ms=2e−4, conditional on bo7 W1 refuting.**
+
+## 81. DECISION RECORD — cycle 54
+
+**Data state.** Both queues 0 P / 0 R at tick start; all 21 cycle-53 jobs landed (`br6` 12,
+`ns6` 3, `bo6` 6). Probes synced in full (br6 453 MB, bo6 207 MB, ns5 re-synced to 521 MB). CSV
+regenerated to **1707 runs** (+21). Five selftests green before use: `c54_score` **17/17**,
+`c53_score` **14/14**, `neff_instrument` **23/23**, `c52_boxfree` **27/27**, `c53_budget_window`
+**6/6**.
+
+**Decisions taken, and why.**
+
+1. **C2 SCORED BEFORE C1**, as registered — the independent prediction read before the
+   labelled-dependent one. Both passed; C1 is written as a **replication**, never a discovery. → §77
+2. **THE BUDGET THREAT IS CONFIRMED ON EVIDENCE NEEDING NO SALVAGE.** 12/12 box-free, n=4,
+   registered window. CORRECTIONS 73 is upgraded from post-hoc to pre-registered. → §77
+3. **V2's PRINTED VERDICT WAS REFUSED.** The scorer's own gate failed on the two rungs feeding the
+   argmin. Recorded UNINTERPRETABLE; the Adam-mini sentence is **SUSPENDED, not deleted** — the
+   symmetric reading of 76(1). Scorer fixed as a tested function. → §79
+4. **STANDING RULE (9) added**, with the ±0.10 bar shown to be ~29 sd at 40-epoch weightwise and
+   the 0.02 argmin tolerance shown to be too tight — the same rule failing in both directions. No
+   past verdict changes; checked explicitly against the sd at each gate's own budget, and
+   **CORRECTIONS 68 is confirmed NOT re-opened**. → §78
+5. **N1's extra seeds DEFERRED on sequencing**, with the cost measured (8 jobs, n=7/rung at 2 SE)
+   and the trigger written down, so the next tick executes rather than re-derives. → §80
+6. **A THIRD CORRECTIONS-71 SUBMISSION FAILURE CAUGHT BEFORE SUBMISSION.** `bd7` was written with
+   `--time=05:50:00` against gpu-short's 4:00:00 cap, which would have rejected all 12 jobs. Fixed,
+   and **`guard 6` now reads live `sinfo` limits** so the class of error cannot recur. A comment
+   was not enough twice; a guard is. → FINDINGS 54.6
+7. **TWO `c53_score.py` LABEL-VS-DATA BUGS FIXED** — a hard-coded seed count producing a FAIL with
+   a misattributed cause, and an `n` column printed from a table literal that concealed the third
+   seed's arrival. → FINDINGS 54.5
+8. **THE CEILING IS AN EXPERIMENTAL VARIABLE IN BOTH NEW BATCHES**, because br6's measured travel
+   is bursty (2 of 12 runs moved +3.3 / +4.0 log units in the final 10 epochs while 10 descended).
+   STANDING RULE (7) COROLLARY forbids funding either batch on an extrapolated headroom, so the
+   box-dependence is measured instead of assumed.
+9. **IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous eleven.
+10. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE and is re-flagged for the operator** (76.9,
+    71). Anything strictly between layerwise and weightwise needs a scatter/gather in the hot
+    update path, in the optimizer under study. **Not done unsupervised.**
+
+**Submitted, 24 jobs, all ACCEPTED BY SLURM and all RUNNING (0 pending on both accounts).**
+
+* **`bd7-*`, 12 on alice2** (`bin/c54_budget_curve.sh`) — the **80-epoch budget point**, ceiling as
+  a variable (HI ∈ {2.0, 6.0}), seeds 0–1. D0, D0.3 (per seed per ceiling, first), D0.4, **D0.5 a
+  new CEILING-INVARIANCE gate**, **D1 with NO direction registered** and three bar-defined branches
+  (falls ≤0.13 / floors ±0.02 / rebounds ≥0.17), D2 the granularity contrast. Per-rung bars.
+* **`bo7-*`, 12 on alice** (`bin/c54_adamw_ceiling.sh`) — the **AdamW re-run** bo6's V0.3
+  prescribed, same ceiling ladder, 20 epochs. W0.3 per seed per ceiling, W0.4, W0.5, **W1 the
+  argmin (LABELLED NOT INDEPENDENT)**, **W2 with no direction registered**.
+
+**NEXT TICK, in order.**
+(a) **`bo7` FIRST — it gates the most.** W0.3 per seed per ceiling; if both ceilings bind on node
+and w, say "AdamW-base beta is not confinable at this ms" and make the next batch an **ms ladder**,
+not a third ceiling. Then W0.4, W0.5, then **W1 before W2**. W1 decides whether the Adam-mini
+sentence is deleted or reinstated, and whether §80's 8 N1 jobs are bought at all.
+(b) **`bd7`: D0.3 per seed per ceiling, then D0.4, then D0.5 BEFORE D1** — pooling two ceilings
+that disagree would manufacture the very budget effect D1 is measuring. Then D1's three branches,
+then D2. **Report the 80-epoch per-seed sd alongside the verdict** (STANDING RULE 9).
+(c) **Do NOT fund 160 epochs until D0.3 scores.** +6.0 is an untested ceiling; that is the error
+§72 was written about, and §77 only licenses ceilings that have been *measured* box-free.
+(d) Still unspent, still bookkeeping not science: the raw-instrument `s` re-derivation sweep,
+carried since 51.
+
+**Queues at tick end.** alice **12 R / 0 P** (`bo7`). alice2 **12 R / 0 P** (`bd7`).
+FairShare 0.333054 / 0.333893, unchanged from cycles 52–53.
+
+## 82. THE NODEWISE MINIMUM IS A **TRANSIENT**, AND THE MECHANISM 74 LEFT OPEN IS MEASURED (cycle 55)
+
+`bo7`/`bd7` could not be read: **both ALICE login nodes are down** (FINDINGS 55.0 — gateway up,
+`132.229.104.230/.231` unreachable from it, all five login aliases refused on :22). No queue was
+read, nothing was synced, nothing was submitted. Everything below comes from the probe mirrors
+already on disk and needed no cluster.
+
+**THE RESULT.** Adaptation lifts N_eff/m **monotonically in block size** — 4 of 4
+network-matched frozen→free pairs give lift(w) 3.84–12.03× > lift(node) 1.26–4.73× >
+lift(lay) 0.72–1.19× ≈ 1 (FINDINGS 55.5). With β frozen the minimum is **weightwise in 4 of 4
+families**. The "nodewise minimum" is therefore **not a property of the nodewise partition**:
+it is where a large weightwise lift has carried weightwise *past* nodewise. This is
+CORRECTIONS 47's scale-selective consumption, reproduced in ordering through a different
+statistic on three families it was never measured on.
+
+**AND THE LIFT IS TRANSIENT, MEASURED WITHIN ONE BOX-FREE BATCH** (FINDINGS 55.6). In absolute
+epoch windows, `br6` weightwise runs 0.0092 → **0.5073** → 0.2551 → 0.1201 while nodewise runs
+0.0217 → 0.4074 → 0.3270 → 0.2768. **The argmin is `w`, then `node`, then `w` again — the
+crossover happens between epochs 20 and 30 inside a single set of runs**, and `bl5` (a different
+batch at a different ceiling) reproduces the curve to three decimals.
+
+> **CORRECTIONS 70's nodewise minimum is a ~10-EPOCH WINDOW OF TRAINING.** It does not exist
+> before adaptation lifts weightwise and it does not survive that lift's decay.
+
+**THIS DOES NOT DELETE THE ADAM-MINI SENTENCE AND MUST NOT BE USED TO.** It is a POST-HOC
+inventory of data already on disk. CORRECTIONS 76(1), read symmetrically per 79, binds a
+post-hoc rescue that strengthens a refutation exactly as hard as one that saves a confirmation.
+**The sentence stays SUSPENDED** pending `bo7`. What changes is not its status but **what the
+next batch should be** — see (5) below.
+
+## 83. DECISION RECORD — cycle 55
+
+**Data state.** Cluster unreachable for the whole tick; the outage was localised to the login
+nodes by probing from the gateway rather than reported as "ssh failed". CSV unchanged at 1707
+runs — **no aggregate was regenerated, because no new `.out` was fetched, and regenerating it
+from unchanged inputs would have manufactured a false "+0 runs" provenance line.** Six
+selftests green before use (`neff_instrument` 23/23, `c52_boxfree` 27/27, `c53_budget_window`
+6/6, `c53_score` 14/14, `c54_score` 17/17, `probe5_window` 41/41) plus the new
+`c55_neff_noise` **51/51**.
+
+**Decisions taken, and why.**
+
+1. **THE TICK WAS SPENT ON THE INVENTORY WE ALREADY OWN, NOT ON WAITING.** 5.5 GB of probes for
+   16 batches were on this Mac; the cluster was needed only to *add* to them. → 55.1–55.6
+2. **STANDING RULE (9) IS NOW BACKED BY 46 MEASURED CELLS INSTEAD OF 7**, and CORRECTIONS 78's
+   "conservative in the safe direction everywhere" is **NARROWED**: true of the gates 78
+   checked, **false of the inventory** — seven cells put ±0.10 below 2 sd, two below 1.4 sd.
+   No past verdict changes; the claim's scope does. → 55.2
+3. **THE DOMINANT NOISE AXIS IS THE RUNG AND THE OPERATING POINT, NOT THE BUDGET.** Median sd
+   by budget is 0.0167 (20 ep) vs 0.0196 (40 ep) — nothing. Weightwise sd at a *single* budget
+   already spans 94×. FINDINGS 54.2's 10.8× collapse is real for its pair (p<0.01) and is
+   **not a budget law**. → 55.2
+4. **12 OF 25 ARGMIN CELLS ARE UNINTERPRETABLE UNDER CORRECTIONS 79's OWN RULE**, applied
+   uniformly for the first time. And `cl5/cU`, the sole control behind CORRECTIONS 70, is
+   **DECIDED AT 2.81 SE** — it stands, and it has been written as if it were far safer than
+   that. → 55.3
+5. **THE NEXT BATCH IS NO LONGER A THIRD SCOPE ON THE OLD QUESTION.** `bo7` asks "does the
+   nodewise minimum survive AdamW". The inventory says the minimum is a ~10-epoch transient
+   that already fails on the budget axis and vanishes entirely with β frozen. **Whatever `bo7`
+   returns, the right follow-up is the EDGES OF THE BAND — where the crossover sits as a
+   function of adaptation extent — not a fourth base optimizer.** Recorded so the next tick
+   executes rather than re-derives.
+6. **CORRECTIONS 74 (N2) IS NOT CONTRADICTED, AND A DEFINITIONAL DEBT IS RECORDED.** 74
+   rejected adaptation extent on a span of 8.27 log units at ms=5e−4; this module measures
+   6.29 for the same cell on a different, stated definition. **The two statistics must be
+   reconciled before either is quoted again.** Neither is adopted over the other here. → 55.4
+7. **A PREDICTION FOR `bd7` IS WRITTEN DOWN BEFORE `bd7` IS READABLE** (weightwise at 80 epochs
+   below 0.1509 and still falling), explicitly labelled POST-HOC-DERIVED so a confirmation is a
+   replication of 55.6's curve and never a discovery. → 55.6
+8. **TWO VACUOUS TESTS FOUND AND KILLED IN THE NEW MODULE'S OWN SELFTEST** — an empty glob was
+   passing a coverage assertion, and three symlink-alias roots were double-counting every `ml5`
+   cell. A coverage test over zero items is the silent-zero failure `c52_boxfree.records()` was
+   hardened against; it is now hardened here too. → 55.1
+9. **NOTHING WAS SUBMITTED AND NOTHING WAS GUESSED ABOUT THE RUNNING JOBS.** `bo7` (12, alice)
+   and `bd7` (12, alice2) were RUNNING at the end of cycle 54; whether they survived the outage
+   is **unknown**. A poller retries login-node reachability from the gateway every 2 minutes.
+10. **IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twelve.
+11. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE and is re-flagged for the operator**
+    (76.9, 71, 81.10). Not done unsupervised.
+
+**NEXT TICK, in order.**
+(a) **Reachability first.** `ssh alice-gw 'nc -z login.alice.universiteitleiden.nl 22'` is the
+    one-line check; the poller log is in the session scratchpad. If still down, the cluster is
+    not the bottleneck and there is more inventory work (the raw-instrument `s` re-derivation,
+    carried since 51, and the span-definition reconciliation owed by 83.6).
+(b) **If up: `squeue` BOTH accounts before anything else** — determine whether `bo7`/`bd7`
+    survived or must be resubmitted. Do not assume either.
+(c) Then cycle 54's order stands: `bo7` W0.3 per seed per ceiling → W0.4 → W0.5 → **W1 before
+    W2**; `bd7` D0.3 → D0.4 → **D0.5 before D1** → D2, reporting the 80-epoch per-seed sd
+    beside every verdict, now against 55.2's measured table rather than ±0.10.
+(d) **Score `bd7`'s D1 against 55.6's written-down expectation as a REPLICATION**, never as a
+    discovery.
+
+**Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.

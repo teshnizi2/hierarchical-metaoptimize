@@ -61,6 +61,25 @@ def fmt(v, nd=4):
     return "--" if v is None or (isinstance(v, float) and not math.isfinite(v)) else f"{v:.{nd}f}"
 
 
+def argmin_blockers(rows, stable):
+    """Which rungs make an argmin over `rows` UNINTERPRETABLE?  (cycle 54)
+
+    An argmin is a statistic OVER the rungs, so it inherits EVERY rung's
+    interpretability -- not just that of the rung it happens to select.  This
+    file's first version gated V1 on the weightwise rung alone and left V2
+    ungated, then printed "V2 REFUTED ... the Adam-mini sentence must be
+    DELETED" from an argmin whose two smallest rungs had both failed the
+    box-free gate on 2 of 2 seeds, while the only box-free rung was the
+    maximum.  Returns ([blocking rung names], reason) -- empty list == usable.
+    """
+    bad = sorted(g for g, rs in rows.items() if not all(o["free"] for o in rs))
+    if bad:
+        return bad, f"the box-free gate failed on {', '.join(bad)}"
+    if not stable:
+        return [], "the stability gate failed"
+    return [], ""
+
+
 def per_seed_boxfree(pat, lo, hi, rec_per_epoch):
     """STANDING RULE (8): the box-free gate, PER SEED.  Returns a list of dicts."""
     out = []
@@ -150,6 +169,23 @@ def selftest():
         ok("per-seed scoring FAILS it, which is the point",
            not all(o["free"] for o in rs))
         ok("n_beta byte-match is read per seed", all(o["n_beta"] == NBETA["w"] for o in rs))
+
+    # --- the V2 gate (cycle 54).  These encode the exact bo6 shape that the
+    #     first version of this file scored as "V2 REFUTED": lay box-free, node
+    #     and w both bound, and the argmin sitting on a bound rung.
+    _free = [{"free": True}, {"free": True}]
+    _bound = [{"free": False}, {"free": False}]
+    ok("V2 gate: the literal bo6 shape is UNINTERPRETABLE",
+       argmin_blockers({"lay": _free, "node": _bound, "w": _bound}, True)[0] == ["node", "w"])
+    ok("V2 gate: a bound rung that is NOT the argmin still blocks",
+       argmin_blockers({"lay": _bound, "node": _free, "w": _free}, True)[0] == ["lay"])
+    ok("V2 gate: all rungs box-free and stable is usable",
+       argmin_blockers({"lay": _free, "node": _free, "w": _free}, True) == ([], ""))
+    ok("V2 gate: instability blocks even when every rung is box-free",
+       argmin_blockers({"lay": _free, "node": _free, "w": _free}, False)[1] != "")
+    ok("V2 gate: one bound seed of two is enough to block (STANDING RULE 8)",
+       argmin_blockers({"lay": _free, "node": _free,
+                        "w": [{"free": True}, {"free": False}]}, True)[0] == ["w"])
 
     ok("argmin imported live", argmin_rung({"lay": .7, "node": .4, "w": .5})[0] == "node")
     ok("argmin undecided inside 0.02",
@@ -301,7 +337,30 @@ def score_bo6():
         order = " < ".join(k for k, _ in sorted(pr.items(), key=lambda kv: kv[1]))
         print(f"\n  AdamW: lay {pr['lay']:.4f}  node {pr['node']:.4f}  w {pr['w']:.4f}   -> {order}")
         print(f"  argmin = {am} ({'decided' if dec else 'UNDECIDED, gap <= 0.02'})")
-        if not dec:
+        # ---------------------------------------------------------------------
+        # THE GATE V2 WAS MISSING (cycle 54).  An argmin is a statistic OVER the
+        # rungs, so it inherits EVERY rung's interpretability, not just its own.
+        # The first version of this file gated V1 on rows["w"] (below) and left
+        # V2 ungated -- and then printed "V2 REFUTED ... the Adam-mini sentence
+        # must be DELETED" from an argmin whose two smallest rungs had BOTH
+        # failed V0.3 on 2 of 2 seeds, while `lay`, the only box-free rung, was
+        # the maximum.  That is the FOURTH time this campaign a summary statistic
+        # has been read past its own uncertainty flag (CORRECTIONS 75: `s` in 51,
+        # the pooled clip fraction in 62, the argmin in 74, this).
+        # bo6's own registration fixes the consequence: "that arm's V1 is
+        # UNINTERPRETABLE, and the batch is re-run at a raised ceiling rather
+        # than reported", and its RESOLUTION note states the general principle --
+        # an untrustworthy rung makes the argmin UNDECIDABLE "rather than
+        # defaulting it to one of the other two.  Say which."
+        bad, why = argmin_blockers(rows, v04)
+        if why:
+            print(f"  --> V2 UNINTERPRETABLE -- {why}.")
+            print("      An argmin inherits the interpretability of EVERY rung it ranks, and")
+            print(f"      {'/'.join(bad) if bad else 'this batch'} feeds it.  The nominal ordering above is NOT a verdict.")
+            print("      Registered consequence (bo6 V0.3): RE-RUN AT A RAISED CEILING.")
+            print("      The Adam-mini sentence is SUSPENDED: it may not be written, and it")
+            print("      may not be deleted either, until the re-run scores.")
+        elif not dec:
             print("  --> V2 UNDECIDED. Buy a third seed, as ns5/ns6 did. Do NOT read the")
             print("      nominal argmin (CORRECTIONS 75).")
         elif am == "node":

@@ -33,6 +33,7 @@ and cycle 52 kept that discipline deliberately.
 
 Run `--selftest` before trusting any number this prints.
 """
+import glob
 import math
 import os
 import sys
@@ -386,16 +387,27 @@ def score_ns5():
     # ---- N0 VALIDITY (new rungs only; the controls are already in the record)
     print("\n(N0) VALIDITY GATE  (the two NEW stepsizes)")
     print(f"  {'ms':7}{'rung':6}{'n_dirs':>8}{'T':>7}{'n_beta':>14}{'byte-match':>12}{'beta MOVED':>12}")
-    n0 = True
+    # The seed count is NOT a validity condition and must not be folded into one
+    # (cycle 54).  This check read `n == 2` hard-coded; when `ns6-*` delivered the
+    # THIRD seed at ms=2e-4 -- a seed this campaign deliberately bought -- N0 went
+    # FAIL and printed "a n_beta mismatch VOIDS the ladder" while every byte-match
+    # cell in its own table read `yes`.  The verdict was right about nothing and
+    # the message named a cause that had not occurred.  What VOIDS the ladder is a
+    # n_beta mismatch, a wrong T, or beta not moving; a changed seed count is data.
+    n0, seedcounts = True, {}
     for ms, root, fam, pat, _ in LAD[1:3]:
         for g in RUNGS:
             a, n = agg(os.path.join(root, pat.format(g=g)), -30.0, 0.0)
             moved = a["min_final"] != a["max_final"]
             match = a["n_beta"] == NBETA[g]
-            n0 &= (n == 2) and (a["T"] == 2000) and moved and match
+            n0 &= (a["T"] == 2000) and moved and match
+            seedcounts[(ms, g)] = n
             print(f"  {ms:7}{g:6}{n:>8}{a['T']:>7}{a['n_beta']:>14,}"
                   f"{('yes' if match else 'NO'):>12}{('yes' if moved else 'NO'):>12}")
-    print(f"  --> N0 {'PASS' if n0 else 'FAIL -- a n_beta mismatch VOIDS the ladder (the two accounts are not byte-identical)'}")
+    print(f"  --> N0 {'PASS' if n0 else 'FAIL -- n_beta mismatch / wrong T / beta did not move. VOIDS the ladder.'}")
+    _uneven = sorted({(ms, n) for (ms, _g), n in seedcounts.items()})
+    print(f"  seed counts (DATA, not a gate): " +
+          "   ".join(f"ms={ms} n={n}" for ms, n in _uneven))
 
     # ---- N0.3 THE BOX-FREE GATE, SCORED FIRST
     print("\n(N0.3) **THE BOX-FREE GATE, SCORED FIRST**, for the fifth time in this campaign.")
@@ -438,8 +450,16 @@ def score_ns5():
         am, dec = argmin_rung(pr)
         order = " < ".join(k for k, _ in sorted(
             ((k, v) for k, v in pr.items() if v is not None), key=lambda kv: kv[1]))
-        print(f"  {ms:7}{nseed:>3}{fmt(pr['lay']):>10}{fmt(pr['node']):>10}{fmt(pr['w']):>10}"
-              f"{str(am):>9}{('yes' if dec else 'NO'):>9}   {order}")
+        # COUNT THE SEEDS THAT ARE ON DISK; DO NOT PRINT THE TABLE LITERAL (cycle 54).
+        # This column printed LAD's hard-coded `nseed`, so after `ns6-*` landed the
+        # third seed at ms=2e-4 the row still read "n 2" while the N_eff/m values
+        # beside it HAD moved (w 0.2054 -> 0.2128, node 0.2244 -> 0.2271) because
+        # neff_table globs the directories.  A provenance label that disagrees with
+        # the number it labels is worse than no label.
+        nreal = len(glob.glob(os.path.join(root, pat.format(g="w"))))
+        flag = "" if nreal == nseed else f"  <-- n differs from the registration's {nseed}"
+        print(f"  {ms:7}{nreal:>3}{fmt(pr['lay']):>10}{fmt(pr['node']):>10}{fmt(pr['w']):>10}"
+              f"{str(am):>9}{('yes' if dec else 'NO'):>9}   {order}{flag}")
 
     n1_undecided = False
     seq = [argmin_rung(profiles[ms])[0] for ms, *_ in LAD]
