@@ -10764,3 +10764,59 @@ epochs should be **below** the 40-epoch 0.1509 and still falling. **That predict
 here, before `bd7` is readable, precisely so it cannot be fitted afterwards** — and it is
 registered as a POST-HOC-DERIVED expectation, so a confirmation is a replication of this
 curve, never a discovery.
+
+## 55.7 THE SPAN-DEFINITION DEBT (83.6) IS PAID, AND IT **CORRECTS** CORRECTIONS 74 (N2)
+
+55.4 recorded that this module's span (3-rung, steady-half mean) reads 6.29 where N2 reported
+8.27, and refused to adopt either. Both are now computed on all 13 interpretable cells, N2's via
+its own selftested `c53_score.beta_span` (**max − min on the LAST record, weightwise arm**):
+
+| root | arm | ep | N2 span (w, last rec) | c55 span (3-rung, steady) | argmin |
+|---|---|---|---|---|---|
+| p5 | r18c10 (**frozen**, ms 1e−3) | 20 | **0.00** | 0.00 | **w** |
+| fz3 | r10 (**frozen**, ms 1e−3) | 20 | **0.00** | 0.00 | **w** |
+| fz3 | c100 (**frozen**, ms 1e−3) | 20 | **0.00** | 0.00 | **w** |
+| fz3 | r34 (**frozen**, ms 1e−3) | 20 | **0.00** | 0.00 | **w** |
+| ml5 | m4 (free, ms 1e−4) | 20 | 1.96 | 1.48 | w |
+| ns5 | m2p4 (free, 2e−4) | 20 | 3.81 | 2.91 | w (UNDEC) |
+| ns5 | m5p4 (free, 5e−4) | 20 | **8.27** | 6.29 | **w** |
+| uc5 | r34 (free, 1e−3) | 20 | **12.18** | 8.88 | **node** |
+| cl5 | cU (free, 1e−3) | 20 | 13.56 | 10.24 | node |
+| uc6 | c100 (free, 1e−3) | 20 | 15.09 | 12.62 | node |
+| uc5 | r10 (free, 1e−3) | 20 | 15.87 | 11.80 | node (UNDEC) |
+| br6 | c2 (free, 1e−3) | **40** | 23.85 | 17.52 | **w** |
+
+**THE 8.27 REPRODUCES EXACTLY**, so the two statistics are reconciled rather than in dispute,
+and **both separate the 20-epoch argmin perfectly**:
+
+| definition | max span among `w`-argmin | min span among `node`-argmin | verdict |
+|---|---|---|---|
+| N2 (weightwise, last record) | **8.27** | **12.18** | **SEPARATES** |
+| c55 (3-rung, steady-half mean) | 6.29 | 8.88 | **SEPARATES** |
+
+**SO N2 REFUTED ITS GUESSED THRESHOLD, NOT ITS VARIABLE.** `bin/c52_nodemin_onset.sh:93`
+registered the flip at *"the stepsize whose beta SPAN first exceeds **~5** log units"*. The 5
+was a guess. The measured boundary lies between **8.27 and 12.18** on N2's own statistic — so
+the ms=5e−4 cell at 8.27 is **below** the boundary, not "past its threshold", and its `w`
+argmin is what the variable predicts rather than a counterexample to it.
+
+**AND THE DECISIVE CELLS ARE THE ONES N2's LADDER DID NOT CONTAIN.** Within the FREE arms alone
+ms and span stay confounded exactly as N2 said (1e−4/2e−4/5e−4 → `w`, 1e−3 → `node`, and span
+rises with ms). **The four FROZEN arms break the confound, and they break it against ms:**
+
+> **ms = 1e−3 in all four frozen cells and in all four free `node` cells. Span is 0.00 in the
+> frozen four and 12.18–15.87 in the free four. The argmin is `w` in the frozen four and `node`
+> in the free four.** Same meta-stepsize, opposite argmin, and only span distinguishes them.
+
+**CORRECTIONS 74's sentence — *"the flip tracks ms, not adaptation extent"* — is REFUTED on
+N2's own statistic.** The flip cannot track ms: ms is held at 1e−3 across eight cells that split
+4–4 on the argmin.
+
+**SPAN IS NOT SUFFICIENT EITHER, AND THAT IS 55.4's BAND.** `br6` at 40 epochs has the largest
+span in the inventory (23.85) and gives `w`. So the argmin is `node` on an INTERVAL of
+adaptation extent — roughly 8–16 log units at these budgets — and `w` on both sides of it.
+That is the same statement as 55.6's transient, read in span instead of in epochs.
+
+**LABELLED POST-HOC.** The boundary was located from data already on disk; only the REFUTATION
+of "the flip tracks ms" is threshold-free, resting solely on eight cells at a single ms
+splitting 4–4. That part does not depend on where the boundary is drawn.

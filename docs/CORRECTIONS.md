@@ -2663,3 +2663,35 @@ selftests green before use (`neff_instrument` 23/23, `c52_boxfree` 27/27, `c53_b
     discovery.
 
 **Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.
+
+## 84. CORRECTIONS 74 (N2) IS **CORRECTED**: THE FLIP DOES NOT TRACK ms (cycle 55, later in the tick)
+
+83.6 recorded a definitional debt and refused to adopt either span statistic. It is paid
+(FINDINGS 55.7). N2's own `c53_score.beta_span` reproduces **8.27 exactly**, so the two
+statistics agree; **both separate the 20-epoch argmin perfectly**, N2's between 8.27 and 12.18.
+
+**N2 REFUTED A GUESSED THRESHOLD, NOT ITS VARIABLE.** `c52_nodemin_onset.sh:93` registered the
+flip at *"span first exceeds **~5** log units"*. The 5 was never measured. The boundary is
+between 8.27 and 12.18, so ms=5e−4's span of 8.27 is **below** it and its `w` argmin is the
+variable's prediction, not a counterexample.
+
+**AND THE REFUTATION OF "IT TRACKS ms" IS THRESHOLD-FREE.** Eight cells sit at ms = 1e−3 and
+split **4–4** on the argmin: the four FROZEN arms (span 0.00, argmin `w`) against the four FREE
+arms (span 12.18–15.87, argmin `node`). **A variable held constant across a 4–4 split cannot be
+the one that governs it.** N2's ladder contained no frozen arm, which is why it could not see
+this; within the free arms alone ms and span remain confounded exactly as N2 said.
+
+> **CORRECTIONS 74's sentence *"the flip tracks ms, not adaptation extent"* is WITHDRAWN.**
+> Adaptation extent is not refuted; ms is. The mechanism 74 left OPEN is 82's: adaptation lifts
+> N_eff/m monotonically in block size, and the argmin is `node` only on the INTERVAL of
+> adaptation extent where the weightwise lift has carried weightwise past nodewise — roughly
+> 8–16 log units of span at these budgets, with `w` on **both** sides (br6 at span 23.85 gives
+> `w`). Span is necessary to the description and is not sufficient on its own.
+
+**WHAT THIS DOES AND DOES NOT DO.** It does not touch the Adam-mini sentence, which stays
+**SUSPENDED** pending `bo7` (82, 79). It does not license a "span threshold" number: the
+boundary was located post-hoc and only the ms refutation is threshold-free. It DOES mean
+CORRECTIONS 70's remaining scopes should be restated in adaptation extent rather than in ms —
+and that **`bo7`, whatever it returns, is measuring a base optimizer's effect on SPAN, not a
+fourth independent scope.** That reframing is the actionable consequence and it is why 83.5
+already redirected the next batch to the edges of the band.
