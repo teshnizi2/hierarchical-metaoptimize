@@ -10820,3 +10820,46 @@ That is the same statement as 55.6's transient, read in span instead of in epoch
 **LABELLED POST-HOC.** The boundary was located from data already on disk; only the REFUTATION
 of "the flip tracks ms" is threshold-free, resting solely on eight cells at a single ms
 splitting 4–4. That part does not depend on where the boundary is drawn.
+
+## 55.8 `bin/c55_span_dissociation.sh` — WRITTEN, DRY-RUN-VALIDATED, **NOT SUBMITTED** (cluster down)
+
+**THE CONFOUND CYCLE 55 COULD NOT BREAK WITH EXISTING DATA.** Span is necessary but not
+sufficient: `br6` has the largest span in the inventory (23.85) and gives `w`. But **every cell
+above the `node` band is also a 40-epoch cell and every cell below it is a 20-epoch cell** —
+so at the band's UPPER edge, span and budget are perfectly confounded. The upper edge might be
+a span edge or a budget edge, and no combination of the 16 probe roots on disk can say which.
+
+**THE DESIGN THAT BREAKS IT.** A 40-epoch arm whose span lands back *inside* the band:
+
+| | ms | epochs | N2 span | argmin |
+|---|---|---|---|---|
+| `ns5-*-m5p4-*` (measured) | 5e−4 | 20 | 8.27 | **w**, 3.80 SE |
+| `cl5-*-cU-*` (measured) | 1e−3 | 20 | 13.56 | **node**, 2.81 SE |
+| `br6-*` (measured) | 1e−3 | 40 | 23.85 | **w**, 13.07 SE |
+| **`sp8-*` (this batch)** | **5e−4** | **40** | **~14.5 predicted** | **node ⇒ span governs; w ⇒ it does not** |
+
+`sp8` is a **pure budget doubling of a decided `w` cell into the middle of the `node` band**.
+Arithmetic, re-run in `guard 4` rather than trusted to the comment: span ∼ ms^**0.84** (log-log
+over the decade 1e−4→1e−3), budget factor **1.759** (the one matched-ms pair, br6/cl5), so
+8.27 × 1.759 = **14.5**, inside the observed `node` range [12.18, 15.87].
+
+**NO DIRECTION IS REGISTERED, AND THE REASON IS THAT OUR OWN TWO CYCLE-55 RESULTS DISAGREE ON
+THIS CELL.** 55.6's transient predicts `w` (the lift has decayed by epoch 30 whatever ms is);
+55.7's band predicts `node`. That disagreement is what makes the cell worth 9 jobs, and
+inventing a direction to collect a confirmation would be the uc5 failure mode (CORRECTIONS 68).
+
+**S0.5 IS A NEW KIND OF GATE AND IT CAN ONLY VOID, NEVER DECIDE.** The design's claim is that
+this cell lands inside the band; if the realised span falls outside **[11, 18]** the
+dissociation was not achieved and **S1 is not scored at all**. A `w` at span 22 is perfectly
+consistent with span governing and answers nothing — reporting it as a verdict would be the
+CORRECTIONS 79 failure (reading a statistic past its own gate) in a new costume.
+
+**THE CEILING IS NOT EXTRAPOLATED.** `BOX=-30:2.0` is what `br6` measured box-free 4/4 at the
+**same** 40-epoch budget and a **strictly larger** ms. That is a measured envelope, not a
+headroom projection; STANDING RULE 7's corollary forbids the latter and this batch does not use
+one. `guard 3b` diffs the claim against `br6`'s own script rather than asserting it.
+
+**GUARDS: 1, 2, 3, 3b, 4, 5, 6 — all present; `bash -n` clean; guard 4's arithmetic re-run
+standalone and passing.** Guards 3/3b/5/6 need a live cluster (`sinfo`, `squeue`, the remote
+`HF.py`) and are **unverified** — they run at submit time. 9 jobs, alice2, inside the ~20-job
+rule. **Not submitted: both login nodes are down.**
