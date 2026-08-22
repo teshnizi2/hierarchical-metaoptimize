@@ -2846,3 +2846,81 @@ still not guessed.** No ssh config was touched and no retry loop was run.
     long one, twice, in two different documents.
 
 **Queues at tick end.** UNKNOWN — both login nodes unreachable. FairShare not readable.
+
+## 86. **THE "BUDGET" CONTRAST IS A WINDOW CONTRAST, AND THE HEADLINE SHOULD BE THE ACCURACY REVERSAL** (cycle 56)
+
+Three corrections and one new headline candidate. **Every number re-derived from the raw `.out`
+series at write time** (STANDING RULE 1); where an audit's number and mine disagreed, mine is
+the one of record.
+
+### 86.1 THERE IS NO BUDGET VARIABLE. CORRECTIONS 73/77 AND GATES C1/C2/C2.5 MEASURE A WINDOW.
+
+`diff` of the two ARGS lines, run directly:
+
+    cl5-lay-cU-s0  vs  bl5-lay-e40-s0
+      --num-epochs      20  ->  40
+      --save-directory  .../cl5 -> .../bl5
+      --run-name        cl5-lay-cU-s0 -> bl5-lay-e40-s0
+
+**Nothing else differs.** `SCHED=none`, `gamma=1`, no budget-coupled decay. **A 40-epoch run IS
+a 20-epoch run continued.** So "N_eff/m at a 20-epoch budget" (steady half = epochs 10-20) versus
+"at 40 epochs" (steady half = epochs 20-40) is a **contrast between two windows of one
+trajectory**, manufactured by the convention that slides the window with B.
+
+The measurement is not wrong; **its name is.** Write **"N_eff/m is non-stationary in training
+time, and the non-stationarity differs by granularity."** Do NOT write "budget-dependent",
+which implies a second causal variable the corpus does not contain. CORRECTIONS 73's quoting
+rule survives in substance ("over epochs 10-20"), and its *"at a 20-epoch budget"* wording
+does not.
+
+### 86.2 THE CSV `plateau` COLUMN MAY NOT BE COMPARED ACROSS BUDGETS.
+
+`aggregate.py:85` is `plateau_of(tests, k=20)`. On a **20-epoch** run that is the mean of the
+**whole run**, including the startup transient; on a 40- or 100-epoch run it is a genuine tail.
+Any cross-budget table built from that column is comparing a whole-run mean against a tail mean.
+Use a **matched-k plateau** (mean of the last 5 test epochs at the epoch being compared).
+Within-budget comparisons (e.g. the 100-epoch baseline table) are unaffected.
+
+### 86.3 **THE NEW HEADLINE CANDIDATE, VERIFIED: THE ACCURACY-OPTIMAL GRANULARITY REVERSES WITH TRAINING HORIZON.**
+
+`nodewise - layerwise`, matched-k plateau (k=5), **paired within seed**, two batches at two
+different ceilings, R18/C10/SGDm+Lion/ms=1e-3/alpha0=1e-3/AUGMENT=1/SCHED=none:
+
+| epoch | br6 (n=4, ceiling +2.0) | bl5 (n=3, ceiling 0.0) | pooled (n=7) | sd | seeds favouring nodewise |
+|---|---|---|---|---|---|
+| 10 | -3.748 | -4.211 | **-3.946** | 0.801 | **0/7** |
+| 15 | -1.360 | -0.973 | **-1.194** | 0.277 | **0/7** |
+| 20 | +0.057 | +0.007 | +0.035 | 0.286 | 4/7 (tie, at the floor) |
+| 25 | +0.540 | +0.971 | **+0.725** | 0.317 | **7/7** |
+| 30 | +1.038 | +1.105 | +1.067 | 0.230 | 7/7 |
+| 40 | +1.253 | +1.265 | **+1.258** | 0.207 | **7/7** |
+
+**Unanimous on both sides of the crossing, monotone between, replicated across two ceilings.**
+Both endpoints are 25-80x the 0.05 pp resolution floor. The crossing is bounded by unanimity
+between **epoch 15 and epoch 25**; it is an interval, not a point estimate.
+
+This claim needs **no contested estimator, no independence assumption, and no assertion about
+anyone else's paper.** It is the strongest thing the campaign owns.
+
+**N_eff/m is hereby DEMOTED to a scoped mechanism diagnostic** and must be reported with `m`,
+box occupancy, and the scaling exponent `s`. It must be stated explicitly that **it does not
+predict this reversal** — nodewise has far LOWER effective independence than layerwise at 40
+epochs (0.2796 vs 0.6903) and yet WINS on accuracy by 1.258 pp, 7/7.
+
+### 86.4 **UNVERIFIED HIGH-SEVERITY RISK: THE Adam-mini / Adalayer / SGG ATTRIBUTION.**
+
+An audit reports full-text greps finding **no** sqrt(N)/noise-averaging/effective-sample
+argument in any of the three, that Adam-mini argues from **Hessian block structure**, Adalayer
+from **second-moment storage coarseness**, and that SGG asserts the **opposite** (intra-correlated
+groups). **I could not verify this: none of the three PDFs is on local disk, and the same audit
+caught a WebFetch summariser FABRICATING an SGG sentence.** So this is an open risk, not a finding.
+
+It is load-bearing. Our own prose asserts the attribution in at least
+`CORRECTIONS.md:1460`, `FINDINGS.md:8920/8945/9103/9114`, `CONTINUE-HERE.md:475/917` —
+including the phrases *"the core refutation"* and *"the Adam-mini / Adalayer / SGG line assumes
+exactly 0."*
+
+**GATE, effective now: no document may assert what Adam-mini, Adalayer or SGG assume until the
+three PDFs have been read locally and the specific sentence quoted.** If the attribution fails,
+the measurement survives untouched — only its framing as a refutation *of those papers* dies,
+and 86.3 does not depend on it at all.
