@@ -54,6 +54,62 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 55) -- **ALICE WAS DOWN ALL TICK. THE NODEWISE MINIMUM IS A TRANSIENT.**
+
+**Read `docs/CORRECTIONS.md` 82-84 and `docs/FINDINGS.md` 55.0-55.8 before quoting the nodewise
+minimum, CORRECTIONS 70, CORRECTIONS 74's "the flip tracks ms", or the +-0.10 bar. 84 WITHDRAWS
+a CORRECTIONS 74 sentence. 82 makes 70's headline a ~10-epoch window of training.**
+
+* **BOTH ALICE LOGIN NODES WERE DOWN FOR THE WHOLE TICK** and the outage was localised, not
+  assumed: the gateway is up and reachable, `132.229.104.230/.231` refuse :22 from it, all five
+  login aliases fail. **No queue read, nothing synced, nothing submitted. CSV unchanged at 1707.**
+  `bo7-*` (12, alice) and `bd7-*` (12, alice2) were RUNNING at the end of cycle 54; **whether
+  they survived is UNKNOWN and is not guessed.**
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else** -- find out whether bo7/bd7 survived or
+  must be resubmitted. Do not assume either.
+* **THE TICK'S RESULT, ALL OF IT FROM PROBES ALREADY ON THIS MAC.** Adaptation lifts N_eff/m
+  **monotonically in block size** -- 4 of 4 network-matched frozen->free pairs give lift(w)
+  3.84-12.03x > lift(node) 1.26-4.73x > lift(lay) 0.72-1.19x ~ 1. **With beta frozen the minimum
+  is WEIGHTWISE in 4 of 4 families.** The "nodewise minimum" is not a property of the nodewise
+  partition: it is where a large weightwise lift carried weightwise PAST nodewise.
+* **AND THE LIFT IS TRANSIENT, MEASURED INSIDE ONE BOX-FREE BATCH.** `br6` weightwise in absolute
+  epoch windows: 0.0092 -> **0.5073** -> 0.2551 -> 0.1201, against nodewise 0.0217 -> 0.4074 ->
+  0.3270 -> 0.2768. **The argmin goes w -> node -> w, crossover between epochs 20 and 30.** `bl5`
+  reproduces the curve to three decimals at a different ceiling. **CORRECTIONS 70's nodewise
+  minimum is a ~10-EPOCH WINDOW OF TRAINING.**
+* **CORRECTIONS 74's "the flip tracks ms, not adaptation extent" is WITHDRAWN (84).** Eight cells
+  sit at ms=1e-3 and split **4-4** on the argmin: four FROZEN arms (span 0.00 -> `w`) against four
+  FREE arms (span 12.18-15.87 -> `node`). A variable held constant across a 4-4 split cannot
+  govern it. N2 refuted its own GUESSED "~5 log units" threshold, not its variable.
+* **THE ADAM-MINI SENTENCE STAYS SUSPENDED.** All of the above is a POST-HOC inventory and
+  CORRECTIONS 76(1), read symmetrically per 79, forbids it overturning a registered gate. What
+  changes is the NEXT BATCH, not the sentence's status.
+* **NEW INSTRUMENT `analysis/c55_neff_noise.py`, 51/51 selftests.** Gives STANDING RULE (9) its
+  missing table: per-seed sd for all 46 box-free cells with n>=2. **The +-0.10 blanket bar spans
+  1.3 sd to 241 sd**, so CORRECTIONS 78's "conservative everywhere" is narrowed to the gates it
+  checked. **12 of 25 argmin cells are UNINTERPRETABLE under CORRECTIONS 79's own rule**, and
+  `cl5/cU` -- the sole control behind 70 -- is **DECIDED AT 2.81 SE**, not the 5x the 0.02 bar
+  implied. Modes: `--all`, `--argmin`, `--lift`, `--timecourse`, `--price GAP SD`, `--crosscheck`.
+* **SUBMITTED: NOTHING.** `bin/c55_span_dissociation.sh` is **written, dry-run-validated and
+  UNSUBMITTED** -- 9 jobs, alice2, tag `sp8-*`. It breaks the one confound cycle 55 could not:
+  at the band's UPPER edge span and budget are perfectly confounded (every cell above the band is
+  40-epoch, every cell below is 20-epoch). `sp8` is a **pure budget doubling of ns5's decided-`w`
+  m5p4 rung into the middle of the `node` band** (ms=5e-4, 40 ep, predicted span 14.5).
+  **`node` => span governs; `w` => 55.7's band gains a budget scope. NO DIRECTION REGISTERED --
+  55.6's transient predicts `w` and 55.7's band predicts `node`, and that is the point.**
+  New gate **S0.5 can only VOID**: outside a realised span of [11, 18] the dissociation was not
+  achieved and S1 is not scored.
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) If bo7/bd7 landed,
+cycle 54's scoring order stands -- `bo7` W0.3 per seed per ceiling -> W0.4 -> W0.5 -> **W1 before
+W2**; `bd7` D0.3 -> D0.4 -> **D0.5 before D1** -> D2 -- with the per-seed sd from 55.2's measured
+table beside every verdict, not +-0.10. (c) Score `bd7`'s D1 against FINDINGS 55.6's
+written-down expectation (weightwise below 0.1509 and still falling) as a **REPLICATION**, never
+as a discovery. (d) Submit `sp8` once the queue is known. (e) Still unspent: the raw-instrument
+`s` re-derivation sweep, carried since 51.
+
 ## Running / next (cycle 53) -- **THE BUDGET THREAT IS REAL; THE HEADLINE IS A 20-EPOCH SENTENCE**
 
 **Read `docs/CORRECTIONS.md` 72-76 and `docs/FINDINGS.md` 53.1-53.10 before quoting N_eff/m, the
