@@ -10176,3 +10176,175 @@ against CORRECTIONS 46(6)'s by-comparator rule. Justification: the comparison is
 shared selftested instrument on probe files, not raw accuracy, and both accounts' `HF.py` are
 byte-identical after PATCH_CLIPCOUNT (63). **N0's `n_beta` byte-match is the check on that
 assumption; if it fails the batch is void.**
+
+---
+
+## 53.1 THE BUDGET THREAT IS **REAL**. `bl5`'s B0.3 FAILED ON THE RUNG THE HEADLINE IS QUOTED AT.
+
+Both queues 0/0 at tick start; all 12 `ns5` and all 9 `bl5` landed. CSV **1686 runs** (+27).
+Scored by `analysis/c53_score.py` (selftest **14/14**) and `analysis/c53_budget_window.py` (**6/6**),
+both new this tick; `neff_instrument.py` gained a `--window` option (selftest 19/19 → **23/23**,
+default untouched) because B1.5 could not be computed without it.
+
+**B0 PASSES 9/9** — T=4000 on every arm, `n_beta` byte-matched (w 11,173,962 / node 14,420 / lay 62).
+
+**B0.3 FAILS on the weightwise rung.** Registered bar: <5% of records at either guard.
+
+| rung | %rec LO | %rec HI | %Q4 HI | %coord HI | 1st HI | epoch | final max | verdict |
+|---|---|---|---|---|---|---|---|---|
+| lay | 0.0000 | 0.0000 | 0.0000 | 0.00000 | — | — | −6.115 | PASS |
+| node | 0.0000 | 0.0000 | 0.0000 | 0.00000 | — | — | −3.230 | PASS |
+| **w** | 0.0000 | **8.0250** | **32.10** | 0.00147 | **3037** | **30.4** | −1.535 | **FAIL** |
+
+The registration's consequence is honoured: **B1 is UNINTERPRETABLE, NOT REFUTED**, and
+`first_hi` **is** the result — *the first direct measurement of the budget at which the box becomes
+unavoidable at R18 weightwise, ms=1e−3, `BETA_CLIP=−30:0.0`: **epoch 30.4***.
+
+## 53.2 THE POOLED B0.3 ROW HID THE ONLY THING THAT MATTERED — **1 SEED OF 3 BOUND**
+
+"8.03% of records at HI" is a mean over a **binary event**. Per seed:
+
+| seed | first_hi | epoch | %rec HI | %Q4 HI | %coord HI | final max | box-free? |
+|---|---|---|---|---|---|---|---|
+| s0 | 3037 | 30.4 | 24.07 | **96.30** | 0.00147 | **0.000** | **NO** |
+| s1 | — | — | 0.00 | 0.00 | 0.00000 | −2.650 | yes |
+| s2 | — | — | 0.00 | 0.00 | 0.00000 | −1.956 | yes |
+
+A 2.65-log-unit spread in where the top coordinate stops, at one config. **A mean over a binary
+event is not a diagnostic.** Every box-free gate from here on is scored **per seed**.
+
+## 53.3 THE WORST-SEED HEADROOM PROJECTION WAS STILL OPTIMISTIC BY 2.2x — the velocity **RE-ACCELERATED**
+
+CORRECTIONS 67 replaced the mean-trajectory projection (56.6 extra epochs) with the worst seed
+(**22.8**) and made "report the worst seed" a rule. Measured bind: **10.4 extra epochs**. The worst
+seed was optimistic by **2.2x**. Top-coordinate velocity, v/vmax, by 10-epoch block:
+
+| seed | ep 0–10 | 10–20 | 20–30 | 30–40 |
+|---|---|---|---|---|
+| **s0** | 0.845 | 0.123 | **0.379** | 0.037 |
+| s1 | 0.835 | 0.064 | 0.002 | −0.049 |
+| s2 | 0.819 | 0.116 | −0.041 | 0.097 |
+
+**s0 re-accelerated 3.1x** after epoch 20; s1 and s2 did not. Deceleration is **not monotone and is
+seed-dependent**, so a decelerating rate is not a safe upper bound either. → CORRECTIONS 72.
+
+## 53.4 THE CLEAN RUNGS NEEDED NO SALVAGE, AND THEY CARRY THE FINDING: **BUDGET-ROBUSTNESS IS GRANULARITY-DEPENDENT**
+
+`node` and `lay` are box-free on **3/3** seeds at 0.0000% on every denominator. Registered window
+(steady half), n=3, nothing post-hoc:
+
+| rung | 20 ep (cl5 cU) | 40 ep (bl5) | Δ | bar | verdict |
+|---|---|---|---|---|---|
+| lay | 0.7262 | 0.6912 | −0.0350 | 0.10 | **STATIONARY** |
+| node | 0.4056 | 0.2774 | **−0.1282** | 0.10 | **DRIFTING** |
+
+**Layerwise holds its value across a budget doubling and nodewise does not**, on arms that never
+touched a guard. Read the layerwise row as a **bound**, not an absence: m=62 is marginal against
+rho_min ~1.1e−03, so write "not shown to move", never "shown not to move".
+
+## 53.5 [POST-HOC, LABELLED] THE WEIGHTWISE FALL IS **NOT** THE BOX — the bound seed and the free seeds agree
+
+Two salvages, both chosen **after** seeing which seed bound, both therefore **suggestive only**.
+
+**P1 — the box-free window.** Records 2000–3037 are box-free on every seed:
+
+| window | epochs | N_eff/m (w) | vs control | box-free? |
+|---|---|---|---|---|
+| cl5 cU 0.5–1.0 (control) | 10–20 | 0.5064 | — | yes |
+| bl5 0.25–0.5 | 10–20 | 0.5191 | +0.0128 | yes |
+| bl5 **0.5–0.759** | **20.0–30.4** | **0.2634** | **−0.2430** | **yes** |
+| bl5 0.759–1.0 | 30.4–40 | 0.1134 | −0.3930 | no (s0 pinned) |
+| bl5 0.5–1.0 | 20–40 | 0.1483 | −0.3580 | no (s0 pinned) |
+
+**P2 — the seeds that never bound.** s0 (bound) **0.1552**; s1 **0.1442**; s2 **0.1455**. Spread
+**0.011**. The seed that spent 96.3% of its last quarter pinned at the ceiling returns the *same*
+number as the two that never touched it. **The registration's reason for calling B1 uninterpretable
+is measurably absent** — but B1's verdict is not overturned by that, it is replicated by `br6-*`.
+
+**B1.5 PASSES** (0.5179 vs 0.5045, +0.0135): the same absolute window gives the same number, so
+`bl5` differs from `cl5` by **budget** and not by seed/node/dataloader.
+
+## 53.6 B2.5 IS REFUTED AND THE REFUTATION SURVIVES THE BOX-FREE WINDOW
+
+| basis | lay | node | w | ordering |
+|---|---|---|---|---|
+| 20 ep, steady half (registered) | 0.7262 | 0.4056 | 0.5064 | node < w < lay |
+| 40 ep, steady half (w contaminated) | 0.6912 | 0.2774 | 0.1483 | **w < node < lay** |
+| 40 ep, **box-free window 0.5–0.759** | 0.7349 | 0.3422 | 0.2634 | **w < node < lay** |
+
+Contamination would have manufactured exactly this flip (a coordinate pinned against a shared wall
+agrees with its neighbours for a reason unrelated to the meta-gradient), so it was checked. **The
+flip survives the box-free window.** B2.5's refutation stands on its own evidence: **the nodewise
+minimum is budget-specific and must not be written as a property of the partition.**
+B2 also FAILS (b(steady) 0.071 → 0.206, bar 0.05), on the same contaminated fit — report both,
+claim neither (cycle 50's C2 lesson).
+
+**B3, recorded not tested:** 40 epochs beats 20 on all three rungs (lay +14.40, node +17.18,
+w +17.79) — the runs really did train longer. Note the **accuracy** ordering also flips: at 20
+epochs lay 74.43 > node 72.79; at 40 epochs **node 89.97 > lay 88.83**.
+
+## 53.7 `ns5` — N0 AND N0.3 PASS; ALL SIX NEW ARMS BOX-FREE, THE FOUR-POINT LADDER IS CLEAN END TO END
+
+All 12 arms: T=2000, `n_beta` byte-matched, beta moved. Occupancy **0.0000% on all four
+denominators** at both stepsizes and all three rungs (final max −5.03 at 2e−4, −3.32 at 5e−4,
+against a ceiling of 0.0). The ms=1e−4 and ms=1e−3 controls were already box-free, so the ladder is
+box-free at every rung.
+
+## 53.8 **N1 IS UNDECIDED, NOT PASSED** — the ms=2e−4 argmin is a coin flip inside the registered tolerance
+
+N_eff/m, VARIANCE instrument, steady half:
+
+| ms | n | lay | node | w | argmin | gap (2 smallest) | decided? |
+|---|---|---|---|---|---|---|---|
+| 1e−4 (ml5 m4) | 3 | 0.7000 | 0.1697 | 0.1287 | w | 0.0410 | yes |
+| **2e−4 (new)** | 2 | 0.6516 | 0.2244 | 0.2054 | ? | **0.0190** | **NO** |
+| 5e−4 (new) | 2 | 0.6581 | 0.4483 | 0.3915 | w | 0.0568 | yes |
+| 1e−3 (cl5 cU) | 3 | 0.7258 | 0.4016 | 0.5045 | node | 0.1029 | yes |
+
+0.0190 < the registered 0.020 tolerance. The two admissible readings of (2e−4, 5e−4) are **(w, w)**
+— admissible, boundary between 5e−4 and 1e−3 — and **(node, w)**, which is N1's **registered
+refutation**. *A test whose refutation branch is live cannot be reported as a pass.* The ns5 header
+registered the remedy in advance ("say UNDECIDED and buy the third seed then"); `ns6-*` buys it.
+
+*(This corrects a bug in `c53_score.py`'s first run, which printed "N1 PASSES" by reading the
+nominal minimum of an undecided rung. Fixed; the scorer now refuses an undecided argmin and names
+the live refutation branch.)*
+
+## 53.9 **N2 IS REFUTED** — the flip tracks the meta-stepsize, NOT adaptation extent
+
+Registered: the argmin flips to `node` where the weightwise beta **span** first exceeds ~5 log
+units, and tracks span better than ms.
+
+| ms | span (w) | > 5 log units? | argmin |
+|---|---|---|---|
+| 1e−4 | 1.961 | no | w |
+| 2e−4 | 3.831 | no | w (undecided) |
+| **5e−4** | **8.268** | **YES** | **w** |
+| 1e−3 | 13.561 | YES | node |
+
+The predicate matches on **1 of 4** rungs. ms=5e−4 has 8.27 log units of span — well past the
+threshold — and the argmin is still `w`. **CORRECTIONS 70 stays scoped to the meta-stepsize; the
+mechanism stays OPEN.** Do not retro-fit a second variable.
+
+**N3, recorded not tested:** plateau rises monotonically with ms on every rung
+(lay 64.62 / 67.09 / 71.74 / 74.43; node 63.51 / 65.52 / 69.33 / 72.79; w 62.28 / 63.60 / 66.27 / 68.58).
+
+## 53.10 SUBMITTED — 21 jobs, all accepted, all running, 0 pending
+
+* **`br6-*`, 12 on alice2** (`bin/c53_budget_replication.sh`) — **THE BUDGET REPLICATION, BOX-FREE
+  BY CONSTRUCTION.** 40 epochs, `BETA_CLIP=−30:2.0` (+2.0 above the **measured** pin, not an
+  extrapolated one), **seeds 0–3** because the weightwise post-hoc number rests on n=2. C0, C0.3
+  (per seed, first), **C0.4 a NEW stability gate** (alpha may now reach e²=7.39; X3's "interior
+  operating point" was measured at 20 epochs and is now known to be budget-scoped), C1, C2, C2.5.
+  **C1 is labelled NOT INDEPENDENT** — it was registered after seeing the post-hoc window, so a
+  confirmation is a replication. **C2 is the independent one**: the lay-stationary/node-drifting
+  asymmetry was informed by nothing post-hoc.
+* **`ns6-*` (named `ns5-*-m2p4-s2`), 3 on alice** (`bin/c53_ns_thirdseed.sh`) — N1's third seed,
+  bought because ns5's own header said to. M1 predicts argmin stays `w` with the gap opening past
+  0.02; refutation is a decided flip to `node`, which is N1's refutation.
+* **`bo6-*`, 6 on alice** (`bin/c53_base_optimizer.sh`) — **AdamW base**, Lion meta, everything else
+  matched to cl5-cU. Every N_eff/m the campaign has quoted is **SGDm**; the CSV has **zero**
+  AdamW-base nodewise runs. **V2 decides whether CORRECTIONS 70 may cite Adam-mini/Adalayer/SGG at
+  all** — those methods partition an *Adam* second moment, and if the nodewise minimum is an SGDm
+  phenomenon that sentence must be deleted rather than hedged. No direction registered for V1,
+  deliberately: there is no mechanism to predict one.

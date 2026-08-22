@@ -1,0 +1,74 @@
+========================================================================================================
+CYCLE 53 ADDENDUM -- bl5's budget contrast, split by what is actually box-free
+  B1 STAYS UNINTERPRETABLE AS REGISTERED.  Everything below is either CLEAN (node,
+  lay -- box-free at 0.0000% on every seed) or POST-HOC AND LABELLED (w).
+========================================================================================================
+
+(1) WHICH ARMS ARE ACTUALLY BOX-FREE, PER SEED.  The pooled B0.3 row hid this.
+
+  arm                       first_hi   epoch   %rec HI   %Q4 HI   %coordHI  final max  box-free?
+  probe_lay_e40_s0                 -       -      0.00     0.00    0.00000     -6.271        yes
+  probe_lay_e40_s1                 -       -      0.00     0.00    0.00000     -6.099        yes
+  probe_lay_e40_s2                 -       -      0.00     0.00    0.00000     -5.976        yes
+  probe_node_e40_s0                -       -      0.00     0.00    0.00000     -3.765        yes
+  probe_node_e40_s1                -       -      0.00     0.00    0.00000     -2.986        yes
+  probe_node_e40_s2                -       -      0.00     0.00    0.00000     -2.940        yes
+  probe_w_e40_s0                3037    30.4     24.07    96.30    0.00147      0.000         NO
+  probe_w_e40_s1                   -       -      0.00     0.00    0.00000     -2.650        yes
+  probe_w_e40_s2                   -       -      0.00     0.00    0.00000     -1.956        yes
+
+  box-free seeds: lay 3/3   node 3/3   w 2/3
+  --> node and lay need NO salvage: their budget contrast is clean as registered.
+
+(2) THE CLEAN RUNGS, AS REGISTERED (n=3, box-free on every seed, steady half).
+  This is the honest budget answer and it needs no caveat beyond its rungs.
+
+  rung     20 ep (cl5 cU)   40 ep (bl5)     delta      bar       verdict
+  lay              0.7262        0.6912   -0.0350     0.10    STATIONARY
+  node             0.4056        0.2774   -0.1282     0.10      DRIFTING
+
+  NOTE THE ASYMMETRY, because it is the finding: layerwise holds its value across
+  a budget doubling and NODEWISE DOES NOT.  Neither arm touched a guard, so this
+  is not the box.  It is the first evidence that N_eff/m's budget-robustness is
+  GRANULARITY-DEPENDENT, and it was bought by a batch whose primary test failed.
+
+(3) [POST-HOC, LABELLED] P1 -- THE BOX-FREE WINDOW on the weightwise rung.
+  Records 2000-3037 (epochs 20.0-30.4) are box-free on EVERY seed, so window
+  0.5-0.759 is a clean contrast against the control's 0.5-1.0, and it is a
+  STRICTLY LATER window than the control's, which is what a budget test needs.
+  IT WAS CHOSEN AFTER SEEING WHICH SEED BOUND.  Suggestive, never a verdict.
+
+  window                            epochs   N_eff/m (w)  vs control  box-free?
+  cl5 cU  0.5-1.0 (ctrl)             10-20        0.5064                    yes
+  bl5     0.25-0.5                   10-20        0.5191     +0.0128        yes
+  bl5     0.5-0.759              20.0-30.4        0.2634     -0.2430        yes
+  bl5     0.759-1                  30.4-40        0.1134     -0.3930NO -- s0 pinned
+  bl5     0.5-1                      20-40        0.1483     -0.3580NO -- s0 pinned
+
+(4) [POST-HOC, LABELLED] P2 -- THE TWO SEEDS THAT NEVER BOUND, full steady half.
+  The registered window, on runs that never touched a guard.  n=2, and n=2 is
+  below this campaign's own bar for a headline number.
+
+  seed          bound?    N_eff/m (w), steady half  vs control
+  s0               YES                      0.1552     -0.3512
+  s1                no                      0.1442     -0.3621
+  s2                no                      0.1455     -0.3609
+
+  box-free seeds only (n=2): 0.1449   vs control 0.5064   delta -0.3615   bar 0.1
+  --> OUTSIDE the bar, at n=2.
+
+(5) B2.5's REFUTATION IS CONFOUNDED, and this is the part that matters most.
+  B2.5 reported the ordering flipping node<w<lay -> w<node<lay at 40 epochs and
+  called the nodewise minimum BUDGET-SPECIFIC.  But w is the rung that bound, and
+  a coordinate pinned against a shared wall AGREES WITH ITS NEIGHBOURS FOR A REASON
+  THAT HAS NOTHING TO DO WITH THE META-GRADIENT -- which depresses N_eff/m.  The
+  flip is therefore exactly what contamination of the w rung would manufacture.
+
+  basis                                    lay      node         w   ordering
+  20 ep, steady half (registered)       0.7262    0.4056    0.5064   node < w < lay
+  40 ep, steady half (w CONTAMINATED)    0.6912    0.2774    0.1483   w < node < lay
+  40 ep, BOX-FREE window 0.5-0.759      0.7349    0.3422    0.2634   w < node < lay
+
+  --> on the BOX-FREE window the ordering is NOT node < w < lay.
+      The flip survives the box-free window, so contamination is NOT what made
+      it.  B2.5's refutation stands on its own evidence.

@@ -2219,3 +2219,183 @@ systematically over-fast rate, which is what §67's STANDING RULE (7) exists to 
 **Queues at tick end:** alice **0** (`uc6-*` complete and scored), alice2 **9 R** (`bl5-*`).
 FairShare 0.333 / 0.334. **The only open batch is the budget ladder, and the budget is the only
 remaining untested threat to the headline.**
+
+---
+
+## 72. STANDING RULE (7) GETS A COROLLARY, AND CORRECTIONS 67's OWN FIX WAS STILL NOT ENOUGH (cycle 53)
+
+67 caught 51.7 extrapolating a **startup** velocity, added STANDING RULE (7) (*a rate used to
+extrapolate must be measured on the segment being extrapolated FROM*), and replaced the mean
+trajectory with the worst seed — 56.6 extra epochs of headroom became **22.8**, and "report the
+worst seed, never the mean" became a rule. It funded `bl5` on that basis and called the margin thin.
+
+**The measured bind was 10.4 extra epochs. The worst-seed projection was optimistic by 2.2x.**
+
+Why, and it is not a fourth kind of carelessness — it is the same one in a third place (FINDINGS
+53.3). The top coordinate's velocity is **not monotone in time and is seed-dependent**: seed 0
+re-accelerated **3.1x** (0.123 → 0.379 v/vmax) between epochs 10–20 and 20–30 while seeds 1 and 2
+kept decelerating. A *decelerating* rate is therefore not a safe upper bound either.
+
+**STANDING RULE (7), COROLLARY:** *a monotone trend in a rate is not a property of the rate. Do not
+fund a batch on an extrapolated headroom in either direction — measure the headroom, or budget the
+box. An extrapolation may earn a GATE; it may never earn a PRESUMPTION.*
+
+**AND A SECOND RULE, EIGHTH, FROM THE SAME BATCH.** `bl5`'s weightwise box-free row read "8.03% of
+records at HI". That is a mean over a **binary, per-seed** event: one seed at 24.07% and two at
+0.00% (FINDINGS 53.2). The pooled row concealed both the phenomenon and its size.
+
+> **STANDING RULE (8):** *a gate on an event that either happens or does not must be scored PER
+> SEED, never on the pooled fraction. Pool only after establishing the event is not seed-specific.*
+
+Rules 5, 6 and 7 forced a fraction to name its denominator, measure at the right resolution, and
+quote its window. None of them stopped a correctly-denominated, correctly-resolved, correctly-
+windowed fraction from being averaged across units on which it was bimodal. All three new batches
+score their box-free gate per seed.
+
+## 73. THE HEADLINE IS **NOT** BUDGET-STABLE. CORRECTIONS 59/68 IS A **20-EPOCH** SENTENCE. (cycle 53)
+
+The budget was named as the last untested threat and it is a **live** one. On the two rungs that
+were box-free on 3/3 seeds and required no salvage of any kind (FINDINGS 53.4):
+
+| rung | 20 ep | 40 ep | Δ | bar | verdict |
+|---|---|---|---|---|---|
+| layerwise | 0.7262 | 0.6912 | −0.035 | 0.10 | STATIONARY |
+| **nodewise** | 0.4056 | 0.2774 | **−0.128** | 0.10 | **DRIFTING** |
+
+**N_eff/m's budget-robustness is GRANULARITY-DEPENDENT** — that is the finding, and it was bought by
+a batch whose primary test failed its own gate. On the weightwise rung the fall is far larger
+(0.5064 → 0.2634 over epochs 20.0–30.4, in a window box-free on every seed), and the seed that spent
+96.3% of its last quarter pinned at the ceiling returns **0.1552** against **0.1442 / 0.1455** for
+the two that never touched it — a spread of 0.011. **The box is not what moved it.**
+
+**QUOTING RULE, effective now.** Write *"over epochs 10–20"* or *"at a 20-epoch budget"* wherever
+CORRECTIONS 59/68's range appears. Do **not** write the 16%–55% range without a budget, and do not
+write "operating point" in a way that implies budget-independence — 65 already narrowed
+"equilibrium" to the bulk; 73 says the bulk value itself moves.
+
+**WHAT IS AND IS NOT ESTABLISHED.**
+
+| claim | status |
+|---|---|
+| N_eff/m falls with budget at **nodewise** | **ESTABLISHED**, n=3, box-free 3/3, registered window, nothing post-hoc |
+| N_eff/m is not shown to move at **layerwise** | **BOUND, not absence** — m=62 is marginal against rho_min ~1.1e−03 |
+| N_eff/m falls with budget at **weightwise** | **SUGGESTIVE ONLY** — post-hoc window, n=2 box-free seeds. `br6-*` replicates it pre-registered |
+| B1 (the registered primary test) | **UNINTERPRETABLE, as registered. NOT overturned by §53.5's post-hoc rescue** |
+| the box caveat of 68 | **still not needed** — 68 is a 20-epoch statement and stands at 20 epochs |
+
+**AND CORRECTIONS 67's LAST SENTENCE MUST NOT BE ADOPTED.** 67 floated that if deceleration
+continued, "the campaign can stop treating the box as a live threat at R18 entirely". It did not
+continue. At 40 epochs 1 of 3 seeds reaches alpha = 1 exactly. The box is a live threat at R18
+**above ~30 epochs**, which also means X3's "at ms=1e−3 the operating point is INTERIOR" is now
+known to be a **20-epoch** statement. `br6-*`'s C0.4 is a stability gate for precisely that reason.
+
+## 74. CORRECTIONS 70 IS BUDGET-SCOPED AS WELL AS ms-SCOPED, AND ITS MECHANISM IS REFUTED (cycle 53)
+
+Three things happened to the nodewise minimum this tick, and two of them narrow it.
+
+1. **B2.5 REFUTES it as a property of the partition.** At 40 epochs the ordering is `w < node < lay`,
+   not `node < w < lay`. Contamination of the w rung would have manufactured exactly that flip, so
+   it was checked against the box-free window 0.5–0.759 — **the flip survives** (FINDINGS 53.6).
+   → **The nodewise minimum is BUDGET-SPECIFIC.** It may be written as holding at 20 epochs,
+   ms=1e−3. It may **not** be written as a property of the partition.
+2. **N2 REFUTES the mechanism.** The registered candidate — that the governing variable is
+   *adaptation extent* rather than the meta-stepsize — predicted the argmin flips to `node` where
+   the weightwise beta span first exceeds ~5 log units. At ms=5e−4 the span is **8.268** and the
+   argmin is still `w`. The predicate matches 1 of 4 rungs (FINDINGS 53.9). **70 stays scoped to
+   the meta-stepsize; the mechanism stays OPEN.** Do not retro-fit a second variable.
+3. **N1 is UNDECIDED, not passed.** At ms=2e−4 the two smallest are 0.2054 (w) and 0.2244 (node),
+   a gap of **0.0190** against the registered 0.020 tolerance. One of the two admissible readings,
+   **(node, w)**, is N1's own registered refutation. A test whose refutation branch is live is not a
+   pass. `ns6-*` buys the third seed the ns5 header registered in advance.
+
+**NET EFFECT ON THE ADAM-MINI SENTENCE.** 70 called it "the most paper-relevant thing since the
+sign-agreement measurement": *the Adam-mini / Adalayer / SGG line places its blocks where the
+retained fraction is smallest.* It now carries **three** scopes — ms=1e−3, 20 epochs, and SGDm base
+— and the third has never been tested at all. `bo6-*`'s V2 tests it: those methods partition an
+**Adam** second moment, and if the nodewise minimum is an SGDm phenomenon the sentence must be
+**deleted, not hedged**.
+
+## 75. A BUG IN THIS TICK'S OWN SCORER, CAUGHT AND FIXED BEFORE IT REACHED A CLAIM (cycle 53)
+
+`c53_score.py`'s first run printed **"N1 PASSES ... the flip is monotone"**. It computed the
+`decided` flag correctly (`NO` at ms=2e−4, printed in its own table) and then read the **nominal**
+minimum of that rung anyway when scoring the sequence. The nominal minimum of a coin flip is a coin
+flip. Fixed: the scorer now refuses an undecided argmin, prints both admissible readings, and names
+the live refutation branch. FINDINGS 53.8 records the correction rather than the first output.
+
+This is the third time this campaign a *summary statistic* has been read past its own uncertainty
+flag (`s` in 51, the pooled clip fraction in 62, the argmin here). The pattern: **the flag was
+computed and displayed correctly, and the conclusion ignored it.**
+
+## 76. DECISION RECORD — cycle 53
+
+**Data state.** Both queues 0 P / 0 R at tick start; all 12 `ns5` and all 9 `bl5` complete. Probes
+synced (742 MB across two roots — the first sync used too narrow an rsync filter and omitted
+`neg_counts.*`, which the reducers require; caught because `reduce_root` returned nothing, and
+re-synced in full). CSV regenerated to **1686 runs** (+27). Five selftests green before use:
+`c53_score` 14/14 and `c53_budget_window` 6/6 (both new), `neff_instrument` **23/23** (was 19/19;
++4 for the new `--window` option), `probe5_window` 41/41, `c52_boxfree` 27/27.
+
+**Decisions taken, and why.**
+
+1. **B0.3 SCORED FIRST AND HONOURED WHEN IT FAILED.** B1's −0.3563 is recorded UNINTERPRETABLE,
+   not REFUTED, exactly as registered — even though the post-hoc evidence says the contamination it
+   feared is absent. Overturning a registered gate with a post-hoc rescue is the move the gate
+   exists to prevent. → §73.
+2. **THE BUDGET THREAT IS CONFIRMED ON EVIDENCE THAT NEEDED NO SALVAGE.** The nodewise rung is
+   box-free on 3/3 seeds, in the registered window, and moved −0.128 against a ±0.10 bar. The
+   headline becomes a 20-epoch sentence. → §73.
+3. **STANDING RULE (7) COROLLARY and STANDING RULE (8) added** — non-monotone rates, and per-seed
+   scoring of binary gates. → §72.
+4. **CORRECTIONS 70 narrowed twice and its mechanism refuted.** → §74.
+5. **N1 recorded UNDECIDED rather than passed**, and this tick's own scorer bug that would have
+   reported it as a pass is written down. → §74(3), §75.
+6. **`neff_instrument.py` gained `--window` as an OPTION with the default untouched**, because
+   every number the campaign quotes comes from the default and a changed default would silently
+   re-derive them. Four selftests added for it, including "explicit 0.5-1.0 reproduces the default
+   exactly".
+7. **A NEW SCORER RATHER THAN AN EDIT TO `c52_boxfree.py`.** That file's ARMS table is a hard-coded
+   list of last tick's globs and it *ignores* its positional argument — pointing it at
+   `../probes_bl5` silently reprints the cycle-52 table, which is what happened on the first attempt
+   this tick. Its **functions** are imported and reused unchanged; a second implementation of a
+   number is a second chance to get it wrong.
+8. **IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous ten.
+9. **THE `stepsize_type` CODE CHANGE REMAINS UNMADE and is re-flagged for the operator.**
+   CORRECTIONS 71 deferred it. Inspecting `HF.py` this tick confirms the deferral was right and
+   sharpens why: `nodewise` works because its beta is shape `(p_size[0],)` and maps back to the
+   parameter by a pure **broadcast view** (`node_view`). Any granularity strictly between layerwise
+   and weightwise needs a **scatter/gather in the hot update path**, not a broadcast — materially
+   more invasive than the existing `PATCH_GRANULARITY`, in the optimizer under study, with this
+   campaign's history of instrumentation bugs costing whole batches. **Not done unsupervised.**
+
+**Submitted, 21 jobs, all ACCEPTED BY SLURM and all RUNNING (0 pending on both accounts).**
+
+* **`br6-*`, 12 on alice2** (`bin/c53_budget_replication.sh`) — the budget replication, **box-free
+  by construction** at `BETA_CLIP=−30:2.0`, +2.0 above the **measured** pin rather than an
+  extrapolated one (§72), 40 epochs, seeds **0–3**. C0, C0.3 (per seed, first), **C0.4 a new
+  STABILITY gate**, C1 (**labelled NOT INDEPENDENT** — registered after seeing the post-hoc window,
+  so a confirmation is a replication), **C2 the independent one** (the lay/node asymmetry, informed
+  by nothing post-hoc), C2.5.
+* **`ns6-*`, 3 on alice** (`bin/c53_ns_thirdseed.sh`) — N1's third seed at ms=2e−4, bought because
+  the ns5 header registered buying it under exactly this condition.
+* **`bo6-*`, 6 on alice** (`bin/c53_base_optimizer.sh`) — **AdamW base**. The CSV has zero
+  AdamW-base nodewise runs and every N_eff/m ever quoted is SGDm. V1 registers **no direction**,
+  deliberately, because no mechanism predicts one — the failure mode 68 recorded when uc5's story
+  passed its bar while its stated mechanism moved nothing.
+
+**NEXT TICK, in order.**
+(a) **`br6`: C0.3 PER SEED FIRST.** If any seed binds even at +2.0, the pair (HI=0.0 → epoch 30.4,
+HI=+2.0 → epoch X) is a two-point measurement of how the bind budget moves with the ceiling and
+**is** the result. Then **C0.4** — an unstable run's correlation statistics measure nothing. Then
+C2 (the independent prediction) **before** C1 (the labelled-dependent one), so the tick's strongest
+evidence is read on the arm that no post-hoc analysis touched.
+(b) **`ns6`: M0.3 per seed, then re-run `c53_score.py`** — it re-reads N1 at n=3 automatically.
+(c) **`bo6`: V0.3 per seed, then V0.4 (trains-at-all), then V2 before V1** — V2 decides whether the
+Adam-mini sentence survives, and V1 has no registered direction so it cannot be over-read.
+(d) **Do NOT fund 80 epochs until C0.3 scores.** +2.0 is an untested ceiling; funding a longer
+budget on it is the error §72 was written about.
+(e) Still unspent, still bookkeeping not science: the raw-instrument `s` re-derivation sweep,
+carried since 51.
+
+**Queues at tick end.** alice **9 R / 0 P** (`ns6` 3, `bo6` 6). alice2 **12 R / 0 P** (`br6`).
+FairShare 0.333 / 0.334, unchanged from cycle 52.

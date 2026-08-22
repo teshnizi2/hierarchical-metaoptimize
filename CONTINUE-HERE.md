@@ -40,6 +40,12 @@ layerwise) where a true pooling arm must be granularity-invariant; `zpool` r=0 i
 The M1 interior optimum survives as an EMPIRICAL curve (layerwise +2.359pp n=10, nodewise
 +1.140pp n=3, absent at blk6 and weightwise) but has no pooling interpretation. On CIFAR-100
 the same r=0.07 costs -43.7pp. **Do not write any "pooling helps" sentence.**
+**THE BUDGET BOUND ON RESULT (1), added cycle 53 (CORRECTIONS 73):** every N_eff/m the campaign
+quotes is a **20-epoch** number, and it MOVES with budget -- nodewise 0.4056 -> 0.2774 across a
+budget doubling, box-free on 3/3 seeds, against a +-0.10 bar. Write "at a 20-epoch budget"
+wherever the 16%-55% range appears, and never write the nodewise minimum as a property of the
+partition (74).
+
 **The correction that bounds all method claims:** a tuned non-meta baseline now WINS. AdamW +
 cosine at lr 1e-3 reaches **94.093 +-0.036** under matched budget (100ep, AUGMENT=1, ResNet18,
 CIFAR-10) against the best MetaOptimize arm's **93.306 +-0.140** -- a 0.79pp deficit. Earlier
@@ -47,6 +53,65 @@ cycles compared against *constant-LR* AdamW (91.86), which MetaOptimize does bea
 The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
+
+## Running / next (cycle 53) -- **THE BUDGET THREAT IS REAL; THE HEADLINE IS A 20-EPOCH SENTENCE**
+
+**Read `docs/CORRECTIONS.md` 72-76 and `docs/FINDINGS.md` 53.1-53.10 before quoting N_eff/m, the
+16%-55% range, the nodewise minimum, or any headroom number. 73 puts a BUDGET on the headline.
+74 narrows CORRECTIONS 70 twice and refutes its mechanism. 72 adds STANDING RULES 7-corollary
+and 8.**
+
+* **BOTH QUEUES WERE 0/0 AT TICK START. All 12 `ns5` and all 9 `bl5` landed. CSV 1686 runs (+27).**
+* **THE FINDING OF THE TICK, and it is a CORRECTION TO OUR OWN HEADLINE.** N_eff/m is **not
+  budget-stable**. On the two rungs box-free on 3/3 seeds, in the registered window, with nothing
+  post-hoc: **nodewise 0.4056 -> 0.2774 (-0.128, bar 0.10) DRIFTING**; layerwise 0.7262 -> 0.6912
+  (-0.035) stationary. **Budget-robustness is GRANULARITY-DEPENDENT.**
+* **QUOTING RULE, EFFECTIVE NOW.** Write *"over epochs 10-20"* or *"at a 20-epoch budget"* wherever
+  the 16%-55% range appears. CORRECTIONS 59/68 is a **20-EPOCH** sentence. 68's box conclusion is
+  untouched *at 20 epochs*.
+* **`bl5`'s B0.3 FAILED on the weightwise rung** -- the one the headline is quoted at. The
+  registered consequence is honoured: **B1 is UNINTERPRETABLE, NOT REFUTED**, and `first_hi` IS the
+  result: **the box becomes unavoidable at R18 weightwise at epoch 30.4**.
+* **1 SEED OF 3 BOUND, and the pooled row hid it** (24.07% / 0.00% / 0.00%). **STANDING RULE (8):
+  a gate on a binary event is scored PER SEED, never on the pooled fraction.**
+* **CORRECTIONS 67's OWN FIX WAS STILL NOT ENOUGH.** Worst-seed headroom said 22.8 extra epochs;
+  measured 10.4. Optimistic by 2.2x, because seed 0 **RE-ACCELERATED 3.1x** after epoch 20.
+  **STANDING RULE (7) COROLLARY: a monotone trend in a rate is not a property of the rate. Do not
+  fund a batch on an extrapolated headroom in either direction.**
+* **THE WEIGHTWISE FALL IS NOT THE BOX** (post-hoc, labelled): the bound seed gives 0.1552 against
+  0.1442 / 0.1455 for the two that never touched a guard. `br6-*` replicates it pre-registered.
+* **CORRECTIONS 70 IS NARROWED TWICE AND ITS MECHANISM REFUTED (74).** B2.5: the ordering at 40
+  epochs is `w < node < lay` and **the flip survives the box-free window**, so **the nodewise
+  minimum is BUDGET-SPECIFIC** -- never write it as a property of the partition. N2: at ms=5e-4 the
+  beta span is 8.27 log units (past its ~5 threshold) and the argmin is still `w`, so the flip
+  tracks **ms**, not adaptation extent. The mechanism stays OPEN.
+* **N1 IS UNDECIDED, NOT PASSED.** At ms=2e-4 the gap is 0.0190 against a registered 0.020
+  tolerance, and one admissible reading **(node, w)** is N1's own refutation. This tick's scorer
+  first printed "N1 PASSES" by reading the nominal minimum of an undecided rung; the bug is fixed
+  and recorded (75).
+* **THE ADAM-MINI SENTENCE NOW CARRIES THREE SCOPES** -- ms=1e-3, 20 epochs, **and SGDm base**, the
+  third never tested. `bo6-*` tests it; if the nodewise minimum is SGDm-specific the sentence must
+  be **deleted, not hedged**.
+* **SUBMITTED, 21 jobs, ALL ACCEPTED AND RUNNING, 0 pending.**
+  (1) **`br6-*`, 12 on alice2** -- `bin/c53_budget_replication.sh`, the budget replication
+  **box-free BY CONSTRUCTION** at `BETA_CLIP=-30:2.0` (+2.0 above the MEASURED pin, not an
+  extrapolated one), 40 epochs, seeds 0-3. C0.4 is a NEW stability gate. **C1 is labelled NOT
+  INDEPENDENT; C2 is the independent one.**
+  (2) **`ns6-*`, 3 on alice** -- `bin/c53_ns_thirdseed.sh`, N1's third seed, bought because ns5's
+  own header registered buying it under exactly this condition.
+  (3) **`bo6-*`, 6 on alice** -- `bin/c53_base_optimizer.sh`, **AdamW base**. Zero AdamW-base
+  nodewise runs exist. V1 registers **no direction**, deliberately.
+* **NEXT TICK, in order.** (a) `br6`: **C0.3 PER SEED FIRST**; if any seed binds at +2.0 the pair
+  (HI=0.0 -> ep 30.4, HI=+2.0 -> ep X) IS the result. Then **C0.4**, then **C2 BEFORE C1** -- read
+  the independent prediction before the labelled-dependent one. (b) `ns6`: M0.3 per seed, then
+  re-run `analysis/c53_score.py` (it re-reads N1 at n=3 automatically). (c) `bo6`: V0.3 per seed,
+  V0.4, then **V2 before V1**. (d) **DO NOT fund 80 epochs until C0.3 scores** -- +2.0 is an
+  untested ceiling and that is the error 72 was written about. (e) Still unspent: the raw-instrument
+  `s` re-derivation sweep.
+* **THE `stepsize_type` CODE CHANGE IS STILL NOT MADE and is RE-FLAGGED FOR THE OPERATOR** (76.9).
+  Reading `HF.py` sharpens why: `nodewise` works by a pure **broadcast view**; anything strictly
+  between layerwise and weightwise needs a **scatter/gather in the hot update path**.
+* Queues at tick end: alice **9 R / 0 P**, alice2 **12 R / 0 P**. FairShare 0.333 / 0.334.
 
 ## Running / next (cycle 52) -- **THE BOX THREAT IS CLOSED; A BOX-FREE MEASUREMENT EXISTS**
 

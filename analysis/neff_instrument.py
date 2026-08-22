@@ -65,6 +65,7 @@ Run `--selftest` before trusting any number this prints.
 """
 import glob
 import math
+import re
 import os
 import sys
 
@@ -141,8 +142,21 @@ def fit_s(ms, neffs):
     return float(np.polyfit(np.asarray(x), np.asarray(y), 1)[0])
 
 
-def reduce_root(root):
-    """probe root -> {family: {rung: {...}}}, steady half, seeds averaged."""
+def reduce_root(root, window=None):
+    """probe root -> {family: {rung: {...}}}, steady half, seeds averaged.
+
+    `window` is an OPTION, added for the cycle-52 `bl5` budget ladder's B1.5
+    replication: a 40-epoch run restricted to records 1000-2000 is the SAME
+    ABSOLUTE window of training as the whole steady half of a 20-epoch control,
+    and without that arm B1 is a seed contrast rather than a budget contrast.
+    The DEFAULT is unchanged (steady half, 0.5-1.0) -- every number the campaign
+    has quoted comes from it, and a changed default would silently re-derive them.
+    """
+    if window is None:
+        window, wname = (0.5, 1.0), "steady .5-1"
+    else:
+        wname = f"win {window[0]:g}-{window[1]:g}"
+    wins = ((wname, tuple(window)),)
     acc = {}
     for d in sorted(glob.glob(os.path.join(root, "*"))):
         if not os.path.isdir(d) or not os.path.exists(os.path.join(d, "neg_counts.json")):
@@ -150,11 +164,11 @@ def reduce_root(root):
         fam, rung, _ = parse_dirname(os.path.basename(d))
         if rung not in RUNGS:
             continue
-        ag = agreement_stats(d)
+        ag = agreement_stats(d, window=tuple(window))
         if ag is None:
             continue
-        r5 = reduce_dir(d, windows=STEADY)
-        w = r5["win"].get("steady .5-1") if r5 else None
+        r5 = reduce_dir(d, windows=wins)
+        w = r5["win"].get(wname) if r5 else None
         acc.setdefault(fam, {}).setdefault(rung, []).append(dict(
             m=float(r5["n_tot"]) if r5 else float("nan"),
             neff_raw=ag["neff_raw"], neff_deb=ag["neff_deb"],
@@ -179,14 +193,16 @@ def reduce_root(root):
     return out
 
 
-def main(root):
-    fams = reduce_root(root)
+def main(root, window=None):
+    fams = reduce_root(root, window=window)
     if not fams:
         print(f"no reducible probe dirs under {root}")
         return 1
+    wlabel = ("steady half, matching frozen_agreement.py's default" if window is None
+              else f"{window[0]:g}-{window[1]:g} of the run (EXPLICIT --window)")
     print("=" * 96)
     print("WHY THE TWO `s` INSTRUMENTS DISAGREE -- testing the BIAS CHANNEL (FINDINGS 48.13)")
-    print(f"  root = {root}   window = steady half, matching frozen_agreement.py's default")
+    print(f"  root = {root}   window = {wlabel}")
     print("=" * 96)
 
     rows = []
@@ -353,6 +369,24 @@ def _selftest():
         chk("default window is the LAST half", abs(a["pbar"] - 0.50) < 1e-9)
         chk("window T is half the records", a["T"] == 1000)
 
+    # --- the B1.5 option.  A 4000-record run sliced 0.25-0.5 must be records
+    #     1000-2000 -- the SAME ABSOLUTE window as the whole steady half of a
+    #     2000-record control.  Without this, B1 is a seed contrast.
+    with tempfile.TemporaryDirectory() as td:
+        # four quarters, each a distinct constant, so a slice is identifiable by value
+        quarters = np.concatenate([np.full(1000, 0.60), np.full(1000, 0.70),
+                                   np.full(1000, 0.80), np.full(1000, 0.90)])
+        dq = os.path.join(td, "quarters")
+        _write(dq, quarters)
+        a25 = agreement_stats(dq, window=(0.25, 0.5))
+        chk("--window 0.25-0.5 selects the SECOND quarter", abs(a25["pbar"] - 0.70) < 1e-9)
+        chk("--window 0.25-0.5 keeps 1000 records", a25["T"] == 1000)
+        a_def = agreement_stats(dq)
+        chk("default still the last half (pbar of Q3+Q4)",
+            abs(a_def["pbar"] - 0.85) < 1e-9)
+        chk("explicit 0.5-1.0 reproduces the default exactly",
+            abs(agreement_stats(dq, window=(0.5, 1.0))["pbar"] - a_def["pbar"]) < 1e-12)
+
     print(f"selftest: {ok}/{ok + fail} PASS")
     return 0 if fail == 0 else 1
 
@@ -360,5 +394,14 @@ def _selftest():
 if __name__ == "__main__":
     if "--selftest" in sys.argv:
         sys.exit(_selftest())
+    win = None
+    for a in sys.argv[1:]:
+        if a.startswith("--window"):
+            spec = a.split("=", 1)[1] if "=" in a else sys.argv[sys.argv.index(a) + 1]
+            lo, hi = (float(x) for x in spec.split("-"))
+            if not (0.0 <= lo < hi <= 1.0):
+                sys.exit(f"--window must satisfy 0 <= lo < hi <= 1, got {spec}")
+            win = (lo, hi)
     pos = [a for a in sys.argv[1:] if not a.startswith("--")]
-    sys.exit(main(pos[0] if pos else "../probes_fz3"))
+    pos = [a for a in pos if not re.fullmatch(r"[\d.]+-[\d.]+", a)]
+    sys.exit(main(pos[0] if pos else "../probes_fz3", window=win))
