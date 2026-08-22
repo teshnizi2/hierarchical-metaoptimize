@@ -1,0 +1,19 @@
+ROLE LOCALISATION -- conv tensors with own R_row_cor > 5%
+(n/a = constant tensor OR within-clamp bound; EXCLUDED from hits, never counted)
+role           exception hits         clean hits   exc n/a   cln n/a
+stem              2 /    10           0 /    48            6        20
+conv1            43 /    80           0 /   408           15        33
+conv2             5 /    80           0 /   408           13        21
+shortcut          2 /    30           0 /   144            6         4
+
+per-arm carrying tensors (exceptions first):
+  [exc] probes_bl5/probe_w_e40_s0         1  layer4.1.conv1:62.3%
+  [exc] probes_bo6/probe_w_adw_s0        12  conv1:99.9%, layer2.1.conv1:99.7%, layer3.1.conv1:99.5%, layer4.0.conv1:99.3%, layer4.0.sc.conv:98.2%, layer3.0.conv1:88.9%, layer4.1.conv2:75.0%, layer4.0.conv2:55.6%
+  [exc] probes_bo6/probe_w_adw_s1        11  layer1.1.conv1:99.7%, conv1:99.4%, layer3.0.conv1:99.4%, layer4.0.conv1:99.2%, layer2.1.conv1:98.8%, layer3.1.conv1:98.2%, layer2.0.conv1:93.3%, layer4.0.sc.conv:77.6%
+  [exc] probes_br6/probe_w_c2_s1          1  layer4.0.conv1:74.0%
+  [exc] probes_ml5/probe_w_m2_s0          7  layer4.0.conv1:99.7%, layer2.1.conv1:99.6%, layer1.1.conv1:99.6%, layer3.1.conv1:99.3%, layer2.0.conv1:99.2%, layer3.0.conv1:98.9%, layer4.1.conv1:98.7%
+  [exc] probes_ml5/probe_w_m2_s1          3  layer4.0.conv1:99.8%, layer4.1.conv1:99.5%, layer3.1.conv1:23.5%
+  [exc] probes_ml5/probe_w_m2_s2          4  layer3.0.conv1:100.0%, layer4.0.conv1:99.6%, layer3.1.conv1:99.4%, layer4.1.conv1:99.3%
+  [exc] probes_wc5/probe_w_m2_s0          6  layer4.0.conv1:99.7%, layer3.0.conv1:99.1%, layer4.1.conv1:99.0%, layer3.1.conv1:96.9%, layer2.0.conv1:73.8%, layer1.0.conv1:7.5%
+  [exc] probes_wc5/probe_w_m2_s1          2  layer4.0.conv1:99.8%, layer4.1.conv1:99.1%
+  [exc] probes_wc5/probe_w_m2_s2          5  layer3.0.conv1:100.0%, layer4.0.conv1:99.7%, layer2.1.conv1:99.6%, layer3.1.conv1:99.6%, layer4.1.conv1:99.3%

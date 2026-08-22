@@ -1,0 +1,26 @@
+LOCALISATION -- R_row_cor INSIDE each conv tensor (exception vs clean sibling)
+
+  probes_ml5/probe_w_m2_s0  (E)   vs  probes_ml5/probe_w_m3_s0  (clean)     20 conv tensors
+    exception per-tensor R_row_cor: min   0.00%  med   0.00%  max  99.69%  tensors>5%: 7/20  constant(nan): 0
+    clean     per-tensor R_row_cor: min   0.00%  med   0.00%  max   0.09%  tensors>5%: 0/20  constant(nan): 3
+    exception top tensors: layer4.0.conv1(512r) 99.7%, layer2.1.conv1(128r) 99.6%, layer1.1.conv1(64r) 99.6%, layer3.1.conv1(256r) 99.3%
+
+  probes_wc5/probe_w_m2_s0  (E)   vs  probes_wc5/probe_w_m3_s0  (clean)     20 conv tensors
+    exception per-tensor R_row_cor: min   0.00%  med   0.01%  max  99.69%  tensors>5%: 6/20  constant(nan): 1
+    clean     per-tensor R_row_cor: min   0.00%  med   0.00%  max   0.09%  tensors>5%: 0/20  constant(nan): 4
+    exception top tensors: layer4.0.conv1(512r) 99.7%, layer3.0.conv1(256r) 99.1%, layer4.1.conv1(512r) 99.0%, layer3.1.conv1(256r) 96.9%
+
+  probes_bo6/probe_w_adw_s0  (E)   vs  probes_cl5/probe_w_cD_s0  (clean)     20 conv tensors
+    exception per-tensor R_row_cor: min   0.02%  med   6.26%  max  99.87%  tensors>5%: 12/20  constant(nan): 0
+    clean     per-tensor R_row_cor: min   0.00%  med   0.00%  max   0.10%  tensors>5%: 0/20  constant(nan): 1
+    exception top tensors: conv1(64r) 99.9%, layer2.1.conv1(128r) 99.7%, layer3.1.conv1(256r) 99.5%, layer4.0.conv1(512r) 99.3%
+
+  probes_bl5/probe_w_e40_s0  (E)   vs  probes_bl5/probe_w_e40_s1  (clean)     20 conv tensors
+    exception per-tensor R_row_cor: min   0.00%  med   0.00%  max  62.32%  tensors>5%: 1/20  constant(nan): 3
+    clean     per-tensor R_row_cor: min   0.00%  med   0.00%  max   2.60%  tensors>5%: 0/20  constant(nan): 1
+    exception top tensors: layer4.1.conv1(512r) 62.3%, layer4.0.conv2(512r) 0.0%, layer3.1.conv1(256r) 0.0%, layer4.1.conv2(512r) 0.0%
+
+  probes_br6/probe_w_c2_s1  (E)   vs  probes_br6/probe_w_c2_s0  (clean)     20 conv tensors
+    exception per-tensor R_row_cor: min   0.00%  med   0.01%  max  73.99%  tensors>5%: 1/20  constant(nan): 6
+    clean     per-tensor R_row_cor: min   0.00%  med   0.00%  max   0.06%  tensors>5%: 0/20  constant(nan): 4
+    exception top tensors: layer4.0.conv1(512r) 74.0%, layer3.1.conv2(256r) 0.1%, layer4.1.conv2(512r) 0.1%, layer4.1.conv1(512r) 0.0%

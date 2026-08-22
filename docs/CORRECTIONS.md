@@ -3203,3 +3203,96 @@ mechanism OPEN. → 59.8
 
 Still a CONSISTENCY with 58.8 and not a proof of it: these measure `z` sign preference,
 58.8 measures plateau accuracy. Unchanged from item 10.
+
+## 89. DECISION RECORD — cycle 60 (ALICE DOWN, **FIFTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**89.0 OPERATIONS.** Outage localised, not assumed, 2026-08-22T22:26Z. `alice-gw` up and
+answering (`p-cfer-016105`); from it both `132.229.104.230` and `132.229.104.231` refuse :22 and
+`login.alice.universiteitleiden.nl` :22 is DOWN. `ssh alice` / `ssh alice2` fail at banner
+exchange. Two probes total, no retry loop, ssh config untouched.
+
+**QUEUE AUDIT: NOT POSSIBLE.** No `squeue` on either account. Nothing was synced, submitted or
+cancelled. Per the standing rule this is reported as OUTAGE and no inference is drawn about the
+science or about job survival. `bo7-*` (12, alice) / `bd7-*` (12, alice2) remain UNKNOWN.
+`sp8` (9, alice2), `hz9` (9, alice), `rw9` (18, alice) remain written, validated, UNSUBMITTED.
+Cycle 58's submission order stands unchanged. **CSV unchanged at 1707 rows.**
+
+**ORPHANS.** CSV unchanged, so the orphan set is unchanged from 87.13 / 59.6. No new orphans
+created (this tick added no runs) and none retired (this tick cited no new families).
+
+**89.1 THE DECISION.** Alice unreachable for a fifth tick ⇒ the only available work is offline.
+Took CONTINUE-HERE item (e), the top-ranked offline item: the mechanism of the 59.4 / 59.8
+exceptions. New instrument `analysis/c60_exception_mechanism.py`, **81/81 selftests**, importing
+c59's measured architecture map rather than re-deriving it. → FINDINGS 60.0–60.6
+
+**89.2 THE 59.4 / 59.8 EXCEPTIONS ARE EXPLAINED. THE MECHANISM IS NO LONGER OPEN.**
+Three hypotheses were registered in the instrument docstring **before any arm was scored**.
+
+* **H_A (1-D bookkeeping artifact) is REFUTED, and backwards.** It is the CLEAN arms that draw a
+  median **50.6%** of their numerator from 1-D tensors — 0.086% of coordinates whose "rows" have
+  width 1 and therefore contribute **exactly 0** to the denominator by construction. In the
+  exceptions the 1-D share is 0.07–2.9%.
+* **H_C (saturation / dead channels) is REFUTED by a single number:** conv coordinates with
+  `p_i ∈ {0,1}` are **0.000% in all 58 arms**.
+* **H_B (genuine conv row structure) HOLDS.** Conv-only R_row_cor: exceptions **7.216–49.412%**,
+  clean **0.000–0.448%**. No overlap, 16× gap. The nodewise half agrees and the conv restriction
+  SHARPENS it (2.75–6.03% inverted vs 64.56–100.00% normal). → 60.2, 60.3
+
+**89.3 A NEW MEASUREMENT THAT STRENGTHENS THE HEADLINE BY 3×, AND A SENTENCE TO STOP WRITING.**
+59.3's published clean band **0.083%–0.612%, median 0.190%** is a MIXTURE over tensor kinds.
+Restricted to the tensors Adam-mini's row argument is actually about — conv rows sharing an
+output channel — the clean band is **0.000%–0.448%, median 0.063%**. The 1-D tensors, where
+"row" and "weight" are the same object and the statistic is vacuous, supplied a median 50.6% of
+the old numerator.
+
+> **STANDING RULE (10): any row/group statistic quoted over a mixed parameter stack must state
+> its tensor-class restriction.** A partition statistic computed over 1-D tensors is comparing an
+> object to itself. Both the all-tensor and the conv-only figure should be given; the conv-only
+> figure is the one that answers the premise. This applies retroactively to 59.3 and 59.8 — the
+> published numbers are NOT withdrawn (they are correct for what they compute) but they must be
+> labelled "all tensors" wherever they appear.
+
+**89.4 THE EXCEPTION IS DYNAMICAL, NOT ARCHITECTURAL — AND THAT IS WHY IT DOES NOT RESCUE THE
+PREMISE.** Where it sits IS patterned: block `conv1` carries in **43 of 80** exception tensors
+vs `conv2` **5 of 80** on identical denominators (two-sided binomial **p = 1.4e-8**), `conv1 >
+conv2` in **10 of 10** arms, and clean arms carry in **0 of 1,008** conv tensors. But WHICH ROWS
+carry is not reproducible: cross-seed correlation of within-tensor-centred conv row means is
+**0.0053 / 0.0124 / 0.0278** against nulls of 0.0103 / 0.0051 / 0.0016 — at the null in every
+exception config. Two within-config controls say it directly: `bl5/e40` seed 0 reads 23.014%
+while seeds 1–2 read 0.044% / 0.039%, and `br6/c2` seed 1 reads 7.216% while seeds 0/2/3 read
+0.043% / 0.034% / 0.034%. **Same config, same architecture — one seed inverts by 500×.**
+
+Adam-mini's premise is a claim about row IDENTITY (*"they all share the same BP error term
+`e_i`"*): output unit `i` is homogeneous BECAUSE it is output unit `i`. 60.5 measures exactly
+that quantity and finds it at the null. → 60.4, 60.5
+
+**89.5 STATED AGAINST OUR OWN INTEREST.** Within a single run the exception arms' row structure
+is REAL, and a per-row step size could exploit it *in that run*, reproducibility or not. That is
+recorded, not buried. It is not Adam-mini's premise, and it is confined to configs already ruled
+unquotable (ms=1e-2, CORRECTIONS 62) plus AdamW-base. **Scope unchanged: we measure `z`, the
+meta-gradient; Adam-mini argues about `G`. No document may write "we refuted Adam-mini."**
+
+**89.6 AN INSTRUMENT ARTIFACT CAUGHT BY THIS TICK'S OWN GATE, BEFORE IT REACHED A CLAIM.**
+The first `--roles` pass reported clean arms carrying in 16 conv tensors, all reading **exactly
+100.0%**, and a `conv1` count of 53/80 with 12/408 clean. Every one was the `max(raw−noise,0)`
+within-clamp binding — a tensor whose within-row spread falls below the binomial floor reads
+R_cor = 1 **by construction**. With per-tensor clamps excluded, clean hits go to **0 of 1,008**
+and the exception `conv1` count to 43/80. The published table is the gated one.
+
+The same clamp then falsified one of this tick's own selftests: the synthetic H_B control was
+built with within-row spread 1e-4, below the binomial floor 2.2e-2, so it clamped. **The
+assertion was wrong, not the code** — it was rewritten to assert the flag FIRES, and a second
+control with above-floor spread was added. 74 → 81 selftests.
+
+**89.7 WHAT IS STILL OPEN.** *Why* `conv1` and not `conv2`, and what the run-specific event is.
+60.4 gives the signature, not the cause; deciding it needs `z` time-series the probe does not
+store. This is a candidate for a future PATCH_PROBE change, **not** for a rerun of existing arms.
+Ranked BELOW every cluster item — it is a curiosity about an already-unquotable regime.
+
+**89.8 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` BOTH accounts before anything.
+(b) Submit `sp8` (alice2, 9), then on alice `hz9` (9) then `rw9` (18). (c) Score `hz9`
+H0 → H0.3 → H0.5 → H1 → H1b → H2, in that order; H0.5 can only VOID. (d) If bo7/bd7 landed,
+cycle 54's scoring order stands with 55.2's per-seed sd. (e) **DONE, do not re-run:** the row
+premise (59.3), the nodewise half (59.8), the exception mechanism (60.2–60.5). (f) The next
+offline item is the carried-since-51 raw-instrument `s` re-derivation — it is now the LAST
+unspent offline item. (g) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.

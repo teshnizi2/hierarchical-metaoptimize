@@ -54,6 +54,73 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 60) -- **ALICE DOWN A FIFTH TICK. THE 59.4/59.8 EXCEPTIONS ARE CLOSED.**
+
+**Read `docs/CORRECTIONS.md` 89 and `docs/FINDINGS.md` 60.0-60.6 before quoting 59.3's or
+59.8's headline band. 89.3 adds STANDING RULE (10) and re-labels both published numbers.**
+
+* **BOTH LOGIN NODES DOWN FOR A FIFTH CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering (`p-cfer-016105`), `132.229.104.230/.231` refuse :22 from it, `login.alice...` :22
+  DOWN, `ssh alice`/`alice2` fail at banner exchange (2026-08-22T22:26Z). **No queue read,
+  nothing synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12,
+  alice) and `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **THE TICK'S RESULT, ALL ZERO-COMPUTE.** New instrument `analysis/c60_exception_mechanism.py`,
+  **81/81 selftests**, modes `--selftest --gate --weightwise --nodewise --report --localise
+  --roles --reproduce`. It imports c59's MEASURED architecture map rather than re-deriving it.
+* **THE 10 WEIGHTWISE / 8 NODEWISE EXCEPTIONS ARE NO LONGER OPEN.** Three hypotheses were
+  registered in the docstring BEFORE any arm was scored, and two died:
+  - **H_A (1-D bookkeeping artifact) REFUTED, backwards.** It is the CLEAN arms that draw a
+    median **50.6%** of the numerator from 1-D tensors (BN/bias), which are 0.086% of
+    coordinates and whose row width is 1, so they contribute **exactly 0** to the denominator by
+    construction. Exceptions draw 0.07-2.9%.
+  - **H_C (saturation / dead channels) REFUTED by one number:** conv coords at `p_i in {0,1}`
+    are **0.000% in all 58 arms**.
+  - **H_B (genuine conv row structure) HOLDS.** Conv-only R_row_cor: exceptions
+    **7.216-49.412%**, clean **0.000-0.448%**. No overlap, 16x gap. Nodewise agrees and the conv
+    restriction SHARPENS it: **2.75-6.03%** inverted vs **64.56-100.00%** normal.
+* **THIS STRENGTHENS 59.3 BY 3x, AND ADDS STANDING RULE (10).** 59.3's published clean band
+  (0.083-0.612%, med 0.190%) is a MIXTURE over tensor kinds. On the tensors Adam-mini's row
+  argument is actually about -- conv rows sharing an output channel -- it is **0.000-0.448%,
+  median 0.063%**. **Any row/group statistic over a mixed parameter stack must state its
+  tensor-class restriction**; on 1-D tensors "row" and "weight" are the same object and the
+  statistic is vacuous. 59.3/59.8's numbers are NOT withdrawn but must be labelled "all tensors".
+* **WHERE IT SITS: `conv1` OF A BASICBLOCK.** Block `conv1` carries in **43 of 80** exception
+  tensors vs `conv2` **5 of 80** on identical denominators (two-sided binomial **p=1.4e-8**),
+  `conv1 > conv2` in **10 of 10** arms, carrying tensors read ~99-100%, and **clean arms carry in
+  0 of 1,008 conv tensors** (95% upper bound 0.298%).
+* **BUT IT IS NOT THE SAME ROWS -- THE EXCEPTION IS DYNAMICAL, NOT ARCHITECTURAL.** Cross-seed
+  correlation of within-tensor-centred conv row means is **0.0053 / 0.0124 / 0.0278** against
+  nulls **0.0103 / 0.0051 / 0.0016** -- at the null in every exception config. Two within-config
+  controls say it directly: `bl5/e40` s0 = **23.014%** vs s1/s2 = 0.044%/0.039%; `br6/c2` s1 =
+  **7.216%** vs s0/s2/s3 = 0.043%/0.034%/0.034%. **One seed inverts by 500x, its siblings do not.**
+* **WHY THAT SETTLES IT:** Adam-mini's premise is a claim about row IDENTITY (*"they all share
+  the same BP error term e_i"*) -- output unit `i` is homogeneous BECAUSE it is unit `i`. That
+  exact quantity is at the null. **Scope unchanged: we measure `z`, they argue about `G`. No
+  document may write "we refuted Adam-mini."**
+* **STATED AGAINST OUR OWN INTEREST (89.5):** within a single run the exception arms' row
+  structure is REAL and a per-row step size could exploit it *in that run*. Recorded, not buried.
+  Confined to configs already unquotable (ms=1e-2, CORRECTIONS 62) plus AdamW-base.
+* **AN ARTIFACT CAUGHT BY THIS TICK'S OWN GATE (89.6).** The first `--roles` pass reported 16
+  clean carrying tensors, all reading **exactly 100.0%** -- every one was the `max(raw-noise,0)`
+  within-clamp binding, which reads R_cor=1 by construction. Gated, clean hits went to 0/1,008.
+  The same clamp then falsified one of this tick's own selftests; **the assertion was wrong, not
+  the code**, and it was rewritten to assert the flag FIRES. 74 -> 81 selftests.
+* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `rw9` (18,
+  alice) all remain written, validated, UNSUBMITTED. Cycle 58's order stands unchanged.
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (b) Submit **`sp8`
+(alice2, 9)**, then on alice **`hz9` (9) then `rw9` (18)**. (c) Score `hz9` **H0 -> H0.3 ->
+H0.5 -> H1 -> H1b -> H2, in that order**; H0.5 can only VOID. (d) If bo7/bd7 landed, cycle 54's
+scoring order stands with 55.2's measured per-seed sd. (e) **DONE, do not re-run:** the row
+premise (59.3), the nodewise half (59.8), the exception mechanism (60.2-60.5). (f) **The
+carried-since-51 raw-instrument `s` re-derivation is now the LAST unspent offline item.**
+(g) The 12 truncated `rs-blk6`/`rs-node` reruns remain last. (h) OPEN but ranked BELOW every
+cluster item: *why* `conv1` and not `conv2`. Needs `z` time-series the probe does not store --
+a future PATCH_PROBE change, NOT a rerun of existing arms.
+
 ## Running / next (cycle 59) -- **ALICE DOWN A FOURTH TICK. ADAM-MINI'S REAL PREMISE IS TESTED, AND IT FAILS.**
 
 **Read `docs/CORRECTIONS.md` 88 and `docs/FINDINGS.md` 59.0-59.7 before writing anything about

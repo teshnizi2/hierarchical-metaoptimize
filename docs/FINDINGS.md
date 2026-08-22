@@ -11488,3 +11488,148 @@ that: the units are nearly redundant with their tensors. Both halves independent
 58.8's measured ordering (nodewise 92.656 vs layerwise 92.906, partitioned arms spanning
 0.254pp against partition-vs-none's 0.390–0.644pp). It remains a CONSISTENCY, not a proof —
 these measure `z` sign preference and 58.8 measures plateau accuracy.
+
+## 60.0 CYCLE 60 — ALICE DOWN A **FIFTH** CONSECUTIVE TICK; ZERO JOBS; THE EXCEPTIONS ARE CLOSED
+
+Outage localised, not assumed (2026-08-22T22:26Z): gateway `alice-gw` up and answering
+(`p-cfer-016105`); from it, `132.229.104.230` and `132.229.104.231` both refuse :22, and
+`login.alice.universiteitleiden.nl` :22 is DOWN. `ssh alice` / `ssh alice2` fail at banner
+exchange. **No queue read. Nothing synced, submitted or cancelled. CSV unchanged at 1707.**
+`bo7-*` (12, alice) and `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+`sp8` (9), `hz9` (9), `rw9` (18) remain written, validated and UNSUBMITTED.
+
+This tick discharges CONTINUE-HERE item (e), the top-ranked offline item: **the mechanism of
+the 59.4 / 59.8 exceptions.** Zero cluster compute; probes already on this Mac.
+
+## 60.1 NEW INSTRUMENT `analysis/c60_exception_mechanism.py` — 81/81 selftests
+
+Modes `--selftest --gate --weightwise --nodewise --report --localise --roles --reproduce`.
+Architecture reconstruction is **imported from `c59_row_premise.py`, never re-derived**, so the
+coordinate→row map is the same MEASURED map that passed 59.2's A0/A1/A2.
+
+Three hypotheses were **registered in the docstring before any arm was scored**:
+
+* **H_A 1-D DOMINATION (artifact).** `R_row = SS_row / (SS_row + SS_within)` mixes two kinds of
+  tensor. A 1-D tensor (BN weight, BN bias, linear bias) has row width 1, so it contributes to
+  the numerator and **exactly 0 to the denominator BY CONSTRUCTION**. If conv coordinates
+  saturate, the ratio is left carried by 1-D tensors and rises toward 1 with no row structure
+  anywhere. Prediction: exceptions show 1-D numerator share → 1 and **conv-only R_row at the null**.
+* **H_B GENUINE CONV ROW STRUCTURE.** Exceptions keep a large conv-only R_row.
+* **H_C DENOMINATOR COLLAPSE** — measured directly as the fraction of conv coordinates at
+  `p_i ∈ {0,1}` and as within-row sd. Driver of H_A, not a rival to it.
+
+H_A and H_B are mutually exclusive on one printed number, so the fork is decidable.
+
+**GATE G1 (integrity, run first).** An independent code path reproduces all **10** published
+59.4 values to 2 d.p. (max |Δ| **0.005 pp**), and **no clamp bound on any of the 10** — so the
+`max(raw−noise,0)` floor artifact is excluded at arm level before anything is interpreted.
+Per-tensor clamps are excluded from every count in 60.4 rather than silently believed.
+
+## 60.2 **H_A IS REFUTED, AND IN THE OPPOSITE DIRECTION. H_B HOLDS.**
+
+58 unique weightwise arms (realpath-deduped per 88.11), 10 exception / 48 clean:
+
+| statistic | exception (n=10) | clean (n=48) |
+|---|---|---|
+| R_row_cor, ALL tensors (the published 59.3 statistic) | 7.173–49.367% (med 42.649%) | 0.083–0.612% (med 0.190%) |
+| **R_row_cor, CONV only** | **7.216–49.412% (med 42.651%)** | **0.000–0.448% (med 0.063%)** |
+| R_row_cor, CONV+FC | 7.101–49.344% | 0.037–0.584% |
+| 1-D share of the numerator | 0.068–2.942% (med 0.085%) | 11.577–64.103% (med 50.585%) |
+| conv coords with `p_i ∈ {0,1}` | **0.000%** | **0.000%** |
+
+* **H_A fails, backwards.** It is the CLEAN arms whose numerator is carried by 1-D tensors
+  (median **50.6%** of the numerator from **0.086%** of the coordinates). In the exceptions the
+  1-D share is **0.07–2.9%** — the structure is in the conv tensors.
+* **H_C fails.** `p_i ∈ {0,1}` is **0.000% in all 58 arms**; nothing saturates, and dead
+  channels are excluded by the same number.
+* **Separation is complete**: max clean conv-only 0.448% vs min exception conv-only 7.216%, a
+  **16×** gap with no overlap.
+
+> **AND THIS STRENGTHENS 59.3 BY 3×.** On the tensors Adam-mini's row argument is actually
+> about — conv rows sharing an output channel — the clean-arm row explains **0.000%–0.448%,
+> median 0.063%**, not the published 0.190%. The published figure was inflated by 1-D tensors,
+> where "row" and "weight" are the same object by construction and the statistic is vacuous.
+
+## 60.3 THE NODEWISE HALF AGREES, AND THE CONV RESTRICTION SHARPENS IT
+
+58 unique nodewise arms, 8 inverted (R_tensor_cor < 60%) / 50 normal — the same configs:
+
+| statistic | inverted (n=8) | normal (n=50) |
+|---|---|---|
+| R_tensor_cor, ALL (the published 59.8 statistic) | 7.80–51.42% (med 38.19%) | 86.88–97.06% (med 93.54%) |
+| **R_tensor_cor, CONV only** | **2.75–6.03% (med 3.60%)** | **64.56–100.00% (med 91.20%)** |
+| R_tensor_cor, 1-D only | 8.27–54.04% | 81.48–97.93% |
+
+Identity error ≤ 1.0e-14 throughout. Restricting to conv **widens** the contrast (all-tensor
+7.8–51.4 vs 86.9–97.1; conv-only 2.8–6.0 vs 64.6–100.0). Both halves say the same thing: in
+the exception configs the conv ROW becomes both a representative unit and a distinct one.
+
+## 60.4 **WHERE IT SITS: `conv1` OF A BASICBLOCK, AND ESSENTIALLY NOWHERE ELSE**
+
+R_row_cor computed INSIDE each conv tensor separately. A tensor "carries" if its own
+R_row_cor > 5% — a threshold **10× above the largest clean whole-arm conv reading (0.448%)**,
+fixed in advance and not tuned afterwards. Constant tensors and tensors whose within-clamp
+bound are **excluded**, never counted as hits.
+
+| role | exception arms | clean arms |
+|---|---|---|
+| stem (`conv1`) | 2 / 10 | **0 / 48** |
+| **block `conv1`** | **43 / 80** | **0 / 408** |
+| block `conv2` | 5 / 80 | **0 / 408** |
+| `sc.conv` (shortcut) | 2 / 30 | **0 / 144** |
+
+* **Clean arms carry in 0 of 1,008 conv tensors** (95% upper bound 0.298%). Every apparent
+  clean hit in the first pass was a within-clamp artifact and vanished under the gate.
+* **`conv1` over `conv2` on identical denominators: 43 vs 5, two-sided binomial p = 1.4e-8.**
+* **`conv1` > `conv2` in 10 of 10 exception arms**, strictly. The only 5 `conv2` hits are in the
+  two AdamW arms, which are also the two arms with the most hits overall (12 and 11) — the
+  effect reaches `conv2` only where it is already large.
+* Carrying tensors read **~99–100%**, not marginally: the affected tensor's within-tensor
+  structure becomes almost entirely row-level.
+
+## 60.5 **BUT IT IS NOT THE SAME ROWS: THE EXCEPTION IS DYNAMICAL, NOT ARCHITECTURAL**
+
+Cross-seed correlation of conv row means, **centred within each tensor** (uncentred means
+correlate merely because rows inherit their tensor's level, which 59.3 already showed is the
+dominant term). Null = rows permuted within each tensor, row counts and marginals preserved.
+Both an ARCHITECTURAL and a DYNAMICAL synthetic control are in the selftests.
+
+| config | seeds | exc | per-seed conv R_row | observed r | null r |
+|---|---|---|---|---|---|
+| `ml5/probe_w_m2` | 3 | 3 | 42.33–44.07% | **0.0053** | 0.0103 |
+| `wc5/probe_w_m2` | 3 | 3 | 41.55–43.24% | **0.0124** | 0.0051 |
+| `bo6/probe_w_adw` | 2 | 2 | 36.88–49.41% | **0.0278** | 0.0016 |
+
+**Every exception config sits at its own null.** Each seed independently develops massive conv
+row structure — on DIFFERENT rows. All 20 clean configs likewise sit at the null (|r| ≤ 0.03).
+
+**Two within-config controls say the same thing directly, and they are the cleanest evidence:**
+
+| config | seed 0 | seed 1 | seed 2 | seed 3 |
+|---|---|---|---|---|
+| `bl5/probe_w_e40` (conv-only R_row) | **23.014%** | 0.044% | 0.039% | — |
+| `br6/probe_w_c2` (conv-only R_row) | 0.043% | **7.216%** | 0.034% | 0.034% |
+
+Same config, same architecture, same hyper-parameters — one seed inverts by **500×** and its
+siblings do not. **The exception is a run-specific event, not a property of the network.**
+
+## 60.6 WHAT THIS DOES AND DOES NOT LICENSE
+
+* **The exceptions do NOT rescue Adam-mini's premise, and this is the point.** That premise is a
+  claim about row IDENTITY — *"they all share the same BP error term `e_i`"* — i.e. that output
+  unit `i` is homogeneous BECAUSE it is output unit `i`. 60.5 measures exactly that and finds it
+  at the null. Which tensors get structure is patterned (`conv1`, 60.4); which ROWS do is not.
+* **Scope is unchanged and not relaxed:** Adam-mini argues about `G`, the base gradient; we
+  measure `z`, the meta-gradient. **No document may write "we refuted Adam-mini."**
+* **Stated against our own interest:** within a single run, row structure in the exception arms
+  is REAL and a per-row step size could exploit it *in that run*. That is not Adam-mini's
+  premise and it is confined to configs already ruled unquotable (ms=1e-2, CORRECTIONS 62) plus
+  AdamW-base. It is recorded, not hidden.
+* **59.4's refutation of clipping stands and is re-confirmed.** Pinning is neither necessary nor
+  sufficient: `cl5-cD` is 76% pinned and clean; `br6/probe_w_c2_s1` is 0.27% pinned and an
+  exception. `bl5/e40_s0` is both pinned (24.05%) and an exception, which is a coincidence of
+  one seed, not a rule.
+* **The 3/3 "modal ceiling exactly 0.000" observation from 59.4 is NOT promoted.** It remains
+  n=3 and post-hoc; nothing here tests it.
+* **What is still OPEN:** *why* `conv1` and not `conv2`, and what the run-specific event is.
+  60.4 gives the signature, not the cause. That needs `z` time-series the probe does not store.
