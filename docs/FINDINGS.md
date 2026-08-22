@@ -7483,7 +7483,7 @@ beta_clip deconfound, 36.3) is on the other account and untouched.
   brackets both curves on the left, where 39.5 showed the layerwise optimum is still open.
 * **Tier 1** is the collapse figure. Four granularities on one rescaled axis either lie on a
   common curve (the claim is structural) or they do not (the claim is pairwise only).
-* **Tier 2** asks whether `weightwise` — which sits at 68.471 ±0.245 (n=10) at ms=1e-3 — recovers
+* **Tier 2** asks whether `weightwise` — which sits at 68.471 ±0.245 (n=10) at ms=1e-3 **at a 20-EPOCH budget; see CORRECTIONS 85, this was read as a 100-epoch number and the matched 100-epoch run reaches 90.913** — recovers
   at *any* meta-step. If it does not, the reparameterisation claim has a measured boundary, which
   is a stronger and more honest statement than omitting the arm.
 

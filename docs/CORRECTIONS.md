@@ -2695,3 +2695,55 @@ CORRECTIONS 70's remaining scopes should be restated in adaptation extent rather
 and that **`bo7`, whatever it returns, is measuring a base optimizer's effect on SPAN, not a
 fourth independent scope.** That reframing is the actionable consequence and it is why 83.5
 already redirected the next batch to the edges of the band.
+
+## 85. **A UNIT ERROR DROPPED THE WEIGHTWISE ARM FROM THE c40 RESPONSE SURFACE** (cycle 56)
+
+Found by an offline audit while ALICE was down; **every number below was re-derived from
+`results/all_runs.csv` at write time**, not quoted from the audit.
+
+**THE ERROR.** FINDINGS 40.3 (Tier 2) justifies its treatment of the per-weight arm with
+*"`weightwise` — which sits at 68.471 ±0.245 (n=10) at ms=1e-3"*. That number is `p7-r18-w`:
+
+| source | n | epochs_done | plateau mean | sd |
+|---|---|---|---|---|
+| `p7-r18-w*` | 10 | **{'20'}** — every one | 68.472 | 0.245 |
+
+An exact match, and **all ten are 20-EPOCH runs**. The `rs-*` response surface they were used to
+reason about is **100 epochs** (`epochs_requested` = {'100'} across all 67 rows). A 20-epoch
+plateau was read as if it were a 100-epoch one.
+
+**THE CONSEQUENCE IS LIVE.** The published surface has four granularity rows —
+`scalar`, `resnet18_blocks`, `layerwise`, `nodewise` — and **no `weightwise` row at all**.
+The single matched 100-epoch plain weightwise run in the entire corpus at
+R18/CIFAR10/SGDm+Lion/ms=1e-3/AUGMENT=1/`BETA_CLIP=-15:-2.3026` is
+
+    kt2_ww_a1e-3_s0   alpha0=1e-3   100/100 epochs   plateau = 90.913
+
+which is **+22.4 pp above the figure used to reason the arm away**, and **+3.10 pp above the
+surface's own scalar cell at the same meta-step** (`rs-scal-1e3-s3/s4`: 87.818 / 87.801,
+mean 87.810, n=2).
+
+**THREE CAVEATS, STATED NOT BURIED.**
+1. **n = 1.** One run. This licenses COMPUTE, never a claim. Nothing in the paper may cite 90.913.
+2. **alpha0 is not matched.** `kt2_ww_a1e-3` runs at alpha0=1e-3; the other 100-epoch weightwise
+   runs sit at alpha0=1e-6 and reach ~78.0-78.1 guarded (`mx_sig_weightwise_s0/1/2`,
+   `d4_clipW_s0/1/2`, `kt2_ww_a1e-6_s0`) or **collapse to 10.0 unguarded**. So the honest
+   statement is *"at 100 epochs with the guard on, weightwise is 78-91 depending on alpha0,
+   not 68.5"* — the error's direction is certain even though its size is not.
+3. The audit reported the scalar cell as 87.764; re-derivation gives **87.810**. The verdict is
+   unchanged, but the re-derived number is the one of record (STANDING RULE 1).
+
+**WHY THIS MATTERS BEYOND A TYPO.** `docs/PLAN.md:140` (D2) names *"weightwise recovers under
+tuning"* as the fork on which the contribution becomes a **tuning-budget analysis** rather than a
+**structural-failure** result. The direction of travel supports the fork being live: `ml5`
+weightwise plateau is **monotone rising in meta-stepsize and has not peaked** —
+
+    ms=1e-4  62.277  |  ms=1e-3  68.508  |  ms=1e-2  74.356      (n=3 each, 20 epochs)
+
+and `rs-w`'s unrun grid is exactly **3e-4 / 1e-3 / 3e-3 / 1e-2**, i.e. it covers the region where
+the arm is still climbing.
+
+**ACTIONS.** (a) FINDINGS 40.3 is amended in place to say **20-epoch** — done this tick, zero
+compute. (b) The 12 `rs-w-*` jobs are the highest-value resubmission on reconnect; they are
+ranked in the reconnect list rather than submitted, because the cluster is down.
+**Until they land, "per-weight granularity fails structurally" may not be written.**
