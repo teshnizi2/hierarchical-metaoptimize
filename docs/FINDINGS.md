@@ -12329,3 +12329,81 @@ CSV unchanged at 1707 (this tick added no runs), so the orphan set is unchanged 
 **109 families, 2 orphan, 12 runs** — `gate0b` and `gate0d`, both retired in 61.8, **not to be
 re-run**. This tick cites `fz3`, `p5`, `ff5`, `cl5`, `ml5`, `ns5`, `uc5`, `uc6`, `bl5`, `br6`,
 `bo6`, `fr5`, `wc5` — all already-cited families. **No orphan retired, none created.**
+
+## 63.7 C62-A RUNS THE SAME TICK IT IS UNBLOCKED, AND IT **PASSES EVERY REGISTERED BAR**
+
+New instrument `analysis/c63_c62a_travel.py`, **26/26 selftests**, registered A0–A3 and
+committed before any arm was scored. 58 weightwise arms load; **40 clean free** arms scored,
+**8 frozen** held out as an anchor (A0, registered exclusion), **10 exception** arms held out
+(59.4 set, CORRECTIONS 62). Primary span is `span[weightwise, full-run mean]`, derived in 63.5.
+
+| test | bar | full-run (primary) | steady-half | terminal | last quarter |
+|---|---|---|---|---|---|
+| **A1** ρ(span, F_col/F_row), n=40 | ≥ +0.50, p<0.01 | **+0.7743**, p=1e−4 | +0.7747 | +0.7088 | +0.7705 |
+| **A2** partial ρ given log10(ms), n=29 | ≥ +0.40 | **+0.5416** | +0.5416 | +0.4242 | +0.5416 |
+| **A2b** ms=1e−3 stratum alone, n=21 | ≥ +0.40 | **+0.5468**, p=0.0107 | +0.5468 | +0.4274 | +0.5468 |
+
+**All three pass under all four span definitions** (A3: verdict AGREES in every row). The
+stratum covers **4 architectures and 2 datasets** at one constant meta-stepsize, which is the
+"across families" C62-A asked for. **A2 is the load-bearing one:** the association survives
+partialling out `log10(ms)`, so 62.7's dose-response is **not purely a hyperparameter
+artifact**. The frozen anchor sits at F_col/F_row **0.5944–0.9991, median 0.7830**, and only
+**10 of 40** free arms fall at or below the frozen maximum.
+
+## 63.8 **AND THE PASS DOES NOT SURVIVE ITS OWN CONFOUND CHECKS. THE SCATTER AT MATCHED SPAN EXCEEDS THE WHOLE TREND.**
+
+These checks are POST-HOC and labelled; they were run because they are the obvious criticism
+of A2b, not because the registered bars failed. **They are reported instead of the +0.5468.**
+
+| A2b variant (span_full) | n | ρ | perm p |
+|---|---|---|---|
+| as registered, ms=1e−3 | 21 | +0.5468 | **0.0107** |
+| **minus the two 40-epoch `bl5` arms** | 19 | +0.4158 | **0.0781** |
+| **within `r18` alone** (fixed ms, arch, dataset) | 11 | **+0.2727** | **0.4276** |
+
+**The A2b signal is carried by BUDGET, not by cross-family span variation.** The two highest
+spans in the stratum are the only 40-epoch arms in it (`bl5/e40` s1/s2, span 12.71/13.06,
+ratio 1.413/1.575). Drop them and the p goes non-significant; restrict to one architecture and
+the correlation is +0.27 at p=0.43, with the nine 20-epoch `r18` arms spanning 6.30–7.92 in
+span and only **0.993–1.108** in ratio — flat.
+
+**THE SHARPEST FACT, AND IT IS ONE PAIR OF ARMS.** `ff5/probe_c100_w_s0` and
+`ff5/probe_r10_w_s0` sit at span **8.3147** and **8.3133** — matched to **0.0014 log units** —
+and their F_col/F_row are **1.1455** and **2.4825**, a factor of **2.17**. All four matched
+cross-family pairs (Δspan ≤ 0.15) give **1.23× – 2.22×**.
+
+**AND THE SCATTER IS NOT CLEANLY "ARCHITECTURE" EITHER — IT IS PARTLY SEED.** `r10`'s own two
+seeds read **2.4825** and **1.4078** at spans 8.3133 / 8.3388, a **1.76×** spread at matched
+span within one config. Per family at ms=1e−3, 20 epochs:
+
+| family | n | span range | F_col/F_row range |
+|---|---|---|---|
+| r18 | 9 | 6.30–7.92 | 0.993–1.108 |
+| r34 | 4 | 6.76–6.92 | 1.173–1.228 |
+| r10 | 4 | 8.31–8.81 | **1.388–2.540** |
+| c100 | 2 | 8.31–8.33 | 1.120–1.146 |
+
+**Whichever way that scatter is attributed, the conclusion is the same and it is arithmetic:
+the whole A2b trend moves the ratio ~1.0 → ~1.57 across 6.8 log units of span, while the
+spread at a SINGLE matched span is 1.12 → 2.48. The residual exceeds the effect.**
+
+**WHAT C62-A THEREFORE LICENSES.** (1) 62.7's trend is **not** explained away by `ms` — A2's
+partial ρ = +0.54 is real and survives every definition. (2) **"Adaptation extent determines
+F_col/F_row" is REFUTED**: span does not determine the ratio at all, and at fixed span the
+ratio moves by more than the entire span-driven range. (3) The variable A2b actually picks up
+at fixed `ms` is **budget**, which 62.7 never controlled and which is a third confound, not a
+mechanism. **62.7 remains post-hoc and is now bounded on both sides. No document may write
+"the column/row ratio measures adaptation extent."**
+
+## 63.9 WHAT C62-A ASKS FOR NEXT, AND WHY IT IS A CLUSTER ITEM RATHER THAN AN OFFLINE ONE
+
+The confound-free test 63.8 shows is missing is a **fixed-architecture, fixed-ms budget
+ladder**: R18/CIFAR-10 at ms=1e−3, weightwise, at 20 / 40 / 80 epochs with n≥3 seeds, scoring
+F_col/F_row against measured `span[weightwise, full-run]`. `bl5` supplies 40 epochs at n=2 and
+`p5`/`cl5` supply 20 at n≥3; **80 epochs at this operating point does not exist on disk**, and
+the seed count at 40 is the reason 63.8's drop-two check moves the p so far. It is therefore a
+**submission**, not an offline pass, and it is ranked BELOW `sp8`/`hz9`/`cp9` because those
+three decide registered gates while this one confirms the interpretation of a post-hoc trend.
+
+**Do not re-run offline:** A1/A2/A2b themselves (63.7), the confound checks (63.8), C62-C
+(63.1), and the span reconciliation (63.2–63.4). All four are closed.

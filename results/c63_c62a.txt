@@ -1,0 +1,119 @@
+======================================================================================================================
+C62-A  --  DOES F_col/F_row TRACK MEASURED BETA TRAVEL, OR THE HYPERPARAMETER?
+span[weightwise, full-run mean] is PRIMARY and is DERIVED (FINDINGS 63.5).
+======================================================================================================================
+arm                                fam      ms  span_full  span_std     F_row     F_col F_col/F_row
+probes_fz3/probe_c100_w_s0        c100       -     0.0000    0.0000     2.269     1.413      0.6228
+probes_fz3/probe_c100_w_s1        c100       -     0.0000    0.0000     2.366     1.406      0.5944
+probes_fz3/probe_r10_w_s0          r10       -     0.0000    0.0000     4.314     3.516      0.8151
+probes_fz3/probe_r10_w_s1          r10       -     0.0000    0.0000     4.229     3.494      0.8261
+probes_fz3/probe_r34_w_s0          r34       -     0.0000    0.0000     1.182     1.181      0.9991
+probes_fz3/probe_r34_w_s1          r34       -     0.0000    0.0000     1.333     1.083      0.8124
+probes_p5/probe_w_a3_s0            r18       -     0.0000    0.0000     2.539     1.913      0.7536
+probes_p5/probe_w_a3_s1            r18       -     0.0000    0.0000     2.575     1.803      0.7000
+probes_ml5/probe_w_m4_s2           r18   1e-04     0.9822    1.4675     2.134     1.822      0.8541
+probes_ml5/probe_w_m4_s1           r18   1e-04     0.9843    1.4701     2.280     1.880      0.8247
+probes_ml5/probe_w_m4_s0           r18   1e-04     0.9929    1.4871     2.142     1.900      0.8871
+probes_ns5/probe_w_m2p4_s1         r18   2e-04     1.9021    2.8202     2.109     1.933      0.9164
+probes_ns5/probe_w_m2p4_s2         r18   2e-04     1.9038    2.8255     1.988     1.790      0.9001
+probes_ns5/probe_w_m2p4_s0         r18   2e-04     1.9625    2.9347     2.047     1.826      0.8918
+probes_ns5/probe_w_m5p4_s1         r18   5e-04     4.4352    6.5082     1.778     1.704      0.9587
+probes_ns5/probe_w_m5p4_s0         r18   5e-04     4.5980    6.7636     1.658     1.586      0.9566
+probes_cl5/probe_w_cD_s1           r18   1e-03     6.2951    8.6167     1.477     1.564      1.0592
+probes_cl5/probe_w_cD_s2           r18   1e-03     6.4157    8.8189     1.446     1.510      1.0437
+probes_cl5/probe_w_cD_s0           r18   1e-03     6.5120    8.9854     1.488     1.478      0.9932
+probes_uc5/probe_r34_w_s0          r34   1e-03     6.7557    9.5764     0.914     1.071      1.1727
+probes_uc5/probe_r34_w_s1          r34   1e-03     6.7681    9.5855     0.882     1.069      1.2129
+probes_ff5/probe_r34_w_s1          r34   1e-03     6.8203    9.7405     0.894     1.082      1.2094
+probes_ff5/probe_r34_w_s0          r34   1e-03     6.9228    9.9112     0.901     1.106      1.2279
+probes_ml5/probe_w_m3_s1           r18   1e-03     7.6047   10.7693     1.464     1.481      1.0117
+probes_wc5/probe_w_m3_s1           r18       -     7.6200   10.7651     1.467     1.487      1.0139
+probes_cl5/probe_w_cU_s1           r18   1e-03     7.6487   10.8155     1.416     1.568      1.1076
+probes_fr5/probe_w_a3_s1           r18       -     7.6759   10.8086     1.430     1.526      1.0671
+probes_fr5/probe_w_a3_s2           r18       -     7.7272   10.9418     1.435     1.475      1.0274
+probes_ml5/probe_w_m3_s2           r18   1e-03     7.7335   10.9442     1.435     1.477      1.0289
+probes_cl5/probe_w_cU_s2           r18   1e-03     7.7688   10.9905     1.423     1.458      1.0241
+probes_wc5/probe_w_m3_s2           r18       -     7.7855   10.9624     1.424     1.472      1.0340
+probes_ml5/probe_w_m3_s0           r18   1e-03     7.8176   11.0715     1.432     1.423      0.9938
+probes_fr5/probe_w_a3_s0           r18       -     7.8714   11.1467     1.401     1.459      1.0413
+probes_wc5/probe_w_m3_s0           r18       -     7.9141   11.2367     1.393     1.425      1.0229
+probes_cl5/probe_w_cU_s0           r18   1e-03     7.9237   11.2744     1.390     1.414      1.0172
+probes_ff5/probe_r10_w_s0          r10   1e-03     8.3133   11.6787     7.929    19.685      2.4825
+probes_ff5/probe_c100_w_s0        c100   1e-03     8.3147   11.7077     1.152     1.320      1.1455
+probes_ff5/probe_c100_w_s1        c100   1e-03     8.3324   11.7238     1.260     1.411      1.1199
+probes_ff5/probe_r10_w_s1          r10   1e-03     8.3388   11.7279     2.709     3.814      1.4078
+probes_uc6/probe_c100_w_s0        c100       -     8.7053   12.4898     1.170     1.349      1.1532
+probes_uc6/probe_c100_w_s1        c100       -     8.7090   12.4670     1.296     1.410      1.0881
+probes_uc5/probe_r10_w_s1          r10   1e-03     8.7785   12.6052     2.743     3.807      1.3879
+probes_uc5/probe_r10_w_s0          r10   1e-03     8.8096   12.6663     7.339    18.642      2.5402
+probes_bl5/probe_w_e40_s1          r18   1e-03    12.7140   17.7988     1.260     1.780      1.4128
+probes_bl5/probe_w_e40_s2          r18   1e-03    13.0634   18.3625     1.215     1.913      1.5746
+probes_br6/probe_w_c2_s3           r18       -    13.1176   18.4149     1.142     1.856      1.6258
+probes_br6/probe_w_c2_s2           r18       -    13.1469   18.4668     1.153     1.816      1.5751
+probes_br6/probe_w_c2_s0           r18       -    13.3741   18.8103     1.257     1.913      1.5216
+
+EXCEPTION ARMS (FINDINGS 59.4 set; ms=1e-2 / AdamW-base). NEVER POOLED:
+probes_bo6/probe_w_adw_s1          r18             8.3777   12.5621   890.134  1660.345      1.8653
+probes_bo6/probe_w_adw_s0          r18             8.9888   13.2543  1453.714  1623.367      1.1167
+probes_ml5/probe_w_m2_s0           r18            12.2620   12.6974  1333.017  1995.162      1.4967
+probes_ml5/probe_w_m2_s1           r18            12.2620   12.6974  1620.907  2414.513      1.4896
+probes_ml5/probe_w_m2_s2           r18            12.2620   12.6974  1544.081  2187.716      1.4168
+probes_br6/probe_w_c2_s1           r18            13.1469   18.5956    86.715   190.977      2.2023
+probes_bl5/probe_w_e40_s0          r18            14.0031   20.0356   368.603   407.402      1.1053
+probes_wc5/probe_w_m2_s1           r18            24.9113   27.6974  1435.689  2265.538      1.5780
+probes_wc5/probe_w_m2_s2           r18            24.9128   27.6974  1453.189  2103.194      1.4473
+probes_wc5/probe_w_m2_s0           r18            24.9134   27.6974  1608.962  2270.103      1.4109
+
+--- A0 FROZEN ANCHOR (span == 0.00 by construction; EXCLUDED from A1/A2/A2b) ---
+  n=8  F_col/F_row = 0.5944 - 0.9991, median 0.7830
+  free arms at or below the frozen MAXIMUM: 10/40
+  40 clean free arms scored; 10 exception arms held out.
+
+--- A1  Spearman(span, F_col/F_row) over clean FREE arms ---
+  span[full-run (PRIMARY)  ] rho = +0.7743   perm p = 0.00010   n = 40   PASS
+  span[steady-half         ] rho = +0.7747   perm p = 0.00010   n = 40   PASS
+  span[terminal            ] rho = +0.7088   perm p = 0.00010   n = 40   PASS
+  span[last quarter        ] rho = +0.7705   perm p = 0.00010   n = 40   PASS
+
+--- A2  partial Spearman given log10(ms), n = 29 (arms with a script-verified ms) ---
+  span[full-run (PRIMARY)  ] partial rho = +0.5416   PASS
+  span[steady-half         ] partial rho = +0.5416   PASS
+  span[terminal            ] partial rho = +0.4242   PASS
+  span[last quarter        ] partial rho = +0.5416   PASS
+
+--- A2b  THE DECIDING TEST: ms = 1e-3 STRATUM ALONE, n = 21, families ['c100', 'r10', 'r18', 'r34'] ---
+  span[full-run (PRIMARY)  ] rho = +0.5468   perm p = 0.01070   PASS
+  span[steady-half         ] rho = +0.5468   perm p = 0.01070   PASS
+  span[terminal            ] rho = +0.4274   perm p = 0.04780   PASS
+  span[last quarter        ] rho = +0.5468   perm p = 0.01110   PASS
+
+  the stratum, sorted by span_full:
+  arm                                fam  span_full F_col/F_row
+  probes_cl5/probe_w_cD_s1           r18     6.2951      1.0592
+  probes_cl5/probe_w_cD_s2           r18     6.4157      1.0437
+  probes_cl5/probe_w_cD_s0           r18     6.5120      0.9932
+  probes_uc5/probe_r34_w_s0          r34     6.7557      1.1727
+  probes_uc5/probe_r34_w_s1          r34     6.7681      1.2129
+  probes_ff5/probe_r34_w_s1          r34     6.8203      1.2094
+  probes_ff5/probe_r34_w_s0          r34     6.9228      1.2279
+  probes_ml5/probe_w_m3_s1           r18     7.6047      1.0117
+  probes_cl5/probe_w_cU_s1           r18     7.6487      1.1076
+  probes_ml5/probe_w_m3_s2           r18     7.7335      1.0289
+  probes_cl5/probe_w_cU_s2           r18     7.7688      1.0241
+  probes_ml5/probe_w_m3_s0           r18     7.8176      0.9938
+  probes_cl5/probe_w_cU_s0           r18     7.9237      1.0172
+  probes_ff5/probe_r10_w_s0          r10     8.3133      2.4825
+  probes_ff5/probe_c100_w_s0        c100     8.3147      1.1455
+  probes_ff5/probe_c100_w_s1        c100     8.3324      1.1199
+  probes_ff5/probe_r10_w_s1          r10     8.3388      1.4078
+  probes_uc5/probe_r10_w_s1          r10     8.7785      1.3879
+  probes_uc5/probe_r10_w_s0          r10     8.8096      2.5402
+  probes_bl5/probe_w_e40_s1          r18    12.7140      1.4128
+  probes_bl5/probe_w_e40_s2          r18    13.0634      1.5746
+
+--- A3  SENSITIVITY ACROSS SPAN DEFINITIONS ---
+    A1: rho +0.7088 .. +0.7747   verdict AGREES across the four definitions
+    A2: rho +0.4242 .. +0.5416   verdict AGREES across the four definitions
+   A2b: rho +0.4274 .. +0.5468   verdict AGREES across the four definitions
+
+wrote results/c63_c62a.json
