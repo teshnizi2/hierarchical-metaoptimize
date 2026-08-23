@@ -4083,3 +4083,40 @@ is unresolved at 20 epochs, and 58.6/58.8's tuned table rests on **nodewise n=1*
 against 94.12's pre-registered reading, unchanged. (d) **DONE, do not re-run:** everything in
 95.12(d), **and now C67 in full (67.1–67.8)**. (e) The offline queue is again down to the
 carried-since-51 `s` re-derivation.
+
+## 87. **THE "WIDENING GAP" WAS A CONFIG MISMATCH. THE DEFICIT IS FLAT.** (cycle 64)
+
+Reported to the operator on 23 Aug in a figure, and wrong. Caught by the master-table fact-check
+and re-derived here from `results/all_runs.csv` before correction.
+
+**THE ERROR.** The budget series was built by comparing the **best MetaOptimize cell at 100
+epochs** (AdamW+Adam, **6-block**, alpha0=**3e-4**, 93.304) against a **specific arm** at 300/600
+epochs (AdamW+Adam, **layerwise**, alpha0=**1e-4**). Two different arms. That manufactures a
+widening trend out of an arm change, and it violates this project's own standing rule that the
+max cell of a sweep is never "the effect".
+
+**CONFIG-MATCHED** — the same MetaOptimize arm (AdamW+Adam, layerwise, alpha0=1e-4, ms=1e-3) and
+the same baseline (AdamW+cosine, lr=1e-3) at every budget, R18/CIFAR-10, `epochs_done ==
+epochs_requested`:
+
+| epochs | AdamW + cosine | best-matched MetaOptimize | gap |
+|---|---|---|---|
+| 100 | 94.058 ±0.097 (n=9) | 92.349 ±0.407 (n=9) | **-1.709** |
+| 300 | 94.999 ±0.164 (n=3) | 93.033 ±0.168 (n=3) | **-1.966** |
+| 600 | 95.138 ±0.108 (n=3) | 93.201 ±0.286 (n=3) | **-1.937** |
+
+**THE GAP IS FLAT AT 1.7-2.0 pp.** It moves +0.26 pp from 100->300 and -0.03 pp from 300->600.
+It does **not** widen, and it does **not** close.
+
+**WHAT CHANGES AND WHAT DOES NOT.**
+* **WITHDRAWN:** "the gap widens with budget", "the gap more than doubles", and any figure or
+  sentence built on the 0.76 -> 1.97 -> 1.94 series. The 0.76 number is an arm change, not a budget effect.
+* **UNCHANGED, and it is still the operative negative:** the long-horizon defence is closed.
+  Cosine gains +1.08 pp from 100->600 while the matched meta arm gains +0.85 pp; both improve,
+  the deficit persists, and no budget in the tested range erases it.
+* **UNCHANGED:** the 100-epoch head-to-head (best meta 93.304 vs SGD+cosine 94.766 = -1.462 pp).
+  That row compares best-cell to best-cell and is internally consistent.
+
+**STANDING RULE (10): a series across ANY axis must hold the arm fixed.** If the best cell moves
+between levels, report the matched arm as the series and the best cell separately, labelled. The
+figure has been regenerated; the superseded PNG must not be circulated.
