@@ -3397,3 +3397,131 @@ per-seed sd. (f) **DONE, do not re-run:** the row premise (59.3), the nodewise h
 exception mechanism (60.2–60.7), **and now the tensor-mean avenue for 89.7 (61.4/61.5)**. (g) The
 raw-instrument `s` re-derivation is now the ONLY unspent offline item, carried since 51, and it is
 bookkeeping. (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
+
+---
+
+## 91. A RECORDED IMPOSSIBILITY WAS HALF WRONG, AND THE HALF THAT WAS WRONG IS THE PAPER'S DELIVERABLE (cycle 62)
+
+**91.0 STATE.** ALICE unreachable for a **SEVENTH** consecutive tick — gateway UP
+(`p-cfer-016105`), both login IPs refusing :22 from it, both accounts failing at banner
+exchange, checked **2026-08-23T04:25Z** and again at **04:43Z**. Nothing submitted, nothing
+cancelled, nothing synced, no queue read. CSV unchanged at 1707. `sp8` (9, alice2), `hz9` (9,
+alice), `cp9` (8, alice), `rw9` (18, alice) all remain written, validated and UNSUBMITTED;
+`docs/` is now **four** cycles behind on the cluster.
+
+**91.1 THE DECISION, AND ITS REASON.** CONTINUE-HERE's offline list was down to one item, the
+carried-since-51 `s` re-derivation, explicitly labelled *bookkeeping*. Rather than spend a
+seventh tick on it, I applied **STANDING RULE (11)** — the rule cycle 61 installed after
+exactly this failure mode — to the one *recorded impossibility* that blocks the operator's
+DEFAULT deliverable: FINDINGS **52.12**, *"the granularity curve cannot be recovered offline …
+filling the layerwise↔weightwise interval requires a new `stepsize_type` in `HF.py`"*.
+
+Naming the field, as (11) requires, splits it:
+
+* `rho_s` / `N_eff` are derived from **`frac_neg`**, a per-record **pooled scalar**. No
+  coordinate resolution ⇒ **52.12 IS CORRECT for the correlation channel and is NOT WITHDRAWN.**
+  That half still needs a code change to the optimizer under study and an operator decision.
+* The **marginal-bias channel** is `neg_counts.npy` — **11,173,962 per-coordinate counts** per
+  R18 weightwise arm. It re-blocks post hoc at **any** block size, at zero compute.
+  **52.12's final clause is WRONG and is withdrawn.**
+
+FINDINGS 43.3 is what makes this matter rather than being a technicality: at a0=1e−6 the
+marginal channel accounts for **all** of the agreement excess over the independence floor.
+**The channel 52.12 declared unreachable is the one carrying the headline.** → FINDINGS 62.1
+
+**91.2 THE INSTRUMENT.** `analysis/c62_blocksize_curve.py`, **83/83 selftests**, importing
+c59's measured architecture map and c60's class/clamp machinery, and using c59's `nested_ss` /
+`noise_split` verbatim. Real-data gates: **G1** — the u=1 rung equals c60's published
+`R_conv_cor` via the independent c59/c60 code path to **4.337e−19** across 6 arms; **G4** —
+the SS identity holds to **1.510e−14** over 102 (arm, rung) cells. It is a generalisation of a
+published number, not a new statistic that happens to agree. → FINDINGS 62.2
+
+**91.3 THREE OF THIS TICK'S OWN ASSERTIONS WERE WRONG AND ITS HARNESS CAUGHT ALL THREE.**
+In each case the assertion, not the code: comparing `abs(a−b)` where both paths correctly read
+`nan`; expecting an offset to add one partial block in total rather than one **per tensor**;
+asserting monotonicity on the CORRECTED null, which is `nan` wherever the clamp binds.
+
+**91.4 AND A FOURTH CATCH WAS A REAL MEASUREMENT LIMIT, RECORDED BEFORE USE, NOT AFTER.**
+The recovery gate planted **perfectly constant** blocks. That makes `SS_within` pure sampling
+noise, so `max(raw − noise, 0)` binds **at exactly the planted rung** — the true peak
+(`E = 97.9 pp`) is excluded by CORRECTIONS 89.6's own rule and the peak is misread one rung low.
+
+> **A perfectly homogeneous block is the one structure this readout cannot locate.** That is a
+> property of the clamp and it is now stated in the instrument docstring, not discovered later.
+
+**91.5 THE REGISTERED SCIENCE: TWO HYPOTHESES DIED, AND ONE OF THEM WAS A HOPED-FOR
+CONFIRMATION.** H1/H2/H3 were registered before any arm was scored.
+
+* **H3 (null everywhere) REFUTED**: E/res = **9.5–169 at every rung**. 59.3's one-point row
+  result does not generalise — **59.3 measured the within-tensor marginal structure at the one
+  block size where it is smallest.** 59.3 is not withdrawn; its scope is now known.
+* **H1 (channel knee) REFUTED**: no peak at u=1. The marginal channel does **not** reproduce
+  48.18's *"the correlation length is approximately the channel"*. **This was the outcome that
+  would have made the campaign's sharpest result independently confirmed through a second
+  statistic. It did not happen, and the dissociation is reported as the result.** 48.18 is
+  untouched — it is a statement about the correlation channel and this is a different channel.
+* **H2 (sub-channel) survives** on the one arm scored so far (62.4), pending 62.8's C62-C.
+
+**91.6 S1/S2 FIRED AND S4 — REGISTERED IN ADVANCE PRECISELY TO SEPARATE THEM — REFUSED THE
+OBVIOUS READING.** g=9 aligned/offset ratio **1.92** (registered ≥1.5), local max at g=9,
+mod-9 direction at **0.0026 pp** reproducing 59.7's null. Every one of those is consistent with
+a 3×3 *filter* object. But a filter also lies inside one input channel, and 59.7 already
+measured a COLUMN excess up to +0.788 pp, so **S2 alone cannot license the word "filter"**.
+S4 tests the `o × i` interaction directly:
+
+> **F_int = 0.811 – 1.041 across ALL 50 clean weightwise arms** (13 families, 4 architectures,
+> 2 datasets). The registered threshold was 1.10. **It is not reached in a single arm.**
+
+**The g=9 phase effect is additive row + input-channel structure. There is no filter-level
+object, and no document may write one.** → FINDINGS 62.5
+
+**91.7 THE POSITIVE, PRESCRIPTIVE RESULT.** `F_row` and `F_col` are both above the null in
+essentially every clean arm. Every partition in the Adam-mini / Adalayer / SGG line is at the
+**output channel or coarser**, and such a partition captures the row effect exactly and the
+**input-channel effect not at all, by construction** — the two directions are orthogonal to it.
+This is the first prescriptive sentence the C direction has produced rather than a refutation.
+**Scope unchanged: we measure `z`; they argue about `G`. No document may write "we refuted
+Adam-mini."** → FINDINGS 62.6
+
+**91.8 A POST-HOC DOSE-RESPONSE, LABELLED AS ONE.** `F_col/F_row` on the matched R18/CIFAR-10
+ladder: **0.700–0.753 (β frozen) < 0.825–0.887 (ms=1e−4) < 0.892–0.917 (2e−4) <
+0.957–0.958 (5e−4) < 0.994–1.107 (1e−3) < 1.411–1.578 (1e−2)** — six rungs, five adjacent
+gaps, every gap clean, crossing 1.0 between 5e−4 and 1e−3. Whole-corpus Mann-Whitney
+**U = 542/544, z = +5.62**, two crossing pairs. Under 76(1)/79 read symmetrically this
+**may not overturn a registered gate** and does not. The ms=1e−2 rung is boundary-dominated
+(62) and the trend stands without it. "Adaptation extent" is an interpretation; the
+confirmation test (C62-A) is **BLOCKED** on 55.4's owed reconciliation of the two incompatible
+`span` definitions, and registering it without that would repeat the CORRECTIONS 41 pathology.
+→ FINDINGS 62.7, 62.8
+
+**91.9 ORPHANS.** CSV unchanged (this tick added no runs), so the orphan set is unchanged from
+90.7: **109 families, 2 orphan, 12 runs**, both already retired in FINDINGS 61.8 and not to be
+re-run. This tick cites `fz3`, `p5`, `ff5`, `cl5`, `fr5`, `ml5`, `ns5`, `uc5`, `uc6`, `wc5`,
+`bl5`, `br6`, `bo6` — all already-cited families, so no orphan is retired and none is created.
+
+**91.9b THE CORPUS SWEEP LANDED AFTER 91.6 WAS WRITTEN, AND IT DEMOTES ONE OF THIS TICK'S OWN
+TESTS.** Over 17 clean arms: **S2's SIGN holds 17/17** (aligned > offset-4 at g=9, sign test
+p=1.5e-5) but its **registered ratio bar of 1.5 is met in only 9 of 16** scorable arms (median
+1.60). **S1's registered form passes 11 of 17 and is therefore NOT reported as a result.** What
+IS unanimous is the unrestricted argmax: **g <= 9 in 17 of 17 arms**, never coarser than one
+3x3 kernel, with E flat below 9 (median ratio 1.10) and falling by a median **2.24x by g=27**
+and **5.38x by g=576**, 17/17 in both. That shape is what 91.6's additive row+column result
+PREDICTS -- an aligned block of g<=9 lies inside one (o,i) cell -- so S1/S2/S4 are one result,
+and it is the additive one. S3 reproduces 59.7's null on the same arms (-0.0003 to +0.0098 pp
+against the published ~0.000-0.010), which is the registered precondition for reporting any of
+them. **The scale statement, with its number: the output-channel partition is 566-4608
+coordinates here; the structure is maximally captured at 2-9. Every partition in that line is
+60x-500x too coarse, along the one axis that leaves the other uncaptured.** -> FINDINGS 62.9
+
+**91.10 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` BOTH accounts before anything.
+(a2) **rsync `docs/` — it is now FOUR cycles behind.** (b) Submit `sp8` (alice2, 9), then
+`hz9` (9, alice). (c) Then `cp9` (8, alice) after applying `patches/patch_probe6_coord.py` on
+the cluster; guard 2 refuses without it. Ranked above `rw9` (90.6) — and 62.5/62.6 **raise its
+value again**, because the input-channel direction it would resolve at coordinate level is now
+the direction carrying half the measured structure. (d) Score `hz9` H0 → H0.3 → H0.5 → H1 →
+H1b → H2; H0.5 can only VOID. (e) If bo7/bd7 landed, cycle 54's order stands with 55.2's
+per-seed sd. (f) **DONE, do not re-run:** 59.3, 59.8, 60.2–60.7, the tensor-mean avenue for
+89.7 (61.4/61.5), **and now the filter hypothesis (62.5, 50 arms, closed)**. (g) The offline
+queue is C62-C (the conv-only u-ladder on all four families), then C62-A **once 55.4's span
+reconciliation is discharged**, then the carried-since-51 `s` re-derivation. (h) The 12
+truncated `rs-blk6`/`rs-node` reruns remain last.

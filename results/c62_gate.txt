@@ -1,0 +1,7 @@
+==============================================================================================
+GATES ON REAL DATA
+==============================================================================================
+G1 reproduction  : 6 arms, worst |c62(u=1) - c60 R_conv_cor| = 4.337e-19   PASS
+G4 identity      : 102 (arm,rung) cells, worst relative error = 1.510e-14   PASS
+
+G2/G3/G5 are synthetic and run under --selftest (they need ground truth).

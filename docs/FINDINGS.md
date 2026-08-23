@@ -11905,3 +11905,254 @@ POST-HOC** wherever reported.
 
 **NOT SUBMITTED.** Guards 1/2/2b/2c/5/6 need the cluster; guards 3 and 4 were run standalone
 on this Mac and **both pass**. `bash -n` clean.
+
+---
+
+## 62.0 CYCLE 62 — ALICE DOWN A **SEVENTH** CONSECUTIVE TICK; ZERO JOBS; A RECORDED IMPOSSIBILITY IS HALF WRONG
+
+Reachability, localised not assumed, at **2026-08-23T04:25Z** and re-checked at **04:43Z**:
+gateway UP and answering (`p-cfer-016105`); `132.229.104.230` and `.231` both refuse :22 from
+it; `ssh alice` and `ssh alice2` both fail at **banner exchange**. **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+
+## 62.1 STANDING RULE (11) APPLIED TO **52.12**, AND IT SPLITS RATHER THAN REVERSES
+
+FINDINGS 52.12 recorded that the operator's default deliverable — *"characterise how agreement
+varies with block size"* — **cannot be produced offline**:
+
+> "Nor can the curve be recovered offline: `probe5_window`'s k-profile takes one k **per arm**
+> ... it is not a post-hoc re-blocking of stored per-coordinate counts. **So filling the
+> layerwise↔weightwise interval requires a new `stepsize_type` in `HF.py`** ... the one place
+> where the C-direction programme needs an operator decision rather than another batch."
+
+STANDING RULE (11) (CORRECTIONS 90.1) requires naming the stored field before recording a
+question as unanswerable. Doing that splits the claim in two:
+
+| channel | the field it needs | verdict |
+|---|---|---|
+| CORRELATION (`rho_s`, `N_eff`) | `frac_neg` — a per-record **pooled scalar**, no coordinate resolution | **52.12 IS CORRECT. NOT WITHDRAWN.** Still needs a new `stepsize_type` and an operator decision. |
+| MARGINAL BIAS (per-coordinate persistent sign preference) | `neg_counts.npy` — **11,173,962 per-coordinate counts** on an R18 weightwise arm | **52.12's last clause is WRONG.** Re-blockable post hoc at **any** block size, at zero compute. |
+
+FINDINGS 43.3 is what makes the split legitimate: it established that the agreement excess
+decomposes into exactly these two channels, and that at a0=1e-6 the marginal channel accounts
+for **all** of the excess over the independence floor (+0.098 pp floor-excess vs −0.0006 pp
+against the marginal-preserving null). **The channel 52.12 declared unreachable is the one
+carrying the headline.**
+
+## 62.2 NEW INSTRUMENT `analysis/c62_blocksize_curve.py` — **83/83 selftests**, gates G1–G5
+
+Modes `--selftest --gate --curve --report --spatial --s4 --s4all`. It imports c59's measured
+architecture map and c60's class/clamp machinery rather than re-deriving either; `nested_ss`
+and `noise_split` are c59's own functions, used verbatim (both are generic over
+`(tensor_id, group_id)` and know nothing about rows).
+
+The statistic at block size g, nested inside the tensor and noise-corrected exactly as in 59.3:
+
+    R(g) = SS_block|tensor / (SS_block|tensor + SS_within)
+    E(g) = R(g) − R_null(g)    [pp]   null = SIZE-PRESERVING WITHIN-TENSOR REGROUP
+
+`R(1) = 1` and `R(n_t) = 0` **by construction**, and the null has the identical mechanical
+shape, so `E` vanishes at both ends and **its LOCATION, not its existence, is the measurement.**
+
+**REAL-DATA GATES PASS.** G1 (reproduction): across 6 `fz3` arms the u=1 rung equals c60's
+published `R_conv_cor`, computed by the independent c59/c60 code path, to a worst
+**4.337e−19**. G4 (identity `SS_total = SS_tensor + SS_block + SS_within`): worst relative
+error **1.510e−14** over 102 (arm, rung) cells. So the ladder is a *generalisation of a
+published number*, not a new statistic that happens to agree.
+
+**THREE SELFTEST ASSERTIONS WERE WRONG AND THE HARNESS CAUGHT ALL THREE** — in each case the
+assertion, not the code: (i) G1 compared `abs(a−b)` where both paths correctly read `nan`
+(pure-noise synthetic clamps on both sides); (ii) an offset block adds one leading partial
+block **per tensor**, not one in total; (iii) monotonicity of the null was asserted on the
+CORRECTED R, which is `nan` wherever the clamp binds — the mechanically monotone quantity is
+`R_raw`. A fourth catch was a genuine measurement limit, recorded in 62.3.
+
+## 62.3 A LIMIT OF THE READOUT, FOUND BY ITS OWN RECOVERY GATE AND RECORDED BEFORE USE
+
+G3 plants structure at a known scale and requires `argmax_u E(u)` to land within one rung.
+The first version planted **perfectly constant** blocks — which makes `SS_within` pure sampling
+noise, so `max(raw − noise, 0)` binds **at exactly the planted rung**, the true peak is
+excluded as an artifact (CORRECTIONS 89.6's rule), and the peak is misread one rung low.
+Measured: plant at u=1, true rung `E = 97.9 pp`, **clamped**, peak reported at u=1/2.
+
+> **A perfectly homogeneous block is the one structure this readout cannot locate.** It is a
+> property of the clamp, not of the data. The gate now plants block levels **plus**
+> per-coordinate jitter, and recovers the plant within one rung at u0 = 1/16, 1/4, 1 and 4.
+
+## 62.4 H3 AND H1 ARE REFUTED ON THE FIRST ARM SCORED; H2 SURVIVES
+
+`probes_p5/probe_w_a3_s0` (R18/C10, β **frozen**, n_rec 2000), **conv tensors only**
+(STANDING RULE 10), 11,159,232 coordinates in 20 tensors:
+
+| u | 1/1024 | 1/256 | 1/64 | 1/16 | 1/4 | **1** | 4 | 16 | 64 |
+|---|---|---|---|---|---|---|---|---|---|
+| E (pp) | **0.1519** | 0.1053 | 0.0718 | 0.0442 | 0.0442 | **0.0426** | 0.0119 | 0.0024 | 0.0000 |
+| E/res | 15.2 | 9.6 | 9.6 | 71.0 | 61.0 | 130.9 | 56.9 | 24.7 | 0.2 |
+
+* **H3 (null everywhere) is REFUTED**: E/res is **9.5–169** at every rung. 59.3's one-point row
+  result does **not** generalise to a flat ladder — there IS within-tensor marginal structure,
+  and 59.3 measured it at the one block size where it is smallest.
+* **H1 (channel knee at u=1) is REFUTED**: there is no peak at u=1. The marginal channel does
+  **not** reproduce 48.18's "correlation length ≈ the channel". **The two channels have
+  different scale structure, and that is a dissociation, not a confirmation.**
+* **H2 (sub-channel) survives on this arm**: E is flat at ~0.043 pp from u=1 down to u=1/16 and
+  then rises 3.6× to 0.152 pp at u=1/1024.
+
+## 62.5 S1/S2 FIRE — AND S4, REGISTERED TO SEPARATE THEM, REFUSES THE OBVIOUS READING
+
+The obvious candidate for a sub-channel scale in a conv tensor is the **3×3 kernel**: a
+contiguous run of 9 coordinates is exactly one (output channel `o`, input channel `i`) filter.
+The u-ladder blurs it (g=9 falls at u = 1/cin, cin = 3..512), so S1/S2/S3 were registered on an
+**absolute-g** ladder, **3×3 conv tensors only**. On `p5/probe_w_a3_s0`:
+
+| test | registered | measured | verdict |
+|---|---|---|---|
+| **S1** local max at g=9 | E(9) = max{E(6),E(8),E(9),E(12),E(16)} | 0.1499 / 0.1098 / **0.1526** / 0.1385 / 0.0917 | **PASS** |
+| **S2** phase, aligned vs offset-4 at g=9 | ratio ≥ 1.5 | 0.1526 / 0.0793 = **1.92** (res 0.0084 pp) | **PASS** |
+| **S3** mod-9 direction reproduces 59.7's null | ≤ 0.02 pp | **0.0026 pp** | **PASS** |
+
+Phase scan at g=9, offsets 0..4: **0.1526, 0.1165, 0.1292, 0.0957, 0.0793** — falls with phase.
+Identical block size, identical null: **only the alignment differs.**
+
+**S4 WAS REGISTERED BEFORE IT WAS RUN, PRECISELY BECAUSE S2 CANNOT LICENSE THE WORD "FILTER".**
+A filter also lies entirely inside input channel `i`, and 59.7 measured a COLUMN excess up to
+**+0.788 pp**, larger than the row's — so pure input-channel structure predicts aligned > offset
+too. The separator is the interaction in the `cout × cin` matrix of filter means
+`m[o,i] = grand + a[o] + b[i] + e[o,i]`, scored as `F = SS_real / SS_null` against the same
+permutation null (ratios, so binomial noise divides out and no clamp can bind):
+
+> **F_int = 0.811 – 1.041 across ALL 50 clean weightwise arms, 13 families, 4 architectures,
+> 2 datasets.** The registered threshold was `F_int ≤ 1.10 ⇒ the effect is ADDITIVE row+column
+> and the word "filter" may NOT be used.` **It is not reached in a single arm.**
+
+**The g=9 phase effect is fully explained by additive row and input-channel structure. There is
+no filter-level object.** S1 and S2 are reported as *measured and explained*, never as evidence
+for a kernel. (The instrument can detect a planted interaction: G3/S4 selftests recover
+`F_int > 3` from a planted filter matrix and `F_int < 1.10` from planted pure-row and pure-column
+matrices.)
+
+## 62.6 **THE POSITIVE RESULT, AND IT IS PRESCRIPTIVE:** THE STRUCTURE A BLOCK METHOD DESTROYS IS ROW **AND INPUT-CHANNEL**, ADDITIVELY
+
+`F_row` and `F_col` are both above the null in essentially every clean arm. The Adam-mini /
+Adalayer / SGG line partitions by **output channel or coarser**. An output-channel partition
+groups a whole row, so it captures `a[o]` exactly and captures `b[i]` **not at all** — the
+input-channel direction is orthogonal to every partition in that line, by construction.
+
+**Scope, unchanged and not optional: we measure `z`, the META-gradient; Adam-mini argues about
+`G`. No document may write "we refuted Adam-mini."**
+
+## 62.7 **POST-HOC, LABELLED, AND THE STRONGEST SHAPE IN THIS TICK:** F_col/F_row IS A MONOTONE DOSE-RESPONSE IN THE META-STEPSIZE
+
+Not registered. Discovered while grouping 62.6's table. Reported as an inventory, and under
+CORRECTIONS 76(1)/79 it **may not overturn a registered gate** — it does not; it is new.
+
+**Matched ResNet18 / CIFAR-10 ladder** (52.13's four-point box-free design plus its neighbours
+and 55.5's frozen comparator), `F_col / F_row` per seed:
+
+| rung | n | per-seed | range |
+|---|---|---|---|
+| **β FROZEN** (`p5`) | 2 | 0.753, 0.700 | 0.700–0.753 |
+| free, ms=1e−4 (`ml5 m4`) | 3 | 0.887, 0.825, 0.854 | 0.825–0.887 |
+| free, ms=2e−4 (`ns5`) | 3 | 0.892, 0.917, 0.900 | 0.892–0.917 |
+| free, ms=5e−4 (`ns5`) | 2 | 0.957, 0.958 | 0.957–0.958 |
+| free, ms=1e−3 (`ml5 m3`+`wc5 m3`+`cl5 cU`) | 9 | 0.994 … 1.107 | 0.994–1.107 |
+| free, ms=1e−2 (`ml5 m2`+`wc5 m2`) **EXC** | 6 | 1.411 … 1.578 | 1.411–1.578 |
+
+**Six rungs, five adjacent gaps, and every gap is clean** (0.753<0.825, 0.887<0.892,
+0.917<0.957, 0.958<0.994, 1.107<1.411). The ordering crosses 1.0 between ms=5e−4 and ms=1e−3.
+
+Over the **whole 50-arm clean corpus** (low adaptation = frozen + ms≤5e−4, n=16; high = ms=1e−3
+and the 40-epoch free arms, n=34): Mann-Whitney **U = 542 of 544, z = +5.62**, with exactly
+**two crossing pairs** (`cl5/probe_w_cD_s0` 0.993 and `ml5/probe_w_m3_s0` 0.994 against a
+frozen maximum of 0.999).
+
+**READ IT AS A RATIO, NEVER AS A LEVEL.** `F_row` and `F_col` both move a lot across these arms
+(0.88–7.93 and 1.07–19.69); the ratio is what is ordered.
+
+**CAVEATS THAT TRAVEL WITH IT.** (1) POST-HOC. (2) The ms=1e−2 rung is boundary-dominated
+(CORRECTIONS 62) and quotable for nothing — it **extends** the trend and the trend stands
+without it across five rungs. (3) "Adaptation extent" is an *interpretation*; what is measured
+is an ordering in ms. CORRECTIONS 74 / 55.4 record that `span` is confounded with ms, with
+frozen-vs-free and with box width, and that **two incompatible span definitions must be
+reconciled before either is quoted**. The confirmation test is registered in 62.8, not run here.
+
+## 62.8 REGISTERED FOR A FUTURE TICK (zero compute, but blocked on a definitional debt)
+
+**C62-A.** If 62.7 is adaptation and not the hyperparameter, `F_col/F_row` must track measured
+β **travel** per arm, not `ms`, and must do so ACROSS families — the r10/r34/c100 arms are
+available and were not used in the matched ladder. **BLOCKED until CORRECTIONS 55.4's owed
+reconciliation of the two `span` definitions (6.29 vs 8.27 log units on the same cell) is
+discharged.** Registering it without that would repeat the CORRECTIONS 41 pathology.
+
+**C62-B.** The exception (ms=1e−2 / AdamW) arms read `F_int = 0.053–0.370` — their filter-mean
+matrices are **far MORE additive than the permutation null**, the only place in the corpus where
+`F_int` departs from 1 at all, and in the *opposite* direction to any structure hypothesis.
+`F_row` and `F_col` there are **890–1621** and **1623–2415**. Recorded, not interpreted; it is
+the 59.4 exception set and remains unquotable.
+
+**C62-C.** The u-ladder was scored on ONE arm (62.4). The corpus sweep of S1/S2/S3 was launched
+this tick; whatever it returns, H2's *location* claim needs the conv-only u-ladder on all four
+families before it is written as anything but a single-arm observation.
+
+## 62.9 THE CORPUS SWEEP LANDED — S2 HOLDS 17/17 BY SIGN, S1's REGISTERED FORM DOES NOT, AND THE KNEE IS EXACTLY WHERE 62.5 SAYS IT MUST BE
+
+`--spatial` over the 4-family × frozen/free set, **17 clean arms** plus 2 exception arms
+reported separately. **This supersedes 62.5's single-arm framing wherever they differ.**
+
+**S2 (the decisive test) — the SIGN is universal, the registered MAGNITUDE is not.**
+
+| | measured |
+|---|---|
+| aligned(offset 0) > offset-4, at g=9 | **17 of 17 clean arms**; two-sided sign test **p = 1.5e−5** |
+| offset 0 is the max of the 5 phases | 16 of 17 |
+| ratio, arms with a positive offset-4 denominator | n=16, **1.20 – 4.97, median 1.60** |
+| registered bar (ratio ≥ 1.5) | met in **9 of 16** |
+| registered refutation (ratio ≤ 1.2) | fires in **1 of 16** (exactly 1.20) |
+
+**Report it as: the phase effect is present in every arm and its registered effect-size bar is
+met in about half.** Not "S2 passes".
+
+**S1's registered form (E(9) the max of {6,8,9,12,16}) passes 11 of 17** — so it is NOT
+reported as a result. The unrestricted argmax over the full g-ladder is more informative and is
+unanimous in a different way:
+
+| argmax g | 2 | 3 | 4 | 6 | 9 | >9 |
+|---|---|---|---|---|---|---|
+| clean arms | 1 | **8** | 2 | 2 | 4 | **0** |
+
+> **The argmax sits at g ≤ 9 in 17 of 17 arms**, across ResNet10/18/34 and CIFAR-10/100, frozen
+> and free. It is never coarser than one 3×3 kernel.
+
+**AND THE SHAPE IS EXACTLY WHAT 62.5's ADDITIVE ROW+COLUMN RESULT PREDICTS.** With structure
+`m[o,i] = a[o] + b[i]` and no interaction, any *aligned* block of `g ≤ 9` lies inside a single
+`(o,i)` cell and captures `a[o]+b[i]` in full, so E should be **flat below 9**; a block of
+`g > 9` straddles cells and averages `b` away, so E should **fall above 9**. Measured:
+
+| | range | median | arms |
+|---|---|---|---|
+| `max(E, g ≤ 9) / E(9)` | 1.00 – 1.23 (15/17; two noise-floor `ff5 r34` arms at 1.47, 6.87) | **1.10** | flat below the kernel |
+| `E(9) / E(27)` | 1.47 – 10.50 | **2.24** | **17/17** |
+| `E(9) / E(576)` | 2.99 – 30.85 | **5.38** | **17/17** |
+
+**The knee is at 9 because 9 is the largest block that stays inside one (output channel, input
+channel) cell — not because a 3×3 filter is an object.** S1, S2 and S4 are one result, and it
+is the additive one. `E` does **not** fall monotonically above 27 (1/17 arms), so no exponent
+is fitted and none is quoted.
+
+**S3 REPRODUCES 59.7 ON THE SAME ARMS:** the mod-9 spatial-tap direction reads
+**−0.0003 to +0.0098 pp** over the 17 clean arms against 59.7's published ~0.000–0.010 pp. The
+instrument agrees with a published number computed by a different code path, so S1/S2/S4 are
+reportable under their own registered precondition.
+
+**THE PRESCRIPTIVE SENTENCE, NOW WITH ITS SCALE.** The nodewise/output-channel partition is
+**566–4608 coordinates** in these models; the scale at which within-tensor marginal structure is
+maximally captured is **2–9 coordinates**. Every partition in the Adam-mini / Adalayer / SGG line
+is **60×–500× coarser than the scale where this structure lives**, and is oriented along the one
+axis (`o`) that leaves the other (`i`) entirely uncaptured. **We measure `z`; they argue about
+`G`; no document may write "we refuted Adam-mini."**
+
+**THE TWO EXCEPTION ARMS BEHAVE THE SAME WAY AND ARE STILL UNQUOTABLE.** `ml5/probe_w_m2_s0`
+and `bo6/probe_w_adw_s0` give E(9) = **87.97** and **86.39 pp** with phase ratios 1.45 and 1.40
+— the same shape, ~500× the amplitude. Recorded; ms=1e−2 remains boundary-dominated
+(CORRECTIONS 62) and AdamW-base remains the 59.4 exception set.

@@ -1,0 +1,65 @@
+====================================================================================================
+S4 -- ROW / COLUMN / INTERACTION IN THE cout x cin FILTER-MEAN MATRIX
+F = SS_real / SS_null against the same within-tensor permutation null.
+Registered before running: F_int <= 1.10 => the g=9 effect is ADDITIVE row+column
+marginals and the word 'filter' may NOT be used.
+====================================================================================================
+arm                             tag                  F_row     F_col     F_int   res(F)  verdict
+probes_bl5/probe_w_e40_s0       probes_bl5/probe_w_e40_s0   368.603   407.402     0.811   0.0012  additive
+probes_bl5/probe_w_e40_s1       probes_bl5/probe_w_e40_s1     1.260     1.780     1.035   0.0008  additive
+probes_bl5/probe_w_e40_s2       probes_bl5/probe_w_e40_s2     1.215     1.913     1.036   0.0008  additive
+probes_bo6/probe_w_adw_s0       probes_bo6/probe_w_adw_s0  1453.714  1623.367     0.225   0.0006  additive
+probes_bo6/probe_w_adw_s1       probes_bo6/probe_w_adw_s1   890.134  1660.345     0.370   0.0007  additive
+probes_br6/probe_w_c2_s0        probes_br6/probe_w_c2_s0     1.257     1.913     1.041   0.0009  additive
+probes_br6/probe_w_c2_s1        probes_br6/probe_w_c2_s1    86.715   190.977     0.953   0.0009  additive
+probes_br6/probe_w_c2_s2        probes_br6/probe_w_c2_s2     1.153     1.816     1.037   0.0006  additive
+probes_br6/probe_w_c2_s3        probes_br6/probe_w_c2_s3     1.142     1.856     1.036   0.0008  additive
+probes_cl5/probe_w_cD_s0        probes_cl5/probe_w_cD_s0     1.488     1.478     1.007   0.0007  additive
+probes_cl5/probe_w_cD_s1        probes_cl5/probe_w_cD_s1     1.477     1.564     1.009   0.0013  additive
+probes_cl5/probe_w_cD_s2        probes_cl5/probe_w_cD_s2     1.446     1.510     1.007   0.0008  additive
+probes_cl5/probe_w_cU_s0        probes_cl5/probe_w_cU_s0     1.390     1.414     1.004   0.0005  additive
+probes_cl5/probe_w_cU_s1        probes_cl5/probe_w_cU_s1     1.416     1.568     1.008   0.0007  additive
+probes_cl5/probe_w_cU_s2        probes_cl5/probe_w_cU_s2     1.423     1.458     1.008   0.0002  additive
+probes_ff5/probe_c100_w_s0      probes_ff5/probe_c100_w_s0     1.152     1.320     1.027   0.0004  additive
+probes_ff5/probe_c100_w_s1      probes_ff5/probe_c100_w_s1     1.260     1.411     1.030   0.0003  additive
+probes_ff5/probe_r10_w_s0       probes_ff5/probe_r10_w_s0     7.929    19.685     1.028   0.0017  additive
+probes_ff5/probe_r10_w_s1       probes_ff5/probe_r10_w_s1     2.709     3.814     1.034   0.0006  additive
+probes_ff5/probe_r34_w_s0       probes_ff5/probe_r34_w_s0     0.901     1.106     1.004   0.0004  additive
+probes_ff5/probe_r34_w_s1       probes_ff5/probe_r34_w_s1     0.894     1.082     1.000   0.0001  additive
+probes_fr5/probe_w_a3_s0        probes_fr5/probe_w_a3_s0     1.401     1.459     1.006   0.0005  additive
+probes_fr5/probe_w_a3_s1        probes_fr5/probe_w_a3_s1     1.430     1.526     1.008   0.0007  additive
+probes_fr5/probe_w_a3_s2        probes_fr5/probe_w_a3_s2     1.435     1.475     1.008   0.0003  additive
+probes_fz3/probe_c100_w_s0      probes_fz3/probe_c100_w_s0     2.269     1.413     1.013   0.0007  additive
+probes_fz3/probe_c100_w_s1      probes_fz3/probe_c100_w_s1     2.366     1.406     1.016   0.0008  additive
+probes_fz3/probe_r10_w_s0       probes_fz3/probe_r10_w_s0     4.314     3.516     1.029   0.0009  additive
+probes_fz3/probe_r10_w_s1       probes_fz3/probe_r10_w_s1     4.229     3.494     1.033   0.0016  additive
+probes_fz3/probe_r34_w_s0       probes_fz3/probe_r34_w_s0     1.182     1.181     1.004   0.0009  additive
+probes_fz3/probe_r34_w_s1       probes_fz3/probe_r34_w_s1     1.333     1.083     1.005   0.0002  additive
+probes_ml5/probe_w_m2_s0        probes_ml5/probe_w_m2_s0  1333.017  1995.162     0.083   0.0005  additive
+probes_ml5/probe_w_m2_s1        probes_ml5/probe_w_m2_s1  1620.907  2414.513     0.057   0.0014  additive
+probes_ml5/probe_w_m2_s2        probes_ml5/probe_w_m2_s2  1544.081  2187.716     0.065   0.0007  additive
+probes_ml5/probe_w_m3_s0        probes_ml5/probe_w_m3_s0     1.432     1.423     1.005   0.0005  additive
+probes_ml5/probe_w_m3_s1        probes_ml5/probe_w_m3_s1     1.464     1.481     1.008   0.0006  additive
+probes_ml5/probe_w_m3_s2        probes_ml5/probe_w_m3_s2     1.435     1.477     1.007   0.0006  additive
+probes_ml5/probe_w_m4_s0        probes_ml5/probe_w_m4_s0     2.142     1.900     1.007   0.0005  additive
+probes_ml5/probe_w_m4_s1        probes_ml5/probe_w_m4_s1     2.280     1.880     1.010   0.0007  additive
+probes_ml5/probe_w_m4_s2        probes_ml5/probe_w_m4_s2     2.134     1.822     1.007   0.0007  additive
+probes_ns5/probe_w_m2p4_s0      probes_ns5/probe_w_m2p4_s0     2.047     1.826     1.006   0.0002  additive
+probes_ns5/probe_w_m2p4_s1      probes_ns5/probe_w_m2p4_s1     2.109     1.933     1.009   0.0004  additive
+probes_ns5/probe_w_m2p4_s2      probes_ns5/probe_w_m2p4_s2     1.988     1.790     1.008   0.0005  additive
+probes_ns5/probe_w_m5p4_s0      probes_ns5/probe_w_m5p4_s0     1.658     1.586     1.006   0.0004  additive
+probes_ns5/probe_w_m5p4_s1      probes_ns5/probe_w_m5p4_s1     1.778     1.704     1.011   0.0006  additive
+probes_p5/probe_w_a3_s0         probes_p5/probe_w_a3_s0     2.539     1.913     1.006   0.0007  additive
+probes_p5/probe_w_a3_s1         probes_p5/probe_w_a3_s1     2.575     1.803     1.009   0.0008  additive
+probes_uc5/probe_r10_w_s0       probes_uc5/probe_r10_w_s0     7.339    18.642     1.029   0.0015  additive
+probes_uc5/probe_r10_w_s1       probes_uc5/probe_r10_w_s1     2.743     3.807     1.033   0.0005  additive
+probes_uc5/probe_r34_w_s0       probes_uc5/probe_r34_w_s0     0.914     1.071     1.004   0.0002  additive
+probes_uc5/probe_r34_w_s1       probes_uc5/probe_r34_w_s1     0.882     1.069     1.000   0.0005  additive
+probes_uc6/probe_c100_w_s0      probes_uc6/probe_c100_w_s0     1.170     1.349     1.026   0.0011  additive
+probes_uc6/probe_c100_w_s1      probes_uc6/probe_c100_w_s1     1.296     1.410     1.030   0.0005  additive
+probes_wc5/probe_w_m2_s0        probes_wc5/probe_w_m2_s0  1608.962  2270.103     0.073   0.0004  additive
+probes_wc5/probe_w_m2_s1        probes_wc5/probe_w_m2_s1  1435.689  2265.538     0.063   0.0003  additive
+probes_wc5/probe_w_m2_s2        probes_wc5/probe_w_m2_s2  1453.189  2103.194     0.053   0.0004  additive
+probes_wc5/probe_w_m3_s0        probes_wc5/probe_w_m3_s0     1.393     1.425     1.005   0.0006  additive
+probes_wc5/probe_w_m3_s1        probes_wc5/probe_w_m3_s1     1.467     1.487     1.008   0.0003  additive
+probes_wc5/probe_w_m3_s2        probes_wc5/probe_w_m3_s2     1.424     1.472     1.007   0.0008  additive
