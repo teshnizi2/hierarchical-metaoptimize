@@ -11663,3 +11663,170 @@ normal.
 
 Both remain descriptions of WHERE, not WHY. 89.7's open question is untouched: `conv1` vs
 `conv2` needs `z` time-series the probe does not store.
+
+## 61.0 CYCLE 61 — ALICE DOWN A **SIXTH** CONSECUTIVE TICK; ZERO JOBS; 89.7's ONE OFFLINE AVENUE IS CLOSED
+
+Outage localised, not assumed (2026-08-23T01:25Z): gateway `alice-gw` up and answering
+(`p-cfer-016105`); from it, `132.229.104.230` and `132.229.104.231` both refuse :22, and
+`login.alice.universiteitleiden.nl` :22 is DOWN. `ssh alice` / `ssh alice2` both fail at banner
+exchange. **No queue read. Nothing synced, submitted or cancelled. CSV unchanged at 1707.**
+`bo7-*` (12, alice) and `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+`sp8` (9), `hz9` (9), `rw9` (18) remain written, validated and UNSUBMITTED.
+
+## 61.1 **THE PROBE DOES STORE A `z` TIME SERIES.** 89.7's PREMISE WAS WRONG, AND THE FIX IS ARITHMETIC
+
+FINDINGS 60.7 and CORRECTIONS 89.7 both close with *"`conv1` vs `conv2` needs `z` time-series the
+probe does not store"*, and rank the question below every cluster item on that basis. **The
+premise is half wrong.** `HF_patched.py::_probe` accumulates `_z_sum`, `_z_sqsum`, `_z_n` and
+**never resets them**, so the emitted `z_mean` / `z_std` are CUMULATIVE running moments. OPERATIONS
+22 already records that they are "temporal" ratios; nobody took the next step. Cumulative moments
+**difference exactly**:
+
+    S(k) = mean(k)*n(k);  Q(k) = (std(k)^2 + mean(k)^2)*n(k)
+    window mean = dS/dn;  window var = dQ/dn - (dS/dn)^2
+
+So a **per-tensor, per-window `z` time series is recoverable on every arm already on this Mac**,
+at 2000–4000 records, at zero cluster cost. What is genuinely NOT recoverable is a per-ROW or
+per-WEIGHT series: the spatial mean is taken before storage. **89.7 was open at tensor resolution
+and shut at row resolution, and only the second half was true.**
+
+## 61.2 NEW INSTRUMENT `analysis/c61_z_timecourse.py` — 46/46 selftests, ALL GATES PASS
+
+Modes `--selftest --gate --report --controls --ksweep`. The architecture map is IMPORTED from
+c59/c60, never re-derived, so it is the same map that passed 59.2's A0/A1/A2.
+
+| gate | measured | bar | verdict |
+|---|---|---|---|
+| G0c accumulation count (fingerprint, below) | **0.000e+00** | 1e-6 | PASS |
+| G0b offset sensitivity, window 1 → 20 | 5.98e-03 → 2.12e-04 | must decay | DECAYS |
+| G1 predicted relative error at K=20 | 1.20e-06 | 1e-4 | PASS |
+| G1 windows with negative recovered variance | **0.0000%** | 0.5% | PASS |
+| G2 round-trip onto the stored cumulative mean | 2.95e-14 | 1e-6 | PASS |
+| G3 shape/role reconstruction, 58 arms | 0 failures | 0 | PASS |
+
+## 61.3 **THE ACCUMULATION COUNT IS `step+2`, NOT `step+1`, AND THE DATA PROVES IT BIT-EXACTLY**
+
+`HF_patched.py:72` sets `self.counter = -1`; `_probe` is called at :95 and the increment is at
+:100, **after** it. So the first call accumulates at counter=-1 and does not write (`-1 % 5 = 4`);
+the second accumulates at counter=0 and writes, labelled `step: 0`. **The record labelled `step=s`
+folds `n = s+2` samples.**
+
+This is not a reading of the source that has to be trusted — record 0 decides it alone:
+
+| hypothesis | samples at record 0 | prediction |
+|---|---|---|
+| n = step+1 | {x} | var == 0 **exactly** |
+| n = step+2 | {0, x} | var == x²/4, i.e. **std == \|mean\| exactly** |
+
+**MEASURED: in 49 of 49 weightwise arms, 100% of tensors with nonzero mean satisfy
+`std == \|mean\|` to 1e-6; the worst deviation over all 58 gated arms is 0.000e+00.** The offset is
+2. **A free by-product: the very first meta-gradient is exactly zero on every tensor** — `H` has
+not accumulated at the first meta-step.
+
+## 61.4 **THE RESULT IS H3, THE PRE-REGISTERED NULL: THE EXCEPTION LEAVES NO TENSOR-MEAN SIGNATURE**
+
+Three hypotheses were registered in the docstring before any arm was scored. Statistic: window
+coherence `c(j,k) = |window mean z_j| / |window sd z_j|`, K=20 windows, ratio conv1/conv2 (a
+WITHIN-arm ratio, self-normalising against the ms=1e-2 confound). 58 arms, 10 exception / 48 clean.
+
+| statistic | exception (n=10) min/med/max | clean (n=48) min/med/max | above clean max | MW z | p |
+|---|---|---|---|---|---|
+| **PEAK coherence c1/c2 (primary)** | 0.84 / **0.99** / 1.17 | 0.77 / **1.02** / 1.21 | **0/10** | −0.16 | 0.87 |
+| MEAN coherence c1/c2 | 0.93 / 1.00 / 1.10 | 0.63 / 0.91 / 1.05 | 3/10 | +3.89 | 1.0e−4 |
+
+**The primary is a flat null.** Complete overlap, zero exception arms above the clean maximum.
+
+**And the secondary is refuted as a `conv1` story by CONTROL C1, which was registered for exactly
+this.** The exception arms differ from clean arms at NON-conv roles too, in both directions and
+with LARGER \|z\|:
+
+| ratio | exception | clean | z | p |
+|---|---|---|---|---|
+| stem/conv2 | 0.40–0.72 | 0.11–0.88 | +2.02 | 4.4e−2 |
+| oneD/conv2 | 0.18–0.42 | 0.23–0.63 | **−3.87** | 1.1e−4 |
+| shortcut/conv2 | 0.69–0.83 | 0.74–1.42 | **−4.61** | 4.0e−6 |
+
+The exception arms have their whole role structure **compressed** (peak c at conv1 0.59–0.86 vs
+clean 0.47–2.03), which is the ms=1e-2 rung behaving like the ms=1e-2 rung. The mean-coherence
+"effect" is that compression, not a conv1 excess. **It is not quoted as support.**
+
+H1-vs-H2 is moot under H3, and points the same way anyway: the halfwidth is **equal at conv1 and
+conv2** in the exception arms (0.45 vs 0.39 median) and BROADER than clean (0.15) — less
+localisation, not more. No burst.
+
+## 61.5 **CONTROL C2 SEALS IT: THE INVERTING SEED IS NOT EXTREME AMONG ITS OWN SIBLINGS**
+
+60.5's two decisive within-config controls, re-run on the new statistic. Siblings share config
+exactly, so this is the strongest control available offline.
+
+| config | inverting seed (published R_row) | its c1/c2 | siblings' c1/c2 | rank |
+|---|---|---|---|---|
+| `bl5/e40` | s0 (**23.014%** vs 0.044/0.039) | 0.95 | 1.11 / 1.00 | **3 of 3 — LAST** |
+| `br6/c2` | s1 (**7.216%** vs 0.043/0.034/0.034) | 1.07 | 1.08 / 1.02 / 1.01 | 2 of 4 |
+| `bo6/adw` | both seeds are exceptions | 0.97 | 0.99 | no clean sibling |
+
+**The seed whose row structure inverts by 500× is the LOWEST of its three seeds on the
+tensor-mean statistic.** Nothing survives here.
+
+**AND THE NULL IS NOT A WINDOW-WIDTH ARTEFACT** (`--ksweep`, POST-HOC; only K=20 was registered).
+Across a 20× range of window widths the inverting seed's rank among its own siblings **wanders**,
+which is what a coin flip looks like:
+
+| K | steps/window | `bl5/e40` rank | `br6/c2` rank |
+|---|---|---|---|
+| 20 | 1000 | 3/3 | 2/4 |
+| 50 | 400 | 1/3 | 4/4 |
+| 100 | 200 | 1/3 | 4/4 |
+| 200 | 100 | 1/3 | 3/4 |
+| 400 | 50 | 1/3 | 3/4 |
+
+A burst confined to a few hundred steps would SHARPEN as K rises. It does not, at any width down
+to 50 steps.
+
+## 61.6 WHAT THIS DOES AND DOES NOT LICENSE
+
+* **DOES:** 89.7's tensor-mean avenue is **CLOSED**. The next tick must not re-open it, and
+  `c61_z_timecourse.py` is the receipt.
+* **DOES:** it excludes one specific rival mechanism — *a tensor-wide drift episode that pushes
+  every coordinate together and manufactures apparent row structure*. That WOULD have shown in the
+  tensor mean. It does not.
+* **DOES NOT** confirm H_B. Under H_B the row structure is WITHIN-tensor, and a spatial mean over
+  rows destroys within-tensor structure **by construction** — so a null here was substantially
+  expected. Stated against our own interest: this test's power against H_B was low from the start,
+  and it is reported as excluding a rival, not as evidence for the survivor.
+* **DOES NOT** touch 59.3, 59.8, 60.2–60.7, or any headline. Nothing is withdrawn.
+* **89.7 REMAINS OPEN**, and is now open with a *specified* instrument requirement rather than a
+  vague one: deciding it needs a per-ROW or per-COORDINATE sign time series, which is a
+  `PATCH_PROBE` change and **not** a rerun of existing arms.
+
+## 61.7 THE CONVERGENCE THAT MATTERS MORE THAN 89.7
+
+`KILLTEST-idea2.md` §5 caveat 1 already says the decisive sub-tensor test *"is impossible with
+stored data — the probe never writes per-coordinate signs"*, and specifies an ~8-line
+`_probe` change (`t_neg`/`t_zero`/`t_n` per tensor, plus a fixed 20,000-coordinate sign
+subsample, ~10 MB/run) plus 1–4 runs at ~1 GPU-hour each.
+
+**61.4/61.5 arrive at the same missing instrument from an unrelated direction.** One probe change
+therefore serves three separate open items at once: 89.7's mechanism, the kill-test's only
+surviving question (within-tensor vs across-tensor clustering), and direction C's untested claim
+that the sign-agreement structure is a *coordinate-level* phenomenon rather than a tensor-level
+one. **That makes it the highest-value pending cluster item, ranked above `rw9`.**
+
+## 61.8 ORPHANS — THE BACKLOG IS CLEARED TO 12 RUNS, AND BOTH FAMILIES ARE RETIRED HERE
+
+Re-audited this tick against every file in `docs/` + the root docs: **109 families, 2 orphan
+families, 12 orphan runs**, down from ~290 on 2026-08-22. Both are retired in one line each and
+neither is to be re-run:
+
+* **`gate0b` (6 runs, n=3)** — HF base, ms=1e-3, α₀=1e-6, **unaugmented**. blk6 65.47–66.33
+  (mean 65.82) vs scalar 68.36–68.79 (mean 68.63): **scalar beats blk6 by +2.81pp**. At 66–69%
+  absolute this is the pre-augmentation memorisation regime; **quotable for nothing**, superseded
+  by `gate0c`/`gate0d` at the same design and usable accuracy. ABANDONED.
+* **`gate0d` (6 runs, n=3)** — **SGDm base / Lion meta**, ms=1e-3, α₀=1e-6. blk6 91.03–91.48
+  (mean 91.26) vs scalar 87.63–87.79 (mean 87.73): **blk6 beats scalar by +3.53pp**. Same contrast
+  under HF base (`gate0c`, ms=1e-3) reads **scalar +0.33pp**. **The sign flips with the base
+  optimizer** — an uncited n=3 replication of the H4 base-optimizer interaction (CORRECTIONS 6).
+  Recorded as a consistency; it is n=3, unaugmented, and does not join any published table.
+* **Truncation note:** `gate0c_blk6_m2_s1` (85/100 ep) and `gate0c_scal_m2_s1` (81/100 ep) are
+  hit by the known `--max-time` truncation. **The ms=1e-2 column of `gate0c` is contaminated and
+  the comparison above uses the ms=1e-3 column only.**

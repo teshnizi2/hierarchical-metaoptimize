@@ -54,6 +54,73 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 61) -- **ALICE DOWN A SIXTH TICK. A PREMISE WE WROTE TWICE WAS WRONG.**
+
+**Read `docs/CORRECTIONS.md` 90 and `docs/FINDINGS.md` 61.0-61.8. 90.1 adds STANDING RULE (11)
+and corrects 89.7's premise; 90.2 changes how anyone must read `z_mean`/`z_std` forever.**
+
+* **BOTH LOGIN NODES DOWN FOR A SIXTH CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice`/`alice2`
+  fail at banner exchange (2026-08-23T01:25Z). **No queue read, nothing synced, nothing submitted,
+  nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) / `bd7-*` (12, alice2) survival
+  still UNKNOWN and still not guessed.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 login.alice.universiteitleiden.nl 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **THE CORRECTION, AND IT IS THE TICK'S MAIN PRODUCT (90.1).** 60.7 and 89.7 both closed with
+  *"conv1 vs conv2 needs `z` time-series the probe does not store"*, and 89.7 ranked the question
+  below every cluster item on that basis. **The probe DOES store one.** `_probe` accumulates
+  `_z_sum`/`_z_sqsum`/`_z_n` and never resets them, so `z_mean`/`z_std` are CUMULATIVE moments and
+  difference exactly into a per-window series. **Per-TENSOR `z` time series: recoverable, free, on
+  every arm on this Mac. Per-ROW / per-COORDINATE: genuinely not, the spatial mean precedes
+  storage.** STANDING RULE (11): *before recording a question as unanswerable from stored data,
+  name the stored field and the reason it cannot answer it.*
+* **AND THE COUNT IS `step+2`, NOT `step+1` (90.2).** `counter` starts at -1 and `_probe` runs
+  BEFORE the increment. The data proves it bit-exactly and independently of the source: n=2 over
+  {0, x} forces `std == |mean|` exactly where n=1 forces `std == 0` exactly. **Worst deviation
+  0.000e+00 across all 58 gated arms.** Free by-product: **the first meta-gradient is exactly zero
+  on every tensor.** Differencing with `step+1` costs 6.0e-3 at window 1, 2.1e-4 by window 20.
+* **THE SCIENCE IS A CLEAN, PRE-REGISTERED NULL (90.3-90.5).** New instrument
+  `analysis/c61_z_timecourse.py`, **46/46 selftests**, modes `--selftest --gate --report
+  --controls --ksweep`, all gates pass, architecture map imported from c59/c60. H1/H2/H3 registered
+  before scoring. Primary (conv1/conv2 peak window coherence): exception **0.84-1.17 med 0.99** vs
+  clean **0.77-1.21 med 1.02**, **0 of 10 above the clean maximum**, MW **z=-0.16, p=0.87**.
+* **A SECONDARY DID FIRE AND IS NOT QUOTED AS SUPPORT.** Mean coherence gives z=+3.89, p=1.0e-4 --
+  and registered CONTROL C1 refutes reading it as a conv1 story: the exception arms differ at
+  NON-conv roles too, both directions, LARGER |z| (shortcut/conv2 **-4.61**, oneD/conv2 **-3.87**).
+  Their whole role structure is compressed; that is the ms=1e-2 rung being itself. **A control
+  written in advance killed this tick's only positive number.**
+* **CONTROL C2 SEALS IT.** On 60.5's within-config seeds, the seed whose row structure inverts by
+  500x is **the LOWEST of its three** (`bl5/e40` s0, rank 3/3) and **inside the sibling spread**
+  (`br6/c2` s1, rank 2/4). `--ksweep` over a 20x range of window widths (down to 50 steps) shows
+  the rank **wandering**, so the null is not a window-width artefact.
+* **STATED AGAINST OUR OWN INTEREST (90.5):** this excludes ONE rival (a tensor-wide drift episode
+  manufacturing apparent row structure). It **does NOT confirm H_B** -- a spatial mean over rows
+  destroys within-tensor structure by construction, so power against H_B was low from the start.
+  **Nothing is withdrawn.** 59.3 / 59.8 / 60.2-60.7 untouched. **89.7 stays OPEN**, now with a
+  specified instrument requirement instead of a vague one.
+* **THE RANKING CHANGES, AND THAT IS THE ACTIONABLE PART (90.6).** `KILLTEST-idea2.md` §5 already
+  specifies an ~8-line `_probe` change (`t_neg`/`t_zero`/`t_n` per tensor + a fixed 20,000-coord
+  sign subsample, ~10 MB/run) and 1-4 runs at ~1 GPU-hour. **61.4/61.5 reach the same missing
+  instrument from an unrelated direction.** One change serves THREE open items: 89.7's mechanism,
+  the kill-test's only surviving question, and direction C's untested claim that the sign-agreement
+  structure is coordinate-level rather than tensor-level. **Ranked ABOVE `rw9`.**
+* **ORPHANS CLEARED TO 12 RUNS** (from ~290 on 2026-08-22): 109 families, 2 orphan. Both retired in
+  FINDINGS 61.8, **not to be re-run** -- `gate0b` (unaugmented memorisation regime, quotable for
+  nothing, ABANDONED) and `gate0d` (SGDm base: blk6 **+3.53pp** over scalar, against HF base's
+  scalar +0.33pp -- an uncited n=3 consistency with the H4 base-optimizer interaction).
+* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `rw9` (18,
+  alice) all remain written, validated, UNSUBMITTED. **`docs/` is now THREE cycles behind on the
+  cluster.**
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (a2) **rsync `docs/`.**
+(b) Submit `sp8` (alice2, 9), then `hz9` (9, alice). (c) **Then the PATCH_PROBE per-coordinate
+change and its 1-4 runs -- ranked ABOVE `rw9` (90.6).** (d) Score `hz9` H0 -> H0.3 -> H0.5 -> H1
+-> H1b -> H2; H0.5 can only VOID. (e) If bo7/bd7 landed, cycle 54's order stands with 55.2's
+per-seed sd. (f) **DONE, do not re-run:** 59.3, 59.8, 60.2-60.7, **and now the tensor-mean avenue
+for 89.7 (61.4/61.5)**. (g) The raw-instrument `s` re-derivation is the ONLY unspent offline item,
+carried since 51, and it is bookkeeping. (h) The 12 truncated `rs-blk6`/`rs-node` reruns last.
+
 ## Running / next (cycle 60) -- **ALICE DOWN A FIFTH TICK. THE 59.4/59.8 EXCEPTIONS ARE CLOSED.**
 
 **Read `docs/CORRECTIONS.md` 89 and `docs/FINDINGS.md` 60.0-60.6 before quoting 59.3's or

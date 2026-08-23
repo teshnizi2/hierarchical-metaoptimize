@@ -3314,3 +3314,86 @@ for the reason each independently records.
 This is the strongest form of confirmation available offline: different arms, different stored
 quantity, no shared code path beyond the architecture map that already passed 59.2's A0/A1/A2.
 Instrument now **87/87 selftests**. Still WHERE, never WHY — 89.7 stands unchanged.
+
+---
+
+## 90. A PREMISE THIS PROJECT WROTE DOWN TWICE WAS WRONG, AND IT COST AN OPEN QUESTION A RANK (cycle 61)
+
+**90.1 THE CORRECTION.** FINDINGS 60.7 and CORRECTIONS 89.7 both end with *"`conv1` vs `conv2`
+needs `z` time-series the probe does not store"*, and 89.7 explicitly ranks the question **below
+every cluster item** because of it. **The probe does store one.** `_probe` accumulates `_z_sum` /
+`_z_sqsum` / `_z_n` and never resets them, so `z_mean` / `z_std` are CUMULATIVE moments, and
+cumulative moments difference exactly into a per-window series. OPERATIONS 22 already noted they
+are "temporal" — the gap was between knowing that and acting on it.
+
+**Corrected statement, and it must replace the old one wherever it appears:** a per-TENSOR `z`
+time series IS recoverable at zero cost on every arm on this Mac; a per-ROW or per-COORDINATE one
+is NOT, because the spatial mean is taken before storage. **89.7 was open at tensor resolution.**
+
+**STANDING RULE (11)**, the eleventh: *before recording a question as unanswerable from stored
+data, name the stored field and the reason it cannot answer it.* 89.7 said "the probe does not
+store `z` time-series" without naming `z_mean`/`z_std` or checking whether they were cumulative.
+Two consecutive handoffs then carried the claim forward unexamined. A one-line reason is what makes
+such a claim auditable by the next tick.
+
+**90.2 AND THE ACCUMULATION COUNT IN EVERY FUTURE READING OF THESE FIELDS IS `step+2`.**
+`HF_patched.py:72` sets `counter = -1`; `_probe` runs at :95, the increment at :100. So the record
+labelled `step=s` folds **s+2** samples. The data confirms it bit-exactly and independently of the
+source: n=2 over samples {0, x} forces **`std == |mean|` exactly**, where n=1 would force
+`std == 0` exactly. **Measured 0.000e+00 worst-case deviation across all 58 gated arms**, 49/49
+weightwise arms at 100% of nonzero-mean tensors. **Free by-product: the first meta-gradient is
+exactly zero on every tensor.** Anyone differencing these fields with `n = step+1` inherits an
+O(1/n) error — 6.0e−3 at the first window, 2.1e−4 by the twentieth (measured, `--gate`).
+
+**90.3 THE SCIENCE: THE PRE-REGISTERED NULL H3 WINS, AND IT IS REPORTED AS A NULL.**
+New instrument `analysis/c61_z_timecourse.py`, **46/46 selftests**, all gates pass. H1/H2/H3 were
+registered in the docstring before any arm was scored. Primary statistic — conv1/conv2 ratio of
+peak window coherence, 10 exception vs 48 clean arms — is **flat: 0.84–1.17 (med 0.99) against
+0.77–1.21 (med 1.02), 0 of 10 above the clean maximum, Mann-Whitney z=−0.16, p=0.87.**
+
+**A secondary statistic did fire (mean coherence, z=+3.89, p=1.0e−4) and is NOT quoted as support**,
+because registered CONTROL C1 refutes reading it as a `conv1` story: the exception arms differ at
+non-conv roles too, in both directions and with larger |z| (shortcut/conv2 z=−4.61, oneD/conv2
+z=−3.87). Their whole role structure is compressed — the ms=1e-2 rung behaving like itself. **A
+control written in advance killed this tick's only positive number. That is the control working.**
+
+**90.4 CONTROL C2 IS THE ONE THAT SETTLES IT.** On 60.5's two within-config seed controls, the
+seed whose row structure inverts by 500× is **the LOWEST of its three seeds** (`bl5/e40` s0, rank
+3 of 3) and **inside the sibling spread** (`br6/c2` s1, rank 2 of 4). A post-hoc `--ksweep` across
+a 20× range of window widths (down to 50-step windows) shows the rank **wandering** rather than
+sharpening, so the null is not a window-width artefact.
+
+**90.5 WHAT IS AND IS NOT LICENSED — STATED AGAINST OUR OWN INTEREST.** This excludes one specific
+rival (a tensor-wide drift episode manufacturing apparent row structure). It **does NOT confirm
+H_B**: under H_B the structure is within-tensor and a spatial mean over rows destroys it *by
+construction*, so this test's power against H_B was low from the start. Recorded as excluding a
+rival, never as evidence for the survivor. **Nothing is withdrawn** — 59.3, 59.8 and 60.2–60.7 are
+untouched. 89.7 stays OPEN, now with a specified instrument requirement instead of a vague one.
+
+**90.6 THE DECISION, AND ITS REASON.** Direction **C stays the project** (the operator's default,
+and Idea 2 is dead by `KILLTEST-idea2.md`'s own verdict while Idea 1 is crowded by Mechanic /
+D-Adaptation / LARS). **The ranking of the pending cluster work CHANGES.** `KILLTEST-idea2.md` §5
+already specifies an ~8-line `_probe` change (`t_neg`/`t_zero`/`t_n` per tensor plus a fixed
+20,000-coordinate sign subsample, ~10 MB/run, 1–4 runs at ~1 GPU-hour) and 61.4/61.5 arrive at the
+**same missing instrument from an unrelated direction**. One change serves three open items:
+89.7's mechanism, the kill-test's only surviving question, and direction C's untested claim that
+the sign-agreement structure is coordinate-level rather than tensor-level. **It is therefore ranked
+above `rw9` (18 jobs) for the first reachable tick.** `sp8` and `hz9` keep their places — they are
+cheap and already validated.
+
+**90.7 ORPHANS CLEARED TO 12 RUNS.** 109 families, 2 orphan, 12 runs (from ~290 on 2026-08-22).
+Both retired in FINDINGS 61.8 and **not to be re-run**: `gate0b` (unaugmented memorisation regime,
+quotable for nothing, ABANDONED) and `gate0d` (SGDm base: blk6 +3.53pp over scalar, against HF
+base's scalar +0.33pp — an uncited n=3 consistency with the H4 base-optimizer interaction, recorded
+but joining no published table). A truncation note is attached: `gate0c`'s ms=1e-2 column has two
+`--max-time`-truncated runs and the comparison uses ms=1e-3 only.
+
+**90.8 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` BOTH accounts before anything.
+(a2) **rsync `docs/` to the cluster — it is now three cycles behind.** (b) Submit `sp8`
+(alice2, 9), then on alice `hz9` (9). (c) **Then the `PATCH_PROBE` per-coordinate change and its
+1–4 runs (90.6), ranked ABOVE `rw9`.** (d) Score `hz9` H0 → H0.3 → H0.5 → H1 → H1b → H2, in that
+order; H0.5 can only VOID. (e) If bo7/bd7 landed, cycle 54's scoring order stands with 55.2's
+per-seed sd. (f) **DONE, do not re-run:** the row premise (59.3), the nodewise half (59.8), the
+exception mechanism (60.2–60.7), **and now the tensor-mean avenue for 89.7 (61.4/61.5)**. (g) The
+raw-instrument `s` re-derivation is now the ONLY unspent offline item, carried since 51, and it is
+bookkeeping. (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
