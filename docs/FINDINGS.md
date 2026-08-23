@@ -11830,3 +11830,78 @@ neither is to be re-run:
 * **Truncation note:** `gate0c_blk6_m2_s1` (85/100 ep) and `gate0c_scal_m2_s1` (81/100 ep) are
   hit by the known `--max-time` truncation. **The ms=1e-2 column of `gate0c` is contaminated and
   the comparison above uses the ms=1e-3 column only.**
+
+## 61.9 `patches/patch_probe6_coord.py` + `bin/c61_coord_probe.sh` — WRITTEN, VALIDATED AGAINST REAL TORCH, **NOT SUBMITTED** (cluster down)
+
+61.7's convergence is now an instrument and a batch, both registered before the cluster came
+back so the next reachable tick submits rather than designs.
+
+**THE PATCH.** `PATCH_PROBE6`, gated on `PROBE6=1`, writes four sidecars beside `probe.jsonl`
+and **does not touch the jsonl schema** — CORRECTIONS 18 is exactly why that matters, since a
+third format generation would need a new guard in every existing reducer:
+
+| file | shape | content |
+|---|---|---|
+| `coord_signs.npy` | [n_rec, k] int8 | sign of `z` at k=20,000 **fixed** coordinates, per record |
+| `coord_idx.npy` | [k] int64 | the tracked coordinate ids (drawn once, fixed seed) |
+| `tensor_signs.npy` | [n_rec, T, 3] int64 | **exact** (n_neg, n_zero, n_total) per tensor |
+| `coord_meta.json` | — | n_records / n_tot / k / seed / n_tensors / stepsize_type |
+
+Coordinates map to (tensor, row) through `c59_row_premise.build_index`, the map that passed
+59.2's A0/A1/A2. **40 MB + 3 MB per weightwise run; 0.22 GB rewrite I/O at
+`PROBE6_WRITE_EVERY=200`.**
+
+**VALIDATED BEFORE SUBMISSION, NOT AFTER — AND ON REAL TORCH.** This Mac has no torch, so
+`tests/test_probe6_block.py` was run on the ROG offload node (torch 2.6.0+cu124, numpy 2.4.6,
+CPU). It applies the patch to a copy of `HF_patched.py` and **exec's the inserted block
+itself** against a synthetic ResNet18-shaped `z` — the code that will run, not a retyped copy.
+**26/26 pass**, including: the synthetic arm reproduces the real `n_tot` **11,173,962**
+exactly; every record's signs equal `sign(zall[idx])`; the per-tensor split is exact and
+reconstructs `frac_neg` to **1e-12** (a free cross-check of the new instrument against the
+old one); `PROBE6=0` writes nothing and sets no optimizer state; `k` clamps to `n_tot` on a
+small arm; no `.tmp` survives.
+
+### 61.9a THE HARNESS CAUGHT A FATAL BUG THAT THIS PROJECT HAD ALREADY FIXED ONCE
+
+The first draft copied PATCH_PROBE5's idiom `np.save(<name>.npy.tmp)` → `os.replace(...)`.
+**`numpy.save` appends `.npy` to a string path that does not already end in it**, so the file
+lands as `.npy.tmp.npy` and the next line raises `FileNotFoundError`. Measured on the ROG:
+`np.save('x.npy.tmp', ...)` → `['x.npy.tmp.npy']`, `os.path.exists('x.npy.tmp')` False.
+
+**This is precisely the bug `patches/patch_probe5_fix.py` repaired in cycle 47**, where it
+would have crashed all 8 jobs ~5 epochs in after burning 25% of their wallclock. Fixed the
+same way (hand numpy an open file **object**), the reason is commented in-place so it is not
+"simplified" back, and `bin/c61_coord_probe.sh` **guard 2b asserts the fix by its signature**
+rather than trusting the `PATCH_PROBE6` marker — because the cluster copy may be older than
+the repo copy. Recorded because the general lesson is not the bug: **copying a working idiom
+from a sibling patch imports its bug history too, and this repo already contained the fix.**
+
+**THE BATCH: `cp9-*`, 8 jobs, alice, 100 epochs.** weightwise × {α₀=1e-6, 1e-3} × seeds {3,4}
+plus layerwise × the same. Operating point **re-derived from `results/all_runs.csv`, not from
+prose** (guard 3 re-runs the derivation at submit time): all 15 `mx_sig_*` rows read SGDm/Lion,
+ms=1e-3, α₀=1e-6, `BETA_CLIP=-15:-2.3026`, **AUGMENT=1**, R18/CIFAR10, batch 100, 100 epochs,
+PROBE=25 → 2000 records. `mx_sig` owns seeds **0/1/2** at every granularity, so cp9's **3/4**
+cannot collide and the runs are poolable with it. Two α₀ rungs because CORRECTIONS 12 measures
+a **16× collapse** in weightwise agreement between them, so one rung cannot speak for the arm.
+Layerwise costs nothing extra and its `tensor_signs` is a **free exact replication** of the
+tensor-level result the kill-test already published — an internal control of the new
+instrument against a known number. `PROBE6_SEED` is pinned to 0 on all 8 jobs so every run
+tracks the **same** coordinate ids.
+
+**A PROSE-VS-DATA CONFLICT, FLAGGED NOT SILENTLY RESOLVED.** CORRECTIONS 826 describes `mx` as
+"AdamW+Adam, a0=1e-6". **The CSV says SGDm+Lion on all 15 `mx_sig` rows.** The CSV wins
+(STANDING RULE 1). That prose line appears to be about `PP-*` rather than `mx`; it is not
+edited this tick, only flagged.
+
+**PRE-REGISTERED DECISION RULE, copied from `KILLTEST-idea2.md` §5 before the data exists.**
+Within-tensor and across-tensor pairwise agreement against the **circular-shift** null:
+**K-A** across-tensor ≤ 0.1 pp above null → **Idea 2 is DEAD OUTRIGHT** and the statistic is a
+characterisation, never a method; **K-B** > ~0.5 pp *and* survivors not concentrated at
+|Δblock|=1 → differentiator (ii) survives; **K-C** otherwise → **UNDECIDED, written as such**.
+A direction is registered deliberately: the tensor-level result points hard at **K-A**, so K-A
+is a REPLICATION at finer granularity and NOT a discovery. The per-coordinate sign *time
+series* that serves 89.7 is **exploratory, outside this decision rule, and must be labelled
+POST-HOC** wherever reported.
+
+**NOT SUBMITTED.** Guards 1/2/2b/2c/5/6 need the cluster; guards 3 and 4 were run standalone
+on this Mac and **both pass**. `bash -n` clean.
