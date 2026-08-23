@@ -12407,3 +12407,181 @@ three decide registered gates while this one confirms the interpretation of a po
 
 **Do not re-run offline:** A1/A2/A2b themselves (63.7), the confound checks (63.8), C62-C
 (63.1), and the span reconciliation (63.2–63.4). All four are closed.
+
+---
+
+## 64.0 STATE — ALICE DOWN A **NINTH** CONSECUTIVE TICK, ZERO JOBS
+
+Reachability localised, not assumed: gateway UP and answering (`p-cfer-016105`);
+`132.229.104.230` and `.231` **both refuse :22 from the gateway**; `ssh alice` and `ssh alice2`
+both fail at banner exchange (exit 255). Checked **2026-08-23T10:25Z**. **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `sp8` (9, alice2), `hz9` (9,
+alice), `cp9` (8, alice), `rw9` (18, alice) remain written, validated, UNSUBMITTED. `docs/` is
+now **SIX** cycles behind on the cluster.
+
+## 64.1 THE QUESTION, AND WHY IT IS NOT A RE-RUN OF THE CLOSED FILTER HYPOTHESIS
+
+62.6/91.7 produced the C direction's first prescriptive sentence: *the structure a block method
+destroys is additive row (output channel) + input channel, and every partition in the Adam-mini
+/ Adalayer / SGG line is at the output channel or coarser, so it captures `a[o]` exactly and
+`b[i]` not at all, by construction.* That sentence is **structural** — it never says how much is
+uncaptured, and it never asks the question a practitioner faces:
+
+> **Among partitions costing the same number of stored scalars, is the output channel the best
+> available choice?**
+
+Every method in that line answers "output channel" **by assumption**. None compares against the
+**transpose of its own partition**, which costs `cin` scalars instead of `cout` and is exactly as
+easy to implement. That comparison had never been made here either:
+
+* 62.9 scored **contiguous absolute-g** blocks. `out` and `in` are not contiguous runs at any `g`
+  and **cannot appear on that ladder**. The input-channel partition — the one 91.7 names as
+  structurally uncaptured — **had never been scored**.
+* `F_row`/`F_col` (62.6, 62.7) are SS **ratios** on the `cout x cin` matrix of filter means, with
+  the nine within-kernel taps averaged away. They answer "is there structure along this axis".
+  They are not a fraction of the field and **carry no cost axis**.
+
+New instrument `analysis/c64_partition_pareto.py`, **50/50 selftests**. The `E` statistic, its
+null, its noise correction and its clamp flags are the PUBLISHED ones (`c62._E_from_index`),
+imported **by reference**; **only the index map is new.** Gate **G1** proves the new maps are a
+relabelling of validated ones — `semantic_index(...,"oi") == c62.build_abs_index(g=9,offset=0)`
+and `semantic_index(...,"spatial") == c62.mod9_index` — on **19 real architectures**. **G6**
+join gate: every scored arm resolves to exactly one CSV row and the hand-written frozen/free tag
+must agree with that row's `meta` column; the stratum is taken from the CSV, never the tag.
+
+**Scope (STANDING RULES 10 and 12): `E[3x3conv, terminal]`.** 3x3 conv tensors only — "input
+channel" and "kernel" are undefined on 1-D tensors and 1x1 shortcut convs, excluded by
+construction. **We measure `z`; Adam-mini / Adalayer / SGG argue about `G`. No document may
+write "we refuted Adam-mini."**
+
+## 64.2 THE PARTITIONS AND THEIR COST — `in` IS CHEAPER THAN `out` ON EVERY ARCHITECTURE
+
+Stored scalars over the 3x3 conv stack, measured (G1 output), not assumed:
+
+| partition | grouping | R10 | R18 / C100 | R34 |
+|---|---|---|---|---|
+| `out` | by output channel `o` — **the whole literature** | 1,984 | 3,904 | 7,616 |
+| `in` | by input channel `i` — **the cost-matched rival** | **1,475** | **3,395** | **7,107** |
+| `oi` | by (o,i) = one 3x3 kernel | 524,480 | 1,220,800 | 2,343,104 |
+| `spatial` | by tap (index mod 9) | 342 | 558 | 990 |
+
+**`in` is strictly cheaper than `out` on all four architectures**, so any arm where `E(in) >
+E(out)` is a Pareto dominance in both coordinates at once.
+
+## 64.3 REGISTERED SCORING — 17 CLEAN ARMS (2 EXCEPTION ARMS EXCLUDED, NEVER POOLED)
+
+Registered and committed (`cb70c47`) **before any arm was scored**.
+
+| gate | result | verdict |
+|---|---|---|
+| **H_D** precondition, scored FIRST | max\|E(spatial)\| = **0.0098 pp** (bar ≤ 0.02) | **PASS** — reproduces 59.7's null |
+| **H_A** primary, cost-matched axis | E(out)>E(in) **10/17 (59%)**, E(in)>E(out) **7/17 (41%)** | **CONFIG-DEPENDENT** |
+| **H_B** Pareto | `out` dominated **7/17 (41%)**, every dominator `in` | **NEITHER** (bars: ≥50% / ≤20%) |
+| **H_C** scale replication | E(oi)>E(out) **17/17 (100%)** | **REPLICATES 62.9** |
+
+**H_A confirms this tick's own registered expectation**, which was deliberately set to
+CONFIG-DEPENDENT so that either uniform outcome would refute it (cycle 58's device). The
+prescriptive sentence it licenses is **"no fixed axis is right"**, NOT "input channel is better".
+
+**H_C is the tick's cleanest positive.** 62.9 located the peak at `g ≤ 9` in 17/17 arms using
+**contiguous** blocks; the semantic `(o,i)` partition — **non-contiguous in construction, built
+from the tensor's shape rather than from flattened offsets** — beats the output channel in
+**17 of 17**. **62.9's peak is a statement about the kernel, not about contiguity.**
+
+## 64.4 THE POST-HOC STRATIFICATION, AND IT SEPARATES PERFECTLY
+
+**LABELLED POST-HOC AND IT STAYS POST-HOC.** H_A was registered as a whole-corpus fraction; this
+names the config axis behind that verdict. Per 76(1)/79 it may not overturn a registered gate and
+**it does not** — H_A stands as CONFIG-DEPENDENT. Stratum taken from the CSV `meta` column, G6-gated.
+
+| stratum | n | E(out) > E(in) | resolved beyond res | `out` PARETO-DOMINATED |
+|---|---|---|---|---|
+| **β frozen** (`meta=fixed`) | 8 | **8/8** | 7/8 | **0/8** |
+| **β free** (`meta=Lion`) | 9 | **2/9** | 8/9 | **7/9** |
+
+**THE MATCHED-PAIR DESIGN.** `fz3` vs `ff5` differ in **`meta` alone** — identical network,
+dataset, granularity, base, `meta_stepsize=1e-3`, `alpha0=1e-3`, `beta_clip`, `augment=1`, and
+**all at 20 epochs** (verified per-pair from the CSV, not asserted):
+
+| arch | seed | frozen | free | budget/ms/a0 matched |
+|---|---|---|---|---|
+| ResNet10 | 0, 1 | out | in | True (20/20) |
+| ResNet18_c100 | 0, 1 | out | in | True (20/20) |
+| ResNet34 | 0, 1 | out | in | True (20/20) |
+
+**out→in flip in 6 of 6 matched pairs**, sign test two-sided **p = 0.031** treating (arch, seed)
+as the unit; **at the architecture level n = 3**, and that weaker count is stated rather than
+buried. **Robust to the null: 6/6 under three independent null-seed sets** — (101,202,303),
+(11,22,33) and a 5-seed (7,13,29,41,53).
+
+On `ff5`'s ResNet34 arms **E(out) goes NEGATIVE** (−0.0147, −0.0182 pp): the output-channel
+partition captures **less than a size-matched random regroup of the same tensor**.
+
+## 64.5 WHAT THIS IS NOT — THE 92.9b BOUNDARY, RESTATED SO IT IS NOT CROSSED
+
+CORRECTIONS **92.9b REFUTED** "adaptation extent determines `F_col/F_row`" — a **continuous
+magnitude** claim, scored across arms with **budget uncontrolled**, whose spread at a single
+matched span (1.12–2.48) exceeded the entire span-driven range (≈1.0–1.57).
+
+64.4 is **a binary contrast at exactly matched budget**, on a different statistic, on a
+matched-pair design. The two are compatible and **64.4 does not revive 92.9b's refuted reading.**
+**No document may write "the column/row ratio measures adaptation extent."** What may be written:
+*which axis carries more per-coordinate sign-preference structure differs between frozen and
+adapting β, on a 6/6 matched-pair design at 20 epochs.*
+
+## 64.6 A MEASURED LIMIT, RECORDED BEFORE SCORING (selftest T13b/T13c), NOT DISCOVERED AFTER
+
+`oi` groups only **nine** coordinates. On structureless synthetic data at a 110k-coordinate stack
+its `E` wanders over **[−0.72, +0.13] pp while `res_pp` reads 0.06–0.38 pp** — for this partition
+**the reported resolution UNDERSTATES the cell's uncertainty.** The same 9-coordinate grouping is
+the published ladder's `g=9` rung, so this is a property of the readout at fine block sizes, not
+of this instrument. Consequences, fixed before the data:
+
+* **H_B is immune by construction** — `oi` costs `O*I` and `out` costs `O`, so `oi` can never be
+  a **cost** dominator (asserted, T13c). H_B's only candidates are `in`/`spatial`/`tensor`, all of
+  which calibrate to within resolution (T13: E = +0.0048 / −0.0322 / −0.0034 pp).
+* **H_C is a sign test across independent arms, never a per-arm threshold**, and the measured
+  wander leans **negative — conservative for H_C**, which fired 17/17 anyway.
+* **No per-arm E(oi) magnitude claim is licensed.**
+
+## 64.7 TWO WRONG ASSERTIONS IN THIS TICK'S OWN HARNESS, CODE RIGHT IN BOTH
+
+1. **The recovery test ignored the refinement lattice.** It demanded that a planted `out` effect
+   leave every other partition flat — but **`oi` REFINES both `out` and `in`** (every 3x3 kernel
+   lies inside one output channel AND one input channel), so `oi` captures by construction
+   whatever `out` captures. Rewritten to demand separation only from **non-refining** partitions.
+   The corrected form is strictly stronger where it matters: it tests `out`-vs-`in`
+   discriminability directly, which is the H_A axis.
+2. **The null-calibration test ran on a 558-coordinate toy stack** where the null is simply
+   unresolvable (structureless E swings ±1 to ±16 pp with res of the same order). Moved to a
+   110k stack, where E calibrates to ≤0.04 pp. **Property of the stack size, not the statistic.**
+
+**G3's second half is what makes 64.3's null informative:** planted **input-channel** structure is
+recovered at **E(in) = 96.8 pp while `out` and `spatial` read NEGATIVE**. Without that, "no
+input-channel advantage" could have meant the readout cannot see input-channel structure at all.
+
+## 64.8 THE TWO EXCEPTION ARMS, REPORTED SEPARATELY AND NEVER POOLED
+
+`ml5/probe_w_m2_s0` (ms=1e−2) and `bo6/probe_w_adw_s0` (AdamW base) read **E(out) 42.30 / 48.80,
+E(in) 56.38 / 46.53, E(oi) 87.97 / 86.39 pp** — **two to three orders of magnitude above every
+clean arm**, and they disagree with each other on the H_A axis. Consistent with the 59.4 / 60.x
+exception characterisation. Both configs are already unquotable (62). **Excluded from all four
+gates and from the stratification.**
+
+## 64.9 WHAT THIS BUYS THE PAPER, AND WHAT IT COSTS
+
+**Buys:** the first statement in this campaign that is about a **design choice a practitioner
+makes** rather than about a premise a paper states. The literature's universal partition is
+**never dominated when β is frozen (0/8) and dominated in 7 of 9 arms when β adapts** — by a
+partition that is **strictly cheaper** (3,395 vs 3,904 scalars on R18). And `oi` beats `out`
+**17/17**, so the scale result survives a non-contiguous re-derivation.
+
+**Costs:** H_A is a **null in the registered form** — no fixed axis wins corpus-wide, and the
+axis that wins is config-dependent. The stratification that explains it is **post-hoc**, n=3 at
+the architecture level, and **at 20 epochs only**. Nothing here measures accuracy: `E` is a
+property of the meta-gradient field, and this tick makes **no claim that capturing more of it
+improves training.** That link is untested and must not be assumed.
+
+**Do not re-run offline:** H_A/H_B/H_C/H_D (64.3), the stratification and its null-seed control
+(64.4), the cost table (64.2). All closed.

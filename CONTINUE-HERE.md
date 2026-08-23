@@ -54,6 +54,85 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 64) -- **ALICE DOWN A NINTH TICK. THE LITERATURE'S PARTITION IS PARETO-DOMINATED WHEN BETA ADAPTS.**
+
+**Read `docs/CORRECTIONS.md` 93 and `docs/FINDINGS.md` 64.0-64.9. 93.7 restates a boundary that
+must not be crossed; 93.10 says plainly what this tick did NOT measure.**
+
+* **BOTH LOGIN NODES DOWN FOR A NINTH CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice` /
+  `alice2` fail at banner exchange (exit 255). Checked **2026-08-23T10:25Z**. **No queue read,
+  nothing synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12,
+  alice) / `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 132.229.104.230 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else.**
+* **THE TICK'S DECISION (93.1).** The offline queue held only the `s` re-derivation, labelled
+  bookkeeping. Instead I asked what direction C had never measured, and it is not a refutation
+  but a **DESIGN CHOICE**: 62.6/91.7 proved the literature's partition captures `a[o]` and not
+  `b[i]` **by construction**, then never asked whether, **at matched cost, the output channel is
+  the better axis at all**. **Nobody in that line compares against the transpose of their own
+  partition.** Now measured.
+* **NOT A RE-RUN OF THE CLOSED FILTER HYPOTHESIS (93.2).** `out`/`in` are **not contiguous runs
+  at any `g`** so they cannot appear on 62.9's ladder; `F_row`/`F_col` are SS ratios on
+  filter-MEAN matrices with the nine taps averaged away, are not a fraction of the field, and
+  **carry no cost axis**. New instrument `analysis/c64_partition_pareto.py`, **50/50 selftests**,
+  registered and committed (`cb70c47`) **before any arm was scored**. `E`, its null, its noise
+  correction and its clamps are the PUBLISHED ones imported **by reference**; **only the index
+  map is new**, and **G1 proves the new maps are a relabelling of validated ones on 19 real
+  architectures**.
+* **`in` IS STRICTLY CHEAPER THAN `out` ON EVERY ARCHITECTURE (64.2):** 1,475 vs 1,984 (R10),
+  **3,395 vs 3,904** (R18/C100), 7,107 vs 7,616 (R34). So `E(in) > E(out)` is a Pareto dominance
+  in **both** coordinates at once.
+* **THE PRIMARY IS A NULL, AND THAT IS THE HONEST HALF (93.4).** H_D passes first
+  (max|E(spatial)| = **0.0098 pp**, reproducing 59.7). **H_A: CONFIG-DEPENDENT** -- E(out)>E(in)
+  10/17, E(in)>E(out) 7/17. The expectation was registered as CONFIG-DEPENDENT **deliberately**,
+  so this **confirms this tick's own expectation** and is the weaker outcome. It licenses **"no
+  fixed axis is right"**, NOT "input channel is better". **H_B: NEITHER** (7/17 = 41%).
+* **THE CLEANEST POSITIVE: 62.9's PEAK IS THE KERNEL, NOT CONTIGUITY (93.5).** H_C fires
+  **17/17** -- the semantic `(o,i)` partition, **non-contiguous in construction**, beats the
+  output channel in every clean arm.
+* **THE POST-HOC STRATIFICATION SEPARATES PERFECTLY, AND STAYS POST-HOC (93.6).** By the CSV
+  `meta` column: **beta FROZEN -- E(out)>E(in) 8/8, `out` dominated 0/8. beta FREE -- 2/9,
+  dominated 7/9.** Matched pairs (`fz3` vs `ff5`, differing in `meta` ALONE, all 20 epochs,
+  ms=1e-3, a0=1e-3, same clip, verified per pair from the CSV) flip **6 of 6**, two-sided
+  **p=0.031** at the (arch,seed) unit -- **n=3 at architecture level, stated not buried** --
+  **robust to three independent null-seed sets**. On `ff5`'s R34 arms **E(out) goes NEGATIVE**.
+  Per 76(1)/79 it **does not overturn H_A**; it names its axis.
+* **THE BOUNDARY THAT MUST NOT BE CROSSED (93.7).** 92.9b refuted "adaptation extent determines
+  F_col/F_row" -- a **continuous magnitude** claim with **budget uncontrolled**. 93.6 is a
+  **binary contrast at exactly matched budget** on a different statistic. Compatible.
+  **No document may write "the column/row ratio measures adaptation extent."**
+* **A LIMIT RECORDED BEFORE SCORING (93.8).** For the 9-coordinate `oi` partition `res_pp`
+  **understates** the uncertainty (structureless E wanders **[-0.72, +0.13] pp** vs res
+  0.06-0.38). Asserted in T13b/T13c before the data. **H_B immune by construction** (`oi` costs
+  `O*I`, can never be a COST dominator); **H_C is a sign test and the bias leans conservative**;
+  **no per-arm E(oi) magnitude claim is licensed.**
+* **TWO WRONG ASSERTIONS, CODE RIGHT IN BOTH (93.9).** The recovery test ignored that **`oi`
+  REFINES `out` and `in`**; the null-calibration test ran on a 558-coord toy stack where the null
+  is unresolvable. Both are wrong assertions about the statistic's DOMAIN, not wrong code.
+* **STATED AGAINST OUR OWN INTEREST (93.10): NOTHING HERE MEASURES ACCURACY.** `E` is a property
+  of the meta-gradient field. **No claim is made that capturing more of it improves training.**
+  That link is untested and is **the largest unclosed gap in direction C.**
+* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `cp9` (8,
+  alice), `rw9` (18, alice) all remain written, validated, UNSUBMITTED. **`docs/` is now SIX
+  cycles behind on the cluster.**
+
+**NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (a2) **rsync `docs/`.**
+(b) Submit `sp8` (alice2, 9), then `hz9` (9, alice). (c) Then `cp9` (8, alice) after applying
+`patches/patch_probe6_coord.py` on the cluster (guard 2 refuses without it) -- **64.3/64.4 raise
+its value again**: it resolves the INPUT-CHANNEL direction at coordinate level, and that is now
+the axis measured to dominate the literature's choice on 7 of 9 free-beta arms. (d) Score `hz9`
+H0 -> H0.3 -> H0.5 -> H1 -> H1b -> H2; H0.5 can only VOID. (e) If bo7/bd7 landed, cycle 54's
+order stands with 55.2's per-seed sd. (f) **DONE, do not re-run:** 59.3, 59.8, 60.2-60.7, the
+tensor-mean avenue for 89.7, the filter hypothesis (62.5/62.9), C62-C (63.1), the span
+reconciliation (63.2-63.4), C62-A (63.7-63.8), **and now C64 in full (64.2-64.4)**. (g) **The
+offline queue is again down to the carried-since-51 `s` re-derivation.** Two SUBMISSIONS now
+queue behind the four written batches: 63.9's fixed-architecture budget ladder, and **C64-B, the
+frozen/free flip at a SECOND budget** -- what turns 64.4 from a 20-epoch statement into a general
+one (**n=3 at architecture level is the binding weakness, not the p-value**). (h) The 12 truncated
+`rs-blk6`/`rs-node` reruns remain last.
+
 ## Running / next (cycle 63) -- **ALICE DOWN AN EIGHTH TICK. THE OFFLINE QUEUE IS EMPTY.**
 
 **Read `docs/CORRECTIONS.md` 92 and `docs/FINDINGS.md` 63.0-63.9. 92.5 adds STANDING RULE

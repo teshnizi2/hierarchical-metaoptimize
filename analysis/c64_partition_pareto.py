@@ -408,6 +408,14 @@ def selftest():
     dom, win = out_dominated(rows)
     chk(not dom, "T21 G5: a clamped cell cannot dominate")
 
+    # ---- T22  the CSV join key (G6 depends on it) ------------------------------------
+    for rel, want in [("probes_fz3/probe_r10_w_s0", "fz3-r10-w-s0"),
+                      ("probes_ff5/probe_c100_w_s1", "ff5-c100-w-s1"),
+                      ("probes_p5/probe_w_a3_s0", "p5-w-a3-s0"),
+                      ("probes_cl5/probe_w_cU_s2", "cl5-w-cU-s2"),
+                      ("probes_bo6/probe_w_adw_s0", "bo6-w-adw-s0")]:
+        chk(arm_to_run(rel) == want, f"T22 join key {rel} -> {want}")
+
     print(f"\n{ok}/{ok} selftests pass")
     return ok
 
@@ -526,21 +534,145 @@ def score(rows):
     print(f"\nH_C SCALE         E(oi)>E(out) in {k_c}/{n} ({p_c:.0f}%)  ->  {vc}")
 
 
+def arm_to_run(rel):
+    """`probes_fz3/probe_r10_w_s0` -> `fz3-r10-w-s0`, the CSV `run` key."""
+    fam = os.path.dirname(rel).replace("probes_", "")
+    rest = os.path.basename(rel).replace("probe_", "").replace("_", "-")
+    return f"{fam}-{rest}"
+
+
+def csv_index(repo):
+    import csv as _csv
+    path = os.path.join(repo, "results", "all_runs.csv")
+    out = {}
+    with open(path) as fh:
+        for r in _csv.DictReader(fh):
+            out.setdefault(r["run"], r)
+    return out
+
+
+def strata(rows, repo, verbose=True):
+    """POST-HOC stratification of H_A by whether beta ADAPTS, joined to the CSV.
+
+    LABELLED POST-HOC AND IT STAYS POST-HOC.  H_A was registered as a whole-corpus
+    fraction; this names the config axis behind that verdict.  Per CORRECTIONS 76(1)/79 a
+    post-hoc reading may not overturn a registered gate, and this one does not -- H_A's
+    verdict (CONFIG-DEPENDENT) is what it explains, not what it replaces.
+
+    G6 (join gate): every scored arm must resolve to exactly ONE CSV row, and the hand
+    written frozen/free tag in `c62.SPATIAL_SET` must AGREE with that row's `meta` column.
+    The stratum is taken from the CSV, never from the tag.
+    """
+    idx = csv_index(repo)
+    recs, bad = [], []
+    for x in rows:
+        if x["exc"]:
+            continue
+        run = arm_to_run(x["rel"])
+        cr = idx.get(run)
+        if cr is None:
+            bad.append((run, "no CSV row"))
+            continue
+        stratum = "frozen" if cr["meta"] == "fixed" else "free"
+        tagged = "frozen" if "frozen" in x["tag"] else "free"
+        if stratum != tagged:
+            bad.append((run, f"tag says {tagged}, CSV meta={cr['meta']}"))
+            continue
+        recs.append(dict(run=run, stratum=stratum, cr=cr, r=x["r"],
+                         dominated=x["dominated"], winner=x["winner"],
+                         arch=cr["network"], ds=cr["dataset"], seed=cr["seed"],
+                         ms=cr["meta_stepsize"], ep=cr["epochs_done"],
+                         clip=cr["beta_clip"], a0=cr["alpha0"]))
+    if bad:
+        print("\nG6 JOIN GATE FAILED:")
+        for b in bad:
+            print("   ", b)
+        return None
+    if verbose:
+        print("\n" + "=" * 112)
+        print("POST-HOC (LABELLED): H_A's config axis is whether BETA ADAPTS.  Stratum from "
+              "the CSV `meta` column, G6-gated.")
+        print("=" * 112)
+        print(f"{'run':<20}{'stratum':>8}{'arch':>16}{'ds':>10}{'ms':>7}{'ep':>4}"
+              f"{'E(out)':>10}{'E(in)':>10}{'res':>8}  winner")
+        for m in sorted(recs, key=lambda z: (z["stratum"], z["arch"], z["seed"])):
+            eo, ei = m["r"]["out"]["E_pp"], m["r"]["in"]["E_pp"]
+            res = max(m["r"]["out"]["res_pp"], m["r"]["in"]["res_pp"])
+            w = "out" if eo > ei else "in"
+            tie = " (within res)" if abs(eo - ei) <= res else ""
+            print(f"{m['run']:<20}{m['stratum']:>8}{m['arch']:>16}{m['ds']:>10}"
+                  f"{m['ms']:>7}{m['ep']:>4}{eo:>10.4f}{ei:>10.4f}{res:>8.4f}  {w}{tie}")
+    return recs
+
+
+def strata_score(recs):
+    from collections import defaultdict
+    by = defaultdict(list)
+    for m in recs:
+        by[m["stratum"]].append(m)
+    print("\n" + "-" * 112)
+    for st in ("frozen", "free"):
+        g = by.get(st, [])
+        if not g:
+            continue
+        k = sum(1 for m in g if m["r"]["out"]["E_pp"] > m["r"]["in"]["E_pp"])
+        res_k = sum(1 for m in g
+                    if abs(m["r"]["out"]["E_pp"] - m["r"]["in"]["E_pp"])
+                    > max(m["r"]["out"]["res_pp"], m["r"]["in"]["res_pp"]))
+        dom_k = sum(1 for m in g if m["dominated"])
+        print(f"{st:>6}:  out>in in {k}/{len(g)}   "
+              f"(resolved beyond res in {res_k}/{len(g)})   "
+              f"'out' PARETO-DOMINATED in {dom_k}/{len(g)}")
+
+    # the MATCHED-PAIR design: fz3 (frozen) vs ff5 (free) differ ONLY in `meta`
+    fz = {(m["arch"], m["seed"]): m for m in recs if m["run"].startswith("fz3-")}
+    ff = {(m["arch"], m["seed"]): m for m in recs if m["run"].startswith("ff5-")}
+    keys = sorted(set(fz) & set(ff))
+    print(f"\nMATCHED PAIRS fz3(frozen) vs ff5(free) -- identical arch/dataset/ms/alpha0/"
+          f"clip/augment/epochs, ONLY `meta` differs:  n={len(keys)}")
+    flips = 0
+    for k in keys:
+        a, b = fz[k], ff[k]
+        wa = "out" if a["r"]["out"]["E_pp"] > a["r"]["in"]["E_pp"] else "in"
+        wb = "out" if b["r"]["out"]["E_pp"] > b["r"]["in"]["E_pp"] else "in"
+        same_budget = a["ep"] == b["ep"] and a["ms"] == b["ms"] and a["a0"] == b["a0"]
+        flips += int(wa == "out" and wb == "in")
+        print(f"   {k[0]:<16} s{k[1]}  frozen->{wa:<3}  free->{wb:<3}  "
+              f"budget/ms/a0 matched={same_budget}  ep={a['ep']}/{b['ep']}")
+    p = 2.0 * (0.5 ** len(keys)) if flips == len(keys) else float("nan")
+    print(f"\n   out->in flip in {flips}/{len(keys)} matched pairs"
+          + (f"   (sign test, two-sided p={p:.3f}, treating (arch,seed) as the unit; "
+             f"at the ARCHITECTURE level n=3)" if flips == len(keys) else ""))
+    print("\n   THIS IS POST-HOC.  It does not overturn H_A, which stands as "
+          "CONFIG-DEPENDENT; it names the axis.")
+    print("   It is NOT a revival of the adaptation-extent dose-response that "
+          "CORRECTIONS 92.9b REFUTED:")
+    print("   that was a CONTINUOUS magnitude claim with budget uncontrolled; this is a "
+          "BINARY contrast at matched budget.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--gate", action="store_true")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--strata", action="store_true")
     ap.add_argument("--root", default="..")
+    ap.add_argument("--repo", default=".")
     a = ap.parse_args()
     if a.selftest:
         selftest()
     if a.gate:
         if not gate(a.root):
             raise SystemExit(1)
-    if a.report:
+    if a.report or a.strata:
         rows = report(a.root)
         score(rows)
+        if a.strata:
+            recs = strata(rows, a.repo)
+            if recs is None:
+                raise SystemExit(1)
+            strata_score(recs)
 
 
 if __name__ == "__main__":

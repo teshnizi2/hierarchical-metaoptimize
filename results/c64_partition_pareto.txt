@@ -1,0 +1,79 @@
+======================================================================================================================
+E[3x3conv, terminal] BY SEMANTIC PARTITION, WITH COST IN STORED SCALARS
+scope: 3x3 conv tensors only; we measure z (meta-gradient), not G
+======================================================================================================================
+arm                               fam cls    E(out)     E(in)     E(oi)  E(spat)    res   #out    #in  dominated?
+----------------------------------------------------------------------------------------------------------------------
+probe_r10_w_s0                    r10 cln    0.1020    0.0666    0.5131   0.0080 0.0103   1984   1475           -
+probe_r10_w_s1                    r10 cln    0.1018    0.0652    0.5576   0.0092 0.0193   1984   1475           -
+probe_r34_w_s0                    r34 cln    0.0072    0.0068    0.0709   0.0003 0.0135   7616   7107           -
+probe_r34_w_s1                    r34 cln    0.0132    0.0032    0.1000   0.0005 0.0023   7616   7107           -
+probe_c100_w_s0                  c100 cln    0.0416    0.0123    0.2234   0.0011 0.0092   3904   3395           -
+probe_c100_w_s1                  c100 cln    0.0447    0.0117    0.2664   0.0011 0.0107   3904   3395           -
+probe_w_a3_s0                     r18 cln    0.0488    0.0269    0.1526   0.0026 0.0084   3904   3395           -
+probe_w_a3_s1                     r18 cln    0.0491    0.0232    0.1949   0.0023 0.0105   3904   3395           -
+probe_r10_w_s0                    r10 cln    0.4357    0.8572    1.8356   0.0098 0.0330   1984   1475          in
+probe_r10_w_s1                    r10 cln    0.1068    0.1326    0.9066   0.0090 0.0127   1984   1475          in
+probe_r34_w_s0                    r34 cln   -0.0147    0.0147    0.1922  -0.0003 0.0196   7616   7107          in
+probe_r34_w_s1                    r34 cln   -0.0182    0.0133    0.0159   0.0002 0.0039   7616   7107          in
+probe_c100_w_s0                  c100 cln    0.0126    0.0225    0.7991   0.0022 0.0128   3904   3395          in
+probe_c100_w_s1                  c100 cln    0.0205    0.0281    0.8588   0.0019 0.0120   3904   3395          in
+probe_w_cU_s0                     r18 cln    0.0377    0.0362    0.2116   0.0032 0.0131   3904   3395           -
+probe_w_cU_s1                     r18 cln    0.0426    0.0524    0.3877   0.0016 0.0261   3904   3395          in
+probe_w_cU_s2                     r18 cln    0.0404    0.0396    0.3449   0.0032 0.0108   3904   3395           -
+probe_w_m2_s0                     r18 EXC   42.3045   56.3779   87.9671   0.0001 0.0057   3904   3395          in
+probe_w_adw_s0                    r18 EXC   48.7956   46.5294   86.3911   0.0067 0.0070   3904   3395           -
+
+====================================================================================================
+REGISTERED SCORING -- 17 clean arms (2 exception arms excluded)
+====================================================================================================
+
+H_D PRECONDITION  |E(spatial)| max = 0.0098 pp (bar <= 0.02) -> PASS
+
+H_A PRIMARY       E(out)>E(in) in 10/17 (59%), E(in)>E(out) in 7/17 (41%)  ->  CONFIG-DEPENDENT
+   registered expectation was CONFIG-DEPENDENT; this CONFIRMS it
+
+H_B PARETO        'out' dominated in 7/17 (41%)  ->  NEITHER
+   dominating partitions: {'in': 7}
+
+H_C SCALE         E(oi)>E(out) in 17/17 (100%)  ->  REPLICATES 62.9
+
+================================================================================================================
+POST-HOC (LABELLED): H_A's config axis is whether BETA ADAPTS.  Stratum from the CSV `meta` column, G6-gated.
+================================================================================================================
+run                  stratum            arch        ds     ms  ep    E(out)     E(in)     res  winner
+ff5-r10-w-s0            free        ResNet10   CIFAR10   1e-3  20    0.4357    0.8572  0.0022  in
+ff5-r10-w-s1            free        ResNet10   CIFAR10   1e-3  20    0.1068    0.1326  0.0025  in
+cl5-w-cU-s0             free        ResNet18   CIFAR10   1e-3  20    0.0377    0.0362  0.0012  out
+cl5-w-cU-s1             free        ResNet18   CIFAR10   1e-3  20    0.0426    0.0524  0.0007  in
+cl5-w-cU-s2             free        ResNet18   CIFAR10   1e-3  20    0.0404    0.0396  0.0023  out (within res)
+ff5-c100-w-s0           free   ResNet18_c100  CIFAR100   1e-3  20    0.0126    0.0225  0.0017  in
+ff5-c100-w-s1           free   ResNet18_c100  CIFAR100   1e-3  20    0.0205    0.0281  0.0015  in
+ff5-r34-w-s0            free        ResNet34   CIFAR10   1e-3  20   -0.0147    0.0147  0.0016  in
+ff5-r34-w-s1            free        ResNet34   CIFAR10   1e-3  20   -0.0182    0.0133  0.0021  in
+fz3-r10-w-s0          frozen        ResNet10   CIFAR10   1e-3  20    0.1020    0.0666  0.0007  out
+fz3-r10-w-s1          frozen        ResNet10   CIFAR10   1e-3  20    0.1018    0.0652  0.0007  out
+p5-w-a3-s0            frozen        ResNet18   CIFAR10   1e-3  20    0.0488    0.0269  0.0007  out
+p5-w-a3-s1            frozen        ResNet18   CIFAR10   1e-3  20    0.0491    0.0232  0.0004  out
+fz3-c100-w-s0         frozen   ResNet18_c100  CIFAR100   1e-3  20    0.0416    0.0123  0.0003  out
+fz3-c100-w-s1         frozen   ResNet18_c100  CIFAR100   1e-3  20    0.0447    0.0117  0.0008  out
+fz3-r34-w-s0          frozen        ResNet34   CIFAR10   1e-3  20    0.0072    0.0068  0.0005  out (within res)
+fz3-r34-w-s1          frozen        ResNet34   CIFAR10   1e-3  20    0.0132    0.0032  0.0002  out
+
+----------------------------------------------------------------------------------------------------------------
+frozen:  out>in in 8/8   (resolved beyond res in 7/8)   'out' PARETO-DOMINATED in 0/8
+  free:  out>in in 2/9   (resolved beyond res in 8/9)   'out' PARETO-DOMINATED in 7/9
+
+MATCHED PAIRS fz3(frozen) vs ff5(free) -- identical arch/dataset/ms/alpha0/clip/augment/epochs, ONLY `meta` differs:  n=6
+   ResNet10         s0  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+   ResNet10         s1  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+   ResNet18_c100    s0  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+   ResNet18_c100    s1  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+   ResNet34         s0  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+   ResNet34         s1  frozen->out  free->in   budget/ms/a0 matched=True  ep=20/20
+
+   out->in flip in 6/6 matched pairs   (sign test, two-sided p=0.031, treating (arch,seed) as the unit; at the ARCHITECTURE level n=3)
+
+   THIS IS POST-HOC.  It does not overturn H_A, which stands as CONFIG-DEPENDENT; it names the axis.
+   It is NOT a revival of the adaptation-extent dose-response that CORRECTIONS 92.9b REFUTED:
+   that was a CONTINUOUS magnitude claim with budget uncontrolled; this is a BINARY contrast at matched budget.

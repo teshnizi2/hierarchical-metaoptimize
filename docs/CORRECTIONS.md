@@ -3648,3 +3648,108 @@ which is bookkeeping.** The next substantive C62-A step is a **fixed-architectur
 ladder** (R18/C10, ms=1e−3, weightwise, 20/40/80 ep, n≥3) — a SUBMISSION, ranked below
 `sp8`/`hz9`/`cp9` because those decide registered gates and it confirms the reading of a
 post-hoc trend (63.9). (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
+
+## 93. DECISION RECORD — cycle 64 (ALICE DOWN, **NINTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**93.0 STATE.** Reachability checked **2026-08-23T10:25Z**, localised not assumed: gateway UP and
+answering (`p-cfer-016105`); `132.229.104.230` and `.231` both refuse :22 **from the gateway**;
+`ssh alice` and `ssh alice2` both fail at banner exchange (exit 255). **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*`/`bd7-*` survival
+still UNKNOWN and still not guessed. `sp8` (9, alice2), `hz9` (9, alice), `cp9` (8, alice), `rw9`
+(18, alice) remain written, validated, UNSUBMITTED. **`docs/` is now SIX cycles behind.**
+
+**93.1 THE DECISION, AND ITS REASON.** 92.14(g) left the offline queue holding exactly one item,
+the carried-since-51 `s` re-derivation, explicitly labelled *bookkeeping*. Rather than spend a
+ninth tick on it I applied **STANDING RULE (11)** to the operator's DEFAULT deliverable and asked
+what direction C had never measured. The answer was not a refutation but a **design choice**:
+62.6/91.7 established that the literature's partition captures `a[o]` and not `b[i]` **by
+construction**, and then never asked whether, **at matched cost**, the output channel is the
+better axis at all. **Nobody in that line compares against the transpose of their own partition.**
+That is now measured. → FINDINGS 64.1
+
+**93.2 IT IS NOT A RE-RUN OF THE CLOSED FILTER HYPOTHESIS (92.14(f)).** `out` and `in` are **not
+contiguous runs at any `g`** and therefore cannot appear on 62.9's absolute-g ladder; the
+input-channel partition had never been scored. `F_row`/`F_col` are SS **ratios** on a matrix of
+filter means with the nine taps averaged away — not a fraction of the field, and **carrying no
+cost axis**. The `E` statistic, its null, its noise correction and its clamp flags are the
+PUBLISHED ones, imported **by reference**; **only the index map is new**, and gate **G1** proves
+the new maps are a relabelling of validated ones on **19 real architectures**.
+
+**93.3 THE INSTRUMENT.** `analysis/c64_partition_pareto.py`, **50/50 selftests**, registered and
+committed (`cb70c47`) **before any arm was scored**. G6 join gate ties every arm to exactly one
+CSV row and requires the hand-written frozen/free tag to agree with that row's `meta` column —
+**the stratum is taken from the CSV, never from the tag.**
+
+**93.4 THE REGISTERED RESULT, AND THE PRIMARY IS A NULL.** H_D (precondition, scored first)
+PASSES at max|E(spatial)| = **0.0098 pp**, reproducing 59.7. **H_A: CONFIG-DEPENDENT** — E(out)>E(in)
+in 10/17, E(in)>E(out) in 7/17. The expectation was registered as CONFIG-DEPENDENT **deliberately**,
+so this **confirms this tick's own expectation and is the weaker of the two possible outcomes**.
+The sentence it licenses is **"no fixed axis is right"**, NOT "input channel is better".
+**H_B: NEITHER** (dominated 7/17 = 41%, against bars of ≥50% / ≤20%). → FINDINGS 64.3
+
+**93.5 THE CLEANEST POSITIVE: 62.9's PEAK IS THE KERNEL, NOT CONTIGUITY.** H_C fires **17/17**:
+the semantic `(o,i)` partition — built from the tensor's shape, **non-contiguous in
+construction** — beats the output channel in every clean arm. 62.9 located that scale with
+contiguous blocks; a partition that shares the scale but not the contiguity reproduces it.
+
+**93.6 THE POST-HOC STRATIFICATION SEPARATES PERFECTLY, AND STAYS POST-HOC.** By the CSV `meta`
+column: **β frozen — E(out)>E(in) 8/8, `out` Pareto-dominated 0/8. β free — 2/9, dominated 7/9.**
+The matched-pair design (`fz3` vs `ff5`, differing in `meta` ALONE, all at 20 epochs, ms=1e−3,
+alpha0=1e−3, same clip, verified per pair from the CSV) flips **6 of 6**, two-sided **p=0.031**
+at the (arch,seed) unit — **n=3 at the architecture level, stated not buried** — and is **robust
+to three independent null-seed sets**. Per 76(1)/79 this **may not overturn a registered gate and
+does not**: H_A stands as CONFIG-DEPENDENT; the stratification **names its axis**. → FINDINGS 64.4
+
+**93.7 THE 92.9b BOUNDARY IS RESTATED SO IT IS NOT CROSSED.** 92.9b refuted "adaptation extent
+determines `F_col/F_row`" — a **continuous magnitude** claim with **budget uncontrolled**, whose
+spread at a single matched span exceeded the whole span-driven range. 93.6 is a **binary contrast
+at exactly matched budget**, on a different statistic, on matched pairs. The two are compatible.
+**93.6 does not revive 92.9b's refuted reading, and no document may write "the column/row ratio
+measures adaptation extent."** → FINDINGS 64.5
+
+**93.8 A MEASURED LIMIT RECORDED BEFORE SCORING, NOT AFTER (cf. 91.4).** For the 9-coordinate
+`oi` partition, `res_pp` **UNDERSTATES** the cell's uncertainty: structureless E wanders over
+**[−0.72, +0.13] pp while res reads 0.06–0.38 pp** at a 110k stack. Written into the docstring and
+asserted in selftests T13b/T13c **before the data**. **H_B is immune by construction** (`oi` costs
+`O*I`, so it can never be a COST dominator — asserted); **H_C is a sign test and the bias leans
+conservative**; **no per-arm E(oi) magnitude claim is licensed.** → FINDINGS 64.6
+
+**93.9 TWO WRONG ASSERTIONS IN THIS TICK'S HARNESS, CODE RIGHT IN BOTH.** (i) The recovery test
+demanded a planted `out` effect leave `oi` flat — but **`oi` REFINES `out` and `in`**, so it
+captures by construction whatever they capture. The corrected, lattice-aware form is **strictly
+stronger**: it tests `out`-vs-`in` discriminability, which is the H_A axis. (ii) Null calibration
+ran on a **558-coordinate toy stack** where the null is unresolvable (±1 to ±16 pp). Moved to
+110k, where it calibrates to ≤0.04 pp. **Both are wrong assertions about the statistic's domain,
+not wrong code** — the campaign's recurring failure mode (92.10, 91.3). → FINDINGS 64.7
+
+**93.10 STATED AGAINST OUR OWN INTEREST.** The primary hypothesis is a **null in its registered
+form**. The result that separates is **post-hoc**, **n=3 at the architecture level**, and **at 20
+epochs only**. And **nothing in this tick measures accuracy**: `E` is a property of the
+meta-gradient field, and **no claim is made that capturing more of it improves training.** That
+link is untested and remains the largest unclosed gap in direction C.
+
+**93.11 SCOPE, UNCHANGED AND NOT OPTIONAL.** 3x3 conv tensors only; `E[3x3conv, terminal]` per
+STANDING RULE (12). We measure `z`, the META-gradient; Adam-mini / Adalayer / SGG argue about `G`.
+**No document may write "we refuted Adam-mini."**
+
+**93.12 ORPHANS.** CSV unchanged at 1707, so the orphan set is unchanged from 92.12: **109
+families, 2 orphan, 12 runs** (`gate0b`, `gate0d`), both retired in FINDINGS 61.8 and **not to be
+re-run**. This tick cites `fz3`, `ff5`, `p5`, `cl5`, `ml5`, `bo6` — all already-cited families.
+**None retired, none created.**
+
+**93.13 IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twenty-one.
+
+**93.14 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` **both** accounts before anything.
+(a2) **rsync `docs/` — SIX cycles behind.** (b) Submit `sp8` (alice2, 9), then `hz9` (9, alice).
+(c) Then `cp9` (8, alice) after applying `patches/patch_probe6_coord.py` on the cluster; guard 2
+refuses without it. **64.3/64.4 raise `cp9`'s value again**: it resolves the input-channel
+direction at coordinate level, and that is now the axis measured to dominate the literature's
+choice on 7 of 9 free-β arms. (d) Score `hz9` H0 → H0.3 → H0.5 → H1 → H1b → H2; H0.5 can only
+VOID. (e) If bo7/bd7 landed, cycle 54's order stands with 55.2's per-seed sd. (f) **DONE, do not
+re-run:** 59.3, 59.8, 60.2–60.7, the tensor-mean avenue for 89.7, the filter hypothesis
+(62.5/62.9), C62-C (63.1), the span reconciliation (63.2–63.4), C62-A (63.7–63.8), **and now
+C64 in full (64.2–64.4)**. (g) **The offline queue is again down to the carried-since-51 `s`
+re-derivation.** Two SUBMISSIONS are now queued behind the four written batches: 63.9's
+fixed-architecture budget ladder, and **C64-B — the frozen/free flip at a SECOND budget**, which
+is what turns 64.4 from a 20-epoch statement into a general one (n=3 at architecture level is the
+binding weakness, not the p-value). (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
