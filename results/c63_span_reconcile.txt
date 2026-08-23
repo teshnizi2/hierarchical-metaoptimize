@@ -1,0 +1,114 @@
+================================================================================================
+R1 / R2 -- REPRODUCE THE TWO PUBLISHED NUMBERS, THEN SHOW THEY ARE ONE
+================================================================================================
+debt cell probes_ns5/probe_w_m5p4_s*: 2 seed dirs
+
+  A (c53, terminal record, weightwise, 2 seeds) = 8.2676   published 8.268   delta -0.0004   PASS
+  B (c55, steady-half mean, weightwise)           = 6.6359   published 6.29   delta +0.3459   FAIL
+
+  R1's B-ARM FAILS, AND THAT FAILURE IS THIS TICK'S FINDING.
+  55.4's 6.29 is NOT the weightwise steady-half span.  c55's own printed
+  docstring (c55_neff_noise.py:388) says the number is 'averaged over the
+  three rungs'.  The debt named ONE axis (time); there are TWO.  See
+  --factorial, which closes the 2x2 to 4 decimals.
+
+  R2 -- B evaluated on a DEGENERATE TERMINAL WINDOW, per dir:
+  dir                                  A(term)  B(term-win)     |diff|  B(steady)   n_rec
+  probe_w_m5p4_s0                       8.3605       8.3605   0.00e+00     6.7636    2000
+  probe_w_m5p4_s1                       8.1747       8.1747   0.00e+00     6.5082    2000
+
+  worst |A - B(terminal window)| = 0.000e+00   PASS
+  => the two published definitions are ONE functional at TWO evaluation times.
+
+  SPAN TIME COURSE on the debt cell (quintiles of the run, log units):
+  dir                                      q1       q2       q3       q4       q5  monotone?
+  probe_w_m5p4_s0                       0.999    2.922    4.753    6.483    7.833     rising
+  probe_w_m5p4_s1                       0.997    2.874    4.524    6.199    7.583     rising
+
+================================================================================================
+THE 2x2 -- ARM SET x EVALUATION TIME, ON THE ns5/ml5 LADDER
+`w/term` is CORRECTIONS 74's definition.  `3rung/steady` is FINDINGS 55.4's.
+================================================================================================
+       ms   w/steady    w/term   3rung/steady   3rung/term  d_time(w)   d_armset
+     1e-4     1.4749    1.9608         1.4823       1.9762     0.4859    -0.0074
+     2e-4     2.8601    3.8057         2.9063       3.8206     0.9456    -0.0461
+     5e-4     6.6359    8.2676         6.2886       7.5009     1.6317     0.3473
+     1e-3    11.0268   13.5614        10.2363      12.5422     2.5346     0.7904
+
+  per-rung, steady half (the arm-set term is this ordering):
+       ms       lay      node         w  lay<node<w?
+     1e-4    1.4814    1.4905    1.4749           no
+     2e-4    2.9374    2.9213    2.8601           no
+     5e-4    5.8299    6.4000    6.6359          YES
+     1e-3    9.1785   10.5037   11.0268          YES
+
+================================================================================================
+R3 -- DO THE TWO DEFINITIONS RANK CELLS THE SAME?
+================================================================================================
+  190 probe dirs; 28 are frozen (span 0.00 under BOTH, by construction) and carry no ordering; 162 scored.
+  Spearman rho(A, B) = 0.965421   over n=162
+  discordant pairs   = 830/12946 = 6.411%
+  A/B ratio          = 0.840 - 1.426, median 1.221
+  A >= B in          = 151/162 dirs
+  --> R3 ORDERINGS DIFFER (registered: rho >= 0.95 and <= 5% discordant)
+
+================================================================================================
+R4 -- N2's OWN PREDICATE, RE-SCORED UNDER ALL FOUR DEFINITIONS
+N2 (CORRECTIONS 74.2): 'the argmin flips to `node` at the stepsize whose
+WEIGHTWISE beta span first exceeds ~5 log units.'  The 5.0 threshold and the
+argmin column are N2's own and are NOT re-tuned or recomputed here.
+================================================================================================
+       ms  argmin        w/steady          w/term    3rung/steady      3rung/term
+     1e-4       w     1.475    <5     1.961    <5     1.482    <5     1.976    <5
+     2e-4       w     2.860    <5     3.806    <5     2.906    <5     3.821    <5
+     5e-4       w     6.636    >5     8.268    >5     6.289    >5     7.501    >5
+     1e-3    node    11.027    >5    13.561    >5    10.236    >5    12.542    >5
+
+  N2 under span[w/steady     ] : predicate matches argmin on 3/4 rungs  ->  REFUTED
+  N2 under span[w/term       ] : predicate matches argmin on 3/4 rungs  ->  REFUTED
+  N2 under span[3rung/steady ] : predicate matches argmin on 3/4 rungs  ->  REFUTED
+  N2 under span[3rung/term   ] : predicate matches argmin on 3/4 rungs  ->  REFUTED
+
+  --> R4: N2's verdict is DEFINITION-INDEPENDENT (all four agree: REFUTED)
+      CORRECTIONS 74(2) STANDS as written.  The debt does not touch it.
+
+================================================================================================
+R5 -- FINDINGS 55.4's BAND, RE-SCORED UNDER ALL FOUR DEFINITIONS
+55.4: 'every cell with span <= 6.29 gives `w`; every cell with span >= 8.88
+gives `node`.  11 of 11.'  The argmin column is c55's, via argmin_in_se and
+CORRECTIONS 79's interpretability gate.  Only the SPAN column is varied.
+================================================================================================
+     root       arm   ep argmin  gap/SE      w/steady        w/term  3rung/steady    3rung/term
+      fz3      c100   20      w    7.38         0.000         0.000         0.000         0.000
+      fz3       r10   20      w   16.99         0.000         0.000         0.000         0.000
+      fz3       r34   20      w    4.05         0.000         0.000         0.000         0.000
+       p5    r18c10   20      w   21.38         0.000         0.000         0.000         0.000
+      ml5        m4   20      w    4.08         1.475         1.961         1.482         1.976
+      ns5      m5p4   20      w    3.80         6.636         8.268         6.289         7.501
+      uc5       r34   20   node    3.26         9.581        12.180         8.879        11.356
+      cl5        cU   20   node    2.81        11.027        13.561        10.236        12.542
+      uc6      c100   20   node    3.17        12.478        15.093        12.621        15.337
+      br6        c2   40      w   13.07        18.572        23.852        17.523        22.720
+
+  10 DECIDED cells (3 node, 7 w, 0 lay)
+  of which 9 are 20-epoch cells -- the restriction 55.4's THRESHOLD sentence carries.
+
+  --- THRESHOLD form, 20ep only (55.4's own scope) ---
+    span[w/steady     ] SEPARATES   max(other)=  6.636  min(node)=  9.581  gap= +2.945
+    span[w/term       ] SEPARATES   max(other)=  8.268  min(node)= 12.180  gap= +3.913
+    span[3rung/steady ] SEPARATES   max(other)=  6.289  min(node)=  8.879  gap= +2.590
+    span[3rung/term   ] SEPARATES   max(other)=  7.501  min(node)= 11.356  gap= +3.855
+  --- THRESHOLD form, ALL decided ---
+    span[w/steady     ] no          max(other)= 18.572  min(node)=  9.581  gap= -8.991
+    span[w/term       ] no          max(other)= 23.852  min(node)= 12.180  gap=-11.671
+    span[3rung/steady ] no          max(other)= 17.523  min(node)=  8.879  gap= -8.644
+    span[3rung/term   ] no          max(other)= 22.720  min(node)= 11.356  gap=-11.364
+
+  --- BAND form (55.4's actual conclusion), ALL decided cells ---
+    span[w/steady     ] band=[  9.581,  12.478]  CLEAN
+    span[w/term       ] band=[ 12.180,  15.093]  CLEAN
+    span[3rung/steady ] band=[  8.879,  12.621]  CLEAN
+    span[3rung/term   ] band=[ 11.356,  15.337]  CLEAN
+
+  --> R5: within 55.4's own 20-epoch scope the THRESHOLD holds under all four definitions.
+      The BAND form holds under all four.

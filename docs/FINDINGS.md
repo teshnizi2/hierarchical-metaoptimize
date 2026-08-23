@@ -12156,3 +12156,176 @@ axis (`o`) that leaves the other (`i`) entirely uncaptured. **We measure `z`; th
 and `bo6/probe_w_adw_s0` give E(9) = **87.97** and **86.39 pp** with phase ratios 1.45 and 1.40
 — the same shape, ~500× the amplitude. Recorded; ms=1e−2 remains boundary-dominated
 (CORRECTIONS 62) and AdamW-base remains the 59.4 exception set.
+
+## 63.0 CYCLE 63 — ALICE DOWN AN **EIGHTH** CONSECUTIVE TICK; ZERO JOBS; THE TOP TWO OFFLINE ITEMS ARE BOTH DISCHARGED
+
+Reachability checked **2026-08-23T07:25Z**. Gateway UP and answering (`p-cfer-016105`);
+`132.229.104.230` and `132.229.104.231` both refuse :22 **from the gateway**; `ssh alice` and
+`ssh alice2` both fail at banner exchange. **No queue read, nothing synced, nothing submitted,
+nothing cancelled. CSV unchanged at 1707 runs.** `bo7-*` (12, alice) / `bd7-*` (12, alice2)
+survival still UNKNOWN and still not guessed. `sp8` (9), `hz9` (9), `cp9` (8), `rw9` (18) all
+remain written, validated and UNSUBMITTED; `docs/` is now **five** cycles behind on the cluster.
+
+This tick spent itself on the two items CORRECTIONS 91.10(g) ranked first and second, both
+zero-compute: **C62-C** (the conv-only u-ladder on all four families) and **the `span`
+definitional debt owed since cycle 55**, which was BLOCKING C62-A. Both are now closed.
+
+## 63.1 C62-C IS DISCHARGED: THE u-LADDER IS UNANIMOUS ON 17 CLEAN ARMS AND IT AGREES WITH THE ABSOLUTE LADDER
+
+New instrument `analysis/c63_uladder_corpus.py`, **53/53 selftests**. It is a DRIVER over
+`c62_blocksize_curve.py` — same ladder, same block index, same nested SS, same within-tensor
+null, same clamp rule — and its arm set is `c62.SPATIAL_SET` **by reference**, asserted by
+selftest T1, so the u-ladder is scored on exactly the arms 62.9's absolute-g sweep used.
+P1–P4 were registered and committed (`30a5049`) **before** any arm beyond 62.4's single
+`p5/probe_w_a3_s0` was scored.
+
+| registered test | measured | verdict |
+|---|---|---|
+| **P1** H2's own refutation, verbatim: `E(1/8) <= E(1) + res` in a majority | fires in **6 of 17** | **H2 SURVIVES** |
+| **P2** argmax `u <= 1/16` (more than 3 rungs below the channel) | **17 of 17** | **HOLDS** |
+| **P3** cross-ladder: `u_peak <= 2 * (9/w50)` | **17 of 17** | **CONSISTENT** |
+| **P4** H1 (channel knee) refuted per arm | **17 of 17** | **H1 REFUTED at corpus scale** |
+
+**THE PEAK IS AT 1–9 COORDINATES, MEASURED A SECOND TIME AND FROM A DIFFERENT DIRECTION.**
+The channel-unit argmax is `u = 1/512` in 13 arms and `1/1024` in 4, i.e. a block of
+**1–9 coordinates** (`1/512`) or **1–4** (`1/1024`). 62.9's absolute-g ladder put the argmax
+at **g ≤ 9 in 17 of 17**. These are two different block indices over the same
+`neg_counts.npy`, and they land on the same scale. **P3 is the first time this project's two
+block-size readouts have been compared, and it was registered with a failure branch that
+would have cost us either 62.4's peak or 62.9's knee.** It did not fire.
+
+**AND H1's REFUTATION IS NOW A CORPUS RESULT, NOT A ONE-ARM ONE.** `E_peak/E(1)` is
+**3.57–101.20, median 8.96** over the 15 clean arms with a positive `E(1)`. The channel is
+not where this structure is; it is 4–10× below the channel in every arm measured.
+
+**STATED AGAINST OUR OWN INTEREST — THE LADDER EDGE.** `U_LADDER` bottoms out at `1/1024`,
+and **4 of 17 arms peak on that boundary rung**, so their argmax is censored from below and
+the true peak could be finer. It cannot be much finer: at `1/1024` the blocks are already
+1–4 coordinates and `E` is exactly 0 at `g = 1` by construction. The 13 interior peaks at
+`1/512` are not censored. **P2/P3/P4 are unanimous with or without the 4 censored arms**
+(all four are already at or below the bar), so no verdict rests on them — but the peak
+LOCATION for those four is a bound, not a point, and must be written as one.
+
+**THE TWO EXCEPTION ARMS ARE THE SAME SHAPE AT ~500× THE AMPLITUDE AND REMAIN UNQUOTABLE.**
+`ml5/probe_w_m2_s0` peaks at `1/512` with `E = 82.31 pp`; `bo6/probe_w_adw_s0` at `1/512`
+with `E = 79.59 pp`. ms=1e−2 stays boundary-dominated (CORRECTIONS 62); AdamW-base stays the
+59.4 exception set. Never pooled; selftest T10 asserts that two huge exception arms cannot
+move a clean verdict.
+
+**SCOPE UNCHANGED.** Conv tensors only (STANDING RULE 10). We measure `z`, the META-gradient;
+Adam-mini argues about `G`. **No document may write "we refuted Adam-mini."**
+
+## 63.2 THE `span` DEBT IS PAID, AND THE DEBT ITSELF NAMED ONLY **HALF** OF THE DIFFERENCE
+
+New instrument `analysis/c63_span_reconcile.py`, **38/38 selftests**. It IMPORTS both
+published definitions rather than restating them (`c53_score.beta_span`,
+`c55_neff_noise.beta_span`), and gate G0 asserts that both read the same
+`c52_boxfree.records()` so the two cannot differ in parsing.
+
+**R2 PASSES EXACTLY.** Evaluating c55's window-mean over a degenerate terminal window
+reproduces c53's per-dir value to **0.000e+00** on both seeds of the debt cell. The time axis
+is one functional at two evaluation times, and that is proved, not argued.
+
+**R1's B-ARM FAILS, AND THE FAILURE IS THE FINDING.** A reproduces CORRECTIONS 74's published
+**8.268** (measured 8.2676). B does **not** reproduce FINDINGS 55.4's **6.29**: the weightwise
+steady-half span is **6.6359**. Chasing the 0.35 identifies a second axis, stated in c55's own
+printed docstring (`c55_neff_noise.py:388`) and never named by the debt: **55.4's number is
+averaged over the three rungs {lay, node, w}; CORRECTIONS 74's is weightwise ALONE.**
+
+**THE 2×2 CLOSES TO FOUR DECIMALS ON THE DEBT CELL (`ns5` m5p4):**
+
+| arm set \ time | steady half (0.5–1.0) | terminal record |
+|---|---|---|
+| **weightwise** | 6.6359 | **8.2676** ← CORRECTIONS 74 |
+| **mean of 3 rungs** | **6.2886** ← FINDINGS 55.4 (published 6.29) | 7.5009 |
+
+**The gap is 1.632 log units of TIME and 0.347 of ARM SET.** The span rises monotonically
+through training on both seeds (quintile means 1.00 → 2.92 → 4.75 → 6.48 → 7.83), which is the
+time term; the arm-set term is the ordering `lay < node < w`, holding at ms 5e−4 and 1e−3 and
+NOT at 1e−4 / 2e−4 (where the three rungs agree to 0.06 log units). Across the ladder the time
+term is **0.486 / 0.946 / 1.632 / 2.535** and the arm-set term **−0.007 / −0.046 / +0.347 /
++0.790** — time dominates at every rung.
+
+**QUOTING RULE, EFFECTIVE NOW.** Write `span[weightwise, terminal]` or
+`span[3-rung, steady-half]`. **A bare "span" is not a quantity in this campaign.**
+
+## 63.3 THE TWO DEFINITIONS ARE **NOT** A MONOTONE REPARAMETERISATION — R3 FAILS ITS OWN BAR
+
+Over **162 non-frozen probe dirs** (190 total, 28 frozen at exactly 0.00 under both by
+construction, de-duplicated by realpath per CORRECTIONS 88.11):
+
+| | measured | registered bar |
+|---|---|---|
+| Spearman ρ(terminal, steady-half) | **0.9654** | ≥ 0.95 ✓ |
+| discordant pairs | **830 / 12,946 = 6.411%** | ≤ 5% ✗ |
+| A/B ratio | 0.840 – 1.426, median **1.221** | — |
+| A ≥ B | **151 of 162** dirs | — |
+
+**REGISTERED CONJUNCTION FAILS → ORDERINGS DIFFER.** 6.4% of arm pairs invert between the two
+definitions, and `A < B` in 11 of 162 dirs (the span FALLS over the steady half there, so
+`B ≤ A` is not a theorem — selftest T3 asserts the falling case is reachable). **Any claim
+that rests on a span ORDERING must name its definition.** That is the prescriptive output of
+paying this debt, and it is stronger than the "quote either, named" outcome R3 registered as
+the pass branch.
+
+## 63.4 NEITHER PUBLISHED VERDICT MOVES — R4 AND R5 BOTH COME BACK DEFINITION-INDEPENDENT
+
+**R4 — CORRECTIONS 74(2) STANDS.** N2's own predicate ("the argmin flips to `node` at the
+stepsize whose weightwise span first exceeds ~5 log units"), with N2's own 5.0 threshold and
+N2's own argmin column, matches on **3 of 4 rungs under all four definitions**:
+
+| ms | argmin | w/steady | w/term | 3rung/steady | 3rung/term |
+|---|---|---|---|---|---|
+| 1e−4 | w | 1.475 <5 | 1.961 <5 | 1.482 <5 | 1.976 <5 |
+| 2e−4 | w | 2.860 <5 | 3.806 <5 | 2.906 <5 | 3.821 <5 |
+| **5e−4** | **w** | **6.636 >5** | **8.268 >5** | **6.289 >5** | **7.501 >5** |
+| 1e−3 | node | 11.027 >5 | 13.561 >5 | 10.236 >5 | 12.542 >5 |
+
+The 5e−4 rung is over 5 log units under **every** definition while the argmin is still `w`.
+**N2 is REFUTED four times out of four. The debt never touched CORRECTIONS 74(2).**
+
+**R5 — FINDINGS 55.4 STANDS, AND ITS PUBLISHED NUMBERS ARE IDENTIFIED EXACTLY.** 10 DECIDED
+cells (c55's `argmin_in_se` + CORRECTIONS 79's gate, called not restated); 9 at 20 epochs.
+Within 55.4's own 20-epoch scope the THRESHOLD separates under all four definitions, and
+under `3rung/steady` the cut is **max(other) = 6.289 / min(node) = 8.879** — 55.4's published
+**6.29 / 8.88**, to the decimal. Gaps: **+2.945 / +3.913 / +2.590 / +3.855**.
+
+**A TEST OF THIS MODULE'S OWN THAT WAS SCORING THE WRONG SHAPE, CAUGHT AND FIXED.** The first
+R5 pass reported "no separation" under all four — because it applied the THRESHOLD test to all
+10 cells including the 40-epoch `br6/c2` (span 18.57, argmin `w`, 13.07 SE). **55.4 itself
+names that cell as the reason its conclusion is a BAND and not a threshold.** Scoring 55.4 by
+the threshold shape alone tests a claim 55.4 explicitly disavowed. Both shapes are now scored
+(selftest T11 asserts a high non-target breaks the threshold and does NOT break the band):
+
+| definition | band [min(node), max(node)] | intruders |
+|---|---|---|
+| w/steady | [9.581, 12.478] | **0** |
+| w/term | [12.180, 15.093] | **0** |
+| 3rung/steady | [8.879, 12.621] | **0** |
+| 3rung/term | [11.356, 15.337] | **0** |
+
+**The band is clean under all four. 55.4 stands as written.**
+
+## 63.5 C62-A IS UNBLOCKED, AND 63.3 DICTATES ITS SPAN DEFINITION RATHER THAN LEAVING IT A CHOICE
+
+CORRECTIONS 91.8 / FINDINGS 62.8 blocked C62-A on this debt. It is discharged, so C62-A may be
+registered. **63.3 makes the definition load-bearing** (orderings differ at 6.4% of pairs), so
+C62-A must name one, and the naming is DERIVED rather than chosen:
+
+* **arm set: weightwise.** `F_col/F_row` is computed on weightwise arms' `neg_counts.npy`.
+  A 3-rung mean would average in two arms whose coordinates the statistic never touched.
+* **time window: the FULL RUN, not the steady half.** `p_i = neg_count_i / n_records` is
+  accumulated over **every** record (PATCH_PROBE5 never resets), so the adaptation extent that
+  produced the F statistics is the full-run mean span. Steady-half and terminal both mismatch
+  the accumulation window of the quantity being explained.
+
+**So C62-A is registered against `span[weightwise, full-run mean]`, with the other three
+carried as a sensitivity column.** That is a THIRD cell of the 2×2's row, and it exists
+because the debt was paid rather than because a fourth definition was wanted.
+
+## 63.6 ORPHANS
+
+CSV unchanged at 1707 (this tick added no runs), so the orphan set is unchanged from 91.9:
+**109 families, 2 orphan, 12 runs** — `gate0b` and `gate0d`, both retired in 61.8, **not to be
+re-run**. This tick cites `fz3`, `p5`, `ff5`, `cl5`, `ml5`, `ns5`, `uc5`, `uc6`, `bl5`, `br6`,
+`bo6`, `fr5`, `wc5` — all already-cited families. **No orphan retired, none created.**
