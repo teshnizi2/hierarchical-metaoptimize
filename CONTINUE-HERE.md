@@ -109,13 +109,38 @@ and corrects 89.7's premise; 90.2 changes how anyone must read `z_mean`/`z_std` 
   FINDINGS 61.8, **not to be re-run** -- `gate0b` (unaugmented memorisation regime, quotable for
   nothing, ABANDONED) and `gate0d` (SGDm base: blk6 **+3.53pp** over scalar, against HF base's
   scalar +0.33pp -- an uncited n=3 consistency with the H4 base-optimizer interaction).
-* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `rw9` (18,
-  alice) all remain written, validated, UNSUBMITTED. **`docs/` is now THREE cycles behind on the
-  cluster.**
+* **THE INSTRUMENT IS NOW WRITTEN AND VALIDATED AGAINST REAL TORCH (61.9).**
+  `patches/patch_probe6_coord.py` (PROBE6=1 gated) writes `coord_signs.npy` [n_rec, 20000] int8,
+  `coord_idx.npy`, an EXACT per-tensor `tensor_signs.npy`, and `coord_meta.json` -- and does NOT
+  touch the `probe.jsonl` schema (CORRECTIONS 18 is why). 40 MB + 3 MB per weightwise run.
+  `tests/test_probe6_block.py` **26/26** on the ROG offload node (torch 2.6.0, numpy 2.4.6): it
+  applies the patch to a copy of HF_patched.py and **exec's the inserted block itself**.
+* **THE HARNESS CAUGHT A FATAL BUG WE HAD ALREADY FIXED ONCE (61.9a).** The first draft copied
+  PATCH_PROBE5's `np.save(<name>.npy.tmp)` idiom; numpy appends `.npy`, the file lands as
+  `.npy.tmp.npy`, `os.replace` raises. **That is the cycle-47 `patch_probe5_fix.py` bug**, which
+  would have crashed all 8 jobs ~5 epochs in. Fixed via a file OBJECT; **guard 2b asserts the fix
+  by signature**, not by the marker, because the cluster copy may be older than the repo copy.
+* **THE BATCH IS WRITTEN: `bin/c61_coord_probe.sh`, `cp9-*`, 8 jobs, alice, 100ep.** weightwise x
+  {a0=1e-6, 1e-3} x s{3,4} + layerwise x same. Operating point RE-DERIVED FROM THE CSV by guard 3
+  at submit time (all 15 `mx_sig` rows: SGDm/Lion, ms=1e-3, a0=1e-6, clip -15:-2.3026, AUGMENT=1,
+  R18/C10, 100ep, PROBE=25 -> 2000 recs). **`mx_sig` owns seeds 0/1/2, so cp9's 3/4 cannot
+  collide** and the runs pool with it. `PROBE6_SEED` pinned to 0 so all 8 track the SAME
+  coordinates. Decision rule K-A/K-B/K-C copied from KILLTEST section 5 **before** the data exists;
+  K-A is registered as expected, so a K-A result is a REPLICATION and NOT a discovery.
+  `bash -n` clean; guards 3 and 4 run standalone on this Mac and PASS.
+* **A PROSE-VS-DATA CONFLICT, FLAGGED NOT RESOLVED:** CORRECTIONS 826 calls `mx` "AdamW+Adam";
+  the CSV says **SGDm+Lion** on all 15 `mx_sig` rows. CSV wins; that line looks like it is about
+  `PP-*`. Not edited this tick.
+* **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), **`cp9` (8,
+  alice)** and `rw9` (18, alice) all remain written, validated, UNSUBMITTED. **`docs/` is now
+  THREE cycles behind on the cluster.**
+* **Reachability re-checked at tick end, 2026-08-23T01:54Z: still DOWN** on both login IPs and
+  both accounts. The tick opened and closed with the same verdict.
 
 **NEXT TICK, in order.** (a) reachability, then `squeue` both accounts. (a2) **rsync `docs/`.**
-(b) Submit `sp8` (alice2, 9), then `hz9` (9, alice). (c) **Then the PATCH_PROBE per-coordinate
-change and its 1-4 runs -- ranked ABOVE `rw9` (90.6).** (d) Score `hz9` H0 -> H0.3 -> H0.5 -> H1
+(b) Submit `sp8` (alice2, 9), then `hz9` (9, alice). (c) **Then `bash bin/c61_coord_probe.sh`
+(dry run) -> `--submit` (8, alice) -- ranked ABOVE `rw9` (90.6). Apply
+`patches/patch_probe6_coord.py` on the cluster FIRST; guard 2 refuses without it.** (d) Score `hz9` H0 -> H0.3 -> H0.5 -> H1
 -> H1b -> H2; H0.5 can only VOID. (e) If bo7/bd7 landed, cycle 54's order stands with 55.2's
 per-seed sd. (f) **DONE, do not re-run:** 59.3, 59.8, 60.2-60.7, **and now the tensor-mean avenue
 for 89.7 (61.4/61.5)**. (g) The raw-instrument `s` re-derivation is the ONLY unspent offline item,
