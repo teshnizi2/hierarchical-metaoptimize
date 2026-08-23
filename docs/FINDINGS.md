@@ -12585,3 +12585,125 @@ improves training.** That link is untested and must not be assumed.
 
 **Do not re-run offline:** H_A/H_B/H_C/H_D (64.3), the stratification and its null-seed control
 (64.4), the cost table (64.2). All closed.
+
+# 65 — C65: THE FIELD PEAK AND THE TRAINING PEAK ARE 5 ORDERS OF MAGNITUDE APART
+
+Cycle 65, ALICE DOWN A TENTH TICK, zero jobs. Entirely offline, on data already spent.
+Closes the gap **93.10** named as direction C's largest: `E` had never been linked to accuracy.
+Instrument `analysis/c65_field_vs_training.py`, **14/14 selftests**, K1–K4 + L1–L5 registered and
+committed (`b3668aa`) **before any accuracy number was read**.
+
+## 65.0 THE DEVICE: ONE X-AXIS FOR BOTH LADDERS
+
+`c62.build_block_index` defines block size as `b = max(1, round(row_width * u))`, so `u` is block
+size **in units of one output-channel row**. That makes the two ladders commensurable:
+
+| training granularity | block size | u | on the E ladder |
+|---|---|---|---|
+| weightwise | 1 coord | 1/row_width (~0.0004) | bottom rung |
+| nodewise | one output channel | **1.0 exactly** | = `out`, the literature's partition |
+| layerwise | whole tensor | O (64–512) | at/above ladder top |
+| resnet18_blocks, scalar | spans tensors | +inf | off the axis (within-tensor E ≡ 0) |
+
+**S1 proves this map against c63's OWN recorded `bsz_min`/`bsz_max` on every rung of every arm**
+(0/289 mismatches), so the axis is not asserted, it is reproduced.
+
+## 65.1 BOTH LADDER ENDS ARE IDENTITIES, NOT MEASUREMENTS
+
+`E = 100·(R_cor(real) − R_cor(null))`. At `b=1` every coordinate is its own block, so `R_raw = 1`
+for the real field **and for every permutation of it**; at `b=tensor`, `R_raw = 0` for both.
+**E = 0 identically at both ends** — asserted numerically by S2/S3 (|E| < 1e-9), with S3b showing
+an interior rung reads 5.6 pp on planted row structure so the identities are not vacuous.
+**E is interior-peaked BY CONSTRUCTION. No document may report that as a discovery.**
+
+## 65.2 WHERE THE FIELD PEAKS — u* ≈ 0.0017, i.e. 1–9 COORDINATES
+
+17/17 clean arms peak at `u = 1/512` or `1/1024` (block size 1–9 coords, the kernel scale):
+
+| family | u*_E (geo-mean, n arms) | range |
+|---|---|---|
+| r10 | 0.00195 (4) | 0.00195–0.00195 |
+| r18 | 0.00170 (5) | 0.00098–0.00195 |
+| r34 | 0.00138 (4) | 0.00098–0.00195 |
+| c100 | 0.00164 (4) | 0.00098–0.00195 |
+
+## 65.3 WHERE TRAINING PEAKS — LAYERWISE, u ≈ 440
+
+20-epoch cells, budget-matched to E, free β, `hier` excluded (CORRECTIONS 21 confound), plateau:
+
+| cell | scalar | blocks | layerwise | nodewise | weightwise |
+|---|---|---|---|---|---|
+| r18 ms1e-3 a0 1e-3 | 71.960±0.02(2) | 73.120±0.09(16) | **74.524±0.10(18)** | 72.858±0.08(16) | 68.496±0.06(17) |
+| c100 ms1e-3 a0 1e-3 | 18.762(1) | 25.718±0.11(10) | **38.166±0.11(13)** | 37.424±0.04(13) | 26.887±0.08(13) |
+| r10 ms1e-3 a0 1e-3 | 62.148(1) | — | **70.900±0.23(5)** | 69.840±0.11(5) | 61.568±0.16(5) |
+| r34 ms1e-3 a0 1e-3 | 73.237(1) | — | **74.446±0.21(5)** | 71.346±0.26(5) | 70.246±0.08(5) |
+
+Argmax is **layerwise in 16 of 21** primary cells, **nodewise in 2**, unresolved in the rest.
+
+## 65.4 THE REGISTERED SCORING
+
+| | registered (all argmaxes) | amended, post-hoc (resolved peaks only) |
+|---|---|---|
+| K1 COINCIDENCE (within 2×) | **0/21 (0%)** — does not fire | **0/14 (0%)** |
+| K2 SEPARATION (≥2 decades) | **20/21 (95%)** — **FIRES** | **14/14 (100%)** |
+| median log10 separation | **5.41** (≈ 2.6×10⁵ ×) | 5.41 |
+| K3 strong negative | **0/2 — does NOT fire** | — |
+| K4 free / frozen | 16/16 / 4/5 | see 65.6 |
+
+100-epoch (budget-unmatched, reported apart, never pooled): K1 0/19, **K2 19/19**, median 4.58.
+
+**K2 IS ROBUST TO PEAK-LOCATION UNCERTAINTY.** The ladder samples only 5 granularities, so the
+true accuracy optimum could lie anywhere between nodewise and layerwise. **The minimum separation
+over all resolved cells is 2.77** (the nodewise-peak cells) — so even placing the accuracy optimum
+at the finest granularity that ever wins, K2 still fires. **L4's censoring cannot reach the
+conclusion.**
+
+## 65.5 K3 DOES NOT FIRE, AND THAT BOUNDS THE CLAIM
+
+At the two strictly-interior (nodewise) accuracy peaks, `E` **is** resolved above zero (0/2 cells
+unresolved). So the honest statement is **mislocation, not vacuity**: the training-best partition
+is not one that captures nothing — it is one that captures far less than the kernel scale does.
+
+## 65.6 POSITIVE CONTROL — FROZEN β MAKES GRANULARITY A NO-OP, AND WE MEASURE THAT
+
+With `meta=fixed` β never moves, so the partition **of β** cannot affect training by construction.
+Granularity span (max−min plateau across granularities), 20-epoch cells:
+
+| stratum | n cells | median span | max span |
+|---|---|---|---|
+| **frozen** | 5 | **0.078 pp** | 0.283 pp |
+| free | 16 | **5.662 pp** | 12.448 pp |
+
+**PASS.** Where granularity provably cannot act we measure 0.078 pp; where it can, 5.66 pp. This
+validates the accuracy ladder as a real measurement and **bounds what the free-stratum spreads may
+be read as**. It also exposes a trap: an argmax over a flat frozen ladder is a coin flip, and one
+such flip (r10/frozen → weightwise) supplied the registered scoring's **only** K2 miss. The
+amended column gates those cells out as UNSCORABLE rather than reassigning them (see CORRECTIONS
+94.3 — the amendment removes this tick's only counter-example and is stated with that conflict of
+interest on the record).
+
+## 65.7 THE LIMIT THAT IS FORCED, NOT CHOSEN, AND IS THE LARGEST CAVEAT
+
+**The per-coordinate field is observable ONLY under weightwise training.** Verified this tick from
+the probe corpus: `probe_c100_lay_s0` has `n_tot = 62`, `..._node_s0` 14,600, `..._blk6_s0` 6,
+against `..._w_s0` 11,220,132. A coarse-granularity run **records per-group counts only** — a
+per-coordinate field does not exist for it. So every `E` in this campaign (62, 63, 64, and here)
+is measured in the weightwise arm, and this comparison assumes the field's SHAPE is not itself
+created by the training granularity. **That assumption is untested and untestable with the
+recorded data.** It is sharpened by the result itself: **weightwise is the WORST resolved
+granularity in every free cell** (68.50 vs 74.52 on r18; 26.89 vs 38.17 on c100) — the field is
+only observable in the arm that trains worst.
+
+## 65.8 WHAT THIS BUYS AND WHAT IT COSTS
+
+**Buys:** the bridge sentence the whole Adam-mini / Adalayer / SGG line rests on — *this structure
+exists in the gradient field, therefore partition there* — is **measured and fails** on the
+meta-gradient field. The structure peaks at 1–9 coordinates; training peaks ~2.6×10⁵ times
+coarser. Direction C is therefore **DIAGNOSTIC, not PRESCRIPTIVE**, and that is now a measured
+statement rather than a caution.
+
+**Costs:** L3 stands — this can refute the prescriptive link, it **cannot** establish causation,
+because granularity also moves meta-state dimensionality and the realised meta-step. K3 does not
+fire. And 65.7's weightwise-only limit is unfixable with recorded data.
+
+**Do not re-run offline:** 65.2–65.6 are closed on the present corpus.

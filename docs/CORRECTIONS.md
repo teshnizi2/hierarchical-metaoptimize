@@ -3753,3 +3753,95 @@ re-derivation.** Two SUBMISSIONS are now queued behind the four written batches:
 fixed-architecture budget ladder, and **C64-B — the frozen/free flip at a SECOND budget**, which
 is what turns 64.4 from a 20-epoch statement into a general one (n=3 at architecture level is the
 binding weakness, not the p-value). (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
+
+---
+
+# CORRECTIONS 94 — cycle 65 decision record
+
+**94.0 OUTAGE, TENTH CONSECUTIVE TICK, LOCALISED NOT ASSUMED.** Gateway `p-cfer-016105` is **up
+and answering**; from it `nc -z 132.229.104.230 22` and `.231` both read **DOWN**; `ssh alice` /
+`ssh alice2` fail at **banner exchange**. Checked **2026-08-23T13:27Z**. **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `sp8` (9), `hz9` (9), `cp9`
+(8), `rw9` (18) remain written, validated, UNSUBMITTED. `docs/` is now **SEVEN** cycles behind on
+the cluster.
+
+**94.1 THE TICK'S DECISION.** The offline queue held only the carried-since-51 `s` re-derivation
+(bookkeeping). Instead I took the item **this campaign had itself flagged as the biggest hole**:
+93.10, written against our own interest — *"`E` is a property of the meta-gradient field. No claim
+is made that capturing more of it improves training. That link is untested and is the largest
+unclosed gap in direction C."* It is testable **offline at zero GPU cost** on data already spent,
+and it is the sentence the entire Adam-mini / Adalayer / SGG line rests on. Now measured.
+→ FINDINGS 65
+
+**94.2 THE RESULT: THE BRIDGE SENTENCE FAILS BY 5 ORDERS OF MAGNITUDE.** Put both ladders on one
+axis (`u` = block size in output-channel-row units, c62's own definition; **S1 reproduces the map
+against c63's recorded `bsz` on every rung**, 0/289 mismatches). The meta-gradient field peaks at
+**u* ≈ 0.0017 (1–9 coordinates, the kernel scale), 17/17 clean arms**. Training peaks at
+**layerwise, u ≈ 440, in 16 of 21 budget-matched cells**. **K1 (coincidence) 0/21. K2 (separation
+≥2 decades) 20/21, median log10 = 5.41 ≈ 2.6×10⁵×.** At 100 epochs, K2 19/19. **Direction C is
+DIAGNOSTIC, not PRESCRIPTIVE — measured, no longer merely cautioned.**
+
+**94.3 A POST-HOC AMENDMENT, DECLARED WITH ITS CONFLICT OF INTEREST ON THE RECORD.** Scoring
+revealed that **frozen-β cells have ladders flat to within noise** — necessarily so, since with β
+frozen the partition **of β** is a no-op by construction. An argmax over a flat ladder is a coin
+flip, and exactly one such flip (r10/frozen → weightwise, sep −0.67) was the registered scoring's
+**only** K2 miss. I added a **peak-resolved gate** marking such cells UNSCORABLE (not reassigning
+them): amended K2 **14/14**, K1 **0/14**. **The amendment removes this tick's only
+counter-example**, so BOTH columns are reported and the amended one **never replaces** the
+registered 20/21. Per 76(1)/79 the registered number remains the headline.
+
+**94.4 K2 SURVIVES PEAK-LOCATION UNCERTAINTY, SO L4's CENSORING CANNOT REACH IT.** The corpus
+samples only 5 granularities, so the true optimum could sit anywhere between nodewise and
+layerwise. **The minimum separation over all resolved cells is 2.77** — placing the optimum at the
+finest granularity that ever wins still fires K2. The conclusion does not depend on where in
+[nodewise, layerwise] the optimum actually is, nor on layerwise being censored at the ladder top.
+
+**94.5 K3 DOES NOT FIRE, AND THE CLAIM IS BOUNDED ACCORDINGLY.** At the two strictly-interior
+(nodewise) accuracy peaks `E` **is** resolved above zero (0/2). **No document may write that the
+training-best partition captures no field structure.** The licensed sentence is **mislocation**:
+it captures far less than the kernel scale does. Where the accuracy peak is layerwise-or-coarser,
+E = 0 is an **IDENTITY** of the null subtraction (65.1) and carries no information at all — which
+is why K3 was registered as scorable ONLY on interior peaks, before the data were seen.
+
+**94.6 THE POSITIVE CONTROL PASSES AND IS WORTH MORE THAN THE HYPOTHESIS IT GUARDS.** Frozen-β
+granularity span **0.078 pp median (max 0.283)** against free-β **5.662 pp median (max 12.448)**.
+Where granularity provably cannot act we measure ~0.08 pp; where it can, ~5.7 pp. This validates
+the whole granularity accuracy corpus as a real measurement, not just this tick's use of it.
+
+**94.7 A LIMIT THAT IS FORCED, AND IT SHARPENS RATHER THAN SOFTENS.** The per-coordinate field is
+observable **only under weightwise training** — coarse probes store per-GROUP counts (`lay` n_tot
+62, `node` 14,600, `blk6` 6) against weightwise 11,220,132. So every `E` in cycles 62–65 is
+measured in the weightwise arm, and **weightwise is the WORST resolved granularity in every free
+cell** (68.50 vs 74.52 layerwise on r18; 26.89 vs 38.17 on c100). The field is only observable in
+the arm that trains worst. The comparison assumes the field's SHAPE is not created by the training
+granularity; **that assumption is untested and untestable with recorded data**, and it is now the
+largest caveat in direction C — 93.10's slot, refilled with a smaller and better-specified gap.
+
+**94.8 WHAT THIS DOES TO THE PAPER'S SPINE.** Direction C's headline (53.1% sign agreement; the
+sqrt(N) refutation) is **untouched** — it is a statement about a field and remains one. What is
+now **forbidden** is the bridge: no document may write *"the field has structure at scale X,
+therefore partition at scale X"*, or any sentence implying finer capture improves training. 91.7's
+prescriptive sentence and 64's Pareto result are statements about **what a partition represents**,
+and 65 shows that does **not** transfer to training outcome. **STANDING RULE (13): every
+E-derived claim is a claim about the meta-gradient field ONLY; the accuracy link is measured and
+is negative at 5 orders of magnitude.**
+
+**94.9 ORPHANS.** CSV unchanged at 1707, so the orphan set is unchanged from 93.12: **109
+families, 2 orphan, 12 runs** (`gate0b`, `gate0d`), both retired in FINDINGS 61.8 and **not to be
+re-run**. This tick cites `fz3`, `ff5`, `p5`, `cl5` (E side) and the granularity accuracy corpus
+(CSV side) — all already-cited families. **None retired, none created.**
+
+**94.10 IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twenty-two.
+
+**94.11 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` **both** accounts before anything.
+(a2) **rsync `docs/` — SEVEN cycles behind.** (b) Submit `sp8` (alice2, 9), then `hz9` (9, alice),
+then `cp9` (8, alice) after applying `patches/patch_probe6_coord.py`. (c) **65 raises `cp9`'s
+value again and changes what it is FOR:** it resolves the input-channel direction at coordinate
+level, which 65 now shows is a **field** question, not a training recommendation — score it that
+way. (d) **The one experiment 65 makes newly worth running, and it is cheap:** a probe that
+records the per-coordinate field under **layerwise or nodewise** training (currently impossible —
+94.7). That is the only way to test whether the kernel-scale peak is an artifact of weightwise
+training, and it is now the binding uncertainty in direction C. It needs a probe-side change, not
+a new sweep. (e) **DONE, do not re-run:** everything in 93.14(f), **and now C65 in full
+(65.2–65.6)**. (f) The offline queue is again down to the `s` re-derivation.

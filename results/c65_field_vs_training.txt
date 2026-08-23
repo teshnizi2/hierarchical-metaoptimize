@@ -1,0 +1,190 @@
+selftests: 14 passed, 0 failed
+
+======================================================================================================================
+PART C -- WHERE THE FIELD PEAKS.  E[3x3conv, terminal], per-coordinate field, weightwise arms only (L2)
+======================================================================================================================
+arm                                  fam  stratum       u*_E   bsz*     E*_pp     res   tie-rungs
+probes_fz3/probe_r10_w_s0            r10   frozen    0.00195    1-9    0.4427  0.0114   1
+probes_fz3/probe_r10_w_s1            r10   frozen    0.00195    1-9    0.4617  0.0121   1
+probes_fz3/probe_r34_w_s0            r34   frozen    0.00195    1-9    0.0777  0.0072   1
+probes_fz3/probe_r34_w_s1            r34   frozen    0.00098    1-4    0.1232  0.0162   1
+probes_fz3/probe_c100_w_s0          c100   frozen    0.00098    1-4    0.2328  0.0082   2
+probes_fz3/probe_c100_w_s1          c100   frozen    0.00195    1-9    0.2672  0.0068   1
+probes_p5/probe_w_a3_s0              r18   frozen    0.00098    1-4    0.1519  0.0100   2
+probes_p5/probe_w_a3_s1              r18   frozen    0.00195    1-9    0.1922  0.0255   2
+probes_ff5/probe_r10_w_s0            r10     free    0.00195    1-9    1.6780  0.0171   1
+probes_ff5/probe_r10_w_s1            r10     free    0.00195    1-9    0.7952  0.0133   1
+probes_ff5/probe_r34_w_s0            r34     free    0.00195    1-9    0.1625  0.0310   1
+probes_ff5/probe_r34_w_s1            r34     free    0.00098    1-4    0.1441  0.0168   1
+probes_ff5/probe_c100_w_s0          c100     free    0.00195    1-9    0.7512  0.0042   1
+probes_ff5/probe_c100_w_s1          c100     free    0.00195    1-9    0.8320  0.0239   1
+probes_cl5/probe_w_cU_s0             r18     free    0.00195    1-9    0.2412  0.0151   1
+probes_cl5/probe_w_cU_s1             r18     free    0.00195    1-9    0.3571  0.0258   1
+probes_cl5/probe_w_cU_s2             r18     free    0.00195    1-9    0.3507  0.0129   1
+
+    r10: u*_E (geo-mean over 4 clean arms) = 0.00195   [0.00195 .. 0.00195]
+    r34: u*_E (geo-mean over 4 clean arms) = 0.00138   [0.00098 .. 0.00195]
+   c100: u*_E (geo-mean over 4 clean arms) = 0.00164   [0.00098 .. 0.00195]
+    r18: u*_E (geo-mean over 5 clean arms) = 0.00170   [0.00098 .. 0.00195]
+
+======================================================================================================================
+PART B -- WHERE TRAINING PEAKS.  plateau by granularity.  PRIMARY -- budget-matched to E (20 epochs)
+======================================================================================================================
+   fam   strat     ms     a0 aug                 scalar            resnet18_            layerwise             nodewise            weightwis
+                                         mean +-sem (n)       mean +-sem (n)       mean +-sem (n)       mean +-sem (n)       mean +-sem (n)
+  c100    free   1e-3   1e-3   1      18.762+-  nan( 1)    25.718+- 0.11(10) *  38.166+- 0.11(13)    37.424+- 0.04(13)    26.887+- 0.08(13)
+  c100    free   1e-3   1e-3   1                      -                    - *  38.282+- 0.23( 2)    37.390+- 0.08( 2)    26.816+- 0.10( 2)
+  c100  frozen   1e-3   1e-3   1                      - ~  15.160+- 0.19( 2) *  15.224+- 0.19( 2) ~  15.177+- 0.10( 2) ~  15.146+- 0.17( 2)
+   r10    free   1e-3   1e-3   1      62.148+-  nan( 1)                    - *  70.900+- 0.23( 5)    69.840+- 0.11( 5)    61.568+- 0.16( 5)
+   r10    free   1e-3   1e-3   1                      -                    - *  70.560+- 0.53( 2)    69.553+- 0.23( 2)    61.447+- 0.02( 2)
+   r10  frozen   1e-3   1e-3   1                      -                    - ~  50.245+- 0.19( 2) ~  50.219+- 0.16( 2) *  50.369+- 0.16( 2)
+   r18    free   1e-3   1e-3   1                      -                    - *  82.782+- 0.15( 2) ~  82.747+- 0.28( 2)    82.053+- 0.31( 2)
+   r18    free   1e-2   1e-3   1                      -    76.827+- 0.09( 3)    78.068+- 0.12( 3) *  78.540+- 0.14( 3)    74.356+- 0.26( 3)
+   r18    free   1e-2   1e-3   1                      -                    - ~  78.337+- 0.16( 3) *  78.503+- 0.12( 3)    74.126+- 0.21( 3)
+   r18    free   1e-3   1e-3   1      71.960+- 0.02( 2)    73.120+- 0.09(16) *  74.524+- 0.10(18)    72.858+- 0.08(16)    68.496+- 0.06(17)
+   r18    free   1e-3   1e-3   1                      -                    - *  74.443+- 0.22( 3)    73.048+- 0.08( 3)    68.536+- 0.18( 3)
+   r18    free   1e-3   1e-3   1                      -                    - *  74.630+- 0.20( 3)    72.903+- 0.11( 3)    68.586+- 0.19( 3)
+   r18    free   1e-3   1e-3   1                      -                    - *  74.426+- 0.15( 3)    72.787+- 0.10( 3)    68.578+- 0.17( 3)
+   r18    free   1e-4   1e-3   1                      -    63.497+- 0.14( 3) *  64.622+- 0.04( 3)    63.510+- 0.07( 3)    62.277+- 0.21( 3)
+   r18    free   2e-4   1e-3   1                      -                    - *  67.154+- 0.06( 3)    65.503+- 0.05( 3)    63.590+- 0.06( 3)
+   r18    free   5e-4   1e-3   1                      -                    - *  71.742+- 0.02( 2)    69.325+- 0.19( 2)    66.266+- 0.11( 2)
+   r18  frozen   1e-3   1e-3   1   *  60.526+- 0.12( 5) ~  60.483+- 0.17( 7) ~  60.479+- 0.16( 7) ~  60.526+- 0.14( 7) ~  60.510+- 0.18( 7)
+   r18  frozen   1e-3   1e-6   1   ~  11.527+- 0.65( 5) *  11.530+- 0.65( 5) ~  11.529+- 0.65( 5) ~  11.528+- 0.65( 5) ~  11.528+- 0.65( 5)
+   r34    free   1e-3   1e-3   1      73.237+-  nan( 1)                    - *  74.446+- 0.21( 5)    71.346+- 0.26( 5)    70.246+- 0.08( 5)
+   r34    free   1e-3   1e-3   1                      -                    - *  74.209+- 0.30( 2)    71.143+- 0.45( 2)    70.137+- 0.24( 2)
+   r34  frozen   1e-3   1e-3   1                      -                    - *  64.023+- 0.66( 2) ~  63.740+- 0.61( 2) ~  63.834+- 0.23( 2)
+   [* = argmax, ~ = within 1 sem of argmax]   21 scorable cells
+
+======================================================================================================================
+PART B -- WHERE TRAINING PEAKS.  plateau by granularity.  SECONDARY -- BUDGET-UNMATCHED vs E, may not be pooled (L5)
+======================================================================================================================
+   fam   strat     ms     a0 aug                 scalar            resnet18_            layerwise             nodewise            weightwis
+                                         mean +-sem (n)       mean +-sem (n)       mean +-sem (n)       mean +-sem (n)       mean +-sem (n)
+  c100    free   1e-3   1e-3   1      22.571+- 0.21( 5)    51.323+- 0.28( 5)    69.488+- 0.17( 8) *  71.184+- 0.07( 3)    66.713+- 0.15( 3)
+  c100    free   1e-3   1e-6   1      22.782+- 0.31( 5)    52.481+- 0.17( 5) *  69.127+- 0.18( 8)                    -                    -
+   r18    free   1e-3   1e-3   1   *  92.451+- 0.12( 6)    92.108+- 0.05( 9)    91.319+- 0.24(11)                    -                    -
+   r18    free   1e-3   1e-4   1      91.742+- 0.02( 3)    91.737+- 0.08( 6) *  91.962+- 0.12( 4)                    -                    -
+   r18    free   1e-3   1e-6   0      73.644+- 0.10( 6) *  74.305+- 0.16( 6)    73.389+- 0.15( 6)                    -                    -
+   r18    free   1e-3   1e-6   1      91.606+- 0.06( 3)    91.592+- 0.07( 6) *  91.697+- 0.03( 3)                    -                    -
+   r18    free   1e-3   1e-6   1      91.504+- 0.08( 3) ~  91.639+- 0.01( 3) *  91.717+- 0.07( 3)                    -                    -
+   r18    free   1e-3   1e-6   1   *  91.567+- 0.09( 3) ~  91.367+- 0.16( 3) ~  91.418+- 0.12( 3)                    -    85.386+- 0.10( 3)
+   r18    free   1e-3   1e-3   1      87.803+- 0.17( 2) ~  91.129+- 0.14( 2) *  91.219+- 0.04( 2)                    -                    -
+   r18    free   1e-3   1e-4   1      87.775+- 0.12( 2) *  91.087+- 0.13( 2) ~  90.910+- 0.07( 2)                    -                    -
+   r18    free   1e-3   1e-6   1      70.651+-16.73( 4) *  90.711+- 0.09( 4)    90.343+- 0.05( 9)                    -                    -
+   r18    free   1e-3   1e-6   ?      42.309+-22.92( 3) *  90.574+- 0.05( 3)    90.361+- 0.13( 3)                    -    48.324+- 0.50( 3)
+   r18    free   1e-3   1e-3   1      87.758+- 0.06(14) *  91.422+- 0.14( 6)    91.097+- 0.05(14) ~  91.331+- 1.22( 2)    90.913+-  nan( 1)
+   r18    free   1e-3   1e-4   1      87.744+- 0.10( 9) *  91.468+- 0.04( 4)    90.849+- 0.06( 9)                    -                    -
+   r18    free   1e-3   1e-6   1      87.772+- 0.04(12)    91.350+- 0.04(12)    90.784+- 0.04(17) *  91.593+- 0.05( 8)    77.889+- 0.16( 4)
+   r18    free   1e-3   1e-6   ?      87.778+- 0.04( 6) *  91.305+- 0.06( 6)    90.922+- 0.03( 4)                    -                    -
+   r18    free   1e-4   1e-3   1      92.231+- 0.08( 5)    87.962+- 4.62( 3) *  92.795+- 0.08( 5)    91.888+- 0.20( 2)                    -
+   r18    free   3e-4   1e-3   1      88.743+- 0.22( 5)    86.622+- 4.91( 3)    91.885+- 0.09( 5) *  92.500+- 0.02( 2)                    -
+   r18    free   3e-5   1e-3   1      91.555+- 0.06( 5)    88.357+- 3.09( 3) *  91.658+- 0.03( 5)                    -                    -
+   [* = argmax, ~ = within 1 sem of argmax]   19 scorable cells
+
+======================================================================================================================
+REGISTERED SCORING -- K1 / K2 / K3 / K4
+======================================================================================================================
+======================================================================================================================
+POSITIVE CONTROL (post-hoc, labelled) -- FROZEN BETA MAKES GRANULARITY A NO-OP BY CONSTRUCTION
+======================================================================================================================
+With `meta=fixed` beta never moves, so the partition OF beta cannot affect training at all.
+Any granularity spread measured there is the pipeline's own noise floor.  This bounds what the
+free-stratum spreads below are allowed to be read as.
+
+   fam   strat     ms     a0   span pp  #grans
+  c100    free   1e-3   1e-3    12.448       4
+  c100    free   1e-3   1e-3    11.466       3
+  c100  frozen   1e-3   1e-3     0.078       4
+   r10    free   1e-3   1e-3     9.331       3
+   r10    free   1e-3   1e-3     9.113       3
+   r10  frozen   1e-3   1e-3     0.150       3
+   r18    free   1e-3   1e-3     0.729       3
+   r18    free   1e-2   1e-3     4.184       4
+   r18    free   1e-2   1e-3     4.376       3
+   r18    free   1e-3   1e-3     6.029       5
+   r18    free   1e-3   1e-3     5.906       3
+   r18    free   1e-3   1e-3     6.044       3
+   r18    free   1e-3   1e-3     5.848       3
+   r18    free   1e-4   1e-3     2.344       4
+   r18    free   2e-4   1e-3     3.564       3
+   r18    free   5e-4   1e-3     5.476       3
+   r18  frozen   1e-3   1e-3     0.047       5
+   r18  frozen   1e-3   1e-6     0.002       5
+   r34    free   1e-3   1e-3     4.199       3
+   r34    free   1e-3   1e-3     4.072       3
+   r34  frozen   1e-3   1e-3     0.283       3
+
+   frozen: n= 5  median granularity span =  0.078 pp   max =  0.283 pp
+     free: n=16  median granularity span =  5.662 pp   max = 12.448 pp
+
+  CONTROL VERDICT: frozen median 0.078 pp vs free median 5.662 pp -> PASS (frozen must be at the noise floor)
+
+
+--- PRIMARY (20 epochs, budget-matched to E) ---
+   fam   strat     ms     a0      u*_acc      u*_E   log10 sep   peak(acc)
+  c100    free   1e-3   1e-3       439.8   0.00164        5.43   layerwise
+  c100    free   1e-3   1e-3       439.8   0.00164        5.43   layerwise
+  c100  frozen   1e-3   1e-3       439.8   0.00164        5.43   layerwise [ties: layerwise,nodewise,resnet18_blocks,weightwise]
+   r10    free   1e-3   1e-3       438.9   0.00195        5.35   layerwise
+   r10    free   1e-3   1e-3       438.9   0.00195        5.35   layerwise
+   r10  frozen   1e-3   1e-3         0.0   0.00195       -0.67   weightwise [ties: layerwise,nodewise,weightwise]
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise [ties: layerwise,nodewise]
+   r18    free   1e-2   1e-3         1.0   0.00170        2.77   nodewise
+   r18    free   1e-2   1e-3         1.0   0.00170        2.77   nodewise [ties: layerwise,nodewise]
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   1e-4   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   2e-4   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   5e-4   1e-3       439.8   0.00170        5.41   layerwise
+   r18  frozen   1e-3   1e-3>=64 (censored)   0.00170        4.58   scalar [ties: layerwise,nodewise,resnet18_blocks,scalar,weightwise]
+   r18  frozen   1e-3   1e-6>=64 (censored)   0.00170        4.58   resnet18_blocks [ties: layerwise,nodewise,resnet18_blocks,scalar,weightwise]
+   r34    free   1e-3   1e-3       404.8   0.00138        5.47   layerwise
+   r34    free   1e-3   1e-3       404.8   0.00138        5.47   layerwise
+   r34  frozen   1e-3   1e-3       404.8   0.00138        5.47   layerwise [ties: layerwise,nodewise,weightwise]
+
+  n = 21 cells
+  [AMENDED, POST-HOC] resolved-peak cells only: n = 14 (7 dropped as unresolved/flat)
+      K1 0/14 (0%)   K2 14/14 (100%)   median log10 sep = 5.41
+  K1 COINCIDENCE  u*_acc within a factor 2 of u*_E: 0/21 (0%)  -> does not fire
+  K2 SEPARATION   log10(u*_acc/u*_E) >= 2:          20/21 (95%)  -> FIRES
+  K3 STRONG NEG   E(u*_acc) unresolved from 0: 0/2 interior-peak cells -> does not fire
+  median log10 separation = 5.41  (258649x in block size)
+
+  K4 STRATUM:
+       free: n=16  median log10 sep =  5.41  K2 fires 16/16
+     frozen: n= 5  median log10 sep =  4.58  K2 fires 4/5
+
+--- SECONDARY (100 epochs, BUDGET-UNMATCHED vs E -- L5, reported apart) ---
+   fam   strat     ms     a0      u*_acc      u*_E   log10 sep   peak(acc)
+  c100    free   1e-3   1e-3         1.0   0.00164        2.78   nodewise
+  c100    free   1e-3   1e-6       439.8   0.00164        5.43   layerwise
+   r18    free   1e-3   1e-3>=64 (censored)   0.00170        4.58   scalar
+   r18    free   1e-3   1e-4       439.8   0.00170        5.41   layerwise
+   r18    free   1e-3   1e-6>=64 (censored)   0.00170        4.58   resnet18_blocks
+   r18    free   1e-3   1e-6       439.8   0.00170        5.41   layerwise
+   r18    free   1e-3   1e-6       439.8   0.00170        5.41   layerwise [ties: layerwise,resnet18_blocks]
+   r18    free   1e-3   1e-6>=64 (censored)   0.00170        4.58   scalar [ties: layerwise,resnet18_blocks,scalar]
+   r18    free   1e-3   1e-3       439.8   0.00170        5.41   layerwise [ties: layerwise,resnet18_blocks]
+   r18    free   1e-3   1e-4>=64 (censored)   0.00170        4.58   resnet18_blocks [ties: layerwise,resnet18_blocks]
+   r18    free   1e-3   1e-6>=64 (censored)   0.00170        4.58   resnet18_blocks
+   r18    free   1e-3   1e-6>=64 (censored)   0.00170        4.58   resnet18_blocks
+   r18    free   1e-3   1e-3>=64 (censored)   0.00170        4.58   resnet18_blocks [ties: nodewise,resnet18_blocks]
+   r18    free   1e-3   1e-4>=64 (censored)   0.00170        4.58   resnet18_blocks
+   r18    free   1e-3   1e-6         1.0   0.00170        2.77   nodewise
+   r18    free   1e-3   1e-6>=64 (censored)   0.00170        4.58   resnet18_blocks
+   r18    free   1e-4   1e-3       439.8   0.00170        5.41   layerwise
+   r18    free   3e-4   1e-3         1.0   0.00170        2.77   nodewise
+   r18    free   3e-5   1e-3       439.8   0.00170        5.41   layerwise
+
+  n = 19 cells
+  [AMENDED, POST-HOC] resolved-peak cells only: n = 14 (5 dropped as unresolved/flat)
+      K1 0/14 (0%)   K2 14/14 (100%)   median log10 sep = 4.58
+  K1 COINCIDENCE  u*_acc within a factor 2 of u*_E: 0/19 (0%)  -> does not fire
+  K2 SEPARATION   log10(u*_acc/u*_E) >= 2:          19/19 (100%)  -> FIRES
+  K3 STRONG NEG   E(u*_acc) unresolved from 0: 0/3 interior-peak cells -> does not fire
+  median log10 separation = 4.58  (37641x in block size)
+
+  K4 STRATUM:
+       free: n=19  median log10 sep =  4.58  K2 fires 19/19

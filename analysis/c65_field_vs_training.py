@@ -277,6 +277,38 @@ def ladder_of_cell(cell):
     return {g: summarise(cell[g]) for g in GRANS if g in cell}
 
 
+def peak_resolved(lad, min_n=2):
+    """Is the accuracy ladder's argmax RESOLVED above its runner-up?
+
+    POST-HOC AMENDMENT, CYCLE 65, LABELLED AS SUCH AND ADDED AFTER SEEING THE DATA.
+    Registration scored every cell's argmax.  Scoring exposed that the FROZEN-beta cells
+    have ladders flat to within noise -- which is exactly what they must be, because with
+    beta frozen nothing adapts and the PARTITION OF BETA IS A NO-OP BY CONSTRUCTION.  An
+    argmax over a flat ladder is a coin flip, and one such coin flip (r10/frozen, argmax
+    weightwise) supplied the single K2 miss in the registered scoring.
+
+    Counting a coin flip as evidence either FOR or AGAINST K1 is wrong in both directions,
+    so this gate marks such cells UNSCORABLE rather than reassigning them.  BOTH the
+    registered and the amended numbers are reported; the amended one never replaces the
+    registered one.  Note the amendment REMOVES this tick's only counter-example, so it is
+    stated with that conflict of interest on the record.
+    """
+    elig = {g: v for g, v in lad.items() if v[2] >= min_n}
+    if len(elig) < 2:
+        return False
+    order = sorted(elig, key=lambda g: -elig[g][0])
+    (m1, s1, _), (m2, s2, _) = elig[order[0]], elig[order[1]]
+    s1 = 0.0 if math.isnan(s1) else s1
+    s2 = 0.0 if math.isnan(s2) else s2
+    return (m1 - m2) > (s1 + s2)
+
+
+def gran_span(lad, min_n=2):
+    """max-min plateau across granularities with resolution, in pp.  The control statistic."""
+    elig = [v[0] for v in lad.values() if v[2] >= min_n]
+    return (max(elig) - min(elig)) if len(elig) >= 2 else float("nan")
+
+
 def peak_of_ladder(lad, min_n=2):
     """Argmax granularity plus the tie set (everything within 1 sem of the max).
 
@@ -581,6 +613,24 @@ def report():
             print("  no scorable cells")
             return
         print(f"\n  n = {n} cells")
+        # --- amended scoring: resolved peaks only (post-hoc, labelled) -----------------
+        res_cells = [(k, fam, lad, best, ties) for (k, fam, lad, best, ties) in scored
+                     if best is not None and fam in fam_upeak and peak_resolved(lad)]
+        rs_seps = []
+        for k, fam, lad, best, _t in res_cells:
+            ua = u_point(shapes_for_family(fam), best)
+            if math.isinf(ua):
+                ua = max(r["u"] for r in load_uladder()["arms"][0]["rows"])
+            rs_seps.append(math.log10(ua / fam_upeak[fam]))
+        if rs_seps:
+            rk1 = sum(1 for s in rs_seps if abs(s) <= math.log10(2.0))
+            rk2 = sum(1 for s in rs_seps if s >= 2.0)
+            nr = len(rs_seps)
+            print(f"  [AMENDED, POST-HOC] resolved-peak cells only: n = {nr} "
+                  f"({n - nr} dropped as unresolved/flat)")
+            print(f"      K1 {rk1}/{nr} ({100.0*rk1/nr:.0f}%)   "
+                  f"K2 {rk2}/{nr} ({100.0*rk2/nr:.0f}%)   "
+                  f"median log10 sep = {np.median(rs_seps):.2f}")
         print(f"  K1 COINCIDENCE  u*_acc within a factor 2 of u*_E: {k1}/{n} "
               f"({100.0*k1/n:.0f}%)  -> {'FIRES' if k1 >= 0.5*n else 'does not fire'}")
         print(f"  K2 SEPARATION   log10(u*_acc/u*_E) >= 2:          {k2}/{n} "
@@ -599,6 +649,39 @@ def report():
             fired = sum(1 for x in v if x >= 2.0)
             print(f"    {s:>7}: n={len(v):2d}  median log10 sep = {np.median(v):5.2f}  "
                   f"K2 fires {fired}/{len(v)}")
+
+    # ---------------- the frozen-beta positive control -------------------------------
+    print("=" * 118)
+    print("POSITIVE CONTROL (post-hoc, labelled) -- FROZEN BETA MAKES GRANULARITY A NO-OP "
+          "BY CONSTRUCTION")
+    print("=" * 118)
+    print("With `meta=fixed` beta never moves, so the partition OF beta cannot affect "
+          "training at all.\nAny granularity spread measured there is the pipeline's own "
+          "noise floor.  This bounds what the\nfree-stratum spreads below are allowed to "
+          "be read as.\n")
+    print(f"{'fam':>6}{'strat':>8}{'ms':>7}{'a0':>7}{'span pp':>10}{'#grans':>8}")
+    spans = {"frozen": [], "free": []}
+    for k, fam, lad, _b, _t in primary:
+        sp = gran_span(lad)
+        st = stratum_of_cell(k)
+        if math.isnan(sp):
+            continue
+        spans.setdefault(st, []).append(sp)
+        print(f"{fam:>6}{st:>8}{k[CELL_KEYS.index('meta_stepsize')]:>7}"
+              f"{k[CELL_KEYS.index('alpha0')]:>7}{sp:>10.3f}"
+              f"{sum(1 for v in lad.values() if v[2] >= 2):>8}")
+    print()
+    for st in ("frozen", "free"):
+        v = spans.get(st, [])
+        if v:
+            print(f"  {st:>7}: n={len(v):2d}  median granularity span = {np.median(v):6.3f} pp"
+                  f"   max = {max(v):6.3f} pp")
+    if spans.get("frozen") and spans.get("free"):
+        print(f"\n  CONTROL VERDICT: frozen median {np.median(spans['frozen']):.3f} pp vs "
+              f"free median {np.median(spans['free']):.3f} pp "
+              f"-> {'PASS' if np.median(spans['frozen']) < 0.25 else 'FAIL'}"
+              f" (frozen must be at the noise floor)")
+    print()
 
     score(primary, "PRIMARY (20 epochs, budget-matched to E)")
     score(secondary, "SECONDARY (100 epochs, BUDGET-UNMATCHED vs E -- L5, reported apart)")
