@@ -108,9 +108,20 @@ which forbids a sentence the campaign was close to writing; 94.7 names the new b
 * **SUBMITTED: NOTHING. CANCELLED: NOTHING.** `sp8` (9, alice2), `hz9` (9, alice), `cp9` (8,
   alice), `rw9` (18, alice) all remain written, validated, UNSUBMITTED. **`docs/` is now SEVEN
   cycles behind on the cluster.**
-* **THE ONE NEW EXPERIMENT 65 MAKES WORTH RUNNING (94.11d):** a probe that records the
-  per-coordinate field under **layerwise or nodewise** training. It needs a **probe-side change,
-  not a new sweep**, and it is the only way to test 94.7 -- now the binding uncertainty in C.
+* **THE ONE NEW EXPERIMENT 65 MAKES WORTH RUNNING -- AND IT IS ALREADY WRITTEN (94.12).**
+  `patches/patch_probe7_field_any_granularity.py` records the **per-coordinate field under ANY
+  training granularity**. 94.7 is an INSTRUMENT limit, not a property of the science:
+  `block_product` reduces the SAME product `u[i]*v[i]` per granularity, so the field exists in
+  every arm and is merely summed away. PROBE7 counts signs BEFORE the reduction into a sidecar;
+  `probe.jsonl` stays byte-identical (CORRECTIONS 18) and training is untouched.
+  **Verified locally without the cluster:** applies, compiles, composes with PROBE5 in either
+  order, idempotent.
+  **RUN GATE P7 FIRST (one 20-epoch job):** a **weightwise** run with `PROBE5=1 PROBE7=1` and
+  `hier=''` must give `coord_neg_counts.npy` **BITWISE EQUAL** to `neg_counts.npy`. Only then is
+  a layerwise/nodewise field comparable to the cycle 62-65 corpus.
+  **Pre-registered reading (94.12):** u* stays at 1/512-1/1024 -> 94.7 discharged and 65 gets
+  STRONGER; u* moves to the training granularity's own scale -> the kernel peak is an ARTIFACT of
+  what the optimizer was allowed to adapt, and **62.9 / 64 / 65.2 must ALL be restated**.
 
 ## Running / next (cycle 63) -- **ALICE DOWN AN EIGHTH TICK. THE OFFLINE QUEUE IS EMPTY.**
 
