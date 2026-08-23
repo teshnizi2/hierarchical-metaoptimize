@@ -1,0 +1,434 @@
+{
+ "A1": {
+  "n": 380,
+  "agree": 380,
+  "frac": 1.0,
+  "worst": 0.0005000000000023874
+ },
+ "A2": {
+  "n": 1291,
+  "frac": 1.0,
+  "median_d5": 0.09900000000000375
+ },
+ "B1": {
+  "cells": 22,
+  "both_resolved": 7,
+  "agree": 5,
+  "frac": 0.7142857142857143,
+  "branch": "SYSTEMIC (b)",
+  "rows": [
+   {
+    "families": [
+     "ff5",
+     "p6f",
+     "p7"
+    ],
+    "network": "ResNet10",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "uc5"
+    ],
+    "network": "ResNet10",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "fz3"
+    ],
+    "network": "ResNet10",
+    "meta": "fixed",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "ml5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-2",
+    "alpha0": "1e-3",
+    "w20": "nodewise",
+    "w5": "resnet18_blocks",
+    "verdict": "*** FLIP ***"
+   },
+   {
+    "families": [
+     "wc5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-2",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "bo6"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "cl5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "cl5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "fr5",
+     "ml5",
+     "p3",
+     "p7",
+     "z3"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "p2",
+     "zb",
+     "zm0"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-6",
+    "w20": "layerwise",
+    "w5": "layerwise",
+    "verdict": "AGREE"
+   },
+   {
+    "families": [
+     "wc5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "ml5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "1e-4",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": "layerwise",
+    "verdict": "AGREE"
+   },
+   {
+    "families": [
+     "ns5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "2e-4",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": "layerwise",
+    "verdict": "AGREE"
+   },
+   {
+    "families": [
+     "ns5"
+    ],
+    "network": "ResNet18",
+    "meta": "Lion",
+    "meta_stepsize": "5e-4",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": "layerwise",
+    "verdict": "AGREE"
+   },
+   {
+    "families": [
+     "fz"
+    ],
+    "network": "ResNet18",
+    "meta": "fixed",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-6",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "fz",
+     "p5"
+    ],
+    "network": "ResNet18",
+    "meta": "fixed",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "ff5",
+     "p6f",
+     "p7"
+    ],
+    "network": "ResNet18_c100",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": "nodewise",
+    "verdict": "*** FLIP ***"
+   },
+   {
+    "families": [
+     "uc6"
+    ],
+    "network": "ResNet18_c100",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "fz3"
+    ],
+    "network": "ResNet18_c100",
+    "meta": "fixed",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   },
+   {
+    "families": [
+     "ff5",
+     "p6f",
+     "p7"
+    ],
+    "network": "ResNet34",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": "layerwise",
+    "verdict": "AGREE"
+   },
+   {
+    "families": [
+     "uc5"
+    ],
+    "network": "ResNet34",
+    "meta": "Lion",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": "layerwise",
+    "w5": null,
+    "verdict": "res->UNRES"
+   },
+   {
+    "families": [
+     "fz3"
+    ],
+    "network": "ResNet34",
+    "meta": "fixed",
+    "meta_stepsize": "1e-3",
+    "alpha0": "1e-3",
+    "w20": null,
+    "w5": null,
+    "verdict": "unres both"
+   }
+  ]
+ },
+ "B2": {
+  "pairs": 97,
+  "flips": 12,
+  "frac": 0.12371134020618557
+ },
+ "B3": {
+  "res20": 59,
+  "res5": 52,
+  "collapse": 9,
+  "frac": 0.15254237288135594
+ },
+ "B4": {
+  "frac_res5": 0.5360824742268041,
+  "pass": true
+ },
+ "B5": {
+  "median_d20": 1.1246666666666627,
+  "median_d5": 0.713333333333324
+ },
+ "C1": [
+  {
+   "families": [
+    "ff5",
+    "p6f",
+    "p7"
+   ],
+   "net": "ResNet18_c100",
+   "gain20": 12.448230769230772,
+   "gain5": 18.22975384615384,
+   "rel": 46.44453644941813
+  },
+  {
+   "families": [
+    "uc6"
+   ],
+   "net": "ResNet18_c100",
+   "gain20": 11.466250000000002,
+   "gain5": 16.892000000000003,
+   "rel": 47.3193066608525
+  },
+  {
+   "families": [
+    "fz3"
+   ],
+   "net": "ResNet18_c100",
+   "gain20": 0.07800000000000296,
+   "gain5": 0.29799999999999827,
+   "rel": 282.05128205126533
+  }
+ ],
+ "C2": {
+  "cited": [
+   [
+    "p7",
+    92
+   ],
+   [
+    "fz",
+    50
+   ],
+   [
+    "ml5",
+    36
+   ],
+   [
+    "fz3",
+    20
+   ],
+   [
+    "p5",
+    20
+   ],
+   [
+    "ff5",
+    18
+   ],
+   [
+    "cl5",
+    18
+   ],
+   [
+    "wc5",
+    18
+   ],
+   [
+    "p4",
+    17
+   ],
+   [
+    "ns5",
+    15
+   ],
+   [
+    "uc5",
+    12
+   ],
+   [
+    "fr5",
+    12
+   ],
+   [
+    "p6f",
+    9
+   ],
+   [
+    "zm0",
+    7
+   ],
+   [
+    "z3",
+    7
+   ],
+   [
+    "uc6",
+    6
+   ],
+   [
+    "bo6",
+    6
+   ],
+   [
+    "p3",
+    6
+   ],
+   [
+    "p2",
+    6
+   ],
+   [
+    "zb",
+    5
+   ]
+  ],
+  "orphan": []
+ }
+}

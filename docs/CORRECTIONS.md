@@ -4120,3 +4120,103 @@ It does **not** widen, and it does **not** close.
 **STANDING RULE (10): a series across ANY axis must hold the arm fixed.** If the best cell moves
 between levels, report the matched arm as the series and the best cell separately, labelled. The
 figure has been regenerated; the superseded PNG must not be circulated.
+
+---
+
+## 97. DECISION RECORD — cycle 68 (ALICE DOWN, **THIRTEENTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**97.0 STATE.** Gateway `p-cfer-016105` up and answering; from it `nc -z 132.229.104.230 22`
+and `.231` both **DOWN**; `ssh alice` / `alice2` fail at banner exchange. Checked
+**2026-08-23T22:26Z**. **No queue read, nothing synced, nothing submitted, nothing cancelled.**
+`bo7-*` (12, alice) / `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+Instrument `analysis/c68_window_blast.py`, **32/32 selftests**, registered and committed
+(`b93c083`) BEFORE any contrast was scored.
+
+**97.1 THE TICK'S DECISION.** 67 found the `plateau_of(k=20)` defect, re-scored **one** design
+inside it (the K2 numerator), and recorded in 67.9 that the rest was not done. With ALICE
+unreachable there is no competing use of the tick, so I audited the whole 380-run stratum:
+**22 matched cells / 97 pairwise granularity contrasts** across ResNet10/18/34 + ResNet18_c100,
+CIFAR-10 and CIFAR-100, both base optimizers, frozen and free meta, ms 1e-4…1e-2. Registered
+A1–A2 (mechanical gate), B1–B5, C1–C2, with both branches of B1 and a kill-control (B4) named
+in advance.
+
+**97.2 THE DEFECT IS EXACT, UNIVERSAL AND BUDGET-SCOPED.** A1: recorded `plateau` == whole-run
+mean in **380/380 = 100.00%** (worst |diff| 0.0005 pp). A2: == mean(last 20) in **1291/1291**
+on ≥25-epoch runs, where the two windows agree to a median **0.099 pp** — against **+13.603 pp**
+on the short stratum. 67's W1 was 144 runs; this is an identity over all 380.
+
+**97.3 THE DEFECT IS NOT CONFINED TO K2, BUT THE STRONGEST READING DOES NOT SURVIVE.**
+B1 argmax agreement: **5/7 = 71.4% as registered (SYSTEMIC)**; **5/6 = 83.3% (UNDECIDED)** once
+the ms=1e-2 cell is excluded by CORRECTIONS 62's pre-existing scope rule. **Neither clears the
+CONFINED bar (≥90%).** B2 raw sign flips **12/97 = 12.4%** clears its >10% bar, but decomposes
+into 2 VOID-BY-SCOPE (ms=1e-2), 3 sub-0.05 pp TIES (frozen-meta cells), and **7 MATERIAL =
+7.2%, below the bar**. **B2 is therefore reported as NOT robustly firing.** The claim that
+survives is the weak one: *the defect reaches beyond the K2 design, in two cell groups other
+than the one 67 fixed* (`cl5` on CIFAR-10 replicates 67.6 — a **1.639 pp resolved** layerwise
+advantage becomes **−0.082 pp unresolved**; and two CIFAR-100 groups, 97.5).
+
+**97.4 A NEGATIVE IN OUR OWN FAVOUR, RECORDED AS SUCH.** B3 (resolution collapse) is
+**REFUTED**: 9/59 = **15.3%** against a >30% bar. k=20 resolves 60.8% of contrasts, k=5 resolves
+53.6%. **The window inflated median effect sizes 1.58× (1.125 → 0.713 pp) but did not
+manufacture significance.** B4 (registered to KILL B1–B3) PASSES at 53.6% ≥ 10%, so B1–B3 are
+interpretable rather than noise. The campaign's 20-epoch tables are mis-*named* and somewhat
+inflated; they are not statistically hollow.
+
+**97.5 THE LOAD-BEARING ITEM: `u_train*` IS RESOLVED ON CIFAR-100, AND IT IS NODEWISE.**
+A fully matched **100-epoch** cell (`window_ok=1`, so the k=20 defect does not apply;
+`epochs_requested=100` for every run): nodewise **71.415 ±0.049 (n=3)** vs layerwise
+**69.048 ±0.220 (n=14)**, **Δ = +2.367 pp**, resolved at **5.24× the 65.6/94.3 gate**, resolved
+at k = 1/5/10/20 alike (Δ 2.23–2.37 pp — **window-invariant**), with **no seed overlap**
+(min nodewise 71.318 > max layerwise 70.260). Ordered in u the arms are a clean **interior
+maximum at u = 1.0**: 0.000355→67.17, **1.0→71.42**, 439.78→69.05, coarser→51.58, ∞→22.21.
+
+**97.6 CREDIT: THIS CELL IS ALREADY ON RECORD — MASTER-TABLE ROW 55 GOT THERE (cycle 64).**
+Row 55 states *"nodewise 71.184 (n=3) BEATS layerwise (69.586, n=5) by +1.60 pp"* on the
+`c100f-*` family. **No credit is claimed for the ordering.** What cycle 68 adds is that it is
+RESOLVED (5.24× the gate), WINDOW-INVARIANT, NON-OVERLAPPING at 3 vs 14, and an INTERIOR
+maximum in u — and what that does to 67.
+
+**97.7 67.7 IS UPGRADED; 67.8 IS CORRECTED.**
+* 67.7 withdrew K2's 5.41 decades and left **≥2.71 as a robustness FLOOR** pending resolution of
+  `u_train*`. On CIFAR-100 `u_train*` resolves at u=1.0, so with u\*_E = 0.001953 the separation
+  is **exactly +2.71 decades, MEASURED**. 5.41 stays withdrawn.
+* **67.8's headline sentence is a CIFAR-10 sentence written without a dataset bracket.**
+  *"There is no training peak among partitions to be far apart from"* rests on the coarse range
+  u∈[1,440] spanning 0.07 pp (20 ep) / 0.172 pp (100 ep tuned). On CIFAR-100 that **same** range
+  spans **2.367 pp, resolved — 14–34× larger**. **CORRECTED to: there is no training peak among
+  partitions ON CIFAR-10; on CIFAR-100 there is one, at nodewise.**
+* **STANDING RULE (13) survives and no longer needs the "no peak" escape:** the training optimum
+  is interior at u=1.0 and the field peak sits 2.71 decades to its left, on the **losing** side —
+  moving from the training optimum toward the field peak costs **−4.25 pp** (nodewise→weightwise)
+  while moving away costs −2.37 pp (nodewise→layerwise).
+
+**97.8 THE PROCESS FAILURE OF 96.6 REPEATED ONE CYCLE LATER, AND IT IS NOW STRUCTURAL.**
+96.6 found that cycles 62–66 cited CORRECTIONS 86.2/86.3/58.1–58.8 **nowhere**. `grep` over
+`FINDINGS 65.0`–end (25,253 chars, i.e. all of cycles 65–67) and `CORRECTIONS 94`–end:
+**`MASTER-TABLE` 0 hits, `CIFAR-100` 0 hits, `CIFAR100` 0 hits, `c100f` 0 hits.** The entire
+u-ladder / field-vs-training story was built on CIFAR-10 alone and never said so, while a row
+in this project's own MASTER-TABLE — written **one cycle earlier** — held the contradicting
+CIFAR-100 measurement. **Two consecutive ticks have now found a load-bearing claim refuted by a
+document the campaign had already written.** That is not incidental.
+
+**STANDING RULE (15), added 97.8:** *before a cross-partition or cross-granularity claim is
+written, `grep docs/MASTER-TABLE.md` for the arms it names and state, in a bracket, which
+datasets and budgets the claim covers.* A claim with no dataset bracket is a claim about
+CIFAR-10 until proven otherwise.
+
+**97.9 96.10 EXECUTED, MINIMALLY AND NON-DESTRUCTIVELY.** `aggregate.py` gains **`plateau5`**
+(mean last 5), **`auc`** (whole-curve mean; on ≤20-ep runs it equals `plateau` to **0.0000 pp**
+over all 380 — the defect as an identity) and **`window_ok`** (STANDING RULE (14) as a column).
+**`plateau` is UNCHANGED**: all **34** pre-existing columns verified **byte-identical across all
+1707 rows**. No published number moves. Redefining `plateau` remains an **operator decision** and
+was not taken.
+
+**97.10 ORPHANS: ZERO IN THE AFFECTED STRATUM.** All 20 families / 380 defective-window runs are
+cited in `docs/`. None can be written off as unused spent compute; the correction burden is real.
+
+**97.11 WHAT I DID NOT DO.** No jobs submitted or cancelled (queues unreachable). No re-scoring
+pass applied to the 20-epoch tables in `docs/` — 68 establishes that such a pass is *owed*
+(97.3) and supplies the columns to do it (97.9), but rewriting 66 cycles of tables is the same
+operator decision as redefining `plateau`. `hz9`, `sp8`, `cp9` remain the top submit-queue items
+the moment ALICE returns; **`hz9` is re-ranked up again** — 97.5 shows the layerwise-vs-nodewise
+question resolves on CIFAR-100 and hz9 is its paired tuned CIFAR-10 test.

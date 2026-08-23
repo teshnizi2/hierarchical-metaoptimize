@@ -13006,3 +13006,180 @@ be far apart from, and the field peaks where training is worst."**
   every number in 66 cycles of docs; that is an operator decision, not an unsupervised one.
 
 **Do not re-run offline:** 67.1–67.8 are closed on the present corpus.
+
+---
+
+## 68.0 STATE — ALICE DOWN A **THIRTEENTH** CONSECUTIVE TICK, ZERO JOBS
+
+Gateway `p-cfer-016105` up and answering; from it `nc -z 132.229.104.230 22` and `.231` both
+**DOWN**; `ssh alice` / `alice2` both fail at banner exchange. Checked **2026-08-23T22:26Z**.
+No queue read, nothing synced, nothing submitted, nothing cancelled.
+
+Instrument `analysis/c68_window_blast.py`, **32/32 selftests**, registered and committed
+(`b93c083`) before any contrast was scored. CSV regenerated with **three ADDED columns only**
+(68.8); all 34 pre-existing columns verified **byte-identical across all 1707 rows**.
+
+## 68.1 THE QUESTION — 67 FIXED ONE DESIGN INSIDE A 380-RUN DEFECT AND LEFT 19 FAMILIES
+
+67.4/96.4 found `plateau_of(tests, k=20)` silently returns the **whole-run mean** on any run
+of ≤20 epochs, and 67.6 re-scored exactly **one** design inside that stratum (the K2
+numerator). 67.9 recorded the rest as not done. C68 audits the whole stratum: **20 families /
+380 runs**, giving **22 matched cells / 97 pairwise granularity contrasts** (granularity free,
+all 15 other config axes fixed), spanning ResNet10/18/34 + ResNet18_c100, CIFAR-10 and
+CIFAR-100, base SGDm and AdamW, `Lion` and beta-frozen `fixed` meta, ms 1e-4…1e-2.
+
+## 68.2 THE MECHANICAL GATE — THE DEFECT IS EXACT, UNIVERSAL, AND STRICTLY BUDGET-SCOPED
+
+| test | stratum | result | bar | verdict |
+|---|---|---|---|---|
+| A1 | ≤20 ep, n=380 | recorded `plateau` == whole-run mean in **380/380 = 100.00%**, worst \|diff\| 0.0005 pp | ≥99.5% | **PASS** |
+| A2(i) | ≥25 ep, n=1291 | recorded `plateau` == mean(last 20) in **1291/1291 = 100.00%** | ≥99.5% | **PASS** |
+| A2(ii) | ≥25 ep | median \|recorded − mean(last 5)\| = **0.099 pp** | >0.05 pp | **PASS** |
+
+67's W1 was 144 runs; this is all 380, and it is an identity, not an approximation.
+A2(ii) is what makes the defect *budget-specific* rather than a metric quibble: on long runs
+the two windows agree to 0.1 pp, on short runs they differ by a median **+13.603 pp**.
+
+## 68.3 B1 — THE DEFECT IS **NOT CONFINED** TO THE K2 DESIGN (registered branch (b)/(c))
+
+Argmax under k=20 vs k=5, resolution gate `margin > 2·√(sem₁²+sem₂²)` (65.6/94.3's own rule):
+
+| reading | doubly-resolved cells | argmax agrees | branch |
+|---|---|---|---|
+| **as registered** | 7/22 | **5/7 = 71.4%** | **SYSTEMIC (b)** |
+| ms=1e-2 excluded by CORRECTIONS 62 scope | 6/22 | **5/6 = 83.3%** | UNDECIDED (c) |
+
+**AGAINST OUR INTEREST, AND DECLARED:** one of the two argmax flips (`ml5`, R18, ms=1e-2,
+nodewise→resnet18_blocks) sits on the rung CORRECTIONS 62 / FINDINGS 51.2 ruled
+BOUNDARY-DOMINATED and 67.3 ruled unquotable. That exclusion should have been in the
+registration and was not. **Both readings are reported; neither clears the CONFINED bar (≥90%).**
+The surviving statement is the weaker of the two: *the defect is not confined to K2*.
+
+The other flip is clean and is the one that matters: `ff5+p6f+p7`, **ResNet18_c100**, ms=1e-3,
+argmax **layerwise (k=20) → nodewise (k=5)**, resolved on both sides, n=13/13.
+
+## 68.4 B2 — THE REGISTERED FLIP RATE FIRES, BUT IT DOES NOT SURVIVE DECOMPOSITION
+
+| category | contrasts | share of 97 |
+|---|---|---|
+| raw sign flips k=20→k=5 | 12 | **12.4%** (registered bar >10% → fires) |
+| — of which VOID BY SCOPE (ms=1e-2, CORRECTIONS 62) | 2 | 2.1% |
+| — of which sub-0.05 pp TIES (frozen-meta `fz`/`fz+p5`, \|Δ\|≤0.03 pp) | 3 | 3.1% |
+| — **MATERIAL** | **7** | **7.2%** (below the bar) |
+| — material **and resolved on BOTH sides** (a true published-direction reversal) | **2** | 2.1% |
+
+**B2 is reported as NOT robustly firing.** The registered statistic clears its bar only
+because it counts a disqualified rung and three numerical ties as reorderings.
+
+The 7 material flips, in full:
+
+| family | net | ms | contrast | k=20 | k=5 |
+|---|---|---|---|---|---|
+| bo6 | R18 | 1e-3 | layerwise−nodewise | +0.035 (unres) | −0.633 (unres) |
+| bo6 | R18 | 1e-3 | layerwise−weightwise | +0.729 (**res**) | −0.315 (unres) |
+| cl5 | R18 | 1e-3 | layerwise−nodewise | **+1.639 (res)** | −0.082 (unres) |
+| fr5+ml5+p3+p7+z3 | R18 | 1e-3 | nodewise−blk6 | −0.262 (**res**) | **+0.581 (res)** |
+| ml5 | R18 | 1e-4 | nodewise−blk6 | +0.013 (unres) | −0.510 (**res**) |
+| **ff5+p6f+p7** | **R18_c100** | 1e-3 | **layerwise−nodewise** | **+0.743 (res)** | **−1.091 (res)** |
+| uc6 | R18_c100 | 1e-3 | layerwise−nodewise | +0.892 (**res**) | −0.614 (unres) |
+
+`cl5` is the CIFAR-10 replication of 67.6: a **1.639 pp resolved** layerwise advantage becomes
+**−0.082 pp unresolved**. Independent family, same conclusion.
+
+## 68.5 B3 REFUTED, B4 PASSES — THE WINDOW DID **NOT** MANUFACTURE SIGNIFICANCE
+
+| test | result | bar | verdict |
+|---|---|---|---|
+| B3 resolution collapse (resolved@20 → unresolved@5) | **9/59 = 15.3%** | >30% ⇒ artifact | **REFUTED — clean negative** |
+| B4 power control (registered to KILL B1–B3) | resolved@5 = **52/97 = 53.6%** | ≥10% | **PASS** |
+| B5 median \|Δ\| (descriptive) | k=20 **1.125 pp** → k=5 **0.713 pp** | — | ratio **1.58×** |
+
+k=20 resolves 60.8% of contrasts, k=5 resolves 53.6%. The window inflates the *median*
+granularity effect by ~1.6×, but it does not fabricate resolving power. **B3 is recorded as a
+negative in the campaign's own favour** and bounds how much of 68.3/68.4 can be blamed on noise.
+
+## 68.6 **THE LOAD-BEARING FINDING: ON CIFAR-100 THE TRAINING OPTIMUM IS NODEWISE, RESOLVED, AND WINDOW-INVARIANT**
+
+Fully matched cell, **100 epochs** (so the k=20 defect does **not** apply — `window_ok=1`):
+ResNet18_c100 / CIFAR-100 / a0=1e-3 / ms=1e-3 / Lion / HIER none / clip −15:−2.3026 / AUG=1 /
+batch 100 / gamma 1 / `epochs_requested=100` for **every** run in the cell.
+
+| arm | u (c65 `u_point`) | n | plateau5 | sem | k=1 | k=10 | k=20 |
+|---|---|---|---|---|---|---|---|
+| **nodewise** | **1.0** | 3 | **71.415** | 0.049 | 71.403 | 71.217 | 71.184 |
+| layerwise | 439.78 | 14 | 69.048 | 0.220 | 69.032 | 68.987 | 68.872 |
+| weightwise | 0.000355 | 3 | 67.167 | 0.178 | 67.187 | 67.029 | 66.713 |
+| resnet18_blocks | (coarser than layerwise) | 5 | 51.584 | 0.244 | 51.718 | 51.474 | 51.323 |
+| scalar | ∞ | 11 | 22.208 | 2.096 | 22.241 | 22.208 | 22.215 |
+
+**nodewise − layerwise = +2.367 pp**, and it is resolved at **every** window:
+
+| k | Δ (pp) | gate | multiple of gate |
+|---|---|---|---|
+| 1 | +2.371 | 0.686 | 3.46× |
+| **5 (documented)** | **+2.367** | **0.452** | **5.24×** |
+| 10 | +2.230 | 0.497 | 4.49× |
+| 20 | +2.312 | 0.508 | 4.55× |
+
+**No seed overlap:** min(nodewise)=71.318 > max(layerwise)=70.260 across 3 vs 14 runs.
+Ordered in u the arms form a clean **interior maximum at u=1.0**:
+0.000355 → 67.17, **1.0 → 71.42**, 439.78 → 69.05, coarser → 51.58, ∞ → 22.21.
+
+Unlike the CIFAR-10 20-epoch ladder, this result **does not depend on the window at all**.
+
+## 68.7 WHAT 68.6 DOES TO 67.7 AND 67.8 — ONE IS UPGRADED, ONE IS CORRECTED
+
+* **67.7's ≥2.71-decade FLOOR becomes a MEASURED VALUE.** 67.7 withdrew 5.41 decades because
+  `u_train* = layerwise` is unresolved under the documented window, leaving ≥2.71 as a
+  robustness floor. On CIFAR-100 `u_train*` **is** resolved and it **is** nodewise, u=1.0.
+  With u\*_E = 0.001953, the separation is **exactly +2.71 decades**, measured, not bounded.
+  5.41 stays withdrawn.
+* **67.8 IS CORRECTED — it is a CIFAR-10 sentence written without a dataset bracket.**
+  67.8: *"there is no training peak among partitions to be far apart from"* (coarse range
+  u∈[1,440] spans 0.07 pp at 20 ep, 0.172 pp at 100 ep tuned). On CIFAR-100 the **same**
+  coarse range spans **2.367 pp, resolved at 5.24× the gate — 14–34× larger**. There *is* a
+  training peak among partitions, and it is at nodewise.
+* **STANDING RULE (13) SURVIVES AND SHARPENS.** It no longer needs the "no peak" escape: the
+  training optimum is interior at u=1.0 and the field peak is 2.71 decades to its left, and
+  travelling from the training optimum *toward* the field peak (nodewise→weightwise) costs
+  **−4.25 pp** while travelling away from it (nodewise→layerwise) costs −2.37 pp.
+  **The field peak is on the losing side of a resolved interior training optimum.**
+
+## 68.8 THE CSV GAINS THREE COLUMNS AND LOSES NOTHING (96.10 executed, minimally)
+
+96.10 recommended *keep `plateau`, ADD `plateau5` + `auc`*. Done, plus `window_ok`:
+
+| column | definition | why |
+|---|---|---|
+| `plateau5` | mean of last 5 epochs | what METRIC RULES and every doc SAY `plateau` is |
+| `auc` | mean over the whole curve | on ≤20-ep runs this is **identically** `plateau` (max \|diff\| **0.0000 pp** over all 380) — the defect written as an identity |
+| `window_ok` | `1` iff epochs_done > 20 | STANDING RULE (14) as a column: a cross-budget table must filter on it or report both windows |
+
+`plateau` is **UNCHANGED**. Verified: all **34** pre-existing columns **byte-identical across
+all 1707 rows** before/after. No published number moves. Redefining `plateau` remains an
+operator decision and was **not** taken.
+
+## 68.9 C2 — ZERO ORPHANS IN THE AFFECTED STRATUM, AND THAT IS THE BAD NEWS
+
+All **20 families / 380 runs** in the affected stratum are cited in `docs/` (p7 59 hits, ml5 49,
+cl5 39, ff5 33, uc5 27, fz3 23, wc5 22, p2 22, p5 19, p4 18, fz 15, uc6 14, p6f 13, z3 12, p3 12,
+ns5 12, fr5 8, bo6 6, zb 5, zm0 1). **ORPHANS: 0.** Every one of the 380 defective-window runs
+feeds a live claim, so the correction burden is real and none of it can be written off as
+already-spent unused compute. (`p4`, 17 runs, is cited but forms no matched granularity cell
+and is not scored here.)
+
+## 68.10 LIMITS
+
+* 68.6 is **n=3 nodewise**, one family (`c100f-*`), one dataset, one a0, one ms. It is a
+  resolved, no-overlap, window-invariant contrast — it is **not** a sweep.
+* The scalar arm of that cell is bimodal (12.84…31.57, sem 2.10; it contains collapsed runs)
+  and is quoted for ordering only, never as a level.
+* 68.3's registration failed to exclude ms=1e-2 in advance; both readings are reported and the
+  weaker one is the claim.
+* B2's decomposition into VOID/TIE/MATERIAL was **not** pre-registered. It is reported because
+  it moves the verdict *against* this tick's own registered statistic, never for it.
+* `plateau5` is `""` for runs shorter than 5 epochs (5 runs corpus-wide).
+* The CIFAR-100 result at 20 epochs (68.3/68.4) and at 100 epochs (68.6) **agree in direction**
+  — nodewise over layerwise — under the documented window. The k=20 column disagrees with both.
+
+**Do not re-run offline:** 68.1–68.9 are closed on the present corpus.

@@ -11,7 +11,23 @@ FIELDS = ["run", "job_id", "account", "network", "dataset", "batch_size",
           "alpha0", "gamma", "augment", "beta_clip", "hier", "lam", "eta_ratio",
           "seed", "epochs_done", "epochs_requested",
           "best_test", "final_test", "final_train", "collapsed", "node", "wallclock_min", "provenance", "dup_group", "superseded",
-          "ep_to_85", "ep_to_88", "ep_to_90", "plateau", "ep_in_band_90"]
+          "ep_to_85", "ep_to_88", "ep_to_90", "plateau", "ep_in_band_90",
+          # ADDED cycle 68, non-destructively.  `plateau` is LEFT EXACTLY AS IT WAS:
+          # redefining it moves 380 runs and 66 cycles of published numbers, which is an
+          # operator decision (CORRECTIONS 96.10), not an unsupervised one.  These three
+          # columns make the ambiguity CORRECTIONS 96.4 / FINDINGS 67.4 found explicit,
+          # so no future analysis has to know that `plateau` changes meaning with budget:
+          #   plateau5  -- mean of the last 5 epochs, i.e. what METRIC RULES and every doc
+          #                SAY `plateau` is.  Equals `plateau` only when epochs_done >= 20
+          #                AND the tail is flat; differs by a median +13.479 pp on the
+          #                380 runs of <= 20 epochs.
+          #   auc       -- mean over the WHOLE curve.  On a <= 20-epoch run this is
+          #                *identically* the recorded `plateau` (c68 A1: 380/380, worst
+          #                |diff| 0.0005 pp), which is the defect stated as an identity.
+          #   window_ok -- 1 iff epochs_done > 20, i.e. iff `plateau` is a genuine tail
+          #                rather than the whole run.  STANDING RULE (14) as a column:
+          #                any cross-budget table must filter on it or report both windows.
+          "plateau5", "auc", "window_ok"]
 
 
 def parse_args_line(line):
@@ -144,6 +160,10 @@ def parse_out(path):
         # Threshold-safety companions (see OPERATIONS gotcha 17): a crossing epoch
         # is only a speed measurement if 90 is comfortably below the plateau.
         "plateau": plateau_of(tests), "ep_in_band_90": in_band(tests, 90.0),
+        # See the FIELDS comment: added, never substituted.
+        "plateau5": round(sum(tests[-5:]) / len(tests[-5:]), 3) if len(tests) >= 5 else "",
+        "auc": round(sum(tests) / len(tests), 3),
+        "window_ok": int(len(tests) > 20),
     }
 
 

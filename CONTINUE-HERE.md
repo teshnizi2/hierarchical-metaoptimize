@@ -54,6 +54,63 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 68) -- **ALICE DOWN A THIRTEENTH TICK. `u_train*` IS RESOLVED ON CIFAR-100, AND IT IS NODEWISE.**
+
+**Read `docs/CORRECTIONS.md` 97 and `docs/FINDINGS.md` 68.0-68.10 FIRST. 97.5/97.7 is the
+load-bearing item; 97.8 adds STANDING RULE (15); 97.9 changed the CSV (additively only).**
+
+* **BOTH LOGIN NODES DOWN FOR A THIRTEENTH CONSECUTIVE TICK**, localised not assumed: gateway up
+  and answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice` /
+  `alice2` fail at banner exchange. Checked **2026-08-23T22:26Z**. **No queue read, nothing
+  synced, nothing submitted, nothing cancelled.** `bo7-*` (12, alice) / `bd7-*` (12, alice2)
+  survival still UNKNOWN and still not guessed. `docs/` is **TEN** cycles behind on the cluster.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 132.229.104.230 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else**, then **GATE P7**, then `hz9`
+  (RE-RANKED UP AGAIN, see below), `sp8`, `cp9`.
+* **THE TICK'S DECISION (97.1).** 67 fixed ONE design inside the 380-run `plateau_of(k=20)`
+  stratum and 67.9 recorded the rest as not done. C68 audited the whole stratum:
+  **22 matched cells / 97 pairwise granularity contrasts**, ResNet10/18/34 + ResNet18_c100,
+  CIFAR-10 and CIFAR-100, both bases, frozen and free meta, ms 1e-4..1e-2.
+  `analysis/c68_window_blast.py`, **32/32 selftests**, committed `b93c083` before scoring.
+* **THE DEFECT IS AN IDENTITY (97.2).** recorded `plateau` == whole-run mean in **380/380**
+  (worst |diff| 0.0005 pp); == mean(last 20) in **1291/1291** on long runs, where the two
+  windows agree to **0.099 pp** against **+13.603 pp** short. Budget-scoped, exactly.
+* **NOT CONFINED TO K2, BUT THE STRONG READING FAILS (97.3).** B1 argmax agreement **5/7 =
+  71.4%** as registered, **5/6 = 83.3%** with ms=1e-2 excluded by CORRECTIONS 62 -- neither
+  clears the CONFINED bar. B2's 12.4% flip rate decomposes to **7.2% MATERIAL, below its bar**;
+  **B2 is reported as NOT robustly firing.** `cl5` independently replicates 67.6 on CIFAR-10:
+  a **1.639 pp resolved** layerwise advantage -> **-0.082 pp unresolved**.
+* **A NEGATIVE IN OUR FAVOUR (97.4).** B3 REFUTED at **15.3%** vs a >30% bar; k=5 still resolves
+  53.6% of contrasts (B4 kill-control PASSES). The window inflated effects **1.58x** but did not
+  manufacture significance.
+* **THE LOAD-BEARING ITEM (97.5).** Matched **100-epoch** CIFAR-100 cell (`window_ok=1`):
+  nodewise **71.415 +-0.049 (n=3)** vs layerwise **69.048 +-0.220 (n=14)**, **+2.367 pp**,
+  **5.24x the resolution gate**, resolved at k=1/5/10/20 alike (**window-invariant**),
+  **no seed overlap** (71.318 > 70.260). An **interior maximum at u=1.0**:
+  0.000355->67.17, **1.0->71.42**, 439.78->69.05, coarser->51.58, inf->22.21.
+* **CREDIT (97.6): MASTER-TABLE row 55 got there in cycle 64.** No credit claimed for the
+  ordering; 68 adds that it is resolved, window-invariant, non-overlapping and interior.
+* **67.7 UPGRADED, 67.8 CORRECTED (97.7).** `u_train*` resolves at u=1.0, so with
+  u\*_E=0.001953 the separation is **exactly +2.71 decades, MEASURED** -- no longer a floor.
+  5.41 stays withdrawn. **67.8's "there is no training peak among partitions" is a CIFAR-10
+  sentence with no dataset bracket**: on CIFAR-100 the same coarse range spans **2.367 pp
+  resolved, 14-34x larger**. STANDING RULE (13) survives and sharpens -- the field peak sits
+  2.71 decades on the **losing** side of a resolved interior training optimum (-4.25 pp).
+* **STANDING RULE (15), added 97.8:** *grep `docs/MASTER-TABLE.md` before writing any
+  cross-granularity claim, and state the datasets/budgets it covers in a bracket. A claim with
+  no dataset bracket is a CIFAR-10 claim until proven otherwise.* Cycles 65-67 cite
+  `MASTER-TABLE` / `CIFAR-100` / `c100f` **zero times** -- 96.6's failure, one cycle later.
+* **THE CSV CHANGED, ADDITIVELY ONLY (97.9).** New columns `plateau5`, `auc`, `window_ok`.
+  **`plateau` UNCHANGED; all 34 pre-existing columns byte-identical across all 1707 rows.**
+  Redefining `plateau` and re-scoring the 20-epoch tables remain **operator decisions**.
+* **ORPHANS: ZERO** in the affected stratum -- all 380 runs feed cited claims (97.10).
+* **OFFLINE QUEUE** is again down to the carried-since-51 `s` re-derivation (bookkeeping).
+
+---
+
+## Superseded -- cycle 67 (kept for the record)
+
 ## Running / next (cycle 67) -- **ALICE DOWN A TWELFTH TICK. THE K2 NUMERATOR IS BUILT ON A COLUMN THIS PROJECT ALREADY RULED UNUSABLE.**
 
 **Read `docs/CORRECTIONS.md` 96 and `docs/FINDINGS.md` 67.0-67.9 FIRST. 96.7 WITHDRAWS the
