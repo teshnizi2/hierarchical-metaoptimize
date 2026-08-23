@@ -3525,3 +3525,126 @@ per-seed sd. (f) **DONE, do not re-run:** 59.3, 59.8, 60.2–60.7, the tensor-me
 queue is C62-C (the conv-only u-ladder on all four families), then C62-A **once 55.4's span
 reconciliation is discharged**, then the carried-since-51 `s` re-derivation. (h) The 12
 truncated `rs-blk6`/`rs-node` reruns remain last.
+
+## 92. DECISION RECORD — cycle 63 (ALICE DOWN, **EIGHTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**92.0 STATE.** Reachability checked **2026-08-23T07:25Z**, localised not assumed: gateway UP
+and answering (`p-cfer-016105`); `132.229.104.230` and `.231` both refuse :22 **from the
+gateway**; `ssh alice` and `ssh alice2` both fail at banner exchange. **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `sp8` (9, alice2), `hz9`
+(9, alice), `cp9` (8, alice), `rw9` (18, alice) all remain written, validated and UNSUBMITTED.
+**`docs/` is now FIVE cycles behind on the cluster.**
+
+**92.1 THE DECISION, AND ITS REASON.** 91.10(g) left an ordered offline queue: C62-C first,
+then C62-A **once the `span` debt is discharged**, then the carried-since-51 `s`
+re-derivation. With the cluster down an eighth tick I executed that queue in its written
+order rather than reopening the ranking. **All three of the first two items closed, and the
+debt-discharge unblocked the third within the same tick**, so cycle 63 delivered C62-C, the
+reconciliation, and C62-A. The `s` re-derivation is again the only unspent offline item and
+is again explicitly bookkeeping.
+
+**92.2 C62-C IS CLOSED, 17 OF 17, AND IT CROSS-VALIDATES TWO PUBLISHED READOUTS.**
+`analysis/c63_uladder_corpus.py`, 53/53 selftests, a DRIVER over c62 whose arm set is
+`c62.SPATIAL_SET` **by reference** (selftest T1). P1–P4 registered and committed (`30a5049`)
+before any arm beyond 62.4's single arm was scored. P2 **17/17**, P3 **17/17**, P4 **17/17**;
+P1 fires 6/17 so **H2 SURVIVES**. The channel-unit peak is a block of **1–9 coordinates**,
+which is 62.9's absolute-g argmax (g ≤ 9, 17/17) reached through a different block index.
+**P3 was the first time this project's two block-size readouts were compared and it carried a
+branch that would have cost us either 62.4's peak or 62.9's knee.** → FINDINGS 63.1
+
+**92.3 STATED AGAINST OUR OWN INTEREST (63.1).** `U_LADDER` bottoms at 1/1024 and **4 of 17
+arms peak on that boundary rung**, so their argmax is censored from below and is a bound, not
+a point. No verdict rests on them — all four are already at or below every bar — but they may
+not be written as located peaks.
+
+**92.4 THE `span` DEBT OWED SINCE CYCLE 55 IS PAID, AND THE DEBT NAMED ONLY HALF OF ITSELF.**
+`analysis/c63_span_reconcile.py`, 38/38 selftests, both definitions IMPORTED not restated,
+gate G0 asserting they share `c52_boxfree.records()`. **R2 is exact to 0.000e+00**, so the
+time axis is one functional at two evaluation times. **R1's B-arm FAILED**, and chasing the
+0.35 identified the axis the debt never named: 55.4's 6.29 is a **three-rung mean**; 74's
+8.268 is **weightwise alone**. The 2×2 closes to four decimals; the gap is **1.632 log units
+of TIME and 0.347 of ARM SET**. → FINDINGS 63.2
+
+**92.5 STANDING RULE (12).** *A statistic aggregated over a parameter stack must state BOTH
+its arm/tensor restriction AND its evaluation window before it is quoted.* STANDING RULE (10)
+already required the tensor-class restriction; this cycle shows the window is the larger term
+of the two (1.632 vs 0.347 on the debt cell) and was the one nobody wrote down.
+**Effective now: `span[weightwise, terminal]` or `span[3-rung, steady-half]`. A bare "span" is
+not a quantity in this campaign.**
+
+**92.6 R3 FAILS ITS OWN BAR, AND THAT IS THE USEFUL HALF.** ρ = **0.9654** (bar ≥ 0.95 ✓) but
+**6.411% discordant pairs** (bar ≤ 5% ✗) over 162 non-frozen dirs, and `A < B` in 11 of them
+so `B ≤ A` is not a theorem. **The two definitions are NOT a monotone reparameterisation**, so
+any claim resting on a span ORDERING must name its definition. → FINDINGS 63.3
+
+**92.7 NEITHER PUBLISHED VERDICT MOVES.** **R4:** N2's own predicate with N2's own 5.0
+threshold and N2's own argmin column matches on 3 of 4 rungs under **all four** definitions —
+the 5e−4 rung is above 5 log units under every one while the argmin is still `w`.
+**CORRECTIONS 74(2) stands as written.** **R5:** within 55.4's own 20-epoch scope the
+threshold separates under all four, and `3rung/steady` gives max(other) = **6.289** /
+min(node) = **8.879** — 55.4's published **6.29 / 8.88**, to the decimal. The BAND form is
+clean under all four. **FINDINGS 55.4 stands as written.** → FINDINGS 63.4
+
+**92.8 A TEST OF THIS TICK'S OWN THAT WAS SCORING THE WRONG SHAPE.** R5's first pass reported
+"no separation" under all four definitions — because it applied a THRESHOLD test to all 10
+DECIDED cells including the 40-epoch `br6/c2`. **55.4 names that exact cell as the reason its
+conclusion is a BAND and not a threshold.** Scoring 55.4 by the threshold shape alone tests a
+claim 55.4 explicitly disavowed. Both shapes are now scored and selftest T11 asserts the
+distinction. **The near-miss was reporting a published finding as unreproducible when the
+error was in the scorer's shape, not in the finding.**
+
+**92.9 C62-A WAS UNBLOCKED AND RUN IN THE SAME TICK, AND IT PASSES EVERY REGISTERED BAR.**
+`analysis/c63_c62a_travel.py`, 26/26 selftests, A0–A3 registered and committed before any arm
+was scored; `MS_MAP` cites the submitting script and line per entry and returns `None` rather
+than guessing for `br6`/`uc6`/`bo6`/`fr5`/`wc5`. **A1 ρ = +0.774** (p = 1e−4, n = 40),
+**A2 partial ρ = +0.542** controlling `log10(ms)` (n = 29), **A2b ρ = +0.547** (p = 0.011)
+within the ms=1e−3 stratum across 4 architectures and 2 datasets. All pass under all four span
+definitions. **A2 is load-bearing: 62.7's dose-response is NOT purely an `ms` artifact.**
+→ FINDINGS 63.7
+
+**92.9b AND THE TICK'S OWN CONFOUND CHECKS DEMOTE IT — THIS IS REPORTED INSTEAD OF THE
++0.547.** Drop the two 40-epoch `bl5` arms and A2b goes ρ = +0.416 at **p = 0.078**. Restrict
+to `r18` alone (fixed ms, architecture and dataset) and ρ = **+0.273 at p = 0.43**, with the
+nine 20-epoch arms flat at **0.993–1.108**. Two arms matched on span to **0.0014 log units**
+differ in F_col/F_row by **2.17×**; `r10`'s own two seeds differ by **1.76×** at matched span.
+**The spread at a single matched span (1.12–2.48) EXCEEDS the entire span-driven range
+(≈1.0–1.57).**
+
+> **"Adaptation extent determines F_col/F_row" is REFUTED.** What A2b picks up at fixed `ms`
+> is **budget** — a third confound 62.7 never controlled, not a mechanism. **No document may
+> write "the column/row ratio measures adaptation extent."** 62.7 remains post-hoc and is now
+> bounded on both sides. → FINDINGS 63.8
+
+**92.10 FIVE WRONG ASSERTIONS IN THIS TICK'S OWN HARNESSES, AND IN EVERY CASE THE CODE WAS
+RIGHT.** (i) a max-vs-min resolution bar; (ii) a flat-control assertion made over CLAMPED
+rungs, which read up to **63 pp by construction** (CORRECTIONS 89.6 / 91.4); (iii) R5's
+threshold-vs-band shape (92.8); (iv) demanding partial ρ ≈ 0 where `x` IS the control, which
+is 0/0 and must return `nan`; (v) the same error again with `y = 2·z`. **Returning 0.0 from a
+degenerate partial-correlation denominator would silently assert "no partial association" —
+exactly the failure A2 exists to prevent.** All five are recorded rather than quietly cut.
+
+**92.11 SCOPE, UNCHANGED AND NOT OPTIONAL.** Conv tensors only for the u-ladder; 3×3 conv
+tensors only for the kernel-scale and F statistics. We measure `z`, the META-gradient;
+Adam-mini / Adalayer / SGG argue about `G`. **No document may write "we refuted Adam-mini."**
+
+**92.12 ORPHANS.** CSV unchanged at 1707, so the orphan set is unchanged from 91.9: **109
+families, 2 orphan, 12 runs** (`gate0b`, `gate0d`), both retired in FINDINGS 61.8 and **not to
+be re-run**. This tick cites only already-cited families. **None retired, none created.**
+
+**92.13 IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twenty.
+
+**92.14 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` **both** accounts before
+anything. (a2) **rsync `docs/` — it is now FIVE cycles behind.** (b) Submit `sp8` (alice2, 9),
+then `hz9` (9, alice). (c) Then `cp9` (8, alice) after applying
+`patches/patch_probe6_coord.py` on the cluster; guard 2 refuses without it. Ranked above
+`rw9` (90.6), and 62.5/62.6 plus **63.1's second, independent location of the 1–9 coordinate
+scale** raise its value again. (d) Score `hz9` H0 → H0.3 → H0.5 → H1 → H1b → H2; H0.5 can only
+VOID. (e) If bo7/bd7 landed, cycle 54's order stands with 55.2's per-seed sd. (f) **DONE, do
+not re-run:** 59.3, 59.8, 60.2–60.7, the tensor-mean avenue for 89.7, the filter hypothesis
+(62.5/62.9), **and now C62-C (63.1), the span reconciliation (63.2–63.4) and C62-A
+(63.7–63.8)**. (g) **The offline queue is down to the carried-since-51 `s` re-derivation,
+which is bookkeeping.** The next substantive C62-A step is a **fixed-architecture budget
+ladder** (R18/C10, ms=1e−3, weightwise, 20/40/80 ep, n≥3) — a SUBMISSION, ranked below
+`sp8`/`hz9`/`cp9` because those decide registered gates and it confirms the reading of a
+post-hoc trend (63.9). (h) The 12 truncated `rs-blk6`/`rs-node` reruns remain last.
