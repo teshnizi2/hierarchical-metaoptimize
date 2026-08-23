@@ -3845,3 +3845,37 @@ records the per-coordinate field under **layerwise or nodewise** training (curre
 training, and it is now the binding uncertainty in direction C. It needs a probe-side change, not
 a new sweep. (e) **DONE, do not re-run:** everything in 93.14(f), **and now C65 in full
 (65.2–65.6)**. (f) The offline queue is again down to the `s` re-derivation.
+
+**94.12 THE INSTRUMENT FOR 94.11(d) IS WRITTEN, TESTED AND READY TO APPLY (same tick).**
+`patches/patch_probe7_field_any_granularity.py`. The limit in 94.7 is an INSTRUMENT limit, not a
+property of the science, and it is removable: `HF.block_product(u, v)` reduces the SAME elementwise
+product `u[i]*v[i]` differently per granularity (sum-all / per-block / per-tensor / per-channel /
+none), so **the per-coordinate field exists in every granularity and is merely summed away before
+anything sees it**. PROBE7 counts signs on the product BEFORE the reduction and writes a sidecar
+`coord_neg_counts.npy` (+ `.json`), leaving `probe.jsonl` byte-identical per CORRECTIONS 18.
+Training is untouched: read-only accumulation inside the existing `torch.no_grad()` block.
+
+**Verified locally this tick** (no cluster needed): applies to `patches/HF_patched.py`, **compiles**
+(`py_compile`), composes with PATCH_PROBE5 **in either order** (the two blocks are independent and
+the only diff is insertion order), and is **idempotent** (`ALREADY_PATCHED`). An initial mark-count
+assert was WRONG (expected 4, actual 3) and **refused to write** rather than half-patching — the
+guard behaved as designed.
+
+**GATE P7, REGISTERED BEFORE ANY DATA:** one **weightwise** run with `PROBE5=1 PROBE7=1` and
+`hier=''` must produce `coord_neg_counts.npy` **BITWISE EQUAL** to `neg_counts.npy`. Same
+expression, same `range(self.num_layers)` order, and the dtype difference (existing path casts
+`.float()` before comparing) is sign-preserving under a widening cast, so exact equality is the
+correct bar and a near-miss is a FAILURE to investigate, never to round. **Scope: `hier=''` only** —
+`_probe` runs after `_zpool`/`_zmpool`, so in a hier arm the existing `zall` is POST-pool while
+PROBE7's product is PRE-pool; `hier` is written into the json so a hier run can never be mistaken
+for a gate pass. **Run the gate first; it costs one 20-epoch job.**
+
+**PRE-REGISTERED READING (STANDING RULE 10), so it cannot be chosen after the fact:** score the
+c62/c63 u-ladder on a LAYERWISE- and a NODEWISE-trained run against the weightwise corpus
+(65.2: u* ~ 0.0017, 17/17 arms). **u* stays at 1/512–1/1024** -> the kernel peak is a property of
+the FIELD, 94.7 is discharged, and 65's separation gets STRONGER (field peak ~5 decades from the
+training optimum measured IN THE SAME ARM). **u* moves to the training granularity's own scale**
+(u~1 nodewise, u~O layerwise) -> the peak is an ARTIFACT of what the optimizer was allowed to
+adapt, and 62.9 / 64 / 65.2 must ALL be restated with that condition attached. **Anything else is
+written UNDECIDED, not rounded to a verdict.** The second outcome is the expensive one and is
+precisely why the test is worth its one job.
