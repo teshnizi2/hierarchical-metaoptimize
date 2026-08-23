@@ -3879,3 +3879,102 @@ training optimum measured IN THE SAME ARM). **u* moves to the training granulari
 adapt, and 62.9 / 64 / 65.2 must ALL be restated with that condition attached. **Anything else is
 written UNDECIDED, not rounded to a verdict.** The second outcome is the expensive one and is
 precisely why the test is worth its one job.
+
+---
+
+# CORRECTIONS 95 — cycle 66 decision record
+
+**95.0 OUTAGE, ELEVENTH CONSECUTIVE TICK, LOCALISED NOT ASSUMED.** Gateway `p-cfer-016105` is
+**up and answering**; from it `nc -z 132.229.104.230 22` and `.231` both read **DOWN**; `ssh
+alice` / `ssh alice2` fail at **banner exchange**. Checked **2026-08-23T16:26Z**. **No queue read,
+nothing synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice)
+/ `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `sp8` (9), `hz9` (9), `cp9`
+(8), `rw9` (18) remain written, validated, UNSUBMITTED, and PROBE7 + GATE P7 (94.12) remain the
+first thing to run on return. `docs/` is now **EIGHT** cycles behind on the cluster.
+
+**95.1 THE TICK'S DECISION.** The offline queue held only the carried-since-51 `s` re-derivation.
+Instead I took the item the previous tick had just installed as **the largest caveat in direction
+C** (94.7 / FINDINGS 65.7) and checked whether its own closing word was true. It was not.
+→ FINDINGS 66
+
+**95.2 A CORRECTION TO 94.7, AGAINST THE PREVIOUS TICK'S CONCLUSION.** 94.7 wrote that the
+assumption behind the weightwise-only limit — that the field's SHAPE is not created by the
+training granularity — *"is untested and **untestable** with recorded data."* The instrument limit
+is CORRECT and is re-verified (T6, from the coarse probes' own json: `n_tot` 11,173,962 weightwise
+vs 14,420 nodewise vs 62 layerwise). **The word "untestable" is WITHDRAWN.** 94.7 reasoned from
+the probe's storage format and never checked the optimiser: with `meta='fixed'`, `meta_update` is
+bound to `no_meta_update` (`return None`, never touches β) and `init_meta` starts β UNIFORM at
+`log(alpha0)` in **every** `stepsize_type`, so α is one constant everywhere and `base_update`
+receives an identical step in all four arms. **With β frozen the granularity does not touch the
+trajectory at all** — so a frozen WEIGHTWISE probe records the field along the trajectory a frozen
+LAYERWISE run would traverse. The corpus already contained 8 such arms. This is asserted from
+`patches/HF_patched.py` by selftest T1, not quoted from memory.
+
+**95.3 THE RESULT: LOCATION INVARIANT, AMPLITUDE NOT.** All **19 of 19** arms peak at u\* ∈
+{1/1024, 1/512} — one rung of spread across β-frozen, free, 10× meta-stepsize, and an AdamW base.
+Six registered tests, all HELD: A1 4/4 families within 1 rung; A3 worst clean arm 0.765 rungs; B1
+(blind) full-ladder shape gap **0.2020** ≤ 0.25; B2 (blind) log₂(u\*) vs the arm's own plateau over
+**21.7 pp on r18** at **+0.027 rungs/pp**; B3 (blind) both exception arms 0.235 rungs from the
+clean mean; **B4 (blind POWER CONTROL) amplitude ratio 2.192×**, corpus E\* range 0.0777→82.3141 pp
+= **1059×**. 17/17 selftests pass.
+
+**95.4 B4 IS THE REASON THIS IS NOT A VACUOUS INVARIANCE, AND IT WAS REGISTERED TO KILL A1/B1.**
+Registered before scoring: *"refuted (and A1/B1 withdrawn) if the ratio is ≤ 1.20"* — because if
+frozen and free fields were identical in every respect, an invariant location would report only
+that a manipulation which did nothing changed nothing. Measured **2.192×** geometric mean, ≥1.56 in
+4 of 4 families. The manipulation is real; the location still does not move.
+
+**95.5 PROVENANCE IS DECLARED PER TEST, INCLUDING AGAINST OUR OWN INTEREST.** A1/A3 are
+**POST-HOC-INFORMED** — c65's PART C table (u\*, E\*, and a frozen/free stratum column) had been
+read before they were written, and they are printed with that label in the output. They are the
+direct answer to 94.7, not independent evidence. B1–B4 are **BLIND**: c65 prints only the peak
+rung, and **excludes the two exception arms** (`if arm["exc"]: continue`), so the ladder SHAPE, the
+accuracy slope, the exception arms' peaks and the amplitude ratio appear in no output that preceded
+registration. Per 76(1)/79 the blind column carries the weight.
+
+**95.6 THIS STRENGTHENS 65 RATHER THAN SOFTENING IT.** 65.7 was the escape hatch for 94.2's
+five-decade separation — the field peak might have been an artifact of the weightwise arm, and
+weightwise trains WORST in every free cell. Closed: the peak sits at 1/512 in the arm that trains
+**best** in the corpus (bo6, 81.75 pp) and in arms where **no adaptation happened at all**. The
+separation is not an artifact of measuring in the worst-training arm. **94.8 and STANDING RULE
+(13) are unaffected** — 66 says the field is robustly measured, and says nothing new about the
+accuracy link, which stays negative at five orders of magnitude.
+
+**95.7 WHAT IS LEFT IS EXACTLY ONE CELL, AND ITS SIZE IS NOW BOUNDED.** No arm has β partitioned
+COARSELY *and freely*; only PROBE7 reaches that. But B5 measures how far it is: the r18
+free-layerwise optimum — **74.524 pp (n=18), which is 94.2's own training peak** — falls **INSIDE**
+the probed plateau range 60.05–81.75. The step from measured to unmeasured is **not an
+extrapolation in outcome**; the residual gap is the PARTITION alone.
+
+**95.8 A RE-RANKING, STATED PLAINLY BECAUSE IT DEMOTES THE PREVIOUS TICK'S TOP ITEM.** 94.11(d)
+called PROBE7 *"the only way to test whether the kernel-scale peak is an artifact of weightwise
+training, and it is now the binding uncertainty in direction C."* Half of that is now wrong: the
+no-adaptation case is measured, across four trajectory classes and 21.7 pp of outcome. **PROBE7 is
+still the only route to the free-coarse cell and still worth its one job, but it is no longer the
+binding uncertainty and must not be described as one.** GATE P7 and the queue ORDER are UNCHANGED
+(95.0); only the justification changes.
+
+**95.9 A NEW SECONDARY OBSERVATION, REGISTERED AS UNSCORED.** The frozen normalised ladder sits
+ABOVE the free one at every rung except the peak: at u = 1 — one output channel, the finest
+partition anywhere in the Adam-mini / Adalayer / SGG line — the frozen field retains **14.5%** of
+its own peak against the free field's **4.0%**. Free adaptation **sharpens** the ladder as well as
+raising it. Its direction disfavours the free-layerwise cell being nearer layer scale, but that is
+an EXTRAPOLATION and no document may write it as a result.
+
+**95.10 ORPHANS.** CSV unchanged at 1707, so the orphan set is unchanged from 94.9: **109
+families, 2 orphan, 12 runs** (`gate0b`, `gate0d`), both retired in FINDINGS 61.8 and **not to be
+re-run**. This tick cites `fz3`, `p5`, `ff5`, `cl5`, `ml5`, `bo6` and `bl5` — all already-cited
+families (`bl5` appears in both docs already). **None retired, none created.**
+
+**95.11 IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twenty-three.
+
+**95.12 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` **both** accounts before anything.
+(a2) **rsync `docs/` — EIGHT cycles behind.** (b) **GATE P7 first** (one 20-epoch weightwise job,
+`PROBE5=1 PROBE7=1 hier=''`, bitwise equality of `coord_neg_counts.npy` against `neg_counts.npy`),
+then `sp8` (alice2, 9), `hz9` (9, alice), `cp9` (8, alice) after applying
+`patches/patch_probe6_coord.py`. (c) Score PROBE7 against 94.12's PRE-REGISTERED READING, which is
+**unchanged and still binding** — but note 66 has already fixed the expected answer's prior: u\*
+did not move across four trajectory classes, so *"u\* moves to the training granularity's own
+scale"* would now contradict 19 arms, not merely one. (d) **DONE, do not re-run:** everything in
+94.11(e), **and now C66 in full (66.1–66.6)**. (e) The offline queue is again down to the
+carried-since-51 `s` re-derivation — genuinely the last item, and it is bookkeeping.

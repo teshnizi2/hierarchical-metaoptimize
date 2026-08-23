@@ -1,0 +1,122 @@
+selftests: 17 passed, 0 failed
+
+====================================================================================================================
+C66 PART 1 -- THE FIELD'S PEAK AND THE ARM'S OWN TRAINING OUTCOME, 19 arms, per-coordinate, 20 epochs
+====================================================================================================================
+arm                                fam  stratumrun                 plateau        u*     rung     E*_pp     res  clamp
+probes_ff5/probe_c100_w_s0        c100     freeff5-c100-w-s0        26.898   0.00195    1/512    0.7512  0.0042      0
+probes_ff5/probe_c100_w_s1        c100     freeff5-c100-w-s1        26.793   0.00195    1/512    0.8320  0.0239      0
+probes_fz3/probe_c100_w_s0        c100   frozenfz3-c100-w-s0        14.976   0.00098   1/1024    0.2328  0.0082      0
+probes_fz3/probe_c100_w_s1        c100   frozenfz3-c100-w-s1        15.317   0.00195    1/512    0.2672  0.0068      0
+probes_ff5/probe_r10_w_s0          r10     freeff5-r10-w-s0         61.343   0.00195    1/512    1.6780  0.0171      0
+probes_ff5/probe_r10_w_s1          r10     freeff5-r10-w-s1         61.495   0.00195    1/512    0.7952  0.0133      0
+probes_fz3/probe_r10_w_s0          r10   frozenfz3-r10-w-s0         50.206   0.00195    1/512    0.4427  0.0114      0
+probes_fz3/probe_r10_w_s1          r10   frozenfz3-r10-w-s1         50.532   0.00195    1/512    0.4617  0.0121      0
+probes_bo6/probe_w_adw_s0          r18      EXCbo6-w-adw-s0         81.745   0.00195    1/512   79.5945  0.0121      0
+probes_ml5/probe_w_m2_s0           r18      EXCml5-w-m2-s0          74.504   0.00195    1/512   82.3141  0.0140      0
+probes_cl5/probe_w_cU_s0           r18     freecl5-w-cU-s0          68.662   0.00195    1/512    0.2412  0.0151      1
+probes_cl5/probe_w_cU_s1           r18     freecl5-w-cU-s1          68.826   0.00195    1/512    0.3571  0.0258      2
+probes_cl5/probe_w_cU_s2           r18     freecl5-w-cU-s2          68.247   0.00195    1/512    0.3507  0.0129      0
+probes_p5/probe_w_a3_s0            r18   frozenp5-w-a3-s0           60.049   0.00098   1/1024    0.1519  0.0100      0
+probes_p5/probe_w_a3_s1            r18   frozenp5-w-a3-s1           61.141   0.00195    1/512    0.1922  0.0255      0
+probes_ff5/probe_r34_w_s0          r34     freeff5-r34-w-s0         70.280   0.00195    1/512    0.1625  0.0310      2
+probes_ff5/probe_r34_w_s1          r34     freeff5-r34-w-s1         70.281   0.00098   1/1024    0.1441  0.0168      7
+probes_fz3/probe_r34_w_s0          r34   frozenfz3-r34-w-s0         64.061   0.00195    1/512    0.0777  0.0072      0
+probes_fz3/probe_r34_w_s1          r34   frozenfz3-r34-w-s1         63.607   0.00098   1/1024    0.1232  0.0162      0
+
+  clean-arm geometric mean u* = 0.00166   (n=17)
+
+====================================================================================================================
+A1 [post-hoc-informed] LOCATION INVARIANCE, frozen vs free, per family
+   registered: |log2(u*_frozen / u*_free)| <= 1.00 rung in 4 of 4 families
+====================================================================================================================
+   fam  n_fz  n_fr   u*_frozen     u*_free   d rungs   verdict
+  c100     2     2     0.00138     0.00195     0.500   within
+   r10     2     2     0.00195     0.00195     0.000   within
+   r18     2     3     0.00138     0.00195     0.500   within
+   r34     2     2     0.00138     0.00138     0.000   within
+
+  A1: 4/4 families within one rung -> HELD
+
+  A3: furthest clean arm from the corpus mean = probes_fz3/probe_r34_w_s1 at 0.765 rungs -> HELD
+
+====================================================================================================================
+B1 [BLIND] FULL-LADDER SHAPE INVARIANCE.  e(u) = E(u)/E*, averaged within stratum
+   registered: max_u |e_frozen - e_free| <= 0.25   |   refuted if > 0.50
+====================================================================================================================
+  rung               u   e_frozen     e_free   |diff|
+  1/1024       0.00098     0.9065     0.7044   0.2020
+  1/512        0.00195     0.9601     0.8492   0.1109
+  1/256        0.00391     0.6133     0.5140   0.0993
+  1/128        0.00781     0.4521     0.3357   0.1164
+  1/64         0.01562     0.2857     0.1999   0.0858
+  1/32         0.03125     0.1984     0.0877   0.1108
+  1/16         0.06250     0.1669     0.0645   0.1024
+  1/8          0.12500     0.1545     0.0611   0.0934
+  1/4          0.25000     0.1480     0.0425   0.1054
+  1/2          0.50000     0.1468     0.0362   0.1106
+  1            1.00000     0.1454     0.0404   0.1050
+  2            2.00000     0.0723     0.0226   0.0497
+  4            4.00000     0.0367     0.0126   0.0241
+  8            8.00000     0.0144     0.0060   0.0084
+  16          16.00000     0.0069     0.0039   0.0030
+  32          32.00000     0.0027     0.0020   0.0007
+  64          64.00000     0.0012     0.0007   0.0005
+
+  B1: max rung-wise gap = 0.2020 at rung 1/1024 -> HELD
+
+====================================================================================================================
+B2 [BLIND] ACCURACY REGRESSION WITHIN ResNet18 -- log2(u*) vs the arm's own plateau
+   registered: |slope| <= 0.10 rung/pp and peak span <= 1 rung  |  refuted if |slope| >= 0.25
+====================================================================================================================
+  arm                                      class  plateau        u*   log2 u*
+  probes_p5/probe_w_a3_s0                 frozen   60.049   0.00098   -10.000
+  probes_p5/probe_w_a3_s1                 frozen   61.141   0.00195    -9.000
+  probes_cl5/probe_w_cU_s2          free ms=1e-3   68.247   0.00195    -9.000
+  probes_cl5/probe_w_cU_s0          free ms=1e-3   68.662   0.00195    -9.000
+  probes_cl5/probe_w_cU_s1          free ms=1e-3   68.826   0.00195    -9.000
+  probes_ml5/probe_w_m2_s0           EXC ms=1e-2   74.504   0.00195    -9.000
+  probes_bo6/probe_w_adw_s0            EXC AdamW   81.745   0.00195    -9.000
+
+  accuracy range spanned  = 60.049 .. 81.745 pp  (21.696 pp)
+  slope                   = +0.0268 rungs per pp
+  peak span               = 1.000 rungs
+  B2 -> HELD
+
+====================================================================================================================
+B3 [BLIND] THE TWO EXCEPTION ARMS -- never pooled (CORRECTIONS 62), LOCATION only
+   registered: both u* within 2 rungs of the clean-arm geometric mean
+====================================================================================================================
+  arm                             what                plateau        u*   rungs from clean
+  probes_ml5/probe_w_m2_s0        ms=1e-2 (10x)        74.504   0.00195              0.235
+  probes_bo6/probe_w_adw_s0       AdamW base           81.745   0.00195              0.235
+
+  B3 -> HELD
+
+====================================================================================================================
+B4 [BLIND] POWER CONTROL -- amplitude MUST move even though location does not
+   registered: geo-mean E*_free / E*_frozen >= 1.50  |  refuted (and A1/B1 withdrawn) if <= 1.20
+====================================================================================================================
+   fam   E*_frozen     E*_free     ratio
+  c100      0.2494      0.7905     3.170
+   r10      0.4521      1.1552     2.555
+   r18      0.1709      0.3114     1.823
+   r34      0.0979      0.1530     1.564
+
+  geometric-mean amplitude ratio = 2.192x
+  full corpus E* range           = 0.0777 .. 82.3141 pp  (1059x)
+  B4 -> HELD
+
+====================================================================================================================
+B5 [BLIND, descriptive] WHERE THE UNOBSERVED free-LAYERWISE CELL SITS
+====================================================================================================================
+  r18 probed-arm plateau range: 60.049 .. 81.745
+    free layerwise ms=1e-3  clip=-30:0.0      plateau  82.782 +-0.145 (n=2)   -> outside the probed range
+    free layerwise ms=1e-2  clip=-30:-2.3026  plateau  78.337 +-0.165 (n=3)   -> INSIDE the probed range
+    free layerwise ms=1e-2  clip=-15:-2.3026  plateau  78.068 +-0.115 (n=3)   -> INSIDE the probed range
+    free layerwise ms=1e-3  clip=-30:-4.6052  plateau  74.630 +-0.202 (n=3)   -> INSIDE the probed range
+    free layerwise ms=1e-3  clip=-15:-2.3026  plateau  74.524 +-0.099 (n=18)   -> INSIDE the probed range
+
+  Reading: where the layerwise optimum falls INSIDE the probed range, the step
+  from measured to unmeasured is not an extrapolation in OUTCOME.  The residual
+  gap is the PARTITION itself, and only PROBE7 (CORRECTIONS 94.12) closes it.

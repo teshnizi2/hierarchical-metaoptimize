@@ -54,7 +54,67 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 65) -- **ALICE DOWN A TENTH TICK. THE FIELD PEAK AND THE TRAINING PEAK ARE 5 ORDERS OF MAGNITUDE APART.**
+## Running / next (cycle 66) -- **ALICE DOWN AN ELEVENTH TICK. THE FIELD'S SCALE DOES NOT MOVE WITH THE TRAJECTORY THAT MEASURED IT.**
+
+**Read `docs/CORRECTIONS.md` 95 and `docs/FINDINGS.md` 66.0-66.7 FIRST. 95.2 WITHDRAWS a word
+from 94.7 and 95.8 DEMOTES the previous tick's top-ranked item.**
+
+* **BOTH LOGIN NODES DOWN FOR AN ELEVENTH CONSECUTIVE TICK**, localised not assumed: gateway up
+  and answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice` /
+  `alice2` fail at banner exchange. Checked **2026-08-23T16:26Z**. **No queue read, nothing
+  synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+  `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `docs/` is **EIGHT** cycles
+  behind on the cluster.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 132.229.104.230 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else**, then **GATE P7** (94.12), then `sp8`,
+  `hz9`, `cp9`.
+* **THE TICK'S DECISION (95.1).** Took 94.7 -- the limit the PREVIOUS tick had just installed as
+  *"the largest caveat in direction C"* -- and checked whether its closing word was true.
+  Instrument `analysis/c66_trajectory_invariance.py`, **17/17 selftests**, A1/A3 + B1-B5
+  registered with per-test provenance before scoring.
+* **THE CORRECTION (95.2).** 94.7 wrote the assumption was *"untested and **untestable** with
+  recorded data."* The instrument limit is CORRECT and re-verified (T6). **"Untestable" is
+  WITHDRAWN.** 94.7 reasoned from the probe's storage format and never checked the optimiser:
+  `meta='fixed'` binds `no_meta_update` (`return None`, never touches beta) and `init_meta` starts
+  beta UNIFORM at `log(alpha0)` in EVERY `stepsize_type`. **With beta frozen the granularity does
+  not touch the trajectory at all** -- so a frozen WEIGHTWISE probe records the field along the
+  trajectory a frozen LAYERWISE run would traverse. The corpus already held 8 such arms. Asserted
+  from `patches/HF_patched.py` by selftest T1, not quoted from memory.
+* **THE RESULT (95.3). ALL 19 OF 19 ARMS PEAK AT u\* in {1/1024, 1/512}** -- one rung of spread
+  across beta-frozen, free, 10x meta-stepsize and an AdamW base. A1 4/4 families within 1 rung;
+  A3 worst clean arm 0.765 rungs; **B1 (blind)** full-ladder shape gap **0.2020** <= 0.25;
+  **B2 (blind)** log2(u\*) vs the arm's own plateau over **21.7 pp on r18** at **+0.027 rungs/pp**;
+  **B3 (blind)** both exception arms 0.235 rungs from the clean mean. **All HELD.**
+* **B4 IS WHY THIS IS NOT VACUOUS (95.4).** Registered to KILL A1/B1 if it failed: amplitude ratio
+  free/frozen **2.192x** (>=1.56 in 4/4 families), corpus E\* range **0.0777 -> 82.3141 pp =
+  1059x**. **Amplitude moves 1059x; location moves <= 1 rung.**
+* **IT STRENGTHENS 65 (95.6).** 65.7 was the escape hatch for 94.2's five-decade separation -- the
+  field peak might have been an artifact of the weightwise arm, which trains WORST in every free
+  cell. Closed: the peak sits at 1/512 in the arm that trains **best** in the corpus (bo6, 81.75
+  pp) and in arms where **no adaptation happened at all**. **94.8 and STANDING RULE (13) are
+  unaffected.**
+* **THE SIZE-ARTIFACT RIVAL IS ALREADY CLOSED (66.4).** c62's S2 phase test: g=9 blocks ALIGNED vs
+  OFFSET-by-4, identical size and null, **aligned > offset in 19 of 19 arms** (1.20-4.97),
+  including the frozen ones. Cited, not re-derived.
+* **A RE-RANKING THAT DEMOTES THE LAST TICK'S TOP ITEM (95.8).** 94.11(d) called PROBE7 *"the
+  binding uncertainty in direction C."* Half of that is now wrong. **PROBE7 is still the only
+  route to the free-coarse cell and still worth its one job, but it is NOT the binding uncertainty
+  and must not be described as one.** GATE P7 and the queue ORDER are UNCHANGED.
+* **WHAT IS LEFT IS EXACTLY ONE CELL, AND ITS SIZE IS BOUNDED (95.7).** No arm has beta
+  partitioned COARSELY *and freely*. But the r18 free-layerwise optimum -- **74.524 pp (n=18),
+  94.2's own training peak** -- falls **INSIDE** the probed plateau range 60.05-81.75. The step
+  from measured to unmeasured is **not an extrapolation in outcome**; the residual gap is the
+  PARTITION alone.
+* **UNSCORED SECONDARY (95.9).** Free adaptation **sharpens** the ladder as well as raising it: at
+  u = 1 the frozen field retains **14.5%** of its peak against the free field's **4.0%**. Its
+  direction disfavours the free-layerwise cell being nearer layer scale -- **an EXTRAPOLATION, and
+  no document may write it as a result.**
+* **OFFLINE QUEUE IS NOW EMPTY** but for the carried-since-51 `s` re-derivation (bookkeeping).
+
+---
+
+## Superseded -- cycle 65 (kept for the record)
 
 **Read `docs/CORRECTIONS.md` 94 and `docs/FINDINGS.md` 65.0-65.8. 94.8 adds STANDING RULE (13),
 which forbids a sentence the campaign was close to writing; 94.7 names the new binding limit.**

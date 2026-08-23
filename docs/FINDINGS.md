@@ -12707,3 +12707,124 @@ because granularity also moves meta-state dimensionality and the realised meta-s
 fire. And 65.7's weightwise-only limit is unfixable with recorded data.
 
 **Do not re-run offline:** 65.2–65.6 are closed on the present corpus.
+
+---
+
+# FINDINGS 66 — cycle 66: THE FIELD'S SCALE IS INVARIANT TO THE TRAJECTORY THAT MEASURED IT
+
+Zero GPU cost. Login nodes down an ELEVENTH consecutive tick; nothing submitted, CSV unchanged at
+1707 runs. Instrument: `analysis/c66_trajectory_invariance.py`, **17/17 selftests pass**, output
+`results/c66_trajectory_invariance.txt`. Inputs are already-spent data: `results/c63_uladder.json`
+(19 arms × the common 17-rung u-ladder) and `results/all_runs.csv`.
+
+## 66.1 65.7 IS HALF WRONG, AND THE HALF THAT IS WRONG IS THE HALF THAT MATTERED
+
+65.7 / CORRECTIONS 94.7 recorded the weightwise-only limit and then wrote that the assumption
+behind it — that the field's SHAPE is not created by the training granularity — is *"untested and
+**untestable** with the recorded data."* **The first clause stands; the word "untestable" is
+WITHDRAWN.** The instrument limit is re-verified here (selftest T6 reads `n_tot` = 11,173,962
+weightwise vs 14,420 nodewise vs 62 layerwise straight out of the coarse probes' own json), but it
+does not imply what 94.7 concluded, for a reason visible in the SOURCE rather than in the data.
+
+**THE PREMISE IS A CODE IDENTITY, NOT AN EMPIRICAL CLAIM** (selftest T1, asserted against
+`patches/HF_patched.py`, not quoted from memory):
+
+* `meta='fixed'` binds `self.meta_update = self.no_meta_update`; `no_meta_update` is `return None`
+  and never touches `self.beta`.
+* `init_meta` sets `beta = log(alpha0) * ones(...)` at **every** `stepsize_type` — scalar,
+  layerwise, nodewise, weightwise. β starts UNIFORM.
+* So `alpha = beta_to_alpha(beta)` is the same constant for every coordinate in every arm, and
+  `base_update(net, g)` receives an identical step size regardless of granularity.
+* `block_product`'s output reaches exactly two callees: `meta_update` (a no-op here) and `_probe`
+  (read-only).
+
+⇒ **With β frozen the granularity does not touch the trajectory at all.** A frozen weightwise run
+and a frozen layerwise run traverse the *same* trajectory. Empirical half, re-derived (T7): frozen
+granularity span median **0.078 pp** vs free **5.662 pp**. Therefore **a frozen weightwise probe
+records the per-coordinate field along the very trajectory a frozen layerwise run would traverse**,
+and for the frozen stratum the instrument limit does not bind.
+
+## 66.2 THE CORPUS ALREADY CONTAINED FOUR TRAJECTORY CLASSES, ALL PROBED PER-COORDINATE
+
+| class | what it is | n arms | r18 plateau |
+|---|---|---|---|
+| frozen | β never moves; granularity a no-op **by construction** | 8 | 60.05–61.14 |
+| free | Lion meta, ms=1e-3, per-coordinate adaptation ON | 9 | 68.25–68.83 |
+| EXC ms=1e-2 | 10× meta stepsize (never pooled, CORRECTIONS 62) | 1 | 74.50 |
+| EXC AdamW | a different BASE optimizer entirely | 1 | 81.75 |
+
+## 66.3 THE RESULT: AMPLITUDE MOVES 1059×, LOCATION MOVES ≤1 RUNG
+
+**All 19 of 19 arms peak at u\* ∈ {1/1024, 1/512}** — a one-rung spread across the entire corpus.
+
+| test | provenance | registered bar | measured | verdict |
+|---|---|---|---|---|
+| **A1** frozen vs free u\*, per family | post-hoc-informed | ≤1 rung in 4/4 fam | 0.000 / 0.000 / 0.500 / 0.500 | **HELD 4/4** |
+| **A3** furthest clean arm from corpus mean | post-hoc-informed | ≤1 rung | **0.765 rungs** | **HELD** |
+| **B1** full 17-rung normalised ladder shape | **BLIND** | max gap ≤0.25 | **0.2020** (at 1/1024) | **HELD** |
+| **B2** log₂(u\*) vs the arm's own plateau, r18 | **BLIND** | \|slope\|≤0.10 rung/pp, span ≤1 | **+0.0268 rung/pp**, span 1.000 | **HELD** |
+| **B3** the two exception arms | **BLIND** | within 2 rungs of clean mean | **0.235** both | **HELD** |
+| **B4** amplitude ratio free/frozen (POWER CONTROL) | **BLIND** | ≥1.50, refuted if ≤1.20 | **2.192×** (4/4 fam: 3.17/2.56/1.82/1.56) | **HELD** |
+
+**B4 is why A1/B1 are not vacuous.** It was registered as the test that could kill the others: if
+frozen and free fields were identical in every respect, invariance of the location would merely
+report that a manipulation which did nothing changed nothing. The manipulation is real —
+free-vs-frozen amplitude ratio **2.19×**, and across the full corpus E\* spans **0.0777 → 82.3141
+pp, a factor of 1059** — while the peak location does not move one rung.
+
+**B2 is the sharpest single line.** On ResNet18 the probed arms span **21.7 pp of plateau
+(60.05 → 81.75)** across β-frozen, free, 10× meta-stepsize and a different base optimizer, and the
+peak location regresses on outcome at **+0.027 rungs per pp** — i.e. traversing the entire 21.7 pp
+range moves the predicted peak by **0.58 of one ladder rung**.
+
+## 66.4 THE ALTERNATIVE EXPLANATION IS ALREADY CLOSED BY c62's PHASE TEST
+
+u\*≈1/512 is 1–9 coordinates, the 3×3 kernel, and the same 3×3 kernel exists in all four
+architectures — so a generic block-index/size artifact must be excluded. c62's S2 phase test does
+exactly that: g=9 blocks ALIGNED to the kernel vs OFFSET by 4, **identical size, identical null,
+only alignment differs**. Cited, not re-derived (`results/c62_spatial.txt`): aligned > offset in
+**19 of 19 arms**, ratio 1.20–4.97, and **the effect is present in the frozen arms too**
+(1.20–1.92). Alignment-dependence cannot be produced by block size.
+
+## 66.5 SECONDARY, UNSCORED: FREE ADAPTATION SHARPENS THE LADDER AS WELL AS RAISING IT
+
+The frozen mean normalised ladder sits ABOVE the free one at every rung except the peak — at
+u = 1 (one output channel, the finest partition anywhere in the Adam-mini / Adalayer / SGG line)
+the frozen field retains **14.5%** of its own peak against the free field's **4.0%**. So
+per-coordinate adaptation does not merely amplify the field, it **concentrates it further toward
+fine scales**. Registered as an observation, not a result. Note its DIRECTION: if it extrapolates,
+a free-*layerwise* trajectory would sit further from layer scale, not nearer — but that is an
+extrapolation and is not claimed.
+
+## 66.6 WHAT THIS DOES TO 65, AND WHAT IS LEFT
+
+**It strengthens 65's headline.** 65.7 was the escape hatch for 94.2's five-decade separation: the
+field peak might have been an artifact of the weightwise arm, and weightwise is the worst-training
+granularity in every free cell. That escape is now closed — the peak sits at 1/512 in the arm that
+trains **best** in the corpus (bo6, 81.75 pp), and in arms where **no adaptation happened at all**.
+The separation is not an artifact of measuring in the worst arm.
+
+**What is left, exactly one cell.** No arm in the corpus has β partitioned COARSELY *and freely*.
+The free-layerwise trajectory is still unobserved at coordinate resolution and only PROBE7
+(CORRECTIONS 94.12) reaches it. But B5 bounds how big that step is: the r18 free-layerwise
+training optimum — **74.524 pp (n=18), which is 94.2's own training peak** — falls **INSIDE** the
+probed plateau range 60.05–81.75. So the step from measured to unmeasured is **not an
+extrapolation in OUTCOME**; the residual gap is the PARTITION itself and nothing else.
+
+## 66.7 LIMITS
+
+* **L1** The ladder's finest rung is 1/1024 (block size 1–4 coords); arms peaking there are at the
+  ladder floor. All statements are about the resolvable range, per c62's scope.
+* **L2** A1/A3 are POST-HOC-INFORMED and labelled so in the output: c65's PART C table (u\*, E\*,
+  stratum) had been read before they were written. B1–B4 are blind — c65 prints only the peak rung
+  and **excludes** the exception arms (`if arm["exc"]: continue`), so B1's shape, B2's slope, B3's
+  exception-arm peaks and B4's ratio appear in no output that preceded registration.
+* **L3** ms=1e-2 stays unquotable as an ACCURACY claim (CORRECTIONS 62). B3 scores the exception
+  arms for LOCATION only, which is a statement about the field, never pooled with the clean 17.
+* **L4** This is the marginal channel only (c62): the correlation channel has no coordinate
+  resolution and is untouched here.
+* **STANDING RULE (13) is unaffected** — every E-derived claim remains a claim about the
+  meta-gradient field only. 66 says the field is robustly measured; it says nothing new about the
+  accuracy link, which stays negative at five orders of magnitude.
+
+**Do not re-run offline:** 66.1–66.6 are closed on the present corpus.
