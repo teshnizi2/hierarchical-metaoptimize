@@ -3978,3 +3978,108 @@ did not move across four trajectory classes, so *"u\* moves to the training gran
 scale"* would now contradict 19 arms, not merely one. (d) **DONE, do not re-run:** everything in
 94.11(e), **and now C66 in full (66.1–66.6)**. (e) The offline queue is again down to the
 carried-since-51 `s` re-derivation — genuinely the last item, and it is bookkeeping.
+
+# CORRECTIONS 96 — cycle 67 decision record
+
+**96.0 OUTAGE, TWELFTH CONSECUTIVE TICK, LOCALISED NOT ASSUMED.** Gateway `p-cfer-016105` up and
+answering; from it `nc -z 132.229.104.230 22` and `.231` both read **DOWN**; `ssh alice` /
+`alice2` fail at **banner exchange**. Checked **2026-08-23T19:26Z**. **No queue read, nothing
+synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `sp8` (9), `hz9` (9), `cp9`
+(8), `rw9` (18) remain written, validated, UNSUBMITTED; PROBE7 + GATE P7 remain the first thing to
+run on return. `docs/` is now **NINE** cycles behind on the cluster.
+
+**96.1 THE TICK'S DECISION.** The offline queue held only the carried-since-51 `s` re-derivation.
+I applied STANDING RULE (12) to the campaign's headline instead: every primary cell of 65.3 — the
+K2 numerator — is `ms1e-3`, and K2 had never been scored against the meta-step-size axis. The
+corpus contains a matched 5-rung ms ladder at which **both** ladders exist. → FINDINGS 67
+
+**96.2 THE FIELD SURVIVES A KNOB THAT MOVES TRAINING BY 10 pp.** 14 weightwise probe arms across
+5 ms rungs: **u\* = 1/512 in 14 of 14, spread 0.000 rungs.** B4, registered in advance to KILL B3
+if it failed, gives amplitude ratio **1.524× on the clean dial** and 415.3× including ms=1e-2.
+With 66's four trajectory classes that is **33 of 33 arms peaking at exactly 1/512.**
+**Against our interest:** 1.524× clears a 1.50 bar by 0.024, and only the unquotable rung makes it
+comfortable.
+
+**96.3 I BUILT THREE TESTS ON A RUNG THIS PROJECT DISQUALIFIED EIGHT CYCLES AGO.** P1/P2/B1 all
+keyed on ms=1e-2, where the training argmax appears to move layerwise→nodewise. **CORRECTIONS 62 /
+FINDINGS 51.2 already ruled that rung BOUNDARY-DOMINATED** — β "exactly fills whatever box it is
+given", *"not a point on the dial at all"*. **P1, P2 and B1 are VOID-BY-SCOPE**, whatever their
+numbers say. The 415× field amplitude there is clip saturation, not structure. → 67.3
+
+**96.4 A REFUTED CONSISTENCY CHECK FOUND A DEFECT UNDER THE HEADLINE.** B2 failed in a direction
+that made no sense (a 1.67 pp gap at 25/25 seeds becoming 0.02–0.37 pp with the sign flipping).
+Cause, asserted from source by selftest T3: `aggregate.py:85` is `plateau_of(tests, k=20)`. **A
+20-epoch run has exactly 20 epochs**, so the docstring's "undefined for runs shorter than k" guard
+never fires and `tests[-20:]` is **the whole run**. W1: **144 runs, 0 disagreements**;
+`mean(last5) − recorded plateau` median **+13.479 pp**. W4: **380 of 1675 runs (22.7%)** carry a
+`plateau` that is a whole-run mean. → 67.4
+
+**96.5 AND IT IS A REDISCOVERY. SAYING SO IS THE POINT.** **CORRECTIONS 86.2 (cycle 56) recorded
+this verbatim** and prescribed matched-k; **86.3 + FINDINGS 58.1 (cycle 58)** established and then
+independently reproduced the horizon reversal to three decimals; **58.3/58.4** already ran my B7 at
+100 epochs. **No credit is claimed for any of it, and B7 is REFUTED as registered.** → 67.5
+
+**96.6 THE LOAD-BEARING CORRECTION: 62–66 NEVER APPLIED 86.2.** `86.2`, `86.3` and `58.1–58.8` are
+cited **nowhere** in cycles 62–66. FINDINGS 65.3's ladder is a 20-epoch `plateau` table — exactly
+the column 86.2 ruled unusable — and its layerwise argmax contradicts 86.3, which this corpus had
+already confirmed. Re-scored from raw `.out` curves at the headline rung ms=1e-3, with 65.6/94.3's
+own resolution gate registered in advance:
+
+| window | layerwise | nodewise | weightwise | resolved strata |
+|---|---|---|---|---|
+| k=20 (recorded) | 74.52 (18) | 72.86 (16) | 68.50 (17) | **4/4, argmax layerwise, 2.94–5.17 sem** |
+| k=5 (documented) | 86.79 (18) | 86.72 (16) | 82.12 (17) | **0/4 — 0.07 pp, 0.15–0.32 sem** |
+
+**The 1.67 pp layerwise advantage is an artifact of the k=20 window.** n=27/25/26 pooled — an
+independent replication ~4× larger than 86.3's n=7, reproducing its epoch-20 tie to 0.085 pp.
+W5's positive control PASSES under both windows, so the correction is actionable. → 67.6
+
+**96.7 K2's VERDICT STANDS; ITS HEADLINE NUMBER IS WITHDRAWN.** 94.2/65.4's **median 5.41 decades
+presumes `u_train* = layerwise` (u=439.78)**, and that argmax is unresolved under the documented
+window. At `u_train* = nodewise` the separation is **2.71**. K2's ≥2-decade bar fires either way
+(B5: 5/5 rungs across the ms axis). **The 5.41 figure is withdrawn as a point estimate; the
+defensible number is ≥2.71 decades (≥512×)** — the robustness floor 65.4 had already computed as a
+footnote, which now carries the claim. → 67.7
+
+**96.8 THE REPLACEMENT SENTENCE IS STRONGER THAN THE ONE IT REPLACES.** With 58.6/58.8's tuned
+100-epoch table (three partitioned arms span **0.172 pp, inside layerwise's own seed sd 0.291**;
+partition-vs-none is 0.454–0.626 pp): **there is no training peak among partitions to be far apart
+from, and the field peaks where training is worst** — u\*_E = 0.001953 sits **0.74 decades from
+weightwise** (−4.6 pp, the worst partition, resolved at n=26) and **2.71 decades below the flat
+best region** u ∈ [1, 440]. **Capturing more of the field's structure monotonically HURTS.** This
+strengthens STANDING RULE (13) rather than softening it. → 67.8
+
+**96.9 STANDING RULE (14), the fourteenth:** *a derived column whose window is defined in absolute
+units must assert that the window is strictly shorter than the series it summarises.* Otherwise it
+silently becomes a different statistic — here, an asymptote at 100 epochs and an
+area-under-the-curve speed measure at 20 — under one column name. The concrete instance:
+`plateau_of`'s guard is `len(tests) >= k` and must be `len(tests) > k` at minimum, or the column
+must be emitted blank. **This is the second time a window definition has cost this campaign a
+headline** (the first was 86.1/86.2), which is why it becomes a rule rather than a note.
+
+**96.10 NOT DONE, DELIBERATELY.** **I did not modify `aggregate.py` or regenerate the CSV.**
+Redefining `plateau` changes 380 runs and every number in 66 cycles of docs, and would invalidate
+c62–c66's cached artifacts mid-campaign. **That is an operator decision.** Recommendation, in
+order: (i) keep `plateau` as-is for continuity, (ii) add a **new** column `plateau5` = mean(last 5)
+plus `auc` = whole-run mean, (iii) re-derive only the tables that compare across budgets. The
+instrument that does the re-derivation from raw `.out` already exists
+(`analysis/c67_plateau_window.py`, 18/18 selftests) and needs no cluster.
+
+**96.11 ORPHANS.** CSV unchanged at 1707, so the orphan set is unchanged from 95.10: **109
+families, 2 orphan, 12 runs** (`gate0b`, `gate0d`), both retired in FINDINGS 61.8 and **not to be
+re-run**. This tick cites `ml5`, `ns5`, `wc5`, `cl5`, `fr5`, `p7`, `p3`, `z3`, `rs` — all
+already-cited families. **None retired, none created.**
+
+**96.12 IDEAS 1 AND 2 STAY DEAD.** Zero jobs, this cycle and the previous twenty-four.
+
+**96.13 NEXT TICK, IN ORDER.** (a) reachability, then `squeue` **both** accounts before anything.
+(a2) **rsync `docs/` — NINE cycles behind.** (b) **GATE P7 first** (one 20-epoch weightwise job,
+`PROBE5=1 PROBE7=1 hier=''`, bitwise equality of `coord_neg_counts.npy` against `neg_counts.npy`),
+then `sp8` (alice2, 9), `hz9` (9, alice), `cp9` (8, alice) after applying
+`patches/patch_probe6_coord.py`. **`hz9` is RE-RANKED UP by 96.6/96.7**: its H1/H1b/H2 are the
+paired, tuned, 100-epoch test of exactly the layerwise-vs-nodewise question that 67.6 has now shown
+is unresolved at 20 epochs, and 58.6/58.8's tuned table rests on **nodewise n=1**. (c) Score PROBE7
+against 94.12's pre-registered reading, unchanged. (d) **DONE, do not re-run:** everything in
+95.12(d), **and now C67 in full (67.1–67.8)**. (e) The offline queue is again down to the
+carried-since-51 `s` re-derivation.

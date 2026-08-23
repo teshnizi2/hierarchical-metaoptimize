@@ -54,7 +54,62 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 66) -- **ALICE DOWN AN ELEVENTH TICK. THE FIELD'S SCALE DOES NOT MOVE WITH THE TRAJECTORY THAT MEASURED IT.**
+## Running / next (cycle 67) -- **ALICE DOWN A TWELFTH TICK. THE K2 NUMERATOR IS BUILT ON A COLUMN THIS PROJECT ALREADY RULED UNUSABLE.**
+
+**Read `docs/CORRECTIONS.md` 96 and `docs/FINDINGS.md` 67.0-67.9 FIRST. 96.7 WITHDRAWS the
+campaign's headline NUMBER (not its verdict); 96.9 adds STANDING RULE (14); 96.6 is the
+load-bearing item.**
+
+* **BOTH LOGIN NODES DOWN FOR A TWELFTH CONSECUTIVE TICK**, localised not assumed: gateway up and
+  answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice` /
+  `alice2` fail at banner exchange. Checked **2026-08-23T19:26Z**. **No queue read, nothing synced,
+  nothing submitted, nothing cancelled. CSV unchanged at 1707.** `bo7-*` (12, alice) / `bd7-*`
+  (12, alice2) survival still UNKNOWN and still not guessed. `docs/` is **NINE** cycles behind.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 132.229.104.230 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else**, then **GATE P7**, then `hz9` (RE-RANKED
+  UP, see below), `sp8`, `cp9`.
+* **THE TICK'S DECISION (96.1).** Applied STANDING RULE (12) to the headline: every primary cell of
+  65.3 is `ms1e-3`, so K2 had never been scored on the meta-step-size axis. Two instruments,
+  both registered and committed BEFORE scoring: `c67_ms_axis.py` (**91/91**, `495a7b1`) and
+  `c67_plateau_window.py` (**18/18**, `de10f70`).
+* **THE FIELD DOES NOT MOVE, AT ALL (96.2).** 14 arms x 5 ms rungs: **u\* = 1/512 in 14/14, spread
+  0.000 rungs**, while B4 (registered to KILL B3) measures amplitude **1.524x** clean / **415x**
+  including ms=1e-2. With 66's four trajectory classes: **33 of 33 arms peak at exactly 1/512.**
+* **I BUILT THREE TESTS ON A DISQUALIFIED RUNG (96.3).** P1/P2/B1 all keyed on ms=1e-2. CORRECTIONS
+  62 already ruled it **BOUNDARY-DOMINATED**, *"not a point on the dial at all"*. **VOID BY SCOPE.**
+* **THE DEFECT UNDER THE HEADLINE (96.4).** `aggregate.py:85` is `plateau_of(tests, k=20)`. A
+  20-epoch run has exactly 20 epochs, so the "undefined" guard never fires and **`plateau` is the
+  WHOLE-RUN MEAN** -- an area-under-the-curve SPEED statistic, read everywhere as an asymptote.
+  W1 **144 runs, 0 disagreements**; median `mean(last5) - plateau` = **+13.479 pp**;
+  **380 of 1675 runs (22.7%)** affected.
+* **AND IT IS A REDISCOVERY -- 86.2 / 86.3 / 58.1 GOT THERE FIRST (96.5).** No credit claimed;
+  **B7 is REFUTED as registered.**
+* **THE LOAD-BEARING ITEM (96.6): CYCLES 62-66 NEVER APPLIED 86.2.** Those sections are cited
+  **nowhere** in 62-66. Re-scored from raw `.out` at ms=1e-3 with 65.6/94.3's own resolution gate:
+  k=20 gives **layerwise, 4/4 resolved, 2.94-5.17 sem**; k=5 (the documented definition) gives
+  **0.07 pp, UNRESOLVED 4/4, 0.15-0.32 sem** at n=27/25/26. **The 1.67 pp layerwise advantage is a
+  window artifact.** W5's positive control passes under both windows.
+* **K2's VERDICT STANDS, ITS NUMBER DOES NOT (96.7).** 5.41 decades presumes `u_train*=layerwise`,
+  which is unresolved. **5.41 is WITHDRAWN as a point estimate; the defensible figure is >=2.71
+  decades (>=512x)** -- 65.4's own robustness floor, which now carries the claim.
+* **THE REPLACEMENT SENTENCE IS STRONGER (96.8).** With 58.6/58.8's tuned table: **there is no
+  training peak among partitions to be far apart from, and the field peaks where training is
+  worst.** u\*_E=0.001953 sits **0.74 decades from weightwise** (-4.6 pp, worst, n=26) and **2.71
+  below the flat best region u in [1,440]** (0.07 pp at 20ep matched-k; 0.172 pp at 100ep tuned).
+  **Capturing more of the field's structure monotonically HURTS.** Strengthens STANDING RULE (13).
+* **STANDING RULE (14), added 96.9:** *a derived column whose window is defined in absolute units
+  must assert that the window is strictly shorter than the series it summarises.*
+* **NOT DONE, DELIBERATELY (96.10).** `aggregate.py` and the CSV are **UNCHANGED** -- redefining
+  `plateau` moves 380 runs and 66 cycles of numbers. **Operator decision.** Recommended: keep
+  `plateau`, ADD `plateau5` + `auc`, re-derive only cross-budget tables.
+* **`hz9` IS RE-RANKED UP (96.13).** Its H1/H1b/H2 are the paired, tuned, 100-epoch test of exactly
+  the layerwise-vs-nodewise question 67.6 shows is unresolved -- and 58.6/58.8 rest on nodewise n=1.
+* **OFFLINE QUEUE** is again down to the carried-since-51 `s` re-derivation (bookkeeping).
+
+---
+
+## Superseded -- cycle 66 (kept for the record)
 
 **Read `docs/CORRECTIONS.md` 95 and `docs/FINDINGS.md` 66.0-66.7 FIRST. 95.2 WITHDRAWS a word
 from 94.7 and 95.8 DEMOTES the previous tick's top-ranked item.**

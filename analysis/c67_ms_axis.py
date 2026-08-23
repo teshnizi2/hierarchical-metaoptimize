@@ -540,8 +540,8 @@ def report(out_json=None, field_limit=None):
         wins = sum(1 for _c, _s, n, l in pairs if n > l)
         print(f"   ms={ms}: {len(pairs)} matched pairs, nodewise wins {wins}")
         for c, sd, n, l in pairs:
-            print(f"      clip={c:>15} seed={sd:>3}  node={n:7.3f}  lay={l:7.3f}  "
-                  f"diff={n - l:+7.3f}")
+            print(f"      clip={c:>15} {sd[0]:>4}/s{sd[1]:<2}  node={n:7.3f}  "
+                  f"lay={l:7.3f}  diff={n - l:+7.3f}")
     n_hi = sum(1 for _c, _s, n, l in b1.get("1e-2", []) if n > l)
     n_lo = sum(1 for _c, _s, n, l in b1.get("1e-3", []) if l > n)
     tot_hi, tot_lo = len(b1.get("1e-2", [])), len(b1.get("1e-3", []))

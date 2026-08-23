@@ -1,0 +1,57 @@
+========================================================================================================
+C67-W  --  WHAT `plateau` IS AT 20 EPOCHS, AND WHETHER K2's NUMERATOR SURVIVES IT
+========================================================================================================
+
+W1  MECHANICAL: recorded plateau == mean(last 20) == mean(whole 20-epoch run)
+    checked 144 runs;  disagreements = 0  -> HELD
+    mean(last5) - recorded plateau:  median +13.479 pp, range +8.250 .. +16.851 pp
+
+W4  BLAST RADIUS across the whole corpus (no bar, a count):
+    runs with a recorded plateau: 1675
+      epochs_done <= 20  window = THE WHOLE RUN            : 380 (22.7%)
+      21..40             window >= half the run            : 25 (1.5%)
+      > 40               window is a genuine tail          : 1270 (75.8%)
+
+W2  THE DECIDING TEST -- 20-epoch ladder at ms=1e-3 under p5 = mean(last 5)
+    (ms=1e-2 printed but NEVER scored: CORRECTIONS 62 boundary-dominated)
+
+    --- window k = 20 (as recorded)
+        ms           clip   layerwise    nodewise   weightwis   argmax        margin
+      1e-4    -15:-2.3026    64.62(3)    63.51(3)    62.28(3)    layerwise   6.67 sem
+      2e-4        -30:0.0    67.15(3)    65.50(3)    63.59(3)    layerwise  10.34 sem
+      5e-4        -30:0.0    71.74(2)    69.32(2)    66.27(2)    layerwise   6.38 sem
+      1e-3    -15:-2.3026    74.52(18)    72.86(16)    68.50(17)    layerwise   5.17 sem
+      1e-3    -30:-2.3026    74.44(3)    73.05(3)    68.54(3)    layerwise   2.94 sem
+      1e-3    -30:-4.6052    74.63(3)    72.90(3)    68.59(3)    layerwise   3.76 sem
+      1e-3        -30:0.0    74.43(3)    72.79(3)    68.58(3)    layerwise   4.44 sem
+      1e-2    -15:-2.3026    78.07(3)    78.54(3)    74.36(3)     nodewise   1.32 sem
+      1e-2    -30:-2.3026    78.34(3)    78.50(3)    74.13(3)     nodewise   0.41 sem  UNRESOLVED
+
+    --- window k = 5 (as documented)
+        ms           clip   layerwise    nodewise   weightwis   argmax        margin
+      1e-4    -15:-2.3026    81.12(3)    78.89(3)    76.64(3)    layerwise   2.99 sem
+      2e-4        -30:0.0    83.46(3)    80.70(3)    78.29(3)    layerwise   2.46 sem
+      5e-4        -30:0.0    86.27(2)    84.43(2)    80.53(2)    layerwise   1.70 sem
+      1e-3    -15:-2.3026    86.79(18)    86.72(16)    82.12(17)    layerwise   0.32 sem  UNRESOLVED
+      1e-3    -30:-2.3026    86.76(3)    86.68(3)    82.18(3)    layerwise   0.20 sem  UNRESOLVED
+      1e-3    -30:-4.6052    86.72(3)    86.68(3)    82.27(3)    layerwise   0.15 sem  UNRESOLVED
+      1e-3        -30:0.0    86.68(3)    86.76(3)    82.11(3)     nodewise   0.20 sem  UNRESOLVED
+      1e-2    -15:-2.3026    86.85(3)    87.01(3)    85.55(3)   resnet18_blocks   1.45 sem
+      1e-2    -30:-2.3026    87.02(3)    87.07(3)    85.18(3)     nodewise   0.10 sem  UNRESOLVED
+
+    headline rung ms=1e-3, k=20 (recorded): argmax layerwise in 4/4 clip strata
+    headline rung ms=1e-3, k=5  (documented): RESOLVED strata = 0/4;  layerwise 0, nodewise 0
+    W2 -> (c) UNDECIDED -- window-dependent with no clean replacement
+
+W3  WINDOW SENSITIVITY (DESCRIPTIVE ONLY -- cannot overturn W2)
+    ms=1e-3, all clip strata pooled by stratum-argmax
+       k     layerwise    nodewise   weightwis   argmax(resolved strata)
+       1      87.42(27)    87.54(25)    83.32(26)   nodewise (UNRESOLVED, 0.37 sem)
+       3      87.03(27)    87.08(25)    82.84(26)   nodewise (UNRESOLVED, 0.27 sem)
+       5      86.76(27)    86.71(25)    82.14(26)   layerwise (UNRESOLVED, 0.33 sem)
+      10      85.47(27)    84.87(25)    79.66(26)   layerwise (resolved, 3.59 sem)
+      20      74.52(27)    72.88(25)    68.52(26)   layerwise (resolved, 5.89 sem)
+
+W5  POSITIVE CONTROL (65.6) UNDER THE NEW WINDOW -- frozen vs free span
+    k=20: frozen median span = 0.047 pp (n=1)   free median span = 5.475 pp (n=9)   -> PASS
+    k= 5: frozen median span = 0.186 pp (n=1)   free median span = 4.580 pp (n=9)   -> PASS

@@ -12828,3 +12828,181 @@ extrapolation in OUTCOME**; the residual gap is the PARTITION itself and nothing
   accuracy link, which stays negative at five orders of magnitude.
 
 **Do not re-run offline:** 66.1–66.6 are closed on the present corpus.
+
+---
+
+## 67.0 STATE — ALICE DOWN A **TWELFTH** CONSECUTIVE TICK, ZERO JOBS
+
+Gateway `p-cfer-016105` up and answering; from it `nc -z 132.229.104.230 22` and `.231` both
+**DOWN**; `ssh alice` / `alice2` fail at banner exchange. Checked **2026-08-23T19:26Z**. No queue
+read, nothing synced, nothing submitted, nothing cancelled. CSV unchanged at 1707.
+
+Two instruments, both registered and committed before scoring:
+`analysis/c67_ms_axis.py` (**91/91 selftests**, commit `495a7b1`) and
+`analysis/c67_plateau_window.py` (**18/18 selftests**, commit `de10f70`).
+
+## 67.1 THE QUESTION I SET OUT TO ASK, AND WHY IT WAS THE RIGHT ONE TO ASK
+
+Every primary cell of 65.3 — the **K2 numerator** — is `ms1e-3`. Under STANDING RULE (12) the
+honest statement of K2 was `K2 fires 20/21 [weightwise-probed field; 20-epoch window; **ms=1e-3**]`
+and the third bracket had never been written. The corpus contains a matched five-rung ms ladder,
+100× wide, at which **both** readouts exist (R18/C10/20ep/a0=1e-3/AUG/SGDm/Lion/batch 100):
+`ml5` supplies rungs 1e-4, 1e-3, 1e-2 varying **only** ms; `ns5` supplies 2e-4 and 5e-4.
+
+## 67.2 THE FIELD DOES NOT MOVE. AT ALL. (B3/B4, BLIND-1LEAK)
+
+14 weightwise probe arms, 5 ms rungs, `E(u)` by c62/c63 **by reference** (T1):
+
+| ms | n arms | u\*_E (geo) | log2 u\* | E\* (geo, pp) | u\* range | E/res |
+|---|---|---|---|---|---|---|
+| 1e-4 | 3 | 0.001953 | −9.00 | 0.2029 | 1/512..1/512 | 11.0–22.0 |
+| 2e-4 | 3 | 0.001953 | −9.00 | 0.2276 | 1/512..1/512 | 6.7–17.7 |
+| 5e-4 | 2 | 0.001953 | −9.00 | 0.2876 | 1/512..1/512 | 9.6–36.2 |
+| 1e-3 | 3 | 0.001953 | −9.00 | 0.3092 | 1/512..1/512 | 8.6–13.4 |
+| 1e-2 | 3 | 0.001953 | −9.00 | 84.2663 | 1/512..1/512 | 5897–11862 |
+
+**B3: peak spread = 0.000 rungs — 14 of 14 arms peak at exactly 1/512.**
+**B4 (POWER CONTROL, registered to KILL B3 if it failed): amplitude ratio 1.524× on the clean
+dial (1e-4→1e-3) and 415.3× including ms=1e-2.** The knob does something; the location does not
+move. Combined with 66 (4 trajectory classes), **the field peak has now survived every
+manipulation this corpus contains.**
+
+**AGAINST OUR INTEREST:** on the clean dial the amplitude ratio is **1.524× against a registered
+bar of 1.50** — it clears by 0.024. Only the boundary-dominated rung makes B4 comfortable, and
+that rung is unquotable (67.3).
+
+## 67.3 THE REVERSAL I FOUND IS **VOID BY SCOPE**, KILLED BY THIS PROJECT'S OWN PRIOR CORRECTION
+
+The ms=1e-2 rung shows the training argmax moving layerwise→nodewise (P1, P2 rho=+0.707, B1 4/6).
+**None of it may be reported.** CORRECTIONS 62 / FINDINGS 51.2 already ruled that rung
+**BOUNDARY-DOMINATED**: at ms=1e-2 the log-stepsize distribution "spreads ballistically at ~99% of
+the maximum Lion speed and exactly fills whatever box it is given (12.70 → 12.70; 27.70 → 27.70)"
+— *"not a confounded point on the dial, it is **not a point on the dial at all**"*. Its 415×
+field amplitude and its E(1)=42.3 pp (vs 0.03 pp elsewhere) are clip saturation, not structure.
+**P1, P2 and B1 are VOID-BY-SCOPE regardless of their numeric verdicts.** I built three tests
+around a rung the campaign had already disqualified eight cycles earlier.
+
+## 67.4 CHASING A REFUTED CONSISTENCY CHECK FOUND THE REAL DEFECT (W1)
+
+B2 (`best_test` consistency) REFUTED in a nonsensical direction: a **1.67 pp** plateau gap with
+25/25 matched seeds became **0.02–0.37 pp with the sign flipping**. Cause, asserted from source
+by selftest T3, not quoted from memory:
+
+    analysis/aggregate.py:85    def plateau_of(tests, k=20):   # "the arm's asymptote"
+
+**A 20-epoch run has exactly 20 epochs**, so `len(tests) >= k` passes, the docstring's
+"undefined for runs shorter than k epochs" guard never fires, and `tests[-20:]` is **the entire
+run**. Verified on the raw `.out` (`ml5-lay-m3-s0`, 4702095):
+
+| curve | 32.53 42.05 52.41 57.69 66.23 70.47 75.53 78.38 81.09 82.57 82.91 83.87 84.18 85.92 86.12 86.83 87.07 86.30 87.17 87.12 |
+|---|---|
+| recorded `plateau` | **74.822** |
+| mean(last 20) | 74.822 ← what `plateau_of` computes |
+| mean(last 5) | **86.898** ← what METRIC RULES says `plateau` is |
+| max / final | 87.170 / 87.120 — **the run ends at its best; there is no collapse** |
+
+**W1 HELD: 144 runs checked, 0 disagreements.** `mean(last5) − recorded plateau` = median
+**+13.479 pp**, range +8.250..+16.851.
+**W4 BLAST RADIUS:** of 1675 runs with a recorded plateau, **380 (22.7%) have `epochs_done ≤ 20`**
+(window = the whole run), 25 (1.5%) are 21–40, 1270 (75.8%) are a genuine tail.
+
+At ≤20 epochs `plateau` is an **area-under-the-learning-curve SPEED statistic**, and the same
+column name denotes a genuine asymptote at 100 epochs. This also explains B2 with no new physics:
+`plateau` and `ep_to_85` are both speed measures and agree; `best_test` is a level measure and
+does not resolve the contrast (0.02–0.37 pp, inside the ±0.37 pp inflation band METRIC RULES
+already warns about).
+
+## 67.5 **THIS IS A REDISCOVERY, AND SAYING SO IS THE POINT** — 86.2 / 86.3 / 58.1 GOT THERE FIRST
+
+| what I "found" | already on record | cycle |
+|---|---|---|
+| `plateau_of` k=20 → whole-run mean at 20 ep | **CORRECTIONS 86.2**, verbatim, prescribing matched-k | 56 |
+| layerwise/nodewise ordering is horizon-dependent | **CORRECTIONS 86.3** (7/7 seeds, crossing in [15,25]) | 56 |
+| reproduced by an independent instrument | **FINDINGS 58.1**, `c58_horizon_reversal.py`, to three decimals | 58 |
+| my B7 (100-epoch flip at ms=3e-4, 1e-3) | **FINDINGS 58.3/58.4**, matched-k=5, and persisting to epoch 100 | 58 |
+
+**B7 is REFUTED as registered and is a rediscovery.** No credit is claimed for any row above.
+
+## 67.6 THE LOAD-BEARING FINDING: **CYCLES 62–66 NEVER APPLIED 86.2, AND K2 IS BUILT ON THE COLUMN IT FORBIDS**
+
+`grep` over `docs/` and `analysis/c6[2-7]*.py`: **86.2, 86.3 and 58.1–58.8 are cited nowhere in
+cycles 62–66.** FINDINGS 65.3's ladder — the K2 numerator — is a 20-epoch `plateau` table, i.e.
+exactly the column 86.2 ruled unusable, and its layerwise argmax contradicts 86.3, which the same
+corpus had already confirmed to three decimals.
+
+**W2, re-scored from raw `.out` curves** (independent of `aggregate.py`), headline rung ms=1e-3,
+resolution gate = 65.6/94.3's own rule (margin > 2·√(sem₁²+sem₂²)), registered in advance:
+
+| window | clip strata | layerwise | nodewise | weightwise | argmax | margin |
+|---|---|---|---|---|---|---|
+| k=20 (recorded) | 4/4 | 74.52 (18) | 72.86 (16) | 68.50 (17) | layerwise | 2.94–5.17 sem, **RESOLVED 4/4** |
+| k=5 (documented) | 0/4 | 86.79 (18) | 86.72 (16) | 82.12 (17) | — | 0.15–0.32 sem, **UNRESOLVED 4/4** |
+
+**The 1.67 pp layerwise advantage is entirely a property of the k=20 window. Under the documented
+definition layerwise and nodewise differ by 0.07 pp and are unresolved in 4 of 4 clip strata**
+(n=27/25/26 pooled — an independent replication ~4× larger than 86.3's n=7, and it reproduces
+86.3's epoch-20 tie of +0.035 to within 0.085 pp).
+
+**W3 window sensitivity (descriptive, pooled ms=1e-3, n=27/25/26):**
+
+| k | layerwise | nodewise | weightwise | argmax |
+|---|---|---|---|---|
+| 1 | 87.42 | **87.54** | 83.32 | nodewise (unresolved, 0.37 sem) |
+| 3 | 87.03 | **87.08** | 82.84 | nodewise (unresolved, 0.27 sem) |
+| 5 | **86.76** | 86.71 | 82.14 | layerwise (unresolved, 0.33 sem) |
+| 10 | **85.47** | 84.87 | 79.66 | layerwise (**resolved**, 3.59 sem) |
+| 20 | **74.52** | 72.88 | 68.52 | layerwise (**resolved**, 5.89 sem) |
+
+Layerwise's advantage is monotone in how much of the *startup transient* the window includes.
+**W5 POSITIVE CONTROL PASSES under both windows** (k=5: frozen span 0.186 pp vs free 4.580 pp;
+frozen n=1 here — weaker than 65.6's n=5 because this design is restricted to a0=1e-3), so the
+re-windowed ladder is a usable measurement and the correction is actionable.
+
+## 67.7 WHAT THIS DOES TO K2 — THE VERDICT SURVIVES, THE HEADLINE NUMBER DOES NOT
+
+The u axis, all four points re-derived this tick from `c65.u_point` on real probe shapes:
+
+| object | u | log10 separation from u\*_E |
+|---|---|---|
+| weightwise | 0.000355 | −0.74 |
+| **field peak u\*_E** | **0.001953** | — |
+| nodewise (= the literature's `out`) | 1.000 | **+2.71** |
+| layerwise | 439.78 | **+5.35** |
+
+94.2/65.4's **median 5.41 decades presumes `u_train* = layerwise`. That argmax is unresolved
+under the documented window.** K2's ≥2-decade bar fires either way (2.71 ≥ 2.0), and B5 scored
+5/5 rungs across the ms axis. **So K2's VERDICT is unchanged and its MAGNITUDE 5.41 is withdrawn
+as a point estimate.** The defensible figure is the robustness floor 65.4 had already computed as
+a footnote — **≥2.71 decades (≥512× in block size)** — which now carries the claim.
+
+## 67.8 THE STATEMENT THAT SURVIVES ALL OF IT, AND IT IS STRONGER THAN 94.2's
+
+Combining 67.2, 67.6 and cycle 58's tuned table (58.6/58.8: at 100 epochs, matched-k=5, each arm
+at its **own** best ms, the three partitioned arms span **0.172 pp — inside layerwise's own seed
+sd of 0.291** — while partition-vs-**none** is 0.454–0.626 pp):
+
+> The meta-gradient field has a sharply located, highly reproducible structure at the kernel
+> scale — u\* = 1/512 in **33 of 33** arms now measured (19 from 66 + 14 here), across 4
+> trajectory classes and a 100× meta-step-size range, while its amplitude moves 415×.
+> Training outcome is **insensitive to partition scale across the entire coarse range**
+> u ∈ [1, 440] (0.07 pp at 20 ep matched-k, n=27/25; 0.172 pp at 100 ep tuned), and falls off
+> **sharply below** it (weightwise, u = 0.000355, −4.6 pp, resolved at n=26). The field's peak
+> sits at u = 0.001953 — **0.74 decades from the worst-performing partition and 2.71 decades
+> below the flat best region.** Capturing more of the field's structure monotonically HURTS.
+
+This is a stronger form of **STANDING RULE (13)**, not a weaker one: it is no longer "the field
+peak and the training peak are far apart", it is **"there is no training peak among partitions to
+be far apart from, and the field peaks where training is worst."**
+
+## 67.9 LIMITS
+
+* ms=1e-2 is **unquotable** (67.3); the clean ms dial is 1e-4→1e-3, a 10× range, not 100×.
+* B4 clears its bar by 0.024 on the clean dial (67.2).
+* W5's frozen stratum is **n=1** in this restricted design.
+* 58.6/58.8's tuned 100-epoch table has **nodewise n=1**; 67.8's "0.172 pp" inherits that.
+* The field remains observable **only under weightwise training** (65.7's instrument limit;
+  66 bounded it, PROBE7 is still the only route to the free-coarse cell).
+* **I did not modify `aggregate.py` or the CSV.** Redefining `plateau` would change 380 runs and
+  every number in 66 cycles of docs; that is an operator decision, not an unsupervised one.
+
+**Do not re-run offline:** 67.1–67.8 are closed on the present corpus.
