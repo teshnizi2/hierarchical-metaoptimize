@@ -121,6 +121,11 @@ BOXES = {
     # cycle-55 span/budget dissociation, submitted and landed in cycle 71.  Single box,
     # read from the script's own BOX= line, not from the data.
     "sp8":  (-30.0,  2.0,    "bin/c55_span_dissociation.sh:189"),
+    # cycle-71 FLOOR ladder (the bd7 re-run).  HI is fixed at +2.0 and the FLOOR is
+    # the varied axis, so the box is per ARM exactly as for cl5/bd7.  Read from the
+    # script's own emitter line, not from the data.
+    "bf8:f60": (-60.0, 2.0, "bin/c71_floor_budget.sh:295"),
+    "bf8:f90": (-90.0, 2.0, "bin/c71_floor_budget.sh:295"),
 }
 
 
