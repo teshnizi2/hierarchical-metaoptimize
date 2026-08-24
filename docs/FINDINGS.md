@@ -13722,3 +13722,88 @@ unaffected by that (the plateau is what it is, and the runs completed 80/80 epoc
 * `bd7` contributes **nothing** to the N_eff/m budget curve. The curve still has **two** points.
 * The census's `ff5`/`fr5`/`ml5@1e−3` items are **flagged, not adjudicated**.
 * `sp8` and `hz9` were submitted this tick and are **unscored**; no number above depends on them.
+
+## 71.7 `sp8` LANDED AND SCORED THE SAME TICK — **THE ARGMIN TRACKS SPAN, NOT BUDGET**
+
+`sp8` (9, alice2) was submitted this tick and all 9 jobs finished inside it: **40/40 epochs,
+`RUN_DONE` 9/9**, verified in the `.out` files rather than inferred from elapsed time.
+
+| gate | result |
+|---|---|
+| **S0** validity | **9/9 PASS** — 40/40 epochs, none collapsed |
+| **S0.3** box-free | **9/9 PASS** — **0.00 %** at *either* guard |
+| **S0.4** plateau > 40 | **9/9 PASS** — 86.892–90.800 |
+| **S0.5** span gate (CAN ONLY VOID) | **PASS** — span **13.111**, gate [11, 18] |
+| **S1** the primary test | **argmin = `node`, gap/SE = 7.35, DECIDED** |
+
+**S0.5's instrument validates against two published numbers on the way past:** `c53_score.beta_span`
+reproduces `ns5` m5p4 at **8.268** (published 8.27) and `br6` c2 at **23.852** (published 23.85).
+Guard 4 predicted span **14.5**; measured **13.111** — inside the gate and inside the node band.
+
+**S1, scored with the REGISTERED instrument** (`c55_neff_noise.py --argmin`, which prices the gap in
+its own SE and refuses any cell with a bound rung anywhere in the ranked set):
+
+| root | arm | ep | span (c55 defn) | argmin | 2nd | gap | SE | gap/SE | status |
+|---|---|---|---|---|---|---|---|---|---|
+| `ns5` | m2p4 | 20 | 2.91 | w | node | 0.0142 | 0.0107 | 1.33 | UNDECIDED |
+| `ns5` | m5p4 | 20 | 6.29 | **w** | node | 0.0566 | 0.0149 | 3.80 | DECIDED |
+| `uc5` | r34 | 20 | 8.88 | node | w | 0.1518 | 0.0465 | 3.26 | DECIDED |
+| **`sp8`** | **m5p4e40** | **40** | **9.96** | **node** | **w** | **0.0728** | **0.0099** | **7.35** | **DECIDED** |
+| `cl5` | cU | 20 | 10.24 | node | w | 0.1007 | 0.0358 | 2.81 | DECIDED |
+| `uc5` | r10 | 20 | 11.80 | node | w | 0.0080 | 0.0207 | 0.38 | UNDECIDED |
+| `uc6` | c100 | 20 | 12.62 | node | w | 0.0676 | 0.0213 | 3.17 | DECIDED |
+| `br6` | c2 | 40 | 17.52 | **w** | node | 0.1298 | 0.0099 | 13.07 | DECIDED |
+
+**`sp8` BREAKS THE CONFOUND CYCLE 55 FLAGGED AGAINST ITSELF.** 55.4 recorded that at the band's
+upper edge *"span and budget are perfectly confounded — every cell above the node band is 40-epoch
+and every cell below is 20-epoch."* **`sp8` is a 40-epoch cell INSIDE the band, and it reads
+`node`.** The confound is broken and span is the variable that survives:
+
+* **At matched BUDGET (40 ep):** `sp8` span 9.96 → **node**; `br6` span 17.52 → **w**.
+  Budget alone cannot produce two different argmins at the same budget.
+* **At matched `ms` (5e−4):** `ns5` 20 ep span 6.29 → **w**; `sp8` 40 ep span 9.96 → **node**.
+  `ms` alone cannot produce two different argmins at the same `ms`.
+* **Span separates all eight cells** into `w` below ~6.3, `node` in ~[8.9, 12.6], `w` above ~17.5.
+
+**NO DIRECTION WAS REGISTERED** — deliberately, because 55.6's transient predicted `w` and 55.7's
+band predicted `node`, and the campaign's own two results disagreed on this cell. That is why the
+batch was worth 9 jobs. **The band branch wins.**
+
+**CONSEQUENCE: two of CORRECTIONS 70's three scopes collapse into one scalar.** Its `ms` scope and
+its 20-epoch budget scope are not independent — both act through **adaptation extent (span)**.
+The third scope, base optimizer, is **not** absorbed: 71.1 shows AdamW gives argmin `w` outright.
+So the surviving statement is **one scalar plus one genuine categorical**, not three scopes.
+
+**THE BAND IS NON-MONOTONE, AND IT IS AN INTERIOR BAND, NOT A THRESHOLD.** CORRECTIONS 74 (N2)
+registered a *threshold* at "span first exceeds ~5" and was already found to have refuted its
+guessed number rather than its variable (92.7). The eight-cell ladder now says the shape is wrong
+too: `w` is the argmin **both below and above** the node band.
+
+## 71.8 S2 — THE BAND IS VISIBLE **WITHIN A SINGLE RUN**
+
+`c55_neff_noise.py --timecourse`, absolute epoch windows so a 20- and a 40-epoch run are compared
+on the same window. All arms whole-run box-free (3/3, 4/4).
+
+| root | rung | 0–10 ep | 10–20 ep | 20–30 ep | 30–40 ep |
+|---|---|---|---|---|---|
+| `sp8` (ms 5e−4) | node | 0.0220 | 0.4236 | **0.3377** | **0.2537** |
+| `sp8` (ms 5e−4) | w | 0.0073 | 0.4174 | 0.5477 | 0.3018 |
+| `br6` (ms 1e−3) | node | 0.0217 | 0.4074 | 0.3270 | 0.2768 |
+| `br6` (ms 1e−3) | w | 0.0092 | **0.5073** | **0.2551** | **0.1201** |
+
+**`br6` crosses over inside one run:** argmin is `node` at 10–20 ep and `w` at 30–40 ep. The `w`
+rung is strongly non-monotone (0.0092 → 0.5073 → 0.1201) while `node` is much flatter
+(0.0217 → 0.4074 → 0.2768). `sp8`'s smaller `ms` moves it along the same curve more slowly, so at
+40 epochs its `w` rung has not yet fallen back below `node` — which is exactly why it reads `node`.
+
+**This is a WITHIN-RUN account of a band previously seen only ACROSS cells**, and it is the
+mechanism the cross-cell ladder implies: both rungs rise then fall with adaptation extent, `w` with
+a larger excursion, so `w` is smallest early, `node` smallest in the middle, `w` smallest again late.
+
+**LABELLED: S2 was registered as a SECONDARY and the crossing reading is POST-HOC in its detail.**
+The registered content is the timecourse table; the rise-then-fall mechanism is an interpretation
+of it and no gate rests on it. It earns a confirmation test, not a claim.
+
+**LIMITS.** `sp8` is n=3, one network, one dataset, one `ms`, SGDm only. The span band's edges are
+read off eight cells that differ in network, dataset and budget as well as span. Two of the eight
+are UNDECIDED. `cl5` cD is UNINTERPRETABLE (all three rungs bound) and is excluded, not counted.

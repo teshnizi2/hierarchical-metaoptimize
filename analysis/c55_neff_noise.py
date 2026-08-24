@@ -118,6 +118,9 @@ BOXES = {
     "bd7:c6": (-30.0, 6.0, "bin/c54_budget_curve.sh:313"),
     "bo7:c2": (-30.0, 2.0, "bin/c54_adamw_ceiling.sh:279"),
     "bo7:c6": (-30.0, 6.0, "bin/c54_adamw_ceiling.sh:279"),
+    # cycle-55 span/budget dissociation, submitted and landed in cycle 71.  Single box,
+    # read from the script's own BOX= line, not from the data.
+    "sp8":  (-30.0,  2.0,    "bin/c55_span_dissociation.sh:189"),
 }
 
 

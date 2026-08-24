@@ -4584,3 +4584,40 @@ and `sp8` **S0 → S0.3 → S0.4 → S0.5 → S1** (S0.5 can only VOID).
 (d) The `bd7` re-run at **LO = −60**, 80 epochs — the only way to get the third budget point.
 (e) The `ff5`/`fr5`/`ml5@1e−3` LO items from 101.6.
 (f) **DONE, do not re-run:** `bo7` (all gates), `bd7` (void, and the void is established).
+
+### 101.9 `sp8` SCORED THE SAME TICK IT WAS SUBMITTED — **SPAN GOVERNS, BUDGET DOES NOT**
+
+All 9 `sp8` jobs finished inside this tick (40/40 epochs, `RUN_DONE` 9/9, verified in the `.out`).
+**S0 9/9, S0.3 box-free 9/9 at 0.00 %, S0.4 9/9, S0.5 span 13.111 inside the [11,18] gate that can
+only VOID.** S1 with the registered instrument: **argmin = `node`, gap/SE = 7.35, DECIDED.**
+
+**NO DIRECTION WAS REGISTERED** (55.6's transient predicted `w`, 55.7's band predicted `node` —
+the campaign's own two results disagreed, which is what made the cell worth 9 jobs). **The band
+branch wins**, and `sp8` breaks the confound 55.4 had flagged against itself: it is the **first
+40-epoch cell INSIDE the node band**, where previously every in-band cell was 20-epoch and every
+40-epoch cell sat above it.
+
+* matched **budget** (40 ep): `sp8` span 9.96 → `node`; `br6` span 17.52 → `w`.
+* matched **`ms`** (5e−4): `ns5` 20 ep span 6.29 → `w`; `sp8` 40 ep span 9.96 → `node`.
+
+**Neither budget nor `ms` can produce two different argmins at its own matched value. Span can.**
+
+**CONSEQUENCE: two of CORRECTIONS 70's three scopes collapse into ONE SCALAR.** The `ms` scope and
+the 20-epoch budget scope both act through **adaptation extent (span)**. The base-optimizer scope
+does **not** collapse — 101.2 shows AdamW gives argmin `w` outright. The surviving form of the
+statement is **one scalar (span) plus one genuine categorical (base optimizer)**, not three scopes.
+
+**AND THE SHAPE IS WRONG IN CORRECTIONS 74, NOT ONLY THE NUMBER.** N2 registered a *threshold*
+("span first exceeds ~5"); 92.7 already found it had refuted its guessed number rather than its
+variable. The eight-cell ladder now shows `w` is the argmin **both below and above** the node band.
+**It is an INTERIOR BAND, not a threshold**, and no document may write it as one.
+
+**A REGISTRY ENTRY WAS ADDED, NOT A NUMBER GUESSED.** `c55_neff_noise.py` skipped `sp8` entirely
+(`BOXES` KeyError → `continue`) because its box was unregistered — the module's deliberate design,
+*"a guessed box is worse than no box."* Added `"sp8": (-30.0, 2.0, "bin/c55_span_dissociation.sh:189")`,
+read from the script's own `BOX=` line. **51/51 selftests still pass.** No bar and no statistic changed.
+
+**S2 (secondary) shows the band WITHIN a single run:** `br6`'s argmin is `node` at 10–20 ep and `w`
+at 30–40 ep, because the `w` rung is strongly non-monotone (0.0092 → 0.5073 → 0.1201) while `node`
+is flat (0.0217 → 0.4074 → 0.2768). **The rise-then-fall mechanism is POST-HOC in its detail and
+no gate rests on it** — it earns a confirmation test, not a claim.
