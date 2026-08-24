@@ -5104,3 +5104,40 @@ blocks of size K), which interpolates the whole 62 → 11.17M range with one kno
 change and it does not belong in the same batch as a measurement**, so it was not bundled into `at1`.
 It is the highest-value next step and it is written down here as the recommendation, not done on a
 hunch: it converts the campaign's central curve from 5 points with a 3-decade hole into a continuum.
+
+## 104.9 THE PATCH 104.8 RECOMMENDED WAS BUILT, VERIFIED AND SUBMITTED THE SAME TICK
+
+104.8 named the chunked partition as the highest-value next step and explicitly declined to bundle
+a code change into a measurement batch. It is now its own change, with its own tests, and `ck1`
+(15 jobs) is out. FINDINGS 74.9 carries the ladder, the registered gates and the risk.
+
+**TWO THINGS THE TEST SUITE CAUGHT THAT I WOULD OTHERWISE HAVE SHIPPED.**
+
+1. **The first version of the suite passed C1/C2 VACUOUSLY.** At `alpha0=1e-6`, `ms=1e-3`, `k=6` —
+   the regime `tests/test_granularity.py` uses — beta barely moves, so *every* granularity agrees to
+   ~1e-8 and "chunk1 == weightwise" passed for the wrong reason. **C7, which asserts the suite can
+   still tell things apart, is what caught it.** The regime is now `alpha0=1e-3`, `ms=1e-2`, `k=25`.
+
+2. **THE HARNESS IS NONDETERMINISTIC ON CUDA, and the amount is exactly the size of the effect.**
+   Running the *same* config twice on a GPU node gives **max|dbeta| = 2.2e-01** — cuDNN's conv
+   backward is nondeterministic and **Lion's `sign()` amplifies any float-level difference into a
+   full ±2·ms beta step** at whichever of 11.17M coordinates sits nearest a sign boundary. That is
+   the same magnitude as a genuine granularity difference, so **a CUDA equivalence test cannot
+   distinguish "identical" from "completely different"** — and it duly reported C1/C2/C4 as FAILING
+   when nothing was wrong. On CPU the same comparisons are **0.000e+00**. The suite now runs on CPU
+   and **C0 asserts a config equals itself before anything else is scored**.
+
+   **This bears on an existing file, so it is recorded rather than left implicit:**
+   `tests/test_granularity.py` runs on CUDA in the weak regime, so its T1–T5 pass **partly because
+   nothing has diverged yet**. Its verdicts are still right — they were re-derived on CPU in the
+   strong regime and hold bitwise — but **raising its `k` or `alpha0` on a GPU would make it fail
+   for reasons that have nothing to do with the code under test.** docs/OPERATIONS.md N.
+
+**STANDING RULE (20): a test that asserts two configurations are IDENTICAL must run on a
+deterministic device and must first assert that a configuration equals ITSELF.** A test that cannot
+fail cannot pass, and a test whose noise floor is the size of its effect is not a test.
+
+**Live `HF.py` on alice is patched** (backup `HF.py.bak_precycle75`, `__pycache__` cleared, canonical
+copy refreshed at `patches/HF_patched.py`, 624 lines, 14 PATCH markers). The 6 running `at1` jobs
+imported the module before the edit and are unaffected; the added branches are unreachable for every
+pre-existing configuration, so even a Slurm requeue would take unchanged code paths.

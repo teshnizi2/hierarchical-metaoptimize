@@ -14397,3 +14397,57 @@ joint function of (m, ms) and A2's curve must be re-read. **A1 can only VOID** (
   anything beyond arithmetic**; what is not mechanical is the *exponent* (§74.4's 0.686).
 * §74.6's rows are n=2 at 20 epochs and are cited for **direction only**, never as effect sizes.
 * Nothing here explains *why* the fine partition costs accuracy. §74.1 removed the leading candidate.
+
+## 74.9 `ck1` — THE CHUNK LADDER. THE HOLE IS NOW ADDRESSABLE.
+
+`PATCH_CHUNKWISE` adds `--stepsize-groups chunk<K>`: each tensor's weights cut, in flat index
+order, into contiguous chunks of K, one beta per chunk. m(K) read from the **allocated** beta:
+
+| rung | K | m | note |
+|---|---|---|---|
+| chunk1 | 1 | 11,173,962 | **== weightwise, BITWISE** |
+| chunk2 | 2 | 5,586,981 | |
+| chunk16 | 16 | 698,373 | |
+| chunk128 | 128 | 87,303 | |
+| chunk1024 | 1024 | 10,944 | beside nodewise's 14,420, **different partition** |
+| chunk8192 | 8192 | 1,407 | not in this batch |
+| chunk65536 | 65536 | 220 | not in this batch |
+| chunk2^24 | 16,777,216 | 62 | **== layerwise, BITWISE** |
+
+**VERIFIED, NOT ASSERTED** (`tests/test_chunkwise.py`, C0–C7, on CPU): chunk1 == weightwise and
+chunk2^24 == layerwise to **0.000e+00** on both weights and beta; chunkK == scalar at ms=0 to
+0.000e+00; m(K) matches the allocated beta at 8 values of K and is monotone; a **ragged** final
+chunk sums over its real members only; the probe reads the chunk partition. `test_granularity.py`'s
+T1–T5 still pass against the patched file, so **no existing granularity regressed**.
+
+**SUBMITTED: `ck1` (15, alice), 0 cancelled.** `bin/c75_chunk_ladder.sh`, all 10 guards live, box
+registered in `c55_neff_noise.BOXES` before submission. chunk{1,2,16,128,1024} × seeds 0-2,
+**ms=1e-4, 100 ep, BETA_CLIP=−15:−2.3026, PROBE=5 AND PROBE5=1**.
+
+**WHY ms IS HELD FIXED, AND THE RISK THAT BUYS.** 72.1b warns that a granularity contrast at a
+shared `ms` measures distance-from-optimum. The chunk family interpolates layerwise ↔ weightwise and
+guard 2b re-derived from the CSV that **ms=1e-4 is the interior argmax of BOTH endpoints**
+(w 91.146 n=5, lay 92.887 n=11) — a very different object from `tw0`'s node@1e-4, where 1e-4 was
+optimal at neither end. **The risk is stated: if an INTERIOR K has an argmax away from 1e-4, K3's
+shape is confounded.** A per-K `ms` sweep is 5× the jobs and was not bought.
+
+**REGISTERED, DO NOT EDIT AFTER THE DATA LANDS:**
+* **K1 — THE ANCHOR, CAN ONLY VOID, AND IT VOIDS THE WHOLE BATCH.** chunk1 is weightwise bitwise,
+  so its plateau5 must reproduce `tw0`'s **91.234** (n=3) within ±0.50 pp. FAILS → the patch changes
+  training in a real 100-epoch run despite the bitwise unit test, and **nothing in `ck1` is read**.
+* **K2 — IS "GRANULARITY" m, OR IS IT THE PARTITION?** chunk1024 (m=10,944) and nodewise
+  (m=14,420) are within 24 % in m but are structurally different partitions of the same weights.
+  At the same ms=1e-4, `tw0` measured nodewise at **91.961**. **PREDICTS: chunk1024 within ±0.50 pp
+  of 91.961.** REFUTES → **partition structure matters at fixed m**, the ladder is a curve in two
+  variables, and every "granularity" statement in the campaign needs the partition named alongside
+  the count. That is the more interesting outcome and it is registered as a real possibility.
+* **K3 — THE SHAPE.** plateau5 monotone non-decreasing as K rises (m falls) across
+  1 → 2 → 16 → 128 → 1024, ties allowed within ±0.15 pp. REFUTES if any adjacent pair inverts by
+  more than 0.15 pp, which would mean structure inside the hole.
+* **K4 — THE BLOCK-SIZE CURVE OF THE FIELD. DESCRIPTIVE, NO DIRECTION REGISTERED** (this is the
+  brief's direction-C default measurement and nothing inside this interval exists to predict from).
+  **K4b, registered:** chunk1024's `a_raw` vs nodewise@1e-4's **0.53836** — K2's question for the
+  field rather than the accuracy. **The "53.1 %" sentence is NOT reproduced and must NOT be written.**
+
+**`ck1` RUNS ON ALICE ONLY.** alice2's `HF.py` does not carry `PATCH_CHUNKWISE` (nor PATCH_PROBE4 /
+PATCH_SCHED — pre-existing drift, gotcha 10). Guard 1d fails closed on any account without it.

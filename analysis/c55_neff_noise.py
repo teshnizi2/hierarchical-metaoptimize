@@ -143,6 +143,12 @@ BOXES = {
     # tw0/wm9/ml5, so again NOT a new box.  REGISTERED BEFORE ANY at1 JOB WAS
     # SUBMITTED, read from the script's own CLIP= line, not from the data.
     "at1":  (-15.0, -2.3026, "bin/c75_tuned_agreement_ladder.sh:CLIP"),
+    # cycle-75 CHUNK LADDER (PATCH_CHUNKWISE), filling the three-decade hole between
+    # nodewise and weightwise.  Same box again -- tw0's, which is wm9's/ml5's.  Its
+    # endpoints chunk1 and chunk<huge> are BITWISE weightwise and layerwise, both of
+    # which tw0 measured box-free at 0.0000 on all four columns in this box.
+    # REGISTERED BEFORE ANY ck1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "ck1":  (-15.0, -2.3026, "bin/c75_chunk_ladder.sh:CLIP"),
 }
 
 

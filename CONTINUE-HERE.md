@@ -119,9 +119,32 @@ MetaOptimize's internals and are untouched; any "our method is better" sentence 
   blk6 will show **5 rows / 3 DISTINCT seeds**, node **8 rows / 5 DISTINCT seeds**. Repeating a seed
   averages down run-to-run noise but **NOT seed variance**. **Report distinct seeds** -- quoting n=5
   and n=8 as independent draws would inflate precision.
-* **NEXT TICK:** score `at1` against **A0 / A0.2 / A0.3 / A1 / A2 / A2b / A3 in that order**; A1
-  first after validity, since a VOID means A2 is not about the tuned ladder. `at1`'s box is already
-  registered. Then **the highest-value step is the `HF.py` chunked-partition patch (104.8)**.
+* **ALSO SUBMITTED THIS TICK: `ck1` (15, alice), 0 cancelled -- THE CHUNK LADDER (104.9, FINDINGS 74.9).**
+  `PATCH_CHUNKWISE` adds `--stepsize-groups chunk<K>`; m(K) = sum ceil(numel/K) spans the WHOLE
+  range with one knob: chunk1 **11,173,962 (== weightwise BITWISE)**, chunk2 5,586,981, chunk16
+  698,373, chunk128 87,303, chunk1024 **10,944** (beside nodewise's 14,420, DIFFERENT partition),
+  chunk2^24 **62 (== layerwise BITWISE)**. `bin/c75_chunk_ladder.sh`, 10 guards, box registered
+  first. chunk{1,2,16,128,1024} x seeds 0-2, ms=1e-4, 100 ep, PROBE=5 AND PROBE5=1.
+  **VERIFIED NOT ASSERTED:** `tests/test_chunkwise.py` C0-C7 on CPU -- both endpoint equivalences
+  hold at **0.000e+00**, and `test_granularity.py` T1-T5 still pass, so nothing regressed.
+* **`ck1` REGISTERED GATES:** **K1 ANCHOR, CAN ONLY VOID AND VOIDS THE WHOLE BATCH** -- chunk1 must
+  reproduce tw0's weightwise **91.234** within +-0.50. **K2: IS GRANULARITY m, OR THE PARTITION?**
+  chunk1024 (m=10,944) vs nodewise (m=14,420) at the same ms -- **PREDICTS within +-0.50 of
+  91.961**; REFUTES -> **partition structure matters at fixed m** and every "granularity" statement
+  needs the partition named alongside the count. **K3:** plateau5 monotone as m falls, ties +-0.15.
+  **K4 DESCRIPTIVE, no direction**; **K4b** chunk1024 a_raw vs node@1e-4's 0.53836.
+* **`ck1` RUNS ON ALICE ONLY** -- alice2 lacks PATCH_CHUNKWISE (gotcha 10); guard 1d fails closed.
+* **STANDING RULE (20), added 104.9: a test asserting two configurations are IDENTICAL must run on
+  a deterministic device and must FIRST assert a configuration equals ITSELF.** Measured: the same
+  config twice on CUDA differs by **max|dbeta| = 2.2e-01**, because Lion's `sign()` amplifies cuDNN
+  nondeterminism into a full +-2*ms beta step -- **the same size as a real granularity difference**.
+  It reported C1/C2/C4 as FAILING when nothing was wrong. On CPU: **0.000e+00**. This also means
+  `tests/test_granularity.py` (CUDA, alpha0=1e-6, k=6) passes **partly because nothing has diverged
+  yet** -- its verdicts were re-derived on CPU and hold, but do not raise its k or alpha0 on a GPU.
+* **NEXT TICK:** score `at1` against **A0 / A0.2 / A0.3 / A1 / A2 / A2b / A3 in that order** (A1
+  first after validity: a VOID means A2 is not about the tuned ladder), then `ck1` against
+  **K0 / K0.2 / K0.3 / K0.4 / K1 / K2 / K3 / K4 / K4b in that order** -- **K1 first, and if K1 VOIDs
+  do not read K2-K4 at all.** Both boxes are already registered in `c55_neff_noise.BOXES`.
 * **THE GAP THAT NEEDS A CODE CHANGE (104.8).** The optimizer supports only scalar / blockwise-of-
   LAYERS / layerwise / nodewise / weightwise, and blockwise is **coarser** than layerwise. **There is
   NO rung anywhere in the three decades between nodewise (14,420) and weightwise (11,173,962)** --
