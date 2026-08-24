@@ -54,6 +54,84 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 74) -- **wm9's W2 REFUTED: THE LADDER IS NOT FLAT. THE 80-ep N_eff AXIS IS CLOSED. `tw0` IS OUT AND CAN WITHDRAW THE HEADLINE.**
+
+**Read `docs/CORRECTIONS.md` 103 and `docs/FINDINGS.md` 73.0-73.6 FIRST. 103.2 is the headline,
+103.3 is the confound that bounds it, 103.4 closes an axis, 103.8 REDIRECTS the campaign.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** `bf9` (12) and `wm9` (10) both complete. CSV **1761 -> 1783
+  PURELY ADDITIVELY** (0 of 1761 pre-existing rows changed a field; header byte-identical).
+  **CANCELLED: nothing.** Scorers registered BEFORE either verdict: `c74_wm9_score.py` (**49/49**),
+  `c74_bf9_score.py` (**47/47**), both asserting their gates against the batch scripts' own text.
+* **THE HEADLINE (103.2): `wm9`'s W2 IS REFUTED.** Tuned weightwise **91.015** against a registered
+  **[92.2, 92.9]**. The four coarse rungs (scalar 92.262, layerwise 92.867, nodewise 92.450) span
+  **0.604 pp**; weightwise sits **1.247 pp** below the nearest and **1.852 pp** below the best --
+  **2.1x the whole four-rung span** below the closest one. **The granularity ladder is NOT flat once
+  every rung is ms-tuned.** Registered reading, in its registered words: *the finest partition
+  carries a real cost that tuning does not buy back.*
+* **W1 IS UNDECIDED AND THE RESULT DOES NOT LEAN ON IT.** gap/SE **0.18** -- the `ms` curve is
+  **FLAT** (0.074 pp over 3e-5..1e-3), not under-resolved. **The grid is NOT being refined.**
+  The refutation survives because the **highest single wm9 run (91.094) is still 1.106 pp below the
+  band** -- all 10 runs are outside it. **Never write "weightwise's optimum is ms=1e-4"**; write
+  "the argmax over the swept grid". W1b certified INTERIOR, which is what licensed scoring W2.
+* **THE CONFOUND, TESTED AT ZERO GPU COST BEFORE ANYTHING WAS SUBMITTED (103.3).** `wm9` ran with
+  **no probe**, so nothing was known about whether it was pinned against its clip box. `probes_ml5`
+  is the **same box (-15,-2.3026) and the same ms (1e-4)**: weightwise **box-free at BOTH guards
+  3/3**, and weightwise still worst there by **4.485 pp**. **THE RESIDUAL GAP IS STATED: ml5 is 20
+  ep, wm9 is 100 ep, and `bf9` measures this same tick that the bind GROWS with budget.**
+* **WEIGHTWISE IS WORST IN 3/3 INDEPENDENT CELLS** -- `wm9` 100ep (-1.852), `ml5` 20ep box-free
+  (-4.485), `bf9` 80ep in a different box (-1.558). Two boxes, three budgets, two `ms`. The deficit
+  **shrinks with budget but does not vanish**. **The node-vs-lay ordering FLIPS between cells and is
+  claimed NEITHER WAY** (102.5's confound again).
+* **`bf9` (103.4/103.5): INSTRUMENT FIRED 12/12** -- the gate `bf8` scored 0/12 on by construction.
+  **The floor decision was right: `rec_lo` = 0.0000 on 12/12.** The **CEILING** binds, fine rungs
+  only: lay **4/4 free**, node 2/4, w 1/4 (`rec_hi` 0.21-0.53, `q4_hi` 0.84-1.00).
+  **G2 is UNTESTED** -- all-seeds argmin *is* `w` as predicted, but **gap/SE 1.61 vs a registered 2**,
+  and the box gate makes it uninterpretable. **Cite bf9 as neither confirming nor refuting 71.7.**
+  **G2b fired: the argmin FLIPS `w` -> `node` when bound seeds are dropped.** All-seeds was
+  registered PRIMARY in advance, all-seeds is uninterpretable, so **neither argmin is claimed**.
+  The `rec_` gate was **NOT re-thresholded** though `coord_hi` is only 0.003-0.012% and doing so
+  would have handed this tick a clean N_eff result.
+* **AXIS CLOSED BY DECISION (103.4): STOP SPENDING ON THE 80-EPOCH N_eff POINT.** Three batches,
+  **36 GPU-jobs**, three different failures: `bd7` bound at **LO**, `bf8` had the **instrument off**,
+  `bf9` binds at **HI**. **The two available ceilings fail in OPPOSITE directions** -- HI=+2.0 pins
+  the fine rungs, HI=+6.0 collapsed weightwise 2/2 to 10.000. **The budget curve keeps TWO points.**
+* **STANDING RULE (19) FIRED TWICE ON MY OWN CODE (103.6).** `c74_bf9_score`'s G0.2 inferred the
+  `.npy` shape from file size assuming int64; the array is **int32**, so it returned **FAIL on 12/12
+  healthy arms** -- a false VOID, c72's error in the same direction. Fixed to read the real header;
+  4 selftests pin it. And `c74_tuned_weightwise_probe.sh`'s guard 1 named `$WS/HF.py`, which exists
+  on **neither** account -- it **FAILED CLOSED and refused to submit**, which is the correct
+  direction. Real path: `MetaOptimize/codes/.../cifar10/Optimizers/HF.py`.
+* **SUBMITTED: `tw0` (9, alice), 0 cancelled.** `bin/c74_tuned_weightwise_probe.sh`, all 6 guards
+  live, box **registered before submission**. w/node/lay x seeds 0-2, **ms=1e-4, 100 ep,
+  BETA_CLIP=-15:-2.3026, PROBE=5 AND PROBE5=1**. Guard 2b re-derived that ms=1e-4 is the argmax for
+  **weightwise, layerwise AND scalar** -- the first cell where every rung is at its own best `ms`
+  **and** the instrument is on.
+* **REGISTERED, DO NOT EDIT AFTER THE DATA LANDS:** `tw0` **T1 (PRIMARY): weightwise box-free at
+  BOTH guards at 100 ep on >= 2 of 3 seeds.** CONFIRMS -> 103.2 stands AND ceiling-runaway is
+  **ruled out** as the mechanism, leaving the deficit unexplained (sharper than the deficit alone).
+  **REFUTES -> 103.2 IS CONFOUNDED WITH THE BOX AND IS WITHDRAWN.** The conflict of interest is on
+  the record: the confirming outcome is the one that keeps this tick's headline alive.
+  **T2** reproduction vs wm9's 91.015, bar +-0.50, **CAN ONLY VOID**. **T3 is DESCRIPTIVE, no
+  direction registered** -- and **the "53.1%" sentence is NOT reproduced by tw0 and must not be
+  written** (refuted as stated since cycle 42; CORRECTIONS 26, flagged at 98.6).
+* **DIRECTION REDIRECTED (103.8), AND IT IS A REDIRECTION, NOT A CLAIM.** The brief's DEFAULT was
+  "make C the project". C's *stated justification* (refuting 1/sqrt(N)) is the half **98.6 already
+  flagged as refuted as stated**, so extending it adds runs, not evidence. **The live question is
+  now: why does the finest partition cost accuracy that `ms`-tuning cannot recover, when coarsening
+  across 1 -> 14,420 groups is free (0.604 pp)?** Direction C's field measurement becomes the
+  **mechanism probe** for that, not the claim. **T1 may overturn this next tick.**
+* **NEXT TICK:** score `tw0` against **T0 / T0.2 / T1 / T2 / T3 / T4 in that order**. T1 first after
+  validity -- **if T1 refutes, stop and withdraw 103.2 before reading T3/T4 at all**, because the
+  operating point would not be the one the claim is about. `probes_tw0` box is already registered.
+* **STILL OPEN, RANKED:** (1) the sweep of every heredoc-fed guard in `bin/` deriving a path from
+  `__file__` (101.11) -- `tw0` passes the CSV path in from bash, the rest of `bin/` is unswept;
+  (2) `blockwise6` has **no matched cell** in the 13-axis census, so the tuned "ladder" is four
+  rungs, not five. **NOTE the live trap:** `~/metaopt/results/all_runs.csv` on alice2 is stale --
+  run batch scripts from `hierarchical-metaoptimize/bin/`, never `~/metaopt/bin/`.
+
+## Superseded -- cycle 73 (kept for the record)
+
 ## Running / next (cycle 73) -- **bf8's "VOID" OVERTURNED; THE ACCURACY REVERSAL IS RESCOPED; 22 JOBS OUT**
 
 **Read `docs/CORRECTIONS.md` 102 and `docs/FINDINGS.md` 72.0-72.6 FIRST. 102.2 overturns a VOID,
