@@ -14046,3 +14046,172 @@ Locate the optimum first, then re-run the single winning cell with `PROBE5=1`.
 * The registered floor branch never fired, so **nothing here licenses an `ms` ladder on the guard
   axis.** `wm9` is an `ms` ladder for a different, accuracy-side reason and must not be cited as
   discharging bf8's guard branch.
+
+---
+
+## 73.0 CYCLE 74 — BOTH CYCLE-73 BATCHES LANDED COMPLETE
+
+Both queues 0 R / 0 P on arrival. `bf9` 12/12 and `wm9` 10/10 finished before the tick began.
+CSV **1761 → 1783 runs, PURELY ADDITIVELY**: 22 added, 0 removed, **0 of 1761 pre-existing rows
+changed a field** (keyed on `(run, job_id)`), 37-column header byte-identical.
+
+Scorers registered **before** either verdict was written: `analysis/c74_wm9_score.py` (**49/49**)
+and `analysis/c74_bf9_score.py` (**47/47**), both asserting their gates against the batch
+scripts' own text so registration and batch cannot drift.
+
+## 73.1 `wm9` — **W2 IS REFUTED. THE GRANULARITY LADDER IS NOT FLAT.**
+
+Gates scored in the registered order.
+
+| gate | result |
+|---|---|
+| W0 validity | **10/10** (epochs_done 100, collapsed false, plateau5 present) |
+| W0.2 reproduction control (can only VOID) | ms=1e-3 → **90.992** vs ref 91.308, diff **−0.316** inside ±0.50 → **PASS** |
+| W1 optimum | argmax ms=1e-4, gap/SE **0.18** → **UNDECIDED** |
+| W1b interior? | ms=1e-4 is **INTERIOR** → W2 **is** scored |
+| W2 registered prediction | **REFUTED** |
+
+The `ms` response is **FLAT**, which is why W1 is undecided:
+
+| ms | plateau5 | sem | n |
+|---|---|---|---|
+| 1e-5 | 90.347 | 0.335 | 2 |
+| 3e-5 | 90.941 | 0.121 | 2 |
+| **1e-4** | **91.015** | 0.073 | 2 |
+| 3e-4 | 90.956 | 0.120 | 2 |
+| 1e-3 | 90.992 | 0.102 | 2 |
+
+Span over 3e-5..1e-3 is **0.074 pp** across 1.5 decades. W1 is undecided because the curve is flat,
+**not** because the grid is too coarse — so refining it buys nothing.
+
+**W2 registered: tuned weightwise lands INSIDE [92.2, 92.9] with best ms ≤ 1e-4.** Measured
+**91.015**, i.e. **OUTSIDE and below**. Against the 13-axis-matched tuned ladder re-derived from the
+CSV (never quoted from a comment):
+
+| rung | groups | best ms | plateau5 | n |
+|---|---|---|---|---|
+| scalar | 1 | 1e-4 | 92.262 | 5 |
+| layerwise | 62 | 1e-4 | 92.867 | 8 |
+| nodewise | 14,420 | 3e-4 | 92.450 | 5 |
+| **weightwise** | **11,173,962** | 1e-4 | **91.015** | 2 |
+
+Four coarse rungs span **0.604 pp**; weightwise sits **1.247 pp** below the nearest (scalar) and
+**1.852 pp** below the best (layerwise) — **2.1× the entire span of the other four** below the
+closest one. Five-rung span **1.852 pp**.
+
+**THE REFUTATION DOES NOT LEAN ON W1.** The highest *single* wm9 run is **91.094**, still **1.106 pp**
+below the band's lower edge, so **every one of the 10 runs** is outside it. The verdict is therefore
+robust to the optimum's location being undecided — which is the only reason an UNDECIDED W1 does not
+sink the result.
+
+## 73.2 THE BOX CONFOUND ON 73.1, TESTED AT ZERO GPU COST — AND IT SURVIVES, AT 20 EPOCHS
+
+`wm9` ran with **NO probe** (deliberate, CORRECTIONS 102.7), so nothing was known about whether its
+weightwise arm was pinned against its clip box. If it was, the 1.25 pp deficit is a clamp artifact.
+
+`probes_ml5` sits in **this exact box** (−15, −2.3026) and its `m4` rung is **this exact ms** (1e-4):
+
+| root/arm | rec_lo | rec_hi | q4_lo | q4_hi |
+|---|---|---|---|---|
+| ml5 w_m4 s0/s1/s2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 |
+| ml5 w_m3 (ms=1e-3) | 0.0555–0.1035 | 0.0350–0.1135 | — | — |
+| ml5 w_m2 (ms=1e-2) | 0.9190 | 0.9540 | 1.0000 | 1.0000 |
+
+**At ms=1e-4 the box is slack at both ends on 3/3 seeds.** (ms=1e-2 is the boundary-dominated rung
+CORRECTIONS 62 already excluded; it is shown only to demonstrate the gate discriminates.)
+
+And the ordering reproduces there independently, in a **fully box-free** cell at 20 epochs, ms=1e-4:
+
+| rung | plateau5 (n=3) |
+|---|---|
+| layerwise | 81.121 |
+| blockwise6 | 79.404 |
+| nodewise | 78.894 |
+| **weightwise** | **76.636** |
+
+Weightwise worst by **4.485 pp** below layerwise.
+
+**THE RESIDUAL GAP, STATED PLAINLY: `ml5` is 20 epochs and `wm9` is 100.** `bf9` measures **this
+tick** that the bind GROWS with budget, so a 20-epoch box-free reading does **not** license a
+100-epoch claim. `tw0` (submitted, §73.5) closes exactly that gap and can withdraw 73.1.
+
+## 73.3 WEIGHTWISE IS WORST IN 3 OF 3 INDEPENDENT CELLS
+
+| cell | budget | box | ms | weightwise | best rung | deficit |
+|---|---|---|---|---|---|---|
+| `wm9` + census | 100 ep | −15:−2.3026 | tuned | 91.015 | layerwise 92.867 | **−1.852** |
+| `ml5` m4 (box-free 3/3) | 20 ep | −15:−2.3026 | 1e-4 | 76.636 | layerwise 81.121 | **−4.485** |
+| `bf9` | 80 ep | −60:+2.0 | 1e-3 | 90.426 | nodewise 91.984 | **−1.558** |
+
+Three budgets, two boxes, two meta-stepsizes. **Weightwise is the worst rung in 3/3.**
+The deficit **shrinks with budget** (4.49 → 1.86 → 1.56) but does not vanish.
+
+**The node-vs-lay ordering FLIPS between cells** (lay > node in wm9's box; node > lay in bf9's box),
+which is CORRECTIONS 102.5's confound firing again and is **not** claimed either way here. Only the
+weightwise result is robust across cells.
+
+## 73.4 `bf9` — THE INSTRUMENT FIRED, THE FLOOR IS FREED, AND THE **CEILING** BINDS ON THE FINE RUNGS
+
+| gate | result |
+|---|---|
+| G0 validity | **12/12** (n_records 8000, n_beta on every record, beta moved) |
+| G0.2 instrument fired | **12/12** — the gate `bf8` scored 0/12 on by construction |
+| G0.3 box-free, BOTH guards | **7/12** |
+| G0.4 trains at all | **12/12** |
+| G1 80-ep N_eff/m point | reported, **not counted** |
+| G2 registered out-of-sample test | **NOT SCORED / UNTESTED** |
+| G2b bound-seed policy | fired exactly as registered |
+
+**The floor decision (CORRECTIONS 102.4) was right: `rec_lo` = 0.0000 on 12/12.** LO=−60 freed it
+completely. **The ceiling is what binds, and only on the fine rungs:**
+
+| rung | box-free | rec_hi on bound seeds | coord_hi |
+|---|---|---|---|
+| layerwise | **4/4** | — | 0.00000 |
+| nodewise | 2/4 | 0.2161, 0.3443 | 0.00003–0.00005 |
+| weightwise | 1/4 | 0.2101, 0.4509, 0.5299 | 0.00005–0.00012 |
+
+`q4_hi` reaches **0.8405–1.0000** on the bound seeds — the bind is concentrated in the last quarter.
+`coord_hi` is **0.003–0.012 %** (a few hundred to a few thousand of 11.17M weights); it is reported
+**alongside** and is **NOT** the gate. Per CORRECTIONS 102.4 the published `rec_`-based 5 % gate is
+**not re-thresholded after seeing this**.
+
+**N_eff/m at 80 epochs** (reported, not counted — the cell fails G0.3):
+
+| rung | m | N_eff/m | sem | per-seed |
+|---|---|---|---|---|
+| lay | 62 | 0.4793 | 0.0132 | 0.5053 0.4631 0.4509 0.4978 |
+| node | 14,420 | 0.0601 | 0.0021 | 0.0589 0.0555 0.0658 0.0603 |
+| w | 11,173,962 | 0.0543 | 0.0029 | 0.0468 0.0591 0.0587 0.0527 |
+
+**G2 predicted argmin = `w` at gap/SE ≥ 2.** All-seeds argmin *is* `w`, but gap/SE = **1.61** —
+**UNDECIDED even ignoring the box**, and the box gate makes it UNINTERPRETABLE regardless. **G2 is
+neither confirmed nor refuted; it is UNTESTED for the second batch running.**
+
+**G2b fired.** Box-free seeds only: lay n=4 (0.4793), node n=2 (0.0572), w n=1 (0.0591) — **the
+argmin FLIPS `w` → `node`**. All-seeds was registered PRIMARY *before* the data, all-seeds is
+uninterpretable, so **neither argmin is claimed**. This is the exact shape the policy exists for.
+
+## 73.5 SUBMITTED — 9 JOBS, 0 CANCELLED
+
+`tw0` (9, alice, `bin/c74_tuned_weightwise_probe.sh`, all 6 guards live): weightwise/nodewise/
+layerwise × seeds 0-2, **ms=1e-4, 100 ep, BETA_CLIP=−15:−2.3026, PROBE=5 AND PROBE5=1**.
+
+Guard 2b re-derived from the CSV that ms=1e-4 is the argmax for **weightwise, layerwise AND scalar**
+— the first cell in the campaign where every rung sits at or beside its own best meta-stepsize
+**and** the instrument is on. Every prior sign-agreement / N_eff number was taken at an untuned point.
+
+**T1 is PRIMARY and it can withdraw §73.1:** is weightwise box-free at both guards at **100** epochs?
+**REGISTERED: box-free on ≥ 2 of 3 seeds.** The conflict of interest is on the record — the outcome
+that CONFIRMS is the one that keeps this tick's own headline alive, which is why the threshold was
+written before the run.
+
+## 73.6 LIMITS
+
+* §73.1's five-rung span mixes n=2 (weightwise) with n=5–8 (coarse rungs). The deficit is 2.1× the
+  four-rung span, so it survives that asymmetry, but the weightwise SE is the weakest in the table.
+* `blockwise6` has **no matched cell** in the 13-axis census, so the "ladder" is four rungs, not five.
+* §73.3 mixes boxes and meta-stepsizes deliberately, to show robustness. It is **not** a matched
+  contrast and no number in it may be quoted as an effect size.
+* The 80-epoch N_eff/m point remains **unmeasured** after three batches. See CORRECTIONS 103.4.
+* `tw0` has not landed. Nothing in §73.1 is final until T1 scores.

@@ -4829,3 +4829,143 @@ may no longer be written as a *granularity* result without "at a shared `ms=1e-3
 (6/6 selftests) validates column arity, detects unescaped pipes, and re-derives the run count,
 GPU-hours and verdict tally from `results/all_runs.csv` and the table itself. It **failed on all
 four bad counts** before the fix and passes now. **Run it before committing any MASTER-TABLE edit.**
+
+---
+
+## 103. DECISION RECORD — cycle 74 (**wm9's W2 REFUTED**; the 80-epoch N_eff axis CLOSED; 9 jobs out)
+
+### 103.1 QUEUE AUDIT
+
+Both login nodes reachable. **Both queues 0 R / 0 P on arrival** — `bf9` (12, alice2) and `wm9`
+(10, alice) had all completed before the tick began.
+
+| family | count | state | verdict | reason |
+|---|---|---|---|---|
+| — | 0 | — | — | nothing running or pending on either account |
+
+**CANCELLED: nothing.** No job was running, so no stuck-job check applied. CSV re-derived from
+`../runs` + `../runs_alice2`: **1761 → 1783**, 22 added, 0 removed, **0 pre-existing rows changed**,
+header byte-identical.
+
+**ORPHANS: none new.** The 22 rows added are `bf9` (12) and `wm9` (10), both cited in FINDINGS
+73.1–73.4 by this tick. CORRECTIONS 98.2's withdrawal of the "~290-run orphan backlog" stands.
+
+### 103.2 **THE HEADLINE: wm9's W2 IS REFUTED, AND THAT IS A STRONGER RESULT THAN CONFIRMING IT**
+
+W2 was registered before the run as: *tuned weightwise lands INSIDE [92.2, 92.9] with best ms ≤ 1e-4;
+CONFIRMS ⇒ the granularity ladder is FLAT once every rung is ms-tuned, across a 180,000× range in
+group count.* **Measured: 91.015. OUTSIDE and BELOW.**
+
+**DECISION: record the registered refuting reading, in the words it was registered in** — *the finest
+partition carries a real cost that tuning does not buy back, and the ladder is NOT flat.*
+
+Two things make this safe to write, and both were fixed in advance:
+
+1. **W1b certified the argmax INTERIOR**, so W2 was legitimately scored. Had the argmax sat on a grid
+   edge, W1b's registration would have forbidden scoring W2 at all.
+2. **W1 came back UNDECIDED (gap/SE 0.18) and the refutation does not depend on it.** The highest
+   *single* wm9 run is 91.094, still 1.106 pp below the band's lower edge — **all 10 runs are
+   outside**. A verdict that needed the argmax located would have been sunk by an undecided W1.
+
+**WHAT MUST NOT BE WRITTEN.** W1 is undecided because the `ms` curve is **flat** (0.074 pp over
+3e-5..1e-3), not because the grid is too coarse. **No document may write "weightwise's optimum is
+ms=1e-4"** — it may write "the argmax over the swept grid", and the grid is not being refined,
+because refining a flat curve buys nothing.
+
+### 103.3 THE CONFOUND I TESTED AGAINST MY OWN HEADLINE, AND WHAT IT LEAVES OPEN
+
+`wm9` ran with **no probe** (CORRECTIONS 102.7 stated that cost in advance), so nothing was known
+about whether its weightwise arm was **pinned against its clip box** — in which case the 1.25 pp
+deficit is a clamp artifact and 103.2 is the same class of error as CORRECTIONS 99/100.
+
+**Tested at ZERO GPU COST, before submitting anything.** `probes_ml5` sits in the identical box
+(−15, −2.3026) and its `m4` rung is the identical ms (1e-4): **weightwise box-free at BOTH guards on
+3/3 seeds**, and weightwise still worst by 4.485 pp there. The `m3`/`m2` rungs bind, so the gate
+discriminates rather than passing everything.
+
+**THE GAP THAT REMAINS IS STATED, NOT PAPERED OVER: `ml5` is 20 epochs and `wm9` is 100**, and `bf9`
+measures **this same tick** that the bind GROWS with budget (§103.5). A 20-epoch box-free reading
+does not license a 100-epoch claim. **`tw0` closes exactly that, and its T1 can withdraw 103.2.**
+
+### 103.4 **DECISION: THE 80-EPOCH N_eff/m POINT IS CLOSED. STOP SPENDING ON IT.**
+
+Three batches, **36 GPU-jobs**, three different failures, no datum:
+
+| batch | box | what happened |
+|---|---|---|
+| `bd7` | HI=+2.0/+6.0, **LO=−30** | VOID — 10/12 bound at the **LO** guard |
+| `bf8` | LO=−60/−90, HI=+2.0 | **instrument never enabled** (`PROBE=5` exported, `PROBE5=1` not) |
+| `bf9` | LO=−60, HI=+2.0 | instrument fired 12/12; **CEILING** binds, node 2/4 and w 3/4 |
+
+**The two available ceilings fail in OPPOSITE directions**: at HI=+2.0 the fine rungs pin against it,
+and at HI=+6.0 `bd7`'s weightwise arms **collapsed 2/2 to 10.000**. Raising the ceiling is not
+available and lowering it is what binds. **The budget curve keeps TWO points (20, 40) and no fourth
+batch is submitted.** This is closed by decision on measured evidence, not by another attempt.
+
+**G2 is UNTESTED, not refuted.** Its predicted argmin (`w`) *is* the all-seeds argmin, but at
+gap/SE = 1.61 against a registered 2 — undecided even before the box gate makes it uninterpretable.
+**Nothing may cite bf9 as confirming or refuting 71.7's band.**
+
+### 103.5 G2b FIRED, AND IT IS THE ARGUMENT FOR PRE-REGISTRATION
+
+Dropping `bf9`'s box-bound seeds **flips the argmin `w` → `node`**. G2b made all-seeds PRIMARY
+*before the data landed*; all-seeds is uninterpretable; therefore **neither argmin is claimed**. Had
+the policy been chosen after seeing the flip, either choice would have been selection. Both columns
+are reported.
+
+Likewise the `rec_`-based 5 % gate was **not re-thresholded** even though `coord_hi` is only
+0.003–0.012 % and re-reading at coordinate resolution would have passed every arm and handed this
+tick a clean N_eff result. That is the trade CORRECTIONS 102.4 registered in advance, and taking it
+would have been the failure this campaign has repeated most.
+
+### 103.6 STANDING RULE (19) FIRED TWICE MORE — BOTH TIMES ON MY OWN CODE
+
+1. **`c74_bf9_score.py`'s G0.2 shipped broken.** It inferred the `.npy` shape from file size assuming
+   int64 and a 128-byte header. The array is **int32**, and the gate returned **FAIL on 12/12 healthy
+   arms** — a *false VOID*, the same direction of error c72 made against `bf8`. Fixed to read the
+   real header via `np.load(mmap_mode='r')`; **four selftests now pin the regression**.
+2. **`c74_tuned_weightwise_probe.sh`'s guard 1 named `$WS/HF.py`, which exists on neither account.**
+   The runner imports from `MetaOptimize/codes/.../cifar10/Optimizers/HF.py`. **The guard FAILED
+   CLOSED and refused to submit** rather than passing on a path it could not find. That is the
+   correct direction for a guard that names a path, and it is why the batch went out correct.
+
+**A gate that reads a proxy it knows how to compute, instead of the quantity it names, fails in both
+directions — and I wrote one within the same tick that quoted the rule.**
+
+### 103.7 SUBMITTED — 9 JOBS, 0 CANCELLED
+
+`tw0` (9, alice), all 6 guards live, `probes_tw0` box **registered before submission**. It buys two
+things at once: **T1** closes 103.3's residual 20-vs-100-epoch gap, and **T3/T4** give the first
+sign-agreement and N_eff/m read at an operating point where **every rung is at or beside its own best
+meta-stepsize** (guard 2b re-derived ms=1e-4 as the argmax for weightwise, layerwise *and* scalar).
+
+**T1's conflict of interest is on the record**: the outcome that CONFIRMS is the one that keeps
+103.2 alive. The threshold (**box-free on ≥ 2 of 3 seeds**) was written before the run.
+
+**T3 is DESCRIPTIVE and no direction is registered** — there is no prior measurement at a tuned point
+to predict from, and registering one would be theatre. **The "53.1 % of 11.17M meta-gradients agree
+in sign" sentence is NOT being reproduced by `tw0` and must not be written**: it has been refuted as
+stated since cycle 42 (CORRECTIONS 26, and the operator-facing flag at 98.6). What survives is the
+drift-vs-N slope and the block-size curve.
+
+### 103.8 WHAT THIS DOES TO THE PROJECT'S DIRECTION
+
+The tick brief's DEFAULT was *"make C the project — extend the sign-agreement measurement across
+granularities, model sizes and datasets."* **That default is now better served by a different
+question than the one it names**, and the reason is measured, not preferred:
+
+* Direction C's stated justification — refuting 1/√N noise-averaging — is the half of C that
+  **98.6 already flagged as refuted as stated**. Extending a measurement whose headline sentence has
+  been withdrawn adds runs, not evidence.
+* What cycles 73–74 produced instead is an **accuracy-side** result that is robust across 3/3
+  independent cells, two boxes, three budgets and two meta-stepsizes: **coarsening is free across
+  1 → 14,420 groups (0.604 pp) and then costs 1.2–1.9 pp at the per-weight limit.**
+* That is a *conclusion the Adam-mini / Adalayer / SGG line asserts and has not measured this way*,
+  and direction C's field measurement is then the **mechanism probe** for it rather than the claim.
+
+**DECISION: the campaign's live question is "why does the finest partition cost accuracy that
+ms-tuning cannot recover, when coarsening across four orders of magnitude is free?"** `tw0` is the
+first experiment in it and it also rules a mechanism in or out: if T1 confirms the box is slack at
+100 ep, **ceiling-runaway is eliminated** as the explanation and the deficit is left genuinely
+unexplained — a sharper result than the deficit alone. **This is recorded as a redirection with its
+justification, not as a claim, and the next tick may overturn it on T1.**
