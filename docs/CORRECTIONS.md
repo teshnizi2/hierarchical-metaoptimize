@@ -4220,3 +4220,82 @@ pass applied to the 20-epoch tables in `docs/` — 68 establishes that such a pa
 operator decision as redefining `plateau`. `hz9`, `sp8`, `cp9` remain the top submit-queue items
 the moment ALICE returns; **`hz9` is re-ranked up again** — 97.5 shows the layerwise-vs-nodewise
 question resolves on CIFAR-100 and hz9 is its paired tuned CIFAR-10 test.
+
+---
+
+## 98. DECISION RECORD — cycle 69 (ALICE DOWN, **FOURTEENTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**OUTAGE, LOCALISED NOT ASSUMED.** Gateway `p-cfer-016105` up and answering; from it
+`nc -z -w 8 132.229.104.230 22` and `.231` both **DOWN**; `ssh alice` / `alice2` both fail at
+banner exchange. Checked **2026-08-24T01:26Z**. Two probes, spaced, no retry loop, no ssh-config
+change (OUTAGE HANDLING rule). **No queue read, nothing synced, nothing submitted, nothing
+cancelled.** `bo7-*` (12, alice) / `bd7-*` (12, alice2) survival remains UNKNOWN and is not
+guessed. CSV unchanged at **1707 runs / 1143.5 GPU-hours**.
+
+**98.1 THE TICK'S DECISION, AND WHY THIS AND NOT THE ALTERNATIVES.** With no competing use of
+the tick I considered four offline candidates and rejected three on the evidence:
+(a) *re-score the 20-epoch tables with `plateau5`* — 97.11 already established this is owed and
+supplied the column, but it is bookkeeping across 66 cycles and remains an **operator decision**;
+(b) *a dataset bracket on the FIELD side of K2* (STANDING RULE 15 applied to the half 68 did not
+check) — but 65.2 already measures `u*_E` per family **including `c100` (0.00164, 4 arms)**, so
+the bracket exists and the mixture concern is worth ≈0.07 decades;
+(c) *kernel-scale vs row-fraction for the `u*=1/512` peak* — already discharged by 62.5's S1/S2/S4
+(absolute-g argmax ≤9 in 17/17, and `F_int ≤ 1.041` **refuses** the word "filter") and by 63.1's
+P3 cross-ladder test.
+**(d) CHOSEN: the campaign-wide ORPHAN census** — a standing per-tick operator instruction that
+has never been discharged at campaign scale. 97.10 scoped it to the 380-run k=20 stratum only,
+and the **~290-run** figure of 2026-08-22 had never been reproduced or localised. Cycles 67 and
+68 each found a load-bearing claim refuted by a document this campaign had already written; an
+orphan run is the same failure mode one level down.
+Instrument `analysis/c69_orphan_census.py`, **24/24 selftests**, citation rule + ORPHAN
+definition + G1–G6 committed (`9e11ff4`) **before any family was classified**.
+
+**98.2 THE ~290-RUN ORPHAN BACKLOG IS WITHDRAWN. IT WAS A SEARCH ARTIFACT.** Campaign-wide,
+109 families / 1707 runs: **102 families / 1676 runs STRICT-cited, 6 / 27 AMBIGUOUS, 1 family /
+4 runs ORPHAN** under the deliberately generous LOOSE rule. The corpus ablation is decisive and
+it **refuted my own first hypothesis**: dropping `MASTER-TABLE.md` leaves the orphan count at
+**4** (so cycle 64's table is *not* what discharged them), while dropping `FINDINGS.md` as well
+yields **342** — reproducing "~290". **The figure is recovered only by omitting the one document
+that records every measured result.** No document may quote a ~290-run orphan backlog again.
+
+**98.3 THE INSTRUCTION IS DISCHARGED, ONE LINE PER FAMILY (FINDINGS 69.5).** `hv` (4 runs, 4 ep,
+chance accuracy) **ABANDONED**; `v2` (2) and `a2` (1) **ABANDONED** — both were LOOSE-rule false
+positives (the arXiv string `2407.07972 v2`; the operator's checklist label "(a2)"), so the true
+uncited set is **7 runs, not 4**, recorded because it moves *against* this tick's own statistic.
+`det` (3) already cited as smoke. `g3` (9, 100 ep) **CITED AND SUPERSEDED** — the guard-OFF
+predecessor of `g4-sgdmAdam-*` and the source of the withdrawn "scalar fails on 2 of 3 seeds"
+number. `gate0b` (6) and `gate0d` (6) already **explicitly ABANDONED** in FINDINGS 61.8.
+**The next tick must stop rediscovering these.**
+
+**98.4 THE ACCOUNTING NUMBER.** True-uncited compute is **7 runs / 0.23 GPU-h = 0.020 % of the
+campaign's 1143.5 GPU-hours**, maximum `epochs_done` **5**. All **32** runs corpus-wide with an
+empty `plateau` ran ≤5 epochs. **Not one run at a usable budget is uncited.**
+
+**98.5 THE CENSUS FOUND NO HIDDEN SCIENCE, AND THAT IS THE RESULT.** Every 100-epoch family the
+matcher flagged is cited and already adjudicated. 96.6/97.8's failure mode has **no counterpart
+at the level of runs**. This is a clean negative and it closes a standing instruction; it does
+not add a claim.
+
+**STANDING RULE (16), added 98.5:** *any claim of the form "X is not cited / not covered /
+orphaned" must name the corpus it searched and report the corpus ablation showing which document
+carries the citations. An uncited-count with no named corpus is a statement about the search, not
+about the evidence.* 69.4 is the case that earned it: the same CSV yields 4 or 342 orphan runs
+depending on whether one file is in the corpus.
+
+**98.6 AN OPERATOR-FACING FLAG, NOT A NEW FINDING.** The tick brief steering this campaign states
+direction C as *"53.1 % of 11.17M per-weight meta-gradients agree in sign (independence =
+50.0000 ± 0.0015 %), refuting the 1/sqrt(N) noise-averaging assumption"* and calls it the
+strongest available contribution. **That sentence has been REFUTED AS STATED in this repo since
+cycle 42** — CORRECTIONS 26 and `MASTER-TABLE.md` row: two arms merged (53.1 % is the LAYERWISE
+m=62 figure; the weightwise arm reads 50.005–50.028 %), the null is n-dependent (the quoted arm
+sits **1.9 pp BELOW its own floor** and was reported as 3.1 pp above it), and it is an α₀=1e-6
+number whose excess collapses 16× at α₀=1e-3. `KILLTEST-idea2.md` §1 adds that no run on disk
+reproduces it. **What survives of direction C is the drift-vs-N slope** (+0.179 / +0.268 / +0.203
+against a required −0.500, three architectures, two datasets) **and the block-size curve**
+(62.5–62.7, 63.1, 65.2), **not the 53.1 % sentence.** The operator is steering by a retracted
+number and should be told so before the next direction decision.
+
+**98.7 WHAT I DID NOT DO.** No jobs submitted or cancelled (queues unreachable). No re-scoring
+pass applied to the 20-epoch tables — still owed (97.3), still an operator decision. `aggregate.py`
+and the CSV are **UNCHANGED** this tick. `hz9`, `sp8`, `cp9` remain the top submit-queue items the
+moment ALICE returns, in that order.

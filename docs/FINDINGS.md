@@ -13183,3 +13183,119 @@ and is not scored here.)
   — nodewise over layerwise — under the documented window. The k=20 column disagrees with both.
 
 **Do not re-run offline:** 68.1–68.9 are closed on the present corpus.
+
+---
+
+# FINDINGS 69 — cycle 69: THE ~290-RUN ORPHAN BACKLOG DOES NOT EXIST. IT WAS A SEARCH ARTIFACT.
+
+Cycle 69, **ALICE DOWN A FOURTEENTH CONSECUTIVE TICK, zero jobs.** Entirely offline, on data
+already spent. Instrument `analysis/c69_orphan_census.py`, **24/24 selftests**, citation rule +
+ORPHAN definition + gates G1–G6 registered and committed (`9e11ff4`) **before any family was
+classified**.
+
+## 69.0 STATE — ALICE DOWN A **FOURTEENTH** CONSECUTIVE TICK, ZERO JOBS
+
+Localised, not assumed. Gateway up and answering (`p-cfer-016105`); from it,
+`nc -z 132.229.104.230 22` and `.231` both **DOWN**; `ssh alice` / `alice2` both fail at banner
+exchange. Checked **2026-08-24T01:26Z**. **No queue read, nothing synced, nothing submitted,
+nothing cancelled. CSV unchanged at 1707 runs / 1143.5 GPU-hours.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival still UNKNOWN and still not guessed. `docs/` is **eleven** cycles
+behind on the cluster.
+
+## 69.1 THE QUESTION — A STANDING OPERATOR INSTRUCTION THAT HAS NEVER BEEN DISCHARGED
+
+The operator's per-tick brief carries, and has carried for many ticks:
+
+> "Also report ORPHANS: families present in `results/all_runs.csv` that no document in `docs/`
+> cites. As of 2026-08-22 there were roughly **290** such runs. These are already-spent compute,
+> so never re-run them; either write them up in one line each or mark them explicitly abandoned."
+
+68.9 (CORRECTIONS 97.10) reported "ORPHANS: 0" — but **scoped to the 380-run k=20 stratum
+only**. The campaign-wide number has never been reproduced, localised or discharged.
+
+**Why it was worth the tick.** 67 and 68 each found a load-bearing claim refuted by a document
+this campaign had *already written* (96.6, 97.8). An orphan run is the same failure mode one
+level down: a result this campaign already **paid for** and never read.
+
+## 69.2 THE RULE, FIXED BEFORE SCORING, AND DELIBERATELY HOSTILE TO THIS TICK'S HEADLINE
+
+`family(run)` = leading run-name token up to the first `-`/`_`. Corpus = all 22 `.md` under
+`docs/`, repo root and `paper/`. Two matchers: **LOOSE** (any whole-token occurrence — generous,
+so it *under*-counts orphans) and **STRICT** (token in a family-reference context `mx/`, `bo7-`,
+"`ms` family"). **ORPHAN was defined as uncited under LOOSE** — the choice that makes the orphan
+set as small as the evidence allows, i.e. the one hardest on the claim below.
+
+## 69.3 THE RESULT — 4 RUNS, NOT 290
+
+| class | families | runs |
+|---|---:|---:|
+| STRICT-CITED | 102 | 1676 |
+| AMBIGUOUS (loose-cited only) | 6 | 27 |
+| **ORPHAN (uncited, generous rule)** | **1** | **4** |
+
+## 69.4 THE ~290 FIGURE IS REPRODUCED **ONLY** BY EXCLUDING `FINDINGS.md` FROM THE CORPUS
+
+A corpus ablation, registered as the explanation test. My own first hypothesis — that cycle 64's
+`MASTER-TABLE.md` absorbed the backlog — is **REFUTED by this control**:
+
+| corpus | orphan families | orphan runs |
+|---|---:|---:|
+| full (22 docs) | 1 | **4** |
+| minus `MASTER-TABLE.md` | 1 | **4** ← the MASTER-TABLE hypothesis fails |
+| minus `MASTER-TABLE.md` **and** `FINDINGS.md` | 27 | **342** ← reproduces "~290" |
+| `docs/` only (the operator's literal wording) | 2 | 13 |
+
+**The ~290-run backlog was a property of the search, not of the corpus.** It is recovered only
+by omitting the one document that records every measured result. No document may quote a ~290
+orphan backlog again.
+
+## 69.5 EVERY CANDIDATE ADJUDICATED, ONE LINE EACH (the instruction, discharged)
+
+| family | n | ep | verdict |
+|---|---:|---:|---|
+| `hv` | 4 | 4 | **TRUE ORPHAN.** `hv_{lam0,lam1,plain,ratio1}`, R18/C10 layerwise Lion a0=1e-6, aborted at 4 ep, best_test 13.36–13.49 (chance level), no `plateau`. An early `hier`/`lam` smoke set. **ABANDONED — nothing in them.** |
+| `v2` | 2 | 3–5 | **TRUE ORPHAN** (my LOOSE rule false-positived on the arXiv string `2407.07972 v2`). Smoke, 13.19–13.75. **ABANDONED.** |
+| `a2` | 1 | 2 | **TRUE ORPHAN** (false-positive: the operator's checklist step label "(a2)"). `a2_smoke`, 2 ep. **ABANDONED.** |
+| `det` | 3 | 5 | Cited as smoke (FINDINGS §5129: *"25-record smoke probes; nothing in them"*). Already discharged. *(That line says `det` (2); the CSV holds 3 — a count slip, not a claim.)* |
+| `g3` | 9 | 100 | **CITED AND SUPERSEDED.** The guard-**OFF** predecessor of `g4-sgdmAdam-*` (FINDINGS §873). Source of the withdrawn "scalar fails on 2 of 3 seeds" number (scalar seeds 88.14 / 18.34 / 20.45) — CORRECTIONS 5 corrected that to 1/3, and 0/3 under Lion. Superseded, not orphaned. |
+| `gate0b` | 6 | 100 | Cited **and already explicitly ABANDONED** in FINDINGS 61.8 / CORRECTIONS: unaugmented memorisation regime, quotable for nothing. |
+| `gate0d` | 6 | 100 | Cited **and already explicitly ABANDONED** in FINDINGS 61.8: SGDm base, blk6 +3.53 pp over scalar. |
+
+**After eyeballing, the true uncited set is `hv` + `v2` + `a2` = 7 runs.** Worse than the
+instrument's 4 — recorded because it moves *against* this tick's own statistic.
+
+## 69.6 THE NUMBER THAT MATTERS: **0.020 % OF SPEND, AND NO USABLE-BUDGET RUN IS UNREAD**
+
+| set | runs | GPU-h | share of 1143.5 GPU-h | max `epochs_done` |
+|---|---:|---:|---:|---:|
+| whole campaign | 1707 | 1143.5 | 100 % | — |
+| true-uncited (`hv`,`v2`,`a2`) | 7 | 0.23 | **0.020 %** | **5** |
+| + `det` (cited-as-smoke) | 10 | 0.33 | 0.029 % | 5 |
+| all runs with an EMPTY `plateau` | 32 | 0.9 | 0.079 % | **5** |
+
+**Every one of the 32 runs in the corpus that never produced a `plateau` ran ≤ 5 epochs**, and
+every uncited run is one of them. **Not one run at a usable budget is uncited.** The campaign's
+compute accounting is clean to 0.02 %.
+
+## 69.7 THE CENSUS FOUND NO HIDDEN SCIENCE, AND THAT IS THE HONEST HEADLINE
+
+The three uncited families are 2–5-epoch smoke runs at chance accuracy. The three 100-epoch
+families that the strict matcher flagged (`g3`, `gate0b`, `gate0d`, 21 runs) are all cited and
+all **already adjudicated** — one superseded, two explicitly abandoned. **There is no unread
+result in this corpus.** 96.6 and 97.8's failure mode (a load-bearing claim refuted by a
+document we had already written) does **not** have a counterpart at the level of runs.
+
+## 69.8 LIMITS — STATED BECAUSE THEY BOUND THE HEADLINE
+
+* **A citation is a TOKEN MATCH, not a reading.** A family can be "cited" by one passing mention
+  in a superseded section and still be scientifically unread. This measures the WEAKER property.
+  **69.3/69.6 are a LOWER BOUND on unread compute, never an estimate of it.** No document may
+  write "only 7 runs were unread."
+* The census is at **family** granularity, which is the operator's wording. Individual runs
+  inside a cited family are not separately checked, and 68.9's `p4` case (cited, but forming no
+  matched cell and scored nowhere) shows that class is non-empty.
+* The LOOSE rule produced **2 false-positive citations** out of 108 (`v2`, `a2`), both caught by
+  eyeball. The AMBIGUOUS class exists precisely to force that eyeball and it worked.
+* `--detail` context lines are printed for the first 3 hits only; the eyeball above used them.
+
+**Do not re-run offline:** 69.1–69.7 are closed on the present corpus.

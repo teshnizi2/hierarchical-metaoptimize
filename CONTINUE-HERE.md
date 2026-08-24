@@ -54,6 +54,59 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 69) -- **ALICE DOWN A FOURTEENTH TICK. THE ~290-RUN ORPHAN BACKLOG DOES NOT EXIST.**
+
+**Read `docs/CORRECTIONS.md` 98 and `docs/FINDINGS.md` 69.0-69.8 FIRST. 98.6 is an
+OPERATOR-FACING FLAG about the brief itself; 98.5 adds STANDING RULE (16).**
+
+* **BOTH LOGIN NODES DOWN FOR A FOURTEENTH CONSECUTIVE TICK**, localised not assumed: gateway up
+  and answering (`p-cfer-016105`), `132.229.104.230/.231` both refuse :22 from it, `ssh alice` /
+  `alice2` fail at banner exchange. Checked **2026-08-24T01:26Z**. **No queue read, nothing
+  synced, nothing submitted, nothing cancelled. CSV unchanged at 1707 runs / 1143.5 GPU-h.**
+  `bo7-*` (12, alice) / `bd7-*` (12, alice2) survival still UNKNOWN and still not guessed.
+  `docs/` is **ELEVEN** cycles behind on the cluster.
+* **CHECK THIS FIRST, IT IS ONE LINE:**
+  `ssh alice-gw 'nc -z -w 8 132.229.104.230 22 && echo UP || echo DOWN'`
+  If UP: **`squeue` BOTH accounts before anything else**, then **GATE P7**, then `hz9`, `sp8`, `cp9`.
+* **THE TICK'S DECISION (98.1).** Three offline candidates were rejected as already-discharged
+  (the field-side dataset bracket -- 65.2 already measures `u*_E` on `c100`; kernel-vs-fraction
+  for `u*=1/512` -- 62.5's S1/S2/S4 and 63.1's P3 closed it; the `plateau5` re-scoring pass --
+  operator decision). **CHOSEN: the campaign-wide ORPHAN census**, a standing per-tick operator
+  instruction never discharged at campaign scale. `analysis/c69_orphan_census.py`, **24/24
+  selftests**, committed `9e11ff4` **before any family was classified**.
+* **THE ~290 FIGURE IS WITHDRAWN AS A SEARCH ARTIFACT (98.2).** 109 families / 1707 runs:
+  **102 fam / 1676 runs STRICT-cited, 6 / 27 AMBIGUOUS, 1 fam / 4 runs ORPHAN** under a
+  deliberately GENEROUS rule. Corpus ablation **refuted my own first hypothesis**: dropping
+  `MASTER-TABLE.md` leaves orphans at **4**; dropping `FINDINGS.md` too gives **342**, which is
+  where "~290" came from. **Never quote a ~290-run orphan backlog again.**
+* **THE INSTRUCTION IS DISCHARGED, ONE LINE PER FAMILY (98.3 / 69.5).** `hv` (4), `v2` (2),
+  `a2` (1) **ABANDONED** -- all 2-5 epoch smoke runs at chance accuracy; `v2`/`a2` were LOOSE-rule
+  false positives, so the true uncited set is **7 runs, not 4** (recorded against this tick's own
+  statistic). `det` (3) already cited as smoke. `g3` (9, 100 ep) **CITED AND SUPERSEDED** --
+  guard-OFF predecessor of `g4-sgdmAdam-*`, source of the withdrawn "scalar fails 2/3 seeds".
+  `gate0b` (6) / `gate0d` (6) already **explicitly ABANDONED** in FINDINGS 61.8.
+  **STOP REDISCOVERING THESE.**
+* **THE ACCOUNTING NUMBER (98.4).** True-uncited compute = **7 runs / 0.23 GPU-h = 0.020 %** of
+  1143.5 GPU-h, max `epochs_done` **5**. All **32** empty-`plateau` runs corpus-wide ran <=5
+  epochs. **Not one run at a usable budget is uncited.**
+* **NO HIDDEN SCIENCE, AND THAT IS THE RESULT (98.5).** Every 100-epoch family flagged is cited
+  and already adjudicated. 96.6/97.8's failure mode has **no counterpart at the level of runs.**
+* **STANDING RULE (16), added 98.5:** *any "X is not cited / orphaned" claim must name its corpus
+  and report the corpus ablation showing which document carries the citations. An uncited-count
+  with no named corpus is a statement about the search, not about the evidence.*
+* **OPERATOR-FACING FLAG (98.6), READ BEFORE THE NEXT DIRECTION DECISION.** The tick brief states
+  direction C as *"53.1 % of 11.17M per-weight meta-gradients agree in sign ... refuting
+  1/sqrt(N)"*. **That sentence has been REFUTED AS STATED here since cycle 42** (CORRECTIONS 26 +
+  MASTER-TABLE): two arms merged, an n-dependent null the quoted arm sits **1.9 pp BELOW**, and an
+  a0=1e-6 scope whose excess collapses 16x at a0=1e-3; `KILLTEST-idea2.md` §1 adds that no run on
+  disk reproduces it. **What survives is the drift-vs-N slope (+0.179/+0.268/+0.203 vs a required
+  -0.500) and the block-size curve (62.5-62.7, 63.1, 65.2) -- not the 53.1 % sentence.**
+* **OFFLINE QUEUE** is again down to the carried-since-51 `s` re-derivation (bookkeeping).
+
+---
+
+## Superseded -- cycle 68 (kept for the record)
+
 ## Running / next (cycle 68) -- **ALICE DOWN A THIRTEENTH TICK. `u_train*` IS RESOLVED ON CIFAR-100, AND IT IS NODEWISE.**
 
 **Read `docs/CORRECTIONS.md` 97 and `docs/FINDINGS.md` 68.0-68.10 FIRST. 97.5/97.7 is the
