@@ -13378,3 +13378,164 @@ the defensible figure is **+1.821 pp at 5.51× the gate**.
   cross-network pooling reaches further is **OPEN** and is the obvious next offline job.
 * `MASTER-TABLE.md` remains **five cycles stale** (no c65–c69 content). That is now recorded as a
   structural hazard, not fixed — see CORRECTIONS 99.4.
+
+---
+
+# FINDINGS 70 — cycle 70: CROSS-NETWORK POOLING DOES **NOT** REACH CYCLE 65's LADDER, BUT IT REACHES 23% OF THE CORPUS AND FLIPS A VERDICT IN 8 CELLS
+
+Zero GPU cost. Login nodes down a **FIFTEENTH** consecutive tick (`ssh alice` / `alice2` both fail
+at banner exchange, checked **2026-08-24T04:26Z**, one probe each, no retry loop, no ssh-config
+change). Nothing synced, nothing submitted, nothing cancelled. CSV unchanged at **1707 runs**.
+
+Instrument `analysis/c70_composition_audit.py`, **31/31 selftests**, registered and committed
+(`547e3d5`) **before any cell was scored**. Outputs `results/c70_composition_audit.txt` (registered)
+and `results/c70_posthoc.txt` (post-hoc supplement, labelled).
+
+## 70.0 THE QUESTION, WHICH WAS WRITTEN DOWN BY THE PREVIOUS TICK
+
+CORRECTIONS **99.5**, verbatim: *"Whether cross-network (or cross-family) pooling reaches into the
+other 100-epoch cells quoted in cycles 65–68 is **OPEN**."* This tick answers it.
+
+**The defect is ASYMMETRIC composition, not pooling.** If every arm pools the same network mixture
+the contrast is still a within-network contrast on average. 68.6's error (CORRECTIONS 99.1) was a
+single-network nodewise arm against a three-network layerwise arm. The statistic is therefore
+total-variation distance between two arms' composition on a free axis, threshold **TVD > 0.25**,
+fixed in the docstring before scoring.
+
+## 70.1 THE HEADLINE: **CYCLE 65's LADDER IS CLEAN.** THE K2 NUMERATOR IS SAFE
+
+All four published 65.3 cells reconstruct to 3 decimals and are **fully matched on every axis their
+key leaves free** — every free axis is single-valued, so TVD is not merely below threshold, it is
+undefined-for-lack-of-variation:
+
+| published cell | cite | key edit found | rows | free-axis TVD | verdict |
+|---|---|---|---|---|---|
+| 65.3 r18 ms1e-3 a0=1e-3 20ep | 65.3 r1 / 67.6 W2 | ADD `beta_clip` | 69 | all single-valued | **CLEAN** |
+| 65.3 c100 ms1e-3 a0=1e-3 20ep | 65.3 r2 | ADD `beta_clip` | 50 | all single-valued | **CLEAN** |
+| 65.3 r10 ms1e-3 a0=1e-3 20ep | 65.3 r3 | ADD `beta_clip` | 16 | all single-valued | **CLEAN** |
+| 65.3 r34 ms1e-3 a0=1e-3 20ep | 65.3 r4 | ADD `beta_clip` | 16 | all single-valued | **CLEAN** |
+| 68.6 c100 100ep (**POSITIVE CONTROL**) | 68.6 / 97.5 / 99.1 | **DROP `network`** | 36 | network **0.4286** | **CONTAMINATED** |
+
+**G1 RECONSTRUCTION PASSES 5/5.** The key search found the 65.3 rows need an ADD (`beta_clip =
+-15:-2.3026`, a restriction the row labels do not name) and **no DROP** — the opposite edit from
+68.6, which needs a DROP of the axis its header *does* name. Cycle 65 under-documented its key;
+cycle 68 mis-stated its key. Only the second is an error of substance.
+
+**G2 POSITIVE CONTROL PASSES.** Told only 68.6's own stated key and its printed numbers, the
+generalised search independently dropped the `network` axis and reproduced cycle 69's correction
+without being shown it: Δ **+2.367 → +1.821 pp**, gate **0.452 → 0.331**, multiple **5.24× →
+5.51×**, no seed overlap. G3 negative control passes 4/5 clean.
+
+## 70.2 CAMPAIGN-WIDE BASE RATE (registered G4/G5/G6, headline pair)
+
+56 scorable relaxed cells (≥2 granularity arms at n≥3), `plateau5`:
+
+| quantity | measured | registered bar | verdict |
+|---|---|---|---|
+| cells spanning >1 network | 16 / 56 (28.6%) | — | pooling is common |
+| **headline contrast CONTAMINATED** | **6 / 56 (10.7%)** | <10% localised | **SYSTEMIC** |
+| argmax flips under matching | 1 / 5 (20.0%) | — | |
+| resolution verdict flips | 2 / 5 (40.0%) | — | |
+| **either flip (materiality)** | **2 / 5 (40.0%)** | <20% cosmetic | **MATERIAL** |
+| G6 direction, margin shrinks | **5 / 5 (100%)** | none — reported either way | see 70.5 |
+
+**AGAINST OUR INTEREST, STATED FIRST: G4 CLEARS ITS BAR BY ONE CELL.** 6/56 = 10.7% vs a 10.0%
+bar; **5/56 = 8.9% would read LOCALISED**. The SYSTEMIC verdict is one cell from flipping and must
+be quoted with that fragility attached. G5's 40% is 2 of 5. Neither is a large-n statistic.
+
+## 70.3 MATCHING **GAINS** PRECISION — THE POWER OBJECTION DOES NOT APPLY
+
+The obvious objection is that network-matching shrinks n, so any lost resolution is power loss
+rather than bias removal. **It is not: the gate FALLS in 5 of 5 matched cells**, because
+asymmetric pooling injects between-network variance into the arm's own sem (99.3 saw this once;
+it is now 5/5):
+
+| cell (CIFAR-10 unless noted) | Δ as-pooled | Δ matched | gate | multiple |
+|---|---|---|---|---|
+| a0=1e-6 100ep additive η=0.06 | +0.912 | **+0.060** | 0.479 → **0.118** | 1.90× → **0.51×** |
+| a0=1e-6 100ep additive η=0.03 | +0.691 | +0.133 | 1.105 → **0.126** | 0.62× → **1.06×** |
+| a0=1e-6 100ep additive η=0.10 | +0.893 | +0.398 | 0.429 → **0.323** | 2.08× → 1.23× |
+| **CIFAR-100** a0=1e-3 100ep (68.6) | +2.367 | +1.821 | 0.452 → **0.331** | 5.24× → **5.51×** |
+| a0=1e-3 100ep blocks−layerwise | +0.562 | +0.419 | 0.190 → **0.138** | 2.96× → **3.05×** |
+
+The multiple of the gate **improves in 3 of 5**. Matching is a precision-gaining manoeuvre here,
+not a power-losing one.
+
+## 70.4 THE ONE VERDICT DESTROYED, AND THE ONE STRENGTHENED
+
+**DESTROYED — additive η=0.06, CIFAR-10, α₀=1e-6, 100 ep.** Pooled, nodewise beats layerwise by
+**+0.912 pp, RESOLVED at 1.90×**. The nodewise arm is ResNet18(3); the layerwise arm is
+R10(6)+R18(8)+R34(5)+R50(2). Network-matched to ResNet18 (8 vs 3): **layerwise beats nodewise by
++0.060 pp, UNRESOLVED at 0.51×**. **The sign flips and the effect vanishes.** No document quotes
+this cell's numbers (`grep` of `docs/` + root `*.md` for 92.314 / 93.225 / 0.893: zero hits), so
+nothing published is retracted — but it is the campaign's cleanest single demonstration that the
+defect can manufacture a resolved ordering out of nothing.
+
+**STRENGTHENED — the plain guarded CIFAR-10 ladder** (α₀=1e-6, 100 ep, hier none), which carries
+the published *"peak at nodewise, not layerwise"* claim:
+
+| readout | as-pooled (node 8 vs lay 27) | R18-matched (8 vs 17) |
+|---|---|---|
+| `plateau5` node−lay | +1.188, gate 0.311, **3.82×** | **+0.846**, gate 0.135, **6.29×** |
+| `plateau` node−lay | +1.159, gate 0.320, 3.62× | +0.809, gate 0.128, **6.34×** |
+
+Same shape as 99.3 on CIFAR-100: margin down ~29%, resolution up. **The CIFAR-10 nodewise peak is
+real and better resolved once matched**, and it now agrees in sign with 68.6/99.3's CIFAR-100
+result under the same correction.
+
+**A free implementation cross-check.** FINDINGS 248 asserts `ETA_RATIO=1` reproduces plain by
+construction. Matched, the additive η=1 cell reads node−lay **+0.795** against the plain cell's
+**+0.846** — **0.051 pp apart**, two separately-labelled row sets at the same physical
+configuration.
+
+## 70.5 POST-HOC, LABELLED: THE REGISTERED RATE IS A **LOWER BOUND**, AND G6 DOES **NOT** GENERALISE
+
+Reading `--report` exposed a scope limit: G4 audits only the **headline** pair (argmax vs
+runner-up), but a document may quote a non-headline pair. The plain guarded ladder of 70.4 is
+exactly that case — its headline pair (nodewise vs blocks) is **TVD 0.0000, CLEAN**, while the
+nodewise-vs-layerwise contrast carrying the published claim is **TVD 0.3704, contaminated**.
+`--posthoc` measures the any-pair rate. It may not overturn a registered gate (CORRECTIONS
+76(1)/79) and does not: it bounds that gate's coverage, which is mechanical.
+
+| | registered (headline) | post-hoc (any pair) |
+|---|---|---|
+| contaminated cells | 6 / 56 (**10.7%**) | **13 / 56 (23.2%)** |
+| with ≥1 flipping pair | 2 / 5 (40%) | **8 / 13 (61.5%)** |
+| re-scorable contrasts | 5 | 45 |
+| **G6 margin shrinks** | **5 / 5 (100%)** | **29 / 45 (64%)** |
+
+**G6's 100% IS AN ARTEFACT OF THE SMALL REGISTERED SET AND IS WITHDRAWN AS A RULE.** At pair
+level the split is 64% shrink / 36% grow — a real skew (29/45, binomial p≈0.036 two-sided) but
+nowhere near universal. The counter-examples are systematic and have an obvious mechanism: every
+`layerwise−weightwise` contrast **grows** under matching (+44.013→+44.985, +31.374→+31.792,
++11.648→+11.907), because pooling weaker networks into the layerwise arm moves it *toward* the
+collapsed weightwise arm. **The honest rule is directional, not absolute:** asymmetric pooling
+biases a contrast by the between-network difference, whose sign depends on which arm the extra
+networks were added to — it inflates like-scaled contrasts and deflates catastrophic ones.
+
+## 70.6 WHAT THIS IS WORTH
+
+**Buys:** the campaign's central separation result (K2, and the 65.3 ladder that is its numerator)
+is **audited and clean** — the newest correction does not propagate backwards into it. The
+CIFAR-10 and CIFAR-100 nodewise-peak results now agree under a common correction. And the corpus
+has a measured contamination rate, so every unaudited contrast has a prior: **~23% chance of being
+composition-contaminated, ~62% chance of a flip if it is.**
+
+**Costs:** G4 clears by one cell and G5 rests on two. The audit covers only the `network` axis
+campaign-wide (PART B audits all free axes, PART A only network). 45 contaminated pairs are
+identified but only the 6 headline cells were scored under registered gates.
+
+**Do not re-run offline:** 70.1–70.5 are closed on the present corpus.
+
+## 70.7 LIMITS
+
+* **L1** PART A's relaxed-cell grouping fixes 13 config axes and frees only `network`. Cross-axis
+  contamination (e.g. asymmetric `beta_clip` composition) is measured in PART B only.
+* **L2** One of the 6 contaminated cells is **not re-scorable** (20 ep, `window_ok=0`, arms of
+  n=4/3/1 — no single network leaves two arms at n≥3). It is counted in G4 and excluded from
+  G5/G6, which is stated rather than silently dropped.
+* **L3** `plateau5` is primary throughout; 65.3's cells are re-derived in `plateau` (k=20) because
+  that is the column their own document published (67.4/97.3's re-scoring debt is untouched here).
+* **L4** The post-hoc any-pair pass matches on **one** network (`pick_network`); a cell whose arms
+  share no common network is skipped, so 23.2% is itself a lower bound.
+* **L5** `MASTER-TABLE.md` remains **six cycles stale**. Still recorded, still not fixed.

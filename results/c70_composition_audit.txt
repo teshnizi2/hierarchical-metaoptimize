@@ -1,0 +1,74 @@
+====================================================================================================
+C70  COMPOSITION AUDIT -- does cross-network pooling reach beyond 68.6?   (CORRECTIONS 99.5)
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+PART B -- THE PUBLISHED CELLS OF CYCLES 65-68
+----------------------------------------------------------------------------------------------------
+
+### 68.6 c100 100ep (POSITIVE CONTROL)
+    cite: FINDINGS 68.6 / CORRECTIONS 97.5, 99.1   column: plateau5
+    key edits: DROP=['network']  ADD=-   rows=36
+    arms: layerwise=14  nodewise=3  resnet18_blocks=5  scalar=11  weightwise=3
+    free-axis composition TVD (headline pair nodewise vs layerwise):
+        network          0.4286  <== CONTAMINATED
+    as published : nodewise - layerwise = +2.367 pp   gate 0.452  5.24x  RESOLVED
+    matched on network=ResNet18_c100:
+    corrected    : nodewise - layerwise = +1.821 pp   gate 0.331  5.51x  RESOLVED
+    argmax flips: False   resolution flips: False
+
+### 65.3 r18 ms1e-3 a0=1e-3 20ep
+    cite: FINDINGS 65.3 row 1 / 67.6 W2   column: plateau
+    key edits: DROP=-  ADD=['beta_clip']   rows=69
+    arms: layerwise=18  nodewise=16  resnet18_blocks=16  scalar=2  weightwise=17
+    free-axis composition: all free axes single-valued (fully matched)
+    as published : layerwise - resnet18_blocks = +1.404 pp   gate 0.272  5.17x  RESOLVED
+    verdict: CLEAN -- no composition correction applies
+
+### 65.3 c100 ms1e-3 a0=1e-3 20ep
+    cite: FINDINGS 65.3 row 2   column: plateau
+    key edits: DROP=-  ADD=['beta_clip']   rows=50
+    arms: layerwise=13  nodewise=13  resnet18_blocks=10  scalar=1  weightwise=13
+    free-axis composition: all free axes single-valued (fully matched)
+    as published : layerwise - nodewise = +0.742 pp   gate 0.236  3.15x  RESOLVED
+    verdict: CLEAN -- no composition correction applies
+
+### 65.3 r10 ms1e-3 a0=1e-3 20ep
+    cite: FINDINGS 65.3 row 3   column: plateau
+    key edits: DROP=-  ADD=['beta_clip']   rows=16
+    arms: layerwise=5  nodewise=5  scalar=1  weightwise=5
+    free-axis composition: all free axes single-valued (fully matched)
+    as published : layerwise - nodewise = +1.059 pp   gate 0.515  2.06x  RESOLVED
+    verdict: CLEAN -- no composition correction applies
+
+### 65.3 r34 ms1e-3 a0=1e-3 20ep
+    cite: FINDINGS 65.3 row 4   column: plateau
+    key edits: DROP=-  ADD=['beta_clip']   rows=16
+    arms: layerwise=5  nodewise=5  scalar=1  weightwise=5
+    free-axis composition: all free axes single-valued (fully matched)
+    as published : layerwise - nodewise = +3.100 pp   gate 0.669  4.63x  RESOLVED
+    verdict: CLEAN -- no composition correction applies
+
+G6 DIRECTION (published cells): margin shrinks in 1, grows in 0
+
+----------------------------------------------------------------------------------------------------
+PART A -- CAMPAIGN-WIDE BASE RATE (mechanical, blind to publication)
+----------------------------------------------------------------------------------------------------
+  scorable relaxed cells (>=2 arms at n>=3) : 56
+  of which span >1 network                          : 16 (28.6%)
+  of which headline contrast is CONTAMINATED        : 6 (10.7%)   [G4 bar: 10%]
+  G4 VERDICT: SYSTEMIC
+  contaminated cells re-scorable network-matched    : 5
+  argmax flips under matching                       : 1 (20.0%)
+  resolution verdict flips under matching           : 2 (40.0%)
+  EITHER flip (materiality)                         : 2 (40.0%)   [G5 bar: 20%]
+  G5 VERDICT: MATERIAL
+  G6 DIRECTION: margin shrinks in 5, grows in 0 (100% shrink)
+
+  the contaminated cells, worst TVD first:
+       TVD              net                   headline    as-pub   matched flipA flipR  key
+     0.619         ResNet18         nodewise-layerwise    +0.912    +0.060     T     T  CIFAR10/SGDm/Lion/ms1e-3/a01e-6/100ep/hieradditive
+     0.545         ResNet18         nodewise-layerwise    +0.691    +0.133     F     T  CIFAR10/SGDm/Lion/ms1e-3/a01e-6/100ep/hieradditive
+     0.545         ResNet18         nodewise-layerwise    +0.893    +0.398     F     F  CIFAR10/SGDm/Lion/ms1e-3/a01e-6/100ep/hieradditive
+     0.429    ResNet18_c100         nodewise-layerwise    +2.367    +1.821     F     F  CIFAR100/SGDm/Lion/ms1e-3/a01e-3/100ep/hier-
+     0.364         ResNet18      resnet18_bl-layerwise    +0.562    +0.419     F     F  CIFAR10/SGDm/Lion/ms1e-3/a01e-3/100ep/hier-

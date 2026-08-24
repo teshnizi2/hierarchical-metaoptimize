@@ -1,0 +1,32 @@
+====================================================================================================
+C70 POST-HOC SUPPLEMENT -- any-pair contamination.  NOT a registered gate.
+====================================================================================================
+
+-- the case that motivated it: plain guarded ladder, CIFAR-10 a0=1e-6, 100 ep
+   [plateau5] as-pooled  node-lay +1.188  gate 0.311  3.82x  n=8/27  TVDnet=0.3704
+   [plateau5] R18-match  node-lay +0.846  gate 0.135  6.29x  n=8/17
+   [plateau ] as-pooled  node-lay +1.159  gate 0.320  3.62x  n=8/27  TVDnet=0.3704
+   [plateau ] R18-match  node-lay +0.809  gate 0.128  6.34x  n=8/17
+
+  scorable cells                     : 56
+  HEADLINE-pair contaminated (G4)    : 6 (10.7%)  <- registered
+  ANY-pair contaminated              : 13 (23.2%)  <- post-hoc
+  ...with >=1 flipping pair          : 8 (61.5%)
+  re-scorable contaminated PAIRS     : 45
+  |margin| shrinks 29, grows 16  (64% shrink)  <- G6 does NOT generalise; see FINDINGS 70.5
+
+  worst 14 contaminated pairs:
+   TVD 0.667   layerwise-nodewise      -1.054 ->   -0.795  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta1
+   TVD 0.667   layerwise-resnet18_bl   -0.748 ->   -0.488  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta1
+   TVD 0.667   layerwise-weightwise   +11.648 ->  +11.907  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta1
+   TVD 0.667   layerwise-nodewise      -1.090 ->   -0.671  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.2
+   TVD 0.667   layerwise-resnet18_bl   -0.439 ->   -0.021  res T->F  CIFAR10/a01e-6/100ep/hieradditive/eta0.2
+   TVD 0.667   layerwise-weightwise   +31.374 ->  +31.792  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.2
+   TVD 0.619   layerwise-nodewise      -0.912 ->   +0.060  res T->F  CIFAR10/a01e-6/100ep/hieradditive/eta0.06
+   TVD 0.619   layerwise-resnet18_bl   +0.676 ->   +1.648  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.06
+   TVD 0.619   layerwise-weightwise   +44.013 ->  +44.985  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.06
+   TVD 0.545   layerwise-nodewise      -0.691 ->   -0.133  res F->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.03
+   TVD 0.545   layerwise-resnet18_bl   +0.136 ->   +0.694  res F->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.03
+   TVD 0.545   layerwise-weightwise   +44.909 ->  +45.466  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.03
+   TVD 0.545   layerwise-nodewise      -0.893 ->   -0.398  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.1
+   TVD 0.545   layerwise-resnet18_bl   +0.384 ->   +0.879  res T->T  CIFAR10/a01e-6/100ep/hieradditive/eta0.1

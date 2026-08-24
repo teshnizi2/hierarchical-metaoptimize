@@ -570,15 +570,103 @@ def report():
     return 0
 
 
+# --------------------------------------------------------------------------- POST-HOC supplement
+def posthoc():
+    r"""POST-HOC, WRITTEN AFTER --report WAS READ, AND LABELLED SO EVERYWHERE.
+
+    --report's G4/G5/G6 audit the HEADLINE pair only (a cell's argmax vs its runner-up), because
+    that is the pair a reader quotes.  Reading the report exposed a scope limit: a document may
+    quote a NON-headline pair.  The plain guarded CIFAR-10 ladder is the case that showed it --
+    its headline pair (nodewise vs blocks) is TVD = 0.0000 and CLEAN, while the nodewise-vs-
+    LAYERWISE contrast that carries the published "peak at nodewise, not layerwise" claim has
+    TVD = 0.3704 and IS contaminated.
+
+    So the registered G4 = 10.7% is a LOWER BOUND.  This mode measures the any-pair rate.
+    It may not overturn a registered gate (CORRECTIONS 76(1)/79) and does not claim to; it
+    bounds the registered gate's scope, which is a mechanical fact about coverage.
+    """
+    rows = load()
+    print('=' * 100)
+    print('C70 POST-HOC SUPPLEMENT -- any-pair contamination.  NOT a registered gate.')
+    print('=' * 100)
+
+    print('\n-- the case that motivated it: plain guarded ladder, CIFAR-10 a0=1e-6, 100 ep')
+    sel = [r for r in rows if r['dataset'] == 'CIFAR10' and r['alpha0'] == '1e-6'
+           and r['epochs_done'] == '100' and r['hier'] == '' and r['augment'] == '1'
+           and r['beta_clip'] == '-15:-2.3026' and r['base'] == 'SGDm' and r['meta'] == 'Lion'
+           and r['meta_stepsize'] == '1e-3' and r['window_ok'] == '1']
+    g = arms_of(sel, 'plateau5')
+    for col in ('plateau5', 'plateau'):
+        c = contrast(g, 'nodewise', 'layerwise', col)
+        gm = {k: [r for r in v if r['network'] == 'ResNet18'] for k, v in g.items()}
+        cm = contrast(gm, 'nodewise', 'layerwise', col)
+        print(f"   [{col:8s}] as-pooled  node-lay {c['delta']:+.3f}  gate {c['gate']:.3f}  "
+              f"{c['mult']:.2f}x  n={c['a']['n']}/{c['b']['n']}  "
+              f"TVDnet={tvd(g['nodewise'], g['layerwise'], 'network'):.4f}")
+        print(f"   [{col:8s}] R18-match  node-lay {cm['delta']:+.3f}  gate {cm['gate']:.3f}  "
+              f"{cm['mult']:.2f}x  n={cm['a']['n']}/{cm['b']['n']}")
+
+    key_axes, cells_ = relaxed_cells(rows, 'plateau5')
+    tot = head = anyp = anyp_flip = 0
+    pairs = []
+    for key, rs in cells_.items():
+        g = arms_of(rs, 'plateau5')
+        h = headline(g, 'plateau5')
+        if not h:
+            continue
+        tot += 1
+        if tvd(g[h[0]], g[h[1]], 'network') > TVD_THRESHOLD:
+            head += 1
+        scor = [a for a, v in g.items() if len(v) >= MIN_ARM_N]
+        bad = [(a, b) for a, b in itertools.combinations(sorted(scor), 2)
+               if tvd(g[a], g[b], 'network') > TVD_THRESHOLD]
+        if not bad:
+            continue
+        anyp += 1
+        net = pick_network(g, 'plateau5')
+        flip = False
+        for a, b in bad:
+            ra = [r for r in g[a] if r['network'] == net]
+            rb = [r for r in g[b] if r['network'] == net]
+            if len(ra) < 2 or len(rb) < 2:
+                continue
+            c0 = contrast(g, a, b, 'plateau5')
+            c1 = contrast({a: ra, b: rb}, a, b, 'plateau5')
+            f = (c1['resolved'] != c0['resolved']) or ((c0['delta'] > 0) != (c1['delta'] > 0))
+            flip = flip or f
+            pairs.append((tvd(g[a], g[b], 'network'), a, b, c0, c1, dict(zip(key_axes, key))))
+        if flip:
+            anyp_flip += 1
+    print(f'\n  scorable cells                     : {tot}')
+    print(f'  HEADLINE-pair contaminated (G4)    : {head} ({100*head/tot:.1f}%)  <- registered')
+    print(f'  ANY-pair contaminated              : {anyp} ({100*anyp/tot:.1f}%)  <- post-hoc')
+    print(f'  ...with >=1 flipping pair          : {anyp_flip} ({100*anyp_flip/max(1,anyp):.1f}%)')
+    d = sum(1 for p in pairs if abs(p[4]['delta']) < abs(p[3]['delta']))
+    u = sum(1 for p in pairs if abs(p[4]['delta']) > abs(p[3]['delta']))
+    print(f'  re-scorable contaminated PAIRS     : {len(pairs)}')
+    print(f'  |margin| shrinks {d}, grows {u}  ({100*d/max(1,d+u):.0f}% shrink)  '
+          f'<- G6 does NOT generalise; see FINDINGS 70.5')
+    print('\n  worst 14 contaminated pairs:')
+    for t, a, b, c0, c1, k in sorted(pairs, key=lambda x: -x[0])[:14]:
+        print(f"   TVD {t:.3f} {a[:11]:>11s}-{b[:11]:<11s} {c0['delta']:+8.3f} -> {c1['delta']:+8.3f}"
+              f"  res {str(c0['resolved'])[0]}->{str(c1['resolved'])[0]}  "
+              f"{k['dataset']}/a0{k['alpha0']}/{k['epochs_done']}ep/"
+              f"hier{k['hier'] or '-'}/eta{k['eta_ratio']}")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--report', action='store_true')
+    ap.add_argument('--posthoc', action='store_true')
     a = ap.parse_args()
     if a.selftest:
         return selftest()
     if a.report:
         return report()
+    if a.posthoc:
+        return posthoc()
     ap.print_help()
     return 1
 

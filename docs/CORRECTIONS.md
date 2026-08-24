@@ -4364,3 +4364,96 @@ correction consumed the tick and a rushed table is worse than a stale one.
 cell carrying the newest load-bearing claim. Whether cross-network (or cross-family) pooling
 reaches into the other 100-epoch cells quoted in cycles 65–68 is **OPEN**, and is the obvious next
 offline job after MASTER-TABLE. `analysis/c69_c100_armset.py` generalises to it directly.
+
+---
+
+## 100. DECISION RECORD — cycle 70 (ALICE DOWN, **FIFTEENTH** CONSECUTIVE TICK, ZERO JOBS)
+
+**OUTAGE.** `ssh alice` and `ssh alice2` both fail at **banner exchange**, checked
+**2026-08-24T04:26Z**. One probe each, no retry loop, no ssh-config change (OUTAGE HANDLING rule).
+**No queue read, nothing rsynced, nothing submitted, nothing cancelled.** `bo7-*` (12, alice) /
+`bd7-*` (12, alice2) survival remains UNKNOWN and is not guessed. CSV unchanged at **1707 runs /
+1143.5 GPU-hours**. `aggregate.py` and `results/all_runs.csv` are **BYTE-UNCHANGED** this tick.
+
+**100.1 THE TICK'S DECISION, AND WHY IT NEEDED NO DELIBERATION.** Cycle 69 closed by writing the
+next job down: CORRECTIONS **99.5**, *"whether cross-network (or cross-family) pooling reaches into
+the other 100-epoch cells quoted in cycles 65–68 is OPEN, and is the obvious next offline job …
+`analysis/c69_c100_armset.py` generalises to it directly."* I took that job rather than re-deriving
+a new one. The competing candidate — the `MASTER-TABLE.md` refresh (99.4) — was **deferred again,
+deliberately**: 99.1's defect was found *while* refreshing that table, and the audit closes a
+question about the science whereas the table is bookkeeping. It is now **six** cycles stale and
+that is the honest cost of this choice, recorded here so the next tick can overrule it.
+
+Instrument `analysis/c70_composition_audit.py`, **31/31 selftests**, gates G1–G6 and the
+TVD > 0.25 contamination threshold fixed in the docstring and **committed (`547e3d5`) before any
+cell was scored**.
+
+**100.2 THE DESIGN DECISION THAT MATTERS: POOLING IS NOT THE DEFECT, ASYMMETRY IS.** 99.1 could
+have been generalised as *"find every cell that pools networks"* — 16 of 56 do. That would have
+been wrong. If every arm pools the same mixture, the contrast remains a within-network contrast on
+average; the 68.6 error was a **single-network arm against a three-network arm**. The audit
+therefore scores total-variation distance between the compared arms' composition, and the
+distinction does real work: the largest cell in the corpus (22 layerwise vs 22 scalar, four
+networks) pools heavily and is **balanced 3/14/3/2 in both arms**, so it is not flagged.
+
+**100.3 THE ANSWER TO 99.5: NO FOR CYCLE 65, YES FOR THE CORPUS.** All four published 65.3 cells
+reconstruct to 3 decimals and are **fully matched on every free axis**. **K2's numerator is clean
+and the campaign's central separation result does not move.** The key search found 65.3 needs an
+ADD (`beta_clip`, a restriction its row labels never state) and **no DROP** — the opposite edit
+from 68.6. Cycle 65 *under-documented* its key; cycle 68 *mis-stated* its key. Only the second is
+an error of substance, and it remains the only published cell that is contaminated.
+
+Campaign-wide the defect is real but bounded: **6/56 headline contrasts contaminated (G4 SYSTEMIC),
+2/5 material (G5 MATERIAL)**; post-hoc at pair level **13/56 (23.2%)** with **8/13** carrying a
+flip. See FINDINGS 70.
+
+**100.4 TWO THINGS RECORDED AGAINST THIS TICK'S OWN RESULT.**
+(a) **G4 clears its 10% bar by ONE CELL** — 6/56 = 10.7%; 5/56 = 8.9% reads LOCALISED. The SYSTEMIC
+verdict is one cell from flipping and no document may quote it without that sentence. G5 rests on
+2 of 5. This is the same shape as 67.2's B4 (1.524 against a 1.50 bar) and is flagged the same way.
+(b) **G6 IS WITHDRAWN AS A RULE.** On the registered set the margin shrank **5/5 (100%)** and I was
+one paragraph from writing *"every composition correction in this campaign has inflated a margin"*.
+The post-hoc pair-level pass refutes it: **29/45 (64%) shrink, 16 grow**, and the counter-examples
+are systematic — every `layerwise−weightwise` contrast **grows** under matching, because pooling
+weak networks into the layerwise arm moves it toward the collapsed weightwise arm. The defensible
+statement is directional, not absolute: asymmetric pooling biases a contrast by the between-network
+difference, and **the sign depends on which arm absorbed the extra networks.**
+
+**100.5 THE POWER OBJECTION IS ANSWERED, 5/5.** Matching cuts n, so lost resolution could be power
+loss rather than bias removal. It is not: **the gate FALLS in 5 of 5 matched cells** and the
+multiple of the gate **improves in 3 of 5**, because asymmetric pooling injects between-network
+variance into an arm's own sem. 99.3 saw this once (0.220 → 0.158) and read it as a curiosity; it
+is a property of the defect.
+
+**100.6 ONE VERDICT DESTROYED, ONE STRENGTHENED — AND NOTHING PUBLISHED IS RETRACTED.** The
+additive η=0.06 / α₀=1e-6 / 100 ep CIFAR-10 cell reads nodewise **+0.912 pp RESOLVED** pooled and
+**layerwise +0.060 pp UNRESOLVED** matched — sign flipped, effect gone. `grep` over `docs/` and the
+root `*.md` finds **zero** citations of that cell's numbers, so no claim is withdrawn; it stands as
+the cleanest demonstration that this defect can manufacture a resolved ordering from nothing.
+Conversely the **plain guarded CIFAR-10 ladder's nodewise peak STRENGTHENS** under the same
+correction (+1.188 → +0.846 pp, 3.82× → **6.29×**), which puts the CIFAR-10 and CIFAR-100
+(68.6/99.3) nodewise-peak results into agreement under a common correction for the first time.
+
+**STANDING RULE (17), added 100.3:** *a multi-arm contrast may not be quoted without reporting the
+composition of the compared arms on every axis its key leaves free. Balanced pooling is admissible;
+asymmetric pooling is not, and a contrast between arms differing in composition is a statement
+about the mixture, not about the axis being compared.* This is STANDING RULE (10) made checkable —
+(10) says "hold the arm fixed", (17) says how to demonstrate that you did, and
+`analysis/c70_composition_audit.py` is the instrument.
+
+**100.7 OPERATOR FLAG, REPEATED FROM 98.6 BECAUSE IT IS STILL UNREAD.** The tick brief steering
+this campaign states direction C as *"53.1% of 11.17M per-weight meta-gradients agree in sign …
+refuting the 1/sqrt(N) noise-averaging assumption"* and calls it the strongest available
+contribution. **That sentence has been REFUTED AS STATED in this repo since cycle 42** (CORRECTIONS
+26): two arms merged, the null is n-dependent, the quoted arm sits 1.9 pp **below** its own floor,
+and no run on disk reproduces it (`KILLTEST-idea2.md` §1). What survives of direction C is the
+drift-vs-N slope (+0.179 / +0.268 / +0.203 against a required −0.500) and the block-size curve
+(62.5–62.7, 63.1, 65.2). **The operator is steering by a retracted number.**
+
+**100.8 WHAT I DID NOT DO.** No jobs submitted or cancelled (queues unreachable). No queue audit
+and no ORPHAN census — 98.2/98.3 discharged the latter campaign-wide last tick and STANDING RULE
+(16) forbids re-quoting a corpus-free orphan count; there is no new run on disk to re-orphan. The
+20-epoch `plateau` re-scoring debt (97.3) is **still owed and still an operator decision**.
+`MASTER-TABLE.md` is **six cycles stale** and is now the top offline job, ahead of extending this
+audit to the 45 identified contaminated pairs. `hz9`, `sp8`, `cp9` remain the top submit-queue
+items the moment ALICE returns, in that order.
