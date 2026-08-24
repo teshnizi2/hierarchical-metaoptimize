@@ -1,0 +1,53 @@
+==============================================================================
+hz9 -- SCORED AGAINST bin/c58_tuned_horizon.sh, IN THE REGISTERED ORDER
+==============================================================================
+
+[H0] VALIDITY, HARD DROP -- epochs_done == requested == 100
+     kept 9/9
+
+[H0.3] THE GUARD GATE -- BETA_CLIP=-15:-2.3026 live, collapsed false, plateau > 40
+     pass 9/9
+
+[H0.5] THE POOLING GATE -- CAN ONLY VOID
+     corpus rs-lay-1e4  mean 92.824  sd 0.291  n=2
+     corpus rs-node-3e4 mean 92.656  n=1 (sd borrowed from layerwise)
+     lay   hz9-lay-1e4-s0        92.818  vs  92.824  |z| = 0.02  OK
+     lay   hz9-lay-1e4-s1        92.908  vs  92.824  |z| = 0.29  OK
+     lay   hz9-lay-1e4-s2        92.680  vs  92.824  |z| = 0.49  OK
+     node  hz9-node-3e4-s1       92.802  vs  92.656  |z| = 0.50  OK
+     node  hz9-node-3e4-s2       92.138  vs  92.656  |z| = 1.78  OK
+     node  hz9-node-3e4-s3       92.524  vs  92.656  |z| = 0.45  OK
+     node  hz9-node-3e4-s4       92.132  vs  92.656  |z| = 1.80  OK
+     => POOLING PERMITTED
+
+[H1] THE PRIMARY TEST -- THE SLOPE, matched-k=5, unpaired, n=5 vs n=5
+     (node@3e-4 - lay@1e-4) @100 = -0.360
+     (node@3e-4 - lay@1e-4) @ 50 = +0.393
+     D = -0.753   bar +-0.30   ==> T-B
+     REGISTERED DIRECTION: pilot D = -0.485 -> T-B.
+     T-B is a REPLICATION of the registered pilot, NEVER a discovery.
+
+     ladder (matched-k=5 plateau, node - lay):
+       ep  10   node  64.930   lay  61.486   diff  +3.444   fav-node 5/5
+       ep  20   node  82.006   lay  80.657   diff  +1.349   fav-node 5/5
+       ep  30   node  87.292   lay  86.508   diff  +0.784   fav-node 5/5
+       ep  40   node  89.828   lay  89.158   diff  +0.670   fav-node 5/5
+       ep  50   node  91.136   lay  90.744   diff  +0.393   fav-node 5/5
+       ep  60   node  91.670   lay  91.509   diff  +0.162   fav-node 4/5
+       ep  70   node  92.099   lay  92.275   diff  -0.176   fav-node 1/5
+       ep  80   node  92.111   lay  92.604   diff  -0.493   fav-node 0/5
+       ep  90   node  92.468   lay  92.737   diff  -0.270   fav-node 0/5
+       ep 100   node  92.450   lay  92.811   diff  -0.360   fav-node 0/5
+
+[H1b] THE LEVEL at epoch 100, bar +-0.50 (STANDING RULE 9)
+     node@3e-4 92.450 +-0.136 (n=5)   lay@1e-4 92.811 +-0.075 (n=5)
+     level = -0.360   se 0.155   |level|/se = 2.32   ==> TIED
+     TIED IS A RESULT: among PARTITIONS the choice is unresolvable once
+     each arm is tuned; only partition-vs-none remains resolvable.
+
+[H2] THE FIXED-ms CELL, PAIRED WITHIN SEED, at epoch 100 -- A REPLICATION
+     seed 3   node@1e-3  92.174   lay@1e-3  91.080   diff  +1.094
+     seed 4   node@1e-3  92.030   lay@1e-3  90.848   diff  +1.182
+     paired mean +1.138   favouring nodewise 2/2
+     registered expectation: +1.0 .. +2.0 AND 2/2  ==> MET
+

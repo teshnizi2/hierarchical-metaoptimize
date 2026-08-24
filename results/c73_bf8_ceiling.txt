@@ -1,0 +1,85 @@
+==============================================================================
+c73 -- bf8 F0 RE-SCORED FROM probe.jsonl, AND THE CEILING BIND
+==============================================================================
+
+[A] WHY c72 SAID VOID -- the instrument was never switched on
+     patch_probe5.py gates the writer on   PROBE5 == '1'
+     c71_floor_budget.sh:306 exports       PROBE=5        (the STRIDE)
+     bd7's c54_budget_curve.sh:287 exports PROBE=5,PROBE5=1,PROBE5_WRITE_EVERY=500
+     => bf8 wrote no neg_counts.npy, so c72's F0 compared None to 11173962.
+     F0 as WRITTEN says 'n_beta byte-match'.  n_beta is a probe.jsonl FIELD.
+
+[F0 RE-SCORED] n_records == 8000, n_beta == NBETA[rung] on EVERY record, beta moved
+     pass 12/12
+     arm                         n       n_beta   stable   beta_min   beta_max
+     probe_w_f60_s0           8000     11173962     True    -45.021      2.000
+     probe_w_f60_s1           8000     11173962     True    -44.655     -2.136
+     probe_w_f90_s0           8000     11173962     True    -45.071      2.000
+     probe_w_f90_s1           8000     11173962     True    -44.663     -2.012
+     probe_node_f60_s0        8000        14420     True    -46.444     -2.168
+     probe_node_f60_s1        8000        14420     True    -46.028     -2.386
+     probe_node_f90_s0        8000        14420     True    -46.528     -2.839
+     probe_node_f90_s1        8000        14420     True    -46.094     -2.378
+     probe_lay_f60_s0         8000           62     True    -46.738     -3.879
+     probe_lay_f60_s1         8000           62     True    -46.620     -3.786
+     probe_lay_f90_s0         8000           62     True    -46.744     -3.930
+     probe_lay_f90_s1         8000           62     True    -46.630     -3.681
+     >>> THE NETWORK DID NOT CHANGE.  c72's VOID was a FILE-PRESENCE test
+     >>> wearing an n_beta label.  The batch is VALID.
+
+[B] THE GUARD CENSUS -- bd7 bound 10/12 arms at LO=-30.  Did -60/-90 free it?
+     coord_* is the honest column (STANDING RULE 6): the clamp acts per
+     COORDINATE, and rec_* goes to 1.0 if ONE of 11.17M weights sticks.
+     arm                     rec_lo%  rec_hi%  coord_lo%  coord_hi% 1st_lo_ep 1st_hi_ep
+     probe_w_f60_s0            0.00%   52.23%    0.0000%    0.0178%         -      38.2
+     probe_w_f60_s1            0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_w_f90_s0            0.00%   50.68%    0.0000%    0.0329%         -      39.5
+     probe_w_f90_s1            0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_node_f60_s0         0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_node_f60_s1         0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_node_f90_s0         0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_node_f90_s1         0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_lay_f60_s0          0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_lay_f60_s1          0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_lay_f90_s0          0.00%    0.00%    0.0000%    0.0000%         -         -
+     probe_lay_f90_s1          0.00%    0.00%    0.0000%    0.0000%         -         -
+
+     arms touching the FLOOR: 0/12   arms touching the CEILING: 2/12
+     >>> THE FLOOR IS FULLY FREED.  bd7's 10/12 LO binds go to 0/12 at LO=-60.
+     >>> c72's F0.3 printed 'AN ARM BINDS AT LO EVEN AT THIS FLOOR' and
+     >>> pointed at `first_lo`.  first_lo is None on all 12.  The residual
+     >>> binding is at the CEILING, which is the OTHER guard, and is exactly
+     >>> the case STANDING RULE (18) was written to catch.
+
+[C] THE CEILING, ARM BY ARM -- beta_true_max toward HI=+2.0
+     probe_w_f60_s0         ep0 -6.907  ep10 -2.775  ep20 -2.067  ep30 -1.809  ep40 2.000  ep50 2.000  ep60 2.000  ep70 2.000  ep80 2.000
+     probe_w_f60_s1         ep0 -6.907  ep10 -2.677  ep20 -2.373  ep30 -2.461  ep40 -2.543  ep50 -2.487  ep60 -2.697  ep70 -2.627  ep80 -2.450
+     probe_w_f90_s0         ep0 -6.907  ep10 -2.779  ep20 -2.179  ep30 -2.033  ep40 2.000  ep50 2.000  ep60 2.000  ep70 2.000  ep80 2.000
+     probe_w_f90_s1         ep0 -6.907  ep10 -2.875  ep20 -2.363  ep30 -2.331  ep40 -2.563  ep50 -2.373  ep60 -2.647  ep70 -2.781  ep80 -2.530
+     probe_node_f60_s0      ep0 -6.907  ep10 -3.646  ep20 -3.436  ep30 -3.392  ep40 -3.672  ep50 -4.052  ep60 -4.407  ep70 -3.579  ep80 -3.105
+     probe_node_f60_s1      ep0 -6.907  ep10 -3.836  ep20 -3.402  ep30 -3.322  ep40 -3.860  ep50 -3.597  ep60 -3.813  ep70 -3.410  ep80 -2.603
+     probe_node_f90_s0      ep0 -6.907  ep10 -3.556  ep20 -3.304  ep30 -3.256  ep40 -3.576  ep50 -3.650  ep60 -3.693  ep70 -3.914  ep80 -3.265
+     probe_node_f90_s1      ep0 -6.907  ep10 -3.740  ep20 -3.332  ep30 -3.038  ep40 -3.526  ep50 -3.890  ep60 -3.917  ep70 -4.231  ep80 -2.378
+     probe_lay_f60_s0       ep0 -6.907  ep10 -4.386  ep20 -5.758  ep30 -5.946  ep40 -6.200  ep50 -6.708  ep60 -7.033  ep70 -7.167  ep80 -7.100
+     probe_lay_f60_s1       ep0 -6.907  ep10 -3.878  ep20 -5.845  ep30 -6.000  ep40 -6.098  ep50 -6.933  ep60 -6.839  ep70 -6.613  ep80 -6.236
+     probe_lay_f90_s0       ep0 -6.907  ep10 -4.376  ep20 -5.736  ep30 -5.997  ep40 -6.176  ep50 -6.618  ep60 -7.057  ep70 -7.313  ep80 -7.544
+     probe_lay_f90_s1       ep0 -6.907  ep10 -3.912  ep20 -5.743  ep30 -6.198  ep40 -6.232  ep50 -6.737  ep60 -6.517  ep70 -6.321  ep80 -6.238
+
+[D] FLOOR INVARIANCE OF THE GUARD VERDICT -- f60 vs f90, per rung and seed
+     rung           seed  f60 coord_hi%  f90 coord_hi%  same verdict
+     lay              s0        0.0000%        0.0000%  yes
+     lay              s1        0.0000%        0.0000%  yes
+     node             s0        0.0000%        0.0000%  yes
+     node             s1        0.0000%        0.0000%  yes
+     w                s0        0.0178%        0.0329%  yes
+     w                s1        0.0000%        0.0000%  yes
+     >>> if every verdict matches, the -90 floor bought nothing the -60 floor
+     >>> did not already buy, and a THIRD floor is not the next experiment.
+
+[E] WHAT IS STILL MISSING, AND WHY IT NEEDS COMPUTE
+     N_eff/m  -- needs the per-COORDINATE running sign counts in neg_counts.npy.
+                 probe.jsonl carries only the per-STEP scalar frac_neg, which
+                 cannot be un-pooled into per-coordinate counts.  F0.5, F1 and
+                 F2 are ABSENT, not failed: bf8 never took the measurement.
+     F2       -- the registered out-of-sample band prediction (argmin = w) is
+                 UNTESTED.  It is not evidence for or against the span band.

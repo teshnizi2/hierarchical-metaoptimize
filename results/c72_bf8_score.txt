@@ -1,0 +1,79 @@
+==============================================================================
+bf8 -- SCORED AGAINST bin/c71_floor_budget.sh, IN THE REGISTERED ORDER
+==============================================================================
+
+[F0] VALIDITY -- n_records == 8000, n_beta byte-match, beta moved
+     pass 0/12
+     VOID probe_w_f60_s0         n=8000 nbeta=None moved=True
+     VOID probe_w_f60_s1         n=8000 nbeta=None moved=True
+     VOID probe_w_f90_s0         n=8000 nbeta=None moved=True
+     VOID probe_w_f90_s1         n=8000 nbeta=None moved=True
+     VOID probe_node_f60_s0      n=8000 nbeta=None moved=True
+     VOID probe_node_f60_s1      n=8000 nbeta=None moved=True
+     VOID probe_node_f90_s0      n=8000 nbeta=None moved=True
+     VOID probe_node_f90_s1      n=8000 nbeta=None moved=True
+     VOID probe_lay_f60_s0       n=8000 nbeta=None moved=True
+     VOID probe_lay_f60_s1       n=8000 nbeta=None moved=True
+     VOID probe_lay_f90_s0       n=8000 nbeta=None moved=True
+     VOID probe_lay_f90_s1       n=8000 nbeta=None moved=True
+     >>> a n_beta mismatch means the NETWORK changed: the batch is VOID.
+
+[F0.3] THE BOX-FREE GATE -- per seed, per FLOOR, AT BOTH GUARDS (RULE 18)
+     bd7 comparison: at LO=-30, 10/12 arms bound (37-42%% of records, 100%% of Q4)
+     arm                     rec_lo%  rec_hi%   q4_lo%   q4_hi%   first_lo  verdict
+     probe_lay_f60_s0          0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_lay_f60_s1          0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_node_f60_s0         0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_node_f60_s1         0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_w_f60_s0            0.00%   52.23%    0.00%  100.00%          -  BOUND
+     probe_w_f60_s1            0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_lay_f90_s0          0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_lay_f90_s1          0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_node_f90_s0         0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_node_f90_s1         0.00%    0.00%    0.00%    0.00%          -  box-free
+     probe_w_f90_s0            0.00%   50.68%    0.00%  100.00%          -  BOUND
+     probe_w_f90_s1            0.00%    0.00%    0.00%    0.00%          -  box-free
+     => box-free 10/12
+     >>> AN ARM BINDS AT LO EVEN AT THIS FLOOR.  Per the registration,
+     >>> `first_lo` and its epoch IS the result: beta is not confinable at
+     >>> this budget, and the next batch is an `ms` ladder, not a third floor.
+
+[F0.4] THE TRAINS-AT-ALL GATE -- plateau5 > 40.0, collapsed false
+     bf8-lay-f60-s0         layerwise        clip -60:2.0    plateau5  91.020  OK
+     bf8-lay-f60-s1         layerwise        clip -60:2.0    plateau5  91.216  OK
+     bf8-lay-f90-s0         layerwise        clip -90:2.0    plateau5  90.884  OK
+     bf8-lay-f90-s1         layerwise        clip -90:2.0    plateau5  90.940  OK
+     bf8-node-f60-s0        nodewise         clip -60:2.0    plateau5  92.090  OK
+     bf8-node-f60-s1        nodewise         clip -60:2.0    plateau5  92.012  OK
+     bf8-node-f90-s0        nodewise         clip -90:2.0    plateau5  92.138  OK
+     bf8-node-f90-s1        nodewise         clip -90:2.0    plateau5  92.154  OK
+     bf8-w-f60-s0           weightwise       clip -60:2.0    plateau5  90.576  OK
+     bf8-w-f60-s1           weightwise       clip -60:2.0    plateau5  90.594  OK
+     bf8-w-f90-s0           weightwise       clip -90:2.0    plateau5  90.610  OK
+     bf8-w-f90-s1           weightwise       clip -90:2.0    plateau5  90.408  OK
+     => pass 12/12
+
+[N_eff/m] VARIANCE instrument, STEADY half -- neff_instrument, unchanged
+     floor  rung       m    N_eff/m         sd box-free    span     ep
+     f60    w       MISSING
+     f60    node    MISSING
+     f60    lay     MISSING
+     f90    w       MISSING
+     f90    node    MISSING
+     f90    lay     MISSING
+
+[F0.5] THE FLOOR-INVARIANCE GATE -- bars w 0.02 / node 0.06 / lay 0.11 (br6, n=4)
+     w      MISSING
+     node   MISSING
+     lay    MISSING
+     => FLOOR-DEPENDENCE -- report it, do NOT patch it.
+
+[F1] THE 80-EPOCH POINT -- what bd7's D1 was meant to be
+     55.6's written-down expectation: weightwise below 0.1509 and still falling.
+     NOT SCORED -- no weightwise arm passes the box-free gate.
+
+[F2] THE SPAN BAND, OUT OF SAMPLE -- REGISTERED PREDICTION: argmin = w, gap/SE >= 2
+     br6 (same ms, HALF the budget) sits at span 17.52 and reads `w`.
+     f60  MISSING a rung
+     f90  MISSING a rung
+

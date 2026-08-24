@@ -4661,3 +4661,171 @@ deriving it from `__file__` inside a stdin heredoc. The failure message now name
 corpus (STANDING RULE 16's subject at the level of documents, and 96.6's at the level of cycles).
 **Any heredoc-fed guard in `bin/` that derives a path from `__file__` has this bug.** Not swept this
 tick; recorded as a ranked follow-up.
+
+---
+
+## 102. DECISION RECORD — cycle 73 (**bf8's VOID OVERTURNED**; 22 jobs submitted; 0 cancelled)
+
+### 102.1 QUEUE AUDIT
+
+Both login nodes reachable (`alice` → `salehkaleybars`, `alice2` → `s5014158`). **Both queues 0 R /
+0 P on arrival.** `hz9`, `sp8` and `bf8` had all completed before this tick began.
+
+| family | count | state | verdict | reason |
+|---|---|---|---|---|
+| — | 0 | — | — | nothing was running or pending on either account |
+
+**CANCELLED: nothing.** No job was running, so no stuck-job check applied. `.out` files rsynced from
+both clusters: **0 transferred, everything already local**. `aggregate.py` re-derives the committed
+CSV with **DIFF_LINES = 0** at **1761 runs**.
+
+### 102.2 **`bf8` IS NOT VOID. THE CORRECTION, AND WHAT IT COST**
+
+Cycle 72's `analysis/c72_bf8_score.py` declared **"F0 pass 0/12 … the batch is VOID"** on an
+`n_beta` mismatch. **Overturned.** `n_beta` is a field of every `probe.jsonl` record; F0 read it from
+`neg_counts.npy` instead, a file `bf8` never wrote, and compared `None` to `11173962`. **F0 re-scored
+against the field its own text names is 12/12** (`analysis/c73_bf8_ceiling.py`, 15/15 selftests,
+registered at `ad1f630` before re-scoring).
+
+**The root cause is a submit-script bug, not a science failure.** `patches/patch_probe5.py:55` gates
+the per-coordinate sign-count writer on `PROBE5 == '1'`; `bin/c71_floor_budget.sh:306` exports
+`PROBE=5` (the probe **stride**) and never `PROBE5=1` (the **instrument**). `bd7` exports both.
+
+**Two distinct errors, and they must not be conflated:**
+
+1. **The batch never took its measurement.** `neff_instrument.reduce_root:162` skips a directory
+   without `neg_counts.json`, so F0.5 / F1 / F2 are **ABSENT**. The registered out-of-sample band
+   prediction is **UNTESTED** — evidence neither for nor against 71.7. **12 GPU-jobs, no N_eff datum.**
+2. **The scorer then mislabelled the absence as a network change.** A missing file was reported as
+   evidence that the architecture differed. **That is the more dangerous of the two**: the first
+   wastes compute, the second would have retired a valid batch from the record.
+
+**`bf8`'s guard 1 DID check `PATCH_PROBE5` was present in `HF.py`. It was present. It was off.**
+
+### 102.3 STANDING RULE (19)
+
+> **A guard that an instrument EXISTS is not a guard that it is ENABLED, and a validity gate must
+> read the quantity it names from the source that actually carries it.** Check the switch, not just
+> the wiring — and if a gate is called "`n_beta` byte-match", it must read `n_beta`. A gate that
+> silently degrades to a file-presence test returns VOID for a healthy run and, in the other
+> direction, PASS for a broken one.
+
+Implemented in `bin/c73_bf9_probe5.sh` guard 1b, which reads the `PROBE5` gate out of `HF.py`, then
+asserts **this script's own `--export` line** sets the stride *and* the instrument *and* the write
+interval, then diffs all three against `bd7`. **It found its own bug twice on the first two dry
+runs** (the guard's source line matched its own pattern) — a self-reading guard must exclude itself.
+
+### 102.4 THE F0.3 MISREPORT, AND WHAT THE FLOOR AXIS IS NOW
+
+c72's F0.3 printed **"AN ARM BINDS AT LO EVEN AT THIS FLOOR"** and pointed the next batch at
+`first_lo`. **`first_lo` is `None` on 12/12 and `rec_lo` is 0.00 % on 12/12.** The bind is at the
+**ceiling**. **STANDING RULE (18) did its job** — the gate scored both guards and caught it — and
+then the prose attached the wrong guard's name to the finding. **The registered "binds at LO ⇒ next
+batch is an `ms` ladder" branch DID NOT FIRE.** Nothing this tick may cite it as discharged.
+
+**DECISION: the floor axis is CLOSED.** Deepest `beta_true_min` in the batch is **−46.744** against
+guard 4's projection of **−46.4** (error 0.34 log units — the extrapolation was sound). f60 and f90
+give the **identical** guard verdict on 6/6 (rung, seed) pairs. **`bf9` therefore runs ONE floor**
+and spends the six freed jobs on seeds 2-3. This is not a convenience: at `LO=−60` no coordinate
+ever reaches the floor, and a constraint that is never active cannot change the trajectory, so
+"is N_eff/m invariant between two floors both strictly below the path" is an identity, not an
+experiment. **THE COST IS STATED: `bf9` does not test floor-invariance at a BINDING floor.**
+
+**The ceiling is NOT raised** — `bd7`'s `HI=+6.0` collapsed weightwise 2/2 to 10.000. Seeds are the
+answer to a bound seed, not a wider box. At the resolution the clamp acts at, the bind is
+`coord_hi` = **0.0178 % / 0.0329 %**, ~2-4k of 11.17M weights, on **seed 0 only**, at both floors.
+**The published `rec_`-based box-free gate is NOT re-thresholded after seeing this.** Re-reading a
+gate at whichever resolution flatters the data is the failure this campaign has repeated most; both
+columns are reported, the old gate stays primary, and `bf9` registers the bound-seed policy
+(**report both ways, all-seeds PRIMARY**) *before* the data lands.
+
+### 102.5 `hz9` — A CLEAN TIE, AND THE CONFOUND IT EXPOSES
+
+**DECISION: record H1b as a clean negative and do not spend further seeds on node-vs-lay at 100 ep.**
+Tuned against tuned, layerwise 92.811 ±0.075 vs nodewise 92.450 ±0.136, **level −0.360 inside a
+±0.50 registered bar ⇒ TIED**. Stated precisely: **distinguishable from zero (|level|/se = 2.32) and
+smaller than the bar** — not "no difference". H1's **T-B** is a **REPLICATION** of a pre-registered
+pilot (D = −0.485) and by its own registration is never a discovery.
+
+**The finding worth carrying forward is H2 against H1b.** The same two partitions differ by
+**+1.138 pp, 2/2** at a shared `ms=1e-3` and by **−0.360 pp** when each is given the `ms` it wants —
+the sign even reverses. **A granularity contrast at one shared meta-stepsize is confounded with
+which meta-stepsize that partition prefers.** That is how nearly every granularity comparison in
+this campaign, and in the Adam-mini / Adalayer / SGG line, is run.
+
+### 102.6 THE DECISION ON THE NEXT EXPERIMENT, AND WHY IT IS NOT MORE OF THE SAME
+
+A 13-axis-matched census (FINDINGS 72.4) shows the four swept rungs span **0.604 pp** once each is
+`ms`-tuned, while **mistuning `ms` by one decade costs −4.424 pp (scalar) and −1.670 pp
+(layerwise)**, and frozen-vs-tuned is **+2.551 pp**. **Adaptation is worth ~2.6 pp; granularity ~0.6 pp.**
+
+> **WEIGHTWISE HAS EXACTLY ONE MATCHED RUN IN THE 1761-RUN CORPUS, at `ms=1e-3`** — an `ms` past the
+> optimum of every rung that has been swept. **Every "weightwise is worst" reading in this campaign
+> is confounded with a single untuned `ms`**, on the rung the 53.1 %-sign-agreement result is about.
+
+**DECISION: `wm9` (10 jobs, alice) fills that rung**, with W2 registered before the data: tuned
+weightwise lands **inside [92.2, 92.9]** with best `ms` **≤ 1e-4**. Confirmed ⇒ the granularity
+ladder is **flat across a 180,000× range in group count (62 → 11.17M)** once every rung is tuned —
+a far stronger form of this project's central negative result than "the anomaly is 0.5 pp", and the
+sentence direction C needs. Refuted ⇒ the finest partition carries a real cost tuning cannot buy
+back. **W1b is registered too: an argmax at a grid edge means the grid is wrong and W2 is NOT
+scored.** Both outcomes are results, which is why they are written down before the run.
+
+**A NOTE AGAINST THIS TICK'S OWN CENSUS.** On a loose 8-axis match, `nodewise@1e-3` reads n=8 /
+92.808 and would have overturned `hz9`'s tuned arm; under the full 13-axis match it is n=3 / 92.254
+and `hz9` was right. **CORRECTIONS 99/100's contamination reproduced on a fresh question this tick**,
+and it was caught only because the census was matched on all thirteen axes from the start.
+
+### 102.7 SUBMITTED, AND THE STANDING RULES APPLIED
+
+`bf9` 12 jobs (alice2, all 10 guards live), `wm9` 10 jobs (alice, all 6 guards live). **22 submitted,
+0 cancelled**, both accounts far inside the 40-pending cap (0 pending on each at submit time).
+**`bf9`'s instrument was verified FIRING within 5 minutes of launch** — `neg_counts.json` with
+`n_tot` = 11,173,962 and a 44,695,976-byte `neg_counts.npy` — rather than assumed from the guard.
+
+**`wm9` runs with NO probe**, deliberately, so its 13 axes match the `rs-`/`ms-` cells it extends.
+**Cost stated: no N_eff/m and no sign counts from `wm9`.** Locate the optimum, then re-run the single
+winning cell with `PROBE5=1` for a sign-agreement read at a **tuned** weightwise operating point.
+
+### 102.8 ORPHANS
+
+Nothing new. CORRECTIONS 98.2 withdrew the "~290-run orphan backlog" as a corpus artefact
+(true figure: 7 uncited runs, all 2-5 epoch smoke tests, already abandoned by name). The 21 rows
+added since — `hz9` (9), `bf8` (12) — are cited in FINDINGS 72.1-72.3 by this tick; `sp8` (9) was
+cited by 71.7-71.8. **No family in `results/all_runs.csv` is currently uncited.**
+
+### 102.9 WHAT DID **NOT** GET DONE
+
+**`docs/MASTER-TABLE.md` — brought current this tick**, ending a three-cycle deferral chain
+(see 102.10). **Still open and ranked, unchanged from 101.11:** the sweep of every heredoc-fed guard
+in `bin/` that derives a path from `__file__`. `bf9` and `wm9` both pass their CSV path in from bash,
+so the two batches submitted this tick are clean; the rest of `bin/` is not swept.
+
+### 102.10 `docs/MASTER-TABLE.md` — BROUGHT CURRENT, AND IT CAUGHT ME OUT
+
+Deferred at cycles 69, 70 and 71 and six cycles stale at 1707 runs. **Done this tick**, covering
+c66-c73: header re-derived to **1761 runs / 1175.8 GPU-hours**, and **6 new rows** (the tuned-`ms`
+ladder, the shared-`ms` confound, `sp8`'s span band, `bo7`'s base-optimizer inversion, `bf8`'s
+PROBE5 failure with STANDING RULE 19, `bf8`'s both-guards census, plus the c69 orphan census and
+c70 composition audit).
+
+**§3 IS REWRITTEN, AND THAT IS THE SUBSTANTIVE CHANGE.** The file's own bottom line named the
+accuracy reversal as the campaign's best surviving accuracy result and flagged it as "still
+threatened by the unrun hz9 tuned-meta-step control". **hz9 has now run and the threat is
+realised.** Row 3 moves **OPEN → CONFIRMED (T-B)** — the direction registered in advance is what
+happened — and row 1 moves **CONFIRMED → CONFIRMED, RESCOPED**: 58.1's numbers stand, but the row
+may no longer be written as a *granularity* result without "at a shared `ms=1e-3`".
+
+**TWO DEFECTS I INTRODUCED WHILE DOING IT, RECORDED AGAINST MYSELF:**
+
+1. **I wrote the verdict tally from estimate rather than by counting** — claimed CONFIRMED 29 /
+   OPEN 10 / WITHDRAWN 2 / UNINTERPRETABLE 3 / 72 rows against an actual **32 / 9 / 3 / 2 / 74**.
+   Four of six numbers wrong. **That is STANDING RULE 1's exact failure, committed inside the file
+   STANDING RULE 15 makes the mandatory grep target.**
+2. **Unescaped `|` characters inside cells** (`|level|/se`, `max |z|`) silently split those cells,
+   shifting the verdict column so three rows parsed with the wrong verdict.
+
+**Both are now mechanically impossible to leave in place.** `analysis/c73_mastertable_check.py`
+(6/6 selftests) validates column arity, detects unescaped pipes, and re-derives the run count,
+GPU-hours and verdict tally from `results/all_runs.csv` and the table itself. It **failed on all
+four bad counts** before the fix and passes now. **Run it before committing any MASTER-TABLE edit.**

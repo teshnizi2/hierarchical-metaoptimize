@@ -13807,3 +13807,242 @@ of it and no gate rests on it. It earns a confirmation test, not a claim.
 **LIMITS.** `sp8` is n=3, one network, one dataset, one `ms`, SGDm only. The span band's edges are
 read off eight cells that differ in network, dataset and budget as well as span. Two of the eight
 are UNDECIDED. `cl5` cD is UNINTERPRETABLE (all three rungs bound) and is excluded, not counted.
+
+---
+
+# CYCLE 72/73 — hz9 SCORED, bf8's "VOID" OVERTURNED, AND THE ms LADDER'S MISSING RUNG
+
+## 72.0 THE TICK
+
+Both login nodes up. **Both queues were 0 R / 0 P on arrival** — `hz9` (9, alice), `sp8` (9,
+alice2) and `bf8` (12, alice2) had all completed. Cycle 72 registered two scorers and ran them but
+recorded no result in any document; this entry closes that gap and then re-opens one of its verdicts.
+
+CSV **1761 runs** (1762 lines). `analysis/aggregate.py ../runs ../runs_alice2` re-derives the
+committed file with **DIFF_LINES = 0** — byte-identical, so nothing below rests on a stale CSV.
+
+## 72.1 `hz9` — ONCE EACH PARTITION IS ms-TUNED, THE CHOICE BETWEEN THEM IS **TIED**
+
+Scored by `analysis/c72_hz9_score.py` (31/31 selftests, registered at `d3a9325` before any cell was
+scored). Every number below was re-derived from `results/all_runs.csv` independently of the scorer;
+the pooled means, sds and SEs reproduce to the last printed digit.
+
+| gate | result |
+|---|---|
+| **H0** validity | **9/9** — 100/100 epochs |
+| **H0.3** guard gate | **9/9** — `BETA_CLIP=-15:-2.3026` live, none collapsed |
+| **H0.5** pooling gate (CAN ONLY VOID) | **PASS** — max \|z\| = 1.80 across 7 arms ⇒ pooling PERMITTED |
+| **H1** the slope | D = **−0.753**, bar ±0.30 ⇒ **T-B** |
+| **H1b** the level at ep 100 | **−0.360**, bar ±0.50 ⇒ **TIED** |
+| **H2** the fixed-`ms` cell | **+1.138 pp, 2/2** ⇒ registered range [+1.0, +2.0] **MET** |
+
+**The two arms, each at its own tuned `ms`** (pooled hz9 + the `rs-` corpus H0.5 licensed, n=5 each):
+
+| arm | ms | plateau5 | sd | se | n |
+|---|---|---|---|---|---|
+| layerwise | 1e-4 | **92.811** | 0.167 | 0.075 | 5 |
+| nodewise | 3e-4 | **92.450** | 0.304 | 0.136 | 5 |
+
+**level = −0.360, se 0.155, \|level\|/se = 2.32.** The verdict is **TIED** because the campaign's
+registered bar (STANDING RULE 9) is an **effect-size** bar of ±0.50 pp, not a significance test.
+**State it precisely: the difference is distinguishable from zero and SMALLER THAN THE BAR.** It is
+not "no difference"; it is "a difference too small to be the thing the partition is chosen for."
+
+**H2 IS THE SAME TWO PARTITIONS AT A COMMON `ms`, AND IT DISAGREES:**
+
+| seed | nodewise @1e-3 | layerwise @1e-3 | diff |
+|---|---|---|---|
+| 3 | 92.174 | 91.080 | **+1.094** |
+| 4 | 92.030 | 90.848 | **+1.182** |
+
+paired mean **+1.138 pp, favouring nodewise 2/2**.
+
+**SO THE NODEWISE ADVANTAGE AT FIXED `ms` IS LARGELY A STATEMENT ABOUT `ms`, NOT ABOUT THE
+PARTITION.** +1.138 pp at a common `ms` becomes −0.360 pp when each arm is given the `ms` it wants.
+The ladder direction even reverses. **Any granularity contrast run at one shared meta-stepsize is
+confounded with which meta-stepsize that partition happens to prefer** — and that is how essentially
+every granularity comparison in this campaign, and in the Adam-mini / Adalayer / SGG line, is run.
+
+**H1's T-B is a REPLICATION, not a discovery,** by its own registration: the pilot wrote down
+D = −0.485 → T-B in advance. The nodewise arm leads at every epoch to 50 (5/5 seeds favour it at
+ep 10-50) and trails from ep 70 (0/5 at ep 80 and 90). **The crossing is real and the endpoint is a
+tie**; reporting only the endpoint hides a +3.444 pp nodewise lead at epoch 10.
+
+## 72.1b **THE ACCURACY REVERSAL INVERTS WHEN EACH ARM IS TUNED.** hz9's REGISTERED THREAT IS REALISED
+
+`hz9` was registered (CORRECTIONS 87.14, `bin/c58_tuned_horizon.sh`) as the decisive test of the
+campaign's **best surviving accuracy result** — the horizon reversal of MASTER-TABLE §3 — with the
+direction registered **in advance as T-B, i.e. against the headline**. It has now run, and **the
+registered direction is what happened.**
+
+| | ep 10 | ep 20 | ep 30 | ep 40 | ep 50 | ep 100 |
+|---|---|---|---|---|---|---|
+| **tuned** `ms` (node@3e-4 − lay@1e-4), hz9 n=5 v 5 | **+3.444** | +1.349 | +0.784 | +0.670 | +0.392 | **−0.361** |
+| **shared** `ms=1e-3` (node − lay), br6+bl5 n=7 paired | **−3.946** | — | — | **+1.258** | — | — |
+
+**Over the identical epoch-10 → epoch-40 window the horizon trend has the OPPOSITE SIGN:**
+
+* shared `ms`: **−3.946 → +1.258**, a change of **+5.204 pp** — nodewise starts far behind and overtakes.
+* tuned `ms`: **+3.444 → +0.670**, a change of **−2.774 pp** — nodewise starts far ahead and decays.
+
+**The sign of the difference at epoch 10 is itself reversed (+3.444 vs −3.946, a 7.4 pp swing).**
+
+**SO THE REVERSAL IS MEASURING DISTANCE-FROM-OPTIMUM, NOT GRANULARITY** — exactly the threat
+MASTER-TABLE §3 row 3 wrote down and called live. At the shared `ms=1e-3`, layerwise sits **1.736 pp
+off its own peak** while nodewise sits **0.098 pp** off its; the "reversal" is largely the layerwise
+arm being progressively punished by an `ms` it does not want, and that punishment growing with
+horizon. Once each arm is given the `ms` it wants, nodewise's early lead **decays to a tie** rather
+than a crossing appearing.
+
+**WHAT THIS DOES AND DOES NOT RETIRE.** The shared-`ms` reversal is a **real, reproducible
+measurement** and 58.1's numbers are not withdrawn — MASTER-TABLE §3 row 1 stays CONFIRMED **as a
+statement about two partitions held at one common meta-stepsize**. What is withdrawn is its
+standing as a *granularity* result. **It may no longer be written as "the accuracy-optimal
+granularity reverses with horizon"** without the qualifier "at a shared `ms=1e-3`", and it can no
+longer be the campaign's headline accuracy claim.
+
+**LIMITS, STATED AGAINST THIS TICK'S OWN CONCLUSION.** The two rows are **different families with
+different designs**: hz9+`rs-` is n=5 vs n=5 **unpaired** at `beta_clip=-15:-2.3026`; br6+bl5 is
+n=7 **paired within seed** at two other beta ceilings. A cross-family contrast is exactly what
+CORRECTIONS 99/100 flagged, and no gate here rests on the two rows being matched. **The epoch-10
+sign flip is 7.4 pp — far outside any plausible design effect — but the epoch-40 magnitudes should
+not be differenced across the two rows.** The clean, within-family statement is the tuned row alone:
+**+3.444 → −0.361, monotone decay to a tie.**
+
+## 72.2 `bf8` IS **NOT VOID**. c72's F0 MEASURED FILE PRESENCE, NOT THE NETWORK
+
+`analysis/c72_bf8_score.py` printed **"F0 pass 0/12"**, `nbeta=None` on all twelve arms, and
+`">>> a n_beta mismatch means the NETWORK changed: the batch is VOID."` **That verdict is wrong.**
+Re-scored by `analysis/c73_bf8_ceiling.py` (15/15 selftests, registered at `ad1f630` **before**
+re-scoring), from the field F0's own text names:
+
+> **F0 re-scored: 12/12 PASS.** `n_beta` is a field of **every** probe record — 11,173,962
+> weightwise / 14,420 nodewise / 62 layerwise — present, correct, and **constant across all 8000
+> records** on all twelve arms. c72 read it instead from `neg_counts.npy`, a file bf8 never wrote,
+> so the comparison was `None == 11173962`.
+
+**Why the file is absent — established from the two source files, not inferred:**
+
+| file | what it says |
+|---|---|
+| `patches/patch_probe5.py:55` | the writer is gated on `os.environ.get('PROBE5','') == '1'` |
+| `bin/c71_floor_budget.sh:306` | exports `PROBE=5` — the probe **stride** — and never `PROBE5=1` |
+| `bin/c54_budget_curve.sh:287` (`bd7`) | exports `PROBE=5,PROBE5=1,PROBE5_WRITE_EVERY=500` |
+
+Two environment variables one character apart. `bd7`'s probe dirs hold `neg_counts.npy`; `bf8`'s
+hold only `block_sizes.json` and `probe.jsonl`, on the cluster as well as locally — so this is not
+an rsync artefact. **bf8's guard 1 did check that `PATCH_PROBE5` is present in `HF.py`. It was
+present. It was switched off.**
+
+**WHAT IS GENUINELY LOST.** `neff_instrument.reduce_root:162` skips any directory without
+`neg_counts.json`, and the per-**coordinate** running sign counts cannot be reconstructed from the
+per-**step** scalar `frac_neg` that `probe.jsonl` does carry. **F0.5, F1 and F2 are ABSENT, not
+failed.** In particular the registered out-of-sample band prediction (argmin = `w`) is **UNTESTED**
+and is **evidence neither for nor against** 71.7's span band. bf8 cost 12 GPU-jobs and produced no
+N_eff datum of any kind.
+
+## 72.3 WHAT `bf8` **DID** MEASURE — THE FLOOR IS FREED, AND THE RESIDUAL BIND IS AT THE CEILING
+
+Everything living in `probe.jsonl` or the CSV survives. `bd7` bound **10/12** arms at `LO=-30`
+(37-42 % of records, 100 % of Q4). At `LO ∈ {-60,-90}`:
+
+> **Arms touching the FLOOR: 0/12. `first_lo` is `None` on every arm.**
+> The deepest `beta_true_min` anywhere in the batch is **−46.744**, against guard 4's
+> pre-registered projection of **−46.4** — the extrapolation was right to **0.34 log units**.
+
+**c72's F0.3 called 2/12 arms BOUND and printed `"AN ARM BINDS AT LO EVEN AT THIS FLOOR"`, directing
+the next batch at `first_lo`.** The binding is at the **ceiling**. STANDING RULE (18) — added last
+cycle precisely so a gate is scored at *both* guards — **worked**: it caught the bind. The prose
+then labelled it with the wrong guard. **The registered "binds at LO ⇒ next batch is an `ms` ladder"
+branch DID NOT FIRE**, because its condition is false on 12/12.
+
+**The ceiling bind, at both resolutions (STANDING RULE 6 — the clamp acts per COORDINATE):**
+
+| arm | rec_hi | **coord_hi** | first touch |
+|---|---|---|---|
+| `probe_w_f60_s0` | 52.23 % | **0.0178 %** | epoch 38.2 |
+| `probe_w_f90_s0` | 50.68 % | **0.0329 %** | epoch 39.5 |
+| all other 10 arms | 0.00 % | 0.0000 % | — |
+
+`rec_hi` — the fraction of records with **any** coordinate at the guard — is driven to ~50 % by
+roughly 2-4 thousand of 11,173,962 weights. **Reporting only `rec_hi` on an 11.17M-coordinate arm
+overstates the bind by a factor of ~3000.** Both columns are given; neither is averaged into the
+other, and **the published `rec_`-based gate is NOT re-thresholded after the fact.**
+
+**IT IS A SEED EFFECT, AND IT REPRODUCES ACROSS FLOORS.** Both bound arms are seed 0; both seed-1
+arms are clean at both floors. `w-s0`'s `beta_true_max` runs away between epoch 30 and 40 and pins
+at +2.0 for the whole second half, at **both** floors; `w-s1` sits near −2.5 throughout. **f60 and
+f90 give the identical guard verdict on 6/6 (rung, seed) pairs.**
+
+**Accuracy at 80 epochs, reported SEPARATELY from the field (STANDING RULE 13), n=4 per rung:**
+nodewise **92.099 ±0.064**, layerwise **91.015 ±0.145**, weightwise **90.547 ±0.094**. This is at a
+**fixed** `ms=1e-3` — see 72.4 for why that qualifier now carries weight.
+
+## 72.4 THE FULLY AXIS-MATCHED `ms` LADDER — AND THE RUNG THAT DOES NOT EXIST
+
+Prompted by 72.1. Census of `results/all_runs.csv` at 100 epochs, plateau5, non-collapsed, matched
+on **all thirteen** axes (network, dataset, batch_size, base, meta, alpha0, gamma, augment,
+beta_clip, hier, lam, eta_ratio, epochs_done) to the `rs-lay-1e4` reference signature.
+
+| rung | best `ms` | plateau5 | sd | n |
+|---|---|---|---|---|
+| scalar | 1e-4 | 92.262 | 0.222 | 5 |
+| nodewise | 3e-4 | 92.450 | 0.304 | 5 |
+| resnet18_blk6 | 1e-4 | 92.652 | 0.079 | 2 |
+| layerwise | 1e-4 | **92.867** | 0.150 | 8 |
+| **weightwise** | **—** | **—** | **—** | **1 run, at one `ms`** |
+
+* **Tuned, the four known rungs span 0.604 pp.**
+* **Mistuning `ms` by one decade costs far more than choosing the partition:** scalar
+  92.262 → 87.839 (**−4.424 pp**) and layerwise 92.867 → 91.196 (**−1.670 pp**) from 1e-4 to 1e-3.
+* Frozen beta (`ms=1e-8`) sits at 90.316 (layerwise); **tuned layerwise − frozen = +2.551 pp.**
+  Having *any* adaptation is worth ~2.6 pp; choosing *which* partition adapts is worth ~0.6 pp.
+
+**MATCHING CHANGED AN ANSWER, AS IT HAS BEFORE.** On a loose 8-axis match `nodewise@1e-3` reads
+n=8, mean 92.808 and would be nodewise's optimum. Under the full 13-axis match it collapses to
+**n=3, mean 92.254**, and nodewise's optimum is `3e-4` — which is what `hz9`'s registration assumed.
+The `gc-node-*` and `gc-w-*` runs drop out. **This is CORRECTIONS 99/100's contamination reproducing
+on a fresh question**; the loose census would have overturned hz9's tuned arm on an artefact.
+
+> **WEIGHTWISE HAS EXACTLY ONE MATCHED RUN IN THE ENTIRE 1761-RUN CORPUS** — `kt2_ww_a1e-3_s0`,
+> `ms=1e-3`, plateau5 **91.308** — and `ms=1e-3` is demonstrably past the optimum for every other
+> rung that has been swept.
+
+**So every "weightwise is worst" reading in this campaign is confounded with a single untuned
+`ms`,** on the rung the 53.1 %-sign-agreement result is entirely about. That is `wm9` (72.5).
+
+## 72.5 SUBMITTED — 22 JOBS, 0 CANCELLED
+
+| batch | acct | n | question | registered prediction |
+|---|---|---|---|---|
+| `bf9` | alice2 | 12 | the 80-ep N_eff/m point, **with the instrument on**. LO=−60, HI=+2.0, seeds 0-3 | **G2: argmin = `w`, gap/SE ≥ 2** — carried over from bf8 **verbatim**, still out-of-sample because bf8 produced no N_eff datum |
+| `wm9` | alice | 10 | **the weightwise `ms` ladder**, {1e-5 … 1e-3} × 2 seeds, 100 ep, 13-axis matched | **W2: tuned weightwise lands INSIDE [92.2, 92.9] and best `ms` ≤ 1e-4** |
+
+**`bf9`'s new guard 1b is the one `bf8` lacked**: it reads the `PROBE5` gate out of `HF.py`, then
+checks **this script's own `--export` line** sets `PROBE=5` *and* `PROBE5=1` *and*
+`PROBE5_WRITE_EVERY`, then diffs those against `bd7`'s. **Verified live**: within 5 minutes of
+launch every `bf9` probe dir holds `neg_counts.json` (`n_tot` 11,173,962, matching the campaign
+constant) and a 44,695,976-byte `neg_counts.npy` = 11,173,962 float32 + header.
+
+**`wm9`'s guard 3 re-derives the 13-axis reference signature FROM THE CSV** and refuses to submit if
+any axis differs — the contamination check of 72.4 run *before* the compute. Its guard 3b
+independently confirmed **1** matched weightwise run and that layerwise and scalar both peak at
+`ms=1e-4`, so the grid is centred on a number the data supports rather than on this file's prose.
+
+**`wm9` carries NO probe** (`PROBE`/`PROBE5` deliberately unset) so its axis matches the `rs-`/`ms-`
+cells it must be comparable to. **The cost is stated: `wm9` yields no N_eff/m and no sign counts.**
+Locate the optimum first, then re-run the single winning cell with `PROBE5=1`.
+
+## 72.6 LIMITS
+
+* 72.1's tuned comparison is n=5 vs n=5, one network, one dataset, one budget, SGDm only, and pools
+  `hz9` with the `rs-` corpus under H0.5's licence. `bo7` showed the granularity ordering **inverts**
+  under AdamW; nothing here is claimed for a base optimizer other than SGDm.
+* 72.4's ladder is **POST-HOC** — assembled this tick from existing cells, at n=2 to n=8 with
+  unequal seeds, and no gate rests on it. It is the *reason* `wm9` was registered, not a result.
+  `resnet18_blk6` is n=2 and `nodewise@1e-4` is n=1.
+* 72.3's ceiling bind is 2 arms, one seed, one budget. Whether `beta_true_max` runaway at weightwise
+  is generic or specific to seed 0 is **not** established by n=2 seeds; `bf9` has 4.
+* The registered floor branch never fired, so **nothing here licenses an `ms` ladder on the guard
+  axis.** `wm9` is an `ms` ladder for a different, accuracy-side reason and must not be cited as
+  discharging bf8's guard branch.

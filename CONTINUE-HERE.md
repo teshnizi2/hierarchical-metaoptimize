@@ -54,7 +54,70 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
-## Running / next (cycle 71) -- **ALICE IS BACK. `bo7`/`bd7` SURVIVED. THE Adam-mini SENTENCE IS DELETED.**
+## Running / next (cycle 73) -- **bf8's "VOID" OVERTURNED; THE ACCURACY REVERSAL IS RESCOPED; 22 JOBS OUT**
+
+**Read `docs/CORRECTIONS.md` 102 and `docs/FINDINGS.md` 72.0-72.6 FIRST. 102.2 overturns a VOID,
+102.3 adds STANDING RULE (19), 102.5/72.1b RESCOPE the campaign's headline accuracy result.**
+
+* **BOTH QUEUES WERE 0 R / 0 P ON ARRIVAL.** `hz9`, `sp8`, `bf8` all complete. Cycle 72 registered
+  two scorers and ran them but **wrote no result into any document** -- this tick closed that gap
+  and then re-opened one of the verdicts. CSV **1761 runs / 1175.8 GPU-h**; `aggregate.py`
+  re-derives the committed file with **DIFF_LINES = 0**. **CANCELLED: nothing.**
+* **`bf8` IS NOT VOID.** c72 printed "F0 pass 0/12 ... the batch is VOID" on an `n_beta` mismatch.
+  `n_beta` is a **probe.jsonl FIELD**, present and constant on all 8000 records of all 12 arms:
+  **F0 re-scored is 12/12** (`analysis/c73_bf8_ceiling.py`, 15/15 selftests, registered first).
+  c72 read it from `neg_counts.npy`, which bf8 never wrote.
+* **ROOT CAUSE: `patch_probe5.py:55` gates the sign-count writer on `PROBE5=='1'`;
+  `c71_floor_budget.sh:306` exports `PROBE=5` (the STRIDE) and never `PROBE5=1` (the INSTRUMENT).**
+  bd7 exports both. bf8's guard 1 checked the PATCH was PRESENT. It was present. It was **off**.
+  **12 GPU-jobs, zero N_eff data. F0.5/F1/F2 are ABSENT, not failed** -- the registered band
+  prediction is **UNTESTED** and is evidence neither for nor against 71.7.
+* **STANDING RULE (19), added 102.3:** *a guard that an instrument EXISTS is not a guard that it is
+  ENABLED, and a validity gate must read the quantity it NAMES from the source that carries it.*
+* **THE FLOOR AXIS IS CLOSED.** 0/12 arms touch LO (bd7: 10/12 at LO=-30); deepest `beta_true_min`
+  **-46.744** vs a projection of **-46.4**. f60/f90 agree on 6/6 pairs. The residual bind is at the
+  **CEILING**, seed-0 only, `coord_hi` **0.0178%/0.0329%** -- c72's F0.3 printed "BINDS AT LO" and
+  pointed at `first_lo`, which is `None` on 12/12. **STANDING RULE (18) worked; the prose misnamed
+  the guard. The registered "binds at LO => ms ladder" branch DID NOT FIRE.**
+* **`hz9`: TUNED-vs-TUNED IS A TIE.** lay@1e-4 **92.811 +-0.075** vs node@3e-4 **92.450 +-0.136**,
+  level **-0.360** inside a +-0.50 bar => **TIED** (|level|/se = 2.32 -- distinguishable from zero
+  and SMALLER THAN THE BAR; not "no difference"). At a shared ms=1e-3 the same pair is
+  **+1.138 pp paired 2/2**. **The sign reverses.**
+* **72.1b -- THE HEADLINE ACCURACY RESULT IS RESCOPED.** Over the same ep10->ep40 window the tuned
+  trend is **-2.774 pp** against the shared-ms **+5.204 pp**, and the ep10 sign flips
+  (**+3.444 vs -3.946**). **The reversal measures DISTANCE-FROM-OPTIMUM, not granularity.**
+  58.1's numbers are NOT withdrawn, but it may only be written "at a shared ms=1e-3" and is **no
+  longer the campaign's headline accuracy claim.** MASTER-TABLE section 3 rewritten accordingly.
+* **THE 13-AXIS-MATCHED ms LADDER (72.4, POST-HOC).** Tuned: scalar 92.262, node 92.450,
+  blk6 92.652, lay **92.867** -- spread **0.604 pp**. Mistuning ms one decade costs **-4.424**
+  (scalar) / **-1.670** (lay). Frozen-to-tuned is **+2.551**. **Adaptation ~2.6 pp; granularity
+  ~0.6 pp.** **WEIGHTWISE HAS ONE MATCHED RUN IN 1761, at an ms past every swept rung's optimum.**
+* **SUBMITTED 22, CANCELLED 0.** `bf9` (12, alice2, 80ep) = the N_eff point **with the instrument
+  on**, LO=-60 only, seeds 0-3; **guard 1b verified live and the instrument CONFIRMED FIRING**
+  (neg_counts.json n_tot 11,173,962; 44,695,976-byte .npy). `wm9` (10, alice, 100ep) = **the
+  weightwise ms ladder**, {1e-5..1e-3} x 2 seeds, guard 3 re-derives the 13-axis signature FROM THE
+  CSV. **At tick end alice2 12 R / 0 P, alice 0 R / 10 P.**
+* **REGISTERED, DO NOT EDIT AFTER THE DATA LANDS:** `bf9` **G2: argmin = `w`, gap/SE >= 2** (carried
+  from bf8 verbatim, still out-of-sample); **G2b bound-seed policy: report both ways, ALL-SEEDS
+  PRIMARY**. `wm9` **W2: tuned weightwise inside [92.2, 92.9], best ms <= 1e-4**; **W1b: an argmax
+  at a grid EDGE means the grid is wrong and W2 is NOT scored**; **W0.2 reproduction control at
+  ms=1e-3 vs 91.308 scores FIRST and can only VOID.**
+* **`docs/MASTER-TABLE.md` IS CURRENT** (102.10), ending the three-cycle deferral. While doing it I
+  wrote the verdict tally from estimate and got 4 of 6 numbers wrong, and left unescaped `|` in
+  three cells. **`analysis/c73_mastertable_check.py` (6/6) now re-derives runs, GPU-hours and the
+  tally, and detects unescaped pipes. Run it before committing any MASTER-TABLE edit.**
+* **STILL OPEN, RANKED:** the sweep of every heredoc-fed guard in `bin/` deriving a path from
+  `__file__` (101.11). `bf9`/`wm9` both pass the CSV path in from bash; the rest of `bin/` is not
+  swept. **NOTE the trap is live**: `~/metaopt/results/all_runs.csv` on alice2 is a **stale Aug-20
+  copy with 0 bf8 rows**, so run batch scripts from `hierarchical-metaoptimize/bin/`, not `~/metaopt/bin/`.
+* **NEXT TICK:** score `bf9` against G0/G0.2/G0.3/G0.4/G1/G2/G2b **in that order** (register
+  `bf9:f60 -> (-60.0, 2.0)` in `c55_neff_noise.BOXES` FIRST or the root is skipped), and `wm9`
+  against W0/W0.2/W1/W1b/W2. If `wm9`'s optimum is interior, the follow-up is **the single winning
+  cell re-run with `PROBE5=1`** for a sign-agreement read at a *tuned* weightwise operating point.
+
+## Superseded -- cycle 71 (kept for the record)
+
+## Running / next (cycle 71) -- SUPERSEDED BY CYCLE 73 (kept for the record)
 
 **Read `docs/CORRECTIONS.md` 101 and `docs/FINDINGS.md` 71.0-71.6 FIRST. 101.2 DELETES a sentence
 suspended since cycle 54; 101.3 rescopes the campaign's headline range; 101.5 adds STANDING RULE (18).**
