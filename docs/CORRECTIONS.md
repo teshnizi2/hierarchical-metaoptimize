@@ -4969,3 +4969,138 @@ first experiment in it and it also rules a mechanism in or out: if T1 confirms t
 100 ep, **ceiling-runaway is eliminated** as the explanation and the deficit is left genuinely
 unexplained — a sharper result than the deficit alone. **This is recorded as a redirection with its
 justification, not as a claim, and the next tick may overturn it on T1.**
+
+---
+
+# 104 — CYCLE 75. T1 CONFIRMED. THE HEADLINE SURVIVES ITS OWN CONFOUND TEST, AND THE MECHANISM IT PROPOSED IS DEAD.
+
+## 104.1 WHAT LANDED, AND THE BOOKKEEPING
+
+Both queues **0 R / 0 P on arrival**; `tw0`'s 9 jobs all complete at 100/100 epochs. CSV
+**1783 → 1792 purely additively** (0 pre-existing rows changed a field, header byte-identical).
+**CANCELLED: nothing.** Scorer `analysis/c75_tw0_score.py` registered at **51/51 selftests BEFORE
+any verdict was read**, with every constant asserted against `bin/c74_tuned_weightwise_probe.sh`'s
+own text (STANDING RULE 19). Gates scored in the registered order T0 → T0.2 → T1 → T2 → T3 → T4.
+
+**ORPHAN AUDIT: 0 orphan families of 117, 0 orphan runs.** The ~290 orphans of 2026-08-22 are fully
+absorbed; every family name in the CSV is now cited somewhere in the documents.
+
+## 104.2 **T1 CONFIRMS — AND THE OUTCOME THAT CONFIRMED IS THE ONE I HAD AN INTEREST IN**
+
+Registered: *weightwise box-free at both guards at 100 ep on ≥ 2 of 3 seeds.* Measured: **3 of 3**,
+and in fact **all 9 arms read exactly 0.0000 on all four occupancy columns** — not one record of
+90,000 and not one (record, coordinate) cell touched either guard. Widest beta span 8.62 in a box
+12.70 wide.
+
+CORRECTIONS 103.7 put the conflict of interest on the record before the run: the CONFIRMING outcome
+is the one that keeps cycle 74's headline alive. It confirmed. I am therefore stating the thing that
+makes that less comfortable rather than more: **the gate was easy.** Every arm passed by the maximum
+possible margin, including the coarse rungs that were never in doubt, which means T1 discriminated
+far less than `bf9`'s version of the same gate did (where lay 4/4, node 2/4, w 1/4). A gate that
+everything passes is weak evidence even when its verdict is the registered one. What rescues it here
+is that the margin is not marginal — 0.0000 is not "under 5 %", it is *no occupancy at all* — so the
+clamp is not merely within tolerance, it is **provably never active**.
+
+**103.2 STANDS, unconfounded.** The 20-vs-100-epoch gap that 103.3 stated honestly and could not
+close is now closed.
+
+## 104.3 **THE MECHANISM THIS TICK KILLED IS THE ONE THE LAST TICK PROPOSED**
+
+`bf9` suggested **ceiling-runaway** — the fine rungs pinning against the upper guard — as the carrier
+for the weightwise accuracy deficit. T1 rules it out at the operating point the deficit is measured
+at: the ceiling is never touched, by any rung, on any seed. **The deficit is now unexplained**, and
+that is a stronger position than the deficit alone, exactly as registered.
+
+**This is the tick's real content and it should not be buried under the confirmation.** We now know
+the weightwise deficit is real (3/3 independent cells, two boxes, three budgets, two `ms`), is not a
+clamp artifact, is not fixed by `ms`-tuning (wm9's curve is flat over 3e-5..1e-3), and is not
+ceiling-runaway. **Four candidate explanations are dead and none has replaced them.**
+
+## 104.4 THE RESULT THAT IS BIGGER THAN THE GATE IT CAME FROM
+
+Assembling `tw0` with the 13-axis census gives a **five-rung tuned ladder with a RESOLVED INTERIOR
+OPTIMUM AT LAYERWISE** (FINDINGS 74.3), every rung at its own argmax and every argmax verified
+interior: frozen 90.384 → scalar 92.262 → blk6 92.652 → **lay 92.887** → node 92.450 → w 91.146.
+Layerwise is resolved against all four other rungs (t = 5.57 / 3.06 / 2.99 / 20.22).
+
+**Refining past 62 groups costs 2.8× what coarsening all the way to 1 group costs.** Adaptation gain
+over frozen peaks at layerwise (+2.503) and **collapses to +0.763 — 30 % of peak — at the per-weight
+limit**, while staying positive. So the per-weight meta-gradient is not harmful, it is **much less
+useful**, and that is the thing to explain.
+
+**A PRIOR CLAIM IS CORRECTED.** FINDINGS §73.6 states "`blockwise6` has no matched cell in the
+13-axis census, so the tuned ladder is four rungs, not five." **It has two** (`rs-blk6-1e4-s0/s1`,
+all 13 axes matching, re-derived by `at1`'s guard 2b from the CSV). The third seed exists but **died
+at 29 epochs** and is correctly excluded by the `epochs_done == 100` filter — which is very likely
+how the earlier reading arrived at "no matched cell". **The ladder is five rungs.** blk6 is still
+the table's weakest row at n=2, which is one of the two things `at1` was submitted to fix.
+
+## 104.5 T4 — THE DATUM THREE BATCHES AND 36 GPU-JOBS FAILED TO GET
+
+`tw0` produces the campaign's **first clean N_eff/m reading, with zero bound cells**: lay 0.7458,
+node 0.0549, w 0.0157, **argmin `w` at gap/SE 22.75, DECIDED**. Because nothing is bound, the
+all-seeds and box-free sets coincide and CORRECTIONS 79's blocking rule never engages.
+
+**I am NOT retro-scoring `bf9`'s G2 with this.** G2 was registered against bf9 at 80 ep in the f60
+box; `tw0` is a different budget, box and `ms`. The prediction (argmin `w`, gap/SE ≥ 2) is
+**corroborated out-of-sample in a new cell**, and **G2 itself stays UNTESTED** per 103.4. Scoring a
+prediction against a cell it was not written for, *after* seeing that the cell agrees with it, is the
+selection this campaign has repeatedly caught itself doing.
+
+**N_eff grows sublinearly with m** — slope 0.686 (3-point LS), against 1.000 for independence and
+0.000 for full sharing. Neither limit is the data.
+
+## 104.6 A ZERO-COST REPLICATION THAT SHOULD HAVE BEEN RUN CYCLES AGO
+
+`probes_fz3` and `probes_ff5` were **already paid for** and carry frozen/free pairs across three more
+families. Re-reducing them with the registered reducer costs nothing and shows `a_raw` falling
+monotonically with m in **7 of 7 conditions**, reaching 0.500–0.504 at the per-weight limit in every
+one — two datasets, four architectures, frozen and free, 20 ep and 100 ep (FINDINGS 74.6).
+
+**The honest deflation, stated with the result rather than after it:** this fall is **partly
+mechanical**. A coarse coordinate's meta-gradient is a sum over many fine ones, and the sign of a sum
+is more consistent than the sign of a summand, so *some* monotone fall is arithmetic, not physics.
+The monotone fall alone is therefore **not** evidence of structure. What is not mechanical is the
+**exponent** (§104.5). No independence null is re-derived here; deriving one on the fly is the exact
+error CORRECTIONS 26 records, and the "53.1 %" sentence is **not written**.
+
+## 104.7 **DECISION — THE DIRECTION IS UNCHANGED AND IS NOW BETTER SUPPORTED**
+
+103.8 redirected the campaign from direction C's *claim* to the question **"why does the finest
+partition cost accuracy that `ms`-tuning cannot recover?"** This tick's evidence supports keeping
+that, and sharpens it:
+
+* the accuracy result is now a **resolved interior optimum**, not a two-point contrast (104.4);
+* its leading mechanical explanation is **eliminated** (104.3);
+* direction C's field measurement is now **clean and decided** (104.5) and pairs rung-for-rung with
+  the accuracy ladder — which is what makes it a mechanism probe rather than a separate claim.
+
+**DECISION: continue on 103.8's question. Do NOT restore direction C's headline claim.** The brief's
+DEFAULT ("extend the sign-agreement measurement across granularities, model sizes and datasets") is
+**partly executed at zero cost this tick** (104.6: three extra families, both datasets, frozen and
+free) and it did not need new compute — which is itself the argument against spending more on it as
+a claim.
+
+**SUBMITTED: `at1` (6, alice), 0 cancelled** — blk6 @ 1e-4 and node @ 3e-4, the two rungs `tw0` left
+either unprobed or probed off their own argmax. **A2 is a genuine out-of-sample gate with a stated
+refutation condition** (FINDINGS 74.7), and a refutation would cost the mechanism story its carrier.
+
+**REGISTERED AGAINST MY OWN BATCH, BEFORE ITS DATA LANDS (FINDINGS 74.8):** `at1` re-runs seeds that
+already exist, so blk6 will show **5 rows / 3 distinct seeds** and node **8 rows / 5 distinct seeds**.
+Repeating a seed averages down run-to-run noise but **not seed variance**. **Report distinct seeds;
+quoting n=5 and n=8 as independent draws would inflate precision**, which is the family of error this
+document exists to prevent.
+
+## 104.8 THE GAP I CANNOT CLOSE WITHOUT A CODE CHANGE, STATED PLAINLY
+
+The optimizer supports `scalar` / `blockwise` (of **layers**) / `layerwise` / `nodewise` /
+`weightwise` only, and `blockwise` is **coarser** than layerwise. So there is **no rung anywhere in
+the three decades between nodewise (14,420) and weightwise (11,173,962)** — precisely the interval in
+which the accuracy collapse and the agreement collapse both happen. Every statement about *where*
+the fine end turns bad is currently an interpolation between two points.
+
+Closing it needs a patch to `HF.py` adding a chunked partition (group each tensor's weights into
+blocks of size K), which interpolates the whole 62 → 11.17M range with one knob. **That is a code
+change and it does not belong in the same batch as a measurement**, so it was not bundled into `at1`.
+It is the highest-value next step and it is written down here as the recommendation, not done on a
+hunch: it converts the campaign's central curve from 5 points with a 3-decade hole into a continuum.

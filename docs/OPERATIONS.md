@@ -11,8 +11,21 @@ flushes when the process exits. Reading that as "the job is stalled" is wrong.
 **Fix (applied):** `run_cifar.sh` now sets `PYTHONUNBUFFERED=1` and runs `python -u`.
 
 **Checking a running job's true progress:** read `PROBE_DIR/probe.jsonl` — the probe
-opens, appends and closes each record, so it flushes immediately. `last_step / 500`
+opens, appends and closes each record, so it flushes immediately. `step / 500`
 = epochs completed (batch size 100, 50k train images).
+
+**CORRECTED cycle 75: the field is `step`, NOT `last_step`.** This file and
+`CONTINUE-HERE.md` both said `last_step`, and no such key exists on any record. The
+record keys are: `step, beta, beta_true_min, beta_true_max, frac_neg, frac_zero,
+h_absmax, mom_norm, n_at_hi, n_at_lo, n_beta, probe_idx, snr, t_n, t_neg, t_zero,
+z_mean, z_skew, z_std, z_sub, z_sub_k`. A health check written against `last_step`
+returns empty and reads as "no probe yet" — i.e. it fails in the direction of
+declaring a healthy job stuck, which is the error that cost this project 51 wrongly
+cancelled jobs. **Two reads ~60 s apart of `step` is the health check.**
+
+**A running job can also show an EMPTY probe dir for the first ~60 s** — the directory
+is created before the first record is flushed. Absence at one read is not evidence;
+re-read before concluding anything.
 
 ## 2. Compare wall-clock per epoch, not raw wall-clock
 `analysis/aggregate.py` records `wallclock_min` and `epochs_done`; divide. Measured

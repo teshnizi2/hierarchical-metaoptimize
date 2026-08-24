@@ -54,6 +54,88 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 75) -- **T1 CONFIRMED 3/3. THE HEADLINE SURVIVED ITS OWN CONFOUND TEST, AND THE MECHANISM IT PROPOSED IS DEAD. A RESOLVED INTERIOR OPTIMUM IN GRANULARITY.**
+
+**Read `docs/CORRECTIONS.md` 104 and `docs/FINDINGS.md` 74.0-74.8 FIRST. 104.2 is the verdict,
+104.3 is what it killed, 104.4 is the result that is bigger than the gate, 104.8 is the next step.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** `tw0`'s 9 jobs all complete at 100/100 ep. CSV
+  **1783 -> 1792 PURELY ADDITIVELY** (0 pre-existing rows changed, header byte-identical).
+  **CANCELLED: nothing.** `analysis/c75_tw0_score.py` registered at **51/51 selftests BEFORE any
+  verdict was read**, every constant asserted against the batch script's own text.
+  **ORPHAN AUDIT: 0 orphan families of 117, 0 orphan runs** -- the ~290 of 2026-08-22 are absorbed.
+* **T1 (PRIMARY) CONFIRMS.** Registered: weightwise box-free at BOTH guards on **>= 2 of 3** seeds.
+  Measured **3 of 3**, and **all 9 arms read exactly 0.0000 on all four occupancy columns** -- not
+  one record of 90,000, not one (record, coordinate) cell, touched either guard. Span 8.62 in a box
+  12.70 wide. **103.2 STANDS, unconfounded**; the 20-vs-100-epoch gap 103.3 left open is closed.
+  **But say the uncomfortable half too (104.2): the gate was EASY** -- every arm passed by the
+  maximum margin, where bf9's version of the same gate discriminated (lay 4/4, node 2/4, w 1/4).
+  What rescues it is that 0.0000 is not "under 5%", it is *no occupancy at all*.
+* **THE TICK'S REAL CONTENT: T1 KILLED THE MECHANISM THE LAST TICK PROPOSED (104.3).**
+  `bf9` suggested **ceiling-runaway** as the carrier for the weightwise deficit. The ceiling is never
+  touched, by any rung, on any seed. **The deficit is real and now UNEXPLAINED** -- not a clamp
+  artifact, not fixable by `ms` (wm9's curve is flat over 3e-5..1e-3), not ceiling-runaway.
+  **Four candidate explanations dead, none has replaced them.**
+* **T2 REPRODUCES: the probe is INERT.** tw0 weightwise **91.234 +-0.065** vs wm9's **91.015**,
+  diff **+0.219** inside the +-0.50 bar. T2 could only VOID and did not.
+* **THE FIVE-RUNG TUNED LADDER HAS A RESOLVED INTERIOR OPTIMUM AT LAYERWISE (104.4, FINDINGS 74.3).**
+  One matched 13-axis cell, every rung at its own argmax, every argmax verified INTERIOR:
+  frozen **90.384** -> scalar **92.262** -> blk6 **92.652** -> **lay 92.887** -> node **92.450** ->
+  w **91.146**. Resolved against all four others (t = 5.57 / 3.06 / 2.99 / 20.22).
+  **Refining past 62 groups costs 2.8x what coarsening to 1 group costs** (1.740 vs 0.624 pp).
+  **Adaptation gain peaks at layerwise (+2.503) and collapses to +0.763 -- 30% of peak -- at the
+  per-weight limit, while staying POSITIVE.** The per-weight meta-gradient is not harmful, it is
+  **much less useful**. That is the thing to explain.
+* **A PRIOR CLAIM CORRECTED: FINDINGS 73.6's "`blockwise6` has no matched cell" is WRONG.** It has
+  two (`rs-blk6-1e4-s0/s1`, all 13 axes matching). The third seed **died at 29 epochs** and is
+  correctly excluded by the `epochs_done==100` filter -- very likely how the earlier reading got
+  "no matched cell". **The ladder is FIVE rungs, not four.** blk6 is still the weakest row at n=2.
+* **T4 -- THE DATUM 3 BATCHES AND 36 GPU-JOBS FAILED TO GET (104.5).** First clean N_eff/m with
+  **zero bound cells**: lay 0.7458, node 0.0549, w 0.0157, **argmin `w` at gap/SE 22.75, DECIDED**.
+  All-seeds and box-free sets coincide, so CORRECTIONS 79's blocking rule never engages.
+  **`bf9`'s G2 is NOT retro-scored with this** -- different budget, box and `ms`; the prediction is
+  corroborated out-of-sample and **G2 stays UNTESTED** per 103.4. **N_eff grows SUBLINEARLY with m,
+  slope 0.686** (3-point LS) against 1.000 for independence and 0.000 for full sharing.
+* **T3 + A ZERO-COST REPLICATION (104.6).** Agreement falls monotonically with m: lay **0.65693**,
+  node **0.53836**, w **0.50117**. Re-reducing the already-paid-for `fz3`/`ff5` roots adds six more
+  conditions: `a_raw` falls monotonically in **7 of 7**, reaching 0.500-0.504 at the per-weight limit
+  in every one -- two datasets, four architectures, frozen and free, 20 ep and 100 ep.
+  **THE HONEST DEFLATION, stated with the result: this fall is PARTLY MECHANICAL** (a coarse
+  coordinate's meta-gradient is a sum over many fine ones; the sign of a sum is more consistent than
+  the sign of a summand). **The monotone fall alone is NOT evidence of structure**; the **exponent**
+  is. **The "53.1%" sentence is NOT reproduced and is NOT written** (refuted as stated since c42).
+* **SUBMITTED: `at1` (6, alice), 0 cancelled.** `bin/c75_tuned_agreement_ladder.sh`, all 8 guards
+  live, box **registered in `c55_neff_noise.BOXES` before submission**. blk6 @ **1e-4** and node @
+  **3e-4** -- the two rungs `tw0` left unprobed or probed OFF their own argmax (tw0 ran node at 1e-4,
+  whose argmax is 3e-4, against 72.1b's standing warning). Guard 2b re-derived both argmaxes from the
+  CSV and asserted both INTERIOR; guard 2c asserted A1's references (92.652 n=2, 92.450 n=5).
+* **REGISTERED, DO NOT EDIT AFTER THE DATA LANDS:** **A2 (the reason it runs): `a_raw` is monotone
+  decreasing in m -- blk6 (m=6) > lay's 0.65693, and node@3e-4 strictly inside (0.50117, 0.65693).**
+  REFUTES -> agreement is not a function of block size alone and the mechanism story **loses its
+  carrier**. **A2b, NO direction registered:** node@3e-4 vs node@1e-4 (0.53836) is the same m at two
+  `ms` -- if they differ, `a_raw` is a joint function of (m, ms). **A1 can only VOID** (+-0.50/arm).
+  **A3 is a REPLICATION of a post-hoc window and is never a discovery.**
+* **REGISTERED AGAINST MY OWN BATCH (FINDINGS 74.8):** `at1` **re-runs seeds that already exist**.
+  blk6 will show **5 rows / 3 DISTINCT seeds**, node **8 rows / 5 DISTINCT seeds**. Repeating a seed
+  averages down run-to-run noise but **NOT seed variance**. **Report distinct seeds** -- quoting n=5
+  and n=8 as independent draws would inflate precision.
+* **NEXT TICK:** score `at1` against **A0 / A0.2 / A0.3 / A1 / A2 / A2b / A3 in that order**; A1
+  first after validity, since a VOID means A2 is not about the tuned ladder. `at1`'s box is already
+  registered. Then **the highest-value step is the `HF.py` chunked-partition patch (104.8)**.
+* **THE GAP THAT NEEDS A CODE CHANGE (104.8).** The optimizer supports only scalar / blockwise-of-
+  LAYERS / layerwise / nodewise / weightwise, and blockwise is **coarser** than layerwise. **There is
+  NO rung anywhere in the three decades between nodewise (14,420) and weightwise (11,173,962)** --
+  exactly where both the accuracy collapse and the agreement collapse happen. Every statement about
+  *where* the fine end turns bad is an interpolation between two points. A chunked partition (group
+  each tensor's weights into blocks of size K) interpolates 62 -> 11.17M with one knob. **A code
+  change does not belong in the same batch as a measurement**, which is why it is not in `at1`.
+* **STILL OPEN, RANKED:** (1) the chunked-partition patch above; (2) the sweep of every heredoc-fed
+  guard in `bin/` deriving a path from `__file__` (101.11) -- `tw0` and `at1` both pass the CSV path
+  in from bash, the rest of `bin/` is unswept. **NOTE the live trap:** `~/metaopt/results/all_runs.csv`
+  on alice2 is stale -- run batch scripts from `hierarchical-metaoptimize/bin/`, never `~/metaopt/bin/`.
+
+## Superseded -- cycle 74 (kept for the record)
+
 ## Running / next (cycle 74) -- **wm9's W2 REFUTED: THE LADDER IS NOT FLAT. THE 80-ep N_eff AXIS IS CLOSED. `tw0` IS OUT AND CAN WITHDRAW THE HEADLINE.**
 
 **Read `docs/CORRECTIONS.md` 103 and `docs/FINDINGS.md` 73.0-73.6 FIRST. 103.2 is the headline,
@@ -2319,7 +2401,7 @@ alpha0); the slope magnitudes do not.
 * `BETA_CLIP` uses a **colon** (`-15:-2.3026`); a comma breaks both the parser and `sbatch --export`.
 * Pin GPUs: `--partition=gpu-l4-24g --gres=gpu:l4:1`. Mixing GPU types makes timing incomparable.
 * A running job's `.out` shows **0 epochs** because Python buffers stdout. Read
-  `PROBE_DIR/probe.jsonl` for true progress (`last_step / 500` = epochs). Three healthy jobs were
+  `PROBE_DIR/probe.jsonl` for true progress (`step / 500` = epochs; the field is `step`, NOT `last_step` -- corrected cycle 75, see docs/OPERATIONS.md 1). Three healthy jobs were
   killed on this misreading.
 * Runs reproduce to ~**±0.02pp, not bitwise** (cuDNN autotuning). Effects under ~0.05pp need more
   seeds.

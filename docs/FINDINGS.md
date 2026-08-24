@@ -14215,3 +14215,185 @@ written before the run.
   contrast and no number in it may be quoted as an effect size.
 * The 80-epoch N_eff/m point remains **unmeasured** after three batches. See CORRECTIONS 103.4.
 * `tw0` has not landed. Nothing in §73.1 is final until T1 scores.
+
+---
+
+# CYCLE 75 — `tw0` SCORED. T1 CONFIRMS. THE FIRST CLEAN N_eff/m READING, AND A RESOLVED INTERIOR OPTIMUM IN GRANULARITY.
+
+All numbers below are re-derived from `results/all_runs.csv` (1792 runs) and `../probes_tw0` by
+`analysis/c75_tw0_score.py` (selftest **51/51**, registered BEFORE any verdict was read).
+CSV grew **1783 → 1792 purely additively**: 0 of 1783 pre-existing rows changed a field, header
+byte-identical, and the 9 new rows are exactly `tw0-{w,node,lay}-s{0,1,2}`.
+
+## 74.0 VALIDITY — T0 9/9, T0.2 9/9
+
+Every dir: `n_records` == 10000, `n_beta` constant on **all 10,000 records** (w 11,173,962 /
+node 14,420 / lay 62), beta moved (span 7.88–8.62), `epochs_done` == `epochs_requested` == 100,
+`collapsed` false, `window_ok` 1. The instrument fired on 9/9 — `neg_counts.json` present with
+`n_tot` == `n_beta`, and `neg_counts.npy` shape read **from its header** equal to `(n_tot,)`.
+
+## 74.1 **T1 (PRIMARY) CONFIRMS — AND BY MORE THAN THE REGISTERED MARGIN**
+
+Registered before the run: *weightwise box-free at BOTH guards on ≥ 2 of 3 seeds.*
+Measured: **weightwise box-free on 3 of 3.** In fact **all 9 arms are box-free on all four
+occupancy columns simultaneously**, at the exact value 0:
+
+| rung | seeds | rec_lo | rec_hi | q4_lo | q4_hi | coord_lo | coord_hi |
+|---|---|---|---|---|---|---|---|
+| lay | 0,1,2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.00000 | 0.00000 |
+| node | 0,1,2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.00000 | 0.00000 |
+| w | 0,1,2 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.00000 | 0.00000 |
+
+Not one record of 90,000, and not one (record, coordinate) cell, touched either guard. The box
+(−15, −2.3026) is **12.70 wide** and the widest beta span observed is **8.62**.
+
+**CONSEQUENCE, exactly as registered:** cycle 74's W2 refutation is **NOT a box artifact**, so
+§73.1 stands; and because the clamp is provably slack, **ceiling-runaway is RULED OUT as the
+mechanism**, which leaves the weightwise deficit **unexplained**. That is the sharper of the two
+registered outcomes, and it is the one that happens to keep cycle 74's headline alive — the conflict
+of interest was recorded in advance (CORRECTIONS 103.7) precisely because it resolved this way.
+
+## 74.2 T2 REPRODUCES — THE PROBE IS INERT
+
+| rung | plateau5 | sem | n | per-seed |
+|---|---|---|---|---|
+| weightwise | 91.234 | 0.065 | 3 | 91.200 91.142 91.360 |
+| nodewise | 91.961 | 0.044 | 3 | 92.026 91.876 91.980 |
+| layerwise | 92.939 | 0.148 | 3 | 93.148 93.016 92.654 |
+
+`tw0` weightwise **91.234** vs `wm9`'s ms=1e-4 cell **91.015** → **+0.219 pp**, inside the ±0.50 bar
+→ **REPRODUCES**. CORRECTIONS 18 asserted the probe leaves training untouched; this **measures** it.
+T2 could only VOID, and it did not.
+
+## 74.3 **THE TUNED GRANULARITY LADDER HAS A RESOLVED INTERIOR OPTIMUM AT LAYERWISE**
+
+One matched 13-axis cell (ResNet18 / CIFAR-10 / bs100 / SGDm+Lion / alpha0=1e-3 / gamma=1 /
+AUGMENT=1 / clip −15:−2.3026 / 100 ep / no hierarchical operator), **every rung at its own argmax
+over its own swept `ms` grid, and every argmax verified INTERIOR**:
+
+| rung | m | best ms | plateau5 | sem | n | gain over frozen |
+|---|---|---|---|---|---|---|
+| frozen | — | 1e-8 | **90.384** | 0.083 | 6 | — |
+| scalar | 1 | 1e-4 | 92.262 | 0.099 | 5 | +1.879 |
+| blk6 | 6 | 1e-4 | 92.652 | 0.056 | 2 | +2.268 |
+| **layerwise** | **62** | **1e-4** | **92.887** | **0.052** | **11** | **+2.503** |
+| nodewise | 14,420 | 3e-4 | 92.450 | 0.136 | 5 | +2.067 |
+| weightwise | 11,173,962 | 1e-4 | 91.146 | 0.068 | 5 | +0.763 |
+
+Layerwise is the argmax and is **resolved against every other rung**:
+
+| contrast | diff | SE | t | verdict |
+|---|---|---|---|---|
+| lay − scalar | +0.624 | 0.112 | 5.57 | RESOLVED |
+| lay − blk6 | +0.235 | 0.077 | 3.06 | RESOLVED (but blk6 is n=2) |
+| lay − node | +0.436 | 0.146 | 2.99 | RESOLVED |
+| lay − weightwise | +1.740 | 0.086 | 20.22 | RESOLVED |
+
+**Refining past 62 groups costs 2.8× what coarsening to 1 group costs** (1.740 vs 0.624 pp).
+**Adaptation gain is a peaked function of granularity**: it rises 1.879 → 2.503 from scalar to
+layerwise, then falls to 2.067 at nodewise and **collapses to 0.763 — 30 % of peak — at the
+per-weight limit.** The per-weight meta-gradient still helps (frozen is 0.763 pp worse), so the
+deficit is *not* "adaptation becomes harmful"; it is **adaptation becoming much less useful**.
+
+**THIS SUPERSEDES §73.6's bullet "`blockwise6` has no matched cell in the 13-axis census."** It has
+**two** (`rs-blk6-1e4-s0/s1`, all 13 axes matching). The third seed `rs-blk6-1e4-s2` exists but
+**died at 29 epochs** and is correctly excluded by the `epochs_done == 100` filter. The ladder is
+**five rungs, not four** — but blk6 rests on n=2 and is the weakest link in the table.
+
+## 74.4 **T4 — THE CAMPAIGN'S FIRST CLEAN N_eff/m READING**
+
+Three prior batches (`bd7`, `bf8`, `bf9` = **36 GPU-jobs**) failed to produce this: bd7 bound at LO,
+bf8 had the instrument off, bf9 bound at HI. `tw0` produces it with **zero bound cells**.
+
+| rung | m | N_eff/m | sem | per-seed | N_eff (absolute) |
+|---|---|---|---|---|---|
+| lay | 62 | 0.7458 | 0.0116 | 0.7248 0.7476 0.7649 | 46.2 |
+| node | 14,420 | 0.0549 | 0.0016 | 0.0526 0.0581 0.0541 | 791.7 |
+| w | 11,173,962 | 0.0157 | 0.0005 | 0.0148 0.0156 0.0166 | 175,431 |
+
+**argmin = `w`, gap 0.0392, SE 0.0017, gap/SE = 22.75 → DECIDED**, and identical all-seeds and
+box-free-only (no cell is bound, so the two sets coincide and CORRECTIONS 79's blocking rule never
+engages). This is the *pattern* `bf9`'s G2 registered in advance (argmin `w`, gap/SE ≥ 2) now
+observed in a cell where the box does **not** block — but G2 was registered against `bf9` at 80 ep
+in the f60 box, and `tw0` is a different cell, so this **corroborates the prediction out-of-sample
+without retro-scoring G2**, which stays UNTESTED per CORRECTIONS 103.4.
+
+**N_eff grows SUBLINEARLY with m**: d log N_eff / d log m = **0.521** (lay→node), **0.812**
+(node→w), **0.686** by 3-point least squares. Independence requires **1.000**; full sharing gives
+**0.000**. Neither limit is the data.
+
+## 74.5 T3 — SIGN AGREEMENT FALLS MONOTONICALLY WITH GROUP COUNT (DESCRIPTIVE, NO DIRECTION REGISTERED)
+
+Steady half, `neff_instrument.agreement_stats`, the reducer every published number came through:
+
+| rung | m | pbar | bias | a_raw | a_deb | bias_share |
+|---|---|---|---|---|---|---|
+| lay | 62 | 0.34366 | −0.15634 | 0.65693 | 0.55326 | 0.661 |
+| node | 14,420 | 0.46165 | −0.03835 | 0.53836 | 0.51472 | 0.616 |
+| w | 11,173,962 | 0.49883 | −0.00117 | 0.50117 | 0.50092 | 0.218 |
+
+Seed-to-seed spread is tiny (weightwise `a_raw` = 0.50119 / 0.50118 / 0.50114).
+
+**THE "53.1 % OF 11.17M META-GRADIENTS AGREE IN SIGN" SENTENCE IS NOT REPRODUCED HERE AND IS NOT
+WRITTEN.** It has been refuted as stated since cycle 42 (CORRECTIONS 26). No independence null is
+re-derived here either — deriving one on the fly is the error CORRECTIONS 26 records.
+
+## 74.6 THE SAME MONOTONE FALL REPRODUCES IN 6 MORE CONDITIONS AT **ZERO GPU COST**
+
+`probes_fz3` (frozen) and `probes_ff5` (free) were already paid for and cover three other families.
+Re-reduced this tick with the same registered reducer (20 ep, n=2 per cell, box −15/−2.3026):
+
+| condition | family | lay | node | w |
+|---|---|---|---|---|
+| frozen | c100 | 0.62069 (62) | 0.53748 (14,600) | 0.50246 (11,220,132) |
+| frozen | r10 | 0.64520 (38) | 0.55158 (8,660) | 0.50407 (4,903,242) |
+| frozen | r34 | 0.56267 (110) | 0.51402 (25,556) | 0.50074 (21,282,122) |
+| free | c100 | 0.58695 | 0.51872 | 0.50023 |
+| free | r10 | 0.59943 | 0.52161 | 0.50045 |
+| free | r34 | 0.54929 | 0.50511 | 0.50012 |
+| free, tuned, 100 ep | r18c10 (`tw0`) | 0.65693 | 0.53836 | 0.50117 |
+
+`a_raw` falls monotonically in m in **7 of 7** conditions, and reaches **0.500–0.504 at the
+per-weight limit in every one** — two datasets, four architectures, frozen and free, 20 ep and
+100 ep. `fz3`'s c100 also carries blk6 (m=6) at **0.65133 > lay's 0.62069**, the only existing
+datum on the coarse end, and it continues the monotone trend.
+
+## 74.7 SUBMITTED — 6 JOBS, 0 CANCELLED
+
+`at1` (6, alice, `bin/c75_tuned_agreement_ladder.sh`, all 8 guards live, box registered in
+`c55_neff_noise.BOXES` **before submission**). `blk6 @ ms=1e-4` and `nodewise @ ms=3e-4`, seeds 0-2,
+100 ep, PROBE=5 **and** PROBE5=1. Guard 2b re-derived **both** argmaxes from the CSV and asserted
+both are **interior**, and guard 2c asserted A1's two reference values (92.652 n=2, 92.450 n=5)
+against the CSV rather than a comment.
+
+It closes two gaps `tw0` left. `tw0` measured agreement at ms=1e-4 on all three of its rungs, but
+1e-4 is the argmax for w/lay/scalar and **not** for node, whose own argmax is 3e-4 — so `tw0`'s
+curve pairs two tuned rungs with one mistuned one, against 72.1b's standing warning. And blk6 has
+tuned *accuracy* in this cell but **has never been probed here at all**.
+
+**REGISTERED, DO NOT EDIT AFTER THE DATA LANDS.** **A2 (the reason the batch runs): `a_raw` is
+monotone decreasing in m across the tuned ladder — blk6 (m=6) > layerwise's 0.65693, and node@3e-4
+strictly inside (0.50117, 0.65693).** REFUTES if blk6 ≤ layerwise or node@3e-4 leaves that interval,
+which would mean agreement is not a function of block size alone and the mechanism story for the
+weightwise accuracy deficit loses its proposed carrier. **A2b, no direction registered:** node@3e-4
+vs node@1e-4 (0.53836) is the same m at two meta-stepsizes — if they differ materially, `a_raw` is a
+joint function of (m, ms) and A2's curve must be re-read. **A1 can only VOID** (bar ±0.50 per arm).
+**A3 is a REPLICATION of a post-hoc window and is never a discovery.**
+
+## 74.8 LIMITS — INCLUDING ONE REGISTERED AGAINST `at1` BEFORE ITS DATA LANDS
+
+* **`at1` re-runs seeds that already exist.** blk6 will hold 5 CSV rows but only **3 distinct
+  seeds** {0,1,2}; node will hold 8 rows but only **5 distinct seeds** {0,1,2,3,4}. Repeating a seed
+  averages down run-to-run noise (±0.02 pp) but **not seed variance**. Quoting n=5 for blk6 or n=8
+  for node as if they were independent draws would inflate the precision. **Report distinct seeds.**
+* §74.3's blk6 row is **n=2** and it is the only rung whose argmax rests on two runs. The interior
+  peak survives at t=3.06 against it, but that contrast is the table's weakest.
+* §74.4's N_eff/m is a **100-epoch** number. CORRECTIONS 73 established N_eff/m **moves with budget**
+  (nodewise 0.4056 → 0.2774 across a doubling), so **write "at a 100-epoch budget"**, and do not
+  compare it to the 20/40-epoch points as if budget were held fixed.
+* §74.5/74.6 report agreement *without* an independence null. The fall with m is partly **mechanical**
+  — a coarse coordinate's meta-gradient is a sum over many fine ones, and the sign of a sum is more
+  consistent than the sign of a summand. **The monotone fall is therefore not by itself evidence of
+  anything beyond arithmetic**; what is not mechanical is the *exponent* (§74.4's 0.686).
+* §74.6's rows are n=2 at 20 epochs and are cited for **direction only**, never as effect sizes.
+* Nothing here explains *why* the fine partition costs accuracy. §74.1 removed the leading candidate.

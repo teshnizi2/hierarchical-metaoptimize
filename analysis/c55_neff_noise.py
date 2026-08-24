@@ -138,6 +138,11 @@ BOXES = {
     # signature (-15, -2.3026) that p5/fr5/fz3/ml5/ff5 all sit in.  Registered
     # BEFORE ANY tw0 JOB WAS SUBMITTED, read from the script's own CLIP= line.
     "tw0":  (-15.0, -2.3026, "bin/c74_tuned_weightwise_probe.sh:CLIP"),
+    # cycle-75 ALL-RUNGS-TUNED agreement ladder: the two rungs tw0 left without a
+    # probe at their OWN argmax -- blk6 @ 1e-4 and nodewise @ 3e-4.  Same box as
+    # tw0/wm9/ml5, so again NOT a new box.  REGISTERED BEFORE ANY at1 JOB WAS
+    # SUBMITTED, read from the script's own CLIP= line, not from the data.
+    "at1":  (-15.0, -2.3026, "bin/c75_tuned_agreement_ladder.sh:CLIP"),
 }
 
 
