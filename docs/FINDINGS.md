@@ -13299,3 +13299,82 @@ document we had already written) does **not** have a counterpart at the level of
 * `--detail` context lines are printed for the first 3 hits only; the eyeball above used them.
 
 **Do not re-run offline:** 69.1–69.7 are closed on the present corpus.
+
+---
+
+## 69.9 SECOND HALF OF THE TICK — 68.6's "FULLY MATCHED" CELL IS NOT MATCHED ON THE NETWORK AXIS
+
+**Provenance, stated first: this was NOT pre-registered.** It was found while re-deriving the
+cycle-65..69 numbers from the CSV in order to bring `docs/MASTER-TABLE.md` current — that file
+cites `c65`/`c66`/`c67`/`c68`/`c69`, STANDING RULE (13) and STANDING RULE (15) **zero times**,
+while STANDING RULE (15) makes it the mandatory grep target before any cross-granularity claim.
+Instrument `analysis/c69_c100_armset.py`, **17/17 selftests**. Under CORRECTIONS 76(1)/79 a
+post-hoc finding may not overturn a registered gate. **It does not** — what follows is a
+MECHANICAL fact about arm membership, and **68.6's verdict survives in full**.
+
+## 69.10 THE RECONSTRUCTION (G1) — 68.6's CELL REPRODUCES ONLY WITH THE NETWORK AXIS RELAXED
+
+68.6 states its cell as *"Fully matched cell, 100 epochs ... **ResNet18_c100** / CIFAR-100 /
+a0=1e-3 / ms=1e-3 / Lion / HIER none / clip −15:−2.3026 / AUG=1"*. **No configuration group in
+the CSV holds 14 CIFAR-100 layerwise runs at that config.** Relaxing the network key alone
+reproduces every published cell to three decimals (selftests T2–T9):
+
+| arm | n | plateau5 | sem | networks actually present |
+|---|---:|---:|---:|---|
+| nodewise | 3 | 71.415 | 0.049 | ResNet18_c100 |
+| **layerwise** | **14** | **69.048** | **0.220** | **ResNet10_c100 (3), ResNet18_c100 (8), ResNet34_c100 (3)** |
+| weightwise | 3 | 67.167 | 0.178 | ResNet18_c100 |
+| resnet18_blocks | 5 | 51.584 | 0.244 | ResNet18_c100 |
+| **scalar** | **11** | **22.208** | **2.096** | **ResNet10_c100 (3), ResNet18_c100 (5), ResNet34_c100 (3)** |
+
+**The contamination is asymmetric (G2), and it runs against the comparison.** Two of the five
+arms — layerwise and scalar — pool three networks; the other three are single-network. So the
++2.367 pp contrast puts a single-network *nodewise* arm against a three-network *layerwise* arm.
+This is a **STANDING RULE (10)** violation — *"a series across any axis must hold the arm
+fixed"* — installed in cycle 64, breached in cycle 68 by the same tick that installed STANDING
+RULE (15).
+
+## 69.11 THE CORRECTED NUMBER — THE EFFECT SHRINKS 23 %, AND THE RESOLUTION IMPROVES
+
+| | 68.6 as published | **network-matched** |
+|---|---|---|
+| layerwise | 69.048 ±0.220 (n=14) | **69.594 ±0.158 (n=8)** |
+| nodewise | 71.415 ±0.049 (n=3) | 71.415 ±0.049 (n=3) |
+| **Δ, k=5 (documented)** | **+2.367 pp** | **+1.821 pp** |
+| gate `2·√(sem₁²+sem₂²)` | 0.452 | **0.331** |
+| **multiple of gate** | 5.24× | **5.51×** |
+| Δ, k=20 | +2.312 pp | **+1.696 pp** (4.74×) |
+| seed overlap | NO | **NO** (71.318 > 70.260) |
+| interior maximum at u=1.0 | YES | **YES** |
+
+**The effect is 0.546 pp smaller — 23 % of it was cross-network pooling — and it is
+simultaneously MORE resolved**, because dropping the R10/R34 runs cuts the layerwise sem from
+0.220 to 0.158 faster than it cuts the margin. `+2.367 pp` is **WITHDRAWN as a point estimate**;
+the defensible figure is **+1.821 pp at 5.51× the gate**.
+
+## 69.12 WHAT SURVIVES, AND ONE THING THAT GETS STRONGER
+
+* **68.6's VERDICT is untouched.** `u_train*` on CIFAR-100 is nodewise, resolved, window-invariant
+  (k=5 and k=20 agree to 0.125 pp matched), non-overlapping, and an interior maximum in `u`:
+  0.000355 → 67.17, **1.0 → 71.42**, 439.78 → **69.59**, coarser → 51.58, ∞ → **22.56**.
+* **97.7's "+2.71 decades, MEASURED" is UNTOUCHED.** That figure is `log10(u_train*/u*_E)` and
+  depends only on the ARGMAX **location** (u = 1.0), not on the margin. The correction moves the
+  margin, not the argmax.
+* **97.7's asymmetry claim gets STRONGER.** "Moving from the training optimum toward the field
+  peak costs −4.25 pp while moving away costs −2.37 pp" becomes **−4.25 vs −1.82** — the
+  field-peak direction is now **2.33× worse** than the coarse direction, up from 1.79×.
+* **68.7's "on CIFAR-100 that same range spans 2.367 pp, resolved — 14–34× larger"** must be
+  restated as **1.821 pp, resolved — 11–26× larger** than CIFAR-10's 0.07/0.172 pp. The
+  dataset-bracket conclusion of 97.7/STANDING RULE (15) is unaffected.
+
+## 69.13 LIMITS
+
+* Post-hoc, and labelled as such throughout. It corrects an arm set, not a gate.
+* The network-matched layerwise arm is **n=8** and still pools four run families
+  (`c100-1e3-layer`, `c100b-1e3-layer`, `c1b-e3`) at one config; that pooling is within-network
+  and is not challenged here.
+* **The same audit has NOT been run on the other 100-epoch cells** quoted in cycles 65–68. This
+  tick checked the one cell that carries the campaign's newest load-bearing claim. Whether
+  cross-network pooling reaches further is **OPEN** and is the obvious next offline job.
+* `MASTER-TABLE.md` remains **five cycles stale** (no c65–c69 content). That is now recorded as a
+  structural hazard, not fixed — see CORRECTIONS 99.4.

@@ -4299,3 +4299,68 @@ number and should be told so before the next direction decision.
 pass applied to the 20-epoch tables — still owed (97.3), still an operator decision. `aggregate.py`
 and the CSV are **UNCHANGED** this tick. `hz9`, `sp8`, `cp9` remain the top submit-queue items the
 moment ALICE returns, in that order.
+
+---
+
+## 99. **68.6's "FULLY MATCHED" CIFAR-100 CELL IS NOT MATCHED ON THE NETWORK AXIS. +2.367 pp IS WITHDRAWN; +1.821 pp REPLACES IT.** (cycle 69, second half)
+
+**POST-HOC, and labelled so throughout.** Found while re-deriving cycles 65–69 from the CSV to
+bring `docs/MASTER-TABLE.md` current. Instrument `analysis/c69_c100_armset.py`, **17/17
+selftests**, gates G1 (reconstruction) / G2 (asymmetric contamination) / G3 (verdict survival).
+Under CORRECTIONS 76(1)/79 a post-hoc result may not overturn a registered gate — **this one does
+not.** It establishes a MECHANICAL fact about which runs sit in which arm, and 68.6's registered
+verdict survives it in full.
+
+**99.1 THE DEFECT.** FINDINGS 68.6 / CORRECTIONS 97.5 state their cell as *"Fully matched cell,
+100 epochs … **ResNet18_c100** / CIFAR-100 / a0=1e-3 / ms=1e-3 / Lion / HIER none / clip
+−15:−2.3026 / AUG=1 … for **every** run in the cell."* **No configuration group in the CSV holds
+14 CIFAR-100 layerwise runs at that config.** Relaxing the network key **alone** reproduces every
+published cell to three decimals (T2–T9: layerwise n=14 / 69.048 / 0.220; scalar n=11 / 22.208;
+gate 0.452; Δ +2.367). The layerwise arm is **ResNet10_c100 (3) + ResNet18_c100 (8) +
+ResNet34_c100 (3)**; the scalar arm is **3 + 5 + 3**. Nodewise, weightwise and blocks are
+single-network. **A single-network nodewise arm was compared against a three-network layerwise
+arm**, and the pooling runs against the comparison.
+
+**99.2 IT IS A BREACH OF THIS PROJECT'S OWN STANDING RULE (10).** *"A series across any axis must
+hold the arm fixed"* — installed cycle 64 (CORRECTIONS 87) after the "widening gap" turned out to
+be a config mismatch. It was breached in cycle 68 **by the same tick that installed STANDING RULE
+(15)**. This is the third consecutive tick (67, 68, 69) in which a load-bearing claim was
+corrected, and the second in which the correction was a scope/arm-set error rather than a
+measurement error.
+
+**99.3 THE CORRECTED NUMBER — SMALLER AND BETTER RESOLVED.** Network-matched to ResNet18_c100:
+layerwise **69.594 ±0.158 (n=8)** vs nodewise **71.415 ±0.049 (n=3)**.
+
+| | as published | **network-matched** |
+|---|---|---|
+| Δ, k=5 (documented) | +2.367 pp | **+1.821 pp** |
+| gate | 0.452 | **0.331** |
+| multiple of gate | 5.24× | **5.51×** |
+| Δ, k=20 | +2.312 pp | **+1.696 pp** (4.74×) |
+| seed overlap | NO | **NO** (71.318 > 70.260) |
+| interior max at u=1.0 | YES | **YES** |
+
+**`+2.367 pp` is WITHDRAWN as a point estimate. The defensible figure is `+1.821 pp` at 5.51× the
+gate** — 23 % smaller and *more* resolved, because dropping the R10/R34 runs cuts the layerwise
+sem (0.220 → 0.158) faster than it cuts the margin.
+
+**WHAT SURVIVES, AND WHAT IMPROVES.** 68.6's verdict — `u_train*` on CIFAR-100 is nodewise,
+resolved, window-invariant, non-overlapping, an interior maximum in `u` — is **untouched**.
+**97.7's "+2.71 decades, MEASURED" is untouched**: it is `log10(u_train*/u*_E)` and depends on the
+argmax LOCATION, not the margin. **97.7's asymmetry claim gets STRONGER**: −4.25 pp toward the
+field peak vs **−1.82 pp** away from it = **2.33×**, up from 1.79×. 68.7's *"14–34× larger than
+CIFAR-10"* restates as **11–26×**; the dataset-bracket conclusion and STANDING RULE (15) stand.
+
+**99.4 A STRUCTURAL HAZARD, RECORDED NOT FIXED.** `docs/MASTER-TABLE.md` was compiled in cycle 64
+and cites `c65`/`c66`/`c67`/`c68`/`c69`, `STANDING RULE (13)`, `STANDING RULE (15)`, `u*_E` and
+`window_ok` **zero times** — it carries none of the field-vs-training, trajectory-invariance,
+plateau-window or CIFAR-100 work. **STANDING RULE (15) makes that file the mandatory grep target
+before any cross-granularity claim.** A mandatory grep target that is five cycles stale is a
+mechanism that will produce exactly the 96.6/97.8 failure it was installed to prevent. Bringing it
+current is the top offline job for the next tick; it was not attempted here because this
+correction consumed the tick and a rushed table is worse than a stale one.
+
+**99.5 THE OPEN QUESTION THIS OPENS.** The cross-network audit has **only** been run on the one
+cell carrying the newest load-bearing claim. Whether cross-network (or cross-family) pooling
+reaches into the other 100-epoch cells quoted in cycles 65–68 is **OPEN**, and is the obvious next
+offline job after MASTER-TABLE. `analysis/c69_c100_armset.py` generalises to it directly.

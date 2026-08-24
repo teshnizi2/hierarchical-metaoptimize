@@ -101,7 +101,31 @@ OPERATOR-FACING FLAG about the brief itself; 98.5 adds STANDING RULE (16).**
   a0=1e-6 scope whose excess collapses 16x at a0=1e-3; `KILLTEST-idea2.md` §1 adds that no run on
   disk reproduces it. **What survives is the drift-vs-N slope (+0.179/+0.268/+0.203 vs a required
   -0.500) and the block-size curve (62.5-62.7, 63.1, 65.2) -- not the 53.1 % sentence.**
-* **OFFLINE QUEUE** is again down to the carried-since-51 `s` re-derivation (bookkeeping).
+* **SECOND HALF OF THE TICK (CORRECTIONS 99): 68.6's "FULLY MATCHED" CIFAR-100 CELL IS NOT
+  MATCHED ON THE NETWORK AXIS.** `analysis/c69_c100_armset.py`, **17/17 selftests**, POST-HOC and
+  labelled so. No config group in the CSV holds 14 CIFAR-100 layerwise runs at 68.6's stated
+  config; relaxing the NETWORK key alone reproduces every published cell to 3 decimals. The
+  layerwise arm is **R10_c100(3) + R18_c100(8) + R34_c100(3)** and scalar is **3+5+3**, while
+  nodewise/weightwise/blocks are single-network -- **a single-network nodewise arm was compared
+  against a three-network layerwise arm.** Breach of **STANDING RULE (10)** (cycle 64), by the
+  same tick that installed STANDING RULE (15).
+* **THE NUMBER MOVES, THE VERDICT DOES NOT.** Network-matched: layerwise **69.594 +-0.158 (n=8)**
+  vs nodewise 71.415 +-0.049 (n=3) -> **D = +1.821 pp** (k=5) at **5.51x the gate**, +1.696 pp at
+  k=20 (4.74x), **no seed overlap** (71.318 > 70.260), **interior maximum at u=1.0 intact**.
+  **+2.367 pp is WITHDRAWN as a point estimate; +1.821 pp replaces it** -- 23% smaller and MORE
+  resolved (layerwise sem 0.220 -> 0.158). **97.7's +2.71 decades is UNTOUCHED** (it is an argmax,
+  not a margin), and **97.7's asymmetry STRENGTHENS**: -4.25 pp toward the field peak vs -1.82 pp
+  away = **2.33x**, up from 1.79x. 68.7's "14-34x larger than CIFAR-10" restates as **11-26x**.
+* **TOP OFFLINE JOB FOR THE NEXT TICK (99.4): BRING `docs/MASTER-TABLE.md` CURRENT.** It was
+  compiled cycle 64 and cites `c65`/`c66`/`c67`/`c68`/`c69`, `STANDING RULE (13)`,
+  `STANDING RULE (15)`, `u*_E` and `window_ok` **ZERO times**. STANDING RULE (15) makes it the
+  mandatory grep target before any cross-granularity claim -- **a mandatory grep target that is
+  five cycles stale will produce exactly the 96.6/97.8 failure it was installed to prevent.**
+  Not attempted this tick: the 99 correction consumed it, and a rushed table is worse than a stale
+  one. **Second offline job (99.5):** run the cross-network audit on the OTHER 100-epoch cells
+  quoted in cycles 65-68; `c69_c100_armset.py` generalises to it directly.
+* **OFFLINE QUEUE:** (1) MASTER-TABLE refresh, (2) cross-network audit of the remaining cells,
+  (3) the carried-since-51 `s` re-derivation (bookkeeping).
 
 ---
 
