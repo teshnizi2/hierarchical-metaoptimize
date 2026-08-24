@@ -149,6 +149,13 @@ BOXES = {
     # which tw0 measured box-free at 0.0000 on all four columns in this box.
     # REGISTERED BEFORE ANY ck1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "ck1":  (-15.0, -2.3026, "bin/c75_chunk_ladder.sh:CLIP"),
+    # `mm1` and `cx2` reuse ck1's box UNCHANGED -- neither is a new box.  All 15 ck1
+    # arms and all 3 tw0 nodewise arms were box-free at 0.0000 on all four columns in
+    # it, spanning m from 62 to 11,173,962, so both new families sit strictly inside
+    # a range already measured slack at both guards.
+    # REGISTERED BEFORE ANY mm1/cx2 JOB WAS SUBMITTED, from each script's own CLIP=.
+    "mm1":  (-15.0, -2.3026, "bin/c76_matched_m_partition.sh:CLIP"),
+    "cx2":  (-15.0, -2.3026, "bin/c76_chunk_coarse_extension.sh:CLIP"),
 }
 
 
