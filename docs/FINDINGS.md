@@ -14355,7 +14355,10 @@ Re-reduced this tick with the same registered reducer (20 ep, n=2 per cell, box 
 
 `a_raw` falls monotonically in m in **7 of 7** conditions, and reaches **0.500–0.504 at the
 per-weight limit in every one** — two datasets, four architectures, frozen and free, 20 ep and
-100 ep. `fz3`'s c100 also carries blk6 (m=6) at **0.65133 > lay's 0.62069**, the only existing
+100 ep. **Provenance, so every number traces to a reducer:** the six `fz3`/`ff5` rows are re-derived
+by `analysis/c75_frozen_free.py` (selftest **16/16**), which prints **"6 of 6"** because it reduces
+only those two roots; the seventh is `tw0`'s own row from `c75_tw0_score.py` (0.65693 > 0.53836 >
+0.50117). **The two scripts do not share a number.** `fz3`'s c100 also carries blk6 (m=6) at **0.65133 > lay's 0.62069**, the only existing
 datum on the coarse end, and it continues the monotone trend.
 
 ## 74.7 SUBMITTED — 6 JOBS, 0 CANCELLED
