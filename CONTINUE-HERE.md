@@ -97,8 +97,39 @@ suspended since cycle 54; 101.3 rescopes the campaign's headline range; 101.5 ad
 * **THE LO CENSUS IS MOSTLY A REDISCOVERY (101.6).** 66/235 arms LO-bound, but `ml5`'s 91.9% and
   `wc5`'s 76.8% are the `ms=1e-2` rung **already in FINDINGS 51.1 and already excluded by
   CORRECTIONS 62**. Open and flagged only: `ff5` (14/18), `fr5` (10/12), `ml5@1e-3` (8.2%).
+* **SECOND HALF OF THE TICK: `sp8` LANDED AND SCORED THE SAME TICK (71.7-71.8, CORRECTIONS 101.9).**
+  All 9 jobs finished inside the tick (40/40 ep, `RUN_DONE` 9/9, verified in the `.out`).
+  **S0 9/9, S0.3 box-free 9/9 at 0.00%, S0.4 9/9, S0.5 span 13.111 inside its [11,18] VOID-only
+  gate** (guard 4 predicted 14.5). **S1: argmin = `node`, gap/SE = 7.35, DECIDED.**
+  **NO DIRECTION WAS REGISTERED** -- 55.6 predicted `w`, 55.7 predicted `node`, and the band wins.
+* **`sp8` BREAKS THE CONFOUND CYCLE 55 FLAGGED AGAINST ITSELF.** It is the **first 40-epoch cell
+  INSIDE the node band**; before it, every in-band cell was 20-epoch and every 40-epoch cell sat
+  above it. At matched **budget** (40 ep): `sp8` span 9.96 -> node, `br6` span 17.52 -> w. At
+  matched **ms** (5e-4): `ns5` 20 ep span 6.29 -> w, `sp8` 40 ep span 9.96 -> node.
+  **Neither budget nor ms can give two argmins at its own matched value. Span can.**
+* **TWO OF CORRECTIONS 70's THREE SCOPES COLLAPSE INTO ONE SCALAR** -- ms and budget both act
+  through **adaptation extent (span)**. The **base-optimizer scope does NOT collapse** (bo7 gives
+  argmin `w` under AdamW). Surviving form: **one scalar + one genuine categorical**, not three scopes.
+* **CORRECTIONS 74's SHAPE IS WRONG, not only its number:** `w` is the argmin **both below and
+  above** the node band. **It is an INTERIOR BAND, not a threshold.** Never write it as a threshold.
+* **S2 shows the band WITHIN ONE RUN:** `br6`'s argmin is `node` at 10-20 ep and `w` at 30-40 ep;
+  the `w` rung is strongly non-monotone (0.0092 -> 0.5073 -> 0.1201) while `node` is flat.
+  **POST-HOC in its detail -- it earns a confirmation test, not a claim.**
+* **SUBMITTED A THIRD BATCH: `bf8` (12, alice2), `bin/c71_floor_budget.sh`, all 8 guards live.**
+  The 80-epoch point re-run at **LO in {-60,-90}, HI FIXED +2.0** -- the axis that actually binds.
+  Floor sized from a **measured** -0.495/epoch descent (projection -46.4, cross-checked against
+  `bd7`'s observed bind epoch) but **deliberately not trusted**: two floors, and F0.5 MEASURES the
+  floor-dependence. **F2 REGISTERS A DIRECTION AGAINST THIS TICK'S OWN BAND: argmin = `w`.**
+  An `argmin = node` refutes the band and **WITHDRAWS the "one scalar" claim**.
+* **A GUARD SILENTLY READ THE WRONG CSV (101.11).** Heredoc-fed python has `__file__ == '<stdin>'`,
+  so the path resolved against CWD to a **stale Aug-20 CSV**. It aborted the batch, but **that was
+  luck** -- the same bug returns a plausible PASS just as easily, and this guard sizes a wall-clock
+  request. Fixed by passing the path in from bash. **Any heredoc-fed guard in `bin/` deriving a
+  path from `__file__` has this bug; the sweep is NOT done and is ranked.**
 * **TOP OFFLINE JOB: `docs/MASTER-TABLE.md`, deferred a THIRD time, still six cycles stale.**
   Do not defer it a fourth.
+* **QUEUE AT TICK END:** alice **9 R** (`hz9`), alice2 **12 PENDING** (`bf8`); `sp8` complete and
+  scored. **30 jobs submitted this tick, 0 cancelled.**
 
 ## Superseded -- cycle 70 (kept for the record)
 
