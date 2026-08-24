@@ -126,6 +126,13 @@ BOXES = {
     # script's own emitter line, not from the data.
     "bf8:f60": (-60.0, 2.0, "bin/c71_floor_budget.sh:295"),
     "bf8:f90": (-90.0, 2.0, "bin/c71_floor_budget.sh:295"),
+    # cycle-73 re-run of bf8 WITH THE INSTRUMENT ON (bf8 never exported PROBE5=1, so
+    # it wrote no neg_counts and reduce_root skipped every one of its arms).  ONE floor:
+    # bf8 measured the deepest beta_true_min in the whole batch at -46.744, and f60/f90
+    # returned the identical guard verdict on 6/6 (rung, seed) pairs, so the second floor
+    # is not a dose.  REGISTERED BEFORE ANY bf9 JOB COMPLETED -- read from the script's
+    # own LO=/HI= lines, not from the data (CORRECTIONS 102.4).
+    "bf9:f60": (-60.0, 2.0, "bin/c73_bf9_probe5.sh:112"),
 }
 
 
