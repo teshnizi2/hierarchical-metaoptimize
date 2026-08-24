@@ -54,6 +54,42 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 70) -- **ALICE DOWN A FIFTEENTH TICK. CROSS-NETWORK POOLING DOES NOT REACH CYCLE 65's LADDER: K2's NUMERATOR IS CLEAN.**
+
+**Read `docs/CORRECTIONS.md` 100 and `docs/FINDINGS.md` 70.0-70.7 FIRST. 100.4 records two things
+against this tick's own result; 100.3 adds STANDING RULE (17); 100.7 repeats the operator flag.**
+
+* **BOTH LOGIN NODES DOWN FOR A FIFTEENTH CONSECUTIVE TICK.** `ssh alice` / `ssh alice2` both fail
+  at **banner exchange**, probed at **2026-08-24T04:26Z** and again at the close of the tick. One
+  probe each, no retry loop, no ssh-config change. **Nothing synced, submitted or cancelled.**
+  `bo7-*` (12, alice) / `bd7-*` (12, alice2) survival remains **UNKNOWN** and is not guessed.
+  CSV unchanged at **1707 runs / 1143.5 GPU-h**; `aggregate.py` and the CSV are **BYTE-UNCHANGED**.
+  **`docs/` has NOT been rsynced to the cluster since cycle 65 — do that first when ALICE returns.**
+* **CORRECTIONS 99.5 IS ANSWERED.** Instrument `analysis/c70_composition_audit.py` (**31/31
+  selftests**, registered at `547e3d5` **before** any cell was scored). Outputs
+  `results/c70_composition_audit.txt` (registered) + `results/c70_posthoc.txt` (post-hoc, labelled).
+* **All four published 65.3 cells are CLEAN** — reconstructed to 3 decimals, fully matched on every
+  free axis. **The 68.6 cell remains the only contaminated published cell.** 65.3 needs an ADD
+  (`beta_clip`, never stated in its row labels); 68.6 needs a DROP of the axis its header *does*
+  name. Under-documentation vs mis-statement — only the second is an error of substance.
+* **Base rate:** 6/56 headline contrasts contaminated (**G4 SYSTEMIC — but by ONE CELL**; 5/56
+  would read LOCALISED), 2/5 material. Post-hoc at pair level **13/56 (23.2%)**, **8/13** with a
+  flip. Any unaudited contrast now has a prior: ~23% contaminated, ~62% flip if so.
+* **G6 IS WITHDRAWN AS A RULE by this tick's own post-hoc pass** — 5/5 shrink became 29/45 (64%);
+  every `layerwise−weightwise` contrast *grows* under matching. Do not quote "100% shrink".
+* **The power objection is answered 5/5**: the gate FALLS in every matched cell and the multiple
+  improves in 3/5. Matching gains precision; it does not cost it.
+* **One verdict destroyed** (additive η=0.06, α₀=1e-6, 100ep, CIFAR-10: nodewise +0.912 RESOLVED →
+  layerwise +0.060 UNRESOLVED, sign flipped; **zero doc citations, so nothing is retracted**).
+  **One strengthened**: the plain guarded CIFAR-10 ladder's nodewise peak, +1.188 → **+0.846 pp at
+  3.82× → 6.29×** — CIFAR-10 and CIFAR-100 (68.6/99.3) nodewise peaks now agree under one correction.
+* **TOP OFFLINE JOB NEXT TICK: `docs/MASTER-TABLE.md`, now SIX cycles stale** (no c65–c70 content)
+  while STANDING RULE (15) makes it the mandatory grep target. Deferred twice; do not defer again.
+  After it: extend the audit to the 45 identified contaminated pairs.
+* **SUBMIT QUEUE the moment ALICE returns:** `hz9`, `sp8`, `cp9`, in that order.
+
+## Superseded -- cycle 69 (kept for the record)
+
 ## Running / next (cycle 69) -- **ALICE DOWN A FOURTEENTH TICK. THE ~290-RUN ORPHAN BACKLOG DOES NOT EXIST.**
 
 **Read `docs/CORRECTIONS.md` 98 and `docs/FINDINGS.md` 69.0-69.8 FIRST. 98.6 is an
