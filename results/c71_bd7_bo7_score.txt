@@ -1,0 +1,102 @@
+====================================================================================================
+BD7  root=/Users/teshnizi/Saber Optimization/alice-backup/probes_bd7
+====================================================================================================
+
+-- D0 VALIDITY (n_records==8000, n_beta byte-match, beta moved)
+   12/12 PASS
+
+-- D0.3 BOX-FREE, per seed per ceiling (bar: <5% of records at EITHER guard)
+   arm                     %rec LO  %rec HI  %Q4 LO  %Q4 HI  1stHI  box-free
+   probe_w_c2_s0             39.26    62.09   100.0   100.0   3033        NO
+   probe_w_c2_s1             37.11     0.00   100.0     0.0      -        NO
+   probe_w_c6_s0              0.00     0.00     0.0     0.0      -       YES
+   probe_w_c6_s1              0.00     0.00     0.0     0.0      -       YES
+   probe_node_c2_s0          41.21     0.00   100.0     0.0      -        NO
+   probe_node_c2_s1          40.36    14.06   100.0    56.2   6875        NO
+   probe_node_c6_s0          41.31     0.00   100.0     0.0      -        NO
+   probe_node_c6_s1          40.34     0.00   100.0     0.0      -        NO
+   probe_lay_c2_s0           41.83     0.00   100.0     0.0      -        NO
+   probe_lay_c2_s1           41.54     0.00   100.0     0.0      -        NO
+   probe_lay_c6_s0           41.86     0.00   100.0     0.0      -        NO
+   probe_lay_c6_s1           41.58     0.00   100.0     0.0      -        NO
+
+-- D0.4 TRAINS-AT-ALL (plateau5 > 40, collapsed false)
+   run                    gran        clip        plateau5   plateau  wok  verdict
+   bd7-lay-c6-s0          layerwise   -30:6.0       91.068    90.886    1     PASS
+   bd7-lay-c2-s0          layerwise   -30:2.0       91.008    90.973    1     PASS
+   bd7-lay-c6-s1          layerwise   -30:6.0       90.854    90.767    1     PASS
+   bd7-lay-c2-s1          layerwise   -30:2.0       91.042    90.868    1     PASS
+   bd7-node-c2-s0         nodewise    -30:2.0       92.126    91.995    1     PASS
+   bd7-node-c6-s0         nodewise    -30:6.0       92.108    91.976    1     PASS
+   bd7-node-c2-s1         nodewise    -30:2.0       92.098    92.063    1     PASS
+   bd7-node-c6-s1         nodewise    -30:6.0       92.176    92.173    1     PASS
+   bd7-w-c6-s0            weightwise  -30:6.0       10.000    10.000    1     FAIL
+   bd7-w-c2-s0            weightwise  -30:2.0       90.882    90.460    1     PASS
+   bd7-w-c6-s1            weightwise  -30:6.0       10.000    10.000    1     FAIL
+   bd7-w-c2-s1            weightwise  -30:2.0       90.472    90.224    1     PASS
+
+-- N_eff/m, VARIANCE instrument, STEADY half (seeds averaged, per ceiling)
+   ceil   rung              m  n        rho_s          N_eff    N_eff/m  resolved  box-free
+   c2     lay              62  2    2.030e-02           27.7    0.44681       yes        NO
+   c2     node         14,420  2    1.117e-03          843.2    0.05848       yes        NO
+   c2     w        11,173,962  2    1.540e-06      613,791.9    0.05493       yes        NO
+   c6     lay              62  2    1.844e-02           29.2    0.47063       yes        NO
+   c6     node         14,420  2    1.100e-03          855.2    0.05931       yes        NO
+   c6     w        11,173,962  2          nan            nan UNRESOLVED        NO       YES
+
+-- D0.5 CEILING-INVARIANCE (only where BOTH ceilings are box-free and resolved)
+   w      UNRESOLVED at c6 -- NOT SCOREABLE (a bound/unresolved arm's value is not a number)
+   node   NOT box-free at both ceilings -- gate does not apply
+   lay    NOT box-free at both ceilings -- gate does not apply
+
+====================================================================================================
+BO7  root=/Users/teshnizi/Saber Optimization/alice-backup/probes_bo7
+====================================================================================================
+
+-- W0 VALIDITY (n_records==2000, n_beta byte-match, beta moved)
+   12/12 PASS
+
+-- W0.3 BOX-FREE, per seed per ceiling (bar: <5% of records at EITHER guard)
+   arm                     %rec LO  %rec HI  %Q4 LO  %Q4 HI  1stHI  box-free
+   probe_w_c2_s0              0.00     0.00     0.0     0.0      -       YES
+   probe_w_c2_s1              0.00     0.00     0.0     0.0      -       YES
+   probe_w_c6_s0              0.00     0.00     0.0     0.0      -       YES
+   probe_w_c6_s1              0.00     0.00     0.0     0.0      -       YES
+   probe_node_c2_s0           0.00     0.00     0.0     0.0      -       YES
+   probe_node_c2_s1           0.00     0.00     0.0     0.0      -       YES
+   probe_node_c6_s0           0.00     0.00     0.0     0.0      -       YES
+   probe_node_c6_s1           0.00     0.00     0.0     0.0      -       YES
+   probe_lay_c2_s0            0.00     0.00     0.0     0.0      -       YES
+   probe_lay_c2_s1            0.00     0.00     0.0     0.0      -       YES
+   probe_lay_c6_s0            0.00     0.00     0.0     0.0      -       YES
+   probe_lay_c6_s1            0.00     0.00     0.0     0.0      -       YES
+
+-- W0.4 TRAINS-AT-ALL (plateau5 > 40, collapsed false)
+   run                    gran        clip        plateau5   plateau  wok  verdict
+   bo7-lay-c2-s0          layerwise   -30:2.0       88.842    81.927    0     PASS
+   bo7-lay-c6-s0          layerwise   -30:6.0       89.190    82.061    0     PASS
+   bo7-lay-c2-s1          layerwise   -30:2.0       88.870    82.161    0     PASS
+   bo7-lay-c6-s1          layerwise   -30:6.0       88.874    82.398    0     PASS
+   bo7-node-c6-s0         nodewise    -30:6.0       89.962    81.997    0     PASS
+   bo7-node-c2-s0         nodewise    -30:2.0       89.486    82.201    0     PASS
+   bo7-node-c6-s1         nodewise    -30:6.0       89.670    82.001    0     PASS
+   bo7-node-c2-s1         nodewise    -30:2.0       90.400    82.956    0     PASS
+   bo7-w-c6-s0            weightwise  -30:6.0       89.404    81.609    0     PASS
+   bo7-w-c2-s0            weightwise  -30:2.0       86.452    81.258    0     PASS
+   bo7-w-c6-s1            weightwise  -30:6.0       89.432    81.969    0     PASS
+   bo7-w-c2-s1            weightwise  -30:2.0       89.696    82.261    0     PASS
+
+-- N_eff/m, VARIANCE instrument, STEADY half (seeds averaged, per ceiling)
+   ceil   rung              m  n        rho_s          N_eff    N_eff/m  resolved  box-free
+   c2     lay              62  2    2.375e-02           25.3    0.40833       yes       YES
+   c2     node         14,420  2    5.529e-04        1,607.2    0.11146       yes       YES
+   c2     w        11,173,962  2    4.705e-06      208,573.7    0.01867       yes       YES
+   c6     lay              62  2    1.895e-02           28.8    0.46382       yes       YES
+   c6     node         14,420  2    5.225e-04        1,689.7    0.11718       yes       YES
+   c6     w        11,173,962  2    5.561e-06      176,984.1    0.01584       yes       YES
+
+-- W0.5 CEILING-INVARIANCE (only where BOTH ceilings are box-free and resolved)
+   w      |0.01867 - 0.01584| = 0.00283   bar 0.06  --> PASS (poolable)
+   node   |0.11146 - 0.11718| = 0.00572   bar 0.06  --> PASS (poolable)
+   lay    |0.40833 - 0.46382| = 0.05549   bar 0.06  --> PASS (poolable)
+

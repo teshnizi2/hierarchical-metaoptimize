@@ -13539,3 +13539,186 @@ identified but only the 6 headline cells were scored under registered gates.
 * **L4** The post-hoc any-pair pass matches on **one** network (`pick_network`); a cell whose arms
   share no common network is skipped, so 23.2% is itself a lower bound.
 * **L5** `MASTER-TABLE.md` remains **six cycles stale**. Still recorded, still not fixed.
+
+---
+
+# CYCLE 71 — **ALICE IS BACK.** `bo7`/`bd7` SURVIVED THE OUTAGE AND BOTH SCORE.
+
+## 71.0 THE OUTAGE ENDED, AND THE FIRST THING DONE WAS THE QUEUE AUDIT
+
+Probed **2026-08-24T07:25Z**. Gateway `p-cfer-016105` up; **both** login IPs answer :22;
+`ssh alice` → `nodelogin04`, `ssh alice2` → `nodelogin03`. **Fifteen ticks of outage are over.**
+
+Both queues were **0 RUNNING / 0 PENDING**. FairShare **0.333054** (alice) / **0.333893** (alice2).
+
+**`bo7-*` (12, alice) and `bd7-*` (12, alice2) SURVIVED.** Fifteen ticks recorded their fate as
+UNKNOWN and refused to guess; the answer is that all 24 completed, `RUN_DONE`, before the login
+nodes fell over — the compute nodes were never the thing that was down. CSV **1707 → 1731 runs**,
+**purely additively**: keyed on `(run, job_id)`, **0 of 1707 pre-existing rows changed a single
+field**, and the 37-column header is byte-identical.
+
+## 71.1 `bo7` PASSES EVERY GATE, AND ITS PRIMARY TEST **CONFIRMS** — AS A REPLICATION
+
+`analysis/c71_bd7_bo7_score.py`, **14/14 selftests**, scoring in the order `bin/c54_adamw_ceiling.sh`
+registered in cycle 54. The occupancy statistic is **imported** from `c52_boxfree` and N_eff/m from
+`neff_instrument.reduce_root` — the same functions every published N_eff number came from.
+
+| gate | result |
+|---|---|
+| **W0** validity | **12/12 PASS** — `n_records`=2000, `n_beta` byte-match (62 / 14,420 / 11,173,962), beta moved |
+| **W0.3** box-free | **12/12 PASS** — **0.00 %** of records at *either* guard, all 12 arms |
+| **W0.4** trains-at-all | **12/12 PASS** — `plateau5` 86.45–90.40, none collapsed |
+| **W0.5** ceiling-invariance | **PASS on all three rungs** → the two ceilings are **POOLABLE** |
+
+W0.5, against the registered 0.06 bar: w |0.01867−0.01584| = **0.00283**; node |0.11146−0.11718| =
+**0.00572**; lay |0.40833−0.46382| = **0.05549**. All pass, so W1/W2 are scored on pooled ceilings.
+
+**W1 — THE PRIMARY TEST.** argmin of N_eff/m, VARIANCE instrument, steady half, box-free arms only:
+
+| rung | c2 (HI=+2.0) | c6 (HI=+6.0) | pooled |
+|---|---|---|---|
+| lay | 0.40833 | 0.46382 | 0.43608 |
+| node | 0.11146 | 0.11718 | 0.11432 |
+| **w** | 0.01867 | 0.01584 | **0.01725** |
+
+**argmin = `w`, gap to `node` = 0.09706**, against a registered bar of 0.02 — **DECIDED**, and
+decided the same way at each ceiling separately (gap 0.0928 / 0.1013).
+
+**The registered prediction was `argmin = w, gap > 0.02`, and it is CONFIRMED — but its own
+registration LABELS IT NOT INDEPENDENT**, because it was computed post-hoc on `bo6`'s box-free
+window. **This is a REPLICATION and must never be written as a discovery.**
+
+**The ordering INVERTS with the base optimizer:**
+
+| base | ordering of N_eff/m | argmin |
+|---|---|---|
+| SGDm (`cl5` cU, n=3, the registered control) | node 0.4016 < w 0.5045 < lay 0.7258 | **node** |
+| **AdamW (`bo7`, n=4 pooled)** | **w 0.01725 < node 0.11432 < lay 0.43608** | **w** |
+
+**CONSEQUENCE, AS REGISTERED IN ADVANCE: the nodewise minimum is an SGDm phenomenon.** CORRECTIONS
+70 already carried three scopes (ms=1e−3; 20 epochs; SGDm); this decides the third. Its own
+registration prescribes the action without discretion: **the Adam-mini sentence is DELETED, not
+hedged.** It has been SUSPENDED since cycle 54 — neither writable nor deletable — and is now
+**DELETED**. → CORRECTIONS 101.2
+
+## 71.2 `bo7`'s W2 PUTS A **BASE-OPTIMIZER SCOPE** ON THE CAMPAIGN'S HEADLINE RANGE
+
+W2: weightwise N_eff/m against the published box-free 4-family range **[0.1571, 0.5474]**
+(CORRECTIONS 68, raw endpoints). **`bo7` reads 0.01725 — OUTSIDE, at 0.110× the LOWER endpoint,
+roughly an order of magnitude below the entire published range.**
+
+**NO DIRECTION WAS REGISTERED for W2**, deliberately. Its refutation branch fires:
+
+> the 16 %–55 % range is **SGDm-specific**, and every quotation needs a **base-optimizer column**,
+> on top of the budget column CORRECTIONS 73 already forced.
+
+`bo6`'s post-hoc window read **0.0182** and was written into the job script **in advance precisely
+so it could not later be sold as a prediction**. `bo7`'s c2 arm reads **0.01867** under a
+*verified* box-free ceiling. The post-hoc value replicates; recorded as such, claimed as nothing more.
+
+**Scope, stated against our own interest:** `ms` and `alpha0` are carried over from the SGDm ladder
+**untuned for AdamW** (the job script says so and forbids quoting any `bo7` plateau against an SGDm
+plateau). W1/W2 are N_eff/m statements, not accuracy statements, but the AdamW operating point is
+**not tuned**, and no document may upgrade this to "AdamW retains less information" as a property
+of the optimizer rather than of this operating point.
+
+## 71.3 `bd7` IS **VOID** FOR ITS PRIMARY TEST — THE **LOW** GUARD BINDS, NOT THE CEILING IT VARIED
+
+`bd7` varied the **HI** ceiling (+2.0 vs +6.0) and held **LO = −30** fixed in both. The gate found
+the wall that actually binds is the one the design held constant.
+
+| gate | result |
+|---|---|
+| **D0** validity | **12/12 PASS** — `n_records`=8000, `n_beta` byte-match, beta moved |
+| **D0.3** box-free | **FAIL on 10 of 12** — **37.11–41.86 %** of records at the **LO** guard, **100 % of Q4** |
+| **D0.4** trains-at-all | **FAIL on 2 of 12** — `bd7-w-c6-s0/s1` collapse to **10.000** (chance) |
+| **D0.5** ceiling-invariance | **NOT SCOREABLE** on any rung |
+| **D1** the 80-epoch point | **VOID** |
+
+**The two arms that ARE box-free are exactly the two that collapsed** (`probe_w_c6_s0/s1`, 0.00 %
+at both guards — beta went nowhere because training diverged), and their N_eff/m is **UNRESOLVED**
+(`res=NO`, rho_s = nan). **No `bd7` arm passes both D0.3 and D0.4. There is no interpretable cell.**
+
+**AND THE LO BINDING IS NEW AT 80 EPOCHS — MEASURED, NOT ASSUMED.** Same instrument, same window,
+same guard value, same config (R18/CIFAR-10/SGDm/ms=1e−3), budget the only difference:
+
+| root | budget | arms | LO-bound (≥5 %) | max %rec LO | median %rec LO |
+|---|---|---|---|---|---|
+| `br6` | **40 ep** | 12 | **0** | **0.00** | **0.00** |
+| `bd7` | **80 ep** | 12 (6 c2 + 6 c6) | **10** | **41.86** | **41.21** |
+
+**The −30 floor is box-free at 40 epochs and binding on ~40 % of records at 80.** It was chosen when
+runs were 20 epochs. **The next batch must LOWER THE FLOOR, not raise the ceiling** — `bd7` raised
+the ceiling twice and both ceilings sat above a trajectory that was leaving through the bottom.
+
+**WHAT THIS COSTS.** D1 was to be the third point of the N_eff/m budget curve (20 → 40 → 80) and
+55.6 had written down a POST-HOC-DERIVED expectation before `bd7` was readable (weightwise below
+0.1509 and still falling). The raw 80-epoch readings *are* below 0.1509 and *do* keep falling
+(w 0.05493, node 0.05848, lay 0.44681 at c2). **THEY ARE NOT SCORED AND MAY NOT BE QUOTED.** They
+are measured on arms pinned to the low wall for ~40 % of records and **100 % of the final quarter**,
+which is the steady half N_eff/m is computed on. Reading them would be the exact failure
+CORRECTIONS 75 names — a statistic read past its own uncertainty flag, for the **fifth** time.
+**55.6's expectation remains untested.** → CORRECTIONS 101.3
+
+## 71.4 A CAMPAIGN-WIDE LO-OCCUPANCY CENSUS — AND MOST OF IT IS A **REDISCOVERY**
+
+Every probe root, each scored against **its own** `beta_clip` read from the CSV (not a shared guess):
+
+| root | clip | ep | arms | LO-bound | max %LO | median %LO |
+|---|---|---|---|---|---|---|
+| `bd7` | −30:2.0 / −30:6.0 | 80 | 12 | **10** | 41.86 | 41.21 |
+| `ml5` | −15:−2.3026 | 20 | 36 | 23 | 91.90 | 11.30 |
+| `wc5` | −30:−2.3026 | 20 | 18 | 9 | 76.80 | 68.95 |
+| `ff5` | −15:−2.3026 | 20 | 18 | 14 | 19.10 | 17.25 |
+| `fr5` | −15:−2.3026 | 20 | 12 | 10 | 17.50 | 11.60 |
+| `bl5` `br6` `bo6` `bo7` `cl5` `fz3` `ns5` `p5` `uc5` `uc6` | various | 20–40 | 127 | **0** | 0.00 | 0.00 |
+
+**66 of 235 arms, 5 roots.** But per **STANDING RULE (16)** the corpus must be named before any
+"this is uncited" claim, and naming it demotes most of this:
+
+* **`ml5`'s 91.90 % and `wc5`'s 76.80 % are the `ms=1e−2` rung, ALREADY MEASURED AND TABULATED in
+  FINDINGS 51.1**, and **CORRECTIONS 62 already ruled `ms=1e−2` BOUNDARY-DOMINATED — "not a point
+  on the dial at all."** Those cells are already unquotable. **This is a REDISCOVERY. Claim nothing.**
+* **`fz3` and `p5` share `ml5`'s −15 floor and read 0.00 %** — they are the **frozen-beta** roots,
+  where beta cannot move, so the floor cannot bind. A clean internal control on the census itself.
+* **GENUINELY OPEN, and ranked for next tick:** `ff5` (14/18, max 19.10 %) and `fr5` (10/12, max
+  17.50 %) at **ms below 1e−2**, plus `ml5`'s **`ms=1e−3` weightwise cell at 8.2 %** (FINDINGS 51.1's
+  own table) — all above a 5 % bar, none at a rung CORRECTIONS 62 excludes. **Whether the cycles
+  that used them gated on the LO guard is NOT established here and is not assumed either way.**
+
+## 71.5 THE ACCURACY READ ON `bd7`/`bo7`, REPORTED SEPARATELY AND NOT AS A COMPARISON
+
+`plateau5` (mean of last 5), never `plateau` — on `bo7` `window_ok=0`, so `plateau` is the
+whole-run mean (CORRECTIONS 96.4 / STANDING RULE 14) and is a speed statistic, not an asymptote.
+
+| family | budget / base | weightwise | nodewise | layerwise |
+|---|---|---|---|---|
+| `bd7` c2 | 80 ep, SGDm | 90.677 | **92.112** | 91.025 |
+| `bd7` c6 | 80 ep, SGDm | **10.000 (collapsed)** | **92.142** | 90.961 |
+| `bo7` c2 | 20 ep, AdamW | 88.074 | **89.943** | 88.856 |
+| `bo7` c6 | 20 ep, AdamW | 89.418 | **89.816** | 89.032 |
+
+**Nodewise is the accuracy argmax in 4 of 4 cells**, across both budgets and both base optimizers.
+Pooled over the clip axis (balanced 2+2, so not asymmetric composition per cycle 70's definition),
+`bd7` gives nodewise **92.127 ± 0.019 (n=4)** vs layerwise **90.993 ± 0.051 (n=4)** = **+1.134 pp**
+at **10.4×** the resolution gate, **no seed overlap**.
+
+**THIS IS AN ACCURACY STATEMENT AND IT DOES NOT TOUCH W1.** W1's `w < node < lay` is an ordering of
+**N_eff/m**, a property of the meta-gradient field; the accuracy argmax is nodewise in the same runs.
+**STANDING RULE (13) forbids joining them** — no document may write "the field has structure at
+scale X, therefore partition at scale X". They are reported side by side and left that way.
+
+The `bd7` nodewise result is consistent with 68.6/99.3's CIFAR-100 nodewise peak (+1.821 pp) and
+with cycle 70's corrected CIFAR-10 ladder (+0.846 pp at 6.29×), now at a **third** budget.
+**But `bd7`'s beta trajectories are box-bound at LO on 10/12 arms.** The accuracy numbers are
+unaffected by that (the plateau is what it is, and the runs completed 80/80 epochs), while the
+**field** numbers from the same runs are void. Stated explicitly so the two are not conflated.
+
+## 71.6 LIMITS
+
+* `bo7`'s W1/W2 are **n=2 per ceiling, n=4 pooled**, at **one** network, **one** dataset, **one**
+  budget, **one** `ms`, and an **untuned** AdamW operating point.
+* W1 is a **REPLICATION** of a post-hoc window, by its own registration. It is not independent.
+* `bd7` contributes **nothing** to the N_eff/m budget curve. The curve still has **two** points.
+* The census's `ff5`/`fr5`/`ml5@1e−3` items are **flagged, not adjudicated**.
+* `sp8` and `hz9` were submitted this tick and are **unscored**; no number above depends on them.

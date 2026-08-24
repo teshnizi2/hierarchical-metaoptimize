@@ -216,7 +216,13 @@ if [ -r "$NS5" ]; then
            "--momentum-param-base 0.99" "--batch-size 100" "5e-4"; do
     grep -q -- "$f" "$NS5" || { echo "GUARD FAIL: '$f' absent from the ns5 control"; exit 1; }
   done
-  grep -q -- 'EPOCHS=20' "$NS5" || {
+  # c52_nodemin_onset.sh writes the budget INLINE (`--num-epochs 20`, line 219) rather
+  # than as an EPOCHS= variable, which br6's script happens to use.  Grepping only the
+  # variable spelling made this guard a FALSE NEGATIVE (cycle 71: the ASSERTION was
+  # wrong, not the code).  Accept either spelling; the INTENT -- ns5 must be a 20-epoch
+  # batch, so that sp8 at 40 is a doubling -- is unchanged and is independently true:
+  # all 15 ns5 rows in results/all_runs.csv have epochs_requested == epochs_done == 20.
+  grep -qE -- '(EPOCHS=20|--num-epochs 20)' "$NS5" || {
     echo "GUARD FAIL: ns5 is not a 20-epoch batch -- this is not a budget doubling"; exit 1; }
   echo "guard 3: ns5 control is R18/CIFAR10/SGDm/Lion, ms=5e-4 present, 20 epochs  OK"
 else

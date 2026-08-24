@@ -54,6 +54,54 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 71) -- **ALICE IS BACK. `bo7`/`bd7` SURVIVED. THE Adam-mini SENTENCE IS DELETED.**
+
+**Read `docs/CORRECTIONS.md` 101 and `docs/FINDINGS.md` 71.0-71.6 FIRST. 101.2 DELETES a sentence
+suspended since cycle 54; 101.3 rescopes the campaign's headline range; 101.5 adds STANDING RULE (18).**
+
+* **THE OUTAGE IS OVER.** Probed **2026-08-24T07:25Z**: gateway up, both login IPs answering :22,
+  `ssh alice` -> `nodelogin04`, `ssh alice2` -> `nodelogin03`. Both queues were **0 R / 0 P**.
+  **`docs/` HAS BEEN RSYNCED to both clusters** -- the six-cycle lag is cleared.
+* **`bo7-*` (12) AND `bd7-*` (12) SURVIVED THE OUTAGE.** Fifteen ticks recorded their fate as
+  UNKNOWN; all 24 completed `RUN_DONE` before the login nodes fell. The compute nodes were never
+  down. **CSV 1707 -> 1731 runs, PURELY ADDITIVELY** (0 of 1707 pre-existing rows changed a field,
+  keyed on `(run, job_id)`; 37-column header byte-identical).
+* **SUBMITTED 18 JOBS:** `hz9` (9, alice) + `sp8` (9, alice2), the two batches fifteen ticks called
+  "written, validated, UNSUBMITTED". All guards re-run live and passed. **CANCELLED: nothing.**
+  At tick end alice **9 R / 0 P**, alice2 **6 R / 0 P** (3 `sp8-lay` COMPLETED 40/40, verified in
+  the `.out`). **`cp9` NOT submitted** -- needs `patches/patch_probe6_coord.py` on the cluster first.
+* **`bo7` PASSES EVERY GATE** (W0 12/12, W0.3 box-free **12/12 at 0.00%**, W0.4 12/12, W0.5 all
+  three rungs -> ceilings POOLABLE). New instrument `analysis/c71_bd7_bo7_score.py`, **14/14
+  selftests**, occupancy IMPORTED from `c52_boxfree` and N_eff from `neff_instrument.reduce_root`.
+* **W1 DECIDED: argmin of N_eff/m = `w`, gap 0.09706 vs a 0.02 bar.** The ordering **INVERTS** with
+  the base optimizer -- SGDm `node 0.4016 < w 0.5045 < lay 0.7258`, AdamW **`w 0.01725 < node
+  0.11432 < lay 0.43608`**. **THE nodewise MINIMUM IS AN SGDm PHENOMENON, so the Adam-mini sentence
+  suspended since cycle 54 is DELETED, not hedged.** **CONFIRMATION IS LABELLED NOT INDEPENDENT by
+  its own registration -- it REPLICATES a post-hoc window and is never a discovery.**
+* **W2: THE HEADLINE RANGE GAINS A BASE-OPTIMIZER SCOPE.** Weightwise N_eff/m under AdamW is
+  **0.01725** against the published **[0.1571, 0.5474]** -- **OUTSIDE, 0.110x the lower endpoint.**
+  Write **"at a 20-epoch budget, under SGDm"**. Under AdamW it is **1.7%**. (ms/alpha0 are UNTUNED
+  for AdamW; this is the operating point, not a property of the optimizer.)
+* **`bd7` IS VOID.** It varied the HI ceiling and fixed **LO=-30**; **D0.3 fails on 10/12 at the LO
+  guard** (37-42% of records, **100% of Q4**). The only 2 box-free arms are the 2 that **COLLAPSED
+  to 10.000**, N_eff UNRESOLVED. **No arm passes both gates; D1 VOID; the budget curve still has
+  TWO points.** The binding is **new at 80 epochs**: `br6` at 40ep is **0.00% on 12/12**, same
+  instrument/guard/config. **The raw 80-ep numbers are NOT quoted** (they would confirm 55.6, which
+  is exactly why quoting them would repeat CORRECTIONS 75's failure a fifth time).
+  **The re-run must LOWER THE FLOOR (LO ~ -60), not raise the ceiling.**
+* **STANDING RULE (18), added 101.5:** *a box-free gate must be scored at BOTH guards, and a batch
+  varying one guard must assert the OTHER is non-binding AT ITS OWN BUDGET.*
+* **ACCURACY, reported SEPARATELY from the field (STANDING RULE 13 forbids joining them):** nodewise
+  is the argmax in **4 of 4** cells across both budgets and both bases; `bd7` nodewise **92.127
+  +-0.019 (n=4)** vs layerwise **90.993 +-0.051** = **+1.134 pp at 10.4x the gate**, no seed overlap.
+* **THE LO CENSUS IS MOSTLY A REDISCOVERY (101.6).** 66/235 arms LO-bound, but `ml5`'s 91.9% and
+  `wc5`'s 76.8% are the `ms=1e-2` rung **already in FINDINGS 51.1 and already excluded by
+  CORRECTIONS 62**. Open and flagged only: `ff5` (14/18), `fr5` (10/12), `ml5@1e-3` (8.2%).
+* **TOP OFFLINE JOB: `docs/MASTER-TABLE.md`, deferred a THIRD time, still six cycles stale.**
+  Do not defer it a fourth.
+
+## Superseded -- cycle 70 (kept for the record)
+
 ## Running / next (cycle 70) -- **ALICE DOWN A FIFTEENTH TICK. CROSS-NETWORK POOLING DOES NOT REACH CYCLE 65's LADDER: K2's NUMERATOR IS CLEAN.**
 
 **Read `docs/CORRECTIONS.md` 100 and `docs/FINDINGS.md` 70.0-70.7 FIRST. 100.4 records two things

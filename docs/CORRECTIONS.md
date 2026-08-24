@@ -4457,3 +4457,130 @@ and no ORPHAN census — 98.2/98.3 discharged the latter campaign-wide last tick
 `MASTER-TABLE.md` is **six cycles stale** and is now the top offline job, ahead of extending this
 audit to the 45 identified contaminated pairs. `hz9`, `sp8`, `cp9` remain the top submit-queue
 items the moment ALICE returns, in that order.
+
+---
+
+## 101. DECISION RECORD — cycle 71 (**ALICE IS BACK**; 18 jobs submitted; `bo7`/`bd7` scored)
+
+### 101.0 THE TICK'S DECISION, AND WHY
+
+Reachability probed **2026-08-24T07:25Z**: gateway up, **both** login IPs answering :22, both
+accounts logging in. **The fifteen-tick outage is over.** Both queues **0 R / 0 P**.
+
+With compute idle and a fifteen-cycle backlog, the order was forced rather than chosen:
+**(1)** audit both queues, **(2)** rsync `docs/` — six cycles stale on the cluster — **(3)** get
+jobs running, because an idle GPU is the only irrecoverable cost here, **(4)** score the 24 runs
+that had been sitting unread since cycle 54. All four were done.
+
+**SUBMITTED: 18 jobs.** `hz9` (9, alice, `bin/c58_tuned_horizon.sh`) and `sp8` (9, alice2,
+`bin/c55_span_dissociation.sh`) — the two batches fifteen ticks called "written, validated,
+UNSUBMITTED". All guards re-run live at submit time and passed. **CANCELLED: nothing.**
+Queue at tick end: alice **9 R / 0 P**, alice2 **6 R / 0 P** (3 `sp8-lay` already COMPLETED, 40/40
+epochs, `RUN_DONE` — verified in the `.out`, not assumed from the elapsed time).
+
+`cp9` (8, alice) was **NOT** submitted: it needs `patches/patch_probe6_coord.py` applied on the
+cluster first, and its ranking should be re-read against 101.2/101.3 rather than carried forward
+unexamined. It is the top submission candidate next tick, after that patch.
+
+### 101.1 A GUARD IN `sp8` WAS A **FALSE NEGATIVE**, AND THE FIX IS RECORDED BECAUSE IT LOOKS LIKE THE DANGEROUS MOVE
+
+`sp8`'s guard 3 aborted with *"ns5 is not a 20-epoch batch — this is not a budget doubling."*
+It greps `c52_nodemin_onset.sh` for `EPOCHS=20`. **That script writes the budget INLINE**
+(`--num-epochs 20`, line 219) and has no `EPOCHS=` variable; its sibling guard for `br6` works only
+because `c53_budget_replication.sh` happens to use the variable spelling.
+
+**Editing a guard so a batch will submit is exactly the move guards exist to stop**, so the
+evidence is recorded rather than the conclusion: (a) `c52_nodemin_onset.sh:219` reads
+`--num-epochs 20`; (b) that script's *own* guard greps for the string `num-epochs 20`; (c) all
+**15** `ns5` rows in `results/all_runs.csv` have `epochs_requested == epochs_done == 20`.
+**ns5 is a 20-epoch batch on three independent readings.** The guard's *intent* was satisfied and
+its *assertion* was wrong — the cycle-91/92 pattern, now on its sixth occurrence. Fix: accept
+either spelling, `grep -qE '(EPOCHS=20|--num-epochs 20)'`. The bar was not loosened.
+
+### 101.2 **THE SUSPENDED Adam-mini SENTENCE IS DELETED.** `bo7` W1 CONFIRMS, AS A REPLICATION
+
+`bo7` passes **W0 12/12, W0.3 box-free 12/12 at 0.00 %, W0.4 12/12, W0.5 on all three rungs**, so
+the two ceilings pool and W1/W2 are interpretable on a licence that was *measured*, not assumed.
+
+**W1: argmin of N_eff/m = `w`, gap 0.09706 against a 0.02 bar — DECIDED**, and decided identically
+at each ceiling alone. The ordering **inverts** with the base optimizer: SGDm gives
+`node 0.4016 < w 0.5045 < lay 0.7258`; AdamW gives `w 0.01725 < node 0.11432 < lay 0.43608`.
+
+The registered consequence is not discretionary and is executed here: **the nodewise minimum is an
+SGDm phenomenon**, and the sentence CORRECTIONS 70 called *"the most paper-relevant thing since the
+sign-agreement measurement"* — that the Adam-mini / Adalayer / SGG line partitions at
+nodewise-or-coarser and that this is "the worst available partition" — **is DELETED, not hedged.**
+It has been SUSPENDED since cycle 54. **It may now not be written at all.**
+
+**The confirmation is LABELLED NOT INDEPENDENT by its own registration** (computed post-hoc on
+`bo6`'s box-free window). **It is a REPLICATION. No document may present it as a discovery.**
+Scope unchanged and repeated: we measure `z`, they argue about `G`. **Never write "we refuted
+Adam-mini."**
+
+### 101.3 **W2 PUTS A BASE-OPTIMIZER SCOPE ON THE HEADLINE RANGE** — 16 %–55 % IS AN SGDm NUMBER
+
+Weightwise N_eff/m under AdamW is **0.01725**, against the published box-free 4-family range
+**[0.1571, 0.5474]** — **OUTSIDE, at 0.110× the lower endpoint.** No direction was registered.
+Its refutation branch fires: **every quotation of "16 %–55 % of the independent information their
+count implies" now needs a BASE-OPTIMIZER column on top of the budget column CORRECTIONS 73 forced.**
+
+Write it as **"at a 20-epoch budget, under SGDm"**. Under AdamW at the same network, dataset, `ms`
+and `alpha0` it is **1.7 %**.
+
+**Against our own interest:** `ms`/`alpha0` are **untuned for AdamW**, so this is a statement about
+this operating point, not a property of the optimizer, and may not be upgraded to one.
+
+### 101.4 **`bd7` IS VOID**, AND THE REASON IS A WALL THE DESIGN HELD CONSTANT
+
+`bd7` varied HI (+2.0 vs +6.0) and fixed **LO = −30**. **D0.3 fails on 10 of 12 arms at the LO
+guard** — 37.11–41.86 % of records, **100 % of Q4**. The only two box-free arms are the two that
+**collapsed to 10.000** (D0.4 FAIL) and whose N_eff/m is **UNRESOLVED**. **No arm passes both
+gates. D1 is VOID and the N_eff/m budget curve still has two points, not three.**
+
+**The binding is NEW AT 80 EPOCHS AND MEASURED:** `br6` at 40 epochs, same instrument, same guard,
+same config, is **0.00 % LO-bound on 12/12**; `bd7` at 80 is **41.21 % median**. **The −30 floor
+is adequate at 40 epochs and not at 80.**
+
+**THE RAW 80-EPOCH NUMBERS ARE NOT QUOTED.** They fall below 0.1509 and keep falling, which is
+exactly what 55.6 wrote down in advance — and quoting them would be reading a statistic past its
+own uncertainty flag, the failure CORRECTIONS 75 has now catalogued **five** times. **55.6's
+expectation is UNTESTED.** The re-run must **LOWER THE FLOOR** (LO ≈ −60), not raise the ceiling.
+
+### 101.5 STANDING RULE (18)
+
+> **A box-free gate must be scored at BOTH guards, and a batch that varies one guard must assert
+> that the OTHER guard is non-binding AT ITS OWN BUDGET.** `bd7` varied the ceiling twice while the
+> trajectory left through the floor, and a floor verified box-free at 40 epochs was carried to 80
+> without re-testing. A guard checked at one budget is a fact about that budget.
+
+### 101.6 THE LO CENSUS IS MOSTLY A REDISCOVERY, AND IS LABELLED AS ONE
+
+66 of 235 probe arms across 5 roots are LO-bound at ≥5 %. Naming the corpus (**STANDING RULE 16**)
+demotes most of it: **`ml5`'s 91.90 % and `wc5`'s 76.80 % are the `ms=1e−2` rung, already tabulated
+in FINDINGS 51.1 and already ruled BOUNDARY-DOMINATED by CORRECTIONS 62.** Nothing is claimed
+there. `fz3`/`p5` share the −15 floor and read 0.00 % because they are **frozen-beta** — an
+internal control on the census.
+
+**Genuinely open, flagged not adjudicated:** `ff5` (14/18, max 19.10 %), `fr5` (10/12, max 17.50 %),
+and `ml5`'s `ms=1e−3` weightwise cell at **8.2 %** — all below `ms=1e−2` and all above a 5 % bar.
+**Whether the cycles using them gated on LO is NOT established and is NOT assumed.**
+
+### 101.7 WHAT DID **NOT** GET DONE, AND IT IS THE SAME ITEM AS LAST TICK
+
+**`docs/MASTER-TABLE.md` is still SIX cycles stale** and was deferred a **third** time. The tick
+was consumed by the reconnect: queue audit, two submissions, 24 runs scored against gates written
+fifteen ticks ago, and a void finding that needed its own budget control. **It is now the top
+offline job and should not be deferred a fourth time** — STANDING RULE (15) makes it the mandatory
+grep target before any cross-granularity claim, and 71.5 has just added another such claim.
+
+`docs/` **was** rsynced to both clusters this tick, clearing the six-cycle lag.
+
+### 101.8 NEXT TICK, IN ORDER
+
+(a) `squeue` both accounts; score `hz9` **H0 → H0.3 → H0.5 → H1 → H1b → H2** (H0.5 can only VOID)
+and `sp8` **S0 → S0.3 → S0.4 → S0.5 → S1** (S0.5 can only VOID).
+(b) **MASTER-TABLE refresh.** Third deferral; do not make it a fourth.
+(c) `cp9` after applying `patches/patch_probe6_coord.py` on the cluster.
+(d) The `bd7` re-run at **LO = −60**, 80 epochs — the only way to get the third budget point.
+(e) The `ff5`/`fr5`/`ml5@1e−3` LO items from 101.6.
+(f) **DONE, do not re-run:** `bo7` (all gates), `bd7` (void, and the void is established).
