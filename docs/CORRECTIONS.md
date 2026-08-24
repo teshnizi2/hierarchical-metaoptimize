@@ -4621,3 +4621,43 @@ read from the script's own `BOX=` line. **51/51 selftests still pass.** No bar a
 at 30–40 ep, because the `w` rung is strongly non-monotone (0.0092 → 0.5073 → 0.1201) while `node`
 is flat (0.0217 → 0.4074 → 0.2768). **The rise-then-fall mechanism is POST-HOC in its detail and
 no gate rests on it** — it earns a confirmation test, not a claim.
+
+### 101.10 `bf8` SUBMITTED — THE 80-EPOCH POINT, RE-RUN AT A LOWERED **FLOOR**, WITH A DIRECTION REGISTERED AGAINST THIS TICK'S OWN RESULT
+
+`bin/c71_floor_budget.sh`, **12 jobs on alice2**, `bf8-*`, 80 epochs, all 8 guards passing live.
+Byte-identical to `bd7` except the clip: **LO ∈ {−60, −90}, HI FIXED at +2.0**, rungs w/node/lay,
+seeds 0–1. HI is fixed on `bd7`'s own evidence — its HI=+6.0 weightwise arms collapsed 2/2 while
+node/lay were indifferent, so its D0.4 branch says the ceiling ladder must go **down**, not up.
+
+**THE FLOOR IS SIZED FROM MEASUREMENT AND THEN NOT TRUSTED.** `beta_true_min` descends
+**−0.495/epoch** (measured on `br6` 40 ep and `bd7` 80 ep), projecting to **−46.4** at 80 epochs,
+and the guard cross-checks that rate against `bd7`'s *observed* bind epoch. **But STANDING RULE (7)'s
+corollary forbids funding a batch on an extrapolated headroom**, so the projection is not used to
+pick one "low enough" floor: the batch runs **two floors and MEASURES** the floor-dependence (F0.5),
+exactly as `bd7` ran two ceilings — on the axis that actually binds.
+
+**F2 REGISTERS A DIRECTION AGAINST 71.7, THIS TICK'S OWN RESULT.** The span band was fit on eight
+cells, none at 80 epochs. `bf8` is `br6`'s `ms` at double the budget, so its span must exceed
+`br6`'s 17.52 and sit further above the band. **PREDICTION: argmin = `w`, gap/SE ≥ 2.** An
+`argmin = node` **REFUTES the band as a function of span alone** and **WITHDRAWS 101.9's "one
+scalar" claim** — the eight-cell fit would then have been confounded with budget after all.
+Registered before the data exists, so it cannot be fitted afterwards.
+
+### 101.11 A GUARD SILENTLY READ THE **WRONG CSV**, AND IT FAILED IN THE SAFE DIRECTION BY LUCK
+
+`bf8`'s throughput guard is fed to `python3` **on stdin** via heredoc, so `__file__` is the literal
+string `'<stdin>'` and `os.path.abspath('<stdin>')` resolves against the **CWD**. The guard's
+`dirname(__file__)/../results/all_runs.csv` therefore pointed at
+`~/metaopt/results/all_runs.csv` — a **stale Aug-20 file** with no `bd7` rows — while the intended
+`~/metaopt/hierarchical-metaoptimize/results/all_runs.csv` sat unread.
+
+**It aborted the batch, so it failed loudly. That was luck, not design.** A guard reading a stale
+corpus can as easily return a plausible PASS, and this one sizes a wall-clock request: a false PASS
+truncates twelve 80-epoch runs. Fixed by passing the path in **from bash**
+(`CSVP="$(cd "$(dirname "$0")/.." && pwd)/results/all_runs.csv"`, with a readability check), never
+deriving it from `__file__` inside a stdin heredoc. The failure message now names the file it read.
+
+**This is the campaign's recurring failure in a new place** — a statistic computed against the wrong
+corpus (STANDING RULE 16's subject at the level of documents, and 96.6's at the level of cycles).
+**Any heredoc-fed guard in `bin/` that derives a path from `__file__` has this bug.** Not swept this
+tick; recorded as a ranked follow-up.
