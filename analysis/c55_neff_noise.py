@@ -133,6 +133,11 @@ BOXES = {
     # is not a dose.  REGISTERED BEFORE ANY bf9 JOB COMPLETED -- read from the script's
     # own LO=/HI= lines, not from the data (CORRECTIONS 102.4).
     "bf9:f60": (-60.0, 2.0, "bin/c73_bf9_probe5.sh:112"),
+    # cycle-74 TUNED weightwise operating point, with the instrument on.  This is
+    # NOT a new box: it is `wm9`'s box, which is in turn the rs-/ms- reference
+    # signature (-15, -2.3026) that p5/fr5/fz3/ml5/ff5 all sit in.  Registered
+    # BEFORE ANY tw0 JOB WAS SUBMITTED, read from the script's own CLIP= line.
+    "tw0":  (-15.0, -2.3026, "bin/c74_tuned_weightwise_probe.sh:CLIP"),
 }
 
 
