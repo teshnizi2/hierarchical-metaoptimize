@@ -14454,3 +14454,165 @@ shape is confounded.** A per-K `ms` sweep is 5× the jobs and was not bought.
 
 **`ck1` RUNS ON ALICE ONLY.** alice2's `HF.py` does not carry `PATCH_CHUNKWISE` (nor PATCH_PROBE4 /
 PATCH_SCHED — pre-existing drift, gotcha 10). Guard 1d fails closed on any account without it.
+
+---
+
+# 75 — CYCLE 76. THE CHUNK LADDER LANDS. "GRANULARITY" IS NOT ONE AXIS.
+
+All 21 jobs of `at1` (6) and `ck1` (15) completed at 100/100 epochs. CSV **1792 → 1813 purely
+additively** (0 pre-existing rows changed a field, header byte-identical). **CANCELLED: nothing.**
+Scorer `analysis/c75_ck1_score.py` registered at **74/74 selftests and COMMITTED before any ck1
+verdict was read**, every constant asserted against `bin/c75_chunk_ladder.sh`'s own text.
+`c75_at1_score.py` (52/52) was registered last cycle. **ORPHAN AUDIT: 119 families, 0 orphans.**
+
+## 75.0 `ck1` — VALIDITY, AND THE ANCHOR THAT LICENSES THE REST
+
+K0 15/15, K0.2 **15/15 with `n_beta` exactly m(K) on every one of 10,000 records per arm**,
+K0.3 15/15, K0.4 **15/15 box-free at 0.0000 on all four occupancy columns**.
+
+**K1 (THE ANCHOR, COULD ONLY VOID) REPRODUCES.** chunk1 is weightwise BITWISE, and it reads
+**90.979 ±0.131 (n=3)** against `tw0`'s **91.234 (n=3)** — diff **−0.255 pp**, inside the ±0.50 bar.
+`PATCH_CHUNKWISE` is inert at the endpoint it is bitwise-equal to, in a real 100-epoch run and not
+only in the unit test. K2–K4 are therefore readable. **The margin is half the bar, not comfortable**;
+that −0.255 is used again below as a batch-offset meter rather than being waved away.
+
+## 75.1 **K2 REFUTES — AND THAT IS THE TICK'S HEADLINE**
+
+| arm | m | partition | plateau5 | n |
+|---|---|---|---|---|
+| chunk1024 | 10,944 | contiguous flat chunks | **92.526 ±0.077** | 3 |
+| nodewise (`tw0`) | 14,420 | output channels | **91.961 ±0.044** | 3 |
+
+diff **+0.565 pp**, outside the registered ±0.50 bar → **REFUTES**. SE 0.089, **t = 6.38, RESOLVED**.
+In the words registered before the data existed: **partition structure matters at fixed m; the ladder
+is a curve in two variables, and every "granularity" statement in this campaign needs the partition
+named alongside the count.**
+
+## 75.2 THE DECOMPOSITION — HOW MUCH OF +0.565 IS ACTUALLY THE PARTITION
+
+`analysis/c76_partition_vs_count.py` (**27/27**, registered this cycle). K2's two arms differ by 24 %
+in m as well as in partition, so the raw number is not yet a partition statement. The count is
+removed by interpolating ck1's OWN chunk curve to m = 14,420 — an **interpolation**, since 14,420
+lies strictly between chunk1024 (10,944) and chunk128 (87,303), which is why a local secant is used
+and not a global 5-point fit whose slope varies 0.35–0.83 pp/decade.
+
+| component | pp |
+|---|---|
+| raw K2 contrast | +0.565 |
+| explained by the **count** | **+0.049** |
+| **residual = the PARTITION** | **+0.517** |
+
+**The count explains under a tenth of it.** t vs the two arms' seed noise = 5.83, and that t is an
+**upper bound** on the confidence because it treats the secant as exact, which it is not.
+
+**THE CROSS-BATCH OFFSET, REPORTED AS A SENSITIVITY AND NOT APPLIED.** chunk1024 is a `ck1` run and
+nodewise a `tw0` run. K1 measures that offset directly, because chunk1 and tw0's weightwise are
+bitwise the same configuration: **−0.255 pp, SE 0.146, t = 1.74 — NOT resolved from zero.** It is
+therefore **not applied**; correcting by an unresolved offset manufactures precision. Applying it
+would move the residual **+0.517 → +0.771, AWAY from zero**, so **the uncorrected primary is the
+conservative one.**
+
+**WHAT IS STILL NOT CONTROLLED, STATED WITH THE RESULT.** At matched m the MEAN group size is
+identical by construction (774.9 weights), but the **size DISTRIBUTION** is not: nodewise's groups
+are heterogeneous per-layer channel counts, chunk's are uniform at K bar ragged tails. So 75.1–75.2
+support **"the partition matters"**, and do **NOT** yet support "architecture ALIGNMENT matters".
+Separating those needs a permuted partition carrying nodewise's exact size multiset. Not run.
+
+## 75.3 K3 CONFIRMS — THE THREE-DECADE HOLE HAS NO STRUCTURE IN IT
+
+| K | m | plateau5 | sem | n |
+|---|---|---|---|---|
+| 1 | 11,173,962 | 90.979 | 0.131 | 3 |
+| 2 | 5,586,981 | 91.095 | 0.024 | 3 |
+| 16 | 698,373 | 91.411 | 0.277 | 3 |
+| 128 | 87,303 | 92.159 | 0.063 | 3 |
+| 1024 | 10,944 | 92.526 | 0.077 | 3 |
+
+Every adjacent step is positive (+0.115, +0.316, +0.748, +0.367) — **monotone non-decreasing, no
+inversion anywhere**. CORRECTIONS 104.8's three-decade hole is filled and **it is smooth**: the
+fine-end accuracy cost rises steadily as the partition is refined, with no threshold, no knee and no
+non-monotone structure hiding inside it. **1.547 pp across three decades of m, ≈0.51 pp/decade.**
+
+## 75.4 K4 — THE FIELD, DESCRIPTIVE, NO DIRECTION REGISTERED
+
+| K | m | pbar | a_raw | a_deb | bias_share | N_eff/m |
+|---|---|---|---|---|---|---|
+| 1 | 11,173,962 | 0.49884 | 0.50117 | 0.50091 | 0.217 | 0.0159 ±0.0009 |
+| 2 | 5,586,981 | 0.49838 | 0.50163 | 0.50120 | 0.265 | 0.0191 ±0.0004 |
+| 16 | 698,373 | 0.49666 | 0.50345 | 0.50219 | 0.365 | 0.0441 ±0.0022 |
+| 128 | 87,303 | 0.49226 | 0.50922 | 0.50640 | 0.305 | 0.0405 ±0.0005 |
+| 1024 | 10,944 | 0.48687 | 0.52280 | 0.51970 | 0.136 | 0.0368 ±0.0012 |
+
+`a_raw` falls monotonically with m inside a **single partition family** — the first agreement curve
+in this campaign that varies only the group count with the partition held fixed.
+**d log N_eff / d log m = 0.873** over the chunk range, against `tw0`'s 0.686 over the outer range;
+independence would give 1.000 and full sharing 0.000, and **neither limit is the data**.
+**The fall is partly MECHANICAL** (a coarse coordinate's meta-gradient is a sum over many fine ones,
+and the sign of a sum is more consistent than the sign of a summand), so the monotone fall alone is
+arithmetic, not physics. No independence null is derived. **The "53.1 %" sentence is not reproduced.**
+
+**K4b, registered:** chunk1024's `a_raw` **0.52280** vs nodewise@1e-4's **0.53836** → **−0.01556**,
+outside the inherited 0.01 tolerance. **The field moves with the PARTITION at nearly fixed m too** —
+K2's verdict, independently, in the instrument rather than the accuracy.
+
+## 75.5 `at1` — A2 CONFIRMS, WITH A BIND THAT MUST BE REPORTED ALONGSIDE IT
+
+A0 6/6, A0.2 6/6. **A1 (could only VOID) REPRODUCES on both arms**: blk6@1e-4 **92.449 ±0.066** vs
+ref 92.652 (−0.203); node@3e-4 **92.564 ±0.113** vs ref 92.450 (+0.114). The probe is inert here too.
+
+**A2 CONFIRMS.** The tuned ladder's agreement is monotone in block size across four rungs:
+
+| rung | m | a_raw | source |
+|---|---|---|---|
+| blk6 | 6 | **0.70432** | at1 |
+| lay | 62 | 0.65693 | tw0 |
+| node | 14,420 | **0.53368** | at1 |
+| w | 11,173,962 | 0.50117 | tw0 |
+
+blk6 > lay ✓ and node strictly inside (0.50117, 0.65693) ✓. **A2b:** node@3e-4 vs node@1e-4 is
+**−0.00468**, inside tolerance → `a_raw` reads as a function of m, not of ms.
+
+**THE BIND, REPORTED BECAUSE IT IS INCONVENIENT AND NOT DESPITE IT.** A0.3 puts **nodewise@3e-4
+BOUND at the LOWER guard on 3/3 seeds** (`rec_lo` 0.4528–0.4599; `coord_lo` 0.034, i.e. 3.4 % of
+(record, coordinate) cells). blk6 is free 3/3. `tw0`'s nodewise at **1e-4** was box-free 3/3 in the
+same box, so **raising `ms` from 1e-4 to 3e-4 is what drives nodewise into the floor.** A2's node
+point therefore comes from a cell the campaign's own primary gate calls BOUND.
+
+**What rescues A2's reading is A2b, and it is a control that came free:** the bound cell (node@3e-4)
+and the free cell (node@1e-4) give `a_raw` within **0.005** of each other at the same m. So this
+floor bind does not detectably move `a_raw`. That is evidence, not an excuse — but **the bind is on
+the record, and any future use of at1's node arm must carry it.**
+
+## 75.6 SUBMITTED — 12 JOBS, 0 CANCELLED, BOTH ON ALICE
+
+**`mm1` (6, `bin/c76_matched_m_partition.sh`)** — the matched-COUNT partition contrast, which
+replaces 75.2's interpolation with a measurement and removes the cross-batch offset entirely by
+running both arms in ONE batch. **m(777) = 14,421 against nodewise's 14,420 — ONE group apart, 6.9e−5
+relative, mean group size 774.8 vs 774.9.** Guard 4 **MEASURED both counts from the ALLOCATED beta on
+the real built network** before submitting, and asserted the formula agrees with the allocation.
+
+* **M1 (PRIMARY, WITHIN-BATCH):** D = plateau5(chunk777) − plateau5(nodewise).
+  **PREDICTS D > +0.30** → the partition matters at matched count and 75.2's +0.517 is real.
+  **REFUTES if D ≤ +0.15, INCLUDING NEGATIVE** → K2's +0.565 was carried by the count difference
+  and/or the batch offset, and "granularity == the count" survives.
+  **(+0.15, +0.30] IS REGISTERED IN ADVANCE AS UNDECIDED**, so a result in the gap cannot be
+  squeezed into either verdict afterwards.
+* **M2 the batch-offset meter — and it CANNOT void M1**, which is within-batch and immune to any
+  common offset. Written down this way *before* the data so a VOID cannot later be used to discard
+  an inconvenient M1.
+* **M3 the field at exactly matched m. DESCRIPTIVE, no direction registered.**
+* **STATED RISK:** nodewise is read at ms=1e-4, which is **not** its own argmax (3e-4). That is
+  deliberate — M1 must be K2's contrast with the confounds removed, not a different contrast — so
+  **a confirmed M1 is a statement at ms=1e-4, not at each partition's own optimum.**
+
+**`cx2` (6, `bin/c76_chunk_coarse_extension.sh`)** — chunk{8192, 65536}, m = **1,407** and **220**,
+re-measured from the allocated beta. Completes 62 ↔ 11,173,962 as a **seven-rung continuum in one
+partition family with one knob**. Guard 4 also re-verified the endpoint identity **chunk2^24 ==
+layerwise, m=62 bitwise**, which is what makes X2 an inside-one-family comparison.
+
+* **X1:** K3's monotone rise must continue 1024 → 8192 → 65536, ties ±0.15, chained onto 92.526.
+* **X2 (ONE-SIDED, registered):** **PREDICTS both ≤ 92.887 + 0.15** — the chunk curve converges to
+  layerwise from below. **REFUTES if either exceeds it** → the chunk family has an interior optimum
+  **above the best rung of the entire tuned ladder**, reached by a knob that ignores architecture.
+  **Landing below confirms nothing interesting and must not be reported as a positive finding.**
+* **X3 the field at m=1,407 and 220. DESCRIPTIVE.**

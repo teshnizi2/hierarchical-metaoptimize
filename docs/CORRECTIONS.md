@@ -5141,3 +5141,137 @@ fail cannot pass, and a test whose noise floor is the size of its effect is not 
 copy refreshed at `patches/HF_patched.py`, 624 lines, 14 PATCH markers). The 6 running `at1` jobs
 imported the module before the edit and are unaffected; the added branches are unreachable for every
 pre-existing configuration, so even a Slurm requeue would take unchanged code paths.
+
+---
+
+# 105 — CYCLE 76. "GRANULARITY" IS TWO VARIABLES, NOT ONE. THE COUNT EXPLAINS A TENTH OF IT.
+
+## 105.1 BOOKKEEPING
+
+Both queues **0 R / 0 P on arrival**. `at1` (6) and `ck1` (15) all complete at 100/100 epochs.
+CSV **1792 → 1813 purely additively** (0 of 1792 pre-existing rows changed a field, header
+byte-identical). **CANCELLED: nothing.** **QUEUE AUDIT: no job to classify — both queues empty,
+so there was nothing to cancel, nothing stuck, and nothing pending on a superseded question.**
+
+`analysis/c75_ck1_score.py` was written, selftested at **74/74** and **git-committed BEFORE any ck1
+number was read** (commit 2cc8b22, ahead of the scoring commit 2f4260b) — STANDING RULE 19 observed
+in the strict order, not merely claimed afterwards. Gates were scored in the registered sequence
+K0 → K0.2 → K0.3 → K0.4 → K1 → K2 → K3 → K4 → K4b, with K1 first because a VOID there voids the batch.
+
+**ORPHAN AUDIT: 119 families, 0 orphan families, 0 orphan runs.** My first pass reported 181
+orphans; that was **my regex, not a regression** — it split run names on `-` only, so every
+underscore-named run (`I1_blk6_s0`, `fx_adamw_1e-4_s2`) became its own "family". Corrected to the
+leading-token grouping that reproduces the documented 117, giving 119 with `at1` and `ck1` added.
+Recorded because a bad audit tool that reports a crisis is itself a finding.
+
+## 105.2 **K2 REFUTED, AND THE REFUTATION IS THE RESULT**
+
+`ck1` was built to fill the three-decade hole between nodewise and weightwise. It did that (105.3),
+but the gate that mattered is **K2**, and K2 **refuted its own registered prediction**:
+
+> chunk1024 (m=10,944, contiguous flat chunks) **92.526 ±0.077** vs nodewise (m=14,420, output
+> channels) **91.961 ±0.044** at the same ms — **+0.565 pp**, outside the ±0.50 bar, **t = 6.38**.
+
+The registered refutation text, written before the data existed, was: *"partition structure matters
+at fixed m, the ladder is a curve in two variables, and every granularity statement in the campaign
+needs the partition named alongside the count."* **That is now the campaign's position.**
+
+**IT WAS REGISTERED AS THE MORE INTERESTING OUTCOME IN ADVANCE, WHICH CUTS BOTH WAYS.** `ck1`'s
+header says so explicitly. A refutation that the experimenter pre-declared "more interesting" is a
+refutation the experimenter had an interest in, and that is exactly the structure CORRECTIONS 103.7
+put on the record for `tw0`. What defends it here is that the bar was **two-sided and symmetric**
+(±0.50 either way), the effect cleared it in the direction that makes MORE work rather than less, and
+**75.2's decomposition then attacked the result rather than dressing it up** — which is what produced
+the honest number below.
+
+## 105.3 THE DECOMPOSITION IS THE PART WORTH KEEPING
+
+The raw +0.565 is **not** a partition statement: the two arms differ by 24 % in m as well as in
+partition, and they come from different batches. `analysis/c76_partition_vs_count.py` (**27/27**,
+registered this cycle) separates both:
+
+* **the count explains +0.049 pp; the partition explains +0.517 pp.** The count accounts for **under
+  a tenth** of the gap. The count was removed by interpolating ck1's own chunk curve to m = 14,420 —
+  strictly an interpolation, using the two bracketing rungs rather than a global fit whose slope
+  varies 0.35–0.83 pp/decade.
+* **the cross-batch offset is MEASURED and NOT APPLIED.** chunk1 and tw0's weightwise are bitwise the
+  same configuration, so K1's −0.255 pp **is** the offset. At t = 1.74 it is **not resolved from
+  zero**, and correcting by an unresolved offset manufactures precision. Applying it would push the
+  residual **+0.517 → +0.771, away from zero**, so **the uncorrected primary is the conservative
+  one.** Stated this way because the convenient direction is the one that needs the discipline.
+
+**THE LIMIT THAT KEEPS THIS FROM BEING THE BIGGER CLAIM.** At matched m the mean group size is
+identical by construction, but the size **distribution** is not — nodewise's groups are heterogeneous
+per-layer channel counts, chunk's are uniform. So the supported claim is **"the partition matters"**.
+It is **NOT** yet "architecture alignment matters", however much the second sentence would be worth.
+**Do not write it.** Separating them needs a permuted partition carrying nodewise's exact size
+multiset, which is a code change and is named in 105.6 as the next one.
+
+## 105.4 K3 CONFIRMED — AND THE HOLE TURNED OUT TO BE EMPTY
+
+90.979 → 91.095 → 91.411 → 92.159 → 92.526 across m = 11,173,962 → 10,944. Every adjacent step
+positive; no inversion. CORRECTIONS 104.8's three-decade hole is filled and **there is no structure
+in it** — the fine-end cost rises smoothly at ≈0.51 pp/decade with no knee and no threshold. That is
+a *negative* result about the shape and it is worth exactly as much as a positive one: every prior
+statement about "where the fine end turns bad" was an interpolation between two points, and the
+answer is that it does not turn anywhere, it slopes.
+
+## 105.5 `at1` CONFIRMED A2 — AND CARRIES A BIND I AM NOT BURYING
+
+A1 reproduces on both arms, A2 CONFIRMS (blk6 0.70432 > lay 0.65693; node 0.53368 strictly inside),
+A2b says `a_raw` reads as a function of m rather than ms. **But A0.3 puts nodewise@3e-4 BOUND at the
+lower guard on 3/3 seeds** (`rec_lo` ≈ 0.455), where `tw0`'s nodewise@1e-4 was box-free 3/3 in the
+same box — **raising `ms` is what drove it into the floor.** A2's node point comes from a cell the
+campaign's own primary gate calls BOUND.
+
+The mitigating fact is a control that cost nothing: the bound cell and the free cell agree on `a_raw`
+to **0.005** at the same m, so this bind does not detectably move the quantity A2 is about. **That is
+evidence, not an excuse.** FINDINGS 75.5 carries the bind so any future use of at1's node arm inherits it.
+
+## 105.6 **DECISION**
+
+**The campaign's question changes shape this tick, and it is the third redirection in three cycles,
+so the reason is stated rather than assumed.** 103.8 asked *"why does the finest partition cost
+accuracy that ms-tuning cannot recover?"* That question presupposed a **one-dimensional** granularity
+axis indexed by m. **K2 refuted the presupposition.** The axis is (count, partition), and at nearly
+fixed count the partition is worth **10× what the count is worth**.
+
+**DECISION: the campaign's object is now the two-variable granularity surface, and the immediate
+job is to establish that 75.2's +0.517 pp survives a MEASURED matched-count contrast rather than an
+interpolated one.** That is `mm1`, submitted this tick. Everything else waits on it, because if M1
+refutes, the surface collapses back to one variable and 105.2–105.3 come off the board.
+
+**This bears directly on the brief's DEFAULT (direction C).** The brief's default is to extend the
+sign-agreement measurement across granularities, model sizes and datasets. **K4/K4b just showed that
+"granularity" is not a well-defined x-axis for that sweep** — chunk1024 and nodewise sit at nearly
+the same m and differ in `a_raw` by 0.0156, outside tolerance. **A sweep indexed by group count
+alone would have been mis-specified**, and this is the tick's argument for *not* spending the
+default's compute yet. Direction C is not dropped; it is blocked on knowing what its x-axis is.
+
+**SUBMITTED: 12 jobs on alice, 0 cancelled, 0 rejected.**
+* **`mm1` (6)** — chunk777 (m=14,421) vs nodewise (m=14,420), same batch, same ms, seeds 0-2.
+  **M1 registered PREDICTS D > +0.30, REFUTES D ≤ +0.15, and (+0.15, +0.30] is registered UNDECIDED
+  in advance** so a mid-band result cannot be squeezed either way. M2 is declared **unable to void
+  M1** before the data exists, so a VOID cannot later be used to discard an inconvenient M1.
+* **`cx2` (6)** — chunk{8192, 65536}, m = 1,407 and 220, completing 62 ↔ 11.17M as a seven-rung
+  continuum in one family. **X2 is ONE-SIDED and its uninteresting outcome is declared uninteresting
+  in advance:** landing below layerwise confirms nothing and must not be reported as a finding.
+
+**VERIFIED LIVE, NOT ASSUMED FROM THE GUARD:** all 6 `mm1` arms are advancing with `n_beta` read from
+probe.jsonl equal to **14,421** (chunk777) and **14,420** (nodewise) on real 100-epoch GPU runs.
+Guard 4 had already measured both from the **allocated beta** on the built network before submission,
+and asserted the closed-form m(K) agrees with the allocation — the batch's entire claim is that these
+two counts match, so that number is measured twice and inherited from no comment.
+
+## 105.7 STILL OPEN, RANKED
+
+1. **`mm1`'s M1** — everything above depends on it.
+2. **The permuted-partition patch** (nodewise's exact group-size multiset, randomly assigned). This
+   is the ONLY thing that can upgrade "the partition matters" to "architecture alignment matters",
+   which is the claim that would actually bear on the Adam-mini / Adalayer / SGG line. **A code
+   change does not belong in the same batch as a measurement**, so it is written here as the
+   recommendation and not bundled into `mm1` or `cx2`.
+3. The sweep of every heredoc-fed guard in `bin/` deriving a path from `__file__` (101.11) — `tw0`,
+   `at1`, `ck1`, `mm1` and `cx2` all pass the CSV path in from bash; the rest of `bin/` is unswept.
+4. alice2 still lacks PATCH_CHUNKWISE / PATCH_PROBE4 / PATCH_SCHED (gotcha 10), so the whole chunk
+   programme is single-account and cannot use the second subscription's concurrency.
