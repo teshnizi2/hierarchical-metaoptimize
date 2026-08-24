@@ -134,6 +134,11 @@ MetaOptimize's internals and are untouched; any "our method is better" sentence 
   needs the partition named alongside the count. **K3:** plateau5 monotone as m falls, ties +-0.15.
   **K4 DESCRIPTIVE, no direction**; **K4b** chunk1024 a_raw vs node@1e-4's 0.53836.
 * **`ck1` RUNS ON ALICE ONLY** -- alice2 lacks PATCH_CHUNKWISE (gotcha 10); guard 1d fails closed.
+* **PATCH_CHUNKWISE CONFIRMED FIRING LIVE, not assumed from the unit test.** At tick end the
+  started `ck1` arms report `n_beta` **exactly** equal to the registered m(K) --
+  chunk1 **11,173,962**, chunk2 **5,586,981**, chunk16 **698,373** -- read from probe.jsonl on a
+  real 100-epoch GPU run, and all arms are advancing. **That is K0.2 already passing on the arms
+  that have started**; it does NOT pre-score K1, which is an accuracy gate and needs the full run.
 * **STANDING RULE (20), added 104.9: a test asserting two configurations are IDENTICAL must run on
   a deterministic device and must FIRST assert a configuration equals ITSELF.** Measured: the same
   config twice on CUDA differs by **max|dbeta| = 2.2e-01**, because Lion's `sign()` amplifies cuDNN
