@@ -54,6 +54,96 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 76) -- **K2 REFUTED: "GRANULARITY" IS (COUNT, PARTITION). AT NEARLY FIXED COUNT THE PARTITION IS WORTH 10x THE COUNT.**
+
+**Read `docs/CORRECTIONS.md` 105 and `docs/FINDINGS.md` 75.0-75.6 FIRST. 105.2 is the headline,
+105.3 is the decomposition that makes it honest, 105.6 is the DECISION and why the brief's
+direction-C default is BLOCKED rather than dropped.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** `at1` (6) and `ck1` (15) all complete at 100/100 ep.
+  CSV **1792 -> 1813 PURELY ADDITIVELY** (0 pre-existing rows changed, header byte-identical).
+  **CANCELLED: nothing** -- both queues were empty, so there was nothing to audit or kill.
+  `analysis/c75_ck1_score.py` registered at **74/74 and GIT-COMMITTED (2cc8b22) BEFORE any ck1
+  number was read**, ahead of the scoring commit -- STANDING RULE 19 in the strict order.
+  **ORPHAN AUDIT: 119 families, 0 orphans.** (A first pass reported 181; that was MY REGEX splitting
+  on `-` only, so underscore-named runs each became a "family". Corrected. See 105.1.)
+* **THE HEADLINE (105.2): `ck1`'s K2 REFUTES.** chunk1024 (m=10,944, contiguous flat chunks)
+  **92.526 +-0.077** vs nodewise (m=14,420, output channels) **91.961 +-0.044** at the SAME ms
+  -- **+0.565 pp**, outside the registered +-0.50 bar, **t = 6.38 RESOLVED**. In the words registered
+  before the data existed: **partition structure matters at fixed m; every "granularity" statement
+  needs the partition named alongside the count.**
+* **THE DECOMPOSITION IS THE PART WORTH KEEPING (105.3, FINDINGS 75.2).**
+  `analysis/c76_partition_vs_count.py` (**27/27**): of the raw +0.565, the **count explains +0.049**
+  and the **PARTITION +0.517** -- the count is under a tenth of it. The count was removed by
+  INTERPOLATING ck1's own curve to m=14,420 (14,420 lies strictly between chunk1024 and chunk128).
+  **The cross-batch offset is MEASURED (-0.255, t=1.74) and NOT APPLIED** -- unresolved, and applying
+  it would move the residual to +0.771, AWAY from zero, so the uncorrected primary is CONSERVATIVE.
+* **THE LIMIT THAT KEEPS THIS FROM BEING THE BIGGER CLAIM.** At matched m the MEAN group size is
+  identical by construction but the size DISTRIBUTION is not (nodewise heterogeneous, chunk uniform).
+  Supported: **"the partition matters"**. **NOT supported: "architecture ALIGNMENT matters"** --
+  however much that second sentence would be worth. **DO NOT WRITE IT** until the permuted-partition
+  arm exists.
+* **K3 CONFIRMS AND THE HOLE IS EMPTY (105.4).** 90.979 -> 91.095 -> 91.411 -> 92.159 -> 92.526,
+  every adjacent step positive, no inversion. The three-decade hole of 104.8 is filled and **there is
+  no structure in it**: ~0.51 pp/decade, no knee, no threshold. The fine end does not turn, it slopes.
+* **K4 / K4b (FINDINGS 75.4).** `a_raw` falls monotonically with m INSIDE ONE partition family --
+  0.52280 (m=10,944) -> 0.50117 (m=11.17M). **d log N_eff / d log m = 0.873** (chunk range) vs tw0's
+  0.686 (outer); independence 1.000, full sharing 0.000, neither is the data. **The fall is PARTLY
+  MECHANICAL** and is not evidence of structure on its own. **K4b: chunk1024 a_raw vs nodewise@1e-4
+  = -0.01556, outside tolerance -- the FIELD moves with the partition too.**
+  **The "53.1%" sentence is NOT reproduced and must NOT be written.**
+* **`at1` A2 CONFIRMS, WITH A BIND ON THE RECORD (105.5, FINDINGS 75.5).** A1 reproduces both arms;
+  a_raw monotone across four tuned rungs (blk6 0.70432 > lay 0.65693 > node 0.53368 > w 0.50117).
+  **BUT A0.3 puts nodewise@3e-4 BOUND at the LOWER guard 3/3** (`rec_lo` ~0.455) where tw0's
+  node@1e-4 was free 3/3 -- **raising ms drove it into the floor.** Mitigation, not excuse: bound and
+  free cells agree on a_raw to **0.005** at the same m. Any future use of at1's node arm inherits this.
+* **SUBMITTED: 12 jobs on alice, 0 cancelled, 0 rejected.**
+  **`mm1` (6, `bin/c76_matched_m_partition.sh`)** -- **chunk777 (m=14,421) vs nodewise (m=14,420),
+  ONE group apart**, same batch, same ms=1e-4, seeds 0-2, 100 ep, PROBE=5 AND PROBE5=1. Replaces
+  75.2's interpolation with a MEASUREMENT and removes the cross-batch offset entirely.
+  **`cx2` (6, `bin/c76_chunk_coarse_extension.sh`)** -- chunk{8192, 65536}, m = **1,407** and **220**,
+  completing 62 <-> 11.17M as a SEVEN-rung continuum in one partition family with one knob.
+  Both boxes registered in `c55_neff_noise.BOXES` (51/51) BEFORE submission, both reuse ck1's box.
+* **`mm1` REGISTERED GATES, DO NOT EDIT AFTER THE DATA LANDS:** **M1 (PRIMARY, WITHIN-BATCH):
+  D = plateau5(chunk777) - plateau5(nodewise). PREDICTS D > +0.30. REFUTES D <= +0.15 INCLUDING
+  NEGATIVE. (+0.15, +0.30] IS REGISTERED UNDECIDED IN ADVANCE** so a mid-band result cannot be
+  squeezed either way. **M2 is declared UNABLE TO VOID M1** (M1 is within-batch, immune to a common
+  offset) before the data exists, so a VOID cannot later be used to discard an inconvenient M1.
+  **M3 field at matched m, DESCRIPTIVE.** **STATED RISK: nodewise is read at 1e-4, NOT its own argmax
+  (3e-4) -- deliberate, so M1 is K2's contrast de-confounded rather than a different contrast. A
+  confirmed M1 is a statement at ms=1e-4, not at each partition's own optimum.**
+* **`cx2` REGISTERED GATES:** **X1** K3's monotone rise continues 1024 -> 8192 -> 65536, ties +-0.15,
+  chained onto 92.526. **X2 ONE-SIDED: PREDICTS both <= 92.887 + 0.15** (converges to layerwise from
+  below); **REFUTES if either exceeds it** -> the chunk family has an interior optimum ABOVE the best
+  rung of the whole tuned ladder, via a knob that ignores architecture -- a METHOD result.
+  **Landing below confirms NOTHING and must not be reported as a positive finding.** **X3 descriptive.**
+* **VERIFIED LIVE, NOT ASSUMED.** All 6 `mm1` arms advancing with `n_beta` read from probe.jsonl at
+  exactly **14,421** (chunk777) and **14,420** (nodewise) on real GPU runs. Guard 4 had ALREADY
+  measured both from the **ALLOCATED beta** on the built network pre-submission and asserted the
+  closed-form m(K) agrees -- the batch's whole claim is that these counts match, so it is measured
+  twice and inherited from no comment.
+* **NEXT TICK:** score `mm1` **M0 / M0.2 / M0.3 / M0.4 / M1 / M2 / M3 in that order** and `cx2`
+  **X0 / X0.2 / X0.3 / X0.4 / X1 / X2 / X3**. **Write and COMMIT both scorers BEFORE reading any
+  verdict** (there is no `c76_mm1_score.py` or `c76_cx2_score.py` yet -- they do not exist).
+  **If M1 REFUTES, 105.2-105.3 come off the board and the axis collapses back to one variable.**
+* **THE NEXT CODE CHANGE, RANKED FIRST AMONG PATCHES (105.7):** a **permuted partition** carrying
+  nodewise's EXACT group-size multiset with weights randomly assigned. It is the ONLY thing that can
+  upgrade "the partition matters" to "architecture ALIGNMENT matters" -- the claim that would bear on
+  the Adam-mini / Adalayer / SGG line. **A code change does not belong in the same batch as a
+  measurement**, which is why it is NOT in `mm1` or `cx2`.
+* **WHY THE BRIEF'S DIRECTION-C DEFAULT IS BLOCKED, NOT DROPPED (105.6).** The default is to sweep
+  sign-agreement across granularities / model sizes / datasets. **K4b shows "granularity" is not a
+  well-defined x-axis for that sweep**: two partitions at nearly the same m differ in `a_raw` by
+  0.0156, outside tolerance. **A sweep indexed by group count alone would be mis-specified.**
+  Direction C is blocked on knowing what its x-axis is -- that is what `mm1` and the permuted arm settle.
+* **STILL OPEN, RANKED:** (1) `mm1`'s M1, everything depends on it; (2) the permuted-partition patch;
+  (3) the `__file__`-derived-path sweep of `bin/` (101.11) -- tw0/at1/ck1/mm1/cx2 all pass the CSV
+  path in from bash, the rest of `bin/` is unswept; (4) alice2 still lacks PATCH_CHUNKWISE /
+  PATCH_PROBE4 / PATCH_SCHED (gotcha 10), so the whole chunk programme is **single-account** and
+  cannot use the second subscription's concurrency.
+
+## Superseded -- cycle 75 (kept for the record)
+
 ## Running / next (cycle 75) -- **T1 CONFIRMED 3/3. THE HEADLINE SURVIVED ITS OWN CONFOUND TEST, AND THE MECHANISM IT PROPOSED IS DEAD. A RESOLVED INTERIOR OPTIMUM IN GRANULARITY.**
 
 **Read `docs/CORRECTIONS.md` 104 and `docs/FINDINGS.md` 74.0-74.8 FIRST. 104.2 is the verdict,
