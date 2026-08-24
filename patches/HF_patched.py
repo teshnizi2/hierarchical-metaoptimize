@@ -19,6 +19,11 @@ class HF():
         self.writer = writer
         self.num_layers = len([0 for _ in  net.parameters()])
         self._device = next(net.parameters()).device  # PATCH_GRANULARITY
+        import os as _osc  # PATCH_SCHED
+        self._sched = _osc.environ.get('SCHED','')
+        self._sched_total = int(_osc.environ.get('SCHED_TOTAL','0') or 0)
+        self._sched_warm = int(_osc.environ.get('SCHED_WARMUP','0') or 0)
+        self._sched_min = float(_osc.environ.get('SCHED_MIN','0') or 0)
         import os as _os  # PATCH_CLIP: SwiftTD/IDBD-style bounds on log step size
         self._hier = _os.environ.get('HIER','')            # PATCH_HIER
         self._hier_lam = float(_os.environ.get('LAM','0') or 0)
@@ -79,6 +84,9 @@ class HF():
 
         with torch.no_grad():
             self.alpha = self.beta_to_alpha(self.beta)
+            if self._sched:  # PATCH_SCHED: alpha_t = schedule(t) * exp(beta_t)
+                _f = self._sched_factor()
+                self.alpha = [a*_f for a in self.alpha]
             HtT_gradft = self.block_product(self.h_condenced, g)
             
             self.base_update(net,g)
@@ -133,6 +141,13 @@ class HF():
             alphas = [torch.exp(b).view(v) for b, v in zip(beta, self.node_view)]
             self.alpha_for_printing = alphas
             return alphas
+        # --- PATCH_CHUNKWISE: one alpha per contiguous chunk of K weights ---
+        if self.stepsize_type == 'chunkwise':
+            _K = self.chunk_size
+            alphas = [torch.exp(b).repeat_interleave(_K)[:_n].view(_s)
+                      for b, _n, _s in zip(beta, self.chunk_numel, self.chunk_shape)]
+            self.alpha_for_printing = alphas
+            return alphas
         
     def block_product(self, u, v):
         if self.stepsize_type == 'scalar':
@@ -146,6 +161,21 @@ class HF():
             return [u[i]*v[i] for i in range(self.num_layers)]
         if self.stepsize_type == 'nodewise':
             return [(u[i]*v[i]).reshape(u[i].shape[0], -1).sum(dim=1) for i in range(self.num_layers)]
+        # --- PATCH_CHUNKWISE: per-chunk sums, zero-padded to a whole number of chunks.
+        # The pad contributes exactly 0 to its chunk's sum, so a ragged final chunk is
+        # summed over its REAL members only and is not silently scaled.
+        if self.stepsize_type == 'chunkwise':
+            _K = self.chunk_size
+            _out = []
+            for i in range(self.num_layers):
+                _p = (u[i]*v[i]).reshape(-1)
+                _n3 = _p.numel()
+                _c = (_n3 + _K - 1) // _K
+                _pad = _c * _K - _n3
+                if _pad:
+                    _p = torch.cat([_p, _p.new_zeros(_pad)])
+                _out.append(_p.view(_c, _K).sum(dim=1))
+            return _out
         
     
     def check_required_attributes(self, args_base, args_meta, required_attributes_base, required_attributes_meta):
@@ -189,7 +219,16 @@ class HF():
         self.lambda_base_t = 1.0
 
     def init_meta(self, stepsize_groups, net_param_names_and_size, alpha0):
-        self.stepsize_type = stepsize_groups if stepsize_groups in ['scalar', 'layerwise', 'nodewise', 'weightwise'] else 'blockwise'
+        # --- PATCH_CHUNKWISE: `chunk<K>` = contiguous chunks of K weights ---
+        import re as _re
+        _cm = _re.match(r'^chunk(\d+)$', stepsize_groups) if isinstance(stepsize_groups, str) else None
+        if _cm:
+            self.stepsize_type = 'chunkwise'
+            self.chunk_size = int(_cm.group(1))
+            if self.chunk_size < 1:
+                raise ValueError('chunk size must be >= 1, got %r' % self.chunk_size)
+        else:
+            self.stepsize_type = stepsize_groups if stepsize_groups in ['scalar', 'layerwise', 'nodewise', 'weightwise'] else 'blockwise'
         if self.stepsize_type == 'blockwise': stepsize_groups = self.polish_the_stepsize_groups(stepsize_groups,net_param_names_and_size)
 
         if self.stepsize_type == 'scalar':
@@ -212,6 +251,15 @@ class HF():
             _lb = torch.log(torch.tensor(alpha0, dtype=torch.float32, device=self._device))
             self.beta = [_lb * torch.ones(tuple(p_size), dtype=torch.float32, device=self._device)
                          for (_n, p_size) in net_param_names_and_size]
+        # --- PATCH_CHUNKWISE ---
+        elif self.stepsize_type == 'chunkwise':
+            _K = self.chunk_size
+            _lb = torch.log(torch.tensor(alpha0, dtype=torch.float32, device=self._device))
+            self.chunk_numel = [int(np.prod(list(p_size))) for (_n, p_size) in net_param_names_and_size]
+            self.chunk_shape = [tuple(p_size) for (_n, p_size) in net_param_names_and_size]
+            self.chunk_counts = [(_n2 + _K - 1) // _K for _n2 in self.chunk_numel]
+            self.beta = [_lb * torch.ones(_c, dtype=torch.float32, device=self._device)
+                         for _c in self.chunk_counts]
         
         # --- PATCH_GRANULARITY ---
         if not hasattr(self, 'beta'):
@@ -226,6 +274,24 @@ class HF():
 
 
 
+
+    # ------------------------------------------------------------ PATCH_SCHED
+    def _sched_factor(self):
+        """Cosine-with-warmup multiplier in [sched_min, 1]."""
+        import math as _m
+        t = self.counter + 1
+        T = self.sched_total_effective() if hasattr(self, 'sched_total_effective') else self._sched_total
+        if T <= 0:
+            return 1.0
+        if self._sched_warm > 0 and t < self._sched_warm:
+            return float(t) / float(self._sched_warm)
+        if self._sched == 'cosine':
+            p = min(1.0, max(0.0, (t - self._sched_warm) / max(1, T - self._sched_warm)))
+            return self._sched_min + (1.0 - self._sched_min) * 0.5 * (1.0 + _m.cos(_m.pi * p))
+        if self._sched == 'linear':
+            p = min(1.0, max(0.0, (t - self._sched_warm) / max(1, T - self._sched_warm)))
+            return self._sched_min + (1.0 - self._sched_min) * (1.0 - p)
+        return 1.0
 
     # ----------------------------------------------------------- PATCH_ZPOOL
     def _zpool(self, z):
@@ -353,12 +419,43 @@ class HF():
             beta_true_max = max(float(bb.max()) for bb in self.beta)
         except Exception:
             beta_true_min = beta_true_max = float('nan')
+        try:  # PATCH_CLIPCOUNT: per-COORDINATE clip occupancy (CORRECTIONS 60, 62)
+            if self._beta_lo is None:
+                _n_lo = _n_hi = _n_beta = 0
+            else:
+                _ceps = 1e-6
+                _n_lo = int(sum(int((bb <= self._beta_lo + _ceps).sum()) for bb in self.beta))
+                _n_hi = int(sum(int((bb >= self._beta_hi - _ceps).sum()) for bb in self.beta))
+                _n_beta = int(sum(int(bb.numel()) for bb in self.beta))
+        except Exception:
+            _n_lo = _n_hi = _n_beta = -1
         try:
             h_absmax = max(float(hh.abs().max()) for hh in self.h_condenced)
         except Exception:
             h_absmax = -1.0  # PATCH_PROBE3
         frac_neg = (zall < 0).sum().item() / max(n_tot, 1)
         frac_zero = (zall == 0).sum().item() / max(n_tot, 1)
+        # --- PATCH_PROBE5: per-group marginal sign counts (heterogeneity floor) ---
+        if os.environ.get('PROBE5', '') == '1':
+            if getattr(self, '_p5_neg', None) is None or self._p5_neg.numel() != n_tot:
+                self._p5_neg = torch.zeros(n_tot, dtype=torch.float32, device=zall.device)
+                self._p5_n = 0
+            self._p5_neg += (zall < 0).float()
+            self._p5_n += 1
+            _p5_every = int(os.environ.get('PROBE5_WRITE_EVERY', '20'))
+            if self._p5_n % max(_p5_every, 1) == 0:
+                import numpy as _np
+                _tmp = os.path.join(self._probe_dir, 'neg_counts.npy.tmp')
+                _dst = os.path.join(self._probe_dir, 'neg_counts.npy')
+                # PATCH_PROBE5_FIX: np.save appends '.npy' to a STRING path that
+                # lacks it, so save(_tmp) would write neg_counts.npy.tmp.npy and the
+                # replace below would fail.  A file OBJECT gets no extension added.
+                with open(_tmp, 'wb') as _fh5:
+                    _np.save(_fh5, self._p5_neg.detach().cpu().numpy())
+                os.replace(_tmp, _dst)
+                with open(os.path.join(self._probe_dir, 'neg_counts.json'), 'w') as _fh:
+                    json.dump({'n_records': int(self._p5_n), 'n_tot': int(n_tot),
+                               'stepsize_type': self.stepsize_type}, _fh)
         zm = zall.mean()
         zs = zall.std()
         z_skew = (((zall - zm) / (zs + 1e-30)) ** 3).mean().item() if n_tot > 1 else 0.0
@@ -367,13 +464,58 @@ class HF():
             mom_norm = float(sum(float((m * m).sum()) for m in mom if torch.is_tensor(m)) ** 0.5)
         except Exception:
             mom_norm = -1.0
+        # --- PATCH_PROBE4 (cycle 42, KILLTEST-idea2 sec.5): per-coordinate sign evidence.
+        # Unreachable when PROBE is unset: _probe() has already returned at
+        # `if not self._probe_every: return` (self._probe_every == 0) well above here.
+        _t_neg = _t_zero = _t_n = None
+        _z_sub = None
+        _idx_first = False
+        try:
+            import base64 as _b64, numpy as _np
+            # (1) EXACT within-tensor sign split -- one device->host sync, not 62.
+            _cnt = torch.stack([torch.stack([(zi < 0).sum(), (zi == 0).sum()])
+                                for zi in z]).cpu()
+            _t_neg = [int(v) for v in _cnt[:, 0]]
+            _t_zero = [int(v) for v in _cnt[:, 1]]
+            _t_n = [int(zi.numel()) for zi in z]
+            # (2) FIXED coordinate subsample, chosen once from a fixed CPU seed so the
+            #     index set is identical across steps, seeds, runs and GPU models.
+            if not hasattr(self, '_probe_idx'):
+                _k = min(int(os.environ.get('PROBE_SUB', '20000')), int(n_tot))
+                _g = torch.Generator(); _g.manual_seed(0)
+                self._probe_idx = torch.randperm(int(n_tot), generator=_g)[:_k].to(zall.device)
+                self._probe_idx_written = False
+                with open(os.path.join(self._probe_dir, 'probe_index.json'), 'w') as _fh:
+                    json.dump({'sub_seed': 0, 'k': int(_k), 'n_tot': int(n_tot),
+                               'stepsize_type': self.stepsize_type,
+                               't_n': _t_n,
+                               'param_numels': [int(v) for v in self.param_numels],
+                               'idx': [int(v) for v in self._probe_idx.cpu()]}, _fh)
+            _s = torch.sign(zall[self._probe_idx]).to(torch.int8).add(1).cpu().numpy()
+            _z_sub = _b64.b64encode(_np.packbits(
+                _np.stack([(_s >> 1) & 1, _s & 1]).astype(_np.uint8)).tobytes()).decode()
+            if not self._probe_idx_written:
+                _idx_first = True
+                self._probe_idx_written = True
+        except Exception as _e:
+            _t_neg = _t_zero = _t_n = None
+            _z_sub = 'ERR:' + repr(_e)[:200]
+        # --- end PATCH_PROBE4
         rec = {'step': int(self.counter),
                'beta': bv.cpu().tolist(),
                'z_mean': mean.cpu().tolist(),
                'z_std': std.cpu().tolist(),
                'snr': snr.cpu().tolist(),
                'frac_neg': frac_neg, 'frac_zero': frac_zero,
-               'z_skew': z_skew, 'mom_norm': mom_norm, 'h_absmax': h_absmax, 'beta_true_min': beta_true_min, 'beta_true_max': beta_true_max}
+               'z_skew': z_skew, 'mom_norm': mom_norm, 'h_absmax': h_absmax, 'beta_true_min': beta_true_min, 'beta_true_max': beta_true_max, 'n_beta': _n_beta, 'n_at_lo': _n_lo, 'n_at_hi': _n_hi}
+        # PATCH_PROBE4 fields
+        rec['t_neg'] = _t_neg
+        rec['t_zero'] = _t_zero
+        rec['t_n'] = _t_n
+        rec['z_sub'] = _z_sub
+        if _idx_first:
+            rec['z_sub_k'] = int(self._probe_idx.numel())
+            rec['probe_idx'] = [int(v) for v in self._probe_idx.cpu()]
         with open(os.path.join(self._probe_dir, 'probe.jsonl'), 'a') as fh:
             fh.write(json.dumps(rec) + chr(10))
         if self.writer is not None:

@@ -868,3 +868,32 @@ launching in that window. Caught by `bash -n`; `sacct` confirmed no job started 
 6. **Name collisions across accounts are real:** `p4-*` already existed on alice2
    (`runs/bdrift4`, the additive r-ladder probe) and is unrelated to cycle 18's `p4-*` on alice.
    Grep both accounts for a prefix before reusing it.
+
+## N. THE HARNESS IS NONDETERMINISTIC ON CUDA — measured cycle 75
+
+Running the **same** config twice through `tests/`-style harnesses on a GPU node:
+
+| granularity | max&#124;dW&#124; | max&#124;dbeta&#124; |
+|---|---|---|
+| weightwise | 9.423e-05 | 2.200e-01 |
+| chunk1 | 9.686e-05 | 2.000e-01 |
+| layerwise | 1.187e-04 | 8.000e-02 |
+
+cuDNN's conv backward is nondeterministic by default, and **Lion's `sign()` amplifies any
+float-level difference into a full ±2·ms beta step** at whichever coordinate sits nearest a sign
+boundary — with 11.17M coordinates, one always does. So `max|dbeta|` between two runs of the
+*same* config is the same magnitude as between two *different* granularities.
+
+**Consequences, and neither is optional:**
+
+1. **An equivalence test run on CUDA cannot distinguish "identical" from "completely different."**
+   `tests/test_chunkwise.py` therefore defaults to **CPU**, where the same comparisons come out at
+   **exactly 0.000e+00**, and its **C0 gate asserts determinism before scoring anything else**.
+2. **`tests/test_granularity.py` runs on CUDA at `alpha0=1e-6`, `meta_stepsize=1e-3`, `k=6`** — a
+   regime where beta barely moves, so *every* granularity agrees to ~1e-8 and its identities pass
+   **partly because nothing has diverged yet**, not only because they hold. Its verdicts are still
+   the right ones (they were re-derived on CPU at `alpha0=1e-3`, `ms=1e-2`, `k=25` and hold
+   **bitwise**), but **do not raise its `k` or `alpha0` and expect it to keep passing on a GPU.**
+
+**Rule: any test asserting two configurations are IDENTICAL must run on CPU and must first assert
+that a config equals itself.** A test that cannot fail cannot pass.
