@@ -14616,3 +14616,178 @@ layerwise, m=62 bitwise**, which is what makes X2 an inside-one-family compariso
   **above the best rung of the entire tuned ladder**, reached by a knob that ignores architecture.
   **Landing below confirms nothing interesting and must not be reported as a positive finding.**
 * **X3 the field at m=1,407 and 220. DESCRIPTIVE.**
+
+# 76 — CYCLE 77. mm1's M1 CONFIRMS AT MATCHED COUNT. THE PARTITION GAP IS A BIAS CHANNEL.
+
+## 76.0 `mm1` — VALIDITY, AND IT IS CLEAN ON EVERY COLUMN
+
+`analysis/c76_mm1_score.py` (**80/80**) and `analysis/c76_cx2_score.py` (**75/75**) were written,
+selftested and **git-committed (2455924) BEFORE any mm1 or cx2 number was read** — STANDING RULE 19
+in the strict order. Every constant in both is asserted against its batch script's own text.
+
+| gate | mm1 | cx2 |
+|---|---|---|
+| P/X0 validity, n_records=10000, ep 100/100 | 6/6 | 6/6 |
+| n_beta EXACT on every record | 6/6 | 6/6 |
+| instrument fired (n_tot, npy shape from HEADER) | 6/6 | 6/6 |
+| BOX-FREE at both guards | **6/6 at 0.0000** | **6/6 at 0.0000** |
+
+All twelve arms read **0.0000 on all four occupancy columns** — not one record, not one
+(record, coordinate) cell, touched either guard. `n_beta` read **14,421 / 14,420** (mm1) and
+**1,407 / 220** (cx2), exactly the counts guard 4 measured from the ALLOCATED beta pre-submission.
+
+## 76.1 **M1 CONFIRMS — THE PARTITION MATTERS AT MATCHED COUNT, MEASURED NOT INTERPOLATED**
+
+| arm | m | partition | plateau5 | n |
+|---|---|---|---|---|
+| chunk777 | 14,421 | uniform flat chunks | **92.529 ±0.150** | 3 |
+| nodewise | 14,420 | output channels | **92.044 ±0.058** | 3 |
+
+**D = +0.485 pp** (se 0.161, t = 3.01), against a band registered before the data existed:
+D > +0.30 CONFIRMS, (+0.15, +0.30] UNDECIDED, D ≤ +0.15 REFUTES. → **CONFIRMS.**
+
+75.2's +0.517 pp was an *interpolated* residual carrying a cross-batch offset. It is now a
+**within-batch measurement at m matched to ONE group in 14,420**, and it reads **+0.485**.
+
+**THE UNCOMFORTABLE HALF, AND IT IS NOT SMALL.** The CONFIRM margin over the UNDECIDED line is
++0.485 − 0.30 = **0.185 pp, about ONE standard error (0.161).** The verdict is one se from
+UNDECIDED. It is also the outcome the experimenter had an interest in — c76 had already published
++0.517, so CONFIRMS is "my previous number survives", the same structure CORRECTIONS 103.7 and
+105.2 put on the record. What defends it: the REFUTE branch was wide (everything ≤ +0.15, including
+negative), the UNDECIDED band was written down in advance precisely so a mid-band result could not
+be squeezed, and **M2 came in small on its own rather than being invoked afterwards.**
+**Do not quote M1 as decisive at n=3. Quote it as confirmed at t=3.01 with the margin stated.**
+
+## 76.2 M2 — THE CROSS-BATCH OFFSET IS NOT A STABLE QUANTITY
+
+mm1's nodewise@1e-4 **92.044 ±0.058** vs `tw0`'s **91.961** → **+0.083 pp**, bar ±0.50 →
+**REPRODUCES.** M2 was declared **unable to void M1** before the data existed and did not need to be.
+
+Read alongside `ck1`'s K1, which measured the same kind of offset at **−0.255** (t=1.74, unresolved):
+the two cross-batch offsets are **+0.083 and −0.255 — opposite signs, both unresolved.** So the
+offset is noise around zero, not a bias with a direction. **This retrospectively supports c76's
+decision NOT to apply the −0.255 correction** (105.3): correcting by a quantity that flips sign
+between batches would have manufactured precision. The decision was made for the right reason at
+the time; it is now also right for a second reason.
+
+## 76.3 `cx2` — X1 CONFIRMS, BUT ITS WITHIN-BATCH CONTENT IS A TIE
+
+| K | m | plateau5 | sem | n | source |
+|---|---|---|---|---|---|
+| 1024 | 10,944 | 92.526 | — | 3 | ck1 (chained anchor) |
+| 8192 | 1,407 | **92.763** | 0.074 | 3 | cx2 |
+| 65536 | 220 | **92.858** | 0.078 | 3 | cx2 |
+| chunk<huge> ≡ layerwise | 62 | 92.887 | — | 11 | tuned ladder |
+
+Adjacent steps +0.237 and +0.095, neither inverting past the ±0.15 tie band → **X1 CONFIRMS.**
+
+**SAY THE WEAKNESS WITH THE VERDICT.** The chain's rise is carried by the **cross-batch** first
+link (1024 → 8192, +0.237). The **within-batch** link (8192 → 65536) is **+0.095 ± 0.108, t = 0.88
+— NOT resolved.** So cx2's own two rungs are a **tie**, and X1's monotone claim leans on an anchor
+imported from ck1, exactly the kind of link 76.2 just showed carries an unresolved ±0.25 offset.
+**X1 is confirmed as registered; it is not strong evidence on its own.**
+
+## 76.4 X2 — CONFIRMS, AND CONFIRMING WAS DECLARED UNINTERESTING IN ADVANCE
+
+Ceiling 92.887 + 0.15 = **93.037**. chunk8192 **92.763 under**, chunk65536 **92.858 under** →
+**CONFIRMS.** X2 was registered ONE-SIDED with its confirming branch declared the ordinary outcome
+and forbidden from being written up as a finding, and `score_X2` returns `interesting=False` on that
+branch so the scorer enforces it rather than the prose. **Recorded, not reported as a result.**
+**The chunk family does NOT overshoot layerwise. There is no architecture-free knob that beats the
+tuned ladder's best rung.**
+
+One receipt worth keeping: chunk65536 (m=220) reads **92.858** against layerwise's **92.887** at
+m=62 — **0.029 pp apart**. The family converges onto its own bitwise endpoint. That is a
+consistency check on `tests/test_chunkwise.py` C2 in a 100-epoch run, not a finding.
+
+## 76.5 **THE SEVEN-RUNG FAMILY, AND A CONFOUNDED EXPONENT CORRECTED**
+
+`analysis/c77_family_curve.py` (**31/31**, declared POST-HOC and DESCRIPTIVE, registers nothing).
+`ck1` ∪ `cx2` = one partition family, one knob, one ms, one box, **21/21 arms box-free**:
+
+| K | m | plateau5 | pbar | a_raw | a_deb | bias_share | N_eff/m |
+|---|---|---|---|---|---|---|---|
+| 1 | 11,173,962 | 90.979 | 0.49884 | 0.50117 | 0.50091 | 0.217 | 0.0159 |
+| 2 | 5,586,981 | 91.095 | 0.49838 | 0.50163 | 0.50120 | 0.265 | 0.0191 |
+| 16 | 698,373 | 91.411 | 0.49666 | 0.50345 | 0.50219 | 0.365 | 0.0441 |
+| 128 | 87,303 | 92.159 | 0.49226 | 0.50922 | 0.50640 | 0.305 | 0.0405 |
+| 1024 | 10,944 | 92.526 | 0.48687 | 0.52280 | 0.51970 | 0.136 | 0.0368 |
+| 8192 | 1,407 | 92.763 | 0.48573 | 0.54506 | 0.54353 | 0.034 | 0.0596 |
+| 65536 | 220 | 92.858 | 0.45579 | 0.58553 | 0.57787 | 0.090 | 0.1180 |
+
+**d log N_eff / d log m over the whole family = 0.850** (7 rungs, partition held FIXED). This
+**supersedes `tw0`'s 0.686** as the campaign's exponent: tw0 fitted it across layerwise / nodewise /
+weightwise — **three different partitions** — so it confounded the count with the partition, which
+is exactly what M1 has now shown is not safe to do. It also extends 75.4's five-rung 0.873.
+Independence gives 1.000, full sharing 0.000; **neither limit is the data.**
+The fall of `a_raw` with m remains **partly MECHANICAL** and is not evidence of structure on its
+own. **The "53.1 %" sentence is NOT reproduced and is NOT written.**
+
+## 76.6 **THE RESULT WORTH MORE THAN THE GATE: THE PARTITION GAP IS A BIAS CHANNEL**
+
+The instrument reports two statistics with a shared inversion:
+`dev_raw = a_raw − 0.5` (deviation of the per-step negative fraction from the FIXED 0.5) and
+`dev_deb = a_deb − 0.5` (deviation from the RUN'S OWN mean). Their difference is the persistent tilt.
+At **exactly matched m** (mm1), the mechanical channel is switched off by construction:
+
+| arm | m | pbar | dev_raw | dev_deb | dev_bias |
+|---|---|---|---|---|---|
+| chunk777 | 14,421 | 0.48666 | 0.02079 | 0.01709 | **0.00370** |
+| nodewise | 14,420 | 0.46178 | 0.03824 | 0.01478 | **0.02346** |
+| **chunk − node** | | | **−0.01744** (t −48.2) | **+0.00232** (t +7.1) | **−0.01976** (t −91.8) |
+
+**THE TWO CHANNELS MOVE IN OPPOSITE DIRECTIONS: the bias channel is +113 % of the raw difference
+and the debiased channel is −13 %.** At identical group count, the two partitions have essentially
+the same *instantaneous* across-coordinate agreement — chunk777 is very slightly HIGHER — and differ
+almost entirely through a **persistent directional tilt** that is **6.3× larger under nodewise**.
+
+This is descriptive: mm1's M3 was registered with no direction, so **it is a reading, not a
+confirmed prediction, and must not be written as one.** It is nonetheless the tick's most
+mechanistic observation, and it is what `pp1`'s P5b turns into a falsifiable prediction (76.7).
+
+**A FREE REPLICATION WORTH RECORDING:** mm1's nodewise `a_raw` is **0.53824** against `tw0`'s
+node@1e-4 **0.53836** — **0.00012 apart across batches**, where plateau5 across the same two batches
+differed by +0.083. **The field instrument reproduces roughly three orders of magnitude more tightly
+than the accuracy does.** Any future design should prefer field contrasts where it can get them.
+
+## 76.7 SUBMITTED — `pp1`, 9 JOBS, 0 CANCELLED, 0 REJECTED, ALICE ONLY
+
+`bin/c77_permuted_partition.sh`, `PATCH_PERMNODE` (new this cycle), the rank-1 code change
+CORRECTIONS 105.7 named. **`permnode<S>` keeps nodewise's group COUNT and its per-tensor group-SIZE
+MULTISET EXACTLY, and randomises only WHICH weights land in which group, within each tensor.**
+Guard 4 measured, for all three seeds, m = **14,420** identical to nodewise, the size multiset
+**identical** (14,420 groups, 10 distinct sizes, min 1, max 4,608), every permutation verified to be
+a true permutation and non-identity, and seeds 0/1/2 verified to be three *different* permutations.
+
+Arms: {nodewise, permnode<seed>, chunk777} × seeds 0-2, ms=1e-4, 100 ep, PROBE=5 AND PROBE5=1,
+box registered in `c55_neff_noise.BOXES` before submission. **The decomposition:**
+node→perm = **ALIGNMENT** (sizes identical), perm→chunk = **SIZE DISTRIBUTION**, node→chunk = D.
+
+* **P2 (PRIMARY, FIVE-WAY, SYMMETRIC):** A = plateau5(permnode) − plateau5(nodewise).
+  **A > +0.30 → ALIGNMENT HURTS** — grouping by output channel is worse than grouping the same
+  number of same-sized *arbitrary* subsets of the same layer. That is the first claim this campaign
+  would have about the Adam-mini / Adalayer / SGG line rather than about MetaOptimize.
+  **[−0.15, +0.15] → NULL**, alignment is not the carrier and the deficit is the size distribution —
+  a clean negative worth as much as the positive. **A ≤ −0.30 → ALIGNMENT HELPS.**
+  **Both ±(0.15, 0.30] bands are registered UNDECIDED in advance.** Symmetric because there is no
+  prior favouring either sign.
+* **P1 the replication**, |D − 0.485| ≤ 0.50, the first out-of-batch replication of M1.
+  **P1 does NOT gate P2** (P2 is within-batch), declared so in advance so a failed replication
+  cannot be used to discard an inconvenient P2.
+* **P3 carries NO independent verdict** — B = D − A algebraically, and registering it too would
+  score one degree of freedom twice. **P4 is an arithmetic receipt, not a finding.**
+* **P5b, REGISTERED AND ITS ORIGIN DECLARED:** derived from 76.6, which was post-hoc. Discriminant
+  on dev_bias(permnode) against the midpoint 0.01358 of {0.00370, 0.02346}, ±25 % band UNDECIDED.
+  **P5b and P2 are logically independent — if they disagree, that is the more interesting result
+  and it must not be buried.**
+* **STATED RISKS:** nodewise is again read at 1e-4, not its own argmax 3e-4 (mm1's risk inherited);
+  and permnode<S> uses the run seed as its permutation seed, so **the batch cannot separate
+  permutation variance from seed variance** — the conservative direction, but stated.
+
+**VERIFICATION, NOT ASSUMPTION.** `tests/test_permnode.py` (P0–P10, **33 PASS / 0 FAIL, on CPU**)
+runs against the LIVE tree as guard 1e of the batch itself. P0 asserts a configuration equals
+ITSELF at 0.000e+00 first (STANDING RULE 20); **P1 asserts permnode-at-the-identity-permutation is
+nodewise BITWISE (0.000e+00)**; P7 checks the alpha scatter/gather round-trip over all 11,173,962
+weights at 0.000e+00; **P8 is the anti-vacuity guard** (permnode does diverge: max|dbeta| 3.8e−01);
+**P10 re-asserts chunk1 == weightwise and chunk<huge> == layerwise at 0.000e+00**, so
+PATCH_PERMNODE disturbed nothing. `tests/test_granularity.py` also still passes.

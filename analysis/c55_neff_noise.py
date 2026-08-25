@@ -156,6 +156,14 @@ BOXES = {
     # REGISTERED BEFORE ANY mm1/cx2 JOB WAS SUBMITTED, from each script's own CLIP=.
     "mm1":  (-15.0, -2.3026, "bin/c76_matched_m_partition.sh:CLIP"),
     "cx2":  (-15.0, -2.3026, "bin/c76_chunk_coarse_extension.sh:CLIP"),
+    # cycle-77 PERMUTED PARTITION (PATCH_PERMNODE), the three-way decomposition of
+    # mm1's +0.485 pp into an ALIGNMENT leg and a SIZE-DISTRIBUTION leg.  Same box
+    # AGAIN -- ck1's, which is tw0's/wm9's/ml5's.  Not a new box.  Its `node` and
+    # `ch` arms are bitwise mm1's two arms, both of which read 0.0000 on all four
+    # occupancy columns in this box; the `perm` arm carries nodewise's EXACT
+    # group-size multiset, so it sits at the same m in the same range.
+    # REGISTERED BEFORE ANY pp1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "pp1":  (-15.0, -2.3026, "bin/c77_permuted_partition.sh:CLIP"),
 }
 
 

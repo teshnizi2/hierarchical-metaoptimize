@@ -54,6 +54,123 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 77) -- **M1 CONFIRMS AT MATCHED COUNT (+0.485 pp). THE PARTITION GAP IS A BIAS CHANNEL, NOT A CORRELATION CHANNEL.**
+
+**Read `docs/CORRECTIONS.md` 106 and `docs/FINDINGS.md` 76.0-76.7 FIRST. 106.2 is the verdict WITH
+its one-standard-error margin stated, 106.5 is the result that is bigger than the gate, 106.6 is the
+DECISION and why the brief's direction-C default is still BLOCKED rather than dropped.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** `mm1` (6) and `cx2` (6) all complete at 100/100 ep.
+  CSV **1,813 -> 1,825 data lines PURELY ADDITIVELY**, checked at the **RAW LINE level** (12 added,
+  0 removed, 0 changed, header byte-identical). **CANCELLED: nothing** -- both queues were empty.
+  `analysis/c76_mm1_score.py` (**80/80**) and `analysis/c76_cx2_score.py` (**75/75**) registered and
+  **GIT-COMMITTED (2455924) BEFORE any mm1 or cx2 number was read** -- STANDING RULE 19 in the
+  strict order. **ORPHAN AUDIT: 121 families, 0 orphans.**
+* **A BOOKKEEPING QUIRK NOW ON THE RECORD (106.1):** the CSV has **1,825 data lines but 1,822
+  distinct run names** -- `a0-{layer,blk6,scal}-1e4_s0` each appear twice (100 ep + a superseded
+  shorter job). Every scorer filters `epochs_done == 100` so no verdict moves, but **an additivity
+  check keyed on run name would silently mask a change to those three rows.** Check raw lines.
+* **THE HEADLINE (106.2): `mm1`'s M1 CONFIRMS.** chunk777 (m=14,421) **92.529 +-0.150** vs nodewise
+  (m=14,420) **92.044 +-0.058**, same batch, counts matched to ONE group: **D = +0.485 pp, t = 3.01**
+  against the pre-registered D > +0.30. 105.6 made everything conditional on this. **105.2 and 105.3
+  STAND**, and now rest on a measurement instead of an interpolation plus an unapplied offset.
+* **SAY THE MARGIN WHENEVER YOU QUOTE M1.** The CONFIRM margin over the UNDECIDED band is
+  **0.185 pp against se 0.161 -- ONE standard error, at n=3.** CONFIRMS was also the outcome the
+  experimenter had an interest in (c76 had published +0.517). What defends it is structural: the
+  REFUTE branch covered everything <= +0.15 including negative, the UNDECIDED band was fixed in the
+  batch script before the data existed, and M2 was declared unable to void M1 in advance.
+  **Do not quote M1 as decisive. Quote it as confirmed at t=3.01, n=3, margin stated.**
+* **THE CROSS-BATCH OFFSET HAS NO STABLE SIGN (106.3).** M2 reads **+0.083** (REPRODUCES) where
+  ck1's K1 read **-0.255**. Two measurements, opposite signs, neither resolved. This
+  **retrospectively vindicates 105.3's refusal to apply the -0.255**, for a second and independent
+  reason. **Treat every cross-batch link as carrying an unmodelled +-0.25 pp.**
+* **X1 CONFIRMS ON PAPER AND IS WEAK (106.4).** 92.526 -> 92.763 -> 92.858, no inversion past +-0.15.
+  But the rise is carried by the **cross-batch** link (+0.237); the **within-batch** link
+  chunk8192 -> chunk65536 is **+0.095 +- 0.108, t = 0.88, NOT resolved.** cx2's own two rungs are a
+  **tie**. **Do not lean on X1.**
+* **X2 CONFIRMS = the ORDINARY outcome, declared uninteresting in advance and NOT a finding.** Both
+  rungs sit under the 93.037 ceiling: **there is no architecture-free knob that beats the tuned
+  ladder's best rung.** `score_X2` returns `interesting=False` on that branch so the scorer, not the
+  prose, enforces it. Receipt worth keeping: chunk65536 (m=220) **92.858** vs layerwise (m=62)
+  **92.887** -- 0.029 apart, the family converging onto its own bitwise endpoint.
+* **THE TICK'S REAL CONTENT (106.5, FINDINGS 76.6): AT MATCHED m THE PARTITION GAP IS A BIAS
+  CHANNEL.** `analysis/c77_family_curve.py` (**31/31, declared POST-HOC, registers nothing**) splits
+  mm1's field difference into the instrument's own two channels:
+  `dev_deb` (instantaneous agreement) chunk 0.01709 vs node 0.01478 -> **+0.00232**;
+  `dev_bias` (persistent tilt) chunk 0.00370 vs node **0.02346** -> **-0.01976**.
+  **The two channels move in OPPOSITE directions: bias is +113% of the raw gap, debiased -13%.**
+  The partitions agree almost equally well instant-by-instant and differ **6.3x in a persistent
+  tilt**. **Every "sign agreement differs across granularities" sentence is, at matched count, a
+  statement about a BIAS and not about correlation.** It is a READING, not a confirmed prediction.
+* **A CONFOUNDED EXPONENT CORRECTED (FINDINGS 76.5).** Seven-rung chunk family, partition HELD FIXED,
+  21/21 box-free: **d log N_eff / d log m = 0.850**. This **supersedes tw0's 0.686**, which was
+  fitted across layerwise/nodewise/weightwise -- three DIFFERENT partitions -- exactly the confound
+  M1 has now shown is not safe. Independence 1.000, full sharing 0.000; neither is the data.
+  **The "53.1%" sentence is NOT reproduced and must NOT be written.**
+* **A FREE REPLICATION WORTH DESIGNING AROUND (76.6).** mm1's nodewise `a_raw` **0.53824** vs tw0's
+  **0.53836** -- **0.00012 apart across batches**, where plateau5 moved +0.083. **The field
+  instrument reproduces ~3 orders of magnitude more tightly than the accuracy does.**
+* **SUBMITTED: `pp1`, 9 jobs on alice, 0 cancelled, 0 rejected.** `bin/c77_permuted_partition.sh`
+  with **PATCH_PERMNODE**, built this cycle -- CORRECTIONS 105.7's rank-1 item, run rather than
+  deferred again. `permnode<S>` keeps nodewise's group COUNT and its **per-tensor group-size
+  MULTISET EXACTLY** and randomises only WHICH weights land in which group, within each tensor.
+  Arms {nodewise, permnode<seed>, chunk777} x seeds 0-2, ms=1e-4, 100 ep, PROBE=5 AND PROBE5=1,
+  box registered in `c55_neff_noise.BOXES` before submission.
+  **The decomposition: node->perm = ALIGNMENT (sizes identical), perm->chunk = SIZE DISTRIBUTION,
+  node->chunk = D.**
+* **`pp1` REGISTERED GATES, DO NOT EDIT AFTER THE DATA LANDS. P2 IS THE PRIMARY, FIVE-WAY AND
+  SYMMETRIC:** A = plateau5(permnode) - plateau5(nodewise).
+  **A > +0.30 -> ALIGNMENT HURTS** (grouping by output channel is worse than grouping the same
+  number of same-sized ARBITRARY subsets of the same layer) -- the first claim this campaign would
+  have about the **Adam-mini / Adalayer / SGG** line rather than about MetaOptimize.
+  **[-0.15, +0.15] -> NULL**, alignment is not the carrier and the whole +0.485 is the SIZE
+  DISTRIBUTION -- a clean negative worth as much as the positive, which would redirect the campaign
+  toward group-size HOMOGENEITY as the design variable. **A <= -0.30 -> ALIGNMENT HELPS.**
+  **Both +-(0.15, 0.30] bands are registered UNDECIDED in advance.** Symmetric because there is no
+  prior favouring either sign.
+  **P1 (replication, |D - 0.485| <= 0.50) DOES NOT GATE P2** -- declared in advance so a failed
+  replication cannot discard an inconvenient P2. **P3 carries NO independent verdict** (B = D - A
+  algebraically). **P4 is an arithmetic receipt.** **P5b is REGISTERED and its post-hoc origin
+  DECLARED**: discriminant on dev_bias(permnode) vs the midpoint 0.01358 of {0.00370, 0.02346},
+  +-25% band UNDECIDED. **P5b and P2 are logically independent -- if they DISAGREE that is the more
+  interesting result and it must not be buried.**
+* **WHAT `pp1` EXPLICITLY DOES NOT CLAIM.** permnode permutes **WITHIN each tensor**, so it tests
+  whether an output channel is special among same-sized subsets **of its own layer**. It does NOT
+  test whether LAYER boundaries matter. **A confirmed P2 is a within-layer statement and must not be
+  written as "architecture is irrelevant".** Also inherited from mm1: nodewise is read at 1e-4, not
+  its own argmax 3e-4, so every verdict is a statement at ms=1e-4. And permnode<S> uses the run seed
+  as its permutation seed, so **the batch cannot separate permutation variance from seed variance**
+  (conservative -- it can only widen the sem -- but stated).
+* **VERIFIED, NOT ASSUMED.** `tests/test_permnode.py` P0-P10, **33 PASS / 0 FAIL on CPU**, run
+  against the **LIVE tree** as guard 1e of the batch itself. **P0 asserts a config equals ITSELF at
+  0.000e+00 FIRST** (STANDING RULE 20); **P1 asserts permnode-at-identity == nodewise BITWISE**;
+  P7 checks the alpha scatter/gather round-trip over all 11,173,962 weights at 0.000e+00; **P8 is
+  the anti-vacuity guard**; **P10 re-asserts chunk1 == weightwise and chunk<huge> == layerwise**, so
+  PATCH_PERMNODE disturbed nothing. `test_chunkwise.py` and `test_granularity.py` also still pass.
+  Guard 4 measured, for **all three seeds**, m = 14,420 identical to nodewise, the size multiset
+  identical (14,420 groups, **10 distinct sizes, min 1, max 4,608**), every permutation verified a
+  true permutation and non-identity, and seeds 0/1/2 verified three DIFFERENT permutations.
+  **At tick end all 9 arms are RUNNING and advancing with `n_beta` read from probe.jsonl at exactly
+  14,421 (chunk777) and 14,420 (nodewise AND permnode) on real GPU runs.**
+* **LIVE `HF.py` ON ALICE IS PATCHED** (backup `HF.py.bak_precycle77`, `__pycache__` cleared,
+  canonical copy refreshed at `patches/HF_patched.py`, **674 lines, md5 8045ec4f... matches live**).
+  Both queues were empty at patch time, so no running job could have imported a half-written module.
+* **NEXT TICK:** score `pp1` **P0 / P0.2 / P0.3 / P0.4 / P1 / P2 / P3 / P4 / P5 / P5b in that
+  order**. **Write and COMMIT `analysis/c77_pp1_score.py` BEFORE reading any verdict -- it does not
+  exist yet.** Score **P2 before P3**, and remember P3 has no independent verdict. **If D is not
+  resolvably positive in pp1's own arms, P3/P4 must NOT be reported as a decomposition of anything**
+  -- that condition is registered in the batch script.
+* **STILL OPEN, RANKED (106.7):** (1) `pp1`'s P2; (2) **more seeds on mm1's exact contrast** -- pp1
+  delivers n=6 on D for free, and if that still leaves D within one se of +0.30, run seeds 3-5;
+  (3) a **layer-boundary permutation** (permute ACROSS tensors holding the size multiset) -- the arm
+  `permnode` deliberately is not, and the only thing that upgrades a confirmed P2 from a
+  within-layer statement to one about architecture as such; (4) the `__file__`-derived-path sweep of
+  `bin/` (101.11); (5) alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_PROBE4 /
+  PATCH_SCHED (gotcha 10), so the whole partition programme is **single-account** -- **this is now
+  the binding constraint on seed counts.**
+
+## Superseded -- cycle 76 (kept for the record)
+
 ## Running / next (cycle 76) -- **K2 REFUTED: "GRANULARITY" IS (COUNT, PARTITION). AT NEARLY FIXED COUNT THE PARTITION IS WORTH 10x THE COUNT.**
 
 **Read `docs/CORRECTIONS.md` 105 and `docs/FINDINGS.md` 75.0-75.6 FIRST. 105.2 is the headline,

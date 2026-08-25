@@ -141,6 +141,15 @@ class HF():
             alphas = [torch.exp(b).view(v) for b, v in zip(beta, self.node_view)]
             self.alpha_for_printing = alphas
             return alphas
+        # --- PATCH_PERMNODE: expand one alpha per group, then scatter it back to the
+        # tensor's own layout through the inverse permutation.  Gathering with perm_inv is
+        # the same map as scattering with perm_idx and costs no allocation per step.
+        if self.stepsize_type == 'permnode':
+            alphas = [torch.exp(b).repeat_interleave(_gs)[_iv].view(_sh)
+                      for b, _gs, _iv, _sh in zip(beta, self.perm_gsize, self.perm_inv,
+                                                  self.perm_shape)]
+            self.alpha_for_printing = alphas
+            return alphas
         # --- PATCH_CHUNKWISE: one alpha per contiguous chunk of K weights ---
         if self.stepsize_type == 'chunkwise':
             _K = self.chunk_size
@@ -161,6 +170,15 @@ class HF():
             return [u[i]*v[i] for i in range(self.num_layers)]
         if self.stepsize_type == 'nodewise':
             return [(u[i]*v[i]).reshape(u[i].shape[0], -1).sum(dim=1) for i in range(self.num_layers)]
+        # --- PATCH_PERMNODE: gather each tensor's elementwise product into permuted
+        # order, then sum in exact groups of gsize.  numel % groups == 0 was asserted at
+        # construction, so no padding is possible and no group is silently rescaled.
+        if self.stepsize_type == 'permnode':
+            _out = []
+            for i in range(self.num_layers):
+                _p = (u[i]*v[i]).reshape(-1)[self.perm_idx[i]]
+                _out.append(_p.view(self.perm_groups[i], self.perm_gsize[i]).sum(dim=1))
+            return _out
         # --- PATCH_CHUNKWISE: per-chunk sums, zero-padded to a whole number of chunks.
         # The pad contributes exactly 0 to its chunk's sum, so a ragged final chunk is
         # summed over its REAL members only and is not silently scaled.
@@ -222,7 +240,12 @@ class HF():
         # --- PATCH_CHUNKWISE: `chunk<K>` = contiguous chunks of K weights ---
         import re as _re
         _cm = _re.match(r'^chunk(\d+)$', stepsize_groups) if isinstance(stepsize_groups, str) else None
-        if _cm:
+        # --- PATCH_PERMNODE: `permnode<S>` = nodewise's sizes, membership permuted ---
+        _pm = _re.match(r'^permnode(\d+)$', stepsize_groups) if isinstance(stepsize_groups, str) else None
+        if _pm:
+            self.stepsize_type = 'permnode'
+            self.perm_seed = int(_pm.group(1))
+        elif _cm:
             self.stepsize_type = 'chunkwise'
             self.chunk_size = int(_cm.group(1))
             if self.chunk_size < 1:
@@ -251,6 +274,33 @@ class HF():
             _lb = torch.log(torch.tensor(alpha0, dtype=torch.float32, device=self._device))
             self.beta = [_lb * torch.ones(tuple(p_size), dtype=torch.float32, device=self._device)
                          for (_n, p_size) in net_param_names_and_size]
+        # --- PATCH_PERMNODE: nodewise's group COUNT and SIZE per tensor, membership
+        # randomised by a per-tensor permutation of that tensor's flat indices.  The
+        # permutation is generated on the CPU from an explicit torch.Generator so it is
+        # identical on CPU and GPU and reproducible from (perm_seed, tensor index) alone.
+        elif self.stepsize_type == 'permnode':
+            _S = self.perm_seed
+            _lb = torch.log(torch.tensor(alpha0, dtype=torch.float32, device=self._device))
+            self.perm_shape = [tuple(p_size) for (_n, p_size) in net_param_names_and_size]
+            self.perm_numel = [int(np.prod(list(p_size))) for (_n, p_size) in net_param_names_and_size]
+            self.perm_groups = [int(p_size[0]) for (_n, p_size) in net_param_names_and_size]
+            self.perm_gsize = []
+            self.perm_idx = []
+            self.perm_inv = []
+            for _i2, (_ne, _g2) in enumerate(zip(self.perm_numel, self.perm_groups)):
+                if _g2 <= 0 or _ne % _g2 != 0:
+                    raise ValueError('permnode: tensor %d has numel %d not divisible by %d'
+                                     % (_i2, _ne, _g2))
+                self.perm_gsize.append(_ne // _g2)
+                _gen = torch.Generator()
+                _gen.manual_seed(_S * 1000003 + _i2)
+                _pi = torch.randperm(_ne, generator=_gen)
+                _iv = torch.empty_like(_pi)
+                _iv[_pi] = torch.arange(_ne)
+                self.perm_idx.append(_pi.to(self._device))
+                self.perm_inv.append(_iv.to(self._device))
+            self.beta = [_lb * torch.ones(_g2, dtype=torch.float32, device=self._device)
+                         for _g2 in self.perm_groups]
         # --- PATCH_CHUNKWISE ---
         elif self.stepsize_type == 'chunkwise':
             _K = self.chunk_size
