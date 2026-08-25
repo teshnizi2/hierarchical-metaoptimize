@@ -173,6 +173,13 @@ BOXES = {
     # were also box-free here, so the arms are interior to a measured free range.
     # REGISTERED BEFORE ANY bn1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "bn1":  (-15.0, -2.3026, "bin/c78_degenerate_tail.sh:CLIP"),
+    # `ar1` (cycle 79) -- the SAME box as bn1/pp1/mm1/ck1, so A5's cross-batch meter
+    # is comparable.  UNLIKE every probed batch before it, ar1 runs at ms=3e-4, a 3x
+    # larger meta stepsize, so beta travels further and a bind at this box is a REAL
+    # possibility rather than a formality.  That is registered in the batch script:
+    # a bind VOIDS A3 (the field gate) and leaves A1/A2 (accuracy-only) standing.
+    # REGISTERED BEFORE ANY ar1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "ar1":  (-15.0, -2.3026, "bin/c79_argmax_robustness.sh:CLIP"),
 }
 
 

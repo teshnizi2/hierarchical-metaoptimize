@@ -14904,3 +14904,126 @@ partition itself, not of anything MetaOptimize does.
 **VERIFIED, NOT ASSUMED:** `chunkwise` chunks WITHIN each tensor (`HF.py` iterates layers, reshapes
 each tensor's own flat view, zero-pads the ragged tail so it is summed over real members only). All
 three pp1 arms are therefore within-tensor partitions and **B is not confounded by layer-crossing.**
+
+## 78.0 `bn1` — VALIDITY, CLEAN ON EVERY COLUMN, 9/9 ON ALL FOUR GUARDS
+
+Scored by `analysis/c78_bn1_score.py`, **117/117 selftest**, **git-committed at 9da5b2b
+BEFORE the batch was submitted**, while no `bn1` run existed in the CSV at all. `git diff
+9da5b2b -- analysis/c78_bn1_score.py` = **0 lines**; working tree clean. The verdict below
+was read from a scorer that could not have been tuned to it.
+
+| guard | result |
+|---|---|
+| T0 validity (n_rec=10000, beta moved, ep=100/100) | **9/9 PASS** |
+| T0.2 n_beta EXACT on every record | **9/9** — n1d 4,851 / c23 4,851 / node 14,420 |
+| T0.3 instrument fired (npy shape read from HEADER) | **9/9** |
+| T0.4 box-free, published rec_-based 5% gate | **9/9**, 0.0000 on all four columns |
+
+CSV **1,834 -> 1,843 raw data lines PURELY ADDITIVELY**, checked at the RAW LINE level:
+9 added (exactly the 9 `bn1-*`), 0 removed, 0 changed, header byte-identical.
+
+## 78.1 **T1 — THE PRIMARY LANDS IN THE BAND REGISTERED UNDECIDED, 0.005 pp BELOW THE THRESHOLD**
+
+| arm | m | plateau5 (n=3) |
+|---|---|---|
+| `chunk2325` uniform | 4,851 | **92.906 +-0.041** |
+| `nodewise1d` channels, size-1 tail merged away | 4,851 | **92.611 +-0.025** |
+| `nodewise` anchor | 14,420 | 92.184 +-0.033 |
+
+**G = chunk2325 - nodewise1d = +0.295 pp** (se 0.048, t 6.15). Registered five-way and
+symmetric before the data existed: `G > +0.30` SURVIVES, `(+0.15, +0.30]` UNDECIDED,
+`[-0.15, +0.15]` TAIL WAS THE CARRIER, `[-0.30, -0.15)` UNDECIDED, `G <= -0.30` REVERSAL.
+
+**-> UNDECIDED. It is not read as either verdict, and the bands are not moved.**
+
+The awkward part stated plainly: G misses SURVIVES by **0.005 pp**, one tenth of its own
+standard error. The gate is a threshold on G, not on t, and G is very well resolved
+(t 6.15) — so this is **not** statistical ambiguity about whether an effect exists. An
+effect exists. What is undecided is only whether it clears a number fixed in advance.
+
+What the number says quantitatively, **without** invoking the registered bands: the gap
+this was trying to explain is D = **+0.533 pooled** (mm1 +0.485, pp1 +0.581). Removing
+**only** the 9,610 size-1 groups leaves **+0.295**. So the degenerate tail accounts for
+roughly **45%** of D and roughly **55% survives** — **but that subtraction crosses group
+counts** (D at m=14,420, G at m=4,851) and ck1's K3 measured ~0.51 pp/decade in favour of
+coarser, so the 45/55 split carries a count confound and is a reading, not a measurement.
+
+**LIMITS, printed by the scorer WITH the verdict, not below it:** on ResNet18 every 1-D
+tensor is a BN scale/shift or `linear.bias`, so "the groups are degenerate (size 1)" and
+"the groups are on the NORMALISATION parameters" coincide EXACTLY — this batch cannot
+tell a size story from a parameter-role story. ms is held at 1e-4 and nodewise1d's own
+argmax has never been measured. Every arm is a WITHIN-TENSOR partition; layer boundaries
+are untested.
+
+## 78.2 T2 CONFIRMS AND IS CONFOUNDED BY DESIGN — IT IS NOT EVIDENCE ABOUT THE TAIL
+
+H = nodewise1d - nodewise = **+0.427 pp** (se 0.041, t 10.43), registered `H > +0.30`
+CONFIRMS. **-> CONFIRMS.** The two arms differ in COUNT (4,851 vs 14,420) as well as in
+the tail, and a count effect ALONE predicts H > 0 at ~0.51 pp/decade. **This confirm says
+nothing about the degenerate tail** and the scorer prints that sentence with the verdict
+every time. T1 is the confound-free contrast.
+
+## 78.3 T3 REPRODUCES (third draw from an offset with no stable sign)
+
+nodewise@1e-4 here **92.184 +-0.033** vs pp1's 92.012 (+0.172) and mm1's 92.044 (+0.140),
+bar +-0.50 -> REPRODUCES. Declared in advance unable to void T1 or T2: both are
+within-batch differences and any offset common to their arms cancels exactly. Three draws
+now: -0.255 (ck1 K1), +0.083 (mm1 M2), +0.140/+0.172 here. **Still no stable sign.**
+
+## 78.4 T5 IS NOT APPLICABLE — REGISTERED, AND HONOURED
+
+T5's dissociation re-test was defined ONLY on an accuracy tie. T1 is UNDECIDED, not NULL,
+so T5 returns **NOT APPLICABLE**. That branch was registered in advance precisely so a
+non-NULL T1 could not be used to fish for a dissociation afterwards. **The 77.5
+dissociation therefore still stands at ONE contrast, and this batch did not re-test it.**
+
+## 78.5 **THE BIAS CHANNEL IS ~100% THE DEGENERATE TAIL, WHILE ACCURACY IS ~45% — POST-HOC**
+
+From the scorer's T4 table (DESCRIPTIVE, no direction registered):
+
+| arm | m | pbar | dev_deb | **dev_bias** | N_eff/m |
+|---|---|---|---|---|---|
+| `nodewise` | 14,420 | 0.46171 | 0.01486 | **0.02345** | 0.0543 +-0.0020 |
+| `nodewise1d` | 4,851 | 0.48877 | 0.01880 | **0.00217** | 0.0929 +-0.0016 |
+| `chunk2325` | 4,851 | 0.48744 | 0.02708 | **0.00208** | 0.0443 +-0.0016 |
+
+CORRECTIONS 106.5 identified the matched-count partition gap as a **BIAS** channel
+(chunk 0.00370 vs node 0.02346, 6.3x). Merging away **only** the 9,610 size-1 groups takes
+nodewise's `dev_bias` from **0.02345 to 0.00217** — a **10.8x collapse, landing at
+chunk2325's 0.00208**, i.e. essentially all the way.
+
+**So the degenerate tail carries ~100% of the bias channel but only ~45% of the accuracy
+gap.** The instrument's tilt is fully explained by the tail; the accuracy gap is not.
+**The bias channel is therefore NOT a sufficient statistic for the accuracy gap.**
+POST-HOC, n=3, one architecture. Registers nothing.
+
+## 78.6 **THE FIELD NEVER ONCE PREDICTS ACCURACY AT MATCHED COUNT — POST-HOC, 3 PAIRS, 3 BATCHES**
+
+`analysis/c79_field_vs_accuracy.py` (**30/30 selftest**, declared POST-HOC and DESCRIPTIVE
+in its own docstring, asserted against its own text). Restricted to **matched group
+count**, because N_eff/m moves mechanically with m (c77: d log N_eff / d log m = 0.850
+with the PARTITION HELD FIXED), so ranking arms of different m by N_eff/m mostly ranks m.
+Three such pairs exist, each WITHIN one batch so the +-0.25 pp cross-batch offset cancels
+in both columns. Convention (chosen post-hoc, and that is stated in the script): higher
+N_eff/m -> higher plateau = CONCORDANT.
+
+| pair | isolates | dplateau5 | dN_eff/m | verdict |
+|---|---|---|---|---|
+| mm1 chunk777 - nodewise | aligned vs uniform, m=14,420 | **+0.485** (t 3.01) | **-0.0180** (t -10.62) | **ANTI-CONCORDANT** |
+| pp1 permnode - nodewise | ALIGNMENT only, sizes identical | **-0.009** (t -0.06) | **-0.0133** (t -13.12) | **ACCURACY UNRESOLVED** |
+| bn1 chunk2325 - nodewise1d | aligned vs uniform, m=4,851, tail gone | **+0.295** (t 6.15) | **-0.0485** (t -21.90) | **ANTI-CONCORDANT** |
+
+**CONCORDANT 0. ANTI-CONCORDANT 2. UNRESOLVED-on-accuracy 1.**
+
+The pattern across all three: **the field is hugely resolved every single time (|t| 10.6,
+13.1, 21.9) and accuracy either moves the OTHER way or does not move at all.** The arm
+with LOWER effective independence wins on accuracy, at two different group counts. Under
+the literature-facing sign convention the field's sign is systematically WRONG here; under
+the opposite convention it would be right twice and still say "large effect" where pp1
+measured none.
+
+**This is the sharpest statement the campaign has against the brief's default direction C.**
+A programme that measures sign agreement across granularities would, on this evidence,
+resolve differences at t ~ 10-22 that do not tell you which partition to use. **POST-HOC
+on all three pairs, n=3 each, ONE architecture, ONE dataset, ONE meta stepsize. It is a
+reason to REGISTER a test, not a result.** See CORRECTIONS 108.6 for what was submitted.

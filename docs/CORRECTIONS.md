@@ -5556,3 +5556,139 @@ per 105.7's rule that a code change gets its own batch and its own equivalence s
 5. alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 / PATCH_SCHED
    (gotcha 10), so the whole partition programme remains **single-account**. Binding constraint on
    seed counts.
+
+## 108 CYCLE 79 — `bn1` T1 IS UNDECIDED BY 0.005 pp; THE FIELD HAS NEVER ONCE PREDICTED ACCURACY; AND ms=1e-4 IS NOT nodewise's ARGMAX
+
+### 108.1 MECHANICS
+Both queues **0 R / 0 P on arrival**; all 9 `bn1` jobs COMPLETED at 100/100 ep.
+**CANCELLED: nothing** — both queues were empty, so there was nothing to audit or kill.
+CSV **1,834 -> 1,843 raw data lines PURELY ADDITIVELY**, checked at the RAW LINE level
+(9 added, exactly the 9 `bn1-*`; 0 removed; 0 changed; header byte-identical).
+`analysis/c78_bn1_score.py` **117/117**, `git diff 9da5b2b` = **0 lines**, working tree
+clean — the verdict was read from a scorer that is bitwise its registration commit.
+**ORPHAN AUDIT**, from `analysis/c69_orphan_census.py --report` (24/24 selftests), not from
+memory: **1,843 runs, 123 families, 0 ORPHANS** (118 strict-cited, 1,817 runs). **5 families
+/ 26 runs remain AMBIGUOUS** — cited only by a bare-token match, unchanged this cycle:
+`g3` (9), `gate0b` (6), `gate0d` (6), `det` (3), `v2` (2). All are pre-cycle-50 scalar /
+blocks families at a0=1e-6 from the dead granularity-anomaly line; they are already-spent
+compute and are **marked abandoned here so the next tick stops rediscovering them.**
+
+### 108.2 **T1 IS UNDECIDED, AND THE 0.005 pp IS NOT ROUNDED AWAY**
+G = chunk2325 - nodewise1d = **+0.295 pp** (se 0.048, t 6.15), both arms m=4,851 EXACTLY.
+Registered band `(+0.15, +0.30]` = UNDECIDED. **It misses SURVIVES by 0.005 pp — one
+tenth of its own standard error.**
+
+**The bands are not moved and the verdict is not upgraded.** This is what a
+pre-registration costs when it lands on a boundary, and paying it is the point.
+
+Two things must be said together, because either alone misleads:
+* **An effect exists.** t = 6.15. The gate is a threshold on G, not on t, so UNDECIDED
+  here does NOT mean "no effect" — it means the effect did not clear a number fixed in
+  advance.
+* **The tail is not the whole carrier.** D = +0.533 pooled; removing ONLY the 9,610
+  size-1 groups leaves +0.295. Roughly **45% of D is the degenerate tail and ~55%
+  survives** — but that subtraction crosses group counts (14,420 vs 4,851) and ck1's K3
+  measured ~0.51 pp/decade in favour of coarser, so **the 45/55 split is a reading with
+  a count confound, not a measurement.**
+
+**Do not write "the degenerate tail explains the partition gap."** Do not write "the tail
+is irrelevant" either. Write: at m=4,851, with the size-1 tail merged away, uniform still
+beats architecture-aligned by +0.295 pp, and the registered gate returned UNDECIDED.
+
+### 108.3 T2 CONFIRMS AND IS WORTH NOTHING; T3 REPRODUCES; T5 IS NOT APPLICABLE
+H = nodewise1d - nodewise = +0.427 (t 10.43) -> CONFIRMS, **and the arms differ in COUNT
+as well as in the tail, so it is not evidence about the tail.** Registered as confounded
+before submission, not excused afterwards. T3 = REPRODUCES (nodewise 92.184 vs pp1 92.012,
+mm1 92.044); the cross-batch offset now has three draws (-0.255, +0.083, +0.140/+0.172)
+and **still no stable sign**. T5 returned **NOT APPLICABLE** because T1 is not NULL —
+honoured, not overridden. **FINDINGS 77.5's dissociation therefore still stands at ONE
+contrast and was NOT re-tested this cycle.**
+
+### 108.4 **THE BIAS CHANNEL IS ~100% THE TAIL WHILE ACCURACY IS ~45% (FINDINGS 78.5)**
+CORRECTIONS 106.5 established that at matched count the partition gap lives in the field's
+BIAS channel, not its correlation channel. Merging away only the size-1 groups takes
+nodewise's `dev_bias` from **0.02345 to 0.00217 — a 10.8x collapse landing on chunk2325's
+0.00208**, i.e. essentially all of it. **So the tail explains ~100% of the instrument's
+tilt but only ~45% of the accuracy gap. The bias channel is NOT a sufficient statistic for
+the accuracy gap.** POST-HOC, n=3, registers nothing.
+
+### 108.5 **THE RESULT THAT BEARS ON THE PROJECT'S DIRECTION (FINDINGS 78.6)**
+`analysis/c79_field_vs_accuracy.py` (**30/30**, POST-HOC and DESCRIPTIVE, asserted against
+its own text) assembles every matched-count pair the campaign owns — restricted to matched
+count because N_eff/m moves mechanically with m (c77: d log N_eff / d log m = 0.850,
+partition held fixed), and each pair within one batch so the ±0.25 pp offset cancels:
+
+| pair | dplateau5 | dN_eff/m | verdict |
+|---|---|---|---|
+| mm1 chunk777 - nodewise | +0.485 (t 3.01) | -0.0180 (t -10.62) | ANTI-CONCORDANT |
+| pp1 permnode - nodewise | -0.009 (t -0.06) | -0.0133 (t -13.12) | ACCURACY UNRESOLVED |
+| bn1 chunk2325 - nodewise1d | +0.295 (t 6.15) | -0.0485 (t -21.90) | ANTI-CONCORDANT |
+
+**CONCORDANT 0. ANTI-CONCORDANT 2. The field is hugely resolved every single time
+(|t| 10.6, 13.1, 21.9) and accuracy either moves the other way or does not move at all.**
+
+**This is the sharpest thing the campaign has against the brief's DEFAULT direction C** —
+"extend the sign-agreement measurement across granularities and characterise how agreement
+varies with block size". On this evidence that programme would resolve differences at
+t ~ 10-22 that do not tell you which partition to use. **All three pairs are POST-HOC and
+none of it can be quoted as a tested prediction.** That is precisely what 108.6 fixes.
+
+### 108.6 **DECISION**
+**(a) `bn1` is closed as UNDECIDED on T1.** Recorded, bands unmoved, no extra seeds added
+to the same registration. Adding seeds to a batch that landed 0.005 pp under its own
+threshold, after seeing which side it fell on, is the one move most likely to manufacture
+a result, and it is refused.
+
+**(b) Direction C is NOT adopted as the project, and NOT yet dropped.** The brief's default
+says make the sign-agreement measurement the paper. Our own data now says the instrument
+does not predict the outcome it would be used to choose between — but only post-hoc. **A
+default this consequential is worth one pre-registered test before it is either adopted or
+abandoned**, and A3 below is that test.
+
+**(c) THE BOUND THAT COULD RESHAPE EVERYTHING, FOUND THIS CYCLE.** Re-derived from the CSV
+at the campaign's own 13-axis signature:
+
+| | plateau5 | n |
+|---|---|---|
+| nodewise @ ms=1e-4 | 92.073 ±0.044 | 13 |
+| nodewise @ ms=3e-4 | **92.493 ±0.092** | 8 |
+
+**+0.420 pp, t ≈ 4.1. ms=1e-4 is NOT nodewise's argmax — it sits 0.42 pp below it,
+comparable to the entire gap the campaign has spent four cycles explaining.** Every D and
+G we own (mm1 +0.485, pp1 +0.581, bn1 +0.295) was measured there, and **chunk777,
+chunk2325 and nodewise1d have never been run at ANY other stepsize**, so their ms curves
+are entirely unmeasured. If chunk's optimum sits near 1e-4 while nodewise's sits at 3e-4,
+a material part of D is "we compared two partitions at one partition's favourable
+stepsize". bn1's own registered limits already flagged this; this cycle stops deferring it.
+
+**(d) SUBMITTED: `ar1`, 12 jobs** — `bin/c79_argmax_robustness.sh`, {nodewise, chunk777,
+nodewise1d, chunk2325} × seeds 0-2 at **ms=3e-4**, 100 ep, PROBE=5 AND PROBE5=1, box
+registered in `c55_neff_noise.BOXES` before submission. **NO NEW PATCH** — every
+granularity already ships and is already covered by an equivalence suite, which is why
+this batch carries far less mechanism risk than the last three. It answers both open
+questions at once: **A1** re-reads D at a stepsize where nodewise is at its own better
+point, and **A3** is the pre-registered concordance test 108.5 is missing.
+
+**(e) `analysis/c79_ar1_score.py` (62/62) is committed BEFORE the batch is submitted**,
+while no `ar1` run exists in the CSV at all — STANDING RULE 19 in the strict order.
+**A1's COLLAPSE branch is registered with exactly the same width as its SURVIVES branch**,
+and if it fires, every D the campaign quotes becomes bounded to ms=1e-4 and CORRECTIONS
+107.2/107.4 plus FINDINGS 76.x/77.x must all be requalified. **A2 cannot amend bn1's T1** —
+T1 was UNDECIDED and stays UNDECIDED whatever A2 returns, registered so that a batch
+designed after T1 missed its threshold by 0.005 pp cannot be used to nudge it across.
+**A3 is VOID if any arm is box-bound**; ms is 3× larger than in any previously probed
+batch, so a bind is a real possibility and is registered in advance rather than treated as
+a surprise.
+
+### 108.7 STILL OPEN, RANKED
+1. **`ar1`'s A1** — is the partition gap an argmax artefact? Everything else is downstream.
+2. **`ar1`'s A3** — the pre-registered concordance test; it decides direction C.
+3. **A layer-boundary permutation** (permute ACROSS tensors holding the size multiset).
+   pp1's A is a WITHIN-LAYER null and only this upgrades it to a statement about
+   architecture as such. Unchanged at rank 3 for three cycles; it needs a new patch.
+4. The 77.5 dissociation at a third contrast (bn1's T5 did NOT supply one).
+5. The `__file__`-derived-path sweep of `bin/` (101.11).
+6. alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 /
+   PATCH_SCHED (gotcha 10), so the whole partition programme remains **single-account** —
+   still the binding constraint on seed counts, and the reason n=3 keeps landing on band
+   boundaries.
