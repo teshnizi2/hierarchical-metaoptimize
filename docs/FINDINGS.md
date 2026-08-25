@@ -14791,3 +14791,116 @@ nodewise BITWISE (0.000e+00)**; P7 checks the alpha scatter/gather round-trip ov
 weights at 0.000e+00; **P8 is the anti-vacuity guard** (permnode does diverge: max|dbeta| 3.8e−01);
 **P10 re-asserts chunk1 == weightwise and chunk<huge> == layerwise at 0.000e+00**, so
 PATCH_PERMNODE disturbed nothing. `tests/test_granularity.py` also still passes.
+
+## 77.0 `pp1` — VALIDITY, AND IT IS CLEAN ON EVERY COLUMN
+
+9/9 arms. `analysis/c77_pp1_score.py` (**139/139 selftest**, git-committed 7ccaec0 **before any pp1
+number was read**, STANDING RULE 19).
+
+| gate | result |
+|---|---|
+| P0   validity (n_records 10000, beta moved, ep 100/100) | **9/9** |
+| P0.2 n_beta EXACT per record — node 14420, perm 14420, ch 14421 | **9/9** |
+| P0.3 instrument fired (neg_counts.json, n_tot == n_beta, npy shape from HEADER) | **9/9** |
+| P0.4 box-free at BOTH guards, rec_-based 5% gate | **9/9, all four columns 0.0000** |
+
+CSV **1825 → 1834 raw data lines, PURELY ADDITIVELY** (9 added, 0 removed, 0 changed, header
+byte-identical), checked at the RAW LINE level per 106.1. Added names are exactly the 9 `pp1-*`.
+
+## 77.1 **P2 IS NULL: ARCHITECTURE ALIGNMENT IS WORTH NOTHING AT FIXED COUNT AND FIXED SIZE MULTISET**
+
+The PRIMARY, five-way and symmetric, registered before the data existed.
+
+| arm | m | partition | plateau5 (n=3) |
+|---|---|---|---|
+| nodewise    | 14,420 | output channels | 92.012 ±0.129 |
+| permnode\<S\> | 14,420 | nodewise's **exact per-tensor size multiset**, membership randomised within each tensor | 92.003 ±0.090 |
+| chunk777    | 14,421 | uniform flat chunks of 777 | 92.593 ±0.058 |
+
+**A = permnode − nodewise = −0.009 pp, se 0.157, t = −0.06 → NULL** (registered band [−0.15, +0.15]).
+The effect is a fifth of the ±0.02 pp reproducibility floor from the campaign's own repeat runs.
+Randomising *which* weights share a group, while holding the group count and the per-tensor
+group-size multiset **exactly**, changes nothing that can be measured.
+
+## 77.2 P1 REPLICATES — D IS REAL AND IT REPRODUCES OUT OF BATCH
+
+**D = chunk777 − nodewise = +0.581 pp, se 0.141, t = 4.11.** mm1 measured +0.485; deviation +0.096,
+inside the registered ±0.50 bar → **REPLICATES**. This is the FIRST out-of-batch replication of M1,
+and it lands *further* from zero than the original, so it is not a regression-to-the-mean artifact.
+
+**P6 (POST-HOC, DESCRIPTIVE, REGISTERS NOTHING): pooled D = +0.533 pp at n=6 seeds per arm.** D is a
+within-batch difference in both batches, so the unmodelled ±0.25 pp cross-batch offset (106.3)
+cancels inside each and the two estimates may be averaged. This closes CORRECTIONS 106.7 item (2).
+
+## 77.3 P3/P4 — THE WHOLE GAP IS THE SIZE DISTRIBUTION
+
+P1.5's decomposability precondition (D > +0.15 AND t ≥ 2.0; **the numbers are the SCORER's**, fixed
+unread, reusing M1's own refute line) is SATISFIED, so P3/P4 may be read as a decomposition.
+
+| leg | contrast | value | t |
+|---|---|---|---|
+| A ALIGNMENT        | node → perm | **−0.009 pp** | −0.06 |
+| B SIZE DISTRIBUTION| perm → ch   | **+0.590 pp** | 5.53 |
+| D both             | node → ch   | +0.581 pp | 4.11 |
+
+P4 receipt: A + B − D = 0.000e+00. **Shares of D: alignment −1.6%, size distribution +101.6%.**
+
+## 77.4 P5b AGREES WITH P2 — THE FIELD'S TILT ALSO TRACKS SIZE, NOT ALIGNMENT
+
+Registered from c77's post-hoc F2, origin declared. x = dev_bias(permnode) against midpoint 0.01358,
+UNDECIDED band [0.00864, 0.01852].
+
+**MEASURED: dev_bias(permnode) = 0.02176 → SIZE-DISTRIBUTION EFFECT.** It sits with nodewise's
+0.02346 (this batch: 0.02334), not with chunk777's 0.00370 (this batch: 0.00355), despite carrying
+arbitrary membership. P2 and P5b were declared logically independent in advance; **they AGREE**,
+which is the weaker of the two possible outcomes only because it was the expected one.
+
+## 77.5 **THE DISSOCIATION THAT IS NOT IN ANY REGISTERED GATE — POST-HOC, AND SAID ANYWAY**
+
+Read off P5's table. It is POST-HOC, it registers nothing, and it must not be quoted as a tested
+prediction — but it is the tick's most consequential number for direction C.
+
+| arm | m | plateau5 | a_deb | dev_deb | **N_eff/m** |
+|---|---|---|---|---|---|
+| nodewise    | 14,420 | 92.012 | 0.51475 | 0.01475 | **0.0547 ±0.0010** |
+| permnode\<S\> | 14,420 | 92.003 | 0.51653 | 0.01653 | **0.0414 ±0.0003** |
+| chunk777    | 14,421 | 92.593 | 0.51729 | 0.01729 | **0.0358 ±0.0012** |
+
+nodewise → permnode moves **N_eff/m by −24% (0.0547 → 0.0414, se 0.0010 and 0.0003, t ≈ 13)** and
+the debiased channel by **+12%**, while plateau accuracy moves **−0.009 pp (t = −0.06)**.
+**The correlation measurement and the optimisation outcome dissociate completely across this
+contrast.** The sign-agreement field is NOT a sufficient statistic for what a partition does to
+optimisation. Anything the campaign writes about agreement-across-granularity now has to survive
+this: the instrument resolved a 24% change that accuracy could not see at all.
+
+## 77.6 **THE MECHANISM, MEASURED FROM THE NETWORK: `nodewise` SPENDS 2/3 OF ITS BUDGET ON 0.09% OF THE WEIGHTS**
+
+Measured on the real built ResNet18 (41 one-dimensional tensors: every BatchNorm scale and shift,
+plus `linear.bias`). Not inferred, not from a comment.
+
+| nodewise group size | groups | % of groups | weights covered | % of weights |
+|---|---|---|---|---|
+| **1** | **9,610** | **66.64%** | **9,610** | **0.09%** |
+| 27 | 64 | 0.44% | 1,728 | 0.02% |
+| 64 | 128 | 0.89% | 8,192 | 0.07% |
+| 128 | 256 | 1.78% | 32,768 | 0.29% |
+| 256 | 512 | 3.55% | 131,072 | 1.17% |
+| 512 | 10 | 0.07% | 5,120 | 0.05% |
+| 576 | 384 | 2.66% | 221,184 | 1.98% |
+| 1,152 | 640 | 4.44% | 737,280 | 6.60% |
+| 2,304 | 1,280 | 8.88% | 2,949,120 | 26.39% |
+| 4,608 | 1,536 | 10.65% | 7,077,888 | 63.34% |
+
+chunk777's multiset is 14,359 groups of exactly 777 plus one ragged remainder per tensor.
+**Both partitions have the same mean group size (774.9 vs 774.8) — the count is matched — but
+nodewise's size variance is 2.2e6 and chunk777's is ~0.**
+
+**On ResNet18 "one step size per output channel" IS weightwise meta-learning on the normalisation
+parameters for two thirds of its groups.** Every 1-D tensor has `numel/shape[0] == 1`, so each BN
+scalar gets its own beta. chunk777 gives each of those tensors exactly ONE group (|C| ≤ 512 < 777).
+This is the concrete difference that B measures, and it is a property of the architecture-aligned
+partition itself, not of anything MetaOptimize does.
+
+**VERIFIED, NOT ASSUMED:** `chunkwise` chunks WITHIN each tensor (`HF.py` iterates layers, reshapes
+each tensor's own flat view, zero-pads the ragged tail so it is summed over real members only). All
+three pp1 arms are therefore within-tensor partitions and **B is not confounded by layer-crossing.**

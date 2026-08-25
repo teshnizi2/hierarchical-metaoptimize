@@ -5429,3 +5429,130 @@ and all three suites — `test_permnode.py` (33 PASS / 0 FAIL), `test_chunkwise.
 5. alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_PROBE4 / PATCH_SCHED (gotcha 10), so
    the whole partition programme is **single-account** and cannot use the second subscription's
    concurrency. This is now the binding constraint on seed counts.
+
+# ============================ CYCLE 78 ============================
+
+## 107.1 BOOKKEEPING
+
+**BOTH QUEUES 0 RUNNING / 0 PENDING ON ARRIVAL.** All 9 `pp1` jobs complete at 100/100 ep.
+**CANCELLED: nothing** — there was nothing to audit or kill. Queue-audit table:
+
+| family | count | state | verdict | reason |
+|---|---|---|---|---|
+| (none) | 0 | — | — | both queues empty on arrival; nothing running, nothing pending |
+
+CSV **1825 → 1834 raw data lines, PURELY ADDITIVELY**, checked at the RAW LINE level per 106.1
+(9 added, 0 removed, 0 changed, header byte-identical). The 9 added names are exactly the 9 `pp1-*`.
+Distinct run names 1822 → 1831; the three duplicate-name rows flagged in 106.1 are untouched.
+
+**ORPHAN AUDIT: 122 families, 1,834 runs, 0 orphans.**
+
+`analysis/c77_pp1_score.py` registered at **139/139 and GIT-COMMITTED (7ccaec0) BEFORE any pp1
+number was read** — STANDING RULE 19 in the strict order. One selftest assertion failed on first run
+(the batch script wraps its within-layer-limit sentence across a comment line break); **the SCORER's
+assertion was corrected to match the script's text, the script was not touched**, and the corrected
+check asserts all three fragments rather than a weakened substring.
+
+## 107.2 **P2 IS NULL — AND THE CLEAN NEGATIVE IS THE RESULT**
+
+**A = permnode − nodewise = −0.009 pp, se 0.157, t = −0.06.** Registered NULL band [−0.15, +0.15].
+
+This was registered five-way and SYMMETRIC precisely so neither sign could be promoted afterwards,
+and the outcome is the middle band. Holding the group count at 14,420 and the per-tensor group-size
+multiset **exactly**, and randomising only which weights land in which group, is worth **nothing** —
+a fifth of the campaign's ±0.02 pp reproducibility floor.
+
+**The sentence CORRECTIONS 105.3 forbade is now not merely unsupported, it is REFUTED at n=3.**
+"Architecture ALIGNMENT matters" was the claim that would have borne on the Adam-mini / Adalayer /
+SGG line. It does not survive its own pre-registered test. Do not write it. Do not write a hedged
+version of it.
+
+**The NULL is worth as much as the positive would have been, and it is worth more than it looks**,
+because it is a negative that *localises* a positive: D is real and replicated, so something carries
+it, and P2 removes the candidate the literature would have assumed.
+
+## 107.3 P1 REPLICATES, AND THE POOLED CONTRAST NOW SITS AT n=6
+
+D = +0.581 pp (t = 4.11) here against mm1's +0.485 — deviation +0.096, inside the registered ±0.50.
+**Pooled D = +0.533 pp at n=6 seeds per arm** (POST-HOC, DESCRIPTIVE, registers nothing; legitimate
+only because D is within-batch in both batches so 106.3's ±0.25 pp offset cancels inside each).
+
+106.2 asked that M1 be quoted with its margin because the CONFIRM cleared the UNDECIDED band by ONE
+standard error. **That caveat can now be retired for D specifically**: an independent batch put it
+at +0.581 with t = 4.11, further from the band, not nearer. **The caveat is NOT retired for anything
+else mm1 was used to support.**
+
+## 107.4 **THE CARRIER IS THE SIZE DISTRIBUTION, AND THE MECHANISM IS MEASURED (FINDINGS 77.6)**
+
+B = +0.590 pp (t = 5.53) — **101.6% of D**, with alignment at −1.6% and the P4 receipt closing at
+0.000e+00.
+
+Measured on the real built ResNet18: **66.64% of `nodewise`'s 14,420 groups are size 1**, covering
+**0.09% of the weights**. Every BatchNorm scale and shift and `linear.bias` — 41 one-dimensional
+tensors, 9,610 scalars — gets its own step size, because for a 1-D tensor `numel/shape[0] == 1`.
+chunk777 gives each of those tensors exactly ONE group. Same mean group size (774.9 vs 774.8, the
+count being matched), size variance 2.2e6 vs ~0.
+
+**On ResNet18, "one step size per output channel" is two-thirds weightwise meta-learning on the
+normalisation parameters.** That is a property of the architecture-aligned partition itself, not of
+MetaOptimize, which is what makes it the first thing in this campaign that speaks to the
+Adam-mini / Adalayer / SGG line rather than about our own optimizer.
+
+**VERIFIED, NOT ASSUMED:** `chunkwise` chunks WITHIN each tensor (HF.py iterates layers and
+zero-pads the ragged tail so it sums over real members only). All three pp1 arms are within-tensor,
+so **B carries no layer-crossing confound**. This was checked in the patch source, not assumed from
+the arm's name.
+
+## 107.5 **THE DISSOCIATION — POST-HOC, UNREGISTERED, AND REPORTED ANYWAY (FINDINGS 77.5)**
+
+Across node → perm, **N_eff/m moves −24% (0.0547 ±0.0010 → 0.0414 ±0.0003, t ≈ 13)** and the
+debiased agreement channel +12%, while **plateau accuracy moves −0.009 pp (t = −0.06)**.
+
+**The field instrument and the optimisation outcome dissociate completely on this contrast.** This
+is the strongest constraint the campaign has yet produced on its own direction-C default: the
+sign-agreement measurement is not a sufficient statistic for what a partition does. A programme that
+extends the agreement measurement across granularities, models and datasets would have measured a
+large, highly resolved change here and been unable to predict from it that accuracy does not move.
+
+It is POST-HOC. It registers nothing. It must not be quoted as a tested prediction. It is on the
+record because burying it would leave direction C looking better supported than it is.
+
+## 107.6 **DECISION**
+
+**The campaign's live line is now: the group-size DISTRIBUTION is the design variable, and the
+degenerate size-1 tail is the specific suspect.** Reasons, in order:
+
+1. It is the only contrast in this campaign that has **replicated out of batch** (+0.485, +0.581,
+   pooled +0.533 at n=6) with a **pre-registered** primary.
+2. Its rival explanation was pre-registered, tested, and **NULLed at t = −0.06**.
+3. The mechanism is **measured on the network**, not inferred: 66.64% of groups on 0.09% of weights.
+4. It is a statement **about the Adam-mini / Adalayer / SGG line**, not about MetaOptimize, which is
+   what the brief's direction C was reaching for and has not delivered.
+
+**The brief's direction-C default stays BLOCKED, and 107.5 is why** — not because it is
+uninteresting, but because pp1 has now shown the agreement field moving 24% with accuracy flat, so
+"characterise how agreement varies with block size" cannot be the paper's claim without first
+explaining why that variation does not predict anything. The 53.1% headline also still does not
+reproduce (76.5, 75.4) and **must not be written**.
+
+**IDEA 1 (I1-*) and IDEA 2: unchanged and still dead.** No I1-* run exists in the CSV and none is
+submitted; the kill-test verdict stands. Nothing this tick bears on either.
+
+**SUBMITTING: `bn1`, the degenerate-tail test.** One code change (`PATCH_NODEBN`, a `nodewise1d`
+partition: nodewise on every tensor with ndim ≥ 2, ONE group per 1-D tensor) plus a matched-count
+uniform arm. m(nodewise1d) = **4,851**; **chunk2325 gives m = 4,851 EXACTLY** — a perfect matched
+count, better than mm1's one-group-apart. Full registration in the batch script before submission,
+per 105.7's rule that a code change gets its own batch and its own equivalence suite.
+
+## 107.7 STILL OPEN, RANKED
+
+1. **`bn1`'s primary** — does the +0.53 pp matched-count gap COLLAPSE when the 9,610 degenerate
+   size-1 groups are removed from the nodewise side?
+2. **A layer-boundary permutation** (permute ACROSS tensors holding the size multiset). pp1's A is a
+   WITHIN-LAYER null; only a cross-tensor permutation upgrades it to a statement about architecture
+   as such. Still not built.
+3. **The dissociation of 107.5 at a second contrast** — it is one comparison at n=3 and post-hoc.
+4. The `__file__`-derived-path sweep of `bin/` (101.11).
+5. alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 / PATCH_SCHED
+   (gotcha 10), so the whole partition programme remains **single-account**. Binding constraint on
+   seed counts.
