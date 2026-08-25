@@ -164,6 +164,15 @@ BOXES = {
     # group-size multiset, so it sits at the same m in the same range.
     # REGISTERED BEFORE ANY pp1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "pp1":  (-15.0, -2.3026, "bin/c77_permuted_partition.sh:CLIP"),
+    # cycle-78 DEGENERATE-TAIL batch (`bn1`), the matched-count contrast run again with
+    # nodewise's 9,610 size-1 groups removed from the architecture-aligned side.  Same
+    # box AGAIN -- pp1's, which is mm1's, which is ck1's.  Not a new box.  Its `node`
+    # arm is bitwise pp1's and mm1's nodewise arm, which read 0.0000 on all four
+    # occupancy columns in this box across 6 runs; `n1d` and `c23` sit at m = 4,851,
+    # between ck1's chunk1024 (m=10,944) and cx2's chunk8192 (m=1,407), both of which
+    # were also box-free here, so the arms are interior to a measured free range.
+    # REGISTERED BEFORE ANY bn1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "bn1":  (-15.0, -2.3026, "bin/c78_degenerate_tail.sh:CLIP"),
 }
 
 
