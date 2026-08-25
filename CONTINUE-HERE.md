@@ -54,6 +54,116 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 78) -- **P2 IS NULL. ARCHITECTURE ALIGNMENT IS WORTH -0.009 pp. THE CARRIER IS THE SIZE DISTRIBUTION, AND THE SUSPECT IS MEASURED.**
+
+**Read `docs/CORRECTIONS.md` 107 and `docs/FINDINGS.md` 77.0-77.6 FIRST. 107.2 is the headline,
+107.4 is the measured mechanism, 107.5 is the unregistered dissociation that constrains direction C,
+107.6 is the DECISION.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** All 9 `pp1` jobs complete at 100/100 ep.
+  CSV **1,825 -> 1,834 raw data lines PURELY ADDITIVELY**, checked at the **RAW LINE level**
+  (9 added -- exactly the 9 `pp1-*` -- 0 removed, 0 changed, header byte-identical).
+  **CANCELLED: nothing** -- both queues were empty, so there was nothing to audit or kill.
+  `analysis/c77_pp1_score.py` (**139/139**) registered and **GIT-COMMITTED (7ccaec0) BEFORE any pp1
+  number was read** -- STANDING RULE 19 in the strict order. **ORPHAN AUDIT: 122 families, 1,834
+  runs, 0 orphans.**
+* **THE HEADLINE (107.2): `pp1`'s P2 is NULL.** A = permnode - nodewise = **-0.009 pp, se 0.157,
+  t = -0.06**, against a band registered FIVE-WAY and SYMMETRIC before the data existed.
+  Holding the group count at 14,420 AND the per-tensor group-size multiset **EXACTLY**, and
+  randomising only which weights land in which group, is worth **nothing** -- a fifth of the
+  campaign's +-0.02 pp reproducibility floor.
+  **The sentence 105.3 forbade is now REFUTED, not merely unsupported.** "Architecture ALIGNMENT
+  matters" was the claim that would have borne on the Adam-mini / Adalayer / SGG line. It does not
+  survive its own pre-registered test. **Do not write it. Do not write a hedged version.**
+* **P1 REPLICATES (107.3).** D = chunk777 - nodewise = **+0.581 pp, t = 4.11** here against mm1's
+  +0.485 -- deviation +0.096, inside the registered +-0.50. First out-of-batch replication of M1,
+  and it lands FURTHER from zero, not nearer. **Pooled D = +0.533 pp at n=6** (P6, POST-HOC,
+  DESCRIPTIVE, registers nothing). 106.2's "quote M1 with its one-se margin" caveat is **retired for
+  D specifically** and for nothing else.
+* **THE DECOMPOSITION CLOSES ON ONE LEG (107.4, FINDINGS 77.3).** A ALIGNMENT **-0.009** (t -0.06),
+  B SIZE DISTRIBUTION **+0.590** (t 5.53), D **+0.581** (t 4.11). P4 receipt A+B-D = 0.000e+00.
+  **Shares of D: alignment -1.6%, size distribution +101.6%.** P1.5's decomposability precondition
+  (D > +0.15 AND t >= 2.0, the numbers fixed by the SCORER, unread) was SATISFIED.
+* **P5b AGREES (77.4).** dev_bias(permnode) = **0.02176** sits with nodewise's 0.02346, not chunk's
+  0.00370 -> SIZE-DISTRIBUTION EFFECT. P2 and P5b were declared logically independent in advance and
+  they agree, which is the weaker of the two possible outcomes only because it was expected.
+* **THE MECHANISM, MEASURED ON THE NETWORK (107.4, FINDINGS 77.6). THIS IS THE TICK'S BEST
+  MATERIAL.** **66.64% of `nodewise`'s 14,420 groups are size 1**, covering **0.09% of the weights**.
+  All 41 one-dimensional tensors -- every BatchNorm scale and shift plus `linear.bias`, 9,610
+  scalars -- have `numel//shape[0] == 1`, so each gets its OWN step size. chunk777 gives each of
+  those tensors exactly ONE group. Same mean group size (774.9 vs 774.8; the count is matched), size
+  variance 2.2e6 vs ~0. **On ResNet18, "one step size per output channel" is two-thirds WEIGHTWISE
+  meta-learning on the normalisation parameters.** That is a property of the architecture-aligned
+  partition ITSELF, not of MetaOptimize -- the first thing in this campaign that speaks to the
+  prior-art line rather than about our own optimizer.
+  **VERIFIED, NOT ASSUMED:** `chunkwise` chunks WITHIN each tensor (HF.py iterates layers, zero-pads
+  the ragged tail so it sums over real members only), so **B carries no layer-crossing confound**.
+* **THE DISSOCIATION, POST-HOC AND UNREGISTERED AND REPORTED ANYWAY (107.5, FINDINGS 77.5).**
+  Across node -> perm, **N_eff/m moves -24% (0.0547 +-0.0010 -> 0.0414 +-0.0003, t ~ 13)** and the
+  debiased channel +12%, while **plateau accuracy moves -0.009 pp (t = -0.06)**. The field
+  instrument and the optimisation outcome dissociate completely. **This is the strongest constraint
+  yet on the brief's direction-C default** -- a programme that measures agreement across
+  granularities would have resolved a 24% change here and been unable to predict that accuracy does
+  not move. It registers NOTHING and must not be quoted as a tested prediction. `bn1`'s **T5**
+  re-tests it on an independent contrast.
+* **SUBMITTED: `bn1`, 9 jobs on alice, 0 cancelled, 0 rejected.** `bin/c78_degenerate_tail.sh` with
+  **PATCH_NODEBN**, built this cycle. `nodewise1d` = nodewise on every tensor with ndim >= 2 (so the
+  per-output-channel partition on every conv and linear WEIGHT MATRIX is left exactly in place) and
+  **ONE group per 1-D tensor**, removing only the degenerate tail. Arms {nodewise1d, chunk2325,
+  nodewise} x seeds 0-2, ms=1e-4, 100 ep, PROBE=5 AND PROBE5=1, box registered in
+  `c55_neff_noise.BOXES` before submission.
+  **m(nodewise1d) = 4,851 and m(chunk2325) = 4,851 EXACTLY -- 0 groups apart, better than mm1's
+  one-apart.**
+* **`bn1` REGISTERED GATES, DO NOT EDIT AFTER THE DATA LANDS. T1 IS THE PRIMARY, FIVE-WAY AND
+  SYMMETRIC:** G = plateau5(chunk2325) - plateau5(nodewise1d), count matched exactly.
+  **[-0.15, +0.15] -> THE DEGENERATE TAIL WAS THE CARRIER** -- the +0.53 pp gap collapses once the
+  9,610 size-1 groups are merged away; PRESCRIPTIVE for Adam-mini / Adalayer / SGG. **This is the
+  NULL band: reachable only by failing to find an effect.**
+  **G > +0.30 -> THE GAP SURVIVES** -- size heterogeneity AS SUCH is the carrier and the fix is not
+  "merge the 1-D tensors". **G <= -0.30 -> REVERSAL, ALIGNMENT PAYS ONCE THE TAIL IS GONE** -- and
+  then **pp1's P2 must be re-read as "alignment is null IN THE PRESENCE OF the tail", which is
+  WEAKER than 107.2 states.** That branch is registered in advance precisely so it cannot be
+  dismissed if it fires. Both +-(0.15, 0.30] bands are registered UNDECIDED.
+* **T2 IS CONFOUNDED BY DESIGN AND SAYS SO ON EVERY BRANCH.** H = nodewise1d - nodewise predicts
+  H > 0, but the arms differ in COUNT (4,851 vs 14,420) and ck1's K3 measured ~0.51 pp/decade in
+  favour of coarser. **A T2 CONFIRM IS NOT EVIDENCE ABOUT THE TAIL.** T1 is the confound-free one.
+  **T3 cannot void T1 or T2** (both within-batch). **T5 is NOT APPLICABLE unless T1 is NULL** --
+  registered so a non-NULL T1 cannot be used to fish for a dissociation.
+* **WHAT `bn1` EXPLICITLY DOES NOT CLAIM.** On ResNet18 every 1-D tensor is a BN scale/shift or the
+  output bias, so **"the groups are degenerate (size 1)" and "the groups are on the NORMALISATION
+  parameters" coincide EXACTLY** -- this batch cannot tell a size story from a parameter-role story.
+  ms is held at 1e-4 and **nodewise1d's own argmax has never been measured**. Every arm is a
+  WITHIN-TENSOR partition, so layer boundaries are untested.
+* **VERIFIED, NOT ASSUMED.** `tests/test_nodebn.py` N0-N10, **36 PASS / 0 FAIL on CPU**, run against
+  the **LIVE tree** as guard 1e of the batch itself. **N0 asserts a config equals ITSELF at
+  0.000e+00 FIRST** (STANDING RULE 20); **N1 asserts nodewise1d == nodewise BITWISE on a
+  purpose-built bias-free net** (the assertion that says the ONLY thing it changes is the 1-D
+  tensors); N4 checks the alpha round-trip over all 11,173,962 weights at 0.000e+00; **N6 is the
+  anti-vacuity guard**; **N10 re-asserts chunk1 == weightwise and chunk<huge> == layerwise**, so
+  PATCH_NODEBN disturbed nothing. `test_permnode.py`, `test_chunkwise.py` and `test_granularity.py`
+  all still pass on the live tree. Guard 4 measured all three m from the **ALLOCATED beta**, asserted
+  the match is EXACT, and asserted that the 41 changed tensors are EXACTLY the 1-D ones.
+  **At tick end all 9 arms are RUNNING and advancing with `n_beta` read from probe.jsonl at exactly
+  4,851 (nodewise1d AND chunk2325) and 14,420 (nodewise) on real GPU runs.**
+* **LIVE `HF.py` ON ALICE IS PATCHED** (backup `HF.py.bak_precycle78`, `__pycache__` cleared,
+  canonical copy refreshed at `patches/HF_patched.py`, **710 lines, md5 d3202635... matches live**).
+  Both queues were empty at patch time and the queue was RE-CHECKED at 0 immediately before the
+  write, so no running job could have imported a half-written module.
+* **NEXT TICK:** score `bn1` **T0 / T0.2 / T0.3 / T0.4 / T1 / T2 / T3 / T4 / T5 in that order**.
+  **`analysis/c78_bn1_score.py` ALREADY EXISTS, is 117/117, and was committed BEFORE the batch was
+  submitted** -- while no `bn1` run existed in the CSV at all. **Do not edit it.** Score **T1 before
+  T2**, remember T2's confirm is not evidence about the tail, and **do not read T5 unless T1 is
+  NULL** (the scorer enforces this, but do not fight it).
+* **STILL OPEN, RANKED (107.7):** (1) `bn1`'s T1; (2) a **layer-boundary permutation** (permute
+  ACROSS tensors holding the size multiset) -- pp1's A is a WITHIN-LAYER null and only this upgrades
+  it to a statement about architecture as such; (3) the **107.5 dissociation at a third contrast**
+  (`bn1`'s T5 is the second); (4) the `__file__`-derived-path sweep of `bin/` (101.11); (5) alice2
+  still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / **PATCH_NODEBN** / PATCH_PROBE4 / PATCH_SCHED
+  (gotcha 10), so the whole partition programme is **single-account** -- still the binding constraint
+  on seed counts.
+
+## Superseded -- cycle 77 (kept for the record)
+
 ## Running / next (cycle 77) -- **M1 CONFIRMS AT MATCHED COUNT (+0.485 pp). THE PARTITION GAP IS A BIAS CHANNEL, NOT A CORRELATION CHANNEL.**
 
 **Read `docs/CORRECTIONS.md` 106 and `docs/FINDINGS.md` 76.0-76.7 FIRST. 106.2 is the verdict WITH
