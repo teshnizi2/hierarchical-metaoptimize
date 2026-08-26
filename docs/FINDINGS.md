@@ -15027,3 +15027,107 @@ A programme that measures sign agreement across granularities would, on this evi
 resolve differences at t ~ 10-22 that do not tell you which partition to use. **POST-HOC
 on all three pairs, n=3 each, ONE architecture, ONE dataset, ONE meta stepsize. It is a
 reason to REGISTER a test, not a result.** See CORRECTIONS 108.6 for what was submitted.
+
+## 79.0 `ar1` — VALIDITY, CLEAN ON THREE GUARDS, BOX-BOUND ON THE FOURTH BY DESIGN
+
+`analysis/c79_ar1_score.py` (**62/62 selftest**), committed at cycle 79 **before any `ar1`
+run existed in the CSV**, run unedited. 12 arms, `{nodewise, chunk777, nodewise1d,
+chunk2325} × seeds 0-2`, ms=**3e-4**, 100 ep, box `-15:-2.3026`.
+
+| guard | result |
+|---|---|
+| A0 validity (n_records==10000, beta moved, ep==100) | **12/12** |
+| A0.2 n_beta EXACT per record (14420 / 14421 / 4851 / 4851) | **12/12** |
+| A0.3 instrument fired (npy shape from HEADER == (n_tot,)) | **12/12** |
+| A0.4 box-free (rec_-based 5% gate) | **0/12 — ALL BOUND** |
+
+CSV **1,844 → 1,856 raw lines PURELY ADDITIVELY**, checked at the **RAW LINE level**
+(12 added — exactly the 12 `ar1-*` — 0 removed, 0 changed, header byte-identical).
+All 12 at 100/100 epochs. **ORPHAN AUDIT (`c69_orphan_census.py`, 24/24): 124 families,
+1,855 runs, 0 orphans, 5 ambiguous.**
+
+## 79.1 **A1 — THE PARTITION GAP IS NOT AN ARGMAX ARTEFACT. IT IS LARGER AT nodewise's OWN BETTER STEPSIZE**
+
+D' = plateau5(chunk777) − plateau5(nodewise) at ms=3e-4, counts matched to ONE group.
+
+| arm | m | plateau5 | n |
+|---|---|---|---|
+| chunk777 | 14,421 | **93.045 ±0.076** | 3 |
+| nodewise | 14,420 | **92.347 ±0.091** | 3 |
+
+**D' = +0.697 pp, se 0.118, t = 5.90 → registered band `> +0.30` → SURVIVES.**
+
+This is the branch cycle 79 registered as the one that STRENGTHENS the campaign, and it
+fired. The same contrast at ms=1e-4 read mm1 **+0.485** (t 3.01) and pp1 **+0.581**
+(t 4.11). Moving to the stepsize where *nodewise* is 0.42 pp better in absolute terms does
+not shrink the gap — it **grows** it, monotonically across three readings (+0.485, +0.581,
++0.697). **CORRECTIONS 107.2 and 107.4 and FINDINGS 76.x/77.x do NOT need an "at ms=1e-4"
+qualifier for D.** The COLLAPSE branch, registered at exactly the same width, did not fire.
+
+## 79.2 **A2 — AND THE WHOLE GAP LIVES IN THE DEGENERATE SIZE-1 TAIL**
+
+G' = plateau5(chunk2325) − plateau5(nodewise1d) at ms=3e-4, both m = 4,851 **EXACTLY**.
+
+| arm | m | plateau5 | n |
+|---|---|---|---|
+| chunk2325 | 4,851 | 93.014 ±0.036 | 3 |
+| nodewise1d | 4,851 | **93.153 ±0.062** | 3 |
+
+**G' = −0.139 pp, se 0.072, t = −1.94 → registered band `[-0.15,+0.15]` → COLLAPSES.**
+
+**A1 and A2 are the same batch, the same seeds, the same stepsize, and the same box.** Put
+them side by side — this is the cleanest statement the campaign owns:
+
+| partition pair | size-1 tail | gap |
+|---|---|---|
+| chunk777 − nodewise | **present** (9,610 size-1 groups, 66.6% of groups, 0.09% of weights) | **+0.697 pp** (t 5.90) |
+| chunk2325 − nodewise1d | **merged away** (one group per 1-D tensor) | **−0.139 pp** (t −1.94) |
+
+Removing the degenerate tail removes **more than all** of the partition gap (the residual
+is −20% of it, and negative). **The difference-of-differences is +0.836 pp — POST-HOC and
+UNREGISTERED as a difference-of-differences**; A1 and A2 were each registered, their
+contrast was not. Report it as the arithmetic of two registered gates, never as a tested
+effect.
+
+**A2 DOES NOT AMEND bn1's T1.** T1 read +0.295 = UNDECIDED at ms=1e-4 and STAYS UNDECIDED.
+A2 is an independent reading at a different stepsize that lands in the NULL band bn1's T1
+missed by 0.005 pp. **Two stepsizes now point the same way, and the campaign still does not
+own a CONFIRMED null on this contrast.**
+
+## 79.3 **A3 VOID — 12/12 BOX-BOUND. THE ONE TEST REGISTERED TO DECIDE DIRECTION C DID NOT RUN**
+
+Registered in advance (cycle 79) as a real possibility at 3× the probed stepsize, and it
+fired. `N_eff/m` is not interpretable on a box-bound arm, so the concordance test is VOID.
+A1 and A2 are accuracy-only and unaffected. **The direction-C decision is still owed.**
+
+## 79.4 **THE CLIP SEVERITY, MEASURED AT ZERO COMPUTE — AND IT IS THE TAIL THAT PINS**
+
+Re-derived from probe dirs already on disk over all 36 arms that carry the instrument.
+`rec_lo` = fraction of records with **any** coordinate at the low guard (the published
+gate); `coord_lo` = fraction of **(record, coordinate)** cells at it (the severity).
+
+| family | ms | arms | rec_lo | coord_lo |
+|---|---|---|---|---|
+| bn1 / mm1 / pp1 | 1e-4 | 24 | **0.0000 EXACTLY** | **0.000000** |
+| ar1 chunk777 | 3e-4 | 3 | ~0.457 | 0.000392–0.000403 |
+| ar1 chunk2325 | 3e-4 | 3 | ~0.457 | 0.000922–0.000929 |
+| ar1 nodewise1d | 3e-4 | 3 | ~0.457 | 0.001379–0.001411 |
+| ar1 **nodewise** | 3e-4 | 3 | ~0.455 | **0.034061–0.034298** |
+
+Two things follow. **(1)** `rec_lo` is an ANY-coordinate criterion, so at 3e-4 it reads
+~0.46 on every arm while the *severity* differs by up to **86×**. The published gate is
+the registered one and is not being changed here, but a fraction must name its denominator
+(STANDING RULE 5) and these two denominators tell different stories. **(2)** The arm that
+actually pins is **`nodewise`, at 3.4% of coordinates — 24–86× every other arm** — and
+`nodewise` is exactly the arm carrying the 9,610 size-1 groups. **The degenerate tail is
+what hits the alpha floor.** This corroborates 79.2's accuracy story from a completely
+independent channel (clip occupancy, not accuracy). **POST-HOC, unregistered, n=3.**
+
+## 79.5 A4 / A5 — DESCRIPTIVE METERS, AS REGISTERED
+
+**A4 (argmax meter, cross-batch, carries ±0.25 pp):** every arm is higher at 3e-4 than at
+1e-4 — nodewise +0.274, chunk777 +0.484, nodewise1d +0.543, chunk2325 +0.108. **This does
+NOT locate any arm's argmax: two stepsizes are two points**, and no arm's ms curve has
+three. **A5 (batch offset):** nodewise@3e-4 here 92.347 ±0.091 (n=3) vs the CSV's prior
+92.493 (n=8) → −0.146 against a ±0.50 bar → **REPRODUCES**. A5 cannot void A1 or A2; both
+are within-batch differences and any common offset cancels exactly.

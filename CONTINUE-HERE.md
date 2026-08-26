@@ -54,6 +54,102 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 81) -- **THE GAP SURVIVES THE STEPSIZE MOVE (+0.697) AND LIVES ENTIRELY IN THE DEGENERATE TAIL (-0.139). A3 VOIDED; DIRECTION C IS STILL OWED.**
+
+**Read `docs/CORRECTIONS.md` 109 and `docs/FINDINGS.md` 79.0-79.5 FIRST. 109.2 and 109.3 are
+the headline PAIR -- neither means much alone. 109.4 is why the direction-C test did not run.
+109.5 is the zero-compute measurement that designed the next batch. 109.6 is the DECISION.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** All 12 `ar1` jobs complete at 100/100 ep.
+  CSV **1,844 -> 1,856 raw data lines PURELY ADDITIVELY**, checked at the **RAW LINE level**
+  (12 added -- exactly the 12 `ar1-*` -- 0 removed, 0 changed, header byte-identical).
+  **CANCELLED: nothing** -- both queues were empty, so there was nothing to audit or kill.
+  `analysis/c79_ar1_score.py` (**62/62**) was committed at cycle 79 BEFORE any `ar1` run
+  existed and was run **UNEDITED** (md5 `2396e5cf...`, `git status` clean).
+  **ORPHAN AUDIT (`c69_orphan_census.py`, 24/24): 124 families, 1,855 runs, 0 orphans.**
+* **A1 SURVIVES (109.2).** D' = chunk777 - nodewise at ms=3e-4 = **+0.697 pp, se 0.118,
+  t 5.90**, against a band registered FIVE-WAY and SYMMETRIC before the data existed.
+  The same contrast reads **+0.485 (mm1, 1e-4), +0.581 (pp1, 1e-4), +0.697 (ar1, 3e-4)** --
+  moving to the stepsize where nodewise is 0.42 pp better in ABSOLUTE terms makes the gap
+  **larger**. **The COLLAPSE branch -- registered at exactly the same width, and the one that
+  would have cost the campaign its central partition claim -- did not fire. No "at ms=1e-4"
+  qualifier is owed on D. 108.6(c)'s bound is DISCHARGED.**
+* **A2 COLLAPSES (109.3), AND THE PAIR IS THE RESULT.** G' = chunk2325 - nodewise1d, both
+  m=4,851 EXACTLY = **-0.139 pp, se 0.072, t -1.94** -> registered `[-0.15,+0.15]`.
+  Same batch, same seeds, same stepsize, same box as A1:
+
+  | pair | size-1 tail | gap |
+  |---|---|---|
+  | chunk777 - nodewise | **present** (9,610 size-1 groups = 66.6% of groups, 0.09% of weights) | **+0.697** (t 5.90) |
+  | chunk2325 - nodewise1d | **merged away** (one group per 1-D tensor) | **-0.139** (t -1.94) |
+
+  **Merging the degenerate tail removes MORE THAN ALL of the partition gap.** That is the
+  campaign's most PRESCRIPTIVE sentence for the Adam-mini / Adalayer / SGG line: on a ResNet,
+  "one step size per output channel" silently gives every BatchNorm scale and shift its own
+  step size, and THAT -- not architecture alignment (pp1's P2 measured alignment at -0.009) --
+  is what the partition comparison has been measuring.
+  **TWO HEDGES, BOTH REAL. (a)** The difference-of-differences (+0.836) is **POST-HOC and
+  UNREGISTERED AS SUCH**; quote it as the arithmetic of two registered gates, never as a
+  tested effect. **(b) A2 DOES NOT AMEND bn1's T1**, which read +0.295 = UNDECIDED and
+  **STAYS UNDECIDED**. Two stepsizes point the same way and the campaign still does NOT own
+  a CONFIRMED null on this contrast.
+* **A3 VOID -- 12/12 BOX-BOUND (109.4).** The one test cycle 79 registered to decide
+  direction C did not run. Registered in advance as a real possibility at 3x the probed
+  stepsize, and it fired. A1/A2 are accuracy-only and stand. **108.6(b) is NOT discharged.**
+* **THE ZERO-COMPUTE MEASUREMENT (109.5, FINDINGS 79.4).** Over all 36 arms carrying the
+  instrument, from probes already on disk: **ms=1e-4 reads rec_lo = rec_hi = 0.0000 EXACTLY
+  on 24/24; ms=3e-4 reads rec_lo ~0.456 on 12/12.** 1e-4 is the ONLY stepsize at which the
+  field has ever been readable, and there it is not marginally free but EXACTLY free.
+  And the severity column names the culprit: **coord_lo is 0.0343 for `nodewise` vs
+  0.00039-0.0014 for the other three -- 24-86x -- and `nodewise` is exactly the arm carrying
+  the 9,610 size-1 groups. The degenerate tail is what hits the alpha floor**, corroborating
+  109.3 from a channel with nothing to do with accuracy. POST-HOC, n=3.
+* **SUBMITTED: `cc1`, 12 jobs on alice, 0 rejected, 0 cancelled.** `bin/c81_concordance.sh`,
+  {nodewise, chunk777, nodewise1d, chunk2325} x seeds **3-5** at **ms=1e-4**, 100 ep,
+  PROBE=5 AND PROBE5=1, box registered in `c55_neff_noise.BOXES` (51/51) before submission.
+  **NO NEW PATCH.** **The design lesson from A3's void is taken explicitly: cycle 79 bought
+  independence with an UNREAD STEPSIZE and lost the whole test to a bind; cc1 buys it with
+  FRESH SEEDS at the READABLE stepsize instead.**
+* **`cc1` REGISTERED GATES, DO NOT EDIT AFTER THE DATA LANDS. C1 IS THE PRIMARY** -- the
+  concordance test, sign convention **transcribed UNCHANGED from A3** and asserted
+  byte-for-byte against `c79_ar1_score.py` by the selftest. **Every branch costed in advance:**
+  both CONCORDANT -> **ADOPT** direction C; both ANTI-CONCORDANT -> **DROP** it, and the
+  anti-prediction IS the reportable result; MIXED -> field is not a sufficient statistic,
+  **DROP**; **VOID AGAIN -> DROP DIRECTION C ON UNREADABILITY** -- registered now so a second
+  void cannot later be re-read as "inconclusive, try again". **C2** carries a real
+  FAILS-TO-REPLICATE branch. **C3 is declared unable to amend bn1's T1.**
+* **VERIFIED, NOT ASSUMED.** All guards passed on the cluster before submission:
+  `test_nodebn.py` **36 PASS**, `test_chunkwise.py` **35 PASS** on CPU against the LIVE tree;
+  guard 4 measured all four m from the **ALLOCATED beta** on the real built network
+  (14420/14421/4851/4851, C3's pair EXACT, C2's 1 apart, size-1 tail still 9,610);
+  **guard 3 ASSERTED the box-free premise from 24 probe dirs rather than quoting it**;
+  guard 7 asserted seeds 3-5 genuinely absent from the CSV. **At tick end all 12 arms are
+  RUNNING and ADVANCING** (two probe.jsonl reads 75 s apart, every arm's `last_step`
+  increasing) with `n_beta` read at exactly 4,851 / 14,421 / 14,420 on real GPU runs.
+* **A GUARD BUG THE DRY RUN CAUGHT, WORTH REPEATING.** The first `c81` guard 4 was
+  hand-rolled, guessed an `HF` API that does not exist, and ran bare `python3` outside the
+  venv -- `ModuleNotFoundError: No module named 'torch'`. **Nothing was submitted.** It was
+  replaced with c79's PROVEN block verbatim. **Always dry-run before `--submit`; and prefer
+  lifting a guard that has already passed over writing a new one.**
+* **NEXT TICK:** score `cc1` **C0 / C0.2 / C0.3 / C0.4 / C1 / C2 / C3 / C4 in that order**.
+  **`analysis/c81_cc1_score.py` ALREADY EXISTS, is 80/80, and was committed BEFORE the batch
+  was submitted** while no `cc1` run existed in the CSV. **Do not edit it.** Score **C1
+  before C2/C3**, and **do not let C4 annotate anything**.
+* **STILL OPEN, RANKED (109.7):** (1) `cc1`'s **C1** -- decides direction C, owed for two
+  cycles; (2) **does the tail prescription generalise?** 109.3 is ResNet18/CIFAR-10/n=3 --
+  `nodewise` vs `nodewise1d` at ResNet34 or CIFAR-100 (staged) is the cheapest test of the
+  paper's most prescriptive sentence and **needs no new patch** (NEW at rank 2);
+  (3) a **layer-boundary permutation** (permute ACROSS tensors holding the size multiset) --
+  needs a new patch, unchanged at rank 3 for four cycles; (4) **no arm's argmax is located**
+  (A4 gives two points; three are needed); (5) the 77.5 dissociation at a third contrast;
+  (6) the `__file__`-derived-path sweep of `bin/` (101.11); (7) alice2 still lacks
+  PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 / PATCH_SCHED (gotcha 10),
+  so the partition programme is **single-account** -- **unchanged for four cycles and now the
+  campaign's most expensive unaddressed piece of infrastructure**, and the reason n=3 keeps
+  landing on band boundaries.
+
+## Superseded -- cycle 78 (kept for the record)
+
 ## Running / next (cycle 78) -- **P2 IS NULL. ARCHITECTURE ALIGNMENT IS WORTH -0.009 pp. THE CARRIER IS THE SIZE DISTRIBUTION, AND THE SUSPECT IS MEASURED.**
 
 **Read `docs/CORRECTIONS.md` 107 and `docs/FINDINGS.md` 77.0-77.6 FIRST. 107.2 is the headline,

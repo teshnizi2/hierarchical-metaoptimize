@@ -5793,3 +5793,153 @@ partition), and the partition carries it — is now confirmed at a second meta-s
 effect *growing*, and its mechanism is pinned to the degenerate size-1 tail from both directions.
 **What it does NOT license:** anything about the meta-gradient field, which this batch could not
 measure.
+
+## 109. **CYCLE 81 — THE PARTITION GAP SURVIVES THE STEPSIZE MOVE AND LIVES ENTIRELY IN THE DEGENERATE TAIL; A3 VOIDED AND DIRECTION C IS STILL OWED**
+
+### 109.1 MECHANICS
+**BOTH QUEUES 0 R / 0 P ON ARRIVAL** (`alice` = salehkaleybars, `alice2` = s5014158).
+All 12 `ar1` jobs complete at 100/100 ep. **CANCELLED: nothing** — both queues were empty,
+so there was nothing to audit or kill. CSV **1,844 → 1,856 raw data lines PURELY
+ADDITIVELY**, checked at the **RAW LINE level** (12 added — exactly the 12 `ar1-*` — 0
+removed, 0 changed, header byte-identical). `analysis/c79_ar1_score.py` (**62/62**) was
+committed at cycle 79 **before any `ar1` run existed** and was run **unedited**
+(md5 `2396e5cf…`, `git status` clean). **ORPHAN AUDIT** (`c69_orphan_census.py`, 24/24
+selftests): **124 families, 1,855 runs, 0 orphans**, 5 ambiguous (`g3`, `gate0b`,
+`gate0d`, `det`, `v2` — bare-token matches only, unchanged from prior cycles).
+
+**A BOOKKEEPING WARNING FOR THE NEXT TICK.** An ad-hoc orphan count keyed on
+`run.split('-')[0]` reports **146 orphan families / 161 runs**. That number is an
+ARTEFACT: most families use `_` as their separator (`gate0b_blk6_s0`, `g1_adamw_layer_s2`),
+so the key splits mid-family and manufactures one "family" per run. **Use
+`analysis/c69_orphan_census.py`, which is selftested against positive and negative
+controls. Do not re-derive the family key by hand — it was tried this cycle and it was
+wrong.**
+
+### 109.2 **A1 SURVIVES — THE GAP IS NOT AN ARGMAX ARTEFACT, AND IT GROWS**
+D' = chunk777 − nodewise at ms=**3e-4**, counts matched to one group:
+**93.045 ±0.076 − 92.347 ±0.091 = +0.697 pp, se 0.118, t 5.90** → registered `> +0.30`
+→ **SURVIVES**.
+
+Cycle 79's fear was that "we compared two partitions at one partition's favourable
+stepsize". Measured, that fear is **backwards**. The same contrast reads:
+
+| reading | ms | D | t |
+|---|---|---|---|
+| mm1 | 1e-4 | +0.485 | 3.01 |
+| pp1 | 1e-4 | +0.581 | 4.11 |
+| **ar1** | **3e-4** | **+0.697** | **5.90** |
+
+Moving to the stepsize where nodewise is 0.42 pp better **in absolute terms** makes the
+gap *larger*, not smaller. **The COLLAPSE branch — registered at exactly the same width,
+and the branch that would have cost the campaign its central partition claim — did not
+fire. CORRECTIONS 107.2 and 107.4, and FINDINGS 76.x/77.x, do NOT need an "at ms=1e-4"
+qualifier for D. 108.6(c)'s bound is DISCHARGED.**
+
+### 109.3 **A2 COLLAPSES — AND TOGETHER WITH A1 THAT IS THE CAMPAIGN'S CLEANEST RESULT**
+G' = chunk2325 − nodewise1d at ms=3e-4, both m = 4,851 **EXACTLY**:
+**93.014 ±0.036 − 93.153 ±0.062 = −0.139 pp, se 0.072, t −1.94** → registered
+`[-0.15,+0.15]` → **COLLAPSES**.
+
+Same batch, same seeds, same stepsize, same box as A1:
+
+| pair | size-1 tail | gap |
+|---|---|---|
+| chunk777 − nodewise | **present** (9,610 size-1 groups = 66.6% of groups, 0.09% of weights) | **+0.697** (t 5.90) |
+| chunk2325 − nodewise1d | **merged away** (one group per 1-D tensor) | **−0.139** (t −1.94) |
+
+**Merging the degenerate tail removes more than all of the partition gap.** That is
+directly PRESCRIPTIVE for the Adam-mini / Adalayer / SGG line: on a ResNet, "one step size
+per output channel" silently gives every BatchNorm scale and shift its own step size, and
+that — not the architecture alignment — is what the partition comparison has been measuring.
+
+**Two hedges, stated because they are real. (a)** The difference-of-differences (+0.836 pp)
+is **POST-HOC and UNREGISTERED as such**; A1 and A2 were each registered, their contrast
+was not. Quote it as the arithmetic of two registered gates. **(b) A2 DOES NOT AMEND bn1's
+T1**, which read +0.295 = UNDECIDED and **STAYS UNDECIDED**, exactly as cycle 79 registered.
+Two stepsizes now point the same way and the campaign still does **not** own a CONFIRMED
+null on this contrast.
+
+### 109.4 **A3 VOID — THE ONE TEST REGISTERED TO DECIDE DIRECTION C DID NOT RUN**
+**0/12 arms box-free.** `N_eff/m` is not interpretable on a box-bound arm, so the
+concordance test is VOID. This was registered in advance at cycle 79 as a real possibility
+at 3× the probed stepsize, and it fired. A1 and A2 are accuracy-only and stand.
+**108.6(b) is NOT discharged: direction C is still neither adopted nor dropped, and the
+test is still owed.**
+
+### 109.5 **THE ZERO-COMPUTE MEASUREMENT THAT DESIGNED THE NEXT BATCH (FINDINGS 79.4)**
+Over all 36 arms carrying the instrument, from probe dirs already on disk:
+**ms=1e-4 reads `rec_lo` = `rec_hi` = 0.0000 EXACTLY on 24/24 arms; ms=3e-4 reads
+`rec_lo` ≈ 0.456 on 12/12.** So **1e-4 is the only stepsize at which the field has ever
+been readable, and there it is not marginally free but exactly free.**
+
+And the severity column says which arm pins: `coord_lo` is **0.0343 for `nodewise`** versus
+0.00039–0.0014 for the other three — **24–86× — and `nodewise` is exactly the arm carrying
+the 9,610 size-1 groups.** **The degenerate tail is what hits the alpha floor**, which
+corroborates 109.3 from a channel that has nothing to do with accuracy. POST-HOC,
+unregistered, n=3.
+
+### 109.6 **DECISION**
+**(a) The partition programme's central claim is UPHELD and is no longer stepsize-bounded.**
+Recorded, no re-qualification of 107.2/107.4 or 76.x/77.x is owed.
+
+**(b) The tail is the carrier, and that is now the paper's most prescriptive sentence** —
+supported by two registered gates in one batch (A1/A2), by bn1's T1 pointing the same way,
+and independently by the clip-severity channel. **It is still ONE architecture, ONE dataset
+and n=3.**
+
+**(c) Direction C is NOT adopted and NOT dropped — for the second cycle running — because
+its registered test VOIDED rather than returning a verdict.** Deciding it on the post-hoc
+78.6 pattern alone is refused: that is the move cycle 79 already refused, and nothing since
+has made it sounder.
+
+**(d) SUBMITTED: `cc1`, 12 jobs on alice** — `bin/c81_concordance.sh`, `{nodewise,
+chunk777, nodewise1d, chunk2325} × seeds 3-5` at **ms=1e-4**, 100 ep, PROBE=5 AND PROBE5=1,
+box registered in `c55_neff_noise.BOXES` (51/51) before submission. **NO NEW PATCH** —
+every granularity already ships and is already covered by an equivalence suite.
+**The design lesson from A3's void is taken explicitly: cycle 79 bought independence with
+an UNREAD STEPSIZE and lost the whole test to a bind; `cc1` buys it with FRESH SEEDS at the
+READABLE stepsize instead** (guard 7 asserts seeds 3-5 are absent from the CSV for all four
+arms at this ms; guard 3 ASSERTS the box-free premise from the probes rather than quoting
+it, over ≥20 dirs, and fails loudly if any is not exactly free).
+
+**(e) `analysis/c81_cc1_score.py` (79/79) is committed BEFORE the batch is submitted**
+(commit `697d378`), while no `cc1` run exists in the CSV at all — STANDING RULE 19 in the
+strict order. **C1's sign convention is transcribed UNCHANGED from A3** and the selftest
+asserts it byte-for-byte against `c79_ar1_score.py`. **Every branch is costed in advance:**
+both CONCORDANT → **ADOPT** direction C; both ANTI-CONCORDANT → **DROP** it and the
+anti-prediction *is* the reportable result; MIXED → field is not a sufficient statistic,
+**DROP**; **VOID again → DROP direction C ON UNREADABILITY** — registered now, so that a
+second void cannot later be re-read as "inconclusive, try again". **C2 carries a real
+FAILS-TO-REPLICATE branch** (three prior agreeing readings do not make a fourth automatic,
+and this is the first at fresh seeds). **C3 is declared unable to amend bn1's T1.**
+
+**(f) THE BATCH'S CENTRAL LIMITATION, STATED IN ITS OWN HEADER.** `cc1` runs at the
+stepsize that is **worse** for accuracy (A4: every arm is higher at 3e-4) because it is the
+only one readable for the field. That trade is deliberate and is written into the script.
+
+**(g) STANDING RULE (21): a fraction must be reported with the denominator that matches the
+mechanism, and when two denominators disagree, say both.** `rec_lo` (ANY coordinate) reads
+~0.46 on all four ar1 arms and hides an **86×** spread in `coord_lo` (per-cell). The
+published 5% gate is registered and is NOT changed here — but 79.4 reports both columns,
+and the next batch that reasons about clipping must do the same.
+
+### 109.7 STILL OPEN, RANKED
+1. **`cc1`'s C1** — the concordance test, at the only stepsize where it can be read. It
+   decides direction C, and it is owed for the second cycle.
+2. **Does the tail prescription generalise?** 109.3 is ResNet18 / CIFAR-10 / n=3. The
+   `nodewise` vs `nodewise1d` contrast at a second architecture (ResNet34) or dataset
+   (CIFAR-100, staged) is the cheapest test of the paper's most prescriptive sentence, and
+   it needs no new patch. **New at rank 2 this cycle.**
+3. **A layer-boundary permutation** (permute ACROSS tensors holding the size multiset).
+   pp1's A is a WITHIN-LAYER null and only this upgrades it to a statement about
+   architecture as such. Needs a new patch. Unchanged at rank 3 for four cycles.
+4. **No arm's argmax is located.** A4 gives two points per arm; three would be needed.
+   Cheap, and it would retire the "we compared at one arm's favourable ms" question for good.
+5. The 77.5 dissociation at a third contrast (`bn1`'s T5 did NOT supply one; `ar1`'s A3
+   voided before it could).
+6. The `__file__`-derived-path sweep of `bin/` (101.11).
+7. alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 /
+   PATCH_SCHED (gotcha 10), so the whole partition programme remains **single-account** —
+   still the binding constraint on seed counts, and the reason n=3 keeps landing on band
+   boundaries. **Unchanged for four cycles; it is now the campaign's most expensive
+   unaddressed piece of infrastructure.**
