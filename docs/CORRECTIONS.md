@@ -5740,3 +5740,56 @@ a session.** The routine advances ~10 cycles/day unattended. A session's mental 
 in hours, and a correction written from a stale model collides, duplicates, and misnumbers — all
 three happened here.
 
+
+## 109. **`ar1` SCORED: THE PARTITION GAP IS NOT AN ARGMAX ARTEFACT, AND IT LIVES ENTIRELY IN THE SIZE-1 TAIL** (cycle 81)
+
+12 jobs, all complete, scored with `analysis/c79_ar1_score.py` (**62/62 selftest**, git-committed
+at 9da5b2b/d9c7d20 **before any `ar1` run existed**). Validity A0 12/12, A0.2 `n_beta` EXACT on
+every record 12/12, A0.3 instrument fired 12/12.
+
+**A1 — THE PRIMARY — SURVIVES, AND IT IS LARGER AT THE SECOND STEPSIZE.**
+Count-matched, aligned vs uniform at m≈14,420:
+
+| | ms=1e-4 | **ms=3e-4** |
+|---|---|---|
+| chunk777 − nodewise | +0.485 (mm1), +0.581 (pp1), pooled **+0.533** | **+0.697** (se 0.118, t 5.90, n=3v3) |
+
+Registered band: `> +0.30 SURVIVES`. **The entire matched-count partition programme was run at
+ms=1e-4, and ms=1e-4 is 0.42 pp below nodewise's own preference — so the whole result could have
+been "we compared two partitions at one partition's favourable stepsize". IT IS NOT.** The gap is
+*larger* where nodewise is *better off*. CORRECTIONS 107's D is no longer bounded to ms=1e-4.
+
+**A2 — COLLAPSES, AND THAT IS THE MECHANISM CLOSING.**
+The same contrast with the size-1 tail ALREADY REMOVED, at m=4,851 EXACT:
+
+    chunk2325 − nodewise1d = **−0.139 pp** (se 0.072, t −1.94) -> registered band [−0.15,+0.15] = **COLLAPSES**
+    (at ms=1e-4 the same contrast was bn1's T1 = +0.295, UNDECIDED)
+
+**A2 does NOT amend bn1's T1 — T1 was UNDECIDED and STAYS UNDECIDED.** But read A1 and A2
+together and the mechanism is bounded on both sides:
+
+> **With the degenerate tail present the partition gap is +0.697 (t 5.90). With the degenerate
+> tail removed it is −0.139 (t −1.94, a null). The gap lives in the size-1 tail.** That is
+> FINDINGS 77.6's measurement — 66.64% of `nodewise`'s 14,420 groups are size 1, being every
+> BatchNorm scale and shift plus `linear.bias`, 9,610 scalars over 0.09% of the weights —
+> now confirmed as the CARRIER by a count-matched contrast at a second meta-stepsize.
+
+**A3 — VOID, AND IT WAS REGISTERED AS VOIDABLE.** The box-free gate failed **0/12**: every arm
+sits at the LO guard on ~45.6% of records (`rec_lo` 0.452–0.460). `ms=3e-4` is 3× any previously
+probed batch and the script said in advance *"a bind here VOIDS A3 and leaves A1/A2"*.
+**So the pre-registered field-vs-accuracy concordance test did not run.** The 0-concordant /
+2-anti-concordant result of `c79_field_vs_accuracy` remains **POST-HOC and unquotable**. It needs
+a re-run at a wider ceiling; that is now the highest-ranked open item.
+*A1/A2 are unaffected: they are within-batch plateau5 differences and both arms bind equally
+(`rec_lo` 0.4583 vs 0.4597 for the A1 pair), so the constraint is common and cancels.*
+
+**A4 (descriptive, no direction).** All four arms prefer 3e-4 to 1e-4: nodewise +0.274,
+chunk777 +0.484, nodewise1d +0.543, chunk2325 +0.108. Two points do not locate an argmax.
+**A5.** nodewise@3e-4 reads 92.347 ±0.091 here vs the CSV's prior 92.493 (n=8): −0.146 against a
+±0.50 bar -> **REPRODUCES**.
+
+**WHAT THIS CHANGES.** The campaign's central surviving result — granularity is (count,
+partition), and the partition carries it — is now confirmed at a second meta-stepsize with the
+effect *growing*, and its mechanism is pinned to the degenerate size-1 tail from both directions.
+**What it does NOT license:** anything about the meta-gradient field, which this batch could not
+measure.
