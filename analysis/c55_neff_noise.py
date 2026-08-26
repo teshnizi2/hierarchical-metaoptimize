@@ -180,6 +180,15 @@ BOXES = {
     # a bind VOIDS A3 (the field gate) and leaves A1/A2 (accuracy-only) standing.
     # REGISTERED BEFORE ANY ar1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "ar1":  (-15.0, -2.3026, "bin/c79_argmax_robustness.sh:CLIP"),
+    # `cc1` (cycle 81) -- the SAME box again, and deliberately back at ms=1e-4.
+    # ar1's A3 VOIDED on 12/12 arms box-bound at 3e-4; measured over the 24 arms of
+    # bn1/mm1/pp1 that carry the instrument, ms=1e-4 reads rec_lo == rec_hi ==
+    # 0.0000 EXACTLY, so it is the only stepsize at which the field has ever been
+    # readable.  cc1 buys its independence with FRESH SEEDS (3,4,5) instead of an
+    # unread stepsize.  A bind HERE would be genuinely new, and it is registered to
+    # VOID C1 (the field gate) while leaving C2/C3 (accuracy-only) standing.
+    # REGISTERED BEFORE ANY cc1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "cc1":  (-15.0, -2.3026, "bin/c81_concordance.sh:CLIP"),
 }
 
 
