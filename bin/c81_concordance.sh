@@ -305,40 +305,81 @@ print("guard 3: %d ms=1e-4 probe dirs, ALL rec_lo == rec_hi == 0.0000 EXACTLY --
       "the readable-stepsize premise holds" % seen)
 PYEOF
 
-# --- GUARD 4 -- m MEASURED FROM THE ALLOCATED beta ON THE REAL NETWORK -----
-python3 - "$WS" "$M_NODE" "$M_CHUNK" "$M_N1D" "$M_CHUNK2" "$CHUNK_K" "$CHUNK_K2" <<'PYEOF' || exit 1
-import os, sys
-ws = sys.argv[1]
-want = {"nodewise": int(sys.argv[2]), "chunk%s" % sys.argv[6]: int(sys.argv[3]),
-        "nodewise1d": int(sys.argv[4]), "chunk%s" % sys.argv[7]: int(sys.argv[5])}
-sys.path.insert(0, os.path.join(ws, "MetaOptimize", "codes", "Supervised_tasks",
-                                "MetaOptimize", "cifar10"))
-import torch
-from Networks.resnet import ResNet18
-net = ResNet18(num_classes=10)
-n_w = sum(p.numel() for p in net.parameters())
-if n_w != 11173962:
-    sys.exit("GUARD FAIL: ResNet18 has %d weights, expected 11,173,962 -- the "
-             "network changed under the finding" % n_w)
-print("guard 4a: ResNet18 = %d weights, unchanged" % n_w)
+# --- GUARD 4 -- ALL FOUR m MEASURED FROM THE ALLOCATED BETA ----------------
+# Lifted VERBATIM from bin/c79_argmax_robustness.sh (only the gate names A1/A2
+# become C2/C3).  It is the proven block: it builds the real network inside the
+# venv and reads the beta the optimizer actually allocates.  Do not re-derive it.
+# Both of this batch's contrasts are MATCHED-COUNT, so the match is MEASURED here,
+# on the real built network, from the beta the optimizer actually allocates.
+(
+  module load Python/3.10.4-GCCcore-11.3.0 >/dev/null 2>&1
+  # shellcheck disable=SC1091
+  source "$WS/envs/mo/bin/activate"
+  cd "$WS/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10" || exit 1
+  python - "$CHUNK_K" "$CHUNK_K2" "$M_NODE" "$M_CHUNK" "$M_N1D" "$M_CHUNK2" "$MST" <<'PYEOF' || exit 1
+import sys, torch
+sys.path.insert(0, ".")
+from build_network import build_network
 from Optimizers.HF import HF
+K, K2, want_node, want_chunk, want_n1d, want_chunk2 = (int(x) for x in sys.argv[1:7])
+MST = float(sys.argv[7])
+
+BASE = {"alg": "SGDm", "weight_decay": 0.1, "momentum_param": 0.99}
+META = {"alg": "Lion", "meta_stepsize": MST, "momentum_param": 0.99,
+        "Lion_beta2": 0.9, "weight_decay": 0}
+
+class NullWriter:
+    def add_scalar(self, *a, **k):
+        pass
+
+def build(gran):
+    torch.manual_seed(0)
+    net = build_network("ResNet18", "cpu")
+    return HF(net, stepsize_groups=gran, alpha0=1e-3, args_base=dict(BASE),
+              args_meta=dict(META), gamma=1, writer=NullWriter())
+
+def m_of(opt):
+    return int(sum(int(b.numel()) for b in opt.beta))
+
+net = build_network("ResNet18", "cpu")
+shapes = [tuple(p.shape) for p in net.parameters()]
+
 got = {}
-for gran in want:
-    opt = HF(net.parameters(), stepsize_type=gran, alpha0=1e-3)
-    m = sum(b.numel() for b in opt.beta_tensors()) if hasattr(opt, "beta_tensors") \
-        else opt.n_beta()
-    got[gran] = int(m)
-bad = {g: (got[g], want[g]) for g in want if got[g] != want[g]}
-if bad:
-    for g,(a,b) in bad.items(): print("  %s: measured %d, registered %d" % (g,a,b))
-    sys.exit("GUARD FAIL: a registered m does not match the ALLOCATED beta")
-print("guard 4b: all four m measured from the allocated beta and EXACT: %s" % got)
-if got["nodewise1d"] != got["chunk%s" % sys.argv[7]]:
-    sys.exit("GUARD FAIL: C3's pair is not count-matched")
-if abs(got["nodewise"] - got["chunk%s" % sys.argv[6]]) > 1:
-    sys.exit("GUARD FAIL: C2's pair is more than 1 group apart")
-print("guard 4c: C3's pair EXACT, C2's pair <= 1 group apart")
+for name, gran, want in (("nodewise", "nodewise", want_node),
+                         ("chunk%d" % K, "chunk%d" % K, want_chunk),
+                         ("nodewise1d", "nodewise1d", want_n1d),
+                         ("chunk%d" % K2, "chunk%d" % K2, want_chunk2)):
+    m = m_of(build(gran))
+    got[name] = m
+    print("guard 4: %-12s ALLOCATED beta m=%-8d (registered %d)" % (name, m, want))
+    if m != want:
+        sys.exit("GUARD FAIL: m(%s) is %d, not the %d registered" % (name, m, want))
+
+# C2's pair must be matched to <= 1 group; C3's must be matched EXACTLY.
+d1 = abs(got["chunk%d" % K] - got["nodewise"])
+d2 = abs(got["chunk%d" % K2] - got["nodewise1d"])
+if d1 > 1:
+    sys.exit("GUARD FAIL: C2's arms are %d groups apart, not <= 1" % d1)
+if d2 != 0:
+    sys.exit("GUARD FAIL: C3's arms are %d groups apart, not 0" % d2)
+print("guard 4b: C2's pair is %d group apart (m=%d vs %d); C3's pair is EXACT at m=%d"
+      % (d1, got["chunk%d" % K], got["nodewise"], got["nodewise1d"]))
+
+# nodewise1d must still differ from nodewise ONLY on the 1-D tensors, and the 9,610
+# size-1 groups FINDINGS 77.6 measured must still be there to be removed.
+o_n1d = build("nodewise1d")
+want_groups = [1 if len(s) == 1 else s[0] for s in shapes]
+if list(o_n1d.n1d_groups) != want_groups:
+    sys.exit("GUARD FAIL: nodewise1d group counts are not (1 per 1-D tensor, shape[0] else)")
+n_deg = sum(s[0] for s in shapes if len(s) == 1)
+if n_deg != 9610:
+    sys.exit("GUARD FAIL: nodewise has %d size-1 groups, not the 9,610 FINDINGS 77.6 "
+             "measured -- the network changed under the finding" % n_deg)
+print("guard 4c: nodewise1d isolates exactly the 1-D tensors; the size-1 tail is "
+      "still %d groups, as FINDINGS 77.6 measured" % n_deg)
 PYEOF
+) || { echo "GUARD 4 FAILED -- nothing submitted"; exit 1; }
+
 
 # --- GUARD 5 -- disk -------------------------------------------------------
 python3 - "$WS" <<'PYEOF' || exit 1

@@ -291,7 +291,12 @@ def selftest():
     ok("the measured premise is quoted with BOTH stepsizes", "rec_lo 0.0000 EXACTLY" in src and "rec_lo ~0.456" in src)
     ok("guard 7 asserts the seeds are genuinely fresh", "GUARD 7" in src and "FRESH" in src)
     ok("guard 4 measures m from the ALLOCATED beta", "ALLOCATED beta" in src)
-    ok("guard 4 asserts ResNet18 still has 11,173,962 weights", "11173962" in src)
+    # Guard 4 is lifted verbatim from c79 and its network-changed check is the
+    # 9,610 size-1 tail FINDINGS 77.6 measured, not a raw weight count.  Assert
+    # what the block ACTUALLY guarantees.
+    ok("guard 4 asserts the 9,610 size-1 tail is still there", "9610" in src)
+    ok("guard 4 asserts C3's pair is EXACT and C2's <= 1 group apart",
+       "C3's arms are %d groups apart, not 0" in src and "not <= 1" in src)
 
     print("  -- the limits, stated in the scorer itself --")
     ok("scorer states it predates the data entirely", "before the data could exist" in doc)
