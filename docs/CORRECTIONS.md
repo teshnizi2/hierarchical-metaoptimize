@@ -5693,53 +5693,50 @@ a surprise.
    still the binding constraint on seed counts, and the reason n=3 keeps landing on band
    boundaries.
 
-## 88. **THE HORIZON REVERSAL INVERTS AT MATCHED OPTIMA. THE HEADLINE IS NOT A GRANULARITY RESULT.** (cycle 65)
+## 108. **A DUPLICATED FINDING AND A STALE-STATE FAILURE — the record corrected** (cycle 80)
 
-Triggered by the master-table fact-check, which registered the confound as the headline's live
-threat. Settled here from data ALREADY ON DISK (`hz9-*`, 9 runs, 100 ep, complete) at zero compute.
+This entry REPLACES a mis-numbered "## 88" appended on 25 Aug by an interactive session. That
+entry is withdrawn as written. Three things went wrong and all three are process, not science.
 
-**THE TEST.** The headline compared `nodewise` and `layerwise` at a **shared** meta-stepsize
-(ms=1e-3). But the two arms have **different optima** — layerwise peaks at ms=1e-4, nodewise at
-ms=3e-4. So the comparison charged layerwise ~1.7 pp of distance-from-its-own-peak. `hz9` puts
-each arm at its OWN optimum. Matched-k plateau (k=5), R18/CIFAR-10, 100 ep:
+**1. IT WAS A REDISCOVERY.** The interactive session independently scored `hz9` and concluded
+that the horizon reversal measures distance-from-optimum rather than granularity. **FINDINGS
+72.1b had already established exactly this, seven cycles earlier, with a better design** — the
+threat was registered IN ADVANCE (CORRECTIONS 87.14), the batch was purpose-built
+(`bin/c58_tuned_horizon.sh`), the direction was pre-registered AGAINST the headline, and it was
+scored at **n=5 v 5** pooling `hz9` with the `rs-` corpus under H0.5's licence. The interactive
+re-derivation used **n=3 v 4, unpaired, hz9 only**.
 
-| epoch | shared ms=1e-3 (`br6`, the headline) | each at its own optimum (`hz9`) |
-|---|---|---|
-| 10 | **-3.748** (layerwise better) | **+3.520** (nodewise better) |
-| 15 | -1.360 | +3.240 |
-| 20 | +0.057 (tie) | +1.193 |
-| 25 | +0.540 | +1.254 |
-| 40 | **+1.253** (nodewise better) | +0.576 |
-| 80 | — | **-0.617** (layerwise better) |
-| 100 | — | **-0.403** (layerwise better) |
+It agrees, and the agreement is worth recording as an independent replication:
 
-**THE SIGN OF THE EARLY-EPOCH DIFFERENCE FLIPS FROM -3.748 TO +3.520 — a 7.27 pp swing.** That is
-not noise. The reversal still exists but it runs the **OTHER WAY** and crosses at epochs **60-80**
-instead of 15-25.
+| | ep 10 | ep 40 | ep 100 |
+|---|---|---|---|
+| FINDINGS 72.1b (n=5 v 5) | **+3.444** | +0.670 | **−0.361** |
+| interactive re-derivation (n=3 v 4) | **+3.520** | +0.576 | **−0.403** |
 
-> **CORRECTIONS 86.3 IS WITHDRAWN AS A GRANULARITY CLAIM.** "The accuracy-optimal granularity
-> reverses with the training horizon, layerwise early and nodewise late" is an artefact of
-> measuring both arms at a meta-stepsize that suits neither. What the headline tracked was
-> **distance from each arm's own meta-stepsize optimum**, exactly as the master table warned.
+Two analysts, two subsets, same sign and same decay. **That is the only value this entry adds.**
 
-**CAVEATS, STATED NOT BURIED.** `hz9` is **unpaired** — the layerwise seeds are {0,1,2} and the
-nodewise seeds {1,2,3,4}, so this contrast carries higher variance than the paired headline, and
-n=3 vs n=4. The late-epoch margins (-0.617, -0.403) are ABOVE the 0.12 pp median seed noise but
-are not paired, so treat the **crossing location** as approximate. **The sign flip at epoch 10 is
-far too large to be explained by any of that** and is the load-bearing observation.
+**2. IT OVERSTATED THE VERDICT.** The withdrawn entry said the headline was "not a granularity
+result" full stop. 72.1b is more careful and 72.1b is right: the shared-`ms` reversal is **a real,
+reproducible measurement** and is NOT withdrawn. What is withdrawn is its standing as a
+*granularity* claim — it may not be written without the qualifier "at a shared `ms=1e-3`". The
+distinction matters and the withdrawn entry erased it.
 
-**CONSEQUENCE FOR THE PROJECT — and it is a scoping decision, not just a correction.**
-1. **No scale test of the reversal may be funded.** The ImageNet / larger-model design begun this
-   cycle is **STOPPED** before any compute: scaling this claim would have scaled an artefact.
-   The confound control that would have been its Stage 0 is this document, and it cost nothing.
-2. **What survives, and it is now the spine:** granularity buys **TOLERANCE to an over-large
-   meta-stepsize**, not peak accuracy (FINDINGS 57.2). `hz9` is fully consistent with that — at
-   matched optima the arms are within ~0.6 pp of each other all the way out, while at a shared
-   over-large ms they differ by 3.7 pp. That is a robustness statement and it is intact.
-3. **IDEA 3 is the only positive METHOD result left standing** (5 CONFIRMED rows, budget-stable,
-   survived three verdict reversals): MetaOptimize costs ~1.11 pp of peak against a tuned cosine
-   and buys real alpha0-insensitivity. Any scale spend should go THERE, not to the reversal.
+**3. IT ACTED ON STALE STATE, AND THAT COST A DECISION.** The session had last read the repo at
+cycle 65 and did not re-read `CONTINUE-HERE.md` after a multi-day gap, during which the routine
+advanced to **cycle 79**. On that stale basis it (a) numbered its entry 88, colliding with the
+existing "88. DECISION RECORD — cycle 59", (b) appended it out of order after 107.7, and (c)
+**stopped a scale-test design** on the reasoning that the headline had just died — when the
+campaign had already absorbed that result at cycle 72 and moved on: cycle 75 resolved an
+interior optimum in granularity, cycle 76 decomposed granularity into **(count, partition)**,
+and cycle 77 measured the partition effect at matched count (**+0.485 pp, t=3.01**).
 
-**STANDING RULE (11): a comparison between two arms that each have a tuned hyper-parameter must
-be made at each arm's own optimum, or it is a distance-from-optimum measurement wearing the
-comparison's clothes.** Retro-check every two-arm claim in FINDINGS against this rule.
+**The stop was still the right call** — a scale test of the shared-`ms` reversal would indeed
+have scaled an artefact — but it was reached from a stale premise, and the plan it stopped was
+therefore never evaluated against the campaign's ACTUAL current question, which is the
+(count, partition) decomposition. **That re-evaluation is now owed.**
+
+**STANDING RULE (12): re-read `CONTINUE-HERE.md` and `git log` before acting, after ANY gap in
+a session.** The routine advances ~10 cycles/day unattended. A session's mental model goes stale
+in hours, and a correction written from a stale model collides, duplicates, and misnumbers — all
+three happened here.
+
