@@ -189,6 +189,18 @@ BOXES = {
     # VOID C1 (the field gate) while leaving C2/C3 (accuracy-only) standing.
     # REGISTERED BEFORE ANY cc1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "cc1":  (-15.0, -2.3026, "bin/c81_concordance.sh:CLIP"),
+    # `fa1` (cycle 82) -- **THE FIRST BOX IN THIS CAMPAIGN THAT WAS BUDGETED FROM AN
+    # IDENTITY RATHER THAN EXTRAPOLATED FROM A TRACE.**  ar1 ran the same four arms at
+    # ms=3e-4 in (-15, -2.3026) and bound on 12/12 (rec_lo 0.4521-0.4597), which VOIDED
+    # its A3.  HF.py's Lion meta update is beta <- (1 - ms*wd_meta)*beta - ms*sign(.)
+    # and every job in this family carries --weight-decay-meta 0, so each update moves
+    # each coordinate by exactly 0 or +-ms and beta is confined to
+    # [ln(alpha0) - ms*T, ln(alpha0) + ms*T] = [-21.907755, +8.092245] at alpha0=1e-3,
+    # ms=3e-4, T = 100 ep x 500 = 50,000 -- for ANY velocity profile, which is what
+    # CORRECTIONS 72 (velocity is non-monotone and seed-dependent) demands.  (-25, +9.0)
+    # lies strictly outside on both sides, so it CANNOT be reached and cannot clamp.
+    # REGISTERED BEFORE ANY fa1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "fa1":  (-25.0,  9.0,    "bin/c82_field_wideclip.sh:CLIP"),
 }
 
 
