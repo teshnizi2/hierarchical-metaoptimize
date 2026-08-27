@@ -54,6 +54,75 @@ The gap is the schedule, not the optimizer. Results (1)-(3) are statements about
 MetaOptimize's internals and are untouched; any "our method is better" sentence is not.
 
 
+## Running / next (cycle 82) -- **DIRECTION C IS DROPPED ON ITS OWN PRE-REGISTERED TEST. THE PARTITION RESULT IS FOUR-DEEP, THE TAIL STORY THREE-DEEP, AND THE PAPER IS THE TAIL PRESCRIPTION.**
+
+**Read `docs/CORRECTIONS.md` 110 and `docs/FINDINGS.md` 80.0-80.5 FIRST. 110.2 is the headline
+and it is a NEGATIVE that closes a direction. 110.6 is why nothing was submitted and exactly what
+the next tick must register before it submits.**
+
+* **BOTH QUEUES 0 R / 0 P ON ARRIVAL.** All 12 `cc1` jobs complete at 100/100 ep, every one
+  `RUN_DONE`. CSV **1,856 -> 1,868 raw data lines PURELY ADDITIVELY**, checked at the **RAW LINE
+  level** with `comm` on sorted copies (12 added -- exactly the 12 `cc1-*` -- 0 removed,
+  0 changed, header byte-identical). **CANCELLED: nothing** -- both queues were empty.
+  `analysis/c81_cc1_score.py` (**80/80**) was committed at cycle 81 BEFORE any `cc1` run existed
+  and was run **UNEDITED** (md5 `c138eab3...`, `git status` clean).
+  **ORPHAN AUDIT (`c69_orphan_census.py`, 24/24): 125 families, 1,867 runs, 0 orphans**
+  (4 AMBIGUOUS, 20 runs, all pre-cycle-30 exploratory).
+* **THE VALIDITY WIN: C0.4 read 12/12 BOX-FREE, `rec_lo` = `rec_hi` = 0.0000 EXACTLY.**
+  `ar1`'s A3 void does NOT recur. Cycle 79 bought independence with an UNREAD stepsize and lost
+  the test to a bind; cycle 81 bought it with FRESH SEEDS at the READABLE stepsize and the box did
+  not bind on a single arm. **109.5's zero-compute prediction held exactly.**
+* **THE HEADLINE (110.2): C1 IS MIXED -> DIRECTION C IS DROPPED.**
+  | contrast | m | d_acc | d_N_eff/m | verdict |
+  |---|---|---|---|---|
+  | C2 chunk777-nodewise | 14,421 vs 14,420 | **+0.727** (t +3.63) | **-0.0237** (t -11.14) | **ANTI-CONCORDANT** |
+  | C3 chunk2325-nodewise1d | 4,851 **EXACT** | +0.011 (t +0.08) | **-0.0529** (t -23.26) | **DISSOCIATION** |
+  **The negative is STRONG, not weak:** the field resolves at t -11 and t -23 -- it is not too
+  noisy to read, it reads decisively and is decisively WRONG about accuracy on one contrast and
+  SILENT on the other. Every branch (incl. a second VOID) was costed before the data existed, so
+  **this cannot be re-read later as "inconclusive, try again". Do not design another batch around
+  `N_eff/m` as a predictor of accuracy.**
+* **D REPLICATES A FOURTH TIME (80.3): +0.727 (t 3.63) at FRESH seeds 3-5.** Series now
+  **+0.485 / +0.581 / +0.697 / +0.727** across two stepsizes and two disjoint seed sets, all
+  positive, none below +0.48. The campaign's most robust effect.
+* **G COLLAPSES A SECOND TIME (80.4): +0.011 (t 0.08) at m=4,851 EXACT**, same seeds/batch/ms as
+  C2. **Tail present -> +0.727; tail removed -> +0.011.** **bn1's T1 is NOT amended -- it read
+  +0.295 = UNDECIDED and STAYS UNDECIDED** (declared in the scorer in advance).
+* **109.7(5) DISCHARGED:** C3 is the 77.5 dissociation at a third contrast, and REGISTERED
+  rather than post-hoc.
+* **NOT A RESULT (80.5):** `nodewise1d - nodewise = +0.816` is post-hoc AND count-confounded
+  (14,420->4,851). Recorded only so the next tick does not mistake it for the tail effect.
+* **SUBMITTED: NOTHING -- a deliberate stop (110.6).** The queue is empty and well inside every
+  limit, so capacity is not the constraint; **STANDING RULE 19** is. The tick that scores a batch
+  must not also invent the next batch's gates from that batch's numbers.
+* **A NEW SYNC GOTCHA, ALMOST A FALSE VERDICT (110.1).** The first scorer run printed
+  **"0 probe dirs"** and C1 -> UNINFORMATIVE. That was a **sync fault, not a result** -- the tick
+  had rsynced only `*.out`, but the field channel lives in `runs/<family>/probe_*/`. A
+  "pull just the small files" shortcut ALSO failed: the scorer names only `neg_counts.json/.npy`
+  in its source but reaches `probe.jsonl` via `c52_boxfree.records()`.
+  **RULE: probe-reading scorers need the FULL `probe_*` dirs incl. `probe.jsonl`, and
+  "0 probe dirs" is ALWAYS a sync fault, never a finding.** Cheap anyway: 1.1 GB in **46 s**
+  under `rsync -z`.
+* **NEXT TICK, CONCRETELY (110.6).** Register -- and git-commit BEFORE submitting --
+  `analysis/c82_gen_score.py` + `bin/c82_tail_generalise.sh` for
+  `{nodewise, nodewise1d} x {ResNet34/CIFAR-10, ResNet18/CIFAR-100} x seeds 0-2` = **12 jobs, one
+  account, ~0.3% of RawUsage**, inside the <=20-job / <=40-pending rule. Gate = the SIGN and
+  RESOLUTION of `nodewise1d - nodewise` per cell, five-way and symmetric, and it **must carry
+  80.5's count confound on every branch, declared in advance**. ResNet34 and CIFAR-100 are both
+  UNPROBED for this contrast, so **argue the box from probe data already on disk** -- that
+  exposure is exactly what voided A3.
+* **STILL OPEN, RANKED (110.7):** (1) **does the tail prescription generalise?** -- promoted to
+  rank 1 now that direction C is closed, no new patch needed; (2) layer-boundary permutation
+  (needs a patch, rank 2 for five cycles); (3) no arm's argmax is located; (4) the
+  `__file__`-derived-path sweep of `bin/` (101.11); (5) **alice2 still lacks PATCH_CHUNKWISE /
+  PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 / PATCH_SCHED** (gotcha 10) -- the partition
+  programme is single-account, unchanged for FIVE cycles, and **with direction C closed, seed
+  count is now the binding constraint on everything left**; fix it BEFORE the generalisation
+  batch, not after. (6) The field-vs-accuracy concordance test is **CLOSED (110.2) -- do not
+  reopen.**
+
+## Superseded -- cycle 81 (kept for the record)
+
 ## Running / next (cycle 81) -- **THE GAP SURVIVES THE STEPSIZE MOVE (+0.697) AND LIVES ENTIRELY IN THE DEGENERATE TAIL (-0.139). A3 VOIDED; DIRECTION C IS STILL OWED.**
 
 **Read `docs/CORRECTIONS.md` 109 and `docs/FINDINGS.md` 79.0-79.5 FIRST. 109.2 and 109.3 are

@@ -5943,3 +5943,120 @@ and the next batch that reasons about clipping must do the same.
    still the binding constraint on seed counts, and the reason n=3 keeps landing on band
    boundaries. **Unchanged for four cycles; it is now the campaign's most expensive
    unaddressed piece of infrastructure.**
+
+## 110. **CYCLE 82 — DIRECTION C IS DROPPED ON ITS OWN PRE-REGISTERED TEST. THE PARTITION RESULT IS NOW FOUR-DEEP AND THE TAIL STORY THREE-DEEP** (2026-08-27)
+
+### 110.1 MECHANICS
+**BOTH QUEUES 0 R / 0 P ON ARRIVAL** (`alice` = salehkaleybars, `alice2` = s5014158). All 12
+`cc1` jobs complete, every one `RUN_DONE` at 100/100 ep.
+CSV **1,856 → 1,868 raw data lines PURELY ADDITIVELY**, checked at the **RAW LINE level**
+(12 added — exactly the 12 `cc1-*` — **0 removed, 0 changed, header byte-identical**, verified by
+`comm` on sorted copies, not by line count).
+**CANCELLED: nothing** — both queues were empty, so there was nothing to audit or kill.
+**ORPHAN AUDIT** (`c69_orphan_census.py`, **24/24 selftest**): **125 families, 1,867 runs,
+0 ORPHANS**; 4 AMBIGUOUS families (`g3` n=9, `gate0d` n=6, `det` n=3, `v2` n=2 — 20 runs, all
+loose-cited only, all pre-cycle-30 exploratory).
+`analysis/c81_cc1_score.py` (**80/80**) was committed at cycle 81 BEFORE any `cc1` run existed and
+was run **UNEDITED** (md5 `c138eab327c1287c37cba3794cd741d7`, `git status` clean).
+
+**A SYNC GOTCHA THAT ALMOST CAUSED A FALSE VERDICT — NEW, WORTH A STANDING RULE.**
+The first scorer invocation read **"0 probe dirs"** and printed C1 → **UNINFORMATIVE**. That was
+**not a result**: the tick had rsynced only `*.out`, and the field channel lives in
+`runs/<family>/probe_*/`. Reading it as a science verdict would have repeated exactly the
+`--save-directory` failure mode of gotcha 1 (which already cost this project a day and 51 wrongly
+cancelled jobs). **Second trap:** the scorer only *names* `neg_counts.json`/`.npy` in its own
+source, so a "pull just the small files" shortcut (1.3 MB instead of 1.1 GB) *also* failed — it
+reaches `probe.jsonl` indirectly via `c52_boxfree.records()`. **RULE: a probe-reading scorer needs
+the FULL `probe_*` dirs incl. `probe.jsonl`; and "0 probe dirs" is ALWAYS a sync fault, never a
+finding.** The full pull is cheap over `rsync -z` (1.1 GB in **46 s**).
+
+### 110.2 **THE HEADLINE — C1 IS MIXED, AND DIRECTION C IS DROPPED**
+The concordance test that has been owed for two cycles finally RAN — C0.4 read **12/12 box-free,
+`rec_lo` = `rec_hi` = 0.0000 EXACTLY** — and it went against the field.
+
+| contrast | m | d_acc | d_N_eff/m | verdict |
+|---|---|---|---|---|
+| C2 chunk777 − nodewise | 14,421 vs 14,420 | **+0.727** (t +3.63) | **−0.0237** (t −11.14) | **ANTI-CONCORDANT** |
+| C3 chunk2325 − nodewise1d | 4,851 **EXACT** | +0.011 (t +0.08) | **−0.0529** (t −23.26) | **DISSOCIATION** |
+
+**MIXED → the field is not a sufficient statistic → DIRECTION C IS DROPPED as a design
+principle.** Every branch was costed before the data existed, *including* a second VOID, so this
+cannot be re-read later as "inconclusive, try again". **Do not design another batch around
+`N_eff/m` as a predictor of accuracy.**
+
+**The negative is strong, not weak.** The field channel resolves at t −11 and t −23 — it is not
+too noisy to read. It reads decisively, and it is decisively *wrong* about accuracy on one
+contrast and *silent* on the other. **That anti-prediction IS the reportable result**, and it is
+the sharpest thing the campaign can say to the Adam-mini / Adalayer / SGG line about
+meta-gradient-correlation-based granularity: the correlation statistic that line would naturally
+reach for does not track the outcome it is supposed to justify.
+
+### 110.3 **WHAT GOT STRONGER, ON THE SAME 12 RUNS**
+* **D REPLICATES A FOURTH TIME (FINDINGS 80.3): +0.727 (t 3.63) at FRESH seeds 3–5.** The series
+  is now +0.485 / +0.581 / +0.697 / **+0.727** across two stepsizes and two disjoint seed sets,
+  **all positive, none below +0.48**. This is the campaign's most robust effect and it is a
+  within-batch, count-matched contrast.
+* **G COLLAPSES A SECOND TIME (80.4): +0.011 (t 0.08) at m=4,851 EXACT.** Paired with C2 on the
+  SAME seeds, same batch, same stepsize: **tail present → +0.727; tail removed → +0.011.**
+* **bn1's T1 IS NOT AMENDED.** It read +0.295 = UNDECIDED and **STAYS UNDECIDED** — declared in
+  the scorer in advance. The campaign still does NOT own a CONFIRMED null on that contrast; what
+  it owns is three draws that all point the same way.
+* **109.7(5) IS DISCHARGED.** C3 supplies the 77.5 dissociation at a third contrast, and unlike
+  77.5 it is REGISTERED rather than post-hoc.
+* **NOT A RESULT (80.5):** `nodewise1d − nodewise = +0.816` is post-hoc AND count-confounded
+  (14,420→4,851). Recorded only so the next tick does not mistake it for the tail effect.
+
+### 110.4 A RECORD-KEEPING COLLISION, NOTED NOT FIXED
+`docs/CORRECTIONS.md` carries **two `## 109.` headings** (the `ar1` scoring block and the cycle-81
+summary block). Same class of defect as the `88` collision that CORRECTIONS 108 had to withdraw.
+Left in place — renumbering a committed record mid-campaign is worse than the collision — but
+flagged so a future reader does not treat them as one entry.
+
+### 110.5 **DECISION**
+1. **DROP direction C.** Its own five-way pre-registered test returned MIXED. Report the
+   anti-prediction as a finding; do not spend another GPU-hour treating `N_eff/m` as a design
+   variable. **This closes the question that has been the top open item for three cycles.**
+2. **The partition + degenerate-tail result is the paper.** It is what survived: a count-matched
+   effect replicated four times, with its mechanism (the 9,610 size-1 BatchNorm/bias groups)
+   pinned from both directions and now on a fresh seed set. The prescriptive sentence for the
+   prior-art line — *"one step size per output channel" silently gives every BatchNorm scale and
+   shift its own step size, and that, not architecture alignment (pp1's P2 = −0.009), is what the
+   partition comparison has been measuring* — is the contribution.
+3. **NEXT: does the tail prescription GENERALISE?** This is now rank 1 by default and by merit.
+   Everything above is ResNet18 / CIFAR-10 / n=3. The `nodewise` vs `nodewise1d` contrast at a
+   second architecture (ResNet34) or dataset (CIFAR-100, staged) is the cheapest possible test of
+   the paper's most prescriptive sentence and **needs no new patch**.
+4. **SUBMITTED THIS TICK: nothing.** See 110.6 — this is a deliberate stop, not an omission.
+
+### 110.6 **WHY NOTHING WAS SUBMITTED — AND THE ONE THING THAT MUST HAPPEN FIRST**
+The queue is empty and well inside every limit, so the constraint is not capacity. The constraint
+is **STANDING RULE 19**: the generalisation batch in 110.5(3) needs its scorer and its bands
+registered and git-committed BEFORE it is submitted, and the tick that scores a batch should not
+also be the tick that invents the next batch's gates from that batch's numbers. **`cc1` was
+scored today; its successor is designed and registered next tick, then submitted.** Cycle 79 is
+the cautionary case in the other direction — it registered against an UNREAD stepsize and lost the
+whole test to a bind. The generalisation batch has the same exposure (ResNet34 and CIFAR-100 are
+both unprobed at these settings for this contrast), so its box must be argued from probe data
+already on disk, not assumed.
+**CONCRETE HANDOFF FOR THE NEXT TICK:** register `analysis/c82_gen_score.py` + `bin/c82_tail_generalise.sh`
+for `{nodewise, nodewise1d} × {ResNet34/CIFAR-10, ResNet18/CIFAR-100} × seeds 0–2` = **12 jobs,
+one account, ~0.3% of RawUsage** — well inside the ≤20-job / ≤40-pending rule. The gate is the
+SIGN and RESOLUTION of `nodewise1d − nodewise` in each cell, five-way and symmetric, **and it must
+carry the count confound of 80.5 on every branch, declared in advance.**
+
+### 110.7 STILL OPEN, RANKED
+1. **Does the tail prescription generalise?** ResNet34 or CIFAR-100, no new patch needed.
+   **Promoted to rank 1** — direction C, which outranked it for three cycles, is now closed.
+2. **A layer-boundary permutation** (permute ACROSS tensors holding the size multiset). pp1's A is
+   a WITHIN-LAYER null; only this upgrades it to a statement about architecture as such. Needs a
+   new patch. Unchanged at rank 2 (was 3) for five cycles.
+3. **No arm's argmax is located.** A4 gives two points per arm; three are needed. Cheap, and it
+   would retire the "we compared at one arm's favourable ms" question for good.
+4. The `__file__`-derived-path sweep of `bin/` (101.11).
+5. **alice2 still lacks PATCH_CHUNKWISE / PATCH_PERMNODE / PATCH_NODEBN / PATCH_PROBE4 /
+   PATCH_SCHED** (gotcha 10), so the partition programme is **single-account** — unchanged for
+   FIVE cycles, still the campaign's most expensive unaddressed infrastructure, and the direct
+   cause of n=3 landing on band boundaries (bn1's T1 missed its threshold by 0.005 pp). With
+   direction C closed, seed count is now the binding constraint on everything that remains, and
+   this should be fixed before the generalisation batch rather than after.
+6. **~~The field-vs-accuracy concordance test~~ — CLOSED this cycle (110.2). Do not reopen.**

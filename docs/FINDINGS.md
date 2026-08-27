@@ -15131,3 +15131,98 @@ NOT locate any arm's argmax: two stepsizes are two points**, and no arm's ms cur
 three. **A5 (batch offset):** nodewise@3e-4 here 92.347 ±0.091 (n=3) vs the CSV's prior
 92.493 (n=8) → −0.146 against a ±0.50 bar → **REPRODUCES**. A5 cannot void A1 or A2; both
 are within-batch differences and any common offset cancels exactly.
+
+## 80.0 `cc1` — VALIDITY, CLEAN ON ALL FOUR GUARDS (the A3 void did NOT recur)
+
+12 jobs (ResNet18 / CIFAR-10, 100 ep, AUGMENT=1, ms=**1e-4**, seeds **3–5**), scored with
+`analysis/c81_cc1_score.py` (**80/80 selftest**, git-committed at 697d378 / 82cdcf8 **before any
+`cc1` run existed**; md5 `c138eab3…`, `git status` clean, run UNEDITED).
+
+| guard | result |
+|---|---|
+| C0 validity (`n_records`=10000, beta moved, ep=100) | **12/12 PASS** |
+| C0.2 `n_beta` EXACT on every record | **12/12** (4851 / 14421 / 4851 / 14420) |
+| C0.3 instrument fired (npy shape from header) | **12/12** (`n_tot` == npy shape on all) |
+| C0.4 **BOX-FREE** (rec-based 5% gate, PRIMARY) | **12/12 FREE** — `rec_lo` = `rec_hi` = **0.0000 EXACTLY**, `coord_lo` = `coord_hi` = **0.000000** |
+
+**The design lesson from `ar1`'s A3 void is vindicated.** Cycle 79 bought independence with an
+UNREAD stepsize (3e-4) and lost the whole test to a bind (0/12 box-free). Cycle 81 bought it with
+FRESH SEEDS at the READABLE stepsize instead, and the box did not bind on a single arm.
+109.5's zero-compute prediction — that ms=1e-4 is not marginally free but *exactly* free — held.
+
+## 80.1 plateau5 per arm — re-derived from `results/all_runs.csv`
+
+| arm | granularity | m | n | plateau5 | seeds 3/4/5 |
+|---|---|---|---|---|---|
+| `node` | nodewise | 14,420 | 3 | **91.890 ±0.077** | 91.744 / 91.922 / 92.004 |
+| `ch` | chunk777 | 14,421 | 3 | **92.617 ±0.185** | 92.298 / 92.614 / 92.938 |
+| `n1d` | nodewise1d | 4,851 | 3 | **92.706 ±0.139** | 92.482 / 92.674 / 92.962 |
+| `c23` | chunk2325 | 4,851 | 3 | **92.717 ±0.046** | 92.626 / 92.760 / 92.766 |
+
+**`nodewise` is the worst of the four arms, and it is the only one carrying the 9,610 size-1
+groups.** The other three sit within 0.100 pp of each other.
+
+## 80.2 **C1 — THE PRIMARY. THE FIELD IS NOT A SUFFICIENT STATISTIC. DIRECTION C IS DROPPED**
+
+Convention (transcribed UNCHANGED from A3, asserted byte-for-byte against `c79_ar1_score.py`
+by the selftest): higher `N_eff/m` → higher plateau5 = CONCORDANT.
+
+| contrast | m | d_acc (pp) | d_N_eff/m | verdict |
+|---|---|---|---|---|
+| C2 `chunk777 − nodewise` | 14,421 vs 14,420 | **+0.727** (t **+3.63**, RESOLVED) | **−0.0237** (t **−11.14**, RESOLVED) | **ANTI-CONCORDANT** |
+| C3 `chunk2325 − nodewise1d` | 4,851 **EXACT** | +0.011 (t +0.08, unresolved) | **−0.0529** (t **−23.26**, RESOLVED) | **DISSOCIATION** |
+
+→ **MIXED. Registered branch: the field is not a sufficient statistic → DROP direction C.**
+
+Both branches were costed in advance (CONCORDANT→ADOPT, ANTI→DROP-and-report,
+MIXED→DROP, VOID→DROP-on-unreadability), so **no branch of this test could have been read as
+"inconclusive, try again"**. The field channel resolves *enormously* — t −11 and t −23 — and
+points the WRONG WAY on one contrast and NOWHERE on the other. It is not that the instrument
+is too noisy; it is that it is decisively uninformative about accuracy.
+
+**This also discharges open item 109.7(5) — the 77.5 dissociation at a THIRD contrast.**
+C3 is that contrast, and here it is REGISTERED rather than post-hoc: at m=4,851 EXACT the field
+moves −0.0529 (t −23.26) while accuracy moves +0.011 (t +0.08). 77.5 (node→perm, −24% field /
+−0.009 pp accuracy) is no longer a lone post-hoc reading.
+
+## 80.3 **C2 — D REPLICATES A FOURTH TIME, AT FRESH SEEDS, WITHIN BATCH**
+
+    D'' = chunk777 − nodewise = +0.727 pp  (se 0.200, t +3.63)
+    registered: |D''−0.533| <= 0.50 REPLICATES | D'' <= 0.15 FAILS | else UNDECIDED  ->  **REPLICATES**
+
+| reading | batch | ms | D |
+|---|---|---|---|
+| mm1 | seeds 0–2 | 1e-4 | +0.485 (t 3.01) |
+| pp1 | seeds 0–2 | 1e-4 | +0.581 (t 4.11) |
+| ar1 | seeds 0–2 | 3e-4 | +0.697 (t 5.90) |
+| **cc1** | **seeds 3–5** | 1e-4 | **+0.727 (t 3.63)** |
+
+Four independent readings, two stepsizes, two disjoint seed sets, **all positive, none below
++0.48**. This is the campaign's most robust effect.
+
+## 80.4 **C3 — G COLLAPSES AT FRESH SEEDS. THE TAIL STORY HOLDS ON A THIRD DRAW**
+
+    G'' = chunk2325 − nodewise1d = +0.011 pp  (se 0.147, t +0.08)
+    registered: >+0.30 SURVIVES | (+0.15,+0.30] UND | [-0.15,+0.15] COLLAPSES | ... ->  **COLLAPSES**
+
+| reading | seeds | ms | G |
+|---|---|---|---|
+| bn1 T1 | 0–2 | 1e-4 | +0.295 → **UNDECIDED** |
+| ar1 A2 | 0–2 | 3e-4 | −0.139 → COLLAPSES |
+| **cc1 C3** | **3–5** | 1e-4 | **+0.011 → COLLAPSES** |
+
+**C3 DOES NOT AMEND bn1's T1. T1 was UNDECIDED and STAYS UNDECIDED** (declared in the scorer in
+advance). But the paired reading is now three-deep: **with the degenerate size-1 tail present the
+aligned-vs-uniform gap is +0.727 (t 3.63); with it removed the same contrast at EXACTLY matched
+count is +0.011 (t 0.08).** The gap lives in the tail, and this is now the *third* draw saying so
+— at a fresh seed set the campaign had never touched.
+
+## 80.5 The tail-removal contrast — POST-HOC and COUNT-CONFOUNDED, reported with its confound
+
+    nodewise1d − nodewise = +0.816 pp   (14,420 -> 4,851 groups)
+
+**This is NOT a clean number and must never be quoted as the tail effect.** It changes the group
+count by 3× at the same time as it removes the tail, so it carries exactly the count confound
+bn1's T2 carried on every branch. The count-MATCHED statements are C2 (+0.727 with the tail) and
+C3 (+0.011 without it); those two are the evidence. 80.5 is recorded only so the next tick does
+not rediscover it and mistake it for a result.
