@@ -197,10 +197,18 @@ BOXES = {
     # each coordinate by exactly 0 or +-ms and beta is confined to
     # [ln(alpha0) - ms*T, ln(alpha0) + ms*T] = [-21.907755, +8.092245] at alpha0=1e-3,
     # ms=3e-4, T = 100 ep x 500 = 50,000 -- for ANY velocity profile, which is what
-    # CORRECTIONS 72 (velocity is non-monotone and seed-dependent) demands.  (-25, +9.0)
-    # lies strictly outside on both sides, so it CANNOT be reached and cannot clamp.
+    # CORRECTIONS 72 (velocity is non-monotone and seed-dependent) demands.  The FLOOR
+    # -25 lies strictly below that interval, so it CANNOT be reached and cannot clamp.
+    # **THE CEILING IS NOT BUDGETED FROM THE IDENTITY AND IS HELD AT ar1's -2.3026.**
+    # An earlier registration of this box read (-25.0, +9.0); it was WITHDRAWN before
+    # any fa1 run existed (CORRECTIONS 111).  Its HI argument rested on
+    # beta_true_max = +3.436 at BETA_CLIP=-30:6.0, which comes from bd7-w-c6-s0/s1 --
+    # both collapsed=1, plateau5 10.000, with beta frozen on BOTH sides for 4,042 and
+    # 3,303 consecutive records.  A released ceiling is the corpus's only 2/2 fatal
+    # intervention, and only the FLOOR is confounded with the stepsize (LO binds on
+    # 12/12 ar1 arms, HI on 1/12).
     # REGISTERED BEFORE ANY fa1 JOB WAS SUBMITTED, from the script's own CLIP= line.
-    "fa1":  (-25.0,  9.0,    "bin/c82_field_wideclip.sh:CLIP"),
+    "fa1":  (-25.0, -2.3026, "bin/c82_field_wideclip.sh:CLIP"),
 }
 
 

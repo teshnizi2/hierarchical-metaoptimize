@@ -6060,3 +6060,275 @@ carry the count confound of 80.5 on every branch, declared in advance.**
    direction C closed, seed count is now the binding constraint on everything that remains, and
    this should be fixed before the generalisation batch rather than after.
 6. **~~The field-vs-accuracy concordance test~~ — CLOSED this cycle (110.2). Do not reopen.**
+
+---
+
+## 111. **CYCLE 82b — TWO PRE-DATA REGISTRATIONS CORRECTED BEFORE THEY BOUGHT A GPU-HOUR: `sf1`'s LADDER IS WITHDRAWN, AND `fa1`'s CEILING WAS ARGUED FROM TWO RUNS THAT HAD DIVERGED** (2026-08-27)
+
+**NOTHING WAS SUBMITTED. NO `sf1` OR `fa1` RUN EXISTS.** Everything below is registered
+against data that does not yet exist (STANDING RULE 19), and every number in it was
+re-derived this tick from `results/all_runs.csv`, from `probes_*/probe.jsonl`, or from the
+cluster source read read-only over `ssh alice`. No cluster file was modified.
+
+The number `109` is taken twice in this file (CORRECTIONS 110.4) and `110` five times as
+sub-headings. This entry is `111`; it does not renumber anything.
+
+### 111.1 THE SINGLETON CENSUS — REGISTERED, RE-VERIFIED, AND IT STANDS
+
+`analysis/c82_singleton_census.py` reproduces ResNet18 **7/7 exactly** against FINDINGS 77.6:
+
+| arch | params | nodewise m | singletons | f | singleton weight coverage | nodewise1d m |
+|---|---|---|---|---|---|---|
+| ResNet10      |  4,903,242 |  8,660 |  5,770 | 66.628% | 0.1177% |  2,915 |
+| ResNet18      | 11,173,962 | 14,420 |  9,610 | 66.644% | 0.0860% |  4,851 |
+| ResNet34      | 21,282,122 | 25,556 | 17,034 | 66.654% | 0.0800% |  8,595 |
+| ResNet50      | 23,520,842 | 79,700 | 53,130 | 66.662% | 0.2259% | 26,677 |
+| ResNet10_c100 |  4,949,412 |  8,840 |  5,860 | 66.290% | 0.1184% |  3,005 |
+| ResNet18_c100 | 11,220,132 | 14,600 |  9,700 | 66.438% | 0.0865% |  4,941 |
+| ResNet34_c100 | 21,328,292 | 25,736 | 17,124 | 66.537% | 0.0803% |  8,685 |
+
+`ResNet50_c100` is not in `build_network.py`. ResNet18's 41 one-dimensional tensors have
+lengths `[64 ×10, 128 ×10, 256 ×10, 512 ×10, 10]` (Σ = 9,610); its ≥2-D tensors contribute
+exactly 4,810 nodewise groups.
+
+**f IS PINNED BY A STRUCTURAL IDENTITY, NOT BY CHANCE.** Every conv is `bias=False` followed
+by one `BatchNorm2d(affine=True)`, so with C = Σ conv out-channels and nc = num_classes:
+`singletons = 2C + nc`, `non-singletons = C + nc`, `f = (2C+nc)/(3C+2nc) → b/(1+b) = 2/3`.
+Verified exactly for all 8 rows. **f is a property of the conv→norm IDIOM — not of depth,
+width, block type or dataset.**
+
+**REGISTERED VERDICT, UNCHANGED: THE CROSS-ARCHITECTURE TEST IS UNTESTABLE — DO NOT RUN.**
+Spread 66.290–66.662% (max/min 1.0056) → predicted gap spread **0.0039 pp** against a
+0.12 pp median / 0.24 pp p90 seed-noise floor; ~11,000 seeds per arm to resolve at t=2.
+Added to the record: the predicted ordering is exactly "larger C first, CIFAR-10 before
+CIFAR-100" (∂f/∂C > 0, ∂f/∂nc < 0), so even at infinite n it would be perfectly confounded
+with network size and dataset. **It may not be resurrected as a cheap side test.**
+
+### 111.2 **`sf1`'s LADDER (REGISTER-c82-singleton-law.md §5–§7) IS WITHDRAWN.** Three defects, each re-derived
+
+Full amendment: `docs/REGISTER-c82b-singleton-law-WITHDRAWAL.md`. The frozen doc is left
+**byte-identical** with a supersession banner prepended (CORRECTIONS 110.4's rule).
+
+1. **IT IS FROZEN IN A CELL ITS OWN R4 VOIDS.** §5 freezes `BETA_CLIP=-15:-2.3026` at
+   ms=3e-4/100 ep. R4 voids any arm at a guard on > 5% of records. Measured across all 12
+   `probes_ar1` dirs (10,000 records each): **rec_lo 0.4521–0.4597 on 12/12 — 9× the
+   threshold** — and that includes `chunk777` and `chunk2325`, which have ZERO singleton
+   groups, so the bind belongs to the (ms, α₀, T) cell and every rung and every comparator
+   inherits it. 36 jobs, ~30 GPU-hours, guaranteed VOID.
+2. **R5 IS ARITHMETICALLY SELF-REFUTING.** "Deep-first at the same f" is not at the same f:
+   shallow-first k=21 → singletons 2,176, m 7,006, **f = 0.31059** (matches §5's own table);
+   deep-first k=21 → singletons 7,690, m 12,520, **f = 0.61422**. §5's own slope then predicts
+   the two L3 arms differ by **+0.381 pp** against R5's 0.24 pp refutation trigger, so **R5
+   fires and declares the law REFUTED exactly when the law is true.** No deep-first k gives
+   2,176 (k=5 → 2,058; k=6 → 2,570). Its comparator K=1604 is matched to m=7,006, not 12,520.
+3. **f IS COLLINEAR WITH m AND WITH THE COMPARATOR — the confound §3 used to disqualify the
+   count form.** Along §5's ladder f = 1 − (4,851 − k)/m with k ≤ 41 ≪ m. Recomputed from the
+   true shape list, the comparator's ≥2-D group count runs **4,810 → 5,251 → 5,949 → 6,966 →
+   8,750 → 11,302 → 14,380** as K goes 2325 → 777, while the `nodewisep` arm holds the real
+   weights at a constant 4,810 groups at every rung. The two hypotheses' predictions differ by
+   ≲ 0.06 pp against a per-rung se of 0.118–0.200 pp.
+
+**Two smaller defects, recorded so the replacement cannot inherit them.**
+* **The proportional form is already falsified at f = 1.** `chunk1` ≡ `weightwise`
+  (`HF.py:341-348`, ⌈numel/1⌉ = numel), so gap(f=1) ≡ 0 by identity. Measured at
+  byte-identical config: `ck1-k1` 90.790/91.230/90.918 vs `tw0-w` 91.200/91.142/91.360 →
+  **−0.255 pp (se 0.146, t −1.74)** against the registered form's **+1.115**. §4's "both
+  harms are proportional to f and to nothing else" is wrong — the second harm is a property
+  of the COMPARATOR and vanishes at f=1.
+* **§5's prose and §5's table specify different partitions.** "ONE group on the remaining
+  41−k" read literally is one group total; the table needs one per remaining tensor
+  (k=0 → 4,810 + 41 = 4,851). `HF.py` has no cross-tensor group construct. **The table is
+  right, the sentence is wrong.**
+
+**WHAT SURVIVES:** §0–§4 and the DO-NOT-RUN verdict. **WHAT MAY NOT BE CLAIMED:**
+`gap(f) = −0.139 + 1.2544·f` in any form, any predicted rung value, any statement that the
+partition gap "scales with" the singleton fraction, §6's R34-vs-R50 weight-coverage test,
+§7's b=0/1/3 extrapolations. **`ar1`'s A1 (+0.697) and A2 (−0.139) survive as MEASUREMENTS;
+only their use as a two-point anchor for a law is withdrawn.**
+
+**THE REPLACEMENT, REGISTERED NOW AND NOT SUBMITTABLE YET.** A **FIXED-m** ladder —
+`nodewisep<k>` on the 41 one-D tensors AND `chunk<K2>` on all ≥2-D tensors, K2 per rung:
+
+| rung | k | K2 | m | off 14,420 | singletons | f |
+|---|---|---|---|---|---|---|
+| L0 |  0 |  777 | 14,421 | +1  |     0 | 0.00000 |
+| L1 |  7 |  802 | 14,409 | −11 |   448 | 0.03109 |
+| L2 | 14 |  844 | 14,416 | −4  | 1,152 | 0.07991 |
+| L3 | 21 |  914 | 14,422 | +2  | 2,176 | 0.15088 |
+| L4 | 28 | 1070 | 14,423 | +3  | 3,968 | 0.27512 |
+| L5 | 34 | 1417 | 14,428 | +8  | 6,528 | 0.45245 |
+| L6 | 41 | 2325 | 14,420 | +0  | 9,610 | 0.66644 |
+
+m varies 0.13% while f sweeps 0 → 0.666; **L0 IS `chunk777` exactly**, so `ar1`'s own arm is a
+free endpoint; m is fixed so the ladder is its own contrast and the comparator collinearity
+disappears. The ordering control matches the **SUM** of one-D lengths, not the COUNT: 4×512 +
+2×64 = **2,176 exactly** at k=6. Box `-25:-2.3026`. n=6. R1 gains an **UNDERPOWERED** branch
+distinct from REFUTED (false-refutation rate 3.9%/12.8%/30.6% at se 0.12/0.15/0.20); R2 keeps
+ONE threshold, not two (its AND-clause really means +0.53, and it floats with realised noise);
+R3 is evaluated on fitted residuals; decomposition (arm and comparator separately) is
+mandatory; gap(f=1) ≡ 0 is a registered boundary condition.
+**BLOCKED ON:** `PATCH_NODEWISEP` does not exist in `Optimizers/HF.py` (verified by grep over
+the live cluster file — `PATCH_GRANULARITY`, `PATCH_NODEBN`, `PATCH_CHUNKWISE` are present,
+`nodewisep` appears nowhere) and `tests/test_nodewisep.py` was never authored. **No `sf1`
+script was written, and none was deleted — none ever existed.** Writing one now could only
+produce an instrument that refuses.
+
+### 111.3 **`fa1`'s CEILING WAS ARGUED FROM TWO RUNS THAT HAD DIVERGED.** The box moves −25:+9.0 → **−25:−2.3026**
+
+The registration at commit `c72d3f7` budgeted BOTH guards from the Lion identity and argued
+that *margin above a provably unreachable bound is free*. **That is right on the FLOOR and
+wrong on the CEILING.**
+
+1. **THE HEADLINE HI EVIDENCE IS A DEAD NETWORK'S ODOMETER.** The header quoted "the true
+   free maximum at HI=+6.0 was **+3.436**, rec_hi 0.0000 on 6/6" as proof that a measured
+   ceiling had been 1.44 too low. From the CSV: **`bd7-w-c6-s0` and `bd7-w-c6-s1` read
+   `collapsed=1`, `plateau5=10.000`, `best_test` 88.82/88.94** — 88.4% at epoch 38, 10.00%
+   from epoch 39 to 80. From `probes_bd7`: in both, `beta_true_min` AND `beta_true_max` are
+   bit-identical for **4,042 and 3,303 consecutive records**, i.e. a frozen β on both sides —
+   zero or NaN meta-gradient. The largest **healthy** free HI excursion at a coarse
+   granularity is **+2.096** (`probe_node_c6_s1`, rec_hi 0.0000, collapsed=0, plateau5 92.176).
+   **NEW CORPUS RULE: JOIN EVERY BETA STATISTIC AGAINST `collapsed` BEFORE QUOTING IT.**
+2. **THE CEILING IS A STABILITY DEVICE, NOT AN INSTRUMENT.** `bd7-w-c2` vs `bd7-w-c6` differ
+   in one field (HI +2.0 → +6.0). At +2.0 the guard clamped hard (rec_hi to 0.6209) and both
+   arms **SURVIVED** (90.882 / 90.472); at +6.0 it never bound and both **DIED** (10.000 /
+   10.000). Corpus-wide: **14 of 1,867 rows are collapsed=1 — 10 weightwise UNBOXED at
+   ms=1e-3, 2 unattributed, and exactly 2 boxed: the released-ceiling pair.** Zero collapses
+   at any coarse granularity under any box. "Two boxes that never bind produce identical
+   trajectories" is true and irrelevant: the choice is between a box that binds and one that
+   does not, and the only direct evidence is 2/2 fatal. HI=+9.0 would let α reach e⁹ = 8,103
+   against ar1's e^−2.3026 = 0.1 — an 81,000× enlargement, bought for nothing.
+3. **ONLY THE FLOOR IS CONFOUNDED WITH THE STEPSIZE.** In `probes_ar1` the LO guard binds
+   **12/12** (rec_lo 0.4521–0.4597); the HI guard binds **1/12** (node s2, rec_hi 0.1196, ≤ 3
+   of 14,420 coordinates = 0.02%). The confound `fa1` exists to retire is a FLOOR confound end
+   to end (39/39 box-free at ms=1e-4 vs 15/15 LO-bound at ms=3e-4). Moving the ceiling would
+   make `fa1` the only cell in the four-cell D series with a different HI — the exact pooling
+   F3 forbids.
+
+**THE FIX, AND ITS DIRECT VALIDATION.** `BETA_CLIP=-25:-2.3026`. Re-running `occupancy()` over
+`ar1`'s own twelve probes with the floor moved to −25 gives **rec_lo = 0.0000 on 12/12** with
+rec_hi unchanged (0.0000 on eleven, 0.1196 on node s2). One field, one guard, zero new risk.
+The floor remains algebraic: `HF.py`'s Lion update is `β ← (1 − ms·wd)·β − ms·sign(·)` with
+`--weight-decay-meta 0`, so β ∈ [ln α₀ − ms·T, ln α₀ + ms·T] = **[−21.907755, +8.092245]** for
+ANY velocity profile (CORRECTIONS 72's requirement), and −25 has 120.6 epochs of headroom
+against a 100-epoch batch. **The ceiling is NOT budgeted from that identity and is held at
+ar1's value; guard H2b asserts it did not move.**
+
+### 111.4 THE OTHER SURVIVING OBJECTIONS APPLIED TO `bin/c82_field_wideclip.sh` + `analysis/c82_fa1_score.py`
+
+* **F3 IS UNPAIRED; THE PAIRED-VARIANCE CLAIM IS WITHDRAWN.** Measured over **356
+  same-config SAME-SEED replicate pairs** (ResNet18/CIFAR10/100 ep/not collapsed/plateau5>80):
+  median |difference| **0.1710 pp** → per-run sd **0.179 pp**. The across-seed sd within a
+  config (156 configs, n>2) has median **0.159 pp**. **Those are the same number — seed
+  explains essentially none of the run-to-run variance in `plateau5` on this cluster**
+  (`PARTS` spans five GPU classes; `ar1` alone scattered over node859/860/883/884/885 with
+  wallclocks 44–114 min). The claimed paired se of ~0.098 pp does not exist. F3 is a Welch
+  two-sample contrast, n=6 vs n=3, se ≈ 0.127 pp, resolving **0.25 pp**.
+* **n GOES 3 → 6 (12 → 24 jobs, two waves of 12).** At n=3 a contrast resolves 0.29 pp; at
+  n=6, 0.21 pp. Two waves because the FairShare rule budgets a batch at ≈20 jobs of ~40 min.
+  **STOPPING RULE, REGISTERED: the band verdict is read ONCE, at n=6.** Below that the scorer
+  prints INTERIM-UNDERPOWERED and **refuses to emit a band label**.
+* **F3 IS THE PRIMARY; F2 SECONDARY; F1 DESCRIPTIVE.** Every F1 branch ends in "direction C
+  stays DROPPED", so F1 cannot change a conclusion and may not hold the headline. F3 is the
+  gate that retires the STANDING RULE 10 breach.
+* **THE PREDICTED |Δ_arm| IS WRITTEN DOWN AND IT IS SMALL.** exp(−15) = 3.06e−7 vs
+  exp(−21.908) = 3.06e−10, both inert against weights of order 1e−1, and a coordinate pinned
+  at −15 by step 27,020 cannot climb to −8 in the 22,980 steps left (it needs 23,333).
+  **|Δ| is EXPECTED below 0.10 pp — below what n=6 resolves — so an unresolved F3 is the
+  EXPECTED outcome and is nearly uninformative on its own.** Registered in advance so the
+  operator does not price this batch as though its primary were powered. **What it delivers
+  regardless is a box-free ms=3e-4 cell, which does not exist anywhere in the corpus.**
+* **F2 GAINS A SECOND CLAUSE.** The band was a bare threshold on a point estimate and
+  ATTENUATED carries a permanent cost. Inverse-variance pooling the three BOX-FREE D readings
+  gives **+0.5805 ± 0.0939** (mm1 +0.4853/0.1613, pp1 +0.5807/0.1414, cc1 +0.7267/0.2001;
+  Q = 0.88 on 2 df, homogeneous), the SURVIVES line at +0.45 sits 0.13 pp below it, and
+  se(D_w − pool) at n=6 is 0.140. **ATTENUATED / COLLAPSES / INVERTS may be DECLARED only if
+  D_w is ALSO below the pool with |t| ≥ 2; otherwise the verdict is CONSISTENT-WITH-BOX-FREE
+  (UNDERPOWERED)** and the band label is printed only as an unconfirmed point reading.
+  SURVIVES needs no second clause. G_w's reference is 0.0.
+* **F0.1, A HEALTH GATE, IS ADDED.** `collapsed` appeared nowhere in either file; a diverged
+  run that still completes its epochs would have passed F0 and dragged D_w ~80 pp into
+  INVERTS. Now: (a) `collapsed` must be 0/empty; (b) `best_test − plateau5 ≤ 2.0 pp` (healthy
+  ar1 arms run 0.27–0.42; `bd7-w-c6-s0` reads 78.8); (c) a beta-freeze detector.
+* **THE FREEZE DETECTOR NEEDED AN INTERIORITY CLAUSE, AND SMOKE-TESTING IT ON REAL PROBES
+  FOUND THAT OUT BEFORE ANY DATA EXISTED.** The naive form (β bit-identical on both sides for
+  ≥ 1,000 consecutive records) is **not a divergence test, it is a CLAMP test**: `ar1-node-s2`
+  sat on the floor (rec_lo 0.4521) AND the ceiling (rec_hi 0.1196) at once, so both extremes
+  were constant by construction and the naive detector reported a **1,194-record "freeze" on a
+  perfectly healthy run**. Requiring both extremes to be **strictly INSIDE the box** gives:
+  ar1-node-s2 → **0**; bd7-w-c6-s0/s1 → **4,042 / 3,303**; bd7-node-c6-s1 (healthy, free) →
+  **0**. Frozen ON a guard is clamped; frozen INSIDE the box is dead.
+* **F0.4 IS SPLIT BY GUARD.** F0.4a (LO) is ALGEBRAIC: rec_lo must be 0.0000 exactly, a touch
+  is impossible and means the config is not the header → VOID, debug, do not rescore.
+  F0.4b (HI) is EMPIRICAL: the ceiling is unchanged from ar1 and IS reachable; an arm at
+  ≥ 5% is dropped from F1 only, F2/F3 stand with occupancy attached. **An HI bind on nodewise
+  is registered IN ADVANCE as expected — ar1 had it — and is a condition SHARED by both halves
+  of F3, not a difference between them.**
+* **THE NETWORK/DATASET JOIN.** `build_network` dispatches on the NAME ALONE (`ResNet18` and
+  `ResNet18_c100` are separate entries), and `len(trainloader)` is 500 at batch 100 for BOTH
+  CIFAR-10 and CIFAR-100, so `--dataset CIFAR100 --NN-name ResNet18` would silently build a
+  10-class head and pass every guard the script had. New guard **H1d** parses `--NN-name` and
+  `--dataset` off the emitter line and feeds those strings to guard 2's axis signature and
+  guard 4's `build_network` / `load_data`; new guard **4c2** asserts the classifier head
+  matches the dataset's class count. This is the class of error that already cost 6 jobs.
+* **THE IDENTITY'S PRECONDITION LIST WAS INCOMPLETE.** `HF.py:99` also calls `_apply_hier()`,
+  whose `additive` branch computes `β = β_prev + dm + ratio·(ds − dm)` and with `ETA_RATIO > 1`
+  can move a coordinate by more than ms — breaking the bound. `--export=ALL` propagates the
+  submitting shell's `HIER`/`ETA_RATIO`. The emitter now pins **`HIER=none,SCHED=none`** and
+  guard **H1e** asserts it. Guard 1c was relaxed from "keys identical to tw0's" to "tw0's keys
+  are all present, plus only the registered pins", so it still catches bf8's lost-key bug.
+* **NEW GUARD H4, THE COLLAPSE AUDIT.** Refuses to run unless `bd7-w-c6-s0/s1` still read
+  `collapsed=1` in the CSV, and prints the corpus collapse census, so the withdrawn +3.436
+  can never be re-quoted as evidence about a free ceiling.
+* Guard 5's per-job disk figure corrected 0.060 → **0.100 GB** (measured: `probes_ar1` is
+  1.1 GB over 12 dirs; `probe_node_ar1_s0/probe.jsonl` alone is 113,735,692 bytes). Guard 1d
+  widened to cover the REVERSED substring form `self.stepsize_type in '<literal>'`, which
+  `HF.py` really contains twice (`in 'scalar'`, `in 'blockwise'`); neither can capture an
+  `fa1` granularity, so this is coverage matching the guard's own claim, not a live fire.
+  Guard 6 now budgets `PEND + NJOBS ≤ 40` and refuses a single submission over 20 jobs.
+* **NOT ADOPTED, DELIBERATELY: the 2-job released-ceiling pilot.** The corpus has ZERO
+  coarse-granularity runs at ms=3e-4/100 ep with a released ceiling, so that risk is
+  UNMEASURED rather than small — but nothing `fa1` is for needs the ceiling moved. If it is
+  ever wanted it is `nodewise s0` + `nodewise1d s0` at `-25:+9.0`, read for `collapsed`,
+  `best_test − plateau5` and `beta_true_max` before anything larger. **It is not registered
+  here and is not part of this batch.**
+
+### 111.5 VERIFICATION (STANDING RULE: evidence, not assertion)
+
+* `bash -n bin/c82_field_wideclip.sh` → OK. Dry run wave a and wave b each emit **12** jobs,
+  exit code **2**, **nothing submitted**. The 7 failing guards are all cluster-only and
+  expected off-cluster (0 runner, 1a-c HF.py probe wiring, 1d patches, 1e equivalence suites,
+  H HF.py source, 4 the venv, 5 `/data1`); guards 2, 2b–2e, 3, 6, 7, 7b pass locally.
+* `python3 analysis/c82_fa1_score.py --selftest` → **188/188 PASS**.
+* `python3 analysis/c55_neff_noise.py --selftest` → **51/51 PASS** with `fa1` re-registered
+  as `(-25.0, -2.3026, "bin/c82_field_wideclip.sh:CLIP")`.
+* The scorer was run end-to-end against `../probes_ar1` as a smoke test (no fa1 data exists);
+  that is how the freeze detector's false positive in 111.4 was caught.
+
+### 111.6 **DECISION**
+
+1. **`fa1` IS READY TO SUBMIT, 24 jobs in two waves of 12, and it is worth buying for ONE
+   reason: it retires the ms/box confound.** It is NOT worth buying to rescue A3 (closed by
+   `cc1`), and its primary is not powered for its own expected effect. If the operator wants
+   a powered primary, this is not that batch.
+2. **`sf1` IS NOT SUBMITTABLE AND ITS LADDER IS WITHDRAWN.** It needs `PATCH_NODEWISEP` and
+   an equivalence suite first, then the FIXED-m redesign in 111.2.
+3. **THE CROSS-ARCHITECTURE SINGLETON-FRACTION TEST STAYS DO-NOT-RUN.**
+4. **SUBMITTED THIS TICK: NOTHING.**
+
+### 111.7 STILL OPEN, RANKED
+
+1. **Does the tail prescription generalise?** ResNet34 or CIFAR-100, no new patch needed.
+   Unchanged at rank 1 — and note it now inherits 111.4's network/dataset guard, which is the
+   exact failure mode a CIFAR-100 batch is exposed to.
+2. **`fa1`, if bought** — the ms/box deconfound.
+3. **`sf1`**, blocked on `PATCH_NODEWISEP` + `tests/test_nodewisep.py`.
+4. **A layer-boundary permutation** (permute ACROSS tensors holding the size multiset).
+   Needs a new patch. Unchanged for six cycles.
+5. **No arm's argmax is located.** Two stepsizes are two points.
+6. **`alice2` still lacks `PATCH_CHUNKWISE` / `PATCH_PERMNODE` / `PATCH_NODEBN` /
+   `PATCH_PROBE4` / `PATCH_SCHED`** (gotcha 10), so the partition programme is
+   single-account — unchanged for SIX cycles, and now directly binding: it is why 24 jobs
+   must go out as two waves instead of one.
+7. **A released ceiling at ms=3e-4/100 ep is UNMEASURED at coarse granularity.** Not needed
+   for anything currently registered; costed at 2 jobs in 111.4 if it ever is.
+8. ~~The field-vs-accuracy concordance test~~ — CLOSED at 110.2. Do not reopen.

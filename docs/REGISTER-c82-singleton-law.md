@@ -1,3 +1,14 @@
+> **SUPERSEDED IN PART — DO NOT SUBMIT §5.**  Sections **§5, §6 and §7** of this document
+> are **WITHDRAWN**, before any `sf1` run existed, by
+> [`docs/REGISTER-c82b-singleton-law-WITHDRAWAL.md`](REGISTER-c82b-singleton-law-WITHDRAWAL.md)
+> and CORRECTIONS 111.  Three verified defects: the ladder is frozen in the (ms=3e-4,
+> BETA_CLIP=-15:-2.3026) cell that its own R4 voids (rec_lo 0.4521-0.4597 on 12/12 ar1 arms);
+> R5's "deep-first at the same f" is not at the same f (k=21 deep-first gives f=0.614, not
+> 0.311) and self-fires; and f is collinear with m and with the comparator's resolution, the
+> same confound-by-construction §3 uses to disqualify the count form.  **§0-§4 and §3's
+> DO-NOT-RUN verdict on the cross-architecture test survive unchanged and were re-verified.**
+> The body below is left BYTE-IDENTICAL on purpose (CORRECTIONS 110.4).
+
 # REGISTRATION — cycle 82: the singleton-fraction law (`sf1`)
 
 Registered **before any run of this batch exists** (STANDING RULE 19). Scorer, bands and

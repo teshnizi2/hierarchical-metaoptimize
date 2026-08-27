@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+"""**PARTIALLY WITHDRAWN.**  Sections A-C of this script (the structural identity
+f = b/(1+b), the census, and the cross-architecture UNTESTABLE verdict) STAND and were
+re-verified.  **Anything this script prints about the sf1 LADDER, its slope
+gap(f) = -0.139 + 1.2544 f, or its predicted rung values is WITHDRAWN** -- see
+docs/REGISTER-c82b-singleton-law-WITHDRAWAL.md and CORRECTIONS 111.  The ladder was
+frozen in a cell its own R4 voids, its R5 ordering control self-fires, and f is
+collinear with m and with the comparator's resolution along that ladder.  The
+replacement is the FIXED-m ladder in the withdrawal doc's section 2.1.  Do not quote
+this script's ladder output.
+"""
 import math, sys
 sys.path.insert(0,"/Users/teshnizi/Saber Optimization/alice-backup/hierarchical-metaoptimize/analysis")
 from c82_singleton_census import (resnet_params, basicblock, bottleneck, census, numel,
