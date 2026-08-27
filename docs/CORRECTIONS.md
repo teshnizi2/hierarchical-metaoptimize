@@ -6332,3 +6332,39 @@ ar1's value; guard H2b asserts it did not move.**
 7. **A released ceiling at ms=3e-4/100 ep is UNMEASURED at coarse granularity.** Not needed
    for anything currently registered; costed at 2 jobs in 111.4 if it ever is.
 8. ~~The field-vs-accuracy concordance test~~ — CLOSED at 110.2. Do not reopen.
+
+## 112. **`fa1` GUARD H1e WAS SELF-REFERENTIAL AND COULD NEVER PASS** (cycle 82c, pre-data)
+
+`bash bin/c82_field_wideclip.sh --submit` **aborted at guard H1e**, refusing to submit 12 jobs.
+The guard was right to fire and wrong about why: **the defect was in the guard, not the batch.**
+
+**THE BUG.** `mine` is bound at line 511 to the single `--export` LINE. At line 646 guard H1c
+**rebinds `mine` to the WHOLE FILE** (`mine = open(me).read()`). H1e, further down, reuses `mine`
+still expecting the narrow meaning and scans it for `"HIER=shrink"` / `"HIER=additive"` — and
+finds them **on its own check-list at line 681**. The guard therefore fails on every invocation
+regardless of configuration. The submitted config was correct throughout: the emitter's
+`--export` line carries `HIER=none,SCHED=none` (line 1089).
+
+**THE FIX.** H1e now re-derives the `--export` line itself instead of inheriting the rebound
+variable, with an in-line comment naming the rebind so it is not re-introduced.
+
+**VERIFIED IN BOTH DIRECTIONS — a guard that only passes is worse than the bug it replaced,
+because the identity it protects would go unguarded:**
+
+| test | expected | observed |
+|---|---|---|
+| real config (`HIER=none`) | H1e PASSES, dry run emits 12 | `guard H1e: HIER=none and SCHED=none are pinned` / `wave a: 12 jobs (dry run)` |
+| `HIER=shrink` injected on the `--export` line | H1e ABORTS | `GUARD FAIL: HIER=shrink is on the --export line -- the identity is VOID` |
+
+**WHY THE GUARD MATTERS AT ALL.** `_apply_hier` can amplify a Lion step beyond ±ms. The whole
+`fa1` design rests on the identity `beta <- (1-ms*wd)*beta - ms*sign(.)`, which bounds beta's
+per-step travel and is what proves the −25 floor **unreachable** rather than merely distant.
+With the hierarchy on, that bound is void and the floor derivation collapses.
+
+**STANDING RULE (13): a guard must be tested in BOTH directions before the batch it gates is
+submitted — once with the real config (must pass) and once with the violation injected (must
+fail).** A green guard is evidence of nothing until it has been shown to go red.
+
+*Third defect caught pre-data this cycle, after fa1's dead-network ceiling justification
+(CORRECTIONS 111) and the clamp-vs-divergence detector that flagged a healthy run as frozen.
+None would have been visible in the results; all three would have produced confident wrong numbers.*

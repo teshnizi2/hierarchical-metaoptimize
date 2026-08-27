@@ -674,13 +674,21 @@ print("guard H1d: the emitter submits --NN-name %s --dataset %s, and guards 2 an
 # beta = beta_prev + dm + ratio*(ds - dm), which with ETA_RATIO > 1 can move a
 # coordinate by MORE than ms in one step and BREAKS THE IDENTITY.  --export=ALL
 # propagates the submitting shell's HIER/ETA_RATIO, so pin them explicitly.
-if "HIER=none" not in mine or "SCHED=none" not in mine:
+# NOTE: `mine` was rebound at H1c to the WHOLE FILE.  H1e must inspect the
+# --export LINE ONLY -- checking the whole file matches this guard's own
+# literals below and can never pass (fixed cycle 82c; see CORRECTIONS 112).
+_exp = [l for l in open(me).read().splitlines()
+        if l.strip().startswith('--export="ALL,') and "PROBE_DIR" in l]
+if len(_exp) != 1:
+    sys.exit("GUARD FAIL: H1e expected exactly 1 --export line, found %d" % len(_exp))
+_exp = _exp[0]
+if "HIER=none" not in _exp or "SCHED=none" not in _exp:
     sys.exit("GUARD FAIL: the --export line does not pin HIER=none and SCHED=none. "
              "--export=ALL would inherit them from the submitting shell and the "
              "bound's precondition would be unverified.")
 for bad in ("HIER=shrink", "HIER=additive"):
-    if bad in mine:
-        sys.exit("GUARD FAIL: %s appears in this script -- the identity is VOID" % bad)
+    if bad in _exp:
+        sys.exit("GUARD FAIL: %s is on the --export line -- the identity is VOID" % bad)
 print("guard H1e: HIER=none and SCHED=none are pinned on the --export line, so "
       "_apply_hier cannot amplify a Lion step beyond +-ms")
 
