@@ -209,6 +209,150 @@ BOXES = {
     # 12/12 ar1 arms, HI on 1/12).
     # REGISTERED BEFORE ANY fa1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "fa1":  (-25.0, -2.3026, "bin/c82_field_wideclip.sh:CLIP"),
+    # `gc1` (cycle 83) -- the CIFAR-100 GENERALISATION SCREEN.  The SAME box as
+    # cc1/bn1/pp1/mm1/ck1, and here the box is NOT a free choice: every 100-epoch
+    # CIFAR-100 run in the corpus, including the c100f-node cell gc1's S2 diagnostic
+    # reads against, sits in exactly (-15, -2.3026).  Changing it would destroy the
+    # only comparator the batch has.
+    # **REVISED AT CLOSEOUT: gc1's meta-stepsize MOVED FROM 1e-3 TO 1e-4.**  The
+    # original registration ran the screen at ms=1e-3, where the Lion identity with
+    # --weight-decay-meta 0 makes beta reachable over [-56.91, +43.09] -- an interval
+    # that STRICTLY CONTAINS the box, with the ceiling reachable from epoch 9.3, so
+    # ~90% of training would have run clamped.  The R18 anchors gc1 screens against
+    # (mm1/pp1/cc1) are all at ms=1e-4, where rec_lo measured 0.0000 on 24/24 arms.
+    # A clamped-regime D is NOT THE SAME ESTIMAND as a box-free D -- fa1 measured
+    # that this box class CHANGES THE OPTIMISER, not merely the instrument (F3
+    # resolved at -0.177) -- and comparability to the anchors is the entire point of
+    # a generalisation screen.  At ms=1e-4 travel is 5.0000 nats: the FLOOR (8.0922
+    # nats away) is UNREACHABLE, and the CEILING (4.6052 away) is reachable only from
+    # epoch 92.1, the same disclosed-not-hidden asymmetry as g3m.  The cost of the
+    # move is the batch-offset diagnostic against the existing ms=1e-3 c100f-node
+    # cell, which was a cross-batch Welch reading carrying the ~0.20 pp RULE-14 floor
+    # and bought little.  CORRECTIONS 115.
+    # CONSEQUENCES, all registered in bin/c83_gen_c100_screen.sh before any gc1 run
+    # existed: (a) a bind does NOT void S1, which is accuracy-only, within-batch, and
+    # has both arms in the SAME box -- the condition under which every published D was
+    # measured; (b) NO FIELD STATISTIC may be read from gc1 at all, and its scorer
+    # refuses to compute one; (c) what CAN void S1 is OCCUPANCY ASYMMETRY between the
+    # two arms, bar 0.10 absolute on rec_lo and rec_hi, since nodewise and chunk771
+    # carry different group-size distributions and need not press the guard equally.
+    # The probe is carried as instrumentation for (c), not as a gate.
+    # REGISTERED BEFORE ANY gc1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "gc1":  (-15.0, -2.3026, "bin/c83_gen_c100_screen.sh:CLIP"),
+    # `g3m` (cycle 83, REVISED AT CLOSEOUT) -- THE ResNet34 GENERALISATION,
+    # D AND G IN ONE cc1-SHAPED BATCH: four arms {nodewise, chunk835, nodewise1d,
+    # chunk2500} x 9 seeds at ONE ms (1e-4), ONE box, ONE submission = 36 jobs.
+    # **THIS ENTRY REPLACES THE WITHDRAWN `g3d` AND `g34` REGISTRATIONS.**  Those
+    # two split the D leg and the G leg across two batches at two meta-stepsizes.
+    # Adversarial review killed that design pre-data on two grounds, both recorded
+    # in CORRECTIONS 115 and in bin/c83_gen_r34_merged.sh's header:
+    #   (F1) the paper's load-bearing sentence is "D is large AND G is null", so
+    #        D-minus-G is the mechanism contrast.  Split across batches it carries
+    #        2*sd_batch^2 from STANDING RULE 14's measured batch random effect
+    #        (sd_batch ~ 0.21 pp, F(62,85)=5.47, p=6.9e-13): se(D-G) would have been
+    #        0.33 pp, so a true +0.5 lands at t=1.5 -- HALF the power of the
+    #        within-batch ResNet18 original (cc1: D-G = +0.716, t 2.9) for the SAME
+    #        36 jobs.  cc1 itself is 12 runs, four arms, one ms, one box
+    #        (jobs 4715633-4715644), and `g3m` copies that shape deliberately.
+    #   (F2) `g34` derived its ms from `g3d`'s nodewise argmax with NO box check.
+    #        ResNet18's nodewise argmax is 3e-4 -- the rung where ar1 bound LO on
+    #        12/12 arms in this same box -- and g34's own scorer VOIDS on binding.
+    #        The modal outcome of the design was 18 jobs returning VOID.
+    # The box is NOT a free choice: mm1/pp1/cc1 (the ms=1e-4 D pool, +0.5805 +-
+    # 0.0939, Q 0.88 on 2 df) and cc1 (the EXACT-count G anchor, +0.011 +- 0.147)
+    # all sit in exactly (-15, -2.3026), and fa1 measured that this box is NOT
+    # inert (F3 resolved on nodewise1d at -0.177), so moving it would destroy the
+    # only comparators the batch has.
+    # **THE BOX STATUS IS ASYMMETRIC BETWEEN FLOOR AND CEILING, AND THAT IS
+    # REGISTERED RATHER THAN DISCOVERED.**  With --weight-decay-meta 0 the Lion
+    # identity gives |beta - ln(alpha0)| <= ms*T exactly, T = 50,000, beta_0 =
+    # ln(1e-3) = -6.9078, so at the PINNED ms=1e-4 travel is 5.0000 nats:
+    #   FLOOR   -15      is 8.0922 nats away -> UNREACHABLE (as for mm1/pp1/cc1).
+    #                    This is WHY ms=1e-4 is pinned; 3e-4 reaches the floor at
+    #                    epoch 54.0 (ar1 bound 12/12 there) and 1e-3 at epoch 16.2.
+    #   CEILING -2.3026  is 4.6052 nats away -> REACHABLE from epoch 92.1, which is
+    #                    INSIDE the plateau5 window (epochs 96-100).  Empirically
+    #                    rec_hi measured 0.0000 on 24/24 R18 arms at this exact ms
+    #                    and box, but ResNet34 carries 25,556 coordinates against
+    #                    ResNet18's 14,420 (~1.8x more chances), so it is NOT safe
+    #                    to assume.
+    # CONSEQUENCES, all fixed in bin/c83_gen_r34_merged.sh and
+    # analysis/c83_gen_score.py before any g3m run existed: (a) a SYMMETRIC bind
+    # does NOT void H1/H2/H3, which are accuracy-only, within-batch, and have both
+    # arms in the SAME box -- the condition under which every published D was
+    # measured; (b) rec_hi is reported PER SEED PER ARM as a FIRST-CLASS number,
+    # not merely as a drop criterion; (c) what DOES void a contrast is OCCUPANCY
+    # ASYMMETRY between its two arms, bar 0.10 absolute on rec_lo and rec_hi;
+    # (d) NO FIELD STATISTIC may be read from g3m at all -- it exports PROBE=5 for
+    # occupancy only and deliberately NOT PROBE5=1, so no neg_counts is written
+    # and its scorer computes no N_eff/m; (e) RULE 11 IS OPEN -- no ResNet34 ms
+    # argmax is measured and the scorer prints that in its own output.
+    # REGISTERED BEFORE ANY g3m JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "g3m":  (-15.0, -2.3026, "bin/c83_gen_r34_merged.sh:CLIP"),
+    # `sl1` (cycle 84) -- **WITHDRAWN BEFORE ANY JOB EXISTED.  DELIBERATELY LEFT
+    # UNREGISTERED.**  The fixed-m singleton ladder was built, validated (68/0
+    # equivalence suite, 105/105 scorer selftest) and then KILLED pre-data at
+    # cycle 84 review.  Two arithmetic defects, both re-derived rather than
+    # quoted (CORRECTIONS 114):
+    #   (1) holding m fixed does not remove the naive ladder's collinearity, it
+    #       RELOCATES it.  m = G2 + S + (41-k) is an identity, so dG2 = -dS + dk
+    #       with |dk| <= 41 against dS spanning 9,610: corr(S, G2) = -0.9999975
+    #       over the 7 registered rungs, the same order as the corr(S, m) =
+    #       0.9999991 that killed the naive ladder.  "singletons hurt" and "coarse
+    #       ndim>=2 chunks hurt" are two names for the ladder's single degree of
+    #       freedom, and NO rung separates them.
+    #   (2) the registered primary could not fail on the question it was built to
+    #       ask.  With the endpoints pinned at their predicted values, the OLS
+    #       slope scores CONFIRMED for a pure STEP at the top rung (b = -0.688)
+    #       and for a NON-MONOTONE zigzag (b = -0.565), while FAILING a genuine
+    #       saturating dose-response (b = -0.379).  Two endpoints carry 48.7% of
+    #       the |leverage| and both are already in the CSV (L0 IS chunk777; L6 is
+    #       nodewise up to G).
+    # `bin/c84_singleton_ladder.sh` and `analysis/c84_sl1_score.py` are DELETED.
+    # `patches/patch_chunkvec.py` and `tests/test_chunkvec.py` are RETAINED as
+    # validated infrastructure for the registered successor (the 2x2 factorial in
+    # (singleton count S) x (ndim>=2 chunk count G2) with m FLOATING and measured
+    # in-batch, docs/REGISTER-ideas-ABC.md section 5.4).  No box may be registered
+    # here until that successor is itself registered and built.
+    # `gn1` (cycle 84) -- THE NORMALISER TRANSFER: ResNet18 vs ResNet18_gn
+    # (GroupNorm(32,C) = 32 GROUPS OF C/32 CHANNELS) at {nodewise, chunk777},
+    # 4 arms in ONE batch, n=4 on the BatchNorm control and n=8 on the GroupNorm
+    # arms (24 jobs).
+    # **THE BOX MOVED FROM -25 TO -15 AT CYCLE 84 REVIEW, AND THE REASON IS THAT
+    # -15 IS THE CELL THE THRESHOLDS CAME FROM.**  (-25, -2.3026) x ms=1e-4 does
+    # not exist anywhere in the 1,891-run corpus: every ms=1e-4 run (nodewise 16,
+    # chunk777 9, nodewise1d 6, chunk2325 6) sits at (-15, -2.3026), and the only
+    # -25 rows are fa1's at ms=3e-4.  gn1's T1 gate (+0.30), its anchor
+    # (+0.5805 +- 0.0939) and its sigma (0.1740) are ALL computed from -15 data,
+    # so running at -25 would have made every frozen threshold a cross-box import
+    # -- the exact move CORRECTIONS 113 forbids after the box was shown to change
+    # the optimiser and not merely the instrument.
+    # The move costs NOTHING, and that is a proof rather than a hope: at ms=1e-4
+    # the Lion identity with --weight-decay-meta 0 gives |dbeta| = ms EXACTLY per
+    # step, so over T = 50,000 steps beta is confined to
+    # [ln(1e-3) - 5.0, ln(1e-3) + 5.0] = [-11.907755, -1.907755] for ANY velocity
+    # profile, and BOTH -25 and -15 lie strictly below it.  They are IDENTICAL IN
+    # EFFECT; -15 is chosen because it is byte-identical to the anchors.
+    # EMPIRICALLY, at this exact cell, the nodewise (singleton) arm reads
+    # rec_lo == rec_hi == 0.0000 on all of mm1 s0-2, pp1 s0-2, cc1 s3-5 and
+    # tw0 s0-2 -- 12/12 -- which is direct evidence on the arm that binds hardest
+    # elsewhere, not an inference.  The CEILING at -2.3026 IS reachable (from
+    # epoch 92.1) and is NOT released: the corpus's only released-ceiling runs
+    # (bd7-w-c6-s0/s1 at -30:6.0) are 2/2 collapsed=1.
+    # **THE OCCUPANCY CLAIM IS NOT INHERITED.**  The two GN arms are a network
+    # that has never been run -- it needs PATCH_RESNET_GN, which did not exist
+    # when this line was written -- and the GN net's beta trajectory is not the BN
+    # net's, so T0.5 MEASURES rec_lo and rec_hi on EVERY arm in BOTH directions
+    # (RULE 13); an arm that binds is UNINTERPRETABLE and DROPS, and >= 2 dropped
+    # or void arms VOID the whole batch.
+    # **NO FIELD STATISTIC MAY BE READ FROM gn1.**  At this cell no coordinate
+    # reaches either guard, so coord_lo is identically 0 and the clip-severity
+    # channel yields nothing; PROBE5 is carried for n_beta and for the T0.5 gate,
+    # and `analysis/c84_gn1_score.py` computes no N_eff/m.  It may NOT be moved to
+    # a binding box to recover coord_lo: that would trade an interpretable
+    # accuracy contrast for an uninterpretable one.
+    # REGISTERED BEFORE ANY gn1 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "gn1":  (-15.0, -2.3026, "bin/c84_normaliser_transfer.sh:CLIP"),
 }
 
 

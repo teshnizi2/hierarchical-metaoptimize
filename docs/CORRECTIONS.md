@@ -6429,3 +6429,261 @@ The operator must still run `claude auth login` to restore the CLI itself.
 > **STANDING RULE (15): a scheduled task must not depend on a nested `claude -p`.** It fails
 > silently, the tick is lost with no error surfaced anywhere, and ~12 were lost before anyone
 > looked. Ticks firing is NOT evidence that work is happening — check `git log` for commits.
+
+
+---
+
+## 114. **CYCLE 84 — A FULLY BUILT AND FULLY VALIDATED BATCH IS KILLED BEFORE IT BUYS A GPU-HOUR: `sl1`'s FIXED-m LADDER CANNOT ANSWER ITS OWN QUESTION. `gn1` SURVIVES WITH SIX CORRECTIONS** (2026-08-29, PRE-DATA)
+
+**NOTHING WAS SUBMITTED. NO CLUSTER FILE WAS MODIFIED.** Verified after the fact:
+`squeue -h -u salehkaleybars | wc -l` = 0; the live `Optimizers/HF.py` contains **0**
+occurrences of `PATCH_CHUNKVEC`; the live `build_network.py` contains **0** of `ResNet18_gn`.
+All patch and suite work was done against scratch copies (`~/sl1_scratch/cifar10`,
+`/data1/.../scratch_gn/cifar10`). `results/all_runs.csv` = 1,891 rows, **zero** beginning `sl1`
+or `gn1`, zero on any non-BatchNorm network.
+
+Two batches were registered pre-data at cycle 84 (`docs/REGISTER-ideas-ABC.md`) and both were
+built to completion. **This entry records that one of them was then killed, on review, before
+any run — and that the other needed six corrections, two of which were factual errors in
+registered *interpretation*, not merely in emphasis.**
+
+### 114.1 `sl1` IS WITHDRAWN AND DELETED. Two arithmetic defects, both re-derived here
+
+`bin/c84_singleton_ladder.sh` and `analysis/c84_sl1_score.py` are **DELETED**. `sl1` is
+**deliberately left unregistered** in `analysis/c55_neff_noise.BOXES`, with the reason recorded
+in place of a box tuple.
+
+It was not killed for being unfinished. It was finished: `PATCH_CHUNKVEC` (a per-tensor
+chunk-size vector subsuming four shipped code paths, each reproduced **bitwise**), a **68/0**
+equivalence suite on the real ResNet18, a **105/105** scorer selftest, a beta-allocation guard
+measuring `m` on every rung from the *allocated* β, and RULE-13 both-directions evidence on 16
+guard checks. **None of that is a defence against the design not being able to answer its own
+question**, and this is the first time in this campaign that a completed batch has been killed.
+
+**DEFECT 1 — HOLDING `m` FIXED DOES NOT REMOVE THE NAIVE LADDER'S COLLINEARITY; IT RELOCATES
+IT.** `m = G2(K2) + S_k + (41 − k)` is an identity, so fixing `m` **forces** `dG2 = −dS + dk`,
+with `|dk| ≤ 41` against `dS` spanning 9,610. Recomputed over the seven registered rungs
+(G2 = 14,380 / 13,927 / 13,237 / 12,226 / 10,442 / 7,893 / 4,810 against S = 0 / 448 / 1,152 /
+2,176 / 3,968 / 6,528 / 9,610):
+
+> **corr(S, G2) = −0.9999975**
+
+That is the **same order** as the `corr(S, m) = 0.9999991` that CORRECTIONS 111 and REGISTER
+§5.1 used to kill the *naive* ladder as dead on arrival. The fixed-m ladder has **one** degree
+of freedom, and "singletons hurt" and "coarse ndim ≥ 2 chunks hurt" are two names for it. It is
+a **theorem about any fixed-m ladder**, not an artefact of the chosen K2 values. The
+registration's claim that "the ladder is its own contrast, so there is no comparator to move"
+was wrong in a specific way: **the comparator did not disappear, it was absorbed into the
+treatment arm.**
+
+The registration's defence — that the ndim ≥ 2 axis is independently pinned at ≈ 0.02 pp — is
+legitimate in *kind* but not in *strength*. Re-derived at write time, at the registered cell
+the only reading is `cc1`'s `chunk777 − chunk2325` = **−0.101, se 0.190, t −0.53** (n = 3v3):
+**unresolved**, ~95 % envelope ≈ [−0.71, +0.50], up to ~35 % of the predicted 0.58 pp span. The
+other two draws (+0.031 `ar1`, −0.019 `fa1`) are both at ms = 3e-4, the cell the registration's
+own T4.5 forbids pooling with. **Quoting the point estimate of an unresolved statistic as a
+bound — and hard-coding the string "cannot MANUFACTURE one" into the scorer's selftest so that
+the claim could not be edited out — is having it both ways**, and it is what STANDING RULE
+"say UNSURE rather than guess" exists to prevent. An independent estimate points the other way
+and was never reconciled: `ck1` measures −0.407 pp per decade of `m`, and G2 falls 0.4756
+decades across the ladder, predicting **+0.194 pp** for this axis — ten times the quoted 0.02.
+
+**The consequence is asymmetric and that is what makes it fatal.** The collinearity does not
+break the CONFIRMED branch (the nuisance is signed *against* the prediction at `cc1`). It
+breaks the **REFUTED** branch, which the registration left uncovered: a true singleton slope of
+−0.3 pp per unit f cancelled by an ndim ≥ 2 slope of +0.3 gives `b̂ ≈ 0` with se ≤ 0.16, and the
+scorer prints **REFUTED — "the tail mechanism is wrong at fixed m"** for a cancellation it
+cannot see.
+
+**DEFECT 2 — THE REGISTERED PRIMARY COULD NOT FAIL ON THE QUESTION IT WAS BUILT TO ASK.** The
+primary was `b̂`, the OLS slope of plateau5 on f over the seven rungs. Driving the registered
+CONFIRMED gate (`b̂ ≤ −0.45`, `t ≤ −2`, span ∈ [+0.30, +0.90]) with the endpoints pinned at
+their predicted values (f grid f̄ = 0.23656, Sxx = 0.36295, se(b̂) = 0.1179 at n = 6):
+
+| interior shape | b̂ | t | scored CONFIRMED? |
+|---|---|---|---|
+| true linear dose-response | −0.872 | −7.4 | yes |
+| **pure STEP at the top rung — no dose-response at all** | **−0.688** | **−5.8** | **YES** |
+| **NON-MONOTONE zigzag** | **−0.565** | **−4.8** | **YES** |
+| threshold at L4 | −1.095 | −9.3 | yes |
+| **saturating — a *genuine* dose-response, all of it by L1** | **−0.379** | **−3.2** | **NO** |
+
+**The gate is miscalibrated in both directions**: it fires for two shapes that are not
+dose-responses and fails the one that is. On CONFIRMED the scorer would have printed *"A
+DOSE-RESPONSE IN SINGLETON COUNT AT FIXED m"*. The cause is structural — OLS leverage on this
+grid is 17.3 / 15.0 / 11.4 / 6.3 / 2.8 / 15.8 / 31.4 %, so **L0 and L6 carry 48.7 % between
+them, and both endpoints are already in the CSV**: L0 **is** `chunk777` by exact identity
+(largest one-D numel 512 < 777) and L6 is `nodewise` up to the alignment term `G` measures. The
+span the ladder was registered to reproduce is `D − G`. Meanwhile T4.2/T4.3 **forbade**
+reporting rung ordering, monotonicity, adjacent pairs or any functional form, because at n = 6
+none is resolvable: **30 of the 48 jobs bought a quantity the batch had pre-committed never to
+state, and the other 18 re-measured `D`.**
+
+**DEFECT 3, sufficient on its own — the refutation was worth little.** A flat ladder removes a
+*mechanistic gloss*, not a claim. The paper's contribution is the **endpoint** prescription,
+established at matched count five times over (`D` IV-pooled **+0.627, se 0.063**, 18
+within-batch seed pairs). No reviewer asks whether the penalty is linear in singleton count;
+reviewers ask whether it generalises.
+
+> **STANDING RULE (16): a registered primary must be shown, BEFORE the runs exist, to
+> DISCRIMINATE — not merely to have power.** Drive the gate with two or three synthetic
+> alternatives that the hypothesis does *not* predict (a step, a non-monotone, a saturation)
+> and show it separates them. `sl1` had t ≈ 7.4 of power against a shape it could not
+> distinguish from three others. Power is not discrimination.
+
+> **STANDING RULE (17): if a batch's registration FORBIDS reporting a quantity, the arms that
+> exist only to measure it must be cut.** Keeping both the rungs and the prohibition is paying
+> for silence.
+
+**WHAT IS RETAINED, AND WHY.** `patches/patch_chunkvec.py` and `tests/test_chunkvec.py` stay,
+as validated infrastructure for the **registered successor**: a 2×2 factorial in (singleton
+count S) × (ndim ≥ 2 chunk count G2) with **`m` FLOATING** and its slope measured in-batch
+(REGISTER §3.4). `m` cannot be held fixed *and* the collinearity broken — that is the identity
+— so the only escape is to let `m` float and measure it. The successor's cells B
+(`chunkvec2325s0` = `chunk2325`) and A (`chunkvec777s0` = `chunk777`) give the ndim ≥ 2 axis
+**in-batch at the batch's own n**, replacing `cc1`'s se-0.190 import. **That successor is a
+sketch, not a registration**, and the patch **must not be applied to the live tree** until it
+exists — the operator note now says so in place of the old "apply it now" instructions.
+
+### 114.2 `gn1` SURVIVES — with six corrections, two of them factual
+
+**(a) THE GROUPNORM ARITHMETIC WAS BACKWARDS IN FOUR FILES.** `nn.GroupNorm(32, C)` takes
+`num_groups = 32`, so it forms **32 groups of C/32 channels** — **2, 4, 8 and 16** channels per
+group at ResNet18's widths 64/128/256/512. All four files said *"blocks of 32 channels"*. That
+sentence was the **sole basis** of T2's registered ambiguity clause — the thing that stops a T2
+firing being over-read — and the scorer **printed it at scoring time** as the interpretation of
+a null. The qualitative claim survives (any group size > 1 breaks per-channel scale invariance)
+but the magnitude is inverted, and a structure it hid now appears: **the departure is GRADED BY
+DEPTH** — nearly per-channel at layer1 (2 to a group), 16 to a group at layer4. So a null could
+not have been attributed *uniformly* to "loss of per-channel scale invariance", and the
+registered `GroupNorm(num_groups = C)` disambiguator is a **smaller** perturbation than the text
+implied. Corrected in all four files, before any run, each carrying the correction visibly.
+
+**(b) RULE 11 WAS NAMED NOWHERE, AND THE NULL BRANCH IS THE INFORMATIVE ONE.** `gn1` runs a
+**different network** at a cell (α₀ = 1e-3, ms = 1e-4) inherited wholesale from BatchNorm, with
+no argmax located on either net (CORRECTIONS 111.7 item 5, still open). **A null at a mistuned
+cell is observationally identical to "the carrier is BatchNorm-specific"** — the same
+structural defect that correctly killed the BN-free arm, one level up. A null is now registered
+as ambiguous between **three** readings, not two, and **a null from `gn1` alone MAY NOT be
+written as a mechanism narrowing.** `gn2` is specified in advance and runs only if T2 fires:
+`gn2a`, a **tuning bracket at α₀ = 3e-4** (both nets, n = 4, 16 jobs), and `gn2b`, the
+`GroupNorm(num_groups = C)` carrier disambiguator. **The bracket axis is α₀, not ms, and that
+is forced by data**: at ms = 3e-4 there is **no free box for the singleton arm** — re-measured
+from `probes_fa1`, the `nodewise` arm reads `rec_hi` = 0.0000 / 0.1672 / 0.0023 / 0.0137 /
+0.2192 / 0.0600, **3 of 6 seeds over the 5 % T0.5 threshold** — while at α₀ = 3e-4 the Lion
+identity gives β ∈ [−13.112, −3.112], so **neither guard is reachable**.
+
+**(c) THE BOX MOVED −25 → −15.** `(ms = 1e-4, −25:-2.3026)` exists in **zero** of the 1,891
+rows: every ms = 1e-4 run sits at −15, and the only −25 rows are `fa1`'s at ms = 3e-4. Yet
+**every** frozen threshold in `gn1` — the +0.30 gate, the +0.5805 anchor, σ = 0.1740 — is
+computed from −15 data, so running at −25 would have made each a **cross-box import**, exactly
+what CORRECTIONS 113 forbids. The move is free by the Lion identity (at ms = 1e-4, β ∈
+[−11.9078, −1.9078], so both floors are provably dead) and it is now also **empirical on the
+arm that matters**: at this exact cell the `nodewise` arm reads `rec_lo = rec_hi = 0.0000` on
+**12/12** (mm1 s0–2, pp1 s0–2, cc1 s3–5, tw0 s0–2). Guard 3 now compares against the **anchor**
+box, not `fa1`'s.
+
+**(d) SEEDS REBALANCED 6/6/6/6 → 4/4/8/8, at the same 24 jobs.** Half the batch was a sixth
+reading of `D`. The BN control only has to **clear a gate** (t ≥ 2 against +0.5805), which n = 4
+does at **t = 4.72**; the GN arms carry the primary. se(`D_GN`) improves **0.100 → 0.0870**, and
+the frozen powered-null threshold therefore tightens **0.13 → 0.113** (1.3 × the new planning
+se). se(`ΔD`) worsens 0.142 → 0.151, accepted because `ΔD` is secondary.
+
+**(e) T0.6, A COMMENSURABILITY GATE, ADDED.** The T0.3 floor of 85 does not protect this
+batch's arithmetic: the whole test compares two differences **in percentage points** on two
+networks that need not sit at the same accuracy. BN plateaus near 92.2 (budget 7.8 pp); a GN arm
+at 88.0 passes T0.1–T0.5 cleanly on a **12.0 pp** budget — a 1.6× change in the scale the effect
+lives on, which if the gap is even partly multiplicative distorts `D_GN` by ~60 % ≈ 7 × se,
+straddling both the +0.30 line and the null band. **Gate: |mean plateau5(GN arms) − mean(BN
+arms)| ≤ 2.0 pp; if it fires, NO transfer verdict is issued and it is NOT a null.** The
+error-budget-normalised `D / (100 − level)` is now printed always, **descriptive, gating
+nothing**.
+
+**(f) GUARD 9, A SEQUENCING INTERLOCK, ADDED.** `gn1` **refines** a mechanism while
+generalisation has been rank 1 for four consecutive cycles (CORRECTIONS 110.7, 111.7) with
+built, guard-complete, unrun, patch-free batches on disk. **Guard 9 discovers them by glob
+(`bin/c83_gen_*.sh`), never by filename, and fails closed on an empty glob** — the ResNet34
+generalisation was restructured *during this same cycle* by a concurrent review (the two
+earlier scripts merged into `c83_gen_r34_merged.sh`, `g3m`, 36 jobs), and the first version of
+this guard hard-coded the two names it would have deleted, which would have gone quietly green.
+Re-derived, and re-derived again by
+the guard at run time: over 1,891 rows, `nodewise1d` / `chunk777` / `chunk2325` appear on
+**ResNet18/CIFAR-10 and nowhere else** (48 runs); ResNet34, ResNet10 and ResNet18_c100 carry
+`nodewise` only. **If `D` does not survive on a second architecture, `gn1` refines something
+that does not exist.** Guard 9 refuses `--submit` until `GN1_GEN_OK` is exported naming a
+**scored** generalisation batch and the `D` leg that survived.
+
+> **STANDING RULE (18): a batch that REFINES a mechanism may not be submitted ahead of a built,
+> unrun batch that could show the mechanism does not generalise.** Enforce it with an interlock,
+> not a note — the ordering has slipped for four cycles on good intentions.
+
+### 114.3 VALIDATION AFTER THE CHANGES — every claim re-run, nothing quoted
+
+* `bash -n` clean; `py_compile` clean on all four Python files.
+* **Dry run: 24 sbatch lines, arms exactly 4/4/8/8, every line carrying
+  `BETA_CLIP=-15:-2.3026` *with its colon*, "dry run, nothing submitted".** Guards that fail
+  off-cluster are all cluster-path ones (runner, live `HF.py`, the patch, the suites, torch,
+  disk, `sinfo`); guards 1b, 2a–2f, 3, 4g, 6, 7, 8 and 9 pass locally with the right numbers.
+* **`analysis/c84_gn1_score.py --selftest`: 112/112 PASS** (was 88/88), including 15 new
+  assertions that the cycle-84 interpretations are present **in both files**.
+* **`tests/test_gn1_guards_rule13.py`: 20 PASS / 0 FAIL**, both directions on guards 9, 2f,
+  2c/2d, 3 and 1b-4 plus the emitter. It **never invokes `--submit`**: the guard bodies are
+  extracted and driven as pure Python, and the shell path runs only in dry-run mode against an
+  edited copy.
+* Scorer driven **end-to-end on six synthetic batches** (deleted afterwards): TRANSFERS,
+  T2-fires, **T0.6-fires**, T1-fails, T0.5-binds→VOID, underpowered-null→UNDECIDED. All six
+  behaved as registered; the T0.6 case suppressed the transfer verdict rather than reporting a
+  null.
+* `tests/test_chunkvec.py` extended and **re-run on the cluster on CPU** against the scratch
+  tree: **80 PASS / 0 FAIL** (was 68/0). The interior-rung `block_product` path — a numeric K2
+  **with** injected singletons **with** ragged tails — is now checked explicitly on the real
+  ResNet18 (**V9b**: `conv1` ragged at K2=914 → 2 chunks, the 2,359,296-weight conv → 2,582
+  chunks, a selected one-D tensor at K=1 and an unselected one at K=numel, each chunk equal to
+  the explicit sum over its **real** members), together with the per-tensor agreement between
+  `beta_to_alpha`'s group count and `block_product`'s chunk count — a mismatch there would
+  silently drive β_i from the wrong gradients, a scientific corruption rather than a crash.
+  **V3b** adds the second endpoint identity `chunkvec2325s0 == chunk2325` (bitwise, w and β
+  both `0.000e+00`, m = 4,851 = m(`nodewise1d`)), which is cell B of the §3.4 successor and the
+  in-batch ndim ≥ 2 control both reviews asked for, plus the anti-vacuity check that the two
+  S = 0 corners are genuinely different arms.
+* `tests/test_resnet18_gn.py` **re-run on the cluster on CPU against a FRESH copy of the
+  current live tree, patched with the edited `patch_resnet_gn.py`: 79 PASS / 0 FAIL** — so the
+  docstring correction did not disturb the patch, and G1's bitwise inertness against the
+  unpatched tree still holds (weights and β both `0.000e+00` after 25 real HF steps).
+* Re-derived, not quoted: `D` = +0.485 / +0.581 / +0.697 / +0.629 / +0.727 (mm1 / pp1 / ar1 /
+  fa1 / cc1); IV pool at ms=1e-4 **+0.5805, se 0.0939, t 6.18**; σ **0.1740** over 22 dof and 11
+  cells; `chunk777` at ms=1e-4 mean **92.580** (n = 9, sd 0.216); `G` = +0.295 / −0.139 /
+  −0.001 / +0.011; ndim≥2 axis = +0.031 / −0.019 / −0.101.
+
+### 114.4 TWO SMALLER FIXES, BOTH CAUGHT BY THE SAME OLD FAILURE MODE
+
+* A new selftest assertion — that the backwards GroupNorm wording survives only as a flagged
+  self-correction — **matched its own source text** and passed vacuously at first. That is
+  precisely CORRECTIONS 112's `fa1` guard H1e failure, re-committed. Fixed **by construction**:
+  the literal is split at build time so the check cannot see itself, with the reason in place.
+* `tests/test_permnode.py` was **missing** from `PATCH_CHUNKVEC`'s operator note, even though
+  edit 2 of that patch rewrites permnode's `if _pm:` into `elif _pm:` — **permnode is the one
+  existing code path whose control flow the patch touches**. Re-verifying every untouched path
+  and skipping the touched one is the wrong way round. Added, with `PERM_TEST_DEVICE=cpu`.
+* The claim "L0 **is** `chunk777` EXACTLY" is now scoped: **bitwise on CPU, and as a partition
+  everywhere.** On GPU it cannot be bitwise — cuDNN's conv backward is nondeterministic and
+  Lion's `sign()` turns any float-level difference into a full ±ms β step (the suite's own
+  header records max|Δβ| = 2.2e-1 for the same config run twice on CUDA), and separately the two
+  arms zero-pad the 41 one-D tensors to differently shaped reductions.
+
+### 114.5 STANDING HANDOFF — the ranking, unchanged in order and sharper in reason
+
+1. **Generalisation, still rank 1, now for a fifth cycle, and now interlocked.** Built,
+   unrun, patch-free: `bin/c83_gen_r34_merged.sh` (`g3m`, 36 jobs) and
+   `bin/c83_gen_c100_screen.sh` (8 jobs). ResNet34 first. **Guard 9 will not let `gn1` go
+   before them**, and it finds them by glob so a further restructuring cannot silence it.
+2. **`gn1`** — 24 jobs, after (1), after the `build_network.py` patch is applied and
+   `tests/test_resnet18_gn.py` re-run on the live tree, and after the 3-epoch smoke run supplies
+   `GN1_MIN_PER_EPOCH`.
+3. **The §3.4 factorial**, if the dose-response question is still wanted after (1) and (2). It
+   needs its own registration, its own power computation, and its own handling of the `m`
+   nuisance — the two half-contrasts span 0.221 and 0.473 decades of `m`, which are **not**
+   equal, so `ck1`'s −0.407 pp/decade does not cancel between them.
+4. alice2 still lacks `PATCH_CHUNKWISE` and `PATCH_NODEBN` — **seven cycles**, still the most
+   expensive unaddressed infrastructure item, still forcing every partition batch onto one
+   account.
