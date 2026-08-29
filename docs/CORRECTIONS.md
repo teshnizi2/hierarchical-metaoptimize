@@ -6368,3 +6368,64 @@ fail).** A green guard is evidence of nothing until it has been shown to go red.
 *Third defect caught pre-data this cycle, after fa1's dead-network ceiling justification
 (CORRECTIONS 111) and the clamp-vs-divergence detector that flagged a healthy run as frozen.
 None would have been visible in the results; all three would have produced confident wrong numbers.*
+
+## 113. **`fa1` SCORED AT n=6: THE BOX IS NOT ACCURACY-NEUTRAL, AND SEEDS DO NOT PAIR ON THIS CLUSTER** (cycle 83)
+
+Scored by hand from an authenticated interactive session because **the routine had been dead for
+~12 ticks** — see the ROUTINE FAILURE note at the end of this entry. 24/24 complete,
+`analysis/c82_fa1_score.py` run **UNEDITED** (md5 `b96ab208...`, `git status` clean,
+selftest **188/188**). CSV 1,868 -> 1,892, **purely additively** (24 added, 0 removed, 0 changed).
+
+**THE FLOOR FIX IS VALIDATED, EXACTLY AS DERIVED.** `rec_lo` = 0.0000 and `coord_lo` = 0.000000
+on **24/24** arms, with `bmin` ~ -21.8 against a reachable -21.908 — **3.092 of headroom**.
+`ar1` at floor -15 was LO-bound on 12/12 arms over ~45.6% of records. The box-free ms=3e-4 cell
+that did not exist anywhere in the corpus now exists.
+
+**F3, THE PRIMARY — AND IT DEFIED ITS OWN REGISTERED EXPECTATION.** The registration said
+|Delta| < 0.10 pp, below what the test resolves, so **unresolved was the expected outcome**.
+It was not:
+
+| arm | fa1 (-25) | ar1 (-15) | Delta | t | verdict |
+|---|---|---|---|---|---|
+| nodewise | 92.327 | 92.347 | -0.020 | -0.15 | unresolved |
+| chunk777 | 92.957 | 93.045 | -0.088 | -0.83 | unresolved |
+| **nodewise1d** | **92.976** | **93.153** | **-0.177** | **-2.22** | **RESOLVED** |
+| chunk2325 | 92.975 | 93.014 | -0.039 | -0.57 | unresolved |
+
+> **THE BOX CHANGED THE OPTIMISER, NOT MERELY THE INSTRUMENT.** `D_w` may NOT be pooled with
+> `ar1`'s D, and **every prose sentence about D must carry its box from here on.**
+
+**F2, SECONDARY: `D_w` = +0.629 pp (se 0.123, within-batch t 5.11) -> SURVIVES** at this box.
+Box-free anchors cc1 +0.727 / mm1 +0.485 / pp1 +0.581; box-bound ar1 +0.697. **This is NOT a
+fifth replication of D** — a different box, and pooling across boxes is the error F3 exists to
+detect. **`G_w` = -0.001 (se 0.076, t -0.01) -> CONSISTENT-WITH-BOX-FREE (UNDERPOWERED);
+COLLAPSES may NOT be declared.** The registered threat was a reading *resolved outside* the null
+band, which would have undercut the tail interpretation. That did not happen: **the tail story
+survives, without gaining a new replication.**
+
+**F1, DESCRIPTIVE: DISSOCIATION** (`dplateau5` -0.001, t -0.01 UNRESOLVED, while `dN_eff/m`
+-0.0216, t -9.73 RESOLVED). Replicates `cc1`'s MIXED verdict. **Direction C stays DROPPED.**
+The `D_w` pair was dropped from F1 by the pre-registered F0.4b: 4 of 6 nodewise arms exceed 5%
+CEILING occupancy (s4 0.2193, s1 0.1673, s5 0.0601, s3 0.0138). The ceiling was deliberately
+left at ar1's value; the corpus's only released-ceiling runs are 2/2 `collapsed=1`.
+
+**A METHODOLOGICAL FINDING THAT REACHES BACKWARDS — SEEDS DO NOT PAIR.** F3's first registration
+called itself PAIRED on shared seed labels. **That claim is WITHDRAWN inside the scorer.**
+Measured over **356 same-config SAME-SEED replicate pairs**: median |difference| **0.1710 pp**
+(per-run sd 0.179) against an **across-seed sd of 0.159 pp**. **Seed carries no reproducibility
+on this cluster**, so a same-seed difference across batches is NOT a paired statistic and must be
+scored unpaired (Welch).
+> **STANDING RULE (14): pairing on seed label is invalid ACROSS batches on this cluster.**
+> Within-batch pairing is untouched. **Every cross-batch "paired within seed" claim in FINDINGS
+> must be re-checked against this** — flagged, not yet done.
+
+**ROUTINE FAILURE, ~12 TICKS LOST (the reason this was scored by hand).** Every scheduled tick
+from ~27 Aug to 29 Aug 15:24 died with `Failed to authenticate: OAuth session expired and could
+not be refreshed`. Root cause: `claude auth status` reads `{"loggedIn": false, "authMethod":
+"none"}` — the CLI has no credentials, and the routine's design shelled out to a **nested
+`claude -p`** that needs its own. **FIXED STRUCTURALLY on 29 Aug: the scheduled task now runs the
+campaign IN-SESSION with no nested subprocess**, so it authenticates the way this session does.
+The operator must still run `claude auth login` to restore the CLI itself.
+> **STANDING RULE (15): a scheduled task must not depend on a nested `claude -p`.** It fails
+> silently, the tick is lost with no error surfaced anywhere, and ~12 were lost before anyone
+> looked. Ticks firing is NOT evidence that work is happening — check `git log` for commits.
