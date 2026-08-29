@@ -676,10 +676,11 @@ fi
 # --- GUARD 4 -- **THE BETA-ALLOCATION GUARD.  m IS MEASURED, NEVER ASSERTED.** -
 python3 - "$WS" "$NET" "$CHUNK_KD" "$CHUNK_KG" "$M_NODE" "$M_CHUNK_D" "$M_N1D" \
     "$M_CHUNK_G" "$N_TENSORS" "$N_1D" "$MAX_1D_NUMEL" "$SINGLETONS" "$NPARAM" \
+    "$ALPHA0" "$MST" \
   <<'PYEOF' || guard_fail "guard 4: beta allocation"
 import os, sys
 (ws, net, kd, kg, m_node, m_chd, m_n1d, m_chg,
- n_ten, n_1d, max1d, singles, nparam) = sys.argv[1:14]
+ n_ten, n_1d, max1d, singles, nparam, a0, mst) = sys.argv[1:16]
 kd, kg = int(kd), int(kg)
 m_node, m_chd, m_n1d, m_chg = int(m_node), int(m_chd), int(m_n1d), int(m_chg)
 n_ten, n_1d, max1d, singles, nparam = (int(n_ten), int(n_1d), int(max1d),
@@ -725,8 +726,26 @@ print("guard 4b: K=%d and K=%d both exceed %d, so ALL %d 1-D tensors get EXACTLY
 
 # 4c -- m MEASURED OFF THE ALLOCATED beta, for all four arms.
 from HF import HF                                              # type: ignore
+# FIX (cycle 85): HF's signature is
+#   HF(net, stepsize_groups, alpha0, args_base, args_meta, gamma, writer=None)
+# and it takes the NET, not net.parameters().  The previous form omitted four
+# required arguments.  Construction copied verbatim from
+# bin/c84_normaliser_transfer.sh, which measures m the same way and works.
+class _NullWriter:
+    def add_scalar(self, *a, **k):
+        pass
+
+
+_BASE = {"alg": "SGDm", "weight_decay": 0.1, "momentum_param": 0.99}
+_META = {"alg": "Lion", "meta_stepsize": float(mst), "momentum_param": 0.99,
+         "Lion_beta2": 0.9, "weight_decay": 0}
+
+
 def m_of(gran):
-    opt = HF(net_obj.parameters(), stepsize_groups=gran)
+    torch.manual_seed(0)
+    fresh = build_network(net, "cpu")
+    opt = HF(fresh, stepsize_groups=gran, alpha0=float(a0), args_base=dict(_BASE),
+             args_meta=dict(_META), gamma=1, writer=_NullWriter())
     return sum(int(b.numel()) for b in opt.beta)
 got = {}
 for gran, want, label in (("nodewise", m_node, "nodewise"),
