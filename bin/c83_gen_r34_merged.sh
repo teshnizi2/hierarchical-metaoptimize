@@ -693,7 +693,7 @@ try:
 except Exception as ex:
     sys.exit("GUARD FAIL: cannot import the LIVE build_network on this host (%s).  "
              "This guard MUST be run on ALICE inside the venv before submission." % ex)
-net_obj = build_network(net)
+net_obj = build_network(net, "cpu")   # FIX (cycle 85): signature is (network_name, device)
 shapes = [tuple(p.shape) for p in net_obj.parameters()]
 tot = sum(int(__import__("math").prod(s)) for s in shapes)
 
