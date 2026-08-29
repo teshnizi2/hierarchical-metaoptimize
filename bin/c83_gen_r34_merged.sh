@@ -463,14 +463,24 @@ for T in test_chunkwise.py test_nodebn.py; do
     # FIX (cycle 85): the suite needs the project venv, exactly as c82 does at its
     # guard 1e.  Without it python3 has no torch and the guard aborts a VALID batch
     # on a MISSING INTERPRETER -- a false negative, not a real precondition failure.
-    OUT="$( ( module load Python/3.10.4-GCCcore-11.3.0 >/dev/null 2>&1
-              # shellcheck disable=SC1091
-              . "$WS/envs/mo/bin/activate" 2>/dev/null
-              cd "$REPO" && NODEBN_TEST_DEVICE=cpu $TO python3 "tests/$T" 2>&1 | tail -3 ) )" || true
-    case "$OUT" in
-      *FAIL*0*|*"0 FAIL"*|*"0 fail"*) echo "guard 1d: tests/$T -- $(printf '%s' "$OUT" | tail -1)" ;;
-      *) guard_fail "guard 1d: tests/$T did NOT pass on this tree: $(printf '%s' "$OUT" | tail -1)" ;;
-    esac
+    # FIX 2 (cycle 85): score the suite on its EXIT CODE, as c82's guard 1e does.
+    # The previous form string-matched `tail -3`, but test_chunkwise.py prints
+    # "ALL CHUNKWISE TESTS PASS" and THEN a 7-line m(K) ladder, so the marker is
+    # never in the last 3 lines and a PASSING suite was read as a failure.
+    # Exit code is authoritative (sys.exit(0)/sys.exit(1)); the marker grep is a
+    # second, independent condition -- BOTH must hold.
+    ( module load Python/3.10.4-GCCcore-11.3.0 >/dev/null 2>&1
+      # shellcheck disable=SC1091
+      . "$WS/envs/mo/bin/activate" 2>/dev/null
+      cd "$REPO" && NODEBN_TEST_DEVICE=cpu $TO python3 "tests/$T" ) > "/tmp/g3m_t.$$" 2>&1
+    RC=$?
+    if [ "$RC" -eq 0 ] && grep -qE "^ALL[A-Z ]*PASS|[0-9]+ PASS, 0 FAIL" "/tmp/g3m_t.$$"; then
+      echo "guard 1d: tests/$T PASS (exit 0, marker present)"
+    else
+      echo "  tests/$T output tail:"; tail -8 "/tmp/g3m_t.$$"
+      guard_fail "guard 1d: tests/$T did NOT pass on this tree (exit $RC)"
+    fi
+    rm -f "/tmp/g3m_t.$$"
   else
     guard_fail "guard 1d: $REPO/tests/$T absent -- the granularity code path this "\
 "batch depends on has no equivalence suite"
