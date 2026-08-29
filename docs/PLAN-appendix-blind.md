@@ -65,7 +65,7 @@ You are evaluating an **online, γ-discounted future-loss** method with a **stat
 
 **Not measured, should be primary:**
 - **Cumulative online training loss** (area under the loss curve) — the closest observable proxy to Fᵗᵞ, and the thing the meta-gradient actually descends.
-- **Final** (and mean-of-last-5-epochs) test accuracy, with bootstrap CIs over paired seeds.
+- **Final** (and mean-of-last-5-epochs) test accuracy, with bootstrap CIs over paired seeds. **[AMENDED, CORRECTIONS 115.]** "Paired seeds" is valid only WITHIN a submission batch. Across batches the seed label carries nothing (sd_seed ≈ 0.044 vs sd_resid ≈ 0.152; seed F(60,85)=1.21, p=0.213) and the bootstrap must be over independent arms with the sqrt(2/k_eff)·sd_batch floor added.
 - **Train loss separately from test accuracy.** Right now you cannot tell whether granularity is an *optimization* effect or an *implicit-regularization* effect. If layerwise reaches the same train loss but different test accuracy, the entire H1/SNR framing is the wrong lens and the paper is about generalization. This is a fork in the road and it is free — the numbers are already in your logs.
 - **Wall-clock-matched comparison.** MetaOptimize costs +44% time. Give the fixed-LR baseline 1.44× the epochs. Under an equal-wall-clock budget several of your wins may not survive.
 - **Actual memory/time per granularity.** The "no additional computational overhead" claim is inherited, not verified. At m = n the trace/state vectors are a different story; measure it.

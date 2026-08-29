@@ -86,7 +86,7 @@ One paper: **A (spine) + B (mechanism core) + D (as the setup/reproduction secti
 ### Shared spine (required for *all* of them — do this first)
 1. **Per-granularity meta-hyperparameter sweep at equal search budget.** α₀ × meta-stepsize grid (≥4×4), independently for m ∈ {1, 6, 62, n}, best-of-budget selection, then ≥3 seeds at the winner. Without this you have no result, only a confound.
 2. **Competently tuned fixed-schedule baselines.** SGDm+cosine and AdamW+cosine, tuned at comparable budget. "MetaOptimize vs MetaOptimize" is not an experiment a reviewer accepts.
-3. **≥3 seeds everywhere, 5 for headline numbers**, mean ± std, paired-seed comparisons, and *report the full sweep*, not just the winner.
+3. **≥3 seeds everywhere, 5 for headline numbers**, mean ± std, paired-seed comparisons **within a single submission batch only** — across batches use Welch and add the batch floor (**[AMENDED, CORRECTIONS 115]**; seed is statistically null on this cluster, batch is not) — and *report the full sweep*, not just the winner.
 4. **Backups.** See §9 — this is a paper-strategy item, not an IT item.
 
 ### A additionally requires

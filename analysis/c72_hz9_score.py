@@ -174,7 +174,30 @@ def h1b(rows, lay, node, e=100, bar=0.50):
 
 
 def h2(rows, e=100):
-    """PAIRED within seed. Returns per-seed diffs and the registered-range verdict."""
+    """**WELCH, n=2 v 2, CROSS-BATCH.  NOT PAIRED.  [CORRECTED, CORRECTIONS 115.]**
+
+    This function zips HZ9_NODE_1E3 against RS_LAY_1E3 on the seed label, and those
+    two arms come from DIFFERENT SUBMISSION WAVES: hz9-node-1e3-s{3,4} are jobs
+    4704502/4704503 and rs-lay-1e3-s{3,4} are jobs 4700388/4700392 -- ~4,100 job-ids
+    and several weeks apart.  STANDING RULE 14 establishes that seeds do NOT pair
+    across batches on this cluster (seed F(60,85)=1.21, p=0.213; batch F(62,85)=5.47,
+    p=6.9e-13), so the seed label is doing no work here and the zip is a bookkeeping
+    device, not a pairing.
+
+    THE POINT ESTIMATE IS UNCHANGED at +1.138 pp -- in a balanced design the paired
+    mean IS the difference of means -- so the registered band (+1.0..+2.0) is still
+    MET and the verdict does not move.  What moves is the uncertainty: the paired
+    reading implies se 0.0440 and t 25.86 on 1 df; the correct Welch reading is
+    se 0.1365, t 8.34 on df 1.67, a 3.1x deflation.  The effect is still 4-11x the
+    measured cross-batch floor (sqrt(2)*sd_batch = 0.20-0.29 pp).
+
+    THE `fav` COUNT RETURNED BELOW IS A SIGN CHECK ON TWO INDEPENDENT ARM MEANS, NOT
+    A PER-SEED GATE.  A "2/2 favouring nodewise" line may not be reported as a
+    within-seed binary gate.  (More generally: a k/k per-seed count is a SIGN TEST on
+    independent replicates EVERYWHERE, including within a batch, because seed is
+    statistically null on this cluster -- its power must be quoted as such.)
+
+    Returns per-seed diffs and the registered-range verdict."""
     diffs = []
     for nd, ly in zip(HZ9_NODE_1E3, RS_LAY_1E3):
         assert nd[-1] == ly[-1], "seed mismatch in the H2 pairing"

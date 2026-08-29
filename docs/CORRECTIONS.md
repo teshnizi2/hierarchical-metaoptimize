@@ -6687,3 +6687,218 @@ that does not exist.** Guard 9 refuses `--submit` until `GN1_GEN_OK` is exported
 4. alice2 still lacks `PATCH_CHUNKWISE` and `PATCH_NODEBN` — **seven cycles**, still the most
    expensive unaddressed infrastructure item, still forcing every partition batch onto one
    account.
+
+---
+
+## 115. **CYCLE 83 CLOSEOUT — THE NINE OPEN ITEMS DISCHARGED; STANDING RULE 14 AUDITED WITH ONE EXPOSURE; TWO BATCHES REGISTERED PRE-DATA** (2026-08-29)
+
+**Full record: `docs/CLOSEOUT.md`, which supersedes FINDINGS and MASTER-TABLE for the nine items
+it covers. NOTHING WAS SUBMITTED. No `sbatch` was run.**
+
+Six items closed with no compute, two were declined outright, one is registered as 44 jobs /
+~70 GPU-h. **Zero published results are withdrawn.** Four claims moved and two working claims
+from this cycle's own analysis were withdrawn before they entered the record.
+
+---
+
+### 115.1 STANDING RULE 14 — AUDITED, CONFIRMED, AND SHARPENED
+
+The rule reproduces exactly: n = 356 same-config same-seed replicate pairs, median |difference|
+**0.1710 pp** (implied per-run sd 0.1793) against a within-config sd of **0.1590 pp** over 160
+configs, all re-derived from the `.out` epoch series.
+
+**The mechanism is sharper than the rule as written.** A two-way orthogonal ANOVA (batch × seed)
+on the 42 config cells carrying a complete sub-grid gives **BATCH F(62,85) = 5.47, p = 6.9e-13,
+sd_batch ≈ 0.21 pp** and **SEED F(60,85) = 1.21, p = 0.213, sd_seed ≈ 0.04 pp**. Seed is
+**statistically null**; batch is a large random effect. A one-way ANOVA on family across 51 cells
+/ 380 runs gives F(81,248) = 4.19, p = 2.6e-18, robust to conditioning on Slurm account (account
+is null, F = 1.19). This is the random-effects model FINDINGS 36.9 asked for at cycle 36 and never
+got — the same found-once-then-ignored pattern as the plateau/k=20 defect.
+
+**THE AUDIT FOUND EXACTLY ONE EXPOSED CLAIM, AND IT HOLDS.** `hz9`'s H2
+(`analysis/c72_hz9_score.py:176`, `zip(HZ9_NODE_1E3, RS_LAY_1E3)`) pairs `hz9-node-1e3-s{3,4}`
+(jobs 4704502/03) against `rs-lay-1e3-s{3,4}` (jobs 4700388/92) on the seed label — two
+submission waves ~4,100 job-ids apart. Point estimate **identical at +1.138 pp** (a balanced
+design forces paired mean = difference of means); Welch se **0.1365**, t **8.34** on df 1.67,
+against the paired reading's implied se 0.0440 and t 25.86 — a **3.1× deflation**. The registered
+band (+1.0..+2.0) is still MET and the verdict does not move. **Corrected in place:** the label
+becomes "Welch, n=2 v 2, cross-batch", and the "2/2 favouring nodewise" becomes a **sign check on
+two independent arm means**, not a per-seed binary gate. `analysis/c72_hz9_score.py`'s docstring
+now says so, as do `FINDINGS.md:13858` and `MASTER-TABLE.md:31`.
+
+**THE NAMED EXPOSURE IS A FALSE ALARM, AND THAT IS ITSELF A FINDING.** The horizon reversal
+("br6 n=4 + bl5 n=3 reported as n=7 paired within seed") is not a Rule-14 violation: each of the
+7 differences is node−lay taken **within one batch at one seed**, so the batch offset cancels
+before pooling starts. Re-scored Welch with the pairing discarded, the ep10 t is **larger**
+(−14.15 vs the paired −13.03) and ep40 reads +1.258 at t 11.30 (was 16.05); point estimates are
+identical at every epoch and the two batches agree to 0.012 pp at ep40 despite different β
+ceilings. **CONFIRMED-RESCOPED stands.**
+
+**THE PAPER IS UNTOUCHED.** All nine D and G readings were verified run-by-run: in every one, both
+arms sit in the **same batch, same seed set, same beta_clip**. D = +0.485 / +0.581 / +0.697 /
++0.727 / +0.629; G = +0.295 / −0.139 / +0.011 / −0.001; pool +0.5805 ± 0.0939, Q 0.88 on 2 df.
+Every figure reproduces to 3 dp. `analysis/c58_horizon_reversal.py` was found to enforce the rule
+**by construction 27 cycles before it was written** (`pool=False` default, batch family in the
+cell key).
+
+**ONE WITHDRAWAL, FORWARD-LOOKING ONLY.** `PLAN.md:104`'s standard "Δ ≥ 0.5pp with a 95% PAIRED
+CI excluding 0" licensed a paired CI on any contrast. **Amended in place** to: a paired CI is
+admissible **only within a batch**; a cross-batch contrast is Welch and must carry a floor of
+**√(2/k_eff)·sd_batch**, sd_batch ≈ 0.21 pp, k_eff the harmonic-mean number of distinct batches
+per arm — and the floor is **ZERO when the two arms have matched batch composition**. (The
+"√2·sd_batch that does not shrink with n" formulation is right only for one-batch-vs-one-batch,
+and would have retroactively condemned this audit's own br6+bl5 reading and four-deep D pool.)
+The same fix is applied at `PLAN-appendix-blind.md:68`, `-paper.md:89` and, most importantly,
+`-research.md:95`, which registered **common random numbers** as the variance-control design for
+an unrun experiment — the exact negation of Rule 14. Pairing on seed removes ~**8%** of variance
+here, not "substantially". The unrun `slf-` open-loop gate (`FINDINGS.md:7069`) is re-registered
+as a Welch TOST and flagged as **near-unrunnable at δ=0.3pp** once the floor is carried.
+
+**ONE SPAN DEMOTED, NOT WITHDRAWN.** FINDINGS 58.8 / CORRECTIONS 87.14 pools ms+mx+rs with
+**unbalanced** family composition between the differenced arms (layerwise@1e-4 = 3 ms + 2 rs;
+blk6@1e-4 = 2 rs only). Welch gives +0.254, se 0.093, t 2.73, df 4.3 — against a floor of
+0.18–0.29 pp, i.e. 70–115% of the gap. **The 0.254 pp is UNRESOLVED AT THE CROSS-BATCH FLOOR**
+and may not be reported as ~3.4 SE. The row's own headline (partition-vs-none 0.390–0.644 pp) is
+unaffected.
+
+**FOUR CORRECTIONS TO THE AUDIT ITSELF**, recorded because they were nearly missed:
+1. The "across-seed sd 0.1590" is a **within-config total sd** and contains the same-seed
+   replicate spread it is compared against. The genuine across-seed statistic (sd of seed means)
+   is **0.1516** over 154 configs, or 0.1562 over 100 one-run-per-seed configs. Reproduction is
+   **close, not exact** — `CORRECTIONS.md:6218` says 156 configs, the audit says 160.
+2. The floor is **√(2/k_eff)·sd_batch**, zero at matched composition, not a constant 0.20 pp.
+3. **Batch is not exchangeable noise, and hardware is not the cause.** Measured within
+   (config × family): 2080Ti−L4 **+0.035** (n=45), A100−L4 **−0.021** (n=21), A100−2080Ti
+   **+0.112** (n=5). No systematic hardware offset, which leaves tree/code state at submission —
+   a **diagnosable bias**. The right instrument is therefore a POOLING GATE on the `hz9` H0.5
+   pattern (can only VOID; max |z| = 1.80), not a blanket variance inflation. GPU-class
+   composition should join box occupancy in the per-batch disclosure line: two of the paper's own
+   D readings have imbalanced GPU composition between arms (mm1, ar1-D) and nobody reported it.
+4. A **k/k per-seed gate is a sign test everywhere**, including within a batch, because seed is
+   null at p=0.213. Within-batch gates are not invalidated; they are weaker than their wording.
+
+---
+
+### 115.2 TWO WORKING CLAIMS WITHDRAWN BEFORE THEY ENTERED THE RECORD
+
+**(a) "The AdamW α₀=1e-3 reversal is bimodal across three batches at ~10σ, UNSAFE TO QUOTE."**
+**WITHDRAWN.** The three "independent batches at byte-identical config" are I1 (92.691), a0
+(90.818) and dc (90.909) — but **CORRECTIONS 29 (`:837-870`) establishes I1 ran with an
+unidentified schedule active** (`HF.py.bak_sched` timestamped 33 s before submission; the arm is
++7.2 pp ahead at epoch 2 where a matched cosine multiplier is 0.9978) and rules that a batch with
+no submit script is not readable as evidence. Item 8's own exclusion list drops I1 on exactly
+those grounds. **With I1 removed there is no bimodality:** 90.818 vs 90.909, a **0.091 pp** gap
+well inside the cross-batch floor. The proposed 6-job tie-breaker is unnecessary. *(Also
+corrected: `dc-awscal-a1e3` reads **90.909** on plateau5 — the 91.159 in circulation is neither
+metric on disk — so the two batches agree to 0.091 pp, not 0.34.)*
+
+**(b) "The tuned ladder maximum is not layerwise — it is at least nodewise1d at 93.153. Decisive
+against closure."** **WITHDRAWN.** All three "rising rungs" are single-family n=3 `ar1` arms
+differenced against a four-family n=11 layerwise arm — the identical unbalanced-composition
+defect demoted at 58.8. Welch: nodewise1d **+0.267** se 0.081 t 3.28; chunk777 **+0.158** se
+0.092 **t 1.72, NOT SIGNIFICANT**; chunk2325 **+0.127** se 0.063 t 2.01. Two of three sit *below*
+the 0.20 pp floor, the third inside it. **The correct sentence is: the identity of the tuned
+ladder maximum is unknown because the three rungs are unbracketed, not because they are known to
+exceed layerwise.**
+
+Item 9a's "the pre-registered r\* test landed and nobody scored it; the 1/N law HOLDS, TIGHTLY" is
+also withdrawn as a close: `MASTER-TABLE.md:77` already scores it **OPEN** with the opposite
+conclusion, the rungs are `r34f-*` (jobs 4685602-4685610) and not `r34r-*` (4684237-4684263), and
+all three architecture argmaxes are decided by **cross-family margins of 0.051–0.124 pp** against
+a 0.20–0.29 pp floor. It stays OPEN and stays not-worth-compute.
+
+---
+
+### 115.3 A NEW DISCLOSURE: `ar1`'s D LEG CARRIES AN ASYMMETRIC GUARD
+
+Read directly from `probes_ar1/*/probe.jsonl` (10,000 records each; Q4 mean fraction of β
+coordinates at the floor, min β exactly −15.000 in every arm):
+
+| arm | Q4 rec_lo | rec_hi |
+|---|---|---|
+| chunk777 | 0.1531 / 0.1575 / 0.1533 | 0.0000 |
+| chunk2325 | 0.1658 / 0.1663 / 0.1640 | 0.0000 |
+| nodewise1d | 0.1624 / 0.1661 / 0.1624 | 0.0000 |
+| **nodewise** | **0.0325 / 0.0326 / 0.0327** | 0.0000 |
+
+**The G leg is SYMMETRIC** (Δ = 0.002) — the mechanism reading is clean. **The D leg is ASYMMETRIC
+at Δ = 0.122**, above the 0.10 bar this closeout registers for `g3m` and `gc1`, and `ar1`'s
+D = +0.697 is one of the four published D readings. **It did not manufacture the effect:** the
+byte-matched box-free replicate `fa1` (`-25:-2.3026`, rec_lo **0.0000 on 24/24**, min β −21.9)
+reads D = **+0.630**. But the disclosure was owed and had never been made.
+
+**The same probes correct item 7.** Item 7 read its three "rising rungs" from the guard-bound
+n=3 `ar1` cells and never mentioned that a **box-free n=6** replicate at the same ms exists. On
+`fa1` those rungs read **+0.089 / +0.070 / +0.089** over layerwise's tuned optimum — a *third* of
+the floor. On the box-free, larger-n evidence they are **indistinguishable from layerwise**.
+
+---
+
+### 115.4 TWO BATCHES REGISTERED, PRE-DATA (STANDING RULE 19)
+
+**44 jobs, ~70 GPU-h, ALICE only. Both scripts, both scorers and `analysis/c55_neff_noise.py` are
+committed BEFORE any run exists. Both exit 2 — not 0 — when any guard is red.**
+
+**`g3m` — `bin/c83_gen_r34_merged.sh` + `analysis/c83_gen_score.py` (83/83). 36 jobs, ~61 GPU-h.**
+Four arms × 9 seeds, ONE ms (1e-4), ONE box, ONE submission: nodewise (m=25,556), chunk835
+(25,562), nodewise1d (8,595), chunk2500 (8,587). H1 = D, H2 = G (TOST at **δ = ±0.30**; ±0.15
+needs |G| < 0.007 and is unreachable), **H3 = D − G, the mechanism contrast, within-batch,
+se 0.116**. Planning sd is ResNet18's **four-arm pooled 0.1742 on 33 df** — not ResNet34's
+layerwise/scalar 0.156, which measures arms the batch does not run. At n=9, se(D) = 0.0821, D =
++0.5 lands at t = 6.1, a refutation needs D ≤ +0.331. ms=1e-4 is pinned because it is the anchor's
+ms **and** the only floor-free rung (floor 8.09 nats away, travel 5.00). The **ceiling** is
+reachable from epoch 92.1 and is DISCLOSED: the scorer reports `rec_hi` per seed per arm as a
+first-class number and voids on >0.10 arm asymmetry. **RULE 11 IS OPEN and the scorer prints it.**
+
+**`gc1` — `bin/c83_gen_c100_screen.sh` + `analysis/c83_gc1_score.py` (110/110). 8 jobs, ~9 GPU-h.**
+Three defects fixed at closeout: **(1)** ms moved **1e-3 → 1e-4**, because at 1e-3 the reachable
+β interval strictly *contains* the box (ceiling from epoch 9.3) and a clamped-regime D is a
+**different estimand** from the box-free anchors — guard 1h was **inverted** to refuse a reachable
+floor and disclose the ceiling, at the cost of withdrawing the S2 cross-batch diagnostic;
+**(2)** the planning sd moved **0.419 → 0.226**, because the old figure was 78% **layerwise** by
+weight, an arm gc1 does not run — on the fine arms only, se(D) at n=4 is 0.160 and a
+CIFAR-10-sized D = +0.5 lands at **t = 3.1**; **(3)** the stopping rule was rewritten. The old
+rule ("|D| ≥ 1.0 → proceed, else close as unaffordable") classified the campaign's **own pooled
+prior** (+0.5805) as a negative — its modal outcome was a **false close** — and its 1.0 pp
+threshold came from a "14× amplification" computed as layerwise 69.594 − scalar 22.560, where
+**scalar reads 22.6% on a 100-class task**: a failed arm, not an amplified granularity effect.
+The replacement resolves on the **realised** statistic (REGIME FAILURE → CLOSE-UNRESOLVED;
+|t| ≥ 3 → CLOSE-CONFIRMED; unresolved with realised se ≤ 0.30 → PROCEED; se > 0.30 →
+CLOSE-UNAFFORDABLE), so **a small point estimate can no longer close CIFAR-100.**
+
+**DELETED, with reasons:** `bin/c83_gen_r34_dleg.sh` (`g3d`) fragmented the D leg from the G leg
+and spent 12 of 18 jobs on rungs it registered in advance as floor-dirty;
+`bin/c83_gen_r34_tail.sh` (`g34`) derived its stepsize through a guard with **no box check**, so
+its modal outcome was 18 jobs returning VOID, and it shipped at 1.06× wallclock headroom with no
+throughput guard while its sibling refused at 1.32×; `analysis/c83_g34_score.py` scored the
+deleted batch. `analysis/c83_gen_score.py`'s selftest asserts all three stay deleted.
+
+**RULE 13, eight injections, all refused:** `WALL=04:00:00` → 1.11× headroom; `MST=3e-4` → floor
+reachable; an ms LIST anywhere in the file → the cc1-shape guard; `M_CHUNK_G=8588` → second
+instrument disagrees; `NET=ResNet18` → the premise does not hold; `CHUNK_KG=295` → the ResNet50
+trap; `SD_PLAN=0.0900` → re-derives to 0.1743; `gpu-short` in PARTS → 4h cap. **Two of the eight
+were holes the testing found, not review**: guard 1b-4 inspected only the emitter region, and
+nothing refused `gpu-short` off-cluster. Both closed. The scorer's own no-field-statistic check
+initially flagged **its own header** — CORRECTIONS 112's self-referential-guard failure, caught by
+the selftest and fixed by asserting over the AST's identifiers.
+
+---
+
+### 115.5 THE HEADLINE
+
+**A batch is not a scheduling unit. It is the unit of measurement.** The paper's load-bearing
+sentence is "D is large AND G is null", so the number carrying it is **D − G**. On ResNet18 that
+was measured inside one batch (`cc1`: four arms, one ms, one box) and reads **+0.716 at t 2.9**.
+The ResNet34 replication had been designed as **two** batches at **two** stepsizes, which inserts
+2·sd_batch² into exactly that contrast: se ≈ 0.33 pp, so a true +0.5 would have landed at
+**t = 1.5** — **roughly half the power of the result being replicated, for the identical 36
+jobs.** Merging them costs nothing and lifts D − G to se 0.116. The corpus already owned the right
+instrument (`hz9`'s H0.5 pooling gate, which can only VOID) and had used it once.
+
+**STILL UNRESOLVED, stated plainly:** every MetaOptimize number in items 4 and 5a is
+**guard-unverified** (no probe directory exists for `i3b`, `a0`, `dc`, `PP`, `pp`); the horizon
+reversal's box occupancy is **still owed** though `probes_br6/` and `probes_bl5/` are on disk;
+the "batch" unit is a run-name prefix that merges submission waves (`fa1` is two waves ~1,830 job
+ids apart), so **the true sd_batch is ≥ 0.21 pp**; **no AdamW meta-stepsize axis exists anywhere**
+in 273 rows, so H4-as-tuned is untestable with this corpus; and the tail prescription remains a
+one-architecture, one-dataset, one-base-optimizer result until `g3m` returns.

@@ -7067,6 +7067,14 @@ Verdict adopted: **apply the code, redesign the experiment.** The identified rep
 per-group into a layerwise arm, c ∈ {0, 0.25, 0.5, 0.75, 1}. Holding m fixed decouples granularity
 from the 1/√m axis **for the first time in the campaign**. It is gated on `slf-`, the open-loop
 gate (replay a donor's own trajectory into itself at the same seed; paired TOST at δ=0.3pp).
+**[RE-REGISTERED, CORRECTIONS 115.]** That TOST is a CROSS-BATCH PAIRED DESIGN and may not
+be run as written: a donor run and its replay are necessarily different submissions, and
+STANDING RULE 14 establishes that seeds do not pair across batches on this cluster (seed
+is statistically null, F(60,85)=1.21 p=0.213; batch is not, F(62,85)=5.47 p=6.9e-13).
+`slf-` must be re-registered as a WELCH TOST carrying the sqrt(2)·sd_batch ≈ 0.20-0.29 pp
+floor, which at δ=0.3pp leaves it with almost no equivalence region — i.e. the gate as
+conceived is close to unrunnable and needs redesigning, not merely relabelling, BEFORE
+it buys a GPU-hour.
 
 ## 36.16 THE PAPER, RESTATED
 
@@ -13849,6 +13857,25 @@ registered bar (STANDING RULE 9) is an **effect-size** bar of ±0.50 pp, not a s
 not "no difference"; it is "a difference too small to be the thing the partition is chosen for."
 
 **H2 IS THE SAME TWO PARTITIONS AT A COMMON `ms`, AND IT DISAGREES:**
+
+> **[CORRECTED, CORRECTIONS 115 — STANDING RULE 14.]** H2 was reported below as
+> "PAIRED WITHIN SEED", with a "2/2 favouring nodewise" per-seed gate. It is not
+> paired: `hz9-node-1e3-s{3,4}` (jobs 4704502/4704503) were zipped on the seed label
+> against `rs-lay-1e3-s{3,4}` (jobs 4700388/4700392) — two submission waves ~4,100
+> job-ids apart, and seeds do not pair across batches on this cluster. **This is the
+> ONLY genuinely exposed paired-across-batches claim found in the whole corpus.**
+> Re-scored Welch, n=2 v 2: the point estimate is IDENTICAL at **+1.138 pp** (a
+> balanced design forces paired mean = difference of means), se **0.1365**, t **8.34**
+> on df 1.67 — against the paired reading's implied se 0.0440 and t 25.86, a 3.1x
+> deflation. **The verdict does not change: still MET against the registered
+> +1.0..+2.0 band, still the right sign, still 4–11x the measured cross-batch floor.**
+> Two things must be read differently: (a) the label is "Welch, n=2 v 2,
+> cross-batch", not "paired within seed"; (b) the "2/2" is a SIGN CHECK on two
+> independent arm means, not a per-seed binary gate. The row's methodological
+> headline — that a granularity contrast at one shared meta-stepsize is confounded
+> with which ms that partition prefers — is UNTOUCHED, because its force comes from
+> the sign reversal against H1b's −0.360 (a different, larger design), not from H2's se.
+
 
 | seed | nodewise @1e-3 | layerwise @1e-3 | diff |
 |---|---|---|---|
