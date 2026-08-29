@@ -460,7 +460,13 @@ echo "guard 1c2: the submitting shell sets none of HIER/SCHED/LAM/ETA_RATIO/AUGM
 for T in test_chunkwise.py test_nodebn.py; do
   if [ -f "$REPO/tests/$T" ]; then
     if command -v timeout >/dev/null 2>&1; then TO="timeout 3600"; else TO=""; fi
-    OUT="$(cd "$REPO" && $TO python3 "tests/$T" 2>&1 | tail -3)" || true
+    # FIX (cycle 85): the suite needs the project venv, exactly as c82 does at its
+    # guard 1e.  Without it python3 has no torch and the guard aborts a VALID batch
+    # on a MISSING INTERPRETER -- a false negative, not a real precondition failure.
+    OUT="$( ( module load Python/3.10.4-GCCcore-11.3.0 >/dev/null 2>&1
+              # shellcheck disable=SC1091
+              . "$WS/envs/mo/bin/activate" 2>/dev/null
+              cd "$REPO" && NODEBN_TEST_DEVICE=cpu $TO python3 "tests/$T" 2>&1 | tail -3 ) )" || true
     case "$OUT" in
       *FAIL*0*|*"0 FAIL"*|*"0 fail"*) echo "guard 1d: tests/$T -- $(printf '%s' "$OUT" | tail -1)" ;;
       *) guard_fail "guard 1d: tests/$T did NOT pass on this tree: $(printf '%s' "$OUT" | tail -1)" ;;
