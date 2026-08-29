@@ -237,6 +237,19 @@ WS=/data1/salehkaleybars/metaopt
 RUNNER=$WS/jobs/run_cifar.sh
 SAVE=$WS/runs/g3m
 
+# --- PROJECT ENVIRONMENT (cycle 85, fix 3) ----------------------------------
+# Several guards import torch (guard 4 builds the LIVE network to MEASURE the
+# beta allocation; the equivalence suites need it too).  A bare ssh shell has no
+# torch, so those guards aborted a VALID batch on a MISSING INTERPRETER -- a
+# false negative three times running.  Activate ONCE here so every guard below
+# sees the same interpreter the JOBS will use.  Failures stay silent on purpose:
+# if the venv is genuinely broken the importing guards still fail loudly and
+# correctly, which is the behaviour we want.  (c82/gc1/gn1 activate per-block;
+# this script has 14 python3 sites, so activating once is the safer form.)
+module load Python/3.10.4-GCCcore-11.3.0 >/dev/null 2>&1 || true
+# shellcheck disable=SC1091
+[ -f "$WS/envs/mo/bin/activate" ] && . "$WS/envs/mo/bin/activate" 2>/dev/null || true
+
 # WALL / PARTS.  gpu-short (4:00:00 cap) IS DELIBERATELY EXCLUDED.  GUARD 7
 # projects the worst-case cost of THE ARMS THIS BATCH ACTUALLY SUBMITS -- not of
 # layerwise, which is what the deleted g3d wrongly measured.  The worst 100-ep
