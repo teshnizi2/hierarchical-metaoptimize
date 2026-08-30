@@ -6902,3 +6902,57 @@ the "batch" unit is a run-name prefix that merges submission waves (`fa1` is two
 ids apart), so **the true sd_batch is ≥ 0.21 pp**; **no AdamW meta-stepsize axis exists anywhere**
 in 273 rows, so H4-as-tuned is untestable with this corpus; and the tail prescription remains a
 one-architecture, one-dataset, one-base-optimizer result until `g3m` returns.
+
+## 116. **THE TAIL MECHANISM GENERALISES. D ON THREE CELLS, D−G ON TWO ARCHITECTURES.** (cycle 86)
+
+`g3m` (36 jobs, ResNet34/CIFAR-10) and `gc1` (8 jobs, ResNet18_c100/CIFAR-100) both complete;
+scored with `analysis/c83_gen_score.py` (83/83) and `analysis/c83_gc1_score.py` (110/110),
+both **UNEDITED** (`git status` clean). CSV 1,891 → 1,935, **purely additively** (+44, −0).
+
+**D, THE COUNT-MATCHED PARTITION GAP, ON THREE (network, dataset) CELLS:**
+
+| cell | D | se | t | seeds |
+|---|---|---|---|---|
+| R18/C10 (4 batches) | +0.485 / +0.581 / +0.697 / +0.727 | — | — | — |
+| **R34/C10 (`g3m`)** | **+0.666** | 0.094 | **7.08** | **9/9**, binomial p=0.0020 |
+| **R18/C100 (`gc1`)** | **+1.640** | 0.245 | **6.71** | **4/4** |
+
+g3m's D sits at **t=0.64 against the R18 ms=1e-4 pool (+0.5805 ±0.0939)** — indistinguishable
+from the value it was registered to reproduce. **C100 gives the LARGEST D in the corpus**, 2.5×
+the R18/C10 value.
+
+**THE MECHANISM, ON A SECOND ARCHITECTURE AND WITH MORE SEEDS THAN THE FIRST:**
+
+| | R18 (`cc1`) | **R34 (`g3m`)** |
+|---|---|---|
+| G (tail removed, count-matched) | +0.011, n=3, se 0.147 | **+0.171, n=9, se 0.073** |
+| **D − G** (within batch) | +0.716 | **+0.495, se 0.119, t 4.15** |
+
+G's TOST at ±0.30 gives **p=0.0488 → NULL REPLICATES**. The ±0.15 band was arithmetically
+unreachable at this n (it needs |G| < 0.0221) and ±0.30 is what was registered, so the honest
+deliverable is equivalence to ±0.30 and it is labelled as such.
+**H3 is the load-bearing number: the gap is present with the tail and absent without it,
+measured INSIDE ONE BATCH**, so STANDING RULE 14's cross-batch floor never enters it.
+
+**WHAT THE SCORERS REFUSED, AND BOTH REFUSALS ARE CORRECT.**
+* `nodewise1d − nodewise = +0.232` on R34 is **NOT tail removal** — it spans 25,556 → 8,595
+  groups = 0.4732 decades = pure count effect at the measured −0.4906 pp/decade slope. The scorer
+  declines to label it so. The tail statistic is the count-matched G.
+* **ResNet50 is structurally excluded** from this comparator: its largest 1-D tensor is 2,048,
+  above every count-matching K, so a chunk arm there would **SPLIT** the very tensors whose
+  merging is the prescription. Do not propose it.
+
+**STRUCTURAL IDENTITY ACROSS DATASETS (S4, descriptive):** R18_c100's merged tail is 9,700 groups
+= 66.44% of m over 0.0865% of the weights, against R18/C10's 9,610 = 66.64% over 0.0860%. The two
+datasets' contrasts are **structurally the same object**.
+
+**WHAT IS STILL NOT MEASURED, registered before the data:** G on CIFAR-100 (no nodewise1d arm;
+its ±0.15 band would need n=34); RULE 11 on either new cell (ms shared and untuned); any field
+statistic (Direction C is dropped). **And the BatchNorm-vs-tail question is still open** — every
+D in the table was measured on a net whose only 1-D tensors are BatchNorm parameters, so
+"the carrier is the degenerate tail" and "the carrier is BatchNorm" remain the same measurement
+seen three times. `gn1` is now UNBLOCKED by guard 9 and is the next batch.
+
+**A PROCESS NOTE.** The first g3m scoring run printed MISSING on every arm. That was the
+`.out`-in-the-ROOT-of-runs/ trap (OPERATIONS gotcha; CORRECTIONS 110.1's "0 probe dirs is ALWAYS
+a sync fault, NEVER a finding"). Taken at face value it would have been reported as a VOID.
