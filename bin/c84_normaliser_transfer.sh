@@ -347,7 +347,10 @@ guard_fail() {
 }
 
 USER_NAME="${USER:-$(whoami)}"
-WS=/data1/salehkaleybars/metaopt
+# PORTABLE (cycle 85): default is alice; set METAOPT_WS to run on alice2, whose
+# HF.py was brought to byte-identical parity on 30 Aug (md5 d3202635c3fc) with all
+# three equivalence suites green, and which carries PATCH_RESNET_GN.
+WS=${METAOPT_WS:-/data1/salehkaleybars/metaopt}
 RUNNER=$WS/jobs/run_cifar.sh
 SAVE=$WS/runs/gn1
 LIVE_TREE=$WS/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10
