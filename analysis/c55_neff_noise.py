@@ -353,6 +353,88 @@ BOXES = {
     # accuracy contrast for an uninterpretable one.
     # REGISTERED BEFORE ANY gn1 JOB WAS SUBMITTED, from the script's own CLIP= line.
     "gn1":  (-15.0, -2.3026, "bin/c84_normaliser_transfer.sh:CLIP"),
+    # `hz3` (cycle 87) -- **THE HORIZON CONTROL, AND THE FIRST BOX IN THE WHOLE
+    # CORPUS THAT IS PROVABLY FREE ON BOTH RAILS AT ITS OWN BUDGET.**
+    # cc1's four arms {nodewise, chunk777, nodewise1d, chunk2325} x 6 seeds at
+    # cc1's own ms=1e-4 and alpha0=1e-3, but at **300 EPOCHS** = 24 jobs.
+    # THE QUESTION.  D and the mechanism contrast D-G are SIGNIFICANTLY NEGATIVE
+    # for much of training on every CIFAR-10 cell and turn positive only in the
+    # last 15-30 epochs (g3m D -0.518 t -4.04 @ep55 -> +0.666 t 7.34 @ep100;
+    # cc1 D-G -0.945 @ep40 -> +0.715 @ep100).  Until hz3 is scored, every
+    # headline in the paper is a claim about the last fifth of a 100-epoch run.
+    # **BOTH RAILS MOVED AND BOTH MOVES ARE FORCED.**  HF.py's Lion meta update
+    # with --weight-decay-meta 0 gives |dbeta| = ms EXACTLY per step, so beta is
+    # confined to [beta_0 - ms*T, beta_0 + ms*T] for ANY velocity profile.  At
+    # ms=1e-4 and T = 300 x 500 = 150,000, travel is 15.0000 nats against
+    # beta_0 = ln(1e-3) = -6.907755, i.e. beta lives in [-21.9078, +8.0922]:
+    #   FLOOR   -15    -> REACHABLE from epoch 161.8 (46% of the run clamped).
+    #   FLOOR   -30    -> UNREACHABLE, 8.0922 nats of slack.
+    #   CEILING -2.3026 -> REACHABLE from epoch 92.1, i.e. 69% of THIS run
+    #           against 8% of a 100-epoch run.  The build kept it on RULE 10
+    #           grounds ("measured beta has never exceeded -3.499").  THAT
+    #           ARGUMENT WAS MEASURED AT 5 NATS OF META-TRAVEL AND DOES NOT
+    #           TRANSFER TO 15.  The corpus's ONLY 15-nat cell is fa1
+    #           (ms=3e-4 x 100 ep, box -25:-2.3026) and there the ceiling BINDS,
+    #           ARM-ASYMMETRICALLY: over fa1's plateau5 window the nodewise arm
+    #           reads rec_hi = 1.0000 on seeds 1, 4 and 5 (a clipped coordinate
+    #           in EVERY record; coord_hi up to 2.77e-4) while ALL EIGHTEEN
+    #           merged-tail runs read exactly 0.000000 on both rails.  A ceiling
+    #           that clamps only the arm the paper is about would have decided
+    #           this batch.  (CORRECTIONS 117.2.)
+    #   CEILING +9.0   -> UNREACHABLE, 0.9078 nats of slack.  REGISTERED.
+    # RULE 10 IS THEREFORE BROKEN ON BOTH RAILS, DELIBERATELY AND STATED: this
+    # box is NOT the published cells' box, the LEVEL of D here is not poolable
+    # with theirs, and the batch's PRIMARY is the WITHIN-RUN change
+    # D(300) - D(100), in which the box, the batch, the seed and the GPU class
+    # cancel identically.  The internal control on D(100) is REPORTING, NOT
+    # GATING (CORRECTIONS 117.5): a D(100) outside [+0.20, +1.00] here is a BOX
+    # FINDING, and discarding the batch for it would throw away the horizon
+    # answer the batch exists to buy.
+    # The scorer (analysis/c87_hz3_score.py) reads occupancy from
+    # n_at_lo / n_at_hi over n_beta -- NOT from the 62-entry per-tensor `beta`
+    # summary, which is blind to real clipping and inverts the arm ranking
+    # (CORRECTIONS 117.1) -- reports BOTH denominators per seed per arm over the
+    # SAME window as each accuracy reading, VOIDS any arm with more than half its
+    # seeds bound at either rail, VOIDS any contrast whose arms differ by more
+    # than 0.10 in coordinate occupancy, and computes NO field statistic.
+    # REGISTERED BEFORE ANY hz3 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "hz3":  (-30.0, 9.0, "bin/c87_horizon_300ep.sh:CLIP"),
+    # `rl3` (cycle 87) -- **THE RULE-11 META-STEPSIZE LADDER, AND THE FIRST BOX IN
+    # THIS CAMPAIGN THAT IS PROVED FREE ON BOTH RAILS AT EVERY RUNG IT EMITS.**
+    # cc1's four arms {nodewise, chunk777, nodewise1d, chunk2325} x ms
+    # {1e-4, 3e-4} x 3 seeds, ResNet18/CIFAR-10, 100 ep = 24 jobs.
+    # THE QUESTION.  RULE 11 says compare tuned arms at each arm's own optimum,
+    # and no arm PAIR in 1,935 rows ever has been: seven families carry a D pair
+    # and every one of them sits at a SINGLE meta-stepsize, so no in-batch ms
+    # profile of a D pair exists anywhere.
+    # **THE LADDER MOVED DOWN, NOT UP, AND THE UPPER BRACKET IS ARITHMETIC.**
+    # CORRECTIONS 117.3.  The build ran {3e-4, 1e-3, 3e-3} in box -30:2.0.  Two of
+    # those three rungs cannot be measured box-free at ANY ceiling at a 100-epoch
+    # budget.  |dbeta| = ms exactly per step (--weight-decay-meta 0), so travel is
+    # 50 nats at ms=1e-3 and 150 at 3e-3 against beta_0 = -6.907755; a provably
+    # free ceiling would have to sit at +43.1 and +143.1, i.e. step sizes of 5e18
+    # and 1e62.  runs/bo7 (nodewise, ms=1e-3, box -30:2.0) shows this is not
+    # hypothetical: max beta rises at the FULL Lion rate with no saturation --
+    # -6.909 -> -3.131 at ep10 -> +0.189 at ep16.6 -> +1.849 at ep19.9 -- reaching
+    # the +2.0 ceiling at epoch 20.2 and still climbing.
+    # THE FREE RANGE IS THEREFORE BOUNDED, AND THE BOUND IS ITSELF THE ANSWER TO
+    # THE UPPER HALF OF RULE 11:  ms_max_free = (hi - beta_0)/T = 3.1816e-4 in
+    # this box at this budget.  RULE 11 can be honoured over (0, 3.18e-4] and
+    # nowhere else; above it every arm's accuracy is a property of the clip.
+    #   ms=1e-4: travel  5.0 nats -> floor clears by 18.09, ceiling by 20.91.
+    #   ms=3e-4: travel 15.0 nats -> floor clears by  8.09, ceiling by  0.91.
+    # BOTH rungs are also rungs a PUBLISHED D was measured at (1e-4 = mm1/pp1/cc1,
+    # 3e-4 = ar1/fa1), so H3's dD compares like with like.  And 100 of the 100
+    # chunk*/nodewise1d rows in the corpus were run in a box that is NOT provably
+    # free at their own meta-travel, so rl3 would be the FIRST provably box-free
+    # measurement of D anywhere in this campaign.
+    # WHAT rl3 MAY NOT CLAIM: it does NOT resolve the gc-/flat split at ms=1e-3
+    # (CORRECTIONS 117.8) -- that rung is not in the ladder, both contested cells
+    # sit in the -15 box, and the split itself re-derives to +0.886, not the 1.19
+    # of the commissioning brief, once a run that stopped at 40 of 100 epochs is
+    # dropped.  An UNBRACKETED argmax makes the scorer print "RULE 11 STAYS OPEN".
+    # REGISTERED BEFORE ANY rl3 JOB WAS SUBMITTED, from the script's own CLIP= line.
+    "rl3":  (-30.0, 9.0, "bin/c87_rule11_ladder.sh:CLIP"),
 }
 
 

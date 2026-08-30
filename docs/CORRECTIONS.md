@@ -6956,3 +6956,368 @@ seen three times. `gn1` is now UNBLOCKED by guard 9 and is the next batch.
 **A PROCESS NOTE.** The first g3m scoring run printed MISSING on every arm. That was the
 `.out`-in-the-ROOT-of-runs/ trap (OPERATIONS gotcha; CORRECTIONS 110.1's "0 probe dirs is ALWAYS
 a sync fault, NEVER a finding"). Taken at face value it would have been reported as a VOID.
+
+---
+
+## 117. **CYCLE 87 — THE BOX INSTRUMENT WAS READING THE WRONG ARRAY. THREE BATCHES REGISTERED PRE-DATA, TWO CUT, ELEVEN REFEREE OBJECTIONS RANKED.** (2026-08-30, PRE-DATA)
+
+Nothing was submitted. Both accounts idle/draining; `squeue` on alice = 0 at write time.
+This entry records, **BEFORE ANY RUN**: a defect in the guard instrument that reaches every
+cycle-87 scorer and re-reads the published corpus; the re-examination of all seven recorded
+kills; the eleven objections a referee would raise, ranked; the practitioner's decomposition;
+and every batch registered, redesigned or deleted.
+
+### 117.1 **THE FATAL ONE: BOX OCCUPANCY WAS READ OFF A 62-ELEMENT PER-TENSOR SUMMARY**
+
+All three cycle-87 scorers (`c87_an0_score.py`, `c87_hz3_score.py`, `c87_rl3_score.py`) computed
+rail occupancy from `r["beta"]` in `probe.jsonl`. **`r["beta"]` is a PER-TENSOR summary — 62
+entries on ResNet18 — while `n_beta` is 14,420.** The per-coordinate rail counts live in
+`n_at_lo` / `n_at_hi`, which no scorer read. The declared fallback keys (`rec_lo`/`rec_hi`,
+`frac_lo`/`frac_hi`) **do not exist in these files at all**, so there was no path to the right
+number even in principle.
+
+Both failure modes are measured on data already on disk, in each run's plateau5 window:
+
+| | 62-list (what the scorers used) | `n_at_*`/`n_beta` (the truth) |
+|---|---|---|
+| `fa1` nodewise s1/s4/s5 | `0.000000` on **all 24 runs** | `rec_hi` = **1.0000** on s1/s4/s5 — a clipped coordinate in EVERY record; `coord_hi` up to 2.77e-4 |
+| `fa1` all 18 merged-tail runs | `0.000000` | `0.000000` — the ceiling binds on the nodewise arm ONLY |
+| `ar1` nodewise vs chunk777 | node 0.0325 vs chunk 0.2305 → **chunk 7× more bound** | node **0.1103** vs chunk **0.00145** → **nodewise 75× more bound** |
+
+The instrument was blind where clipping was total and **inverted the sign of the arm asymmetry**
+where it did fire. FIXED: a single shared `rail_fracs()` reader in all three scorers, gating on
+the coordinate fraction and printing the record fraction beside it, never instead of it; the
+62-list survives only as a labelled diagnostic column. `bin/c87_an0_analysis.sh` **GUARD 3c**
+enforces this mechanically across all three files, in both directions.
+
+**WHAT THE CORRECTED INSTRUMENT SAYS ABOUT THE PUBLISHED CORPUS — and the news is good.**
+Re-read over every D-carrying cell, in each run's own plateau5 window, at the true denominator:
+
+| cell | verdict |
+|---|---|
+| `mm1`, `pp1`, `cc1`, `bn1`, **`g3m`**, **`gc1`** | **0.000000 on BOTH rails, every arm, every seed.** Clean. |
+| `fa1` | every merged-tail arm 0.000000; **nodewise ceiling-bound on 5 of 6 seeds** (`rec_hi` 0.046–1.000, `coord_hi` 3e-6–2.8e-4). ARM-ASYMMETRIC — disclosed, and it survives the registered coordinate gate. |
+| `ar1` | floor-bound on **all** arms and **asymmetrically**: node 0.110 vs chunk 0.0014, a 75× gap. **VOID.** The floor holds the nodewise arm's step sizes UP, which INFLATES D — and ar1 is the joint-highest R18 cell. |
+
+So the headline D readings on mm1/pp1/cc1 (R18), g3m (R34) and gc1 (C100) are clean under the
+corrected instrument; ar1 leaves the primaries; fa1 travels with a ceiling disclosure.
+
+### 117.2 **`hz3`: THE CEILING WAS ARGUED FROM A MEASUREMENT TAKEN AT ONE THIRD THE META-TRAVEL**
+
+The build moved hz3's floor −15 → −30 (forced: at 300 ep, ms·T = 15.0 nats and −15 is reachable
+from epoch 161.8) and kept the ceiling at −2.3026 on RULE 10 grounds — "measured beta in this box
+class has never exceeded −3.499". **That measurement was taken at 5 nats of meta-travel** (cc1,
+ms=1e-4 × 100 ep) and does not transfer to 15. The corpus's only 15-nat cell is `fa1`, and there
+the −2.3026 ceiling **binds, on the nodewise arm only** (117.1). The ceiling sits 4.6052 nats
+above β₀ and is reachable from epoch 92.1 = **69% of a 300-epoch run** against 8% of a 100-epoch one.
+
+FIXED: **`BETA_CLIP = -30:9.0`**. With β₀ = −6.907755 and ms·T = 15.0, β is confined to
+[−21.9078, +8.0922], so the floor clears by 8.0922 nats and the ceiling by 0.9078.
+**Both rails are now PROVABLY unreachable — the first box in the corpus of which that is true at
+its own budget.** GUARD 8 refuses a reachable rail in either direction and, under RULE 13,
+re-runs the same arithmetic on −2.3026, 0.0, +2.0, +6.0 and +8.0 and condemns every one.
+RULE 10 is now broken on BOTH rails, deliberately and stated: this box is not the published
+cells' box, the LEVEL of D here is not poolable with theirs, and the PRIMARY is the within-run
+change, which is immune. hz3 also gains the `HF.py` md5 pin (`d3202635c3fc`) it lacked, so a
+tree mutated under a queued 10-hour job is refused rather than silently accepted.
+
+### 117.3 **`rl3`: TWO OF ITS THREE RUNGS CANNOT BE MEASURED BOX-FREE AT ANY CEILING — AND THAT IS THE ANSWER, NOT A PROBLEM**
+
+The build ran ms ∈ {3e-4, 1e-3, 3e-3} in box −30:+2.0. `--weight-decay-meta 0` makes |Δβ| = ms
+EXACTLY per step, so β is confined to [β₀ − ms·T, β₀ + ms·T]. At 100 epochs that is 50 nats at
+ms=1e-3 and 150 at 3e-3: **a provably free ceiling would have to sit at +43.1 and +143.1 — step
+sizes of 5e18 and 1e62.** `runs/bo7` (nodewise, ms=1e-3, box −30:2.0) shows this is not
+hypothetical: max β rises at the **full Lion rate with no saturation whatever** — −6.909 →
+−3.131 @ep10 → +0.189 @ep16.6 → +1.849 @ep19.9, reaching +2.0 at epoch 20.2 and still climbing.
+The build's own box also fails at ms=3e-4: +2.0 is 8.9078 nats above β₀ against 15.0 of travel.
+
+REDESIGNED: **4 arms × ms {1e-4, 3e-4} × 3 seeds = 24 jobs (unchanged), box −30:+9.0.**
+
+* **Both rungs are provably box-free on both rails** (5.0 and 15.0 nats against 23.09/15.91).
+* **Both rungs are stepsizes a published D was measured at** — 1e-4 = mm1/pp1/cc1, 3e-4 = ar1/fa1 —
+  where the build's ladder could say that of only one of its three.
+* The eight jobs freed buy a third seed: se(two-cell contrast) 0.1785 → **0.1458**, an 18.4%
+  reduction, and the separable rung gap 0.357 → 0.291 pp.
+* **THE UPPER BRACKET IS NOW ARITHMETIC, NOT PURCHASABLE.** In this box at this budget the
+  largest box-free meta-stepsize is `ms_max_free = (hi − β₀)/T = 3.1816e-4`. **RULE 11 can be
+  honoured over (0, 3.18e-4] and nowhere else**; above it every arm's accuracy is a property of
+  the clip, not of the arm, and no amount of compute changes that. That is a finding, and the
+  scorer states it rather than spending eight jobs discovering it.
+* GUARD 2a(ii), re-derived: **100 of the 100 chunk\*/nodewise1d rows in the corpus were run in a
+  box that is NOT provably free at their own meta-travel** — every one sits behind a −2.3026
+  ceiling only 4.6052 nats above β₀. rl3 would be the FIRST provably box-free measurement of D
+  anywhere in this campaign. (cc1/mm1/pp1/g3m were measured CLEAN, which is not the same thing.)
+* GUARD 8c, the empirical-saturation refusal, is **DEMOTED to supporting evidence** and says so
+  in its own output: an algebraic proof does not need an empirical crutch, and 8a refuses any
+  future rung that is not provably free before 8c is ever reached.
+
+### 117.4 **`hz3`: THE PLANNING sd WAS IMPORTED FROM A BUDGET THE BATCH DOES NOT RUN**
+
+`SD_PLAN = 0.1743` is the R18 four-arm pooled sd on 33 df **at 100 epochs**. Re-derived from the
+CSV over every complete 300-epoch cell with n ≥ 2 at SGDm / α₀=1e-3, the pooled within-cell sd is
+**0.2260 on 3 df** — 30% larger. At the build's n=4 that puts the |t| ≥ 2 bar at **0.3196, ABOVE
+the batch's own predicted lower edge of +0.30**: it could not have confirmed its own prediction.
+FIXED: the planning sd is the larger of the two, and **seeds 4 → 6 (16 → 24 jobs)**, giving
+se(D) = 0.1305 and a bar of 0.261. GUARD 2e re-derives both sds, prints the size of the import
+error (1.30×) and runs the failing direction explicitly. The 3 df is disclosed, not hidden.
+
+### 117.5 **`hz3`: THE INTERNAL CONTROL WAS GATING, AND IT FAILED IN THE EXPENSIVE DIRECTION**
+
+As built, a D(100) outside [+0.20, +1.00] returned before H1 and discarded the batch. But hz3
+sits in a DIFFERENT BOX from cc1, and `fa1` established that a box change moves the OPTIMISER,
+not merely the instrument — so a D(100) of, say, +0.15 here is a real **box finding**, while the
+PRIMARY quantity, the within-run change D(300) − D(100), stays perfectly valid because both
+readings share the box, the batch, the seed and the GPU class. The band was also self-defeating
+as a check: at se(D) = 0.1233 it was ±3.2 se wide, so it rarely catches a broken instrument and
+reliably catches a genuine box shift. **DEMOTED to REPORTING.** It now decides only whether the
+LEVEL of D may be set beside the published cells.
+
+### 117.6 **`hz3`: A SINGLE 5-EPOCH ENDPOINT WOULD HAVE FIRED A REFUTATION ON A WOBBLE**
+
+D(t), re-derived per seed from the `.out` series (`analysis/c87_an0_score.py` F3), oscillates by
+~1.0–1.2 pp peak-to-trough on every CIFAR-10 cell: cc1 reads +0.625 @ep25, +0.020 @ep40,
+−0.560 @ep55, +0.243 @ep70, +0.727 @ep100; mm1 +0.539 / +0.237 / −0.439 / −0.027 / +0.485.
+Against a refutation bar of +0.20 and se ≈ 0.13, one 5-epoch window landing in a trough would
+have printed "REFUTED — fixed-budget artefact" and rewritten the paper. **The PRIMARY reading is
+now the mean over the last 50 epochs** at each of ep100/200/300; the plateau5-comparable 5-epoch
+value is reported beside it, always.
+
+### 117.7 **`rl3`: AN UNBRACKETED ARGMAX PRINTED "THE OBJECTION CANNOT BE RAISED AGAIN"**
+
+`band_profile()` returned an argmax on every branch and nothing downstream gated on EDGE-LOW /
+EDGE-HIGH, so a profile whose optimum sat at the edge of the grid still triggered the sentence
+"RULE 11 is then closed on R18/CIFAR-10 ... the objection cannot be raised again on this cell."
+**An unbracketed argmax does not locate an optimum; it locates the edge of the grid.**
+FIXED: the bander returns `bracketed`, every RULE-11 sentence is gated on it, and an unbracketed
+common argmax now prints **"RULE 11 THEREFORE STAYS OPEN"**, plus — when the argmax is the top
+rung — the arithmetic bound of 117.3 in place of a claim.
+
+### 117.8 **`rl3` DOES NOT AND CANNOT RESOLVE THE gc-/FLAT SPLIT, AND THE SPLIT IS +0.886, NOT 1.19**
+
+The design register claimed rl3 would "resolve the 1.19 pp gc- anomaly". It cannot: the split
+lives at ms=1e-3, which the redesigned ladder does not run and which cannot be run box-free at
+all at this budget, and both contested cells sit in the −15 box while rl3 sits in −30:+9.0.
+The split itself re-derives to **+0.886 se 0.164 t 5.40** (gc-\* 93.140 n=5 sd 0.101; FLAT
+92.254 n=3 sd 0.273) — the brief's 1.19 averages in `rs-node-1e3-s1`, which **stopped at 40 of
+100 epochs**, and plateau5 is not comparable across budgets. GUARD 2f re-derives both forms,
+names the offending run, and **REFUSES ms=1e-3 in `MST_LIST` outright** so no future edit can
+re-invite the claim. **The design-register claim and its prediction (c) are DELETED.**
+
+### 117.9 **`hz3` HAD NO OPTIMISER PIN AND WOULD HAVE ACCEPTED A MUTATED TREE**
+
+`bin/c87_rule11_ladder.sh` pins `HF.py` md5 `d3202635c3fc` as a refusal; `hz3` pinned nothing, so
+a tree patched underneath a queued or running 10-hour job — by `cs1`'s `PATCH_CHUNKVEC`, say —
+would have been silently accepted. FIXED: the same pin, with a refusal message that names the
+remedy (apply patches in a **scratch tree** and point at it with `CIFAR10_DIR`; never mutate the
+shared tree while a long batch is queued). **STANDING CONSEQUENCE FOR `cs1`: it MUST be built in
+a scratch tree, and `PATCH_CHUNKVEC` must be applied to BOTH accounts in one operation with all
+three equivalence suites re-run and the pin updated in the same commit, or not at all.**
+
+### 117.10 **THE PRACTITIONER'S NUMBER HAS TWO EXACT DECOMPOSITIONS AND THEY DISAGREE BY G**
+
+T = nodewise1d − nodewise splits algebraically **two** ways, and both are identities:
+
+```
+    T = (D − G) + U        count charged AFTER the ND-partition term
+    T =  D      + C        count charged BEFORE it,   C = U − G
+```
+
+so "the count component" is a **definitional choice, not a measurement**. The build registered
+only the first and printed a single share. Re-derived in-batch, box-free seeds only:
+
+| cell | T | D | G | D−G (tail) | U (count) | **U/T** | **C/T** |
+|---|---|---|---|---|---|---|---|
+| `cc1` (n=3) | +0.816 | +0.727 | +0.011 | +0.715 | +0.101 | **12.3%** | **10.9%** |
+| `fa1` (n=6) | +0.649 | +0.629 | −0.001 | +0.630 | +0.019 | **2.9%** | **3.0%** |
+| `g3m` (n=9) | +0.758 | +0.666 | +0.171 | +0.495 | +0.263 | **34.7%** | **12.1%** |
+
+Both identities close to **0.0e+00** on every cell. They differ by exactly G, which is 22.6% of T
+on R34. **ACROSS BOTH DEFINITIONS AND ALL CELLS THE COUNT SHARE RUNS 2.9% TO 34.7%, AND THAT
+RANGE — NOT A SINGLE NUMBER — IS WHAT THE PAPER MAY QUOTE.** `ar1` contributes nothing: it is
+box-void under the corrected instrument (117.1).
+
+**THE IMPORTED SLOPE IS DELETED.** The record carries four values for one quantity — −0.4070
+(CORRECTIONS 114.1/114.5), −0.4906 (CORRECTIONS 116 / `c83_gen_score.py`), −0.5100 (FINDINGS
+14561/14975) and a cycle-87 OLS re-fit of ck1 at −0.5361 — a spread of 0.1291 pp/decade against a
+0.10 bar: **IRRECONCILABLE**. Re-derived here: ck1-only OLS over 5 rungs in ONE batch =
+**−0.5361 ± 0.0459 (R² 0.979)**; ck1+cx2 pooled over 7 rungs across TWO batches = −0.4363 ±
+0.0403 (cross-batch, so sd_batch ≈ 0.21 sits inside the fit); the local secant bracketing
+m=14,420 = −0.4073. **AND 4 OF THE 7 LADDER RUNGS USE K ≤ 512 = the largest 1-D tensor, so they
+SPLIT the very tensors whose merging is the prescription** — the ladder does not measure a pure
+count axis at all. U, measured in-batch at the right count range on the right architecture, is
+the estimate the slope was being imported for. Use it; delete the slope.
+
+### 117.11 **COMMENSURABILITY: CIFAR-100 IS THE SMALLEST EFFECT IN THE CORPUS, NOT THE LARGEST**
+
+CORRECTIONS 116 states "**C100 gives the LARGEST D in the corpus**, 2.5× the R18/C10 value".
+**THAT SENTENCE IS WITHDRAWN.** A percentage POINT is not commensurable across a 3.7× change in
+the error budget the effect lives on. Re-derived on both scales, box-free cells only:
+
+| cell | base error | D (pp) | **relative error reduction** |
+|---|---|---|---|
+| `mm1` R18/C10 | 7.956 | +0.485 | +6.10% |
+| `pp1` R18/C10 | 7.988 | +0.581 | +7.27% |
+| **`cc1` R18/C10** | 8.110 | +0.727 | **+8.96%** ← argmax on relative error |
+| `fa1` R18/C10 | 7.673 | +0.629 | +8.20% |
+| `g3m` R34/C10 | 8.664 | +0.666 | +7.69% |
+| **`gc1` R18/C100** | 29.688 | **+1.640** ← argmax on raw pp | **+5.52%** ← SMALLEST |
+
+The campaign registered exactly this gate for `gn1` (CORRECTIONS 114.2(e): the T0.6
+admissibility rule plus the D/(100−level) print) and then did not apply it to its own
+cross-dataset headline. Applied here: **5 of the 10 cell pairs are INADMISSIBLE on raw pp**
+(gc1's error budget is 3.43×–3.87× the CIFAR-10 cells'). VERDICT: **SCALE-DEPENDENT** — the
+argmax moves from gc1 to cc1 when the scale changes. Print D on both scales everywhere, or pick
+one and use it consistently, including in the abstract.
+
+### 117.12 **THE HORIZON TRAJECTORY, PUBLISHED WHATEVER `hz3` LATER SAYS**
+
+D(t) and (D−G)(t) on a fixed grid of budget fractions, per seed, from the `.out` series already
+on disk, behind the corrected box gate:
+
+| cell | verdict | crossing |
+|---|---|---|
+| **`cc1`** | **REVERSAL PRESENT** — D = −0.560, t −5.20 @ep55 | ~65% of budget |
+| **`g3m`** | **REVERSAL PRESENT** — D = −0.301 t −2.18 @ep40, −0.518 t −4.06 @ep55 | ~69% of budget |
+| `mm1`, `pp1`, `fa1` | **UNRESOLVED** — D dips below zero but never at \|t\| ≥ 2 at or below 0.60 of budget. Supports NEITHER a reversal claim NOR a no-reversal claim. |
+| **`gc1` (CIFAR-100)** | **NO REVERSAL** — +1.072 t 5.20 @ep40 rising monotonically to +1.640. Never significantly negative. |
+| `ar1` | **VOID** — the box gate removed it before F3 ran. No trajectory claim in either direction. |
+
+So **the mid-training reversal is a property of a CELL, not of the effect**, and the hardest
+dataset shows none of it. Two decisive points for how `hz3` must be argued: (i) there is **no
+schedule** (`SCHED=none` on every headline run) and `args.num_epochs` occurs in `train.py`
+exactly twice — the argparse declaration and `for epoch in range(args.num_epochs)` — and nowhere
+in `HF.py`, so the dynamics **cannot know T**: "D tracks the fraction of budget elapsed" is a
+description, not a mechanism, and epoch 100 of a 300-epoch run IS a 100-epoch run; (ii) the
+figure must be published regardless, because a referee holding the artefact computes it in an
+afternoon.
+
+### 117.13 **THE SEVEN RECORDED KILLS, RE-EXAMINED INDEPENDENTLY**
+
+| # | kill | verdict |
+|---|---|---|
+| 1 | `sl1`, the fixed-m singleton ladder (48 jobs) | **SOUND.** corr(S,G2) = −0.99999749 re-derived to 8 figures from a from-scratch shape list; m = G2 + S + (41−k) is an identity, not an artefact. Its CONFIRMED gate fires for a pure step (b −0.688, t −5.84) and FAILS a genuine saturating dose-response (b −0.379, t −3.2), so the primary could not discriminate. 30 of 48 jobs bought quantities already in the CSV. |
+| 1b | the 2×2 factorial escape (REGISTER-c82b §3.4) | **KILL AS REGISTERED.** It IS identified — corr(s,g) = 0.0 EXACTLY on the four cells, so the collinearity is genuinely broken — but the design is saturated: rank[1,s,g,s·g] = rank[1,s,g,log m] = 4 on 4 cells, so the interaction and the m covariate occupy the SAME single residual df. Decisive point is power, not identification: at n=8/cell (32 jobs) se(τ) = 0.180, **WORSE than g3m's D−G already in hand (+0.4947 se 0.1384 at n=9)**; matching it needs 56 jobs, a decisive se=0.10 needs 104, all necessarily in ONE batch against a ~20-job envelope. The one thing it uniquely promised — an in-batch count slope — **already exists**: g3m's chunk2500 − chunk835 gives −0.5549 ± 0.1743 within one batch at n=9. |
+| 2 | the cross-architecture singleton-FRACTION law | **SOUND.** f is pinned at 2/3 by the conv→BN idiom: 66.290–66.662% across all 7 nets, spread 1.00561×, so the fraction form predicts a total spread of 0.00389 pp against a per-run sd of 0.174 — ~16,000 seeds per arm at t=2. The predicted ordering is perfectly confounded with network size and dataset. |
+| 3 | **ResNet50 excluded structurally** | **PREMATURE.** The premise is right (largest 1-D tensor 2,048; count-matching K = 295 and 885 both below it; 44 of 107 one-D tensors split) and the inference is wrong. At K=295 the tail collapses 53,130 → 219 groups, a **242.6× merge against 234.4× on R18 and 233.3× on R34 — more aggressive than either published cell — and ZERO size-1 groups survive** (smallest tail group 10, exactly as on R18/R34). The prescription is "do not give every normalisation scalar its own step size", not "give every normalisation tensor exactly one". Count match 79,796 vs 79,700 = 5.2e-4 decades. **RE-OPENED as `r50`, registered below.** |
+| 4 | Direction C (N_eff/m as an accuracy predictor) | **SOUND, and the strongest kill in the corpus.** `analysis/c81_cc1_score.py` re-run UNEDITED reproduces everything: C0.4 12/12 BOX-FREE with rec_lo = rec_hi = 0.0000; ANTI-CONCORDANT t −11.14 and DISSOCIATION t −23.26 on a gate pre-registered at commit 697d378 **before any cc1 run existed**, with all four branches costed in advance. The anti-prediction is itself reportable. |
+| 5 | Idea 1 (cosine prior), Idea 2, all hierarchical pooling | **SOUND.** Idea 1 loses by 1.873 pp to a tuned 94.417 ± 0.113 baseline — 15× the cross-batch floor, and the kill survives its own evidence being demoted (CLOSEOUT 5.1 later ruled the I1 batch's schedule unidentified; CORRECTIONS 29 had already scoped the withdrawal to the mechanism claim, leaving "Idea 1 loses" standing and schedule-independent). Idea 2 killed at ZERO compute on existing probe data against a pre-registered 0.1 pp threshold. Pooling: M0's shrink has a half-life ≤ 693 steps at every λ ≥ 0.001 against ~50,000, so the six-decade sweep measured FULL pooling three times over. |
+| 6 | the Q4 rebound; the pooling scale law r\* ~ 1/N | **SOUND.** Q4: both candidate mechanisms killed BY DIRECT TEST (clip occupancy driven 100% → 0% moved the ratio by 0.4%), and the rebounded quantity IS the Direction-C instrument. r\*: every one of the three argmaxes is decided by a CROSS-FAMILY margin 2–5× below the 0.20–0.29 pp batch floor; the binding limit is grid spacing, not seeds. Disposition stays **OPEN-and-unfunded**, not closed. |
+| 7 | ImageNet | **SOUND, and the recorded reason UNDERSTATES it.** 489/1000 train classes is the lesser blocker; `val/` holds 50,000 FLAT files with no class subdirectories and a find for `*devkit*`, `*ground_truth*`, `*.mat`, `*solution*` over the whole tree returns nothing — **THE VALIDATION SET IS UNLABELLED, so plateau5 cannot be computed at any number of classes.** From our own measured timings (R50/CIFAR-10 = 136 min/100 ep on L4), one 90-epoch run ≈ 165 L4-h; the smallest useful design ≈ 989 L4-h, and `load_data.py` is a CIFAR loader with no ImageNet path and no DALI/FFCV. If ever revived it must be reported as "ImageNet-489", never as ImageNet. |
+
+### 117.14 **THE ELEVEN REFEREE OBJECTIONS, RANKED — WHAT IS CLOSEABLE AND WHAT IS STRUCTURAL**
+
+| # | objection | severity | status after this cycle |
+|---|---|---|---|
+| 1 | **The motivation is INVERTED, and I verified it in the source files rather than on trust.** `paper/refs/2406.16793.md`, **"Algorithm 3 Partition for non-Transformers"**, in full: `param_blocks = {}` / `for name, param in parameters do` / **`param_blocks[name] = param`** / `end for` / `return param_blocks` — **one block per TENSOR, for every parameter. On a ResNet, Adam-mini is LAYERWISE.** It cannot create a per-output-channel partition at all, let alone the degenerate size-1 tail this work is about. **"Algorithm 3 Partition for Transformers"** partitions embed/output by tokens, query/key by heads, value/attn.proj/mlp by output neurons, and then line 19 **`param_blocks[name] = param`** — so every LayerNorm gain and every bias gets ONE block, i.e. `nodewise1d` is already Adam-mini's default there too. `2407.07972.md` line 22 verbatim: "the last layer and LayerNorm parameters in particular are necessary for retaining performance and stability to learning rate" — the OPPOSITE of the prescription. `2506.01049.md`: SGG "groups gradient statistics in each layer into clusters ... while maintaining precise per-parameter adaptation" — not an output-channel partition at all. | **sinks-it** | **STRUCTURAL. NO EXPERIMENT IN THIS PROGRAMME FIXES IT.** Only reframing does, and the only reframing worth a conference slot — the Adalayer bridge — REQUIRES a LayerNorm architecture the corpus does not have (`vt1`). STANDING RULE 12 must be widened from "the premise Adam-mini argues from" to "**the partition Adam-mini uses**". Every mention of Adam-mini as a target must be deleted before submission. |
+| 2 | **The horizon.** D and D−G are significantly negative for much of training on cc1 and g3m and turn positive only near the end. | **sinks-it** | **PARTLY CLOSED FOR FREE, FULLY CLOSEABLE BY `hz3`.** 117.12: the reversal is cell-specific — gc1 shows none, mm1/pp1/fa1 are UNRESOLVED — and the trajectory is now published either way. `hz3` (24 jobs, 65 GPU-h) decides the rest. |
+| 3 | **RULE 11 open on every new cell.** No arm pair in 1,935 rows has ever been compared at both arms' own optima. | major | **CLOSEABLE ON R18 by `rl3`, over (0, 3.18e-4] and only there** (117.3). STAYS OPEN on R34 and CIFAR-100 by construction; `gm2` folds in the cheap 2-point form for C100. |
+| 4 | **The mechanism is measured on ONE dataset.** `gc1` was a screen: no nodewise1d, no chunk2293, so G and D−G exist on CIFAR-10 only. | major | **CLOSEABLE by `gm2`** (24 jobs, 21 GPU-h) — but see its power caveat below: at n=3 the G NULL is NOT establishable and the batch must not claim it. |
+| 5 | **The practitioner's number is count-confounded.** | major | **CLOSED, ANALYSIS-ONLY** (117.10). The answer is a RANGE, 2.9%–34.7%, across two equally valid identities. |
+| 6 | **CIFAR-100 reported on an incommensurable scale.** | major | **CLOSED, ANALYSIS-ONLY** (117.11). CORRECTIONS 116's "largest D in the corpus" is withdrawn. |
+| 7 | **The mechanism is under-identified: "size-1 groups" and "BatchNorm" are the same measurement seen five times.** | major | **OPEN.** `gn1` cannot settle it — its own registration concedes a null is observationally identical to "the carrier is BN-specific". `cs1` is the cheaper, cleaner test but is itself location- and depth-confounded (117.15). |
+| 8 | **External validity.** Re-enumerated from the CSV at write time: **100 chunk\*/nodewise1d rows, 100 of them SGDm** (`Counter({'SGDm': 100})`) — zero under any other base. Meanwhile **150 AdamW granularity rows DO exist**, every one at ms=1e-3, with no chunk counterpart, and MASTER-TABLE row 100 records that the granularity ORDERING inverts with the base optimiser. | major | **OPEN, AND THE PROGRAMME ALLOCATED IT ZERO JOBS.** Registered below as `aw1` (12 jobs, ~11 GPU-h, no new code). |
+| 9 | **The baseline.** Re-derived at write time over R18/CIFAR-10/100 ep, complete runs, n ≥ 3: the best MetaOptimize cell anywhere is **blk6 @ms=1e-3/α₀=3e-4 = 93.317**, then nodewise1d @3e-4 = 93.153 (n=3, `ar1` — **now box-VOID under 117.1**), against tuned SGDm+cosine at lr=0.1 = **95.124** (n=5, interior and bracketed: 94.172 / 94.844 / 95.124 / 94.181 at 0.01/0.03/0.1/0.3). **Deficit −1.81 pp** for the best arm, −1.97 for the best partition arm, against a headline effect of +0.67. | major | **OPEN, AND UNFIXABLE BY COMPUTE.** Answered by rewriting: state the deficit in the abstract, never claim MetaOptimize competitiveness. Note the two available defences currently cancel — "the baseline doesn't matter, this is about partitioning" requires the transfer that objection 1 denies. |
+| 10 | **Statistical weight:** four batches of three, not eighteen draws; BATCH F(62,85)=5.47 sd≈0.21, SEED null. | minor | **ANSWERED BY WRITING.** Report D as within-batch contrasts with the BATCH as the unit; quote the binomial sign test beside every k/k gate; disclose GPU-class composition per arm (`hz3` fixes this prospectively by making class a function of seed). |
+| 11 | **Record hygiene:** two `## 109.` headings; four circulating slope values; the CSV ships `plateau` and `plateau5` with no schema note; `.out` in the ROOT while probes live in `runs/<family>/`. | minor | **PARTLY CLOSED.** The slope is deleted (117.10); the `.out`/probe layout is now a GUARD (an0 guard 1). The duplicate heading and the CSV schema note remain. |
+
+### 117.15 **THE BATCHES. REGISTERED, REDESIGNED, OR DELETED — ALL BEFORE ANY RUN.**
+
+**BUILT AND VALIDATED (nothing submitted):**
+
+| tag | script | jobs | GPU-h | account | decides | REFUTES the paper if |
+|---|---|---|---|---|---|---|
+| `an0` | `bin/c87_an0_analysis.sh` | **0** | **0** | laptop | the three analysis-only corrections (117.10–117.12) | n/a — corrections, not tests |
+| `hz3` | `bin/c87_horizon_300ep.sh` | 24 | ~65 | alice | does the gap survive past a 100-epoch budget | **D(300) ≤ +0.20**, or D(300) < 0.5·D(100) with a monotone decline across ep100/200/300 → the effect is a fixed-budget artefact, the headline becomes "at a 100-epoch budget", the mechanism claim goes with it, and the parent paper's own ImageNet null becomes the correct long-budget reading |
+| `rl3` | `bin/c87_rule11_ladder.sh` | 24 | ~22 | alice2 | RULE 11 on R18 over the box-free range | **D at matched optima ≤ +0.15**, or nodewise at its own argmax ≥ chunk777 at its own argmax → the headline is only "at a fixed shared meta-stepsize", which is a much weaker and largely uninteresting claim |
+
+**REGISTERED, NOT YET BUILT** (in priority order; each needs its own build + guard ladder):
+
+* **`aw1` — the AdamW base-optimiser cell. 12 jobs, ~11 GPU-h, no new code.** The four cc1 arms
+  under AdamW base on R18/CIFAR-10, 3 seeds, with an ms bracket. Closes objection 8, the one
+  external-validity axis the corpus itself predicts will bite. **REFUTES:** D ≤ +0.15 under AdamW
+  → the result is an SGDm phenomenon and the generality claim dies.
+* **`gm2` — the mechanism on CIFAR-100. 24 jobs, ~21 GPU-h, alice2.** 4 arms × 3 seeds at
+  ms=1e-4 **only** (NOT the two-stepsize design as sketched), box **−25:0.0 or wider** — the
+  sketch's "provably free at both stepsizes" was a FLOOR argument only, and at ms=3e-4 the
+  −2.3026 ceiling is reachable from epoch 30.7 and binds ARM-ASYMMETRICALLY on fa1 (117.1).
+  **REGISTERED POWER CAVEAT:** R18_c100's within-cell sd at ms=1e-4 is 0.3459 on 6 df, so at n=3
+  se(contrast) = 0.283 and the sketch's "G = 0.00 ± 0.25" band is narrower than one standard
+  error; TOST-ing G inside ±0.30 needs n ≈ 10. **gm2 may report D−G > 0; it may NOT claim the G
+  null replicates.** Correction to the sketch: the smallest group on the 100-class net is 64
+  (the first BatchNorm), not 100. **REFUTES:** G ≥ 0.5·D at t ≥ 2 → the ND partition, not the
+  tail, carries the CIFAR-100 gap and the mechanism does not generalise across datasets.
+* **`cs1` — the conv-singleton carrier test. 16 jobs (not 12), scratch tree.** convsing places
+  9,920 size-1 groups on conv1 (1,728) + the layer2 shortcut (8,192) — count-matched to
+  chunk777 EXACTLY (1,728 + 8,192 + 41 + 4,460 = 14,421, verified from a from-scratch shape
+  list). **REGISTERED CONFOUND:** those are the ONLY two ndim≥2 tensors small enough to carry
+  K=1, both structurally atypical and at two specific depths, against nodewise's 9,610
+  singletons spread over 41 BN layers at every depth; and convsing's ND side is a uniform chunk
+  while nodewise's is node-aligned. A 4th arm (singletons on the BN tail with the ND side
+  uniformly chunked at the same K2) makes the location contrast exact — hence 16 jobs, not 12.
+  **A null narrows the claim to "normalisation scalars OR early/shortcut convolutions", not to
+  BatchNorm.** MUST be built in a scratch tree (117.9).
+* **`vt1` — the LayerNorm/Transformer cell.** The ONLY item that touches objection 1.
+  **Its cost is a day of implementation and an equivalence suite, not 33 GPU-h**: `build_network.py`
+  has no Transformer path (verified live: M1, M2, ResNet10/18/34/50/101/152, ResNet18_soft,
+  ResNet18_c100, ResNet34_c100, then `0/0`), and PATCH_GRANULARITY has never seen a 3-D parameter
+  or a leading dimension of 1 (cls token (1,1,192), pos_embed (1,65,192)). Start the code NOW in
+  parallel with `hz3`'s runs; it costs laptop time, not queue slots. Pre-register the fallback
+  framing (the implementation-hazard note) so an abort is a scoped result.
+* **`r50` — ResNet50/CIFAR-10, the second block family. 6-job probe (n=2/cell, not n=1) + 24, ~68 GPU-h.**
+  Re-opened per 117.13 kill 3. Buys the first Bottleneck architecture and the only
+  cross-architecture axis that is not pinned by f = 2/3 (singleton weight coverage 0.2259% vs
+  R34's 0.0800%, a 2.82× move). Disclose the 219-vs-107 tail over-resolution beside the number.
+
+**CUT — DO NOT RUN:**
+
+* **`ln1` (12 jobs). CUT.** `nn.GroupNorm(1,C)` and `gn1`'s `nn.GroupNorm(32,C)` present the
+  **identical** partition, m and singleton census by construction, so ln1 is a third point on an
+  axis whose first two points will already have agreed or already failed for the same registered
+  reason. It is also **not Transformer LayerNorm** (GN normalises over (C,H,W) per sample; a
+  Transformer's LN is over channels per token), so it cannot carry the Adalayer bridge it was
+  sold on. And at gn1's measured GN sd of 0.244, n=3 gives se(D) = 0.199 — its own registered
+  band (±0.30) cannot be tested and its refutation bar needs n ≈ 12. Reallocate to `aw1`.
+* **`rl34` (16 jobs). DO NOT BUILD.** Self-declared contingency on the most expensive cell in the
+  corpus (R34 median 72 min/100 ep, up to 94), re-asking a question `rl3` and `gm2` answer on two
+  other cells. Build only if a referee explicitly demands it.
+* **the 2×2 factorial. KILL** (117.13, row 1b). If the dose-response question is ever funded, the
+  only defensible build is the 2×3 with G2 ∈ {14380, 4810, 220} (36 jobs, se(τ) 0.0945, se(γ)
+  0.0986, 1 residual df), and it queues behind everything above.
+
+### 117.16 **VALIDATION OF THE THREE BUILT SCRIPTS. NOTHING WAS SUBMITTED.**
+
+`squeue -u salehkaleybars` = 0 at write time; `runs/hz3` and `runs/rl3` do not exist; neither
+script was run with `--submit`; `an0` emits 0 Slurm jobs by registration and refuses `--submit`
+with exit 3.
+
+* `bash -n` OK on all three; every scorer compiles.
+* **Selftests, on the laptop AND on ALICE inside the project venv, identical:**
+  `c87_hz3_score.py` **144/144**, `c87_rl3_score.py` **122/122**, `c87_an0_score.py` **129/129**.
+  Each cross-checks its own frozen constants against the batch script character-for-character, so
+  the two cannot drift; each caught real errors during this cycle (the hz3 seed count, the rl3
+  power constants, the rl3 batch-script ms tags).
+* **RULE 13 harness `tests/test_rl3_guards_rule13.py`, run ON ALICE: 34 PASS, 0 FAIL, 0 SKIP** —
+  including **GUARD 4 measured off the LIVE allocated β** at every rung, refusing in four
+  independent directions (m off by one; the G leg's exact match broken; a chunk K of 256 below
+  the largest 1-D tensor of 512, which would SPLIT the tensors whose merging is the prescription;
+  the tail mis-registered), and the six new box directions of 117.2/117.3.
+* `an0` ran END TO END on the laptop against the raw corpus (~150 s) and produced F1, F2 and F3
+  in full; its H0 gate independently reproduces the 117.1 census and VOIDs `ar1` for the right
+  reason and with the right number.
+* **GUARD 3c** (new) asserts all three scorers read `n_at_lo`/`n_at_hi` over `n_beta` and that the
+  per-tensor list appears only inside the shared reader — the 117.1 fix made mechanical.
+
+### 117.17 **STANDING RULES ADDED THIS CYCLE**
+
+* **RULE 20.** Box occupancy is read from `n_at_lo` / `n_at_hi` over `n_beta`. The per-tensor
+  `beta` summary is a diagnostic column and may never gate anything. Both denominators are
+  printed; the coordinate fraction gates, the record fraction is disclosed. (117.1)
+* **RULE 21.** A batch's planning sd must be derived at the batch's OWN budget. A sd imported
+  across a budget change is a guard defect. (117.4)
+* **RULE 22.** An unbracketed argmax closes nothing. No scorer may write "RULE 11 is closed"
+  from an EDGE-LOW or EDGE-HIGH profile. (117.7)
+* **RULE 23.** Where a quantity admits two exact decompositions, the paper quotes the RANGE over
+  both, never one of them. (117.10)
+* **RULE 12 (WIDENED).** No document may write "we refuted Adam-mini" **or imply that Adam-mini
+  creates the degenerate tail this work is about.** Algorithm 3 assigns one block per 1-D tensor.
+  (117.14, objection 1)
