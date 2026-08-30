@@ -7344,3 +7344,42 @@ with exit 3.
 * **RULE 12 (WIDENED).** No document may write "we refuted Adam-mini" **or imply that Adam-mini
   creates the degenerate tail this work is about.** Algorithm 3 assigns one block per 1-D tensor.
   (117.14, objection 1)
+
+## 118. **`gn1` ISSUES NO TRANSFER VERDICT. THE COMMENSURABILITY GATE FIRED.** (cycle 88)
+
+24/24 complete, all four arms box-free on BOTH rails under the corrected instrument
+(rec_lo = rec_hi = 0.0000 everywhere), 0 of 4 arms void, every seed passing T0.1–T0.4.
+Scored with `analysis/c84_gn1_score.py` (112/112) **UNEDITED**. CSV 1,935 → 1,960 additively.
+
+| arm | network | granularity | m | plateau5 | sd | n |
+|---|---|---|---|---|---|---|
+| bn-node | ResNet18 | nodewise | 14,420 | 92.000 | 0.277 | 4 |
+| bn-ch | ResNet18 | chunk777 | 14,421 | 92.587 | 0.131 | 4 |
+| gn-node | ResNet18_gn | nodewise | 14,420 | 89.330 | 0.239 | 8 |
+| gn-ch | ResNet18_gn | chunk777 | 14,421 | 89.532 | 0.304 | 8 |
+
+**T0.6 FAILED, AND IT WAS REGISTERED AT CYCLE-84 REVIEW BEFORE THE DATA EXISTED.**
+BN level 92.293 (error budget 7.707 pp) vs GN level 89.431 (budget **10.569 pp**): difference
+−2.862 pp, **budget ratio 1.37× against a registered bar of |diff| ≤ 2.0.**
+
+> **NO TRANSFER VERDICT IS ISSUED.** D_GN and D_BN are not commensurable in percentage points at
+> a 1.37× difference in error budget: if the gap is even partly MULTIPLICATIVE in the budget,
+> D_GN is distorted by several times its own se and straddles BOTH the +0.30 line AND the
+> [−0.15, +0.15] null band. **THIS IS NOT A NULL AND MAY NOT BE WRITTEN AS ONE.**
+
+The face-value numbers are D_BN = +0.587 and D_GN = +0.202. **Neither may be quoted as a
+transfer result.** Writing "the gap collapses under GroupNorm" from these would be exactly the
+scale error CORRECTIONS 117.11 withdrew for CIFAR-100 — a raw-pp comparison across two different
+error budgets — committed a second time in the same cycle.
+
+**CONSEQUENCE.** The under-identification stands: **"the carrier is the degenerate size-1 tail"
+and "the carrier is BatchNorm" remain the same measurement seen five times.** `gn1` was the
+designated instrument and it could not separate them at this cell, for a reason its own
+registration anticipated. Any successor must either (a) match the error budgets — a GroupNorm
+configuration reaching ~92, i.e. a group count other than 32 or a tuned cell — or (b) abandon the
+pp scale for a budget-relative statistic AND pre-register that choice, since switching scales
+after seeing the data is the failure 117.11 is about.
+
+**THE BATCH IS NOT WASTED.** It is the corpus's only GroupNorm cell, all 24 runs are box-free and
+valid, and it establishes the GN accuracy regime (89.4 ±0.3 at this configuration) that any
+successor must budget-match against.
