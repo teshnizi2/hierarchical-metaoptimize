@@ -7313,6 +7313,14 @@ with exit 3.
   torch-free census independently; guard 8 reports BOTH RAILS PROVABLY UNREACHABLE (floor slack
   8.0922 nats, ceiling 0.9078) and, under RULE 13, condemns −15, −2.3026, 0.0, +2.0, +6.0 and
   +8.0 with the same arithmetic.  **24 jobs emitted in dry run, 0 rejected, nothing submitted.**
+* **`rl3`'s FULL GUARD LADDER ALSO RAN GREEN ON ALICE — no guard failure of any kind.**  Guard 4
+  measured m off the LIVE allocated β **at BOTH stepsizes**: 14420 / 14421 / 4851 / 4851 at
+  ms=1e-4 AND at ms=3e-4, 8 of 8 exact — "**m IS INVARIANT ACROSS THE STEPSIZES FOR ALL FOUR ARMS,
+  so RULE 10 holds by MEASUREMENT, not by assumption**", which matters more here than in any
+  previous batch because rl3 IS a series in ms.  Guard 8a: both rails provably free at both rungs,
+  binding slack 0.9078 nats; guard 8a2 reports ms_max_free = 3.181551e-04 and, under RULE 13,
+  refuses ms=1e-3 (a free ceiling would need +43.1 = a step size of 5.2e+18) and ms=3e-3
+  (+143.1 = 1.4e+62).  **24 jobs emitted in dry run, 0 rejected, nothing submitted.**
 * `rl3`'s scorer additionally reports a **POST-SELECTION se** for `D_own` — a 20,000-draw
   parametric bootstrap over the argmax choice at the MEASURED pooled sd — beside the fixed-cell
   se, which stays PRIMARY.  The fixed-cell figure treats the selected cells as fixed and a reader
