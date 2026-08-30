@@ -726,9 +726,21 @@ def score(runs_dir, probes_dir, out=sys.stdout):
             P("    **ALL FOUR PROFILES ARE FLAT WITHIN RESOLUTION.**  The argmaxes above")
             P("    scatter because they are noise-selected, and that scatter is the")
             P("    RESULT, not a failure to find an argmax: if no arm's accuracy varies")
-            P("    by more than the resolution across a full decade of meta-stepsize,")
-            P("    then the stepsize the published comparison ran at cannot have decided")
-            P("    that comparison.  RULE 11 is closed on R18/CIFAR-10 by flatness.")
+            P("    by more than the resolution across the measured range, then the")
+            P("    stepsize the published comparison ran at cannot have decided that")
+            P("    comparison AT THIS RESOLUTION.  **AND THAT QUALIFIER IS LOAD-BEARING:**")
+            P("    the resolution here is %.3f pp, which is %.0f%% of the effect D itself"
+              % (gap_bar, 100 * gap_bar / 0.65))
+            P("    (~0.65 pp).  A TRUE gradient of up to %.3f pp would still band FLAT."
+              % gap_bar)
+            P("    So the honest sentence is 'no arm's optimum moves the comparison by")
+            P("    more than %.3f pp over %s' -- NOT 'RULE 11 is closed'.  Resolving"
+              % (gap_bar, MS_LIST))
+            P("    +-0.15 would need n = %.1f per cell = %d jobs, which this design"
+              % (2.0 * (SD_PLAN / (NULL_HALF / ANTI_OVERCLAIM_T)) ** 2,
+                 int(round(len(ARMS) * len(MS_LIST) * 2.0
+                           * (SD_PLAN / (NULL_HALF / ANTI_OVERCLAIM_T)) ** 2))))
+            P("    deliberately does not buy.")
         elif len(set(argmax.values())) == 1 and all(bracketed[k] for k in ARMS):
             P("    ALL FOUR ARMS PEAK AT THE SAME STEPSIZE, AND EVERY ARGMAX IS")
             P("    BRACKETED.  RULE 11 is then closed on R18/CIFAR-10 over the")
@@ -789,6 +801,45 @@ def score(runs_dir, probes_dir, out=sys.stdout):
         P("    D_own = %+0.3f  se %.3f  t %.2f  (pooled sd, %d df)"
           % (d, se, d / se if se else float("nan"), df))
         P("    bias-corrected envelope: [%+0.3f, %+0.3f]" % (d - SELECT_BIAS, d + SELECT_BIAS))
+        # POST-SELECTION se.  CORRECTIONS 117.7 note: the se above is the
+        # UNCONDITIONAL two-cell se and treats the selected cells as fixed.  When
+        # two arms each independently select a rung from a profile whose true gaps
+        # are below resolution, D_own's sampling distribution is a MIXTURE over
+        # which pair of rungs got selected, and its spread exceeds that se.  A
+        # small parametric bootstrap over the selection is reported beside it;
+        # the fixed-cell figure remains PRIMARY (it is what the published D
+        # readings are), and a reader who recomputes gets both.
+        try:
+            import random as _rnd
+            _rnd.seed(20260830)
+            mu = {k: pool.mean((k, m)) for k in (D_PAIR[0], D_PAIR[1])
+                  for m in MS_LIST if (k, m) in cells}
+            have = all((k, m) in cells for k in D_PAIR for m in MS_LIST)
+            if have:
+                sdc = pool.sd if pool.sd == pool.sd else SD_PLAN
+                sec = sdc / math.sqrt(N_PER_CELL)
+                draws = []
+                for _ in range(20000):
+                    pick = {}
+                    for k in D_PAIR:
+                        vals = [(pool.mean((k, m)) + _rnd.gauss(0.0, sec), m)
+                                for m in MS_LIST]
+                        pick[k] = max(vals)[0]
+                    draws.append(pick[D_PAIR[0]] - pick[D_PAIR[1]])
+                mb = sum(draws) / len(draws)
+                sb = math.sqrt(sum((x - mb) ** 2 for x in draws) / (len(draws) - 1))
+                P("    POST-SELECTION se (parametric bootstrap over the argmax, 20,000")
+                P("    draws at the MEASURED pooled sd): %.3f against the fixed-cell"
+                  % sb)
+                P("    %.3f -- inflation %.2fx.  The fixed-cell figure stays PRIMARY;"
+                  % (se, sb / se if se else float("nan")))
+                P("    this one is what a reader recomputing the selection would get.")
+            else:
+                P("    POST-SELECTION se: NOT COMPUTED -- a cell is void, so the")
+                P("    selection distribution is not defined.  Disclosed, not skipped.")
+        except Exception as _e:
+            P("    POST-SELECTION se: NOT COMPUTED (%s).  Disclosed, not skipped."
+              % type(_e).__name__)
         b = band_down(d)
         # ANTI-OVERCLAIM: a refutation-shaped band may be DECLARED only if D_own is
         # separated from the WITHIN-BATCH shared-ms D at |t| >= 2.

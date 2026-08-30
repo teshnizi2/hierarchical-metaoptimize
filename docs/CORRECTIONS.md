@@ -7306,6 +7306,21 @@ with exit 3.
   reason and with the right number.
 * **GUARD 3c** (new) asserts all three scorers read `n_at_lo`/`n_at_hi` over `n_beta` and that the
   per-tensor list appears only inside the shared reader — the 117.1 fix made mechanical.
+* **`hz3`'s FULL GUARD LADDER RAN GREEN ON ALICE, EXIT 0, ZERO GUARD FAILURES.**  Guard 4 measured
+  m off the LIVE allocated β: nodewise **14420**, chunk777 **14421**, nodewise1d **4851**,
+  chunk2325 **4851** — all equal to the registered values, the G leg an EXACT match and the D leg
+  +1 group; guard 4e refuses all four one-group perturbations; guard 4f reproduces every m from a
+  torch-free census independently; guard 8 reports BOTH RAILS PROVABLY UNREACHABLE (floor slack
+  8.0922 nats, ceiling 0.9078) and, under RULE 13, condemns −15, −2.3026, 0.0, +2.0, +6.0 and
+  +8.0 with the same arithmetic.  **24 jobs emitted in dry run, 0 rejected, nothing submitted.**
+* `rl3`'s scorer additionally reports a **POST-SELECTION se** for `D_own` — a 20,000-draw
+  parametric bootstrap over the argmax choice at the MEASURED pooled sd — beside the fixed-cell
+  se, which stays PRIMARY.  The fixed-cell figure treats the selected cells as fixed and a reader
+  recomputing the selection gets the larger number; both are printed.  `score()` was also
+  exercised END TO END on three synthetic 24-run trees (flat profiles → FLAT-PROFILE + SURVIVES
+  TUNING + VACUOUS; a rising profile → EDGE-HIGH, `bracketed=False`, "RULE 11 STAYS OPEN" and the
+  arithmetic bound; a floor-bound tree → every cell UNRESOLVED and H2/H3 VOID) — coverage the
+  selftest structurally cannot reach.
 
 ### 117.17 **STANDING RULES ADDED THIS CYCLE**
 
