@@ -7704,3 +7704,47 @@ prescription **+0.427/+0.649/+0.758/+0.816**; and the refusal at **+0.115 (t 0.8
 Scope in the **abstract**, not the limitations: one base, one meta, η ≤ 3e-4, 100 epochs, and a
 **−1.807 pp** deficit against tuned SGD+cosine (best MetaOptimize cell 93.317 n=3 vs
 `bl-sgd-01` 95.124 n=5 sem 0.047).
+
+## 120. **RULE 11 IS CLOSED ON R18/CIFAR-10, AND THE IMPORTED COUNT SLOPE IS SUPERSEDED** (cycle 89)
+
+`rl3` 24/24 complete, scored with `analysis/c87_rl3_score.py` (122/122) **UNEDITED**.
+CSV 1,960 → 1,984 additively. Four arms × ms {1e-4, 3e-4} × 3 seeds, ONE batch, box −30:9.0.
+
+**THE PRIMARY — RULE 11 CLOSED.**
+
+    dD = -0.090  se 0.178  t -0.51 (16 df)
+    -> Tuning each arm to its OWN argmax does not resolvably move D.
+    Reportable: **"D is unchanged at matched optima to within 0.356 pp."**
+
+This answers the referee objection ranked most likely to sink the paper. The campaign had already
+watched one headline INVERT at matched optima (the horizon reversal, +3.444 → −0.361), so the
+question was live and the answer was not assumed.
+
+**D SURVIVES AT BOTH RUNGS, G IS NULL AT THE ANCHOR RUNG** (all within-batch, count-matched):
+
+| | D = chunk777 − nodewise | G = chunk2325 − nodewise1d |
+|---|---|---|
+| ms=1e-4 | **+0.681** se 0.126, t 5.42 | **−0.011** se 0.126, t −0.08 |
+| ms=3e-4 | **+0.591** se 0.126, t 4.70 | +0.217 se 0.126, t 1.72 |
+
+**THE COUNT SLOPE IS SUPERSEDED, AND IT WAS 4–7× TOO LARGE.** U = chunk2325 − chunk777 is the
+PURE count axis, 0.4732 decades, measured IN BATCH at every rung:
+
+    U @ ms=1e-4 = +0.064 se 0.126  ->  **+0.135 pp/decade**
+    U @ ms=3e-4 = +0.017 se 0.126  ->  **+0.035 pp/decade**
+
+The record carried **FOUR conflicting imported values** (−0.407, −0.4906, ~0.51, −0.5361), all
+cross-batch and cross-box. **Prefer the in-batch value.** Consequence, and it matters for the
+paper's practitioner claim: T = nodewise1d − nodewise = **+0.756** at ms=1e-4 decomposes as
+T = (D − G) + U = 0.692 + **0.064** — so the count component is **8% of the effect, not the ~30%
+the imported −0.49 slope implied.** The tail component dominates by an order of magnitude.
+
+**ms-SENSITIVITY OF D, MEASURED WITHIN ONE BATCH:** +0.681 → +0.591 across 0.477 decades =
+**−0.189 pp per decade of ms**. The corpus value (+0.14) is cross-batch AND cross-box and is
+superseded wherever the two disagree.
+
+**WHAT THIS DOES NOT CLOSE, and the scorer says so itself:** RULE 11 stays OPEN on ResNet34 and
+CIFAR-100, where no ladder exists. No pooling with mm1/pp1/cc1/ar1/fa1 (different box). The
+gc-/flat ms=1e-3 split stays unadjudicated — rl3's own ms=1e-3 nodewise cell is VOID and rl3 can
+only add a third reading. **Sign tests are omitted deliberately:** at n=3 a 2-of-2 agreement has
+exact p=0.25 and carries no evidence, and seed is statistically null on this cluster anyway.
