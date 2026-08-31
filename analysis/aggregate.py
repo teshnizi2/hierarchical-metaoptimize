@@ -27,7 +27,34 @@ FIELDS = ["run", "job_id", "account", "network", "dataset", "batch_size",
           #   window_ok -- 1 iff epochs_done > 20, i.e. iff `plateau` is a genuine tail
           #                rather than the whole run.  STANDING RULE (14) as a column:
           #                any cross-budget table must filter on it or report both windows.
-          "plateau5", "auc", "window_ok"]
+          #   complete  -- 1 iff epochs_done >= 0.95 * epochs_requested, i.e. iff the run
+          #                actually FINISHED its budget.  ADDED cycle 88 (CORRECTIONS 119.3).
+          #                window_ok does NOT imply this: 16 runs of 1,960 are window_ok=1
+          #                with epochs_done < 0.9 * requested, and one of them
+          #                (rs-blk6-1e4-s2, 29/100 epochs, plateau5 85.228) sits in the
+          #                PRIMARY cell's blk6 arm, where including it moves the arm mean
+          #                by 1.217 pp (92.530 -> 91.313) and its sem by 19x
+          #                (0.064 -> 1.218).  A plateau5 from a truncated run is the tail of
+          #                a DIFFERENT budget, so it is not commensurable with its arm.
+          #                STANDING RULE (21): every accuracy table filters on
+          #                window_ok==1 AND complete==1, or states in-line why not.
+          "plateau5", "auc", "window_ok", "complete"]
+
+
+def complete_of(epochs_done, epochs_requested):
+    """1 iff the run reached >=95% of its requested budget.
+
+    Returns "" when the budget is unknown, so an unparseable header is never
+    silently scored as complete.  RULE 13: tested in BOTH directions by
+    analysis/c88_complete_selftest.py.
+    """
+    try:
+        req = float(epochs_requested)
+    except (TypeError, ValueError):
+        return ""
+    if req <= 0:
+        return ""
+    return int(float(epochs_done) >= 0.95 * req)
 
 
 def parse_args_line(line):
@@ -164,42 +191,50 @@ def parse_out(path):
         "plateau5": round(sum(tests[-5:]) / len(tests[-5:]), 3) if len(tests) >= 5 else "",
         "auc": round(sum(tests) / len(tests), 3),
         "window_ok": int(len(tests) > 20),
+        # See the FIELDS comment / CORRECTIONS 119.3.  Added, never substituted:
+        # window_ok keeps its documented meaning (is `plateau` a tail?), and this
+        # column carries the separate question (did the run finish?).
+        "complete": complete_of(len(tests), a.get("num-epochs", "")),
     }
 
 
-rows = []
-for d in sys.argv[1:]:
-    for f in glob.glob(os.path.join(d, "**", "*.out"), recursive=True):
-        r = parse_out(f)
-        if r:
-            rows.append(r)
-# A resubmission reuses --run-name, so `run` is NOT a unique key: the same name
-# can carry a finished run and an in-flight one. Any analysis that keys a dict on
-# `run` then silently keeps whichever came last -- which is how three completed
-# 100-epoch alpha0 controls were shadowed by partial reruns. Flag them here so a
-# collision is visible in the CSV instead of being discovered downstream.
-by_name = {}
-for r in rows:
-    by_name.setdefault(r["run"], []).append(r)
-dups = {k: v for k, v in by_name.items() if len(v) > 1}
-for name, group in dups.items():
-    best = max(group, key=lambda r: int(r["epochs_done"] or 0))
-    for r in group:
-        r["dup_group"] = name
-        r["superseded"] = 0 if r is best else 1
+# Guarded cycle 88 (CORRECTIONS 119.3) so the module can be IMPORTED by a scorer
+# without aggregating anything.  Invocation is unchanged:
+#     python3 analysis/aggregate.py <dir> [<dir> ...] > results/all_runs.csv
+if __name__ == "__main__":
+    rows = []
+    for d in sys.argv[1:]:
+        for f in glob.glob(os.path.join(d, "**", "*.out"), recursive=True):
+            r = parse_out(f)
+            if r:
+                rows.append(r)
+    # A resubmission reuses --run-name, so `run` is NOT a unique key: the same name
+    # can carry a finished run and an in-flight one. Any analysis that keys a dict on
+    # `run` then silently keeps whichever came last -- which is how three completed
+    # 100-epoch alpha0 controls were shadowed by partial reruns. Flag them here so a
+    # collision is visible in the CSV instead of being discovered downstream.
+    by_name = {}
+    for r in rows:
+        by_name.setdefault(r["run"], []).append(r)
+    dups = {k: v for k, v in by_name.items() if len(v) > 1}
+    for name, group in dups.items():
+        best = max(group, key=lambda r: int(r["epochs_done"] or 0))
+        for r in group:
+            r["dup_group"] = name
+            r["superseded"] = 0 if r is best else 1
 
-rows.sort(key=lambda r: (r["network"], r["dataset"], r["base"], r["granularity"], r["seed"]))
-w = csv.DictWriter(sys.stdout, fieldnames=FIELDS, extrasaction="ignore")
-w.writeheader()
-for r in rows:
-    r.setdefault("dup_group", "")
-    r.setdefault("superseded", 0)
-    w.writerow(r)
-print(f"# {len(rows)} runs aggregated", file=sys.stderr)
-if dups:
-    print(f"# WARNING: {len(dups)} duplicated run-name(s); "
-          f"filter superseded==0 before any per-run analysis:", file=sys.stderr)
-    for name, group in sorted(dups.items()):
-        detail = ", ".join(f"{r['job_id']}({r['epochs_done']}ep"
-                           f"{'' if not r['superseded'] else ', superseded'})" for r in group)
-        print(f"#   {name}: {detail}", file=sys.stderr)
+    rows.sort(key=lambda r: (r["network"], r["dataset"], r["base"], r["granularity"], r["seed"]))
+    w = csv.DictWriter(sys.stdout, fieldnames=FIELDS, extrasaction="ignore")
+    w.writeheader()
+    for r in rows:
+        r.setdefault("dup_group", "")
+        r.setdefault("superseded", 0)
+        w.writerow(r)
+    print(f"# {len(rows)} runs aggregated", file=sys.stderr)
+    if dups:
+        print(f"# WARNING: {len(dups)} duplicated run-name(s); "
+              f"filter superseded==0 before any per-run analysis:", file=sys.stderr)
+        for name, group in sorted(dups.items()):
+            detail = ", ".join(f"{r['job_id']}({r['epochs_done']}ep"
+                               f"{'' if not r['superseded'] else ', superseded'})" for r in group)
+            print(f"#   {name}: {detail}", file=sys.stderr)

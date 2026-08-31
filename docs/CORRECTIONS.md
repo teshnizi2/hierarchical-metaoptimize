@@ -7383,3 +7383,324 @@ after seeing the data is the failure 117.11 is about.
 **THE BATCH IS NOT WASTED.** It is the corpus's only GroupNorm cell, all 24 runs are box-free and
 valid, and it establishes the GN accuracy regime (89.4 ±0.3 at this configuration) that any
 successor must budget-match against.
+
+---
+
+# 119 THE REFRAME IS KILLED, THE PAPER IS RE-FRAMED, AND THREE BATCHES ARE REGISTERED BEFORE THEY RUN
+
+**Cycle 88.** This entry does four things: it kills the proposed "degenerate groups explain the
+parent's anomaly" reframe on four independent counts; it records the framing that replaces it;
+it corrects five documents that carried defects a referee would have found; and it registers
+three batches — **`ub9`, `aw1`, `gf2`** — with their scorers **committed and hashed before any
+of their runs exist** (RULE 19). **Nothing was submitted.**
+
+Full plan: **`docs/PAPER-PLAN.md`** (new).
+
+## 119.0 THE KILL — "degenerate groups explain the parent paper's granularity anomaly"
+
+Four independent kills, each verified this cycle from files on disk.
+
+**K1 — the parent never makes the claim.** §7.1's only stated CIFAR-10 finding (line 4645) is
+*"In every tested combination, MetaOptimize outperforms its corresponding fixed-step-size
+baseline"* — MetaOptimize vs a tuned fixed LR, **not** blockwise vs scalar. The positive half is
+an inference from the §7.3 aside plus one appendix figure covering two (base, meta) pairs. There
+is no numeric table for §7.1, **no seed count**, and **no error bars**:
+`grep -icE "error bar|shaded|standard deviation|confidence interval"` over the full text = **0**.
+
+**K2 — the §9 sentence is indexed by APPROXIMATION, and every prior internal quotation elided
+the clause.** See 119.2.
+
+**K3 — at the parent's own η=1e-3 the mechanism points the wrong way, 5 batches of 5.**
+Re-derived this cycle (plateau5, `window_ok==1 AND complete==1`), layerwise → nodewise:
+`br6` 89.612→90.865, `bl5` 89.645→90.910, `bf8` 91.015→92.099, `bf9` 90.995→91.983,
+`sp8` 89.903→90.660. The **66.6%-singleton partition wins** by +0.76 to +1.25 pp across three
+boxes and two horizons. The direction reverses only at η=1e-4. **A mechanism whose central
+prediction is violated in every admissible cell at the parent's own configuration cannot be
+offered as an explanation of that configuration.**
+
+**K4 — removing 100% of the singletons buys nothing.** Inside one batch (`ck1`):
+chunk1 (m=11,173,962, **100%** singletons) **90.979** → chunk2 (m=5,586,981, **0%** singletons)
+**91.095**. Step **+0.115, se 0.133, t +0.87 — NOT RESOLVED**, against a count-only prediction of
++0.131 to +0.161 at the family's own in-batch slopes, i.e. an **excess of −0.046 to −0.016**.
+The `ck1` ladder is smooth in log *m* with **no kink** at the one step where singleton fraction
+collapses from 100% to 0%.
+
+**CONSEQUENCE.** *"Size-1 groups cause the non-monotonicity"* is **REFUTED**. What survives is
+narrower, better measured, and harder to refute: **shattering the 41 one-dimensional
+normalisation tensors, while the weights they scale stay grouped, costs 0.43-0.82 pp at matched
+group count.** That is an **architectural** prescription, not a size law and not a variance law.
+
+**Also struck: "variance" as the mechanism.** The drift-vs-group-size slopes are positive in 6
+of 6 fits where 1/√N requires −0.500 — but *drift* is the per-step magnitude of net systematic
+movement, **not** an estimator variance, and it is **censored at the meta-stepsize** by Lion's
+sign update. It cannot refute a variance claim, and presenting it as doing so would be a second
+error on top of the first. The admissible sentence is in PAPER-PLAN ledger 6.1.
+
+## 119.1 CORRECTION TO `docs/PAPER-CONFIG.md` — the parent's seed count was misattributed
+
+The CIFAR-10 (§7.1) table carried *seeds | curves "averaged over 5 random seeds"*. **Wrong, and
+wrong in the direction that flatters the result we wanted to build on.** `grep -niE "random
+seeds|averaged over"` returns exactly two hits (lines 4655, 22813) and **both belong to §7.2**,
+the non-stationary CIFAR-100 experiment. **§7.1 states no seed count and no error bars**, so the
+parent's CIFAR-10 curves are of **unstated replication, possibly single-seed**. Corrected in
+place, with the §7.2 blockwise m=2 note (line 4677) added alongside.
+
+## 119.2 CORRECTION — the §9 quotation was truncated at a load-bearing clause
+
+Verbatim, lines 5308-5311:
+
+> *"While increasing the number of step sizes is anticipated to enhance performance, our
+> experimental findings in Section 7 reveal that this improvement is not consistent **across the
+> MetaOptimize approximations evaluated**. Further investigation is needed in future research."*
+
+Every previous internal quotation stopped at *"not consistent …"*. The clause indexes the
+inconsistency by **approximation / (base, meta) instantiation**, not by an accuracy-vs-*m* curve.
+
+**BINDING CONSEQUENCE.** (a) No draft may say *"we explain the parent's reported non-monotonicity
+of the granularity curve"* — the parent never measured a curve, and six blocks on a ResNet-18
+cannot contain a size-1 group (min block size **1,856**, re-derived). (b) An answer to the
+sentence **as written** must vary the approximation axis, and we never have: a census of all
+`chunk*`/`nodewise1d` rows returns **n=112, base=SGDm (112/112), meta=Lion (112/112),
+meta_stepsize ∈ {1e-4: 85, 3e-4: 27}**. Zero at η=1e-3, zero under any other base. **`aw1` is
+therefore not an optional robustness check; it is the only thing that would make the §9 hook
+honest.**
+
+## 119.3 INSTRUMENT DEFECT AND FIX — `window_ok` never meant "the run finished"
+
+`window_ok` means *epochs_done > 20*, i.e. *"is `plateau` a tail rather than the whole run?"*
+It has been used as if it meant *"this run completed its budget"*. It does not.
+
+**16 runs of 1,960** are `window_ok=1` with `epochs_done < 0.9 × epochs_requested`, and one of
+them — **`rs-blk6-1e4-s2`, 29 of 100 epochs, plateau5 = 85.228** — sits in the **PRIMARY
+cell's blk6 arm**:
+
+| filter | n | mean | sem |
+|---|---|---|---|
+| `window_ok==1` (the registered gate) | 6 | **91.313** | **1.218** |
+| `window_ok==1 AND epochs_done ≥ 0.95×requested` | 5 | **92.530** | **0.064** |
+
+A **1.217 pp** swing in an arm mean and a **19×** swing in its sem, turning on a filter that was
+never registered. Every published primary-cell blk6 number silently depended on which of these
+two an analyst happened to apply. (The nodewise arm moves too: n 21→20, 92.024→92.031.)
+
+**FIX, non-destructively, matching this file's own precedent (added, never substituted):**
+`window_ok` keeps its documented meaning and a new column **`complete`** carries the separate
+question. `analysis/aggregate.py` gains `complete_of()`; its main block is now guarded under
+`if __name__ == "__main__"` so a scorer can import it without aggregating anything (CLI
+invocation unchanged). `results/all_runs.csv` was backfilled **purely from columns already
+present** — no `.out` re-parse — and verified: 1,960 rows in and out, **0 cells changed outside
+the new column**, header order identical to `FIELDS`. Pre-fix copy kept at
+`results/all_runs.pre-c88.bak.csv`. Result: **complete=1 1,943 / complete=0 17 / unknown 0.**
+
+**STANDING RULE (21): every accuracy table filters on `window_ok==1 AND complete==1`, or states
+in-line why not.**
+
+Validated both directions by `analysis/c88_complete_selftest.py` — **20/20 checks pass**
+(4 admits, 8 refusals incl. missing/unparseable/zero/negative budgets, 8 corpus-level
+consequences). SHA-256 `bdb14ead82a0adf073edf081f7d43dd69039ed9541b7a19d85836a828eb72768`.
+
+## 119.4 PRIOR-ART HOLE CLOSED — CAM-HD was absent from the file entirely
+
+**Jie, Gao, Vasnev & Tran, "Adaptive Hierarchical Hyper-gradient Descent" (CAM-HD),
+arXiv:2008.07277, IJMLC 2022** appeared **nowhere** in `docs/`. It is the closest prior work and
+it already does four of the things this campaign thought were its own: it builds the
+global/layer/filter/parameter ladder; it names the small-sample mechanism in words (*"the updating
+for each learning rate only depends on the average of a small number of examples … over-
+parameterization is an issue to be concerned"*); it reports the interior optimum explicitly
+(*"neither at full global level nor full layer/filter level, but a weighted combination"*); and it
+fixes it with **hierarchical partial pooling**.
+
+**It must be cited in the first paragraph of any granularity claim we make.** What it does **not**
+contain, i.e. what is actually ours: degenerate groups, any treatment of 1-D tensors,
+the size-distribution-vs-alignment decomposition, **count-matching** (its levels vary count and
+size distribution simultaneously — the exact confound we spent the campaign removing), and
+MetaOptimize.
+
+**This makes our position better, not worse**, because we can answer the referee question it
+raises (*"why not the classically optimal soft version?"*) **with data**: this campaign
+implemented partial pooling in three operators and all three failed their own controls (M0
+withdrawn — operator saturates; M1's interior optimum is 76% an α₀ artefact and transfers
+nowhere; zpool rescues +11.13 pp and still lands 2.30 pp below plain blk6). That is a section.
+**Do not propose a new pooling design.** Added to `docs/PRIOR-ART.md` with a seven-row table of
+shipped-but-unjustified tensor-level rules (Adam-mini, Adalayer, Muon, LARS/LAMB, bitsandbytes,
+Shampoo, Adafactor).
+
+## 119.5 `docs/PRIOR-ART.md` — the arXiv:2410.08198 claim is UNVERIFIED and may be backwards
+
+PRIOR-ART asserted that Xie et al. (ICLR 2025) give a bound whose smoothness term improves with
+finer partitions and whose **noise term does not** — our "ready-made formal home". **We do not
+hold that paper** (`paper/refs/` has only 2406.16793, 2407.07972, 2506.01049), and the claim was
+never re-derived. A second reading suggests the **opposite**: that refinement gives a
+monotonically **better** bound with **no counteracting noise term** — in which case it is existing
+theory that **contradicts** our falling limb, which is far more interesting to cite and far worse
+to misquote. Marked **UNVERIFIED — DO NOT QUOTE** in place. **Fetch and re-derive before any
+draft.**
+
+## 119.6 THE RUNNER-UP FRAMING'S HEADLINE STATISTIC WAS OVERSTATED IN OUR OWN PROSE
+
+The methods/reproducibility framing was to be sold on *"23.2% of 56 published contrasts
+contaminated, 62% flipping"*. Against FINDINGS 70.5's own table: the **registered** rate is
+**6/56 = 10.7%** against a pre-registered <10% bar (FINDINGS 70.2, in bold, against its own
+interest: *"G4 CLEARS ITS BAR BY ONE CELL"*), the 56 are **mechanically enumerated scorable
+cells**, not published contrasts, and 70.5 states the post-hoc supplement *"may not overturn a
+registered gate … it bounds that gate's coverage"*. **FINDINGS 70.6 then quotes the post-hoc
+number as the takeaway prior anyway** — that sentence is superseded here.
+**Quote 10.7% as the rate; quote 13/56 as the coverage bound; never the reverse.**
+
+## 119.7 `PATCH_NODEFLOOR` SPEC CORRECTED BEFORE IT WAS WRITTEN
+
+The proposed spec carried two errors that would have failed its own equivalence suite. Both found
+by independent re-derivation from `named_parameters()` shapes this cycle.
+
+1. **`E6` asserted `min group size == min(k, 512)`. FALSE.** `linear.bias` has **C = 10**, so
+   `max(1, C//k) = 1` group of 10 for every k ≥ 16, and the minimum 1-D group size across the
+   family is **1, 2, 3, 4, 6, 8, 10, 10, 10, 10, 10, 10** for k = 1…512. The operator enforces
+   `min(k, C_tensor)`, **not** a floor of k — **the name misdescribes it.** Correct assertion:
+   `min 1-D group size == min(k, 10)`.
+2. **`E5` demanded counts at k=3 and k=6, which are RAGGED and unimplementable.**
+   `PATCH_NODEBN` asserts `groups[i] * gsize[i] == numel[i]` exactly and builds alphas with
+   `repeat_interleave(gsize)` — a **uniform** machine with no ragged path. Divisibility check
+   (need `C % max(1, C//k) == 0` for every 1-D size C ∈ {10, 64, 128, 256, 512}): **k=3 ragged
+   on all five; k=6 ragged on 64/128/256/512.** **Restrict k to the divisor-safe set
+   {1, 2, 4, 8, 16, 32, 64, 128, 256, 512}**, where the two boundary equivalences
+   (`nodefloor1` ≡ nodewise at m=14,420; `nodefloor512` ≡ nodewise1d at m=4,851) are
+   **structural**, not approximate.
+
+**CONFIRMED CORRECT in the spec** (re-derived independently): the full m-table
+14420 / 9615 / 7993 / 7212 / 6391 / 6011 / 5411 / 5111 / 4961 / 4891 / 4861 / 4851; the
+count-matched comparators chunk1167→9,619, chunk1560→7,212 (**exact**), chunk2325→4,851
+(**exact**), chunk777→14,421; and `FLOOR_k(weightwise) ≡ chunkwise-K` to within the ragged tail
+(k=16 → 698,373 **exactly**; k=8/128/1024 off by one group).
+
+## 119.8 THE BRIEFED TWO-LADDER CENTREPIECE IS KILLED ON ARITHMETIC
+
+Minimum group size, re-derived: **scalar 11,173,962; blk6 1,856** (tensor split [3,12,15,15,15,2]
+→ block sizes 1856/147968/525568/2099712/8393728/5130); **layerwise 10** (`linear.bias`).
+**Any floor k ≤ 10 is the IDENTITY at scalar, blk6 and layerwise** — three of five rungs,
+**including the primary cell's argmax** (layerwise, m=62, **92.887**, n=11, sem 0.052). So the
+peak cannot move, and the design's refutation condition ("both ladders share their peak") is
+**entailed by its own construction**. A design whose refutation is entailed by its construction
+cannot be registered.
+
+The two rungs where a floor bites carry **all** the count exposure (0.380 and 0.903 decades), in
+a region where local secants of the singleton-free family span **−0.090 to +0.828 pp/decade and
+change sign** — so no covariate can rescue it. And `FLOOR_k(weightwise)` **is** the already-run
+`ck1` family. **The brief's claim that this centrepiece has never been run is false.**
+
+## 119.9 `gf1` AS REGISTERED HAD ZERO POWER — AND THAT IS NOW EXECUTABLE
+
+`gf1` registered *"TOST on DD at ±0.30"* as its equivalence branch. Pooled within-arm sd
+re-derived this cycle from the four owned D batches: **0.2105 (df 18)**. At 4 arms × 5 seeds,
+**se(DD) = 0.1883**, so the TOST bound is 0.30 − 1.746 × 0.1883 = **−0.0287 — NEGATIVE. The
+branch can never fire, whatever the data say.** This is the `gn1` ±0.15 unreachable-band mistake
+repeated. 80% TOST power needs **n = 14/arm = 56 jobs**. Its rival branch was also a strawman:
+the only mechanism motivating the experiment (1/√N_g) predicts **DD ≈ 0.19**, inside `gf1`'s own
+pre-declared UNRESOLVED band. Under `gf1`'s own stated prior the modal verdict was UNRESOLVED at
+~100%. Reproduce with `python3 analysis/c88_scorers.py --power`.
+
+**`gf1` IS WITHDRAWN. `gf2` replaces it at the same 20 jobs.**
+
+## 119.10 REGISTRATION — `ub9`, `aw1`, `gf2`. SCORER HASHED BEFORE THE RUNS EXIST (RULE 19)
+
+**Scorer: `analysis/c88_scorers.py`, SHA-256 `88a0abfc00bf4def8c7d268d3690b84a7cf98888a62b0a357a2c318a332a7b9c`.**
+Validated by `--selftest`: **30/30 checks pass**, covering all three decision rules in both
+directions, GATE 0 per-seed behaviour, the `complete` gate, and a live re-derivation of every
+constant from the CSV. **NO JOB WAS SUBMITTED. Both accounts are committed (`hz3` on alice,
+`rl3` on alice2).**
+
+### `ub9` — 9 jobs, ~9 GPU-h, alice, **no new code**. PRIORITY 1.
+
+The corpus's **only** reproduction of the parent's CIFAR-10 claim (18 `augment=0` runs,
+AdamW+Adam, η=1e-3, α₀=1e-6, 100 ep: scalar **73.830** / blk6 **74.352** / layerwise **73.449**)
+is **guard-unverified at a setting arithmetic says must bind**. β₀ = ln(1e-6) = **−13.8155**;
+the −15 floor is **1.1845 nats** below and the −2.3026 ceiling **11.5129 nats** above. Under Lion
+`|Δβ| = η` per step, and 500 steps/epoch × 100 epochs = **50 nats of travel**: the **floor is
+reachable at epoch 2.4** and the **ceiling at epoch 23.0**. `runs/PP` holds only
+`Tensorboard_outputs` — **no `probe.jsonl` exists**. A floor bind on the single-group scalar arm
+while the 6-group arm differentiates away from it is precisely the mechanism that manufactures
+the +0.522.
+
+**Purchase:** the same cell, 3 arms × 3 seeds, at `BETA_CLIP=-60:6.0` with `PATCH_CLIPCOUNT`,
+compared against the 18 runs on disk. **Registered as buying MEASURED, not provable, freedom** —
+at η=1e-3 over 100 epochs no box with a sane ceiling is provably free (it would need
+hi ≥ β₀+50 = **+36.2**, a step size of ~5e15). That is arithmetic, not a budget limit.
+
+**Decision rule, fixed:** with step1 = blk6 − scalar and step2 = layerwise − blk6 on the wide-box
+arm — step1 > +0.30 **and** step2 < −0.30 → *reproduction stands*; |step1| ≤ 0.30 → *the +0.522
+was a clipping artefact*, **which is a POSITIVE result** identifying guard occupancy as a
+mechanism for the parent's own reported inconsistency and must be reported as such; otherwise
+*partial*, report both steps with their boxes and claim neither shape.
+**WHAT WOULD REFUTE:** |step1| ≤ 0.30 in the wide box.
+
+### `aw1` — 12 jobs, ~11 GPU-h, alice, **no new code**. PRIORITY 2.
+
+nodewise vs chunk777 (m = 14,420 vs 14,421, **one group apart**) × 6 seeds, **base = AdamW**, ONE
+batch. Closes the corpus's largest external-validity hole (119.2: 112/112 rows are SGDm+Lion) on
+**the axis §9 is indexed by**.
+
+**Decision rule, fixed:** 95% CI lower bound > +0.30 → *transfers*; upper bound < +0.15 → *does
+not transfer* — **the more interesting outcome, and it must not be buried**, because it says the
+effect is a property of one MetaOptimize instantiation, which is a **direct answer to the
+question the parent actually asked**; otherwise *unresolved at n=6, report the interval, do not
+re-cut the data, and do not call it "partially transferring"*.
+**WHAT WOULD REFUTE:** a 95% CI upper bound below +0.15 under AdamW.
+
+### `gf2` — 20 jobs, ~18 GPU-h, alice, **BLOCKED on `PATCH_NODEFLOOR`**. PRIORITY 4, APPENDIX-GRADE.
+
+Arms: **A1 `nodefloor2` (m=9,615) vs A2 `chunk1167` (m=9,619)**, gap **4 groups = 0.00018
+decades**; **A3 `nodefloor4` (m=7,212) vs A4 `chunk1560` (m=7,212)**, **EXACT**. n=5, one batch,
+primary cell.
+
+Two repairs of `gf1`, both forced by numbers re-derived this cycle. **(a) The in-batch anchor is
+dropped**: `gf1` justified re-running D(1) by "a cross-batch anchor would sit on the 0.21 pp
+floor", but that floor is on **accuracy**, and D is a within-batch difference so batch offsets
+cancel inside it — the observed sd of D across the four owned batches is **0.0994, BELOW the
+0.1719 expected from seed noise alone at n=3v3**. **D is batch-transportable even though accuracy
+is not.** Anchor: **+0.5949**, from cc1 0.727 / mm1 0.485 / pp1 0.581 / gn1 0.587 (never quote it
+without its four constituents; the previously circulated +0.551 is a **composition-unbalanced**
+pool over 7 nodewise families against 4 chunk777 families). **(b) Two dose points, not one**:
+singleton fraction is 66.64% at k=1 and **exactly 0% at every k ≥ 2**, so along `gf1`'s single
+axis "degeneracy removed" and "count reduced" are the same event (corr = −1) — the identical
+collinearity that killed the singleton ladder.
+
+**Decision rule, fixed:** statistic **S = D(2) + D(4)**, se(S) = **0.1883**. Three pre-registered
+points **2.60 and 2.66 se apart** (**81-91% correct classification** at n=5):
+**H_SINGLETON S=0.20** (harm is specific to size-1 groups) / **H_SMOOTH S=0.69** (harm declines
+smoothly → shrinkage is the right instrument, and CAM-HD already published it) /
+**H_TENSOR S=1.19** (only a **whole** 1-D tensor recovers it). Nearest point wins **and must be
+≥1.5 se closer than the runner-up**; otherwise **UNRESOLVED — report the interval, and do not
+call it "mixed evidence."**
+**Registered cross-check, fixed now so it cannot be dropped later:** whatever `gf2` says must
+agree in **sign** with `ck1`'s chunk1→chunk2 datum (119.0 K4). If `gf2` returns H_SINGLETON
+while `ck1` says removing **all** singletons buys nothing, the paper reports the **conflict**,
+not the convenient half. The ck1 datum's own power limit is registered too: it re-groups 100% of
+11,173,962 coordinates while the tail is 0.086% of the weights, so it refuses a **general size
+law** and **cannot rule out** a tail-specific effect.
+**WHAT WOULD REFUTE the surviving claim:** S ≤ 0.445 (H_SINGLETON) would restore the degeneracy
+story and contradict `ck1`; S in the dead bands returns UNRESOLVED and the paper does not
+depend on it.
+
+**GATE 0 for all three, pre-registered:** every run carries `probe.jsonl` with
+`PATCH_CLIPCOUNT`; occupancy is read from the **per-coordinate** rails `n_at_lo`/`n_at_hi`
+**only**, **never** from the 62-element per-tensor `beta` summary, and is scored **per seed,
+never pooled**. Any arm with >1 bound seed → **VOID**, reported as void.
+
+## 119.11 THE FRAMING THAT REPLACES THE REFRAME
+
+**"A granularity gain is a tuning gain: ranking what actually moves accuracy in meta-learned step
+sizes."** The parent gets **one sentence** in the introduction and is never invoked again as
+justification. The thesis is that *"the number of step sizes"* is at least four variables — the
+shared meta-stepsize, α₀, the group **count**, and the group-**size distribution** — each of
+which moves the measured effect by more than the effect itself; and that once all four are
+controlled the partition is a **second-order knob**. That is a direct answer to the §9 sentence
+**as written**, since at a shared η a granularity comparison measures **distance-from-optimum**,
+not the partition.
+
+The load-bearing measurements, all re-derived this cycle: **+3.291 → +0.655** in one batch at
+fixed seeds (η); **D = +0.727/+0.485/+0.581/+0.587**, mean **+0.595 ± 0.050**, four independent
+within-batch batches; **+0.666 (t 7.08, 9v9)** on R34 and **+1.640 (t 6.71)** on C100; the
+alignment null at **−0.009 (t −0.06)** holding count **and** the exact size multiset; the
+prescription **+0.427/+0.649/+0.758/+0.816**; and the refusal at **+0.115 (t 0.87)**.
+Scope in the **abstract**, not the limitations: one base, one meta, η ≤ 3e-4, 100 epochs, and a
+**−1.807 pp** deficit against tuned SGD+cosine (best MetaOptimize cell 93.317 n=3 vs
+`bl-sgd-01` 95.124 n=5 sem 0.047).

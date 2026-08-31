@@ -145,6 +145,90 @@ No paper justifies block granularity by **estimator variance under within-tensor
 exchangeability**. The field uses Hessian block-diagonality (Adam-mini), backprop correlation
 `G = ez^T` (Adam-mini, Adafactor), or norm/module semantics (Bernstein). RAdam noticed the
 variance angle and named parameter-sharing as the fix — *as future work* — and nobody followed
-up. Xie et al. (ICLR 2025, arXiv:2410.08198) provide the ready-made formal home: their bound
-`η·H(L,Φ) + 2√(1−β₂)·Σ_b d_b σ_b` has a smoothness term that improves with finer partitions
-and a noise term that does not.
+up. Xie et al. (ICLR 2025, arXiv:2410.08198) were previously cited here as the ready-made formal
+home, on the claim that their bound `η·H(L,Φ) + 2√(1−β₂)·Σ_b d_b σ_b` has a smoothness term
+that improves with finer partitions and a noise term that does not.
+
+> **UNVERIFIED — DO NOT QUOTE (cycle 88, CORRECTIONS 119.5).** We do **not** hold
+> arXiv:2410.08198 locally (`paper/refs/` contains only 2406.16793, 2407.07972, 2506.01049),
+> so the bound above was never re-derived from the source. A second reading of the paper's
+> abstract-level claim reports the **opposite** of what we need: that `H(L,Φ₁) ≤ H(L,Φ₂)`
+> whenever `Φ₁` refines `Φ₂`, i.e. finer partitions give a **monotonically better** bound with
+> **no counteracting noise term**. If that is right, this reference is not our formal home —
+> it is existing theory that **contradicts** the falling limb we measure, which is a far more
+> interesting thing to cite and a far worse thing to misquote.
+> **ACTION BEFORE ANY DRAFT:** fetch the PDF, re-derive the bound, and replace this block with
+> whichever version survives. Until then neither reading may appear in a draft.
+
+
+---
+
+# THE CLOSEST PRIOR WORK, AND IT WAS MISSING FROM THIS FILE ENTIRELY
+
+*Added cycle 88 (CORRECTIONS 119.4). Its absence was a hole a referee would have found first.*
+
+## CAM-HD — Jie, Gao, Vasnev & Tran, "Adaptive Hierarchical Hyper-gradient Descent"
+
+**arXiv:2008.07277**, published in *International Journal of Machine Learning and Cybernetics*
+(2022). **This paper must be cited in the first paragraph of any granularity claim we make.**
+
+It already does four of the things this campaign thought were its own:
+
+1. **It builds the granularity ladder.** Global / layer-wise / filter-wise / parameter-wise
+   learning rates, all learned by hypergradient descent.
+2. **It states the small-sample mechanism, in words, four years before us.** *"For the model
+   involving a large number of learning rates for different groups of parameters, the updating
+   for each learning rate only depends on the average of a small number of examples. Therefore,
+   when the batch size is also not large, over-parameterization is an issue to be concerned."*
+3. **It reports the non-monotonicity explicitly.** *"usually the optimal performance is neither
+   at full global level nor full layer/filter level, but a weighted combination of two levels."*
+   An interior optimum, published.
+4. **It fixes it with the classically correct remedy** — hierarchical **partial pooling**, an L2
+   penalty `λ_layer·Σ_l(α_l − α_g)² + λ_para·Σ_l Σ_p(α_p^l − α_l)²` pulling finer levels toward
+   coarser ones.
+
+### What CAM-HD does NOT contain — i.e. what is actually ours
+
+* degenerate / size-1 groups, and any treatment of **1-D tensors** (BatchNorm scale and shift,
+  biases) as a distinguished object;
+* the **size-distribution vs alignment** decomposition, and the alignment null;
+* **count-matching** — its levels differ in group count and in size distribution simultaneously,
+  so its interior optimum is exactly the confound we spent the campaign removing;
+* MetaOptimize (it predates the parent by four years).
+
+### Why this makes our position BETTER, not worse
+
+A referee who knows this literature asks: *"the classical remedy for noisy small groups is
+shrinkage — Stein, Bühlmann credibility `Z = n/(n+k)`, empirical-Bayes moderation — and CAM-HD
+already published partial pooling for exactly this. Why a hard rule instead of the soft,
+classically optimal, already-published version?"*
+
+**We can answer that with data, and the answer is on disk.** This campaign implemented
+hierarchical partial pooling of per-group step sizes in three operators and **all three failed
+their own controls** (MASTER-TABLE rows 68/69/70/74/75): `M0 shrink` is **WITHDRAWN** because the
+operator saturates (it applies every step, so any λ ≥ 0.001 has a half-life ≤ 693 steps against
+~50,000 — the sweep measured full pooling three times over); `M1 additive r` shows a clean
+interior optimum at r ≈ 0.05-0.07 worth +1.07 pp, but **76% of it is an α₀=1e-6 escape-rate
+artefact** (+1.011 pp becomes +0.239 pp at α₀=1e-3) and it **transfers to no other architecture
+or dataset**; `zpool` rescues the per-weight arm by +11.13 pp and still lands **2.30 pp below
+plain blk6**. MASTER-TABLE's own bottom line: *the r-dial is a meta-learning-rate knob, not a
+pooling knob.*
+
+That is a section, not an excuse. **Do not propose a new pooling design.**
+
+## Two further precedents for special-casing 1-D tensors, all unjustified by their authors
+
+Every one of these ships a **de facto tensor-level floor** that its own paper never names,
+never ablates and never justifies. That is the gap our count-matched contrast fills.
+
+| method | what it does to 1-D tensors | its stated reason |
+|---|---|---|
+| **Adam-mini** (2406.16793) | Algorithm 3 for non-Transformers is verbatim `for name, param in parameters: param_blocks[name] = param` — **one block per tensor**. The Transformer partition falls through to `else param_blocks[name] = param` for exactly the LayerNorm gains and biases. | none — its stated principle is Hessian sub-block **alignment**, which our permutation null refutes as the carrier at −0.009 pp (t −0.06) |
+| **Adalayer** (2407.07972) | LayerNorm parameters are a **whole-tensor** block; biases are not learned at all | concludes adaptivity **on** the last layer and LayerNorm is *necessary* — note this is about merging **across** norm tensors vs shattering **within** one, and the paper must state that distinction explicitly |
+| **Muon** | 1-D parameters (norm gains, biases), embeddings and the head are routed to **AdamW** | tensor **rank**, justified by the geometry of Newton-Schulz orthogonalisation |
+| **LARS / LAMB** (1708.03888) | BatchNorm and bias parameters conventionally **exempted** from the layer-wise trust ratio | folklore: their norms are tiny and the ratio becomes numerically unstable |
+| **bitsandbytes** (2110.02861) | tensors with **< 4096 elements** kept at 32-bit | *"small tensors … often contain highly variable parameters (biases) or parameters that require high precision (batch norm, layer norm)"* — precision, not grouping |
+| **Shampoo** | `max_preconditioner_dim` (default 128) is a **CAP FROM ABOVE**; 1-D parameters get diagonal Adam, i.e. **per-coordinate** state | cubic preconditioner cost — the *opposite* direction from a floor |
+| **Adafactor** | `min_dim_size_to_factor` is a threshold below which it does **not** factor, falling back to full per-coordinate second moments | memory, again the opposite direction |
+
+**No method in the survey imposes a minimum group size on step sizes.** Two impose a maximum.

@@ -16,7 +16,55 @@ Appendix Table 2. Extracted directly from the paper, so nothing here depends on 
 | meta momentum c̄ | 0.9 |
 | **blockwise partition** | **six blocks — "one for each linear layer and four blocks for the ResNet modules"** |
 | **data augmentation** | **NOT MENTIONED ANYWHERE IN THE PAPER.** `augment`, `random crop`, `flip` return zero hits across the full text. The released code has none either. |
-| seeds | curves "averaged over 5 random seeds" |
+| seeds | **NOT STATED FOR §7.1.** See the correction below — the "averaged over 5 random seeds" phrase belongs to §7.2, not here. |
+| error bars | **NONE.** `error bar`, `shaded`, `standard deviation`, `confidence interval` return **0** hits across the full text. |
+
+## CORRECTION (cycle 88, CORRECTIONS 119.1) — the seed row was misattributed
+
+The row above previously read *seeds | curves "averaged over 5 random seeds"* under the
+**CIFAR-10 (§7.1)** table. **That is wrong, and it was wrong in the direction that flatters the
+result we wanted to build on.**
+
+`grep -niE "random seeds|averaged over"` over the full text (arXiv:2402.02342v6,
+`~/.arxiv-mcp-server/papers/2402.02342.md`, 22,872 lines) returns exactly **two** hits, line
+4655 and line 22813, and **both belong to §7.2, the non-stationary CIFAR-100 experiment**:
+
+> line 4655: "We evaluated MetaOptimize in a non-stationary setting with 10 sequential tasks …
+> Each curve is averaged over 5 random seeds."
+
+**§7.1 states no seed count, no error bars, and no standard deviations.** So the CIFAR-10
+learning curves — the sole basis for the blockwise > scalar inference — are of **unstated
+replication, possibly single-seed**. This is a legitimate and generous explanation for why the
+parent's granularity result was inconsistent, and it must be said in the paper rather than
+quietly relied upon.
+
+Also note **§7.2's blockwise is m = 2**, not 6 — line 4677, *"two blocks: one for the first
+three layers and one for the last layer"*. The paper therefore runs **exactly two granularities
+anywhere**: scalar, and a "blockwise" whose group count differs between experiments.
+
+## CORRECTION (cycle 88, CORRECTIONS 119.2) — the §9 sentence, quoted IN FULL
+
+Every previous internal quotation of the §9 Limitations sentence **elided a load-bearing
+clause**. Verbatim, lines 5308-5311:
+
+> **Blockwise step-sizes:** While step sizes can vary much in granularity, our experiments
+> focused on scalar and blockwise step-sizes. While increasing the number of step sizes is
+> anticipated to enhance performance, our experimental findings in Section 7 reveal that this
+> improvement is not consistent **across the MetaOptimize approximations evaluated**. Further
+> investigation is needed in future research.
+
+The clause **"across the MetaOptimize approximations evaluated"** indexes the inconsistency by
+**approximation / (base, meta) instantiation**, *not* by an accuracy-vs-m curve. The parent is
+**not** reporting that the granularity curve turns down in the middle; it never measured a curve.
+
+**CONSEQUENCE, BINDING.** Any sentence of the form *"we explain the parent's reported
+non-monotonicity of the granularity curve"* misquotes a paper that does not exist and is
+refutable by any referee who opens §7.1. And any answer to the §9 sentence **as written** must
+vary the approximation axis — which our corpus does not: all **112** `chunk*`/`nodewise1d` rows
+are `base=SGDm, meta=Lion`, at `meta_stepsize` ∈ {1e-4, 3e-4} only.
+
+Finally, **"variance" appears 0 times in the parent paper** (`grep -c -i variance` = 0). That is
+confirmed, but it is a statement about their vocabulary, not a licence for ours.
 
 ## The claim we are testing
 
