@@ -246,6 +246,7 @@ a0-layer-1e3_s0,4680708,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,
 a0-layer-1e4_s0,4680709,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,0,100,100,92.4,92.27,99.83,0,node885,39,env,a0-layer-1e4_s0,0,7,12,19,92.053,21,91.976,90.158,1,1
 g2_mAdam_layer_s0,4679381,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.08,91.67,99.83,0,node882,41,inferred,,0,9,16,24,91.767,26,91.868,89.453,1,1
 g1_adamw_layer_s0,4679169,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.0,91.82,99.74,0,node885,42,inferred,,0,13,18,31,91.569,35,91.68,88.336,1,1
+ub9-ly-s0,4796073,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,0,100,100,74.5,74.22,100.0,0,node870,43,env,,0,,,,73.992,0,74.104,73.425,1,1
 a0-layer-1e6_s0,4680710,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,91.94,91.53,99.8,0,node881,40,env,,0,10,16,27,91.684,29,91.684,89.3,1,1
 a0-layer-1e4_s0,4682515,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,0,55,100,91.96,91.96,99.48,0,node880,,env,a0-layer-1e4_s0,1,6,11,19,91.558,17,91.754,88.988,1,0
 bg600_meta_s1,4683673,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,additive,na,0.06,1,600,600,93.71,93.34,100.0,0,node853,461,env,,0,8,10,13,93.493,6,93.386,92.941,1,1
@@ -260,6 +261,7 @@ I1_layer_s1,4700570,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-
 bg300_meta_s1,4683667,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,additive,na,0.06,1,300,300,93.37,93.18,99.99,0,node885,119,env,,0,7,8,11,93.208,5,93.192,92.349,1,1
 bo7-lay-c6-s1,4702622,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Lion,1e-3,1e-3,1,1,-30:6.0,,na,na,1,20,20,89.28,88.71,95.61,0,node885,8,env,,0,8,12,,82.398,1,88.874,82.398,0,1
 g1_adamw_layer_s1,4679170,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,1,100,100,91.67,91.15,99.78,0,node885,42,inferred,,0,14,16,32,91.18,39,91.294,88.091,1,1
+ub9-ly-s1,4796076,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,1,100,100,74.26,74.1,100.0,0,node873,32,env,,0,,,,73.928,0,73.85,73.34,1,1
 a0-layer-1e3_s1,4680717,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,90.87,90.77,99.85,0,node885,39,env,,0,9,15,29,90.618,81,90.664,88.614,1,1
 a0-layer-1e4_s1,4680718,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,1,100,100,92.31,92.31,99.88,0,node881,39,env,,0,8,12,17,91.773,24,92.034,89.857,1,1
 g2_mAdam_layer_s1,4679382,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,1,100,100,92.0,91.52,99.84,0,node882,41,inferred,,0,8,15,24,91.583,39,91.776,89.201,1,1
@@ -274,6 +276,7 @@ dc-aw-a1e4-s2,4683418,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1
 I1_layer_s2,4700571,salehkaleybars,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,100,100,92.59,92.59,99.98,0,node868,39,env,,0,7,10,18,92.355,16,92.52,90.284,1,1
 a0-layer-1e6_s2,4680728,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,100,100,91.89,91.86,99.84,0,node882,39,env,,0,10,14,28,91.654,34,91.694,89.171,1,1
 g1_adamw_layer_s2,4679171,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,2,100,100,91.83,91.76,99.77,0,node885,42,inferred,,0,13,19,35,91.505,41,91.558,88.14,1,1
+ub9-ly-s2,4796079,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,2,100,100,74.61,73.77,99.99,0,node870,39,env,,0,,,,74.077,0,74.018,73.599,1,1
 g2_mAdam_layer_s2,4679383,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,2,100,100,92.19,92.0,99.85,0,node882,40,inferred,,0,9,15,27,91.8,28,91.832,89.295,1,1
 a0-layer-1e3_s2,4680726,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,100,100,91.19,91.09,99.92,0,node881,39,env,,0,10,15,32,91.015,67,91.022,88.77,1,1
 a0-layer-1e4_s2,4680727,s5014158,ResNet18,CIFAR10,100,layerwise,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,2,100,100,92.05,91.78,99.81,0,node882,39,env,,0,8,14,22,91.767,20,91.832,89.808,1,1
@@ -310,6 +313,7 @@ a0-blk6-1e4_s0,4680706,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,
 a0-blk6-1e4_s0,4682514,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,0,50,100,91.25,90.64,98.85,0,node882,,env,a0-blk6-1e4_s0,1,8,18,27,90.264,25,90.866,87.415,1,0
 g2_mAdam_blk6_s0,4679378,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.2,91.71,99.7,0,node885,43,inferred,,0,10,17,27,91.619,27,91.712,89.276,1,1
 g1_adamw_blk6_s0,4679166,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.1,91.68,99.62,0,node882,46,inferred,,0,12,17,35,91.641,38,91.75,88.315,1,1
+ub9-b6-s0,4796072,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,0,100,100,75.7,75.58,100.0,0,node887,43,env,,0,,,,75.245,0,75.322,74.803,1,1
 i3b-1e4-s1,4700639,salehkaleybars,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,1,100,100,92.49,91.96,99.78,0,node884,43,env,,0,10,14,25,92.109,31,92.21,89.532,1,1
 I1_blk6_s1,4700567,salehkaleybars,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,92.42,92.39,99.95,0,node887,44,env,,0,8,12,26,91.92,29,92.296,89.771,1,1
 i3b-3e4-s1,4700641,salehkaleybars,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,3e-4,1,1,-15:-2.3026,,na,na,1,100,100,93.33,93.32,99.96,0,node886,43,env,,0,12,16,23,93.213,7,93.284,90.419,1,1
@@ -324,6 +328,7 @@ g1_adamw_blk6_s1,4679167,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Lio
 g2_mAdam_blk6_s1,4679379,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,1,100,100,91.98,91.82,99.71,0,node880,45,inferred,,0,10,16,28,91.654,34,91.622,89.174,1,1
 i3b300-1e1-s1,4700681,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-1,1,1,-15:-2.3026,,na,na,1,300,300,84.88,84.58,89.96,0,node864,141,env,,0,,,,84.475,0,84.564,80.31,1,1
 i3b300-1e2-s1,4700679,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-2,1,1,-15:-2.3026,,na,na,1,300,300,90.72,90.5,99.96,0,node883,131,env,,0,12,22,62,90.451,266,90.486,89.286,1,1
+ub9-b6-s1,4796075,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,1,100,100,74.73,74.51,100.0,0,node887,40,env,,0,,,,74.508,0,74.508,73.809,1,1
 a0-blk6-1e6_s1,4680716,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,91.9,91.79,99.71,0,node880,44,env,,0,10,16,29,91.547,29,91.584,89.149,1,1
 i3b300-1e5-s1,4700677,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-5,1,1,-15:-2.3026,,na,na,1,300,300,92.67,92.11,99.93,0,node864,130,env,,0,8,15,29,92.26,38,92.294,91.057,1,1
 a0-blk6-1e3_s1,4680714,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,92.26,92.17,99.93,0,node886,43,env,,0,8,12,18,92.118,12,92.106,89.945,1,1
@@ -345,6 +350,7 @@ g1_adamw_blk6_s2,4679168,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Lio
 i3bc-1e1-s2,4700664,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-1,1,1,-15:0,,na,na,2,100,100,80.73,80.02,83.19,0,node883,42,env,,0,,,,80.345,0,80.474,73.573,1,1
 i3b-1e3-s2,4700657,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,100,100,92.42,92.13,99.92,0,node883,43,env,,0,10,12,18,92.228,9,92.222,90.157,1,1
 i3b-1e5-s2,4700651,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-5,1,1,-15:-2.3026,,na,na,2,100,100,91.9,91.77,99.73,0,node880,44,env,,0,9,14,27,91.591,37,91.592,89.313,1,1
+ub9-b6-s2,4796078,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,2,100,100,75.23,74.82,99.99,0,node872,34,env,,0,,,,74.599,0,74.56,74.15,1,1
 i3b-1e4-s2,4700653,s5014158,ResNet18,CIFAR10,100,resnet18_blocks,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,2,100,100,92.32,91.73,99.62,0,node882,44,env,,0,9,17,28,91.734,31,91.606,89.313,1,1
 I1_scal_s0,4700563,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,100,100,92.93,92.75,99.98,0,node880,43,env,,0,10,17,24,92.126,26,92.538,89.638,1,1
 PP_scal_s0,4700548,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-15:-2.3026,,na,na,0,100,100,74.13,73.62,100.0,0,node868,38,env,,0,,,,73.495,0,73.908,72.831,1,1
@@ -353,11 +359,13 @@ a0-scal-1e4_s0,4680703,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-4
 a0-scal-1e4_s0,4682513,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,0,50,100,91.14,91.07,98.62,0,node882,,env,a0-scal-1e4_s0,1,8,16,26,90.477,23,90.828,87.43,1,0
 a0-scal-1e3_s0,4680702,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,0,100,100,92.76,92.56,99.92,0,node881,45,env,,0,10,12,18,92.481,9,92.62,90.128,1,1
 a0-scal-1e6_s0,4680704,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,92.12,91.41,99.61,0,node882,45,env,,0,10,19,30,91.673,36,91.656,88.987,1,1
+ub9-sc-s0,4796071,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,0,100,100,73.77,72.1,99.81,0,node887,43,env,,0,,,,72.36,0,72.068,72.432,1,1
 g1_adamw_scal_s0,4679277,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.05,91.67,99.58,0,node885,45,inferred,,0,11,19,33,91.74,26,91.746,88.291,1,1
 g2_mAdam_scal_s0,4679375,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,0,100,100,92.23,91.97,99.67,0,node886,46,inferred,,0,10,17,25,91.662,30,91.774,89.088,1,1
 pp_scal_s1,4683698,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-15:-2.3026,,na,na,1,100,100,73.95,73.95,100.0,0,node883,39,env,,0,,,,73.256,0,73.794,72.718,1,1
 I1_scal_s1,4700564,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,92.75,92.72,99.96,0,node887,43,env,,0,8,15,25,92.213,28,92.54,89.606,1,1
 PP_scal_s1,4700549,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-15:-2.3026,,na,na,1,100,100,74.7,73.75,100.0,0,node885,39,env,,0,,,,73.97,0,73.442,73.474,1,1
+ub9-sc-s1,4796074,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,1,100,100,73.81,71.75,99.9,0,node887,41,env,,0,,,,71.797,0,71.806,71.769,1,1
 g2_mAdam_scal_s1,4679376,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,1,100,100,91.77,91.77,99.58,0,node885,44,inferred,,0,10,22,36,91.422,37,91.492,88.718,1,1
 a0-scal-1e3_s1,4680711,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,93.07,92.83,99.93,0,node882,43,env,,0,9,13,16,92.816,6,92.724,90.343,1,1
 a0-scal-1e4_s1,4680712,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,1,100,100,92.31,92.31,99.7,0,node882,44,env,,0,8,16,29,91.772,31,91.944,89.336,1,1
@@ -369,6 +377,7 @@ I1_scal_s2,4700565,salehkaleybars,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e
 a0-scal-1e3_s2,4680720,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-3,1,1,-15:-2.3026,,na,na,2,100,100,92.98,92.78,99.98,0,node882,43,env,,0,11,14,17,92.754,9,92.778,89.998,1,1
 a0-scal-1e4_s2,4680721,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-4,1,1,-15:-2.3026,,na,na,2,100,100,92.2,91.95,99.64,0,node886,43,env,,0,9,15,26,91.703,29,91.798,89.311,1,1
 g2_mAdam_scal_s2,4679377,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,1,none,,na,na,2,100,100,91.8,91.55,99.72,0,node885,44,inferred,,0,12,18,31,91.427,40,91.456,88.722,1,1
+ub9-sc-s2,4796077,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,0,-60:6.0,,na,na,2,100,100,74.17,73.43,100.0,0,node855,83,env,,0,,,,73.393,0,73.392,72.989,1,1
 a0-scal-1e6_s2,4680722,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Adam,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,100,100,92.14,91.95,99.54,0,node885,44,env,,0,12,22,32,91.651,32,91.762,88.718,1,1
 g1_adamw_scal_s2,4679279,s5014158,ResNet18,CIFAR10,100,scalar,AdamW,Lion,1e-3,1e-6,1,1,none,,na,na,2,100,100,92.04,90.97,99.53,0,node885,45,inferred,,0,14,21,31,91.428,43,91.448,87.831,1,1
 bo7-w-c6-s0,4702629,salehkaleybars,ResNet18,CIFAR10,100,weightwise,AdamW,Lion,1e-3,1e-3,1,1,-30:6.0,,na,na,0,20,20,90.12,90.12,95.14,0,node887,9,env,,0,8,14,19,81.609,5,89.404,81.609,0,1
