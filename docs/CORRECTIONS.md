@@ -7791,3 +7791,33 @@ re-scoped."* G is resolved at t +3.23. So:
 
 **PROCESS NOTE.** This is the outcome the batch was built to be able to produce. It was registered
 symmetrically, it came out against the campaign's preferred story, and it is recorded as such.
+
+## 122. **`hz3`: THE GAP GROWS WITH BUDGET. THE HORIZON OBJECTION IS DEAD.** (cycle 92)
+
+24/24 complete, scored with `analysis/c87_hz3_score.py` (144/144) UNEDITED. CSV → 2,041.
+Four arms × 6 seeds × 300 epochs, ONE batch, GPU class balanced by construction.
+
+| budget | D | G | D − G |
+|---|---|---|---|
+| 100 | +0.179 | +0.159 | +0.020 |
+| 200 | +0.512 | −0.037 | +0.549 |
+| **300** | **+0.407** | **−0.079** | **+0.486** |
+
+**D(300) − D(100) = +0.229, se 0.070, t 3.27 (df 10), n=6 v 6 — measured WITHIN-RUN** on the
+per-seed CHANGE in each arm, so seed, run, batch, box and GPU class cancel identically. This is
+the cleanest contrast in the corpus and it is why the design was within-run.
+
+**THE OBJECTION IS ANSWERED.** The referee objection ranked joint-first was that D is negative for
+most of training and turns positive only near the end, making the whole result a property of the
+last fifth of training. **It is not: the gap GROWS with budget.** And G moves the other way,
++0.159 → −0.079, so the tail-removed contrast becomes MORE null as training lengthens — the
+direction the mechanism predicts, at a budget three times the one it was fitted on.
+
+**AND IT KILLS THE LAST IMPORTED SLOPE.** The in-batch count axis U = chunk2325 − chunk777 reads
+**+0.399 / −0.052 / −0.108** at 100/200/300 epochs. It **changes sign with budget**, so no single
+count slope exists to import — the four conflicting values in the record (−0.407, −0.4906, ~0.51,
+−0.5361) were never one quantity. Any count correction must be measured in-batch AT THE BUDGET
+BEING CORRECTED.
+
+**NOT CLAIMED:** a RULE-11 tuned result at 300 ep; a sixth replication of the R18 D series; a
+budget law; any extrapolation past 300 epochs; any amendment to cc1's published D(100) = +0.727.
