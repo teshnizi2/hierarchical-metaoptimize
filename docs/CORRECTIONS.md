@@ -7821,3 +7821,85 @@ BEING CORRECTED.
 
 **NOT CLAIMED:** a RULE-11 tuned result at 300 ep; a sixth replication of the R18 D series; a
 budget law; any extrapolation past 300 epochs; any amendment to cc1's published D(100) = +0.727.
+
+## 123. **TWO CYCLE-91/92 HEADLINES ARE WITHDRAWN. BOTH WERE MINE, BOTH ARE INSTRUMENT ERRORS.** (cycle 94)
+
+Found by the cycle-93 planning audit and **independently re-verified here before withdrawal**.
+
+### 123.1 `aw1` "D TRANSFERS TO AdamW" — WITHDRAWN. IT IS **UNRESOLVED**.
+
+I reported D = +0.361, se 0.079, t 4.55 and wrote *"D TRANSFERS. It clears the pre-registered
+≥ +0.30 with t ≥ 2 bar."* **Two things were wrong.**
+
+1. **THE METRIC WAS THE BANNED COLUMN.** Those arm means are the CSV `plateau` column =
+   **mean of the last 20 epochs** — the column this project's own standing rule bans as primary.
+   Re-derived on **plateau5**:
+
+   | column | chunk777 | nodewise | D |
+   |---|---|---|---|
+   | `plateau` (k=20, BANNED) | 93.153 | 92.793 | **+0.361** |
+   | **plateau5 (PRIMARY)** | 93.257 | 92.978 | **+0.279** |
+
+2. **I WROTE AN AD-HOC SCORER INSTEAD OF RUNNING THE REGISTERED ONE.** `analysis/c88_scorers.py`
+   was committed at 5129e74 **before any aw1 run existed** and is unmodified. Run now, verbatim:
+
+       {'D_adamw': 0.279, 'se': 0.087, 't': 3.19, 'n': (3, 3), 'D_sgdm_anchor': 0.5949,
+        'rule': "UNRESOLVED at n=6. Report the interval. Do NOT re-cut the data,
+                 and do NOT describe it as 'partially transferring'."}
+
+   The registered rule is **95% LOWER BOUND > 0.30**, not "point estimate ≥ 0.30 with t ≥ 2".
+   The lower bound is **0.108**. My prose restated the hashed rule more weakly than the code.
+   The registration also specified **6 seeds**; only 3 reached the contrast, so the primary ran at
+   half its registered power.
+
+> **`aw1` IS UNRESOLVED. D under AdamW is +0.279 [0.108, 0.450].** It may not be written as
+> transferring, nor as "partially transferring" — the scorer forbids that phrase by name.
+> **The knock-on strengthens the other conclusion:** on plateau5 G = +0.232 (t 2.62), so
+> **D−G under AdamW = +0.047**, not the +0.135 in the record. "The tail mechanism is
+> SGDm-specific" stands, with better numbers.
+
+### 123.2 `hz3` "THE GAP GROWS WITH BUDGET" — WITHDRAWN. IT IS **FLAT**, AND THE GROWTH WAS A WINDOW ARTEFACT.
+
+Recomputed within-run, per-seed paired, from the 24 raw `.out` series:
+
+| window | D(100) | D(300) | D(300)−D(100) | t |
+|---|---|---|---|---|
+| **w=5 — plateau5, THE PRIMARY** | +0.576 | +0.428 | **−0.149** | **−1.42** |
+| w=20 — the CSV column | +0.522 | +0.419 | −0.103 | −2.10 |
+| w=50 — the hz3 scorer's window | +0.179 | +0.407 | +0.229 | +5.11 |
+
+**Only the 50-epoch window grows, and its own rationale is why.** At B=100 a 50-epoch trailing
+mean spans epochs **50–99** and therefore *contains* the documented mid-training trough
+(cc1 −0.560 at ep 55) that the wide window was introduced to avoid; at B=300 it spans 250–299 and
+contains none. The window injects the trough at exactly one budget. A second signal was available
+and I missed it: that window's D(100) = +0.179 sits **4.7 se below** the plateau5 pool of +0.612
+at the same configuration — the anchor check should have fired.
+
+> **DEFENSIBLE REPLACEMENT:** *"D is present and resolved at a 3× budget (+0.428, se 0.071,
+> t 6.0, n=6v6) and is statistically FLAT from 100 to 300 epochs (−0.149 ± 0.105). It is not a
+> last-fifth-of-training artefact; it does not grow."* **That still answers the horizon
+> objection.** It is not a new result and must not be written as one.
+
+### 123.3 STANDING RULE (16): RUN THE REGISTERED SCORER. DO NOT HAND-ROLL ONE.
+
+Both errors came from the same habit — scoring a batch with a python block written at read time
+instead of the RULE-19 scorer committed before the runs existed. The registered scorer for `aw1`
+would have printed the correct verdict and the sentence forbidding my phrasing. **If a batch has a
+registered scorer, it is scored by that scorer, unedited, and its output is quoted, not
+paraphrased.** A hand-rolled reduction may be used only as a cross-check, and any disagreement
+resolves in favour of the registered code.
+
+### 123.4 CONSEQUENCE FOR `nl1`, WHICH IS RUNNING NOW
+
+`nl1` (24 jobs, SGD and RMSProp bases) was submitted on the normalisation hypothesis. The audit
+shows that hypothesis is **half a level confound**: regressing D on the aligned arm's accuracy
+level **within SGDm alone** gives slope **−0.188 pp per pp, se 0.091, t −2.06**, and predicts
++0.440 at aw1's level against +0.279 observed. So roughly half of the SGDm−AdamW gap is explained
+by a slope that exists without any change of base. **`nl1` is NOT cancelled** — the corpus
+contains ZERO count-matched partition rows under SGD or RMSProp, so the cells are new regardless,
+and the confound is handled at analysis time by fitting level as a covariate, which needs MORE
+points, not fewer. **REGISTERED NOW, BEFORE THE DATA:** nl1 is scored by regressing D on aligned-arm
+level with base as a factor; the base effect is the RESIDUAL after the level slope, not the raw
+difference. **Lion is excluded from the monotone ordering** — its sign update makes per-group α the
+only thing setting per-coordinate magnitude, which predicts partitioning matters MOST there, the
+opposite end from where the hypothesis places it.
