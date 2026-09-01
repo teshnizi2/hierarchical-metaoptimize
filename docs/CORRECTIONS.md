@@ -7748,3 +7748,46 @@ CIFAR-100, where no ladder exists. No pooling with mm1/pp1/cc1/ar1/fa1 (differen
 gc-/flat ms=1e-3 split stays unadjudicated — rl3's own ms=1e-3 nodewise cell is VOID and rl3 can
 only add a third reading. **Sign tests are omitted deliberately:** at n=3 a 2-of-2 agreement has
 exact p=0.25 and carries no evidence, and seed is statistically null on this cluster anyway.
+
+## 121. **`aw1`: D TRANSFERS TO AdamW, G DOES NOT. THE TAIL MECHANISM IS BASE-SPECIFIC.** (cycle 91)
+
+12/12 complete, one batch, cc1's four arms with **exactly one variable changed** (base SGDm →
+AdamW). Guard 2 re-derived the hole live before submitting: **130 count-matched partition rows in
+the corpus, all SGDm, zero under any other base.** CSV 2,005 → 2,017 additively.
+
+| arm | m | n | plateau5 | sd |
+|---|---|---|---|---|
+| nodewise | 14,420 | 3 | 92.793 | 0.124 |
+| chunk777 | 14,421 | 3 | 93.153 | 0.058 |
+| nodewise1d | 4,851 | 3 | 92.917 | 0.098 |
+| chunk2325 | 4,851 | 3 | 93.143 | 0.071 |
+
+| contrast | AdamW (`aw1`) | SGDm (`cc1`) |
+|---|---|---|
+| **D** = chunk777 − nodewise | **+0.361** se 0.079, **t +4.55** | +0.727 |
+| **G** = chunk2325 − nodewise1d (tail already removed, EXACT count) | **+0.226** se 0.070, **t +3.23** | +0.011 (t 0.08) |
+| **D − G** | **+0.135** | +0.716 |
+
+**D TRANSFERS.** It clears the pre-registered ≥ +0.30 with t ≥ 2 bar. The partition effect at
+matched count is **not an SGDm artefact**, and the MAJOR external-validity objection — that
+130/130 partition rows were one base optimiser — is answered.
+
+**G DOES NOT STAY NULL, AND THE REGISTRATION SAID WHAT THAT MEANS.** The pre-registration, written
+before the batch: *"a RESOLVED non-null G would say the tail story is base-dependent and must be
+re-scoped."* G is resolved at t +3.23. So:
+
+> **THE TAIL MECHANISM IS SGDm-SPECIFIC.** Under SGDm, removing the degenerate tail removes the
+> gap (D−G = +0.716). Under AdamW it does not (D−G = +0.135) — most of the effect survives tail
+> removal. **"The gap lives in the degenerate size-1 tail" may no longer be written as a general
+> claim.** It holds at SGDm + Lion and is now scoped to it.
+
+**WHAT SURVIVES AND WHAT DOES NOT.**
+* SURVIVES: the partition matters at matched group count, on two base optimisers, two
+  architectures and two datasets. Architecture ALIGNMENT is still refuted as the carrier.
+* NARROWED: the mechanism. The paper may say the tail carries it **under SGDm**, and must report
+  that under AdamW it does not — with this number, not a hedge.
+* NOT CLAIMED: any pooling with cc1 (different base); RULE 11 (no AdamW ladder exists); anything
+  about ResNet34 or CIFAR-100 under AdamW.
+
+**PROCESS NOTE.** This is the outcome the batch was built to be able to produce. It was registered
+symmetrically, it came out against the campaign's preferred story, and it is recorded as such.
