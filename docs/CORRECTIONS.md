@@ -8747,3 +8747,145 @@ paper's 3-decimal convention. No Slurm job was submitted; `rp1` and `hz3`-R2 wer
   place in the author list) and 6 (minting the DOI) block submission.
 * **`tmlr.sty` is still not obtainable**, so `paper.tex` is verified under `article`; the swap is
   the two `%<<TMLR>>` lines and has not itself been compiled.
+
+---
+
+## 129. Cycle 102 — `rp1` LANDED AND SCORED: THE ALIGNMENT NULL REPLICATES AT TWICE THE POWER, THE PERMUTATION DRAW IS EXCHANGEABLE, AND THE CSV'S EIGHT STALE ROWS ARE REPAIRED
+
+**Supersedes 128.6's first bullet.** `rp1` is no longer "complete on disk and deliberately
+unscored". All 24 runs are complete, ingested, and scored by the registered scorer run unedited.
+`hz3`-R2 is NOT landed and is unchanged from 128.6 — see 129.5.
+
+### 129.1 THE RULE 20 ARGS SWEEP, AND THE DECOUPLING THAT WAS THE POINT OF THE BATCH
+
+All 24 `.out` files were swept before anything else was read. Every flag in the list
+`--optimizer --alg-base --alg-meta --stepsize-groups --seed --meta-stepsize --num-epochs
+--dataset --NN-name --alpha0 --gamma --batch-size --momentum-param-{base,meta}
+--weight-decay-{base,meta} --Lion-beta2-meta --save-directory --run-name` appears **exactly once**
+in **every** file; one `ARGS:` line and one `ENV:` line per file; 24/24 unique `PROBE_DIR`.
+Single-valued across all 24: `BETA_CLIP=-15:-2.3026`, `PROBE=5`, `AUGMENT=1`, `HIER=none`,
+meta `Lion`, base `SGDm`, ms `1e-4`, 100 epochs, `alpha0 1e-3`, `gamma 1`, CIFAR10, ResNet18,
+batch 100, optimizer HF.
+
+**The decoupling is confirmed, so the batch is NOT void.** The arm × seed matrix is
+`nodewise / permnode101 / permnode202 / permnode303`, each against seeds `6,7,8,9,10,11` — fully
+crossed, 6 per arm. The permutation index is fixed within an arm while the run seed varies across
+it, which is exactly what `pp1` could not do (`bin/c77_permuted_partition.sh` passed `S =` the run
+seed). Confirmed independently in the code: `HF.py` builds the draw from a **dedicated**
+`torch.Generator().manual_seed(S*1000003 + i)`, so the partition depends only on
+`(perm_seed, tensor index)` and never on the global RNG that `--seed` sets. Had the draw index
+tracked the run seed the batch would have been declared void; it does not.
+
+### 129.2 EIGHT STALE CSV ROWS, NOT SEVEN — AND THE FIRST SCORER RUN WAS INVALID
+
+128.6 recorded **seven** stale mid-flight rows. The true number is **eight**: `rp1-p202-s9` was
+ingested at 98/100 epochs, which passes `complete` (>= 95%) and so did not show up in the
+`complete = 0` count, but its `plateau5` was still the tail of a truncated curve. The eight are
+`p101-s{10,11}`, `p202-s{9,10,11}`, `p303-s{9,10,11}`.
+
+**This was caught the right way and is recorded because it nearly was not.** The first run of
+`c97_rp1_score.py` returned `V0: 16/24` with eight dirs reading `ep=86/100`, `84/100` and so on,
+which contradicted every `.out` tail (all 24 read `Epoch 99` + `RUN_DONE`). The scorer's V0 reads
+`epochs_done` **from the CSV** (line 381), not from the probe — so the failure was the run table
+being behind the disk, not the runs. **The verdict from that first run is void and is not recorded
+anywhere.** The local `.out` mirror was re-synced from both clusters, the CSV was rebuilt, and the
+scorer was re-run. Only the second run is quoted.
+
+### 129.3 THE INGEST, AND THE `dup_group` TRAP
+
+`aggregate.py ../runs ../runs_alice2` alone is **not** a faithful rebuild of `results/all_runs.csv`.
+It sets `dup_group` only where a **run name** collides, so a bare re-run silently dropped the
+**36** `dup_group` annotations that `args_repair.py` writes for differently-named same-experiment
+pairs (`ml2-adam-*` / `ml2-rms-*`, `h2-*`, `c100*`) — the very column that closes A3. The correct
+pipeline, now recorded: **`aggregate.py` then `args_repair.py --apply`**.
+
+Under that pipeline the diff against `6a374f4`'s CSV is exactly:
+
+```
+rows 2173 -> 2173 ; added 0 ; removed 0 ; CHANGED 8
+  all eight are rp1-p{101,202,303}-s{9,10,11} mid-flight snapshots
+  NON-rp1 rows changed: 0
+```
+
+So the claim "0 pre-existing rows change" holds for **every row except the eight this task existed
+to repair**, and it is stated that way rather than as an unqualified zero.
+
+Consequences re-derived, not carried: `complete = 0` **24 -> 17**; admissible **1,724 -> 1,731**;
+inadmissible **449 -> 442**; `permnode` inadmissible **7 -> 0**; partition-family admissible
+**420 -> 427** (Lion **408 -> 415**, RMSProp 12 unchanged); wallclock-carrying rows
+**2,150 -> 2,158**; GPU-hours **1,625 -> 1,632**; count-matched families **249/256 -> 256/256**.
+Six `chk()` constants in `c98_reproduce.py` were updated to match, and the audit returns
+**ALL 283 CHECKS PASS**.
+
+### 129.4 THE VERDICT, QUOTED AS ISSUED (RULE 16)
+
+`analysis/c97_rp1_score.py --root .../runs/rp1 --csv results/all_runs.csv`, unedited,
+md5 `7d21c4f5c16ccf25196fd6a5e6391fa9`, selftest **147/147 PASS**. Gates: V0 24/24, V0.2 24/24
+(`n_beta` exactly 14420 on every arm), V0.3 24/24, V0.4 **24/24 box-free** (`rec_lo = rec_hi =
+0.0000` on all 24 over T = 10,000).
+
+```
+T1  A = permnode - nodewise = -0.018 pp  (se 0.079, t -0.23 on 5 df, p 0.8248)  -> NULL
+T1b 95% CI [-0.222, +0.185], half-width 0.203, CI/band 1.36
+    MDE 0.222 pp (normal), 0.276 pp (t, 5 df)  -> CONSISTENT WITH NULL, UNDERPOWERED
+T2  draw     F(2,10) = 0.175, p 0.8423  -> THE PERMUTATION DRAW IS EXCHANGEABLE
+    run seed F(5,10) = 4.634, p 0.0190  -> RUN SEED IS A REAL EFFECT HERE
+    sigma_draw 0.0000 (truncated from -0.00114) | sigma_seed 0.1000 | sigma_resid 0.0908
+    smallest resolvable sigma_draw 0.0653 pp
+T3  A_p: -0.013+-0.082, -0.036+-0.105, -0.007+-0.062; spread 0.029; all three NULL
+T4  se 0.0791 vs pp1's 0.157 = 0.50x; design promised ~0.09: MET
+T5  A/D = -2.8%; 95% CI [-33.9%, +28.3%] of D; D pooled = +0.654
+```
+
+**THE PRE-REGISTERED DEMOTION DID NOT FIRE, AND THE ARITHMETIC IS RECORDED SO IT CANNOT BE
+RE-LITIGATED.** The clause (§3.5, §4.6) is: *if `rp1` returns an interval that still spans half of
+D, report the alignment leg as UNDERDETERMINED, not as a null.* D pooled = 0.654, so half of D =
+**0.327 pp**. CI half-width **0.203** < 0.327; normal MDE **0.222** < 0.327; conservative t-based
+MDE **0.276** < 0.327; and both CI bounds (−33.9%, +28.3%) are inside ±50% of D. The demotion does
+not fire on any reading, so the leg is a **null**.
+
+**Note on the briefing's description of the mechanism.** The word `UNDERDETERMINED` appears
+**zero** times in `c97_rp1_score.py`. The demotion clause is the **paper's** registration; the
+scorer supplies the interval and issues no such verdict. The demotion the *scorer* carries is
+`T1b`, and `T1b` **fired**: `CONSISTENT WITH NULL, UNDERPOWERED`. Both are reported.
+
+### 129.5 `hz3`-R2 IS UNCHANGED — STILL PENDING, NEVER STARTED, ARGS CHECK STILL OWED
+
+Jobs `4848866` (`hz3-ch-s5`), `4848867` (`hz3-c23-s5`), `4848868` (`hz3-n1d-s5`) are `PENDING`
+with elapsed `0:00`, `START_TIME N/A`, reason `Priority`. **No `.out` file exists for any of the
+three job ids.** Therefore:
+
+* STANDING RULE 20's post-launch ARGS check **remains OWED** and could not be discharged. There
+  was nothing to `scancel` and nothing was cancelled.
+* `c87_hz3_score.py` was **not** run on a restored box-matched 6 v 6, because that 6 v 6 does not
+  exist. **§4.8's budget-flatness verdict is UNCHANGED.**
+* The superseded seed-5 trio still on disk (`4814293/4/5`) was confirmed to carry
+  `BETA_CLIP=-15:-2.3026` — the wrong box, which is why R2 exists.
+
+### 129.6 MECHANICAL EVIDENCE
+
+```
+scorer selftest                              ->  147/147 PASS
+c97_rp1_score.py (unedited, 2nd run)         ->  V0..V0.4 all 24/24; verdict above
+aggregate.py + args_repair.py --apply        ->  2173 rows, 8 changed, 0 other, 0 +/-
+c98_reproduce.py                             ->  ALL 283 CHECKS PASS
+tectonic paper.tex                           ->  exit 0; 3 overfull hboxes, ALL PRE-EXISTING
+                                                 at HEAD (12.25499 / 7.28497 / 20.28241 pt)
+c98_release.py                               ->  137 files, 6.2 MB
+cd release && make verify                    ->  137 checked, 0 bad
+cd release && make reproduce                 ->  ALL 272 CHECKS PASS, 1 section declared skipped
+```
+
+No Slurm job was submitted. `hz3`-R2 was not disturbed.
+
+### 129.7 STILL OPEN
+
+* **`hz3`-R2 has not started.** Everything in 128.6 about it stands.
+* **A new discrepancy is on the record, not resolved: `rp1`'s run seed is a real effect**
+  (F(5,10) = 4.634, p = 0.0190) against the corpus seed null (F 1.21, p 0.213; F(30,30) = 1.50,
+  p = 0.138). Logged as Appendix **A.3b** in both markups. It is not resolvable from this design:
+  at one observation per cell the residual is interaction-plus-noise, so a draw × seed interaction
+  lands in the same denominator. It does not touch `A`, which is paired within run seed.
+* **The alignment leg is still not an equivalence claim** — `T1b` underpowered. The open
+  contribution narrows from ~half of D to ~a third; it is not zero.
+* The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).

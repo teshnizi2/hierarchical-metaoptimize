@@ -1,7 +1,22 @@
 # STATUS — operator dashboard
 
-Updated 2 Sep 2026 (cycle 101). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **128**) > `docs/FINDINGS.md` > everything else.
+Updated 2 Sep 2026 (cycle 102). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **129**) > `docs/FINDINGS.md` > everything else.
+
+## Cycle 102 — `rp1` LANDED AND SCORED; `hz3`-R2 STILL PENDING
+
+| | |
+|---|---|
+| `rp1` | **24/24 complete, ingested, SCORED.** ARGS sweep CLEAN; permutation seed **decoupled** from the run seed (permnode101/202/303 × seeds 6–11, fully crossed) — batch is **not** void |
+| Verdict (unedited, selftest 147/147) | `T1` A = −0.018 ± 0.079, t −0.23, p 0.8248 → **NULL**; `T1b` → **CONSISTENT WITH NULL, UNDERPOWERED** (95% CI [−0.222, +0.185], MDE 0.222); `T2` draw **exchangeable** (F(2,10) 0.175, p 0.84) |
+| Pre-registered demotion | **DID NOT FIRE.** half of D = 0.327; CI half-width 0.203, MDE 0.222, t-MDE 0.276 — all below it; CI = [−33.9%, +28.3%] of D, inside ±50%. Leg stands as a **null** |
+| Power | se 0.157 → **0.0791** (0.50×, design promised ≈0.09: MET). Open contribution ~half of D → **~a third** |
+| CSV | **eight** stale rows (not seven — `p202-s9` hid at 98/100), all repaired. `2173 → 2173`, 8 changed, **0 non-`rp1` rows changed**, 0 ± |
+| Ingest gotcha | `aggregate.py` alone drops the **36** `args_repair.py` `dup_group` annotations. Correct pipeline: **`aggregate.py` then `args_repair.py --apply`** |
+| Corpus deltas | admissible 1,724 → **1,731**; `complete=0` 24 → **17**; `permnode` inadmissible 7 → **0**; families 249/256 → **256/256**; GPU-h 1,625 → **1,632** |
+| Audit | `c98_reproduce.py` → **ALL 283 CHECKS PASS** (6 constants updated); `tectonic` exit 0, 3 overfull hboxes **all pre-existing**; deposit 137/137, `make reproduce` 272 PASS |
+| `hz3`-R2 | **STILL PENDING, NEVER STARTED** (`0:00`, `START_TIME N/A`, no `.out`). RULE 20 ARGS check **still OWED**; nothing to cancel; **§4.8 budget verdict UNCHANGED** |
+| New discrepancy | `rp1`'s run seed is a **real** effect (F(5,10) 4.634, p 0.0190) vs the corpus seed null — logged as Appendix **A.3b**, not reconciled |
 
 ## Cycle 101 — DRAFT-v4 is assembled and `paper.tex` is reconciled with it
 
@@ -13,7 +28,7 @@ Authority: `docs/CORRECTIONS.md` (highest number wins, now **128**) > `docs/FIND
 | The pool conflict | 11 / 13 / 14 cells all reproduced exactly; **14 is primary** (`sm3` is in Table 2, and the ground for excluding it did not distinguish it from `nl1`) |
 | B1 | **`identified` is withdrawn.** `dQ(base given batch)` = 4.11 on 2 df, **p 0.128 — unchanged at 14 cells**, because `sm3` brings a new batch as well as a new cell. Batch identity explains 95.8% against base's 92.8% |
 | Deposit | 137 files / 6.2 MB, `make verify` 137/137, `make reproduce` exit 0 (266 checks, 1 section declared skipped) |
-| Still open | `rp1` unscored (7 stale CSV rows); the nine `pp_`/`PP_` pairs still outside `dup_group`; the AdamW-level separation experiment of §9; the seven TODO-FOR-AUTHOR items below |
+| Still open | ~~`rp1` unscored~~ **closed, cycle 102**; the nine `pp_`/`PP_` pairs still outside `dup_group`; the AdamW-level separation experiment of §9; the seven TODO-FOR-AUTHOR items below |
 
 The 18 blocking items below are recorded as the cycle-100 gate found them. Cycle 101 acts on all
 of them; `docs/CORRECTIONS.md` §128 is the authority on what was done and what was re-derived

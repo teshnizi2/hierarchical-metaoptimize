@@ -72,8 +72,11 @@ ResNet-34 and ResNet-50, every contrast taken within one submission, so batch ef
 The uniform partition wins in every count-matched cell we measured. Pooled over the eight SGDm
 cells the effect is $+0.556 \pm 0.045\pp$ and homogeneous there (Cochran $Q$ 4.21 on 7 df), while
 cells that differ in base optimiser are strongly heterogeneous. Alignment itself is a bounded
-null: at fixed count and fixed size multiset, permuting which weights share a group is worth
-$-0.009 \pm 0.157\pp$, 95\% CI $[-55\%, +51\%]$ of it. Of nine candidate mechanisms, none
+null, now replicated: at fixed count and fixed size multiset, permuting which weights share a
+group is worth $-0.009 \pm 0.157\pp$ in the first batch and $-0.018 \pm 0.079\pp$ in a
+pre-registered replication that decouples the permutation draw from the run seed and doubles the
+power, narrowing the interval from $[-55\%, +51\%]$ to $[-34\%, +28\%]$ of $\Dstat$; the draw's own
+variance component is zero. Of nine candidate mechanisms, none
 survives as a general carrier, and we report all nine.
 
 Scope, stated here rather than deferred. The corpus is CIFAR-resolution vision, and a Lion
@@ -107,7 +110,7 @@ work on \emph{``the layer and weight levels''}.
 That is also how the paper closes on the question: \emph{``while increasing the number of step
 sizes is anticipated to enhance performance, our experimental findings in Section 7 reveal that
 this improvement is not consistent across the MetaOptimize approximations evaluated.''} We take
-that question up with 2{,}173 runs ($\approx$1{,}625 GPU-hours; 1{,}724 admissible) on CIFAR-10
+that question up with 2{,}173 runs ($\approx$1{,}632 GPU-hours; 1{,}731 admissible) on CIFAR-10
 and CIFAR-100 --- ResNet-10, -18, -34 and -50 across the corpus, and ResNet-18, -34 and -50 in
 every count-matched cell --- and report one robust measurement, one bounded null, and a
 mechanism we could not find.
@@ -173,7 +176,13 @@ worth $\mathbf{-0.009 \pm 0.157}$ \textbf{pp} ($t\ -0.06$, 3 v 3, one batch), sc
 $\mathbf{[-0.317, +0.298]}$ \textbf{pp} $= [-55\%, +51\%]$ of the same batch's $\Dstat$, and
 the effect this design could have detected at 80\% power is $\mathbf{0.440}$ \textbf{pp}
 $= 76\%$ of $\Dstat$. So an alignment effect accounting for most of $\Dstat$ is excluded; one
-accounting for half of it is \textbf{not} --- power against $\Astat = \Dstat/2$ is 0.46. We
+accounting for half of it is \textbf{not} --- power against $\Astat = \Dstat/2$ is 0.46. A
+pre-registered replication (\arm{rp1}, 24 jobs, three permutation draws $\times$ six seeds with the
+draw decoupled from the run seed) has since returned $\mathbf{-0.018 \pm 0.079}$ \textbf{pp},
+95\% CI $\mathbf{[-34\%, +28\%]}$ of $\Dstat$, with the permutation draw's variance component
+measured at \textbf{zero} ($F(2,10) = 0.175$, $p = 0.84$): the null replicates at twice the power
+and the open contribution narrows from about half of $\Dstat$ to about a third, though it is still
+\textbf{not} an equivalence claim (\S\ref{sec:rp1}). We
 also record a defect in our own registration: the \texttt{NULL} band's half-width (0.15) is
 \textbf{narrower than the standard error the batch achieved} (0.157), so a genuinely zero
 effect would have scored \texttt{NULL} only 66\% of the time. What is left as the leading
@@ -211,7 +220,7 @@ cell reaches $93.317 \pm 0.083$ pp against a tuned SGD\,+\,cosine baseline at
 $95.124 \pm 0.047$ ($n = 5$, the interior maximum of a bracketed grid), a \textbf{1.807 pp
 deficit}, and the deficit widens to 2.56 pp on ResNet-34 and 4.21 pp on ResNet-50. We make no
 competitiveness claim. (iii) The base optimiser has been varied four ways and the meta-optimiser
-once: of the 420 admissible runs in the partition families, 408 carry a \textbf{Lion}
+once: of the 427 admissible runs in the partition families, 415 carry a \textbf{Lion}
 meta-optimiser and 12 --- one cell, the second-moment corner that
 \S\ref{sec:silent-failures}'s void batch failed to test --- carry RMSProp. One cell is not an
 axis, so no general statement about the meta-optimiser is available from this corpus.
@@ -234,11 +243,14 @@ interior optimum; \S\ref{sec:related} states exactly what is left.
   in meta-learned step sizes, replicated in 20 within-batch cells across three networks,
   2 datasets, 4 base optimisers and 2 meta-optimisers (\S\ref{sec:primary}--\S\ref{sec:rule11},
   Table~\ref{tab:D}, Figure~\ref{fig:forest}).
-\item \textbf{A pre-registered permutation null, reported with its resolution}: at fixed count
-  \emph{and} fixed per-tensor size multiset, membership is worth $-0.009 \pm 0.157$ pp,
-  95\% CI $[-0.317, +0.298] = [-55\%, +51\%]$ of $\Dstat$, MDE 0.440 pp. This
-  \textbf{bounds} alignment's contribution rather than eliminating it, in one batch at one
-  design point, and we report the registration defect that limits it (\S\ref{sec:alignment}).
+\item \textbf{A pre-registered permutation null, replicated and reported with its resolution}: at
+  fixed count \emph{and} fixed per-tensor size multiset, membership is worth $-0.009 \pm 0.157$ pp
+  (95\% CI $[-55\%, +51\%]$ of $\Dstat$, MDE 0.440 pp) in the original batch, and
+  $-0.018 \pm 0.079$ pp (95\% CI $[-34\%, +28\%]$ of $\Dstat$, MDE 0.222 pp) in a replication that
+  removes the permutation-seed confound and measures the draw's variance component at zero. This
+  \textbf{bounds} alignment's contribution rather than eliminating it, at one
+  design point, and we report the registration defect that limits it and the equivalence test it
+  still fails (\S\ref{sec:alignment}, \S\ref{sec:rp1}).
 \item \textbf{A candidate moderator for the effect's heterogeneity, with its confound measured
   rather than asserted}: over fourteen same-contrast ResNet-18 cells the base optimiser is the
   coarsest partition that leaves them internally homogeneous (within $Q$ 7.36 on 10 df,
@@ -631,10 +643,12 @@ of their requested epochs} (23 of the 24 finished under 90\%; the twenty-fourth 
 100). The worst of them, \arm{rs-blk6-1e4-s2}, ran 29 of 100 epochs and still reports \plateau{}
 85.228; it sits in a \arm{resnet18\_blocks} arm of the \arm{rs} meta-stepsize sweep, where
 including it moves that arm's mean by 1.22 pp and inflates its sem 19-fold. \textbf{None of the
-24 is in a count-matched arm of any cell reported in this paper; seven are truncated snapshots of
-the in-flight \arm{rp1} batch (\S\ref{sec:inflight}), which contributes no number here} --- see
+24 is in a count-matched arm of any cell reported in this paper} --- see
 the attrition ledger in \S\ref{sec:repro}, where attrition
-inside the primary contrasts is zero. Of 2{,}173 rows, \textbf{1{,}724 are admissible}.
+inside the primary contrasts is zero. Of 2{,}173 rows, \textbf{1{,}731 are admissible}.
+(This count is 7 higher than the 1{,}724 of earlier drafts for one reason only: \arm{rp1}'s eight
+mid-flight snapshot rows have been refreshed from the completed \texttt{.out} files, so seven of
+them now pass the \texttt{complete} gate. No other row moved.)
 
 \paragraph{Selection on the test set, stated in full.}
 \textbf{No validation split was held out anywhere in this project.} CIFAR-10 and CIFAR-100
@@ -907,12 +921,12 @@ $\rho$ superlative survived two review cycles in \S\ref{sec:primary} as a result
 \label{sec:inflight}
 
 Three weaknesses this paper states about itself, and one experiment it declares was never run,
-are addressed by four batches submitted while this draft was being written. Two of the four ---
-\arm{bm2} and \arm{sm4} --- have since completed and been scored by running their registered
-scorers \textbf{unedited}, and their verdicts are folded into \S\ref{sec:moderator},
-\S\ref{sec:prescription}, \S\ref{sec:tail}, \S\ref{sec:normalisation} and \S\ref{sec:threats}.
-Two --- \arm{rp1} and the \arm{hz3} seed-5 trio --- are not scored, and \textbf{no number from
-either enters any claim in this paper}. The registrations are stated here in full regardless of
+are addressed by four batches submitted while this draft was being written. Three of the four ---
+\arm{bm2}, \arm{sm4} and \arm{rp1} --- have since completed and been scored by running their
+registered scorers \textbf{unedited}, and their verdicts are folded into \S\ref{sec:moderator},
+\S\ref{sec:alignment}, \S\ref{sec:prescription}, \S\ref{sec:tail}, \S\ref{sec:normalisation} and
+\S\ref{sec:threats}. One --- the \arm{hz3} seed-5 trio --- is not scored, and \textbf{no number
+from it enters any claim in this paper}. The registrations are stated here in full regardless of
 outcome, so that the decision rules are on the record ahead of the numbers, and so that a reader
 can check that the two verdicts we did read are the ones we said we would read.
 
@@ -934,11 +948,11 @@ scorers unedited; the other two contribute no number to this paper.}
 tag & batch & jobs & what it repairs & registered scorer & status \\
 \midrule
 R1 & \arm{rp1} & 24 & the alignment null's power \textbf{and} its permutation-seed confound
-     (\S\ref{sec:alignment}) & \texttt{c97\_rp1\_score.py} & complete on disk, \textbf{not
-     scored} \\
+     (\S\ref{sec:alignment}) & \texttt{c97\_rp1\_score.py} & \textbf{SCORED --- null
+     REPLICATED} \\
 R2 & \arm{hz3} seed-5 trio & 3 & the budget cell's clip-box and GPU-class mismatch
      (\S\ref{sec:budget}, \S\ref{sec:threats} T9) & \texttt{c87\_hz3\_score.py}, reused
-     unedited & \textbf{queued} \\
+     unedited & \textbf{queued, not started} \\
 R3 & \arm{bm2} & 12 & the base-optimiser moderator's single-batch SGD and RMSProp levels
      (\S\ref{sec:moderator}) & \texttt{c97\_bm2\_score.py} & \textbf{SCORED --- both levels
      REPLICATE} \\
@@ -1030,19 +1044,34 @@ were measured on the batches' own probe records rather than inherited: \arm{sm4}
 are among the six that a reader holding the deposit alone cannot regenerate, because both gates
 read the excluded probe records; \S\ref{sec:repro} says so and names them.
 
-\textbf{R1 is complete on disk and deliberately unscored.} All 24 \arm{rp1} runs reach 100 epochs
-in their own \texttt{.out} series. Seven of the twenty-four were ingested into
-\texttt{results/all\_runs.csv} mid-flight and their rows still carry the partial epoch counts of
-that snapshot, so the run table is behind the disk for this batch. We have not run
-\texttt{analysis/c97\_rp1\_score.py}, and \textbf{no \arm{rp1} number appears anywhere in this
-paper}, including in \S\ref{sec:alignment} where it would matter most. The registration stands as
-written, including the clause that binds us: if \arm{rp1} returns an interval that still spans
-half of $\Dstat$, the alignment leg is to be reported as \textbf{underdetermined}, not as a null.
+\textbf{R1 is complete and scored.} All 24 \arm{rp1} runs reach 100 epochs in their own
+\texttt{.out} series and all 24 now carry complete rows: eight of the twenty-four had been
+ingested mid-flight and carried the partial epoch counts of that snapshot, and re-running
+\texttt{analysis/aggregate.py} over the refreshed \texttt{.out} tree corrected exactly those eight
+rows and \textbf{changed no other row in the corpus} (0 added, 0 removed, 0 other rows altered).
+\texttt{analysis/c97\_rp1\_score.py} was then run \textbf{unedited} --- selftest 147/147 PASS ---
+and its verdict is transcribed in \S\ref{sec:alignment}. The clause that binds us did \textbf{not}
+fire: the interval does not span half of $\Dstat$, so the alignment leg is reported as a null and
+not as underdetermined. That the demotion did not fire is a fact about the data, not a choice; the
+arithmetic is printed in \S\ref{sec:alignment} so a reader can check it against the rule as
+registered.
 
-\textbf{R2 is queued.} The three seed-5 jobs sit \texttt{PENDING} on the same congested partition
-on which the original \arm{hz3} seed-3 and seed-4 runs waited 16 and 23 hours, so a wait is
-expected rather than anomalous. STANDING RULE 20's post-launch ARGS check is owed on them the
-moment they start.
+The RULE 20 ARGS sweep was run over all 24 \texttt{.out} files before the scorer: every flag
+appears \textbf{exactly once} in every file, and the permutation seed is confirmed
+\textbf{decoupled from the run seed} --- \arm{permnode101}, \arm{permnode202} and \arm{permnode303}
+each appear against the full run-seed set 6--11, so the draw is fixed within an arm while the seed
+varies across it. This is the specific defect of \arm{pp1} (\texttt{bin/c77\_permuted\_partition.sh}
+passed $S =$ the run seed) and the \texttt{.out} lines show it is gone. Had the draw index tracked
+the seed we would have declared the batch void; it does not.
+
+\textbf{R2 is still queued and has never started.} The three seed-5 jobs (\arm{hz3-ch-s5},
+\arm{hz3-c23-s5}, \arm{hz3-n1d-s5}) sit \texttt{PENDING} with elapsed time \texttt{0:00} and no
+assigned start time, on the same congested partition on which the original \arm{hz3} seed-3 and
+seed-4 runs waited 16 and 23 hours, so a wait is expected rather than anomalous. No \texttt{.out}
+file exists for any of the three job ids, so STANDING RULE 20's post-launch ARGS check
+\textbf{remains owed} and cannot be discharged yet; it is owed the moment they start, and the batch
+is to be cancelled on any \texttt{BETA\_CLIP} mismatch. Until they run, the box-matched 6 v 6 at 300
+epochs does not exist and \textbf{\S\ref{sec:budget}'s budget verdict is unchanged}.
 
 \section{Results}
 \label{sec:results}
@@ -1315,8 +1344,8 @@ of the 2{,}173 runs, every batch that ever ran a \arm{nodewise} arm alongside a 
 uniform-chunk arm is one of these twenty-two (the twenty above, \arm{gn1}-GroupNorm, and
 \arm{ar1}), and every other batch carrying a \arm{nodewise} arm has no arm to match it against.
 The enumeration also shows that no such cell could have been lost to the admissibility gate: all
-238 uniform-chunk, \arm{nodewise1d} and \arm{permnode} runs in the corpus outside the in-flight
-\arm{rp1} batch are admissible, and the
+256 uniform-chunk, \arm{nodewise1d} and \arm{permnode} runs in the corpus --- 238 of them outside
+\arm{rp1}, and now all 18 of \arm{rp1}'s \arm{permnode} rows as well --- are admissible, and the
 sixteen batches involved contribute 272 runs of which 272 are admissible
 (\S\ref{sec:repro}, Table~\ref{tab:attrition}). Two further count-matched contrasts exist in the
 corpus and are reported elsewhere in this paper rather than in Table~\ref{tab:D}, because neither
@@ -1833,19 +1862,110 @@ insensitivity to alignment and not about a manipulation that failed to apply.
   we do not present them as though they were.
 \end{enumerate}
 
-\paragraph{What would settle it, and it is running.}
-A single batch closes all three of the statistical gaps above: \textbf{R1 --- \arm{rp1},
-\arm{permnode} at three permutation draws $\times$ six seeds with the permutation seed decoupled
-from the run seed, plus a six-seed \arm{nodewise} arm; 24 jobs (\S\ref{sec:inflight}).} No patch
-is needed --- \arm{permnode<S>} already accepts an explicit $S$; \arm{c77} simply passed the run
-seed. That design (i) takes $\se(\Astat)$ from 0.157 to $\approx 0.09$, which brings the MDE to
-$\approx 0.25$ pp, below half of $\Dstat$ and inside the pre-registered band for the first time;
-(ii) yields a \textbf{two-way variance decomposition} that separates permutation variance from
-seed variance, so limit 2 above becomes a measured number instead of a caveat; and (iii) supplies
-the replication $\Astat$ has never had. Until it reports, the sentence this paper is entitled to
-is the bounded one above and not a stronger one. \textbf{If \arm{rp1} returns an interval that
-still spans half of $\Dstat$, the alignment leg is to be reported as underdetermined rather than
-as a null}, and we register that in advance here and in that batch's own scorer.
+\subsubsection{The replication: \arm{rp1} settles limit 2, doubles the power, and confirms the
+null}
+\label{sec:rp1}
+
+\arm{rp1} is \arm{pp1}'s alignment leg re-measured with the confound removed and the $n$ raised:
+three fixed permutation draws (\arm{permnode101/202/303}) \textbf{fully crossed} with six fresh run
+seeds (6--11), plus a six-seed \arm{nodewise} arm --- 24 jobs at \arm{pp1}'s own cell, same box,
+same $\eta$, same base/meta pair, same architecture, same probe. Nothing else changes. The
+permutation seed is now an explicit constant: \texttt{HF.py} builds each draw from
+\texttt{torch.Generator().manual\_seed($S\cdot 1000003 + i$)} on a \emph{dedicated} generator, so
+the partition depends only on $(S,\,\text{tensor index})$ and not on the global RNG that
+\texttt{--seed} sets. We verified the decoupling on the runs' own \texttt{ARGS:} lines rather than
+from the script header (STANDING RULE 20): each of \arm{permnode101/202/303} appears against the
+full seed set 6--11, every flag appears exactly once in all 24 files, and every validity gate is
+24/24 --- including \texttt{V0.4}, where all 24 probe directories report
+\texttt{rec\_lo} $=$ \texttt{rec\_hi} $= 0.0000$ over $T = 10{,}000$ recorded steps, so no run
+touched a clip rail.
+
+The registered scorer \texttt{analysis/c97\_rp1\_score.py}, run \textbf{unedited}
+(\texttt{--selftest} 147/147 PASS), verbatim:
+
+\begin{quote}\small\ttfamily
+nodewise\ \ \ \ \ m=14420\ n=6\ \ 92.066 +-0.050\\
+permnode101\ \ m=14420\ n=6\ \ 92.053 +-0.050\\
+permnode202\ \ m=14420\ n=6\ \ 92.030 +-0.064\\
+permnode303\ \ m=14420\ n=6\ \ 92.059 +-0.050\\[2pt]
+T1\ \ per-seed paired d\_s: -0.219, -0.179, +0.065, +0.052, +0.295, -0.125\\
+\ \ \ \ A = permnode - nodewise = -0.018 pp\ \ (se 0.079, t -0.23 on 5 df, p 0.8248)\\
+\ \ \ \ ->\ **NULL**\\
+T1b se 0.0791 | 95\% CI [-0.222, +0.185] (half-width 0.203) | CI/band 1.36\\
+\ \ \ \ MDE at 80\% power: 0.222 pp (normal), 0.276 pp (t, 5 df)\\
+\ \ \ \ ->\ **CONSISTENT WITH NULL, UNDERPOWERED**\\
+T2\ \ draw\ \ \ \ \ F(2,10) = 0.175, p 0.8423\ \ ->\ THE PERMUTATION DRAW IS EXCHANGEABLE\\
+\ \ \ \ run seed F(5,10) = 4.634, p 0.0190\ \ ->\ RUN SEED IS A REAL EFFECT HERE\\
+\ \ \ \ sigma\_draw 0.0000 pp (TRUNCATED AT ZERO from -0.00114) | sigma\_seed 0.1000 pp\\
+\ \ \ \ | sigma\_resid 0.0908 pp; smallest resolvable sigma\_draw 0.0653 pp\\
+T5\ \ A / D = -2.8\%;\ \ 95\% CI = [-33.9\%, +28.3\%] of D\ \ (D pooled = +0.654 pp)
+\end{quote}
+
+\paragraph{The binding clause did not fire, and here is the arithmetic.}
+We registered in advance that \emph{if \arm{rp1} returned an interval that still spans half of
+$\Dstat$, the alignment leg is to be reported as \textbf{underdetermined} rather than as a null}.
+$\Dstat$ pooled over the two batches that measured it within batch at this configuration is
+$+0.654$ pp, so half of $\Dstat$ is \textbf{0.327 pp}. The realised interval half-width is
+\textbf{0.203 pp}, the normal-approximation MDE is \textbf{0.222 pp}, and the conservative
+$t$-based MDE on 5 df is \textbf{0.276 pp} --- all three below 0.327. Equivalently, the interval on
+$\Astat$ runs from $-33.9\%$ to $+28.3\%$ of $\Dstat$, and neither bound reaches $\pm 50\%$. The
+demotion does not fire on any of these readings, so the alignment leg stands as a \textbf{null}. We
+state the test rather than the conclusion alone because a rule that is only quoted when it passes
+is not a rule.
+
+\paragraph{What is now settled, and what is not.}
+\begin{itemize}
+\item \textbf{Limit 2 is retired --- it is a measured number, not a caveat.} The two-way
+  decomposition on the balanced $3 \times 6$ grid puts the permutation draw's variance component at
+  \textbf{exactly zero} (truncated from $-0.00114$; $F(2,10) = 0.175$, $p = 0.84$), against a
+  residual sd of 0.0908 pp. The three per-draw contrasts are $-0.013 \pm 0.082$,
+  $-0.036 \pm 0.105$ and $-0.007 \pm 0.062$, a spread of 0.029 pp, and \textbf{all three fall in
+  the same registered band} --- so a single draw run \arm{pp1}-style would have returned the same
+  verdict from this experiment. \arm{pp1}'s confound therefore inflated no variance it did not
+  already carry, and $\Astat$ may be read as a statement about the permutation \emph{distribution}
+  rather than about one arbitrary draw. This is registered as a null with a stated resolution,
+  never as proof of zero: the smallest draw-to-draw sd this design could have resolved is
+  0.0653 pp.
+\item \textbf{The power roughly doubled, and that is a receipt, not a finding.} $\se(\Astat)$ falls
+  from \arm{pp1}'s realised 0.157 to \textbf{0.0791} --- a ratio of $0.50\times$ against a design
+  that promised $\approx 0.09$, so the design was met. The interval on $\Astat$'s share of $\Dstat$
+  tightens from \arm{pp1}'s $[-55\%, +51\%]$ to $\mathbf{[-33.9\%,\ +28.3\%]}$.
+\item \textbf{It is still not an equivalence claim.} \texttt{T1b} is the part of the registration
+  that binds hardest, and it fires: the point estimate sits inside the $\pm 0.15$ band but the 95\%
+  CI does not (CI half-width 0.203, ratio 1.36), so the correct reading is \textbf{consistent with
+  null, underpowered} --- the data are equally consistent with a true zero and with an alignment
+  effect up to 0.222 pp, about a third of $\Dstat$. We do not write this as ``alignment does not
+  matter''. The conclusion is unchanged in \emph{kind} and stronger in \emph{degree}: alignment is
+  excluded as the principal carrier of $\Dstat$, and a contribution of up to roughly a third of
+  $\Dstat$ remains open where before it was up to half.
+\item \textbf{The two batches are not pooled.} $\Astat$ is a within-batch quantity and the scorer
+  explicitly refuses to pool \arm{rp1}'s $\Astat$ with \arm{pp1}'s; the two readings are reported
+  side by side on the same registered band, which is what makes them comparable at all. The
+  \texttt{T5} percentages are cross-batch and descriptive, carry the $\pm 0.25$ pp unmodelled batch
+  offset, and carry no gate.
+\end{itemize}
+
+\paragraph{One disagreement with our own corpus, reported rather than smoothed.}
+In this batch the run seed is a \textbf{real} effect: $F(5,10) = 4.634$, $p = 0.0190$, sd 0.100 pp.
+That contradicts the corpus METHODS finding that seed is null ($F$ 1.21, $p$ 0.213; and the
+batch $\times$ seed ANOVA of \S\ref{sec:discipline}, $F(30,30) = 1.50$, $p = 0.138$). We do not
+reconcile the two here and we do not drop either. Two readings are available and we cannot separate
+them with what we have: at one observation per cell the residual is interaction-plus-noise and not
+decomposable, so a draw $\times$ seed interaction would land in the same denominator; and a single
+batch's 6 seeds is a thin base from which to overturn a corpus-wide null. What it does mean
+concretely is that \textbf{\arm{rp1}'s own pairing within run seed was worth doing} --- the pairing
+that \texttt{T1} uses is what removes this variance from $\Astat$'s standard error. It is logged in
+Appendix~\ref{app:discrepancy} as a discrepancy rather than resolved.
+
+\paragraph{What still would settle the rest.}
+Limits 1 and 3 above are untouched by \arm{rp1} and remain exactly as stated: \arm{permnode}
+permutes \emph{within} each tensor, so this is a \textbf{within-layer} statement that does not test
+whether layer boundaries matter; and $\Astat$ is still measured at one cell --- ResNet-18 /
+CIFAR-10 / SGDm $+$ Lion / $\eta = 10^{-4}$ / 100 epochs, with \arm{nodewise} read at the inherited
+$\eta$ rather than at its own argmax of $3\times10^{-4}$ --- against a $\Dstat$ measured in sixteen
+count-matched cells across three networks, two datasets and four base optimisers. \arm{rp1} doubles
+the power and removes the confound; it does not broaden the design point, and we do not claim it
+does.
 
 \subsection{The prescription, and its exact scope}
 \label{sec:prescription}
@@ -2153,7 +2273,8 @@ M8 & Some summary statistic of the group-size distribution &
 
 \textbf{The two nulls}: architecture alignment (\S\ref{sec:alignment}, \S\ref{sec:null-repeat})
 --- a \emph{bounded} null, $\Astat = -0.009 \pm 0.157$, 95\% CI $[-55\%, +51\%]$ of $\Dstat$,
-from one batch at one design point --- and out-of-sample predictability of $\Dstat$
+replicated at $\Astat = -0.018 \pm 0.079$, 95\% CI $[-34\%, +28\%]$ of $\Dstat$ --- and
+out-of-sample predictability of $\Dstat$
 (\S\ref{sec:prediction}). \S\ref{sec:pooling} adds the failure of the classical remedy ---
 hierarchical partial pooling --- which is a dead \emph{fix} rather than a dead mechanism, and is
 included because CAM-HD makes it the obvious question to ask.
@@ -2762,14 +2883,22 @@ instrument and we could not make it beat a good partition.
 
 \S\ref{sec:alignment}. $\Astat = -0.009 \pm 0.157$, $t\ -0.06$, scored \texttt{NULL} against a band
 registered in advance, with a 95\% interval of $[-0.317, +0.298]$ pp $= [-55\%, +51\%]$ of
-$\Dstat$ and an MDE of 0.440 pp $= 76\%$ of $\Dstat$. It excludes alignment as the principal
+$\Dstat$ and an MDE of 0.440 pp $= 76\%$ of $\Dstat$; replicated in \arm{rp1} at
+$\Astat = -0.018 \pm 0.079$, $t\ -0.23$, same band, same verdict, 95\% interval
+$[-0.222, +0.185]$ pp $= [-34\%, +28\%]$ of $\Dstat$ and MDE 0.222 pp $= 34\%$ of $\Dstat$
+(\S\ref{sec:rp1}). It excludes alignment as the principal
 carrier and leaves a moderate contribution open, from one batch at one design point, with
 permutation variance confounded with seed variance and with a registration defect we print (band
 half-width $0.15 <$ realised $\se$ 0.157). Read at that strength it is still what redirected this
 programme from architecture alignment to group-size homogeneity, and it is still worth as much as
 the positive --- a negative reported with its resolution is a deliverable; a negative reported
-without one is a claim we cannot support. R1 (\arm{rp1}, 24 jobs, in flight,
-\S\ref{sec:inflight}) is designed to halve the interval and to decompose the two variance sources.
+without one is a claim we cannot support. R1 (\arm{rp1}, 24 jobs, \S\ref{sec:inflight}) has since
+done both things it was designed to do: it halved the interval ($\se$ 0.157 $\to$ 0.0791) and
+decomposed the two variance sources, putting the permutation draw's component at zero
+($F(2,10) = 0.175$, $p = 0.84$). The null replicates at $\Astat = -0.018 \pm 0.079$ and the open
+contribution narrows from roughly half of $\Dstat$ to \textbf{roughly a third} ---
+$[-33.9\%, +28.3\%]$ of $\Dstat$. It remains consistent-with-null-but-underpowered rather than an
+equivalence claim (\S\ref{sec:alignment}).
 
 \section{Measurement discipline: what our own instrument did to us}
 \label{sec:discipline}
@@ -2958,9 +3087,9 @@ worth being exact about by how much.
 
 The census is stated under a rule a reader can execute against the deposited run table: a
 \textbf{partition-family run} is an admissible row whose \texttt{granularity} is \arm{nodewise},
-\arm{nodewise1d}, \arm{chunk*} or \arm{permnode*}. There are \textbf{420} of them, of which
-\textbf{408 are meta $=$ Lion and 12 are meta $=$ RMSProp}; the twelve are \arm{sm4}. Before
-\arm{sm4} the count was 408 of 408. (An earlier version of this paper quoted ``367 of 367'' here.
+\arm{nodewise1d}, \arm{chunk*} or \arm{permnode*}. There are \textbf{427} of them, of which
+\textbf{415 are meta $=$ Lion and 12 are meta $=$ RMSProp}; the twelve are \arm{sm4}. Before
+\arm{sm4} the count was 415 of 415. (An earlier version of this paper quoted ``367 of 367'' here.
 That figure does not re-derive under any definition of ``partition-programme run'' we can
 reconstruct from the run table, so we drop it rather than restate it --- the same treatment
 Appendix~\ref{app:discrepancy}.7 gives every number of that kind.)
@@ -3005,10 +3134,12 @@ and the alignment null is underpowered.}
 \S\ref{sec:identifiability} and \S\ref{sec:alignment}. The size distribution is the surviving
 carrier and takes $+0.590 \pm 0.107$ of the decomposition, but we cannot say which property of it
 and this corpus provably cannot tell us. Separately, the leg that redirected us there is measured
-once, at $n = 3$ v $3$, with an interval spanning $[-55\%, +51\%]$ of $\Dstat$ and with permutation
-variance confounded with seed variance: \textbf{a moderate alignment contribution is not
-excluded}, and the batch that would exclude it (R1, \arm{rp1}, 24 jobs) is running rather than
-reported.
+twice: once at $n = 3$ v $3$ with an interval spanning $[-55\%, +51\%]$ of $\Dstat$ and with
+permutation variance confounded with seed variance (\arm{pp1}), and once at $n = 6$ with three
+permutation draws and the confound removed (\arm{rp1}, \S\ref{sec:rp1}), which narrows the interval
+to $[-33.9\%, +28.3\%]$ of $\Dstat$ and puts the draw's variance component at zero. \textbf{A
+moderate alignment contribution is still not excluded} --- up to about a third of $\Dstat$, where
+before it was half --- and no batch now in flight would exclude it.
 
 \paragraph{T3 --- Scale and domain.}
 CIFAR-resolution vision, ResNets, one framework. ImageNet-1k \citep{deng2009imagenet} is not
@@ -3279,15 +3410,15 @@ $-$ infrastructure jobs, no training & $-4$ & --- &
   each logs one \texttt{ARGS} line \\
 $-$ crashed or cancelled before epoch 1 & $-64$ & $\approx$0 &
   itemised below; \textbf{not one logged a single epoch} \\
-\textbf{rows in \texttt{results/all\_runs.csv}} & \textbf{2{,}173} & 1{,}624.8 &
-  2{,}150 carry a wallclock \\
+\textbf{rows in \texttt{results/all\_runs.csv}} & \textbf{2{,}173} & 1{,}631.7 &
+  2{,}158 carry a wallclock \\
 $-$ no readable \plateau{} & $-25$ & \multirow{3}{*}{66.3} & 2--5-epoch smoke tests \\
 $-$ \texttt{window\_ok = 0}, \plateau{} present & $-400$ & &
   budget $\le$ 20 epochs; \texttt{window\_ok} is \texttt{epochs\_done > 20} \\
-$-$ \texttt{window\_ok = 1}, \texttt{complete = 0} & $-24$ & &
-  truncated runs, 7 of them in-flight \arm{rp1} snapshots; \texttt{complete} is
+$-$ \texttt{window\_ok = 1}, \texttt{complete = 0} & $-17$ & &
+  truncated runs; \texttt{complete} is
   \texttt{epochs\_done} $\ge 0.95 \times$ requested \\
-\textbf{admissible} & \textbf{1{,}724} & 1{,}558.4 & the gate of Eq.~\ref{eq:adm} \\
+\textbf{admissible} & \textbf{1{,}731} & 1{,}565.3 & the gate of Eq.~\ref{eq:adm} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -3325,22 +3456,23 @@ crashes are all hierarchical-pooling runs, in the region of \S\ref{sec:rw-camhd}
 \S\ref{sec:pooling} that Appendix~\ref{app:discrepancy}.9 already marks as carried from the project
 record rather than re-derived.
 
-\textbf{The 449 inadmissible rows are not failures; they are short-budget probes.} All 425
+\textbf{The 442 inadmissible rows are not failures; they are short-budget probes.} All 425
 \texttt{window\_ok = 0} rows requested $\le$ 20 epochs (392 at 20, 33 at 2--5) and so could never
-carry a five-epoch plateau at their requested budget. Only 24 of the 449 are full-budget runs, and
-those are the truncated ones. By granularity, the 449 are: \arm{layerwise} 136, \arm{weightwise}
-111, \arm{nodewise} 108, \arm{resnet18\_blocks} 56, \arm{scalar} 30, \arm{permnode} 7 (the
-in-flight \arm{rp1} snapshots), no-partition baseline 1 ---
+carry a five-epoch plateau at their requested budget. Only 17 of the 442 are full-budget runs, and
+those are the truncated ones. By granularity, the 442 are: \arm{layerwise} 136, \arm{weightwise}
+111, \arm{nodewise} 108, \arm{resnet18\_blocks} 56, \arm{scalar} 30,
+no-partition baseline 1 --- \textbf{no \arm{permnode} row is inadmissible}; earlier drafts
+recorded seven, which were \arm{rp1}'s mid-flight snapshots, and those rows are now complete ---
 i.e.\ attrition is concentrated in the coarse and the maximally fine arms of the exploratory
 ladders, which is where the 20-epoch probes were run.
 
 \textbf{Attrition inside the primary contrasts is exactly zero.} The sixteen batches that carry a
 count-matched contrast contribute \textbf{272 runs, of which 272 are admissible}. More strongly:
-\textbf{every} uniform-chunk, \arm{nodewise1d} and \arm{permnode} run in the corpus outside the
-in-flight \arm{rp1} batch --- 238 rows
+\textbf{every} uniform-chunk, \arm{nodewise1d} and \arm{permnode} run in the corpus ---
+\textbf{256 of 256}, \arm{rp1} included
 --- is admissible, so no count-matched cell could have been lost to the gate even in principle.
-(Counting \arm{rp1} the figure is 249 of 256; the seven exceptions are its mid-flight snapshots,
-and they enter no contrast here.)
+(Earlier drafts read 249 of 256, the seven exceptions being \arm{rp1}'s mid-flight snapshots;
+those rows are now complete.)
 Submitted $n$ equals admissible $n$ in all twenty cells of Table~\ref{tab:D} and in the excluded
 \arm{ar1} cell.
 
@@ -3352,7 +3484,7 @@ four arms instead of two, and half the registered per-arm power on the primary. 
 realised seed set matches its submission script's \texttt{SEEDS} line.
 
 \paragraph{Compute.}
-2{,}150 runs carry a wallclock; they total \textbf{1{,}625 GPU-hours} over 29 distinct nodes and
+2{,}158 runs carry a wallclock; they total \textbf{1{,}632 GPU-hours} over 29 distinct nodes and
 two accounts, on NVIDIA L4 24 GB, RTX 2080 Ti 11 GB, A100 80 GB and A100 MIG 40 GB partitions. GPU
 class is recorded per run and was measured to carry no systematic offset between arms
 (\S\ref{sec:variance}); every primary is within batch, so a per-node offset shared by the two arms
@@ -3536,8 +3668,11 @@ which moved that conditional test from $\Delta Q$ 0.05 on 1 df to $\Delta Q$ 4.1
 not finish it. Architecture \textbf{alignment} is bounded out as the principal carrier, in one
 batch at one design point: holding the count \emph{and} the per-tensor size multiset and permuting
 only membership is worth $-0.009 \pm 0.157$ pp, 95\% CI
-$[-0.317, +0.298] = [-55\%, +51\%]$ of $\Dstat$, against an MDE of 0.440 pp. A moderate alignment
-contribution is not excluded and a further batch is running to bound it more tightly. The surviving
+$[-0.317, +0.298] = [-55\%, +51\%]$ of $\Dstat$, against an MDE of 0.440 pp; and, in a second batch
+that removes the permutation-seed confound, $-0.018 \pm 0.079$ pp, 95\% CI
+$[-0.222, +0.185] = [-34\%, +28\%]$ of $\Dstat$, against an MDE of 0.222 pp. A moderate alignment
+contribution is still not excluded, though the bound has tightened from about half of $\Dstat$ to
+about a third. The surviving
 carrier is the group-size distribution, which takes $+0.590 \pm 0.107$ ($t\ 5.53$) of the same
 three-arm decomposition.
 
@@ -3573,10 +3708,11 @@ registered scorer, which this project also produced and withdrew (\S\ref{sec:lev
 
 \textbf{The experiments that would break the impasse}, in the order we would run them. Two of the
 four registered in \S\ref{sec:inflight} have been read: R3, the base-moderator replication at fresh
-seeds, which replicated both levels and is in \S\ref{sec:moderator}; and R4, the second-moment
-corner, which refuted its mechanism and is in \S\ref{sec:normalisation}. Two remain: the alignment
-replication with the permutation seed decoupled (R1, complete on disk and deliberately unscored)
-and the box- and hardware-matched budget trio (R2, queued). To those we add two experiments the
+seeds, which replicated both levels and is in \S\ref{sec:moderator}; R4, the second-moment
+corner, which refuted its mechanism and is in \S\ref{sec:normalisation}; and R1, the alignment
+replication with the permutation seed decoupled, which replicated the null at twice the power and
+is in \S\ref{sec:alignment}. One remains: the box- and hardware-matched budget trio (R2, queued and
+not yet started). To those we add two experiments the
 last cycle created rather than closed. \textbf{The first would convert the base optimiser from a
 candidate moderator into an identified one}: a second independent batch at each level
 \emph{within one submission}, or failing that a third batch at the level where base and batch are
@@ -3652,6 +3788,19 @@ resolvable ($F(39,172) = 0.71$; random-effects $sd_{batch} = 0.000$ against with
 The seed half of the claim reproduces ($F(30,30) = 1.50$, $p = 0.138$). See \S\ref{sec:variance}
 for the replacement statement.
 
+\paragraph{A.3b --- \arm{rp1}'s run seed contradicts the corpus seed null, and we do not reconcile
+them.}
+A.3 records that the seed half of the batch/seed claim reproduces: $F(30,30) = 1.50$, $p = 0.138$,
+and the corpus METHODS finding is $F$ 1.21, $p$ 0.213. \arm{rp1}'s two-way decomposition disagrees
+--- on its balanced $3 \times 6$ \arm{permnode} grid the run seed is a real effect,
+$\mathbf{F(5,10) = 4.634}$, $\mathbf{p = 0.0190}$, sd 0.100 pp (\S\ref{sec:rp1}). Both readings are
+re-derived, not quoted, and we leave the disagreement standing. It is not resolvable from this
+design: at one observation per cell the residual is interaction-plus-noise, so a draw $\times$ seed
+interaction would land in the same denominator, and six seeds in one batch is a thin base from
+which to overturn a corpus-wide null. The disagreement does not touch $\Astat$: \texttt{T1} pairs
+within run seed, which removes exactly this variance from $\Astat$'s standard error, so a real seed
+effect makes the pairing more valuable rather than less.
+
 \paragraph{A.4 --- Heterogeneity $\tau$, and the two $Q$'s.}
 The record carried $\tau = 0.285$ pp against 0.137 pp measurement noise. DerSimonian--Laird with
 Welch standard errors gives $\mathbf{\tau = 0.215}$ \textbf{pp} against an rms $\se$ of
@@ -3697,7 +3846,7 @@ probes and fail this paper's admissibility gate (\texttt{window\_ok = 0}), so th
 
 \paragraph{A.8 --- Corpus size.}
 The record variously says 1{,}960 / 2{,}077 / 2{,}113 runs and $\sim$1{,}200--1{,}400 GPU-hours. At
-write time: \textbf{2{,}173 rows, 1{,}724 admissible, 1{,}625 GPU-hours} summed over the 2{,}150 runs
+write time: \textbf{2{,}173 rows, 1{,}731 admissible, 1{,}632 GPU-hours} summed over the 2{,}158 runs
 carrying a wallclock, with 2{,}237 jobs having entered the training script and nothing awaiting
 ingest (\S\ref{sec:repro}, Table~\ref{tab:attrition}). The correction register runs to
 entry 128.

@@ -73,12 +73,12 @@ def chk(name, got, paper, where, fmt="%+.3f"):
 def corpus(rows, adm, args):
     print("\n[1] CORPUS  (§8 Reproducibility, Appendix A.8)")
     chk("rows in results/all_runs.csv", len(rows), 2173, "abstract, §8", "%.0f")
-    chk("admissible rows", len(adm), 1724, "§3.3, A.8", "%.0f")
+    chk("admissible rows", len(adm), 1731, "§3.3, A.8", "%.0f")
     wc = [float(r["wallclock_min"]) for r in rows if r["wallclock_min"]]
-    chk("runs carrying a wallclock", len(wc), 2150, "§8", "%.0f")
-    chk("GPU-hours", sum(wc) / 60.0, 1625, "abstract, §8", "%.0f")
+    chk("runs carrying a wallclock", len(wc), 2158, "§8", "%.0f")
+    chk("GPU-hours", sum(wc) / 60.0, 1632, "abstract, §8", "%.0f")
     chk("distinct nodes", len({r["node"] for r in rows if r["node"]}), 29, "§8", "%.0f")
-    for flag, paper in (("window_ok", 425), ("complete", 24)):
+    for flag, paper in (("window_ok", 425), ("complete", 17)):
         n = sum(1 for r in rows if r[flag] != "1")
         chk("rows failing %s" % flag, n, paper, "§3.3 attrition", "%.0f")
     chk("rows with no plateau5", sum(1 for r in rows if not r["plateau5"]), 25,
@@ -469,9 +469,9 @@ def metacensus(rows, adm, args):
     fam = lambda g: (g in ("nodewise", "nodewise1d")
                      or g.startswith("chunk") or g.startswith("permnode"))
     sel = [r for r in adm if fam(r["granularity"])]
-    chk("admissible runs in the partition families", len(sel), 420,
+    chk("admissible runs in the partition families", len(sel), 427,
         "§7 T1, §1 scope (iii), A.1", "%.0f")
-    chk("   ...with meta = Lion", sum(1 for r in sel if r["meta"] == "Lion"), 408,
+    chk("   ...with meta = Lion", sum(1 for r in sel if r["meta"] == "Lion"), 415,
         "§7 T1, §1 scope (iii), A.1", "%.0f")
     chk("   ...with meta = RMSProp (all twelve are sm4)",
         sum(1 for r in sel if r["meta"] == "RMSProp"), 12,
