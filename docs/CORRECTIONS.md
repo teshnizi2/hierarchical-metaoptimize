@@ -8600,3 +8600,150 @@ STANDING RULE 20 both batches were swept today and both pass. Score first, then 
 blocking items. `bm2` in particular cannot close B1: a second batch at two levels does not make a
 four-level Q partition non-tautological, because three of the four levels are singletons and
 `Q_between = 36.40 − 4.21 = 32.19` identically for *any* partition that isolates them.
+
+---
+
+## 128. Cycle 101 — DRAFT-v4 ASSEMBLED FROM SIX PACKAGES AND RECONCILED WITH `paper.tex`; THE POOL CONFLICT RE-DERIVED, `identified` WITHDRAWN, `367` DROPPED
+
+`paper/DRAFT-v4.md` and `paper/paper.tex` are now one manuscript in two markups. 100 anchored
+replacements were applied to DRAFT-v3 and 81 to `paper.tex`, each asserted to match its anchor
+**exactly once** before it was applied; a failed anchor aborted the build rather than being
+applied by judgement. Both files carry the same numbers — 47 key figures checked
+programmatically in both, 47/47 present.
+
+### 128.1 THE ONE CONFLICT THAT MATTERED, AND HOW IT WAS SETTLED
+
+Three delivered packages gave three different same-contrast pools. **All three reproduce
+exactly**, so the disagreement was definitional, not arithmetic:
+
+| pool | cells | fixed-effect | Q / df | τ | base share |
+|---|---|---|---|---|---|
+| DRAFT-v3 | 11 | +0.5707 ± 0.0370 | 36.4048 / 10 | 0.2033 | 88.45% |
+| `calibration` | 13 (+`bm2`×2) | +0.6345 ± 0.0331 | 55.4021 / 12 | 0.2307 | 89.63% |
+| `new-results` | **14** (+`sm3`) | **+0.5297 ± 0.0294** | **102.4739 / 13** | **0.2948** | **92.82%** |
+
+**Fourteen is primary.** `calibration`'s ground for excluding `sm3` — that it is one of the five
+batches §3.4 names as having no scorer registered before its runs existed — does not distinguish
+it from `nl1`, which supplies **two cells of the same pool**. Excluding `sm3` from the pool while
+tabling it as Table 2 row 19 would have been inconsistent. `sm4` stays out of every pool on the
+one ground that does discriminate: its own registered scorer forbids pooling it with `aw1` or
+`sm3`.
+
+**But the framing is `calibration`'s, because the decisive test does not move.** Re-derived at
+fourteen cells, with base × batch as the common refinement:
+
+```
+base    : between 95.1152 / 3   share 92.82%   within 7.3587 / 10
+batch   : between 98.1592 / 10  share 95.79%   within 4.3147 / 3
+base x batch                                   within 0.2067 / 1
+   dQ(batch | base) = 7.1520 on 9 df   p 0.62
+   dQ(base  | batch) = 4.1080 on 2 df  p 0.128     <-- UNCHANGED from 13 cells
+```
+
+`sm3` brings a new **batch** as well as a second AdamW **cell**, so it buys the level's
+homogeneity test and buys nothing at all on the conditional test. **The base optimiser is still
+not separated from the submission it arrived in at p < 0.05, at fourteen cells as at thirteen.**
+The word *identified* is therefore withdrawn from the abstract, §1, Contribution 3, the §4.4
+heading and summary block, Figure 2's caption and the Conclusion, and replaced by *candidate
+moderator* with the rival stated in the same sentence. This is B1 closed by deletion, not by
+hedging.
+
+### 128.2 WHAT ELSE WAS RE-DERIVED RATHER THAN CARRIED
+
+* **Permutation context, recomputed for the new shape.** All 45,045 partitions of the fourteen
+  cells with the realised shape {8,2,2,2}: the base partition ranks **14th, p = 0.00031** (median
+  share 0.333, max 0.957). Leave-one-out 89.6–95.7%. Best post-hoc contiguous cut in D order
+  **97.5%** — `new-results`' figure confirmed.
+* **The box justification is unstable and we now say so.** Between-box Q is 1.08/2 at eleven
+  cells, **5.14/2 (p 0.077)** at thirteen — `calibration`'s finding, confirmed — and **0.69/2
+  (p 0.71)** at fourteen. It moves because all four non-SGDm cells sit in one box. The paper now
+  rests the pooling on the unconfounded within-SGDm test, **0.76 on 2 df, p 0.68**, and prints all
+  three whole-pool readings rather than the flattering one.
+* **ρ is FOURTH of twenty, not third of sixteen.** `sm3`'s ρ = 0.0205 is now the corpus minimum.
+  Ranking: sm3 0.0205, aw1 0.0397, gm2 0.0504, **gc1 0.0552**. CIFAR-10 median 0.080 over
+  eighteen cells, two of them below gc1. A1 is closed against the *new* table, not the old one.
+* **The `G` family: three families, three answers, all printed.** Pre-specified twelve
+  (+0.067 ± 0.023, Q 18.21/11); enlarged fourteen with `sm3`+`sm4` (+0.093 ± 0.022, Q 28.25/13,
+  p 0.0084); fifteen with `bn1` (+0.128 ± 0.020, Q 42.98/14). DRAFT-v3's "fourteen" was
+  twelve+`bn1`+`sm3` (Q 40.08/13) — a *different* family, reproduced here so the supersession is
+  visible.
+* **`367 of 367` is DROPPED, not restated.** It does not re-derive under any reconstructible
+  definition. `new-results` proposed a batch-scoped rule giving 354/22 batches; re-run here it
+  gives **353**, so it is not stable either. The paper adopts `production`'s rule, which is one
+  line and executable against the deposited table: **420 admissible partition-family rows, 408
+  Lion, 12 RMSProp**. Asserted by a new `--metacensus` section.
+
+### 128.3 THREE DEFECTS FOUND DURING INTEGRATION THAT NO PACKAGE HAD
+
+1. **§4.2's U table was a fourth A7.** It claimed twelve cells and "magnitude never exceeds
+   +0.34 pp". `sm4`'s U is **+0.359 ± 0.074, t 4.88** — the claim was false the moment `sm4` was
+   tabled. Both `sm3` (+0.071) and `sm4` are now rows, the count is fourteen, the bound is
+   +0.36, and the thirteen-Lion-cell bound of +0.34 is kept and labelled.
+2. **`calibration` §7.5 is withdrawn.** It reported that §4.8's `+0.229 ± 0.070, t 3.27` does not
+   reproduce. `analysis/c87_hz3_score.py --runs ../runs`, run unedited here, prints
+   `+0.229 se 0.070 t 3.27 (df 10.0)` — on the per-seed **change in each arm**, which its own text
+   states. The paper quotes the scorer as issued and no correction is owed.
+3. **T8 said "n = 3 in ten of sixteen cells".** Re-derived: **fifteen of twenty**. (It was eleven
+   of sixteen before the ingest, so the original was also wrong by one.)
+
+### 128.4 THE AUDIT WAS EXTENDED BEFORE THE PROSE WAS WIDENED
+
+`analysis/c98_reproduce.py` went from 105 `chk(` sites / 188 assertions to **283 assertions, all
+passing, exit 0**, covering **216 of 725** distinct quantity-numerals = **29.8%**, and the
+manuscript prints that measured triple in §3.4 as a fixpoint. New coverage: the fourteen-cell pool
+and every level, the **conditional tests against batch identity** (the numbers that carry the
+withdrawal of *identified*), all three box readings, the meta-optimiser census, the two `rl3` T
+rows, the `sm3`/`sm4` tail decomposition and all three `G` families. `analysis/c98_figures.py`
+gained the four cells with `sm4` under its own `base` string so it can never be pooled into the
+AdamW level; the figures were regenerated and F1 now prints "20 count-matched cells", F2 "base
+explains 92.8% of the 14-cell Q".
+
+A new failure mode was closed on A8's own principle: a section that cannot run now registers
+itself, and the summary prints `n SECTION(S) COULD NOT RUN HERE, so this is not full coverage`.
+The deposit exercises this — it ships no raw `hz3` series, runs 266 of the 283 checks, and says so.
+
+### 128.5 MECHANICAL EVIDENCE
+
+```
+python3 analysis/c98_reproduce.py            ->  ALL 283 CHECKS PASS.   exit 0
+     --census                                ->  216 / 725 distinct quantity-numerals = 29.8%
+python3 analysis/c98_figures.py --all --numbers -> 2173 rows, 1724 admissible, 20 cells
+                                                  14-cell pool +0.530 +- 0.029  Q 102.47/13
+tectonic -X compile paper.tex                ->  exit 0, 59 pp, 612x792 pt
+                                                 (clean-build page count; the PDF embeds a
+                                                  build date and is not byte-reproducible)
+pdftotext paper.pdf | grep -c '??'           ->  0        (4 figures, 12 tables, References)
+figure files referenced / present            ->  8 / 8
+DRAFT-v4 abstract                            ->  227 words; paperfactory _abstract_defects: NONE
+paper.tex abstract (de-macroed)              ->  214 words
+23 gate _SECURITY_SIGNALS over both files    ->  0 matches   (the 'defence' artefact is gone)
+placeholders <>, TODO/TBD/XXX/FIXME          ->  0 in both
+'Draft v' / 'earlier draft' / 'camera-ready' / 'DOI: pending'  ->  0 in both
+banned `plateau` column                      ->  2 mentions per file, both the BAN and the
+                                                 column list; 0 readings in the analysis code
+python3 analysis/c98_release.py              ->  137 files, 6.2 MB
+cd release && make verify                    ->  137 checked, 0 bad
+cd release && make reproduce                 ->  ALL 266 CHECKS PASS, 1 section declared skipped
+```
+
+Scorers re-run **unedited** with only documented arguments (RULE 16): `c88_scorers.py --score ub9`
+(verdict reproduced verbatim), `c87_rl3_score.py --runs ../runs_alice2` (§4.5's H3 block),
+`c87_hz3_score.py --runs ../runs` (§4.8's window, including the `± 0.070`), `c98_figures.py --all
+--numbers`. `sm4` and `bm2` cannot be re-run here — their gates read the excluded probes, which is
+blocking item A2 — so their verdicts are quoted as `new-results` recorded them and every one of
+the **45 numeric tokens** in the two issued blocks was checked to survive into both files at the
+paper's 3-decimal convention. No Slurm job was submitted; `rp1` and `hz3`-R2 were not touched.
+
+### 128.6 STILL OPEN
+
+* **`rp1` is complete on disk and deliberately unscored**; its seven stale mid-flight CSV rows are
+  the whole of the `complete = 0` increase from 17 to 24, and the paper says so in §3.3, §8 and
+  Table 3. Re-ingesting and scoring is the next cycle's call, under the registration that binds it.
+* **The nine `pp_`/`PP_` cross-submission pairs are still not in `dup_group`.** §3.3, §4.1 and §8
+  state the gap rather than implying a completeness the column does not have.
+* **The base optimiser is a candidate moderator, not an identified one.** The experiment that
+  would settle it is named in §9: a second independent batch at each level within one submission.
+* **`docs/STATUS.md` carries seven TODO-FOR-AUTHOR decisions**; items 1 (the third contributor's
+  place in the author list) and 6 (minting the DOI) block submission.
+* **`tmlr.sty` is still not obtainable**, so `paper.tex` is verified under `article`; the swap is
+  the two `%<<TMLR>>` lines and has not itself been compiled.

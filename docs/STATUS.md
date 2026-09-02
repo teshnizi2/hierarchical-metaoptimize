@@ -1,7 +1,23 @@
 # STATUS — operator dashboard
 
-Updated 2 Sep 2026 (cycle 100). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **127**) > `docs/FINDINGS.md` > everything else.
+Updated 2 Sep 2026 (cycle 101). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **128**) > `docs/FINDINGS.md` > everything else.
+
+## Cycle 101 — DRAFT-v4 is assembled and `paper.tex` is reconciled with it
+
+| | |
+|---|---|
+| Draft | `paper/DRAFT-v4.md` + `paper/paper.tex` (59 pp PDF, `tectonic` exit 0) — **one manuscript, two markups**, 47/47 key figures identical |
+| Built from | the six `paper/sections/v4-*.md` packages, applied as 100 (md) + 81 (tex) anchored replacements, each asserted to match **exactly once** |
+| Audit | `c98_reproduce.py` → **ALL 283 CHECKS PASS**, exit 0; coverage **216 / 725 distinct quantity-numerals = 29.8%**, printed in §3.4 as a fixpoint |
+| The pool conflict | 11 / 13 / 14 cells all reproduced exactly; **14 is primary** (`sm3` is in Table 2, and the ground for excluding it did not distinguish it from `nl1`) |
+| B1 | **`identified` is withdrawn.** `dQ(base given batch)` = 4.11 on 2 df, **p 0.128 — unchanged at 14 cells**, because `sm3` brings a new batch as well as a new cell. Batch identity explains 95.8% against base's 92.8% |
+| Deposit | 137 files / 6.2 MB, `make verify` 137/137, `make reproduce` exit 0 (266 checks, 1 section declared skipped) |
+| Still open | `rp1` unscored (7 stale CSV rows); the nine `pp_`/`PP_` pairs still outside `dup_group`; the AdamW-level separation experiment of §9; the seven TODO-FOR-AUTHOR items below |
+
+The 18 blocking items below are recorded as the cycle-100 gate found them. Cycle 101 acts on all
+of them; `docs/CORRECTIONS.md` §128 is the authority on what was done and what was re-derived
+rather than carried.
 
 ## Verdict — Q1 meta-gate re-run on DRAFT-v3
 
@@ -139,3 +155,44 @@ evidence is everywhere, attrition is fully disclosed (§8 Table 3), no sub-MIE e
 | Alignment | bounded null, A = −0.009 ± 0.157, CI [−0.317, +0.298] = [−55%, +51%] of D |
 | Mechanism | 3 refuted (M2/M3/M6), 1 narrowed (M4), 1 not separable (M7), 3 undecidable (M1/M5/M8) |
 | Known dead ends | TinyStories (≥3 weeks, nobody asked); more G cells; more seeds on existing D cells |
+
+## TODO-FOR-AUTHOR — the seven decisions the `production` package could not take
+
+Added by the cycle-101 `production` package (C2/C3/C4). **None of these is a placeholder in the
+manuscript:** every one has finished prose in place that is true of the paper as it stands. Each
+row says what to edit if the answer changes. Full context in `paper/sections/v4-production.md` §11.
+
+| # | decision | what the paper says now | if it changes |
+|---|---|---|---|
+| 1 | **Does the originator of the hierarchical partial-pooling design join the author list?** `docs/PLAN-appendix-collab.md:133` names him — *"Arsalan — co-author, not acknowledgement. He originated the hierarchical partial-pooling idea"* — i.e. a co-author of the parent paper. The name was **not** put into the manuscript: an author list is your decision and the source is an internal advisory note. | Two authors. Competing interests discloses that §5.9's design came from *"a researcher who is also a co-author of the parent work and who is not an author of this paper"*, and that §5.9 is negative about it. | Add to the author block and CRediT (Conceptualization, §2.4/§5.9); **add a second COI sentence naming a second parent co-author among the authors**; get his affiliation + ORCID from him. |
+| 2 | **Any grant to declare?** | *"received no dedicated project funding and no grant"* | replace with funder + identifier. Nothing was invented. |
+| 3 | **`Funding acquisition` sits on Saber's CRediT roles while Funding says there was no grant.** Not edited — removing a CRediT role is a statement about a person. | both stand as written | drop the role, or say in Funding that it refers to the institutional compute allocation |
+| 4 | **Correspondence address** — your own address of record on this repo was used, not an institutional one. | `mohammadrezaahmaditeshnizi@gmail.com` | swap for the LIACS address; two files (DRAFT-v3 End matter, `paper.tex` `\thanks`) |
+| 5 | **ORCIDs** — omitted rather than guessed. | `release/CITATION.cff` has `authors:` with names + affiliations, no `orcid:`, and a comment saying why | add `orcid:` under each author, rebuild the deposit |
+| 6 | **Mint the DOI** — needs an archive account and publishes a permanent public record, so it is yours to do. | the paper prints **no DOI** and cites the artefact by commit; `CITATION.cff` has **no** `identifiers:` block, on purpose | reserve it, then write the same string into `release/README.md`, `CITATION.cff` and the Data-availability statement; rebuild. `release/README.md` § *Minting the DOI* has the five steps |
+| 7 | **Rebuild the deposit from a clean checkout** — the current build stamped `DIRTY`, correctly. | warning is printed in `release/README.md` | after the integration commit: `python3 analysis/c98_release.py && cd release && make verify` |
+
+**1 and 6 block submission. 2–5 and 7 are one-line edits.**
+
+## Corpus, AFTER the `6a374f4` ingest — re-derived by the production package
+
+The table above this section still prints the pre-ingest numbers; these are the current ones, and
+`analysis/c98_reproduce.py` now asserts all of them (**ALL 188 CHECKS PASS, exit 0**).
+
+| | pre-ingest | now |
+|---|---|---|
+| `.out` files on the two clusters | 2,193 | **2,241** |
+| …with an `ARGS:` line | 2,189 | **2,237** (4 infrastructure jobs have none) |
+| crashed before epoch 1 | 64 | **64** (unchanged; 2,237 − 2,173) |
+| rows in `results/all_runs.csv` | 2,113 | **2,173** |
+| admissible | 1,671 | **1,724** |
+| GPU-h | 1,582.2 | **1,624.8** (admissible: 1,558.4) |
+| truncated (`window_ok=1, complete=0`) | 17 | **24** — the 7 new ones are in-flight `rp1` snapshots at 82–87/100 |
+| repeated-flag runs (`argsline_guard.py`, unedited, over all 2,241) | 36 | **36** — still exactly `ml2` 24 + `sm3` 12 |
+
+Two manuscript sentences became **false**, not merely stale, and have exact replacements in
+`v4-production.md` §5.3: *"None of the 17 is in a count-matched arm"* (seven of the 24 are
+`permnode` arms) and *"all 214 uniform-chunk, `nodewise1d` and `permnode` runs are admissible"*
+(now 238 of 238 excluding the in-flight `rp1`, 249 of 256 including it). A third, Appendix A.1's
+*"367/367 is meta = Lion"*, is falsified by `sm4`: of the 420 admissible partition-family runs,
+**408 are Lion and 12 are RMSProp**.

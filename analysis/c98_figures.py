@@ -63,6 +63,7 @@ BASE_C = {                       # Okabe-Ito
     "RMSProp":  "#009E73",       # bluish green
     "AdamW":    "#D55E00",       # vermillion
     "SGDm-GN":  "#CC79A7",       # reddish purple  (GroupNorm variant)
+    "AdamW+RMS":"#56B4E9",       # sky blue  (AdamW base, RMSProp META -- NOT an AdamW-level member)
 }
 DSET_M = {"C10": "o", "C100": "D"}          # marker encodes dataset
 NET_MS = {"ResNet-18": 6.0, "ResNet-34": 7.5, "ResNet-50": 9.0}
@@ -168,11 +169,26 @@ CELLS = [
   ("gc1-ch","chunk771"), ("gc1-node","nodewise"), None, None),
  ("gm2",      "ResNet-18",    "C100", "SGDm",    "1e-4", 100,
   ("gm2-ch","chunk771"), ("gm2-node","nodewise"), ("gm2-c22","chunk2293"), ("gm2-n1d","nodewise1d")),
+ ("bm2 (SGD)","ResNet-18",     "C10",  "SGD",     "1e-4", 100,
+  ("bm2-sgd-ch","chunk777"), ("bm2-sgd-node","nodewise"), None, None),
+ ("bm2 (RMSProp)","ResNet-18", "C10",  "RMSProp", "1e-4", 100,
+  ("bm2-rms-ch","chunk777"), ("bm2-rms-node","nodewise"), None, None),
+ ("sm3",      "ResNet-18",    "C10",  "AdamW",   "1e-4", 100,
+  ("sm3-awrms-ch","chunk777"), ("sm3-awrms-node","nodewise"),
+  ("sm3-awrms-c23","chunk2325"), ("sm3-awrms-n1d","nodewise1d")),
+ # sm4 is the corpus's ONLY non-Lion partition cell.  It carries its own `base`
+ # string so it can never be pooled into the AdamW level, and it is deliberately
+ # absent from POOL12 -- analysis/c97_sm4_score.py's registered scope note forbids
+ # pooling it with aw1 or sm3.
+ ("sm4",      "ResNet-18",    "C10",  "AdamW+RMS","1e-4", 100,
+  ("sm4-awrms-ch","chunk777"), ("sm4-awrms-node","nodewise"),
+  ("sm4-awrms-c23","chunk2325"), ("sm4-awrms-n1d","nodewise1d")),
 ]
 # The cells that share a BYTE-IDENTICAL contrast object on ResNet-18
 # (nodewise -> chunk777, m 14,420 vs 14,421).
 POOL12 = {"cc1","mm1","pp1","gn1 (BN)","rl3 @1e-4","rl3 @3e-4","fa1","hz3",
-          "gn1 (GN)","aw1","nl1 (SGD)","nl1 (RMSProp)"}
+          "gn1 (GN)","aw1","nl1 (SGD)","nl1 (RMSProp)",
+          "bm2 (SGD)","bm2 (RMSProp)","sm3"}
 
 # The GroupNorm cell is REMOVED from the paper by R0 checklist item 1
 # (docs/STATUS.md): its own registered scorer, analysis/c84_gn1_score.py, halts at

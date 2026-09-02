@@ -46,6 +46,29 @@ def copy(src, dst):
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     shutil.copy2(src, dst)
 
+HEADLINE_KEYS = [
+    "rows in results/all_runs.csv", "admissible rows", "GPU-hours",
+    "cells with D > 0", "live pool, 11 byte-identical cells",
+    "within-SGDm pool", "within-SGDm Q (k=8)",
+    "A = permnode", "95% CI low", "95% CI high",
+    "best ResNet-18/C10 MetaOptimize arm", "tuned SGD+cosine baseline",
+    "deficit",
+]
+
+def headline_block(audit):
+    """The lines of the audit that carry the paper's headline numbers.
+
+    Generated from the audit output, never typed, so the README cannot ship a
+    number this deposit's own code disagrees with.  A key that no longer
+    matches is skipped rather than faked.
+    """
+    out = []
+    for key in HEADLINE_KEYS:
+        for ln in audit.splitlines():
+            if ln.strip().startswith(key):
+                out.append("    " + ln.rstrip()); break
+    return "\n".join(out).lstrip()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--outdir", default=os.path.join(ROOT, "release"))
@@ -127,7 +150,7 @@ def main():
         dirty=("  **The working tree was DIRTY at build time; re-build from a "
                "clean checkout before minting the DOI.**" if dirty else ""),
         n_out=n_out, log_mb=log_bytes / 1e6,
-        audit_head="\n".join("    " + x for x in audit.splitlines()[:8]).lstrip(),
+        audit_head=headline_block(audit),
     ))
 
     # ---- 5. the manifest -----------------------------------------------------
@@ -173,7 +196,7 @@ sys.exit(1 if bad else 0)
 
 MAKEFILE = r"""# Reproduce the paper's numbers and figures from this artefact.
 #
-#   make reproduce        every headline number, re-derived and checked
+#   make reproduce        the numbers that carry a claim, re-derived and asserted
 #   make reproduce-table2 just Table 2 / Figure 1
 #   make figures          rebuild the four figures into figures/
 #   make logs             unpack the raw per-epoch logs (needed by `make figures`
@@ -251,6 +274,15 @@ comparator batch must exist, and there must be disk and queue headroom.
 CITATION = """cff-version: 1.2.0
 message: "If you use this artefact, please cite it."
 title: "The partition, not the count: artefact"
+authors:
+  - family-names: "Ahmaditeshnizi"
+    given-names: "Mohammadreza"
+    affiliation: "LIACS, Leiden University"
+  - family-names: "Salehkaleybar"
+    given-names: "Saber"
+    affiliation: "LIACS, Leiden University"
+# ORCIDs are omitted rather than guessed. Add `orcid: "https://orcid.org/..."`
+# under each author before deposit if you want them resolvable.
 abstract: >-
   Run table, raw per-epoch logs, submission scripts, optimiser patches, registered
   scorers and figure code for a count-matched measurement of step-size granularity
@@ -258,22 +290,26 @@ abstract: >-
 type: dataset
 license: CC-BY-4.0
 date-released: "%(date)s"
-identifiers:
-  - type: doi
-    value: "PENDING"
-    description: >-
-      Not yet minted. The deposit is prepared; the DOI is reserved at submission
-      and inserted here and in the paper's Data-availability statement before
-      camera-ready.
+# NO `identifiers:` BLOCK IS PRESENT ON PURPOSE.
+# This artefact has not been deposited and has no DOI. Rather than print a
+# placeholder that a parser could mistake for one, the field is absent. After
+# depositing, add:
+#
+# identifiers:
+#   - type: doi
+#     value: "<the DOI the archive issues>"
+#
+# and make the same insertion in README.md and in the paper's
+# Data-availability statement.
 """
 
 README = """# Artefact: *The partition, not the count*
 
-**DOI: PENDING.** The deposit is assembled and self-verifying; no DOI has been
-minted yet. A Zenodo reserved DOI is taken at submission time and written into
-this file, into `CITATION.cff`, and into the paper's Data-availability statement
-before camera-ready. Until then, cite this artefact by repository commit
-`%(short)s`.
+**DOI: not yet minted.** This deposit is assembled, self-verifying and ready to
+upload; nobody has deposited it yet, so there is no DOI to print and none is
+printed. Cite this artefact by its repository commit `%(short)s` until one
+exists. Minting it is a five-minute manual step and is written out under
+*Minting the DOI* below.
 
 Built %(stamp)s from commit `%(commit)s`.%(dirty)s
 
@@ -290,6 +326,12 @@ runs in a few seconds on a laptop, needs `python3` and `matplotlib` and nothing
 else, and exits non-zero if any headline number fails to reproduce. It prints one
 line per number: *derived value | paper value | PASS/FAIL | where it appears*.
 
+## The headline numbers, as this deposit re-derives them
+
+Every line below was cut out of `REPRODUCTION-AUDIT.txt` by the build script at
+build time. None of it was typed, and the build refuses to finish if any check
+in that file fails.
+
     %(audit_head)s
 
 ## Layout
@@ -298,7 +340,7 @@ line per number: *derived value | paper value | PASS/FAIL | where it appears*.
 |---|---|
 | `data/all_runs.csv` | the run table of record. One row per run: full configuration (network, dataset, batch size, granularity, base, meta, η, α₀, γ, augmentation, β-box, hierarchical mode, λ, r, seed), outcomes (`best_test`, `final_test`, `plateau5`, `plateau`, `auc`, epochs-to-threshold), provenance (`job_id`, `account`, `node`, `wallclock_min`), and the two admissibility flags (`window_ok`, `complete`) |
 | `logs/raw_out.tar.gz` | %(n_out)d raw Slurm `.out` files, %(log_mb).1f MB uncompressed — the per-epoch train/test series, plus each run's own `ARGS:` and `ENV:` line. `make logs` unpacks them |
-| `code/c98_reproduce.py` | the audit. Re-derives every headline and checks it |
+| `code/c98_reproduce.py` | the audit. Re-derives and asserts the numbers that carry a claim in the paper; `--census` prints its measured coverage, and section 3.4 of the paper states the scope |
 | `code/c98_figures.py` | the four figures, from the CSV, on one palette |
 | `code/aggregate.py` | builds `all_runs.csv` from the raw `.out` files |
 | `code/argsline_guard.py` | sweeps every run's own `ARGS:` line for a repeated flag |
@@ -317,7 +359,7 @@ line per number: *derived value | paper value | PASS/FAIL | where it appears*.
 * **`plateau5`** — the mean test accuracy over the last 5 epochs of the requested
   budget — is the only accuracy metric read. The CSV also carries `plateau`, the
   20-epoch analogue; it is **banned** as a primary and the code never reads it.
-  Two headlines were withdrawn from an earlier draft for quoting it.
+  Two headlines were withdrawn during writing for quoting it.
 * **Admissibility** is `window_ok == 1 AND complete == 1 AND a readable plateau5`,
   applied before any arm mean is formed.
 * **Every contrast is within one batch** — one contiguous submission — so any
@@ -339,6 +381,31 @@ line per number: *derived value | paper value | PASS/FAIL | where it appears*.
   in the run table (`beta_clip`) and in the scorers' output.
 * **The CIFAR-10 / CIFAR-100 datasets**, which are standard public downloads and
   are fetched by `torchvision` at run time.
+
+## Minting the DOI
+
+This artefact has no DOI. Nothing in this deposit, in `CITATION.cff` or in the
+paper prints one, and no placeholder stands in for one. To mint it:
+
+0. Drop the final manuscript (`paper.pdf`) into this directory. The build does
+   not add it, because the manuscript is not final while the deposit is being
+   rebuilt; a deposit without it is still complete for reproduction, but a
+   reader arriving from the DOI expects to find the paper next to the data.
+1. `make verify` (every file matches `MANIFEST.md5`) and `make reproduce`
+   (exit 0, every check PASS) on a clean checkout. The build stamps the commit
+   it was made from at the top of this file; if that line says the working tree
+   was dirty, rebuild from a clean checkout first.
+2. Upload this directory to the archive of record (Zenodo, or the institutional
+   repository if the venue requires it). Reserve the DOI *before* publishing the
+   record, so the same string can go into the paper.
+3. Write that DOI into three places and nowhere else: the top of this file, the
+   `identifiers:` block of `CITATION.cff` (commented out there, with the exact
+   shape to use), and the paper's Data-availability statement.
+4. Rebuild (`python3 analysis/c98_release.py`) so `MANIFEST.md5` covers the
+   edited files, and re-run `make verify`.
+
+Steps 2 and 3 are the author's to take: they require an archive account and they
+publish a permanent public record.
 
 ## License
 
