@@ -3655,7 +3655,7 @@ claim is **not re-derivable** under our own stated rule and is dropped rather th
 **A.8 — Corpus size.** The record variously says 1,960 / 2,077 / 2,113 runs and ~1,200–1,400
 GPU-hours. At write time: **2,173 rows, 1,731 admissible, 1,632 GPU-hours** summed over the 2,158
 runs carrying a wallclock, with 2,237 jobs having entered the training script and nothing awaiting
-ingest (§8, Table 3). The correction register runs to entry 128.
+ingest (§8, Table 3). The correction register runs to entry 131.
 
 **A.9 — Two blocks carried from the record without re-derivation.** Two statements are **not**
 re-derived at write time and are marked where they appear: (i) the "6 of 6 fits with the wrong
@@ -3732,7 +3732,7 @@ all submission scripts (`bin/`), all optimiser patches (`patches/`), all registe
 (`analysis/`), the figure code and the reproduction audit are deposited as a single archive.
 **The deposit has no DOI**, because it has not been deposited; the artefact is identified by the
 repository commit recorded in its `README.md`, and `CITATION.cff` carries no `identifiers:` block
-rather than a stand-in for one. The archive is 6.3 MB,
+rather than a stand-in for one. The archive is 6.4 MB,
 carries an md5 manifest for every file, and re-derives every number `make reproduce`
 checks — the list is in §3.4 — on a laptop in seconds, with no GPU and no dependency beyond
 `python3` and `matplotlib`. **One class of number requires data the deposit does not carry, and

@@ -4557,7 +4557,7 @@ The record variously says 1{,}960 / 2{,}077 / 2{,}113 runs and $\sim$1{,}200--1{
 write time: \textbf{2{,}173 rows, 1{,}731 admissible, 1{,}632 GPU-hours} summed over the 2{,}158 runs
 carrying a wallclock, with 2{,}237 jobs having entered the training script and nothing awaiting
 ingest (\S\ref{sec:repro}, Table~\ref{tab:attrition}). The correction register runs to
-entry 128.
+entry 131.
 
 \paragraph{A.9 --- Two blocks carried from the record without re-derivation.}
 Two statements are \textbf{not} re-derived at write time and are marked where they appear: (i) the
@@ -4657,7 +4657,7 @@ scorers (\texttt{analysis/}), the figure code and the reproduction audit are dep
 archive. \textbf{The deposit has no DOI}, because it has not been deposited; the artefact is
 identified by the repository commit recorded in its \texttt{README.md}, and \texttt{CITATION.cff}
 carries no \texttt{identifiers:} block rather than a stand-in for one. The archive
-is 6.3 MB, carries an md5 manifest for every file, and re-derives every number
+is 6.4 MB, carries an md5 manifest for every file, and re-derives every number
 \texttt{make reproduce} checks --- the list is in \S\ref{sec:registration} --- on a laptop in
 seconds, with no GPU and no dependency beyond
 \texttt{python3} and \texttt{matplotlib}. \textbf{One class of number requires data the deposit

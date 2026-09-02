@@ -9264,3 +9264,36 @@ since the packages were written), plus 30 integrator edits described below.
 * `bin/c98_hz3_s5_box30.sh.bak_wall10` is still untracked, now via `.gitignore` rather than by
   leaving the tree dirty.
 * The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).
+
+## 132. N1 AND N2 -- THE LAST TWO STALE INTEGERS IN THE END MATTER
+
+The cycle-107 gate returned MAJOR REVISIONS on two items, both false as printed, neither
+touching a result.  Both are corrected in BOTH markups.
+
+**N1.**  Data Availability said the deposit "is 6.3 MB".  `head -1 release/MANIFEST.md5` reads
+`139 files, 6.4 MB, built 2026-09-02 from ea9058b`, and the paper's own S8 already said 6.4 MB
+635 lines earlier -- an internal contradiction inside a Q1-mandatory end-matter section.
+  paper.tex:4660, DRAFT-v4.md:3735   6.3 -> 6.4 MB.
+
+**N2.**  Appendix A.8 said "The correction register runs to entry 128".  `grep -oE '^## [0-9]+'
+docs/CORRECTIONS.md | tail -1` reads `## 131`; entries 129, 130 and 131 were written by the three
+cycles that produced this candidate.
+  paper.tex:4560, DRAFT-v4.md:3658   entry 128 -> entry 131.
+
+VERIFICATION.  `python3 analysis/c98_reproduce.py` exit 0, ALL 565 CHECKS PASS, census still at
+its fixpoint (557 claim-carrying assertions covering 372 of 849 distinct quantity-numerals,
+43.8%).  `tectonic -X compile paper.tex` exit 0, paper.pdf written, no errors and the same three
+overfull hboxes at identical widths.  Both edits fall inside the 56.2% of quantity-numerals the
+audit does not assert, which is exactly the gap S3.4 declares, so no asserted number moved.
+
+**STILL OPEN, and deliberately NOT fixed in this entry -- N3, which is larger than the gate
+recorded.**  Table `tab:inflight` row R2 reads "`hz3` seed-5 trio | 3 | ... | queued, not
+started", and DRAFT-v4.md:977 says "R2 is still queued and has never started".  That trio
+(4855960/61/62) was CANCELLED and replaced by the four-arm `hz3q` quartet (4864632-35), which is
+RUNNING on gpu-l4-24g and is not mentioned anywhere in either markup (`grep -c hz3q` = 0 in both).
+So R2's row, its paragraph at md:889 / tex, md:977, md:1139, md:3065 and md:3078 are stale as a
+group, and A.8's "nothing awaiting ingest" becomes false the moment the quartet lands.
+This is ONE edit pass once the quartet is scored, not two: the batch finishes ~02:30-03:10 CEST,
+after which c99_hz3q_score.py is run, c87_hz3_score.py is re-run UNEDITED as the non-overwrite
+check, four `hz3q-*` rows are ingested with no dup_group and no supersession, and the whole R2
+story is rewritten once with the actual verdict in hand.
