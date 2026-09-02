@@ -20,15 +20,24 @@ section 7 T7 describes, the Appendix A.4 printed-table pools, and the T9 reading
 It does NOT check: prose-only quantities, group counts m, the attrition ledger's
 upstream cluster-side rows, GPU-hour subtotals, wallclock, byte counts, arXiv ids,
 or any value that exists only inside a registered scorer's own printed output.
-`--census` measures and prints that coverage rather than asserting it, so the number
-in section 3.4 can never drift from the code again.
+`--census` measures and prints that coverage, AND section [16] asserts it: the three
+figures section 3.4 prints -- assertion sites, distinct quantity-numerals covered, and
+the total it is a fraction of -- are chk()ed like any other number, against the
+sentence read out of the manuscript itself, so a stale coverage sentence now exits
+non-zero instead of passing. (Before cycle 102 the census only measured, and section
+3.4's "216 of the 725 ... 29.8%" survived three review cycles while the code printed
+747 and 28.9%.) The census never counts its own assertions.
 
 Each line prints:  derived value | paper value | PASS/FAIL | where it appears.
 The tolerance is half a unit in the last printed digit, so a PASS means the paper
 and this script agree to the precision the paper actually claims.
 
 House rules this script obeys, and would fail loudly if the CSV stopped obeying:
-  * `plateau5` is the only accuracy metric read; the `plateau` column is banned.
+  * `plateau5` is the only accuracy metric read AS A PRIMARY; the `plateau` column
+    is banned as one.  The single exception is the metric-sensitivity section, which
+    reads all four end-of-training columns SIDE BY SIDE, as a disclosure of what
+    section 4.4's decomposition does when the endpoint is varied, and makes none of
+    them primary.
   * admissibility = window_ok AND complete AND a readable plateau5.
   * every contrast is within one batch.
   * rows sharing a dup_group are averaged within the group first (ml2 is 3 v 3).
@@ -51,6 +60,9 @@ FAILS = []
 ASSERTED = []      # every (fmt, paper) pair actually asserted -- drives --census
 SKIPPED = []       # sections that could not run here, so "ALL n PASS" cannot be
                    # misread as full coverage (this is A8's own failure mode).
+CENSUS_MARK = None # set by censuscheck() to len(ASSERTED) BEFORE it asserts, so the
+                   # census is computed over the claim-carrying assertions only and
+                   # never counts its own four self-referential sites.
 
 def skip(section, why):
     SKIPPED.append((section, why))
@@ -711,7 +723,11 @@ def census(path=None, quiet=False):
 
     Returns (n_tokens, n_distinct, n_quantities, n_covered).  A numeral is COVERED if
     some chk() in this run asserted a paper value that prints to the same string at
-    that chk()'s own precision."""
+    that chk()'s own precision.
+
+    The census never counts itself: once censuscheck() has frozen CENSUS_MARK, only
+    the assertions made BEFORE that point are read, so asserting the census triple
+    cannot inflate the coverage it is asserting."""
     path = path or DRAFT
     if not os.path.exists(path):
         print("\n[census] %s not found -- census skipped" % path); return None
@@ -726,8 +742,9 @@ def census(path=None, quiet=False):
         if _XREF.search(pre) or _VERSION.search(pre):
             continue
         quants.append(tok)
+    claims = ASSERTED if CENSUS_MARK is None else ASSERTED[:CENSUS_MARK]
     covered_strings = set()
-    for fmt, paper in ASSERTED:
+    for fmt, paper in claims:
         t = (fmt % paper).lstrip("+-")
         if "." in t: covered_strings.add(t)
     hit = {q for q in quants if q.lstrip("0") in covered_strings or q in covered_strings}
@@ -746,7 +763,7 @@ def census(path=None, quiet=False):
         print("  ...minus section, table, figure and equation labels,")
         print("     arXiv ids and software versions  = QUANTITIES     %5d  (%d distinct)"
               % (n_q, n_qd))
-        print("  chk() assertion sites executed in this run           %5d" % len(ASSERTED))
+        print("  chk() assertion sites executed in this run           %5d" % len(claims))
         print("  distinct quantity-numerals this run asserts          %5d" % n_cov)
         print("  coverage of distinct quantity-numerals               %5.1f%%"
               % (100.0 * n_cov / n_qd if n_qd else 0.0))
@@ -756,12 +773,215 @@ def census(path=None, quiet=False):
     return n_tok, n_qd, n_q, n_cov
 
 
+# ====================================== METRIC SENSITIVITY  (S4.4, S1.1 C1/C3, S7 T10)
+# The house rule is NOT relaxed here: `plateau5` remains the primary and the `plateau`
+# column remains banned AS a primary.  What this section does is DISCLOSE what S4.4's
+# heterogeneity decomposition and S4.3's sign result do when the endpoint column is the
+# only thing that varies.  Everything else is held fixed at the paper's own definitions:
+# the row filter of Eq. (9) -- which is defined on plateau5 and is deliberately NOT
+# re-derived per metric, because that would make this row-filter sensitivity, which is
+# S7 T10 -- the arm prefixes of CELLS, the dup_group collapse of R-E, and POOL12.
+MS_METRICS = ["plateau5", "plateau", "best_test", "final_test"]
+
+def _arm_on(col):
+    """c98_figures.arm with the metric column swapped, and nothing else changed."""
+    def _arm(rows, prefix, gran):
+        sel = [r for r in rows if r["run"].startswith(prefix) and r["granularity"] == gran]
+        groups, singles = {}, []
+        for r in sel:
+            v = (r.get(col) or "").strip()
+            if v == "":                    # admissible row, unreadable on THIS endpoint
+                continue
+            dg = (r.get("dup_group") or "").strip() or F.PENDING_DUP.get(r["run"], "")
+            if dg: groups.setdefault(dg, []).append(float(v))
+            else:  singles.append(float(v))
+        vals = singles + [st.mean(v) for v in groups.values()]
+        return vals, len(vals)
+    return _arm
+
+def _cells_on(col, adm, with_gn):
+    old_arm, old_gn = F.arm, F.WITH_GN
+    F.arm, F.WITH_GN = _arm_on(col), with_gn
+    try:    return F.cells(adm)
+    finally: F.arm, F.WITH_GN = old_arm, old_gn
+
+# metric -> the values S4.4's endpoint table prints, in its own column order:
+#   pool D, se, Q(13 df), tau, between-base Q(3 df), share %, cells with D>0 of 20,
+#   cells resolved at t>=3 of 20, rms measurement se, sd of the fourteen D's
+METRIC_TABLE = {
+ "plateau5":   (0.530, 0.029, 102.47, 0.295, 95.12, 92.8, 20, 18, 0.143, 0.255),
+ "plateau":    (0.449, 0.024,  29.37, 0.101, 18.36, 62.5, 20, 20, 0.112, 0.159),
+ "best_test":  (0.396, 0.025,   9.87, 0.000,  3.70, 37.5, 20, 11, 0.137, 0.084),
+ "final_test": (0.614, 0.043,  39.91, 0.251, 34.66, 86.8, 19,  7, 0.355, 0.394),
+}
+# metric -> the four base-level pools S4.4's endpoint table prints
+METRIC_LEVELS = {
+ "plateau5":   {"SGDm": 0.556, "SGD": 1.000, "RMSProp": 0.720, "AdamW": 0.189},
+ "plateau":    {"SGDm": 0.438, "SGD": 0.737, "RMSProp": 0.634, "AdamW": 0.315},
+ "best_test":  {"SGDm": 0.411, "SGD": 0.432, "RMSProp": 0.386, "AdamW": 0.261},
+ "final_test": {"SGDm": 0.588, "SGD": 0.139, "RMSProp": 1.518, "AdamW": 0.420},
+}
+METRIC_SPREAD = {"plateau5": 5.3, "plateau": 2.3, "best_test": 1.7, "final_test": 10.9}
+METRIC_RANK = {                        # the rank order S4.4 prints, and the inversion
+ "plateau5":   "SGD > RMSProp > SGDm > AdamW",
+ "plateau":    "SGD > RMSProp > SGDm > AdamW",
+ "best_test":  "SGD > SGDm > RMSProp > AdamW",
+ "final_test": "RMSProp > SGDm > AdamW > SGD",
+}
+
+def metricsens(rows, adm, args):
+    print("\n[15] METRIC SENSITIVITY -- the endpoint varied, everything else held fixed")
+    print("     (S4.4 'The endpoint, varied'; S1.1 C1 and C3; S7 T10; S9)")
+    bases = ["SGDm", "SGD", "RMSProp", "AdamW"]
+    for col in MS_METRICS:
+        pool, sep, Qp, taup, betp, shrp, posp, resp, rmsp, sdp = METRIC_TABLE[col]
+        cs20 = _cells_on(col, adm, False)                    # the 20 Table 2 cells
+        live = [c for c in _cells_on(col, adm, True)
+                if c["in12"] and c["base"] != "SGDm-GN"]
+        assert all(c["base"] != "AdamW+RMS" for c in live), "sm4 leaked into the pool"
+        assert len(live) == 14 and len(cs20) == 20, "the cell set moved with the metric"
+        m, sem_, Q, df, tau = meta([(c["D"], c["seD"]) for c in live])
+        sub = {b: meta([(c["D"], c["seD"]) for c in live if c["base"] == b]) for b in bases}
+        within = sum(sub[b][2] for b in bases)
+        print("   ---- %s" % col)
+        chk("pool D        %-11s" % col, m, pool, "S4.4 endpoint table")
+        chk("   se         %-11s" % col, sem_, sep, "S4.4 endpoint table", "%.3f")
+        chk("   Q / 13 df  %-11s" % col, Q, Qp, "S4.4 endpoint table", "%.2f")
+        chk("   p          %-11s" % col, chi2_sf(Q, df), None, "", "%.4g")
+        chk("   tau        %-11s" % col, tau, taup, "S4.4 endpoint table", "%.3f")
+        chk("   between-base Q / 3 df", Q - within, betp, "S4.4 endpoint table", "%.2f")
+        chk("   share of Q %-11s" % col, 100 * (Q - within) / Q, shrp,
+            "S4.4 endpoint table, S7 T10", "%.1f")
+        chk("   cells with D > 0 of 20", sum(1 for c in cs20 if c["D"] > 0), posp,
+            "S4.4, S1.1 C1, S7 T10, S9", "%.0f")
+        chk("   ...resolved at t >= 3.0", sum(1 for c in cs20 if c["tD"] >= 3.0), resp,
+            "S4.4 endpoint table", "%.0f")
+        chk("   rms measurement se", math.sqrt(sum(c["seD"]**2 for c in live) / len(live)),
+            rmsp, "S4.4 endpoint paragraph", "%.3f")
+        chk("   sd of the fourteen D's", st.stdev([c["D"] for c in live]), sdp,
+            "S4.4 endpoint paragraph", "%.3f")
+        for b in bases:
+            chk("   level %-8s %-11s" % (b, col), sub[b][0], METRIC_LEVELS[col][b],
+                "S4.4 endpoint table")
+        hi = max(sub[b][0] for b in bases); lo = min(sub[b][0] for b in bases)
+        chk("   level spread factor", hi / lo, METRIC_SPREAD[col],
+            "S4.4 endpoint paragraph", "%.1f")
+        order = " > ".join(sorted(bases, key=lambda b: -sub[b][0]))
+        ok = order == METRIC_RANK[col]
+        if not ok: FAILS.append(("rank order %s" % col, order, METRIC_RANK[col], "S4.4"))
+        print("      %-46s %-32s | paper %-32s | %s"
+              % ("rank order of the four level pools", order, METRIC_RANK[col],
+                 "PASS" if ok else "**FAIL**"))
+
+    # The one cell that changes sign, and WHY.  S4.4 calls it an se inflation on a
+    # single-epoch reading and not a reversal, so the se ratio and the two arms' own
+    # sds are asserted too -- that is the claim, not the sign.
+    fin = {c["label"]: c for c in _cells_on("final_test", adm, False)}
+    pl5 = {c["label"]: c for c in _cells_on("plateau5",   adm, False)}
+    b = fin["bm2 (SGD)"]
+    chk("bm2 (SGD) D on final_test", b["D"], -0.073, "S4.4 endpoint paragraph, S1.1 C1")
+    chk("   its se", b["seD"], 0.500, "S4.4 endpoint paragraph", "%.3f")
+    chk("   its t -- unresolved, NOT reversed", b["tD"], -0.15, "S4.4, S1.1 C1", "%.2f")
+    chk("   its plateau5 reading", pl5["bm2 (SGD)"]["D"], 0.978, "S4.4, Table 2")
+    chk("   se inflation vs plateau5", b["seD"] / pl5["bm2 (SGD)"]["seD"], 5.8,
+        "S4.4 endpoint paragraph", "%.1f")
+    for pre, gran, who, s5, sf in (("bm2-sgd-ch",   "chunk777", "uniform",  0.127, 0.467),
+                                   ("bm2-sgd-node", "nodewise", "nodewise", 0.077, 0.729)):
+        sel = [r for r in adm if r["run"].startswith(pre) and r["granularity"] == gran]
+        chk("   bm2 %-8s arm sd, plateau5" % who,
+            st.stdev([float(r["plateau5"]) for r in sel]), s5,
+            "S4.4 endpoint paragraph", "%.3f")
+        chk("   bm2 %-8s arm sd, final_test" % who,
+            st.stdev([float(r["final_test"]) for r in sel]), sf,
+            "S4.4 endpoint paragraph", "%.3f")
+    r5 = math.sqrt(sum(c["seD"]**2 for c in [x for x in _cells_on("plateau5", adm, True)
+                       if x["in12"] and x["base"] != "SGDm-GN"]) / 14.0)
+    rf = math.sqrt(sum(c["seD"]**2 for c in [x for x in _cells_on("final_test", adm, True)
+                       if x["in12"] and x["base"] != "SGDm-GN"]) / 14.0)
+    chk("final_test rms se / plateau5 rms se", rf / r5, 2.5,
+        "S4.4 endpoint paragraph", "%.1f")
+
+
+# ------------------------------------------------- the census, ASSERTED not measured
+# §3.4 of the manuscript prints this audit's own coverage.  Until cycle 102 `--census`
+# only MEASURED it, so the sentence "216 of the 725 ... 29.8%" sat in the draft for
+# three review cycles while the code printed 747 and 28.9%, and every run still exited
+# 0.  Section [16] turns that sentence into an asserted number like any other.
+#
+# THE PAPER VALUE IS READ OUT OF THE PAPER, not duplicated here.  Every other chk()
+# in this file compares a derived value against a constant that a human copied from
+# the manuscript; for this one the constant IS the manuscript's own sentence, so
+# there is exactly one place to update and no way for the code's idea of what §3.4
+# prints to drift from what §3.4 prints.  Reword the sentence and the parse fails
+# loudly rather than passing quietly.
+#
+# WHEN THIS FAILS: it is telling you §3.4 has gone stale -- usually because a chk()
+# site was added or removed somewhere above.  Run
+#     python3 analysis/c98_reproduce.py --census
+# and write the printed triple into the §3.4 sentence of BOTH paper/paper.tex and
+# paper/DRAFT-v4.md, then re-run until it is a fixpoint (it converges in one step
+# unless the new percentage string is a decimal that was not already in the draft).
+CENSUS_SHAPE = ("... the audit executes **N claim-carrying assertions covering C of "
+                "the Q distinct quantity-numerals** in this manuscript, which is P% "
+                "of them ...")
+_CENSUS_RE = re.compile(
+    r"audit executes (\d+) (?:claim-carrying )?assertions covering (\d+) of the "
+    r"(\d+) distinct quantity-numerals in this manuscript(?:, which is "
+    r"([\d.]+)% of them)?")
+
+def _census_claim(path):
+    """(assertions, covered, distinct, pct) as §3.4 PRINTS them, or None."""
+    flat = re.sub(r"[*`\s]+", " ", open(path).read())
+    m = _CENSUS_RE.search(flat)
+    if not m: return None
+    n, c, q, p = m.groups()
+    return int(n), int(c), int(q), (float(p) if p else None)
+
+def censuscheck(rows, adm, args):
+    """§3.4's coverage sentence, re-measured and asserted against the manuscript."""
+    global CENSUS_MARK
+    print("\n[16] THE COVERAGE CENSUS, ASSERTED  (§3.4 Registration and scope)")
+    if not getattr(args, "_full", True):
+        skip("censuscheck", "only some sections were requested, so the assertion "
+                            "count would not be the manuscript's")
+        return
+    path = getattr(args, "draft", None) or DRAFT
+    if not os.path.exists(path):
+        skip("censuscheck", "no manuscript in this tree (the deposit ships none), "
+                            "so §3.4's coverage cannot be re-measured here")
+        return
+    claim = _census_claim(path)
+    if claim is None:
+        FAILS.append(("§3.4 coverage sentence not parseable", "-", "-",
+                      "expected the shape: " + CENSUS_SHAPE))
+        print("  **FAIL** could not find §3.4's coverage sentence in %s."
+              % os.path.relpath(path, ROOT))
+        print("           expected shape:  %s" % CENSUS_SHAPE)
+        return
+    p_sites, p_cov, p_qd, p_pct = claim
+    CENSUS_MARK = len(ASSERTED)      # freeze BEFORE asserting: see census()
+    _n_tok, n_qd, _n_q, n_cov = census(path, quiet=True)
+    chk("chk() assertion sites executed", CENSUS_MARK, p_sites, "§3.4", "%.0f")
+    chk("distinct quantity-numerals asserted", n_cov, p_cov, "§3.4", "%.0f")
+    chk("distinct quantity-numerals in the draft", n_qd, p_qd, "§3.4", "%.0f")
+    if p_pct is not None:
+        chk("coverage of distinct quantity-numerals",
+            100.0 * n_cov / n_qd if n_qd else 0.0, p_pct, "§3.4", "%.1f")
+    print("    (the `paper` column here is §3.4's own sentence, read out of %s."
+          % os.path.relpath(path, ROOT))
+    print("     A FAIL means that sentence has gone stale, not that a result moved:")
+    print("     re-run with --census and write the printed triple into §3.4 in BOTH")
+    print("     paper.tex and DRAFT-v4.md, then re-run to a fixpoint.)")
+
+
 SECTIONS = [("corpus", corpus), ("table2", table2), ("heterogeneity", heterogeneity),
             ("alignment", alignment), ("prescription", prescription), ("tail", tail),
             ("budget", budget), ("competitiveness", competitiveness),
             ("rho", rho), ("gn1gate", gn1gate), ("metacensus", metacensus),
             ("countaxis", countaxis),
-            ("tuning", tuning), ("appendices", appendices), ("deposit", deposit)]
+            ("tuning", tuning), ("appendices", appendices), ("deposit", deposit),
+            ("metricsens", metricsens),
+            ("censuscheck", censuscheck)]      # MUST stay last: it freezes CENSUS_MARK
 
 def main():
     ap = argparse.ArgumentParser()
@@ -773,9 +993,15 @@ def main():
                     help="print the coverage census and nothing else")
     ap.add_argument("--draft", default=DRAFT, help="the manuscript the census reads")
     ap.add_argument("--no-census", action="store_true")
+    ap.add_argument("--allow-stale-census", action="store_true",
+                    help="report a stale §3.4 coverage sentence but do not exit "
+                         "non-zero for it.  Used by c98_release.py: the deposit "
+                         "ships no manuscript, so §3.4's sentence is not a number "
+                         "the artefact can get wrong.  NEVER use it to close F2.")
     a = ap.parse_args()
     F.WITH_GN = a.with_gn
     want = [n for n, _ in SECTIONS if getattr(a, n)] or [n for n, _ in SECTIONS]
+    a._full = len(want) == len(SECTIONS)
     rows, adm = load(a.csv)
     if a.census:
         import io as _io, contextlib as _c
@@ -783,6 +1009,11 @@ def main():
         with _c.redirect_stdout(buf):
             for name, fn in SECTIONS: fn(rows, adm, a)
         census(a.draft)
+        if FAILS:
+            print("\n%d CHECK(S) FAILED while measuring the census:" % len(FAILS))
+            for n, got, paper, where in FAILS:
+                print("   %-46s derived %s vs paper %s   (%s)" % (n, got, paper, where))
+            return 1
         return 0
     print("=" * 78)
     print("REPRODUCTION AUDIT -- %s" % os.path.relpath(a.csv, ROOT))
@@ -790,12 +1021,23 @@ def main():
     for name, fn in SECTIONS:
         if name in want: fn(rows, adm, a)
     print("\n" + "=" * 78)
+    stale = []
+    if a.allow_stale_census:
+        stale = [f for f in FAILS if f[3] == "§3.4"]
+        for f in stale: FAILS.remove(f)
     if FAILS:
         print("%d CHECK(S) FAILED:" % len(FAILS))
         for n, got, paper, where in FAILS:
             print("   %-46s derived %s vs paper %s   (%s)" % (n, got, paper, where))
     else:
         print("ALL %d CHECKS PASS." % len(ASSERTED))
+    if stale:
+        print("%d §3.4 COVERAGE CHECK(S) STALE, NOT COUNTED AS FAILURES "
+              "(--allow-stale-census):" % len(stale))
+        for n, got, paper, where in stale:
+            print("   %-46s derived %s vs paper %s" % (n, got, paper))
+        print("   The manuscript's coverage sentence is behind the code. Fix §3.4 in")
+        print("   paper.tex AND DRAFT-v4.md and re-run WITHOUT this flag.")
     if SKIPPED:
         print("%d SECTION(S) COULD NOT RUN HERE, so this is not full coverage:"
               % len(SKIPPED))

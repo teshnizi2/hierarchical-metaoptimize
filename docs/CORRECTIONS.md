@@ -8889,3 +8889,203 @@ No Slurm job was submitted. `hz3`-R2 was not disturbed.
 * **The alignment leg is still not an equivalence claim** — `T1b` underpowered. The open
   contribution narrows from ~half of D to ~a third; it is not zero.
 * The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).
+
+---
+
+## 130. Cycle 104 — THE SUBMISSION CANDIDATE: FIVE PACKAGES INTEGRATED INTO BOTH MARKUPS, ALL 15 BLOCKING ITEMS CLOSED, ZERO GPU
+
+Cycle 103's Q1 meta-gate returned MAJOR REVISIONS (7/10, 15 blocking, all zero-GPU). Five
+packages were written against those items and left as replacement text only
+(`paper/sections/v5-{abstract-and-gate,contradictions,false-numbers,metric-sensitivity,rp1-into-paper}.md`).
+This cycle applied all five to **both** `paper/paper.tex` and `paper/DRAFT-v4.md`, re-derived
+every quantity two packages disagreed on, and verified the result mechanically. **No Slurm job
+was submitted. No registered scorer was edited. `hz3`-R2 was not disturbed.**
+
+### 130.1 WHAT WAS APPLIED
+
+104 keyed replacements from the five packages (whitespace-tolerant anchor matching, each anchor
+asserted unique in its target file before it was applied), plus 17 integrator edits described
+below. Closed: G1, G2, G3, G4, F1, F2, S1–S7, R1, M1.
+
+* **G1** — six end-matter `\paragraph{}` blocks promoted to `\section*{}` with the gate's exact
+  case (`Data Availability`, `Code Availability`, `Ethics`, `Competing Interests`, `Funding`,
+  `Author Contributions`); six markdown run-ins promoted to `##`. Zero prose changed.
+  `q1_meta_gate`'s own regex: **0 of 6 found → 6 of 6 found**.
+* **G2/G4** — abstract rewritten: 255 → **218 words** (`.tex`) and **228** (`.md`), the 67-word
+  sentence gone (longest is now 31 / 33 words), all seven `se_empirical` abstract obligations
+  matched on both files, Threats split into *Limits of the included evidence* (T1–T8) and
+  *Limits of the review process* (T9–T12) with both trigger strings in running prose.
+* **G3** — a workload / task-suite paragraph at the head of §3 (task suite, subject systems,
+  training scenario, budgets, execution environment), which is also the first place the network
+  census is printed.
+* **F1** — §3.3's `24` corrected to **17** and the three dependent clauses with it; `The worst of
+  them` corrected to `The lowest-accuracy of them` (`rs-blk6-3e4-s2` ran 24 of 100, fewer than
+  `rs-blk6-1e4-s2`'s 29).
+* **F2** — §3.4's coverage sentence corrected and, for the first time, **asserted** by the audit
+  (`[16] THE COVERAGE CENSUS, ASSERTED`, which parses the sentence back out of `DRAFT-v4.md`).
+* **S1–S7** — the §3.5 heading/caption/status contradictions, `There is no third`, §4.3's
+  absolute against §4.4's sensitivity check, five stale `sixteen` counts, §5.8's LOO-RMSE table
+  recomputed on 20 cells / 11 design points, §5.6 recomputed with it, the withdrawn
+  `F(62,85) = 5.47` removed from both load-bearing sites, all 15 orphan labels cross-referenced,
+  and the abstract's network attribution moved onto the count-matched cells.
+* **M1** — Contribution 3 restated as conditional on the endpoint, with a four-endpoint
+  sensitivity table in §4.4, the endpoint axis added to §7 T10, and §9 qualified. Contribution 1
+  is stated as the part that survives all four endpoints.
+* **R1** — the deposit README's two surviving over-claims replaced (already in
+  `analysis/c98_release.py` from the package; the deposit was rebuilt this cycle).
+
+### 130.2 CONFLICTS BETWEEN PACKAGES, RE-DERIVED RATHER THAN PICKED
+
+1. **The §3.5 heading and `tab:inflight`'s caption.** `contradictions` wrote *"three scored, one
+   still in flight"*; `rp1-into-paper` wrote *"three scored, one never started"*. **Re-derived:**
+   `ssh alice squeue -u salehkaleybars` at write time returns three jobs — `hz3-ch-s5`,
+   `hz3-c23-s5`, `hz3-n1d-s5` (ids 4855960–62, a resubmission of the 4848866–68 of 129.5) — all
+   `PENDING` with elapsed time `0:00`. They are queued and have never started, which is also what
+   the table's own R2 status cell already said. **Landed: "three scored, one never started"**, and
+   a merged caption that states both facts ("queued and has never started").
+2. **The §3.4 census triple.** `false-numbers` predicted 353 / 231 / 747 / 30.9%;
+   `metric-sensitivity` predicted 353 / 256 / 775 / 33.0%. **Neither was taken.** The triple was
+   iterated to a fixpoint after every package had landed, and re-iterated after each subsequent
+   integrator edit: **353 assertions / 256 covered / 786 distinct / 32.6%**, reached in one step
+   each time.
+3. **The cell count and Table 2's size.** Both packages say twenty; `cells()` says twenty
+   (ResNet-18 ×18, ResNet-34 ×1, ResNet-50 ×1; CIFAR-10 ×18, CIFAR-100 ×2; Lion ×19, RMSProp ×1).
+   No conflict, verified rather than assumed.
+4. **The abstract.** `contradictions` S7 and `abstract-and-gate` G2/G4 both rewrote it. The G2/G4
+   abstract was taken because it already carries S7's correction (the network list is attached to
+   the count-matched cells, where it is exactly true); S7's own abstract edit was dropped as
+   superseded, and its non-abstract leg (§1's corpus network list) was applied separately.
+5. **§5.6 / §5.8 (S4d).** `contradictions` flagged that recomputing §5.8 on 11 design points
+   without recomputing §5.6 would replace one contradiction with another. **S4d was applied**, so
+   both sections now sit on the same design-point set. Independent reconstruction from the
+   audit's own per-cell `D`/level listing gives **11 design points, 10 of them CIFAR-10**, a
+   CIFAR-10 slope of −0.180 ± 0.054 (t −3.33, r −0.762, exact permutation p 0.0099 over 10!) and
+   an all-points slope of −0.046 ± 0.010 (t −4.41, r −0.827) against the package's −0.173 ± 0.051
+   and −0.045 ± 0.010; the residual difference is inverse-variance versus unweighted collapsing
+   of replicate batches and 3-dp versus full-precision inputs. Sign tests and the power bound
+   reproduce exactly: 9/11 → p 0.065, 8/10 → p 0.109, critical |r| 0.602 at n = 11, 0.632 at
+   n = 10, 0.396 at n = 25.
+
+### 130.3 INTEGRATOR EDITS BEYOND THE FIVE PACKAGES
+
+Each closes a claim that became false, or was already false, at integration time.
+
+* **`tab:D`'s caption was stale and is corrected, not flagged.** It exempted "the two `rl3` rungs
+  and the two `nl1` bases" from *"every cell is a separate contiguous submission"* and omitted
+  **rows 17 and 18, which are both `bm2` and are one submission of four arms** (§3.5 R3 says so
+  itself). Now named.
+* **§3.3's "the `plateau` column … is not used" had become false**, because §4.4's endpoint
+  disclosure now reads it. Rewritten to "**banned as a primary** … carries no number in this
+  paper except inside §4.4's endpoint-sensitivity tables, which read all four end-of-training
+  columns side by side as a *disclosure* and make none of them primary."
+* **§8's "One command" told the reader to run `--census` inside the deposit**, which ships no
+  manuscript. Corrected to say it measures the scope *in the source repository* and cannot
+  measure it inside the deposit.
+* **`6.2 MB` was false in four places.** Re-derived from `head -1 release/MANIFEST.md5` after the
+  final deposit build: **6.3 MB in 137 files**. All four corrected.
+* **Figure 2's caption implied the 92.8% was endpoint-free.** One sentence added to both markups
+  naming the other three endpoints (86.8%, 62.5%, and nothing to decompose on `best_test`).
+* **§1's corpus network list omitted the single ResNet-101 row.** Now "ResNet-10, -18, -34, -50
+  and one ResNet-101 across the corpus".
+* **The manuscript referred to itself as a draft in 34 places** ("the previous draft", "earlier
+  drafts", "this draft"). Every self-reference is now "the previous version of this paper" /
+  "earlier versions of this paper" / "this paper"; CRediT's *Writing — original draft* and §5.9's
+  defined term *the draft sentence* are untouched. No number and no claim changed.
+* **Two numerals existed in one markup only**, both pre-existing at HEAD: `0.1241` (`nl1`/RMSProp
+  ρ, the largest of the twenty — the whole sentence was missing from the markdown) and `0.24`
+  (the *p* of the RMSProp level's within-level `Q`, printed only in the markdown table). Both
+  markups now carry both. **The two files now contain the identical set of decimal quantities.**
+* Two roadmap sentences (S6) and the G3 workload block both anchored the head of §3; they were
+  merged rather than applied twice. Same for §7's Threats preamble.
+* `sec:threats-evidence` and `sec:threats-process` — the two labels G4 introduced — were
+  cross-referenced from the §7 preamble rather than left as spare handles, so the orphan count
+  stays at zero.
+
+### 130.4 MECHANICAL VERIFICATION — PASTED, NOT SUMMARISED
+
+```
+1  python3 analysis/c98_reproduce.py              ->  exit 0   ALL 357 CHECKS PASS
+     [16] THE COVERAGE CENSUS, ASSERTED  (§3.4)
+       chk() assertion sites executed        353 | paper 353 | PASS
+       distinct quantity-numerals asserted   256 | paper 256 | PASS
+       distinct quantity-numerals in draft   786 | paper 786 | PASS
+       coverage of distinct quantity-numerals 32.6 | paper 32.6 | PASS
+     census re-measured after the edit: 353 / 256 / 786 / 32.6%  -- FIXPOINT
+
+2  paperfactory text_quality / reporting_profile
+     paper.tex     abstract 218 words (cap 230); longest sentence 31 words / 204 chars
+                   (cap 62 / 430);  _abstract_defects = []
+     DRAFT-v4.md   abstract 228 words (cap 230); longest sentence 33 words / 196 chars
+                   _abstract_defects = []
+     assess_text_quality(paper.tex): abstract_defects [] section_defects [] caption_defects []
+     assess_reporting_completeness(se_empirical): paper.tex 17/17, missing []
+       DRAFT-v4.md 7/7 abstract + 10/10 methods (abstract fed directly: _extract_abstract
+       is LaTeX-only and returns nothing for markdown)
+     q1_meta_gate end-matter regex: FOUND 6 of 6, MISSING []
+
+3  tectonic paper.tex                             ->  exit 0, 65 pages (was 61)
+     '??' in the PDF text          0
+     undefined refs / citations    0
+     TeX errors                    0
+     Overfull hboxes               3  -- 7.28497 / 20.28241 / 12.25499 pt, byte-identical
+                                      to the three at HEAD; this cycle adds none
+
+4  orphan labels: 74 \label defined, 74 referenced, ORPHANS = 0, dangling \ref = 0
+     (was 72 / 57 / 15 at HEAD)
+
+5  every \includegraphics target exists:
+     figures/f1_forest_D.pdf 42956 B, f2_base_moderator.pdf 22842 B,
+     f3_budget.pdf 34021 B, f4_decomposition.pdf 32415 B
+
+6  "Draft v" 0/0, "earlier draft" 0/0, "previous draft" 0/0, TODO 0/0, TBD 0/0, XXX 0/0,
+     placeholder 0/0, FIXME 0/0, zenodo DOI 0/0, ORCID 0/0, "grant no/number" 0/0
+     (the paper states outright that it has no DOI and received no grant)
+
+7  `plateau` (the banned 20-epoch column) appears 5x in each markup: once at §3.3 declaring
+     it banned as a primary, three times inside §4.4's endpoint-sensitivity disclosure, once
+     in §8's CSV schema listing.  It is primary nowhere.
+
+8  every verdict string the manuscript quotes was found VERBATIM in a registered scorer:
+     'CONSISTENT WITH NULL, UNDERPOWERED', 'THE PERMUTATION DRAW IS EXCHANGEABLE AT THIS
+     RESOLUTION', 'RUN SEED IS A REAL EFFECT HERE', 'TRUNCATED AT ZERO'  (c97_rp1_score.py);
+     'AGREE WITHIN RESOLUTION', 'FAILS TO REPLICATE', 'NO POOLING ACROSS'  (c97_bm2_score.py);
+     'G PERSISTS', 'MECHANISM CONTRAST RESOLVED', 'SMALLEST D'  (c97_sm4_score.py);
+     'NO TRANSFER VERDICT IS ISSUED', 'THIS IS NOT A NULL', 'THE WHOLE BATCH IS VOID'
+     (c84_gn1_score.py); 'THE FIELD IS NOT A SUFFICIENT STATISTIC' (c81_cc1_score.py).
+     `grep -ic underdetermined analysis/c97_rp1_score.py` -> 0, which is what §3.5 and
+     §4.6.1 now say.  c97_rp1_score.py --selftest -> 147/147 PASS,
+     md5 7d21c4f5c16ccf25196fd6a5e6391fa9, unedited.
+
+9  numeric diff, paper.tex vs DRAFT-v4.md (section refs, arXiv ids, software versions and
+     LaTeX layout constants excluded):
+       decimal quantities present in paper.tex and absent from DRAFT-v4.md   0
+       decimal quantities present in DRAFT-v4.md and absent from paper.tex   0
+       (at HEAD these were 12 and 2)
+       values in both at different multiplicities: 4 -- 0.05, 3.0, 9.0, 88.4, all of them
+       the same value repeated a different number of times, none a disagreement.
+
+   deposit: python3 analysis/c98_release.py -> 137 files, 6.3 MB
+            cd release && make verify        -> 137 files checked, 0 bad
+            cd release && make reproduce     -> ALL 342 CHECKS PASS, exit 0,
+                                                2 sections declared unrunnable there
+```
+
+### 130.5 STILL OPEN
+
+* **`hz3`-R2 has not started.** Three jobs `PENDING` at `0:00` (4855960–62). Everything in
+  129.7 about it stands, and the manuscript now says "never started" in the heading, the caption
+  and the status column alike.
+* **Appendix A.3b's disagreement is unchanged and unreconciled** — `rp1`'s run seed is a real
+  effect (F(5,10) = 4.634, p = 0.0190) against the corpus seed null.
+* **The alignment leg is a NULL, not an equivalence claim** — `T1b` fired UNDERPOWERED.
+* **§5.6's verdict moved under the twenty-cell ingest** and this is stated in the manuscript
+  rather than buried: inside CIFAR-10 the slope goes from −0.161 ± 0.067 (a coin on its edge) to
+  −0.173 ± 0.051 with exact permutation p 0.0097, and the independent instrument now clears
+  |t| ≥ 2. Holding network *and* base fixed it is still unresolved (−0.187 ± 0.125, p 0.333),
+  which is the leg the confound argument rests on.
+* **The deposit's `6.3 MB` will move again** when `hz3`-R2's `.out` files land. Re-derive it from
+  `head -1 release/MANIFEST.md5` at the final build.
+* `bin/c98_hz3_s5_box30.sh.bak_wall10` is left untracked on purpose — it is an editor dropping
+  beside a live submission script, and `c98_release.py`'s new `skipfile()` filter keeps it out of
+  the deposit. It is not committed.
+* The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).

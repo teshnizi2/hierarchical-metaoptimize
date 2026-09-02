@@ -190,7 +190,7 @@ CLIP=-30:9.0                   # the batch's own box (c87_horizon_300ep.sh:CLIP,
                                # c87_hz3_score.py:CLIP, and 21 of 24 hz3 ENV lines)
 OLDCLIP=-15:-2.3026            # the box the three superseded runs actually used
 PART=gpu-2080ti-11g            # SEED_CLASS[5] -- all four arms of seed 5 share it
-WALL=10:00:00
+WALL=7:00:00                   # 300ep observed 155-342 min; 10h was unschedulable (24 pending in this partition)
 MST=1e-4
 ALPHA0=1e-3
 GAMMA=1
