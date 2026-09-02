@@ -5,3 +5,6 @@ data/
 *.tar.gz
 runs/
 Tensorboard_outputs/
+
+# build product of analysis/c98_release.py -- regenerate, do not commit
+release/

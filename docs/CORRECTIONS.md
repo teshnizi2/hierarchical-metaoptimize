@@ -8349,3 +8349,179 @@ which is free).
   no `c96_*` scorer and `bin/c96_secondmoment.sh` names none. Rule 19 (hash the scorer before
   submission) was silently skipped, which is why a void batch ran to completion and would have
   entered the draft as "mechanism candidate 8, refuted".
+
+#### PRE-SUBMISSION CHECKLIST — STANDING RULES 20 AND 21, MADE MECHANICAL
+
+Two tools now exist so that the `ml2`/`sm3` failure cannot reach a result again. Both were
+verified **on the cluster** (13/13 green, `bash /data1/salehkaleybars/metaopt/argsguard_selftest.sh`)
+against the known-bad `sm3` (must FAIL) and the known-good `cc1` (must PASS).
+
+* `analysis/argsline_guard.py` — reads a run's **own** `ARGS:` line (or a literal command line),
+  fails loudly on **any** repeated flag, prints the effective value of every flag, checks a
+  declared design with `--expect`, and flags flags that differ across a batch with
+  `--batch-consistency`. Stdlib only; exit 0 PASS / 1 FAIL / 2 nothing to audit.
+* `bin/_lib_guards.sh` — sourceable; carries the venv preamble. `guard_presubmit "$CMD" flag=val …`
+  rejects the composed command line **before** `sbatch`; `guard_postlaunch "$WS/runs" "<prefix>-"
+  flag=val …` reads the first launched run's actual `ARGS` line and fails the batch if it does not
+  match the declared design (prints the `scancel`; `ARGSGUARD_AUTOCANCEL=1` runs it).
+  `guard_scorer_registered <scorer>` enforces Rule 21 and prints the scorer's sha256 for Rule 19.
+
+**Every new submission script must, in this order:**
+
+1. Declare the design once as an array — `DESIGN=(alg-base=… alg-meta=… meta-stepsize=… alpha0=…
+   num-epochs=… dataset=… NN-name=…)` — and never restate an optimiser flag anywhere else.
+2. `. "$(dirname "$0")/_lib_guards.sh"` and `guard_scorer_registered analysis/<batch>_score.py ||
+   exit 2` **before** any job is composed (Rule 21: the scorer is written first).
+3. `guard_presubmit "$CMD" "${DESIGN[@]}" || exit 2` for the first composed `$CMD` of every arm.
+   A `$BFLAGS` block followed by an appended `--alg-meta …` is the exact shape that voided both
+   batches; this check is what catches it.
+4. After `sbatch`, `guard_postlaunch "$WS/runs" "<prefix>-" "${DESIGN[@]}" || exit 2`. Return code
+   2 means UNVERIFIED, not PASS.
+5. In the batch report, quote **one run's `ARGS` line verbatim** plus the guard's `VERDICT` line.
+
+**Corpus sweep, run at write time with the new tool.** All 2,181 `.out` on both clusters
+(1,262 alice + 919 alice2): **1,246 + 895 = 2,141 clean, 36 with a repeated flag, 4 with no `ARGS`
+line** (jobs that never started). The 36 are exactly `ml2` (24, on alice2 — `--alg-meta` `Adam→Lion`
+and `RMSProp→Lion`, plus `--momentum-param-meta 0.9→0.99` and `--weight-decay-meta` twice) and
+`sm3` (12, on alice — `--alg-meta RMSProp→Lion`, `--weight-decay-meta` twice). **No other batch on
+either cluster carries a repeated flag in its own `ARGS` line.** That is evidence about the runs
+that exist on disk, not about the ten flagged scripts' *headers*, which still need the 125.4 audit;
+but it does mean that whatever those scripts composed, the jobs that ran from them were not voided
+this way.
+
+---
+
+## 126 — CYCLE 99: DRAFT-v3 ASSEMBLED FROM SIX REWRITE PACKAGES, WITH FOUR PRE-REGISTERED BATCHES IN FLIGHT AND THREE CLAIMS WITHDRAWN
+
+`paper/DRAFT-v3.md` (2,372 lines) supersedes `paper/DRAFT-v2.md`, which is committed unchanged
+alongside it so the supersession is visible. It is the integration of the six packages under
+`paper/sections/` (`scorer-violation`, `heterogeneity`, `alignment-null`, `byte-identical-T9`,
+`stats-hygiene`, `production`) plus `docs/ARGS-AUDIT.md`. Where two packages disagreed the number
+was **re-derived from `results/all_runs.csv` at integration time**, not adjudicated by preference;
+§126.2 lists every such conflict and its resolution. `analysis/c98_reproduce.py` exits 0 on the
+result.
+
+### 126.1 THREE CLAIMS WITHDRAWN, AND THE PAPER IS WEAKER FOR TWO OF THEM
+
+* **The alignment refutation becomes a bounded null.** `A = −0.009 ± 0.157` is an n=3 v 3,
+  single-batch, single-cell measurement whose 95% interval is [−0.317, +0.298] = **[−55%, +51%] of
+  the same batch's D**, with an MDE of 0.440 pp = 76% of D and power 0.46 against `A = D/2`. The
+  words "refutes", "does nothing" and "worth nothing" are gone from the title strapline, the
+  abstract, §1.1, §2.5, §4.6, §5, §5.10, §7 T2 and §9. The registration defect is printed with the
+  result: the NULL band's half-width (0.15) is **narrower than the realised se** (0.157), so a true
+  zero would have scored NULL only 66% of the time.
+* **M7's falsification is withdrawn, and the surviving slope points the other way.** The
+  `gn1`-GroupNorm cell is removed everywhere (Table 2, the pool, the design-point set, the
+  abstract's counts) because its own registered scorer halts at T0.6 and prints *"NO TRANSFER
+  VERDICT IS ISSUED … THIS IS NOT A NULL"*. Both legs of the old §5.6 came from that cell: it was
+  the within-batch test, and it was the low-level point that flattened the within-CIFAR-10 slope.
+  Without it the within-CIFAR-10 slope moves from −0.021 ± 0.077 (t −0.27) to **−0.161 ± 0.067
+  (t −2.38, exact permutation over all 9! orderings p = 0.0454)** — nominally resolved, in the
+  direction the level model predicts. STATUS R0 item 1's instruction to "downgrade it to a weak
+  null" **cannot be followed as written**. M7's verdict is **not separable**, not dead: the slope
+  moves 3.2× with which confound is held (−0.119 ± 0.022 holding base, −0.386 ± 0.105 holding
+  network, −0.187 ± 0.125 t −1.49 holding both, exact permutation p 0.333). **The mechanism tally
+  is therefore three refuted (M2, M3, M6), one narrowed (M4), one not separable (M7), one untested
+  (M1), one inapplicable (M5), one not identifiable (M8).** The title no longer carries a count.
+* **§4.8's budget flatness is demoted to an unresolved trend.** D(300) − D(100) = −0.149 ± 0.105
+  (t −1.42) on six seeds and −0.207 ± 0.107 (**t −1.94**, not −1.93) on the five box-matched ones.
+  Neither excludes zero, so the paper claims the **level** (D survives 3× the budget, all six seeds
+  favour `chunk777` at 300 ep, exact binomial p 0.0156) and explicitly does **not** claim the
+  trend. The batch's own registered scorer's 50-epoch verdict `GROWS` (+0.229 ± 0.070, t 3.27) is
+  printed alongside rather than suppressed.
+
+Against those, two things get stronger: §4.4 gains an **identified moderator** (below), and the
+primary itself improves, because the removed cell was the smallest D and the only one below t 3
+(pool +0.546 → **+0.571**).
+
+### 126.2 EVERY CROSS-PACKAGE CONFLICT, AND THE RE-DERIVATION THAT SETTLED IT
+
+| conflict | packages | resolution |
+|---|---|---|
+| Cochran Q: 43.19/36.40 vs 43.01/36.29 | `scorer-violation`+`production` vs `heterogeneity`+`byte-identical-T9` | **Not a disagreement — a convention.** Full-precision arm means give 43.19 (36.40); the printed three-decimal (D, se) pairs of Table 2 give 43.01 (36.29). **Full precision adopted**, because it is what `c98_figures.py` and `c98_reproduce.py` compute and what `make reproduce` re-derives; both are printed in A.4 with the reason |
+| within-SGDm Q 4.22 vs 4.21; pool +0.555 vs +0.556 | same split | same convention → **4.21 / +0.556 ± 0.045** |
+| 11-cell pool +0.570 vs +0.571 | same split | **+0.571 ± 0.037**, τ 0.203, rms se 0.152, I² **72%** (not 73%) |
+| between-base share "≈75%" vs 88% | STATUS/125.1 vs `heterogeneity`/`production` | **Both denominators named.** Q_between = **32.20 on 3 df** is 88.4% of the live 11-cell Q (36.40) and 74.6% of the legacy 12-cell Q (43.19). STATUS item 2 and 125.1 paired an 11-cell numerator with a 12-cell denominator; that is corrected here |
+| SGDm subset "k=8, 6 batches" | STATUS item 2 | **7 batches** — cc1, mm1, pp1, gn1, rl3, fa1, hz3 |
+| pooled SGDm D−G: +0.499 vs +0.514 ± 0.064 vs +0.514 ± 0.056 | STATUS item 15 vs `stats-hygiene` vs `production` | **+0.514 ± 0.056** (k=8, all CIFAR-10 SGDm), to match Figure 4; the k=6 R18/C10 pool is +0.514 ± 0.064, same point estimate. STATUS's +0.499 is the pre-`dup_group` value |
+| alignment CI upper limit +0.299 vs +0.298 | STATUS/125 vs `alignment-null`/`production` | **+0.298** (full precision; the record's +0.299 comes from 3-dp-rounded inputs) |
+| `hz3` box-matched t −1.93 vs −1.94 | 124/STATUS vs `byte-identical-T9`/`production` | **−1.9379 → −1.94** |
+| Holm-adjusted p on the normal approximation | `stats-hygiene` table vs its own §R.3 | The table computed Holm(z) on the **Welch ordering**. Recomputed on its own ordering: **g3m 0.20, ml2 0.19, aw1 0.11** — §R.3's values, which are the correct ones |
+| mechanism count: "four refuted" vs "three refuted" | `stats-hygiene` E9 vs `scorer-violation` | **Three.** E9 counted M7 as refuted; the same package's `gn1`-GN removal is what withdraws that refutation |
+| Fig. 2 caption "six submissions / two normalisation schemes" | `production` | **seven submissions / three β-boxes**; every cell is BatchNorm after the removal |
+
+### 126.3 TWO DEFECTS FOUND AT INTEGRATION THAT NO PACKAGE CAUGHT
+
+* **§4.2's `U` table carried `ml2` at its uncollapsed standard error.** Every package corrected
+  `ml2`'s `D`, `G` and `D − G` for the `dup_group` collapse and none corrected its `U`. Re-derived
+  on three seed groups, `U(ml2) = +0.337 ± 0.112` (t 3.02), not ± 0.088. Corrected in DRAFT-v3 with
+  the six-run value stated alongside so the correction is visible.
+* **§4.7's `ml2` T row was tabled at its uncollapsed se as well**: +0.619 ± 0.176 (t **3.52**),
+  not ± 0.133 / t 4.66. Corrected. The rule in §3.3 now states the `dup_group` reduction once, in
+  the methods, so it cannot be applied to some contrasts and not others again.
+
+### 126.4 MECHANICAL VERIFICATION RUN ON DRAFT-v3, ALL GREEN
+
+* **Every tabled quantity re-derived from the CSV: 55 for 55.** Table 2's 16 D/se/t triples,
+  §4.7's 11 T rows, §5.4's 13 G values (12 tabled + `bn1`), §4.2's 12 U values and the 5-rung `ck1`
+  ladder all reproduce to three decimals. Two mismatches were found by this check and both are
+  §126.3.
+* **Placeholders: 0** of the TODO / TBD / FIXME / `[to be completed]` kind. **Six author-only
+  `⟨…⟩` decisions remain** and are enumerated in the end matter (grant identifiers, the final
+  author list, a conditional second conflict-of-interest disclosure, the third contributor's
+  inclusion, further acknowledgements, the correspondence address). None can be filled from the
+  repository and none is a number.
+* **Figures: 4 referenced, 4 present on disk** (`paper/figures/f{1..4}*.png`, PDF companions
+  alongside), all generated by `analysis/c98_figures.py` from the CSV with no typed value.
+* **Equations: 12 display blocks, 12 numbered, tags 1–12 sequential, 0 untagged.**
+* **The banned `plateau` column appears nowhere except where it is being banned.**
+* **Registered scorer verdicts quoted as issued**, including the two that cost us: `c84_gn1`'s
+  *"NO TRANSFER VERDICT IS ISSUED … THIS IS NOT A NULL"* and `c87_hz3`'s `GROWS`.
+* `python3 analysis/c98_reproduce.py` → **exit 0, all 99 checks PASS.**
+
+### 126.5 FOUR PRE-REGISTERED BATCHES, DESCRIBED IN §3.5 AND CONTRIBUTING NO NUMBER
+
+New §3.5 states each batch's registration **before** its numbers exist. **No result from any of the
+four enters a claim in DRAFT-v3.**
+
+| tag | batch | jobs | status at write time | scorer |
+|---|---|---|---|---|
+| R1 | `rp1` | 24 | RUNNING (14 launched) | `analysis/c97_rp1_score.py` |
+| R2 | `hz3` seed-5 trio | 3 | PENDING (4848866–68; gpu-2080ti-11g congested) | `analysis/c87_hz3_score.py`, reused **unedited** |
+| R3 | `bm2` | 12 | **COMPLETED 12/12 at 100 epochs, UNSCORED** | `analysis/c97_bm2_score.py` |
+| R4 | `sm4` | 12 | RUNNING | `analysis/c97_sm4_score.py` |
+
+**`bm2` completed after the draft's numbers were frozen and is deliberately not reported.** Its
+runs' own `ARGS:` line carries exactly one `--alg-meta` and matches the declared design; it is to
+be scored by running `c97_bm2_score.py` **unedited** and quoting its verdict, and its registration
+already states in advance that a small `D′` reads UNDECIDED because `SE_MAX = 0.15 < SE_D = 0.194`
+makes the powered-null branch unreachable. §3.5 says all of this in the paper rather than leaving a
+completed batch unmentioned.
+
+### 126.6 WHAT WAS NOT DONE, DELIBERATELY
+
+* **`sm3`'s 12 rows are still not ingested** (2,113 → 2,125). Ingesting them would move Table 2 to
+  17 cells, move the abstract's counts, and invalidate all four figures and the reproduction audit,
+  which were built for the 16-cell corpus. DRAFT-v3 therefore quotes `sm3` **only** as a
+  consistency check re-derived from its raw `.out` (§4.4, §5.4, Appendix B, §8 Table 3), states
+  explicitly that no claim rests on it and that `make reproduce` does not check it, and leaves the
+  ingest as the first item of the next cycle: run `analysis/aggregate.py` **unedited** (its
+  last-wins parser writes `meta=Lion` by itself; no hand-edit) and then add the four-line `CELLS`
+  entry named in `paper/sections/production.md` §8.4.
+* **`release/` is not committed.** It is a build product of `analysis/c98_release.py`, and this
+  repository's `.gitignore` excludes `data/` and `*.tar.gz`, so committing it would put a
+  `MANIFEST.md5` in git that git itself makes unverifiable. The builder is committed; the deposit
+  is regenerated from a clean checkout before the DOI is minted.
+* **`analysis/argsline_guard.py`'s non-recursive `collect_files`** is left as it is and disclosed
+  in the paper (§6.4) instead. All twelve `.out` it skips are clean and none is in the run table.
+* **`analysis/c87_hz3_score.py` is not edited** despite its `SEED_CLASS` mislabelling three runs'
+  GPU class, because it is a registered scorer with data behind it. The correction lives in §7 T9,
+  and R2 makes the label true again.
+
+### 126.7 STANDING RULE 22 — A CONVENTION IS PART OF A NUMBER
+
+Two packages computed the same Cochran Q and got 43.19 and 43.01, and neither was wrong: one used
+full-precision arm means and one used the three-decimal values printed in Table 2. That is not a
+discrepancy until somebody quotes both in one document, which the draft did. **Every pooled
+quantity must name the precision it was computed at, once, in the methods.** DRAFT-v3 does so in
+its header block and in A.4.

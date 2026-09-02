@@ -1,19 +1,55 @@
 # STATUS — operator dashboard
 
-Updated 2 Sep 2026 (cycle 98). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins) > `docs/FINDINGS.md` > everything else.
+Updated 2 Sep 2026 (cycle 99). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **126**) > `docs/FINDINGS.md` > everything else.
 
 ## Verdict
 
 | | |
 |---|---|
-| Draft | `paper/DRAFT-v2.md`, 10,852 w — **DESK-REJECT** at the Q1 gate |
-| Defensibility | **6 / 10** (panel fails the stage below 7) |
-| Nature of the reject | **claims calibration + production readiness. NOT a science reject.** |
-| Blocking items | 15. **13 need ZERO GPU.** 2 need runs (~27 GPU-h total) |
-| Realistic home | **TMLR** — 65–75% if the claims are rescoped BEFORE submission |
-| Runs / GPU-h | 2,113 rows + 12 un-ingested `sm3` = **2,125** / ~1,594 |
-| Cluster | **IDLE. Both queues empty.** `sm3` COMPLETED 12/12 |
+| Draft | **`paper/DRAFT-v3.md`** — R0 applied in full; `DRAFT-v2.md` kept alongside, superseded |
+| Cycle-98 verdict on v2 | **DESK-REJECT**, defensibility 6/10, 15 blocking items |
+| R0 (13 zero-GPU items) | **DONE.** Six rewrite packages integrated; see CORRECTIONS 126 |
+| R1 / R2 / R3 / R4 | **IN FLIGHT.** `rp1` running, `hz3`-s5 trio pending, `bm2` COMPLETE+UNSCORED, `sm4` running |
+| Claims withdrawn this cycle | 3 — alignment refutation → bounded null; M7 falsification → not separable; budget flatness → unresolved trend (126.1) |
+| Mechanism tally | **3 refuted** (M2/M3/M6), 1 narrowed (M4), 1 not separable (M7), 3 undecidable (M1/M5/M8) |
+| Verification | 55/55 tabled quantities re-derived; 0 placeholders; 4/4 figures on disk; 12/12 equations numbered; `c98_reproduce.py` exit 0 |
+| Runs / GPU-h | 2,113 rows + 12 un-ingested `sm3` = **2,125** / ~1,594; +51 jobs in flight |
+| Cluster | **BUSY.** 4 batches, 51 jobs |
+
+## Cycle 99 — what changed
+
+* `paper/DRAFT-v3.md` assembled from `paper/sections/*.md` + `docs/ARGS-AUDIT.md`. Every
+  cross-package numeric conflict re-derived from `results/all_runs.csv`; the table of conflicts and
+  resolutions is CORRECTIONS **126.2**.
+* **Convention fixed (STANDING RULE 22):** pooled quantities are computed at **full precision** from
+  the run table (Q 43.19 / 36.40), not from Table 2's printed 3-dp values (43.01 / 36.29). Both are
+  printed in A.4. This is what made two packages look like they disagreed.
+* **Corrections to this dashboard**, from 126.2: the between-base share is **88.4% of the 11-cell Q
+  (32.20 / 36.40)** or 74.6% of the legacy 12-cell Q — item 2's "≈75%" paired an 11-cell numerator
+  with a 12-cell denominator. Item 2's "k=8, 6 batches" is **7 batches**. Item 3's `+0.299` is
+  **+0.298**. Item 15's pooled SGDm D−G `+0.499 ± 0.062` is **+0.514 ± 0.056**.
+* **Item 1 could not be followed as written.** It said to rebuild M7 on the within-C10 slope and
+  downgrade it to a weak null. Removing `gn1`-GN takes that slope from −0.021 ± 0.077 (t −0.27) to
+  −0.161 ± 0.067 (t −2.38, exact perm p 0.0454) — nominally resolved, the *other* way. M7 is
+  **not separable**, not null. See 126.1.
+* **Two defects found at integration that no package caught** (126.3): `ml2`'s `U` and `T` were
+  still tabled at their uncollapsed standard errors. `U` → +0.337 ± 0.112 (t 3.02); `T` → t 3.52.
+* `release/` is **not** committed — build product, and `.gitignore` would make its manifest
+  unverifiable. Rebuild from a clean checkout with `python3 analysis/c98_release.py`.
+
+## Next cycle, in order
+
+1. **Ingest `sm3`'s 12 rows** (2,113 → 2,125) with `analysis/aggregate.py` **unedited**, then add the
+   four-line `CELLS` entry in `analysis/c98_figures.py` named in `paper/sections/production.md` §8.4,
+   regenerate the figures and re-run `c98_reproduce.py`. Table 2 goes to 17 cells; the abstract's
+   counts and both figure captions move with it.
+2. **Score `bm2` (R3)**: `python3 analysis/c97_bm2_score.py`, **unedited**, quote the verdict.
+3. Verify R2's ARGS/ENV lines once the trio starts:
+   `for J in 4848866 4848867 4848868; do grep -m1 '^ARGS:' .../runs/*-$J.out; done` — `scancel` on
+   any mismatch (STANDING RULE 20).
+4. Score `rp1` (R1) and `sm4` (R4) when they finish, each with its own registered scorer, unedited.
+5. Mint the DOI; rebuild `release/` from a clean checkout; fill the six `⟨…⟩` author-only items.
 
 ## Venue table (from the gate)
 
