@@ -8189,3 +8189,163 @@ failure mode small n produces is spurious success, and CV cannot detect a mislab
 direction. **A cross-validated null at n = 11 is defensible in a way a cross-validated success at
 n = 11 never is.** Analysis 2 is paper-ready as a negative; Analysis 1 contributes a limit and an
 experiment design.
+
+---
+
+## 125. THE Q1 REVIEW VERDICT, AND `sm3` IS VOID AS DESIGNED
+
+Cycle 98. Three panels (hard-questions, red-team, q1-meta-gate) were run against
+`paper/DRAFT-v2.md` with the PaperFactory rubrics applied verbatim. Every number below was
+re-derived at write time from `results/all_runs.csv` or from the raw `.out` epoch series.
+
+### 125.1 VERDICT: **DESK-REJECT. DEFENSIBILITY 6/10** (the stage fails below 7)
+
+It is a **claims-calibration and production-readiness** reject, not a science reject. 15 blocking
+items; **13 need zero GPU**. The three substantive ones, each verified by the panels themselves:
+
+1. **THE PAPER BREAKS ITS OWN REGISTERED-SCORER RULE.** `python3 analysis/c84_gn1_score.py
+   --root ../runs_alice2/gn1` prints *"budget ratio 1.37x … FAIL … NO TRANSFER VERDICT IS ISSUED
+   … THIS IS NOT A NULL and it may not be written as one."* The draft nonetheless makes `gn1`-GN
+   Table 2 row 10, one of "17 cells", the largest single contributor to the headline Q
+   (43.01/11 → 36.29/10 without it), and the "decisive" falsification of M7 — which is exactly
+   the pp comparison the gate forbids. §3.4 makes "run the registered scorer unedited" a stated
+   contribution, so this is the discipline claim being false about itself.
+2. **THE HETEROGENEITY IS FULLY ATTRIBUTABLE.** DerSimonian–Laird on the 12 published (D, se)
+   pairs: total **Q 43.01 / 11 df**. Restricted to the 8 SGDm+BatchNorm cells — still 6 batches,
+   2 meta-stepsizes, 2 budgets — **Q 4.22 / 7 df, p 0.75, τ = 0.000**, pool **+0.555 ± 0.045**.
+   Between-base Q 32.1/3 ≈ 75% of the total; base+normalisation ≈ 89%. Deviations from the pool:
+   SGD +0.480 (z 4.07), AdamW −0.276 (z −2.82), GroupNorm −0.353 (z −2.45), RMSProp +0.418
+   (z 1.64). **"for reasons we cannot attribute" is refuted by our own §5.5 three pages later.**
+   Also: Q re-derives to 43.01 and 36.29, not the abstract's 43.2 / 36.4 — and A.4 prints both and
+   calls it "reproduces exactly".
+3. **THE SECOND HEADLINE IS AN UNDERPOWERED SINGLE-BATCH NULL SOLD AS A REFUTATION.**
+   A = −0.009 ± 0.157 → 95% CI **[−0.317, +0.299] = [−55%, +51%] of D**. MDE at 80% power
+   **0.440 pp = 76% of D**. The pre-registered NULL band half-width (0.15) is **smaller than the
+   realised se** (0.157), so the registered rule returns NULL ~47% of the time when alignment
+   truly carries a quarter of D; TOST does not establish equivalence (t 0.90 / 1.02, df 3.57).
+   The permutation seed **is** the run seed. **"ALIGNMENT IS REFUTED" may not be written.**
+
+Plus, verified: `hz3` is two submissions in two β-boxes (job span 32,288; `hz3-ch-s5`'s own ENV
+line reads `BETA_CLIP=-15:-2.3026` against `-30:9.0` for its seed-5 partner and all of seeds 0–4),
+so §4.8's "the pairing cancels … batch, box" is false and the flat verdict moves t −1.42 → −1.93
+without the contaminated pair; the 12-cell pool is called "byte-identical" while spanning **three**
+boxes, which `analysis/c87_rl3_score.py`'s own header forbids; 442/2,113 runs (20.9%) are dropped
+with no breakdown while the aligned arm fails the gate 41.4% corpus-wide and the uniform arm 0.0%
+(benign — 392 of 442 are 20-epoch probes, and **admissible n == submitted n in all 17 cells** —
+but the defusing facts are nowhere in the draft); `plateau5` is a TEST metric and every selection
+in the paper is made on it, undisclosed; no MIE was pre-registered for the primary D; and the
+document has **zero figures, zero numbered equations, two literal `[to be completed]` placeholders
+and 152 lines of unicode math**.
+
+Venue table: NeurIPS/ICML/ICLR 3–5% → 12–18%; **TMLR 30–40% → 65–75%**; Machine Learning
+(Springer) ~15% → 55–65%; workshop (OPT/HiLD) 55–65% → ~80%.
+
+### 125.2 `sm3` IS **VOID AS DESIGNED** — THE SAME FLAG BUG AS `ml2`, AND IT WAS NOT CAUGHT
+
+All 12 jobs COMPLETED (00:45–00:53 each, 100/100 epochs, `RUN_DONE`). **The second-moment corner
+was never run.** `bin/c96_secondmoment.sh` line 67 puts `--alg-meta RMSProp` into `$BFLAGS`; line
+72 then appends `--alg-meta Lion` to the same command. argparse takes the last occurrence. The
+runs' own ARGS line reads `--alg-meta RMSProp … --alg-meta Lion`, and the runtime prints
+`args_meta includes unnecessary attributes {'normalizer_param'}` — Lion has no normaliser. This is
+**bit-for-bit the `c94_meta_ladder.sh` defect** that voided `ml2`'s meta axis, repeated one cycle
+after it was diagnosed, because the audit was done on the script rather than on the ARGS line.
+
+**THE PRE-REGISTERED PREDICTION CANNOT BE EVALUATED.** "AdamW base × RMSProp meta, both carrying a
+second moment, predicts the smallest D; refuted at D ≥ +0.55" is unaskable of a batch that ran
+Lion. Mechanism candidate 8 is **untested, not refuted**, and must be written that way.
+
+**WHAT sm3 ACTUALLY IS: a byte-identical independent replicate of `aw1`** (AdamW base × Lion meta,
+box −15:−2.3026, ms 1e-4, α0 1e-3, 100 ep, ResNet-18/CIFAR-10, seeds 0–2). Re-derived here from
+the raw epoch series as mean-of-last-5 (`plateau5`), never from prose:
+
+| arm | aw1 (n=3) | sm3 (n=3) | offset |
+|---|---|---|---|
+| nodewise | 92.978 | 93.103 | +0.125 |
+| chunk777 | 93.257 | 93.244 | −0.013 |
+| nodewise1d | 93.069 | 93.019 | −0.050 |
+| chunk2325 | 93.301 | 93.315 | +0.014 |
+
+| contrast | aw1 | sm3 | pooled 6v6 |
+|---|---|---|---|
+| D = chunk777 − nodewise | +0.279 ± 0.087 (t 3.19) | **+0.141 ± 0.064 (t 2.22)** | **+0.210 ± 0.056 (t 3.76)** |
+| G = chunk2325 − nodewise1d | +0.232 ± 0.089 (t 2.62) | **+0.296 ± 0.096 (t 3.07)** | **+0.264 ± 0.060 (t 4.42)** |
+| D − G | +0.047 | −0.155 | −0.054 |
+
+**THREE THINGS THIS BUYS, ALL FREE, AND ALL OF THEM ANSWER REVIEW DEMANDS:**
+
+* **An 18th count-matched cell, positive.** "Positive in every count-matched cell" survives, and
+  Q04's completeness sentence gets one more cell behind it. D(sm3) = +0.141 is the smallest D in
+  the corpus — under **Lion**, so it says nothing about second moments in the meta-update.
+* **G under AdamW is RESOLVED IN TWO INDEPENDENT BATCHES** (t 2.62, t 3.07; pooled t 4.42), and
+  **D − G = −0.054 at 6v6**. The §5.4 / M4 rewrite the panel demanded is now a replicated fact:
+  the size-1 tail carries essentially **none** of D under AdamW and most of it under SGDm. This
+  is stronger than the draft's version and it is base-dependence, not "narrowed to SGDm".
+* **The base-optimiser moderator now has TWO design points at AdamW.** Q01's objection to the
+  §4.4 rewrite is that the one factor that does move D has n=1 design point per level. AdamW is
+  now covered by two independent batches. SGD, RMSProp and GroupNorm remain n=1 — which is what
+  R3 below buys.
+
+**Batch offsets ≤ 0.125 pp across four arms**, an independent confirmation of the bound that
+replaced the withdrawn "batch is a large random effect" claim.
+
+`sm3`'s 12 rows are **not yet in `results/all_runs.csv`** (2,113 → 2,125 on ingest), and their
+`meta` column must be written **Lion**.
+
+### 125.3 WHAT TO RUN, RANKED BY WHAT THE REVIEW DEMANDED — NOT BY WHAT IS INTERESTING
+
+* **R0 — the zero-GPU rewrite package. 13 of the 15 blocking items. Do it first.** No run changes
+  a desk-reject that fires on placeholders, missing figures, an unattributed-heterogeneity claim
+  the table refutes, and a scorer verdict the paper stepped over. Checklist in `docs/STATUS.md`.
+* **R1 — permnode, 3 permutation draws × 6 seeds, permutation seed DECOUPLED from the run seed,
+  plus a 6-seed nodewise arm. ~24 jobs, ~24 GPU-h, one batch.** `permnode<S>` already takes an
+  explicit S (PATCH_PERMNODE), so **no patch is needed** — `c77` simply passed S = run seed
+  (its own line 447 says so). Buys: the second headline stops being an n=3 seed-confounded null
+  with a CI spanning half the effect; se 0.157 → ~0.09; and the two-way decomposition separates
+  permutation variance from seed variance for the first time. Demanded by Q02, Q14, red-team #4.
+* **R2 — `hz3` seed-5 trio (`ch`, `c23`, `n1d`) re-run at 300 ep in box −30:9.0. 3 jobs, ~9
+  GPU-h.** Buys: the only budget-generalisation result stops resting on a cross-box pair. Report
+  6v6 box-matched. Demanded by red-team #2 / gate blocking #4.
+* **R3 — base-moderator replication: a second independent batch at SGD and at RMSProp base
+  (nodewise + chunk777, 3 seeds). 12 jobs, ~12 GPU-h.** After R0 the paper's headline becomes
+  "the base optimiser explains ~75% of the heterogeneity". Today SGD and RMSProp are ONE batch
+  (`nl1`) each and GroupNorm is voided, so the new headline rests on n=1 per level. sm3 fixed
+  AdamW for free; this fixes the other two. Demanded by Q01 / gate blocking #2.
+* **R4 — the non-meta transfer probe: the same four partitions applied as a per-group LR scale on
+  a plain SGDm/AdamW run with no meta-learning. ~24 jobs + a patch.** The single thing the venue
+  table names for a main-track paper, and Q16's ask. Not blocking; it is the difference between
+  an internal audit of one framework and a claim about step-size granularity. Needs genuine
+  design work — a fixed per-group LR scale is not a straight port of the partition instrument.
+* **R5 — the additive tail test (124.6), A1 = chunk2325 vs A2 = chunk2325 + a manufactured
+  9,610-singleton tail at m = 4,851 exactly. ~40 jobs + a patch + an equivalence suite.**
+  **NO REVIEWER ASKED FOR IT.** It remains the best mechanism experiment in the queue and the
+  only design that breaks the tail/alignment confound, but §5.7's non-identifiability is already
+  an accepted stated limit, and three panels spent zero words asking for a mechanism. Defer until
+  R0–R2 are done.
+
+**CUT — TinyStories.** Assessed by reading the code, not by guessing. The data is READY (50
+pretokenised `.bin` shards, 10 G, `STAGED.txt` 19 Aug) and `train.py` already exposes
+`--stepsize-groups`. But that tree's `HF.py` supports only
+`scalar / layerwise / nodewise / weightwise / resnet*_blocks` — **no chunkwise, no nodewise1d, no
+permnode, no probe5**. The entire instrument must be ported and re-verified (4 patches, a
+Transformer count-matching census, the equivalence suite), then η/α0 must be calibrated from
+scratch because **zero training runs have ever been executed there** (`runs/` holds one
+`ts-pretok` job and nothing else), then a primary batch at 100k iters × 131k tokens/iter. **Weeks
+and ≥300 GPU-h before the first contrast**, to answer a scope limit the abstract already states
+honestly — and it is *not* the reviewers' ask, which is transfer **outside** MetaOptimize (R4),
+not a new modality inside it. **Also cut:** more G cells (R0 needs a Holm rule over the existing
+12, not a 13th), more seeds on existing D cells (seed is null, cells are balanced, zero
+attrition), and a budget-matched GroupNorm rescue (the gate asked for `gn1`-GN to be REMOVED,
+which is free).
+
+### 125.4 TWO STANDING RULES, BOTH PAID FOR BY THIS CYCLE
+
+* **STANDING RULE 20 — A BATCH'S SCIENCE IS WHAT THE RUNS' OWN `ARGS` LINE SAYS.** Never what the
+  submission script's header claims, and never what the CSV's derived columns say. Two batches
+  (`ml2`, `sm3`) were built, submitted, completed and reported before anyone read an ARGS line.
+  Every batch report must quote one verbatim. **Ten further scripts contain ≥2 `--alg-meta`
+  occurrences and are unaudited**: `c43`, `c44`, `c48`, `c49`, `c57`, `c58`, `c72`, `c83`, `c84`,
+  `c87`.
+* **STANDING RULE 21 — NO BATCH IS SUBMITTED WITHOUT A REGISTERED SCORER.** `analysis/` contains
+  no `c96_*` scorer and `bin/c96_secondmoment.sh` names none. Rule 19 (hash the scorer before
+  submission) was silently skipped, which is why a void batch ran to completion and would have
+  entered the draft as "mechanism candidate 8, refuted".

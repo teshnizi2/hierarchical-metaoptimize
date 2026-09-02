@@ -1,137 +1,112 @@
 # STATUS — operator dashboard
 
-Updated 2 Sep 2026. Detail lives here; chat stays short.
+Updated 2 Sep 2026 (cycle 98). Detail lives here; chat stays short.
 Authority: `docs/CORRECTIONS.md` (highest number wins) > `docs/FINDINGS.md` > everything else.
 
 ## Verdict
 
 | | |
 |---|---|
-| Do we have a paper? | **Yes.** A MEASUREMENT paper. Not a mechanism paper, not a prediction paper. |
-| Title | *A granularity gain is a tuning gain* |
-| Thesis | "Number of step sizes" is **4 variables**, not 1. Each moves the effect by more than the effect. |
-| Runs / GPU-h | 2,077 / ~1,300 |
-| Biggest risk | **No mechanism.** 7 candidate carriers dead; the 8th is not identifiable from this corpus |
+| Draft | `paper/DRAFT-v2.md`, 10,852 w — **DESK-REJECT** at the Q1 gate |
+| Defensibility | **6 / 10** (panel fails the stage below 7) |
+| Nature of the reject | **claims calibration + production readiness. NOT a science reject.** |
+| Blocking items | 15. **13 need ZERO GPU.** 2 need runs (~27 GPU-h total) |
+| Realistic home | **TMLR** — 65–75% if the claims are rescoped BEFORE submission |
+| Runs / GPU-h | 2,113 rows + 12 un-ingested `sm3` = **2,125** / ~1,594 |
+| Cluster | **IDLE. Both queues empty.** `sm3` COMPLETED 12/12 |
 
-## Cycle 96 — two zero-GPU analyses, both NULL (CORRECTIONS 124)
+## Venue table (from the gate)
 
-| analysis | question | verdict | survives review |
+| venue | as-is | after fixes | the one thing |
 |---|---|---|---|
-| 1 — carrier | which property of the size distribution carries D? | **NOT IDENTIFIABLE** | verdict yes, its positive claim **DELETED** |
-| 2 — prediction | can D be predicted from cell properties? | **NOT PREDICTABLE** | **yes, intact — paper-ready** |
+| NeurIPS/ICML/ICLR | 3–5% | 12–18% | transfer probe OUTSIDE MetaOptimize |
+| **TMLR** | 30–40% | **65–75%** | rescope the three overstated headlines |
+| ML (Springer) / Neurocomputing | ~15% / ~30% | 55–65% | figures, equations, artefact DOI, fill placeholders |
+| Workshop (OPT / HiLD) | 55–65% | ~80% | cut to one story + one figure |
 
-* Analysis 1's "degeneracy indicator carries D, β −0.986, t −12.5" **is an arm dummy.**
-  `frac_groups_size1` is 0.6664 on nodewise and 0.0000 on all three other arms; its shape test is
-  χ² 7.5665/10 — **identical to five figures** to a bare nodewise dummy, to an arbitrary two-level
-  regressor, and to the plain "the other three arms share a mean" test. Refuted out of sample by
-  `ck1` (+0.106 ± 0.18 vs +0.986 claimed, 4.9 se).
-* Root cause: at fixed count the corpus has **one contrast type**; design-matrix **rank 3**;
-  20 candidates collinear at |r| ≥ 0.93 collapse to ~2 classes. CV cannot catch this.
-* Analysis 2: LOO over 11 design points. Mean baseline RMSE **0.4005**. Best model 0.3284, and
-  **100% of that margin is the single CIFAR-100 point**. Inside CIFAR-10 the **mean wins**
-  (0.2791 vs 0.2863). Sign test p 0.227. Power bound: n=11 needs |r| ≥ 0.602.
-* **PRESERVED:** D is genuinely heterogeneous — Q 43.0/11 df, p 1.1e-5, τ 0.285 pp vs 0.137 pp noise.
+## sm3 — COMPLETED, VOID AS DESIGNED, SALVAGED (CORRECTIONS 125.2)
 
-## Newly dead this cycle
+**The second-moment corner does not exist.** `bin/c96_secondmoment.sh` carries the SAME
+`--alg-meta` last-wins bug as `c94_meta_ladder.sh`: `BFLAGS` sets `--alg-meta RMSProp`, the
+sbatch line then appends `--alg-meta Lion`. The runs' own ARGS line proves it, and the runtime
+warns `args_meta includes unnecessary attributes {'normalizer_param'}` (Lion has none).
 
-| what | how it died |
+**So sm3 is a byte-identical independent replicate of `aw1`** (AdamW base × Lion meta, box
+−15:−2.3026, ms 1e-4, α0 1e-3, 100 ep, 3 seeds). Re-derived from the raw `.out` series:
+
+| arm | aw1 | sm3 | offset |
+|---|---|---|---|
+| nodewise | 92.978 | 93.103 | +0.125 |
+| chunk777 | 93.257 | 93.244 | −0.013 |
+| nodewise1d | 93.069 | 93.019 | −0.050 |
+| chunk2325 | 93.301 | 93.315 | +0.014 |
+
+| contrast | aw1 (3v3) | sm3 (3v3) | pooled (6v6) |
+|---|---|---|---|
+| D | +0.279 ± 0.087 (t 3.19) | **+0.141 ± 0.064 (t 2.22)** | **+0.210 ± 0.056 (t 3.76)** |
+| G | +0.232 ± 0.089 (t 2.62) | **+0.296 ± 0.096 (t 3.07)** | **+0.264 ± 0.060 (t 4.42)** |
+| D − G | +0.047 | −0.155 | −0.054 |
+
+**Three things this buys, all free:**
+1. **An 18th count-matched cell, still positive** → "positive in every cell" survives, and the
+   completeness sentence the gate asked for gets stronger.
+2. **G under AdamW is now RESOLVED IN TWO INDEPENDENT BATCHES** (t 2.62, t 3.07). The rewrite the
+   panel demanded for §5.4 / M4 is now a replicated fact: **the tail carries ~none of D under
+   AdamW** (D − G = −0.054 at 6v6), and most of it under SGDm.
+3. **The base-optimiser moderator has 2 design points at AdamW instead of 1** — the exact gap
+   Q01 says makes the moderator unvalidatable out of sample. AdamW is now covered; SGD, RMSProp
+   and GroupNorm are still n=1.
+
+**Batch offsets ≤ 0.125 pp across four arms** — an independent confirmation of the withdrawn
+"batch is a large random effect" claim's replacement bound.
+
+## What to run, ranked by what the REVIEW demanded
+
+| # | run | jobs / GPU-h | demanded by | buys |
+|---|---|---|---|---|
+| **R0** | **zero-GPU rewrite package** (13 of 15 blocking items) | 0 | gate S1/S3/S5/S6/S9/S11 + Q01/Q03/Q04/Q05/Q08/Q09/Q15/Q17/Q20/Q21/Q22 | the desk-accept. **Do this first; nothing else matters until it is done** |
+| **R1** | **permnode 3 perm-draws × 6 seeds, permutation seed DECOUPLED from run seed** + 6-seed nodewise arm | 24 / ~24 | Q02, Q14, red-team #4, gate blocking #3 | turns the 2nd headline from an n=3 single-batch null (CI = [−55%,+51%] of D) into a two-way variance decomposition. se 0.157 → ~0.09 |
+| **R2** | **hz3 seed-5 trio re-run in box −30:9.0** (`ch`, `c23`, `n1d` @300 ep) | 3 / ~9 | red-team #2, gate blocking #4 | repairs the ONLY budget-generalisation result. Restores 6v6 box-matched; today the "flat" verdict (t −1.42) depends on the contaminated pair (t −1.93 without it) |
+| **R3** | **base-moderator replication**: 2nd independent batch at SGD and RMSProp bases, node+chunk777, 3 seeds | 12 / ~12 | Q01 / gate blocking #2 (the §4.4 rewrite's weak flank) | the new headline is "base optimiser explains ~75% of Q". Today SGD/RMSProp are ONE batch (`nl1`) each. This makes the moderator replicated at every level except GroupNorm |
+| **R4** | **non-meta transfer probe**: same 4 partitions as a per-group LR scale on plain SGDm/AdamW, no meta-learning | ~24 / ~24 + patch | Q16, venue table (main-track "one thing") | the ONLY route from 12–18% to a main-track paper. Converts an internal audit of one framework into a claim about step-size granularity. Needs design work — a fixed per-group LR scale is not a straight port |
+| R5 | additive tail test A1/A2 (chunk2325 ± a manufactured 9,610-singleton tail at m = 4,851 exactly) | ~40 / ~40 + patch + suite | **NOBODY** | breaks the tail/alignment confound. Registered at 124.6, still the best mechanism experiment — but no reviewer asked for a mechanism, and §5.7's non-identifiability is already an accepted limit |
+
+## CUT
+
+| candidate | why cut |
 |---|---|
-| **Level slope −0.392** (cycle 95 headline) | exact permutation **p 0.167** (4/24); **+0.026 ± 0.088** inside CIFAR-10; `gn1`'s within-batch BN/GN pair moves D the **WRONG WAY by up to 7 se** |
-| Size-distribution carrier, any named statistic | not identifiable — arm indicator in disguise |
-| D as a predictable quantity | no model beats the corpus mean out of sample |
+| **TinyStories** | **WEEKS, not days, and zero reviewers asked for it.** Data IS ready (50 pretok `.bin` shards, 10 G, staged 19 Aug) and `train.py` already takes `--stepsize-groups`. But that tree's `HF.py` supports only `scalar/layerwise/nodewise/weightwise/*_blocks` — **no chunkwise, no nodewise1d, no permnode, no probe5**. The whole instrument must be ported and re-verified (4 patches + a Transformer count-matching census + the equivalence suite), then η/α0 calibrated from scratch (zero training runs have EVER been executed there; only `ts-pretok`), then a primary. ≥3 weeks and ≥300 GPU-h before the first contrast. And it answers a scope limit the abstract already states honestly — **not** the reviewers' ask, which is transfer outside MetaOptimize (R4), not a new modality inside it |
+| more G cells | R0 needs a Holm rule over the 12 existing G tests, not a 13th |
+| more seeds on existing D cells | seed is null; the cells are balanced with zero attrition |
+| budget-matched GroupNorm rescue | the gate asked for gn1-GN to be REMOVED. Removal is free |
 
-**Gain, not loss:** *"partition matters" is NOT a restatement of where the aligned arm lands* — now
-supported from the other direction, and a covariate we would have had to defend is gone.
+## Do before anything else (R0 checklist, in gate order)
 
-## Do before anything else
+| # | item | zero GPU |
+|---|---|---|
+| 1 | **Remove `gn1`-GN** from Table 2, from the 12-cell pool, from the abstract's counts, and from §5.6. Its own registered scorer prints *"NO TRANSFER VERDICT IS ISSUED … THIS IS NOT A NULL"*. Rebuild M7 on the within-C10 slope alone and downgrade it to a weak null | yes |
+| 2 | **§4.4 → a decomposition.** Total Q 43.0/11; within SGDm+BN (k=8, 6 batches, 2 η, 2 budgets) **Q 4.22/7, p 0.75, τ 0.000**, pool +0.555 ± 0.045; between-base Q 32.1/3. Delete *"for reasons we cannot attribute"* from §4.4, the abstract and §9 | yes |
+| 3 | **Alignment → a BOUNDED NULL.** Print A = −0.009 [−0.317, +0.299] = [−55%, +51%] of D, MDE 0.44 pp, and the registration defect (band half-width 0.15 < realised se 0.157). Delete "REFUTED"/"does nothing" from title strapline, abstract, §1.1 #2, §4.6, §9 | yes |
+| 4 | **Delete "byte-identical"** — the 12 cells span 3 β-boxes; `c87_rl3_score.py`'s own header forbids cross-box pooling. Add a box column to Table 2 and Appendix B | yes |
+| 5 | **Rewrite T9**: the three `hz3` seed-5 rows are NOT a metadata defect. Their own ENV line reads `BETA_CLIP=−15:−2.3026`; the config really differs. hz3 is also not one contiguous submission (job span 32,288) | yes |
+| 6 | **§3.3: disclose test-set selection.** No validation split was held out; every tuning decision selects on `plateau5`. Label §4.5's dD = −0.090 an UPPER BOUND; note T4's deficit is conservative | yes |
+| 7 | **Attrition table**: 2,113 attempted / 442 dropped (window_ok 400, no plateau5 25, incomplete 17) crossed with granularity + the two defusing facts (392 of 442 are 20-ep probes; **admissible n == submitted n in all 17 cells**) | yes |
+| 8 | **G decision rule**: state it, apply it to all 12 cells, report 3 of 12 resolved at nominal α (aw1 2.62, ml2 2.44, g3m 2.34), none surviving Holm. Change M4 to "base-dependent". **Now backed by sm3's replicate** | yes |
+| 9 | **Q04's unwritten sentence** — "Table 2 plus the excluded `ar1` cell is the COMPLETE set of count-matched contrasts in the corpus; none is omitted and the excluded one is also positive." Strongest available sentence, currently unsaid | yes |
+| 10 | **4 figures, one palette**: F1 forest of the cells by base; F2 ck1 ladder vs log m; F3 within-run D(epoch) trough; F4 A/B/D decomposition with the share interval | yes |
+| 11 | **Numbered display equations** for D/G/A/U/T, plateau5, the admissibility predicate | yes |
+| 12 | **Fill both end-matter placeholders**; ship a DOI/anon URL, framework+CUDA versions, per-batch {script, commit, scorer, md5, seeds registered vs realised}, `make reproduce-table2`, and a corrected `beta_clip` column | yes |
+| 13 | **Fix the count**: title says eight dead mechanisms; the M-table says M1 "untested", M5 "inapplicable", M4 "narrowed", M8 "not identifiable". Retitle or re-partition the index | yes |
+| 14 | **T4 superlative**: 93.317 is the best **ResNet-18** cell, not the corpus max. State the grouping key and report both deficits | yes |
+| 15 | Unicode → LaTeX macros (152 lines); Appendix order A.7→A.9→A.8; Table 2 caption (gn1's two rows share a batch); "17 under 90%" is 16; label the two ses for rl3's D; quote the POOLED SGDm D−G (+0.499 ± 0.062), not cc1's max; re-obtain Zheng & Kwok from arXiv source; hedge Adam-mini as Adalayer is hedged; state CAM-HD's method was never implemented | yes |
+
+## Ingest / housekeeping
 
 | # | item |
 |---|---|
-| 1 | **Fix CSV:** `hz3-c23-s5`, `hz3-ch-s5`, `hz3-n1d-s5` carry `beta_clip -15:-2.3026`; the batch is `-30:9.0`. A scorer grouping on `beta_clip` reads D(300) **+0.464 instead of +0.428** |
-| 2 | `ar1` admissibility must be the SAME rule in every analysis (box-VOID, 117.1) |
-| 3 | **`nl1` is ONE batch**, not two. Non-SGDm evidence is 2 batches / 6 df |
-
-## Next batch to build (registered, NOT submitted — CORRECTIONS 124.6)
-
-Additive tail test: **A1 = chunk2325** vs **A2 = chunk2325 with a manufactured 9,610-group size-1
-tail at m = 4,851 EXACTLY**. First arm ever that is neither architecture-aligned nor tail-free.
-Plus a **heterogeneity sweep at zero degeneracy** (CV 0.09/0.40/0.76/1.90, min size ≥ 10).
-Both under **AdamW and SGDm**. ~40 jobs, 2 batches. Prioritise over more G cells.
-
-**Do NOT buy:** more seeds (seed null; sd of D across 4 owned batches 0.0994 < 0.1719 seed-noise
-expectation) · another R18/SGDm/CIFAR-10/100-ep replicate · anything moving count and partition together.
-
-## The four claims
-
-| # | claim | number | state |
-|---|---|---|---|
-| 1 | Meta-stepsize dominates | layerwise−scalar +3.291 at eta=1e-3, **+0.655 tuned** | GREEN |
-| 2 | alpha0 sets the sign | monotone up at 1e-6, down at 1e-3 | GREEN |
-| 3 | Count is convex in log m, not a slope | 10 rungs, 5.25 decades | GREEN |
-| 4 | Size distribution at fixed count | **15 cells**, D +0.202 … +1.640; Q 43.0/11 df, τ 0.285 pp | GREEN |
-| — | Alignment is NOT the carrier | −0.009, t −0.06 | GREEN |
-| — | **WHICH property of the size distribution** | not identifiable — needs new runs (124.1) | **OPEN** |
-| — | **D is not predictable** | no model beats the mean; LOO 0.3284 vs 0.4005, all of it 1 point | GREEN (null) |
-| — | Practitioner: merge 1-D tensors | +0.756 (8% count, 92% tail) | GREEN, **SGDm-scoped** |
-
-## Dead — do not reopen
-
-Hierarchical pooling · Idea 1 (cosine prior) · Idea 2 · Direction C (N_eff/m predicts accuracy) ·
-sqrt(N) attribution to Adam-mini/Adalayer/SGG · singleton-fraction law · horizon reversal as a
-granularity claim · ImageNet (val set unlabelled) · method competitiveness (−1.81 pp vs cosine) ·
-base-optimiser normalisation · **the −0.392 level slope** · **D as a predictable quantity** ·
-**any named size-distribution statistic as "the carrier"**
-
-## Corrections that cost us claims
-
-| what | why |
-|---|---|
-| "Adam-mini groups per channel" | It is **one block per tensor** — ships our prescription |
-| "Size-1 groups are the carrier" | Removing singletons buys +0.115 (t 0.87). Unit is the **tensor** |
-| "C100 has the largest D" | Incommensurable scale; on relative error it is the **smallest** |
-| `ar1` as replication | Box-bound asymmetrically → VOID |
-| Count slope −0.49 | In-batch value is **+0.135**. Four imported values were wrong |
-| Our anomaly reframe | Parent §7.1 has no seed count and no error bars |
-| "D ~ aligned-arm LEVEL, slope −0.392" | permutation p 0.167; +0.026 inside C10; `gn1` falsifies it by up to 7 se |
-| "Degeneracy indicator carries D, t −12.5" | It is an **arm dummy** — χ² identical to a bare nodewise indicator |
-
-## Closed this week
-
-| test | result |
-|---|---|
-| **carrier analysis** (0 GPU) | **NOT IDENTIFIABLE.** 150 multisets constructed, R1/R2 receipts pass; rank-3 design |
-| **prediction analysis** (0 GPU) | **NOT PREDICTABLE.** 15 cells → 11 design points; mean wins inside CIFAR-10 |
-| `g3m` ResNet-34 | Mechanism generalises. D +0.666, D−G +0.495 |
-| `gc1` CIFAR-100 | D +1.640. Screen only, no mechanism leg |
-| `gn1` GroupNorm | **No verdict** — commensurability gate fired (1.37x budget ratio) |
-| `rl3` Rule 11 | **CLOSED.** dD −0.090, t −0.51 |
-| `fa1` floor fix | rec_lo 0.0000 on 24/24 |
-
-## Queue
-
-| batch | acct | jobs | question | risk |
-|---|---|---|---|---|
-| `r50` | alice | 12 | ResNet-50, the 4th architecture | **RUNNING — do not disturb** |
-| `ml2` | alice2 | 24 | meta-optimizer axis (Adam / RMSProp) | **RUNNING — do not disturb** |
-| `tl1` | — | ~20 | **additive tail test** A1 vs A2 at m=4,851 exactly (124.6) | not built — **TOP PRIORITY** |
-| `hv1` | — | ~20 | heterogeneity sweep at zero degeneracy, CV 0.09→1.90 | not built |
-| `lv1` | — | ~16 | **within-batch level ladder** — the only way to test level properly | not built |
-| `gf2` | — | 20 | granularity x eta surface | not built |
-| `ub9` | alice2 | 9 | parent's own cell a clipping artefact? | **status UNVERIFIED this cycle** |
-| — | — | — | *closed since: `hz3`, `aw1`, `nl1`, `gm2`* | — |
-
-## Open
-
-1. **WHICH property of the size distribution** — unidentifiable at fixed count; needs `tl1` + `hv1`
-2. Tail vs BatchNorm — under-identified, `gn1` could not separate
-3. Rule 11 on R34 / C100 — no ladder there
-4. Only **ONE** CIFAR-100 design point; dataset / level / singleton-fraction are the SAME column
-5. `m` and `params` are 1-vs-10 leverage contrasts (`g3m` alone) — LOO RMSE 13.3 / 38.8
-
-## Standing rules that bite
-
-Batch is the unit of replication (F=5.47), seed is null · box occupancy from per-coordinate rails,
-never the 62-element beta summary · count-match or correct · never compare raw pp across error
-budgets · register the scorer before the runs · test guards in both directions · **RULE 16: run the
-registered scorer UNEDITED and quote it, never hand-roll a reduction** · **state the identifiability
-bound BEFORE the coefficients, not after**
+| 1 | **Ingest sm3's 12 rows** into `results/all_runs.csv` (→ 2,125). Its `meta` column must read **Lion**, not RMSProp |
+| 2 | **AUDIT EVERY BATCH'S ARGS LINE, not its submission script.** `c94` and `c96` both shipped a double `--alg-meta`. `c43/c44/c48/c49/c57/c58/c72/c83/c84/c87` each contain ≥2 `--alg-meta` occurrences and are unaudited |
+| 3 | **STANDING RULE 20**: a batch's science is what the runs' own ARGS line says, never what the script header claims. Every batch report must quote one ARGS line verbatim |
+| 4 | **STANDING RULE 21**: no batch is submitted without a registered scorer. `sm3` had none (`analysis/` has no `c96_*`), which is why a void batch ran to completion unremarked |
+| 5 | `ar1` admissibility must be the SAME rule in every analysis (box-VOID, 117.1) |
+| 6 | `nl1` is ONE batch, not two |
