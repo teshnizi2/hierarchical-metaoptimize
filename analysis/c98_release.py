@@ -24,7 +24,12 @@ SCORERS = ["c76_mm1_score.py", "c77_pp1_score.py", "c78_bn1_score.py",
            "c87_hz3_score.py", "c88_scorers.py", "c97_bm2_score.py",
            "c97_rp1_score.py", "c97_sm4_score.py"]
 TOOLS   = ["aggregate.py", "args_repair.py", "argsline_guard.py",
-           "c98_figures.py", "c98_reproduce.py", "c98_release.py"]
+           "c98_figures.py", "c98_reproduce.py", "c98_release.py",
+           # c98_reproduce's [15b] imports this; without it `make reproduce`
+           # crashes on the deposit with ModuleNotFoundError.  Caught in cycle
+           # 106 by running `make reproduce` on the built deposit, which is the
+           # only place that import is exercised outside the source tree.
+           "c99_qcalibration.py"]
 DOCS    = ["CORRECTIONS.md", "ARGS-AUDIT.md", "DATASETS.md", "OPERATIONS.md",
            "MASTER-TABLE.md"]
 

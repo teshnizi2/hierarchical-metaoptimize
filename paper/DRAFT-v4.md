@@ -3213,8 +3213,8 @@ onto the scorers already quoted here would re-mint every md5 in the provenance t
 section and destroy the very property — committed-before-the-data, run unedited — that makes
 those quotes worth anything.
 
-**Artefact and identifier.** The deposit is **6.3 MB in 137 files**, with `MANIFEST.md5`
-covering every one of them and `make verify` checking all 137 against it. **It has no DOI, and
+**Artefact and identifier.** The deposit is **6.4 MB in 139 files**, with `MANIFEST.md5`
+covering every one of them and `make verify` checking all 139 against it. **It has no DOI, and
 this paper prints none.** The artefact is identified by the repository commit stamped at the top
 of the deposit's `README.md`, which `MANIFEST.md5` pins byte-for-byte; a DOI is attached when the
 archive of record issues one, and the deposit carries the four-step procedure for doing that and

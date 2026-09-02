@@ -9226,6 +9226,15 @@ since the packages were written), plus 30 integrator edits described below.
     §5.5's quote block.
   * Audit section `[14]`, which runs all ten deposit scorers unedited, still reports
     **2 REACHED / 2 PARTIAL / 6 BLOCKED** and PASSES its three asserted counts.
+* **`make reproduce` on the built deposit found two defects that no source-tree run can find**,
+  which is the whole reason the deposit is built and run rather than assembled:
+  1. `analysis/c98_release.py`'s `TOOLS` list did not ship `c99_qcalibration.py`, so
+     `code/c98_reproduce.py`'s new `[15b]` section crashed the deposit's audit with
+     `ModuleNotFoundError: No module named 'c99_qcalibration'`. Added to `TOOLS`.
+  2. The deposit is now **139 files, 6.4 MB**, not the *"6.3 MB in 137 files"* §8 and the End
+     matter printed. Two of the three extra files are this cycle's (`code/c99_qcalibration.py`)
+     and cycle 105's (`scripts/c99_hz3q_quartet.sh`). Both sentences corrected in both markups.
+     This number moves with every build; re-derive it from `head -1 release/MANIFEST.md5`.
 * **A latent bug in `c97_bm2_score.py`, found and NOT fixed** (RULE 16): its `--outs` path
   (`rows_from_outs`) yields floats where `_f()` expects strings, so `--outs` crashes with
   `AttributeError: 'float' object has no attribute 'strip'` — locally *and* on the cluster. The
