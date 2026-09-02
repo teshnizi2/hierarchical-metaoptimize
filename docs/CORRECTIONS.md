@@ -8525,3 +8525,78 @@ full-precision arm means and one used the three-decimal values printed in Table 
 discrepancy until somebody quotes both in one document, which the draft did. **Every pooled
 quantity must name the precision it was computed at, once, in the methods.** DRAFT-v3 does so in
 its header block and in A.4.
+
+---
+
+## 127. Cycle 100 — Q1 META-GATE RE-RUN ON DRAFT-v3: MAJOR REVISIONS, 8/10, 18 BLOCKING, ZERO GPU
+
+The gate at `/Users/teshnizi/PaperFactory/paperfactory/agents/q1_meta_gate.py` was applied to
+`paper/DRAFT-v3.md` @ `617b6c8`. Its static layer (`_static_checks`, `_apply_static_gate`,
+`assess_text_quality`, `assess_reporting_completeness`) was **executed**, not paraphrased, against a
+pseudo-LaTeX projection of the markdown. Verdict moved **DESK-REJECT 6/10 → MAJOR REVISIONS 8/10**.
+All 15 of cycle 98's items are closed; 18 smaller ones are open; **none of the 18 is a science
+defect and none needs a GPU.**
+
+### 127.1 THE TWO FALSE ASSERTIONS — these are why it is not a desk-accept
+
+* **§4.3 and the Figure 1 caption call CIFAR-100's ρ = D/headroom = 0.055 "the smallest value in
+  the corpus".** It is the **third smallest of sixteen**. Re-derived by running the paper's own
+  figure code unedited (`python3 analysis/c98_figures.py --all --numbers`): `aw1` 0.0397, `gm2`
+  0.0504, `gc1` 0.0552. Both smaller cells are inside the corpus and one of them is the *other*
+  CIFAR-100 cell. `c98_reproduce.py` never checks ρ, which is why the rewrite did not catch it.
+  The commensurability argument survives verbatim; only the superlative dies.
+* **§8's "No number in this paper requires data that is not in that deposit" is false.** Verified
+  by running `python3 analysis/c77_pp1_score.py` unedited: it prints `0 probe dirs`, `nodewise n=0
+  NO DATA`, and `P2 ... cannot be scored`. §4.6's alignment null quotes that scorer's `NULL`
+  verdict. Every verbatim scorer verdict in §4.5, §4.6, §5.2 and §5.6/T7 is gated on the ~42 GB
+  probe files the 6.7 MB deposit excludes, and §3.4/§6.2 make "run the registered scorer unedited"
+  a titled contribution. Fix: ship the kilobyte-scale per-run box-occupancy / `N_eff/m` summary
+  table and give each scorer a `--summary` input path.
+
+### 127.2 INDEPENDENTLY RE-VERIFIED, ALL STILL OPEN AT HEAD
+
+| item | check run | result |
+|---|---|---|
+| `dup_group` census | read `results/all_runs.csv` | **6 rows / 3 pairs** (`a0-*` only), not the 18 §3.3 and §8 claim; **no `ml2` pair** |
+| `sm3` ingest | `grep -c sm3 results/all_runs.csv` | **0**, while §5.4 reports a *computed* Holm adjusted p from it |
+| §4.7's T table | read §4.7 | **11 rows, both `rl3` cells omitted** under "ten cells, every one at t ≥ 3.3"; one is t 3.09 and the other (+0.756) is quoted four lines below the table |
+| audit coverage | `grep -c 'chk(' analysis/c98_reproduce.py` vs decimal numerals in the draft | **51 sites / 99 PASS** against **1,602**; the header claims "every number". Audit itself exits 0 |
+| `sm4` Rule 20 | swept all 12 `.out` ARGS lines on alice | **PASS** — exactly one `--alg-meta`, reading `RMSProp` |
+| `bm2` Rule 20 | swept all 12 `.out` ARGS lines on alice | **PASS** — one `--alg-meta`; bases SGD ×6, RMSProp ×6, seeds 3–5 |
+
+### 127.3 NEW, FROM RUNNING THE GATE CODE
+
+* **There is no `paper.tex`.** The gate's first branch returns `{"passed": false, "structural_gaps":
+  ["missing paper.tex"]}`. S6 (unicode math in source) also fires: the manuscript is markdown with
+  literal ±, →, ≈, τ, ρ.
+* **The abstract is 922 words against `ABSTRACT_TARGET_WORDS` = (120, 230).** Four times over, and
+  `_blocking_text_quality_defects` does not classify it as minor. It cascades into three further
+  defects ("missing structured moves", "conclusion lacks a supported stance", "overloaded
+  Results-style sentence"). The 922-word block should become §1; a ≤230-word abstract replaces it.
+* **S9 and S10 fire**: `DOI: pending` ×2 and six `⟨…⟩` author-only placeholders; `**Draft v3.**` in
+  the header block and *"An earlier draft of this paper claimed…"* in three places.
+
+### 127.4 A GATE ARTEFACT — DO NOT CHASE IT
+
+`infer_reporting_profiles_from_tex` routes this paper to **`adversarial_security_eval`** (Carlini
+et al.) and then demands a threat model, adaptive attacks and an undefended-system ablation. The
+cause is **one word**: `defence`, at DRAFT-v3 line 1690, describing `argsline_guard.py`. Under the
+profiles that actually apply the paper scores `ml_eval_benchmark` **0.82** and `reforms_ml_science`
+**0.85**, and their only applicable miss (the leakage check) is answered in §3.3 and §7 T12 in
+prose the regex does not match. Recorded so no future cycle writes a threat model.
+
+Separately, `over_venue_cap` and `sections_over_budget` are gated behind `track ==
+systematic_review` (FLW16) and therefore do **not** block. 19,639 body words is a venue-fit
+problem, not a gate failure.
+
+### 127.5 THE ORDERING RULE THIS CYCLE ADDS
+
+**Score before you write.** `sm4` and `bm2` have both COMPLETED and are UNSCORED. Their verdicts
+rewrite §3.5, §4.4 and §5.4. Opening the v4 text pass first means editing those three sections
+twice. Under STANDING RULE 16 the scorers are run unedited and their verdicts quoted; under
+STANDING RULE 20 both batches were swept today and both pass. Score first, then edit.
+
+**And do not wait on the cluster.** None of the four in-flight batches touches any of the 18
+blocking items. `bm2` in particular cannot close B1: a second batch at two levels does not make a
+four-level Q partition non-tautological, because three of the four levels are singletons and
+`Q_between = 36.40 − 4.21 = 32.19` identically for *any* partition that isolates them.
