@@ -10,23 +10,23 @@ Correspondence: `mohammadrezaahmaditeshnizi@gmail.com`
 
 MetaOptimize (Sharifnassab, Salehkaleybar & Sutton, ICML 2025) meta-learns one step size per
 parameter group and reports that finer partitions help inconsistently, never separating that from
-the group *count*. Its own contribution therefore remains unmeasured. Our research question is
-whether it survives holding the count fixed. We answer with a benchmarking experiment on the
-released MetaOptimize artefact, patched only to add partitions. The sampling frame is a 2,173-run
+the group *count*. Its contribution therefore remains unmeasured. Our research question is
+whether it survives at fixed count. We answer with a benchmarking experiment on the
+released artefact, patched only to add partitions. The sampling frame is a 2,173-run
 CIFAR-10/CIFAR-100 corpus; the unit of analysis is a within-batch count-matched contrast.
 
-The uniform partition wins in all twenty count-matched cells, spanning ResNet-18, ResNet-34 and
-ResNet-50. Pooled over eight SGDm cells the effect size is +0.556 ± 0.045 pp, homogeneous
-(Q 4.21 on 7 df), while cells differing in base optimiser are strongly heterogeneous. Alignment
+The uniform partition wins in all twenty count-matched cells, on ResNet-18, ResNet-34 and
+ResNet-50. Pooled over eight SGDm cells the effect size is +0.556 ± 0.045 pp (calibrated 95% CI ± 0.121), homogeneous against that null (Q 4.21, median 9.4), while cells
+differing in base optimiser are not. Alignment
 is a bounded null: at fixed count and size multiset, permuting group membership is worth
 −0.009 ± 0.157 pp, and −0.018 ± 0.079 pp in a pre-registered replication at twice the resolution.
 Of nine candidate mechanisms, none is a general carrier.
 
 Threats to validity: the corpus is CIFAR-resolution vision, and a Lion meta-optimiser carries every
 count-matched cell but one. Every accuracy is a test-set quantity with no held-out validation
-split, bounding construct validity. Against tuned SGD + cosine, the state-of-the-art
-alternative, the method trails by 1.8–4.2 pp, dwarfing this ≈0.6 pp effect. This should be read as
-a constraint on partition design, not as support for practitioners.
+split, bounding construct validity. The method trails tuned baselines (SGD+cosine on ResNet-18,
+AdamW+cosine on ResNet-34 and ResNet-50) by 1.8–4.2 pp, dwarfing this ≈0.6 pp effect. Read this as a
+constraint on partition design, not support for practitioners.
 
 ---
 
@@ -81,16 +81,23 @@ ResNet-34, ResNet-50), 2 datasets, 4 base optimisers, 2 meta-optimisers, 2 meta-
 effect D = +0.456 ± 0.195 to +0.727 ± 0.200 pp across **six independent batches**; on ResNet-34
 D = +0.666 ± 0.094 (9 v 9); on ResNet-50 D = +0.881 ± 0.261; on CIFAR-100 D = +1.640 ± 0.245 and
 +1.485 ± 0.238. Over the fourteen cells that run the same ResNet-18 partition contrast, D varies
-genuinely across configurations (**Q = 102.47 on 13 df, p = 5.5e-16**, τ = 0.295 pp against
-0.143 pp rms measurement error), and splitting those fourteen by base optimiser leaves them
-homogeneous inside every level (within Q = 7.36 on 10 df, p = 0.69) while accounting for **92.8%
-of that Q** (between-base Q = 95.12 on 3 df). **We do not claim the base optimiser is
+genuinely across configurations (**Q = 102.47 on 13 df**: p = 5.5e-16 against χ²₁₃, which is the
+**wrong reference** at these degrees of freedom, and **Monte-Carlo p = 0.013** against the
+distribution Q actually has here; τ = 0.295 pp against 0.143 pp rms measurement error, both of
+them upper bounds — §7 T13), and splitting those fourteen by base optimiser leaves them
+homogeneous inside every level (within Q = 7.36 on 10 df, p = 0.69; Monte-Carlo p = 0.86) while
+accounting for **92.8% of that Q** (between-base Q = 95.12 on 3 df, p = 1.7e-20 against χ²₃ and
+**Monte-Carlo p = 0.005**). The weight-free statement of the same fact, which uses no standard
+error at all and is what this claim now rests on: the base-optimiser grouping takes η² = 0.840 of
+the unweighted variance of the fourteen D, ranking 9th of all 45,045 partitions of its shape
+(**exact p = 0.00020**). **We do not claim the base optimiser is
 identified**: the share is a property of the grouping and not of the label, and the obvious rival
 — batch identity — accounts for 95.8% of the same Q. §4.4 states exactly what that analysis can
 and cannot support. At a fixed base optimiser D does
 not vary: over eight SGDm cells spanning seven separate submissions, two meta-stepsizes, two
-budgets and three step-size clip boxes, D = **+0.556 ± 0.045 pp** with Q = 4.21 on 7 df (p = 0.76,
-τ = 0.000). We report that as an estimate and not as a threshold clearance: this campaign's
+budgets and three step-size clip boxes, D = **+0.556 ± 0.045 pp** with Q = 4.21 on 7 df (p = 0.76
+against χ²₇; Monte-Carlo p = 0.86 against a null whose median is 9.4, τ = 0.000). The calibrated
+95% interval on that pool is ± 0.121 pp, not the ± 0.088 its se implies (§7 T13). We report that as an estimate and not as a threshold clearance: this campaign's
 pre-registered minimum interesting effect, 0.30 pp, was fixed before `mm1` ran and carried
 unchanged into eight registered scorers, but it is registered for a single within-batch cell and
 never for a pool (§3.3).
@@ -128,8 +135,8 @@ no summary statistic of the size distribution is *identifiable*
 from this corpus, because at fixed count the design contains exactly one contrast type and every
 candidate collapses to an indicator for the aligned arm; and **no measurable property of a
 configuration predicts D out of sample** better than the corpus mean by a margin that survives the
-power bound (|r| ≥ 0.602 needed at 11 design points). A cross-validated *null* at n = 11 is
-defensible in a way a cross-validated success at n = 11 never is; we report both, and the null is
+power bound (|r| ≥ 0.632 needed at 10 design points). A cross-validated *null* at n = 10 is
+defensible in a way a cross-validated success at n = 10 never is; we report both, and the null is
 the one that survives.
 
 **Scope, stated here and not deferred to a threats section.** (i) Everything is CIFAR-resolution
@@ -160,7 +167,10 @@ and §3 fixes the partitions, the contrasts and the metric before any result is 
    the paper that does not depend on the endpoint we chose**: re-derived on all four
    end-of-training columns the corpus carries, the sign holds in 20 / 20 cells on `plateau5`,
    20 / 20 on the 20-epoch column, 20 / 20 on `best_test` and 19 / 20 on `final_test`, and the
-   pooled level stays between +0.396 and +0.614 pp. The one exception is unresolved rather than
+   pooled level stays between +0.396 and +0.614 pp — those four are **fixed-effect** pools,
+   +0.396 to +0.674 pp on random effects, and **the sign claim does not depend on which**, nor on
+   anything in §7 T13, because no quantity in Table 2 is a pooled quantity. The one exception is
+   unresolved rather than
    reversed — `bm2` (SGD) at −0.073 ± 0.500, t −0.15, a cell whose se inflates 5.8-fold on a
    single-epoch reading (§4.4).
 2. **A pre-registered permutation null, replicated and reported with its resolution**: at fixed
@@ -172,13 +182,19 @@ and §3 fixes the partitions, the contrasts and the metric before any result is 
    defect that limits it and the equivalence test it still fails (§4.6, §4.6.1).
 3. **A candidate moderator for the effect's heterogeneity, with its confound measured rather than
    asserted**: over fourteen same-contrast ResNet-18 cells the base optimiser is the coarsest
-   partition that leaves them internally homogeneous (within Q 7.36 on 10 df, p 0.69) and it
-   accounts for 92.8% of the between-cell Cochran Q (95.12 of 102.47 on 3 df); inside the SGDm
+   partition that leaves them internally homogeneous (within Q 7.36 on 10 df, χ² p 0.69,
+   Monte-Carlo p 0.86) and it
+   accounts for 92.8% of the between-cell Cochran Q (95.12 of 102.47 on 3 df) — a share whose
+   evidence now rests on a **weight-free exact permutation** (η² = 0.840, 9th of the 45,045
+   partitions of its shape, p = 0.00020) rather than on the χ² p-values, which §7 T13 shows are
+   anticonservative by many orders of magnitude at these degrees of freedom; inside the SGDm
    level D is homogeneous (τ = 0.000, 95% upper limit 0.109 pp) across seven submissions, two
    meta-stepsizes, two budgets and three clip boxes. **All four levels now rest on two or more
    independent submissions**, and each is internally homogeneous (within-level Q 0.17/1, 1.37/1,
-   1.61/1 and 4.21/7); a registered replication (`bm2`) bought the two thinnest levels, and it is
-   what makes the decomposition a testable restriction rather than an arithmetic identity.
+   1.61/1 and 4.21/7 — Monte-Carlo p 0.70, 0.30, 0.25 and 0.86 against each level's own simulated
+   null, every one of them *further* from significance than the χ² value it replaces); a
+   registered replication (`bm2`) bought the two thinnest levels, and it is what makes the
+   decomposition a testable restriction rather than an arithmetic identity.
    **We report, in the same place, that this is not yet identification**: the share is invariant to
    any relabelling that induces the same grouping, batch identity accounts for 95.8%, and base
    survives conditioning on batch only at ΔQ 4.11 on 2 df, p 0.13 (§4.4, Figure 2). **And that it
@@ -186,7 +202,12 @@ and §3 fixes the partitions, the contrasts and the metric before any result is 
    on the three other end-of-training columns the corpus carries, the base-optimiser share is
    86.8% on `final_test` with the level ordering *inverted* (SGD moves from the largest level to
    the smallest), 62.5% on the 20-epoch column, and on `best_test` there is no heterogeneity to
-   decompose at all (Q 9.87 on 13 df, p 0.70, τ = 0.000, I² = 0%). Of the four endpoints, the one
+   decompose at all (Q 9.87 on 13 df, p 0.70, τ = 0.000, I² = 0%). **Referred to the right null
+   (§7 T13) the conditionality is sharper still**: only `plateau5` has heterogeneity that resolves
+   at all (Monte-Carlo p 0.013 against 0.24, 0.90 and 0.16), so on three of the four endpoints
+   there is nothing for any moderator to explain. The weight-free permutation, which does not need
+   the heterogeneity established first, puts the base grouping at η² 0.840, 0.800, 0.276 and 0.670
+   (exact p 0.00020, 0.00029, 0.34 and 0.0076). Of the four endpoints, the one
    this project chose is the one on which the decomposition is strongest. We disclose that rather
    than change the primary metric.
 4. **A ranking of the four variables** that "the number of step sizes" conflates, with the
@@ -202,7 +223,11 @@ and §3 fixes the partitions, the contrasts and the metric before any result is 
    +1.363 ± 0.151 pp** across twelve within-batch cells under SGDm, SGD and RMSProp bases, and
    costs nothing in learned parameters. Under an AdamW base with a **Lion** meta-optimiser it is
    worth nothing measurable (+0.007 ± 0.056 over two batches); under the same AdamW base with an
-   **RMSProp** meta it is worth +0.988 ± 0.231. The exception is a base–meta pairing, not a base
+   **RMSProp** meta it is worth +0.988 ± 0.231. Both halves face §4.4's endpoint knife in §4.7 and
+   the first survives it: the twelve cells are positive on all four end-of-training endpoints
+   (48 of 48) and the AdamW+Lion pool stays inside the registered ±0.15 pp band on all four,
+   while resolution falls 12 / 12, 12 / 12, 8 / 12, 6 / 12 and `sm4` itself goes unresolved on
+   `final_test` (t 1.51). The exception is a base–meta pairing, not a base
    (§4.7, §5.4, §5.5).
 7. **A measurement-discipline appendix** documenting a batch that failed silently on its own axis,
    a metric column that produced two withdrawn headlines, an argument-line defect that voided two
@@ -606,6 +631,39 @@ $$
 its within-level and between-level parts, $Q = Q_{\mathrm{within}} + Q_{\mathrm{between}}$
 with degrees of freedom adding likewise. Figure 2(b) is that partition.
 
+**The reference distribution Q is referred to, and why it is not χ².** Eq. (12) is a χ²ₖ₋₁
+statistic only when the se_i are known, or estimated at enough degrees of freedom to be treated
+as known. Ours are Welch standard errors formed from two arms of three to six runs: over the
+fourteen cells §4.4 pools, their Welch–Satterthwaite degrees of freedom run from **2.04 to 9.68,
+median 2.91**. At three degrees of freedom a sample variance is unstable enough that
+w_i = se_i^-2 is a wildly variable weight, and Q is correspondingly over-dispersed — its null
+mean on 13 df is **26.9, not 13**. Beside every χ² p-value this paper reads as *resolving* heterogeneity we
+therefore print a **Monte-Carlo p**, obtained by simulating this paper's own estimator under a homogeneous
+truth: for each cell, n_c and n_n normal draws at that cell's own two arm standard deviations and
+its own n, pushed through the same `welch()` and the same DerSimonian–Laird `meta()` as
+everything else in the paper, 20,000 times at a registered seed. The code is
+`analysis/c99_qcalibration.py` and §7 T13 states what it changes. **Two nulls are simulated and
+both are printed**, because they bracket the answer: a *per-cell* null that takes each cell's own
+two arm standard deviations as the truth, and a *common-sd* null that gives every arm one pooled
+within-arm sd (0.186 pp on 70 df). The first is the larger-p end of the bracket and is the one we
+quote as *the* Monte-Carlo p; the second is printed beside it so that the reader sees the range
+rather than the flattering end of it. Where an interval rather than a p-value is at stake we
+quote a **calibrated half-width**: the 95th percentile of |μ̂ − μ| in that same simulation, which
+has exact 95% coverage by construction. Across three seeds the headline Monte-Carlo p moves
+between 0.011 and 0.013, and at 200,000 draws it is 0.012; we quote the registered 20,000-draw
+value and state that range rather than implying more precision than 20,000 draws buy. **Where a
+χ² p is printed with no simulated companion we say so here rather than leave it to be found.** The
+simulation is registered for §4.4's fourteen-cell D pool, for the base-optimiser groupings taken
+inside it, for that pool on all four end-of-training columns, for §5.4's G family at twelve,
+fourteen and fifteen tests, and for the momentum-present residual of §5.5's 2 × 2 collapse. It is
+*not* run for §4.4's conditioning ΔQ's, for the subset Q's taken inside the SGDm level (the four
+moderator axes, the leave-one-cell-out sweep and the four identical-configuration submissions), or
+for the eleven- and thirteen-cell box partitions quoted as record, whose χ² p's are printed for
+the record only. Every one of those supports a null or an unresolved reading, and on *every* statistic
+we have calibrated the correction moved the p **up** — so an uncalibrated χ² p overstates
+significance and never understates it, which for a null reading is the conservative
+direction.
+
 **The precision every pooled quantity is computed at.** Every pooled estimate, Cochran *Q* and
 DerSimonian–Laird τ in this paper is computed from full-precision arm means in the run table,
 which is what the deposited code computes and what `make reproduce` re-derives. Computing the
@@ -626,7 +684,13 @@ pooled once, and the claim made of it is "positive in every cell", not "signific
 cells". Where a p-value is quoted anywhere in this paper it is two-sided; at n = 3 v 3 we
 give the Welch–Satterthwaite value as primary and the normal approximation alongside it,
 because the two differ materially at 2–4 degrees of freedom and the paper's `t` columns are
-the normal-approximation quantity.
+the normal-approximation quantity. **That concession was made for `t` and, until this version,
+was not carried into the Q layer. The inconsistency is ours, and we state it before a referee
+does.** Every Cochran Q in this paper is built out of the same 2–4 df standard errors, and until
+now every Q p-value in this paper was referred to χ²ₖ₋₁ as though those standard errors were
+known. They are not; the reference is wrong in the anticonservative direction and by a large
+factor; and the next paragraph, §4.4 and §7 T13 carry into Q exactly the correction this
+paragraph already carried into `t`.
 
 **The minimum interesting effect, and where it was fixed.** Every registered scorer in this
 campaign judges a within-batch difference against the same three-way band: |Δ| ≤ 0.15 pp is a
@@ -763,12 +827,16 @@ printed-table pools; the partition-family meta-optimiser census (§7 T1); and th
 reachability register of §8. It does **not** assert: prose-only quantities, group counts, the
 attrition ledger's upstream cluster-side rows, wallclock and byte counts, Appendix B's arm means,
 or any value that exists only inside a registered scorer's own printed output — those are quoted
-from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census`, the
-audit executes **353 claim-carrying assertions covering 256 of the 786 distinct
-quantity-numerals** in this manuscript, which is 32.6% of them. Those three figures are not
-merely measured: section `[16]` of the audit reads this sentence back out of the manuscript
-and asserts the triple against a fresh measurement, so a stale coverage claim now exits
-non-zero instead of passing quietly, which is what it did for three review cycles. (The four
+from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census` on
+`paper/DRAFT-v4.md`, the
+audit executes **557 claim-carrying assertions covering 372 of the 849 distinct
+quantity-numerals** in this manuscript, which is 43.8% of them. Those three figures are not
+merely measured: section `[16]` of the audit reads this sentence back out of **both markups** —
+`paper/DRAFT-v4.md` and `paper/paper.tex` — and asserts the triple against that one fresh
+measurement, so a stale coverage claim in *either* file now exits non-zero instead of passing
+quietly, which is what it did for three review cycles. (The count is taken on the draft alone,
+because the quantity rule stated above is a markdown fence rule; the two markups are required to
+print the same triple, and `[16]` fails if they disagree. The eight
 sites that do that self-check are excluded from the count and from the coverage they report,
 so the census never counts itself.) We print the fraction rather than a superlative because a superlative is exactly the
 kind of claim this audit exists to catch: the first version of it checked no ρ, and a false ρ
@@ -1144,11 +1212,22 @@ Restrict Table 2 to the fourteen cells that run the same ResNet-18 partition con
 (`nodewise` → `chunk777`, count-matched to +1 group on 14,420; rows 1–4, 6–12 and 17–19) so that
 the contrast itself is held fixed. `sm4` (row 20) is **excluded from every pool in this section**
 by its own registered scope note, which forbids pooling it with `aw1` or `sm3`; it runs a
-different meta-optimiser and is treated in §5.5. Those fourteen are heterogeneous: the
-fixed-effect pool is +0.530 ± 0.029 with
+different meta-optimiser and is treated in §5.5. Those fourteen are heterogeneous. Because
+τ > 0 the **random-effects** (DerSimonian–Laird) pool is the honest summary of them, and it is
+**+0.611 ± 0.087 pp**, 95% CI [+0.441, +0.782]. The **fixed-effect** pool — which is what
+Figure 1's inset, the endpoint table below and every other "pooled D" in this paper report — is
++0.530 ± 0.029, and that interval covers the truth 65% of the time rather than 95%: its
+calibrated 95% half-width is 0.089 pp, not the 0.058 that 1.96 se gives (§7 T13). We print both
+and label which is which rather than quietly switching.
 
-> **Q = 102.47 on 13 df, p = 5.5e-16**; DerSimonian–Laird **τ = 0.295 pp** against an rms
-> measurement se of **0.143 pp**, i.e. I² = 87%.
+> **Q = 102.47 on 13 df**: p = 5.5e-16 against χ²₁₃, which is **not the distribution this Q
+> has**, and **Monte-Carlo p = 0.013** against the distribution it does have (0.002 under the
+> common-sd null; §7 T13). The null Q on 13 df has mean 26.9, median 21.4 and 95th percentile
+> 62.4, against χ²₁₃'s 13, 12.3 and 22.4. DerSimonian–Laird **τ = 0.295 pp** against an rms
+> measurement se of **0.143 pp**, i.e. I² = 87% — **both of these are upper bounds**, because
+> Eq. (12) subtracts k − 1 = 13 where the null mean is 26.9; recentred there they read τ = 0.271
+> pp and I² = 74% (0.280 pp and 79% under the common-sd null). We keep the standard estimator and
+> label it rather than substituting one of our own.
 
 Three of the fourteen were not available to the previous version of this paper. Two are `bm2`, the registered
 replication of §3.5's R3, and they are quoted from its scorer, `analysis/c97_bm2_score.py`, run
@@ -1170,15 +1249,21 @@ cannot recur. The third is `sm3`, whose twelve rows are now in the deposited run
 
 Split the fourteen by the base optimiser, the axis §5.5 was already looking at:
 
-| base optimiser | base state, from the runs' own `ARGS` line | cells | batches | pooled D (pp) | within-level Q |
+| base optimiser | base state, from the runs' own `ARGS` line | cells | batches | pooled D (pp) | within-level Q/df (χ² p; MC p) |
 |---|---|---|---|---|---|
-| SGD | no momentum, no second moment | 2 | 2 | **+1.000 ± 0.067** | 0.17 / 1 (p 0.68) |
-| RMSProp | second moment 0.999, no momentum | 2 | 2 | **+0.720 ± 0.128** | 1.37 / 1 (p 0.24) |
-| SGDm | momentum 0.99, no second moment | 8 | 7 | **+0.556 ± 0.045** | 4.21 / 7 (p 0.76) |
-| AdamW | momentum 0.9 + second moment 0.999 | 2 | 2 | **+0.189 ± 0.052** | 1.61 / 1 (p 0.20) |
+| SGD | no momentum, no second moment | 2 | 2 | **+1.000 ± 0.067** | 0.17 / 1 (0.68; **0.70**) |
+| RMSProp | second moment 0.999, no momentum | 2 | 2 | **+0.720 ± 0.128** | 1.37 / 1 (0.24; **0.30**) |
+| SGDm | momentum 0.99, no second moment | 8 | 7 | **+0.556 ± 0.045** | 4.21 / 7 (0.76; **0.86**) |
+| AdamW | momentum 0.9 + second moment 0.999 | 2 | 2 | **+0.189 ± 0.052** | 1.61 / 1 (0.20; **0.25**) |
 
-**Between base optimisers, Q = 95.12 on 3 df (p = 1.7e-20) — 92.8% of the total; within levels,
-Q = 7.36 on 10 df (p = 0.69).** **Every level of this moderator now rests on at least two
+**Between base optimisers, Q = 95.12 on 3 df — 92.8% of the total; within levels, Q = 7.36 on
+10 df.** Both p-values are printed twice throughout, because the first of them is computed
+against the wrong reference: between-base p = 1.7e-20 against χ²₃ and **Monte-Carlo p = 0.005**
+against the distribution that Q actually has (0.0007 under the common-sd null), within-level
+p = 0.69 against χ²₁₀ and Monte-Carlo p = 0.86. **The direction of every one of these corrections
+is the same**: heterogeneity is far less resolved than χ² says, and homogeneity is more so. §7
+T13 gives the simulation, and the weight-free permutation two paragraphs below is what this
+subsection's central claim now rests on. **Every level of this moderator now rests on at least two
 independent submissions.** That is new, and it is the single most important thing `bm2` and the
 `sm3` ingest bought. Before stating what the decomposition does and does not license, we state the
 arithmetic that limits it, because a referee will find it otherwise.
@@ -1192,10 +1277,31 @@ On fourteen cells no level is a singleton: 3.15 of the present 7.36 within-level
 in levels that previously had none, and those 3 df were a test the label could have failed — the
 scorer's registered line is Q > 3.841 → the level is not a stable quantity — and did not. The
 base partition is now a **restriction the data could have rejected**, and it did not reject it:
-all four levels are homogeneous, p 0.20–0.76. Over all 45,045 partitions of the fourteen cells
-with the realised shape {8, 2, 2, 2}, the base-optimiser partition ranks 14th (permutation
-p = 0.00031, against a median share of 0.333 and a maximum of 0.957). Leave-one-cell-out over the
-fourteen gives 89.6% to 95.7%.
+all four levels are homogeneous, χ² p 0.20–0.76 and Monte-Carlo p 0.25–0.86. (That registered
+rule is itself mis-sized for the same reason: simulated, Q > 3.841 fires on a homogeneous
+two-cell level 10% of the time and not 5%, and the size-0.05 critical value is 6.22. A level that
+does not fire it is therefore *stronger* evidence of homogeneity than the rule claims, not
+weaker.) Over all 45,045 partitions of the fourteen cells with the realised shape {8, 2, 2, 2},
+the base-optimiser partition ranks 14th (permutation p = 0.00031, against a median share of 0.333
+and a maximum of 0.957). Leave-one-cell-out over the fourteen gives 89.6% to 95.7%.
+
+**The weight-free version of that permutation, which is what this subsection now rests on.** The
+rank-14 test above permutes labels but still scores each partition by a *weighted* share of Q, so
+it inherits the se_i and their two-to-four degrees of freedom. Scoring the same 45,045 partitions
+by the **unweighted** between-group share of the fourteen D's variance removes the standard
+errors from the test altogether:
+
+> η² = **0.840** for the base-optimiser partition, **rank 9 of 45,045**, exact p = **0.00020**,
+> against a null median of 0.200 and a maximum of 0.894.
+
+**This is the load-bearing statistic for the moderator claim from here on**, because it does not
+depend on the se estimates at all and so is untouched by §7 T13. It is an exact enumeration, not
+a sample, so it carries no Monte-Carlo error; and run on the weighted share it reproduces the
+published rank 14 and p = 0.00031 above, which is how we know the enumeration is the paper's own.
+Note what it does and does not say: like the rank-14 test it is conditional on the observed
+spread of the fourteen D and asks only whether *this partition* of them is special. Whether there
+is any spread to partition is the separate question Q answers, and calibrated, Q answers it at
+p = 0.013.
 
 **The rival label, measured.** The variable most likely to induce this grouping by accident is
 batch identity, because the two partitions very nearly coincide: the fourteen cells fall into
@@ -1242,8 +1348,14 @@ The remaining within-level residual is not resolvable at all:
 
 > Over the eight SGDm cells — **seven separate submissions, two meta-stepsizes (1e-4, 3e-4), two
 > budgets (100 and 300 epochs), three β-boxes and two clusters** — the pool is **+0.556 ± 0.045**
-> with **Q = 4.21 on 7 df, p = 0.76, I² = 0%, τ = 0.000** (one-sided 95% Q-profile upper limit
-> **0.109 pp**, below the 0.146 pp rms measurement se of the cells themselves).
+> with **Q = 4.21 on 7 df, I² = 0%, τ = 0.000**. χ²₇ puts that Q at p = 0.76; **its own simulated
+> null, whose median is 9.4, puts it at Monte-Carlo p = 0.86 and at the 14th percentile** (§7
+> T13), so the homogeneity claim holds and the reference it used to be stated against did not.
+> The one-sided 95% Q-profile upper limit on τ is **0.109 pp** against χ²₇ and **0.097 pp** when
+> the profile is simulated at each trial τ — **the one quantity in this subsection the χ²
+> reference gets wrong in our disfavour** — and both are below the 0.146 pp rms measurement se of
+> the cells themselves. The pool's own interval is the one that moves the other way: ± 1.96 se is
+> ± 0.088 pp and covers 73%, and the calibrated 95% half-width is ± 0.121 pp.
 
 Four of those eight are submissions of the *identical* configuration — `cc1`, `mm1`, `pp1` and
 the BatchNorm arm of `gn1` — and they land at +0.727, +0.485, +0.581 and +0.587, Q = 0.88 on
@@ -1326,12 +1438,25 @@ last test epoch `final_test` — holding the admissibility gate of Eq. 11, the a
 read. This is not §7 T10, which varies the row filter at a fixed endpoint; it is the other axis,
 and no previous version of this paper reported the decomposition on any endpoint but `plateau5`.
 
-| endpoint | pooled D (pp) | Q / 13 df | p | τ (pp) | between-base Q / 3 df | share of Q | cells D > 0 |
+| endpoint | pooled D (pp) | Q / 13 df | p (χ²₁₃) | MC p | τ (pp) | between-base Q / 3 df | share of Q | cells D > 0 |
 |---|---|---|---|---|---|---|---|
-| `plateau5` *(primary)* | +0.530 ± 0.029 | 102.47 | 5.5e−16 | 0.295 | 95.12 | **92.8%** | 20 / 20 |
-| `plateau` *(20-epoch)* | +0.449 ± 0.024 | 29.37 | 0.0058 | 0.101 | 18.36 | 62.5% | 20 / 20 |
-| `best_test` | +0.396 ± 0.025 | **9.87** | **0.70** | **0.000** | 3.70 | 37.5% | 20 / 20 |
-| `final_test` | +0.614 ± 0.043 | 39.91 | 1.4e−4 | 0.251 | 34.66 | 86.8% | **19 / 20** |
+| `plateau5` *(primary)* | +0.530 ± 0.029 | 102.47 | 5.5e−16 | **0.013** | 0.295 | 95.12 | **92.8%** | 20 / 20 |
+| `plateau` *(20-epoch)* | +0.449 ± 0.024 | 29.37 | 0.0058 | **0.24** | 0.101 | 18.36 | 62.5% | 20 / 20 |
+| `best_test` | +0.396 ± 0.025 | **9.87** | **0.70** | **0.90** | **0.000** | 3.70 | 37.5% | 20 / 20 |
+| `final_test` | +0.614 ± 0.043 | 39.91 | 1.4e−4 | **0.16** | 0.251 | 34.66 | 86.8% | **19 / 20** |
+
+*Columns: the **fixed-effect** pooled D in pp over the fourteen cells; Cochran Q on 13 df; its p
+against χ²₁₃ and its Monte-Carlo p against the distribution Q actually has at these degrees of
+freedom (per-cell null; the common-sd null gives 0.002, 0.19, 0.88 and 0.080); DerSimonian–Laird
+τ in pp, an upper bound for the same reason; the between-base component of Q on 3 df; its share
+of Q; and how many of the twenty count-matched cells of Table 2 are positive.*
+
+**The MC column is the one that means anything, and it changes the reading of three rows out of
+four** (§7 T13). The random-effects pools of the same four rows are +0.611 ± 0.087,
++0.480 ± 0.038, +0.396 ± 0.025 and +0.674 ± 0.097 pp; the between-base Q's Monte-Carlo p's are
+0.005, 0.099, 0.60 and 0.025; and the weight-free permutation, which uses no se at all and
+therefore survives all of this untouched, gives η² 0.840, 0.800, 0.276 and 0.670 at exact p
+0.00020, 0.00029, 0.34 and 0.0076.
 
 The same four endpoints, split by base optimiser — the table this subsection is built on,
 recomputed three more times:
@@ -1345,9 +1470,13 @@ recomputed three more times:
 
 Three readings, stated plainly rather than buried.
 
-1. **On `best_test` there is no heterogeneity to decompose at all.** Q = 9.87 on 13 df is *below
-   its own degrees of freedom*: p = 0.70, I² = 0%, DerSimonian–Laird τ = 0.000, and between base
-   optimisers Q is 3.70 on 3 df (p = 0.30). This is not an error-inflation artefact — `best_test`'s
+1. **On `best_test` there is no heterogeneity to decompose at all.** Q = 9.87 on 13 df sits at
+   the **tenth percentile of its own simulated null** (Monte-Carlo p = 0.90). "Below its own
+   degrees of freedom" is the wrong way to say it — that null's mean is 25.3, not 13 (§7 T13) —
+   but it is right about the direction and by a wider margin than χ²₁₃'s p = 0.70 suggested:
+   I² = 0%, DerSimonian–Laird τ = 0.000, and between base optimisers Q is 3.70 on 3 df (p = 0.30
+   against χ²₃, Monte-Carlo p = 0.60). The weight-free permutation agrees and is the cleanest
+   statement of it: η² = 0.276, rank 15,248 of 45,045, exact p = 0.34. This is not an error-inflation artefact — `best_test`'s
    rms measurement se over the fourteen cells is 0.137 pp against `plateau5`'s 0.143 pp, within
    5% — it is that the between-cell spread is gone: the sd of the fourteen D is 0.084 pp on
    `best_test` against 0.255 pp on `plateau5`, i.e. *smaller than the measurement error*. On that
@@ -1362,10 +1491,20 @@ Three readings, stated plainly rather than buried.
 3. **The endpoint this project chose is the one on which the decomposition is strongest.** A
    referee is entitled to write that sentence, so we write it first: of the four, `plateau5`
    maximises Q, maximises τ and maximises the between-base share.
+4. **Calibrated, `plateau5` is the only one of the four with resolved heterogeneity at all.**
+   Referring each row's Q to its own simulated null instead of to χ²₁₃ (§7 T13) gives Monte-Carlo
+   p 0.013, 0.24, 0.90 and 0.16. The 20-epoch column's p = 0.0058 and `final_test`'s p = 1.4e−4
+   **do not survive the correct reference**; `plateau5`'s 5.5e−16 does, at p = 0.013. This makes
+   item 3 sharper rather than softer — on three of the four endpoints there is no resolved spread
+   for any moderator to explain — and it is a self-criticism, so we print it in the same list as
+   the other three rather than in a footnote. The claim it does *not* touch is §4.3's: the sign,
+   which is 20 / 20 on three endpoints and 19 / 20 on the fourth, is a per-cell quantity and is
+   not pooled.
 
 **What survives the change of endpoint is §4.3's measurement, not this subsection's
-decomposition.** The fourteen-cell pool is positive and of one order on all four (+0.396 to
-+0.614 pp), and the count-matched sign result of Table 2 reads **20 / 20, 20 / 20, 20 / 20 and
+decomposition.** The fourteen-cell pool is positive and of one order on all four (fixed-effect
+pools +0.396 to +0.614 pp; random-effects +0.396 to +0.674), and the count-matched sign result of
+Table 2 reads **20 / 20, 20 / 20, 20 / 20 and
 19 / 20** cells. The single exception is `bm2` (SGD) on `final_test`: D = −0.073 ± 0.500,
 t = −0.15. **That is a cell the endpoint cannot read, not a cell that reverses.** `final_test` is
 one epoch's evaluation, and inside `bm2`'s two arms the sd of that single reading is 0.467 and
@@ -1409,8 +1548,11 @@ momentum effect and an unresolved normalisation one. With `bm2` and `sm3` in the
 contrast is gone, and §5.5 withdraws the sentence that rested on it. What survives is that neither
 component *alone* is the moderator: collapsing the four levels to momentum-present /
 momentum-absent removes 61.1% of Q against the four-level partition's 92.8%, and leaves a residual
-Q of **34.64 on 9 df (p 6.9e-5)** inside the momentum-present group — the SGDm-to-AdamW gap
-survives the collapse. **The candidate moderator is *the base optimiser*, not any single component
+Q of **34.64 on 9 df** inside the momentum-present group — the SGDm-to-AdamW gap survives the
+collapse. That residual is the largest the paper carries, and **it still does not resolve on a
+calibrated reference**: χ²₉ puts it at p 6.9e-5, its own simulated null (mean 16.5, §7 T13) at
+**Monte-Carlo p 0.074**. What the collapse shows is the *share* it fails to remove, 61.1% against
+92.8%, and that comparison needs no p. **The candidate moderator is *the base optimiser*, not any single component
 of it.**
 
 **We still register the 2 × 2 as a prediction, not a result**, for four reasons, and a referee
@@ -1495,8 +1637,13 @@ level carries **two or more independent submissions** — SGD `nl1` + `bm2`, RMS
 AdamW `aw1` + `sm3`, SGDm seven — and every level is homogeneous: Q 0.17 / 1, 1.37 / 1, 1.61 / 1
 and 4.21 / 7 respectively, the eight SGDm cells spanning seven separate submissions, two
 meta-stepsizes, two budgets and three clip boxes at τ = 0.000. (b) Partitioning the fourteen-cell
-Cochran Q (Eq. 12): **95.12 of 102.47 (92.8%) is between base optimisers**, on 3 df, p 1.7e-20;
-the within-level remainder is 7.36 on 10 df, p 0.69. On the previous version's eleven cells the same
+Cochran Q (Eq. 12): **95.12 of 102.47 (92.8%) is between base optimisers**, on 3 df. **Every bare p
+drawn inside this figure or quoted in this caption is a χ² value and is anticonservative** (§7
+T13); panel (b)'s annotation carries its Monte-Carlo companion beside it: between-base p 1.7e-20 against χ²₃ is **Monte-Carlo p 0.005** against the distribution Q
+actually has, and the within-level remainder, 7.36 on 10 df at χ² p 0.69, is Monte-Carlo p 0.86;
+the four per-level Q's are at Monte-Carlo p 0.70, 0.30, 0.25 and 0.86. The weight-free statement
+of panel (b), which needs no se and is what §4.4 now rests on: η² = 0.840, rank 9 of all 45,045
+partitions of the realised {8,2,2,2} shape, exact p = 0.00020. On the previous version's eleven cells the same
 partition read 32.20 of 36.40 (88.4%), and against the legacy twelve-cell pool containing the
 withdrawn GroupNorm cell, 74.6% — the "≈75%" figure. Every denominator must be named. The share is
 a property of the grouping and not of the label — batch identity, on eleven levels, accounts for
@@ -1785,7 +1932,11 @@ meta-optimiser the move is worth nothing measurable, and that now rests on two i
 rather than one: `aw1` +0.091 ± 0.078 and `sm3` −0.083 ± 0.081, pooling to **+0.007 ± 0.056**
 (their between-batch Q is 2.39 on 1 df, so the two do not agree closely, but neither is resolved
 and the pool is not). Under the **same AdamW base with an RMSProp meta-optimiser** the move is
-worth **+0.988 ± 0.231 (t 4.28)** — the largest T in the CIFAR-10 corpus. So the exception is not
+worth **+0.988 ± 0.231 (t 4.28)** — the largest T this corpus carries *at ResNet-18 on CIFAR-10*.
+It is not the largest on CIFAR-10 outright: `r50` reads +1.049 ± 0.317, and the superlative
+earlier versions of this work printed — "the largest T in the CIFAR-10 corpus" — was false of
+that row. It is also plateau5-specific: on `best_test` four of the eleven other
+ResNet-18 / CIFAR-10 cells are larger, and on `final_test` two are. So the exception is not
 "AdamW". It is "AdamW **with a Lion meta-optimiser**", and one cell is all the evidence there is
 on the other side of that line. §5.5 develops what this does to the mechanism story.
 
@@ -1798,6 +1949,66 @@ the tail component is the rest; the same decomposition on `sm4` gives T = +0.988
 where the count component is **36%**. Any account that treats "merge the 1-D tensors" as purely a
 count reduction has the decomposition backwards, and any account that treats the count component
 as negligible has it backwards at this cell.
+
+**The endpoint, varied — the prescription under §4.4's own knife.** §4.4 takes a knife to the
+base-optimiser decomposition, re-deriving it on the three end-of-training columns the deposited
+run table carries besides plateau5, and reports that the decomposition does not survive the
+change while §4.3's sign does. That knife has to cut here too. T is this paper's only actionable
+recommendation — it is the sixth contribution, and the one a reader could act on tomorrow — so
+applying the test to the moderator and withholding it from the prescription would be exactly the
+selective disclosure §4.4 was written to end. We therefore re-derive *the whole of the table
+above* on `plateau` (20-epoch), `best_test` and `final_test`, holding the admissibility gate of
+Eq. 11, the arm prefixes of the table, the `dup_group` collapse and the Welch construction
+**fixed**, and varying only the column that is read.
+
+| endpoint | T over the twelve | T > 0 | t ≥ 3 | rms se | AdamW+Lion pool | `sm4` |
+|---|---|---|---|---|---|---|
+| plateau5 *(primary)* | +0.337 to +1.363 | 12 / 12 | **12 / 12** | 0.162 | +0.007 ± 0.056 | +0.988 (t 4.28) |
+| `plateau` *(20-epoch)* | +0.407 to +1.664 | 12 / 12 | **12 / 12** | 0.104 | +0.051 ± 0.062 | +0.730 (t 8.70) |
+| `best_test` | +0.170 to +1.280 | 12 / 12 | **8 / 12** | 0.132 | −0.111 ± 0.085 | +0.393 (t 3.89) |
+| `final_test` | +0.147 to +1.630 | 12 / 12 | **6 / 12** | 0.460 | +0.106 ± 0.054 | +0.723 (**t 1.51**) |
+
+*Columns: the range of T over the twelve non-AdamW cells; how many of those twelve are positive;
+how many are resolved at t ≥ 3; the rms measurement se over them; the inverse-variance pool of
+the two AdamW+Lion cells that fix the scope line; and `sm4`, the single cell on the other side of
+it.*
+
+**The prescription survives the knife, and survives it better than §4.4's decomposition did.**
+Three readings, in the order §4.4 gives its own.
+
+1. **The sign is endpoint-free, in every cell, on every endpoint.** All twelve non-AdamW cells
+   are positive on all four columns — **48 of 48** — and no cell on any endpoint falls below
+   +0.147 pp or rises above +1.664 pp. The one cell carrying no §7 T9 confound, `hz3` matched at
+   5 v 5, is positive *and* resolved on all four: +0.328 (t 3.89), +0.432 (t 5.37), +0.338
+   (t 9.91) and +0.368 (t 4.11).
+2. **The scope line holds where we put it, on all four.** The AdamW+Lion pool stays inside the
+   ±0.15 pp half-width of the registered `NULL` band on every endpoint. We report that as an
+   estimate and not as a threshold clearance, because §3.4 fixes that band **for a cell and not
+   for a pool** and we do not extend it, and because two qualifications travel with it. Cell by
+   cell the point estimates are inside the band on seven of the eight endpoint-by-cell readings;
+   the exception is `aw1` on `final_test` at +0.253 ± 0.109, which lands in the (0.15, 0.30]
+   interval registered **in advance** as undecided. And on the interval form of the rule — the
+   form `aw1`'s own scorer uses — the pool's entire 95% interval lies inside the band only on
+   plateau5 ([−0.104, +0.117]). **The scope line is a place where the move is not measurable, on
+   every endpoint; it is an equivalence claim on the primary endpoint only.**
+3. **What degrades is resolution, and it degrades on the single-epoch columns.** Twelve of twelve
+   resolve at t ≥ 3 on plateau5 and on the 20-epoch column, **eight** on `best_test` and **six**
+   on `final_test`, while the rms measurement se over the twelve runs 0.162, 0.104, 0.132 and
+   **0.460** pp — 2.8× plateau5's on `final_test`. This is the corpus-wide loss §4.4 already
+   records for D (18, 20, 11 and 7 of 20 cells resolved), and T loses *less* of it: 100%, 100%,
+   67% and 50% of its cells resolve against D's 90%, 100%, 55% and 35%.
+
+**One thing genuinely does not survive, and it is the exception rather than the rule.** `sm4` —
+the cell that moves the scope line from "AdamW" to "AdamW with a Lion meta-optimiser" — is
+resolved on three endpoints (t 4.28, 8.70 and 3.89) and **unresolved on `final_test`**:
++0.723 ± 0.479, t 1.51. Its point estimate clears §3.4's registered 0.30 pp effect line on all
+four; its 95% interval clears it on two. So the *base–meta pairing* of Contribution 6 is a
+plateau5 and 20-epoch result that weakens on the two single-epoch columns, and we say so rather
+than let the reader find it. The *prescription* that pairing qualifies is not weakened: it holds
+its sign in every cell on every endpoint, holds its scope line on every endpoint, and holds its
+resolution on the two multi-epoch endpoints of the four. **A prescription that survives an
+endpoint knife is stronger stated with the knife than without it.** Every number in this
+paragraph and its table is asserted by `python3 analysis/c98_reproduce.py --metricsens`.
 
 **Practical significance, answered rather than volunteered.** Scope item (iv) of §1 puts the
 objection in its sharpest form — the effect is ≈0.6 pp inside a method that is 1.8 to 4.2 pp
@@ -2088,10 +2299,16 @@ t 3.23, Welch df 3.7): on Welch degrees of freedom **nothing survives Holm** (sm
 p = 0.46, `g3m`); on the anti-conservative normal approximation **`sm4` (adjusted p = 0.017) and
 `sm3` (adjusted p = 0.028) both survive**, which no tabled cell did at twelve. We record that
 without resting anything on it, because the normal approximation is the wrong reference at 3.5
-degrees of freedom and we say so elsewhere in this paper. The enlarged family is also
-heterogeneous where the pre-specified one was not — fourteen-cell G pool +0.093 ± 0.022,
-Q = 28.25 on 13 df (p = 0.0084), against the twelve-cell +0.067 ± 0.023, Q = 18.21 on 11 df
-(p = 0.077) — and the two cells that make it so are the two new AdamW-base ones.
+degrees of freedom and we say so elsewhere in this paper. The enlarged family carries more raw
+heterogeneity than the pre-specified one — fourteen-cell G pool +0.093 ± 0.022, Q = 28.25 on
+13 df, against the twelve-cell +0.067 ± 0.023, Q = 18.21 on 11 df — and the two cells that make
+it so are the two new AdamW-base ones. **Neither Q resolves, and an earlier version of this
+paragraph, which read the fourteen as heterogeneous where the twelve was not, rested on the wrong
+reference and is corrected here.** Those two χ² p-values are 0.0084 and 0.077; simulating this
+family's own null exactly as §7 T13 simulates §4.4's — same cells, same arms, the same `welch()`
+and `meta()`, 20,000 draws at the registered seed — gives a null Q with mean 24.0 on 13 df and
+20.1 on 11 df, and **Monte-Carlo p 0.26 and 0.42**. The contrast between the two families is a
+property of the reference, not of the cells.
 
 **We therefore make no claim that `G` is resolved in any
 individual cell**, and an earlier version of this section, which rested on `G` being resolved
@@ -2123,8 +2340,11 @@ SGDm, removing the tail removes the gap". (`sm3`'s G, which an earlier version o
 also listed here, is now a tabled cell.) Enlarging the family to all fifteen and re-running Holm
 changes the count but not the verdict on Welch degrees of freedom, where **nothing survives**;
 on the normal approximation `bn1` (adjusted p = 1.2e-8), `sm4` (0.017) and `sm3` (0.028)
-survive. The fifteen-test family is heterogeneous (G pool +0.128 ± 0.020, Q = 42.98 on 14 df,
-p = 8.6e-5), driven by `bn1`; `bn1` and `cc1` are the same configuration in different batches
+survive. The fifteen-test family carries the largest G-layer Q in the paper (G pool
++0.128 ± 0.020, Q = 42.98 on 14 df), and **it does not resolve either**: χ²₁₄ puts it at
+p = 8.6e-5, its own simulated null (mean 26.1, §7 T13) at **Monte-Carlo p 0.12**. An earlier
+version of this sentence called the family heterogeneous on the χ² reading alone. What is visible
+without a p is that the Q is driven by `bn1`; `bn1` and `cc1` are the same configuration in different batches
 and their `G` values differ by 0.284 ± 0.155 (t 1.83), i.e. not resolved, which is what §6.3's
 cross-batch bound predicts. We disclose it rather than leave a referee to find it.
 
@@ -2279,15 +2499,18 @@ collapse leaves a residual Q of 34.64 on 9 df — and M9 shows that adding a sec
 
 ### 5.6 Not dead, not separable: D and the aligned arm's accuracy level
 
-Over all 11 design points (§5.8 states the grouping rule), regressing D on the aligned arm's
-`plateau5` gives slope **−0.045 ± 0.010, t −4.52, r −0.833** — which looks like a law and is not
+Over all 10 design points (§5.8 states the grouping rule), regressing D on the aligned arm's
+`plateau5` gives slope **−0.045 ± 0.011, t −4.21, r −0.830** — which looks like a law and is not
 one, because level and dataset are the same column: the single CIFAR-100 design point sits at
-level 70.44 and the ten CIFAR-10 design points at 89.63–93.04.
+level 70.44 and the nine CIFAR-10 design points at 89.63–93.04.
 
-Inside CIFAR-10 the slope is **−0.173 ± 0.051, t −3.37, r −0.766** over 10 design points (exact
-permutation over all 10! = 3,628,800 orderings, p = 0.0097). **This is a strengthening we did not
-want and report anyway**: on the sixteen-cell set the same regression read −0.161 ± 0.067, r 0.669
-against a critical 0.666, and the previous version of this paper called it a coin landing on its edge. Ingesting
+Inside CIFAR-10 the slope is **−0.176 ± 0.056, t −3.16, r −0.767** over 9 design points (exact
+permutation over all 9! = 362,880 orderings, p = 0.0151). **This is a strengthening we did not
+want and report anyway**: on the sixteen-cell set, grouped by the same rule, the same regression
+read −0.162 ± 0.074, r 0.666 against a critical 0.707 at eight points — unresolved, and the
+previous version of this paper, which split two cells that this rule joins and so read the sixteen
+cells at nine CIFAR-10 points, got r 0.669 against a critical 0.666 and called it a coin landing
+on its edge. Ingesting
 `bm2`, `sm3` and `sm4` merges three pairs of cells into their design points, which reduces
 measurement error in *both* columns and de-attenuates the slope. So the association is now
 resolved, and the three things that stop it being a mechanism are the ones that matter.
@@ -2295,21 +2518,23 @@ resolved, and the three things that stop it being a mechanism are the ones that 
 * **It is aliased with the network and with the base optimiser, and the alias is the whole
   effect.** The two lowest-level CIFAR-10 design points are `r50` (a different network) and `sm4`
   (a different meta-optimiser), with `nl1`/`bm2`/SGD next. Holding the base fixed at SGDm
-  (6 points, spanning ResNet-18/34/50) gives **−0.119 ± 0.022**; holding the network fixed at
-  ResNet-18 (8 points, spanning five base–meta pairings) gives **−0.282 ± 0.068**; holding
-  **both** fixed — the only four points where "level" varies with nothing else structural — gives
-  **−0.187 ± 0.125, t −1.49, exact permutation p = 0.333, unresolved, and unmoved by the ingest.**
-  A slope whose magnitude moves by 2.4× depending on which confound you hold, and which does not
+  (5 points, spanning ResNet-18/34/50) gives **−0.126 ± 0.022**; holding the network fixed at
+  ResNet-18 (7 points, spanning five base–meta pairings) gives **−0.287 ± 0.075**; holding
+  **both** fixed — the only three points where "level" varies with nothing else structural — gives
+  **−0.188 ± 0.148, t −1.27, unresolved.** At three points the exact permutation test carries no
+  information: its smallest attainable two-sided p is 2/3! = 0.333 and the observed slope reaches
+  only p = 0.667, so the t is the only reading available. It is also the reading that matters.
+  A slope whose magnitude moves by 2.3× depending on which confound you hold, and which does not
   resolve when you hold both, is measuring the confounds.
 * **An instrument that does not share an arm with D does not settle it either.** D and level share
-  the `nodewise` arm. The mechanical slope this induces is **−0.016** — the mean sampling variance
+  the `nodewise` arm. The mechanical slope this induces is **−0.014** — the mean sampling variance
   of a `nodewise` arm mean over the 18 CIFAR-10 cells, 0.01724, over the variance of level across
-  the ten design points, 1.11080 — under a tenth of −0.173, so the artefact is not the
+  the nine design points, 1.19374 — under a tenth of −0.176, so the artefact is not the
   explanation. (An earlier version of this paper printed 0.01808 for the first of those two inputs; that value
   does not re-derive under either a cell-level or a point-level average and is replaced rather
   than restated.) Replacing level by an independent instrument — the mean of the `chunk2325` and
-  `nodewise1d` arms, neither of which enters D — gives **−0.204 ± 0.082, t −2.49** within
-  CIFAR-10, which now clears |t| ≥ 2 where the sixteen-cell reading (−0.167 ± 0.101, t −1.65) did
+  `nodewise1d` arms, neither of which enters D — gives **−0.208 ± 0.089, t −2.33** within
+  CIFAR-10, which now clears |t| ≥ 2 where the sixteen-cell reading (−0.168 ± 0.112, t −1.50) did
   not. The association is therefore not an arm-sharing artefact; it is still not separable from
   the network and the base.
 * **The one within-batch contrast left in the corpus does not resolve it either.** `rl3` ran both
@@ -2328,13 +2553,13 @@ batch's face values as a falsification of the level model — a within-batch `dD
 described as wrong-signed by 2.2 to 7.0 se. We withdraw that, and we withdraw the falsification
 with it. **Both legs of the earlier argument came from the withdrawn cell**: it was the
 within-batch test, and it was also the low-level point that flattened the within-CIFAR-10 slope,
-which without it moves from −0.044 ± 0.070 (t −0.63) to the −0.173 ± 0.051 above. The paper is
+which without it moves from −0.045 ± 0.076 (t −0.59) to the −0.176 ± 0.056 above. The paper is
 weaker here than the previous version of this paper claimed, and in the direction the level model predicts.
 
 **What is left is an honest negative-space statement, not a dead mechanism.** The accuracy level
-of the aligned arm is not separable from the network and the base optimiser in this corpus, at 10
-CIFAR-10 design points, where it is resolved (|r| 0.766 against a critical 0.632) and still
-collapses to t −1.49 the moment the network and the base are both held fixed. We do not claim it
+of the aligned arm is not separable from the network and the base optimiser in this corpus, at 9
+CIFAR-10 design points, where it is resolved (|r| 0.767 against a critical 0.666) and still
+collapses to t −1.27 the moment the network and the base are both held fixed. We do not claim it
 is a carrier; we do not
 claim it is not; and §5.8 shows that as a *predictor* it is the worst of the four models we tried,
 out of sample. The design needed to separate it — a level contrast at fixed network, fixed base
@@ -2379,41 +2604,66 @@ a search result:
 
 ### 5.8 Null: D is not predictable from configuration properties
 
-The twenty D cells of Table 2 collapse to **11 distinct design points** under the rule that two
+The twenty D cells of Table 2 collapse to **10 distinct design points** under the rule that two
 cells are one design point when they run the same network, dataset, base–meta pairing, η and
-budget in different submissions: the six identical ResNet-18/SGDm/η=1e-4/100-epoch batches are one
-point; the two CIFAR-100 batches are one; `aw1` and `sm3` are one; `nl1`/SGD and `bm2`/SGD are one;
-`nl1`/RMSProp and `bm2`/RMSProp are one; `sm4`, the corpus's only RMSProp meta, is its own.
-**Collapsing replicate batches is not cosmetic, and the alternative is a trap we report rather than
-take**: a fold that holds out `bm2`/SGD while `nl1`/SGD remains in the training set is not out of
-sample, and scoring the four new cells as four new folds would turn the sign test below from 9/11
-(p = 0.065) into 12/14 (p = 0.013) without a single new configuration having been measured. Four
-new cells bought **one** new design point. Leave-one-design-point-out, refitting each
-single-predictor model on the held-in 10:
+budget, whatever submission they arrived in and whatever step-size clip box they ran in: the six
+identical ResNet-18/SGDm/η=1e-4/100-epoch batches are one point; `rl3` at η = 3e-4 and `fa1` are
+one; the two CIFAR-100 batches are one; `aw1` and `sm3` are one; `nl1`/SGD and `bm2`/SGD are one;
+`nl1`/RMSProp and `bm2`/RMSProp are one; `hz3`, `g3m`, `r50` and `sm4` — the last the corpus's only
+RMSProp meta — are each their own. **Collapsing replicate batches is not cosmetic, and the
+alternative is a trap we report rather than take**: a fold that holds out `bm2`/SGD while
+`nl1`/SGD remains in the training set is not out of sample, and scoring the four new cells as four
+new folds would turn the sign test below from 8/10 (p = 0.109) into 11/13 (p = 0.022) without a
+single new configuration having been measured. Four new cells bought **one** new design point.
+
+**The clip box is deliberately not in the key, and a previous version of this paper had it both
+ways.** `rl3` at η = 3e-4 and `fa1` agree on every field the key names — and on batch size, α₀, γ,
+augmentation and the hierarchical flags as well; their runs' own `ARGS:` lines are identical up to
+the save directory and the run name — and differ only in `BETA_CLIP` (−30:9.0 against
+−25:−2.3026). As measurements they agree: +0.591 ± 0.096 against +0.629 ± 0.123, a difference of
++0.038 ± 0.156 (z 0.24). The previous version of this paper nevertheless printed them as two
+points while collapsing five `-15:-2.3026` batches together with `rl3` at η = 1e-4, which sits in
+−30:9.0, into one. We apply the rule as written. Naming the box in the key instead gives **twelve**
+points, not eleven, and we report what that reading does rather than only asserting that we
+rejected it: LOO RMSE 0.3514 for the mean against 0.2437 for k·log(headroom) (−31%, unchanged),
+but the all-folds sign test becomes 10/12, p = 0.039, and §5.6's both-fixed leg becomes
+−0.201 ± 0.092, t −2.19 (exact permutation p = 0.100) on five points. **That is the only reading
+anywhere in this paper under which a statistic in this section crosses 0.05, and it buys the
+crossing by holding out `rl3` at η = 1e-4 while five batches identical to it on every key field
+stay in the training set** — the same leakage the previous paragraph rejects for `bm2`/SGD. It is
+also the box axis that §4.4 measures and rejects as a moderator (between-box Q = 0.76 on 2 df,
+p = 0.68, over the eight SGDm cells that span all three boxes). We report it, and we do not take
+it.
+
+Leave-one-design-point-out, refitting each single-predictor model on the held-in 9:
 
 | model | LOO RMSE | vs "predict the corpus mean" |
 |---|---|---|
-| **mean (baseline)** | **0.3685** | — |
-| D ∝ k·log(headroom) | 0.2548 | −31% |
-| CIFAR-100 dummy | 0.3601 | −2% |
-| D ∝ k·headroom | 0.3467 | −6% |
-| D ∝ level (OLS) | 0.8678 | **+135% WORSE** |
+| **mean (baseline)** | **0.3868** | — |
+| D ∝ k·log(headroom) | 0.2667 | −31% |
+| CIFAR-100 dummy | 0.3775 | −2% |
+| D ∝ k·headroom | 0.3654 | −6% |
+| D ∝ level (OLS) | 0.9319 | **+141% WORSE** |
 
 **None of this is a result, and here is why.** The margin is still dominated by the single
-CIFAR-100 fold: the mean errs by −0.893 there and `k·log(headroom)` by −0.470, and restricted to
-the ten CIFAR-10 folds the best model wins by 0.042 RMSE (0.2637 → 0.2222, −16%; the level model,
-0.2163, −18%), with a sign test of 8/10, two-sided p = 0.109. Over all eleven folds the sign test
-is 9/11, p = 0.065. **The verdict is unchanged from the sixteen-cell table this replaces**:
+CIFAR-100 fold: the mean errs by −0.887 there and `k·log(headroom)` by −0.462, and restricted to
+the nine CIFAR-10 folds the best model wins by 0.046 RMSE (0.2809 → 0.2352, −16%; the level model,
+0.2309, −18%), with a sign test of 7/9, two-sided p = 0.180. Over all ten folds the sign test is
+8/10, p = 0.109. **And the sign test is not a stable statistic at this n**: on the sixteen cells
+this table replaces, grouped by the same rule, it read 8/9 (p 0.039); adding four cells and one
+design point moves it to 8/10 (p 0.109). A statistic that crosses 0.05 in either direction when
+one fold is added or removed is not evidence that a predictor works, and we read the RMSE margins
+rather than the sign test wherever the two disagree. **The verdict is unchanged from the sixteen-cell table this replaces**:
 nothing crosses a threshold, and the pattern — one CIFAR-100 fold carrying the margin, a headroom
 model that leads inside CIFAR-10 without reaching significance — is the same to within a
 percentage point of RMSE. The functional form is itself the winner of about ten candidates scored
 on the same points, so any apparent improvement is a best-of-ten selection statistic before it is
-anything else. And the power bound is still decisive: **at 11 design points a predictor needs
-|r| ≥ 0.602 — it must explain ≥ 36% of the between-design-point variance — to be visible at
+anything else. And the power bound is still decisive: **at 10 design points a predictor needs
+|r| ≥ 0.632 — it must explain ≥ 39.9% of the between-design-point variance — to be visible at
 p < 0.05**; seeing |r| = 0.4 would need ≈ 25 design points, which is not reachable by brute force.
 
-The level model earns its own sentence. Fitted on the ten CIFAR-10 points it predicts
-D(CIFAR-100) = **+4.36 against +1.56 observed**, an error of +2.80 pp — more than three times the
+The level model earns its own sentence. Fitted on the nine CIFAR-10 points it predicts
+D(CIFAR-100) = **+4.43 against +1.56 observed**, an error of +2.86 pp — more than three times the
 error of simply predicting the corpus mean. A covariate that is nominally resolved *within*
 CIFAR-10 (§5.6) and catastrophic the moment it is asked to leave it is a within-regime
 association, not a law.
@@ -2432,7 +2682,7 @@ and has no predictive content anyway.
 > accounts for 92.8% of it (§4.4, where the rival label is measured too), and
 > within a fixed base D is homogeneous (τ = 0.000, 95% upper limit 0.109 pp). What remains
 > unpredictable is the **continuous** part — no measurable scalar property of a configuration
-> predicts D out of sample better than the corpus mean by a margin this design, at 11 design
+> predicts D out of sample better than the corpus mean by a margin this design, at 10 design
 > points, can resolve.*
 
 The two statements are not in tension, and the estimands are worth separating explicitly. §4.4 is a
@@ -2710,8 +2960,8 @@ maximum of a bracketed 4-point grid: 94.172 / 94.844 / **95.124** / 94.181). The
 That is the *smallest* deficit in the corpus, not a typical one, and the network is doing the
 work. On ResNet-34 the best plain cell is 92.265 ± 0.053 (n = 9) against 94.823 ± 0.035 for
 AdamW + cosine, a deficit of **−2.558 ± 0.063**; on ResNet-50 it is 90.833 ± 0.236 against
-95.047 ± 0.110, a deficit of **−4.214 ± 0.260**. **The honest range is −1.8 to −4.2 pp behind
-a tuned schedule, and it widens with depth.**
+95.047 ± 0.110 for AdamW + cosine again, a deficit of **−4.214 ± 0.260**.
+**The honest range is −1.8 to −4.2 pp behind a tuned schedule, and it widens with depth.**
 
 The single highest MetaOptimize cell anywhere in the corpus is not the one above: it is
 93.967 ± 0.074 (n = 3; ResNet-34, layerwise, SGDm + Lion, η = 1e-3, α₀ = 1e-6, with this
@@ -2843,9 +3093,12 @@ larger**, and §4.4 now reports it in full: recomputed on the four end-of-traini
 deposited run table with the row filter and the cell set held fixed, the base-optimiser
 decomposition accounts for 92.8% of Cochran Q on `plateau5`, 86.8% on `final_test` with the level
 ordering inverted, 62.5% on the 20-epoch column, and on `best_test` it accounts for nothing,
-because Q = 9.87 on 13 df (p 0.70, τ = 0.000) leaves no heterogeneity to decompose. **The
+because Q = 9.87 on 13 df (χ² p 0.70, Monte-Carlo p 0.90, τ = 0.000) leaves no heterogeneity to decompose. **The
 count-matched sign result of §4.3 survives all four** (20 / 20, 20 / 20, 20 / 20, 19 / 20 cells,
-the exception unresolved at t −0.15 rather than reversed); the decomposition does not. `plateau5`
+the exception unresolved at t −0.15 rather than reversed); the decomposition does not. **§4.7's
+prescription faces the same knife and survives it**: T is positive in all twelve non-AdamW cells
+on all four endpoints (48 of 48) and its AdamW+Lion scope line holds on all four, while its
+resolution falls 12 / 12, 12 / 12, 8 / 12, 6 / 12. `plateau5`
 remains the primary and we do not switch to whichever endpoint flatters a claim — the disclosure
 is the repair.
 
@@ -2864,6 +3117,65 @@ offered as a benchmark result. The within-batch contrasts are much less exposed 
 no cell was selected, and §4.3 shows the reported set of count-matched contrasts is complete —
 but they are measured at a test-selected operating point, and `D` moves −0.189 pp per decade
 of η (§4.5). We cannot report a selection-free estimate of anything and we do not claim one.
+
+**T13 — The meta-analytic layer was referred to the wrong null, and this version carries the
+correction rather than softening the claim.** Every Cochran Q in this paper weights cells by
+w_i = se_i^-2, and every se_i is a Welch standard error built from two arms of three to six runs:
+over §4.4's fourteen cells the Welch–Satterthwaite degrees of freedom run from **2.04 to 9.68,
+median 2.91**. Q is therefore **not** χ²ₖ₋₁. Simulating this paper's own estimator under a
+homogeneous truth — 20,000 draws through the same `welch()` and the same DerSimonian–Laird
+`meta()`, `analysis/c99_qcalibration.py`, seed registered — gives a null Q on 13 df with **mean
+26.9, median 21.4 and 95th percentile 62.4**, against χ²₁₃'s 13, 12.3 and 22.4. §3.3 already
+conceded exactly this problem one layer down, for `t` at 2–4 df, and Welch-corrects every `t` in
+the paper on that ground; **the concession was not carried into the Q layer until now, and that
+inconsistency was ours.** Four consequences, stated here rather than left to be found.
+
+1. **Every χ² p-value on this layer is anticonservative, some of them by many orders of
+   magnitude.** Q = 102.47 is printed at p = 5.5e-16 and has Monte-Carlo p = 0.013 (0.002 under a
+   common-sd null); between-base Q = 95.12 is printed at p = 1.7e-20 and has Monte-Carlo
+   p = 0.005 (0.0007). Fourteen and seventeen orders of magnitude. Both p-values are now printed
+   at every site that carries one.
+2. **τ and I² are upper bounds**, because Eq. (12) subtracts k − 1 = 13 where the null mean of Q
+   is 26.9. Recentred on the simulated null, τ = 0.295 → 0.271 pp and I² = 87% → 74% (0.280 pp
+   and 79% under the common-sd null). We keep the standard estimator, which is what a reader will
+   recompute, and label it.
+3. **The pooled intervals undercover.** The eight-cell SGDm pool's ± 1.96 se interval covers 73%,
+   not 95%; its calibrated 95% half-width is ± 0.121 pp against the ± 0.088 that its se implies.
+   The fourteen-cell fixed-effect interval covers 65%, with a calibrated half-width of 0.089 pp
+   against 0.058. **No sign, ordering or per-cell quantity in this paper depends on either**:
+   nothing in Table 2 is pooled.
+4. **One quantity moves the other way, and we report it for that reason.** §4.4's one-sided 95%
+   Q-profile upper limit on the SGDm τ is 0.109 pp against χ²₇ and **0.097 pp** when the profile
+   is simulated at each trial τ: there the χ² reference is conservative. A correction that only
+   ever helped its authors would not be one.
+
+**What survives, and it is the whole of the claim.** The decomposition is not deleted and does
+not need to be. The heterogeneity resolves against its own simulated null (p = 0.013); the
+base-optimiser structure is confirmed by a test that uses *no* standard errors at all — an exact
+enumeration of all 45,045 partitions of the realised {8, 2, 2, 2} shape, η² = 0.840, rank 9,
+p = 0.00020 — and that permutation, not the χ² p, is what §1.1's third contribution now rests on.
+Every level remains homogeneous and by a wider margin than before: the calibrated p's are 0.70,
+0.30, 0.25 and 0.86 where the χ² values were 0.68, 0.24, 0.20 and 0.76, and the registered
+Q > 3.841 rule that §4.4 says the levels could have failed has a realised size of 0.10 rather
+than 0.05 (size-0.05 critical value 6.22), so not firing it is stronger evidence than the rule
+claimed. **What does not survive is the endpoint table's other three rows**: on the 20-epoch
+column Q = 29.37 (χ² p 0.0058) has Monte-Carlo p 0.24, and on `final_test` Q = 39.91 (χ² p
+1.4e−4) has Monte-Carlo p 0.16. §5.4's G family goes the same way: its twelve- and fourteen-cell
+Cochran Q's, 18.21 on 11 df and 28.25 on 13 df, read χ² p 0.077 and 0.0084 and **Monte-Carlo
+p 0.42 and 0.26** against their own simulated null (mean 20.1 and 24.0), so the fourteen are *not*
+heterogeneous where the twelve were not, and §5.4 no longer says they are. Two further χ²
+readings go with them: §5.4's fifteen-test G family, Q = 42.98 on 14 df at χ² p 8.6e-5 and
+Monte-Carlo p 0.12, and §5.5's momentum-present residual, Q = 34.64 on 9 df at χ² p 6.9e-5 and
+Monte-Carlo p 0.074. **Every heterogeneity this paper reads as resolved now carries the p of its
+own simulated null, and most do not survive it**: of the nine χ² readings that used to be read as
+resolved, **three** clear p < 0.05 on the calibrated reference — `plateau5`'s total Q (0.013), its
+between-base component (0.005) and `final_test`'s between-base component (0.025) — and six do
+not. **On a calibrated reference `plateau5` is the only endpoint of
+the four with resolved heterogeneity at all**, which makes §4.4's conditionality disclosure
+stronger rather than weaker. **What is untouched** is §4.3: D's sign is 20 / 20 on three
+endpoints and 19 / 20 on the fourth, every D, se and t in Table 2 is a within-cell Welch quantity
+already corrected for its own degrees of freedom, and none of them is a pooled quantity or a χ²
+reading.
 
 ---
 
@@ -2919,11 +3231,18 @@ differently-named runs that resolve to the same experiment plus the three `a0` r
 one member of each carries `superseded = 1` (§3.3). The column is exhaustive within a batch
 for every run that logs an `ENV:` line; it does not carry the nine cross-submission pairs of
 §4.1's parent cell, which §4.1 handles in text. Raw per-epoch series are the Slurm
-`.out` files in `logs/raw_out.tar.gz`; each carries its own `ARGS:` and `ENV:` line, which
-is the authority on what that run actually did. The shipped log set is **2,241 files, which is
-every `.out` file on either cluster**: 2,237 with an `ARGS:` line and the four infrastructure
-jobs that have none. There is no shortfall to state, and the `sm3` runs that an earlier version
-of this ledger carried as un-ingested are in the run table.
+`.out` files in `logs/raw_out.tar.gz`. The shipped log set is **2,241 files, which is every
+`.out` file in the two clusters' Slurm run directories** (1,322 and 919). **Neither provenance
+line is universal, and these are the counts.** **2,237** of the 2,241 carry their own `ARGS:`
+line — the **four** that do not are infrastructure jobs that ran no training (`gtest`,
+`gtest2`, `mo-smoke`, `ts-pretok`) — and **2,113** carry their own `ENV:` line, so **128 do
+not**: those four plus 124 that carry `ARGS:` without `ENV:` (103 on the first account, 25 on
+the second). The `ENV:` line was added to the submission template partway through the corpus, so
+every file missing one carries a Slurm job id at or below 4,680,828 while every file carrying
+one is at or above 4,680,676. Where a line is present it is the authority on what that run
+actually did, and RULE 20 is enforced on all 2,237 `ARGS:` lines. There is no shortfall in the
+log set itself, and the `sm3` runs that an earlier version of this ledger carried as un-ingested
+are in the run table.
 
 **Attrition — every job we launched, and where each one went.** The ledger below reconciles
 the Slurm output directories on both clusters against the run table, so that a reader can
@@ -3135,13 +3454,15 @@ optimisers, two meta-optimisers, two meta-stepsizes and two budgets; it survives
 to its own optimum (−0.090 ± 0.178, itself an upper bound in magnitude); it is present and
 resolved at 3× the budget; and its variation across configurations has a candidate moderator that
 we can decompose but not identify — splitting the fourteen same-contrast ResNet-18 cells by base
-optimiser leaves them homogeneous inside every level (Q 7.36 / 10 df, p 0.69) and accounts for
+optimiser leaves them homogeneous inside every level (Q 7.36 / 10 df, χ² p 0.69, Monte-Carlo
+p 0.86) and accounts for
 92.8% of the between-cell heterogeneity (Q 95.12 / 3 df), with all four levels now resting on two
 or more independent submissions and the SGDm level homogeneous at Q 4.21 / 7 df, p 0.76, τ 0.000,
 pool +0.556 ± 0.045. That share is a property of the grouping rather than of the label: batch
 identity accounts for 95.8% of the same Q, and the base optimiser survives conditioning on it only
 at ΔQ 4.11 on 2 df, p 0.13. It is also conditional on the endpoint, and §4.4 says so where it is
-stated: on `best_test` the same fourteen cells are homogeneous (Q 9.87 / 13 df, p 0.70, τ 0.000)
+stated: on `best_test` the same fourteen cells are homogeneous (Q 9.87 / 13 df, χ² p 0.70,
+Monte-Carlo p 0.90, τ 0.000)
 and there is nothing to decompose, and on `final_test` the level ordering inverts — whereas the
 count-matched sign result above holds on all four endpoints the corpus carries (20 / 20, 20 / 20,
 20 / 20, 19 / 20 cells). The measurement survives the choice of endpoint; the moderator does not.
@@ -3303,15 +3624,23 @@ without claiming to have identified its cause.
 The record stated that inside CIFAR-10 the corpus mean *wins* out of sample (0.2791 vs 0.2863) with
 a sign test of 8/11, p = 0.227. With `r50` and `ml2` added the headroom models were marginally
 ahead inside CIFAR-10 and the sign test was 9/11, p = 0.065. After the `gn1`-GroupNorm removal the
-design-point set was 10, the best model won inside CIFAR-10 by 0.040 RMSE (0.2791 → 0.2395, −14%)
-and the sign tests were 8/10 (p 0.109) overall and 7/9 (p 0.180) inside CIFAR-10. With `bm2`,
-`sm3` and `sm4` ingested the set is **11** — those four cells add one design point, not four,
-because three of them replicate a configuration already present — and the readings are 0.042 RMSE
-(0.2637 → 0.2222, −16%) with sign tests 9/11 (p 0.065) overall and 8/10 (p 0.109) inside CIFAR-10.
-The verdict is unchanged at every step — nothing reaches significance, the margin is dominated by
-one CIFAR-100 fold, the functional form is a best-of-ten selection, and the power bound, now
-|r| ≥ 0.602, is not approached — but the null holds by a narrower margin than the record implied,
-and we report the margin that re-derives rather than the record's phrasing.
+design-point set was recorded as 10, the best model won inside CIFAR-10 by 0.040 RMSE
+(0.2791 → 0.2395, −14%) and the sign tests were 8/10 (p 0.109) overall and 7/9 (p 0.180) inside
+CIFAR-10. Those counts are quoted as record: they were produced by an enumeration that split `rl3`
+at η = 3e-4 from `fa1`, two cells identical on every field of the stated key, while collapsing five
+batches together with a sixth in a different clip box. **With `bm2`, `sm3` and `sm4` ingested and
+the rule applied as written the set is 10, not the 11 the record carried** — those four cells add
+one design point, not four, because three of them replicate a configuration already present — and
+the readings are 0.046 RMSE (0.2809 → 0.2352, −16%) with sign tests 8/10 (p 0.109) overall and 7/9
+(p 0.180) inside CIFAR-10. The verdict is unchanged at every step — nothing reaches a threshold
+that survives adding or removing one fold, the margin is dominated by one CIFAR-100 fold, the
+functional form is a best-of-ten selection, and the power bound, now |r| ≥ 0.632, is not
+approached. Two things are worth logging rather than smoothing. The sixteen-cell step, regrouped
+by the corrected rule, would have read 9 points with a sign test of 8/9 (p 0.039), so that
+statistic has crossed 0.05 in both directions as folds were added; and naming the clip box in the
+key — the enumeration the record half-applied — gives 12 points and a sign test of 10/12
+(p 0.039), which §5.8 reports and declines. The null holds on the RMSE margins, which are stable,
+and by a narrower margin than the record implied.
 
 **A.6 — `fa1`'s ceiling caveat, stated precisely.** The record variously described `fa1`'s
 `nodewise` arm as grazing the ceiling in "5 of 6 seeds". The scorer's own occupancy table: all 24
@@ -3397,7 +3726,8 @@ contrast we exclude; its D (+0.697 ± 0.118) is quoted in §4.3 solely so the ex
 ## Data Availability
 
 The complete run table (`results/all_runs.csv`, 2,173 rows), the
-raw per-epoch Slurm logs (2,241 `.out` files, each carrying its own `ARGS:` and `ENV:` line),
+raw per-epoch Slurm logs (2,241 `.out` files, of which 2,237 carry their own `ARGS:` line and
+2,113 their own `ENV:` line; §8 itemises the exceptions),
 all submission scripts (`bin/`), all optimiser patches (`patches/`), all registered scorers
 (`analysis/`), the figure code and the reproduction audit are deposited as a single archive.
 **The deposit has no DOI**, because it has not been deposited; the artefact is identified by the

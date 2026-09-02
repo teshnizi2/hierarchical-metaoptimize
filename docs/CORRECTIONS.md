@@ -9089,3 +9089,169 @@ Each closes a claim that became false, or was already false, at integration time
   beside a live submission script, and `c98_release.py`'s new `skipfile()` filter keeps it out of
   the deposit. It is not committed.
 * The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).
+
+---
+
+## 131. Cycle 106 — THE SUBMISSION CANDIDATE: FOUR PACKAGES INTEGRATED INTO BOTH MARKUPS, ALL SEVEN BLOCKING ITEMS CLOSED, ZERO GPU
+
+Cycle 105's Q1 meta-gate returned MAJOR REVISIONS (7/10, 7 blocking, structural list empty).
+Four packages were written against those items and left as replacement text only
+(`paper/sections/v6-{calibration,false-sentences,design-points,endpoint-knife}.md`, closing
+B1/B2, B3/B4/B5/B7, B6 and B8). This cycle applied all four to **both** `paper/paper.tex` and
+`paper/DRAFT-v4.md`, re-derived every quantity the packages left in conflict, and verified the
+result mechanically. **No Slurm job was submitted. No registered scorer was edited.** The `hz3q`
+quartet was not disturbed.
+
+### 131.1 WHAT WAS APPLIED
+
+101 keyed replacements extracted programmatically from the four package documents (every anchor
+asserted `count == 1` against the live file at apply time — **101 of 101 unique, zero drift**
+since the packages were written), plus 30 integrator edits described below.
+
+* **B1/B2 (calibration)** — 23 tex + 23 md edits. Cochran `Q` is referred to its own simulated
+  null everywhere it carries a claim; `Q = 102.47` keeps its χ² p 5.5e-16 and gains **MC p
+  0.013**, between-base `Q = 95.12` gains **MC p 0.005**; τ and I² are labelled upper bounds
+  (0.295→0.271 pp, 87%→74% recentred); §4.4 leads with the **random-effects** pool
+  +0.611 ± 0.087 and labels the fixed-effect +0.530 ± 0.029 as what every other "pooled D" means;
+  the abstract carries the calibrated ±0.121 pp half-width; the weight-free exact permutation
+  (η² 0.840, rank 9 of 45,045, p 0.00020) becomes the moderator claim's evidence; §3.3 owns the
+  t-vs-Q inconsistency; §7 gains **T13**.
+* **B3/B4/B5/B7 (false-sentences)** — A.4's superseded 88.4 % pair deleted (tex `"88.4"` 4→3, now
+  equal to the md's 3); §8 and Data Availability print the measured log counts (2,241 files;
+  2,237 `ARGS:`; 2,113 `ENV:`; 128 files short an `ENV:` line, four of them short an `ARGS:` line
+  too) and are rescoped to *the two clusters' Slurm run directories*; the abstract names all
+  three comparators and drops "the state-of-the-art alternative"; `_census_claim()` gains a LaTeX
+  branch so §3.4's triple is asserted out of **both** markups (`[16]` now prints eight rows).
+* **B6 (design-points)** — §5.8's rule applied as written: **10** design points, not 11; §5.6 at
+  **9** CIFAR-10 points. Every dependent number reprinted, the 12-point sensitivity reported and
+  declined, and 71 assertion sites added.
+* **B8 (endpoint-knife)** — §4.7's prescription `T` put under §4.4's endpoint knife (12/12
+  non-AdamW cells positive on all four endpoints, 48 of 48; resolution 12/12, 12/12, 8/12, 6/12);
+  §4.7's "the largest `T` in the CIFAR-10 corpus" corrected (`r50` is larger); Contribution 6 and
+  §7 T10 stop being silent about the knife.
+
+### 131.2 CONFLICTS AND FALSE CLAIMS THE INTEGRATION EXPOSED — RE-DERIVED, NOT PICKED
+
+1. **The abstract went over its cap when B2 and B5 both landed.** Measured with the gate's own
+   `paperfactory.agents.text_quality`: `DRAFT-v4.md` reached **237** words against a 230 cap.
+   Eight words were bought back by compression that changes no claim, and the same compressions
+   were applied to `paper.tex` so the two stay parallel. Final: **tex 219, md 228**, both
+   `_abstract_defects == []`, longest sentence 32 words against a 62-word cap.
+2. **B2's rewording silently cost a reporting obligation.** Dropping "effect **size**" from the
+   abstract broke the only cue for *Main result with effect size and measurement stability*
+   (`reporting_profile.py:985`), taking `se_empirical` from 17/17 to **16/17**. "size" was
+   restored; verified back at **17/17** with both missing-item lists empty.
+3. **§3.3's new convention sentence was FALSE as integrated.** It said a Monte-Carlo `p` is
+   printed "beside every χ² p-value that carries a claim". It is not: the conditioning `ΔQ`'s,
+   the subset `Q`'s taken inside the SGDm level and the historical box partitions carry none.
+   The universal is **deleted**, not softened: the sentence now scopes itself to the χ² p-values
+   the paper reads as *resolving* heterogeneity, enumerates the exceptions by name, and states
+   the direction argument (every calibrated statistic moved its `p` **up**, so an uncalibrated
+   χ² `p` overstates significance and never understates it).
+4. **THREE FURTHER RESOLUTION CLAIMS DID NOT SURVIVE THE CORRECTION, AND ARE CORRECTED RATHER
+   THAN LEFT.** Calibrating them needed a new entry point in `c99_qcalibration.py`
+   (`gfamily_null`, `subpool_null`), each of which re-derives the paper's own printed `Q` through
+   the paper's own `welch()`/`meta()` and **asserts it** before simulating anything:
+   * §5.4's `G` family: twelve cells `Q = 18.21` on 11 df (χ² p 0.077, **MC p 0.42**, null mean
+     20.1) and fourteen cells `Q = 28.25` on 13 df (χ² p 0.0084, **MC p 0.26**, null mean 24.0).
+     *"The enlarged family is also heterogeneous where the pre-specified one was not"* is FALSE
+     on a correct reference — the contrast is a property of the reference — and is deleted.
+   * §5.4's fifteen-test `G` family: `Q = 42.98` on 14 df, χ² p 8.6e-5, **MC p 0.12**, null mean
+     26.1. *"The fifteen-test family is heterogeneous"* is withdrawn.
+   * §5.5's momentum-present residual: `Q = 34.64` on 9 df, χ² p 6.9e-5, **MC p 0.074**, null
+     mean 16.5. The largest residual the paper carries, and it does not resolve either. The
+     conclusion it supported ("the candidate moderator is the base optimiser, not any single
+     component of it") rests on the **share** comparison, 61.1 % against 92.8 %, which needs no
+     `p`, and the text now says so.
+   Net: of the **nine** χ² readings this paper used to read as resolved heterogeneity, **three**
+   clear p < 0.05 on the calibrated reference — `plateau5`'s total `Q` (0.013), its between-base
+   component (0.005) and `final_test`'s between-base component (0.025) — and six do not. §7 T13
+   states that count.
+5. **Figure 2's in-panel annotation** drew a bare χ² `p 0.69`. `c98_figures.py:396` now prints
+   `p 0.69 (MC 0.86)`, with the 0.86 **computed** from `c99_qcalibration` at the registered seed,
+   not typed; the figure was regenerated and the caption adjusted to match.
+6. **The census fixpoint.** All four packages and every integrator edit change both the assertion
+   count and the manuscript's numeral count. `--census` was iterated to a fixpoint in both files:
+   §3.4 now reads **557 claim-carrying assertions covering 372 of the 849 distinct
+   quantity-numerals, 43.8 %** (was 353 / 256 / 786 / 32.6 %), and `[16]` asserts that triple out
+   of `paper.tex` **and** `DRAFT-v4.md`.
+7. **`.gitignore` gains `*.bak*`.** `bin/c98_hz3_s5_box30.sh.bak_wall10` is still not committed
+   and still not deleted, but the tree is now genuinely clean, so `c98_release.py` no longer
+   stamps the deposit *"the working tree was DIRTY at build time"*. This is the same class of
+   defect cycle 102 caught, and `c98_release.py`'s own `skipfile()` filter already agreed.
+
+### 131.3 MECHANICAL VERIFICATION — PASTED, NOT SUMMARISED
+
+* `python3 analysis/c98_reproduce.py` → **ALL 565 CHECKS PASS**, exit 0, at a census fixpoint.
+  (HEAD 351d9a6 for comparison: ALL 357 PASS.) 208 assertion sites were added this cycle.
+* `tectonic -X compile paper.tex` → **exit 0**, 0 errors, 0 undefined references, **0 `??` in the
+  rendered text**, 71 pages (was 65). Overfull `\hbox` boxes: **the same three as the baseline,
+  at identical widths** 7.28497 pt, 20.28241 pt, 12.25499 pt — **zero new overfull boxes**.
+* Abstract: `paper.tex` **219** words, `DRAFT-v4.md` **228**, cap 230, `_abstract_defects == []`
+  on both; longest abstract sentence 32 words / 209 chars against caps of 62 / 430;
+  `assess_text_quality(paper.tex)['all_defects'] == []`;
+  `assess_reporting_completeness(paper.tex)['score'] == 17` with both missing-item lists empty.
+* Labels: **74 labels, 74 distinct refs, 0 orphans, 0 dangling refs, 0 duplicates**; 12 equation
+  labels, all cross-referenced.
+* **Numeric diff `paper.tex` vs `DRAFT-v4.md`** (all `/\d+\.\d+/`, `\label`/`\ref`/`\cite`
+  stripped, `{,}` and `\,` removed, thousands commas removed, markdown `§x.y` cross-references
+  stripped): tex-only residual multiset **27 occurrences at HEAD → 26 now**, md-only **41 → 41**.
+  **NEW residuals introduced this cycle: NONE, in either direction.** One pre-existing residual
+  was repaired: `88.4`, by B3. The 26 surviving tex-only occurrences are LaTeX layout parameters
+  (`\parskip 0.35em`, `\arraystretch 1.12`, `minipage{0.92\linewidth}`, four `p{}` column widths,
+  `\emergencystretch 3.5em`), `\S7.1`–`\S7.5` references to the *parent* paper's sections, and
+  multiset count differences on `0.05`, `0.15`, `0.30`, `0.4`, `3.0`. The 41 md-only are
+  markdown section numbers, arXiv identifiers and two extra `9.0`. All were present, identically,
+  at HEAD.
+* **Registered scorers, run UNEDITED (RULE 16), verdicts compared to what the paper quotes:**
+  * `c97_rp1_score.py` → exit 0. `VERDICT  T1 NULL | T1b CONSISTENT WITH NULL, UNDERPOWERED |
+    T2 draw: THE PERMUTATION DRAW IS EXCHANGEABLE AT THIS RESOLUTION`; `A = -0.018 pp (se 0.079,
+    t -0.23 on 5 df, p 0.8248)`; draw `F(2,10) 0.175, p 0.8423`. Matches §4.6 verbatim.
+  * `c87_rl3_score.py --runs <mirror>` → exit 0. `D(ms=1e-4) = +0.681 se 0.126`,
+    `dD = -0.090 se 0.178 t -0.51 (16 df)`, `VERDICT: RULE 11 CLOSED ON R18/CIFAR-10 -- tuning
+    each arm to its own argmax does not resolvably move D.` Matches §4.5's quote block verbatim.
+  * `c87_hz3_score.py --runs <mirror>` → exit 0. `D(300) = +0.407 se 0.065 t 6.31 (df 10.0)
+    n=6 v 6`; `D(300) on the plateau5-comparable 5-epoch window = +0.428 se 0.086`;
+    `VERDICT: MECHANISM SURVIVES THE HORIZON`. Matches §4.8.
+  * `c97_bm2_score.py --root ../runs/bm2` run **on the cluster where its probe records live**,
+    exactly as §4.4 says it was: R0.5 reads `T 10000 rec_lo 0.0000 rec_hi 0.0000` on all twelve
+    probe dirs; `D'_SGD base SGD +0.9780 +- 0.0858 t 11.40 3v3 -> REPLICATES`; `D'_RMS base
+    RMSProp +0.6313 +- 0.1492 t 4.23 3v3 -> REPLICATES`; `SGD ... -> pool +1.0000 +- 0.0673
+    Q 0.172 on 1 df -> REPLICATED (Q <= 3.841)`; `RMSProp ... -> pool +0.7204 +- 0.1283
+    Q 1.367 on 1 df -> REPLICATED (Q <= 3.841)`. **Verbatim identical** to §4.4's quote block.
+    Its `--selftest` passes 79/79.
+  * `c97_sm4_score.py --runs ../runs --probes ../runs/sm4`, likewise on the cluster:
+    `D = chunk777 - nodewise = +0.8893 +- 0.2285   t +3.89 (df 2.3, p 0.0494)   n 3v3`,
+    `95% CI [+0.4415, +1.3371]`, `VERDICT: REFUTED. D >= +0.55 ...`. **Verbatim identical** to
+    §5.5's quote block.
+  * Audit section `[14]`, which runs all ten deposit scorers unedited, still reports
+    **2 REACHED / 2 PARTIAL / 6 BLOCKED** and PASSES its three asserted counts.
+* **A latent bug in `c97_bm2_score.py`, found and NOT fixed** (RULE 16): its `--outs` path
+  (`rows_from_outs`) yields floats where `_f()` expects strings, so `--outs` crashes with
+  `AttributeError: 'float' object has no attribute 'strip'` — locally *and* on the cluster. The
+  `--csv` path, which is the one the paper's verdict was issued from, is unaffected. Logged, not
+  edited.
+
+### 131.4 STILL OPEN
+
+* **The `hz3q` quartet (jobs 4864632–35) is not ingested.** It was submitted the night before
+  this integration and is a disclosed sensitivity analysis, not a new cell; nothing in this
+  candidate depends on it. When it lands it must be scored with `c99_hz3q_score.py`, the parent
+  `c87_hz3_score.py` re-run unedited to confirm its output is unchanged, and four **new** rows
+  named `hz3q-*` ingested with no `dup_group` and no supersession.
+* **§4.7's opening still says "The practitioner's move"** four paragraphs before "For a
+  practitioner choosing an optimiser, this paper recommends nothing." The one-word repair
+  (*"The designer's move"*) was identified by the endpoint-knife package and deliberately left
+  out of scope; it belongs in its own entry.
+* **§4.7's ¶ footnote prints the `bn1`/`ml2` agreement as `z 1.06`**; it re-derives to
+  0.1927 / 0.1805 = **1.07**, outside the half-a-last-digit tolerance. Pre-existing, unasserted,
+  no package owns the line.
+* **Six χ² `p`-values are still uncalibrated by design** — the conditioning `ΔQ`'s, the four
+  moderator axes and the leave-one-cell-out sweep inside the SGDm level, and the eleven- and
+  thirteen-cell box partitions quoted as record. §3.3 names all of them and states why the
+  direction is conservative there. Calibrating them is a future cycle's work, not a defect.
+* **Appendix A.3b's disagreement is unchanged and unreconciled** — `rp1`'s run seed is a real
+  effect (F(5,10) = 4.634, p = 0.019) against the corpus seed null.
+* `bin/c98_hz3_s5_box30.sh.bak_wall10` is still untracked, now via `.gitignore` rather than by
+  leaving the tree dirty.
+* The nine `pp_`/`PP_` cross-submission pairs are still outside `dup_group` (A4 unchanged).

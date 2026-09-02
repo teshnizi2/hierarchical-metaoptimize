@@ -393,7 +393,12 @@ def fig2(rows, cs, numbers=False):
             zorder=3, label="within SGDm   Q %.2f, %d df" % (within, wdf))
     axR.text(0, between / 2, "%.0f%%\nof Q" % (100 * between / tot11[2]), ha="center",
              va="center", color="white", fontsize=8.0, zorder=5)
-    axR.annotate("p %.2f — the eight SGDm cells are\nhomogeneous, τ = %.3f" % (chi2_sf(within, wdf), sub["SGDm"][4]),
+    # The chi-square p of the within-level Q is anticonservative here (S3.3, S7 T13):
+    # its Monte-Carlo companion is computed, not typed, from the registered simulation.
+    import c99_qcalibration as _K
+    _mc = _K.mc_p(_K.qnull(_K.live_arms([r for r in rows if admissible(r)]), _K.DRAWS, _K.SEED, "percell")["W"], within)
+    axR.annotate("p %.2f (MC %.2f) — the eight SGDm cells are\nhomogeneous, τ = %.3f"
+                 % (chi2_sf(within, wdf), _mc, sub["SGDm"][4]),
                  xy=(0.26, between + within / 2), xytext=(0.40, between * 0.62),
                  fontsize=6.8, color=INK, ha="left", va="center",
                  arrowprops=dict(arrowstyle="-", color=MUTE, lw=0.7))

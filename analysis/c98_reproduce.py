@@ -707,6 +707,7 @@ def deposit(rows, adm, args):
 
 # ============================================================== THE COVERAGE CENSUS
 DRAFT = os.path.join(ROOT, "paper", "DRAFT-v4.md")
+TEX   = os.path.join(ROOT, "paper", "paper.tex")
 
 # A decimal numeral in the draft is a QUANTITY unless it is one of these.  The rule
 # is mechanical and is stated in §3.4 so a referee can re-run it.
@@ -901,6 +902,300 @@ def metricsens(rows, adm, args):
     chk("final_test rms se / plateau5 rms se", rf / r5, 2.5,
         "S4.4 endpoint paragraph", "%.1f")
 
+    # ------------- the SAME knife, applied to S4.7's prescription T ---------------
+    # S4.4 varies the endpoint under D.  T = nodewise1d - nodewise is Contribution 6
+    # and the paper's only actionable recommendation, so it faces the same knife or
+    # the disclosure is selective.  Everything is held fixed exactly as above -- the
+    # arm prefixes of S4.7's own table, the dup_group collapse, welch() -- and only
+    # the column read changes.  The twelve non-AdamW cells are the claim, the two
+    # AdamW+Lion cells and their pool are the scope line, sm4 is the exception.
+    T_ARMS = [("bn1", "bn1-n1d", "bn1-node"), ("ml2", "ml2-", "ml2-"),
+              ("fa1", "fa1-n1d", "fa1-node"), ("g3m", "g3m-n1d", "g3m-node"),
+              ("cc1", "cc1-n1d", "cc1-node"), ("r50", "r50-n1d", "r50-node"),
+              ("gm2", "gm2-n1d", "gm2-node"), ("hz3", "hz3-n1d", "hz3-node"),
+              ("nl1 SGD", "nl1-sgd-n1d", "nl1-sgd-node"),
+              ("nl1 RMSProp", "nl1-rms-n1d", "nl1-rms-node"),
+              ("rl3 @1e-4", "rl3-n1d-m1e4", "rl3-node-m1e4"),
+              ("rl3 @3e-4", "rl3-n1d-m3e4", "rl3-node-m3e4")]
+    # metric -> the values S4.7's endpoint table prints, in its own column order:
+    #   min T, max T, T > 0 of 12, resolved at t >= 3 of 12, rms se of the twelve,
+    #   AdamW+Lion pool and its se, sm4's T, se and t
+    T_METRIC = {
+     "plateau5":   (0.337, 1.363, 12, 12, 0.162,  0.007, 0.056, 0.988, 0.231, 4.28),
+     "plateau":    (0.407, 1.664, 12, 12, 0.104,  0.051, 0.062, 0.730, 0.084, 8.70),
+     "best_test":  (0.170, 1.280, 12,  8, 0.132, -0.111, 0.085, 0.393, 0.101, 3.89),
+     "final_test": (0.147, 1.630, 12,  6, 0.460,  0.106, 0.054, 0.723, 0.479, 1.51),
+    }
+    # metric -> hz3 box-matched 5 v 5 (T, t): the seed-5 trio is excluded for the T9
+    # clip-box and hardware mismatch, exactly as S4.7's footnote does on plateau5.
+    T_HZ3 = {"plateau5": (0.328, 3.89), "plateau": (0.432, 5.37),
+             "best_test": (0.338, 9.91), "final_test": (0.368, 4.11)}
+    print("\n   ==== S4.7's prescription T = nodewise1d - nodewise, under the same knife")
+    tpos = 0
+    for col in MS_METRICS:
+        lo, hi, posp, resp, rmsp, awp, awsep, s4, s4se, s4t = T_METRIC[col]
+        a_ = _arm_on(col)
+        g = {}
+        for lab, pa, pb in T_ARMS:
+            av, _ = a_(adm, pa, "nodewise1d"); bv, _ = a_(adm, pb, "nodewise")
+            g[lab] = welch(av, bv)
+        assert len(g) == 12, "the T cell set moved with the metric"
+        print("   ---- %s" % col)
+        chk("T  min of the twelve   %-11s" % col, min(x[0] for x in g.values()), lo,
+            "S4.7 endpoint table")
+        chk("T  max of the twelve   %-11s" % col, max(x[0] for x in g.values()), hi,
+            "S4.7 endpoint table")
+        npos = sum(1 for x in g.values() if x[0] > 0); tpos += npos
+        chk("   T > 0 of 12         %-11s" % col, npos, posp,
+            "S4.7 endpoint table, S1.1 C6", "%.0f")
+        chk("   ...resolved t >= 3  %-11s" % col,
+            sum(1 for x in g.values() if x[2] >= 3.0), resp,
+            "S4.7 endpoint table", "%.0f")
+        chk("   rms se of the twelve %-10s" % col,
+            math.sqrt(sum(x[1] ** 2 for x in g.values()) / 12.0), rmsp,
+            "S4.7 endpoint paragraph", "%.3f")
+        pool = []
+        for pa, pb in (("aw1-n1d", "aw1-node"), ("sm3-awrms-n1d", "sm3-awrms-node")):
+            av, _ = a_(adm, pa, "nodewise1d"); bv, _ = a_(adm, pb, "nodewise")
+            t_, se_, _ = welch(av, bv); pool.append((t_, se_))
+        m_, sem_, _Q, _df, _tau = meta(pool)
+        chk("   AdamW+Lion T pool   %-11s" % col, m_, awp,
+            "S4.7 endpoint table, S1.1 C6")
+        chk("      its se           %-11s" % col, sem_, awsep,
+            "S4.7 endpoint table", "%.3f")
+        av, _ = a_(adm, "sm4-awrms-n1d", "nodewise1d")
+        bv, _ = a_(adm, "sm4-awrms-node", "nodewise")
+        t_, se_, tt_ = welch(av, bv)
+        chk("   sm4 (AdamW+RMSProp) %-11s" % col, t_, s4, "S4.7 endpoint table")
+        chk("      its se           %-11s" % col, se_, s4se, "S4.7 endpoint table", "%.3f")
+        chk("      its t            %-11s" % col, tt_, s4t, "S4.7 endpoint table", "%.2f")
+        h = {}
+        for tag in ("hz3-n1d-s", "hz3-node-s"):
+            h[tag] = [float(r[col]) for r in adm
+                      if r["run"].startswith(tag) and (r.get(col) or "").strip()
+                      and r["run"] != tag + "5"]
+        assert len(h["hz3-n1d-s"]) == 5 and len(h["hz3-node-s"]) == 5, "hz3 is not 5 v 5"
+        th, _seh, tth = welch(h["hz3-n1d-s"], h["hz3-node-s"])
+        chk("   hz3 box-matched 5v5 %-11s" % col, th, T_HZ3[col][0], "S4.7 footnote")
+        chk("      its t            %-11s" % col, tth, T_HZ3[col][1],
+            "S4.7 footnote", "%.2f")
+    chk("T > 0 over 4 endpoints x 12 cells", tpos, 48,
+        "S4.7 endpoint paragraph, S1.1 C6", "%.0f")
+
+    # The two S4.7 claims that are orderings rather than numbers.  The second is the
+    # cycle-105 repair: "the largest T in the CIFAR-10 corpus" was FALSE of sm4 --
+    # r50 reads +1.049 against sm4's +0.988 -- and is true only at ResNet-18.
+    pl5a = _arm_on("plateau5")
+    Tv = {}
+    for lab, pa, pb in T_ARMS + [("sm4", "sm4-awrms-n1d", "sm4-awrms-node")]:
+        av, _ = pl5a(adm, pa, "nodewise1d"); bv, _ = pl5a(adm, pb, "nodewise")
+        Tv[lab] = welch(av, bv)[0]
+    top18 = max([l for l in Tv if l not in ("g3m", "r50", "gm2")], key=lambda l: Tv[l])
+    topc10 = max([l for l in Tv if l != "gm2"], key=lambda l: Tv[l])
+    for nm, got_, want in (("largest T at R18 / C10, plateau5", top18, "sm4"),
+                           ("largest T over the CIFAR-10 corpus", topc10, "r50")):
+        ok = got_ == want
+        if not ok: FAILS.append((nm, got_, want, "S4.7 sm4 paragraph"))
+        print("      %-46s %-12s | paper %-12s | %s"
+              % (nm, got_, want, "PASS" if ok else "**FAIL**"))
+    av, _ = pl5a(adm, "r50-n1d", "nodewise1d"); bv, _ = pl5a(adm, "r50-node", "nodewise")
+    _t, _se, _tt = welch(av, bv)
+    chk("   r50's T, the true CIFAR-10 maximum", _t, 1.049, "S4.7 sm4 paragraph")
+    chk("      its se", _se, 0.317, "S4.7 sm4 paragraph, S4.7 table", "%.3f")
+    # ...and how many ResNet-18 / CIFAR-10 cells overtake sm4 on the two single-epoch
+    # columns, which is why the repaired superlative is still plateau5-specific.
+    R18C10 = [l for l, _a, _b in T_ARMS if l not in ("g3m", "r50", "gm2")]
+    for col, paper in (("best_test", 4), ("final_test", 2)):
+        a_ = _arm_on(col)
+        def _T(pa, pb):
+            av, _ = a_(adm, pa, "nodewise1d"); bv, _ = a_(adm, pb, "nodewise")
+            return welch(av, bv)[0]
+        s4v = _T("sm4-awrms-n1d", "sm4-awrms-node")
+        others = dict([(l, _T(pa, pb)) for l, pa, pb in T_ARMS if l in R18C10] +
+                      [("aw1", _T("aw1-n1d", "aw1-node")),
+                       ("sm3", _T("sm3-awrms-n1d", "sm3-awrms-node"))])
+        chk("   R18/C10 cells besides sm4", len(others), 11,
+            "S4.7 sm4 paragraph", "%.0f")
+        chk("   ...larger than sm4 on %-11s" % col,
+            sum(1 for v in others.values() if v > s4v), paper,
+            "S4.7 sm4 paragraph", "%.0f")
+
+    # The scope line, stated exactly: the two AdamW+Lion cells against the registered
+    # band cell by cell (the form S3.4 actually registered), and the pool's interval.
+    inband = 0
+    for col in MS_METRICS:
+        a_ = _arm_on(col); pool = []
+        for lab, pa, pb in (("aw1", "aw1-n1d", "aw1-node"),
+                            ("sm3", "sm3-awrms-n1d", "sm3-awrms-node")):
+            av, _ = a_(adm, pa, "nodewise1d"); bv, _ = a_(adm, pb, "nodewise")
+            t_, se_, _ = welch(av, bv); pool.append((t_, se_))
+            if abs(t_) <= 0.15: inband += 1
+            if lab == "aw1" and col == "final_test":
+                chk("   aw1 on final_test -- the UNDECIDED reading", t_, 0.253,
+                    "S4.7 endpoint paragraph")
+                chk("      its se", se_, 0.109, "S4.7 endpoint paragraph", "%.3f")
+        m_, sem_, _Q, _df, _tau = meta(pool)
+        if col == "plateau5":
+            chk("   AdamW+Lion pool 95% CI low", m_ - 1.96 * sem_, -0.104,
+                "S4.7 endpoint paragraph")
+            chk("      ...CI high", m_ + 1.96 * sem_, 0.117, "S4.7 endpoint paragraph")
+        n_in = sum(1 for x in [(m_ - 1.96 * sem_), (m_ + 1.96 * sem_)]
+                   if abs(x) <= 0.15)
+        if col != "plateau5" and n_in == 2:
+            FAILS.append(("AdamW+Lion pool interval inside the band on " + col,
+                          "yes", "plateau5 only", "S4.7 endpoint paragraph"))
+    chk("AdamW+Lion cell readings inside the band, of 8", inband, 7,
+        "S4.7 endpoint paragraph", "%.0f")
+    r12 = {}
+    for col in ("plateau5", "final_test"):
+        a_ = _arm_on(col)
+        r12[col] = math.sqrt(sum(welch(a_(adm, pa, "nodewise1d")[0],
+                                       a_(adm, pb, "nodewise")[0])[1] ** 2
+                                 for _l, pa, pb in T_ARMS) / 12.0)
+    chk("T rms se, final_test / plateau5", r12["final_test"] / r12["plateau5"], 2.8,
+        "S4.7 endpoint paragraph", "%.1f")
+
+
+# ======================= NEW: the Q calibration (S3.3, S4.4, S7 T13, Fig. 2)
+# S4.4 refers Cochran Q to chi2_{k-1}, but its weights w_i = se_i^-2 come from Welch
+# standard errors estimated at 2.04-9.68 df (median 2.91), so chi2 is the wrong
+# reference and every Q p-value on that layer is anticonservative.  c99_qcalibration
+# simulates the paper's OWN estimator -- the same welch(), the same DerSimonian-Laird
+# meta() -- under a homogeneous truth and gives the reference Q actually has.  The
+# seed and draw count are REGISTERED in c99_qcalibration (SEED, DRAWS); changing
+# either changes every number below, which is why they live there and not here.
+# This section is numbered [15b] on purpose: S3.4 names "section [16]" as the census
+# self-check, and renumbering censuscheck would silently falsify that sentence.
+def calibration(rows, adm, args):
+    print("\n[15b] Q CALIBRATION  (S3.3, S4.4, S7 T13, Fig. 2)")
+    import c99_qcalibration as K
+    cs = K.live_arms(adm)
+    chk("cells in the calibrated pool", len(cs), 14, "S4.4, T13", "%.0f")
+    print("   fast estimator agrees with welch() to %.1e  (seed %d, %d draws)"
+          % (K.check_estimator_fidelity(cs, K.SEED), K.SEED, K.DRAWS))
+    dfs = [K.welch_df(c) for c in cs]
+    chk("min Welch df of the fourteen cells", min(dfs), 2.04, "S3.3, T13", "%.2f")
+    chk("median Welch df -- why chi2 is the wrong reference", st.median(dfs), 2.91,
+        "S3.3, S4.4, T13", "%.2f")
+    chk("max Welch df", max(dfs), 9.68, "S3.3, T13", "%.2f")
+    psd, pdf = K.pooled_arm_sd(cs)
+    chk("pooled within-arm sd (the common-sd null)", psd, 0.186, "S3.3", "%.3f")
+    chk("   its df", pdf, 70, "S3.3", "%.0f")
+
+    obs = K.observed(cs)
+    per = K.qnull(cs, K.DRAWS, K.SEED, "percell")
+    com = K.qnull(cs, K.DRAWS, K.SEED, "common")
+    chk("null Q on 13 df: mean", st.mean(per["Q"]), 26.9, "S7 T13", "%.1f")
+    chk("   median", K.quant(per["Q"], .5), 21.4, "S7 T13", "%.1f")
+    chk("   95th percentile", K.quant(per["Q"], .95), 62.4, "S7 T13", "%.1f")
+    chk("MC p of Q = 102.47", K.mc_p(per["Q"], obs["Q"]), 0.013,
+        "abstract, S1, S4.4, S7 T13, Fig. 2", "%.3f")
+    chk("   ...under the common-sd null", K.mc_p(com["Q"], obs["Q"]), 0.002,
+        "S4.4, S7 T13", "%.3f")
+    chk("MC p of between-base Q = 95.12", K.mc_p(per["B"], obs["between"]), 0.005,
+        "S1, S4.4, S7 T13, Fig. 2", "%.3f")
+    chk("   ...under the common-sd null", K.mc_p(com["B"], obs["between"]), 0.0007,
+        "S7 T13", "%.4f")
+    chk("MC p of within-level Q = 7.36", K.mc_p(per["W"], obs["within"]), 0.86,
+        "S1, S4.4, Fig. 2", "%.2f")
+    for b, p in (("SGD", 0.70), ("RMSProp", 0.30), ("SGDm", 0.86), ("AdamW", 0.25)):
+        chk("MC p of the %-8s level Q" % b, K.mc_p(per["LV"][b], obs["per"][b]), p,
+            "S1.1 C3, S4.4 table, Fig. 2", "%.2f")
+    chk("null median of the SGDm level Q (7 df)", K.quant(per["LV"]["SGDm"], .5), 9.4,
+        "abstract, S1, S4.4", "%.1f")
+
+    # tau and I^2 subtract k-1 = 13 where the null mean is 26.9: UPPER BOUNDS.
+    w = [1.0 / se ** 2 for _, se in obs["items"]]
+    W = sum(w); den = W - sum(x ** 2 for x in w) / W
+    e = st.mean(per["Q"])
+    chk("tau recentred on the null mean", math.sqrt(max(0.0, (obs["Q"] - e) / den)),
+        0.271, "S4.4, S7 T13", "%.3f")
+    chk("I^2 recentred on the null mean", 100 * max(0.0, (obs["Q"] - e) / obs["Q"]),
+        73.7, "S4.4, S7 T13", "%.1f")
+
+    # the intervals
+    sg = [c for c in cs if c["base"] == "SGDm"]
+    sper = K.qnull(sg, K.DRAWS, K.SEED, "percell")
+    chk("coverage of the SGDm pool's +-1.96 se interval, %", 100 * K.coverage(sper, 1.96),
+        73.0, "abstract, S4.4, S7 T13", "%.1f")
+    chk("   its calibrated 95% half-width, pp", K.half_width(sper), 0.121,
+        "abstract, S1, S4.4, S7 T13", "%.3f")
+    chk("   the nominal half-width it replaces", 1.96 * K.observed(sg)["se"], 0.088,
+        "S1, S7 T13", "%.3f")
+    chk("coverage of the 14-cell fixed-effect interval, %", 100 * K.coverage(per, 1.96),
+        65.2, "S4.4, S7 T13", "%.1f")
+    chk("   its calibrated 95% half-width, pp", K.half_width(per), 0.089,
+        "S4.4, S7 T13", "%.3f")
+    m_re, se_re = K.re_pool(obs["items"], obs["tau"])
+    chk("random-effects pool over the fourteen", m_re, 0.611, "S4.4")
+    chk("   its se", se_re, 0.087, "S4.4", "%.3f")
+    chk("   its 95% CI, low", m_re - 1.96 * se_re, 0.441, "S4.4")
+    chk("   ...high", m_re + 1.96 * se_re, 0.782, "S4.4")
+
+    # the one quantity chi2 gets CONSERVATIVELY wrong
+    chk("calibrated Q-profile upper limit on the SGDm tau",
+        K.tau_upper(sg, K.DRAWS, K.SEED), 0.097, "S4.4, S7 T13", "%.3f")
+    # the registered 1-df decision rule
+    sz, cv = K.rule_size(cs, K.DRAWS, K.SEED)
+    chk("realised size of the registered Q > 3.841 rule", sz, 0.10, "S4.4, S7 T13", "%.2f")
+    chk("   its size-0.05 critical value, not 3.841", cv, 6.22, "S7 T13", "%.2f")
+
+    # THE LOAD-BEARING STATISTIC: no se enters it anywhere.
+    e0, ge, tot, pp_, med, p95, mx = K.permutation_eta2(cs)
+    chk("weight-free eta^2, base-optimiser grouping", e0, 0.840,
+        "S1, S1.1 C3, S4.4, S7 T13, Fig. 2", "%.3f")
+    chk("   partitions of shape {8,2,2,2}", tot, 45045, "S4.4", "%.0f")
+    chk("   the base partition's rank among them", ge, 9, "S4.4, S7 T13", "%.0f")
+    chk("   its EXACT permutation p", pp_, 0.00020,
+        "S1, S4.4, S7 T13, Fig. 2", "%.5f")
+    chk("   null eta^2 median", med, 0.200, "S4.4", "%.3f")
+    s0, ge2, tot2, p2 = K.permutation_share(cs)
+    chk("   the WEIGHTED share permutation the paper already prints", p2, 0.00031,
+        "S4.4 -- cross-check that this enumeration is the paper's own", "%.5f")
+
+    # the endpoint disclosure, calibrated.  plateau5 stays primary.
+    END = {"plateau5":   (0.013, 0.005, 0.840, 0.00020, 0.611),
+           "plateau":    (0.24,  0.099, 0.800, 0.00029, 0.480),
+           "best_test":  (0.90,  0.60,  0.276, 0.33851, 0.396),
+           "final_test": (0.16,  0.025, 0.670, 0.00757, 0.674)}
+    for col in MS_METRICS:
+        mcq, mcb, eta, pe, rem = END[col]
+        ec = K.live_arms(adm, _arm_on(col)); o = K.observed(ec)
+        s = K.qnull(ec, K.DRAWS, K.SEED, "percell")
+        chk("MC p of Q, %-11s" % col, K.mc_p(s["Q"], o["Q"]), mcq,
+            "S4.4 endpoint table, S7 T13", "%.3f" if col == "plateau5" else "%.2f")
+        chk("   MC p of between-base Q, %-11s" % col, K.mc_p(s["B"], o["between"]), mcb,
+            "S4.4 endpoint note, S7 T13", "%.3f")
+        q_ = K.permutation_eta2(ec)
+        chk("   weight-free eta^2, %-11s" % col, q_[0], eta, "S4.4 endpoint note", "%.3f")
+        chk("      its exact p, %-11s" % col, q_[3], pe, "S4.4 endpoint note", "%.5f")
+        chk("   random-effects pool, %-11s" % col,
+            K.re_pool([K._welch(c["cv"], c["nv"]) for c in ec], o["tau"])[0], rem,
+            "S4.4 endpoint note")
+    # S5.4's Gstat family, calibrated the same way -- a DIFFERENT contrast (chunk2325
+    # minus nodewise1d) and therefore its own null.  K.gfamily_null re-derives both Q's
+    # from the raw arms through the paper's own welch()/meta() and asserts they equal the
+    # printed 18.21 and 28.25 before it simulates anything.  Neither resolves, so S5.4's
+    # old "heterogeneous where the pre-specified one was not" was a property of the
+    # reference and is corrected in the manuscript rather than restated.
+    g = K.gfamily_null(adm, K.DRAWS, K.SEED)
+    chk("G family, twelve cells: Q", g["12"][0], 18.21, "S5.4", "%.2f")
+    chk("   its MC p", g["12"][3], 0.42, "S5.4, S7 T13", "%.2f")
+    chk("   its null Q mean on 11 df", g["12"][4], 20.1, "S5.4, S7 T13", "%.1f")
+    chk("G family, fourteen cells: Q", g["14"][0], 28.25, "S5.4", "%.2f")
+    chk("   its MC p -- NOT resolved", g["14"][3], 0.26, "S5.4, S7 T13", "%.2f")
+    chk("   its null Q mean on 13 df", g["14"][4], 24.0, "S5.4, S7 T13", "%.1f")
+    chk("G family, fifteen with bn1: Q", g["15"][0], 42.98, "S5.4", "%.2f")
+    chk("   its MC p -- NOT resolved", g["15"][3], 0.12, "S5.4, S7 T13", "%.2f")
+    chk("   its null Q mean on 14 df", g["15"][4], 26.1, "S5.4, S7 T13", "%.1f")
+    mres = K.subpool_null([c for c in cs if c["base"] in ("SGDm", "AdamW")],
+                          K.DRAWS, K.SEED)
+    chk("momentum-present residual Q (S4.5's 2x2 collapse)", mres[0], 34.64, "S4.5", "%.2f")
+    chk("   its MC p -- NOT resolved", mres[3], 0.074, "S4.5, S7 T13", "%.3f")
+    chk("   its null Q mean on 9 df", mres[4], 16.5, "S4.5, S7 T13", "%.1f")
+    chk("null mean of the best_test Q -- why 'below its own df' is the wrong test",
+        st.mean(K.qnull(K.live_arms(adm, _arm_on("best_test")), K.DRAWS, K.SEED,
+                        "percell")["Q"]), 25.3, "S4.4 reading 1", "%.1f")
 
 # ------------------------------------------------- the census, ASSERTED not measured
 # §3.4 of the manuscript prints this audit's own coverage.  Until cycle 102 `--census`
@@ -930,15 +1225,28 @@ _CENSUS_RE = re.compile(
     r"([\d.]+)% of them)?")
 
 def _census_claim(path):
-    """(assertions, covered, distinct, pct) as §3.4 PRINTS them, or None."""
-    flat = re.sub(r"[*`\s]+", " ", open(path).read())
+    """(assertions, covered, distinct, pct) as §3.4 PRINTS them, or None.
+
+    Reads BOTH markups.  DRAFT-v4.md needs only markdown emphasis flattened.
+    paper.tex additionally wraps the triple in \\textbf{...} and escapes the per
+    cent sign, so the LaTeX branch strips the markup macro names, the braces and
+    the backslash before the shape regex runs.  Neither branch touches a digit,
+    and neither re-censuses the .tex: the QUANTITY count is defined by census()'s
+    fence rule, which is a markdown rule, so there is one measurement and both
+    files must print it."""
+    raw = open(path).read()
+    if path.endswith(".tex"):
+        raw = re.sub(r"\\(?:textbf|textit|emph|mathbf|texttt|mathrm)\s*\{", "{", raw)
+        raw = raw.replace("\\%", "%").replace("\\,", " ").replace("~", " ")
+        raw = raw.replace("{", " ").replace("}", " ")
+    flat = re.sub(r"[*`\s]+", " ", raw)
     m = _CENSUS_RE.search(flat)
     if not m: return None
     n, c, q, p = m.groups()
     return int(n), int(c), int(q), (float(p) if p else None)
 
 def censuscheck(rows, adm, args):
-    """§3.4's coverage sentence, re-measured and asserted against the manuscript."""
+    """§3.4's coverage sentence, re-measured and asserted against BOTH markups."""
     global CENSUS_MARK
     print("\n[16] THE COVERAGE CENSUS, ASSERTED  (§3.4 Registration and scope)")
     if not getattr(args, "_full", True):
@@ -950,29 +1258,318 @@ def censuscheck(rows, adm, args):
         skip("censuscheck", "no manuscript in this tree (the deposit ships none), "
                             "so §3.4's coverage cannot be re-measured here")
         return
-    claim = _census_claim(path)
-    if claim is None:
-        FAILS.append(("§3.4 coverage sentence not parseable", "-", "-",
-                      "expected the shape: " + CENSUS_SHAPE))
-        print("  **FAIL** could not find §3.4's coverage sentence in %s."
-              % os.path.relpath(path, ROOT))
-        print("           expected shape:  %s" % CENSUS_SHAPE)
+    # The MEASUREMENT is taken once, on the markdown draft.  The ASSERTION is made
+    # against every markup present, so a triple that goes stale in paper.tex alone
+    # -- which §3.4 used to claim was impossible, while [16] only ever read the
+    # draft -- now exits non-zero instead of passing quietly.
+    targets = [path]
+    if os.path.abspath(path) == os.path.abspath(DRAFT) and os.path.exists(TEX):
+        targets.append(TEX)
+    claims = {}
+    for q_ in targets:
+        c_ = _census_claim(q_)
+        if c_ is None:
+            FAILS.append(("§3.4 coverage sentence not parseable in %s"
+                          % os.path.relpath(q_, ROOT), "-", "-",
+                          "expected the shape: " + CENSUS_SHAPE))
+            print("  **FAIL** could not find §3.4's coverage sentence in %s."
+                  % os.path.relpath(q_, ROOT))
+            print("           expected shape:  %s" % CENSUS_SHAPE)
+        else:
+            claims[q_] = c_
+    if not claims:
         return
-    p_sites, p_cov, p_qd, p_pct = claim
     CENSUS_MARK = len(ASSERTED)      # freeze BEFORE asserting: see census()
     _n_tok, n_qd, _n_q, n_cov = census(path, quiet=True)
-    chk("chk() assertion sites executed", CENSUS_MARK, p_sites, "§3.4", "%.0f")
-    chk("distinct quantity-numerals asserted", n_cov, p_cov, "§3.4", "%.0f")
-    chk("distinct quantity-numerals in the draft", n_qd, p_qd, "§3.4", "%.0f")
-    if p_pct is not None:
-        chk("coverage of distinct quantity-numerals",
-            100.0 * n_cov / n_qd if n_qd else 0.0, p_pct, "§3.4", "%.1f")
+    for q_, (p_sites, p_cov, p_qd, p_pct) in claims.items():
+        tag = os.path.basename(q_)
+        chk("sites executed        %-20s" % tag, CENSUS_MARK, p_sites,
+            "§3.4", "%.0f")
+        chk("distinct numerals asserted %-15s" % tag, n_cov, p_cov, "§3.4", "%.0f")
+        chk("distinct numerals in draft %-15s" % tag, n_qd, p_qd, "§3.4", "%.0f")
+        if p_pct is not None:
+            chk("coverage of distinct numerals %-12s" % tag,
+                100.0 * n_cov / n_qd if n_qd else 0.0, p_pct, "§3.4", "%.1f")
     print("    (the `paper` column here is §3.4's own sentence, read out of %s."
+          % " and ".join(os.path.relpath(q_, ROOT) for q_ in claims))
+    print("     The COUNT is measured on %s alone -- one measurement, both markups"
           % os.path.relpath(path, ROOT))
-    print("     A FAIL means that sentence has gone stale, not that a result moved:")
-    print("     re-run with --census and write the printed triple into §3.4 in BOTH")
-    print("     paper.tex and DRAFT-v4.md, then re-run to a fixpoint.)")
+    print("     assert it.  A FAIL means that sentence has gone stale, not that a")
+    print("     result moved: re-run with --census and write the printed triple into")
+    print("     §3.4 in BOTH paper.tex and DRAFT-v4.md, then re-run to a fixpoint.)")
 
+
+# ================================================ NEW: the design-point set, §5.6 / §5.8
+# B6.  §5.8 states a design-point rule -- same network, dataset, base--meta pairing,
+# eta and budget -- and the enumeration that follows it printed ELEVEN points while the
+# rule itself yields TEN: `rl3` at eta 3e-4 and `fa1` are identical on every element of
+# the key and differ only in the step-size clip box, which the same enumeration already
+# collapses across for its six-batch point and which §4.4 measures and rejects as a
+# moderator.  This section applies the rule as written and asserts every number §5.6 and
+# §5.8 print under it, including the 12-point sensitivity the paper reports and rejects.
+DP_KEY = lambda c: (c["network"], c["dataset"], c["base"], c["eta"], c["epochs"])
+
+def _dp_instr(adm):
+    """The tail-free instrument of §5.6: mean of the chunk2325 and nodewise1d arms."""
+    out = {}
+    for (lab, net, ds, base, eta, ep, ch, nd, c23, n1d) in F.CELLS:
+        if lab == F.GN_CELL and not F.WITH_GN: continue
+        if not (c23 and n1d): continue
+        gv, _ = arm(adm, *c23); hv, _ = arm(adm, *n1d)
+        if gv and hv: out[lab] = 0.5 * (st.mean(gv) + st.mean(hv))
+    return out
+
+def _dp_box(rows):
+    """The beta_clip box(es) each cell's own D arms ran in, read off the CSV."""
+    out = {}
+    for (lab, net, ds, base, eta, ep, ch, nd, c23, n1d) in F.CELLS:
+        if lab == F.GN_CELL and not F.WITH_GN: continue
+        b = set()
+        for pre, gran in (ch, nd):
+            b |= {r["beta_clip"] for r in rows
+                  if r["run"].startswith(pre) and r["granularity"] == gran}
+        out[lab] = "+".join(sorted(b))
+    return out
+
+def _dp_points(cs, keyfn, instr):
+    g = {}
+    for c in cs: g.setdefault(keyfn(c), []).append(c)
+    pts = []
+    for cl in g.values():
+        ins = [instr[c["label"]] for c in cl if c["label"] in instr]
+        pts.append(dict(labels=[c["label"] for c in cl],
+                        D=st.mean([c["D"] for c in cl]),
+                        level=st.mean([c["aligned"] for c in cl]),
+                        headroom=st.mean([c["headroom"] for c in cl]),
+                        instr=(st.mean(ins) if ins else None),
+                        dataset=cl[0]["dataset"], network=cl[0]["network"],
+                        base=cl[0]["base"]))
+    return sorted(pts, key=lambda p: (p["dataset"], -p["D"]))
+
+def _dp_fit_mean(tr):
+    m = st.mean([q["D"] for q in tr]);  return lambda p: m
+def _dp_fit_origin(tr, x):
+    k = sum(x(q) * q["D"] for q in tr) / sum(x(q) ** 2 for q in tr)
+    return lambda p: k * x(p)
+def _dp_fit_ols(tr, x):
+    n = len(tr); xs = [x(q) for q in tr]; ys = [q["D"] for q in tr]
+    mx = sum(xs) / n; my = sum(ys) / n
+    sxx = sum((v - mx) ** 2 for v in xs)
+    if sxx == 0: return lambda p: my           # dummy is constant in this fold
+    b = sum((v - mx) * (y - my) for v, y in zip(xs, ys)) / sxx
+    return lambda p: (my - b * mx) + b * x(p)
+DP_MODELS = [
+    ("mean (baseline)",   _dp_fit_mean),
+    ("k*log(headroom)",   lambda tr: _dp_fit_origin(tr, lambda q: math.log(q["headroom"]))),
+    ("CIFAR-100 dummy",   lambda tr: _dp_fit_ols(tr, lambda q: 1.0 if q["dataset"] == "C100" else 0.0)),
+    ("k*headroom",        lambda tr: _dp_fit_origin(tr, lambda q: q["headroom"])),
+    ("level (OLS)",       lambda tr: _dp_fit_ols(tr, lambda q: q["level"]))]
+
+def _dp_loo(pts):
+    out = {}
+    for name, fit in DP_MODELS:
+        e = [fit([q for j, q in enumerate(pts) if j != i])(p) - p["D"]
+             for i, p in enumerate(pts)]
+        c10 = [v for v, p in zip(e, pts) if p["dataset"] == "C10"]
+        out[name] = (math.sqrt(sum(v * v for v in e) / len(e)),
+                     math.sqrt(sum(v * v for v in c10) / len(c10)), e)
+    return out
+
+def _dp_binom2(w, n):
+    from math import comb
+    lo = min(w, n - w)
+    return min(1.0, 2.0 * sum(comb(n, i) for i in range(lo + 1)) / 2 ** n)
+
+def _dp_ols(xs, ys):
+    n = len(xs); mx = sum(xs) / n; my = sum(ys) / n
+    sxx = sum((v - mx) ** 2 for v in xs)
+    sxy = sum((v - mx) * (y - my) for v, y in zip(xs, ys))
+    b = sxy / sxx; a = my - b * mx
+    res = [y - (a + b * v) for v, y in zip(xs, ys)]
+    se = math.sqrt(sum(r * r for r in res) / (n - 2) / sxx) if n > 2 else float("nan")
+    syy = sum((y - my) ** 2 for y in ys)
+    return b, se, b / se, sxy / math.sqrt(sxx * syy)
+
+def _dp_perm(xs, ys):
+    """Exact two-sided permutation p for the OLS slope.  sxx and both means are fixed
+    under permutation of y, so |b| is monotone in |sum(x_i y_sigma(i)) - n mx my|."""
+    import itertools
+    n = len(xs); mx = sum(xs) / n; my = sum(ys) / n; c = n * mx * my
+    obs = abs(sum(a * b for a, b in zip(xs, ys)) - c)
+    hit = tot = 0
+    for pm in itertools.permutations(ys):
+        tot += 1
+        if abs(sum(a * b for a, b in zip(xs, pm)) - c) >= obs - 1e-9: hit += 1
+    return hit / tot
+
+def _dp_critr(n):
+    """Two-sided 5% critical Pearson r at df = n-2: bisect the Student-t survival
+    function, written as a regularised incomplete beta (Numerical Recipes 6.4)."""
+    df = n - 2
+    def _betacf(a, b, x):
+        tiny = 1e-30; c = 1.0; d = 1 - (a + b) * x / (a + 1)
+        if abs(d) < tiny: d = tiny
+        d = 1 / d; h = d
+        for m in range(1, 300):
+            m2 = 2 * m
+            aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2))
+            d = 1 + aa * d; c = 1 + aa / c
+            if abs(d) < tiny: d = tiny
+            if abs(c) < tiny: c = tiny
+            d = 1 / d; h *= d * c
+            aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1))
+            d = 1 + aa * d; c = 1 + aa / c
+            if abs(d) < tiny: d = tiny
+            if abs(c) < tiny: c = tiny
+            d = 1 / d; de = d * c; h *= de
+            if abs(de - 1) < 1e-14: break
+        return h
+    def _betainc(a, b, x):
+        if x <= 0: return 0.0
+        if x >= 1: return 1.0
+        lb = math.lgamma(a + b) - math.lgamma(a) - math.lgamma(b)
+        if x < (a + 1) / (a + b + 2):
+            return math.exp(math.log(x) * a + math.log(1 - x) * b + lb) * _betacf(a, b, x) / a
+        return 1 - math.exp(math.log(1 - x) * b + math.log(x) * a + lb) * _betacf(b, a, 1 - x) / b
+    lo, hi = 0.0, 100.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        if _betainc(df / 2, 0.5, df / (df + mid * mid)) > 0.05: lo = mid
+        else: hi = mid
+    t = (lo + hi) / 2
+    return t / math.sqrt(t * t + df)
+
+def designpoints(rows, adm, args):
+    print("\n[17] THE DESIGN-POINT SET  (§5.8's rule, applied as written; §5.6's slopes)")
+    cs    = cells(adm)
+    instr = _dp_instr(adm)
+    box   = _dp_box(rows)
+
+    # --- the collapse the previous enumeration missed, at cell level.  RULE 20 was
+    #     checked against the runs' own ARGS:/ENV: lines; see
+    #     paper/sections/v6-design-points.md §A.2.
+    d = {c["label"]: c for c in cs}
+    chk("rl3 @3e-4 and fa1 share every key field", 1.0 if
+        DP_KEY(d["rl3 @3e-4"]) == DP_KEY(d["fa1"]) else 0.0, 1.0, "§5.8", "%.0f")
+    chk("...and differ in the clip box", 0.0 if box["rl3 @3e-4"] == box["fa1"] else 1.0,
+        1.0, "§5.8", "%.0f")
+    dd  = d["fa1"]["D"] - d["rl3 @3e-4"]["D"]
+    sed = math.sqrt(d["fa1"]["seD"] ** 2 + d["rl3 @3e-4"]["seD"] ** 2)
+    chk("fa1 - rl3@3e-4, as cells", dd, +0.038, "§5.8")
+    chk("   se", sed, 0.156, "§5.8", "%.3f")
+    chk("   z",  dd / sed, +0.24, "§5.8", "%.2f")
+    chk("cells of the six-batch point in the -15 box",
+        float(sum(1 for l in ("cc1", "mm1", "pp1", "gn1 (BN)", "ml2")
+                  if box[l] == "-15:-2.3026")), 5, "§5.8", "%.0f")
+
+    pts = _dp_points(cs, DP_KEY, instr)
+    c10 = [p for p in pts if p["dataset"] == "C10"]
+    chk("design points under the rule as written", len(pts), 10, "§5.8", "%.0f")
+    chk("   of which CIFAR-10",                    len(c10),  9, "§5.6", "%.0f")
+
+    res = _dp_loo(pts)
+    for name, paper, paper10 in [("mean (baseline)", 0.3868, 0.2809),
+                                 ("k*log(headroom)", 0.2667, 0.2352),
+                                 ("CIFAR-100 dummy", 0.3775, None),
+                                 ("k*headroom",      0.3654, None),
+                                 ("level (OLS)",     0.9319, 0.2309)]:
+        chk("LOO RMSE  %-16s" % name, res[name][0], paper, "§5.8 table", "%.4f")
+        if paper10 is not None:
+            chk("   CIFAR-10 folds", res[name][1], paper10, "§5.8 prose", "%.4f")
+    base, alt = res["mean (baseline)"][2], res["k*log(headroom)"][2]
+    w  = sum(1 for i in range(len(pts)) if abs(alt[i]) < abs(base[i]))
+    w9 = sum(1 for i, p in enumerate(pts) if p["dataset"] == "C10" and abs(alt[i]) < abs(base[i]))
+    chk("sign test, all folds (wins)", w, 8, "§5.8", "%.0f")
+    chk("   p", _dp_binom2(w, len(pts)), 0.109, "§5.8", "%.3f")
+    chk("sign test, CIFAR-10 folds (wins)", w9, 7, "§5.8", "%.0f")
+    chk("   p", _dp_binom2(w9, len(c10)), 0.180, "§5.8", "%.3f")
+    for e, nm, pv in [(base, "mean", -0.887), (alt, "k*log(headroom)", -0.462)]:
+        for v, q in zip(e, pts):
+            if q["dataset"] == "C100":
+                chk("CIFAR-100 fold error, %-16s" % nm, v, pv, "§5.8")
+    chk("critical |r| at 10 design points", _dp_critr(10), 0.632, "§5.8", "%.3f")
+    chk("   its r^2 (share of variance needed)", 100 * _dp_critr(10) ** 2, 39.9,
+        "§5.8", "%.1f")
+    chk("critical |r| at 9 CIFAR-10 points", _dp_critr(9), 0.666, "§5.6", "%.3f")
+    chk("|r| = 0.4 first visible at n =",
+        float(min(n for n in range(5, 60) if _dp_critr(n) <= 0.4)), 25, "§5.8", "%.0f")
+
+    # the level model, out of sample
+    f = _dp_fit_ols(c10, lambda q: q["level"]); m = _dp_fit_mean(c10)
+    for p in pts:
+        if p["dataset"] == "C100":
+            chk("level model predicts D(CIFAR-100)", f(p), +4.43, "§5.8", "%.2f")
+            chk("   observed",                      p["D"], +1.56, "§5.8", "%.2f")
+            chk("   its error",                     f(p) - p["D"], +2.86, "§5.8", "%.2f")
+            chk("   the corpus mean's error",       m(p) - p["D"], -0.89, "§5.8", "%.2f")
+
+    # --- §5.6's slopes on the same points
+    def sl(sel, nm, pb, pse, pt, pr=None):
+        b, se, t, r = _dp_ols([p["level"] for p in sel], [p["D"] for p in sel])
+        chk("slope %-26s" % nm, b, pb, "§5.6")
+        chk("   se", se, pse, "", "%.3f")
+        chk("   t",  t,  pt,  "", "%.2f")
+        if pr is not None: chk("   r", r, pr, "", "%.3f")
+        return b
+    sl(pts, "all 10 points",          -0.045, 0.011, -4.21, -0.830)
+    sl(c10, "9 CIFAR-10 points",      -0.176, 0.056, -3.16, -0.767)
+    chk("   exact permutation p over 9!",
+        _dp_perm([p["level"] for p in c10], [p["D"] for p in c10]), 0.0151, "§5.6", "%.4f")
+    sgdm = [p for p in c10 if p["base"] == "SGDm"]
+    r18  = [p for p in c10 if p["network"] == "ResNet-18"]
+    both = [p for p in r18 if p["base"] == "SGDm"]
+    chk("CIFAR-10 points with base SGDm",  len(sgdm), 5, "§5.6", "%.0f")
+    chk("CIFAR-10 points on ResNet-18",    len(r18),  7, "§5.6", "%.0f")
+    chk("CIFAR-10 points with both fixed", len(both), 3, "§5.6", "%.0f")
+    bs = sl(sgdm, "base fixed at SGDm",   -0.126, 0.022, -5.74)
+    br = sl(r18,  "network fixed at R18", -0.287, 0.075, -3.83)
+    sl(both,      "both fixed",           -0.188, 0.148, -1.27)
+    chk("ratio of the two held-one slopes", br / bs, 2.3, "§5.6", "%.1f")
+    chk("both-fixed exact permutation p over 3!",
+        _dp_perm([p["level"] for p in both], [p["D"] for p in both]), 0.667, "§5.6", "%.3f")
+    ins = [p for p in c10 if p["instr"] is not None]
+    b, se, t, _ = _dp_ols([p["instr"] for p in ins], [p["D"] for p in ins])
+    chk("slope on the independent instrument", b, -0.208, "§5.6")
+    chk("   se", se, 0.089, "", "%.3f"); chk("   t", t, -2.33, "", "%.2f")
+    # the arm-sharing artefact
+    mv = []
+    for (lab, net, ds, base, eta, ep, ch, nd, c23, n1d) in F.CELLS:
+        if lab == F.GN_CELL and not F.WITH_GN: continue
+        if ds != "C10": continue
+        nv, _ = arm(adm, *nd); mv.append(st.variance(nv) / len(nv))
+    chk("mean var of a nodewise arm mean, 18 C10 cells", st.mean(mv), 0.01724, "§5.6", "%.5f")
+    vl = st.variance([p["level"] for p in c10])
+    chk("var of level over the 9 CIFAR-10 points", vl, 1.19374, "§5.6", "%.5f")
+    chk("mechanical slope", -st.mean(mv) / vl, -0.014, "§5.6")
+
+    # --- the sensitivity §5.8 reports and rejects: the clip box in the key -> 12 points
+    p12 = _dp_points(cs, lambda c: DP_KEY(c) + (box[c["label"]],), instr)
+    chk("design points if the clip box enters the key", len(p12), 12, "§5.8", "%.0f")
+    r12 = _dp_loo(p12)
+    chk("   LOO RMSE, mean baseline",   r12["mean (baseline)"][0], 0.3514, "§5.8", "%.4f")
+    chk("   LOO RMSE, k*log(headroom)", r12["k*log(headroom)"][0], 0.2437, "§5.8", "%.4f")
+    b12, a12 = r12["mean (baseline)"][2], r12["k*log(headroom)"][2]
+    w12 = sum(1 for i in range(len(p12)) if abs(a12[i]) < abs(b12[i]))
+    chk("   sign test wins", w12, 10, "§5.8", "%.0f")
+    chk("   its p (the one threshold this reading crosses)",
+        _dp_binom2(w12, len(p12)), 0.039, "§5.8", "%.3f")
+    b5 = [p for p in p12 if p["dataset"] == "C10" and p["base"] == "SGDm"
+          and p["network"] == "ResNet-18"]
+    bb5, se5, t5, _ = _dp_ols([p["level"] for p in b5], [p["D"] for p in b5])
+    chk("   §5.6's both-fixed leg at 5 points", bb5, -0.201, "§5.8")
+    chk("      se", se5, 0.092, "", "%.3f"); chk("      t", t5, -2.19, "", "%.2f")
+    chk("      its exact permutation p over 5!",
+        _dp_perm([p["level"] for p in b5], [p["D"] for p in b5]), 0.100, "§5.8", "%.3f")
+
+    # --- the leakage variant §5.8 names and rejects
+    NEW = ("sm3", "bm2 (SGD)", "bm2 (RMSProp)", "sm4")
+    p13 = _dp_points(cs, lambda c: ("E", c["label"]) if c["label"] in NEW else DP_KEY(c), instr)
+    chk("design points if the four new cells are new folds", len(p13), 13, "§5.8", "%.0f")
+    r13 = _dp_loo(p13)
+    b13, a13 = r13["mean (baseline)"][2], r13["k*log(headroom)"][2]
+    w13 = sum(1 for i in range(len(p13)) if abs(a13[i]) < abs(b13[i]))
+    chk("   sign test wins", w13, 11, "§5.8", "%.0f")
+    chk("   its p", _dp_binom2(w13, len(p13)), 0.022, "§5.8", "%.3f")
 
 SECTIONS = [("corpus", corpus), ("table2", table2), ("heterogeneity", heterogeneity),
             ("alignment", alignment), ("prescription", prescription), ("tail", tail),
@@ -980,7 +1577,8 @@ SECTIONS = [("corpus", corpus), ("table2", table2), ("heterogeneity", heterogene
             ("rho", rho), ("gn1gate", gn1gate), ("metacensus", metacensus),
             ("countaxis", countaxis),
             ("tuning", tuning), ("appendices", appendices), ("deposit", deposit),
-            ("metricsens", metricsens),
+            ("metricsens", metricsens), ("calibration", calibration),
+            ("designpoints", designpoints),
             ("censuscheck", censuscheck)]      # MUST stay last: it freezes CENSUS_MARK
 
 def main():
