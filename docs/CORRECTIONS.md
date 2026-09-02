@@ -7903,3 +7903,289 @@ level with base as a factor; the base effect is the RESIDUAL after the level slo
 difference. **Lion is excluded from the monotone ordering** — its sign update makes per-group α the
 only thing setting per-coordinate magnitude, which predicts partitioning matters MOST there, the
 opposite end from where the hypothesis places it.
+
+## 124. **TWO ZERO-GPU ANALYSES: THE CARRIER IS NOT IDENTIFIABLE, AND D IS NOT PREDICTABLE. BOTH ARE NULLS. ONE POSITIVE CLAIM IS DELETED BY REVIEW.** (cycle 96)
+
+Two analyses of data already on disk (no Slurm job submitted), each independently re-derived from
+`results/all_runs.csv` by a second agent that did **not** use the analyst's scripts. Every headline
+number reproduced to three decimals, including the registered scorer's own output
+(`analysis/c88_scorers.py --score aw1` → `{'D_adamw': 0.279, 'se': 0.087, 't': 3.19}`).
+`plateau5` throughout; `plateau` never used.
+
+---
+
+### 124.1 ANALYSIS 1 — WHICH PROPERTY OF THE SIZE DISTRIBUTION CARRIES D? **VERDICT: NOT IDENTIFIABLE FROM THIS CORPUS.**
+
+**What was built.** Group-size multisets **constructed, not assumed**, for 163 (network,
+granularity) cells — 8 networks × 20 granularities — by running `build_network(name, "cpu")` +
+`HF(net, stepsize_groups=g, …)` on the ALICE **login node** (CPU only) and reading sizes off the
+optimizer's own allocated state (`opt.beta`, `opt.n1d_groups/n1d_gsize`, `opt.perm_groups/perm_gsize`,
+`opt.chunk_counts/chunk_numel`, `opt.param_groups_indices`). 150/163 OK; the 13 ERR are
+`resnet18_blocks`/`resnet50_blocks` applied to the wrong depth, which HF rejects.
+
+Two receipts asserted on **every** cell and passing on all 150:
+**R1** `sum(size × count) == sum(p.numel())`; **R2** `sum(count) == total beta elements allocated`.
+Constructed values reproduce every constant in the record exactly: R18 P = 11,173,962; layerwise
+m = 62; nodewise m = 14,420; nodewise1d m = 4,851; chunk777 m = 14,421; chunk2325 m = 4,851;
+R34 nodewise 25,556 / chunk835 25,562; R18_c100 nodewise 14,600 / chunk771 14,595.
+
+Twenty candidate statistics computed exactly per multiset (mean/median/sd/CV/skew/min/max, harmonic
+and geometric mean, sd of log size, entropy H_cat and H_w, inverse participation ratio, Gini,
+`frac_groups_size1`, `frac_weights_in_size1`, group/weight fractions below thresholds
+{2,3,11,65,101,1001}, and `het = log10 m − log10 ipr`).
+
+**What the analysis reported, and what review did to it.**
+
+The analysis nominated the **degeneracy indicator** (`frac_groups_size1`) as the best predictor,
+with a common-slope fit on R18 × SGDm × 100 ep giving **β = −0.986 ± 0.079, t = −12.5**, count inert
+beside it (t = −0.33), and a shape-test χ² of 7.5665 on 10 df (p = 0.67) against p ≲ 1e-3 for every
+continuous heterogeneity statistic.
+
+> **THAT POSITIVE CLAIM IS AN ARTEFACT AND IS DELETED.** `frac_groups_size1` takes exactly **two**
+> values across the entire count-matched design: **0.6664 on nodewise, 0.0000 on the other three
+> arms**, on all three networks. The reviewer re-ran the analyst's own shape test with (a)
+> `frac_groups_size1`, (b) a bare 1/0 "is this arm nodewise" dummy, (c) an arbitrary statistic taking
+> −7.3 on nodewise and +2.1 elsewhere, and (d) the plain 2-df test that the three non-nodewise arms
+> share a mean. **All four give χ² = 7.5665/10 and 35.7575/22 — identical to five figures.** The
+> "fit" IS the three-arm equality test, relabelled. A regressor whose fit is invariant to its own
+> values is not a predictor.
+>
+> **β = −0.986 ± 0.079 (t −12.5) MUST NOT BE WRITTEN DOWN.** It is the nodewise deficit (0.657 pp)
+> divided by 0.6664 — a two-level dummy coefficient rescaled to a dose the corpus never visits. Its
+> own extrapolation is refuted by `ck1`: refitting the five uniform rungs (chunk1 90.979, chunk2
+> 91.095, chunk16 91.411, chunk128 92.159, chunk1024 92.526) as `acc ~ 1 + log10 m + frac_size1`
+> gives **c = +0.106 ± 0.18 (t 0.59)**, **4.9 se** below +0.986. This matches the record's existing
+> +0.115 (t 0.87) refusal. The `ck1` check was the only thing in Analysis 1 that could catch the
+> artefact, and it did; it is promoted from caveat to finding.
+
+**THE STRUCTURAL LIMIT, which governs everything above.** At fixed count the corpus contains exactly
+**one contrast type** — architecture-aligned (nodewise / nodewise1d) versus uniform chunk — plus one
+zero-dose control (permnode). Over the four count-matched arms the candidates are collinear at
+|r| ≥ 0.93 (cv–sdlog +0.9992, sdlog–het +0.9980, cv–het +0.9961, cv–gini +0.9886, frac_size1–het
++0.9569); the design matrix has **rank 3**, so at most **two** statistics are jointly identifiable
+and all twenty collapse into about two equivalence classes. Twenty candidates were scored against a
+design that can distinguish two, and the winner is the one that happens to be an arm indicator.
+Cross-validation cannot catch this: leave-one-batch-out leaves the arm structure intact in every fold.
+
+**COUNT IS GENUINELY CONTROLLED — that part survives.** 12 of the 28 primary contrasts are EXACT
+(nodewise1d m = 4,851 vs chunk2325 m = 4,851); the 2×2 factorial separates count from partition
+cleanly (the same 0.473-decade move is worth **+0.012** among uniform arms and **+0.682** among
+aligned ones on R18 × SGDm × 100 ep); no slope is imported anywhere. **The confound this time is arm
+identity, not count.**
+
+**WHAT THE ENTRY LICENSES.**
+
+> **"At fixed group count the corpus contains a single contrast type, so every candidate summary of
+> the size distribution reduces to an indicator for the architecture-aligned arm and none is
+> identifiable. The size distribution remains the surviving carrier; WHICH property of it is an open
+> question requiring new runs."**
+
+This is a **limit**, not the stronger "no simple summary suffices" — which would imply a search was
+possible. It is not.
+
+**FORBIDDEN PHRASINGS.** "The degeneracy indicator is the carrier" (it is an arm dummy) ·
+β = −0.986 ± 0.079 / t = −12.5, in any role · "the ranking inverts off SGDm" (that is **two**
+batches, `aw1` and `nl1`, at n = 3, one of which contributes χ² 0.10, and `aw1` ran at half its
+registered power).
+
+**STRENGTH CORRECTION.** "Nothing fits all 11" is a **p = 0.032** rejection, and `g3m` (χ² 10.02) +
+`aw1` (7.83) supply 50% of the 35.76. Leave-one-batch-out: dropping `g3m` → p = 0.175, dropping
+`aw1` → p = 0.111, dropping all of `nl1` → 0.039, dropping both non-SGDm batches → 0.142. The
+defensible sentence is *"the corpus does not support a common shape"*, not *"a common shape is
+refuted"*. Direction unchanged, strength was overstated.
+
+---
+
+### 124.2 ANALYSIS 2 — CAN D BE PREDICTED? **VERDICT: NO. THE PREDICTIVE FRAMING IS DEAD BEFORE IT REACHED A DRAFT.**
+
+**This one survives review intact.** The reviewer rebuilt the cell table from scratch and matched
+every published value to three decimals.
+
+**THE 15-CELL D TABLE** (plateau5, within-batch, count-matched by construction; `ar1` excluded as
+box-VOID under 117.1 — asymmetric floor binding, node 0.110 vs chunk 0.0014):
+
+| family | net | base | ms | ep | n | D | se | t | level | D/headroom | G |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| cc1 | ResNet18 | SGDm | 1e-4 | 100 | 3v3 | +0.727 | 0.200 | 3.63 | 91.890 | 0.0896 | +0.011 |
+| mm1 | ResNet18 | SGDm | 1e-4 | 100 | 3v3 | +0.485 | 0.161 | 3.01 | 92.044 | 0.0610 | — |
+| pp1 | ResNet18 | SGDm | 1e-4 | 100 | 3v3 | +0.581 | 0.141 | 4.11 | 92.012 | 0.0727 | — |
+| gn1 | ResNet18 | SGDm | 1e-4 | 100 | 4v4 | +0.587 | 0.153 | 3.83 | 92.000 | 0.0734 | — |
+| gn1 | ResNet18_gn | SGDm | 1e-4 | 100 | 8v8 | +0.202 | 0.137 | 1.48 | 89.330 | 0.0190 | — |
+| rl3 | ResNet18 | SGDm | 1e-4 | 100 | 3v3 | +0.681 | 0.173 | 3.93 | 91.908 | 0.0842 | −0.011 |
+| rl3 | ResNet18 | SGDm | 3e-4 | 100 | 3v3 | +0.591 | 0.096 | 6.18 | 92.507 | 0.0789 | +0.217 |
+| fa1 | ResNet18 | SGDm | 3e-4 | 100 | 6v6 | +0.629 | 0.123 | 5.11 | 92.327 | 0.0820 | −0.001 |
+| hz3 | ResNet18 | SGDm | 1e-4 | 300 | 6v6 | +0.428 | 0.086 | 4.94 | 92.816 | 0.0595 | −0.057 |
+| aw1 | ResNet18 | AdamW | 1e-4 | 100 | 3v3 | +0.279 | 0.087 | 3.19 | 92.978 | 0.0397 | +0.232 |
+| nl1 | ResNet18 | SGD | 1e-4 | 100 | 3v3 | +1.035 | 0.109 | 9.54 | 91.156 | 0.1171 | +0.525 |
+| nl1 | ResNet18 | RMSProp | 1e-4 | 100 | 3v3 | +0.973 | 0.251 | 3.87 | 92.155 | 0.1241 | +0.020 |
+| g3m | ResNet34 | SGDm | 1e-4 | 100 | 9v9 | +0.666 | 0.094 | 7.08 | 91.336 | 0.0768 | +0.171 |
+| gc1 | ResNet18_c100 | SGDm | 1e-4 | 100 | 4v4 | +1.640 | 0.245 | 6.71 | 70.311 | 0.0552 | — |
+| gm2 | ResNet18_c100 | SGDm | 1e-4 | 100 | 3v3 | +1.485 | 0.238 | 6.24 | 70.569 | 0.0504 | +0.068 |
+
+These 15 collapse to **11 distinct design points** (cc1/mm1/pp1/gn1-BN are one configuration in four
+batches; gc1/gm2 are one CIFAR-100 configuration in two).
+
+**LEAVE-ONE-DESIGN-POINT-OUT, 1 predictor each, refit on the held-in 10:**
+
+| model | LOO RMSE | vs "predict the corpus mean" |
+|---|---|---|
+| **mean (baseline)** | **0.4005** | — |
+| D = k·log(headroom) | 0.3284 | −18% (see below) |
+| D = k·headroom | 0.3383 | −16% |
+| CIFAR-100 dummy | 0.3918 | −2% |
+| log10 meta_stepsize | 0.4074 | +2% |
+| aligned-arm level | 0.5313 | **+33% WORSE** |
+| log10 group count m | 13.34 | +3230% |
+| log10 params | 38.81 | +8732% |
+
+> **THE 18% IS ONE POINT.** The entire margin of `k·log(headroom)` is the single CIFAR-100 design
+> point (fold error +0.582 vs the mean's +0.953). **Restricted to the ten CIFAR-10 folds the mean
+> WINS: 0.2791 vs 0.2863.** Sign test over 11 folds: 8/11, two-sided **p = 0.227**. And the
+> functional form is itself the winner of ~10 candidates scored on the same 11 points, so the 18% is
+> a **best-of-ten selection statistic** before it is anything else. **Do not report 18%.**
+
+**THREE ALIASINGS that make the corpus look richer than it is.**
+1. `frac_groups_size1`, log10 m, log10 params, log10(n classes) and the CIFAR-100 dummy are **not
+   five predictors**. f is pinned to 2/3 by the structural identity of 111.1 (every conv is
+   `bias=False` followed by one affine norm), taking 0.66644 on every CIFAR-10 cell and 0.66438 on
+   the two CIFAR-100 cells. Regressing D on f is regressing D on the dataset dummy with a slope of
+   **−462.8**. *Anyone who writes "D scales with the singleton fraction" from this corpus has
+   written "CIFAR-100 is different".*
+2. m and params are **1-vs-10 leverage contrasts** on `g3m` alone — hence LOO RMSE 13.3 and 38.8.
+3. G is not independent of D (same batch) and has no predictive content anyway (t +0.38).
+
+**POWER BOUND, stated so nobody redesigns blind.** At n = 11 a predictor needs **|r| ≥ 0.602** — it
+must explain ≥ 36% of the between-design-point variance — to be visible at p < 0.05. Seeing
+|r| = 0.4 would need ~25 design points. Not reachable by brute force.
+
+**WHAT IS PRESERVED, and it is not small.** D is genuinely heterogeneous: over the twelve cells
+sharing a **byte-identical** partition contrast (R18 nodewise → chunk777), **Q = 43.0 on 11 df,
+p = 1.1e-5** (36.3/10 dropping the GroupNorm cell); DerSimonian–Laird **τ = 0.285 pp** against
+**0.137 pp** measurement noise. So D varies by roughly twice its measurement error, for reasons we
+cannot attribute.
+
+> **THE DRAFT SENTENCE:** *"D is real, replicated across 15 count-matched within-batch cells, and
+> varies genuinely across configurations (τ = 0.285 pp vs 0.137 pp noise). No measurable property of
+> a configuration predicts D out of sample better than the corpus mean."*
+
+---
+
+### 124.3 THE LEVEL SLOPE IS DEAD. IT WAS NEVER RESOLVED, AND ITS ONE WITHIN-BATCH TEST FALSIFIES IT.
+
+The cycle-95 reading *"D ~ aligned-arm accuracy LEVEL, slope −0.392, se 0.165, t −2.37, r −0.859"*
+reproduces byte-identically — and **must not be written anywhere, in any role.**
+
+1. **NEVER SIGNIFICANT.** n = 4, 2 residual df. **Exact permutation over all 4! = 24 orderings:
+   4/24, p = 0.167.** With four points |r| = 0.86 arises by chance about one time in six.
+2. **INSIDE CIFAR-10 IT IS ZERO AND WRONG-SIGNED.** Over all 10 CIFAR-10 design points:
+   **+0.026 ± 0.088, t +0.30, r +0.104.** It is −0.289 dropping GroupNorm, −0.136 dropping GroupNorm
+   and every non-SGDm base, and **+0.094 (POSITIVE)** keeping GroupNorm and dropping the non-SGDm
+   bases. A slope whose sign is set by which one of ten points you omit is not a slope.
+3. **IT IS NOT THE SHARED-ARM ARTEFACT** — checked, and the exoneration matters. D and level share
+   the nodewise arm, mechanically inducing −var(node mean)/var(level) = **−0.013** across CIFAR-10
+   and −0.026 across the four base cells: one twentieth of −0.392. An independent instrument (mean of
+   chunk2325 and nodewise1d, neither of which enters D) gives −0.045 on all design points and −0.320
+   within CIFAR-10. **The fragility is genuine small-n.**
+4. **THE DECISIVE WITHIN-BATCH TEST FALSIFIES IT.** `gn1` ran BatchNorm and GroupNorm ResNet18 in the
+   **same batch** — one variable changed, batch cancels. Level moves **−2.670 pp** (92.000 → 89.330).
+   Every version of the level model predicts D should RISE (+1.047 at −0.392; +0.772 at −0.289;
+   +0.363 at −0.136). **Observed dD = −0.385 ± 0.205 — it FALLS**, i.e. **3.6 to 7.0 se wrong-signed.**
+   The 118 commensurability caveat cuts the same way, not against it: the level model IS a raw-pp
+   model, so either the pp scale is valid there and the model fails by up to 7 se, or it is not and
+   the model has no defined prediction at a 10.6 pp budget — which is the admission that it is not a law.
+5. **"DATASET-SPECIFIC INTERCEPT" IS NOT ESTIMABLE.** One CIFAR-100 design point ⇒ the intercept is
+   fitted from its own single observation with zero residual df. LOO RMSE 0.5413, 35% worse than the
+   mean. And since the within-CIFAR-10 slope is +0.026, it degenerates to a dataset dummy.
+6. **HEADROOM NORMALISATION IS REAL BUT SMALL AND STILL FAILS.** CV over 11 design points: D 0.551 vs
+   D/headroom 0.419 — a 24% reduction, not a collapse. Leave-one-dataset-out: a CIFAR-10 headroom
+   fraction k = 0.0754 predicts D(CIFAR-100) = **+2.229 against +1.560 observed, −3.9 se**. It is the
+   least wrong of the three (level errs +8.9 se, the mean +0.953) and is still wrong by four se, and
+   **CIFAR-100 has the LOWEST D/headroom of any BatchNorm cell (0.0528) despite ~4× the headroom.**
+
+> **THIS IS A GAIN, NOT A LOSS.** *"Partition matters" is NOT a restatement of where the aligned arm
+> lands* — a claim the campaign already wanted, now supported from the other direction, and a
+> covariate the paper would otherwise have had to defend is removed.
+
+---
+
+### 124.4 TWO PROCESS DEFECTS FOUND EN ROUTE. FIX BOTH.
+
+**(a) CSV METADATA DEFECT — confirmed row by row.** `hz3-c23-s5`, `hz3-ch-s5` and `hz3-n1d-s5` carry
+`beta_clip = "-15:-2.3026"` while `hz3-node-s5` and every other hz3 row carries `"-30:9.0"`. **Any
+scorer that groups on `beta_clip` silently drops exactly those three and reads D(300) = +0.464
+instead of the authoritative +0.428 (123.2).** Fix before it produces a fourth withdrawal.
+
+**(b) TWO INCONSISTENT ADMISSIBILITY RULES ON THE SAME RUNS.** Analysis 1 included `ar1` in its
+11-batch set; Analysis 2 excluded it as box-VOID (117.1). Same corpus, same window, two rules, reader
+not told. It does not drive the verdict (dropping `ar1`: subset p 0.671 → 0.722; ALL-11 p 0.032 →
+0.030) — but it is the asymmetry a referee finds first.
+**(c) `nl1` IS ONE BATCH, NOT TWO.** One contiguous submission (job_ids 4832408–4832415+, one node
+pool), split only by the `base` column. Both analyses counted SGD and RMSProp as independent units;
+Analysis 1's LOO dropped its halves separately while Analysis 2's correctly held them together, so
+the two analyses disagreed about what a batch is. **Under this campaign's own rule the corpus has 10
+batches and 10 design points, and the non-SGDm evidence is 2 batches / 6 df.**
+
+---
+
+### 124.5 WHAT REACHES THE PAPER, AND WHAT DOES NOT
+
+**WRITE** (verified end-to-end against the CSV by two independent reductions):
+1. The **15-cell D table** — a measurement, not a regression: within-batch, count-matched by
+   construction, spanning 2 architectures, 2 datasets, 4 base optimisers, 2 meta-stepsizes, 2 budgets,
+   2 normalisation schemes. One of its values is the registered scorer's own output.
+2. **D varies genuinely across configurations.** Q = 43.0/11 df, p = 1.1e-5; τ 0.285 pp vs 0.137 pp
+   noise. This is the premise the prediction question needed.
+3. **No measurable property of a configuration predicts D out of sample better than the corpus mean.**
+   Quote the power bound in the same sentence.
+4. **"Partition matters" is not a restatement of where the aligned arm lands** (124.3).
+5. **One sentence** for Analysis 1, as the identifiability limit in 124.1 — not as a result.
+
+**DO NOT WRITE:** "the degeneracy indicator is the carrier" · β = −0.986 / t −12.5 · "the ranking
+inverts off SGDm" · the 18% LOO improvement as a headline · the −0.392 level slope, anywhere.
+
+---
+
+### 124.6 THE ONE THING WORTH RUNNING — REGISTERED HERE, NOT SUBMITTED
+
+Every count-matched arm the campaign has ever run **REMOVES** the tail (nodewise → chunk777,
+nodewise → nodewise1d), so "tail" is perfectly confounded with "architecture-aligned". The decisive
+experiment is therefore **ADDITIVE**, and it is the design that breaks the arm-indicator degeneracy
+because it creates, for the first time, an arm that is **neither architecture-aligned nor tail-free**.
+
+* **Arm A1** = plain `chunk2325` (m = 4,851, min size 10, cv 0.088, gini 0.009).
+* **Arm A2** = `chunk2325` with one large conv tensor split into 9,610 size-1 groups, merging
+  elsewhere to hold **m = 4,851 EXACTLY**. Two arms, identical count, both arbitrary, differing ONLY
+  in whether a size-1 tail exists.
+* **PREDICTION IF THE TAIL IS THE CARRIER:** A2 loses ~0.6 pp to A1. **If A2 − A1 is null, the
+  degeneracy statistic is dead as a carrier** and the size-1 tail is only a proxy.
+* **PAIR IT WITH A HETEROGENEITY SWEEP AT ZERO DEGENERACY**, which no run in the corpus provides:
+  uniform-count partitions at m = 4,851, min size ≥ 10, prescribed size CV in {0.09, 0.40, 0.76, 1.90}
+  (0.09 = chunk2325, 0.76 = nodewise1d, 1.90 = nodewise). This dissociates cv/gini/sdlog/het from
+  `frac_size1` for the first time. Accuracy tracking CV with the tail absent ⇒ continuous
+  heterogeneity wins; flat ⇒ it is dead.
+* **RUN BOTH UNDER AdamW AND SGDm** — that is precisely where the two candidate carriers disagree.
+  ~4 arms × 2 bases × 5 seeds ≈ 40 jobs, ONE batch per base, ms 1e-4, alpha0 1e-3, 100 ep,
+  box −15:−2.3026, plateau5, **scorer hashed before submission (RULE 19)**, GATE 0 box-occupancy per seed.
+* **PRIORITISE THIS OVER MORE G CELLS.** More G on the existing quad cannot break the degeneracy,
+  only measure it more precisely.
+
+**WHAT NOT TO BUY:** more seeds on existing cells (seed is null; D's measurement noise 0.137 pp is
+already half its real spread τ 0.285 pp); another SGDm/R18/CIFAR-10/100-ep replicate (four exist, and
+their sd of D is 0.0994, **below** the 0.1719 expected from seed noise alone); anything that moves
+count and partition together.
+
+**HIGHEST-VALUE NEW CELLS, ranked:** (1) a **within-batch level ladder** — move the aligned arm's
+accuracy at fixed everything else, 3–4 rungs, one submission, D at each rung; the corpus has exactly
+ONE such datum today (`gn1`'s BN/GN pair) and it goes the wrong way by up to 7 se. (2) A **second
+CIFAR-100 design point** at a different level (AdamW is the obvious choice) — every out-of-sample win
+in Analysis 2 is one point. (3) A **third dataset** — dataset, level and singleton fraction are
+literally the same column today. (4) A **second architecture that is not ResNet34** (ResNet10 is in
+`build_network.py`, cheap, and moves m 0.22 decades the other way). (5) **Budget at a third value.**
+
+**PROCESS NOTE.** Both analyses were run to answer questions the campaign wanted answered YES. Both
+came back NO. Analysis 1 additionally produced a positive claim that survived its own
+cross-validation and was killed by a reviewer in one paragraph on identifiability grounds — the
+failure mode small n produces is spurious success, and CV cannot detect a mislabelled unidentifiable
+direction. **A cross-validated null at n = 11 is defensible in a way a cross-validated success at
+n = 11 never is.** Analysis 2 is paper-ready as a negative; Analysis 1 contributes a limit and an
+experiment design.
