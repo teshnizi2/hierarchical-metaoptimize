@@ -58,7 +58,8 @@
 #     superseded runs carry BETA_CLIP=-15:-2.3026 against their comparator's
 #     -30:9.0, and are ACTIVELY FLOOR-BOUND in it: coord_lo 0.0088-0.0183 with
 #     beta pinned at exactly -15.0000, against a comparator 6.75 nats clear);
-#   * D(s5) stops being a cross-GPU-class contrast (three classes, above);
+#   * D(s5) stops being a cross-GPU-class contrast (the archived pair spans
+#     two GPU MODELS across three Slurm partitions, measured above);
 #   * NOTHING depends on an archived comparator.  The old design re-ran three
 #     arms and paired them against hz3-node-s5 from a different submission.  This
 #     one re-runs all four, so the pair is internally generated.

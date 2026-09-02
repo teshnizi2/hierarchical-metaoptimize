@@ -505,7 +505,7 @@ PYEOF
 # =============================================================================
 python3 - "$RUNROOT" "$SAVE" "$TAG" "$PARENT_TAG" "$SEED" "$ARMS" "$PARENT_SCORER" \
   <<'PYEOF' || guard_fail "guard 6: non-collision"
-import os, sys
+import glob, os, sys
 runroot, save, tag, parent, seed, arms, pscorer = sys.argv[1:8]
 shorts = [s.split(":")[1] for s in arms.split()]
 fails = []
@@ -530,20 +530,46 @@ for sh in shorts:
     if os.path.exists(d):
         fails.append("%s already exists; HF.py opens probe.jsonl in APPEND mode, so "
                      "a re-run would interleave two runs in one file" % d)
-# (d) every archived hz3 probe dir must still be present and untouched by us
-missing = []
+# (d) every archived hz3 arm's probe data must still be ON DISK.  It may be under
+#     the canonical name or under the .box* name the SUPERSEDED three-arm repair
+#     renamed it to; either is intact, but only the canonical name is the one
+#     analysis/c87_hz3_score.py globs, so say which and say what it costs.
+missing, displaced = [], []
 for sh in shorts:
     d = os.path.join(save, "probe_%s_%s_s%s" % (sh, parent, seed))
-    if not os.path.isdir(d):
+    if os.path.isdir(d):
+        continue
+    alt = sorted(g for g in glob.glob(d + ".*") if os.path.isdir(g))
+    alt = [a for a in alt if os.path.exists(os.path.join(a, "probe.jsonl"))]
+    if alt:
+        displaced.append((d, alt[-1], os.path.getsize(os.path.join(alt[-1], "probe.jsonl"))))
+    else:
         missing.append(d)
 if missing:
-    fails.append("the ARCHIVED probe directories %s are absent -- this batch must "
-                 "leave the archive intact, so verify what happened before "
-                 "submitting" % missing)
-else:
-    print("guard 6d: all %d archived probe_<short>_%s_s%s directories are present "
-          "and are NOT touched by this batch (no rename, no move, no delete)."
-          % (len(shorts), parent, seed))
+    fails.append("the archived probe data for %s is NOWHERE ON DISK, neither under "
+                 "the canonical name nor under any .box* name.  This batch must "
+                 "leave the archive intact -- find out what happened BEFORE "
+                 "submitting anything." % missing)
+if displaced:
+    print("guard 6d: !! %d archived probe directory/ies are DISPLACED, not lost:"
+          % len(displaced))
+    for d, a, sz in displaced:
+        print("             %s" % os.path.basename(d))
+        print("               -> %s  (probe.jsonl %.0f MB, INTACT)"
+              % (os.path.basename(a), sz / 1e6))
+    print("           This rename was made by the SUPERSEDED three-arm repair, which")
+    print("           reused the hz3 run names and therefore had to move these out of")
+    print("           the way.  THIS BATCH DOES NOT NEED IT AND DOES NOT TOUCH THEM.")
+    print("           CONSEQUENCE, WHICH MUST BE REPORTED: while they sit under the")
+    print("           .box* name, analysis/c87_hz3_score.py cannot measure seed-%s"
+          % seed)
+    print("           occupancy for those arms ON THIS TREE -- it globs the canonical")
+    print("           name only.  If the superseded batch is cancelled, restore the")
+    print("           canonical names so the parent registration stays reproducible")
+    print("           here as well as on the local mirror.")
+print("guard 6d: %d/%d archived probe directories are on disk with data; NONE of "
+      "them is renamed, moved or deleted by this batch."
+      % (len(shorts) - len(missing), len(shorts)))
 # (e) the parent scorer must not mention the new tag anywhere
 if os.path.exists(pscorer) and tag in open(pscorer).read():
     fails.append("the parent scorer mentions %r -- it must be unaware of this batch"
