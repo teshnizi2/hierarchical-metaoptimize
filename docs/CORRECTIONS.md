@@ -9762,3 +9762,51 @@ the 547 unchecked Markdown cross-references and `analysis/xref_check.py`; red-te
 R10; carried items 2, 4, 5, 6; and the Plan C signposting.  R9 (the restructure) is CLOSED as
 DECLINED on measurement -- see `paper/sections/v9-plan.md`: a 15-pp main body needs ~7,600 words
 of new digest prose in both markups, which is precisely how the 8 existing residuals arose.
+
+## 137. R4 AND R2 CLOSED -- AN UNDISCLOSED TEST SIZE, AND TWO ESTIMATORS UNDER ONE SYMBOL
+
+**R4 -- THE REGISTERED BAR IS TWICE AS PERMISSIVE AS IT LOOKS.**  The budget verdict runs against
+`|t| >= 2.0` on 5 df, frozen in `c99_hz3q_score.py`'s `band_flat()` at the parent registration's
+own `CONFIRM_T`.  Computed here: that is a two-sided test of size **alpha = 0.1019**, not 0.05 --
+about twice the conventional threshold -- and the paper never said so.  In a paper whose stated
+contribution is disclosure discipline, an undisclosed test size is the wrong thing to leave in.
+
+Now disclosed at the site where a reader meets the budget result, with the two mitigations that
+are also true and also checkable:
+  * the bar was **NOT SHOPPED** -- it predates `hz3q`, and the two readings it calls `FLAT`
+    (t -1.42, t -1.94) are flat under either threshold, so its permissiveness decided neither;
+  * the repaired reading clears a strict 0.05 as well -- **but only just.**
+
+**A CORRECTION TO THE RECORD, AND TO WHAT I REPORTED IN CHAT.**  I stated that the repaired
+reading's `p = 0.0500` "clears even a strict 0.05".  Directionally right, materially understated.
+Re-derived at full precision from the six per-seed paired differences:
+
+    n = 6   delta = -0.2383   se = 0.0927   t = -2.5721   df = 5
+    two-sided p = 0.04991     size-0.05 critical |t| = 2.5706     95% CI [-0.4765, -0.0001]
+
+So it clears 0.05 by **0.0015 in t** and the 95% upper limit excludes zero by **0.0001 pp**.  An
+intermediate calculation of mine gave p = 0.0502 (i.e. FAILING 0.05) from rounding se to 0.0927
+instead of the exact 0.09266 -- at this margin the third decimal of se decides the verdict, which
+is itself worth knowing.  The paper now prints the margin rather than the bare fact, because a
+referee who recomputes will find it, and "we clear 0.05 by fifteen ten-thousandths of a t" reads
+far better than an unqualified "we clear 0.05".
+
+**R2 -- ONE SYMBOL OVER TWO ESTIMATORS, and the collision is worse than recorded.**  The budget
+table's `se` column was undefined.  The table's `se` is the sem of the n **per-seed paired
+differences** (the estimator `band_flat()` consumes); the level `D(300)` two paragraphs below
+carries a **Welch two-sample** se.  The hazard is not merely that they differ -- it is that here
+they print almost the same number, **0.0927 against 0.093**, while estimating different things.
+Both are now named, with the general rule stated: `+-` against a SLOPE is the paired-difference
+se, against a LEVEL the Welch se.
+
+**VERIFICATION.**  Census re-iterated to a FIXPOINT in two passes -- the new prose added four
+distinct quantity-numerals, so the triple moves `628 / 411 / 978 / 42.0%` -> `628 / 411 / 982 /
+41.9%` and coverage ticks DOWN again; reported, not absorbed.  `c98_reproduce.py` exit 0,
+**ALL 636 CHECKS PASS**.  `xref_check.py` exit 0.  `paper_numeric_diff.py` the same 8 pre-existing
+residuals, byte-identical list (`0.05 3.0 39,172` | `0.087 0.279 3.19 9.0 x2`), **ZERO new**.
+Abstract 222 words, defects `[]`, cap 230.  `tectonic` **0 errors**.  No Slurm job submitted.
+
+**STILL OPEN:** R8 (deposit cold-skips `[7] BUDGET`, fails soft and announces it), R10's seven
+formatting residuals, carried items 2 (two md lines starting with `|`), 4 (S4.8's opening
+over-scopes as T9 did), 5 (ALICE staging dirs), 6 (whether S9 needs a companion sentence), and the
+Plan C signposting.  Six author items unchanged and untouched.

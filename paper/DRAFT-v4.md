@@ -831,8 +831,8 @@ attrition ledger's upstream cluster-side rows, wallclock and byte counts, Append
 or any value that exists only inside a registered scorer's own printed output — those are quoted
 from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census` on
 `paper/DRAFT-v4.md`, the
-audit executes **628 claim-carrying assertions covering 411 of the 978 distinct
-quantity-numerals** in this manuscript, which is 42.0% of them. Those three figures are not
+audit executes **628 claim-carrying assertions covering 411 of the 982 distinct
+quantity-numerals** in this manuscript, which is 41.9% of them. Those three figures are not
 merely measured: section `[16]` of the audit reads this sentence back out of **both markups** —
 `paper/DRAFT-v4.md` and `paper/paper.tex` — and asserts the triple against that one fresh
 measurement, so a stale coverage claim in *either* file now exits non-zero instead of passing
@@ -2163,6 +2163,23 @@ repaired reading is `NOT FLAT — D DECLINES WITH BUDGET` (p = 0.050 two-sided, 
 [−0.477, −0.000]). **All three readings are reported together, always**: the repaired one does not
 erase the published one from the record, it is the disclosed repair of the one seed whose contrast
 was cross-box and cross-class.
+
+In the table, se is the standard error of the mean of the n *per-seed paired differences*
+δₛ — the estimator the registered scorer's `band_flat()` gate consumes. It is **not** the Welch
+two-sample se used for the level D(300) two paragraphs below, and the two happen to print almost
+the same number here (0.0927 against 0.093) while estimating different things. Wherever this paper
+writes ± against a *slope* it is the paired-difference se; against a *level*, the Welch se.
+
+**The registered bar is more permissive than 0.05, and we did not say so until now.**
+\|t\| ≥ 2.0 on 5 degrees of freedom is a two-sided test of size α = 0.102, not 0.05 — about twice
+the conventional threshold. Two things bound the damage, and both are checkable. First, the bar
+was **not shopped**: it is the parent registration's `CONFIRM_T`, frozen in `band_flat()` before
+`hz3q` existed, and the two readings it declares `FLAT` (t −1.42, t −1.94) are flat under either
+threshold, so its permissiveness never decided them. Second, the repaired reading clears a strict
+0.05 as well — but *only just*, and the margin is the honest number to print: \|t\| = 2.5721
+against a size-0.05 critical value of 2.5706 at 5 df, giving p = 0.0499 and a 95% upper limit of
+−0.0001 pp. The withdrawal survives the stricter threshold by fifteen ten-thousandths of a t.
+A reader who prefers 0.05 to our registered bar reaches the same verdict, and by that margin only.
 
 **Read the withdrawal for exactly what it is.** D *shrinks* as the budget grows; it does not go
 away. At 300 epochs it is +0.394 ± 0.093, t 4.25 — positive, resolved and within four tenths of an
