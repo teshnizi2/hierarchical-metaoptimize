@@ -240,7 +240,8 @@ anywhere (\S\ref{sec:metric}, \S\ref{sec:threats} T12). (vi) We inherit, and par
 with, \citet{choi2020empirical} on tuning-protocol sensitivity, \citet{zheng2019blockwise} on
 blockwise adaptivity, and CAM-HD \citep{jie2022camhd} on the granularity ladder and its
 interior optimum; \S\ref{sec:related} states exactly what is left, \S\ref{sec:contributions} lists what this paper
-adds, and \S\ref{sec:method} fixes the partitions, the contrasts and the metric before any result
+adds, \S\ref{sec:guide} maps every claim in it to the evidence for that claim, and
+\S\ref{sec:method} fixes the partitions, the contrasts and the metric before any result
 is read.
 
 \subsection{Contributions}
@@ -328,6 +329,70 @@ is read.
   that voided two batches, and an internal variance claim that did not reproduce
   (\S\ref{sec:discipline}, Appendix~\ref{app:discrepancy}).
 \end{enumerate}
+
+\subsection{Reader's guide and evidence map}
+\label{sec:guide}
+
+This paper is long because it reports a failed mechanism search alongside a positive result, and
+both are evidence. It is not built to be read straight through, so this subsection says where
+everything is.
+
+\textbf{Four things carry the argument}: the count-matched contrast
+(\S\ref{sec:primary}, Table~\ref{tab:D}); the candidate moderator and the endpoint knife taken
+to it (\S\ref{sec:moderator}); the budget reading and the sentence of ours it withdrew
+(\S\ref{sec:budget}); and the stated scope of the audit that re-derives all three
+(\S\ref{sec:registration}). A referee who reads only those four has the argument in front of
+them. Every other section supports one of them, bounds one of them, or reports something we
+looked for and did not find.
+
+\textbf{The map below is an index, not a summary.} For each claim it names the subsection that
+states it, the float that displays it, the numbered section of
+\texttt{analysis/c98\_reproduce.py} that re-derives it, and the deposit command that re-runs that
+derivation (\S\ref{sec:repro}). It carries no quantities on purpose: every number in this paper
+is stated at one site, and the map points at the site rather than repeating it.
+
+\begin{center}
+\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}>{\raggedright\arraybackslash}p{0.07\linewidth}>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+claim & stated in & shown in & audit & deposit \\
+\midrule
+At fixed group count, the partition beats the count &
+  \S\ref{sec:primary}, \S\ref{sec:rule11} & Table~\ref{tab:D}, Figure~\ref{fig:forest} &
+  \texttt{[2]}, \texttt{[9]} & \texttt{make reproduce-table2} \\
+The base optimiser moderates the effect --- conditional on the endpoint &
+  \S\ref{sec:moderator} & Figure~\ref{fig:moderator} & \texttt{[3]} &
+  \texttt{make reproduce} \\
+Nine candidate mechanisms, and none of them is a general carrier &
+  \S\ref{sec:mechanisms}, \S\ref{sec:tail}, \S\ref{sec:normalisation} &
+  Figure~\ref{fig:decomposition} & \texttt{[6]}, \texttt{[17]} & \texttt{make reproduce} \\
+The effect survives 3$\times$ the budget, and it declines with it &
+  \S\ref{sec:budget} & Figure~\ref{fig:budget} & \texttt{[7]} & \texttt{make reproduce} \\
+Alignment is a bounded null, and the permutation draw is exchangeable &
+  \S\ref{sec:alignment}, \S\ref{sec:rp1}, \S\ref{sec:null-repeat} & --- & \texttt{[4]} &
+  \texttt{make reproduce} \\
+The one-dimensional-tensor prescription, and its base--meta exception &
+  \S\ref{sec:prescription} & --- & \texttt{[5]} & \texttt{make reproduce} \\
+The corpus, the count-matching, admissibility and attrition &
+  \S\ref{sec:partitions}--\S\ref{sec:metric}, \S\ref{sec:repro} &
+  Table~\ref{tab:partitions}, Table~\ref{tab:attrition} & \texttt{[1]}, \texttt{[13]} &
+  \texttt{make verify}, \texttt{make reproduce} \\
+The scope limits, including the competitiveness deficit &
+  \S\ref{sec:threats-evidence} T1--T8 & --- & \texttt{[8]} & \texttt{make reproduce} \\
+The four in-flight registrations, and the one that reversed us &
+  \S\ref{sec:inflight}, \S\ref{sec:budget}, Appendix~\ref{app:discrepancy} &
+  Figure~\ref{fig:budget} & \texttt{[7]} & \texttt{make reproduce} \\
+What the audit asserts, and what it does not &
+  \S\ref{sec:registration}, \S\ref{sec:repro} & --- & \texttt{[16]}, \texttt{[14]} &
+  \texttt{make reproduce} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{What the map does not do.} It does not weight the evidence and it does not stand in for
+\S\ref{sec:threats}: a row says where a claim is, not how much it will bear. Where a claim is
+conditional --- \S\ref{sec:moderator}'s moderator, \S\ref{sec:prescription}'s prescription and
+\S\ref{sec:budget}'s slope each are --- the condition is stated at the site and only there.
 
 \section{Related work, and what is left}
 \label{sec:related}
@@ -692,6 +757,11 @@ is reported as such.
 \subsection{Metric, admissibility, multiplicity, and units of replication}
 \label{sec:metric}
 
+\emph{This subsection fixes the endpoint, the admissibility filter, the multiplicity convention
+and the unit of replication before any result is read. A referee who accepts those definitions can
+go straight to \S\ref{sec:primary}; one who wants them varied wants
+\S\ref{sec:moderator}'s endpoint block and \S\ref{sec:threats} T10.}
+
 \paragraph{Metric.}
 For a run $r$ that completed $E_r$ test epochs with accuracies $a_r(1),\dots,a_r(E_r)$, the
 primary metric throughout is
@@ -938,6 +1008,11 @@ is the one-line place it would be closed.
 \subsection{Registration discipline}
 \label{sec:registration}
 
+\emph{This subsection states which scorers were registered before their runs existed, the three
+places we knowingly depart from one, and --- in its closing paragraph --- what the audit asserts
+and what it does not. That closing paragraph is what a referee checking a number's provenance
+wants.}
+
 Where a batch has a scorer committed before its runs existed, that scorer is run
 \textbf{unedited} and its printed verdict is quoted rather than paraphrased. This rule exists
 because it was broken: two cycle-91/92 headlines were withdrawn after being produced by
@@ -1056,6 +1131,11 @@ $\rho$ superlative survived two review cycles in \S\ref{sec:primary} as a result
 
 \subsection{Four pre-registered batches: all four now scored, one after a forced redesign}
 \label{sec:inflight}
+
+\emph{This subsection puts the four in-flight registrations on the record with their decision
+rules ahead of their numbers. A referee who wants only the outcomes can read
+Table~\ref{tab:inflight} and follow it into \S\ref{sec:moderator}, \S\ref{sec:rp1},
+\S\ref{sec:prescription}, \S\ref{sec:budget} and \S\ref{sec:normalisation}.}
 
 Three weaknesses this paper states about itself, and one experiment it declares was never run,
 are addressed by the four batches of Table~\ref{tab:inflight}, submitted while this paper was
@@ -1639,6 +1719,11 @@ pool.}
 can measure but not exclude}
 \label{sec:moderator}
 
+\emph{This is the longest subsection in the paper and it does two separable things: it identifies
+a candidate moderator for the heterogeneity in $\Dstat$, then it attacks that moderator. The
+attack begins at ``The endpoint, varied'' below; Figure~\ref{fig:moderator}, at the end, carries
+both halves.}
+
 Restrict Table~\ref{tab:D} to the fourteen cells that run the same ResNet-18 partition contrast
 (\arm{nodewise} $\rightarrow$ \arm{chunk777}, count-matched to $+1$ group on 14{,}420; rows
 1--4, 6--12 and 17--19) so that the contrast itself is held fixed. \arm{sm4} (row 20) is
@@ -1902,6 +1987,10 @@ figure on the previous version's eleven cells was 88.4\% of a $Q$ of 36.40, and 
 twelve-cell pool that contained the GroupNorm cell it was 74.6\% --- the ``$\approx 75\%$'' that
 earlier versions of this work quoted. All are true of different denominators; none may be quoted
 without naming its own.
+
+\emph{From here the subsection changes subject: everything above establishes the decomposition,
+everything below tests it against the three other end-of-training columns the corpus carries, and
+\S\ref{sec:threats} T13 supplies the null those tests are referred to.}
 
 \paragraph{The endpoint, varied --- and the part of this subsection that does not survive it.}
 Everything above is computed on \plateau{}, and \S\ref{sec:metric} concedes, as the sixth of its
@@ -2450,6 +2539,10 @@ does.
 \subsection{The prescription, and its exact scope}
 \label{sec:prescription}
 
+\emph{This subsection states the one designer-facing recommendation the paper makes and then
+attaches its scope, which is narrower than the recommendation. A referee who wants the
+recommendation and its exception wants Table~\ref{tab:T} and the endpoint rows below it.}
+
 The practitioner's move implied by \S\ref{sec:primary} and \S\ref{sec:alignment} is: \textbf{give
 each one-dimensional tensor a single step size instead of one per element.} Measured as
 $\Tstat = \arm{nodewise1d} - \arm{nodewise}$ (Eq.~\ref{eq:T}), within batch, it reads as in
@@ -2468,11 +2561,11 @@ batch & network / setting & $n$ & $\Tstat$ (pp) & $\se$ & $t$ \\
 \midrule
 \arm{bn1} & R18 / C10 / SGDm & 3 v 3 & $+0.427$ & 0.041 & 10.43 \\
 \arm{hz3}$^{\ddagger}$ & R18 / C10 / SGDm, \textbf{300 ep} & 6 v 6 & $+0.337$ & 0.069 & 4.85 \\
-\arm{rl3} & R18 / C10 / SGDm, $\eta\ 3{\times}10^{-4}$ & 3 v 3 & $+0.391$ & 0.127 & 3.09 \\
+\arm{rl3} & R18 / C10 / SGDm, $\eta\ 3{\times}10^{-4}$, box $-30{:}9.0$ & 3 v 3 & $+0.391$ & 0.127 & 3.09 \\
 \arm{ml2} & R18 / C10 / SGDm & 3 v 3 ($\times$2 reruns) & $+0.619$ & 0.176 & 3.52 \\
 \arm{fa1} & R18 / C10 / SGDm, $\eta\ 3{\times}10^{-4}$ & 6 v 6 & $+0.649$ & 0.110 & 5.88 \\
 \arm{nl1} & R18 / C10 / \textbf{SGD} & 3 v 3 & $+0.692$ & 0.135 & 5.12 \\
-\arm{rl3} & R18 / C10 / SGDm, $\eta\ 10^{-4}$ & 3 v 3 & $+0.756$ & 0.117 & 6.45 \\
+\arm{rl3} & R18 / C10 / SGDm, $\eta\ 10^{-4}$, box $-30{:}9.0$ & 3 v 3 & $+0.756$ & 0.117 & 6.45 \\
 \arm{g3m} & \textbf{R34} / C10 / SGDm & 9 v 9 & $+0.758$ & 0.093 & 8.13 \\
 \arm{cc1} & R18 / C10 / SGDm & 3 v 3 & $+0.816$ & 0.159 & 5.13 \\
 \arm{nl1} & R18 / C10 / \textbf{RMSProp} & 3 v 3 & $+0.916$ & 0.242 & 3.79 \\
@@ -3083,6 +3176,11 @@ effect. The unit is the \textbf{tensor}, not the group size.
 
 \subsection{Narrowed to a base--meta pairing: the tail as a universal carrier}
 \label{sec:tail}
+
+\emph{This subsection asks whether the size-1 tail is the carrier of $\Dstat$ and ends by
+narrowing it to a base--meta pairing instead. A referee following the mechanism search as a whole
+can read Table~\ref{tab:mechanisms}, this subsection's verdict and
+Figure~\ref{fig:decomposition}.}
 
 $\Dstat - \Gstat$ (Eqs.~\ref{eq:D}--\ref{eq:G}) isolates the size-1 tail's contribution ---
 $\Gstat$ is the same contrast with the tail already removed from both arms, count-matched
@@ -3887,7 +3985,7 @@ with a recursive collector for this reason.
 
 We separate two kinds of limit, because they are not answerable by the same means. T1--T8 are
 \textbf{limits of the included evidence} (\S\ref{sec:threats-evidence}): statements about what the runs in this corpus can and
-cannot support, which only more runs would move. T9--T12 are \textbf{limits of the review process}
+cannot support, which only more runs would move. T9--T13 are \textbf{limits of the review process}
 (\S\ref{sec:threats-process}):
 decisions we made in excluding, filtering, scoring and scoping this audit, which a reader can
 re-make on the deposited run table without running anything new. The two lists are kept apart so
@@ -3895,6 +3993,10 @@ that neither reads as a softening of the other.
 
 \subsection{Limits of the included evidence}
 \label{sec:threats-evidence}
+
+\emph{These are limits of the evidence itself: only more runs would move them. A referee weighing
+external validity wants T1, T3 and T4. The limits a reader can re-decide on the deposited run
+table are in \S\ref{sec:threats-process} instead.}
 
 \paragraph{T1 --- Almost one meta-optimiser.}
 Lion's sign update makes the per-group $\alpha$ the
@@ -4058,6 +4160,10 @@ differing by 0.197 pp.
 
 \subsection{Limits of the review process}
 \label{sec:threats-process}
+
+\emph{These are decisions we made in excluding, filtering, scoring and scoping this audit, and a
+reader can re-make every one of them on the deposited run table. A referee checking the statistics
+wants T13, which supplies the calibrated null this paper's Cochran $Q$ readings are referred to.}
 
 \paragraph{T9 --- Excluded data, and one batch that is two.}
 One batch (\arm{ar1}, $\Dstat = +0.697 \pm 0.118$) is excluded as box-void throughout: it bound on
@@ -4254,6 +4360,10 @@ freedom, and none of them is a pooled quantity or a $\chi^2$ reading.
 
 \section{Reproducibility}
 \label{sec:repro}
+
+\emph{This section is the deposit's manual and the corpus's attrition ledger. A referee who only
+wants to re-derive the headlines needs the one-command block immediately below; everything after
+it documents what the deposit cannot re-run, and why, rather than leaving it to be discovered.}
 
 \paragraph{One command.}
 The deposit re-derives and asserts the numbers that carry a claim in this paper;

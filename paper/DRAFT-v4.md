@@ -157,7 +157,8 @@ partition (§4.7). (v) Every accuracy here is a test-set quantity and no validat
 held out anywhere (§3.3, §7 T12). (vi) We inherit, and partly overlap with, Choi et al. on
 tuning-protocol sensitivity, Zheng & Kwok on blockwise adaptivity, and CAM-HD on the granularity
 ladder and its interior optimum; §2 states exactly what is left, §1.1 lists what this paper adds,
-and §3 fixes the partitions, the contrasts and the metric before any result is read.
+§1.2 maps every claim in it to the evidence for that claim, and §3 fixes the partitions,
+the contrasts and the metric before any result is read.
 
 ### 1.1 Contributions
 
@@ -232,6 +233,42 @@ and §3 fixes the partitions, the contrasts and the metric before any result is 
 7. **A measurement-discipline appendix** documenting a batch that failed silently on its own axis,
    a metric column that produced two withdrawn headlines, an argument-line defect that voided two
    batches, and an internal variance claim that did not reproduce (§6, Appendix A).
+
+### 1.2 Reader's guide and evidence map
+
+This paper is long because it reports a failed mechanism search alongside a positive result, and
+both are evidence. It is not built to be read straight through, so this subsection says where
+everything is.
+
+**Four things carry the argument**: the count-matched contrast (§4.3, Table 2); the candidate
+moderator and the endpoint knife taken to it (§4.4); the budget reading and the sentence of ours
+it withdrew (§4.8); and the stated scope of the audit that re-derives all three (§3.4). A referee
+who reads only those four has the argument in front of them. Every other section supports one of
+them, bounds one of them, or reports something we looked for and did not find.
+
+**The map below is an index, not a summary.** For each claim it names the subsection that states
+it, the float that displays it, the numbered section of `analysis/c98_reproduce.py` that
+re-derives it, and the deposit command that re-runs that derivation (§8). It carries no
+quantities on purpose: every number in this paper is stated at one site, and the map points at
+the site rather than repeating it.
+
+| claim | stated in | shown in | audit | deposit |
+|---|---|---|---|---|
+| At fixed group count, the partition beats the count | §4.3, §4.5 | Table 2, Figure 1 | `[2]`, `[9]` | `make reproduce-table2` |
+| The base optimiser moderates the effect — conditional on the endpoint | §4.4 | Figure 2 | `[3]` | `make reproduce` |
+| Nine candidate mechanisms, and none of them is a general carrier | §5, §5.4, §5.5 | Figure 4 | `[6]`, `[17]` | `make reproduce` |
+| The effect survives 3× the budget, and it declines with it | §4.8 | Figure 3 | `[7]` | `make reproduce` |
+| Alignment is a bounded null, and the permutation draw is exchangeable | §4.6, §4.6.1, §5.10 | — | `[4]` | `make reproduce` |
+| The one-dimensional-tensor prescription, and its base–meta exception | §4.7 | — | `[5]` | `make reproduce` |
+| The corpus, the count-matching, admissibility and attrition | §3.1–§3.3, §8 | Table 1, Table 3 | `[1]`, `[13]` | `make verify`, `make reproduce` |
+| The scope limits, including the competitiveness deficit | §7 T1–T8 | — | `[8]` | `make reproduce` |
+| The four in-flight registrations, and the one that reversed us | §3.5, §4.8, Appendix A | Figure 3 | `[7]` | `make reproduce` |
+| What the audit asserts, and what it does not | §3.4, §8 | — | `[16]`, `[14]` | `make reproduce` |
+
+**What the map does not do.** It does not weight the evidence and it does not stand in for §7:
+a row says where a claim is, not how much it will bear. Where a claim is conditional — §4.4's
+moderator, §4.7's prescription and §4.8's slope each are — the condition is stated at the site
+and only there.
 
 ---
 
@@ -526,6 +563,10 @@ slightly different object and is reported as such.
 
 ### 3.3 Metric, admissibility, multiplicity, and units of replication
 
+*This subsection fixes the endpoint, the admissibility filter, the multiplicity convention and
+the unit of replication before any result is read. A referee who accepts those definitions can go
+straight to §4.3; one who wants them varied wants §4.4's endpoint block and §7 T10.*
+
 **Metric.** For a run $r$ that completed $E_r$ test epochs with accuracies
 $a_r(1),\dots,a_r(E_r)$, the primary metric throughout is
 
@@ -745,6 +786,10 @@ rather than let the column imply a completeness it does not have, and
 
 ### 3.4 Registration discipline
 
+*This subsection states which scorers were registered before their runs existed, the three places
+we knowingly depart from one, and — in its closing paragraph — what the audit asserts and what it
+does not. That closing paragraph is what a referee checking a number's provenance wants.*
+
 Where a batch has a scorer committed before its runs existed, that scorer is run **unedited** and
 its printed verdict is quoted rather than paraphrased. This rule exists because it was broken: two
 cycle-91/92 headlines were withdrawn after being produced by reductions hand-written at read time
@@ -845,6 +890,10 @@ kind of claim this audit exists to catch: the first version of it checked no ρ,
 superlative survived two review cycles in §4.3 as a result.
 
 ### 3.5 Four pre-registered batches: all four now scored, one after a forced redesign
+
+*This subsection puts the four in-flight registrations on the record with their decision rules
+ahead of their numbers. A referee who wants only the outcomes can read the table at its head and
+follow it into §4.4, §4.6.1, §4.7, §4.8 and §5.5.*
 
 Three weaknesses this paper states about itself, and one experiment it declares was never run, are
 addressed by the four batches tabulated below, submitted while this paper was being written.
@@ -1270,6 +1319,10 @@ contrast; `sm4`, the one cell with a non-Lion meta-optimiser, is plotted but is 
 
 ### 4.4 The heterogeneity has a candidate moderator, the base optimiser — and a rival we can measure but not exclude
 
+*This is the longest subsection in the paper and it does two separable things: it identifies a
+candidate moderator for the heterogeneity in D, then it attacks that moderator. The attack begins
+at "The endpoint, varied" below; Figure 2, at the end, carries both halves.*
+
 Restrict Table 2 to the fourteen cells that run the same ResNet-18 partition contrast
 (`nodewise` → `chunk777`, count-matched to +1 group on 14,420; rows 1–4, 6–12 and 17–19) so that
 the contrast itself is held fixed. `sm4` (row 20) is **excluded from every pool in this section**
@@ -1435,7 +1488,7 @@ experiment.
 
 **What their agreement measures is therefore re-measurement of a fixed seed set across
 batches, not replication across seeds**, and §6.3 is where its worth is settled: with the batch
-variance component withdrawn (sd_batch = 0.000 pp, F(39, 172) = 0.71), a second submission at
+variance component withdrawn (sd_batch = 0.000 pp, F(39,172) = 0.71), a second submission at
 the same seeds is a rerun, not a replicate. Q = 0.88 on 3 df says that D does not move between
 reruns, which is worth knowing and is not nothing; it does not say that D survives a change of
 seed. The one comparison in this pool that does say that is `cc1` against `mm1` or `pp1`, and
@@ -1486,6 +1539,10 @@ Q 102.61 / 14, between 95.01 / 3), and restoring the withdrawn GroupNorm arm as 
 previous version's eleven cells was 88.4% of a Q of 36.40, and against the legacy twelve-cell pool
 that contained the GroupNorm cell it was 74.6% — the "≈75%" that earlier versions of this work
 quoted. All are true of different denominators; none may be quoted without naming its own.
+
+*From here the subsection changes subject: everything above establishes the decomposition,
+everything below tests it against the three other end-of-training columns the corpus carries, and
+§7 T13 supplies the null those tests are referred to.*
 
 **The endpoint, varied — and the part of this subsection that does not survive it.** Everything
 above is computed on `plateau5`, and §3.3 concedes, as the sixth of its selection items, that
@@ -1947,6 +2004,10 @@ the power and removes the confound; it does not broaden the design point, and we
 does.
 
 ### 4.7 The prescription, and its exact scope
+
+*This subsection states the one designer-facing recommendation the paper makes and then attaches
+its scope, which is narrower than the recommendation. A referee who wants the recommendation and
+its exception wants the prescription table and the endpoint rows below it.*
 
 The practitioner's move implied by §4.3 and §4.6 is: **give each one-dimensional tensor a single
 step size instead of one per element.** Measured as T = `nodewise1d` − `nodewise` (Eq. 5), within
@@ -2439,6 +2500,10 @@ not the group size.
 
 
 ### 5.4 Narrowed to a base–meta pairing: the tail as a universal carrier
+
+*This subsection asks whether the size-1 tail is the carrier of D and ends by narrowing it to a
+base–meta pairing instead. A referee following the mechanism search as a whole can read §5's
+opening table, this subsection's verdict and Figure 4.*
 
 `D − G` (Eqs. 1–2) isolates the size-1 tail's contribution — G is the same contrast with the tail
 already removed from both arms, count-matched exactly.
@@ -3093,12 +3158,16 @@ in §6.1 was run with a recursive collector for this reason.
 
 We separate two kinds of limit, because they are not answerable by the same means. T1–T8 are
 **limits of the included evidence**: statements about what the runs in this corpus can and cannot
-support, which only more runs would move. T9–T12 are **limits of the review process**: decisions we
+support, which only more runs would move. T9–T13 are **limits of the review process**: decisions we
 made in excluding, filtering, scoring and scoping this audit, which a reader can re-make on the
 deposited run table without running anything new. The two lists are kept apart so that neither
 reads as a softening of the other.
 
 ### Limits of the included evidence
+
+*These are limits of the evidence itself: only more runs would move them. A referee weighing
+external validity wants T1, T3 and T4. The limits a reader can re-decide on the deposited run
+table are in the next subsection instead.*
 
 **T1 — Almost one meta-optimiser.** Lion's sign update makes the per-group α the *only* thing
 setting per-coordinate update magnitude, which is precisely the regime where the partition should
@@ -3240,6 +3309,10 @@ tests. But fifteen cells rest on 3 v 3, and §6.1 shows two reruns of one such c
 0.197 pp.
 
 ### Limits of the review process
+
+*These are decisions we made in excluding, filtering, scoring and scoping this audit, and a reader
+can re-make every one of them on the deposited run table. A referee checking the statistics wants
+T13, which supplies the calibrated null this paper's Cochran Q readings are referred to.*
 
 **T9 — Excluded data, and one batch that is two.** One batch (`ar1`, D = +0.697 ± 0.118) is
 excluded as box-void throughout: it bound on the step-size guards asymmetrically, in the direction
@@ -3416,6 +3489,10 @@ reading.
 ---
 
 ## 8. Reproducibility
+
+*This section is the deposit's manual and the corpus's attrition ledger. A referee who only wants
+to re-derive the headlines needs the one-command block immediately below; everything after it
+documents what the deposit cannot re-run, and why, rather than leaving it to be discovered.*
 
 **One command.** The deposit re-derives and asserts the numbers that carry a claim in this paper;
 §3.4 states that scope exactly, and `python3 analysis/c98_reproduce.py --census` measures it *in

@@ -9866,3 +9866,208 @@ No Slurm job submitted; both queues empty.
 
 **REMAINING:** R10's seven formatting residuals (all justified as formatting, not content), and
 the Plan C signposting.  Six author items unchanged and untouched.
+
+## 139. PLAN C APPLIED, THREE RESIDUALS CLOSED, AND A THREAT INDEX THAT OMITTED A THREAT
+
+Two packages integrated (`paper/sections/v11-signposting.md`, `paper/sections/v11-residuals.md`),
+plus the dashboard rewritten.  **29 replacements applied, all anchors re-verified `count == 1`
+against the live files immediately before each substitution.**  Total diff: **195 insertions, 8
+deletions**, and each of the 8 removed lines is a line rewritten in place -- **no sentence was
+deleted and none was softened.**
+
+**PLAN C -- SIGNPOSTING, APPLIED.  Nothing moved, nothing renumbered.**  Three added elements,
+**932 words** measured, **zero quantities**:
+  * a new **S1.2 "Reader's guide and evidence map"** after S1.1 -- lead, a ten-row map
+    (claim | stated in | shown in | audit | deposit), closing caveat.  A non-floating
+    `center`+`tabular`, so it takes **no table number** and shifts no float numbering.  New label
+    `sec:guide` (tex:334), referenced exactly once.
+  * **ten italic one-shot openers** at the heads of S3.3, S3.4, S3.5, S4.4, S4.4's endpoint block,
+    S4.7, S5.4, S7 *evidence*, S7 *process*, S8.
+  * **one forward pointer** to S1.2 in S1's closing sentence.
+The functional test -- a referee reaches any claim's evidence in one step -- is met by three
+one-hop routes: S1.1 -> section + float (already true at 58c0c85); S1.2's map -> section + float
++ the numbered `c98_reproduce.py` section that re-derives the number + the `make` target that
+re-runs it (new, and the only route to the last two); section head -> triage answer without
+reading the section (new).
+
+**THE CENSUS DID NOT MOVE, AND THE ONE INTERNAL THAT DID IS ACCOUNTED FOR.**  Asserted triple
+**628 / 411 / 982 / 41.9%**, identical to 58c0c85; `c98_reproduce.py` exit 0, **ALL 636 CHECKS
+PASS**.  Internals: raw `\d+\.\d+` 3067 -> **3098**, distinct **1007** unchanged; quantities
+2614 -> **2615**, distinct **982** unchanged.  The `+1` was traced rather than absorbed: it is the
+Markdown ATX heading numeral **`1.2`**, which survives `_XREF` because a heading numeral is
+preceded by `### ` and not by a `S`/`Table`/`Figure` token.  It does not touch `n_qd` because
+`1.2` **already occurred twice** as a quantity numeral (`meta-stepsize 1.2%`, `adjusted p =
+1.2e-8`) -- verified by direct enumeration -- and `n_q` is asserted by nothing (`censuscheck`
+unpacks it as `_n_q`).  The other 30 new numerals are all `SN.M` cross-references and all fall to
+`_XREF`.  **No quantity was smuggled in.**
+
+**A REQUIRED CONSEQUENTIAL EDIT TO A REGISTERED CHECK'S DATA.**  `analysis/xref_check.py`
+allowlists the eight **parent-paper** `S7.x` references **by line number**, and five of the eight
+sit after the S1.2 insertion.  **Re-derived, not pasted** (the package supplied a literal and
+also supplied a recompute recipe; the recipe was used): `PARENT_LINES` `{41, 43, 45, 250, 254,
+257, 258, 260}` -> **`{41, 43, 45, 287, 291, 294, 295, 297}`**.  Each of the eight was inspected
+and confirmed to carry a genuine reference to the parent paper's own S7.1 / S7.2 / S7.3 / S7.5
+before being listed.  This is an edit to a check's **data**, not its logic, and the file's
+docstring anticipates it: *"the allowlist is itself checked ... so the allowlist cannot silently
+rot as the draft moves."*  `xref_check.py` now resolves **596** references (up from 545), 0
+unresolved, 0 stale.
+
+**THE DISCLOSED COST: 75 pp -> 76 pp.**  Measured with `pdfinfo` on a real build.  It is not
+recoverable -- roughly half the growth is the ten openers spread through the document, so no
+configuration of this package keeps 75 pp.  `paper/sections/v9-plan.md`'s Plan C row asserting
+"75 pp, unchanged -- and honestly so" is **wrong by one page**, and the measurement is reported
+rather than the estimate.  The trade is one page of navigation against seventy-five of content.
+
+**R10 -- ALL EIGHT RESIDUALS GIVEN AN INDIVIDUAL WRITTEN VERDICT; THREE CLOSED.**  Residual list
+**8 -> 5**, zero new, and the five that remain are a strict subset of the original eight.
+**Every causal claim below was established by deleting the candidate site and re-counting**, not
+by reading the tool's printed context -- and that matters, because `quantities()` uses
+`ctx.setdefault`, so **the context it prints is the FIRST occurrence, not the surplus one**, and
+it is misleading for all five surviving residuals.  Both packages' *counts* were correct; both
+packages' *site inferences* had to be re-verified, and one package's context-based reading of
+`0.05` and `3.0` was wrong.
+  * `39,172` tex-only x1 -- **CLOSED.  One space.**  DRAFT-v4.md wrote `F(39, 172)` where
+    paper.tex:1930 writes `F(39,172)`; the diff's thousands-group branch `\d{1,3}(?:,\d{3})+` has
+    no optional space, so the spaced form registers no token at all.  All three `F(39,172)`
+    statements were always in **both** files, and every other `F(a,b)` pair is spelled identically
+    across the two, so the md line was the sole violation of the document's own convention.
+    Fixed at DRAFT-v4.md:1491; measured tex 2 / md 2.
+  * `9.0` md-only x2 -- **CLOSED, and the inherited label REFUSED.**  This was **not** a
+    formatting artefact: no normaliser was involved.  DRAFT-v4.md printed `box -30:9.0` in two
+    `rl3` rows of S4.7's `T` table and paper.tex did not -- a difference in what the two tables
+    print.  **But no claim diverged**: the clip box for those two rungs is in Table 2 rows 6/7 of
+    both markups and both markups' `T`-table footnote points there.  Closed on the **tex** side
+    (paper.tex:2564, :2568), adding the annotation rather than deleting a true one from the md.
+    Measured tex 24 / md 24.
+  * `0.05` tex-only x1 -- **OPEN, IRREDUCIBLE, formatting by design.**  The `\caption` of
+    `\label{tab:holm}` (paper.tex:3255-3256).  Deleting that caption takes tex 23 -> 22 and lands
+    exactly on md's 22.  Markdown pipe tables have no caption construct; the caption's claim is
+    restated in the sentence after the table in both markups.
+  * `3.0` tex-only x1 -- **OPEN, IRREDUCIBLE, formatting by design.**  The `\caption` of
+    `\label{tab:T}` (paper.tex:2554-2556).  Deleting it takes tex 4 -> 3, landing on md's 3.  Both
+    halves of its claim are in the md prose in a **sharper** form (the weakest `t` 3.09, not the
+    rounded `>= 3.0` bar).
+  * `0.087`, `0.279`, `3.19` md-only x1 each -- **OPEN, JUSTIFIED, one shared cause.**  A single md
+    line, DRAFT-v4.md:2674, quotes `c88_scorers.py`'s printed dict in an **inline single-backtick
+    span**; paper.tex:3414-3418 carries the identical dict inside `\begin{quote}`, which `norm_tex`
+    strips as quoted scorer output, while `norm_md` strips fences, 4-space indents and `>` blocks
+    but not inline backtick spans.  Deleting md:2673-2675 takes `0.087` 10 -> 9, `0.279` 8 -> 7,
+    `3.19` 2 -> 1 -- each landing exactly on the tex count.  A pure exclusion asymmetry.
+  * **The optional `E4`** (fencing the md dict to match the tex) **and `E2`** (stripping the box
+    from the md rows) were both **declined**: E4 is cosmetic and rewrites a prose line into a code
+    block the authors did not ask for, E2 deletes a true annotation from the markup that has it.
+  * **`paper_numeric_diff.py` will keep exiting 1.**  The two captions are irreducible without
+    inventing caption prose carrying quantities for Markdown pipe tables -- writing new
+    number-bearing prose into the markup the census reads, purely to satisfy a diff.  **Read this
+    check by its printed list, not by its exit code.**
+
+**A CONTENT DEFECT FOUND AND FIXED: S7's OWN THREAT INDEX OMITTED ONE OF ITS OWN THREATS.**  S7's
+opening paragraph split the threats into `T1--T8` (limits of the included evidence) and
+`T9--T12` (limits of the review process).  **`T13` exists** and sits inside *Limits of the review
+process* -- verified by enumerating the threat paragraphs: T1-T8 fall in tex:3899-4053, T9-**T13**
+in tex:4062-4189, under the `\subsection{Limits of the review process}` at tex:4059.  T13 is not
+a minor threat: it is the calibrated-null correction that several of the paper's own Q readings
+are referred to, and S1.1 items 1 and 3 both cite it.  Fixed to `T9--T13` in both markups
+(DRAFT-v4.md:3161, paper.tex:3988).  Adds no numeral.
+
+**CORRECTIONS TO THE RECORD -- five, each re-measured, none absorbed.**
+  1. **The briefing's claim that `F(39,172)` "was real and is already closed (was missing from
+     the Markdown)" was FALSE on both halves.**  It was never closed -- the residual was present
+     at 58c0c85 and `paper_numeric_diff.py` reported **8**, not 7 -- and it was never a prose gap:
+     the Markdown carried all three statements.  The task was to dispose of **eight** residuals.
+  2. **The briefing's cause attributions for the two tex-only tokens were wrong.**  `0.05` is not
+     "a `p < 0.05` and a tabular column width" and `3.0` is not "a pp bar and a typesetting
+     length" -- each is a single LaTeX float caption, established by deletion-and-recount above.
+     Genuine column widths and typesetting lengths are already stripped by `norm_tex`.
+  3. **CORRECTIONS 137's and 138's summary line "R10's seven formatting residuals (all justified
+     as formatting, not content)" is half right.**  "Seven" is the distinct-token count against
+     **eight** occurrences, and **"all formatting" is wrong for the `9.0` pair**, which was a real
+     table-content difference.  The inherited label was not applied where it did not fit.
+  4. **R2 WAS REPORTED CLOSED WHEN ONLY ONE OF ITS TWO LIMBS WAS.**  R2 as logged had two limbs --
+     S4.8's budget table has **no caption** and an **undefined `se` column**.  CORRECTIONS 137
+     closed the `se` limb and did not mention the caption; 137, 138 and `docs/STATUS.md` then all
+     carried R2 as closed.  At this HEAD the table is still an unfloated `center`/`tabular`
+     (paper.tex:2810-2822) with **no `\caption` and no `\label`** -- verified.  **No edit
+     proposed**: nothing cross-references it (no label; `xref_check.py` clean) and the following
+     prose *"In the table, se is..."* does a caption's job in both markups (paper.tex:2832 /
+     DRAFT-v4.md:2229).  But the record said fixed when it was not, so it is now logged
+     open-by-decision rather than closed.
+  5. **`paper/sections/v9-plan.md` carries pre-136 census figures** (`892`, `45.9%`, and the
+     sentence "the asserted census stays at 892") against the live **982 / 41.9%**.  Left
+     unedited -- it is a superseded planning document and its Plan C *conclusion* proved correct;
+     only its printed denominator is stale.  Any future census simulation must run against 982.
+
+**TWO DEVIATIONS FROM `v9-plan.md` S8, both on measurement and both accepted.**  Its S8.3
+per-contribution pointers were **dropped**: all seven S1.1 items already end in a bracket naming
+their sections and floats, so the one-step property already held, and editing the paper's most
+number-dense list to restate pointers it already carries is pure downside.  And the opener set was
+**re-chosen**: S4.6 dropped (measured 893 w), S4.7 added (2,430 w), and S4.8 (2,916 w)
+deliberately **not** opened -- an opener licenses triage, and S4.8 is one of the four things a
+referee must not skip, so it is named in S1.2's load-bearing list instead.
+
+**A NEW INSTANCE OF A KNOWN TRAP, AND THE COUNT IS NOW FOUR.**  The line-wrap `grep` false alarm
+(CORRECTIONS 138 recorded the first) struck again this cycle: S4.8's *"the measured ladder stops
+at 300 epochs and so does the claim"* guard reads as **absent** from DRAFT-v4.md on a single-line
+grep and is present, wrapping across **:2273-2274**.  Four false divergence alarms so far.
+Promoted to a standing note in the dashboard: search a whitespace-collapsed buffer, never a
+single line.
+
+**KNOWN AND NOT FIXED ON PURPOSE.**  `analysis/c98_reproduce.py` prints the section label `[15]`
+**twice** -- line 621 (partition-family meta-optimiser census) and line 987 (metric sensitivity) --
+so the audit's own printed labels are ambiguous.  Registered machinery, cosmetic numbering, and
+renumbering mid-cycle would churn 636 output lines.  S1.2's evidence map deliberately cites
+neither.  Rename to `[18]` at the next machinery change.
+
+**UNSURE, STATED RATHER THAN GUESSED.**
+  * **Whether 76 pp reads better to a TMLR referee than 75 pp did.**  The navigation was verified
+    to work mechanically; nobody has evidence on how a referee trades a page against it.
+  * **The Markdown abstract's authoritative word count.**  `_extract_abstract`,
+    `clean_abstract_text` and `_abstract_defects` are **not in this tree** -- confirmed by search,
+    they appear only inside `docs/` and `paper/sections/` prose.  A plain count gives **231**
+    against the gate's recorded **228** and a **230** cap; the tex agrees at **222** by both
+    methods; the longest sentence is 33 words against a bar of 62.  **What is certain is that this
+    cycle did not touch the abstract**: both markups' abstracts are **byte-identical to 58c0c85**,
+    so the gate's own figures stand unchanged.  Anyone editing the abstract must run the gate, not
+    a word count.
+  * **Whether S1.2 belongs before S2** or as a "how to read this" block near S7, and **whether
+    italic is the right treatment** for ten openers versus `\paragraph` run-in heads.  No
+    measurement distinguishes them; taste is the authors'.
+
+**VERIFICATION -- pasted, not summarised.**  `c98_reproduce.py` exit 0, **ALL 636 CHECKS PASS**,
+census **628 / 411 / 982 / 41.9%** (fixpoint held).  `xref_check.py` exit 0, **596 references**
+(section 500, table 51, figure 22, appendix 23), 8 allowlisted, **0 unresolved, 0 stale**.
+`test_fence_mask.py` **ALL PASS**.  `paper_numeric_diff.py` exit 1 with **5** residuals
+(tex-only `0.05`, `3.0`; md-only `0.087`, `0.279`, `3.19`) -- **0 new, 3 closed**.
+`tectonic -X compile paper.tex` on a clean copy of `paper/`: exit 0, **76 pp**, **0** TeX errors,
+**0** undefined, **0** `??` in the extracted PDF text, **75 labels / 75 distinct refs, 0 orphan,
+0 dangling, 0 duplicate**, and the **same two** `Overfull \hbox` at the **same widths**
+(7.28497 pt, 12.25499 pt) as the pre-Plan-C build -- no third.  `dup_group_guard.py` 21 groups,
+42 rows stamped, 3 superseded, **PASS**.  `c99_hz3q_score.py --selftest` **59/59 PASS**.
+`c87_hz3_score.py` unedited, `--runs` supplied: **VERDICT: SURVIVES**, **MECHANISM SURVIVES THE
+HORIZON**, `D(300)-D(100) = +0.229` -> **GROWS**, `grep -c hz3q` **0**.  `c99` gates: **H0 PASS**
+(all four arms NVIDIA L4, `-30:9.0`, seed 5, 300 ep), **H1 PASS** worst coordinate fraction
+**0.000000** at bar 0.05, **H2** repaired `-0.238 / 0.093 / -2.57` -> **NOT FLAT, D DECLINES WITH
+BUDGET**, **H3** repaired `D(300) +0.394 / 0.093 / +4.25` and `G(300) -0.048`, **HC** `+0.134 pp`
+against a 1.00 bar, and RULE 13 still refuses the archive on both GPU model and `beta_clip`.
+Corpus `results/all_runs.csv` **2,177 rows**.  The four "declines != disappears" guards present
+exactly once in **both** markups.  Contribution 1 intact at all four sites, abstract
+byte-identical.  Read-only `ssh` only: both ALICE staging dirs still gone, both queues
+header-only.  **No Slurm job submitted.**
+
+**THE SIX AUTHOR ITEMS ARE UNCHANGED, STILL EXACTLY SIX, AND EACH WAS VERIFIED STILL OPEN** with
+its line numbers re-derived at this HEAD (they all shifted with the S1.2 insertion).  The end
+matter's CRediT roles, Funding statement, correspondence address and author list were **not
+touched**.  Item 6 -- authorship for the originator of the S5.9 design -- remains an ethics
+decision to be settled **before** submission, because the paper's own Competing Interests calls
+the origination "a substantial intellectual contribution rather than an acknowledgeable courtesy".
+
+**`docs/STATUS.md` REWRITTEN FROM SCRATCH.**  Its "Open, carried from CORRECTIONS 135" section
+still listed items 2-6 as open when all five had been closed in cycles 114-115; it also carried
+stale line numbers, a stale census triple (`628 / 409 / 892 / 45.9%`), a wrong R10 diagnosis and a
+header two commits behind.  Every row of the replacement was re-derived at this HEAD, none copied
+forward, and **four line-number errors in my own first draft of it were caught by spot-checking
+its rows back against the repo** -- including a correspondence-address citation that was a false
+grep hit.  Folded in: R4 and R2 (partly) closed, R8 documented, the census correction
+45.9% -> 42.0% -> 41.9%, `xref_check.py` and `test_fence_mask.py` as registered per-cycle checks,
+the operational trap that `c87`/`c99` cannot find the raw records without `--runs`, and that the
+deposit must be rebuilt at the submission commit.

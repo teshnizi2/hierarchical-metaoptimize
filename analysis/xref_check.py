@@ -29,7 +29,7 @@ ROOT  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DRAFT = os.path.join(ROOT, "paper", "DRAFT-v4.md")
 
 # Lines whose "SN.M" refers to the PARENT paper's own sections, not ours.
-PARENT_LINES = {41, 43, 45, 250, 254, 257, 258, 260}
+PARENT_LINES = {41, 43, 45, 287, 291, 294, 295, 297}
 
 _FENCE = re.compile(r"(?s:```.*?```)|(?m:^ {4,}\S.*$)")
 
