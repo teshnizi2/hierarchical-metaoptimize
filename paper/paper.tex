@@ -2672,7 +2672,8 @@ resolution.
 
 \arm{hz3} ran the four arms for 300 epochs at 6 seeds, so $\Dstat$ at 100, 200 and 300 epochs can
 be taken \textbf{within run}, per seed. That pairing cancels the seed, the run and the batch
-identically. It does \textbf{not} cancel the step-size clip box or the GPU class, because
+identically in all three readings below. In the \textbf{as-published} reading alone it does
+\textbf{not} also cancel the step-size clip box or the GPU class, because
 \arm{hz3} is two submissions: its seed-5 \arm{chunk777}, \arm{nodewise1d} and \arm{chunk2325}
 runs were resubmitted in the narrower box $-15{:}{-}2.3026$ and on an A100, while everything else
 --- including their own seed-5 \arm{nodewise} partner --- ran at $-30{:}9.0$ on an L4 or a

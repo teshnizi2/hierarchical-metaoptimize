@@ -2120,8 +2120,9 @@ opposite direction, on one framework, at CIFAR resolution.
 ### 4.8 Budget: the effect survives 3× the budget, and it declines with it
 
 `hz3` ran the four arms for 300 epochs at 6 seeds, so D at 100, 200 and 300 epochs can be taken
-**within run**, per seed. That pairing cancels the seed, the run and the batch identically. It does
-**not** cancel the step-size clip box or the GPU class, because `hz3` is two submissions: its
+**within run**, per seed. That pairing cancels the seed, the run and the batch identically in all
+three readings below. In the **as-published** reading alone it does **not** also cancel the
+step-size clip box or the GPU class, because `hz3` is two submissions: its
 seed-5 `chunk777`, `nodewise1d` and `chunk2325` runs were resubmitted in the narrower box
 `−15:−2.3026` and on an A100, while everything else — including their own seed-5 `nodewise` partner
 — ran at `−30:9.0` on an L4 or a 2080 Ti (§7 T9). That seed has since been re-run: `hz3q` repeats
@@ -2866,8 +2867,8 @@ nothing crosses a threshold, and the pattern — one CIFAR-100 fold carrying the
 model that leads inside CIFAR-10 without reaching significance — is the same to within a
 percentage point of RMSE. The functional form is itself the winner of about ten candidates scored
 on the same points, so any apparent improvement is a best-of-ten selection statistic before it is
-anything else. And the power bound is still decisive: **at 10 design points a predictor needs
-|r| ≥ 0.632 — it must explain ≥ 39.9% of the between-design-point variance — to be visible at
+anything else. And the power bound is still decisive: **at 10 design points a predictor
+needs |r| ≥ 0.632 — it must explain ≥ 39.9% of the between-design-point variance — to be visible at
 p < 0.05**; seeing |r| = 0.4 would need ≈ 25 design points, which is not reachable by brute force.
 
 The level model earns its own sentence. Fitted on the nine CIFAR-10 points it predicts
@@ -2979,8 +2980,8 @@ Reported as such, `ml2` is still informative, in a way we would not have bought 
 **two nondeterministic reruns of one 3 v 3 measurement** in one batch. They read **+0.554 ± 0.217**
 and **+0.357 ± 0.211**. A 0.197 pp spread between reruns of one measurement, at fixed seeds inside
 one batch, is a direct **nondeterminism** bound — not a seed bound and not a batch bound — and it is
-of the same order as τ = 0.203 pp (§4.4). Over all twelve same-seed pairs the bound is mean
-|Δ`plateau5`| **0.163 pp**, max **0.472 pp**. Collapsed to its three groups, `ml2` gives
+of the same order as τ = 0.203 pp (§4.4). Over all twelve same-seed pairs the bound is
+mean |Δ`plateau5`| **0.163 pp**, max **0.472 pp**. Collapsed to its three groups, `ml2` gives
 D = +0.456 ± 0.195, which is row 5 of Table 2.
 
 **What we now do about it, mechanically.** `analysis/argsline_guard.py` reads a run's own `ARGS:`

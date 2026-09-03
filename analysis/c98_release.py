@@ -399,9 +399,16 @@ that exists only inside a registered scorer's printed output are out — and sec
 
 %(census)s
 
-Two further limits, stated here rather than left to be found. This deposit ships
+Three further limits, stated here rather than left to be found. This deposit ships
 no manuscript, so `--census` has nothing to re-measure against here and the audit
-reports that section as skipped. And of the ten registered scorers the paper
+reports that section as skipped. Second, on a *cold* checkout `make reproduce`
+also skips section `[7] BUDGET`: that section reads the raw per-epoch `.out`
+series, which ships compressed, so it has nothing to read until `make logs` has
+unpacked it. The skip is announced, not silent, and it is soft by design — a hard
+failure there would make `make reproduce` fail for every user who has not yet run
+`make logs`, which is the normal first state of this deposit. Run `make logs`
+first and the section runs; the Makefile's default target ordering does this for
+you. And of the ten registered scorers the paper
 quotes or relies on, run unedited against this deposit alone, two reach their
 quoted verdict in full, two reach part of it, and six halt or print `NO DATA`,
 because they read the `probe*.jsonl` traces that *What is not here* excludes. Run

@@ -9810,3 +9810,59 @@ Abstract 222 words, defects `[]`, cap 230.  `tectonic` **0 errors**.  No Slurm j
 formatting residuals, carried items 2 (two md lines starting with `|`), 4 (S4.8's opening
 over-scopes as T9 did), 5 (ALICE staging dirs), 6 (whether S9 needs a companion sentence), and the
 Plan C signposting.  Six author items unchanged and untouched.
+
+## 138. THE CARRIED ITEMS AND R8 -- CLOSED, PLUS A STALE FIGURE IN THE SHIPPED DEPOSIT
+
+**CARRIED 2 -- two prose lines rendered as Markdown table rows.**  Both found and fixed by
+reflow rather than by escaping, so the `|r|` / `|Δ|` notation stays uniform with the rest of the
+prose (Markdown only treats a *leading* `|` as a delimiter):
+  DRAFT-v4.md:2870  `|r| ≥ 0.632 — it must explain ...`   -> "needs" moved down from 2869
+  DRAFT-v4.md:2983  `|Δ`plateau5`| **0.163 pp**, ...`      -> "mean" moved down from 2982
+`grep -nE '^\|(r|Δ|ρ|t|D)\|'` now returns nothing.  The TeX was never affected.
+
+**CARRIED 4 -- S4.8's opening over-scoped its own caveat**, the same shape R2 fixed in T9.
+"That pairing cancels the seed, the run and the batch identically.  It does **not** cancel the
+step-size clip box or the GPU class" read as scoping all three of S4.8's readings, when only the
+**as-published six-seed** reading carries those exceptions -- the five-seed reading drops the
+offending seed, and the repaired reading is matched by construction.  Now reads "...identically
+in all three readings below.  In the **as-published** reading alone it does **not** also cancel..."
+in both markups.
+
+**CARRIED 5 -- ALICE staging dirs removed, after checking.**  `/data1/salehkaleybars/metaopt/
+c99pkg` and `c99pkg2` (151K + 193K).  Contents were five files, and every one md5-identical to its
+repo counterpart (`c87_hz3_score.py`, `c99_hz3q_score.py`, `bin/c99_hz3q_quartet.sh`); no `.out`,
+no `probe*`, nothing unique.  Removed; workspace otherwise intact.
+
+**CARRIED 6 -- DECIDED: NO.**  S9 already states the two findings separately, in **both** markups:
+"...present and resolved at 3x the budget, at +0.394 +- 0.093, t 4.25, while declining with budget
+at a rate that now resolves (-0.238 +- 0.093, t -2.57, paired within seed) --- two findings, of
+which the second does not weaken the first."  A companion sentence would dilute it.
+*A false alarm of mine, corrected here:* I first reported this sentence as present in
+DRAFT-v4.md but MISSING from paper.tex.  It is in both -- paper.tex:4607-4608 -- and my grep
+missed it only because the phrase wraps across a line break there.  No divergence existed.
+
+**R8 -- the deposit's cold `[7] BUDGET` skip is now DOCUMENTED, not changed.**  Decision and
+reason: hard-failing would make `make reproduce` fail for every user who has not yet run
+`make logs`, which is the normal first state of the deposit, so the soft skip is correct
+behaviour and the defect was that it went unexplained in the README.  The generator's
+"Two further limits" paragraph is now "Three", naming the section, why it cannot read
+(`.out` ships compressed), that the skip is announced rather than silent, and the one-command fix.
+
+**A REAL DEFECT FOUND WHILE DOING R8, IN A SHIPPED ARTEFACT.**  `release/README.md` was still
+printing the coverage figure as **45.9%** -- the value CORRECTIONS 136 corrected to 42.0% and 137
+re-derived to 41.9%.  Not a generator bug: the README interpolates `%(census)s` at build time, so
+the built deposit was simply older than the fix.  **This is the failure mode TODO-FOR-AUTHOR item
+4 exists to catch, and it had already bitten.**  Deposit rebuilt; README now prints 41.9%.
+**It must be rebuilt once more at whatever commit is submitted** -- a deposit is only as current
+as its last build.
+
+**VERIFICATION.**  Census already at its FIXPOINT (628 / 411 / 982 / 41.9%) -- the reflows and the
+scoping edit added no quantity-numerals, as expected.  `c98_reproduce.py` exit 0, **ALL 636 CHECKS
+PASS**.  `xref_check.py` exit 0 (545 refs).  `test_fence_mask.py` ALL PASS.
+`paper_numeric_diff.py` the same 8 pre-existing residuals, ZERO new.  `tectonic` **0 errors**.
+Deposit: `make verify` 140 files 0 bad; cold `make reproduce` **ALL 547 PASS** with both skips
+announced; after `make logs` **ALL 628 PASS**; `make clean` then verify 140 / 0 bad.
+No Slurm job submitted; both queues empty.
+
+**REMAINING:** R10's seven formatting residuals (all justified as formatting, not content), and
+the Plan C signposting.  Six author items unchanged and untouched.
