@@ -47,6 +47,7 @@ Exit 0 = PASS (every required comparison identical), 1 = FAIL.
 """
 import argparse
 import hashlib
+import importlib.machinery
 import importlib.util
 import os
 import sys
@@ -89,9 +90,14 @@ class _NullWriter(object):
 
 
 def load_module(path, tag):
-    spec = importlib.util.spec_from_file_location("hf_%s" % tag, path)
+    """Load an HF.py by PATH, whatever its extension.  The pre-patch reference is
+    HF.py.bak_ebjs, so spec_from_file_location's suffix sniffing is not usable --
+    an explicit SourceFileLoader is."""
+    name = "hf_%s" % tag
+    loader = importlib.machinery.SourceFileLoader(name, path)
+    spec = importlib.util.spec_from_loader(name, loader)
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    loader.exec_module(mod)
     return mod
 
 
