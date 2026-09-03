@@ -22,8 +22,8 @@
 # =============================================================================
 #SBATCH --partition=gpu-short
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=48G
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=40G
 #SBATCH --time=02:30:00
 #SBATCH --output=/data1/salehkaleybars/metaopt/runs/in489smoke-driver-%j.out
 
@@ -36,14 +36,18 @@ cd $WS/imagenet489
 export PYTHONUNBUFFERED=1
 export BETA_CLIP=-15:-2.3026          # campaign standard (as in the g4m batch)
 
+# Leave 2 cores for the main process; qos-interactive/qos-testing cap a user at
+# cpu=12,gpu=1, and those are the only partitions with no queue right now.
+NW=$(( ${SLURM_CPUS_PER_TASK:-4} - 2 ))
+
 BASE="--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 \
 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 \
 --gamma 1 --meta-stepsize 3e-2 --alpha0 1e-6 \
 --NN-name resnet18 --num-classes 489 --data $WS/data/imagenet489 \
---batch-size 256 --num-workers 14 --steps-per-epoch 400 --num-epochs 3 \
+--batch-size 256 --num-workers ${NW} --steps-per-epoch 400 --num-epochs 3 \
 --max-time 00:40:00 --seed 1"
 
-echo "DRIVER node=$(hostname) job=${SLURM_JOB_ID}"
+echo "DRIVER node=$(hostname) job=${SLURM_JOB_ID} cpus=${SLURM_CPUS_PER_TASK} workers=${NW}"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 
 for G in scalar layerwise nodewise; do
