@@ -10,23 +10,23 @@ Correspondence: `mohammadrezaahmaditeshnizi@gmail.com`
 
 MetaOptimize (Sharifnassab, Salehkaleybar & Sutton, ICML 2025) meta-learns one step size per
 parameter group and reports that finer partitions help inconsistently, never separating that from
-the group *count*. Its contribution therefore remains unmeasured. Our research question is
-whether it survives at fixed count. We answer with a benchmarking experiment on the
-released artefact, patched only to add partitions. The sampling frame is a 2,177-run
-CIFAR-10/CIFAR-100 corpus; the unit of analysis is a within-batch count-matched contrast.
+the group *count*. Its contribution therefore remains unmeasured: does it survive at fixed count?
+We answer by benchmarking the released artefact, patched only to add partitions. The sampling
+frame is a 2,177-run CIFAR-10/CIFAR-100 corpus, the unit a within-batch count-matched contrast.
 
-The uniform partition wins in all twenty count-matched cells, on ResNet-18, ResNet-34 and
-ResNet-50. Pooled over eight SGDm cells the effect size is +0.556 ± 0.045 pp (calibrated 95% CI ± 0.121), homogeneous against that null (Q 4.21, median 9.4), while cells
+The uniform partition wins all twenty count-matched cells, on ResNet-18, ResNet-34 and
+ResNet-50. Pooled over eight SGDm cells the effect is +0.556 ± 0.045 pp (calibrated 95% CI ± 0.121), homogeneous against that null (Q 4.21, median 9.4), while cells
 differing in base optimiser are not. Alignment
 is a bounded null: at fixed count and size multiset, permuting group membership is worth
-−0.009 ± 0.157 pp, and −0.018 ± 0.079 pp in a pre-registered replication at twice the resolution.
+−0.009 ± 0.157 pp, and −0.018 ± 0.079 in a pre-registered replication at twice the resolution.
 Of nine candidate mechanisms, none is a general carrier.
 
-Threats to validity: the corpus is CIFAR-resolution vision, and a Lion meta-optimiser carries every
-count-matched cell but one. Every accuracy is a test-set quantity with no held-out validation
-split, bounding construct validity. The method trails tuned baselines (SGD+cosine on ResNet-18,
-AdamW+cosine on ResNet-34 and ResNet-50) by 1.8–4.2 pp, dwarfing this ≈0.6 pp effect. Read this as a
-constraint on partition design, not support for practitioners.
+Threats: the corpus is CIFAR-resolution vision; a Lion meta-optimiser carries every
+count-matched cell but one. Within one batch, on repaired data, the gap declines from +0.632 pp at
+100 epochs to +0.394 at 300, withdrawing our earlier flatness claim. Every accuracy is a test-set
+quantity with no held-out validation split, bounding construct validity. The method trails tuned
+baselines by 1.8–4.2 pp, dwarfing this ≈0.6 pp effect. Read this as a constraint on partition
+design, not support for practitioners.
 
 ---
 
@@ -831,8 +831,8 @@ attrition ledger's upstream cluster-side rows, wallclock and byte counts, Append
 or any value that exists only inside a registered scorer's own printed output — those are quoted
 from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census` on
 `paper/DRAFT-v4.md`, the
-audit executes **584 claim-carrying assertions covering 389 of the 872 distinct
-quantity-numerals** in this manuscript, which is 44.6% of them. Those three figures are not
+audit executes **628 claim-carrying assertions covering 409 of the 892 distinct
+quantity-numerals** in this manuscript, which is 45.9% of them. Those three figures are not
 merely measured: section `[16]` of the audit reads this sentence back out of **both markups** —
 `paper/DRAFT-v4.md` and `paper/paper.tex` — and asserts the triple against that one fresh
 measurement, so a stale coverage claim in *either* file now exits non-zero instead of passing
@@ -2171,6 +2171,36 @@ takes this paragraph as "the effect disappears at longer budgets" has read it ba
 states the two findings separately for that reason. Table 2's `hz3` cell is a separate, CSV-based
 reading of a separate registration and is unmoved by any of this.
 
+**Where does D reach zero? We do not know, and three points cannot tell us.** The arithmetic a
+referee will do is the linear one, so we do it here rather than leave it implied: at −0.238 pp per
+200 epochs, D(300) = +0.394 needs 0.394 / (0.238/200) ≈ 331 further epochs, putting a linear
+zero-crossing near 631 epochs — and on the unrounded ladder both routes to it, the paired slope
+applied to D(300) and least squares through all three repaired points, give 630. **That number is
+not a prediction, and four measured facts say why.** (i) It has no upper bound. Propagated through
+the same linear model, the registered 95% interval on the slope, [−0.477, −0.000], puts the
+crossing anywhere from about 465 epochs to never, because the interval reaches zero. (ii) The
+ladder resolves a difference, not a rate. Split into its two halves, paired within seed exactly as
+the endpoints are, the decline reads −0.120 ± 0.142 (t −0.84) over 100–200 epochs and
+−0.118 ± 0.096 (t −1.23) over 200–300: *neither half resolves*, and only the full 100–300 span
+does. The measurement licenses an endpoint difference and says nothing about the shape between
+those endpoints, let alone past them. (iii) The functional form is therefore unidentified, and here
+the choice of form matters far more than the quality of the fit. D linear in B, linear in ln B, and
+decaying exponentially in B all reproduce the three repaired points to within 0.020 pp — well
+inside a per-point se of 0.074 to 0.116 — and they put the crossing at 630 epochs, at 2034 epochs,
+and nowhere at all (the exponential fit gives D(600) = +0.195 and never reaches zero). (iv) The
+runs themselves argue against the linear form in particular, because a constant-rate catch-up is
+what linearity assumes and both arms are visibly saturating: across 100, 200 and 300 epochs
+`chunk777` gains +0.693 pp and then −0.016 ± 0.055, and `nodewise` gains +0.813 and then
++0.102 ± 0.096, so past 200 epochs neither arm is still measurably improving. **The measured ladder
+stops at 300 epochs and so does the claim.** We report a resolved decline across [100, 300] at one
+design point, in one batch, on six trajectory pairs read at three prefixes — six independent units,
+not eighteen — and we report no rate, no functional form and no crossing beyond it. The corpus's
+only 600-epoch runs sit at a different design point (an AdamW base with a layerwise partition,
+against a cosine-schedule baseline), carry no `chunk777`–`nodewise` contrast, and cannot extend
+this ladder; the run that would settle the question, this cell at 600 epochs, was not submitted. A
+reader who wants the shape of D(B) should read this subsection as a request for it, not as an
+estimate of it.
+
 **Why the published reading was wrong, and why it took a fifth run to see it.** Seed 5's
 `chunk777`, `nodewise1d` and `chunk2325` runs sat in a narrower clip box *and* on different silicon
 from their own `nodewise` partner, and the two defects bite at different budgets — the one shape of
@@ -2194,6 +2224,32 @@ when seed 5 is dropped, against 0.027 pp at 300 epochs); the repaired seed repro
 rather than the archived outlier. At B = 100 all four archived seed-5 arms are box-free, so the
 per-arm archived-to-repaired differences there — −0.204, +0.130, +0.376, +0.212 for `nodewise`,
 `chunk777`, `nodewise1d`, `chunk2325` — are class-plus-nondeterminism alone (§7 T9).
+
+**How the reversal actually happens, since deleting the bad seed does not produce it.** The first
+objection to a headline that turns on one seed is that it turns on one seed, and the table above
+already answers it: delete the contaminated seed and stop there and the reading is −0.207 ± 0.107,
+t −1.94 — **still `FLAT`**. What crosses the bar is the *replacement*, and it does two things at
+once, in almost exactly equal measure. *Location*: `hz3q`'s seed-5 δ is −0.396 against the five
+clean seeds' mean of −0.207, and a sixth observation moves a mean by exactly one sixth of its
+distance from that mean — here −0.0315, which carries −0.2068 to −0.2383, the table's −0.207 and
+−0.238. *Precision*: restoring n from 5 to 6 returns the degree of freedom the deletion cost and
+cuts the se from 0.107 to 0.093. Because t is δ/se, the two compose exactly: \|t\| goes from 1.94
+to 2.57, a ratio of 1.327, which is 1.152 from the location times 1.152 from the precision — 50.1%
+and 49.9% of the move in logs. **Neither half does it alone**, and the reader should not have to
+reconstruct that from the table.
+
+**The replacement is not an outlier; it displaces one.** `hz3q`'s seed-5 δ of −0.396 sits 0.79
+standard deviations inside the five archived seeds' own spread, and it is only the *third* most
+negative of the repaired six — seeds 2 and 3 read −0.454 and −0.440. The value it replaces, the
+archived seed 5's +0.142, was the *most positive* of the archived six. The repair takes the single
+most flatness-favouring observation in the set out and puts an unremarkable one in; that is the
+whole of the mechanism. **What the verdict is sensitive to is n = 6, not seed 5.** Deleting each
+seed in turn from the repaired pool gives \|t\| = 2.29, 2.50, 1.94, 1.94, 3.98 and 1.94 for seeds 0
+through 5 (the three that fall short read 1.943, 1.938 and 1.938 unrounded), so three of the six
+single-seed deletions put the reading back under the bar — and the last of those three is simply
+the five-clean-seed row of the table above. That is the honest size of a six-seed paired test whose
+two-sided p is 0.050. It is a property of the design, not of the seed we repaired, and it is why
+this subsection reports a decline resolved at this budget and this design point rather than a law.
 
 **A control `hz3`'s own design could not run.** The quartet's cross-class control (HC, §3.5) puts
 `hz3q-node-s5` at `plateau5`(300) = 92.908 on the L4 against the archived `hz3-node-s5`'s 92.774 on
@@ -2243,17 +2299,18 @@ Any claim about D is a claim about the end of training at these budgets.
 ![Figure 3](figures/f3_budget.png)
 
 **Figure 3 — D at 1×, 2× and 3× the budget, paired WITHIN run, and what one box-mismatched seed
-does to it.** `hz3` ran the four arms for 300 epochs at six seeds, so D can be read off the same
-run at three budgets, cancelling seed, run and batch identically. (a) Faint lines are the six
-per-seed trajectories; the two heavy lines are the arm-set means with 95% intervals. **Seed 5 is
+did to it.** `hz3` ran the four arms for 300 epochs at six seeds, so D can be read off the same
+run at three budgets, cancelling seed, run and batch identically. (a) Faint blue lines are the
+archived per-seed trajectories; the heavy lines are arm-set means with 95% intervals. **Seed 5 is
 drawn in red because it is not box-matched**: its chunk arm ran in β-box −15:−2.3026 and its
 nodewise arm in −30:9.0, so that seed's D is a cross-box difference and the other five are not.
-(b) The budget slope both ways. D is present and resolved at every budget. **The panel is drawn on
-the archive**, in which the slope does not resolve either on all six seeds (−0.149 ± 0.105,
-t −1.42) or on the five box-matched seeds alone (−0.207 ± 0.107, t −1.94). **Seed 5 has since been
-re-run box- and class-matched, and on that repaired pool the slope does resolve: −0.238 ± 0.093,
-t −2.57** (§4.8). The red trajectory is therefore the reading this figure supersedes, kept because
-the published record is part of the evidence.
+The green dotted trace is that same seed re-run box- and class-matched (`hz3q`): **the archived
+reading rises across the budget and the repaired one falls**, which is the whole of the repair.
+(b) The budget slope, **all three readings together**, which is what the repair's own registered
+scorer requires. It does not resolve on the six archived seeds (−0.149 ± 0.105, t −1.42) or on the
+five box-matched seeds alone (−0.207 ± 0.107, t −1.94), and it does resolve, barely, on the
+repaired pool (**−0.238 ± 0.093, t −2.57**; §4.8). The archived readings are kept in the panel
+rather than replaced by it, because the published record is part of the evidence.
 
 ---
 
@@ -3205,11 +3262,19 @@ this threat item.** A registered constant that no run is ever compared against i
 both sides of the scorer's own check on that map are declarations, and neither reads a run — and the
 repair is to measure, not to re-declare.
 
-Consequently §4.8's within-run pairing cancels seed, run and batch, but **not** the clip box (from
-epoch 162) and **not** the GPU class (throughout). Both exceptions are limits on the budget
-reading and must be carried with it; neither is cancelled by the pairing, and §4.8 is to be read
-with them attached. The same applies to T = `nodewise1d` − `nodewise`; G and U are matched inside
-their pairs at every seed and are unaffected.
+Consequently the within-run pairing behind §4.8's **as-published** reading cancels seed, run and
+batch, but **not** the clip box (from epoch 162) and **not** the GPU class (throughout): that
+reading is the one that contains `hz3`'s archived seed 5. Both exceptions are limits on *that*
+reading, neither is cancelled by the pairing, and the as-published column is to be read with them
+attached. **Neither exception attaches to §4.8's other two readings.** The five-seed reading drops
+the offending seed and the repaired reading replaces it, and both are matched on both counts —
+read off the runs' own headers rather than declared. Every seed of both sits in the single clip box
+`−30:9.0`, and every seed of both has its four arms on one GPU class: L4 at seeds 0, 1 and 2 and at
+`hz3q`'s seed 5, RTX 2080 Ti at seeds 3 and 4, with `hz3q`'s four arms additionally on one node,
+`node883`. That is what the quartet was submitted to achieve, and it is why the repaired column
+carries neither exception *by construction*. Inside the as-published reading the same exception
+applies to T = `nodewise1d` − `nodewise`, whose archived seed-5 pair is cross-box and cross-class;
+G and U are matched inside their pairs at every seed, archived seed 5 included, and are unaffected.
 
 Seed 5 is also the batch's per-seed outlier at 100 epochs — D(100) = **+0.148** against **+0.548,
 +0.564, +0.586, +0.622, +0.990** — and unremarkable at 300 (+0.290, against a seed-2 low of

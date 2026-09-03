@@ -56,6 +56,7 @@ RUNDIRS = _rundirs()
 INK    = "#1B1B1B"
 GRID   = "#D9D6D0"
 MUTE   = "#7A7A7A"
+REPC   = "#007A4D"           # the repaired (hz3q) reading in F3
 FAINT  = "#EDEAE4"
 BASE_C = {                       # Okabe-Ito
     "SGDm":     "#0072B2",       # blue
@@ -470,27 +471,40 @@ def fig3(rows, cs, numbers=False):
         if m: box.setdefault(int(m.group(2)), {})[m.group(1)] = r["beta_clip"]
     mismatch = sorted(s for s, v in box.items() if len(v) == 2 and v["ch"] != v["node"])
     keep = [s for s in seeds if s not in mismatch]
+    # hz3q: the box- and class-matched re-run of the mismatched seed.  It REPLACES
+    # that seed and adds none, so the repaired pool is the same six seeds.  With the
+    # hz3q .out files absent the panel degrades to the two archived readings, which
+    # is exactly what it drew before the repair existed.
+    qch, qnd = series("hz3q-ch-s*.out"), series("hz3q-node-s*.out")
+    rep = sorted(set(qch) & set(qnd) & set(mismatch))
+    RCH, RND = (dict(ch), dict(nd)) if rep else (None, None)
+    for s5 in rep:
+        RCH[s5], RND[s5] = qch[s5], qnd[s5]
 
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(7.4, 3.3),
-                                   gridspec_kw=dict(width_ratios=[1.35, 1.0], wspace=0.28))
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(7.4, 3.5),
+                                   gridspec_kw=dict(width_ratios=[1.30, 1.0], wspace=0.42))
     col = BASE_C["SGDm"]
 
-    # ---- left: per-seed within-run traces + the two arm-set means
+    # ---- left: per-seed within-run traces + the arm-set means
     for s in seeds:
         ys = [pl5(ch[s], B) - pl5(nd[s], B) for B in Bs]
         bad = s in mismatch
-        axL.plot(Bs, ys, color=("#B0392B" if bad else col), lw=1.0,
-                 alpha=(0.95 if bad else 0.30),
-                 ls=("--" if bad else "-"), marker="o", ms=3.0, zorder=(4 if bad else 2))
-        if bad:
-            axL.annotate("seed %d: the two arms sit in DIFFERENT\nβ-boxes (−15:−2.3026 vs −30:9.0).\nNot box-matched." % s,
-                         xy=(160, ys[0] + (ys[1] - ys[0]) * 0.6), xytext=(163, 0.045),
-                         fontsize=6.5, color="#B0392B", ha="left", va="bottom",
-                         arrowprops=dict(arrowstyle="-", color="#B0392B", lw=0.7))
-    for lab, ss, c_, ls_ in (("all %d seeds" % len(seeds), seeds, col, "-"),
-                             ("box-matched %d seeds" % len(keep), keep, "#00507F", (0, (5, 2)))):
-        mu = [st.mean([pl5(ch[s], B) - pl5(nd[s], B) for s in ss]) for B in Bs]
-        se = [st.stdev([pl5(ch[s], B) - pl5(nd[s], B) for s in ss]) / math.sqrt(len(ss)) for B in Bs]
+        axL.plot(Bs, ys, color=("#B0392B" if bad else col), lw=(1.1 if bad else 1.0),
+                 alpha=(0.95 if bad else 0.28),
+                 ls=("--" if bad else "-"), marker="o", ms=3.0, zorder=(4 if bad else 2),
+                 label=("seed %d, archived: cross-box, cross-class" % s) if bad else None)
+    for s5 in rep:
+        ys = [pl5(RCH[s5], B) - pl5(RND[s5], B) for B in Bs]
+        axL.plot(Bs, ys, color=REPC, lw=1.1, alpha=0.95, ls=(0, (1.2, 1.2)),
+                 marker="o", ms=3.0, zorder=5,
+                 label="seed %d, repaired: same box, same class" % s5)
+    lines = [("archived, all %d seeds" % len(seeds), (ch, nd), seeds, col, "-"),
+             ("archived, box-matched %d" % len(keep), (ch, nd), keep, "#00507F", (0, (5, 2)))]
+    if rep:
+        lines.append(("repaired, %d seeds" % len(seeds), (RCH, RND), seeds, REPC, (0, (1.2, 1.2))))
+    for lab, (C_, N_), ss, c_, ls_ in lines:
+        mu = [st.mean([pl5(C_[s], B) - pl5(N_[s], B) for s in ss]) for B in Bs]
+        se = [st.stdev([pl5(C_[s], B) - pl5(N_[s], B) for s in ss]) / math.sqrt(len(ss)) for B in Bs]
         axL.errorbar(Bs, mu, yerr=[1.96 * x for x in se], color=c_, lw=2.0, ls=ls_,
                      marker="s", ms=5.0, capsize=3, capthick=1.0, zorder=6, label=lab)
     axL.axhline(0, color=INK, lw=0.8)
@@ -498,16 +512,22 @@ def fig3(rows, cs, numbers=False):
     axL.set_ylabel("D, paired WITHIN run  (pp)")
     axL.set_title("(a)  D across the budget, hz3, within run", loc="left", pad=7)
     axL.yaxis.grid(True, color=GRID, lw=0.6); axL.set_axisbelow(True)
-    axL.set_ylim(-0.02, 1.09)
+    axL.set_ylim(-0.02, 1.62)
     axL.set_xlim(88, 312)
-    axL.legend(loc="upper right", frameon=True, framealpha=1.0, edgecolor=GRID,
-               handlelength=1.8, borderpad=0.5)
+    h, l = axL.get_legend_handles_labels()
+    order = [l.index(x) for x in sorted(l, key=lambda z: (not z.startswith(("archived,", "repaired,")), l.index(z)))]
+    axL.legend([h[i] for i in order], [l[i] for i in order],
+               loc="upper center", ncol=1, frameon=True, framealpha=1.0, edgecolor=GRID,
+               handlelength=2.1, borderpad=0.5, labelspacing=0.35, fontsize=6.6,
+               bbox_to_anchor=(0.50, 1.005))
 
     # ---- right: the slope, both ways
     rowsD = []
-    for lab, ss, c_ in (("all %d seeds" % len(seeds), seeds, col),
-                        ("box-matched %d" % len(keep), keep, "#00507F")):
-        dd = [(pl5(ch[s], 300) - pl5(nd[s], 300)) - (pl5(ch[s], 100) - pl5(nd[s], 100))
+    slope_src = [("repaired, %d seeds" % len(seeds), (RCH, RND), seeds, REPC)] if rep else []
+    slope_src += [("archived, box-matched %d" % len(keep), (ch, nd), keep, "#00507F"),
+                  ("archived, all %d seeds" % len(seeds), (ch, nd), seeds, col)]
+    for lab, (C_, N_), ss, c_ in slope_src:
+        dd = [(pl5(C_[s], 300) - pl5(N_[s], 300)) - (pl5(C_[s], 100) - pl5(N_[s], 100))
               for s in ss]
         m_, se_ = st.mean(dd), st.stdev(dd) / math.sqrt(len(dd))
         rowsD.append((lab, m_, se_, m_ / se_, len(dd), c_))
@@ -517,26 +537,36 @@ def fig3(rows, cs, numbers=False):
         axR.text(m_, i + 0.26, "%+.3f ± %.3f   t %.2f   (n=%d)" % (m_, se_, t_, n_),
                  ha="center", va="bottom", fontsize=7.0, color=c_)
     axR.axvline(0, color=INK, lw=0.9)
-    axR.set_yticks(range(len(rowsD))); axR.set_yticklabels([r[0] for r in rowsD])
-    axR.set_ylim(-0.75, len(rowsD) - 0.30)
+    axR.set_yticks(range(len(rowsD)))
+    axR.set_yticklabels([r[0].replace("archived, all ", "archived, ")
+                             .replace("archived, box-matched ", "box-matched ")
+                             .replace("repaired, ", "REPAIRED, ").replace(" seeds", "")
+                         for r in rowsD], fontsize=7.0)
+    axR.set_ylim(-0.80, len(rowsD) - 0.28)
     axR.set_xlabel("D(300) − D(100)   (pp, 95% CI)")
     axR.set_title("(b)  the budget slope, and its sensitivity", loc="left", pad=7)
     axR.xaxis.grid(True, color=GRID, lw=0.6); axR.set_axisbelow(True)
-    axR.text(0.5, 0.035, "neither interval excludes zero: the flat verdict does not turn\n"
-                         "on the box-mismatched seed — but its t does (−1.42 vs −1.94)",
+    axR.text(0.5, 0.030,
+             ("all three readings together, as the repair’s own registered scorer requires.\n"
+              "Only the repaired one excludes zero, and it barely does."
+              if rep else
+              "neither interval excludes zero: the flat verdict does not turn\n"
+              "on the box-mismatched seed — but its t does (−1.42 vs −1.94)"),
              transform=axR.transAxes, ha="center", va="bottom",
              fontsize=6.6, color=MUTE, style="italic")
 
     if numbers:
         print("\n== F3 ==   hz3 budget, paired within run, plateau5 at each budget")
         print("  box-mismatched seeds: %s" % (mismatch or "none"))
-        for lab, ss in (("all", seeds), ("box-matched", keep)):
+        src = [("archived, all", (ch, nd), seeds), ("archived, box-matched", (ch, nd), keep)]
+        if rep: src.append(("repaired", (RCH, RND), seeds))
+        for lab, (C_, N_), ss in src:
             print("  %s (n=%d, seeds %s)" % (lab, len(ss), ss))
             for B in Bs:
-                d = [pl5(ch[s], B) - pl5(nd[s], B) for s in ss]
+                d = [pl5(C_[s], B) - pl5(N_[s], B) for s in ss]
                 se = st.stdev(d) / math.sqrt(len(d))
                 print("     B=%3d  D %+0.3f  se %0.3f  t %5.2f" % (B, st.mean(d), se, st.mean(d) / se))
-            dd = [(pl5(ch[s], 300) - pl5(nd[s], 300)) - (pl5(ch[s], 100) - pl5(nd[s], 100)) for s in ss]
+            dd = [(pl5(C_[s], 300) - pl5(N_[s], 300)) - (pl5(C_[s], 100) - pl5(N_[s], 100)) for s in ss]
             se = st.stdev(dd) / math.sqrt(len(dd))
             print("     D(300)-D(100) %+0.3f  se %0.3f  t %5.2f" % (st.mean(dd), se, st.mean(dd) / se))
     return fig

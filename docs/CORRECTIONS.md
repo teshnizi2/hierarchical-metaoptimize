@@ -9484,3 +9484,227 @@ the repaired seed -- `analysis/c98_figures.py:469` selects `hz3-(ch|node)-s(\d+)
 does not match, so the panel is drawn on the archive and its caption now says so; (iii) the eight
 pre-existing markup residuals above; (iv) two `DRAFT-v4.md` prose lines that begin with `|` and
 will render as table rows (`|r| >= 0.632`, `|Delta plateau5|`).
+
+## 135. Cycle 111 — THE FOUR POST-DESK-ACCEPT EDITS, INTEGRATED INTO BOTH MARKUPS
+
+The Q1 meta-gate returned **DESK-ACCEPT, 9/10, `structural_gaps = []`, `blocking_remaining = []`**
+at cycle 110.  Nothing below was blocking.  Two packages
+(`paper/sections/v8-abstract-and-scope.md`, `paper/sections/v8-mechanics-and-extrapolation.md`)
+were applied to **both** markups in one commit.  **Eleven keyed replacements landed — four in
+`paper/paper.tex`, four in `paper/DRAFT-v4.md`, one in `analysis/c98_reproduce.py`, plus the
+Figure 3 caption in each markup — every anchor verified `count == 1` immediately before it was
+applied.**  The two packages touched disjoint sentences, so nothing had to be merged; the
+overlap that did exist was the §3.4 self-census, which both move, and it was iterated to a
+fixpoint rather than set from either package's dry run.
+
+### 135.1 R1 — THE ABSTRACT NOW CARRIES THE WITHDRAWAL
+
+The abstract's threats paragraph listed four qualifiers (CIFAR resolution; a Lion meta-optimiser
+carrying every count-matched cell but one; no held-out validation split; the 1.8--4.2 pp deficit
+against tuned baselines) and was **silent on the budget**.  It now reads *"Within one batch, on
+repaired data, the gap declines from +0.632 pp at 100 epochs to +0.394 at 300, withdrawing our
+earlier flatness claim."*
+
+Three scoping decisions, each forced by a measurement rather than by taste.  **"Within one
+batch"** because `+0.632` and `+0.394` straddle the pooled `+0.556`, so an unscoped clause would
+read as the twenty-cell pooled effect decaying, which is false; the *indefinite* article is
+required because the corpus holds 72 runs at 300+ epochs across `hz3`, `e3a`, `i3a300`, `i3b300`,
+`e300`, `hz3q` and the `bg300`/`bg600` baselines, so "the one batch run to 300 epochs" would have
+been a false uniqueness claim.  **"on repaired data"** discloses which of §4.8's three readings the
+numbers are, in three words; A.2's rule *"All three are reported wherever any of them is"* is
+satisfied in §4.8, and a 230-word cap cannot hold all three in the abstract.  **Full-precision
+`+0.632` / `+0.394`** rather than `+0.63` / `+0.39`, because c98 section `[16]` asserts the count
+of **distinct** quantity-numerals in `DRAFT-v4.md`; a rounded form would be a new distinct numeral.
+
+**The word budget was measured, not estimated.**  `paperfactory.agents.text_quality`
+`_abstract_defects` at the module-default band `ABSTRACT_TARGET_WORDS = (120, 230)`:
+
+    BEFORE  paper.tex 219 words, defects []   |  DRAFT-v4.md 228 words, defects []
+    AFTER   paper.tex 217 words, defects []   |  DRAFT-v4.md 228 words, defects []
+
+The binding file is the Markdown at **228 of 230**; the two markups differ by nine because
+`clean_abstract_text` strips `\citep{...}` and `\pp` before counting.  **The dashboard's "227
+words" was wrong in both directions** — the headroom was two words, not three.  Twenty-four words
+were freed by seven compressions, none of which drops evidence; the only real information loss is
+the baselines parenthetical *(SGD+cosine on ResNet-18, AdamW+cosine on ResNet-34 and ResNet-50)*,
+whose claim — the 1.8--4.2 pp deficit — is unchanged and whose baselines are named in §7 T4 and
+asserted by c98's own `chk("tuned SGD+cosine baseline, ResNet-18/C10", ...)`.  Two checker
+constraints were found by measurement: `"remains"` is the abstract's only Background cue for
+`_missing_structured_moves`, and `"Every accuracy"` is its only Results cue that actually matches
+(`\breport\b` fails on the trailing *s*).  Both survive.  Longest sentence after the edit **30
+words (tex) / 31 (md)** against a 62-word cap; longest 209 characters against 430.
+
+### 135.2 R2 — T9'S BOX/CLASS CAVEAT NOW SCOPES TO ONE READING, NOT THREE
+
+T9 read *"…§4.8's within-run pairing cancels seed, run and batch, but **not** the clip box … and
+§4.8 is to be read with them attached."*  The subject was the whole subsection, which reports
+three readings, so on its face it scoped the exceptions to the **repaired** reading whose entire
+purpose was to remove them.  **The correct scope is narrower even than "the archived readings":**
+read off each run's own `NODE=` / `BETA_CLIP=` / GPU-model header lines for all 24 `hz3` and 4
+`hz3q` `.out` files —
+
+    as published (6 archived seeds)   s0,s1,s2 L4 @ -30:9.0 | s3,s4 RTX 2080 Ti @ -30:9.0
+                                      s5 MIXED: A100 80GB on ch/n1d/c23 @ -15:-2.3026,
+                                                RTX 2080 Ti on node @ -30:9.0   -> NOT MATCHED
+    seed 5 dropped (archived 0-4)     every seed box- AND class-matched          -> MATCHED
+    repaired (archived 0-4 + hz3q s5) every seed box- AND class-matched          -> MATCHED
+                                      hz3q's four arms: L4 @ -30:9.0, node883, jobs 4864632-35
+
+— **only the six-seed as-published reading carries the exceptions**, and the registered scorer's
+own header line already says so (`hz3 AS PUBLISHED (6 archived seeds; s5 cross-box, cross-class)`).
+Contrast by contrast inside the archived seed 5: `D` and `T` are cross-box and cross-class, `G` and
+`U` are matched — which reproduces T9's existing `G`/`U` claim and localises the exception to two
+contrasts at one seed of one reading.  The rewrite makes the subject the as-published reading,
+states in bold that neither exception attaches to the other two readings, gives the measured basis
+rather than asserting it, and keeps the `T`/`G`/`U` sentence scoped to the archived seed 5.
+**Nothing was softened**: both exceptions are still stated, still un-cancellable by pairing, and
+the as-published column still has to be read with them attached.
+
+### 135.3 R3 — THE ZERO-CROSSING, ANSWERED WITH ARITHMETIC INSTEAD OF WITH "YOU HAVE READ IT BACKWARDS"
+
+The paper's only guards against *"the effect disappears at longer budgets"* were assertions
+(`paper.tex:1283` "it does not vanish"; `:2741` "has read it backwards").  A referee does the
+arithmetic instead: `0.394 / (0.238/200) = 331.09` further epochs → a linear zero-crossing at
+**631**.  **That arithmetic is right and is now printed in the paper**, together with the
+unrounded route (`0.39367 / (0.238333/200) = 330.35` → 630.3) and an OLS line through all three
+repaired points (`D = 0.750889 - 0.00119167 B`, zero at 630.1).  Both give **630**.
+
+Four **measured** facts say why it is not a prediction, and each is now asserted by c98:
+
+| # | fact | numbers |
+|---|---|---|
+| i | no upper bound | the registered 95% interval `[-0.477, -0.000]` propagates to a crossing between **465** epochs and **never**, because the interval reaches zero |
+| ii | the ladder resolves a difference, not a rate | `D(200)-D(100) = -0.120 ± 0.142`, `t -0.84`; `D(300)-D(200) = -0.118 ± 0.096`, `t -1.23`; **neither half resolves**, only the full span (`-0.238 ± 0.093`, `t -2.57`) |
+| iii | the functional form is unidentified | linear-in-`B`, linear-in-`ln B` and exponential all fit the three points to within **0.020 pp** (worst residuals 0.0006 / 0.0198 / 0.0088, against a per-point `se` of 0.074--0.116) and place the crossing at **630**, **2034** and **nowhere** (`D(600) = +0.195`) |
+| iv | the runs contradict linearity in particular | `chunk777` gains `+0.693` then `-0.016 ± 0.055`; `nodewise` gains `+0.813` then `+0.102 ± 0.096`.  Past 200 epochs neither arm is still measurably improving, so a constant-rate catch-up is not what the runs show |
+
+Two further disclosures cost no numerals: the ladder is **six trajectory pairs read at three
+prefixes** — six independent units, not eighteen — and the corpus's only 600-epoch runs
+(`bg600_cos_s{0,1,2}`, `bg600_meta_s{0,1,2}`: AdamW base, layerwise, box `-15:-2.3026`) carry **no**
+`chunk777`--`nodewise` contrast and cannot extend the ladder.  The paragraph names the run that
+would settle it — this cell at 600 epochs — as **not submitted**.
+
+### 135.4 R5 — HOW THE REVERSAL HAPPENS, WHICH IS THE ANSWER TO "ONE SEED FLIPPED YOUR HEADLINE"
+
+Both halves re-derived.  **Deleting the contaminated seed does NOT produce the reversal:** `n=5,
+delta -0.2068, se 0.106712, t -1.93793` → `-0.207 ± 0.107`, `t -1.94`, **still FLAT** inside the
+frozen `|t| < 2.0` band.  The **replacement** does it, by doing two things at once:
+
+    LOCATION   (x - mean5)/6 = (-0.39600 - (-0.20680))/6 = -0.031533
+               mean5 + that = -0.238333  ==  the repaired estimate, to the last digit
+    PRECISION  se 0.106712 -> 0.092661, a 13.2% cut (n restored from 5 to 6)
+    COMPOSE    |t| 1.93793 -> 2.57211, ratio 1.327249 = 1.152482 x 1.151644
+               = 50.1% location / 49.9% precision, in logs.  NEITHER HALF ALONE.
+
+**And the replacement is not an outlier — it removes one.**  `hz3q`'s `delta = -0.396` sits
+**0.79 sd inside** the five archived seeds' own spread and is only the **third** most negative of
+the repaired six (seeds 2 and 3 read `-0.454` and `-0.440`); the value it displaces, the archived
+seed 5's `+0.142`, was the **single most positive** of the archived six.
+
+**The honest limit is disclosed rather than argued away.**  Leave-one-out over the repaired six
+gives `|t| = 2.287, 2.500, 1.943, 1.938, 3.979, 1.938` for seeds 0--5: **three of six deletions
+fall back under the frozen bar**, and the seed-5 deletion is simply the paper's existing
+five-clean-seed row.  That is the size of a six-seed paired test whose two-sided `p` is `0.050` —
+a property of **n = 6**, not of the seed we repaired.  This is additive disclosure the gate did
+not ask for; it was included because it is the first thing a hostile referee computes and the
+paper already concedes everything it shows.
+
+### 135.5 THE TWO OWED ITEMS FROM CORRECTIONS 134, BOTH CLOSED
+
+**(i) The probe records are synced; H1 is now locally re-derivable.**
+`runs/hz3/probe_{node,ch,n1d,c23}_hz3q_s5/` were empty and `c99_hz3q_score.py` refused correctly
+(`NO OCCUPANCY IS MEASURABLE`) rather than passing silently.  Cost assessed
+(341,395,663 + 334,977,070 + 239,384,039 + 238,774,776 = **1,154,531,548 B = 1.08 GiB** against
+28 GiB free), pulled read-only by `rsync` over the existing key login — **no Slurm job was
+submitted; both queues were left alone** — and verified `sha256`-identical local vs remote on all
+four (`node 0d85a909e443d29c`, `ch f0ef8d88432c4e91`, `n1d 919b7b3197c53d8d`,
+`c23 03e39a1db010e1eb`).  `c99_hz3q_score.py`, re-run **UNEDITED**, now prints **`H1 PASS — worst
+coordinate fraction 0.000000 (bar 0.05)`** on n = 500 coordinates per arm at epochs 100, 200 and
+300.  **No prose change is owed**: that is verbatim what `paper.tex:1163-1166` already claimed, so
+the gap was between the paper and the local tree and the sync closed it in the direction needing no
+rewording.  **CORRECTIONS 134's characterisation of §3.5 was wrong** — §3.5 makes the positive,
+measured claim, not a statement of the limit.  The Data-Availability register's `c99_hz3q` PARTIAL
+entry ("…but not its H1 box gate") is a statement about the **deposit**, which still excludes
+`probe*.jsonl` for size, and **remains true and unedited**.
+
+**(ii) Figure 3 panel (b) is redrawn, and the caption landed in the same commit.**  The decisive
+reason was not staleness: the panel printed, *inside the panel*, the italic annotation *"neither
+interval excludes zero: the flat verdict does not turn on the box-mismatched seed"* — a conclusion
+the reversal makes **false**, which the caption's honest "the panel is drawn on the archive"
+disclosure never retracted.  A referee who reads figures before captions met a withdrawn claim
+asserted flatly.  Second reason: the panel showed two of the three readings that `c99`'s own
+combination rule (`ALL THREE ARE REPORTED TOGETHER, ALWAYS`) requires reported together.  The
+redraw **keeps both archived readings** — so the disclosure is preserved and made visual — and adds
+the repaired one; panel (a) now draws the archived seed-5 trace rising beside the repaired one
+falling, which is R5's mechanism shown rather than asserted.  `analysis/c98_figures.py` degrades to
+the old two-reading panel if the `hz3q` `.out` files are absent.  `--numbers` agrees with §4.8's
+tables to the last digit (repaired `D(100) +0.632` / `D(200) +0.512` / `D(300) +0.394`,
+`D(300)-D(100) -0.238 se 0.093 t -2.57`).  **The figure invents no number.**
+
+### 135.6 THE AUDIT — 44 NEW ASSERTIONS, AND A NEW CENSUS FIXPOINT
+
+Every claim-carrying number in R3 and R5 is now asserted in `analysis/c98_reproduce.py`, in the
+paper's own idiom, in the same commit as the prose.  **No tolerance, predicate, derivation or
+check was weakened, and no existing literal was edited.**  The §3.4 self-census, which the audit
+reads back out of both markups, was re-iterated to a **FIXPOINT**: `584 / 389 / 872 / 44.6%` →
+**`628 / 409 / 892 / 45.9%`**, set identically in both files.
+
+### 135.7 MECHANICAL VERIFICATION — PASTED, NOT SUMMARISED
+
+| check | baseline (`fe957e4`) | after |
+|---|---|---|
+| `python3 analysis/c98_reproduce.py` | exit 0, **ALL 592 CHECKS PASS** | **exit 0, ALL 636 CHECKS PASS** |
+| census fixpoint | 584 / 389 / 872 / 44.6% | **628 / 409 / 892 / 45.9%** |
+| `python3 analysis/paper_numeric_diff.py` | 2530 (970 distinct) tex, 2532 (970) md; 3 tex-only + 5 md-only | **2589 (990) tex, 2591 (990) md; 3 tex-only + 5 md-only — the SAME 8, byte for byte** |
+| `_abstract_defects`, `paper.tex` | 219 words, `[]` | **217 words, `[]`** |
+| `_abstract_defects`, `DRAFT-v4.md` | 228 words, `[]` | **228 words, `[]`** (cap 230) |
+| longest abstract sentence | 31 / 32 words | **30 / 31 words** (cap 62) |
+| `tectonic -X compile paper.tex` | exit 0, 74 pp | **exit 0, 75 pp** |
+| TeX errors / undefined refs / `??` | 0 / 0 / 0 | **0 / 0 / 0** |
+| labels / orphan labels / unresolved refs | 74 / 0 / 0 | **74 / 0 / 0** |
+| `Overfull \hbox` (distinct) | 2 — 7.28497 pt, 12.25499 pt | **2 — the same two, unchanged** |
+| `c99_hz3q_score.py --selftest` | 59/59 PASS | **59/59 PASS** |
+| `c99_hz3q_score.py` unedited | H0 PASS · **H1 REFUSED** · H2 repaired `-0.238 / 0.093 / -2.57 NOT FLAT` · H3 repaired `+0.394 / 0.093 / +4.25` · HC `+0.134` | H0 PASS · **H1 PASS 0.000000** · H2, H3, HC **identical** |
+| `c87_hz3_score.py` unedited | `SURVIVES`; `MECHANISM SURVIVES THE HORIZON`; `+0.229 -> GROWS`; `grep -c hz3q` 0 | **identical, `grep -c hz3q` still 0** |
+| `dup_group_guard.py` | 21 groups, 42 rows, 3 superseded, PASS; selftest 5/5 | **identical** |
+
+**The residual list is byte-identical before and after**: tex-only `0.05`, `3.0`, `39,172`;
+md-only `0.087`, `0.279`, `3.19`, `9.0` x2.  **Zero NEW residuals in either direction.**  The
+page count moves **74 → 75**; that is the R3 and R5 prose, reported rather than absorbed.
+
+**CONTRIBUTION 1 IS UNWEAKENED, CHECKED AT FOUR SITES.**  Abstract: *"wins all twenty
+count-matched cells … the effect is +0.556 ± 0.045 pp (calibrated 95% CI ± 0.121), homogeneous
+against that null (Q 4.21, median 9.4)"* — every number and every qualifier kept; the only changes
+are `wins in all twenty` → `wins all twenty`, `the effect size is` → `the effect is`, and one
+redundant `pp` unit.  §1 Contributions item 1: **untouched, byte for byte**.  §4.8: the new
+paragraphs are insertions; no existing sentence was deleted or softened, including *"has read it
+backwards"*, which is now immediately substantiated.  §9: *"it is present and resolved at 3× the
+budget, at +0.394 ± 0.093, t 4.25, while declining with budget at a rate that now resolves … two
+findings, of which the second does not weaken the first"* — **unchanged**.  `hz3q` still enters no
+cell of Table 2, and is neither a replication, a design point nor a cell.
+
+**"DECLINES" STILL CANNOT BE READ AS "DISAPPEARS"** — now at four sites, not two:
+`paper.tex:1283` *"it does not vanish"*; `:2741` *"has read it backwards"*; the new R3 paragraph
+(*"The measured ladder stops at 300 epochs and so does the claim"*, plus the four facts above);
+and the new R5 paragraph (*"reports a decline resolved at this budget and this design point rather
+than a law"*).
+
+**No Slurm job was submitted.  Both queues are empty and were left that way.  Cluster access was
+one read-only `rsync`.**
+
+### 135.8 STILL OPEN AFTER THIS ENTRY
+
+1. The 8 tex↔md numeric residuals — pre-existing, in sections no package touched.  One is a real
+   md prose gap (`F(39,172)` at `paper.tex:1845` and `:4658`, `DRAFT-v4.md:3739` only).
+2. Two `DRAFT-v4.md` prose lines beginning with `|` will render as table rows
+   (`|r| >= 0.632`, `|Delta plateau5|`).
+3. §4.8's budget table still has no caption and an undefined `se` column (dashboard R2).
+4. 75 pp / ~34k body words — the reviewer-burden risk (dashboard R9), unchanged in kind.
+5. Staging dirs `c99pkg/`, `c99pkg2/` left on ALICE.
+6. §4.8's opening paragraph carries the same over-scoping shape R2 fixed in T9 (*"That pairing
+   cancels the seed, the run and the batch identically.  It does not cancel the step-size clip box
+   or the GPU class, because `hz3` is two submissions…"*).  It is weaker — it names `hz3`
+   explicitly and the next sentences introduce the re-run — and was flagged rather than silently
+   edited.
+7. The six author items (CRediT ↔ Funding, correspondence address, ORCIDs, deposit rebuild at the
+   submission commit, DOI, §5.9 authorship decision).  **Out of scope by standing instruction.**

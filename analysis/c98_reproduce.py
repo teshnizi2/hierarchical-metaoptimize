@@ -457,6 +457,95 @@ def budget(rows, adm, args):
     chk("epoch the -15 floor first becomes reachable",
         math.ceil((math.log(1e-3) - (-15.0)) / (1e-4 * 500)), 162, "§3.5 R2, §7 T9", "%.0f")
 
+    # ---- §4.8 R3: the extrapolation a referee computes, and why it is not usable ----
+    D_ = lambda s, B: pl5(CH[s], B) - pl5(ND[s], B)
+    D100 = st.mean([D_(s, 100) for s in seeds]); D300 = st.mean([D_(s, 300) for s in seeds])
+    slope = m_ / 200.0                              # m_ is the repaired D(300)-D(100)
+    chk("epochs past 300 to a LINEAR zero (0.394/(0.238/200))",
+        0.394 / (0.238 / 200.0), 331, "§4.8 R3", "%.0f")
+    chk("   linear zero-crossing, rounded ladder", 300 + 0.394 / (0.238 / 200.0), 631,
+        "§4.8 R3", "%.0f")
+    chk("   linear zero-crossing, unrounded ladder", 300 + D300 / (-slope), 630,
+        "§4.8 R3", "%.0f")
+    n3, sB, sD = 3, sum((100, 200, 300)), D100 + st.mean([D_(s, 200) for s in seeds]) + D300
+    Ds = [D100, st.mean([D_(s, 200) for s in seeds]), D300]
+    sBB = sum(b * b for b in (100, 200, 300)); sBD = sum(b * d for b, d in zip((100, 200, 300), Ds))
+    sl = (n3 * sBD - sB * sD) / (n3 * sBB - sB * sB); ic = (sD - sl * sB) / n3
+    chk("   least-squares line through all three points, zero at", -ic / sl, 630,
+        "§4.8 R3", "%.0f")
+    chk("   crossing at the steep end of the registered CI [-0.477, -0.000]",
+        300 + D300 / (0.477 / 200.0), 465, "§4.8 R3", "%.0f")
+    for a, b, ed, ese, et in ((100, 200, -0.120, 0.142, -0.84), (200, 300, -0.118, 0.096, -1.23)):
+        v = [D_(s, b) - D_(s, a) for s in seeds]
+        mm, ss_ = st.mean(v), st.stdev(v) / math.sqrt(len(v))
+        chk("D(%d)-D(%d), repaired -- the half-interval" % (b, a), mm, ed, "§4.8 R3")
+        chk("   se", ss_, ese, "§4.8 R3", "%.3f")
+        chk("   t  (NEITHER half resolves; only the full span does)", mm / ss_, et,
+            "§4.8 R3", "%.2f")
+    lb = [math.log(b) for b in (100, 200, 300)]
+    sB2 = sum(lb); sBB2 = sum(b * b for b in lb); sBD2 = sum(b * d for b, d in zip(lb, Ds))
+    sl2 = (n3 * sBD2 - sB2 * sD) / (n3 * sBB2 - sB2 * sB2); ic2 = (sD - sl2 * sB2) / n3
+    chk("   log-budget fit, zero at", math.exp(-ic2 / sl2), 2034, "§4.8 R3", "%.0f")
+    ld = [math.log(d) for d in Ds]
+    sD3 = sum(ld); sBD3 = sum(b * d for b, d in zip((100, 200, 300), ld))
+    sl3 = (n3 * sBD3 - sB * sD3) / (n3 * sBB - sB * sB); ic3 = (sD3 - sl3 * sB) / n3
+    chk("   exponential fit, D(600) -- it never reaches zero", math.exp(ic3 + sl3 * 600), 0.195,
+        "§4.8 R3")
+    chk("   worst residual of the three two-parameter fits (pp)",
+        max(max(abs(d - (ic + sl * b)) for b, d in zip((100, 200, 300), Ds)),
+            max(abs(d - (ic2 + sl2 * b)) for b, d in zip(lb, Ds)),
+            max(abs(d - math.exp(ic3 + sl3 * b)) for b, d in zip((100, 200, 300), Ds))),
+        0.020, "§4.8 R3 -- all three fit inside the per-point se", "%.3f")
+    for tag, A_, g1, g2, se2 in (("chunk777", CH, 0.693, -0.016, 0.055),
+                                 ("nodewise", ND, 0.813, 0.102, 0.096)):
+        chk("%s paired gain 100->200 (both arms saturate)" % tag,
+            st.mean([pl5(A_[s], 200) - pl5(A_[s], 100) for s in seeds]), g1, "§4.8 R3")
+        v = [pl5(A_[s], 300) - pl5(A_[s], 200) for s in seeds]
+        chk("   %s paired gain 200->300" % tag, st.mean(v), g2, "§4.8 R3")
+        chk("      se", st.stdev(v) / math.sqrt(len(v)), se2, "§4.8 R3", "%.3f")
+
+    # ---- §4.8 R5: HOW the reversal happens.  Dropping s5 does NOT produce it. ----
+    d5 = [D_(s, 300) - D_(s, 100) for s in seeds if s != 5]          # five clean seeds
+    m5, se5 = st.mean(d5), st.stdev(d5) / math.sqrt(len(d5))
+    x = dd[5]                                                        # hz3q's seed-5 delta
+    chk("dropping seed 5 alone: delta (STILL FLAT)", m5, -0.207, "§4.8 R5, §3.5")
+    chk("   se", se5, 0.107, "§4.8 R5", "%.3f")
+    chk("   t  (|t| < 2.0 -> the deletion does NOT reverse the verdict)", m5 / se5, -1.94,
+        "§4.8 R5", "%.2f")
+    chk("hz3q seed-5 delta, the replacement", x, -0.396, "§4.8 R5")
+    chk("   LOCATION: (x - mean5)/6, one sixth of its distance from the mean",
+        (x - m5) / 6.0, -0.0315, "§4.8 R5", "%+.4f")
+    chk("   mean5 unrounded", m5, -0.2068, "§4.8 R5", "%+.4f")
+    chk("   mean5 + (x-mean5)/6 == the repaired estimate", m5 + (x - m5) / 6.0, -0.2383,
+        "§4.8 R5", "%+.4f")
+    chk("   PRECISION: se falls 5 -> 6 seeds", se_, 0.093, "§4.8 R5", "%.3f")
+    chk("   |t| ratio 5 -> 6 seeds", abs((m_ / se_) / (m5 / se5)), 1.327, "§4.8 R5", "%.3f")
+    chk("      location factor |m6/m5|", abs(m_ / m5), 1.152, "§4.8 R5", "%.3f")
+    chk("      precision factor se5/se6", se5 / se_, 1.152, "§4.8 R5", "%.3f")
+    chk("      location share of the move, in logs (%)",
+        100 * math.log(abs(m_ / m5)) / math.log(abs((m_ / se_) / (m5 / se5))), 50.1,
+        "§4.8 R5", "%.1f")
+    chk("      precision share (%)",
+        100 * math.log(se5 / se_) / math.log(abs((m_ / se_) / (m5 / se5))), 49.9,
+        "§4.8 R5", "%.1f")
+    chk("the replacement is NOT an outlier: |z| against the five archived seeds' spread",
+        abs((x - m5) / st.stdev(d5)), 0.79, "§4.8 R5", "%.2f")
+    chk("   its rank among the repaired six, most negative = 1",
+        sorted(dd).index(x) + 1, 3, "§4.8 R5", "%.0f")
+    arch = [(pl5(ch[s], 300) - pl5(nd[s], 300)) - (pl5(ch[s], 100) - pl5(nd[s], 100))
+            for s in seeds]
+    chk("   the ARCHIVED seed-5 delta it displaces", arch[5], 0.142, "§4.8 R5")
+    chk("   its rank among the archived six, most POSITIVE = 1",
+        sorted(arch, reverse=True).index(arch[5]) + 1, 1, "§4.8 R5", "%.0f")
+    jt = []
+    for i in range(len(seeds)):
+        v = [dd[j] for j in range(len(dd)) if j != i]
+        jt.append(abs(st.mean(v) / (st.stdev(v) / math.sqrt(len(v)))))
+    for i, exp in enumerate((2.29, 2.50, 1.94, 1.94, 3.98, 1.94)):
+        chk("   leave-one-out |t|, seed %d dropped" % i, jt[i], exp, "§4.8 R5", "%.2f")
+    chk("   how many of the six deletions fall back under |t| = 2.0",
+        sum(1 for v in jt if v < 2.0), 3, "§4.8 R5 -- the sensitivity is n=6, not seed 5", "%.0f")
+
 def competitiveness(rows, adm, args):
     print("\n[8] THE SCOPE LIMIT WE MUST NOT SOFTEN  (abstract (ii), §7 T4)")
     import collections
