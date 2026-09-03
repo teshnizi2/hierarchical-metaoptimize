@@ -75,12 +75,19 @@
 # -----------------------------------------------------------------------------
 # ACCOUNT AND CO-TENANCY
 # -----------------------------------------------------------------------------
-# ALICE (salehkaleybars) -- the tree that produced the sc50 comparators.  Both
-# trees carry the SAME HF.py (md5 d3202635c3fcef09387a316b73f2bb3f, verified on
-# both hosts), so the choice is about queue co-tenancy, not comparability: the
-# sibling G4 batch (60 ResNet-18 jobs) is left the whole of alice2.  Both queues
-# were EMPTY at submission time.  36 x ~2.3 h = ~83 GPU-h; at ~12 concurrent
-# slots that is ~7 h of wall clock.
+# ALICE (salehkaleybars).  NOT a free choice: `s5014158` cannot read
+# /data1/salehkaleybars/metaopt/runs (Permission denied, verified), so on alice2
+# guard 2 could not verify the premise on the archived sc50 runs at all and the
+# scorer's RC comparators would have to fall back to the registration's frozen
+# copy.  Both trees carry the SAME HF.py (md5 d3202635c3fcef09387a316b73f2bb3f,
+# verified on both hosts), so nothing is lost in comparability by staying here.
+# The cost is queue co-tenancy: the sibling G4 batch (72 ResNet-18 jobs) was
+# already submitted on THIS account when this batch went in, so the two share a
+# fair-share.  That costs wall clock and nothing else -- H2, the only gated
+# contrast, is entirely WITHIN this batch and cannot be touched by what else is
+# queued.  36 x ~2.3 h = ~83 GPU-h; with G4's ~72 GPU-h ahead of it and ~12-24
+# concurrent slots, expect ~13 h to drain.  Nothing is niced, promoted or
+# cancelled: no job submitted by anyone else is touched.
 #
 # -----------------------------------------------------------------------------
 # THE SCORER.  STANDING RULE 21: REGISTERED AND COMMITTED BEFORE THIS RUNS
