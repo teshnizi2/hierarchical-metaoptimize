@@ -95,7 +95,16 @@ CLIP="-15:-2.3026"; MST=1e-3; ALPHA0=1e-6; EPOCHS=100; BATCH=100
 GAMMA=1; AUG=1
 SEEDS="0 1 2"
 PARTS=gpu-short,gpu-l4-24g,gpu-2080ti-11g,gpu-mig-40g,gpu-a100-80g
-WALL=03:30:00
+# WALL, MEASURED not guessed.  Smoke tinsmoke3-lay-s0 (job 4887023, NVIDIA L4,
+# node887, shared with three other jobs) ran Tiny-ImageNet at ~44 s/epoch
+# including the test pass, so 100 epochs is ~74 min there; smoke tinsmoke2
+# (job 4886984, same node, less contended) was ~36 s/epoch, i.e. ~61 min.
+# Taking the slower measurement, allowing 1.5x for the slowest GPU in the
+# partition list, and then the house 1.5x margin gives ~167 min -> 03:00:00,
+# which is still inside gpu-short's 4 h ceiling so no partition is excluded.
+# CTRL_WALL is the CIFAR-10 arm's, at the same 2:30 the archived 100-epoch
+# CIFAR runs use (measured p99 93 min).
+WALL=03:00:00
 CTRL_WALL=02:30:00
 
 echo "=============================================================="
