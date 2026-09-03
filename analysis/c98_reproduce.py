@@ -857,7 +857,14 @@ TEX   = os.path.join(ROOT, "paper", "paper.tex")
 
 # A decimal numeral in the draft is a QUANTITY unless it is one of these.  The rule
 # is mechanical and is stated in §3.4 so a referee can re-run it.
-_FENCE   = re.compile(r"```.*?```|^ {4,}\S.*$", re.S | re.M)   # code blocks & indented cmds
+# NB the two alternatives need DIFFERENT flags, so they carry inline scopes rather
+# than a shared `re.S | re.M`.  With a shared re.S the `.*$` of the indented-command
+# branch matched newlines and ran to the LAST `$` in the file: one mask swallowed
+# 49,965 of 308,256 characters (16.9% of the draft, against 0.3% correct), so the
+# census denominator was computed on a manuscript with a sixth of it invisible.
+# analysis/paper_numeric_diff.py always had this right ((?m) only, no re.S); the two
+# are meant to share one exclusion rule and §3.4 says so, so this is the bug.
+_FENCE   = re.compile(r"(?s:```.*?```)|(?m:^ {4,}\S.*$)")   # code blocks & indented cmds
 _XREF    = re.compile(r"(?:§|Appendix\s|App\.\s|Table\s|Tables\s|Figure\s|Fig\.\s|Eq\.\s|"
                       r"Eqs\.\s|item\s|R0\s|\bA\.|\bT\d|\bM\d|\bP\d|\bS\d|\bC\d|\bF\d|"
                       r"\bU\d|\bX\d|arXiv:|:\d{7}|v)$")

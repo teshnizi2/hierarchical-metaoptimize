@@ -9708,3 +9708,57 @@ one read-only `rsync`.**
    edited.
 7. The six author items (CRediT ↔ Funding, correspondence address, ORCIDs, deposit rebuild at the
    submission commit, DOI, §5.9 authorship decision).  **Out of scope by standing instruction.**
+
+## 136. THE COVERAGE CENSUS OVERSTATED ITSELF -- A MASKING BUG MADE A PRINTED CLAIM FALSE
+
+Found by a plan agent costing the R9 restructure; measured and repaired here.
+
+**THE BUG.**  `analysis/c98_reproduce.py:860` read
+
+    _FENCE = re.compile(r"```.*?```|^ {4,}\S.*$", re.S | re.M)
+
+`re.S` applies to the WHOLE pattern, so the indented-command branch's `.*$` matched newlines and
+ran to the LAST `$` in the file.  Measured on `paper/DRAFT-v4.md` (308,256 chars):
+
+    masked, live (buggy)   52,099 chars = 16.9%   longest single mask 49,965
+    masked, correct         2,419 chars =  0.8%   longest single mask     88
+
+So the coverage census -- whose result S3.4 prints AS A CLAIM about this paper's own verification
+scope -- was computed on a manuscript with a sixth of it invisible.
+
+**CONSEQUENCE, and it is not in our favour.**  The printed triple was
+`628 assertions covering 409 of the 892 distinct quantity-numerals = 45.9%`.
+Re-derived with the mask fixed: `628 covering 411 of 978 = 42.0%`.  86 quantity-numerals were
+hidden from the denominator.  **The paper overstated its own coverage by 3.9 points** and is
+corrected DOWNWARD in both markups.  Fixpoint reached in one iteration.
+
+**`analysis/paper_numeric_diff.py` NEVER HAD THIS BUG** -- line 84 is `(?m)` only, no `re.S`.  The
+two tools are required to share ONE exclusion rule and S3.4 says so, so the census was the wrong
+one.  After the fix they mask **identical character positions** (2,419, verified as a position-set
+comparison, not a length sum -- summing lengths double-counts indented lines inside fences and
+falsely reports a 702-char disagreement).
+
+**A CORRECTION TO MY OWN FIRST MEASUREMENT.**  I initially reported the correct mask as 987 chars
+/ 0.3%, from `re.compile(..., re.M)` alone.  That is wrong in the other direction: without `re.S`
+the fence branch cannot match across newlines, so fenced blocks went unmasked entirely.  The fix
+must scope the flags per branch:
+
+    _FENCE = re.compile(r"(?s:```.*?```)|(?m:^ {4,}\S.*$)")
+
+**REGRESSION TEST.**  New `analysis/test_fence_mask.py`, exit 0, ALL PASS.  Three checks: the
+`_FENCE` line must not carry a shared `re.S`; a synthetic indented line must mask only itself
+(the buggy pattern reduces that probe to a single space, swallowing all four numerals, so the
+test genuinely catches it); and c98's mask must cover the same positions as
+`paper_numeric_diff.py`'s, with an implausibility guard at 5% of the draft.
+
+**VERIFICATION.**  `c98_reproduce.py` exit 0, ALL 636 CHECKS PASS.  `paper_numeric_diff.py` the
+same 8 pre-existing residuals, ZERO new (3 tex-only 0.05 / 3.0 / 39,172; 5 md-only 0.087 / 0.279 /
+3.19 / 9.0 x2) -- its exit 1 is that known state, not a regression.  Abstract 222 words, defects
+`[]`, cap 230.  `tectonic` 0 errors, paper.pdf written.  No number other than the census triple
+moved; no Slurm job submitted.
+
+**STILL OPEN, not attempted this cycle** (six agents died on API 529s before doing any work):
+the 547 unchecked Markdown cross-references and `analysis/xref_check.py`; red-team R2, R4, R8,
+R10; carried items 2, 4, 5, 6; and the Plan C signposting.  R9 (the restructure) is CLOSED as
+DECLINED on measurement -- see `paper/sections/v9-plan.md`: a 15-pp main body needs ~7,600 words
+of new digest prose in both markups, which is precisely how the 8 existing residuals arose.

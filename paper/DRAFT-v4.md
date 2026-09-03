@@ -831,8 +831,8 @@ attrition ledger's upstream cluster-side rows, wallclock and byte counts, Append
 or any value that exists only inside a registered scorer's own printed output — those are quoted
 from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census` on
 `paper/DRAFT-v4.md`, the
-audit executes **628 claim-carrying assertions covering 409 of the 892 distinct
-quantity-numerals** in this manuscript, which is 45.9% of them. Those three figures are not
+audit executes **628 claim-carrying assertions covering 411 of the 978 distinct
+quantity-numerals** in this manuscript, which is 42.0% of them. Those three figures are not
 merely measured: section `[16]` of the audit reads this sentence back out of **both markups** —
 `paper/DRAFT-v4.md` and `paper/paper.tex` — and asserts the triple against that one fresh
 measurement, so a stale coverage claim in *either* file now exits non-zero instead of passing
