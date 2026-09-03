@@ -563,11 +563,24 @@ echo "QUEUED=$(squeue -h -u "$USER" -o '%j' | grep -c "^$TAG-")"
 # and scancel the batch on any mismatch.
 # =============================================================================
 if [ "$HAVE_LIB" = 1 ]; then
-  guard_postlaunch "$RUNROOT" "$TAG-" "${DESIGN[@]}" || {
-    echo "!!! The launched batch is VOID AS DESIGNED.  Cancel it:"
+  guard_postlaunch "$RUNROOT" "$TAG-" "${DESIGN[@]}"
+  PLRC=$?
+  if [ "$PLRC" = 1 ]; then
+    echo "!!! The launched batch MISMATCHES its design and is VOID AS DESIGNED."
     echo "!!!   scancel --name=\$(squeue -h -u \$USER -o %j | grep '^$TAG-' | tr '\\n' ',' | sed 's/,\$//')"
     exit 2
-  }
+  elif [ "$PLRC" = 2 ]; then
+    echo "guard 8: UNVERIFIED, NOT void -- no job had started within the wait, so"
+    echo "         no ARGS line existed yet.  This is the normal outcome when the"
+    echo "         account is at its QOS GPU cap.  The batch is NOT cancelled."
+    echo "         RULE 20 IS STILL OWED.  Run this the moment the first job starts,"
+    echo "         and scancel the batch on any mismatch:"
+    echo "           python3 analysis/argsline_guard.py $RUNROOT --name $TAG- \\"
+    echo "             --expect NN-name=$NET --expect stepsize-groups=$GRAN \\"
+    echo "             --expect num-epochs=$EPOCHS --expect meta-stepsize=$MST \\"
+    echo "             --expect alg-base=SGDm --expect alg-meta=Lion"
+    exit 3
+  fi
 else
   echo "guard 8: _lib_guards.sh unavailable -- audit by hand once the first job"
   echo "         starts:  python3 analysis/argsline_guard.py $RUNROOT --name $TAG"
