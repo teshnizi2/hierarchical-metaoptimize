@@ -10099,3 +10099,186 @@ float and equation numbers.  The only deltas are `\subsection` 35 -> 36, `\label
 (both the new S1.2), and `tabular`/`center` 25/14 -> 26/15 (the map, which is non-floating and so
 takes no table number).  In the Markdown, `xref_check.py` reports sections defined 43 -> 44, the
 addition being `1.2`.  The manuscript-and-check diff is **195 insertions, 8 deletions**.
+
+---
+
+## 140. AN INFEASIBILITY FINDING WAS WRONG — IMAGENET-489 EXISTS, IS LABELLED, AND IS NOW RUNNING
+
+**Cycle 89.** The campaign recorded ImageNet as infeasible on three grounds. **Two of the three
+were false**, and the false ones were load-bearing: they are the reason 2,177 archived runs are
+all at CIFAR resolution while the parent paper's motivating anomaly is an ImageNet phenomenon.
+This entry records what was wrong, how it was found, what the data actually is, and the batch
+that was registered and launched on the strength of it. It also corrects three claims made
+**inside this project's own Phase-1 report**, because that report is not exempt from RULE 20.
+
+### 140.1 "THE VALIDATION SET IS UNLABELLED" — FALSE
+
+The labels were on disk the entire time, as **50,000 per-image XML annotations** under
+`ILSVRC/Annotations/CLS-LOC/val/`, each carrying a `<name>nXXXXXXXX</name>` element naming the
+synset. All 50,000 parse; they resolve to **1000 distinct validation classes**, of which **489
+overlap the trainable set**.
+
+**Why it was missed, which is the transferable part.** The earlier audits searched for the
+*conventional containers* of ImageNet validation labels — `*devkit*`, `*ground_truth*`, `*.mat` —
+and found none, then concluded the labels were absent. The labels were in an unconventional
+container. A search for the artefact's usual **filename** is not a search for the **information**;
+this one returned "not found" for a thing that was present in a different form. That is the same
+error shape as CORRECTIONS 119.1, where a grep for a phrase returned hits belonging to a different
+section and the count was believed anyway.
+
+### 140.2 "THE HARNESS IS SCALAR-ONLY" — FALSE AS A BLOCKER, BUT THE OBVIOUS CORRECTION IS ALSO WRONG
+
+The Phase-1 report records this blocker as flatly FALSE on the grounds that
+`MetaStep/MetaStep/imagenet/HF.py` *"natively supports scalar, layerwise, nodewise, weightwise,
+resnet18_blocks"*. **That is a docstring, not the code.** Read this cycle, the non-scalar branches
+of that file are **dead**:
+
+* `layerwise` — `[np.log(alpha0)*torch.ones(n)].cuda()` calls `.cuda()` on a **list** →
+  `AttributeError` at construction.
+* `blockwise` — `torch.log(alpha0)` on a Python float → `TypeError`.
+* `nodewise` / `weightwise` — `beta` is built on CPU while the meta-gradient arrives on GPU →
+  device mismatch on the first meta update.
+
+So that harness really **is** scalar-only in practice, and the docstring is the thing that is
+false. What was wrong was not the observation but the **inference from it**: "this harness cannot
+do granularity" was treated as "the campaign cannot do granularity at 224px", when the campaign's
+**maintained** `cifar10/Optimizers/HF.py` — the exact optimizer every archived granularity number
+came from — works, and the only missing piece was a 224px **data path**. The fix was therefore a
+new harness that supplies data and training loop and imports the maintained HF **unedited**, not a
+patch to the dead one. Nothing pre-existing was modified.
+
+**Both halves matter.** Recording only "the blocker was false" would leave the next reader
+expecting `imagenet/HF.py` to work, which it does not.
+
+### 140.3 "ONLY 489 OF 1000 TRAIN CLASSES" — TRUE, AND THE ONE REAL LIMIT
+
+Unchanged, and it is why every number from this line of work carries a qualifier.
+
+### 140.4 WHAT THE DATASET ACTUALLY IS
+
+`/data1/salehkaleybars/metaopt/data/imagenet489/`, standard `torchvision` `ImageFolder` layout:
+
+| | |
+|---|---|
+| `train/` | symlink into the PI's `ILSVRC/Data/CLS-LOC/train`, **489 class dirs, 627,329 images** |
+| `validation/` | **489 class dirs, 24,450 symlinks, 0 broken, exactly 50 images per class** |
+| labels | **recovered from the per-image XML annotations**, not from a devkit |
+| chance top-1 | 1/489 = **0.2045 %** |
+
+The PI tree was **read-only throughout**. The class-dir counts were re-derived on the live tree in
+this cycle's launcher preflight (489/489), not quoted.
+
+**THE SCOPE SENTENCE THAT MUST TRAVEL WITH EVERY NUMBER FROM THIS DATA.** It is
+**ImageNet-489**, never "ImageNet": 489 of 1000 train classes; 627,329 train images; validation
+24,450 images at exactly 50 per class with labels recovered from per-image XML annotations rather
+than a devkit; chance 0.2045 %. **No number from it is comparable to a published ImageNet-1k
+result** — fewer classes is an easier task at equal everything else, and the train set is 49 % of
+ImageNet-1k's.
+
+### 140.5 A REGISTERED, FROZEN FILE STILL CARRIES THE REFUTED PREMISE — DELIBERATELY NOT EDITED
+
+`analysis/cT1_tin_score.py`, the registered Tiny-ImageNet scorer, states in its header that
+*ImageNet-1k is blocked on DATA* because the PI tree holds *"an unlabelled 50,000-image validation
+set"*. **That premise is now refuted by 140.1.** The file is **not edited**: it is a RULE 21
+scorer, frozen at registration, and RULE 16 forbids editing it to run it. This entry supersedes
+that sentence.
+
+**cT1's science is unaffected and its batch remains worth running.** Tiny-ImageNet-200 still moves
+resolution and class count without credentials. What changes is its *standing*: it was registered
+as a **substitute** for an experiment believed impossible, and it is now a **complement** to one
+that is running. A finding from `tn1` and a finding from `in489g1` are two points on the scale
+axis, and the honest framing after this entry is that neither is the other's proxy.
+
+### 140.6 THREE CORRECTIONS TO THIS PROJECT'S OWN PHASE-1 REPORT
+
+**(a) The meta-stepsize claim was backwards.** Phase 1 described `3e-2` as "the campaign's
+CIFAR-tuned" value and `1e-3` as merely "the parent's". Re-derived from `results/all_runs.csv`
+this cycle: the campaign's CIFAR-10 corpus at `alpha0=1e-6`, `BETA_CLIP=-15:-2.3026` is at
+**`1e-3`**, and there is **no scalar-vs-layerwise CIFAR-10 ladder at `3e-2` anywhere in the
+corpus** — `3e-2` is what the currently-running `g4m` batch is *exploring*, not an established
+configuration. `1e-3` is therefore simultaneously the parent's ImageNet value **and** the
+campaign's own matched-control value. Had the ladder run at the smoke test's `3e-2` it would have
+had **no matched control on either side**. The smoke's `3e-2` was correct for proving a pipeline
+and wrong for a ladder.
+
+**(b) The ladder as briefed does not test the parent's own contrast.** The parent's ImageNet
+sentence is about **blockwise**, verified in-repo at `docs/PAPER-CONFIG.md:71`: *"Unlike CIFAR10,
+here the blockwise versions of MetaOptimize showed no improvement over the scalar versions."*
+A scalar/layerwise/nodewise ladder therefore tests a contrast the parent never reports. The
+launched batch adds **`resnet18_blocks` (m=6)** as **PRIMARY-A**. Granularity is free — Phase 1
+measured m=1 and m=15,378 within 0.7 % of each other in throughput — so the fourth arm costs only
+its own runs. Note also the claim's **direction**: it is *"no improvement"*, a **null**, not
+"loses to scalar". The registered scorer therefore makes **VANISHES** the band that corroborates
+the parent, and writes a null as a positive finding.
+
+**(c) The budget numbers are L4-only.** Phase 1 flagged this itself and it is preserved here:
+15.9 min/epoch is a measurement on one GPU model. It should be re-measured if the batch lands
+elsewhere.
+
+### 140.7 A CORPUS CONTRADICTION THAT WOULD HAVE HALVED THE BAR
+
+Building the CIFAR-10 reference, two cells at the *same nominal* `alpha0` / `BETA_CLIP` /
+meta-stepsize disagreed in **sign**: `mx` gives layerwise − scalar = **+3.307**, `bo-lion` gives
+**−0.171**. Chased rather than averaged: `bo-lion` has **`base = Lion`, not `SGDm`**
+(`docs/FINDINGS.md:5596`). It is a different base optimizer and is not config-matched. Pooling it
+would have diluted the reference lift and left the scorer carrying a bar roughly **half** its
+correct size. The registered scorer excludes it by predicate and its `selftest` **asserts both the
+exclusion and its reason**, so the trap cannot be re-entered silently.
+
+The reference that survives is cross-batch replicated, which is what lets it carry a bar at all —
+ResNet18 / CIFAR10 / SGDm+Lion / `1e-3` / `1e-6` / `-15:-2.3026` / aug 1 / gamma 1 / bs 100 /
+100 ep / not collapsed, **53 rows**:
+
+| arm | m | plateau5 | n | batches | D vs scalar |
+|---|---|---|---|---|---|
+| scalar | 1 | 87.879 | 12 | 5 | — |
+| resnet18_blocks | 6 | 91.448 | 12 | 5 | **+3.568** |
+| layerwise | 62 | 90.893 | 17 | 6 | **+3.013** |
+| nodewise | 15,378 | 91.739 | 8 | 3 | **+3.860** |
+| weightwise | ~11.4 M | 79.183 | 4 | 2 | −8.696 |
+
+Per-batch **D** vs scalar: layerwise `+3.162 / +3.088 / +3.164 / +2.817` (4 batches,
+between-batch sd **0.142**); blocks `+3.687 / +3.808 / +3.451 / +3.540 / +3.555` (5 batches,
+sd **0.125**). Pooled within-cell SD **0.1988** pp. A ~0.13 pp between-batch sd on a ~+3.1 to
++3.6 pp effect is what makes a half-size bar meaningful rather than arbitrary.
+
+Note the curve is **non-monotone in m**: blocks (m=6) outscores layerwise (m=62), and weightwise
+collapses. Granularity is not a single ordered axis.
+
+### 140.8 A SILENT RULE 20 SKIP, IN THIS CYCLE'S OWN LAUNCHER, CAUGHT BEFORE SUBMISSION
+
+The first revision of `bin/cI1_in489g1_ladder.sh` pointed its guard at
+`$WS/analysis/argsline_guard.py`, **which does not exist on alice** (the guard lives in the repo
+checkout), and wrapped the call in `[ -f "$GUARD" ]`. Result: **every per-line RULE 20 check was
+skipped while the dry run still printed PASS.** It was found by deliberately running the guard by
+hand to confirm it *rejects* bad input, rather than trusting a green line.
+
+Fixed three ways: the path is corrected; a missing guard now **REFUSES** the batch instead of
+skipping; and the preflight prints the guard's `sha256`, verified identical to the committed one
+(`81cea8b5…4e5388`). Negative-tested live: good line `rc=0`, wrong `--expect` `rc=1`, repeated
+flag `rc=1`.
+
+**A second, subtler misuse was removed.** The cross-line consistency check originally piped all 12
+composed lines into `argsline_guard --stdin`. That option reads the **whole stream as one command
+line**, so it would have reported every flag as 12× repeated and refused for entirely the wrong
+reason. The per-line check is the guard's correct use; the cross-line check now strips the
+declared axes and asserts the remainder byte-identical.
+
+**A guard that cannot fail is not a guard.** Both defects printed PASS.
+
+### 140.9 WHAT WAS REGISTERED AND LAUNCHED
+
+* **`analysis/cI1_in489g1_score.py`** — committed **before** the launcher and **before any
+  `in489g1` run existed** (RULE 21), `selftest` **32/32 PASS**, including an assertion that the
+  corpus held **zero** `imagenet489` rows at registration. Verified end-to-end on synthetic
+  batches to return `ANOMALY_ABSENT` and `CORROBORATES_PARENT` on the two poles, and to refuse on
+  a repeated flag, an `m` mismatch and a short horizon.
+* **`in489g1`** — 12 jobs, `scalar / resnet18_blocks / layerwise / nodewise` × seeds 0,1,2, 84
+  epochs, submitted to `gpu-l4-24g` as **4887226–4887237**. All four `m` values (1 / 6 / 62 /
+  15,378) were verified on the **live 489-class model** before submission, not taken from a table;
+  `resnet18_blocks` had previously only been checked on a synthetic tree and it is PRIMARY-A.
+* Seeds are submitted **seed-major**, so a partial allocation yields a **complete 4-arm ladder at
+  n=1** rather than three seeds of one arm.
+
+**None of the campaign's 44 concurrent `g4m`/`a2g3` jobs was touched.** They sit on `gpu-short`
+under `qos-short-gpu`, a different QoS pool from `qos-gpu-l4`.
