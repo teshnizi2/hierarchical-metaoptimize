@@ -2,7 +2,8 @@
 
 Updated 3 Sep 2026 (**cycle 116**). Detail lives here; chat stays short.
 Authority: `docs/CORRECTIONS.md` (highest number wins, now **139**) > `docs/FINDINGS.md` > everything else.
-HEAD = the cycle-116 commit (parent **`58c0c85`**), working tree clean.
+Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`); HEAD is the docs-only
+commit that follows it and changes `docs/STATUS.md` and `docs/CORRECTIONS.md` alone. Working tree clean.
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp** — 75 until this cycle; see Plan C below). Corpus = **2,177 rows**.
 **No Slurm job submitted. Both queues empty** — `squeue -u salehkaleybars` and `-u s5014158` both return a header only.
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
@@ -90,7 +91,7 @@ and the only route to the last two); section head → triage answer without read
   `paper.tex:1363` / `DRAFT-v4.md:1072` *"does not vanish"* · `paper.tex:2856` / `:2249` *"has read it backwards"* ·
   `paper.tex:2882` / `:2273–2274` *"The measured ladder stops at 300 epochs and so does the claim"* ·
   `paper.tex:2944` / `:2331` *"a decline resolved at this budget and this design point rather than a law"*.
-- The whole cycle-116 diff is **195 insertions, 8 deletions**, and every one of the 8 removed lines is a
+- The manuscript-and-check diff for cycle 116 is **195 insertions, 8 deletions**, and every one of the 8 removed lines is a
   line that was rewritten in place (2 forward pointers, 2 threat-index tokens, 1 `F(39,172)` spacing,
   2 `T`-table rows, 1 `PARENT_LINES`). **No sentence was deleted and none was softened.**
 
@@ -154,8 +155,9 @@ and the only route to the last two); section head → triage answer without read
 
 | | |
 |---|---|
-| state | **rebuilt from a clean checkout at the cycle-116 commit** — see CORRECTIONS 139 for the verification transcript |
-| census in `release/README.md` | must read **41.9%** and match the paper. It shipped **45.9%** once (CORRECTIONS 138): the README interpolates `%(census)s` at build time, so a stale deposit prints a stale figure with no other symptom |
+| built from | commit **`2f4fd9a`**, **from a genuinely clean checkout** — the README's build stamp carries no DIRTY suffix. This is the first deposit since CORRECTIONS 138 for which that is true |
+| verified | `make verify` **140 files, 0 bad** · cold `make reproduce` **ALL 547 CHECKS PASS** with **both** skips announced (`[7] BUDGET` — raw `hz3` `.out` series absent; `censuscheck` — the deposit ships no manuscript) · after `make logs`, `make reproduce` **ALL 628 CHECKS PASS** with only the `censuscheck` skip · `make clean` then `make verify` **140 / 0 bad**, restored to shipped state |
+| census in `release/README.md` | **41.9%**, and it matches the paper — `README.md:34`, `paper.tex:1119`, `DRAFT-v4.md:880`, all three re-read. It shipped **45.9%** once (CORRECTIONS 138): the README interpolates `%(census)s` at build time, so a stale deposit prints a stale figure with no other symptom |
 | `release/` | **gitignored** — a build product of `analysis/c98_release.py`, regenerated, never committed |
 
 **A deposit is only as current as its last build.** It must be rebuilt once more at whatever commit is
@@ -211,6 +213,7 @@ commit-pinned and self-verifying.
 | 3 | **§4.8's budget table has no caption and no label** — `paper.tex:2810–2822` is an unfloated `center`/`tabular`; the md is a bare pipe table | **OPEN, RECORDED NOT CLOSED.** This is R2's *other* limb. CORRECTIONS 137 closed the `se` limb and did not mention this one; 137, 138 and the previous dashboard then all carried R2 as closed. Verified at this HEAD: no `\caption`, no `\label`. Acceptable as-is — nothing cross-references it and the following prose *"In the table, se is…"* does a caption's job in both markups — **but the record said fixed when it was not** |
 | 4 | **`analysis/c98_reproduce.py` prints the section label `[15]` twice** — line 621 (partition-family meta-optimiser census) and line 987 (metric sensitivity) | **OPEN, NOT FIXED ON PURPOSE.** Registered audit machinery; the numbering is cosmetic; renumbering mid-cycle would churn 636 output lines. §1.2's evidence map deliberately cites neither. Rename to `[18]` at the next machinery change |
 | 5 | **The abstract has no headroom, and the gate that measures it is not in this tree** | **OPEN, a standing hazard.** md 231 by plain count against a recorded 228 and a 230 cap. Any abstract edit must be gated, not counted |
+| 6 | **A code comment now points at a section this rewrite deleted** — `analysis/c98_reproduce.py:275` reads *"docs/STATUS.md R0 item 3 prints the upper limit as +0.299"* | **OPEN, NOT EDITED ON PURPOSE.** This dashboard no longer has an R0 section, so the comment is stale. It is a **comment inside registered audit machinery** and the assertion beside it re-derives 0.298 independently, so nothing is wrong with the check — but the pointer is dead. Fix at the next machinery change, not by editing the audit mid-cycle |
 
 **CLOSED this cycle (139), with evidence — do not re-open:** Plan C signposting (applied; census
 fixpoint held; `xref_check` green on 596 refs), R10's `39,172` (one space) and R10's `9.0` pair (a

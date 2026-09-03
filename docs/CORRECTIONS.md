@@ -10071,3 +10071,31 @@ grep hit.  Folded in: R4 and R2 (partly) closed, R8 documented, the census corre
 45.9% -> 42.0% -> 41.9%, `xref_check.py` and `test_fence_mask.py` as registered per-cycle checks,
 the operational trap that `c87`/`c99` cannot find the raw records without `--runs`, and that the
 deposit must be rebuilt at the submission commit.
+
+**THE DEPOSIT, REBUILT FROM A GENUINELY CLEAN CHECKOUT AT `2f4fd9a`.**  The repository was cloned
+to a fresh directory placed as a **sibling of `runs/`** (the builder resolves the raw records as
+`<repo>/../runs`, so a build anywhere else silently loses them), checked out at `2f4fd9a`,
+`git status` empty, and `python3 analysis/c98_release.py` run there.  **`release/` built: 140
+files, 6.6 MB**, and the README's build stamp reads *"Built 2026-09-03 from commit
+`2f4fd9a3b267758718ab6d5e59b93068197bf5a9`"* with **no DIRTY suffix** -- the first deposit since
+CORRECTIONS 138 for which that is true (the previous one was built from `d1a3ed4` with a dirty
+tree, and its own README said so).  Verification, pasted:
+  `make verify` -> **140 files checked, 0 bad**
+  cold `make reproduce` -> **ALL 547 CHECKS PASS**, with **both** skips announced rather than
+    silent: `[7] BUDGET` (*"raw hz3 .out series not found -- SECTION SKIPPED"*) and `censuscheck`
+    (*"no manuscript in this tree (the deposit ships none), so S3.4's coverage cannot be
+    re-measured here"*).  This is R8's documented behaviour, reproduced on a genuinely cold deposit.
+  `make logs`, then `make reproduce` -> **ALL 628 CHECKS PASS**, only the `censuscheck` skip left.
+  `make clean`, then `make verify` -> **140 / 0 bad**; deposit restored to its shipped state.
+**AND THE FIGURE THAT SHIPPED STALE ONCE NOW AGREES IN ALL THREE PLACES:** coverage reads
+**41.9%** at `release/README.md:34`, at `paper.tex:1119` and at `DRAFT-v4.md:880`.  It must still
+be rebuilt at whatever commit is finally submitted -- author item 4 stands, because a deposit is
+only ever as current as its last build.
+
+**NOTHING MOVED, PROVEN RATHER THAN ASSERTED.**  Counted across `58c0c85` -> `2f4fd9a` in
+paper.tex: `table` 11 -> 11, `figure` 4 -> 4, `equation` 12 -> 12, `\caption` 15 -> 15, `\section`
+11 -> 11, and the **label order** of `tab:`, `fig:` and `eq:` is **identical**, which is what fixes
+float and equation numbers.  The only deltas are `\subsection` 35 -> 36, `\label{sec:` 45 -> 46
+(both the new S1.2), and `tabular`/`center` 25/14 -> 26/15 (the map, which is non-floating and so
+takes no table number).  In the Markdown, `xref_check.py` reports sections defined 43 -> 44, the
+addition being `1.2`.  The manuscript-and-check diff is **195 insertions, 8 deletions**.
