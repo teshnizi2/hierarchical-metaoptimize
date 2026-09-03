@@ -365,7 +365,14 @@ def gate_run(path, want):
         if env.get(k) != v:
             bad.append("ENV %s is %r, registered %r" % (k, env.get(k), v))
     got_r = env.get("ETA_RATIO")
-    if got_r is None or abs(float(got_r) - want["r"]) > 1e-12:
+    # A non-additive run carries ETA_RATIO=na (run_cifar.sh echoes ${ETA_RATIO:-na}
+    # over an unset variable), so this must FAIL rather than raise -- the RULE 13
+    # discrimination path feeds exactly such runs through this gate on purpose.
+    try:
+        r_ok = got_r is not None and abs(float(got_r) - want["r"]) <= 1e-12
+    except (TypeError, ValueError):
+        r_ok = False
+    if not r_ok:
         bad.append("ENV ETA_RATIO is %r, registered %r" % (got_r, want["r"]))
     ser = C87.series_from_out(path)
     ndone = (max(ser) + 1) if ser else 0
