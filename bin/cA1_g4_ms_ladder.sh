@@ -268,9 +268,9 @@ PYEOF
 # ---- GUARD 4 -- no name collision ------------------------------------------
 if grep -q "^$PREFIX-" "$CSVP"; then guard_fail "guard 4: $PREFIX-* already in the CSV"
 else echo "guard 4: no $PREFIX-* name collision in the corpus"; fi
-if [ -d "$SAVE" ] && ls "$SAVE"/${PREFIX}-*.out >/dev/null 2>&1; then
-  guard_fail "guard 4b: $SAVE already holds $PREFIX-*.out"
-else echo "guard 4b: no $PREFIX-*.out under $SAVE"; fi
+if ls "$WS/runs"/${PREFIX}-*.out >/dev/null 2>&1; then
+  guard_fail "guard 4b: $WS/runs already holds $PREFIX-*.out"
+else echo "guard 4b: no $PREFIX-*.out under $WS/runs"; fi
 
 # ---- GUARD 5 -- room and queue ---------------------------------------------
 FREE=$(df -BG "$WS" 2>/dev/null | tail -1 | awk '{print $4}' | tr -d 'G')
@@ -336,8 +336,15 @@ if [ "$SUBMIT" = 1 ]; then
   echo "---- $PREFIX- added to bin/PROTECTED.txt; no trim may cancel it ----"
   # STANDING RULE 20, AFTER launch: read the FIRST RUN'S OWN ARGS line and abort
   # the batch on any mismatch.  This is the check that would have caught ml2/sm3.
-  guard_postlaunch "$SAVE" "$PREFIX-" "${DESIGN[@]}" || {
+  # NOTE the directory.  jobs/run_cifar.sh carries
+  #   #SBATCH --output=/data1/salehkaleybars/metaopt/runs/%x-%j.out
+  # so the .out files land in $WS/runs, NOT in --save-directory ($SAVE, which
+  # holds only the probe dirs).  Watching $SAVE here returns a FALSE
+  # "UNVERIFIED" -- corrected after the g4m launch, where the hand audit at the
+  # right path returned PASS on all 21 started runs.  The composed sbatch lines
+  # are untouched by this fix.
+  guard_postlaunch "$WS/runs" "$PREFIX-" "${DESIGN[@]}" || {
     echo "!!! THE LAUNCHED BATCH IS VOID AS DESIGNED.  Cancel it now."
     exit 2; }
-  echo "---- score with:  python3 analysis/cA1_g4_score.py --runs $SAVE --probes $SAVE"
+  echo "---- score with:  python3 analysis/cA1_g4_score.py --runs $WS/runs --probes $SAVE"
 fi
