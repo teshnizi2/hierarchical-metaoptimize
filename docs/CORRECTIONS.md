@@ -10282,3 +10282,95 @@ declared axes and asserts the remainder byte-identical.
 
 **None of the campaign's 44 concurrent `g4m`/`a2g3` jobs was touched.** They sit on `gpu-short`
 under `qos-short-gpu`, a different QoS pool from `qos-gpu-l4`.
+
+---
+
+## 140. THE LANDING PASS — FIVE BATCHES IN FLIGHT, THE SHARED TREE RE-PROVED FROM SCRATCH, AND ONE SELF-INFLICTED FALSE ALARM
+
+**Nothing in this entry scores anything.** Every one of the five batches this cycle launched is
+still running. No verdict is quoted below because no batch is complete, and a scorer run on a
+partial batch is exactly the failure RULE 13 exists to prevent.
+
+### 140.1 QUEUE STATE, RE-DERIVED FROM `sacct` AND `squeue`, NOT FROM THE AGENTS' REPORTS
+
+| account | batch | jobs | COMPLETED | RUNNING | PENDING | decides |
+|---|---|---|---|---|---|---|
+| `alice` (READ-ONLY) | `g4m` | 72 | **65** | 7 | 0 | r x meta-stepsize ladder |
+| `alice` (READ-ONLY) | `a2g3` | 36 | **0** | 5 | 31 | ResNet-50 r-ladder |
+| `alice2` | `tl1` | 42 | **27** | 14 | 1 | **G1** — two-level shrink, the proposal as written |
+| `alice2` | `eb1` | 18 | **0** | 0 | 18 | **G16** — empirical-Bayes / James-Stein lambda |
+| `alice2` | `tn1` | 12 | **0** | 0 | 12 | Tiny-ImageNet granularity ladder |
+
+`g4m` needs one more wave (~35 min). `a2g3` has 31 jobs behind 5 at an archived ResNet-50 mean of
+**148.7 min** (n=12), against ~12 concurrent GPU slots: **~7-8 h**. On `alice2` the cap runs
+~14-16 GPUs; `tl1` finishes within the hour, then `eb1` (~70 min), then `tn1` (~2.5 h).
+
+**Not ours, on `alice`:** 12 `in489g1` jobs PENDING, from the ImageNet-489 line. Nothing was
+submitted to or cancelled on `alice` in this pass; it was contacted read-only.
+
+### 140.2 GPU-HOURS COMMITTED — 178.2 h, PROJECTED FROM MEASURED MEANS
+
+`g4m` 41.7 h (72 x 34.72 min, mean over the 65 finished) - `a2g3` 89.2 h (36 x 148.7 min, the
+archived `r50` mean) - `tl1` 24.0 h (42 x 34.30 min, mean over the 27 finished) - `eb1` 10.3 h
+(18 x 34.30, same cell) - `tn1` 13.0 h (9 x ~75 min projected from `tinsmoke3`'s measured 14.95
+min / 20 epochs, plus 3 CIFAR controls x 34.30 min). **`alice` 130.9 h, `alice2` 47.3 h.**
+
+### 140.3 THE SHARED-TREE HAZARD WAS REAL, AND IT IS NOT WHERE THE AGENTS LOOKED
+
+Three agents patched one tree while jobs were queued against it. `HF.py` was safe by luck of
+ordering — last write **21:43:40**, earliest `tl1` start **21:50:11**, so all 42 `tl1` jobs import
+one `HF.py` (md5 `9ede3d108fd833b5ea856e38d82a4d4a`, 915 lines, 50 `PATCH_` markers).
+
+**But `load_data.py` and `build_network.py` were rewritten at 22:30:14 — forty minutes AFTER the
+first `tl1` job started.** Python reads them at process start, so `tl1` **is** split across two
+versions of those two files. That split is harmless **only because** the Tiny-ImageNet patch is a
+bitwise no-op, which makes that proof load-bearing for a batch it was never written for. Nothing
+in a `.out` file records either file's md5; the next agent to touch this tree without a no-op
+proof splits a live batch for real.
+
+### 140.4 RE-PROVED INDEPENDENTLY, NOT TAKEN ON REPORT
+
+A purpose-written audit (`land_noop_audit.py`, cluster jobs 4887185 / 4887238, torch 2.0.1+cu118)
+compared the **live** tree against **pinned `d3202635c3fc`** over a matrix wider than either
+agent's: 5 pre-existing `--hier` modes x {layerwise, nodewise, scalar} x {box, no box} x
+alpha0 {1e-6, 1e-3} = **60 configurations**, hashing betas + network weights + the whole
+`h_condenced` trace as float64 bytes. **60/60 bitwise identical.** Every `def` in the pinned file
+survives; `PATCH_TWOLEVEL` and `PATCH_EBJS` coexist with distinct dispatch guards and neither
+clobbered the other. All 11 pre-existing `--NN-name` values build bitwise-identical parameter sets
+in identical named order.
+
+The three registered suites were then re-run **UNEDITED** and all pass against the live tree:
+`tl_equivalence.py` (proofs A/B/C — including `rho=0` spread exactly 0 at every t, the rho ladder
+flat in t, and the lam ladder decaying at exactly `(1-lam)^dt`), `cG16_noop_equiv.py`
+(11/11 SAME for pre/post **and** pinned/post), `tin_equivalence.py` (11 networks, 4 loader
+configs, group counts measured on the live `HF.py`).
+
+### 140.5 THE FALSE ALARM, RECORDED BECAUSE IT NEARLY BECAME A FINDING
+
+The independent audit reported **`ebjz` inert on live** — which, taken at face value, would have
+voided 3 of `eb1`'s 18 jobs. It was **an artifact of the audit's own testbed**: a 4-tensor MLP,
+i.e. **m=4** layerwise groups, against a James-Stein factor carrying an **(m-3)** numerator, which
+is all but the degenerate case. Re-run at the **production** group count (ResNet18, layerwise,
+**m=62**, the configuration `eb1` actually submits), all three EB arms are live and mutually
+distinct: `ebjs` std(beta) 8.29e-04, `ebjz` 1.87e-03, `ebjs EB_RHO=0.9` 4.81e-02, against plain
+6.13e-02. **No defect. The audit was wrong, not the patch.** Incidental confirmation from the same
+probe: `additive r=1` hashes **identically** to plain, so r=1 is the exact arithmetic identity and
+`eb1`'s `a1` control is real.
+
+### 140.6 RULE 20, RULE 21, RULE 16
+
+`argsline_guard.py` over `tl1`: **40 clean, 0 with repeated flags or design mismatch, 0 without an
+ARGS line — VERDICT: PASS.** The realised arms, read from the runs' own ARGS/ENV lines, match the
+registration exactly: 5 rho rungs x 2 alpha0 x 3 seeds, plus plain-layerwise and scalar controls.
+`eb1` and `tn1` have **no started runs**, so they have no ARGS line yet and RULE 20 is **owed, not
+satisfied** — `cG16_submitline_audit.py` covers `eb1` 18/18 from Slurm's `SubmitLine` in the
+meantime. **Re-run `argsline_guard.py --name eb1-` and `--name tn1-` once those start.**
+
+Every scorer predates its runs. `cA1_g4_score.py` committed `8adc5cf` **20:53:27**, first `g4m`
+job started **20:55:05** — 98 seconds. `cG1_tl_score.py` `907a4fb`, `cG16_eb_score.py` `24abab8`,
+`cT1_tin_score.py` `0e1c9d8`, all before their first run. sha256s match what each agent declared.
+**One near-miss on the record:** `cA2_g3_score.py` was edited at `aa4213f` **21:09:04**, after
+`a2g3` was submitted (**20:57:23**) — permissible only because no `a2g3` job has ever started, so
+no data existed. It must not be touched again; `a2g3` now has 5 jobs running.
+
+`c98_reproduce.py` **exit 0, ALL 636 CHECKS PASS**. `git status` clean, nothing under `paper/`.

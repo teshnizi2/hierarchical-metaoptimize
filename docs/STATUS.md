@@ -1,11 +1,26 @@
 # STATUS — operator dashboard
 
 Updated 3 Sep 2026 (**cycle 116**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **139**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **140**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`); HEAD is the docs-only
 commit that follows it and changes `docs/STATUS.md` and `docs/CORRECTIONS.md` alone. Working tree clean.
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp** — 75 until this cycle; see Plan C below). Corpus = **2,177 rows**.
-**No Slurm job submitted. Both queues empty** — `squeue -u salehkaleybars` and `-u s5014158` both return a header only.
+**FIVE BATCHES IN FLIGHT — nothing complete, nothing scored.** Re-derived from `sacct`/`squeue`:
+
+| account | batch | jobs | done | run | pend | decides | lands |
+|---|---|---|---|---|---|---|---|
+| `alice` RO | `g4m` | 72 | 65 | 7 | 0 | r × meta-stepsize ladder | ~35 min |
+| `alice` RO | `a2g3` | 36 | 0 | 5 | 31 | ResNet-50 r-ladder | ~7–8 h |
+| `alice2` | `tl1` | 42 | 27 | 14 | 1 | **G1** two-level shrink — the proposal as written | <1 h |
+| `alice2` | `eb1` | 18 | 0 | 0 | 18 | **G16** empirical-Bayes / James-Stein λ | ~2 h |
+| `alice2` | `tn1` | 12 | 0 | 0 | 12 | Tiny-ImageNet granularity ladder | ~4–5 h |
+
+**GPU-h committed 178.2** (`alice` 130.9, `alice2` 47.3), projected from measured means, not requests.
+Also on `alice`, not ours: 12 `in489g1` PENDING. Nothing submitted or cancelled on `alice` — read-only.
+**Tree re-proved from scratch:** live vs pinned `d3202635c3fc` bitwise identical over **60 configurations**;
+`tl_equivalence` / `cG16_noop_equiv` / `tin_equivalence` re-run UNEDITED, all PASS. RULE 20 `tl1` **40 clean, PASS**;
+**owed for `eb1`/`tn1` once they start.** See CORRECTIONS 140 — including a shared-tree split in
+`load_data.py`/`build_network.py` that only the Tiny-ImageNet no-op proof makes harmless.
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
 ## Verdict
@@ -16,7 +31,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp** — 75 until this cyc
 | Audit | `c98_reproduce.py` **exit 0, ALL 636 CHECKS PASS**; census at fixpoint **628 / 411 / 982 / 41.9%** |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens, all pre-existing, 0 new.** Three of the eight were closed this cycle |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours** |
+| GPU to reach submission | **0 jobs, 0 hours** (the 178.2 GPU-h in flight is the NEXT cycle's science, not this manuscript's) |
 
 **Ready to submit: NO** — not for any manuscript defect, for the six author items.
 
