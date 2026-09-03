@@ -12,7 +12,7 @@ MetaOptimize (Sharifnassab, Salehkaleybar & Sutton, ICML 2025) meta-learns one s
 parameter group and reports that finer partitions help inconsistently, never separating that from
 the group *count*. Its contribution therefore remains unmeasured. Our research question is
 whether it survives at fixed count. We answer with a benchmarking experiment on the
-released artefact, patched only to add partitions. The sampling frame is a 2,173-run
+released artefact, patched only to add partitions. The sampling frame is a 2,177-run
 CIFAR-10/CIFAR-100 corpus; the unit of analysis is a within-batch count-matched contrast.
 
 The uniform partition wins in all twenty count-matched cells, on ResNet-18, ResNet-34 and
@@ -49,7 +49,7 @@ Limitations section asks for future work on *"the layer and weight levels"*.
 That is also how the paper closes on the question: *"while increasing the number of step sizes
 is anticipated to enhance performance, our experimental findings in Section 7 reveal that this
 improvement is not consistent across the MetaOptimize approximations evaluated."* We take that
-question up with 2,173 runs (≈1,632 GPU-hours; 1,731 admissible) on CIFAR-10 and CIFAR-100 —
+question up with 2,177 runs (≈1,642 GPU-hours; 1,735 admissible) on CIFAR-10 and CIFAR-100 —
 ResNet-10, -18, -34, -50 and one ResNet-101 across the corpus, and ResNet-18, -34 and -50 in every count-matched
 cell — and report one robust measurement, one bounded null, and a mechanism we could not find.
 
@@ -146,7 +146,7 @@ a tuned schedule at every scale we ran: on ResNet-18 its best plain cell reaches
 against a tuned SGD+cosine baseline at 95.124 ± 0.047 (n=5, the interior maximum of a bracketed
 grid), a **1.807 pp deficit**, and the deficit widens to 2.56 pp on ResNet-34 and 4.21 pp on
 ResNet-50. We make no competitiveness claim. (iii) The base optimiser has been varied four ways and
-the meta-optimiser once: of the 427 admissible runs in the partition families, 415 carry a **Lion**
+the meta-optimiser once: of the 431 admissible runs in the partition families, 419 carry a **Lion**
 meta-optimiser and 12 — one cell, the second-moment corner that §6.1's void batch failed to test —
 carry RMSProp. One cell is not an axis, so no general statement about the meta-optimiser is
 available from this corpus. (iv) The effect is ≈0.6 pp inside a method that is 1.8 to 4.2 pp
@@ -377,24 +377,24 @@ replication — all three before any result is read.
 profile, stated here in the detail a replication needs rather than left to the submission scripts.
 **Task suite.** Supervised image classification on CIFAR-10 and CIFAR-100 (Krizhevsky 2009) at
 native 32×32 resolution, on the shipped 50,000/10,000 train/test split, with **no held-out
-validation partition anywhere in the project** (§3.3, §7 T12). 1,967 of the 2,173 runs are
+validation partition anywhere in the project** (§3.3, §7 T12). 1,971 of the 2,177 runs are
 CIFAR-10 and 206 are CIFAR-100. **Subject systems.** Networks are instantiated by the parent
-release's `build_network.py`: ResNet-18 on 1,872 rows (1,667 CIFAR-10, 188 CIFAR-100, 17 the
+release's `build_network.py`: ResNet-18 on 1,876 rows (1,671 CIFAR-10, 188 CIFAR-100, 17 the
 GroupNorm variant of §7 T7), ResNet-34 on 150, ResNet-10 on 119, ResNet-50 on 31 and ResNet-101
 on 1. Every count-matched cell of Table 2 is ResNet-18 (eighteen cells), ResNet-34 (one) or
-ResNet-50 (one). **Training scenario.** Mini-batch size 100 in all 2,173 runs; one test-set
+ResNet-50 (one). **Training scenario.** Mini-batch size 100 in all 2,177 runs; one test-set
 evaluation after every training epoch; augmentation is `RandomCrop(32, padding=4)` followed by a
-random horizontal flip (`patches/patch_augment.py`), recorded on in 2,059 rows, off in 27, and
-unrecorded in 87 early rows — and on in 534 of the 535 partition-family rows, the one exception
+random horizontal flip (`patches/patch_augment.py`), recorded on in 2,063 rows, off in 27, and
+unrecorded in 87 early rows — and on in 538 of the 539 partition-family rows, the one exception
 carrying no value in that column. **Budgets.** 100 epochs is the standard workload (1,614 runs);
-the budget ladder of §4.8 extends it to 300 (62 runs); 392 runs are 20-epoch probes, and the
+the budget ladder of §4.8 extends it to 300 (66 runs); 392 runs are 20-epoch probes, and the
 remaining 105 sit on other budgets (36 at 80 epochs, 30 at 40, 6 at 600 and 33 on 2–5-epoch smoke
 runs). **No learning-rate schedule is applied to any MetaOptimize arm** — the step size is what the
 method learns — and the tuned cosine-schedule baselines of §7 T4 are the only arms in the corpus
 that carry one. **Execution environment.** One virtual environment
 on both cluster accounts (Python 3.10.4, PyTorch 2.0.1+cu118, CUDA 11.8, torchvision 0.15.2,
 numpy 1.26.4, Slurm) across NVIDIA L4 24 GB, RTX 2080 Ti 11 GB, A100 80 GB and A100 MIG 40 GB
-partitions; 1,632 GPU-hours over 29 nodes (§8).
+partitions; 1,642 GPU-hours over 29 nodes (§8).
 
 ### 3.1 The partitions
 
@@ -552,17 +552,18 @@ $$
 where $\texttt{window\_ok}(r) = [\,E_r > 20\,]$ — the tail in (10) must be a genuine
 plateau and not most of a short probe — and
 $\texttt{complete}(r) = [\,E_r \ge 0.95\,E^{\mathrm{req}}_r\,]$. The second condition is not
-redundant: **17 of 2,173 runs pass `window_ok` while having completed under 95% of their
+redundant: **17 of 2,177 runs pass `window_ok` while having completed under 95% of their
 requested epochs** (16 of the 17 finished under 90%; the seventeenth stopped at 94 of 100).
 The lowest-accuracy of them, `rs-blk6-1e4-s2`, ran 29 of 100 epochs and still reports `plateau5`
 85.228; it sits in a `resnet18_blocks` arm of the `rs` meta-stepsize sweep, where including
 it moves that arm's mean by 1.22 pp and inflates its sem 19-fold. **None of the 17 is in a
 count-matched arm of any cell reported in this paper** — see the attrition ledger in
 §8, which books these same seventeen rows as its `window_ok = 1, complete = 0` line and where
-attrition inside the primary contrasts is zero. Of 2,173 rows, **1,731 are
-admissible**. (This count is 7 higher than the 1,724 of earlier versions of this paper for one reason only:
-`rp1`'s eight mid-flight snapshot rows have been refreshed from the completed `.out` files, so
-seven of them now pass the `complete` gate. No other row moved.)
+attrition inside the primary contrasts is zero. Of 2,177 rows, **1,735 are
+admissible**. (This count is 11 higher than the 1,724 of earlier versions of this paper for two
+reasons and no others: `rp1`'s eight mid-flight snapshot rows have been refreshed from the
+completed `.out` files, so seven of them now pass the `complete` gate; and the four `hz3q` rows of
+§3.5 were ingested, all four admissible. No other row moved.)
 
 **Selection on the test set, stated in full.** **No validation split was held out anywhere in
 this project.** CIFAR-10 and CIFAR-100 ship a 50,000/10,000 train/test split; we trained on
@@ -788,7 +789,8 @@ set.
 3. **§4.8 reports the budget contrast on `plateau5` and declines the scorer's registered primary
    window.** `analysis/c87_hz3_score.py` fixes a 50-epoch mean as its primary reading and returns
    `GROWS` on it, with D(300) − D(100) = +0.229; `plateau5`, this paper's primary metric
-   everywhere else, returns −0.149 ± 0.105 (t −1.42). We keep `plateau5` for consistency and print
+   everywhere else, returns −0.149 ± 0.105 (t −1.42) on the same archived seeds, and **−0.238 ± 0.093
+(t −2.57)** once seed 5 is repaired. We keep `plateau5` for consistency and print
    the registered verdict alongside it rather than instead of it, and §4.8 explains the mechanism
    of the disagreement — a 50-epoch trailing window at B = 100 contains the mid-training trough
    and at B = 300 does not.
@@ -829,8 +831,8 @@ attrition ledger's upstream cluster-side rows, wallclock and byte counts, Append
 or any value that exists only inside a registered scorer's own printed output — those are quoted
 from the scorer, not re-derived. Measured by `python3 analysis/c98_reproduce.py --census` on
 `paper/DRAFT-v4.md`, the
-audit executes **557 claim-carrying assertions covering 372 of the 849 distinct
-quantity-numerals** in this manuscript, which is 43.8% of them. Those three figures are not
+audit executes **584 claim-carrying assertions covering 389 of the 872 distinct
+quantity-numerals** in this manuscript, which is 44.6% of them. Those three figures are not
 merely measured: section `[16]` of the audit reads this sentence back out of **both markups** —
 `paper/DRAFT-v4.md` and `paper/paper.tex` — and asserts the triple against that one fresh
 measurement, so a stale coverage claim in *either* file now exits non-zero instead of passing
@@ -842,16 +844,18 @@ so the census never counts itself.) We print the fraction rather than a superlat
 kind of claim this audit exists to catch: the first version of it checked no ρ, and a false ρ
 superlative survived two review cycles in §4.3 as a result.
 
-### 3.5 Four pre-registered batches: three scored, one never started
+### 3.5 Four pre-registered batches: all four now scored, one after a forced redesign
 
 Three weaknesses this paper states about itself, and one experiment it declares was never run, are
-addressed by the four batches tabulated below, submitted while this paper was being written. Three of the four — `bm2`,
-`sm4` and `rp1` — have since completed and been scored by running their registered scorers
-**unedited**, and their verdicts are folded into §4.4, §4.6, §4.7, §5.4, §5.5 and §7. One — the
-`hz3` seed-5 trio — is not scored, and **no number from it enters any claim in this paper**. The
-registrations are stated here in full regardless of outcome, so that the decision rules are on the
-record ahead of the numbers, and so that a reader can check that the three verdicts we did read are
-the ones we said we would read.
+addressed by the four batches tabulated below, submitted while this paper was being written.
+**All four** — `bm2`, `sm4`, `rp1` and the `hz3` seed-5 repair — have since been scored by running
+their registered scorers **unedited**, and their verdicts are folded into §4.4, §4.6, §4.7, §4.8,
+§5.4, §5.5 and §7. One of the four did not run in the form it was registered in: R2's three queued
+jobs were cancelled before they started and were replaced by a four-arm batch, `hz3q`, described
+below. The registrations are stated here in full regardless of outcome, so that the decision rules
+are on the record ahead of the numbers, and so that a reader can check that the four verdicts we
+read are the ones we said we would read. **One of them withdraws a sentence this project
+published**, and §4.8 carries the withdrawal rather than burying it.
 
 Every one of the four was submitted under the two rules that the failures in §6.1 paid for:
 **STANDING RULE 20** — a batch's science is what the runs' own `ARGS:` line says, never what the
@@ -862,7 +866,7 @@ without a scorer that already exists, whose selftest already passes, and whose s
 | tag | batch | jobs | what it repairs | registered scorer | status |
 |---|---|---|---|---|---|
 | R1 | `rp1` | 24 | the alignment null's power **and** its permutation-seed confound (§4.6) | `analysis/c97_rp1_score.py` | **SCORED on the second run — null REPLICATED (§4.6.1)** |
-| R2 | `hz3` seed-5 trio | 3 | the budget cell's clip-box and GPU-class mismatch (§4.8, §7 T9) | `analysis/c87_hz3_score.py`, reused unedited | **queued, not started** |
+| R2 | `hz3q` | 4 | the budget cell's clip-box and GPU-class mismatch (§4.8, §7 T9); replaces the `hz3` seed-5 trio, cancelled unstarted | `analysis/c99_hz3q_score.py` | **SCORED — `NOT FLAT`; flatness WITHDRAWN (§4.8)** |
 | R3 | `bm2` | 12 | the base-optimiser moderator's single-batch SGD and RMSProp levels (§4.4) | `analysis/c97_bm2_score.py` | **SCORED — both levels REPLICATE (§4.4)** |
 | R4 | `sm4` | 12 | the second-moment corner the void batch of §6.1 failed to test | `analysis/c97_sm4_score.py` | **SCORED — mechanism REFUTED (§5.5)** |
 
@@ -886,18 +890,39 @@ equivalence claim unless the entire 95% interval lies inside the ±0.15 band, an
 land. Two rules, two owners, both reported in §4.6.1: one of them fired and one of them did not,
 and it is not the one a reader would guess.
 
-**R2 — the `hz3` seed-5 trio, re-run box- and hardware-matched.** `hz3-ch-s5`, `hz3-c23-s5` and
-`hz3-n1d-s5` re-run at 300 epochs in the batch's own box `−30:9.0` and pinned to the batch's own
-GPU class for seed 5 (RTX 2080 Ti), restoring a matched 6 v 6 at every budget. Nothing else in
-`hz3` is touched; its seed-5 `nodewise` partner is already in the right box. The composed argument
-line was verified byte-identical to the original `hz3-ch-s5` run's own `ARGS:` line modulo the
-partition flag, and the box arithmetic was pre-registered: at ms·T = 1e-4 × 300 × 500 = 15.0 nats
-of travel from β₀ = −6.907755, β is confined to [−21.908, +8.092], so **both rails of `−30:9.0`
-are provably unreachable** while the superseded box's floor of −15 is reachable from epoch 162 —
-which is exactly what the probe records show happened (§7 T9). This batch changes the data the
-registered reader reads; it does not change the reader. `analysis/c87_hz3_score.py` is reused
-**unedited** (sha256 `0be1f5201d…`, selftest 144/144 PASS) rather than a second scorer being
-written, because writing one would create two registrations for one question.
+**R2 — the `hz3` seed-5 repair: registered as a trio, delivered as a quartet.**
+*As registered.* `hz3-ch-s5`, `hz3-c23-s5` and `hz3-n1d-s5` re-run at 300 epochs in the batch's own
+box `−30:9.0` and pinned to the batch's own GPU class for seed 5 (RTX 2080 Ti), restoring a matched
+6 v 6 at every budget against the archived seed-5 `nodewise` run, which is already in the right box.
+*What happened.* Those three jobs (Slurm 4855960–62) never started. They sat on `gpu-2080ti-11g`
+with elapsed time `00:00:00` and no node ever assigned; the queue's own start estimate for them
+stood at roughly a week, and we cancelled them rather than hold the paper for it. No `.out` file
+exists for any of the three job ids, which is why they appear nowhere in the attrition ledger of §8:
+that ledger reconciles logs against the run table, and these three produced no log.
+*What we ran instead, and why the replacement is the better design.* `hz3q`: *four* arms —
+`nodewise`, `chunk777`, `nodewise1d` and `chunk2325` — at seed 5, 300 epochs, box `−30:9.0`, in
+**one** submission (Slurm 4864632–35) on **one** card (`node883`, an NVIDIA L4 on `gpu-l4-24g`).
+The registered trio matched an *archived* comparator by pinning a partition, so it was correct only
+if the queue delivered that partition and only if the archived run it leaned on was what its
+metadata said. The quartet generates its comparator inside itself: box and GPU class are identical
+across the four arms **by construction**, and the seed-5 contrast depends on no archived run at all.
+We changed the design because a week-long queue made the registered one unaffordable, and we say
+that rather than present the redesign as foresight; it is nonetheless the better design, and it buys
+a measurement the original could not make (HC below). Its one cost is that the quartet sits on a
+different GPU class from seeds 0–4, which is exactly why that control is carried.
+*The registration.* Under STANDING RULE 21, `analysis/c99_hz3q_score.py` (sha256 `50d95083c8…`,
+selftest 59/59 PASS) was committed **before the runs existed**, and it writes no reader of its own:
+it imports `analysis/c87_hz3_score.py` (sha256 `0be1f5201d…`) **unedited** under STANDING RULE 16,
+so the quartet changes the data the registered reader reads and not the reader. Its flatness
+bar, \|t\| < 2.0, is frozen in `band_flat()` and predates the runs. The box arithmetic is unchanged from
+the registration: at ms·T = 1e-4 × 300 × 500 = 15.0 nats of travel from β₀ = −6.907755, β is
+confined to [−21.908, +8.092], so **both rails of `−30:9.0` are provably unreachable**, while the
+superseded box's floor of −15 is reachable from epoch ⌈8.092245 / 0.05⌉ = 162 — which is what the
+probe records show happened (§7 T9). The gate measures that rather than asserting it: the worst
+coordinate fraction over all four arms at epochs 100, 200 and 300 is **exactly 0.000000** on
+n = 500 coordinates per arm, against a registered bar of 0.05. That gate reads the per-group β
+trajectories, which are the one class of file the deposit excludes for size (§8); the readings
+below need only the `.out` series and are reproducible from the deposit alone.
 
 **R3 — `bm2`, the base-moderator replication.** One submission, four arms (`SGD`/`RMSProp` ×
 `nodewise`/`chunk777`), three **fresh** seeds (3, 4, 5 against `nl1`'s 0, 1, 2), 12 jobs at `nl1`'s
@@ -952,7 +977,8 @@ re-synced from both clusters and the run table was rebuilt with `analysis/aggreg
 `analysis/args_repair.py --apply` — the second step is not optional, because `aggregate.py` alone
 marks `dup_group` only where a *run name* collides and silently drops the annotations that tag
 differently-named same-experiment pairs. The rebuild changed exactly those eight rows and **no
-other row in the corpus** (2,173 rows in and out; 0 added, 0 removed, 8 changed, 0 of them outside
+other row in the corpus** (the table then stood at 2,173 rows: 2,173 rows in and out; 0 added,
+0 removed, 8 changed, 0 of them outside
 `rp1`). `analysis/c97_rp1_score.py` was then run a **second** time, **unedited** — selftest 147/147
 PASS, md5 `7d21c4f5c16ccf25196fd6a5e6391fa9` — on the rebuilt table; every validity gate returned
 24/24; and **only that second run is transcribed**, in §4.6.1.
@@ -974,13 +1000,44 @@ defect of `pp1` (`bin/c77_permuted_partition.sh` passed `S =` the run seed) and 
 show it is gone. Had the draw index tracked the seed we would have declared the batch void; it
 does not.
 
-**R2 is still queued and has never started.** The three seed-5 jobs (`hz3-ch-s5`, `hz3-c23-s5`,
-`hz3-n1d-s5`) sit `PENDING` with elapsed time `0:00` and no assigned start time, on the same
-congested partition on which the original `hz3` seed-3 and seed-4 runs waited 16 and 23 hours, so a
-wait is expected rather than anomalous. No `.out` file exists for any of the three job ids, so
-STANDING RULE 20's post-launch ARGS check **remains owed** and cannot be discharged yet; it is owed
-the moment they start, and the batch is to be cancelled on any `BETA_CLIP` mismatch. Until they run,
-the box-matched 6 v 6 at 300 epochs does not exist and **§4.8's budget verdict is unchanged**.
+**R2 landed, and it withdrew a sentence.** The quartet completed and was scored by running
+`c99_hz3q_score.py` **unedited**. Its provenance gate H0 reads node, GPU model and `BETA_CLIP` off
+each run's own header rather than from any declaration, and passes: all four arms `node883`,
+`NVIDIA L4`, `−30:9.0`, seed 5, 300 epochs. Turned on the archive it repairs, the same gate
+**refuses** it — those four runs carry two GPU models and two clip boxes — so the gate is shown to
+cut in both directions before a number is read. STANDING RULE 20 is discharged on all four `.out`
+files: `analysis/argsline_guard.py` returns **4 clean, 0 with a repeated flag or a design mismatch,
+VERDICT PASS**.
+
+**The primary, H2: is D flat from 100 to 300 epochs?** Paired within seed on `plateau5`, the
+registered reader returns three readings and the scorer prints all three. `hz3` as published, six
+archived seeds: **−0.149 ± 0.105, t −1.42** — `FLAT`. `hz3` with seed 5 dropped, five seeds:
+**−0.207 ± 0.107, t −1.94** — `FLAT`. **Repaired**, archived seeds 0–4 plus `hz3q`'s seed 5:
+**−0.238 ± 0.093, t −2.57, df 5** — **`NOT FLAT`, and the sign names the direction: D declines with
+budget.** The project record's sentence "D is present and resolved at a 3× budget and is
+statistically flat from 100 to 300 epochs" does not stand on the repaired data and is
+**withdrawn**. All three readings are reported together, always: the repaired one does not replace
+the published one in the record, it is the disclosed repair of the one seed whose contrast was
+cross-box and cross-class. **The gap itself is untouched.** Repaired, D(300) = **+0.394 ± 0.093,
+t 4.25**, against the published **+0.428 ± 0.086, t 4.94**; G(300) = −0.048 against −0.057. D
+shrinks as the budget grows; it does not vanish, and no cell of Table 2 moves.
+
+**HC, the cross-class control — reporting, not gating.** `hz3q-node-s5` on the L4 reads
+`plateau5`(300) = 92.908; the archived `hz3-node-s5` on the RTX 2080 Ti reads 92.774. Same seed,
+same box, same flags, same code; only the GPU class differs. Δ = **+0.134 pp** against a registered
+bar of |Δ| ≤ 1.00 pp: **GPU class is not first-order on the level.** This is a measurement `hz3`'s
+own design — which assigns GPU class as a function of seed — could never make. It decides what this
+paper may say about `hz3`'s *levels*; it does not touch D, which is a within-seed, within-class
+contrast in both batches.
+
+**The non-overwrite check, which is not optional.** `hz3q` adds rows; it overwrites nothing.
+`c87_hz3_score.py` was re-run **unedited** after the ingest, its output contains the string `hz3q`
+**zero** times — its own glob predicate rejects every `hz3q` file name, and `hz3q`'s probe
+directories are disjoint from `hz3`'s — and its verdicts are unchanged (`SURVIVES` on the primary,
+`MECHANISM SURVIVES THE HORIZON` on the secondary). The four `hz3q` rows enter
+`results/all_runs.csv` with no `dup_group` and no supersession, and they enter no cell of Table 2.
+`hz3q` repairs one seed of one batch: it is not a replication, not a new design point and not a new
+cell, and it is counted as none of them.
 
 ---
 
@@ -1136,7 +1193,12 @@ independent replicate of `aw1` rather than the corner it was built for.
 `nodewise` partner (§7 T9). The matched 5 v 5 reading is **+0.455 ± 0.096, t 4.75**; the cell's
 sign, magnitude and resolution are unchanged, the difference being 0.028 pp at full precision
 (0.027 from the rounded table entries) against a 0.086 pp se.
-Run R2 (§3.5) restores a matched 6 v 6.
+The box- and class-matched re-run of that seed (`hz3q`, R2 of §3.5) has since landed and restores a
+matched 6 v 6: **+0.394 ± 0.093, t 4.25**, a shift of 0.034 pp. **This cell is not changed to that
+value.** `hz3q` is a separate batch under a separate registration; the corpus is frozen at the runs
+the cells were built from, and every pooled quantity in §4.3 and §4.4 — including the exact
+enumeration of all 45,045 partitions of the fourteen cells — is computed on it. The repaired 6 v 6
+is read off the `.out` series in §4.8 and is disclosed here, not substituted.
 
 **Row 5's `n` is three, not six.** `ml2`'s two nominal halves are the same effective command line
 *including* `--seed`, so the batch is three seeds run twice rather than six seeds (§6.1). The point
@@ -1162,12 +1224,12 @@ Appendix B and its role in the design is discussed under T7 in §7. Consequently
 
 **Table 2 together with the excluded `ar1` cell is the complete set of count-matched
 `nodewise`-versus-uniform-chunk contrasts in this corpus. None is omitted, and the excluded one is
-also positive.** We verified this by enumeration rather than by recollection: of the 2,173 runs,
+also positive.** We verified this by enumeration rather than by recollection: of the 2,177 runs,
 every batch that ever ran a `nodewise` arm alongside a count-matched uniform-chunk arm is one of
 these twenty-two (the twenty above, `gn1`-GroupNorm, and `ar1`), and every other batch carrying a
 `nodewise` arm has no arm to match it against. The enumeration also shows that no such cell could
-have been lost to the admissibility gate: all 256 uniform-chunk, `nodewise1d` and `permnode` runs in
-the corpus — 238 of them outside `rp1`, and now all 18 of `rp1`'s `permnode` rows as well — are
+have been lost to the admissibility gate: all 259 uniform-chunk, `nodewise1d` and `permnode` runs in
+the corpus — 241 of them outside `rp1`, and now all 18 of `rp1`'s `permnode` rows as well — are
 admissible, and the twenty batches involved
 contribute 332 runs of which 332 are admissible (§8, Table 3). Three further count-matched contrasts exist in the corpus and are reported
 elsewhere in this paper rather than in Table 2, and the reason is the same in all three cases —
@@ -1909,7 +1971,8 @@ batch:
 | sm4 | R18 / C10 / **AdamW**, **RMSProp meta** | 3 v 3 | **+0.988** | 0.231 | 4.28 |
 
 ‡ `hz3` matched at 5 v 5 (seed-5 trio excluded for the clip-box and hardware mismatch of §7 T9):
-**+0.328 ± 0.084, t 3.89**.
+**+0.328 ± 0.084, t 3.89**. The `hz3q` quartet of §3.5 repairs that seed but is a separate
+registration and enters no pool here.
 § The two `rl3` rungs share one batch and one clip box, as Table 2 rows 6 and 7 already note;
 they are two operating points, not two submissions.
 ¶ `bn1` and `ml2` are the same experiment at the same seeds up to one flag Lion does not read:
@@ -2054,38 +2117,100 @@ named in §9 and was not run. Until it is, the correct reading of this paper is 
 parameter the field sets by architectural intuition has a measurable and consistent optimum in the
 opposite direction, on one framework, at CIFAR resolution.
 
-### 4.8 Budget: the effect survives 3× the budget; whether it decays is not resolved
+### 4.8 Budget: the effect survives 3× the budget, and it declines with it
 
 `hz3` ran the four arms for 300 epochs at 6 seeds, so D at 100, 200 and 300 epochs can be taken
 **within run**, per seed. That pairing cancels the seed, the run and the batch identically. It does
 **not** cancel the step-size clip box or the GPU class, because `hz3` is two submissions: its
 seed-5 `chunk777`, `nodewise1d` and `chunk2325` runs were resubmitted in the narrower box
 `−15:−2.3026` and on an A100, while everything else — including their own seed-5 `nodewise` partner
-— ran at `−30:9.0` on an L4 or a 2080 Ti (§7 T9). We therefore report the budget contrast **twice**:
-as submitted, and over the five clean seeds.
+— ran at `−30:9.0` on an L4 or a 2080 Ti (§7 T9). That seed has since been re-run: `hz3q` repeats
+**all four** arms at seed 5 for 300 epochs in the batch's own box `−30:9.0`, in one submission on
+one NVIDIA L4 (node883, jobs 4864632–35, all `COMPLETED`), so its box and its GPU class are matched
+*by construction* rather than by declaration and the seed-5 pair is generated internally. `hz3q`
+repairs one seed of `hz3`; it is not a replication, not a new design point and not a new cell, and
+it is counted as none of those. We therefore report the budget contrast **three ways**: as
+published, over the five clean seeds, and repaired — and, following the repair's own registered
+scorer, we report all three together, always.
 
-| budget | D, 6 seeds as submitted | se | D, 5 clean seeds | se |
-|---|---|---|---|---|
-| 100 | +0.576 | 0.109 | **+0.662** | 0.083 |
-| 200 | +0.514 | 0.115 | **+0.575** | 0.119 |
-| 300 | +0.428 | 0.071 | **+0.455** | 0.081 |
+| budget | D, 6 seeds as published | se | D, 5 clean seeds | se | D, **repaired** | se |
+|---|---|---|---|---|---|---|
+| 100 | +0.576 | 0.109 | +0.662 | 0.083 | **+0.632** | 0.074 |
+| 200 | +0.514 | 0.115 | +0.575 | 0.119 | **+0.512** | 0.116 |
+| 300 | +0.428 | 0.071 | +0.455 | 0.081 | **+0.394** | 0.090 |
 
 **The level is robust, and it is the claim we make.** D(300) reads +0.428 ± 0.086 at 6 v 6
-(t 4.94) and +0.455 ± 0.096 at 5 v 5 (t 4.75) on the Welch estimator used everywhere else in this
-paper; all six seeds favour `chunk777` at 300 epochs (exact binomial p = 0.0156). **The partition
-gap is not an artefact of a 100-epoch budget.**
+(t 4.94) as published, +0.455 ± 0.096 at 5 v 5 (t 4.75), and **+0.394 ± 0.093 (t 4.25)** repaired,
+on the Welch estimator used everywhere else in this paper; all six seeds favour `chunk777` at 300
+epochs on every one of the three readings (exact binomial p = 0.0156). The repair moves the level
+by 0.034 pp, four tenths of one se. **The partition gap is not an artefact of a 100-epoch budget,
+and nothing below weakens that.**
 
-**The trend is not robust, and we do not claim it.** Within-run, D(300) − D(100) = **−0.149 ±
-0.105, t −1.42** over all six seeds and **−0.207 ± 0.107, t −1.94** over the five clean ones.
-Neither resolves at |t| ≥ 2, but the second is close enough that the difference matters, so we say
-where it comes from: 76% of the shift is at the **100-epoch** end (the six-seed D(100) rises by
-0.086 pp when seed 5 is removed, against 0.027 pp at 300 epochs), and seed 5's low D(100) is
-**not** explained by either defect — the clip box is provably inert before epoch 162, and the
-hardware term (§6.3) points the other way. It is an unexplained extreme value in an n = 6 cell.
-The honest statement is therefore the weaker one: **D does not grow with budget from 100 to 300
-epochs, and we cannot resolve whether it decays.** We do not report flatness as a result. A
-box- and hardware-matched replacement trio (R2, §3.5) is registered and will settle it; until it
-lands this cell carries its sensitivity in the text.
+**The trend now resolves, and it resolves against a sentence we published.** The previous version
+of this subsection said: *"D does not grow with budget from 100 to 300 epochs, and we cannot
+resolve whether it decays."* **That sentence is withdrawn.** On the repaired data the decay
+resolves. Within run, paired within seed at `plateau5`, D(300) − D(100) reads
+
+| reading | seeds | n | δ | se | t (df) |
+|---|---|---|---|---|---|
+| as published | archived 0–5 | 6 | −0.149 | 0.105 | −1.42 (5) |
+| seed 5 dropped | archived 0–4 | 5 | −0.207 | 0.107 | −1.94 (4) |
+| **repaired** | archived 0–4 + `hz3q` seed 5 | 6 | **−0.238** | 0.093 | **−2.57** (5) |
+
+against a bar of \|t\| ≥ 2 frozen in `c99_hz3q_score.py`'s `band_flat()` at the parent
+registration's own `CONFIRM_T` **before `hz3q` was submitted**. The registered verdict on the
+repaired reading is `NOT FLAT — D DECLINES WITH BUDGET` (p = 0.050 two-sided, 95% interval
+[−0.477, −0.000]). **All three readings are reported together, always**: the repaired one does not
+erase the published one from the record, it is the disclosed repair of the one seed whose contrast
+was cross-box and cross-class.
+
+**Read the withdrawal for exactly what it is.** D *shrinks* as the budget grows; it does not go
+away. At 300 epochs it is +0.394 ± 0.093, t 4.25 — positive, resolved and within four tenths of an
+se of the published value. The claim that dies is the narrower one about the *slope*. A reader who
+takes this paragraph as "the effect disappears at longer budgets" has read it backwards, and §8
+states the two findings separately for that reason. Table 2's `hz3` cell is a separate, CSV-based
+reading of a separate registration and is unmoved by any of this.
+
+**Why the published reading was wrong, and why it took a fifth run to see it.** Seed 5's
+`chunk777`, `nodewise1d` and `chunk2325` runs sat in a narrower clip box *and* on different silicon
+from their own `nodewise` partner, and the two defects bite at different budgets — the one shape of
+contamination a within-run pairing cannot cancel. The −15 floor first becomes reachable at epoch
+⌈8.092245 / 0.05⌉ = 162, and the probe records agree: floor occupancy for those three arms is
+0.000000 at epoch 100, 0.000485, 0.001621 and 0.001443 at 200, and 0.008598, 0.018323 and 0.008900
+at 300, with the ceiling never touched. So seed 5's archived D(100) is box-free and its archived
+D(300) is box-bound. The hardware was worse than mislabelled: `hz3`'s registered scorer *declares*
+all four seed-5 runs `gpu-2080ti-11g`, while their own headers report one RTX 2080 Ti and three
+A100 80 GB cards, across the three Slurm partitions `gpu-2080ti-11g`, `gpu-a100-80g` and
+`gpu-mig-40g`. Both sides of that scorer's own check are declarations; neither reads a run. `hz3q`'s
+provenance gate measures instead, and turned on the archive it is built to refuse it refuses it on
+both counts.
+
+**What the repair moved.** Seed 5's D(100) goes +0.148 → +0.482 and its D(300) goes +0.290 →
++0.086: the two ends move in *opposite* directions, which is why the repair changes the slope
+(−0.149 → −0.238) far more than either level (+0.576 → +0.632 and +0.428 → +0.394). This also
+relocates the sensitivity the previous version reported. As published, 76% of the shift between the
+six-seed and five-seed readings sat at the **100-epoch** end (the six-seed D(100) rises by 0.086 pp
+when seed 5 is dropped, against 0.027 pp at 300 epochs); the repaired seed reproduces that end
+rather than the archived outlier. At B = 100 all four archived seed-5 arms are box-free, so the
+per-arm archived-to-repaired differences there — −0.204, +0.130, +0.376, +0.212 for `nodewise`,
+`chunk777`, `nodewise1d`, `chunk2325` — are class-plus-nondeterminism alone (§7 T9).
+
+**A control `hz3`'s own design could not run.** The quartet's cross-class control (HC, §3.5) puts
+`hz3q-node-s5` at `plateau5`(300) = 92.908 on the L4 against the archived `hz3-node-s5`'s 92.774 on
+the RTX 2080 Ti — same seed, box, flags and code, class alone differing — so δ = **+0.134 pp**
+against a 1.00 pp bar registered before the run: **GPU class is not first-order on the level**. It
+licenses one thing, that `hz3`'s per-seed *levels* may be read across seeds despite the class
+assignment, and it touches nothing about D, in which the class cancels identically in both batches.
+It also cross-checks §6.3, which measures 2080 Ti − L4 = +0.035 pp over n = 45 configurations: the
+direct same-seed control gives −0.134 pp for the same difference. The signs disagree and both sit an
+order of magnitude inside the disclosure bar, which is the finding — neither is large enough to
+carry a claim.
+
+**A frozen bar reversed our own headline, and that is the point.** The threshold that withdrew this
+claim was committed to version control before the data that triggered it existed, in a file whose
+selftest asserts it (59/59 PASS) and which imports the parent reader unedited rather than
+re-implementing it. We report the withdrawal here, in full, rather than in an appendix, because a
+registration that can only confirm is not a registration.
 
 One further reading must be disclosed rather than buried, because the batch's own registered scorer
 prints it. `analysis/c87_hz3_score.py` fixes its primary window at **50 epochs**, not at
@@ -2094,8 +2219,14 @@ prints it. `analysis/c87_hz3_score.py` fixes its primary window at **50 epochs**
 therefore *contains* the mid-training trough documented below, while at B = 300 it contains none:
 the window injects the trough at exactly one budget. `plateau5` is this paper's primary metric
 throughout and we do not switch it here — but the registered verdict is `GROWS`, our
-primary-window reading is a non-significant decline, and a reader is entitled to both. See
-Appendix A.2.
+primary-window reading is a resolved decline, and a reader is entitled to both. That verdict is
+`hz3`'s and stands unchanged: `c87_hz3_score.py` was re-run unedited for this revision, admits
+**no** `hz3q` file, and prints what it printed before. For completeness and marked **unregistered**
+— `c87` is registered on `hz3` and `hz3q`'s own registered window is `plateau5` — recomputing
+`c87`'s 50-epoch estimator on the repaired pool gives +0.161 ± 0.085, t 1.89, inside that scorer's
+own ±0.20 `SATURATES` band. **The repair moves the two windows toward each other, not apart**: part
+of the discrepancy was the contaminated seed. We do not restate a registered verdict on data it was
+not registered for; we report that we looked. See Appendix A.2.
 
 **The trajectory is not monotone, and we publish it.** Within run, D goes significantly *negative*
 in mid-training and recovers:
@@ -2117,10 +2248,12 @@ run at three budgets, cancelling seed, run and batch identically. (a) Faint line
 per-seed trajectories; the two heavy lines are the arm-set means with 95% intervals. **Seed 5 is
 drawn in red because it is not box-matched**: its chunk arm ran in β-box −15:−2.3026 and its
 nodewise arm in −30:9.0, so that seed's D is a cross-box difference and the other five are not.
-(b) The budget slope both ways. D is present and resolved at every budget, and the slope does not
-resolve either on all six seeds (−0.149 ± 0.105, t −1.42) or on the five box-matched seeds alone
-(−0.207 ± 0.107, t −1.94). Neither interval excludes zero, so the verdict does not turn on the
-contaminated seed — but its *t* does, and we print both rather than choosing.
+(b) The budget slope both ways. D is present and resolved at every budget. **The panel is drawn on
+the archive**, in which the slope does not resolve either on all six seeds (−0.149 ± 0.105,
+t −1.42) or on the five box-matched seeds alone (−0.207 ± 0.107, t −1.94). **Seed 5 has since been
+re-run box- and class-matched, and on that repaired pool the slope does resolve: −0.238 ± 0.093,
+t −2.57** (§4.8). The red trajectory is therefore the reading this figure supersedes, kept because
+the published record is part of the evidence.
 
 ---
 
@@ -2258,7 +2391,8 @@ run twice rather than six seeds (§6.1). Averaging within seed before differenci
 D +0.456 ± 0.195 (t 2.34), G +0.173 ± 0.073 (t 2.38), D − G +0.282 ± 0.208 (t 1.36). **Every
 point estimate is unchanged**; only the standard errors move. `hz3` matched at 5 v 5 for the
 seed-5 mismatch of §7 T9 reads D +0.455 ± 0.096, G −0.050 ± 0.075, D − G +0.506 ± 0.121, t 4.16 —
-same verdict.
+same verdict; and repaired at 6 v 6 with `hz3q`'s seed 5, D +0.394 ± 0.093, G −0.048 ± 0.061,
+D − G +0.442 — same verdict again.
 
 **The `G` tests, corrected for multiplicity.** `G` is measured once per count-matched
 cell, so the values above are a family and the ones that reach nominal significance
@@ -2778,7 +2912,7 @@ D = +0.456 ± 0.195, which is row 5 of Table 2.
 **What we now do about it, mechanically.** `analysis/argsline_guard.py` reads a run's own `ARGS:`
 line, fails on any repeated flag, and checks a declared design; `bin/_lib_guards.sh` refuses to
 `sbatch` a command line that does not match the declared design and re-reads the first launched
-job's actual `ARGS:` line afterwards. Swept over the 2,237 runs carrying an `ARGS:` line on both
+job's actual `ARGS:` line afterwards. Swept over the 2,241 runs carrying an `ARGS:` line on both
 clusters, exactly **36 carry a repeated flag, and they are exactly `ml2`'s 24 and `sm3`'s 12**. No
 other batch on either cluster is affected: `--alg-base`, `--stepsize-groups`, `--meta-stepsize`,
 `--alpha0`, `--num-epochs`, `--seed` and `--normalizer-param-*` are single-occurrence in every run
@@ -2797,7 +2931,7 @@ column instead of the 5-epoch primary, and scoring a batch with a reduction writ
 arrived instead of the scorer committed before the runs existed. On `aw1`, the two columns give
 G = +0.226 (t 3.23) and G = +0.232 (t 2.62); the difference is small but the *verdict* moved,
 because the registered rule was a 95% lower bound and the hand-rolled prose restated it as a point
-estimate with t ≥ 2. On `hz3`, a 50-epoch trailing window turned a flat budget effect into a
+estimate with t ≥ 2. On `hz3`, a 50-epoch trailing window turned a *declining* budget effect into a
 growing one (§4.8). Both are one-line mistakes that survived internal review.
 
 The rule we now follow, and recommend: **if a batch has a registered scorer, it is scored by that
@@ -2899,8 +3033,8 @@ by how much.
 
 The census is stated under a rule a reader can execute against the deposited run table: a
 **partition-family run** is an admissible row whose `granularity` is `nodewise`, `nodewise1d`,
-`chunk*` or `permnode*`. There are **427** of them, of which **415 are meta = Lion and 12 are
-meta = RMSProp**; the twelve are `sm4`. Before `sm4` the count was 415 of 415. (An earlier version
+`chunk*` or `permnode*`. There are **431** of them, of which **419 are meta = Lion and 12 are
+meta = RMSProp**; the twelve are `sm4`. Absent `sm4` the census reads 419 of 419. (An earlier version
 of this paper quoted "367 of 367" here. That figure does not re-derive under any definition of
 "partition-programme run" we can reconstruct from the run table, so we drop it rather than restate
 it — the same treatment Appendix A.7 gives every number of that kind.)
@@ -3061,8 +3195,15 @@ designed to assign GPU class **by seed** precisely so that a seed's four arms sh
 resubmission broke that, and the batch's registered scorer still labels all four seed-5 runs
 `gpu-2080ti-11g`. This mismatch applies at **every** budget, the 100-epoch reading included. It is
 a defect in the registered scorer's metadata, not in its statistics; under our own file-freeze rule
-we do not edit a registered scorer after its data exist, so the correction is recorded here, and
-R2 makes the label true again.
+we do not edit a registered scorer after its data exist, so the correction is recorded here.
+**R2 does not make that label true.** The replacement quartet ran on an NVIDIA L4, not on the
+RTX 2080 Ti the cancelled trio was pinned to, so `hz3`'s archived seed-5 label is wrong and stays
+wrong. What the quartet does is make the label *irrelevant* to the contrast: its four arms share one
+card, so the seed-5 D it delivers is within-class whatever that class is, and its HC control
+measures the class term directly at +0.134 pp on the level (§3.5). **That is the general lesson of
+this threat item.** A registered constant that no run is ever compared against is a decoration —
+both sides of the scorer's own check on that map are declarations, and neither reads a run — and the
+repair is to measure, not to re-declare.
 
 Consequently §4.8's within-run pairing cancels seed, run and batch, but **not** the clip box (from
 epoch 162) and **not** the GPU class (throughout). Both exceptions are limits on the budget
@@ -3074,9 +3215,21 @@ Seed 5 is also the batch's per-seed outlier at 100 epochs — D(100) = **+0.148*
 +0.564, +0.586, +0.622, +0.990** — and unremarkable at 300 (+0.290, against a seed-2 low of
 +0.168). We note explicitly that **neither defect explains that outlier**: the box is inert at 100
 epochs, and the hardware term (§6.3: A100 − 2080 Ti = +0.112 pp) sits on the arm that would
-*inflate* D, not deflate it. The 100-epoch outlier is unexplained. §4.8 reports the budget contrast
-both with and without seed 5 for this reason, and a replacement seed-5 trio in the original box and
-on matched hardware is R2 (§3.5).
+*inflate* D, not deflate it. The 100-epoch outlier is unexplained — **and it did not reproduce**.
+`hz3q`'s box- and class-matched seed 5 returns D(100) = **+0.482**, close to though still below the
+five archived seeds' range of +0.548 to +0.990, against the archived **+0.148**. We do not attribute
+that 0.334 pp: the box is provably inert at 100 epochs, so only GPU class and run-to-run
+nondeterminism remain, and the cross-class control puts the class term at +0.134 pp on a *level*,
+which is both too small and, being common to the two arms, largely cancelled inside D. The
+`nodewise` arm alone — identically flagged, identically boxed, differing from its archived twin only
+in GPU class — moves by −0.204 pp at that budget, which is the scale of same-configuration scatter
+an n = 6 cell cannot separate from a real seed effect. **The asymmetry that matters is elsewhere.**
+Because the box binds only after epoch 162, seed 5's archived contrast is box-free at 100 epochs and
+box-bound at 300 (floor occupancy 0.008598, 0.018323, 0.008900 on `chunk777`, `nodewise1d`,
+`chunk2325`). That is a defect present at one end of a within-run pairing and absent at the other,
+which is precisely what pairing cannot cancel, and it is why the repair moves the budget *slope*
+much more than either *level*. §4.8 reports the budget contrast as published, without seed 5, and repaired,
+for this reason, and the replacement batch is R2 (§3.5).
 
 Finally, for reuse: a scorer that groups on `beta_clip` drops exactly those three runs, keeps
 `nodewise` seed 5, and reads an **unbalanced** D(300) = +0.464 ± 0.084 in place of the balanced
@@ -3213,15 +3366,15 @@ onto the scorers already quoted here would re-mint every md5 in the provenance t
 section and destroy the very property — committed-before-the-data, run unedited — that makes
 those quotes worth anything.
 
-**Artefact and identifier.** The deposit is **6.4 MB in 139 files**, with `MANIFEST.md5`
-covering every one of them and `make verify` checking all 139 against it. **It has no DOI, and
+**Artefact and identifier.** The deposit is **6.5 MB in 140 files**, with `MANIFEST.md5`
+covering every one of them and `make verify` checking all 140 against it. **It has no DOI, and
 this paper prints none.** The artefact is identified by the repository commit stamped at the top
 of the deposit's `README.md`, which `MANIFEST.md5` pins byte-for-byte; a DOI is attached when the
 archive of record issues one, and the deposit carries the four-step procedure for doing that and
 for writing the resulting string into the three places that must agree. We print the commit rather
 than a promised identifier because a promised identifier does not resolve.
 
-**Data.** `data/all_runs.csv`, 2,173 rows, one per run, with the full configuration
+**Data.** `data/all_runs.csv`, 2,177 rows, one per run, with the full configuration
 (network, dataset, batch size, granularity, base, meta, η, α₀, γ, augmentation, β-box,
 hierarchical mode, λ, r, seed), the outcome columns (`best_test`, `final_test`,
 `plateau5`, `plateau`, `auc`, epochs-to-threshold), the provenance columns (`job_id`,
@@ -3231,16 +3384,16 @@ differently-named runs that resolve to the same experiment plus the three `a0` r
 one member of each carries `superseded = 1` (§3.3). The column is exhaustive within a batch
 for every run that logs an `ENV:` line; it does not carry the nine cross-submission pairs of
 §4.1's parent cell, which §4.1 handles in text. Raw per-epoch series are the Slurm
-`.out` files in `logs/raw_out.tar.gz`. The shipped log set is **2,241 files, which is every
-`.out` file in the two clusters' Slurm run directories** (1,322 and 919). **Neither provenance
-line is universal, and these are the counts.** **2,237** of the 2,241 carry their own `ARGS:`
+`.out` files in `logs/raw_out.tar.gz`. The shipped log set is **2,245 files, which is every
+`.out` file in the two clusters' Slurm run directories** (1,326 and 919). **Neither provenance
+line is universal, and these are the counts.** **2,241** of the 2,245 carry their own `ARGS:`
 line — the **four** that do not are infrastructure jobs that ran no training (`gtest`,
-`gtest2`, `mo-smoke`, `ts-pretok`) — and **2,113** carry their own `ENV:` line, so **128 do
+`gtest2`, `mo-smoke`, `ts-pretok`) — and **2,117** carry their own `ENV:` line, so **128 do
 not**: those four plus 124 that carry `ARGS:` without `ENV:` (103 on the first account, 25 on
 the second). The `ENV:` line was added to the submission template partway through the corpus, so
 every file missing one carries a Slurm job id at or below 4,680,828 while every file carrying
 one is at or above 4,680,676. Where a line is present it is the authority on what that run
-actually did, and RULE 20 is enforced on all 2,237 `ARGS:` lines. There is no shortfall in the
+actually did, and RULE 20 is enforced on all 2,241 `ARGS:` lines. There is no shortfall in the
 log set itself, and the `sm3` runs that an earlier version of this ledger carried as un-ingested
 are in the run table.
 
@@ -3256,15 +3409,15 @@ them have no readable `plateau5` and are removed first, so the `window_ok` line 
 
 | stage | n | GPU-h | note |
 |---|---|---|---|
-| Slurm `.out` files on the two clusters | 2,241 | — | `runs/` + `runs_alice2/` + the on-cluster copies |
+| Slurm `.out` files on the two clusters | 2,245 | — | `runs/` + `runs_alice2/` + the on-cluster copies |
 | — infrastructure jobs, no training | −4 | — | `gtest`, `gtest2`, `mo-smoke`, `ts-pretok`; no `ARGS` line, no CSV row |
-| **jobs that entered the training script** | **2,237** | — | each logs one `ARGS` line |
+| **jobs that entered the training script** | **2,241** | — | each logs one `ARGS` line |
 | — crashed or cancelled before epoch 1 | −64 | ≈0 | itemised below; **not one logged a single epoch** |
-| **rows in `results/all_runs.csv`** | **2,173** | 1,631.7 | 2,158 carry a wallclock |
+| **rows in `results/all_runs.csv`** | **2,177** | 1,641.5 | 2,162 carry a wallclock |
 | — no readable `plateau5` | −25 | } 66.3 | 2–5-epoch smoke tests |
 | — `window_ok = 0`, `plateau5` present | −400 | } | budget ≤ 20 epochs; `window_ok` is `epochs_done > 20` |
 | — `window_ok = 1`, `complete = 0` | −17 | } | truncated runs; `complete` is `epochs_done ≥ 0.95 × requested` |
-| **admissible** | **1,731** | 1,565.3 | the gate of Eq. 11 |
+| **admissible** | **1,735** | 1,575.2 | the gate of Eq. 11 |
 
 **The 64 that never produced an epoch**, by cause, read off their own tracebacks:
 
@@ -3301,9 +3454,10 @@ seven, which were `rp1`'s mid-flight snapshots; those rows have been refreshed f
 **Attrition inside the primary contrasts is exactly zero.** The twenty batches that carry a
 count-matched contrast — the seventeen of Table 2, plus `ar1`, `bn1` and `rp1` — contribute
 **332 runs, of which 332 are admissible**. More strongly:
-**every** uniform-chunk, `nodewise1d` and `permnode` run in the corpus — **256 of 256**, `rp1`
+**every** uniform-chunk, `nodewise1d` and `permnode` run in the corpus — **259 of 259**, `rp1`
 included — is admissible, so no count-matched cell could have been lost to the gate even in
-principle. (Earlier versions of this paper read 249 of 256, the seven exceptions being `rp1`'s mid-flight
+principle. (Earlier versions of this paper read 249 of the 256 such rows the corpus then held,
+the seven exceptions being `rp1`'s mid-flight
 snapshots; those rows are now complete.) Submitted `n` equals admissible `n` in
 all twenty cells of Table 2 and in the excluded `ar1` cell.
 
@@ -3314,7 +3468,7 @@ and `chunk777` × 6 seeds". The submission script `bin/c90_awbase.sh` ran 4 arms
 per-arm power on the primary. Every other batch's realised seed set matches its submission
 script's `SEEDS` line.
 
-**Compute.** 2,158 runs carry a wallclock; they total **1,632 GPU-hours** over 29 distinct
+**Compute.** 2,162 runs carry a wallclock; they total **1,642 GPU-hours** over 29 distinct
 nodes and two accounts, on NVIDIA L4 24 GB, RTX 2080 Ti 11 GB, A100 80 GB and A100 MIG
 40 GB partitions. GPU class is recorded per run and was measured to carry no systematic
 offset between arms (§6.3); every primary is within batch, so a per-node offset shared by
@@ -3411,7 +3565,7 @@ and `nl1` batches.
 **An integrity check a reader can run on our own logs.**
 `analysis/argsline_guard.py` sweeps every run's own `ARGS:` line for a repeated flag,
 because argparse silently takes the last occurrence and a submission script can therefore
-run a different experiment from the one it declares. Over the 2,237 runs carrying an
+run a different experiment from the one it declares. Over the 2,241 runs carrying an
 `ARGS:` line on both clusters it finds exactly 36 with a repeated flag, in two batches, and
 those two batches are reported as void-as-designed in §6.1. The partition axis, the budget
 axis and the step-size axis (`--alg-base`, `--stepsize-groups`, `--meta-stepsize`,
@@ -3452,7 +3606,9 @@ an architecture-aligned partition by a uniform one is worth a positive amount of
 **every one of 20 within-batch cells** across three networks, two datasets, four base
 optimisers, two meta-optimisers, two meta-stepsizes and two budgets; it survives tuning each arm
 to its own optimum (−0.090 ± 0.178, itself an upper bound in magnitude); it is present and
-resolved at 3× the budget; and its variation across configurations has a candidate moderator that
+resolved at 3× the budget, at +0.394 ± 0.093, t 4.25, **while declining with budget at a rate that
+now resolves** (−0.238 ± 0.093, t −2.57, paired within seed) — two findings, of which the second
+does not weaken the first; and its variation across configurations has a candidate moderator that
 we can decompose but not identify — splitting the fourteen same-contrast ResNet-18 cells by base
 optimiser leaves them homogeneous inside every level (Q 7.36 / 10 df, χ² p 0.69, Monte-Carlo
 p 0.86) and accounts for
@@ -3508,12 +3664,14 @@ that than a mechanism that does not survive its own controls — this project pr
 too, and killed it (§5.7) — or than a refutation that does not survive its own registered scorer,
 which this project also produced and withdrew (§5.6).
 
-**The experiments that would break the impasse**, in the order we would run them. Two of the four
-registered in §3.5 have been read: R3, the base-moderator replication at fresh seeds, which
-replicated both levels and is in §4.4; and R4, the second-moment corner, which refuted its
-mechanism and is in §5.5. Two remain: the alignment replication with the permutation seed
-decoupled (R1, complete on disk and deliberately unscored) and the box- and hardware-matched
-budget trio (R2, queued). To those we add two experiments the last cycle created rather than
+**The experiments that would break the impasse**, in the order we would run them. **All four**
+registered in §3.5 have now been read. R3, the base-moderator replication at fresh seeds,
+replicated both levels and is in §4.4; R4, the second-moment corner, refuted its mechanism and is
+in §5.5. R1, the alignment replication with the permutation seed decoupled, replicated the null at
+twice the power and is in §4.6.1; and R2, the seed-5 budget repair, had its registered trio
+cancelled unstarted, and its replacement quartet returned `NOT FLAT` and withdrew a flatness
+sentence (§4.8). None of the four is outstanding. To those we add two
+experiments the last cycle created rather than
 closed. **The first would convert the base optimiser from a candidate moderator into an identified
 one**: a second independent batch at each level *within one submission*, or failing that a third
 batch at the level where base and batch are most tightly aliased, run at fresh seeds under the
@@ -3557,8 +3715,8 @@ base = SGDm): Lion +0.727 · Adam +0.554 · RMSProp +0.357". The arithmetic is r
 are wrong: the `ml2` batch's two halves both ran meta = Lion (§6.1), so +0.554 and +0.357 are two
 nondeterministic reruns of one configuration at the same seeds, not two meta-optimisers. Every
 partition-family run behind the cells of Table 2 is meta = Lion, and the one batch that varies
-the meta-optimiser is a single cell: of the 427 admissible runs in the partition families,
-415 are meta = Lion and 12 are meta = RMSProp. **One cell is not an axis, and no meta-optimiser
+the meta-optimiser is a single cell: of the 431 admissible runs in the partition families,
+419 are meta = Lion and 12 are meta = RMSProp. **One cell is not an axis, and no meta-optimiser
 axis may be reported.** (The record's own count, "367 of 367", does not re-derive under any
 reconstructible definition and is dropped rather than restated, per A.7's precedent.) Consequently the record's "G is not null under an RMSProp meta (+0.276, t 3.21)" is also
 mislabelled: that is `ml2`'s second Lion rerun, and its companion reads +0.071 ± 0.103.
@@ -3566,9 +3724,11 @@ mislabelled: that is `ml2`'s second Lion rerun, and its companion reads +0.071 �
 **A.2 — Two values from the banned metric column.** The record carried
 G(AdamW) = +0.226, t 3.23 and hz3 "the gap grows with budget, +0.229, t 3.27". Both come from
 20-epoch and 50-epoch trailing windows respectively. On the primary 5-epoch window:
-G(AdamW) = **+0.232 ± 0.089, t 2.62**; and the budget effect is **−0.149 ± 0.105, t −1.42**, i.e. a
-decline that does not resolve — **−0.207 ± 0.107, t −1.94** once `hz3`'s mismatched seed-5 pair is
-set aside (§7 T9, §4.8). Both replacements match the project's own later corrections; we record the
+G(AdamW) = **+0.232 ± 0.089, t 2.62**; and the budget effect is **−0.149 ± 0.105, t −1.42** on the
+archived seeds, i.e. a decline that does not resolve. It reads **−0.207 ± 0.107, t −1.94** once
+`hz3`'s mismatched seed-5 pair is set aside, and **−0.238 ± 0.093, t −2.57** — a decline that
+**does** resolve — once that seed is re-run box- and class-matched (§7 T9, §4.8). All three are
+reported wherever any of them is. Both replacements match the project's own later corrections; we record the
 originals so the supersession is visible. Note that the 50-epoch reading is not merely a discarded
 internal note: it is the **registered primary** of `analysis/c87_hz3_score.py`, whose verdict is
 `GROWS`. We keep `plateau5` as this paper's primary metric and print both, rather than quietly
@@ -3653,9 +3813,10 @@ runs on disk are 20-epoch probes and fail this paper's admissibility gate (`wind
 claim is **not re-derivable** under our own stated rule and is dropped rather than restated.
 
 **A.8 — Corpus size.** The record variously says 1,960 / 2,077 / 2,113 runs and ~1,200–1,400
-GPU-hours. At write time: **2,173 rows, 1,731 admissible, 1,632 GPU-hours** summed over the 2,158
-runs carrying a wallclock, with 2,237 jobs having entered the training script and nothing awaiting
-ingest (§8, Table 3). The correction register runs to entry 131.
+GPU-hours. At write time: **2,177 rows, 1,735 admissible, 1,642 GPU-hours** summed over the 2,162
+runs carrying a wallclock, with 2,241 jobs having entered the training script and nothing awaiting
+ingest — the last batch to land, the `hz3q` quartet of §3.5, is scored and its four rows are in the
+table (§8, Table 3). The correction register runs to entry 134.
 
 **A.9 — Two blocks carried from the record without re-derivation.** Two statements are **not**
 re-derived at write time and are marked where they appear: (i) the "6 of 6 fits with the wrong
@@ -3725,23 +3886,24 @@ contrast we exclude; its D (+0.697 ± 0.118) is quoted in §4.3 solely so the ex
 
 ## Data Availability
 
-The complete run table (`results/all_runs.csv`, 2,173 rows), the
-raw per-epoch Slurm logs (2,241 `.out` files, of which 2,237 carry their own `ARGS:` line and
-2,113 their own `ENV:` line; §8 itemises the exceptions),
+The complete run table (`results/all_runs.csv`, 2,177 rows), the
+raw per-epoch Slurm logs (2,245 `.out` files, of which 2,241 carry their own `ARGS:` line and
+2,117 their own `ENV:` line; §8 itemises the exceptions),
 all submission scripts (`bin/`), all optimiser patches (`patches/`), all registered scorers
 (`analysis/`), the figure code and the reproduction audit are deposited as a single archive.
 **The deposit has no DOI**, because it has not been deposited; the artefact is identified by the
 repository commit recorded in its `README.md`, and `CITATION.cff` carries no `identifiers:` block
-rather than a stand-in for one. The archive is 6.4 MB,
+rather than a stand-in for one. The archive is 6.5 MB,
 carries an md5 manifest for every file, and re-derives every number `make reproduce`
 checks — the list is in §3.4 — on a laptop in seconds, with no GPU and no dependency beyond
 `python3` and `matplotlib`. **One class of number requires data the deposit does not carry, and
 we state exactly which.** The per-group β trajectories (`probe*.jsonl`, ≈42 GB) are excluded for
 size and are available from the authors on request. They are not a supplement: they are the input
 to the box-occupancy and meta-gradient-field gates inside the registered scorers, so a reader
-with the deposit alone regenerates **two** of the ten scorer verdicts we quote in full
-(`c87_rl3`, §4.5; `c87_hz3`, §4.8), **two** in part (`c81_cc1`'s D and G legs but not §5.2's
-field block; `c83_gc1`'s S1 but not its arm-asymmetry guard), and **six** not at all — including
+with the deposit alone regenerates **two** of the eleven scorer verdicts we quote in full
+(`c87_rl3`, §4.5; `c87_hz3`, §4.8), **three** in part (`c81_cc1`'s D and G legs but not §5.2's
+field block; `c83_gc1`'s S1 but not its arm-asymmetry guard; `c99_hz3q`'s H0, H2, H3 and HC — which
+is every reading §4.8 quotes — but not its H1 box gate), and **six** not at all — including
 §4.6's `P2` alignment block, §5.6/§7 T7's `gn1` halt, the box-occupancy evidence that
 **excludes** `ar1` in §4.3, and the two gates behind §3.5's newly scored batches.
 `python3 analysis/c98_reproduce.py --deposit` prints that register
@@ -3811,7 +3973,7 @@ Stated in CRediT terms.
 **M. Ahmaditeshnizi** (LIACS, Leiden University) — Conceptualization (equal), Methodology,
 Software (the chunkwise, 1-D-tensor, permuted-node and probe partitions and their identity tests,
 as patches to the released MetaOptimize implementation), Validation, Formal analysis,
-Investigation (all 2,173 runs), Data curation, Writing – original draft, Visualization, Project
+Investigation (all 2,177 runs), Data curation, Writing – original draft, Visualization, Project
 administration.
 **S. Salehkaleybar** (LIACS, Leiden University) — Conceptualization (equal), Supervision,
 Resources, Funding acquisition, Writing – review & editing, and continuity with the parent work.
@@ -3837,7 +3999,9 @@ surfaced between the project's internal record and the data are recorded in Appe
 rather than corrected silently. Several claims were withdrawn by that procedure during
 writing — an alignment refutation downgraded to a bounded null, a mechanism refutation
 withdrawn because the batch's own registered scorer refuses to compute the contrast it
-rested on, a budget flatness claim demoted to an unresolved trend, and a variance claim that
+rested on, a budget flatness claim first demoted to an unresolved trend and then **withdrawn
+outright** when a pre-registered re-run of its one contaminated seed resolved the trend against us
+(t −2.57 against a bar of 2.0 frozen before the run existed), and a variance claim that
 did not reproduce — and two whole batches were found to have run a different experiment from
 the one they declared (§6.1). All of those outcomes are reported.
 

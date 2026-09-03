@@ -22,7 +22,11 @@ SCORERS = ["c76_mm1_score.py", "c77_pp1_score.py", "c78_bn1_score.py",
            "c81_cc1_score.py", "c82_fa1_score.py", "c83_gc1_score.py",
            "c83_gen_score.py", "c84_gn1_score.py", "c87_rl3_score.py",
            "c87_hz3_score.py", "c88_scorers.py", "c97_bm2_score.py",
-           "c97_rp1_score.py", "c97_sm4_score.py"]
+           "c97_rp1_score.py", "c97_sm4_score.py",
+           # c99 imports c87 from its own directory; both land in code/scorers/,
+           # so the deposit can run the scorer that withdrew §4.8's flatness
+           # sentence.  Its H1 box gate still needs the excluded probe records.
+           "c99_hz3q_score.py"]
 TOOLS   = ["aggregate.py", "args_repair.py", "argsline_guard.py",
            "c98_figures.py", "c98_reproduce.py", "c98_release.py",
            # c98_reproduce's [15b] imports this; without it `make reproduce`

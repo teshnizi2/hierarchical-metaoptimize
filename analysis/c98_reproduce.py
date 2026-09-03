@@ -84,11 +84,11 @@ def chk(name, got, paper, where, fmt="%+.3f"):
 # --------------------------------------------------------------- the sections
 def corpus(rows, adm, args):
     print("\n[1] CORPUS  (§8 Reproducibility, Appendix A.8)")
-    chk("rows in results/all_runs.csv", len(rows), 2173, "abstract, §8", "%.0f")
-    chk("admissible rows", len(adm), 1731, "§3.3, A.8", "%.0f")
+    chk("rows in results/all_runs.csv", len(rows), 2177, "abstract, §8", "%.0f")
+    chk("admissible rows", len(adm), 1735, "§3.3, A.8", "%.0f")
     wc = [float(r["wallclock_min"]) for r in rows if r["wallclock_min"]]
-    chk("runs carrying a wallclock", len(wc), 2158, "§8", "%.0f")
-    chk("GPU-hours", sum(wc) / 60.0, 1632, "abstract, §8", "%.0f")
+    chk("runs carrying a wallclock", len(wc), 2162, "§8", "%.0f")
+    chk("GPU-hours", sum(wc) / 60.0, 1642, "abstract, §8", "%.0f")
     chk("distinct nodes", len({r["node"] for r in rows if r["node"]}), 29, "§8", "%.0f")
     for flag, paper in (("window_ok", 425), ("complete", 17)):
         n = sum(1 for r in rows if r[flag] != "1")
@@ -405,6 +405,58 @@ def budget(rows, adm, args):
         chk("D(300)−D(100), %s seeds" % tag, m_, paper[3], "§4.8, Fig. 3b")
         chk("   t", m_ / se_, paper[4], "§4.8, Fig. 3b", "%.2f")
 
+    # ---- the hz3q repair: seed 5 re-run box- and class-matched (§4.8, §7 T9) ----
+    # hz3q is a SEPARATE batch under a SEPARATE registration.  It repairs one seed of
+    # hz3; it is not a replication, not a new design point and not a new cell, and it
+    # enters no cell of Table 2.  The published readings above are UNCHANGED and are
+    # asserted first, on purpose: all three readings are reported together, always.
+    qch, qnd = series("hz3q-ch-s*.out"),  series("hz3q-node-s*.out")
+    qn1, qc2 = series("hz3q-n1d-s*.out"), series("hz3q-c23-s*.out")
+    if not (set(qch) == set(qnd) == {5}):
+        print("        (hz3q .out series not found -- repaired readings skipped)")
+        return
+    n1d, c23 = series("hz3-n1d-s*.out"), series("hz3-c23-s*.out")
+    CH, ND = dict(ch), dict(nd)
+    N1, C2 = dict(n1d), dict(c23)
+    CH[5], ND[5], N1[5], C2[5] = qch[5], qnd[5], qn1[5], qc2[5]
+    for B, exp, ese in ((100, 0.632, 0.074), (200, 0.512, 0.116), (300, 0.394, 0.090)):
+        d = [pl5(CH[s], B) - pl5(ND[s], B) for s in seeds]
+        chk("D(%d), REPAIRED 6 seeds" % B, st.mean(d), exp, "§4.8 table col 3")
+        chk("   se", st.stdev(d) / math.sqrt(len(d)), ese, "§4.8 table col 3", "%.3f")
+    dd = [(pl5(CH[s], 300) - pl5(ND[s], 300)) - (pl5(CH[s], 100) - pl5(ND[s], 100))
+          for s in seeds]
+    m_, se_ = st.mean(dd), st.stdev(dd) / math.sqrt(len(dd))
+    chk("D(300)−D(100), REPAIRED 6 seeds", m_, -0.238, "§4.8 -- c99 H2 REGISTERED VERDICT")
+    chk("   se", se_, 0.093, "§4.8 -- c99 H2", "%.3f")
+    chk("   t  (bar |t| >= 2.0 frozen pre-run -> NOT FLAT, D DECLINES)",
+        m_ / se_, -2.57, "§4.8, §8, A.2, end matter", "%.2f")
+    d, se, t = welch([pl5(CH[s], 300) for s in seeds], [pl5(ND[s], 300) for s in seeds])
+    chk("D(300) REPAIRED 6 v 6 (Welch)", d, 0.394, "§4.8, Table 2 dagger, §8")
+    chk("   se", se, 0.093, "§4.8, Table 2 dagger", "%.3f")
+    chk("   t  (Contribution 1 UNTOUCHED)", t, 4.25, "§4.8, Table 2 dagger, §8", "%.2f")
+    g = welch([pl5(C2[s], 300) for s in seeds], [pl5(N1[s], 300) for s in seeds])[0]
+    chk("G(300) REPAIRED 6 v 6", g, -0.048, "§4.8, A.11")
+    chk("(D-G)(300) REPAIRED", d - g, 0.442, "§4.8, A.11")
+    chk("HC cross-class hz3q-node-s5 - hz3-node-s5 @300",
+        pl5(qnd[5], 300) - pl5(nd[5], 300), 0.134,
+        "§4.8 HC, §7 T9 -- bar |delta| <= 1.00 pp")
+    chk("   hz3q-node-s5 plateau5(300)", pl5(qnd[5], 300), 92.908, "§4.8 HC", "%.3f")
+    chk("   hz3-node-s5  plateau5(300)", pl5(nd[5], 300), 92.774, "§4.8 HC", "%.3f")
+    chk("archived seed-5 D(100)", pl5(ch[5], 100) - pl5(nd[5], 100), 0.148, "§7 T9")
+    chk("repaired seed-5 D(100)", pl5(qch[5], 100) - pl5(qnd[5], 100), 0.482, "§7 T9")
+    chk("archived seed-5 D(300)", pl5(ch[5], 300) - pl5(nd[5], 300), 0.290, "§7 T9")
+    chk("repaired seed-5 D(300)", pl5(qch[5], 300) - pl5(qnd[5], 300), 0.086, "§7 T9")
+    chk("seed-5 nodewise class-only shift @100", pl5(qnd[5], 100) - pl5(nd[5], 100), -0.204,
+        "§7 T9 -- same box, same flags, class only")
+    chk("seed-5 chunk777 class-only shift @100", pl5(qch[5], 100) - pl5(ch[5], 100), 0.130,
+        "§4.8 -- box-free at B=100")
+    chk("seed-5 nodewise1d class-only shift @100", pl5(qn1[5], 100) - pl5(n1d[5], 100), 0.376,
+        "§4.8 -- box-free at B=100")
+    chk("seed-5 chunk2325 class-only shift @100", pl5(qc2[5], 100) - pl5(c23[5], 100), 0.212,
+        "§4.8 -- box-free at B=100")
+    chk("epoch the -15 floor first becomes reachable",
+        math.ceil((math.log(1e-3) - (-15.0)) / (1e-4 * 500)), 162, "§3.5 R2, §7 T9", "%.0f")
+
 def competitiveness(rows, adm, args):
     print("\n[8] THE SCOPE LIMIT WE MUST NOT SOFTEN  (abstract (ii), §7 T4)")
     import collections
@@ -481,9 +533,9 @@ def metacensus(rows, adm, args):
     fam = lambda g: (g in ("nodewise", "nodewise1d")
                      or g.startswith("chunk") or g.startswith("permnode"))
     sel = [r for r in adm if fam(r["granularity"])]
-    chk("admissible runs in the partition families", len(sel), 427,
+    chk("admissible runs in the partition families", len(sel), 431,
         "§7 T1, §1 scope (iii), A.1", "%.0f")
-    chk("   ...with meta = Lion", sum(1 for r in sel if r["meta"] == "Lion"), 415,
+    chk("   ...with meta = Lion", sum(1 for r in sel if r["meta"] == "Lion"), 419,
         "§7 T1, §1 scope (iii), A.1", "%.0f")
     chk("   ...with meta = RMSProp (all twelve are sm4)",
         sum(1 for r in sel if r["meta"] == "RMSProp"), 12,
@@ -495,9 +547,9 @@ def metacensus(rows, adm, args):
     cmf = lambda g: (g.startswith("chunk") or g.startswith("permnode")
                      or g == "nodewise1d")
     norp = [r for r in rows if cmf(r["granularity"]) and not r["run"].startswith("rp1")]
-    chk("count-matched-family rows outside the in-flight rp1 batch", len(norp), 238,
+    chk("count-matched-family rows outside the in-flight rp1 batch", len(norp), 241,
         "§4.3, §8", "%.0f")
-    chk("   ...of which admissible", sum(1 for r in norp if F.admissible(r)), 238,
+    chk("   ...of which admissible", sum(1 for r in norp if F.admissible(r)), 241,
         "§4.3, §8 -- 'all ... are admissible' holds only outside rp1", "%.0f")
 
 # =========================================================== NEW: the gn1 gate
@@ -686,6 +738,9 @@ DEPOSIT_SCORERS = [
   "--runs <unpacked logs>; no probe dependency"),
  ("c87_hz3_score", "§4.8 the budget window",     "REACHED",
   "--runs <unpacked logs>; no probe dependency"),
+ ("c99_hz3q_score","§4.8 the repaired slope",     "PARTIAL",
+  "H0/H2/H3/HC regenerate off the .out series; the H1 box gate prints "
+  "'NO OCCUPANCY IS MEASURABLE' -- probe*.jsonl is the excluded class"),
 ]
 
 def deposit(rows, adm, args):
@@ -697,7 +752,9 @@ def deposit(rows, adm, args):
     n = lambda st_: sum(1 for _, _, x, _ in DEPOSIT_SCORERS if x == st_)
     chk("registered scorers REACHED on the deposit", n("REACHED"), 2,
         "§8 + End-matter rewrite (A2)", "%.0f")
-    chk("   PARTIAL", n("PARTIAL"), 2, "§8 + End-matter rewrite (A2)", "%.0f")
+    chk("   PARTIAL", n("PARTIAL"), 3, "§8 + End-matter rewrite (A2)", "%.0f")
+    chk("   registered scorer verdicts this paper quotes in full",
+        len(DEPOSIT_SCORERS), 11, "§8 + End-matter rewrite (A2)", "%.0f")
     chk("   BLOCKED by the excluded probe files", n("BLOCKED"), 6,
         "§8 + End-matter rewrite (A2)", "%.0f")
     print("    (this table is a REGISTER, not a derivation: each row was produced by")

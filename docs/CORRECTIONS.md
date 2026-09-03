@@ -9297,3 +9297,190 @@ This is ONE edit pass once the quartet is scored, not two: the batch finishes ~0
 after which c99_hz3q_score.py is run, c87_hz3_score.py is re-run UNEDITED as the non-overwrite
 check, four `hz3q-*` rows are ingested with no dup_group and no supersession, and the whole R2
 story is rewritten once with the actual verdict in hand.
+
+---
+
+## 133. STANDING RULE 22 -- THE INGEST IS `aggregate.py` THEN `args_repair.py --apply`, AND A GUARD NOW ENFORCES IT
+
+The `hz3q` ingest (commit 17b9af7) surfaced a pipeline trap that had been latent since the A3
+duplicate-pair repair was written, and that would have silently undone it.
+
+**THE TRAP.**  `analysis/aggregate.py` regenerates `results/all_runs.csv` from the `.out` tree.
+It knows nothing about `dup_group`: it stamps that column **only where a run NAME collides**,
+which catches the three `a0` reruns and misses **all eighteen pairs of differently-named
+same-experiment runs** that `analysis/args_repair.py --apply` writes.  Run alone, therefore,
+`aggregate.py` **wipes 36 stamps and reverts the A3 repair**.  Nothing errors.  Nothing looks
+wrong.  The only symptom is downstream and silent: `ml2` reverts from 3 v 3 to 6 v 6, its
+`se` falls **0.195 -> 0.142** and its `t` rises **2.34 -> 3.20**, moving a Table 2 row and the
+`t >= 3.0` resolution count with it.
+
+**THE RULE, now STANDING RULE 22.**  *The ingest is `aggregate.py` THEN
+`args_repair.py --apply`.  Never one alone, and never `aggregate.py` last.*  Verified on this
+ingest: after both steps the diff against the committed 2,173-row CSV is exactly **+4 rows,
+0 changed, 0 removed**.
+
+**THE GUARD.**  `analysis/dup_group_guard.py`, new in this entry, refuses a run table whose
+repair has been reverted.  It restates nothing: it imports `args_repair.GROUPS`, the single
+source of truth for the eighteen pairs, so it cannot drift from the repair it guards.  It
+asserts that every member of every pair is stamped and stamped with the right group; that the
+table carries **21 distinct `dup_group`s over 42 rows** (18 pairs from `args_repair` + the 3
+run-name collisions `aggregate.py` finds by itself); that every group has exactly 2 members;
+and that `superseded = 1` appears on exactly the 3 `a0` rows and nowhere else.  On failure it
+exits 1 and prints the remediation command.
+
+    python3 analysis/dup_group_guard.py              # exit 0 iff the repair is intact
+    python3 analysis/dup_group_guard.py --selftest   # the guard checks itself
+
+VERIFICATION.  `python3 analysis/dup_group_guard.py` -> `21 groups, 42 rows stamped,
+3 superseded. VERDICT: PASS`, exit 0.  `--selftest` -> **5/5 PASS**: the guard passes the live
+table and **fails** all four revert modes -- a bare `aggregate.py` rebuild (all 36 stamps
+wiped), a single lost stamp, a stamp rewritten to a wrong group, and an invented supersession.
+Run it after every ingest and before any commit that touches `results/all_runs.csv`.
+
+---
+
+## 134. THE BUDGET REVERSAL, INTEGRATED -- A PRE-REGISTERED BAR TOOK A CLAIM OF OURS AWAY
+
+Two packages (`paper/sections/v7-budget-reversal.md`, `paper/sections/v7-inflight-and-counts.md`)
+were merged and applied to **both** markups in one commit.  Where they touched the same sentence
+the text was **re-derived**, not chosen between: §3.5's R2 identity, the §4.8 withdrawal
+paragraph, Table 2's dagger note, §7 T9's two paragraphs, §8's experiment list and §9's
+withdrawal roll-call each carry one merged version.  **97 keyed replacements landed, 51 in
+`paper/paper.tex` and 46 in `paper/DRAFT-v4.md`, every anchor verified `count == 1` immediately
+before it was applied.**
+
+**THE REVERSAL.**  `hz3`'s seed 5 was doubly confounded -- its three non-`nodewise` arms carried
+`BETA_CLIP=-15:-2.3026` against `-30:9.0` everywhere else, **and** ran on A100 cards while their
+own comparator ran on an RTX 2080 Ti.  `hz3q` re-runs **all four** arms at that seed, 300 epochs,
+`-30:9.0`, in one submission on one NVIDIA L4 (`node883`, Slurm 4864632--35, all `COMPLETED`), so
+box and GPU class are matched **by construction**.  `analysis/c99_hz3q_score.py`, run **UNEDITED**
+(RULE 16; sha256 `50d95083c8...`, selftest **59/59 PASS**, `PARENT_SHA256` matching the committed
+`c87_hz3_score.py` byte for byte), returns three readings and prints all three:
+
+    hz3 AS PUBLISHED   n=6  delta -0.149  se 0.105  t -1.42  df 5  ->  FLAT
+    SEED 5 DROPPED     n=5  delta -0.207  se 0.107  t -1.94  df 4  ->  FLAT
+    REPAIRED           n=6  delta -0.238  se 0.093  t -2.57  df 5  ->  NOT FLAT -- D DECLINES WITH BUDGET
+
+The `|t| >= 2.0` bar is frozen in `band_flat()` at the parent registration's own `CONFIRM_T` and
+predates the runs (RULE 21).  **§4.8's sentence "D does not grow with budget from 100 to 300
+epochs, and we cannot resolve whether it decays" is WITHDRAWN**, together with the subsection
+title built on it and three downstream restatements (§3.4 item 3, A.2, Figure 3's caption).  The
+withdrawal is stated in §4.8 in full, not in an appendix.
+
+**WHAT IS NOT WITHDRAWN, and the paper says so in four places.**  Contribution 1 is untouched.
+Repaired, `D(300) = +0.394 +- 0.093, t 4.25` against the published `+0.428 +- 0.086, t 4.94` --
+a shift of 0.034 pp, four tenths of one se.  All six seeds still favour `chunk777` at 300 epochs
+on every one of the three readings.  **D shrinks with budget; it does not go away.**  `hz3q`
+repairs ONE SEED: it is not a replication, not a new design point and not a new cell, it enters no
+cell of Table 2, and Table 2 row 9 keeps `+0.428 +- 0.086, t 4.94` with the repaired value
+DISCLOSED in the dagger note rather than substituted.
+
+**WHY THE PUBLISHED READING WAS WRONG, MEASURED.**  The `-15` floor first becomes reachable at
+epoch `ceil(8.092245 / 0.05) = 162`.  Archived seed-5 floor occupancy is **0.000000 at epoch 100**
+and 0.000485 / 0.001621 / 0.001443 at 200, rising to 0.008598 / 0.018323 / 0.008900 at 300, with
+`coord_hi` 0.000000 throughout.  So seed 5's archived `D(100)` is **box-free** and its archived
+`D(300)` is **box-bound** -- a defect present at one end of a within-run pairing and absent at the
+other, which is the one shape pairing cannot cancel, and the reason the repair moved the SLOPE
+(-0.149 -> -0.238) far more than either LEVEL (+0.576 -> +0.632, +0.428 -> +0.394).
+
+**T9's "unexplained extreme value" IS NOT REPRODUCIBLE.**  A box- and class-matched re-run of the
+same seed reads `D(100) = +0.482` against the archived `+0.148`; the `nodewise` control arm --
+same box, same flags, class only -- moves `-0.204` pp at that budget on its own.  T9 now also
+carries the general lesson: `c87_hz3_score.py:115` DECLARES `SEED_CLASS`, and both sides of its
+own check on that map are declarations -- a registered constant that no run is ever compared
+against is a decoration, and the repair is to measure, not to re-declare.  `c87`'s constant stays
+wrong-and-registered under the file-freeze rule, and R2 does **not** make its label true: the
+quartet ran on an L4, so the label stays wrong and is made IRRELEVANT to the contrast instead.
+
+**HC, THE CROSS-CLASS CONTROL** (reporting, not gating).  `hz3q-node-s5` on the L4 reads
+`plateau5(300) = 92.908`; the archived `hz3-node-s5` on the RTX 2080 Ti reads `92.774`.  Same
+seed, box, flags and code; class alone differs.  `delta = +0.134 pp` against a `1.00 pp` bar
+registered before the run: **GPU CLASS IS NOT FIRST-ORDER ON THE LEVEL.**  It cross-checks §6.3's
+corpus hardware term (`2080Ti - L4 = +0.035` pp over n = 45), which disagrees in SIGN and sits an
+order of magnitude inside the same bar -- both are reported, neither carries a claim.
+
+**H1, AND A DEPOSIT LIMIT NOW STATED IN THE PAPER.**  Worst coordinate fraction **exactly
+0.000000** on n = 500 coordinates per arm at epochs 100, 200 and 300, bar 0.05.  That gate reads
+`probe*.jsonl`, which the deposit excludes for size, so it is **not reproducible from the local
+backup tree** (`runs/hz3/probe_*_hz3q_s5/` are empty there and the scorer correctly refuses with
+`NO OCCUPANCY IS MEASURABLE`).  It was re-derived by running the same unedited scorer on ALICE,
+where the records live.  §3.5 now says which readings need the probes and which do not, and
+`c99_hz3q_score` is registered **PARTIAL** in `c98_reproduce.py`'s deposit register for exactly
+that reason -- the register's counts move to 2 REACHED / 3 PARTIAL / 6 BLOCKED over eleven
+scorers, and §8's prose moves with them.
+
+**N3 -- THE STALE R2 STORY.**  The registered trio 4855960--62 was **CANCELLED at 00:00:00
+elapsed** with no node ever assigned (`sacct`), left no `.out` file, and contributes no number
+anywhere.  Every site that described it as live was rewritten: §3.5's title, opening, table
+caption, `tab:inflight` row R2, the R2 registration paragraph and the R2 result paragraph; §7 T9's
+two paragraphs; §8's experiment list; §9's roll-call.  The §8 list was **also** stale for R1 --
+`paper.tex` said "Two of the four ... have been read" and then listed three, and `DRAFT-v4.md`
+called R1 "complete on disk and deliberately unscored" against its own table row.  Both now read
+"All four ... have now been read".
+
+**THE CORPUS COUNTS, ALL RE-DERIVED FROM THE 2,177-ROW CSV.**  rows 2,173 -> **2,177**;
+admissible 1,731 -> **1,735**; wallclock-carrying 2,158 -> **2,162**; GPU-hours 1,632 -> **1,642**
+(exact 1,641.55 h from 98,493 min; the ledger prints 1,641.5 and 1,575.2, which subtract to the
+braced 66.3 exactly); partition-family admissible 427 -> **431**, of which Lion 415 -> **419**
+(RMSProp 12 unchanged); count-matched rows outside `rp1` 238 -> **241**, all such rows 256 ->
+**259**; `.out` files 2,241 -> **2,245** (1,326 + 919), jobs entering the training script 2,237 ->
+**2,241**, files carrying `ENV:` 2,113 -> **2,117**.  The ledger closes exactly: **2,245 - 4 - 64
+= 2,177**.  §3.1's uncensused counts moved with them: CIFAR-10 1,967 -> **1,971**, ResNet-18
+1,872 -> **1,876** (C10 leg 1,671), augmentation on 2,059 -> **2,063** and 534/535 -> **538/539**
+in the partition family, 300-epoch runs 62 -> **66**.  Two historical figures were kept as history
+with their scope made explicit rather than restated: the `rp1` rebuild's "2,173 rows in and out"
+and §8's "249 of the 256 such rows the corpus then held".  `paper.tex` and `DRAFT-v4.md` had
+**disagreed** at A.1 before this entry (tex 420/408 against md 427/415); both now read 431/419.
+
+**THE AUDIT'S EIGHT MIRRORED LITERALS.**  `analysis/c98_reproduce.py` holds the paper's printed
+values as literals, so exit 0 was unreachable by editing the manuscript alone.  The eight stale
+mirrors were set to the re-derived values **in the same commit as the manuscript**, which is the
+only order that does not turn the audit green against a stale paper.  **No tolerance, predicate,
+derivation or check was weakened.**  Twenty-five NEW assertions were added instead, covering every
+repaired reading, the HC control, the four per-arm class-only shifts at B = 100, and the epoch-162
+box arithmetic.  `python3 analysis/c98_reproduce.py` -> **exit 0, ALL 592 CHECKS PASS**, at a
+census FIXPOINT of **584 / 389 / 872 / 44.6%** (re-iterated to stability after every edit).
+
+**A NEW TOOL: `analysis/paper_numeric_diff.py`.**  The house rule that every edit lands in both
+markups was enforced by hand until now.  This makes it mechanical: it normalises the two idioms
+for the same number (`2{,}177` vs `2,177`, `$-0.238$` vs `**-0.238**`, U+2212 vs `-`), reuses the
+coverage census's own cross-reference and version exclusions rather than restating them, and
+compares the two files' quantity numerals as a MULTISET -- because a half-applied edit shows up
+exactly as a count difference.  **On this integration it reports 8 residuals, and all 8 are
+PRE-EXISTING**: the same multiset, token for token, at HEAD 17b9af7 before a byte was changed.
+**Zero were introduced.**  They are four LaTeX-only table captions (`tab:T`'s "t >= 3.0",
+`tab:holm`'s "nominal 0.05"), one `paper.tex` paragraph on batch-as-a-variance-component
+(`F(39,172) = 0.71`) that `DRAFT-v4.md` never carried, one scorer snippet the tex wraps in
+`quote` and the md prints inline (`0.279 / 0.087 / 3.19`), and two md table row labels that name
+the clip box where the tex row labels do not (`9.0` twice).  **OPEN, and not repaired here** --
+they belong to sections neither package touched.
+
+**THE DEPOSIT.**  Rebuilt from the new HEAD; it now ships `c99_hz3q_score.py` (the deposit's own
+claim is "all registered scorers"), so it stands at **140 files, 6.5 MB** against the 139 files
+and 6.4 MB of the previous build, and §8, A.8 and the End matter print the new figures.
+`release/data/all_runs.csv` carries 2,177 rows and `release/logs/raw_out.tar.gz` 2,245 members.
+
+**EVERYTHING ELSE, VERIFIED UNCHANGED.**  `c87_hz3_score.py` re-run **UNEDITED** after the ingest
+admits **zero** `hz3q` files (`grep -c hz3q` on its output = 0) and prints what it printed before
+(`SURVIVES`; `MECHANISM SURVIVES THE HORIZON`); its 50-epoch `GROWS` verdict stands.  STANDING
+RULE 20 on the four `hz3q` `.out` files: **4 clean, 0 repeated flags, VERDICT PASS**.
+`dup_group_guard.py`: 21 groups, 42 rows stamped, 3 superseded, PASS; `--selftest` 5/5.
+`tectonic -X compile paper.tex`: exit 0, 74 pages, **0 errors, 0 unresolved references, 0 `??`**,
+0 orphan labels, two overfull hboxes (7.28 pt, 12.25 pt) -- the baseline's third, 20.28 pt at
+`tab:inflight`, is gone.  Abstract 217 words.  **No Slurm job was submitted; both queues are
+empty and cluster access was read-only** (`sacct`, `find`/`grep` over the run directories, and the
+two registered scorers run unedited).
+
+ONE FURTHER DISCLOSURE, marked **UNREGISTERED** in §4.8 because `c87` is registered on `hz3` and
+`hz3q`'s registered window is `plateau5`: recomputing `c87`'s own 50-epoch estimator on the
+repaired pool gives `+0.161 +- 0.085, t 1.89`, inside that scorer's own `SAT_HALF = 0.20` band --
+`SATURATES` rather than `GROWS`.  **The repair moves the two windows toward each other, not
+apart**; part of §3.4's window discrepancy was the contaminated seed.  We do not restate a
+registered verdict on data it was not registered for; we report that we looked.
+
+STILL OPEN after this entry: (i) sync `runs/hz3/probe_*_hz3q_s5/probe.jsonl` from ALICE into the
+backup so H1 is re-derivable from the deposit tree; (ii) redraw `figures/f3_budget` panel (b) with
+the repaired seed -- `analysis/c98_figures.py:469` selects `hz3-(ch|node)-s(\d+)$`, which `hz3q`
+does not match, so the panel is drawn on the archive and its caption now says so; (iii) the eight
+pre-existing markup residuals above; (iv) two `DRAFT-v4.md` prose lines that begin with `|` and
+will render as table rows (`|r| >= 0.632`, `|Delta plateau5|`).
