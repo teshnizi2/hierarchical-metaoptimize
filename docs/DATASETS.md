@@ -45,3 +45,74 @@ download, or (b) report the 489-class subset explicitly as "ImageNet-489", never
 ## TinyStories — not yet staged
 Needed only for the language-model arm (parent paper §7.4). Lower priority than the budget
 sweep and CIFAR-100, both of which bear directly on the current claim.
+
+## Tiny-ImageNet-200 — STAGED AND VERIFIED on alice2, cycle "main-idea fix"
+
+The credential-free scale axis. It moves **both** axes that separate CIFAR from
+ImageNet — input resolution 32 → 64 and class count 10 → 200 — and unlike
+ImageNet-1k its validation split ships **labelled**, so accuracy is computable.
+
+**Licence check, performed before anything was downloaded.**
+`https://cs231n.stanford.edu/tiny-imagenet-200.zip` answers a bare `HEAD` from the
+alice2 login node with `HTTP/1.1 200 OK`, `Content-Length: 248100043`,
+`Last-Modified: Mon, 09 Feb 2015`. No authentication challenge, no cookie, no
+redirect to a registration or terms page. **Nothing was accepted on the account
+holder's behalf and nothing needed to be.** (Contrast ImageNet-1k, which is
+blocked on exactly that and stays scoped out.)
+
+Downloaded 248,100,043 bytes,
+sha256 `6198c8ae015e2b3e007c7841da39ec069199b9aa3bfa943a462022fe5e43c821`.
+
+**Counts MEASURED on disk by `bin/tin_stage.py`, not assumed** (the script
+asserts each one and prints the observed value beside the expectation, because
+the failure that scoped ImageNet-1k out was a silent partial download):
+
+| | measured |
+|---|---|
+| train class directories | **200** |
+| `wnids.txt` entries, and identical to the train dirs | 200, True |
+| train images | **100,000** — every class exactly 500 |
+| `val/val_annotations.txt` rows | **10,000** |
+| val JPEGs on disk, and 1:1 with the label rows | 10,000, True |
+| distinct wnids in the val labels, all present in train | **200**, True |
+| val images per class | **50**, every class |
+| images not already RGB (converted) | 1,821 train, 168 val |
+
+**Staging.** Raw archive at `/zfsstore/user/s5014158/tinyimagenet/`. The harness
+reads only a decoded uint8 cache at
+`.../cifar10/data/tiny-imagenet-200-cache/` (`train_x.npy` 1.23 GB,
+`val_x.npy` 123 MB, `train_y/val_y`, `classes.txt`, `MANIFEST.json` with per-file
+sha256). The cache exists because `load_data.py` builds its DataLoader with the
+shipped default `num_workers=0`: decoding 100,000 JPEGs would happen inside the
+training process and the run would be data-bound. Holding uint8 HWC in memory
+and calling `Image.fromarray` in `__getitem__` is exactly what torchvision's own
+CIFAR10 dataset does, so the transform pipeline is the same object graph as the
+CIFAR path's. `bin/tin_stage.py --verify-only` re-checks the hashes and the
+label map.
+
+**Normalisation, measured over this staged train split** (not quoted from a
+paper): mean `[0.4802, 0.4481, 0.3975]`, std `[0.2764, 0.2689, 0.2816]`.
+`AUGMENT=1` gives `RandomCrop(64, padding=8)` + `RandomHorizontalFlip` — padding
+8 at 64px is the same 1/8-of-a-side ratio as the CIFAR path's padding 4 at 32px.
+
+**Harness wiring** is `patches/patch_tinyimagenet.py`, purely additive and
+guarded: one `elif dataset_name == "TinyImageNet"` in `load_data.py`, one
+`if network_name == 'ResNet18_tin'` in `build_network.py`, one appended class,
+and one new file `tin_data.py` that nothing imports unless the new dataset is
+requested. `ResNet18_tin` subclasses `ResNet` and overrides only `forward()`,
+inserting a parameterless stride-2 max-pool after the stem so 64×64 becomes
+32×32 and every later tensor shape — including the 4×4 map that the fixed
+`F.avg_pool2d(out, 4)` requires — is identical to the CIFAR path.
+
+`tests/tin_equivalence.py`, run on the cluster (torch 2.0.1+cu118, job 4886974),
+proves the patch inert: all 11 pre-existing `--NN-name` values construct
+bit-identical parameters in identical `named_parameters()` order with
+bit-identical forward passes; CIFAR-10 and CIFAR-100 produce bit-identical
+batches with augmentation off and on; both new names raise on the pre-patch
+modules. `ResNet18_tin` has 62 layerwise groups, the same as `ResNet18`, and
+differs from it only in the classifier head (11,271,432 vs 11,173,962
+parameters); nodewise m is 14,800 vs 14,420, the +380 being the 190 extra output
+nodes in weight and bias.
+
+**It is not ImageNet.** 200 classes at 64px. No number from it may be compared
+with a published ImageNet-1k result.
