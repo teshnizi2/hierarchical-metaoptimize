@@ -1,26 +1,40 @@
 # STATUS — operator dashboard
 
-Updated 3 Sep 2026 (**cycle 116**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **140**) > `docs/FINDINGS.md` > everything else.
-Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`); HEAD is the docs-only
-commit that follows it and changes `docs/STATUS.md` and `docs/CORRECTIONS.md` alone. Working tree clean.
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp** — 75 until this cycle; see Plan C below). Corpus = **2,177 rows**.
-**FIVE BATCHES IN FLIGHT — nothing complete, nothing scored.** Re-derived from `sacct`/`squeue`:
+Updated 4 Sep 2026 (**cycle 117**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **141**) > `docs/FINDINGS.md` > everything else.
+Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`).
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,357 rows** (2,177 + 180 ingested this cycle).
+**`c98_reproduce.py` NOW EXITS 1** — the ingest made 8 draft numerals stale. Author fix, see CORRECTIONS 141.6.
 
-| account | batch | jobs | done | run | pend | decides | lands |
+## Queue — re-derived from `sacct`/`squeue` at this HEAD
+
+**LANDED AND INGESTED — five batches, 180 runs, all RULE 20 `VERDICT: PASS`, all scorers unedited.**
+
+| batch | n | decides | verdict |
+|---|---|---|---|
+| `g4m` | 72 | r × meta-stepsize | **REFUTED** — interior peak survives ms-tuning at **+0.821 pp** (bar 0.50). Overturns the audit's central mechanism claim |
+| `tl1` | 42 | two-level shrink, as written | **NULL** both alpha0 — PEAK −0.253 / −0.819 |
+| `eb1` | 18 | empirical-Bayes / James–Stein λ | **FAILURE** — LIFT +0.041 vs bar 1.16 |
+| `a2g3` | 36 | ResNet-50 r-ladder | **UNRESOLVED** — the two alpha0 disagree; not softened |
+| `tn1` | 12 | Tiny-ImageNet granularity | **REPLICATES** — GRAN **+40.975 pp** |
+
+**IN FLIGHT — nothing complete, nothing scored, no verdict claimed.**
+
+| account | batch | jobs | done | run | pend | decides | score with |
 |---|---|---|---|---|---|---|---|
-| `alice` RO | `g4m` | 72 | 65 | 7 | 0 | r × meta-stepsize ladder | ~35 min |
-| `alice` RO | `a2g3` | 36 | 0 | 5 | 31 | ResNet-50 r-ladder | ~7–8 h |
-| `alice2` | `tl1` | 42 | 27 | 14 | 1 | **G1** two-level shrink — the proposal as written | <1 h |
-| `alice2` | `eb1` | 18 | 0 | 0 | 18 | **G16** empirical-Bayes / James-Stein λ | ~2 h |
-| `alice2` | `tn1` | 12 | 0 | 0 | 12 | Tiny-ImageNet granularity ladder | ~4–5 h |
+| `alice2` | `hb1` | 18 | 12 | 6 | 0 | head/backbone m=2 split; bar CAPTURE ≥ 0.50 | `cH1_hb1_score.py` |
+| `alice2` | `lsm1` | 24 | 0 | 11 | 13 | is the peak Lion-specific? meta = Adam r-curve | `cA3_lsm1_score.py` |
+| `alice` RO | `in489g1` | 12 | **0** | 8 | 4 | ImageNet-489 granularity ladder | `cI1_in489g1_score.py` |
 
-**GPU-h committed 178.2** (`alice` 130.9, `alice2` 47.3), projected from measured means, not requests.
-Also on `alice`, not ours: 12 `in489g1` PENDING. Nothing submitted or cancelled on `alice` — read-only.
-**Tree re-proved from scratch:** live vs pinned `d3202635c3fc` bitwise identical over **60 configurations**;
-`tl_equivalence` / `cG16_noop_equiv` / `tin_equivalence` re-run UNEDITED, all PASS. RULE 20 `tl1` **40 clean, PASS**;
-**owed for `eb1`/`tn1` once they start.** See CORRECTIONS 140 — including a shared-tree split in
-`load_data.py`/`build_network.py` that only the Tiny-ImageNet no-op proof makes harmless.
+**`in489g1` WAS NOT LOOKED AT.** Job states only; no `.out` opened, parsed or scored. Nothing
+submitted or cancelled on `alice` — read-only.
+
+**Class-count law** (`docs/REGISTER-class-count-law.md`, `65ba0d0`, registered with **0** `in489g1`
+runs complete). Re-derived from the corpus this cycle, not from its own registration:
+Q = scalar/layerwise on `plateau5` = **0.9669** (C=10) · **0.3286** (C=100) · **0.1939** (C=200);
+`Q(C) = Q10·(C/10)^(−0.5112)` predicts **Q(489) = 0.132**, falsified above **0.60**. The ingest did
+not move it (Q10 0.9668 → 0.9669). `in489g1` is its test.
+
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
 ## Verdict
@@ -28,7 +42,7 @@ Also on `alice`, not ours: 12 `in489g1` PENDING. Nothing submitted or cancelled 
 | | |
 |---|---|
 | Q1 meta-gate | **DESK-ACCEPT, 9/10, `structural_gaps = []`, `passed = True`, 0 blocking.** Returned at cycle 111 on v8 (CORRECTIONS 135). **Carried, not re-derivable here** — the gate tool is not in this tree |
-| Audit | `c98_reproduce.py` **exit 0, ALL 636 CHECKS PASS**; census at fixpoint **628 / 411 / 982 / 41.9%** |
+| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, all caused by this cycle's ingest (corpus 2,177 → 2,357); **exit 0 on the pre-ingest CSV, verified both ways**. 4 are census counts, 4 substantive (best R18/C10 arm 93.317 → **93.328**, now `eb1-a06`; deficit 1.807 → **1.796**; partition-family rows 431 → **434**, Lion 419 → **422**). **No claim reverses** — baseline unmoved at 95.124 (se 0.047), deficit still ~1.8 pp. Fix = edit both markups; **author scope**, see CORRECTIONS 141.6. Census at fixpoint **628 / 411 / 982 / 41.9%** |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens, all pre-existing, 0 new.** Three of the eight were closed this cycle |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
 | GPU to reach submission | **0 jobs, 0 hours** (the 178.2 GPU-h in flight is the NEXT cycle's science, not this manuscript's) |
@@ -39,7 +53,7 @@ Also on `alice`, not ours: 12 `in489g1` PENDING. Nothing submitted or cancelled 
 
 | check | result |
 |---|---|
-| `python3 analysis/c98_reproduce.py` | exit 0, **ALL 636 CHECKS PASS** |
+| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals after the ingest, not a moved result. Same script on the pre-ingest CSV: **exit 0**. See CORRECTIONS 141.6 |
 | census fixpoint (measured on `DRAFT-v4.md`, asserted against both markups) | **628 / 411 / 982 / 41.9%** — **unmoved by Plan C, as designed** |
 | census internals | raw `\d+\.\d+` 3067 → **3098**, distinct **1007** (unchanged); quantities 2614 → **2615**, distinct **982** (unchanged). The `+1` is the Markdown heading numeral `1.2`; `1.2` already occurred twice as a quantity, so the asserted denominator did not move. `n_q` is asserted by nothing |
 | `python3 analysis/xref_check.py` | exit 0, **596 references** (section 500, table 51, figure 22, appendix 23), **0 unresolved, 0 stale**, 8 allowlisted parent-paper refs on lines `[41, 43, 45, 287, 291, 294, 295, 297]` |
@@ -179,7 +193,7 @@ and the only route to the last two); section head → triage answer without read
 actually submitted, and the README's coverage figure checked against the paper's. That is author item 4,
 and it has already bitten once.
 
-## TODO-FOR-AUTHOR — 6 open, all outside agent scope, each verified open at this HEAD
+## TODO-FOR-AUTHOR — 7 open, all outside agent scope, each verified open at this HEAD
 
 | # | item | evidence it is still open | effort |
 |---|---|---|---|
@@ -190,11 +204,17 @@ and it has already bitten once.
 | 5 | **Mint the artefact DOI** | *"The deposit has no DOI, because it has not been deposited"* — `paper.tex:5048` / `DRAFT-v4.md:4054` — honest, not a stub | 5 min + upload |
 | 6 | **Authorship for the §5.9 design originator** | Competing Interests names them as *"a researcher … who is not an author"* and calls the origination *"a substantial intellectual contribution rather than an acknowledgeable courtesy"* — `paper.tex:5106`, `:5109` / `DRAFT-v4.md:4110`, `:4113` | **decision, not edit** |
 
+| 7 | **Refresh the 8 corpus numerals the ingest made stale, in BOTH markups, then re-run to a fixpoint** | `c98_reproduce.py` **exit 1, 8 CHECK(S) FAILED**; the same script on the pre-ingest CSV exits **0**. Census: rows **2177→2357**, admissible **1735→1915**, wallclock **2162→2342**, GPU-h **1642→1805.4**. Substantive: best R18/C10 arm **93.317→93.328** (`i3b-3e4`→`eb1-a06`), deficit **1.807→1.796**, partition-family rows **431→434** / Lion **419→422** | 15 min |
+
 - Items 1–5 are mechanical. **Item 6 is an ethics decision only the authors can make, and it must be
   settled before submission** — the paper's own Competing Interests says so.
+- **Item 7 is new this cycle and is the only one an agent created.** It is author scope solely because
+  the fix edits `paper/DRAFT-v4.md` and `paper/paper.tex`. **No scientific claim reverses**: the
+  baseline is unmoved at **95.124 (se 0.047)** and the deficit is still ~1.8 pp. Edit the pair together
+  and re-run `c98_reproduce.py` to a fixpoint — CORRECTIONS 141.6.
 - **Do not delegate 1, 2, 3 or 6.** End matter, CRediT, funding, correspondence and the author list are
   the authors' by standing instruction.
-- **The list is exactly six.** Nothing was added this cycle; nothing was closed.
+- **The list is seven.** Item 7 was added this cycle; nothing was closed.
 
 ## Venue
 

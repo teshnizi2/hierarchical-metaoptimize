@@ -10374,3 +10374,159 @@ job started **20:55:05** — 98 seconds. `cG1_tl_score.py` `907a4fb`, `cG16_eb_s
 no data existed. It must not be touched again; `a2g3` now has 5 jobs running.
 
 `c98_reproduce.py` **exit 0, ALL 636 CHECKS PASS**. `git status` clean, nothing under `paper/`.
+
+## 141. THE FIVE BATCHES LANDED, INGESTED AND RECORDED — AND THE INGEST BROKE `c98`
+
+Cycle 117. Five batches finished, were audited under RULE 20, and entered the corpus. Two new
+batches were registered and launched. `in489g1` is **still running and was not looked at.**
+The single thing an operator must act on is at 141.6: **`c98_reproduce.py` now exits 1**, because
+adding 180 rows made eight numerals in the draft stale. No scientific claim reversed.
+
+### 141.1 THE FIVE VERDICTS, FROM REGISTERED SCORERS RUN UNEDITED
+
+Each verdict is its own scorer's, not this pass's; this pass verified provenance and ingested the
+rows. 180 runs, `0 WITH REPEATED FLAGS OR DESIGN MISMATCH` on every batch.
+
+| batch | n | question | verdict |
+|---|---|---|---|
+| `g4m` | 72 | r x meta-stepsize | **REFUTED** — "r is more than a meta-stepsize dial." Interior peak survives ms-optimisation within each r at **+0.821 pp** (bar 0.50) |
+| `tl1` | 42 | two-level `beta_g = s + d_g`, the proposal as written | **NULL at both alpha0** — PEAK −0.253 (1e-6), −0.819 (1e-3). Plain layerwise beats every partial-shrinkage setting |
+| `eb1` | 18 | empirical-Bayes / James–Stein lambda | **FAILURE** — LIFT +0.041 pp against a bar of 1.16 |
+| `a2g3` | 36 | ResNet-50 r-ladder | **SPLIT / UNRESOLVED** at both alpha0; the two initialisations disagree. Reported unresolved, not softened |
+| `tn1` | 12 | Tiny-ImageNet granularity | **REPLICATES** — GRAN = layerwise − scalar = **+40.975 pp** |
+
+`g4m` **overturns the audit's central mechanism claim.** All 637 prior hierarchical runs sat at a
+single `ms=1e-3`, so "r is a step-size dial in a pooling costume" had never actually been tested.
+
+### 141.2 RULE 20 — THE DEBT AT 140.6 IS NOW PAID, AND TWO NEW BATCHES ADDED
+
+140.6 recorded RULE 20 as **owed** for `eb1` and `tn1`, and `a2g3`/`g4m` were audited only in part.
+All five were re-audited at this HEAD with `argsline_guard.py` run unedited, from the runs' **own**
+ARGS lines: `g4m` **72 clean**, `a2g3` **36**, `tl1` **42**, `eb1` **18**, `tn1` **12** — every one
+`VERDICT: PASS`. `hb1` **18 clean, PASS**, with `batch-consistency: every non-axis flag is identical
+across 18 runs`. `lsm1` **10 clean, PASS** (10 of 24 had started; the rest were PENDING).
+
+**`lsm1` needed a check the generic guard cannot make.** Its meta-optimiser *is* the axis, so
+`--alg-meta` cannot be a global `--expect`, and that is the exact flag `ml2` and `sm3` duplicated. A
+per-arm audit over all 10 started runs confirms: `--alg-meta` appears **exactly once** in every run;
+every Adam run carries `--normalizer-param-meta` and momentum `0.9` and **no** `--Lion-beta2-meta`;
+every Lion run the mirror image with momentum `0.99`; `ETA_RATIO` matches the run-name rung under the
+launcher's own `RTAG=$(echo "$R" | tr -d '.')`; `HIER=additive` throughout. All **8** registered cells
+(5 Adam rungs x 3 Lion rungs' worth) are represented. **Re-run over all 24 before any number is
+quoted.**
+
+*Recorded because it nearly became a finding:* the first pass of that per-arm check reported 5
+FAILs. They were **the checker's bug, not the batch's** — it compared the dot-stripped run-name tag
+`r003` against the numeric `ETA_RATIO=0.03`. The launcher's `tr -d '.'` was then read rather than
+assumed, and the batch is clean.
+
+### 141.3 RULE 21 — EVERY SCORER PREDATES ITS RUNS, AND NOTHING EXISTING WAS EDITED
+
+| batch | scorer | committed | first job start | margin |
+|---|---|---|---|---|
+| `hb1` | `analysis/cH1_hb1_score.py` | `d8bc124` 10:22:30 | 10:25:05 (submit 10:24:08) | 2 m 35 s |
+| `lsm1` | `analysis/cA3_lsm1_score.py` | `adf8584` 10:27:33 | 11:08:06 (submit 10:29:26) | 40 m |
+
+The class-count law was committed at `65ba0d0` **10:09:34**. Independently confirmed clean: `sacct`
+shows **zero** `in489g1` jobs COMPLETED — all 12 are `End=Unknown` — so the pre-registration was made
+with **0 runs complete**, not merely 0 read.
+
+`git diff --name-status bb98abb..HEAD` returns **five `A` and one `M`**, and the `M` is
+`bin/PROTECTED.txt` (a one-line prefix append). **No `analysis/*.py` was modified.** RULE 16 holds:
+no scorer was edited after its data existed.
+
+### 141.4 THE INGEST — 2,177 -> 2,357, WITH ZERO PRE-EXISTING ROWS TOUCHED
+
+`aggregate.py ../runs ../runs_alice2` **THEN** `args_repair.py --apply`, in that order.
+
+The pipeline was proved reproducible **before** the new rows were added: regenerating from the
+unchanged mirrors and applying the repair gives a file **bit-for-bit identical** to the committed
+CSV. Only then were the 180 `.out` files pulled, so the whole delta is attributable to them.
+
+Keyed on `(run, job_id)`, both unique: **0 pre-existing rows missing, 0 changed, 180 added** —
+`g4m` 72, `a2g3` 36, `tl1` 42, `eb1` 18, `tn1` 12. Header unchanged at 38 columns; the duplicate-name
+warning is the same 3 pairs as before; `args_repair` touched the same 36 `dup_group` rows. All 180
+new rows are `complete=1`, `window_ok=1`, `collapsed=0`, with `plateau5` present on every one.
+
+**`TinyImageNet` / `ResNet18_tin` now exist in the corpus for the first time.**
+
+*Operator note:* the five batches were briefly rsync'd into `Saber Optimization/runs` instead of
+`Saber Optimization/alice-backup/runs`. Both stray directories contained **only** the 180 new files,
+were moved into the canonical mirrors with `mv -n`, and were removed. Mirror counts went 1314 -> 1422
+and 919 -> 991, exactly +108 and +72. `in489g1` was **never pulled**.
+
+### 141.5 THE CLASS-COUNT LAW RE-DERIVED FROM THE CORPUS, NOT FROM ITS OWN REGISTRATION
+
+The law was registered at `65ba0d0` off hand-parsed `.out` files for Tiny-ImageNet. Those rows are
+now **in the CSV**, so the law can be re-derived by the ordinary corpus predicate. Matched cell
+throughout (SGDm+Lion, ms 1e-3, alpha0 1e-6, gamma 1, augment 1, `beta_clip -15:-2.3026`, HIER unset,
+bs 100, 100 ep, `collapsed=0`, `window_ok=1`, `complete=1`, not superseded), `plateau5` primary:
+
+| C | dataset | scalar | layerwise | GRAN | Q = scalar/layerwise |
+|---|---|---|---|---|---|
+| 10 | CIFAR-10 | 87.913 (n=15) | 90.919 (n=26) | +3.006 | **0.9669** |
+| 100 | CIFAR-100 | 22.776 (n=5) | 69.302 (n=8) | +46.526 | **0.3286** |
+| 200 | Tiny-ImageNet | 9.859 (n=3) | 50.835 (n=3) | +40.975 | **0.1939** |
+
+`Q(C) = Q10 * (C/10)^(-b)`, least-squares through the origin: **b = 0.5112**. Predictions:
+**Q(489) = 0.1324**, **Q(1000) = 0.0918** — reproducing the registered 0.132 and 0.092 to three
+decimals. Exponents fitted separately are **0.4687** (10->100, resolution held at 32 px) and
+**0.5363** (100->200, which also doubles resolution), agreeing to 14.4%: a single exponent in class
+count alone spans both transitions, which is the quantitative reason the driver is read as **class
+count, not resolution**.
+
+**The ingest did not move the law.** Q10 went 0.9668 -> 0.9669 despite 180 new rows entering the pool
+(the CIFAR-10 cell grew from n=12/17 to n=15/26). The registered prediction stands unaltered and
+`in489g1` remains its test.
+
+### 141.6 `c98_reproduce.py` NOW EXITS 1 — THE INGEST DID IT, AND THE FIX IS THE AUTHOR'S
+
+**This is the one item requiring a person.** Verified in both directions at this HEAD: against the
+pre-ingest CSV `c98` **exits 0**; against the post-ingest CSV it **exits 1 with 8 failed checks**.
+Nothing else changed. The script asserts the live corpus against numerals hard-coded in
+`paper/DRAFT-v4.md` and `paper/paper.tex`, so growing the corpus makes them stale **by construction**
+— the script's own note says a FAIL "means that sentence has gone stale, not that a result moved."
+
+Four are pure census: rows **2177 -> 2357**, admissible **1735 -> 1915**, runs with a wallclock
+**2162 -> 2342**, GPU-hours **1642 -> 1805.4**.
+
+Four are substantive and two of them are **in the abstract**:
+
+* **best ResNet-18/C10 MetaOptimize arm 93.317 -> 93.328**, and the arm's identity changes from
+  `i3b-3e4` to **`eb1-a06`**. Noted honestly: `eb1` **failed** its own registered bar (LIFT +0.041
+  against 1.16), yet one of its arms is now the corpus's best ResNet-18/CIFAR-10 arm — by **+0.011
+  pp**, i.e. inside noise. A failed lift and a competitive arm are not in conflict.
+* **deficit 1.807 -> 1.796** (abstract (ii), §7 T4, §9).
+* **admissible runs in the partition families 431 -> 434**, of which meta=Lion **419 -> 422**.
+
+**No claim reverses.** The scope limit the abstract must not soften still holds: the tuned
+SGD+cosine baseline is unmoved at **95.124 (se 0.047)** and the deficit is still ~1.8 pp against it.
+Only the numerals are stale.
+
+**Not fixed here, on purpose.** Closing this means editing `paper/DRAFT-v4.md` and `paper/paper.tex`,
+which is outside agent scope, and `c98`'s note requires the pair be edited together and re-run to a
+fixpoint. `git status` shows **nothing under `paper/`**; the only modified path is
+`results/all_runs.csv`.
+
+### 141.7 THE TWO NEW BATCHES, AND THE ONE STILL RUNNING
+
+`hb1` (18 jobs, `alice2`) tests the **head/backbone split** — the first mechanism the data actively
+points at, after nine died. Its `[60,2]` partition was verified **on the live model**, not assumed:
+`ResNet18_c100` has 62 parameter tensors and the head is `linear.weight`/`linear.bias`, **not `fc.*`**
+as supposed. Registered bar `CAPTURE >= 0.50`, with `mid`/`stem` controls so "m=2 helps" and "the
+*head* helps" can be told apart. 12 COMPLETED, 6 RUNNING.
+
+`lsm1` (24 jobs, `alice2`) tests whether the surviving peak is **Lion-specific**: the additive
+r-curve under meta = Adam against an in-batch Lion control. `PEAK_A >= 0.50` kills the sign account;
+`<= 0.20` licenses only "does not transfer to Adam at this cell". 11 RUNNING, 13 PENDING.
+
+`in489g1` (12 jobs, `alice`) — **8 RUNNING, 4 PENDING, 0 COMPLETED.** Job states were read; **no
+`.out` file was opened, parsed, listed by size or scored.** No verdict exists and none is claimed.
+Score it with `analysis/cI1_in489g1_score.py` run **UNEDITED** when all 12 finish.
+
+*Defect carried forward, not patched mid-flight:* `bin/_lib_guards.sh` re-assigns
+`WS=${METAOPT_WS:-/data1/salehkaleybars/metaopt}` at source time, clobbering an `alice2` launcher's
+own `WS`. `guard_postlaunch` therefore watches the wrong directory and returns UNVERIFIED. Submitted
+commands are unaffected. `tn1` hit the same bug and misattributed it to queueing. Fix by exporting
+`METAOPT_WS` before sourcing, or by stopping the library shadowing `WS` — **not while jobs are
+queued**.
