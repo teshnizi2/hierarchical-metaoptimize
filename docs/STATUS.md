@@ -1,39 +1,40 @@
 # STATUS — operator dashboard
 
-Updated 4 Sep 2026 (**cycle 117**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **141**) > `docs/FINDINGS.md` > everything else.
+Updated 4 Sep 2026 (**cycle 118**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **142**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,357 rows** (2,177 + 180 ingested this cycle).
-**`c98_reproduce.py` NOW EXITS 1** — the ingest made 8 draft numerals stale. Author fix, see CORRECTIONS 141.6.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,399 rows** (2,357 + 42 ingested this cycle: `lsm1` 24, `hb1` 18).
+**`c98_reproduce.py` STILL EXITS 1** — same 8 stale numerals as before this ingest; the 4 substantive ones did **not** move. Author fix, see CORRECTIONS 141.6 / 142.6.
 
-## Queue — re-derived from `sacct`/`squeue` at this HEAD
+## Queue — re-derived from `squeue` at this HEAD
 
-**LANDED AND INGESTED — five batches, 180 runs, all RULE 20 `VERDICT: PASS`, all scorers unedited.**
+**LANDED AND INGESTED THIS CYCLE — 2 batches, 42 runs, both RULE 20 `VERDICT: PASS`, both scorers unedited.**
 
 | batch | n | decides | verdict |
 |---|---|---|---|
-| `g4m` | 72 | r × meta-stepsize | **REFUTED** — interior peak survives ms-tuning at **+0.821 pp** (bar 0.50). Overturns the audit's central mechanism claim |
-| `tl1` | 42 | two-level shrink, as written | **NULL** both alpha0 — PEAK −0.253 / −0.819 |
-| `eb1` | 18 | empirical-Bayes / James–Stein λ | **FAILURE** — LIFT +0.041 vs bar 1.16 |
-| `a2g3` | 36 | ResNet-50 r-ladder | **UNRESOLVED** — the two alpha0 disagree; not softened |
-| `tn1` | 12 | Tiny-ImageNet granularity | **REPLICATES** — GRAN **+40.975 pp** |
+| `lsm1` | 24 | is the surviving additive interior peak Lion-specific? | **UNRESOLVED-TRUNCATED** — `PEAK_A` **+0.075** is inside the vanishing band (≤ 0.20), but the Adam argmax sits on `r=0.03`, adjacent to the unsampled `(0, 0.03)`. Matched grid {0, 0.06, 1}: Lion **+0.826**, Adam **−0.239**, `DELTA` **+1.065**. Fix = rungs at r = 0.01, 0.015 — **not a softer bar** |
+| `hb1` | 18 | does a scalar step size fail at high C because it cannot serve the head? | **REFUTED-SMALL** — `SPEC` **−0.1753**. Head `[60,2]` captures **+0.0412** of the 46.904 pp gap; the arbitrary `[31,31]` midpoint captures **+0.2165**, five times more |
 
 **IN FLIGHT — nothing complete, nothing scored, no verdict claimed.**
 
 | account | batch | jobs | done | run | pend | decides | score with |
 |---|---|---|---|---|---|---|---|
-| `alice2` | `hb1` | 18 | 12 | 6 | 0 | head/backbone m=2 split; bar CAPTURE ≥ 0.50 | `cH1_hb1_score.py` |
-| `alice2` | `lsm1` | 24 | 0 | 11 | 13 | is the peak Lion-specific? meta = Adam r-curve | `cA3_lsm1_score.py` |
+| `alice2` | `cbl1` | 33 | **0** | 5 | 28 | count ladder m = 1…62 **and** balance ladder at m=2 | `cJ1_cbl1_score.py` (`727eeca`) |
 | `alice` RO | `in489g1` | 12 | **0** | 8 | 4 | ImageNet-489 granularity ladder | `cI1_in489g1_score.py` |
 
-**`in489g1` WAS NOT LOOKED AT.** Job states only; no `.out` opened, parsed or scored. Nothing
-submitted or cancelled on `alice` — read-only.
+**`in489g1` WAS NOT LOOKED AT.** Job states only; no `.out` opened, parsed, listed by size or scored.
+Nothing submitted or cancelled on `alice` — read-only.
+
+**`cbl1` RULE 20 is a PARTIAL and the debt is open.** 5 of 33 jobs have written an ARGS line; all 5
+audit clean (`argsline_guard.py` unedited, `VERDICT: PASS`). **Re-run the full 33-file audit before
+scoring.** Zero `cbl1` rows are in the corpus. ETA ≈ 4 h at ~5 concurrent GPU slots.
 
 **Class-count law** (`docs/REGISTER-class-count-law.md`, `65ba0d0`, registered with **0** `in489g1`
-runs complete). Re-derived from the corpus this cycle, not from its own registration:
-Q = scalar/layerwise on `plateau5` = **0.9669** (C=10) · **0.3286** (C=100) · **0.1939** (C=200);
-`Q(C) = Q10·(C/10)^(−0.5112)` predicts **Q(489) = 0.132**, falsified above **0.60**. The ingest did
-not move it (Q10 0.9668 → 0.9669). `in489g1` is its test.
+runs complete). Re-derived from the corpus at this HEAD under the register's own predicate (130
+matched rows), not from its registration: Q = scalar/layerwise on `plateau5` = **0.9669** (C=10) ·
+**0.3284** (C=100) · **0.1939** (C=200); least-squares b = **−0.5194** gives **Q(489) = 0.128**,
+inside the registered **[0.05, 0.30]**, far below FALSIFIED (> 0.60) and DECISIVELY FALSIFIED
+(≥ 0.95). This ingest moved it by **0.0001** (0.1283 → 0.1282). `in489g1` is its test.
 
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
@@ -42,25 +43,25 @@ not move it (Q10 0.9668 → 0.9669). `in489g1` is its test.
 | | |
 |---|---|
 | Q1 meta-gate | **DESK-ACCEPT, 9/10, `structural_gaps = []`, `passed = True`, 0 blocking.** Returned at cycle 111 on v8 (CORRECTIONS 135). **Carried, not re-derivable here** — the gate tool is not in this tree |
-| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, all caused by this cycle's ingest (corpus 2,177 → 2,357); **exit 0 on the pre-ingest CSV, verified both ways**. 4 are census counts, 4 substantive (best R18/C10 arm 93.317 → **93.328**, now `eb1-a06`; deficit 1.807 → **1.796**; partition-family rows 431 → **434**, Lion 419 → **422**). **No claim reverses** — baseline unmoved at 95.124 (se 0.047), deficit still ~1.8 pp. Fix = edit both markups; **author scope**, see CORRECTIONS 141.6. Census at fixpoint **628 / 411 / 982 / 41.9%** |
-| tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens, all pre-existing, 0 new.** Three of the eight were closed this cycle |
+| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
+| tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours** (the 178.2 GPU-h in flight is the NEXT cycle's science, not this manuscript's) |
+| GPU to reach submission | **0 jobs, 0 hours.** The 45 jobs in flight (`cbl1` 33 + `in489g1` 12) are the NEXT cycle's science, not this manuscript's |
 
-**Ready to submit: NO** — not for any manuscript defect, for the six author items.
+**Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 
 ## Mechanical verification — commands run at this HEAD
 
 | check | result |
 |---|---|
-| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals after the ingest, not a moved result. Same script on the pre-ingest CSV: **exit 0**. See CORRECTIONS 141.6 |
+| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals, not a moved result. **The same 8 as before this cycle's ingest**, verified by restoring the pre-ingest CSV (which also exits 1; it exited 0 only against the 2,177-row corpus of cycle 116). This cycle moved only the 4 census counts; the 4 substantive numerals are bit-identical. See CORRECTIONS 141.6 / 142.6 |
 | census fixpoint (measured on `DRAFT-v4.md`, asserted against both markups) | **628 / 411 / 982 / 41.9%** — **unmoved by Plan C, as designed** |
 | census internals | raw `\d+\.\d+` 3067 → **3098**, distinct **1007** (unchanged); quantities 2614 → **2615**, distinct **982** (unchanged). The `+1` is the Markdown heading numeral `1.2`; `1.2` already occurred twice as a quantity, so the asserted denominator did not move. `n_q` is asserted by nothing |
 | `python3 analysis/xref_check.py` | exit 0, **596 references** (section 500, table 51, figure 22, appendix 23), **0 unresolved, 0 stale**, 8 allowlisted parent-paper refs on lines `[41, 43, 45, 287, 291, 294, 295, 297]` |
 | `python3 analysis/test_fence_mask.py` | **ALL PASS** |
 | `python3 analysis/paper_numeric_diff.py` | **exit 1 — and exit 1 IS the green state.** 2,606 tex numerals (994 distinct) vs 2,607 md (994 distinct); **2 tex-only** (`0.05`, `3.0`), **3 md-only** (`0.087`, `0.279`, `3.19`) |
 | `tectonic -X compile paper.tex`, clean copy of `paper/` | exit 0, **76 pp**, **0** TeX errors, **0** undefined, **0** `??` in the extracted PDF text, **75 labels / 75 distinct refs, 0 orphan, 0 dangling, 0 duplicate**, **2** `Overfull \hbox` (7.28497 pt, 12.25499 pt — the same two as before Plan C, no third) |
-| `python3 analysis/dup_group_guard.py` | **21 groups, 42 rows stamped, 3 superseded — PASS** |
+| `python3 analysis/dup_group_guard.py` | **21 groups, 42 rows stamped, 3 superseded — PASS**, unmoved by the 42-row ingest (RULE 22) |
 | `python3 analysis/c99_hz3q_score.py --selftest` | **59/59 PASS** |
 | `c99` gates, raw records supplied | **H0 PASS** (all four arms `NVIDIA L4` / `-30:9.0` / seed 5 / 300 ep) · **H1 PASS** worst coordinate fraction **0.000000**, bar 0.05 · **H2** repaired `-0.238 / 0.093 / -2.57` → **NOT FLAT, D DECLINES WITH BUDGET** · **H3** repaired `D(300) +0.394 / 0.093 / +4.25`, `G(300) -0.048` · **HC** `+0.134 pp`, bar 1.00 → GPU class not first-order on the level. RULE 13 still refuses the archive on both GPU model and `beta_clip` |
 | `c87_hz3_score.py` unedited | **VERDICT: SURVIVES** · **MECHANISM SURVIVES THE HORIZON** · `D(300)-D(100) = +0.229` → **GROWS** · `grep -c hz3q` = **0** |

@@ -10530,3 +10530,135 @@ own `WS`. `guard_postlaunch` therefore watches the wrong directory and returns U
 commands are unaffected. `tn1` hit the same bug and misattributed it to queueing. Fix by exporting
 `METAOPT_WS` before sourcing, or by stopping the library shadowing `WS` — **not while jobs are
 queued**.
+
+## 142. `lsm1` LANDS UNRESOLVED-TRUNCATED, `hb1`+`lsm1` INGESTED, `cbl1` CLEAN IN FLIGHT
+
+Cycle 118. One registered verdict landed, 42 runs ingested, one batch audited mid-flight, one batch
+deliberately not looked at. **Nothing requiring a person is new** — the single open operator item is
+still 141.6, and this cycle did not make it worse.
+
+### 142.1 `lsm1` — THE VERDICT, QUOTED FROM THE SCORER RUN UNEDITED
+
+All 24 jobs reached `RUN_DONE`; the queue holds no `lsm1` job. `analysis/cA3_lsm1_score.py` was run
+with its documented arguments (`--runs /home/s5014158/metaopt/runs --probes .../runs/lsm1`) and
+**unedited** — `md5 f470bfa0c5fedba7efb0da02521c29be`, identical on the Mac and on `alice2`,
+`git status` clean on both, registered at `adf8584` before any `lsm1` run existed (RULE 21/16).
+
+> ```
+> VERDICT: UNRESOLVED-TRUNCATED
+>   PEAK_A is inside the vanishing band, but the Adam argmax sits on the rung adjacent to the
+>   unsampled interval (0, 0.03), so a taller peak may be hidden there and the vanishing is not
+>   established.  Reported as UNRESOLVED; the fix is rungs at r = 0.01 and 0.015, not a softer bar.
+> ```
+
+Gates first: G0 admitted 24/24 with 8/8 cells populated; G1 no-op controls PASS both metas
+(Adam +0.136 in a ±0.7518 band, Lion +0.047 in ±0.3913); G4 noise PASS (this batch's within-cell
+SD 0.1673 against a 0.2876 ceiling); G3 manifold PASS (Lion `PEAKm` +0.826 against bar 0.50).
+
+**Re-derived independently from the freshly ingested corpus, not read off the scorer** — the two
+agree to the printed decimal:
+
+| meta | r=0 | r=0.03 | r=0.06 | r=0.2 | r=1 |
+|---|---:|---:|---:|---:|---:|
+| Adam | 91.421 | **91.497** | 91.182 | 91.066 | 90.669 |
+| Lion | 92.264 | — | **93.090** | — | 90.974 |
+
+`PEAK_A` = best interior − best endpoint = **+0.075 pp**, inside the registered vanishing band
+(≤ 0.20). On the **matched** sub-grid {0, 0.06, 1}, which rests on no asymmetry between the two
+metas, `PEAKm(Lion)` = **+0.826** and `PEAKm(Adam)` = **−0.239**, so `DELTA` = **+1.065 pp**.
+
+**What this does and does not decide.** It does **not** close the question the batch was built to
+close. The honest reading is: the interior peak **does not transfer to Adam at this cell**, and the
+matched-grid contrast is large and in the predicted direction — but the registered primary refuses
+to call it a vanishing, because the Adam argmax landed on `r=0.03`, the rung adjacent to the
+unsampled interval `(0, 0.03)`, and a taller peak could sit inside it. G2 is asymmetric by
+construction: `PEAK_A` is a **lower** bound with both endpoints sampled exactly, so truncation can
+overturn a VANISHES and never a SURVIVES. **The bar was not softened and the secondary was not
+promoted.** The named fix is two more rungs at r = 0.01 and 0.015, not a re-read of this batch.
+
+### 142.2 THE INGEST — 2,357 → 2,399, ZERO PRE-EXISTING ROWS TOUCHED
+
+`aggregate.py ../runs ../runs_alice2` **THEN** `args_repair.py --apply`, in that order.
+
+Proved reproducible **before** anything new was added: regenerating from the unchanged mirrors and
+applying the repair returns the committed CSV **bit-for-bit** (`md5 686f68a5…` both sides). Only then
+were the 42 `.out` files pulled, so the entire delta is attributable to them.
+
+Keyed on `(run, job_id)`, unique on both sides: **0 pre-existing rows missing, 0 changed, 42 added** —
+`lsm1` 24, `hb1` 18. Header unchanged at **38** columns; the duplicate-name warning is the same 3
+pairs; `args_repair` touched the same 36 `dup_group` rows. All 42 new rows are `complete=1`,
+`window_ok=1`, `collapsed=0`, with `plateau5` present. Mirror `runs_alice2` went 991 → 1,033 `.out`.
+
+**Zero `cbl1` rows entered the corpus** — that batch is still running and was not pulled.
+
+`hb1` re-derives from the corpus exactly as its own scorer reported it, which is the point of
+ingesting it: scalar **22.841**, `[2,60]` stem 22.709, `[60,2]` head 24.775, `[31,31]` mid 32.995,
+`resnet18_blocks` 53.261, layerwise **69.745**. Capture of the scalar→layerwise gap (46.904 pp):
+head **+0.0412**, stem −0.0028, mid **+0.2165**, blocks +0.6486. `SPEC` = head − max(control) =
+**−0.1753**. REFUTED-SMALL stands.
+
+### 142.3 RULE 20 — THREE BATCHES, ALL `VERDICT: PASS`
+
+`analysis/argsline_guard.py` run **unedited** on each:
+
+| batch | files audited | clean | repeated flag / design mismatch | no ARGS line | verdict |
+|---|---:|---:|---:|---:|---|
+| `hb1` | 18 | 18 | 0 | 0 | **PASS** |
+| `lsm1` | 24 | 24 | 0 | 0 | **PASS** |
+| `cbl1` | 5 (of 33; the rest have not started) | 5 | 0 | 0 | **PASS** |
+
+**Nothing was cancelled.** `cbl1`'s audit is a partial by necessity — only 5 of 33 jobs have written
+an ARGS line — and the RULE 20 obligation on the other 28 is **carried open**, to be discharged
+before scoring. The bracket group-size strings survive `sbatch → runner → argparse` verbatim
+(e.g. `--stepsize-groups [4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3]`).
+
+### 142.4 `in489g1` — JOB STATES ONLY, STILL
+
+**8 RUNNING, 4 PENDING, 0 COMPLETED** on `alice`. No `.out` file was opened, parsed, listed by size
+or scored; `cI1_in489g1_score.py` was **not run**, and no verdict exists or is claimed. Nothing was
+submitted or cancelled on `alice`. Longest elapsed 10:48:07.
+
+**The registered prediction was not touched, and the ingest did not move it.** Re-derived from the
+corpus at this HEAD under the register's own predicate (130 matched rows):
+Q = scalar/layerwise on `plateau5` = **0.9669** (C=10, n 15/26) · **0.3284** (C=100, n 8/11) ·
+**0.1939** (C=200, n 3/3). Least-squares slope of log Q on log C gives b = **−0.5194** and
+**Q(489) = 0.128**. Pre-ingest the same computation gives 0.1283 — the 42 new rows moved the
+prediction by **0.0001**. Comfortably inside the registered interval **[0.05, 0.30]**, and far below
+the FALSIFIED band (> 0.60) and the DECISIVELY FALSIFIED band (≥ 0.95).
+
+*Two bookkeeping notes, neither affecting any claim.* (i) `lsm1`'s 24 CIFAR-10 rows do **not** enter
+this pool — they carry a non-empty `hier`, which the register's predicate excludes — so only `hb1`'s
+CIFAR-100 rows touched it, growing three cells by +3 each. (ii) The register's headline **0.132** was
+fitted on the 2,177-row corpus it was pinned to; at this HEAD the same fit returns **0.128**. Both
+sit inside the interval and the registration is unchanged. Separately, CORRECTIONS **141** labels the
+exponent `0.5363` as the `100→200` step; it is in fact the `10→200` step (the true `100→200` pairwise
+slope is `−0.7601`). The register's own three-exponent span `[0.120, 0.156]` reproduces exactly from
+{10→100, 10→200, least-squares} = {0.1560, 0.1200, 0.1282}, confirming the mislabel is in 141's
+prose and not in the registration.
+
+### 142.5 `cbl1` IN FLIGHT — 5 RUNNING, 28 PENDING, 0 COMPLETE
+
+The count/balance ladder (33 jobs, `alice2`, scorer `cJ1_cbl1_score.py` registered at `727eeca`
+before submission). Nothing scored, no `plateau5` read, no verdict claimed. The 5 started jobs are
+mid-run (epochs 50–77 of 100). At ~5 concurrent GPU slots and ~45 min per job the batch needs roughly
+another 4 hours.
+
+### 142.6 `c98_reproduce.py` — STILL EXIT 1, AND THIS INGEST BROKE NOTHING NEW
+
+Run at this HEAD: **exit 1, 8 checks failed** — *the same 8, on the same claims, as before this
+cycle's ingest.* Verified in both directions by restoring the pre-ingest CSV and re-running.
+
+The four **substantive** numerals are **bit-identical across the ingest**: best ResNet-18/C10 arm
+**93.328** (paper 93.317), deficit **1.796** (paper 1.807), partition-family rows **434** (paper 431),
+of which meta=Lion **422** (paper 419). This cycle moved only the four pure census counts further:
+rows 2,357 → **2,399**, admissible 1,915 → **1,957**, runs with a wallclock 2,342 → **2,384**,
+GPU-hours 1,805 → **1,833**.
+
+So 141.6 remains the single open operator item and is **not aggravated**: no new claim went stale,
+and no result moved. The fix is still to edit `paper/DRAFT-v4.md` and `paper/paper.tex` together and
+re-run to a fixpoint — **author scope**. `git status` shows **nothing under `paper/`**; the only
+modified path is `results/all_runs.csv`.
+
+*Defect still carried, still not patched mid-flight:* `bin/_lib_guards.sh` re-assigns
+`WS=${METAOPT_WS:-/data1/salehkaleybars/metaopt}` at source time. Export `METAOPT_WS` before sourcing,
+or stop the library shadowing `WS` — **not while `cbl1` is queued.**
