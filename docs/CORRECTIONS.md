@@ -10662,3 +10662,57 @@ modified path is `results/all_runs.csv`.
 *Defect still carried, still not patched mid-flight:* `bin/_lib_guards.sh` re-assigns
 `WS=${METAOPT_WS:-/data1/salehkaleybars/metaopt}` at source time. Export `METAOPT_WS` before sourcing,
 or stop the library shadowing `WS` — **not while `cbl1` is queued.**
+
+## 143. cbl1 -- THE COUNT LADDER IS UNRESOLVED AND THE BALANCE STATISTIC DISQUALIFIED ITSELF
+
+33 runs, CIFAR-100 / ResNet18_c100 / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 ep, ONE batch so every
+contrast is within-batch.  RULE 20: 33 clean, 0 repeated flags, VERDICT PASS -- this discharges the
+partial-audit debt CORRECTIONS 142.3 left open.  Scored by analysis/cJ1_cbl1_score.py, registered at
+727eeca BEFORE any cbl1 run existed, run UNEDITED.
+
+**THE MIRROR CONTROL FIRED, AND IT KILLED THE BATCH'S OWN REGISTERED STATISTIC.**
+    arm   spec        B         capture
+    b45   [45,17]     0.84742   +0.4202
+    c02   [31,31]     1.00000   +0.2159
+    b17   [17,45]     0.84742   +0.0679
+    b60   [60,2]      0.20559   +0.0451
+    b55   [55,7]      0.50861   +0.0107
+`[45,17]` and `[17,45]` have **IDENTICAL normalised entropy** and differ by **+16.539 pp, se 0.799,
+t +20.71 (df 4)**, i.e. capture 0.4202 vs 0.0679.  The scorer's own words:
+
+    R5 MIRROR-BREAK: Normalised entropy is NOT the operative variable here; cut POSITION is.
+    The registered statistic is DISQUALIFIED as an explanation and is NOT replaced by a
+    better-fitting one.
+
+That refusal is the point.  The mirror arm b17 was added by the submitting agent BEYOND the briefed
+design, precisely because balance and cut position are perfectly collinear at m=2 with contiguous
+groups; without it the registered statistic could not have been tested against its only serious
+rival inside the batch, and entropy would have "explained" the ladder while being wrong.
+
+**VERDICTS.**  COUNT: `COUNT-LAW-UNRESOLVED-BALANCE-COMPARABLE` -- BAL_RANGE 0.4095 against
+CNT_RANGE 0.7841, ratio 0.522, above the 0.500 UNRESOLVED threshold and below the 1.000 that would
+have made balance dominate.  BALANCE: `BALANCE-MATTERS`.
+
+**WHAT SURVIVES IS SHARPER THAN EITHER HYPOTHESIS, AND IS ASYMMETRIC IN DEPTH.**  Cutting at tensor
+45 -- isolating the LAST ~17 tensors -- captures 42% of a 46.5 pp gap.  The mirror captures 7%.
+Isolating only the final 2 (the head hypothesis, REFUTED at CORRECTIONS 142) captures 4.5%.  So the
+operative variable is neither group count nor size balance: the LATE layers need their own step
+size.  No optimum in m is named here -- CAPTURE is 0 at m=1 and 1 at m=62 BY CONSTRUCTION.
+
+**DESCRIPTIVE, never gating.**  LOG law (log m / log 62) RMSE 0.0743, inside the +-0.15 band at
+every m -- NOT REJECTED.  LIN law (m-1)/61 RMSE 0.3236, outside the band at m = 2,4,8,16,32 --
+REJECTED.  M90 = 32.  The TRAIN ladder is monotone with a largest adjacent drop of 0.0000
+(TRAINCAP 0.000/0.187/0.286/0.329/0.702/0.952/1.000 at m = 1..62; train5 22.840 -> 98.957),
+consistent with CORRECTIONS 141's train-side finding.
+Cross-batch and gating nothing: cbl1's [31,31] capture +0.2159 against hb1's +0.2165 (-0.0006) and
+[60,2] +0.0451 against +0.0412 (+0.0039), so the two batches agree where they overlap.
+
+**INGEST.**  2,399 -> 2,432 rows.  Pipeline proved BIT-IDENTICAL on the unchanged mirrors before
+any .out was pulled, so the whole delta is attributable to the new runs: 33 added, **0 changed,
+0 removed**.  `aggregate.py` THEN `args_repair.py --apply` (36 dup_group rows, the same 36 as
+baseline).  dup_group_guard: 21 groups / 42 rows / 3 superseded, VERDICT PASS (RULE 22).
+
+**SCOPE.**  CIFAR-100 only.  HIER unset in all 33 runs, so this says nothing about any
+hierarchical or shrinkage operator, about the interior r-peak, or about whether the optimum in m
+moves with class count -- that last rests on cross-batch CIFAR-10 pools one CIFAR-100 batch cannot
+settle.
