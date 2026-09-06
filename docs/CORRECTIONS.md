@@ -10894,3 +10894,104 @@ jobs projects **348.5 GPU-h**, worst case 476 at the 34 h cap.  `cbl1`'s 33 runs
 42.0 min** (min 30.9, max 48.5) -> `cpk1` at 39 jobs projects **27.3 GPU-h**, worst case 97.5.
 **Cycle total 375.8 GPU-h projected, 573.5 worst case.**  A is ~93% of the spend, which is why its
 GPU-hours went to rungs rather than seeds.
+
+## 146. `cpk1` LANDS -- CUT POSITION IS THE OPERATIVE VARIABLE, AND THE PRE-REGISTERED RIVAL WON
+
+Cycle 122.  39/39 complete, 0 failures.  Scorer `analysis/cK1_cpk1_score.py` run UNEDITED
+(sha256 `9d82f309bed13499e05f75e0…`, identical on the Mac and alice2, matching the digest frozen
+at registration commit `3c3419e`, 155 s before the first job was submitted).  RULE 20:
+`argsline_guard` = **39 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line,
+VERDICT PASS**; batch-consistency confirms every non-axis flag identical across all 39.
+All five gates pass: G0 provenance 39/39, G1 partition manifest (62 tensors / 11,220,132 params,
+all 11 specs compose in sizes AND parameter counts), G2 completeness, G3 archive band
+(k01 −0.059 pp, k62 +0.235 pp), G4 manifold gap +46.990 pp.
+
+### 146.1 THE VERDICT, QUOTED VERBATIM
+
+    VERDICT (the SHAPE):            POSITION-SINGLE-PEAKED
+    VERDICT (the BOUNDARY account): BOUNDARY-REFUTED
+    VERDICT (the PARAM-BAL rival):  PARAM-BALANCE-FAVOURED
+    FINAL: SHAPE POSITION-SINGLE-PEAKED | BOUNDARY BOUNDARY-REFUTED
+           | PARAM-BAL PARAM-BALANCE-FAVOURED | REPLICATION CBL1-ORDER-REPLICATES
+
+### 146.2 THE SIX REGISTERED PREDICTIONS, SCORED
+
+    P1  argmax k* = 45 (layer3|layer4 stage boundary)   REFUTED  (X3)
+    P2  single-peaked                                    HELD
+    P3  CAPTURE < 0.10 at every k >= 52                  REFUTED  (k=52 is +0.3324)
+    P4  RANGE >= 0.30                                    HELD     (0.6826)
+    P5  the parameter-balance rival LOSES (k* != 49)     REFUTED  (k* = 49 exactly)
+    P6  both mirror pairs break                          HELD
+
+Three of six refuted.  **P5 is the one that matters.**  Parameter balance was named in advance as
+the single rival mechanism *because* it predicted a different grid point (49, not 45), could be
+stated without cpk1 data, and was already losing on cbl1's five points.  It was registered so that
+agreement would be a surprise rather than a confirmation.  It agreed, exactly.  This is the first
+pre-registered mechanism in the campaign to survive its own test; twelve earlier candidates did not.
+
+### 146.3 THE CURVE
+
+    k    spec      plateau5  se      CAPTURE   param share of the COARSE group
+    01   scalar    22.721    0.451   0.0000    --
+    17   [17,45]   25.949    0.280   +0.0687   0.01994
+    24   [24,38]   27.416    0.501   +0.0999   0.03386
+    31   [31,31]   33.009    0.338   +0.2190   0.08648
+    38   [38,24]   35.951    0.444   +0.2815   0.14208
+    42   [42,20]   41.072    0.212   +0.3905   0.19472
+    45   [45,17]   42.239    0.625   +0.4154   0.24733
+    47   [47,15]   45.688    0.529   +0.4888   0.35251
+    49   [49,13]   55.447    0.148   +0.6965   0.56283   <- ARGMAX
+    52   [52,10]   38.342    0.653   +0.3324   0.57461
+    55   [55,7]    23.372    0.590   +0.0139   0.78497
+    60   [60,2]    24.719    0.547   +0.0425   0.99543
+    62   layerwise 69.711    0.228   +1.0000   --
+
+RANGE 0.6826 (X1 fires below 0.10 -- nowhere near).  PEAK SET = {49} alone.  Half-maximum span
+7 tensors: the hump covers k in [42,49].  **Position is settled as the operative variable**: both
+mirror pairs break at identical normalised entropy -- k=17 vs k=45 at B=0.84742 differ by 16.290 pp
+(t +23.78), k=24 vs k=38 at B=0.96290 by 8.535 pp (t +12.75).
+
+### 146.4 THE FINDING THE SCORER DID NOT REGISTER, RECORDED AS DESCRIPTIVE
+
+The step k=49 -> k=52 is **-0.3640 CAPTURE, -17.105 pp, t -25.55 (df 4)** -- capture halves.  But
+those two arms differ by only **0.0118 of parameter share** (0.56283 vs 0.57461).  Three tensors
+carrying 132,096 parameters -- 2.7 % of the fine group -- move from the fine group to the coarse
+one, and half the benefit disappears.
+
+So parameter balance predicts **where** the argmax sits and does **not** explain the **shape**
+around it: a mechanism operating on the parameter split alone cannot produce a 36-point collapse
+from a 1.2-point change in that split.  This is DESCRIPTIVE.  It was not registered, the comparison
+is not matched on anything, and it may not be promoted to a finding.  It is the obvious next test.
+
+### 146.5 CROSS-BATCH REPLICATION
+
+Five of cbl1's cut positions were re-run here in a fresh batch.  Batch is the unit of replication
+(F(62,85)=5.47, p 6.9e-13), so only the ORDER of the seven separated pairs was a registered test --
+and it holds (CBL1-ORDER-REPLICATES).  The magnitudes, which gate nothing, agree to within 0.005
+CAPTURE at every shared point (k=17 +0.0687/+0.0679, k=31 +0.2190/+0.2159, k=45 +0.4154/+0.4202,
+k=55 +0.0139/+0.0107, k=60 +0.0425/+0.0451).  Anchors: cpk1 22.721/69.711 vs cbl1 22.725/69.669.
+
+### 146.6 TRAIN SIDE
+
+TRAIN argmax k=49 = TEST argmax k=49 (T1 not triggered).  train5 anchors 22.866 -> 98.972 (span
+76.106 pp).  The coarse-arm failure remains train-side: k01 fits 22.9 % of its own training set
+where layerwise fits 99.0 %.
+
+### 146.7 INGEST
+
+`aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` **THEN** `args_repair.py --apply`.
+**39 added, 0 changed, 0 removed**; 2,444 -> 2,483 rows.  args_repair applied its usual 36
+dup_group rows.  METHOD NOTE, recorded because it nearly produced a phantom ingest: `aggregate.py`
+writes to **stdout**, not to the CSV.  Redirecting it to a log file leaves the corpus untouched and
+the subsequent "0 pre-existing rows changed" check passes **vacuously**.  The diff must be read for
+`added`, not only for `changed`.
+
+### 146.8 SCOPE
+
+CIFAR-100 / ResNet18_c100 / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 ep.  Every sweep arm has m=2;
+the anchors are anchors, not rungs.  This batch says NOTHING about group COUNT, about
+`resnet18_blocks`, about CIFAR-10 / Tiny-ImageNet / ImageNet-489 / ResNet-50, about any other
+meta-stepsize or optimiser pair, or about any hierarchical operator (HIER unset in every arm).  It
+locates a curve in cut position k for ONE architecture in ONE `named_parameters()` order; a
+different ordering of the same network is a different experiment.  Normalised entropy stays
+DISQUALIFIED (cbl1 R5) and is NOT rehabilitated here whichever way it falls.

@@ -1,33 +1,50 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 121**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **145**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 122**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **146**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,444 rows**, **unchanged this cycle** (nothing landed, nothing ingested).
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,483 rows** (+39 `cpk1` this cycle; **0 changed, 0 removed**).
 **`c98_reproduce.py` STILL EXITS 1** — the same 8 stale numerals as at CORRECTIONS 141.6 / 142.6, proved inherited (`git diff 94c6e4f..HEAD` over `paper/`, `results/`, `c98` = **0 files**). Author fix.
 
 ## Queue — re-derived from `squeue` / `sacct` at this HEAD
 
-**NOTHING LANDED THIS CYCLE. NO VERDICT IS CLAIMED. 0 rows ingested.**
+**`cpk1` LANDED — 39/39, verdict below. `in489g2` still running. 39 rows ingested (2,444 → 2,483).**
 
-**IN FLIGHT — 53 jobs, 2 batches, both registered before any run existed.**
+**`cpk1` — CIFAR-100 cut-position sweep, m=2. CORRECTIONS 146.**
+
+| verdict | |
+|---|---|
+| SHAPE | **POSITION-SINGLE-PEAKED** |
+| BOUNDARY account | **BOUNDARY-REFUTED** |
+| PARAM-BALANCE rival | **PARAM-BALANCE-FAVOURED** ← the rival named in advance WON |
+| replication of `cbl1` | **CBL1-ORDER-REPLICATES** |
+
+| prediction | outcome |
+|---|---|
+| P1 argmax k*=45 (stage boundary) | ❌ REFUTED |
+| P2 single-peaked | ✅ HELD |
+| P3 capture < 0.10 at k ≥ 52 | ❌ REFUTED (k=52 is +0.332) |
+| P4 range ≥ 0.30 | ✅ HELD (0.683) |
+| P5 parameter balance LOSES (k* ≠ 49) | ❌ REFUTED — k* = 49 exactly |
+| P6 both mirror pairs break | ✅ HELD |
+
+- **Argmax k\* = 49**, capture **+0.6965**, plateau5 **55.447** — inside `layer4.0`, *not* at the `layer3|layer4` boundary.
+- **Position is settled as the operative variable.** Both mirror pairs break at identical normalised entropy: k=17 vs 45 at B=0.84742 → 16.290 pp (t +23.78); k=24 vs 38 at B=0.96290 → 8.535 pp (t +12.75).
+- **First pre-registered mechanism in the campaign to survive its own test.** Twelve earlier candidates did not. It was registered *because* it predicted a different grid point, so agreement is a surprise, not a confirmation.
+- **The shape is not explained by it** (descriptive, not registered): k=49 → k=52 loses **−0.364 capture (t −25.55)** on a parameter-share change of only **0.0118**. Three tensors holding 2.7 % of the fine group's parameters carry half the benefit. That is the next test.
+- Gates: G0 39/39 · G1 manifest exact in sizes AND parameter counts · G2 complete · G3 anchors −0.059 / +0.235 pp · G4 gap +46.990 pp.
+
+**IN FLIGHT — 14 jobs.**
 
 | account | batch | jobs | run | pend | done | decides | score with |
 |---|---|---|---|---|---|---|---|
 | `alice` | `in489g2` | 14 | 8 | 6 | 0 | **where** ImageNet-489 crosses CAPTURE 0.5 on `m` in (6,62) | `cI2_in489g2_score.py` (`571707b`) |
-| `alice2` | `cpk1` | 39 | 12 | 27 | 0 | **whether** cut POSITION, not count, is operative at fixed m=2 | `cK1_cpk1_score.py` (`3c3419e`) |
 
-| batch | arms | seeds | ETA (all jobs) |
-|---|---|---|---|
-| `in489g2` | `g01` scalar · `g08` · `g16` · `g32` · `g45` · `g62` layerwise · **`p08` position control at m=8** | 2 | **~2 days** — seed-0 wave ≈ 06:00 7 Sep; seed-1 wave gated behind the 8-GPU `QOSMaxGRESPerUser` cap |
-| `cpk1` | `k01` scalar · `[k,62-k]` for k ∈ {17,24,31,38,42,45,47,49,52,55,60} · `k62` layerwise | 3 | **~2–3 h** — ≈ 07:30–08:00 6 Sep at 12-way concurrency |
+- `in489g2` pace: ~19 min/epoch under 8-way contention (vs `in489g1`'s 15.9 min) → ~27 h/run, inside the 34 h wall. seed-0 ≈ 06:00 7 Sep; seed-1 gated behind the 8-GPU `QOSMaxGRESPerUser` cap.
+- **`p08` is the arm that matters**: same m as `g08`, different cut. Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. It exists because `cbl1`'s mirror arm did exactly that to its balance statistic (CORRECTIONS 143) — and `cpk1` has now confirmed that position dominates, so R2 is a live risk, not a formality.
+- Pre-registered for `in489g2`: M50 ∈ [16,62], point 38.70 (CIFAR-100 crosses at 9.30 → the ladder is predicted to move RIGHT with class count).
 
-- **Both batches carry their own anchors IN BATCH.** Batch is the unit of replication (F(62,85)=5.47, p 6.9e-13); seed is null (F(11,1976)=0.152). Nothing spliced from `in489g1` or `cbl1`.
-- **`in489g2`'s `g08`/`g16`/`g32` are `cbl1`'s spec strings byte-for-byte** — the two ladders share a grid, so the cross-dataset claim is a comparison, not an interpolation.
-- **`p08` is the arm that matters**: same m as `g08`, different cut (B 0.53636 vs 0.99923). Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. This exists because `cbl1`'s mirror arm did exactly that to its balance statistic (CORRECTIONS 143).
-- Pre-registered: **A** M50 ∈ [16,62], point 38.70 (CIFAR-100 crosses at 9.30 → ladder predicted to move RIGHT with class count). **B** single-peaked, argmax k*=45 (the layer3\|layer4 stage boundary), parameter-balance rival (k*=49) predicted to LOSE.
-
-**RULE 20 — PASS, BUT PARTIAL: 20 of 53 audited. DEBT OPEN.**
+**RULE 20 — `cpk1` DEBT RETIRED (39/39 PASS). `in489g2` 8/14, reopens when its 6 pending jobs start.**
 
 | account | audited | result |
 |---|---|---|
