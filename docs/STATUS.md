@@ -1,19 +1,81 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 130**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **154**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 131**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **155**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 rows, UNCHANGED this cycle — nothing ingested**. `cfr2` (launched) and `cts3` are **in flight, 0 rows**; `in489g2` is **not ours**.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,549 rows (+12 this cycle: `cfr2` ONLY)**. `cts3` finished 6/6 during this cycle and was **deliberately NOT ingested** (its own registered scorer, out of this cycle's scope, and pulling it would have broken the clean 12-row diff); `in489g2` is **not ours**.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**This cycle LAUNCHED `cfr2` (12 jobs, NOT landed, NOT scored, NOT ingested) and RE-DERIVED MASTER-TABLE row 24's four falloff numerals with a committed scorer.** CORRECTIONS **154**. **MASTER-TABLE row 24 WAS EDITED** — falloff clause replaced, CORRECTIONS 154 annotation appended; the row's verdict stays **CONFIRMED on its SENTENCE**. The numeral question and the ordering question were scored **separately and do not agree**: the ordering **holds at 2 SE**, **3 of 4 numerals AGREE**, **`nodewise` does not** (−1.840).
+**This cycle LANDED, SCORED and INGESTED `cfr2`.** CORRECTIONS **155**. Registered verdict **`ROW24-3E4-SURVIVES`** — **the label is accepted, its sentence is REFUSED.** The wall-**driven** account is refuted at **7.87 SE**; the floor's contribution to the gap is **bounded above by 24.6% (95% CI), point 9.83% — not excluded**, and `ATTENUATED` is only **0.70 SE** away. **The cycle's real finding is that the registered NEGATIVE CONTROL is not a control:** all **3/3 clamped SCALAR** runs reach exactly −15.0000 and are pinned **5.7×** harder than layerwise at the coordinate denominator, and the scalar arm supplies **100% of the `DID`**. **MASTER-TABLE row 24 WAS EDITED** — numerals re-stamped to the post-`cfr2` corpus and a CORRECTIONS 155 annotation appended; verdict stays **CONFIRMED on its SENTENCE**, threat status stays **CONSTRAINED**.
 
-## Cycle 130 — the three deliverables
+## Cycle 131 — the deliverables
 
 | # | deliverable | outcome |
 |---|---|---|
-| 1 | `cfr2` — one-factor floor release at **`ms=3e-4`** | **LAUNCHED**, 12 jobs, ONE submission. RULE 21 **114 s**, RULE 20 **PASS**, ENV audit **7/7**. Not landed |
-| 2 | `cQ1` — row 24's falloff numerals on `plateau5` | **SCORED**, 38/38 selftests. Sentence **CONFIRMED**, numerals **CORRECTED**, provenance **defective** |
-| 3 | `docs/MASTER-TABLE.md` row 24 | **UPDATED IN PLACE** (1 line changed, file line numbering preserved) |
+| 1 | `cfr2` — one-factor floor release at **`ms=3e-4`** | **LANDED 12/12, SCORED, INGESTED.** `ROW24-3E4-SURVIVES`, `DID` −0.3240 pp (−1.31 SE), CI [−0.8106, +0.1626] |
+| 2 | the four registered attacks on that verdict | **2 LAND HARD** (the interval; the mislabelled negative control), **1 lands as a scope fix** (148.4's citation), **1 lands as a refusal** (pooling is a joint-null test only) |
+| 3 | ingest | **+12 rows, 0 changed, 0 removed**; **0 `cts3` rows**. Corpus **2,537 → 2,549** |
+| 4 | `docs/MASTER-TABLE.md` row 24 | **UPDATED IN PLACE** — numerals re-stamped (corpus growth moved `scalar` and `layerwise`), CORRECTIONS 155 annotation appended |
+
+## `cfr2` — LANDED, SCORED, INGESTED (CORRECTIONS 155)
+
+Scorer `analysis/cO2_cfr2_score.py` run **UNEDITED**, sha256 `1e4f531a…d2a3b3ba` **identical on the Mac and in the `alice2` checkout**, `git diff -- analysis/` **empty on both**. `--selftest` **PASSED 0 failures pre- AND post-ingest** (the RULE 21 gate correctly degrading to `[INFO] NOT APPLICABLE`) — **the registration's claim about its own selftest is TRUE, unlike `cfr1`'s**. Every figure below re-derived this cycle from the raw `.out` files and the **6,000 raw probe records** with independent parsers.
+
+| arm | box | **plateau5** | sd | train5 | sd |
+|---|---|---|---|---|---|
+| scalar | CLAMPED `-15:-2.3026` | **88.7680** | 0.1376 | 93.6340 | 0.4240 |
+| layerwise | CLAMPED | **92.0647** | 0.0888 | 99.9127 | 0.0031 |
+| scalar | RELEASED `-80:-2.3026` | **89.0780** | **0.4146** | 93.6833 | 0.3898 |
+| layerwise | RELEASED | **92.0507** | 0.0842 | 99.9147 | 0.0064 |
+
+| contrast | pp | SE units |
+|---|---|---|
+| `G_C` (lay − sc, CLAMPED) | **+3.2967** | 18.78 `SE_GAP` (train +6.2787) |
+| `G_R` (lay − sc, RELEASED) | **+2.9727** | 16.93 `SE_GAP` (train +6.2313) |
+| **`DID = G_R − G_C`** | **−0.3240** | **−1.31 `SE_DID`**, bar 0.4966, CI **[−0.8106, +0.1626]** |
+| negative control (scalar `R − C`) | **+0.3100** | bar ±0.3512 — **88.3% of its own bar**, `cfr1` read +0.0067 |
+| layerwise `R − C` | **−0.0140** | — |
+
+- **G0/R1/R2/R3/R4 all PASS.** 12/12 COMPLETED, 12/12 `RUN_DONE`, 0 tracebacks, 100/100 epochs. RULE 21 margin **114 s** (`dfd9339` 16:31:52 → all 12 `Submit` 16:33:46, **zero spread**). RULE 20 `--batch-consistency`: **12 clean, 0 mismatch, PASS**, every non-axis flag identical. ENV audit **6 × `-15` / 6 × `-80`**, `PROBE=100` 12/12.
+- **Detector validated empirically, not assumed:** largest single-stride `|dβ|` anywhere in the batch = **0.030041** ≤ the registered tolerance **0.0304**, so the wall detector has **no false negatives**.
+- **`R4(ii)` PASSED — and the premise it tested is now measured for the first time.** Clamped layerwise **3/3** reach exactly −15.0000, first arrival at **99.5–99.9%** of the theoretically earliest step (26,975) — **free-fall** — with occupancy at this rung's **0.4600** ceiling (`lay-C-s0` sits exactly on it, 230/230). Released layerwise bottoms at −21.80…−21.83, **99.3–99.5%** of the float32 travel bound −21.907576, `n_at_lo = 0` at every record, never within 0.0304 of −80. **Ceiling untouched 12/12** ⇒ the floor is the only wall and a one-factor release is a **complete** box audit here.
+- **cfr2's CLAMPED cells replicate the corpus cell** (agreement, never a splice): scalar 88.7680 vs 88.7444, layerwise 92.0647 vs 91.9264, gap 3.2967 vs 3.1820 (inside `2·SE_GAP` = 0.3511).
+
+**Four attacks — 2 land hard, 1 is a scope fix, 1 is a refusal.**
+
+| attack | found |
+|---|---|
+| **the interval (LANDS)** | CI as % of `G_C` = **[−24.59%, +4.93%]**, point **−9.83%**; `ATTENUATED` is **0.70 SE** away (`cfr1`: 1.87 SE). **80% power only against ≥0.7055 pp = 21.40% of `G_C`; 24% power against the effect actually seen.** *"Within the bar"* at this width licenses **"bounded above by ~25%"**, **not** *"does not move the gap"* |
+| **the negative control (LANDS HARDEST)** | **it is not a control.** 3/3 clamped scalar runs hit −15.0000 and sit there **31.6–31.8%** of the trajectory; at the **coordinate** denominator `m=1` is pinned **5.7×** more than `m=62` (**31.7%** vs **5.53%**). Released, the scalar coordinate descends to **−19.70 = 85.3% of maximum travel** (vs **8.3%** at `cfr1`'s rung) and **ends training frozen**, 0.30 nats from the registered `COLLAPSED-BY-FREEZING` threshold. `DID` = (lay −0.0140) − (sc **+0.3100**): **the arm assumed inert supplies 100% of the estimate.** Per seed **+0.232 / +0.628 / +0.070 — 3/3 same sign** (layerwise is sign-mixed), with a **31.6% counterfactual dose** measured in the same runs. `sigma_w` **is** understated for that one cell (sd 0.4146, `P(χ²₂>x)` = 0.024) though the batch's pooled 0.2268 (df 8) is consistent with the registered 0.2150; on the batch's own sigma the CI only **widens** to [−0.8374, +0.1894] |
+| **direction / pooling (REFUSAL)** | `cfr1` +0.0320 and `cfr2` −0.3240 are **statistically indistinguishable** (`Q` = 1.02, df 1, p 0.312; direct contrast z = −1.01). Fixed-effect pool **−0.1468 ± 0.1760, p 0.404**. **Legitimate ONLY as a joint-null test** — recorded, **never quotable as an effect size**: exposure differs structurally (**83.81%** vs **46.05%** of trajectory), `BATCH` is the unit of replication, and the scalar arm binds at one rung and not the other. Even the pooled CI still admits **−0.49 pp** |
+| **the premise / 148.4 (SCOPE FIX)** | `cfr2` is the **first probe of any `m=62` or `m=1` run at `ms=3e-4`**. 153.8's *"100% bound"* was, when written, an extrapolation from a `m ≥ 777` census (154.5) — **amended in CORRECTIONS 155.8: the claim survives, its provenance is corrected from 148.4 to `cfr2`** (`m=62` 3/3, `m=1` 3/3). The *"94.7%"* in the same line is the `cfr1`-excluded reading; with `cfr1`'s rows in it is **93.12%**. Both recorded |
+
+**ADDITION TO 148.5's m-LADDER (scope caution, not refutation).** 148.5 is headed *"Core set, `ms=1e-3`"*, where `m=1` reads **0.0%**. At **`ms=3e-4`** the run-level ladder is **FLAT** (scalar 3/3 = 100%, layerwise 3/3 = 100%) and the **coordinate-level ladder is INVERTED** (31.7% vs 5.5%). Binding is **non-monotone in `ms`** for `m=1`. **148.5's monotone-in-`m` reading may not be extended to `ms=3e-4`.**
+
+## Row 24 — DISCHARGED / CONSTRAINED / UNAUDITABLE (CORRECTIONS 155.9)
+
+| segment | status |
+|---|---|
+| `scalar`/`layerwise` @ **`ms=1e-4`** | **DISCHARGED by arithmetic** — min reachable β **−11.914545** > −15; no wall can exist |
+| `scalar`/`layerwise` @ **`ms=1e-3`** | **DISCHARGED** (`cfr1`) |
+| `scalar`/`layerwise` @ **`ms=3e-4`** | **CONSTRAINED, NOT DISCHARGED** — wall-driven refuted at 7.87 SE, but ≤24.6% not excluded and the estimate rides the mislabelled control arm |
+| **peak-location-free headline** (loss at fixed `ms=1e-3` vs own peak), scalar vs layerwise | **DISCHARGED AT BOTH ENDPOINTS** — it uses only `1e-4` (arithmetic) and `1e-3` (`cfr1`). This is row 24's preferred headline and it is now the box-audited one |
+| `blk6`, `nodewise` (incl. nodewise's peak @ `3e-4`) | **UNAUDITED** — neither `cfr1` nor `cfr2` ran those arms; `cQ1`'s stratum is the **clamped** box |
+| **every rung above `ms=1e-3`** (`3e-3`, `1e-2`) | **UNAUDITABLE WITH THIS BOX** — travel bound at `3e-3` is **−156.9**, so the released **−80 floor is itself reachable**. `blk6`'s and `nodewise`'s **upper chords sit here** |
+
+**Which rungs the four numerals rest on:** `scalar` (peak `1e-4` → `3e-4`, `1e-3`) and `layerwise` (same) now rest **entirely on audited rungs**; `blk6` and `nodewise` each carry a chord on an **unauditable** rung, and `nodewise`'s **peak** sits on clamped `3e-4`. A second, independent reason not to claim the sub-ordering 154 already declined.
+
+## Row 24's numerals DRIFTED on this ingest — measured, not discovered later
+
+`cfr2`'s six **clamped** rows are legitimately inside `cQ1`'s stratum, so ingesting this batch **moves row 24's own re-derived numerals**. `cQ1` re-run **UNEDITED** (sha `aa0bf548…`), `--selftest` **38/38**:
+
+| arm | CORRECTIONS 154 | **post-`cfr2` HEAD** | Δ |
+|---|---|---|---|
+| `scalar` | 5.8976 ± 0.1659 | **5.8884 ± 0.1547** | −0.0092 |
+| `blk6` | 0.9148 ± 0.1843 | **0.9148 ± 0.1827** | 0.0000 |
+| `layerwise` | 1.8437 ± 0.1319 | **1.7893 ± 0.1183** | **−0.0544** |
+| `nodewise` | 0.7532 ± 0.1701 | **0.7532 ± 0.1687** | 0.0000 |
+
+`sigma_w` 0.1967 (df 216) → **0.1951 (df 222)**; the `ms=3e-4` cells go **n=5 → 8** for both arms; the corpus clamped gap at that rung **3.1820 → 3.2250** and the share-of-decade **93.12% → 94.68%**. **No conclusion moves** — Test A still 3 of 4 AGREE with `nodewise` still DISAGREEing by −1.8398, Test B still resolved at 2 SE, and **B-ALT is completely unchanged** (4.4219 / 0.9144 / 1.6749 / 0.1993) because it touches only cells `cfr2` does not populate. Row 24's printed numerals are **re-stamped and dated**. **This is FINDINGS 58.8(a)'s corpus-growth fragility — the one that broke `nodewise` at 154 — biting `scalar` and `layerwise`, harmlessly, and it will bite again on the next ingest into this stratum.**
 
 
 ## Row 24 — the numerals RE-DERIVED (CORRECTIONS 154, `cQ1`)
@@ -44,7 +106,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 ro
 - **NOT claimed:** the sub-ordering among partitions (nodewise 0.753 < blk6 0.915 < layerwise 1.844 — finer is **not** monotonically more tolerant). Both rest on **n=1** cells. Only **partition-vs-none** is asserted.
 - **Clamp scope UNCHANGED.** `cQ1`'s stratum **is** the clamped box `-15:-2.3026`; the recomputed `blk6` and `nodewise` falloffs sit on a **still-clamped** surface — and they are the two arms whose numerals moved.
 
-## `cfr2` — LAUNCHED, **NOT LANDED** (CORRECTIONS 154)
+## `cfr2` — the LAUNCH record (CORRECTIONS 154), retained; **superseded by the LANDED section above**
 
 One-factor floor release at **`ms=3e-4`**, the rung `cfr1` left open. `{scalar, layerwise}` × box `{C = -15:-2.3026, R = -80:-2.3026}` × seeds `{0,1,2}`, **all four cells IN BATCH**. Byte-match to `cfr1` proven: `diff` of the two launchers' sbatch composition blocks is **EMPTY**; the only scalar-setting difference is `MST=1e-3 → MST=3e-4`.
 
@@ -74,8 +136,8 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 | `scalar` ×4, `layerwise` ×3 at `PROBE=100` | **`cfr2`'s own, launched this cycle** |
 
 - 148.4's *"ms=3e-4, n=15, floor 100.0%"* is measured on **`m ≥ 777` / `nodewise` runs ONLY**. **Binding at `m=1` or `m=62` at `ms=3e-4` is UNMEASURED IN THE CORPUS.**
-- It is cited in **CORRECTIONS 153.8** and in **row 24's CORRECTIONS-153 annotation** as evidence the layerwise arm binds at that rung. **It is not evidence of that.** Both citations must be **narrowed**; row 24's annotation was narrowed this cycle, 153.8 has not been.
-- `cfr2`'s **clamped layerwise arm is the measurement that settles it** — a deliverable whatever the `DID` does.
+- It is cited in **CORRECTIONS 153.8** and in **row 24's CORRECTIONS-153 annotation** as evidence the layerwise arm binds at that rung. **It is not evidence of that.** Row 24's annotation was narrowed at 154; **153.8 was amended at CORRECTIONS 155.8** — both are now done.
+- **SETTLED.** `cfr2`'s clamped arms are the measurement: **`m=62` 3/3 and `m=1` 3/3 reach −15.0000 at `ms=3e-4`**. **The claim survives; its evidence is now `cfr2`, not 148.4.** And the undesigned half — `m=1` binding at all — is what broke the design's negative control (CORRECTIONS 155.6).
 
 ## `cfr1` — LANDED, SCORED, INGESTED (CORRECTIONS 153)
 
@@ -189,18 +251,18 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 |---|---|---|---|---|---|---|---|
 | `alice2` | **`cfr2`** | **12** | **8** | **4** | 0 | **RUNNING — launched this cycle, NOT landed.** ids 4913096–4913107, **all Submit 16:33:46, zero spread** | `cO2_cfr2_score.py` (`dfd9339`), **NOT yet run** |
 | `alice2` | `cfr1` | 12 | 0 | 0 | **12** | landed, scored, ingested last cycle (CORRECTIONS 153) | `cO1_cfr1_score.py` (`dbf90db`), run UNEDITED |
-| `alice2` | **`cts3`** | 6 | **6** | 0 | 0 | **RUNNING — 772 ep**, elapsed 3:05–3:49. **Left alone: not cancelled, not pulled, 0 rows** | `cO1_cts3_score.py` (`327e3f0`) |
-| `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS, never touch.** Re-read at this HEAD: 8 RUNNING (elapsed 11:31), 6 PENDING | `cI2_in489g2_score.py` (`571707b`) |
+| `alice2` | **`cts3`** | 6 | 0 | 0 | **6** | **FINISHED during this cycle — 6/6 `RUN_DONE`, queue empty.** **DELIBERATELY NOT INGESTED and NOT SCORED**: out of this cycle's scope, it has its own registered scorer, and pulling it would have broken `cfr2`'s clean 12-row diff. **0 rows in the corpus (verified by name scan).** Ready for the next cycle | `cO1_cts3_score.py` (`327e3f0`) |
+| `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS, never touch.** Re-read at this HEAD with `squeue` only: 8 RUNNING (elapsed **13:50:37**), 6 PENDING | `cI2_in489g2_score.py` (`571707b`) |
 | `alice2` | `scl1` | 12 | 0 | 0 | **12** | landed and ingested last cycle (CORRECTIONS 152) | `cP1_scl1_score.py` (`aac1bf0`) |
 
-- **This cycle ingested NOTHING.** `cfr2` and `cts3` are both in flight and both contribute **0 rows**; `results/all_runs.csv` is **byte-unchanged at 2,537 rows**. No `.out` and no probe was pulled from either account.
-- `in489g2` on `alice`: **8 `RUNNING` (elapsed 11:31), 6 `PENDING`** at this HEAD. **Read with `squeue -u salehkaleybars` only. Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
+- **This cycle ingested `cfr2` ONLY: +12 rows, 0 changed, 0 removed, 2,537 → 2,549.** `cts3`'s 12 `.out` files were **never copied** to `../runs_alice2`; **0 `cts3` rows landed**, verified by a post-ingest name scan.
+- `in489g2` on `alice`: **8 `RUNNING` (elapsed 13:50:37), 6 `PENDING`** at this HEAD. **Read with `squeue -u salehkaleybars` only. Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
 - **This session cancelled, requeued or modified nothing on either account.** `cfr2`'s 12 jobs were submitted by the launch agent in ONE submission; **no mismatch was found, so nothing was cancelled**.
 - **`cfr2` scoring command when it lands** (run UNEDITED, after re-running the RULE 20 guard over all 12 `.out` files): `export METAOPT_WS=/home/s5014158/metaopt; cd /home/s5014158/metaopt/hmo-cfr2 && python3 analysis/cO2_cfr2_score.py --runs /home/s5014158/metaopt/runs --probes /home/s5014158/metaopt/runs/cfr2`
 
 ## INGEST — **NOTHING INGESTED THIS CYCLE**
 
-`results/all_runs.csv` is **byte-unchanged at 2,537 rows**. `aggregate.py` was **not run**; no `.out` and no probe was pulled from either account. `cfr2` (12, in flight) and `cts3` (6, RUNNING) both contribute **0 rows**; `in489g2` is **not ours**. The table below is **last cycle's `cfr1` ingest, retained for the record**.
+`results/all_runs.csv` is **2,549 rows (+12)**. `python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (to **STDOUT**, into the corpus — CORRECTIONS 146.7's vacuous-check trap avoided) then `python3 analysis/args_repair.py --apply`. Keyed diff on `(run, jobid)`: **ADDED 12** (job ids 4913096–4913107), **CHANGED 0**, **REMOVED 0**, **`cts3` rows 0**. `args_repair` reported *"36 rows updated"* but the keyed diff shows **0 changed fields** — it rewrote `dup_group` values identical to those already present; recorded so the "36" is not later read as a corpus change.
 
 ## INGEST (cycle 129, `cfr1`) — the diff, read both ways (CORRECTIONS 146.7)
 
@@ -215,7 +277,7 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 | **REMOVED** | **0** |
 | `args_repair.py --apply` | 36 `dup_group` stamps re-applied (aggregate regenerates without them); **0 accuracy/config values changed**, 0 `superseded` changed. Net vs the pre-ingest CSV: **0 changed rows** |
 | ingested rows spot-check | all 12 `epochs_done=100`; the four cell means reproduce the scorer exactly (87.8707 / 91.3133 / 87.8773 / 91.3520) |
-| **NOT ingested** | `cts3` (6 RUNNING) — **0 rows** |
+| **NOT ingested** | `cts3` (6/6 finished this cycle) — **0 rows, deliberately deferred** |
 
 **RULE 20 — `cfr2` 8/8 started runs, re-derived at this HEAD** (4 `PENDING` get the same audit on start):
 
@@ -371,7 +433,7 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 | | |
 |---|---|
 | Q1 meta-gate | **DESK-ACCEPT, 9/10, `structural_gaps = []`, `passed = True`, 0 blocking.** Returned at cycle 111 on v8 (CORRECTIONS 135). **Carried, not re-derivable here** — the gate tool is not in this tree |
-| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL** at this HEAD after the `cfr1` ingest (rows **2537**/2177, admissible **2095**/1735, wallclock **2522**/2162, GPU-h **2222**/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807, partition-family rows **437**/431, Lion **425**/419). The **2 substantive** numerals (93.328, 1.796) are **bit-identical across this ingest**; only the census counts moved (6 → 8 failures because `cfr1`'s 12 rows also moved the partition-family and Lion counts). **No claim reverses.** Historical note, unchanged: verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
+| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL** at this HEAD after the `cfr2` ingest (rows **2549**/2177, admissible **2107**/1735, wallclock **2534**/2162, GPU-h **2233**/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807, partition-family rows **437**/431, Lion **425**/419). **All 4 substantive numerals (93.328, 1.796, 437, 425) are BIT-IDENTICAL across this ingest** — `cfr2`'s 12 rows are not in the partition families; **only the 4 census counts moved** (2537→**2549**, 2095→**2107**, 2522→**2534**, 2222→**2233**), and the failure count stays at **8**. **No claim reverses.** Historical note, unchanged: verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
 | GPU to reach submission | **0 jobs, 0 hours.** `cfr1`'s **9.98** GPU-h are spent and landed (CORRECTIONS 153); `scl1`'s 9.80 landed at 152; `cts3`'s ~33.0 are in flight; `in489g2`'s ~348.5 on `alice` are **not ours**. None of it is this manuscript's science |
@@ -382,7 +444,7 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 
 | check | result |
 |---|---|
-| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** at this HEAD — stale draft numerals, not a moved result; **inherited, author scope, deliberately NOT fixed**. Derived vs paper after the `cfr1` ingest: rows **2537**/2177, admissible **2095**/1735, wallclock **2522**/2162, GPU-h **2222**/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807, partition-family **437**/431, Lion **425**/419. Historical detail from cycle 127, unchanged: `git diff --name-only 94c6e4f..HEAD` over `paper/`, `results/` and `c98_reproduce.py` = **0 files**, so every input is byte-identical to the pre-cycle HEAD. Derived vs paper: rows 2444/2177, admissible 2002/1735, wallclock 2429/2162, GPU-h 2153.85/1642, best R18/C10 93.328/93.317, deficit 1.796/1.807, partition rows 437/431, Lion 425/419. `c98` exited 0 only against the 2,177-row corpus of cycle 116. **A detached worktree is NOT a valid control** — it reports 14, the 6 extra being coverage-census checks that move because gitignored `hz3` `.out` files are absent. See CORRECTIONS 141.6 / 142.6 / 145.4 |
+| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** at this HEAD — stale draft numerals, not a moved result; **inherited, author scope, deliberately NOT fixed**. Derived vs paper after the `cfr2` ingest: rows **2549**/2177, admissible **2107**/1735, wallclock **2534**/2162, GPU-h **2233**/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807, partition-family **437**/431, Lion **425**/419 — the 4 substantive numerals **bit-identical** to the pre-ingest HEAD. Historical detail from cycle 127, unchanged: `git diff --name-only 94c6e4f..HEAD` over `paper/`, `results/` and `c98_reproduce.py` = **0 files**, so every input is byte-identical to the pre-cycle HEAD. Derived vs paper: rows 2444/2177, admissible 2002/1735, wallclock 2429/2162, GPU-h 2153.85/1642, best R18/C10 93.328/93.317, deficit 1.796/1.807, partition rows 437/431, Lion 425/419. `c98` exited 0 only against the 2,177-row corpus of cycle 116. **A detached worktree is NOT a valid control** — it reports 14, the 6 extra being coverage-census checks that move because gitignored `hz3` `.out` files are absent. See CORRECTIONS 141.6 / 142.6 / 145.4 |
 | census fixpoint (measured on `DRAFT-v4.md`, asserted against both markups) | **628 / 411 / 982 / 41.9%** — **unmoved by Plan C, as designed** |
 | census internals | raw `\d+\.\d+` 3067 → **3098**, distinct **1007** (unchanged); quantities 2614 → **2615**, distinct **982** (unchanged). The `+1` is the Markdown heading numeral `1.2`; `1.2` already occurred twice as a quantity, so the asserted denominator did not move. `n_q` is asserted by nothing |
 | `python3 analysis/xref_check.py` | exit 0, **596 references** (section 500, table 51, figure 22, appendix 23), **0 unresolved, 0 stale**, 8 allowlisted parent-paper refs on lines `[41, 43, 45, 287, 291, 294, 295, 297]` |
