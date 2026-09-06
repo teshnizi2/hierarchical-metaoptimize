@@ -1,91 +1,154 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 123**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **147**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 124**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **148**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle.**
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 rows** (+18 `cts1` this cycle; **0 changed, 0 removed**).
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 rows** — **no ingest this cycle**; `cts2` has not landed, `grep -c cts2 results/all_runs.csv` = **0**.
 **`c98_reproduce.py` STILL EXITS 1** — the same inherited stale numerals as at CORRECTIONS 141.6 / 142.6. Author fix; not touched here.
 
 ## Queue — re-derived from `squeue` at this HEAD
 
-**`cts1` LANDED — 18/18, verdict below. `in489g2` still running on `alice`. `alice2` queue EMPTY. 18 rows ingested (2,483 → 2,501).**
-
-**`cts1` — single-tensor resolution of the k=49 → k=52 cliff. CORRECTIONS 147.**
-
-| verdict | |
-|---|---|
-| CLIFF | **CLIFF-REPRODUCES** (TOTAL +0.3598, bar 0.1820) |
-| SPLIT | **SINGLE-TENSOR-MAJORITY** |
-| TENSOR | **`layer4.0.bn2.weight`** (512 params) |
-| A1 MASS (**the briefing's** account) | **MASS-REFUTED** — and with the wrong sign |
-| A2 BN LEVERAGE (the scorer's) | **BN-LEVERAGE-FAVOURED** — *class-level form WITHDRAWN, see below* |
-| SCALE-SHIFT | **SCALE-SHIFT-ASYMMETRIC** |
-
-| step (each moves exactly ONE tensor) | params | dCAPTURE | pp / t (df 4) |
-|---|---|---|---|
-| k=49→50 `layer4.0.bn2.weight` | 512 | **+0.5289** | **+24.834** / +26.32 |
-| k=50→51 `layer4.0.bn2.bias` (matched control) | 512 | −0.0050 | −0.233 / −0.19 |
-| k=51→52 `layer4.0.shortcut.0.weight` | 131,072 | −0.1641 | −7.707 / −7.81 |
-| TOTAL | | +0.3598 | +16.894 / +25.95 |
-
-- **My own prediction was REFUTED.** I predicted the 131,072-param shortcut projection on mass grounds (Q2). It has SHARE **−0.4562** — moving it *gains* 7.7 pp. Second consecutive cycle the briefing's inherited reading lost (cf. 146.2 P5).
-- **Matched control:** DROP1 − DROP2 = **+0.5339 (24.4 SE)** between two 512-param tensors in the same BN module. Paired by seed: +24.294 / +25.932 / +24.276 pp, sign-consistent 3/3.
-- Gates: G0 18/18 · G1 manifest exact in sizes, params AND names · G1b one tensor per step · G2 18×100 epochs · G3 anchors −0.083 / +0.085 pp · G4 gap +46.951 pp. Scorer sha256 `91b2803005d4…` matches the digest frozen at `186d9ad`; re-run unedited on the Mac **and** alice2, verdict reproduces verbatim.
-
-**ADVERSARIAL ROUND — 5 lenses, 2 REFUTED. Both refutations re-derived here before acceptance.**
-
-| lens | verdict | finding |
-|---|---|---|
-| statistics & power | not refuted | SE honestly derived; leave-one-seed-out reproduces every gate. **k50/k51/k52 not converged at ep 99** (+0.046/+0.047/+0.066 pp/ep) |
-| implementation / off-by-one | not refuted | Live optimiser: no off-by-one, named tensor *is* the moved tensor, init & batch order shared |
-| same-data-twice | not refuted | 18 distinct job ids / md5s / 12 nodes, one submission. **But cpk1 & cts1 share seeds {0,1,2} — correlated, not independent** |
-| mechanism | **REFUTED** | Fine group ends at the `BETA_CLIP` floor **β=−15.000 in 12/12** cut runs; `MASS-REFUTED` is a theorem of `HF.py:189` (unnormalised sum) + `:881` (`sign()`) |
-| scope / overreach | **REFUTED** | A2's own condition holds at cpk1 k=**31/49/52/55** with captures **+0.219/+0.697/+0.332/+0.014** — it predicts nothing. Plus an **undocumented second cliff** k=52→55 (−0.3185) |
-
-**WITHDRAWN / NARROWED / SURVIVES**
-
-| | |
-|---|---|
-| **WITHDRAWN** | `BN-LEVERAGE-FAVOURED` **as a class claim**. Of cpk1's 10 steps moving a norm scale out of the fine group, **8 raise capture, 2 lower it**; the nearest analogue (k=45→47, `layer4.0.bn1.weight`, also 512 params, same block) **gains +3.449 pp** |
-| **NARROWED** | `MASS-REFUTED` → a restatement of Lion's `sign()`, not a discovery · `SCALE-SHIFT-ASYMMETRIC` → one site · `CLIFF-REPRODUCES` → same-seed replication on different hardware, **not** an independent batch · `SHARE1=1.47` is 147 % of a **non-monotone path**; against the manifold DROP1 = **52.9 %** |
-| **SURVIVES** | The intervention arithmetic, unanimously (5/5 lenses reproduced every number). `SINGLE-TENSOR-MAJORITY` and the naming of `layer4.0.bn2.weight` **as an intervention statement at one cut position** |
-
-**IN FLIGHT — 14 jobs, all on `alice`. Not mine to touch beyond monitoring.**
+**`cts2` LAUNCHED AND RUNNING (12/12, alice2). `in489g2` still running on `alice` — NOT MINE. No ingest: corpus unchanged at 2,501 rows.**
 
 | account | batch | jobs | run | pend | done | decides | score with |
 |---|---|---|---|---|---|---|---|
+| `alice2` | **`cts2`** | 12 | **12** | 0 | 0 | is `cts1`'s 24.8 pp cliff **stepsize allocation** or **clamp-turnover timing**? | `cM1_cts2_score.py` (`1a06a52`) |
 | `alice` | `in489g2` | 14 | 8 | 6 | 0 | **where** ImageNet-489 crosses CAPTURE 0.5 on `m` in (6,62) | `cI2_in489g2_score.py` (`571707b`) |
-| `alice2` | — | **0** | 0 | 0 | — | queue EMPTY since `cts1` completed | — |
 
-- `in489g2` seed-0 jobs at **5:34:47** elapsed at this HEAD; seed-1 still `PENDING`, gated behind the 8-GPU `QOSMaxGRESPerUser` cap. seed-0 ≈ 06:00 7 Sep.
-- **`p08` is the arm that matters**: same m as `g08`, different cut. Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. `cpk1` and now `cts1` both confirm position dominates, so R2 is a live risk.
-- **`in489g2` is NOT this session's batch. Never cancel, requeue or modify it.**
+- `cts2` elapsed **35:54** at this HEAD, 8 distinct nodes, no queueing. Landing expected **11:55–12:05 CEST**; measured basis `cpk1` 42.0 min/run over 39 jobs and `cts1` 18 jobs at ≈45 min. Cost ≈ **9 GPU-h**.
+- `in489g2` seed-0 jobs at **6:33:33** elapsed; seed-1 still `PENDING`, gated behind the 8-GPU `QOSMaxGRESPerUser` cap. **`in489g2` is NOT this session's batch. Never cancel, requeue or modify it.**
+- **`cts2` IS NOT SCORED.** It had not landed at this HEAD; only `--selftest` was ever run against its scorer.
 
-**RULE 20 — `cts1` DEBT RETIRED (18/18 PASS). `in489g2` 8/14, reopens when its 6 pending jobs start.**
+**`cts2` — 2×2×3 clamp × cut. CORRECTIONS 148.1–148.2.**
+
+| factor | levels |
+|---|---|
+| cut | `k49 = [49,13]` · `k50 = [50,12]` (the step moves exactly `layer4.0.bn2.weight`, 512 params) |
+| clamp | `C = BETA_CLIP -15:-2.3026` · `R = BETA_CLIP -80:-2.3026` (**only the floor moves**) |
+| seeds | 0, 1, 2 |
+
+- Cell: CIFAR-100 / `ResNet18_c100` / SGDm+Lion / `ms=1e-3` / `alpha0=1e-6` / 100 ep / `AUGMENT=1` / `HIER=none` / `PROBE=0`.
+- **Both CLAMPED cells run in batch.** `cts1`'s arms are NOT spliced in — batch is the unit of replication and the estimand is a within-batch interaction.
+- Released floor `-80` is non-binding **by arithmetic**: `|dβ| ≤ ms = 1e-3` per meta-step, 50,000 steps from `float32(log 1e-6) = −13.815511` reach at worst **−63.790127**.
+- Bars: `SURVIVE/PREMISE 12.4170` · `COLLAPSE 1.4564` · `INTERACTION 2.0598` · `NOISY 2.6757` · `DEAD 5.00` pp, from `σ_w = 0.8919 pp` (df 46, `m=2` restriction).
+- Gates in order, first failure decides: **G0** provenance → VOID · **R1** manipulation (fails **closed** if traces unreadable) · **R2** DEAD run → UNRESOLVED-DIVERGED · **R3** SD > 3σ_w → UNRESOLVED-NOISY · **R4** `D_C < 12.4170` → UNRESOLVED-PREMISE. `COLLAPSED-BY-FREEZING` is a distinct named outcome.
+- **Prior on record before the data:** COLLAPSED or PARTIAL, not SURVIVED. Both branches carry identical machinery and identical bars.
+
+**RULE 20 — `cts2` 12/12 PASS. `in489g2` 8/14, reopens when its 6 pending jobs start.**
 
 | account | audited | result |
 |---|---|---|
-| `alice` | 8/14 | **8 clean, 0 repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS** |
-| `alice2` | 18/18 (`cts1`) | **18 clean, 0, 0 — VERDICT PASS.** Independently confirmed: stripping the 4 axis flags collapses all 18 ARGS lines to **one** string, with **one** `ENV:` string |
+| `alice2` | 12/12 (`cts2`) | **12 clean, 0 repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS** (exit 0) |
+| `alice` | 8/14 | **8 clean, 0, 0 — VERDICT PASS** (unchanged; the 6 pending jobs cannot be audited from the queue) |
 
-- Only STARTED jobs write an ARGS line. **Re-run the full audit on `in489g2` before scoring it.**
-- **The pending jobs cannot be audited from the queue.** `jobs/run_in489.sh` passes `"$@"`; `scontrol write batch_script` returns a script whose only `--stepsize-groups` occurrence is a **usage comment reading `scalar`**. That is a decoy — do not read it as a design mismatch.
-- `argsline_guard.py` is `81cea8b5…` byte-identical on Mac, `alice` and `alice2`.
+- The manipulation cannot ride on the ARGS line — `BETA_CLIP` is an env var — so it was re-derived from each run's **own `ENV` line**: **6 at `-15:-2.3026`, 6 at `-80:-2.3026`, `PROBE=0` in all 12**, agreeing with the run NAME and the ARGS line in every case. **No mismatch → nothing scancelled.**
+- Run with `METAOPT_WS=/home/s5014158/metaopt` exported; `bin/_lib_guards.sh` clobbers `WS` otherwise.
+
+**RULE 21 / RULE 16 — `cts2`, proved by wall clock and by `git diff`.**
+
+| check | result |
+|---|---|
+| registration commit | `1a06a52ba3bb158542a0d03df71a11d20106cae6`, **2026-09-06T11:08:55+02:00** (epoch 1788685735) |
+| earliest Slurm submit (`sacct`) | **2026-09-06T11:10:01** (epoch 1788685801); last 11:10:02 |
+| **margin** | **66 s**; 1-second spread across all 12 ids = one submission |
+| `git diff --numstat 8e61b28 1a06a52 -- analysis/` | **`983  0  analysis/cM1_cts2_score.py`** — one added file, **983 insertions, 0 deletions**. No pre-existing scorer touched |
+| whole commit | 3 files, **1,464 insertions, 0 deletions** (scorer, launcher, `bin/PROTECTED.txt`) |
+| corpus at registration | `grep -c cts2 results/all_runs.csv` = **0** |
 
 **ACCOUNT HYGIENE — clean on both.**
 
-- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **0**. Nothing else queued on either.
+- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **12**, all `cts2-`. Nothing else queued on either.
 - **0 CANCELLED on either account this cycle.** No job this session did not submit was touched.
-- `bin/PROTECTED.txt` carries `cpk1-` and `in489g2-`.
-- Job `4912087` is absent from `cts1`'s id run 4912082–4912100 — it is **another user's** array task, the jobid counter being cluster-global. Not a censored arm.
+- `bin/PROTECTED.txt` carries `cts2-` (18 prefixes), committed in `1a06a52`.
+
+**`cts1` — CARRIED FORWARD from cycle 123 (CORRECTIONS 147). This is what `cts2` is testing.**
+
+| | |
+|---|---|
+| CLIFF | **CLIFF-REPRODUCES** (TOTAL +0.3598, bar 0.1820) · SPLIT **SINGLE-TENSOR-MAJORITY** |
+| the tensor | **`layer4.0.bn2.weight`** (512 params) — k=49→50 = **+24.834 pp** |
+| matched control | k=50→51 `layer4.0.bn2.bias`, also 512 params, same BN module = **−0.233 pp** |
+| withdrawn | `BN-LEVERAGE-FAVOURED` **as a class claim**; `MASS-REFUTED` is a theorem of `HF.py:189` + `:881`, not a result |
+| **the open limitation** | the fine group ends at the `BETA_CLIP` floor β=−15.000 in **12/12** cut runs. **Nothing in `cts1` separates stepsize allocation from clamp-turnover timing** — hence `cts2` |
+
+## Clamp census — CORRECTIONS 148.3–148.10
+
+**Read-only, 1,171 probe dirs on both accounts (665 `alice` / 506 `alice2`), 1,091 joined to their own `.out`. Nothing written into either runs tree. THE HEADLINE IS A NULL: no finding is refuted; one family is re-labelled.**
+
+| rail (terminal record, n=1,091) | rate |
+|---|---|
+| FLOOR | 301/1091 = **27.6%** |
+| CEILING | 98/1091 = **9.0%** |
+| either | 331/1091 = **30.3%** |
+
+**The meta-stepsize is the first-order axis, not granularity.** Core set = canonical box `-15:-2.3026`, `HIER=none`, live meta, n=501:
+
+| `ms` | n | floor | ceiling | binds |
+|---|---|---|---|---|
+| `1e-4` | 297 | 1.0% | 1.7% | **2.7%** |
+| `3e-4` | 15 | 100.0% | 6.7% | 100.0% |
+| `1e-3` | 177 | 77.4% | 27.1% | **78.0%** |
+| `1e-2` | 12 | 100.0% | 50.0% | 100.0% |
+
+- The 8 binds at `ms=1e-4` are named and **none is an SGDm+Lion primary at the correct box**: `aw1-node-s{0,1,2}` (AdamW, ceiling), `sm3-awrms-node-s{0,1}` (AdamW+RMSProp, ceiling), and the **three `hz3` seed-5 rows already known to carry the wrong box** (CORRECTIONS 8114).
+- m-ladder at `ms=1e-3`: scalar **0/10** → blk6 68.8% (R18) → layerwise/nodewise/weightwise **100%** on R10, R18, R18_c100. Two exceptions, both ResNet34: nodewise (m=25,556) **0/5**, weightwise (m=21.3M) **40%**.
+- Same ladder at `ms=1e-4`: **34 rungs, n=297, highest single rung 9.1%**, pooled 2.7%. **The rise with `m` exists only where `ms` is past its optimum.**
+- Structural nulls: frozen-beta arms **0/78**; `HIER=shrink` **0/26**.
+- All **33 scalar probe runs** in the corpus: floor 0/33, ceiling 0/33, and 0/33 touch either wall at any sampled record. FINDINGS 36.3's scalar sentence is **confirmed corpus-wide**.
+- **A DETECTOR TRAP, recorded because it produced a wrong answer here first.** `float32(-2.3026) = -2.3025999069213867 ≠ -2.3026`, so exact equality is a clean floor detector and a **broken ceiling** one. The first pass read the corpus ceiling as **2.8%** (true **9.0%**) and CIFAR-100's as **0.0%** (true **68.6%**). Compare against `float32(wall)`. With the tolerance the two detectors agree on **all 667 records carrying both — 0 disagreements**.
+- **Pipeline validated against three already-recorded results**, reproduced without being told: `ar1` 12/12 floor (6203) · `fa1` nodewise ceiling 5/6 with the other three arms 0/6 (117.1) · `hz3`'s three seed-5 rows floor-bound while all 21 `-30:9.0` rows are clean (8114).
+
+**MOSTLY ALREADY KNOWN — the confound is FINDINGS 36.3's finding, not this cycle's.** Four prior audits: **36.3** (named the confound) · **51.1** (established the coordinate denominator this census uses) · **51.2/51.4/51.6** (mechanism; frozen half clip-clean 28/28) · **52.2/52.3/52.4** (box-free controls; clip saturation already excluded) · **117.1** (the paper's D already audited) · **147** (`cts1` 12/12) · **6190–6215**, **8114**, **OPERATIONS.md:447**.
+
+**Genuinely new — three things, and they are modest:** corpus-wide scope (all 1,171 probe dirs vs named batches); **`ms` rather than granularity as the dominant axis**; and a coverage statement plus the float32 trap.
+
+**FINDINGS AT RISK — per finding.**
+
+| # | finding | state |
+|---|---|---|
+| **1** | **MASTER-TABLE row 24** — *"partitioning buys TOLERANCE to an over-large `ms`"* (falloff scalar 5.871 vs blk6 1.060 / lay 1.801 / node 2.593 pp/decade) | **AT RISK, THE WORST CASE.** Its content IS the region above the `ms` peak = the clamped region for partitioned arms, interior for scalar. Restating it as "clamped regime" does not save it — **the regime IS the finding**. Its own instrumentation is absent: the c40 `ms-` family is **0/52** rows with any trajectory (also `ac` 0/42, `bl` 0/30, `ad` 0/29, `r34r` 0/27, `dc` 0/25, `r10` 0/24, `i3a` 0/21, `mx` 0/46) |
+| **2** | **MASTER-TABLE row 23** — finer partition helps: **+3.339** shared-`ms`, **+0.564** tuned | **SURVIVES RESTATEMENT.** Tuned figure **clean** (layerwise 0/6 at `ms=1e-4`; floor 8.09 nats away vs 5 nats of Lion travel). Shared-`ms` figure is clamp-asymmetric and must be **labelled clamped-regime** |
+| 3 | MASTER-TABLE row 31 — shared-`ms` contrast confounded with preferred `ms` (`hz9`) | **SURVIVES, strengthened.** But `hz9` has no probe dir and no TB trace — its own occupancy is **UNMEASURED, not clean**; disclosed |
+| 4 | CLOSEOUT 3 / CORRECTIONS 114.3 — **THE PAPER's D** (+0.5805 ± 0.0939) | **UNTOUCHED.** Already audited at 117.1; this census reproduces it exactly. All 14 count-matched cells at `ms=1e-4` box-inert. `ar1` already VOID, `fa1` already disclosed |
+| 5 | CLOSEOUT item 5a — unaugmented parent cell, guard caveat | **CAVEAT DISCHARGED; the CLOSEOUT entry is STALE.** `ub9` at `-60:6.0` measures **0/9**, and releasing the box made the granularity step **larger** — the campaign's one direct test came out **against** the artefact hypothesis |
+| 6 | MASTER-TABLE rows 56/57 — CIFAR-100 granularity (+47 pp) | **SURVIVES.** Maximally clamp-asymmetric on paper (scalar 0/2 vs lay/node/weight 13/13, ceiling 68.6%), but a 47 pp effect is not manufacturable by a stepsize wall, and `cts1` reproduces the ordering at `m=2`. Row 57 is a **within-clamped-regime** contrast |
+| 7 | MASTER-TABLE row 27 (H4) | **OPEN, not worsened.** `bo6` 4/6 (all ceiling — already recorded as a failed gate); `bo7` **0/12 and on disk** |
+| 8 | rows 36/37/38, CLOSEOUT 2 — horizon reversal | **CLEAN.** `br6` 0/12, `bl5` 1/9, `sp8` 0/9, `ns5` 0/15 — already run in released boxes |
+| 9 | Direction C (53.1% sign-agreement, frozen profile, `N_eff/m`) | **UNTOUCHED.** Frozen 0/78; already box-tested at 52.3 |
+| 10 | CORRECTIONS 146/147 (`cpk1`, `cts1`) | **Nothing to add** — no probe dir exists; 147 already states the limitation. **This is what `cts2` settles** |
+| 11 | `hz3` wrong-box rows (8114) | A known metadata discrepancy is now **measured to be a real regime difference** |
+
+**COVERAGE — the honest limit. 1,356 of 2,501 rows (54.2%) have a beta trajectory; 1,145 (45.8%) have none.**
+
+| stratum | with a trajectory |
+|---|---|
+| scalar | 33/246 = **13.4%** |
+| layerwise | 344/995 = 34.6% |
+| weightwise | 170/248 = 68.5% |
+| nodewise | 227/286 = 79.4% |
+| `resnet18_blocks` | 242/242 = 100% |
+| `ms=1e-3` | 852/1721 = 49.5% |
+| `ms=1e-4` | 349/376 = **92.8%** |
+
+- TB `beta_block*` exists on only **339** run dirs and only ever logs `m ≤ 6`, so it can never measure a layerwise/nodewise/weightwise arm. **For any batch not named above the clamp status is NOT MEASURED, and is not inferred.**
+- **INFERRED, labelled:** that scalar at `ms=1e-4` is box-free — **no scalar probe exists at any `ms` but `1e-3`**; the argument is algebraic (`β ∈ [ln a0 ∓ ms·T]` = `[−11.908, −1.908]`), and it does **not** exclude the ceiling.
+- **Direction of harm is NOT measured.** 117.1 argues a floor INFLATES D for `ar1`; `ub9` measures the opposite. Neither generalises; this cycle claims neither.
+- Sampling is the terminal record + 10 interior byte-quantiles, so "bound at some sampled record" is a **lower bound**; the terminal flag is exact.
+
+**THE NEXT EXPERIMENT.**
+
+- **Step 0, zero GPU-h, NOT DONE HERE.** `tc1` (12 rows, `-30:6.0`, measured **1/12**) and `ub9` (9 rows, `-60:6.0`, measured **0/9**) are the only two of the corpus's **24** non-canonical-box cells that contain a **scalar** arm — `wc5`/`cl5`/`uc5`/`uc6`/`bl5`/`br6`/`bo6`/`bo7`/`bd7`/`bf8`/`bf9`/`ns5`/`sp8` are `{layerwise, nodewise, weightwise}` only. **Deliberately not differenced**: their data already exist, so RULE 21 requires a scorer registered and committed first. At n=2 per (arm, `alpha0`) `tc1` is a **direction check, not a settlement**, and its box differs from canonical in **both** walls, so a null there is ambiguous.
+- **Step 1 — 12 jobs, ~12 GPU-h, ONE submission.** R18/CIFAR-10/SGDm+Lion, `alpha0=1e-3`, 100 ep, at **`ms=1e-3`** (the over-large point), granularity `{scalar, layerwise}` × box `{-15:-2.3026, -30:6.0}` × seeds `{0,1,2}`. Estimand `[lay−scal]_wide − [lay−scal]_narrow`, all four arms in one batch. Pre-register: within ±0.30 pp → row 24 survives; wide box shrinks the gap > 0.30 pp → **the tolerance is the wall and row 24 is rewritten**; wide box grows it → the box was suppressing a real effect.
+- Guards required: RULE 20 after launch; coordinate-denominator occupancy per seed per arm, voiding any contrast whose arms differ by > 0.10; and the disclosure that `-30:6.0` is **measured-free, not provably free** (`ms·T = 50` nats at `ms=1e-3`). Hazard on record: 6190–6215 measured 2/2 fatal collapses releasing the ceiling to `+6.0` **at weightwise** — this design carries no weightwise arm, and `tc1` ran 100 ep at `-30:6.0` with zero collapses.
+- **Extending the census is NOT worth GPU-hours.** The 1,145 un-instrumented rows cannot be re-instrumented without re-running them, and for the modern cells the answer is already "inert".
 
 **COST — measured from history, not guessed.**
 
 | batch | reference | mean/run | projected | worst case (walltime cap) |
 |---|---|---|---|---|
 | `in489g2` | `in489g1` 12 runs = 298.7 GPU-h | **24.89 h** | **348.5 GPU-h** | 476.0 |
-| `cts1` (LANDED) | measured, `sacct` 18/18 | **41.5 min** | **12.46 GPU-h actual** | — |
-| **total in flight** | | | **348.5 GPU-h** | **476.0** |
+| `cts2` (RUNNING) | `cpk1` 42.0 min over 39 jobs; `cts1` 18 jobs ≈45 min | **≈45 min** | **≈9 GPU-h** | 30.0 (`--time 02:30:00`) |
+| **total in flight** | | | **≈357.5 GPU-h** | **506.0** |
 
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
@@ -97,7 +160,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 | Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours.** The 14 jobs in flight (`in489g2` only, ~348.5 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
+| GPU to reach submission | **0 jobs, 0 hours.** The 26 jobs in flight (`in489g2` 14 + `cts2` 12, ~357.5 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
 
 **Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 

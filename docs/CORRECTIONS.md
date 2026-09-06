@@ -11264,3 +11264,444 @@ The decisive one, in priority order:
    separate "this tensor" from "this cut position" -- within cts1 the two are perfectly confounded
    by construction.
 5. **The second cliff** k = 52 -> k = 55 (-0.3185) has never been decomposed.
+
+## 148. `cts2` REGISTERED AND RUNNING; AND A CORPUS-WIDE CLAMP CENSUS THAT RE-LABELS ONE FAMILY OF RESULTS AND REFUTES NONE
+
+Cycle 124.  Two things happened and they are of very different weight.  `cts2` is a live 12-job
+batch that will decide whether CORRECTIONS 147's cliff is a stepsize-allocation fact or a
+clamp-turnover artefact; it has **not landed and is not scored here**.  The clamp census is a
+read-only audit of 1,171 probe directories on both accounts, and **its honest headline is that
+almost nothing moves**: it changes the LABEL on the `ms=1e-3` family of results, leaves the
+`ms=1e-4` family — which is where the paper's evidence lives — untouched, and refutes no finding
+in the file.  Section 148.6 says what was already on the record before this cycle, because most
+of it was.
+
+### 148.1 `cts2` — WHAT IS RUNNING, AND THE RULE 20 / RULE 21 EVIDENCE
+
+12 jobs, `4912582`–`4912593`, one submission on **alice2** (`s5014158`), workspace
+`/home/s5014158/metaopt`.  Design is 2x2x3: cut `{k49 = [49,13], k50 = [50,12]}` x clamp
+`{C = BETA_CLIP -15:-2.3026, R = BETA_CLIP -80:-2.3026}` x seed `{0,1,2}`, on
+CIFAR-100 / `ResNet18_c100` / SGDm base + Lion meta / `ms=1e-3` / `alpha0=1e-6` / 100 epochs.
+Only the clamp FLOOR moves between C and R; the ceiling is held at `-2.3026` so the manipulation
+is one-factor.  Both CLAMPED cells run **in batch** — `cts1`'s arms are not spliced in, because
+batch is the unit of replication and the estimand is a within-batch clamp x cut interaction.
+
+**RULE 20, re-run at this HEAD on all 12 started runs** (with `METAOPT_WS=/home/s5014158/metaopt`
+exported so `bin/_lib_guards.sh` cannot clobber `WS`):
+
+    python3 /home/s5014158/metaopt/hmo-cts2/analysis/argsline_guard.py \
+            /home/s5014158/metaopt/runs --name cts2-
+    argsline_guard: 12 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+    VERDICT: PASS                                                         (exit 0)
+
+The manipulation itself cannot ride on the ARGS line — `BETA_CLIP` is an environment variable — so
+it was re-derived here from each run's **own** `ENV` line, independently of the launcher's report:
+
+| run | `BETA_CLIP` | `PROBE` | `--stepsize-groups` | `--seed` |
+|---|---|---|---|---|
+| `cts2-k49-C-s{0,1,2}` | `-15:-2.3026` | 0 | `[49,13]` | 0/1/2 |
+| `cts2-k50-C-s{0,1,2}` | `-15:-2.3026` | 0 | `[50,12]` | 0/1/2 |
+| `cts2-k49-R-s{0,1,2}` | `-80:-2.3026` | 0 | `[49,13]` | 0/1/2 |
+| `cts2-k50-R-s{0,1,2}` | `-80:-2.3026` | 0 | `[50,12]` | 0/1/2 |
+
+6 CLAMPED and 6 RELEASED, and the `ENV` line agrees with the run NAME and with the ARGS line in
+**all 12**.  **No mismatch, so nothing was scancelled.**  No job this session did not submit was
+touched on either account.
+
+**RULE 21, proved by wall clock and not by assertion.**  Registration commit
+`1a06a52ba3bb158542a0d03df71a11d20106cae6`, author and committer date **2026-09-06T11:08:55+02:00**
+(epoch 1788685735).  Earliest Slurm-recorded submit stamp for any `cts2` job, read back from
+`sacct`: **2026-09-06T11:10:01** (epoch 1788685801), the last **11:10:02**.  **MARGIN = 66 s**, and
+the 1-second spread across all 12 ids is the wall-clock proof of a single submission.
+
+**RULE 16 — no pre-existing scorer was edited.**  `git diff --numstat 8e61b28 1a06a52 -- analysis/`
+returns exactly one line, `983  0  analysis/cM1_cts2_score.py`: **983 insertions, 0 deletions, one
+added file**.  `git diff --name-status` over `analysis/` shows a single `A`.  The commit as a whole
+is 3 files / 1,464 insertions / 0 deletions (`analysis/cM1_cts2_score.py`, `bin/cM1_clamp_release.sh`,
+`bin/PROTECTED.txt`).  `grep -c cts2 results/all_runs.csv` = **0** at this HEAD, so the scorer was
+committed before any of its data existed, on the corpus as well as on the clock.
+
+### 148.2 `cts2`'s PRE-REGISTRATION, SO THE VERDICT CANNOT BE CHOSEN AFTERWARDS
+
+Primary is `plateau5` (mean of the last 5 test epochs), read from each run's own `.out`; the CSV
+`plateau` column is banned as primary and the scorer never opens it.  `train5` is reported at every
+arm.  `D_C = M(k49,C) - M(k50,C)`, `D_R = M(k49,R) - M(k50,R)`, and the estimand is the interaction
+`INT = D_C - D_R`.  Bars, from a pooled within-cell SD re-derived from the corpus and restricted to
+the `m=2` `[k,62-k]` granularities (`sigma_w = 0.8919 pp`, df 46): `SURVIVE/PREMISE 12.4170 pp`
+(half `cts1`'s own 24.8340 pp cliff), `COLLAPSE 1.4564 pp` (2 SE), `INTERACTION 2.0598 pp` (2 SE_INT),
+`NOISY 2.6757 pp` (3 sigma_w), `DEAD 5.00 pp`.
+
+Gates fire in order and the first failure decides: **G0** provenance -> VOID; **R1** manipulation
+check (every CLAMPED run must reach its floor, every RELEASED run's minimum beta must stay strictly
+above `-80 + 0.1004`) -> UNRESOLVED-MANIPULATION, failing **closed** to
+UNRESOLVED-MANIPULATION-UNCHECKED if the traces cannot be read at all; **R2** any DEAD run ->
+UNRESOLVED-DIVERGED, registered in advance precisely so that "removing the floor stopped it
+training" can never be scored as "the cliff collapsed"; **R3** within-cell SD above 3 sigma_w ->
+UNRESOLVED-NOISY; **R4** the in-batch CLAMPED cliff must reproduce (`D_C >= 12.4170`) ->
+UNRESOLVED-PREMISE.  `COLLAPSED-BY-FREEZING` is a distinct named outcome when both released cells
+end below beta = -20 in both blocks.  The released floor `-80` is non-binding **by arithmetic**:
+Lion with `--weight-decay-meta 0` gives `|dbeta| <= ms = 1e-3` per meta-step exactly, and 50,000
+meta-steps from `float32(log 1e-6) = -13.815511` reach at worst `-63.790127`, so `-80` is 16.21 nats
+below anything this configuration can produce.
+
+The registering agent put its **prior on record before the data**: COLLAPSED or PARTIAL rather than
+SURVIVED, on the ground that `cts1`'s k49 arm has both groups pinned at the floor while k50's first
+group never comes within 1.18 nats of it, and an asymmetrically binding constraint is the definition
+of a confound.  Both branches carry identical machinery and identical bars.
+
+**`cts2` IS NOT SCORED IN THIS ENTRY.**  All 12 jobs were `RUNNING` at this HEAD, 16-17 minutes
+elapsed, on 8 distinct nodes; expected landing 45-55 min from the 11:10:01 start.
+
+### 148.3 THE CLAMP CENSUS — INSTRUMENT, AND THE ONE TRAP THAT ALMOST CORRUPTED IT
+
+Read-only, both accounts: **1,171 probe directories** (665 on `alice`, 506 on `alice2`).  For each,
+the terminal complete record of `probe.jsonl` plus 10 interior byte-quantile records; `probe_index.json`
+for the true group count `m`.  Runs were joined to their own `.out` **`ENV` line's `PROBE_DIR`**,
+which is an exact path join, with a token-multiset fallback on the run name: **1,091 of 1,171
+joined** (781 by `PROBE_DIR`, 310 by name); the remaining 80 are reported as unjoined and enter no
+rate.  Nothing was written into either runs tree.
+
+Binding is read at **coordinate** resolution — the correct denominator, per FINDINGS 51.1 — by two
+detectors: `n_at_lo > 0` / `n_at_hi > 0` where the probe schema carries them (667 records), and
+equality of `beta_true_min` / `beta_true_max` with the box wall otherwise.
+
+**THE TRAP, recorded because it silently produced a wrong answer here first.**  Exact float equality
+with the wall is a clean detector for the FLOOR and a **broken** one for the CEILING.  `-15.0` is
+exactly representable in float32; `-2.3026` is not — the clamp writes
+`float32(-2.3026) = -2.3025999069213867`, which is `!=` the Python float `-2.3026` parsed from the
+`BETA_CLIP` string.  The first pass of this census therefore reported a corpus ceiling rate of
+**2.8%** when the true figure is **9.0%**, and a CIFAR-100 ceiling rate of **0.0%** against a true
+**68.6%**.  It was caught only because the two detectors disagreed on 17 records.  With a float32
+tolerance the two detectors agree on **all 667 records that carry both — 0 floor disagreements, 0
+ceiling disagreements**.  Anyone repeating this measurement must compare against `float32(wall)`,
+not against the string's decimal value.
+
+**PIPELINE VALIDATION against results already on the record**, all reproduced by this instrument
+without being told the answer: `ar1` floor-bound **12/12** (CORRECTIONS 6203); `fa1` ceiling-bound on
+the **nodewise arm in 5 of 6 seeds** and **0/6 on each of `chunk777`, `chunk2325`, `nodewise1d`**
+(CORRECTIONS 117.1's arm asymmetry, exactly); `hz3`'s three mislabelled seed-5 rows
+(`hz3-c23-s5`, `hz3-ch-s5`, `hz3-n1d-s5`) floor-bound **3/3** at `-15:-2.3026` while all **21** rows
+at `-30:9.0` are clean on both rails (CORRECTIONS 8114); frozen-beta arms **0/78** (FINDINGS 51.6
+verified 28/28; this is a 2.8x larger sample of the same null).
+
+### 148.4 HOW OFTEN THE BOX BINDS — MEASURED
+
+Terminal record, all 1,091 scorable probes:
+
+| rail | rate |
+|---|---|
+| FLOOR | 301/1091 = **27.6%** |
+| CEILING | 98/1091 = **9.0%** |
+| either | 331/1091 = **30.3%** |
+
+CORE SET — canonical box `-15:-2.3026`, `HIER=none`, live meta-optimizer, n = 501 — broken by
+**meta-stepsize**, which is the first-order axis and not granularity:
+
+| `ms` | n | floor | ceiling | binds |
+|---|---|---|---|---|
+| `1e-4` | 297 | 1.0% | 1.7% | **2.7%** |
+| `3e-4` | 15 | 100.0% | 6.7% | **100.0%** |
+| `1e-3` | 177 | 77.4% | 27.1% | **78.0%** |
+| `1e-2` | 12 | 100.0% | 50.0% | **100.0%** |
+
+**At the tuned `ms=1e-4` the box is effectively inert; at the shared `ms=1e-3` it binds in four runs
+out of five.**  The 8 runs that do bind at `ms=1e-4` are named, and none is an SGDm+Lion primary at
+the correct box: `aw1-node-s{0,1,2}` (AdamW base, ceiling) and `sm3-awrms-node-s{0,1}`
+(AdamW+RMSProp, ceiling) — 5 ceiling touches under non-SGDm bases — plus the **three `hz3` seed-5
+rows already known to carry the wrong box** (CORRECTIONS 8114).  Excluding that known contamination,
+the SGDm+Lion primary cells at `ms=1e-4` and the canonical box bind **0 times**.
+
+Two structural nulls: frozen-beta arms **0/78**; `HIER=shrink` **0/26** — full pooling collapses beta
+to a common value, so no group can run to a wall.
+
+At `ms=1e-3`, by dataset and by network:
+
+| stratum | n | floor | ceiling |
+|---|---|---|---|
+| CIFAR-10 | 126 | 77.8% | 10.3% |
+| CIFAR-100 | 51 | 76.5% | **68.6%** |
+| ResNet10 | 17 | 88.2% | 29.4% |
+| ResNet18 | 92 | 83.7% | 7.6% |
+| ResNet18_c100 | 51 | 76.5% | 68.6% |
+| ResNet34 | 17 | 35.3% | 5.9% |
+
+The FLOOR rate is the same on both datasets; the whole dataset difference is the CEILING, six times
+as often on CIFAR-100.  By `alpha0` at `ms=1e-3`: `1e-3` n=158 floor 79.7% / ceiling 29.7%;
+`1e-6` n=19 floor 57.9% / ceiling 5.3%.  The RATE is comparable; the DURATION is not, because at
+`alpha0=1e-6` beta starts 1.1845 nats above the floor and at `1e-3` it starts 8.09 nats away.
+
+### 148.5 THE m-LADDER — THE CONFOUND EXISTS ONLY IN THE MISTUNED-`ms` REGIME
+
+Core set, `ms=1e-3`:
+
+| m | arm | net | n | binds |
+|---|---|---|---|---|
+| 1 | scalar | R18 | 10 | **0.0%** |
+| 6 | `resnet18_blocks` | R18 | 16 | 68.8% |
+| 6 | `resnet18_blocks` | R18_c100 | 10 | 0.0% |
+| 38 | layerwise | R10 | 5 | 100.0% |
+| 62 | layerwise | R18 | 30 | 100.0% |
+| 62 | layerwise | R18_c100 | 13 | 100.0% |
+| 110 | layerwise | R34 | 5 | 100.0% |
+| 8,660 | nodewise | R10 | 5 | 100.0% |
+| 14,600 | nodewise | R18_c100 | 13 | 100.0% |
+| 25,556 | nodewise | R34 | 5 | **0.0%** |
+| 4,903,242 | weightwise | R10 | 5 | 100.0% |
+| 11,173,962 | weightwise | R18 | 20 | 100.0% |
+| 11,220,132 | weightwise | R18_c100 | 13 | 100.0% |
+| 21,282,122 | weightwise | R34 | 5 | **40.0%** |
+
+Same ladder at `ms=1e-4`: **34 rungs, n = 297, and the highest single rung reads 9.1%** (nodewise /
+R18, n=55 — driven by the `aw1`/`sm3` non-SGDm cases above), pooled **2.7%**.  **The rise with m
+exists only where the meta-stepsize is past its optimum.**  Where the campaign's live results now
+sit (`ms=1e-4`), `m` and clamp occupancy are not confounded, because the clamp is inert.
+
+**TWO MEASURED QUALIFICATIONS TO FINDINGS 36.3 AS WRITTEN.**  (i) 36.3's *"exactly -15.0000 in 100%
+of layerwise, nodewise and weightwise arms across all three architectures"* does **not** hold on
+ResNet34: at `ms=1e-3`, R34 nodewise binds **0/5** and R34 weightwise **2/5**, against 100% for
+every R10 / R18 / R18_c100 rung.  The correct sentence is *"monotone in m on R10, R18 and
+ResNet18_c100; NON-monotone on ResNet34, where the fine arms escape the floor"*.  (ii) 36.3's
+*"clip-activity is monotone in m"* is a FLOOR statement; the ceiling is not monotone in m and is
+strongly dataset-dependent.
+
+**36.3's central sentence is CONFIRMED corpus-wide and strengthened.**  Across **all 33 scalar probe
+runs** in the corpus (10 batches, three `alpha0` values, all at `ms=1e-3`): floor **0/33**, ceiling
+**0/33**, and **0/33 touch either wall at any of the 10 interior sampled records**.  The scalar
+reference never touches a bound anywhere in the corpus, not merely at `alpha0=1e-6`.
+
+### 148.6 WHAT WAS ALREADY ON THE RECORD — CITED, NOT RE-DISCOVERED
+
+**The clamp has been audited four times before this cycle.  None of the following is new, and this
+entry does not claim it.**
+
+* **FINDINGS 36.3** already names the confound in full, from the `p7free` and `mx` probes, and
+  already states that *"the scalar reference is the only arm that never touches a bound"* and that
+  *"every granularity-vs-scalar comparison in this campaign is confounded with how hard the guard is
+  biting"*.  **The existence of the confound is 36.3's finding, not this cycle's.**
+* **FINDINGS 51.1** already established that every clip fraction quoted before it was at the wrong
+  resolution (per-tensor `beta[]` instead of coordinate-level `beta_true_min/max`).  This census uses
+  51.1's denominator because 51.1 settled it.  51.2 established the mechanism as ballistic and
+  two-sided; 51.4/51.6 established that `wc5` widened the wrong wall and that the frozen half is
+  clip-clean 28/28.
+* **FINDINGS 52.2/52.3/52.4** already ran the campaign's box-free controls (`cl5-cU`, `uc5-r10`,
+  `uc5-r34` at `-30:0.0`, 0.0000% of coordinates at either guard) and already **excluded** clip
+  saturation as the Q4-rebound mechanism, with the `N_eff/m` headline moving `+0.024/-0.006/-0.004`
+  across four boxes and three families.
+* **CORRECTIONS 117.1** already re-read the D-carrying cells at the true denominator, already found
+  `mm1/pp1/cc1/bn1/g3m/gc1` clean, already found `fa1` arm-asymmetric and disclosed it, and already
+  VOIDed `ar1`.  **The paper's D was audited there.  This census reproduces that audit and adds
+  nothing to it.**
+* **CORRECTIONS 147** already recorded `cts1`'s fine group pinned at the floor in 12/12 cut runs and
+  already stated that nothing in `cts1` separates stepsize allocation from clamp-turnover timing.
+* **CORRECTIONS 6190-6215** already established the ceiling as a stability device (2/2 fatal when
+  released at weightwise) and that only the floor is confounded with the stepsize.  **CORRECTIONS
+  8114** already recorded the three mislabelled `hz3` rows.  **OPERATIONS.md:447** already records
+  that the clip runs after `_apply_hier`, so a binding clip breaks mean-preservation.
+
+### 148.7 WHAT IS GENUINELY NEW IN THIS CENSUS — THREE THINGS, AND THEY ARE MODEST
+
+1. **Scope.** Previous audits looked at named batches.  This is the first pass over **all 1,171
+   probe directories on both accounts** at coordinate resolution.
+2. **The meta-stepsize is the dominant axis, not granularity.**  This is the one genuinely
+   load-bearing new fact.  36.3 framed the confound as granularity-vs-clamp; measured across the
+   corpus it is **`ms`-vs-clamp**, with granularity entering only at `ms >= 1e-3`.  That is what
+   makes the null in 148.9 possible: it is *because* the modern programme runs at `ms=1e-4` that the
+   clamp does nothing to it.
+3. **A coverage statement for the half of the corpus that has no trajectory at all** (148.10), which
+   no previous audit gave, and the float32 ceiling trap of 148.3.
+
+### 148.8 FINDINGS AT RISK — PER FINDING
+
+**[1] MASTER-TABLE row 24** — *"partitioning buys TOLERANCE to an over-large meta-stepsize, not peak
+accuracy; the granularity claim is a robustness claim"* (falloff above the `ms` peak: scalar 5.871 vs
+blk6 1.060 / layerwise 1.801 / nodewise 2.593 pp per decade).  Verdict CONFIRMED.
+**AT RISK, and it is the worst case in the file.**  Its entire content is the response surface
+**above** each arm's `ms` optimum, and that region is measured here to be the clamped region for
+partitioned arms and the interior region for scalar: at `ms=1e-3` scalar binds **0/10** (R18) and
+**0/33** corpus-wide, while every layerwise, nodewise and weightwise rung on R10/R18/R18_c100 binds
+100%; at `ms=1e-2` every rung binds 100% on the floor and 50% on the ceiling.  The mechanism the row
+asserts and the mechanism the box supplies are the same mechanism: a too-large `ms` drives a group's
+beta ballistically (FINDINGS 51.2) and the floor catches exactly those runaway groups, so a
+partitioned arm gets a stabiliser the single-group scalar arm never invokes — and "pp lost per decade
+above the peak" is precisely what a stabiliser changes.  **Restating it as "in the clamped regime"
+does not save it, because the regime IS the finding.**  Worse, its own instrumentation is absent:
+the c40 `ms-` family that carries the falloff numbers has **0 of 52 rows with any beta trajectory**
+(measured), as do `ac` 0/42, `bl` 0/30, `ad` 0/29, `r34r` 0/27, `dc` 0/25, `r10` 0/24, `i3a` 0/21 and
+`mx` 0/46.  **The occupancy of the runs row 24 is actually computed from is NOT MEASURED and cannot
+be, without re-running them.**
+
+**[2] MASTER-TABLE row 23** — *"does a finer partition help at all"*, CONFIRMED, two numbers.  The
+shared-`ms` figure **+3.339 pp** is **clamp-asymmetric** (at `ms=1e-3`, scalar 0/10 vs layerwise
+30/30 at the floor); the tuned figure **+0.564 pp at `ms=1e-4`** is **clean** — measured 0/6 for
+layerwise at that `ms`, and algebraically unreachable besides, since at `alpha0=1e-3` the floor is
+8.09 nats away against `ms*T = 5` nats of Lion travel.  **SURVIVES RESTATEMENT.**  The honest form:
+*"+0.564 pp at matched tuning, box-inert; the +3.339 pp shared-`ms` figure is measured with the fine
+arm at the floor and the coarse arm interior and must be labelled clamped-regime."*  Row 23's own
+existing caveat ("81-83% of the apparent gain is meta-step tuning") already points the same way.
+
+**[3] MASTER-TABLE row 31** — a shared-`ms` granularity contrast is confounded with which `ms` that
+partition prefers (`hz9`).  **`hz9` has no probe directory and no TensorBoard beta trace — its
+occupancy is UNMEASURED, not clean, and that is disclosed here.**  But the census *strengthens* the
+row's conclusion rather than threatening it: the reason a shared-`ms` contrast is not a partition
+contrast now has a second, mechanical component.  **SURVIVES, with the disclosure added.**
+
+**[4] CLOSEOUT item 3 / CORRECTIONS 114.3 — THE PAPER's D** (`chunk777` − nodewise, pooled
+**+0.5805 ± 0.0939**, G = 0 at exact count match).  **ALREADY AUDITED at CORRECTIONS 117.1, and this
+census reproduces that audit exactly and adds nothing.**  Every count-matched cell at `ms=1e-4` is
+box-inert on this instrument: `mm1` 0/6, `pp1` 0/9, `cc1` 0/12, `bn1` 0/9, `nl1` 0/24, `ml2` 0/24,
+`sm4` 0/12, `bm2` 0/12, `gm2` 0/12, `gc1` 0/8, `g3m` 0/36, `r50` 0/12, `gn1` 0/24, `rp1` 0/24.
+`ar1` is floor-bound 12/12 and is **already VOID**; `fa1` is arm-asymmetric and **already disclosed**.
+**UNTOUCHED.**
+
+**[5] CLOSEOUT item 5a — the unaugmented parent cell**, filed CLOSED-WITH-GUARD-CAVEAT because
+occupancy was unmeasured 1.18 nats from the floor.  **THE CAVEAT IS DISCHARGED AND THE CLOSEOUT ENTRY
+IS STALE.**  `ub9` (registered at CORRECTIONS 119.10, scorer hashed pre-data) re-ran the cell at
+`-60:6.0`; measured here, **0/9 binding** — the box really was released.  And the registered verdict
+went the *other* way: releasing the box made the granularity step **larger**, not smaller.  **This is
+the campaign's one direct test of "does the clamp manufacture a granularity gain", and it came out
+against the artefact hypothesis.**
+
+**[6] MASTER-TABLE rows 56/57 — CIFAR-100 granularity** (scalar 22.6 -> blk6 51.3 -> layerwise 69.6,
++47 pp).  Measured at `ms=1e-3` on CIFAR-100: scalar **0/2**, blk6 **0/10**, layerwise **13/13**,
+nodewise **13/13**, weightwise **13/13**, with the ceiling bound in 68.6% of runs as well.
+**Maximally clamp-asymmetric on paper — but a 47 pp effect is not manufacturable by a stepsize wall**,
+and CORRECTIONS 147's `cts1` reproduces the same ordering at `m=2` on an independent instrument.
+**SURVIVES**, with the label *"measured in a regime where every partitioned arm is two-sided clamped
+and the scalar arm is interior"*.  Row 57's nodewise-vs-layerwise comparison is **within** the
+clamped set (both 13/13) and is a within-regime contrast.
+
+**[7] MASTER-TABLE row 27 (H4, base-optimizer interaction)** — **OPEN, and not made worse.**  `bo6`
+binds 4/6 (all four are CEILING touches), which row 27 already records as a failed box-free gate;
+`bo7` binds **0/12** and **is on disk**.  Not at risk; unfinished.
+
+**[8] MASTER-TABLE rows 36/37/38, CLOSEOUT item 2 — the horizon reversal.**  Measured: `br6` 0/12,
+`bl5` 1/9, `sp8` 0/9, `ns5` 0/15.  **CLEAN** — this finding was already run in released boxes.
+
+**[9] Direction C (the 53.1% sign-agreement null, the frozen 4-family profile, `N_eff/m`).**  Frozen
+arms 0/78; `N_eff/m` already box-tested across four boxes and three families at FINDINGS 52.3.
+**UNTOUCHED.**
+
+**[10] CORRECTIONS 146/147 (`cpk1`, `cts1`).**  No probe directory exists for either; the beta
+evidence is the `Optimizer_blockwise/beta_block{0,1}` traces, which exist only because `m=2`.  147
+already records the 12/12 pinning and already states the limitation.  **Nothing to add — and this is
+exactly what `cts2` was registered to settle.**
+
+**[11] `hz3`'s wrong-box rows (CORRECTIONS 8114).**  Now measured rather than merely labelled: the
+three seed-5 rows are floor-bound with the canonical box while all 21 `-30:9.0` rows are clean on
+both rails.  **A known metadata discrepancy is confirmed to be a real regime difference**; any scorer
+pooling them would pool a clamped run with box-free ones.
+
+### 148.9 WHAT THE CENSUS LEAVES ALONE — THE NULL, STATED PLAINLY AND NOT INFLATED
+
+**No finding in the file is refuted by this census.**  The census changes the LABEL on the `ms=1e-3`
+family and leaves the `ms=1e-4` family alone.  That is the whole result.
+
+* **The campaign's entire modern programme lives in a regime where the clamp does nothing.**  296+
+  core-set probe runs at `ms=1e-4`, 2.7% binding, and every residual case is either a non-SGDm base
+  variant or the known `hz3` contamination.  The count-matched partition series, the chunk-size
+  ladder, the permutation null, and the architecture and dataset screens are all in that regime.
+* `ck1` — the five-rung chunk-size ascent of paper §4.2, the corpus's cleanest granularity ladder —
+  is **0/15 binding, both rails, every seed**.
+* `rp1` 0/24, `gn1` 0/24, `g3m` 0/36, `gm2`+`gc1` 0/20, `r50` 0/12, `nl1` 0/24, `tw0` 0/9, `rl3`
+  0/24, `br6` 0/12, `ns5` 0/15, `sp8` 0/9, `bo7` 0/12, `uc5` 0/12, `uc6` 0/6, `bl5` 1/9, `tc1` 1/12,
+  `ub9` 0/9.
+* The frozen half: **0/78**.
+* Contrasts in which **every** arm is equally clamped are not damaged, only re-labelled: CIFAR-100
+  nodewise vs layerwise (both 13/13), `cts1`'s k49-vs-k50 cut (12/12, already stated in 147).
+
+### 148.10 MEASURED vs INFERRED, AND THE INSTRUMENT'S LIMITS
+
+**MEASURED** (read-only, this cycle, from the runs' own files): every rate above, from 1,171
+`probe.jsonl` files at coordinate resolution, `m` from `probe_index.json`; the join of 1,091/1,171
+probes to their own `.out` `ARGS`/`ENV` lines; the corpus coverage census below; the `cts2` `ARGS`
+and `ENV` audit of 148.1.
+
+**COVERAGE — the honest limit.**  Joining probe directories and TensorBoard `beta_block*` traces to
+`results/all_runs.csv` by separator-normalised run name: **1,356 of 2,501 rows (54.2%) have a beta
+trajectory of any kind; 1,145 (45.8%) have none.**  Coverage is worst exactly where it matters most:
+
+| stratum | with a trajectory |
+|---|---|
+| scalar | 33/246 = **13.4%** |
+| layerwise | 344/995 = 34.6% |
+| weightwise | 170/248 = 68.5% |
+| nodewise | 227/286 = 79.4% |
+| `resnet18_blocks` | 242/242 = 100% |
+| `ms=1e-3` | 852/1721 = 49.5% |
+| `ms=1e-4` | 349/376 = **92.8%** |
+
+TensorBoard `beta_block*` exists on only **339** run directories corpus-wide and only ever logs
+`m <= 6` blocks, so it can never measure a layerwise, nodewise or weightwise arm.  **For any batch
+not named in this entry the clamp status is NOT MEASURED, and it is not inferred.**
+
+**INFERRED, and labelled as such:**
+* That the scalar arm at `ms=1e-4` is box-free.  **No scalar probe exists at any `ms` other than
+  `1e-3` in the entire corpus** — every one of the 33 is at `1e-3`.  The inference is algebraic, not
+  statistical: with `--weight-decay-meta 0`, beta is confined to `[ln a0 - ms*T, ln a0 + ms*T]`, so
+  at `alpha0=1e-3`, `ms=1e-4`, `T=50,000` that is `[-11.908, -1.908]` and the `-15` floor is
+  unreachable.  **The ceiling is NOT excluded by that argument.**
+* That the 1,145 rows with no trajectory share the status of instrumented runs at the same
+  `(net, dataset, alpha0, ms, box)`.  **This is NOT asserted.**  Where a finding rests on such a
+  family the entry says UNMEASURED, not clean.
+* **Direction of harm is not measured anywhere in this census.**  Whether a binding floor inflates or
+  deflates a given contrast is unknown in general: CORRECTIONS 117.1 argues one direction for `ar1`
+  ("the floor holds the nodewise arm's step sizes UP, which INFLATES D"), while `ub9` measures the
+  opposite direction in the one cell that has a scalar arm.  Both are on the record; **neither
+  generalises**, and this entry claims neither.
+
+**TWO INSTRUMENT LIMITS TO CARRY.**  (1) Trajectory sampling is the terminal record plus 10 interior
+byte-quantile records, so "bound at some sampled record" is a **lower bound** on "ever bound"; the
+terminal flag is exact.  (2) Where `probe.jsonl` is absent the answer is *"not available"*, never
+*"not binding"*.
+
+### 148.11 THE NEXT EXPERIMENT
+
+**Step 0 costs zero GPU-hours, and it is not scored here.**  Two box-released, **scalar-containing**
+cells are already complete on disk, and the census confirms both are genuinely released:
+
+| batch | n | cell | box | arms | measured binding |
+|---|---|---|---|---|---|
+| `tc1` | 12 | R18 / CIFAR-10, `ms=1e-3`, `alpha0` {1e-3, 1e-4}, 100 ep, AUGMENT=1 | `-30:6.0` | scalar, `resnet18_blocks`, layerwise | **1/12** (one layerwise seed) |
+| `ub9` | 9 | R18 / CIFAR-10, `alpha0=1e-6`, `ms=1e-3`, 100 ep | `-60:6.0` | scalar, `resnet18_blocks`, layerwise | **0/9** |
+
+All 21 rows are `complete=1`, `superseded=0`.  **They are exactly the scalar-arm box contrast that
+the twelve box-ladder batches never ran** — measured here: of the 24 non-canonical-box cells in the
+corpus, only `tc1` and `ub9` contain a scalar arm; `wc5`, `cl5`, `uc5`, `uc6`, `bl5`, `br6`, `bo6`,
+`bo7`, `bd7`, `bf8`, `bf9`, `ns5` and `sp8` are all `{layerwise, nodewise, weightwise}` only.
+
+**THESE ARMS ARE DELIBERATELY NOT DIFFERENCED IN THIS ENTRY.**  Their data already exist, so under
+RULE 21 a scorer must be registered and committed **before** the contrast is computed; computing it
+now and writing the number down would be exactly the post-hoc scoring the rule forbids.  The scorer
+must state in advance the arm means, the matched canonical-box cell, the decision rule, and the fact
+that **`tc1`'s box differs from the canonical cell in BOTH walls**, so a null there is ambiguous
+between "the box does not matter" and "the two changes cancel".  At n = 2 per `(arm, alpha0)`, `tc1`
+is underpowered against the campaign's own ~0.21 pp batch floor and is a **direction check, not a
+settlement**.
+
+**Step 1 — the purchase that actually settles row 24.  12 jobs, ~12 GPU-h, ONE submission.**
+R18 / CIFAR-10 / SGDm+Lion / `alpha0=1e-3` / AUGMENT=1 / 100 ep, at **`ms=1e-3`** (the over-large
+point; `ms=1e-4` needs no arm because both granularities are already measured box-inert there),
+granularity `{scalar, layerwise}` x box `{-15:-2.3026, -30:6.0}` x seeds `{0,1,2}`.
+Estimand: `[layerwise − scalar]_wide − [layerwise − scalar]_narrow`, **all four arms in one batch**
+so the cross-batch floor cancels.  Pre-register: within ±0.30 pp of zero -> row 24's tolerance claim
+is about the PARTITION and survives; the wide box shrinking the gap by more than 0.30 pp -> the
+tolerance is the wall and row 24 must be rewritten; the wide box GROWING it (which is what `ub9` did
+at `alpha0=1e-6`) -> the tolerance is real and the box was suppressing it.
+Guards that must be live: RULE 20 after launch; a coordinate-denominator occupancy print per seed per
+arm, voiding any contrast whose arms differ by more than 0.10 in occupancy; and a disclosure that
+`-30:6.0` is **measured-free, not provably free** — at `ms=1e-3` over 100 epochs `ms*T = 50` nats, so
+no sane ceiling is provable.  Known hazard, from the record: CORRECTIONS 6190-6215 measured 2/2 fatal
+collapses when the ceiling was released to `+6.0` **at weightwise**; this design carries no
+weightwise arm, and `tc1` already ran scalar/blk6/layerwise at `-30:6.0` for 100 epochs with zero
+collapses, so the risk is measured rather than assumed.
+
+**Extending the census is NOT worth GPU-hours.**  The 1,145 un-instrumented rows cannot be
+re-instrumented without re-running them, and for the modern cells the answer is already "inert".
+
+### 148.12 LEDGER
+
+**No ingest this cycle.**  `cts2` had not landed; `results/all_runs.csv` is unchanged at **2,501
+rows** and `grep -c cts2` = 0.  `aggregate.py` was not run and no row was added, changed or removed.
+`analysis/c98_reproduce.py` **still exits 1** on the same inherited stale numerals — author scope,
+CORRECTIONS 141.6 / 142.6, **not touched here**.  `git status` shows **nothing under `paper/`**;
+no file under `paper/` was read for edit or written this cycle.
