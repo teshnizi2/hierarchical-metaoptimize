@@ -10995,3 +10995,272 @@ meta-stepsize or optimiser pair, or about any hierarchical operator (HIER unset 
 locates a curve in cut position k for ONE architecture in ONE `named_parameters()` order; a
 different ordering of the same network is a different experiment.  Normalised entropy stays
 DISQUALIFIED (cbl1 R5) and is NOT rehabilitated here whichever way it falls.
+
+---
+
+## 147. `cts1` LANDS -- ONE TENSOR CARRIES THE CLIFF AT ONE SITE.  THE BRIEFING'S MASS ACCOUNT IS DEAD, AND THE WINNING ACCOUNT'S CLASS-LEVEL FORM IS WITHDRAWN BY THE PARENT BATCH'S OWN DATA
+
+Cycle 123.  18/18 complete, 0 failures.  Scorer `analysis/cL1_cts1_score.py` run UNEDITED
+(sha256 `91b2803005d40af3d18efe258411f7de6e5c98399759cb2c7f2d0cf94870bcbd`, identical on the Mac and
+on alice2, matching the digest frozen at registration commit `186d9ad`, 92 s before the first job
+was submitted; `git status --porcelain analysis/cL1_cts1_score.py` empty).  RULE 20: `argsline_guard`
+= **18 clean, 0 mismatch, 0 without an ARGS line, VERDICT PASS**; independently confirmed here by
+stripping `--stepsize-groups` / `--seed` / `--run-name` / `--save-directory` from all 18 ARGS lines,
+which collapses them to **one** distinct string, with one distinct `ENV:` string
+(`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none PROBE=0`).  All gates pass: G0 18/18, G1 manifest
+(62 tensors / 11,220,132 params, all four specs exact in sizes, parameter counts AND tensor names),
+G1b each step moves exactly one tensor and it is the registered one, G2 completeness (18 x 100
+epochs, no gaps, `RUN_DONE` in all 18), G3 anchors -0.083 / +0.085 pp, G4 gap +46.951 pp.
+
+Every number below was re-derived on this machine from the raw `.out` epoch lines with an
+independent parser before the scorer was consulted, and the scorer was then re-run locally
+(`METAOPT_WS=.../alice-backup python3 analysis/cL1_cts1_score.py --runs ../runs_alice2`, exit 0)
+and on alice2.  Both reproduce the FINAL line character-for-character.
+
+### 147.1 THE VERDICT, QUOTED VERBATIM
+
+    VERDICT (the CLIFF):   CLIFF-REPRODUCES
+    VERDICT (the SPLIT):   SINGLE-TENSOR-MAJORITY
+    VERDICT (the TENSOR):  layer4.0.bn2.weight
+    VERDICT (A1 MASS):     MASS-REFUTED
+    VERDICT (A2 BN):       BN-LEVERAGE-FAVOURED
+    VERDICT (SCALE-SHIFT): SCALE-SHIFT-ASYMMETRIC
+    FINAL: CLIFF CLIFF-REPRODUCES | SPLIT SINGLE-TENSOR-MAJORITY | TENSOR layer4.0.bn2.weight
+           | MASS MASS-REFUTED | BN BN-LEVERAGE-FAVOURED | SCALE-SHIFT SCALE-SHIFT-ASYMMETRIC
+
+### 147.2 THE ARMS
+
+    arm  spec       n  plateau5  se     train5   CAPTURE   coarse ends at / fine starts at
+    k01  scalar     3  22.666    0.422  22.827   +0.0000   -- (anchor)
+    k49  [49,13]    3  55.169    0.405  62.273   +0.6923   conv2.weight | bn2.weight
+    k50  [50,12]    3  30.335    0.852  32.219   +0.1633   bn2.weight   | bn2.bias
+    k51  [51,11]    3  30.568    0.845  32.287   +0.1683   bn2.bias     | shortcut.0.weight
+    k52  [52,10]    3  38.275    0.510  42.104   +0.3324   shortcut.0.weight | shortcut.1.weight
+    k62  layerwise  3  69.617    0.295  98.973   +1.0000   -- (anchor)
+
+In-batch GAP = 46.951 pp.  Per-seed plateau5: k49 55.974/54.688/54.844, k50 31.680/28.756/30.568,
+k51 31.964/29.046/30.694, k52 38.916/37.268/38.640.  All 18 rows carry `epochs_done=100`,
+`window_ok=1`, `complete=1`, `superseded=0`, `collapsed=0`.
+
+### 147.3 THE THREE SINGLE-TENSOR DROPS AND THE MATCHED CONTROL
+
+    step        tensor that moves            params   dCAPTURE   SHARE     pp / se / t (df 4)
+    k=49->50    layer4.0.bn2.weight             512    +0.5289   +1.4700   +24.834 / 0.944 / +26.32
+    k=50->51    layer4.0.bn2.bias               512    -0.0050   -0.0138    -0.233 / 1.200 /  -0.19
+    k=51->52    layer4.0.shortcut.0.weight   131072    -0.1641   -0.4562    -7.707 / 0.987 /  -7.81
+    TOTAL                                            +0.3598             +16.894 / 0.651 / +25.95
+
+MATCHED CONTROL (registered as Q5): `layer4.0.bn2.weight` and `layer4.0.bn2.bias` hold **identical**
+parameter counts (512 vs 512), are adjacent in `named_parameters()`, and belong to the same
+`BatchNorm2d`.  DROP1 - DROP2 = **+0.5339, 24.4 SE**, bar 0.05.  Paired by seed (seeds are shared
+across arms, an analysis the registration did not perform): DROP1 = +24.294 / +25.932 / +24.276 pp,
+DROP2 = -0.284 / -0.290 / -0.126 pp; sign-consistent 3/3 on both, with zero overlap.
+
+Registered predictions scored: **Q1 HELD** (largest drop is DROP1), **Q2 REFUTED**, **Q3 HELD**
+(TOTAL +0.3598 vs bar 0.1820), **Q4 HELD**, **Q5 HELD**, **Q6 HELD** (train agrees: train DROP1
++0.3947 is also the largest).
+
+### 147.4 MY OWN PREDICTION WAS REFUTED.  THE BRIEFING AUTHOR WAS WRONG
+
+**A1 PARAMETER MASS was the reading carried into this batch from the cycle briefing** -- the scorer
+says so in its own registration text, and registered it as the RIVAL TO BEAT precisely so that the
+briefing could lose in public.  It lost, and it lost **with the wrong sign**.  I predicted that
+`layer4.0.shortcut.0.weight` -- 131,072 params, 99.225 % of the moved mass -- would carry the
+collapse (Q2).  Its SHARE is **-0.4562**: moving it out of the fine group does not cost capture, it
+**adds** +7.707 pp.  The 512-parameter tensor holding 0.39 % of the moved mass carries +1.4700.
+This is the second consecutive cycle in which the briefing's inherited reading was the loser
+(CORRECTIONS 146.2, P5) and it should be read as such: the briefing is a hypothesis generator with
+a losing record, not a prior.
+
+### 147.5 THE ADVERSARIAL ROUND -- FIVE LENSES, TWO REFUTED
+
+| lens | verdict | what it found |
+|---|---|---|
+| statistics & power | not refuted | Registered SE 0.012653 honestly re-derived (sigma_w 0.724511, df 71, 37 cells). Leave-one-seed-out and per-seed independent scoring reproduce every gate 3/3. **But k50/k51/k52 had not converged at epoch 99.** |
+| implementation / off-by-one | not refuted | Instantiated the real `HF` optimiser on the real model for all four specs: group 0 is exactly indices 0..k-1, no off-by-one, the named tensor is the tensor that moves, weight/bias are separate `nn.Parameter`s, init and batch order shared at fixed seed (epochs 0-3 agree to 0.01 pp). **But it found the beta clamp and the Lion `sign()`.** |
+| same-data-twice | not refuted | 18 distinct job ids 4912082-4912100, 18 distinct md5s, 12 nodes, one submission 2026-09-06T09:07:53. Scorer glob is `**/cts1-*.out`; zero `cts1` rows existed in the CSV. The "identical +0.3324 vs cpk1" is a 4-dp rounding artefact (exact diff 4.0e-6). **But cpk1 and cts1 share seeds {0,1,2} and every non-axis flag -- correlated batches, not independent replicates.** |
+| mechanism / dull-account | **REFUTED** | The fine group's terminal stepsize is the `BETA_CLIP` floor in **12/12** cut runs; `MASS-REFUTED` is a theorem of `HF.py`, not a result. |
+| scope / overreach | **REFUTED** | A2's own stated condition is satisfied at **four** cpk1 cuts and predicts nothing; the "matched control" is nested, not matched; a **second, undocumented cliff** exists at k=52 -> k=55. |
+
+Both refutations were re-derived here independently before being accepted.
+
+**(a) The mediation is not the moved tensor's stepsize.**  From the runs' own TensorBoard traces
+(`Optimizer_blockwise/beta_block{0,1}`, 500 logged points per run), terminal beta:
+
+    arm   COARSE (block0), 3 seeds            FINE (block1)     fraction of log at the clamp (fine)
+    k49   -14.989 / -14.987 / -14.290         -15.000 x3        0.65
+    k50    -9.828 /  -9.882 /  -9.700         -15.000 x3        0.63
+    k51    -9.802 /  -9.836 /  -9.732         -15.000 x3        0.63
+    k52   -10.542 / -10.104 / -10.072         -15.000 x3        0.63-0.64
+    k01   (scalar) -15.000 x3                                    0.63
+
+`BETA_CLIP=-15:-2.3026`, clamped at `HF.py` PATCH_CLIP.  **The fine group ends pinned at the floor
+(alpha = 3.06e-7) in all twelve cut runs**, so no arm gives `layer4.0.bn2.weight` -- or any other
+fine-group tensor -- a different steady-state stepsize.  What differs between arms is the terminal
+stepsize of the **6,315,072-parameter COARSE group**, which anneals to the floor when `bn2.weight`
+is absent from it (k49) and stalls ~200x higher when it is present (k50/k51).  The winning arm is
+the one in which **both** groups end frozen.  The accuracy ordering is already locked by epoch 20
+(k49 23.60 vs k50 20.61 / k51 20.47 / k52 21.25 / k01 20.41) and is indistinguishable at epoch 16
+(14.02-14.27 across all five).  This is the confound already on the books as FINDINGS 36.3
+(*"GRANULARITY AND beta_clip ARE PERFECTLY CONFOUNDED"*), and cts1 was run inside it.
+
+**(b) `MASS-REFUTED` is a property of the code, not a discovery.**  `HF.block_product` on the
+`blockwise` path returns an **unnormalised sum** over group members
+(`sum([(u[i]*v[i]).sum() for i in group_indices])`, HF.py:189), and `Lion_meta_update` applies
+`torch.sign(...)` to it (HF.py:881), so `|dbeta| == meta_stepsize` exactly and parameter count enters
+the meta-update nowhere.  A 512-parameter term can flip the sign of a sum over 6.3 M parameters.
+A1 was therefore refutable by reading the optimiser, before any job ran.
+
+**(c) A2's own condition holds at four cpk1 cuts and predicts nothing.**  A2 is stated as: a BN
+scale sits first in the FINE group while its own convolution is ALREADY COARSE.  Enumerating cpk1's
+eleven m=2 cuts against the 62-tensor `named_parameters()` order (from the manifest, not from prose):
+
+    k    first tensor of the FINE group      preceding tensor (coarse)        A2?   CAPTURE
+    31   layer3.0.bn1.weight                 layer3.0.conv1.weight            YES   +0.2190
+    49   layer4.0.bn2.weight                 layer4.0.conv2.weight            YES   +0.6965
+    52   layer4.0.shortcut.1.weight          layer4.0.shortcut.0.weight       YES   +0.3324
+    55   layer4.1.bn1.weight                 layer4.1.conv1.weight            YES   +0.0139
+    (17, 24, 38, 42, 45, 47, 60 do not satisfy it)
+
+Four sites, captures spanning **+0.0139 to +0.6965** -- nearly the entire range of the sweep, and
+including **k=55, the worst cut in the whole grid**.  The property A2 names does not predict capture;
+cut position does.  Further: of cpk1's **10 steps that move at least one normalisation scale from the
+fine group to the coarse group, 8 RAISE capture and 2 lower it** -- and the corpus's nearest analogue
+to DROP1, the step k=45 -> k=47 which moves `layer4.0.bn1.weight` (also a 512-parameter BN scale,
+also in `layer4.0`) out of the fine group, gains **+3.449 pp / +0.0734 capture**.  That step is
+confounded (`layer4.0.conv1.weight` moves with it), but it is the only other BN-scale-out move in the
+corpus and it points the **opposite** way.
+
+**(d) The matched control is nested, not matched.**  The spec `[k, 62-k]` produces a contiguous
+prefix cut, so DROP2 is not "the cost of moving `bn2.bias`" but "the cost of moving `bn2.bias`
+*given* `bn2.weight` already went coarse and capture already fell to 0.163".  The counterfactual
+partition coarse = {0..48, 50} is not expressible in the spec language and was never run.  The
+registered sentence *"Under ANY account in which the currency is parameter mass these two drops must
+be EQUAL"* additionally requires **additivity**, which this batch's own DROP3 (131,072 parameters
+moving, capture RISING) disproves.  Mass is refuted by Q2's sign, not by the matched control the
+registration advertised as its cleanest instrument.
+
+**(e) There are two cliffs and only one was decomposed.**  From cpk1's capture curve: k=49 -> k=52 is
+**-0.3641**, and k=52 -> k=55 is **-0.3185**, 87.5 % as large.  The second cliff appears nowhere in
+`docs/CORRECTIONS.md`, `docs/FINDINGS.md`, `analysis/cL1_cts1_score.py` or
+`bin/cL1_cliff_tensor_split.sh` (grep returns nothing).  It also contains a 512-parameter BN scale
+(`layer4.0.shortcut.1.weight`) beside a 2,359,296-parameter conv, and has never been resolved.
+
+**(f) Horizon.**  Terminal OLS slopes on test accuracy over epochs 80-99 (pp/epoch): k01 -0.00099,
+k49 -0.00374, k62 +0.02059 (converged) but **k50 +0.04620, k51 +0.04670, k52 +0.06600** -- the three
+arms that define the cliff are still climbing at epoch 99, having gained +0.877 / +0.830 / +1.293 pp
+over the last 20 epochs.  `plateau5` is a snapshot of a rising curve at exactly those arms.  No
+ResNet18_c100 run in the corpus exceeds 100 epochs, so this cannot be settled from existing data.
+It does **not** touch the tensor attribution: k50 and k51 slopes agree to 1 %, so truncation bias
+cancels in the matched control.
+
+### 147.6 WHAT IS WITHDRAWN, WHAT IS NARROWED, WHAT SURVIVES
+
+**WITHDRAWN.**  `BN-LEVERAGE-FAVOURED` **as a class-level mechanism claim**.  The sentence "a
+BatchNorm scale has leverage a BatchNorm shift does not -- multiplicative gains carry the partition
+effect" is withdrawn.  It is contradicted by data already in the corpus at three other sites
+(147.5c), and the scorer's own verdict label is retained only as the arithmetic outcome of the
+registered SHARE test at one site, never as a mechanism.  The verdict string is NOT edited (RULE 16);
+its **interpretation** is.
+
+**NARROWED.**
+- `MASS-REFUTED` is demoted from an empirical result to a restatement of `HF.py:189` + `HF.py:881`
+  (147.5b).  Correctly stated: *parameter mass is not the currency **under a sign-based
+  meta-optimiser***, which is a fact about Lion, not a partition-theoretic law.
+- `SCALE-SHIFT-ASYMMETRIC` holds **descriptively at one site**.  The corpus's other scale-out move
+  (k=45 -> k=47) goes the other way.
+- `CLIFF-REPRODUCES` is a replication **at the same seeds {0,1,2} with byte-identical non-axis
+  flags on different hardware**, not an independent second batch.  Same-seed cross-batch pairs on
+  the scalar anchor agree to 0.014-0.112 pp while the across-seed spread inside cts1's own k01 arm
+  is 1.456 pp; the batches are correlated.  Do not write "reproduces in an independent batch".
+- `SHARE1 = +1.4700` must not be quoted as "one tensor accounts for more than 100 % of the effect".
+  It is 147 % of the **16.894 pp path** k49 -> k52, whose denominator is non-monotone (DROP2 and
+  DROP3 are both negative), so the SHAREs are finite differences along a path, not a decomposition
+  of contributions.  Against the 46.951 pp scalar-to-layerwise manifold, DROP1 = 24.834 pp =
+  **52.9 %**.  Quote that.
+
+**SURVIVES.**  The intervention arithmetic, unanimously: all five lenses reproduced every headline
+number, and the implementation lens verified end-to-end on the live model and live optimiser that
+the named tensor is the tensor that moves, with no off-by-one, no RNG divergence, and no
+group-size-dependent initialisation.  `SINGLE-TENSOR-MAJORITY` and the naming of
+`layer4.0.bn2.weight` stand **as an intervention statement at this one cut position**.
+
+### 147.7 REGISTERED-AND-TESTED vs DESCRIPTIVE
+
+**REGISTERED AND TESTED** (frozen at `186d9ad` before submission; bars, gates and both accounts in
+the same committed blob): the six gates G0-G4/G5a/G5b; R1/R2/R3; Q1-Q6; the SE 0.012653; the
+CLIFF_BAR 0.1820; the matched control Q5.  Outcome: cliff reproduces, split is single-tensor,
+tensor is `layer4.0.bn2.weight`, A1 refuted, A2 favoured on its SHARE test, scale-shift asymmetric.
+
+**DESCRIPTIVE, NOT REGISTERED, NOT GATING** (added this cycle, after the data): everything in 147.5.
+The beta traces, the clamp fractions, the epoch-20 ordering lock, the terminal slopes, the paired
+per-seed statistics, the four A2-satisfying cpk1 cuts, the BN-scale crossing census, the k45 -> k47
+counterexample, and the second cliff at k=52 -> k=55.  None of it was named in advance; it is
+recorded as description and as the design input for the next batch, and **no verdict above was
+changed by it**.  What changed is what the verdicts are allowed to mean.
+
+### 147.8 SCOPE
+
+CIFAR-100 / `ResNet18_c100` / SGDm+Lion / meta-stepsize 1e-3 / alpha0 1e-6 / gamma 1 / batch 100 /
+100 epochs / `BETA_CLIP=-15:-2.3026` / `AUGMENT=1` / `HIER` unset / `PROBE=0`.  **Every cut arm has
+m = 2**; the anchors are anchors, not rungs, so this batch says nothing about the group **count**,
+about `resnet18_blocks`, about CIFAR-10 / Tiny-ImageNet / ImageNet-489 / ResNet-50, about any other
+meta-stepsize or optimiser pair, or about any hierarchical or shrinkage operator.  A tensor named
+here is named at **one site, in one architecture, in one `named_parameters()` order**; a different
+ordering of the same network is a different experiment.  The `BETA_CLIP` floor binds in every cut
+arm, so nothing here separates "stepsize allocation" from "clamp-turnover timing" (FINDINGS 36.3,
+still OPEN).  `plateau5` at k50/k51/k52 is a 100-epoch snapshot of a rising curve, so the cliff's
+**asymptotic** existence is untested.  Normalised entropy stays DISQUALIFIED (cbl1 R5) and is not
+rehabilitated here.  CORRECTIONS 117 objection 7 -- *"'size-1 groups' and 'BatchNorm' are the same
+measurement seen five times"* -- remains **OPEN**: `gn1` could not separate them (CORRECTIONS 118),
+`cs1` was registered to break the location confound and has **zero rows in the corpus** (never ran),
+and cts1 has strictly less separating power than either, being one tensor at one site.
+
+### 147.9 THE HONEST ONE-SENTENCE CLAIM
+
+> On CIFAR-100 / `ResNet18_c100` under SGDm+Lion at ms 1e-3, alpha0 1e-6, 100 epochs, m = 2, in this
+> one `named_parameters()` order, moving the single 512-parameter tensor `layer4.0.bn2.weight` from
+> the fine group to the coarse group at the capture-maximising cut k = 49 costs **24.834 pp** of
+> plateau5 (t +26.3, df 4) while moving its own 512-parameter bias one step later costs **nothing**
+> (-0.233 pp) and moving the adjacent 131,072-parameter residual projection **gains 7.707 pp** -- so
+> the partition-position response is discontinuous at single-tensor resolution and is not governed
+> by parameter mass; whether that reflects BatchNorm-scale leverage is **not** established, and the
+> class-level version of that claim is refuted by cpk1's own data at three other sites.
+
+### 147.10 INGEST LEDGER
+
+`python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (stdout redirected to
+the corpus itself, per 146.7), then `python3 analysis/args_repair.py --apply`.  Diff against the
+pre-ingest snapshot, keyed on (`run`, `job_id`), reading added AND changed AND removed:
+
+    added 18 | changed 0 | removed 0     2,483 -> 2,501 rows; field list identical
+
+The 18 added are exactly `cts1-k{01,49,50,51,52,62}-s{0,1,2}`.  `args_repair` reported 36 rows
+updated relative to the freshly regenerated file (`dup_group` backfill only, 0 accuracy/config
+values, 0 supersessions); against the pre-ingest corpus the net change on pre-existing rows is
+**zero**.  Ingested `plateau5` matches the independent `.out` re-parse to < 4e-6 pp on all six arms.
+`c98_reproduce.py` **still exits 1** on the same inherited stale numerals (author scope, not fixed
+here).
+
+### 147.11 THE NEXT EXPERIMENT
+
+The decisive one, in priority order:
+
+1. **`cts2` -- clamp release + probe.**  Re-run k49 and k50 only, 6 jobs, one submission, with
+   `BETA_CLIP` made non-binding and `PROBE=1` so per-tensor `<h,g>` is logged.  Pre-register:
+   *if the 24.8 pp cliff survives a non-binding clamp the finding is about stepsize allocation; if
+   it collapses it was clamp-turnover timing.*  This is the only experiment that can retire
+   FINDINGS 36.3, and it leaves the tensor attribution intact either way.
+2. **`cts3` -- the specificity test that needs no new instrumentation.**  Single-tensor cuts at
+   k = 46 vs k = 47, which move `layer4.0.bn1.weight` **alone** -- a 512-parameter BN scale in the
+   same block.  "BN scale must be in the fine group" predicts a second cliff there; the existing
+   confounded k45 -> k47 step points the opposite way (+3.449 pp).  Homologous cuts at k = 7, 19, 34
+   (`layer1.0`, `layer2.0`, `layer3.0`) have never been submitted and would test the class claim at
+   four sites for 12 jobs.
+3. **Fresh seeds.**  A 6-run `cts1b` on k49/k50 at seeds 3,4,5 converts the strongest claim (the
+   matched 512-vs-512 control) from same-seed replication to an independent seed draw.
+4. **A permutation control** that places `bn2.weight` in the coarse group **without** moving the
+   boundary (an explicit name-list spec, which `polish_the_stepsize_groups` already supports), to
+   separate "this tensor" from "this cut position" -- within cts1 the two are perfectly confounded
+   by construction.
+5. **The second cliff** k = 52 -> k = 55 (-0.3185) has never been decomposed.

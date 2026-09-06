@@ -1,75 +1,91 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 122**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **146**) > `docs/FINDINGS.md` > everything else.
-Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,483 rows** (+39 `cpk1` this cycle; **0 changed, 0 removed**).
-**`c98_reproduce.py` STILL EXITS 1** — the same 8 stale numerals as at CORRECTIONS 141.6 / 142.6, proved inherited (`git diff 94c6e4f..HEAD` over `paper/`, `results/`, `c98` = **0 files**). Author fix.
+Updated 6 Sep 2026 (**cycle 123**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **147**) > `docs/FINDINGS.md` > everything else.
+Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle.**
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 rows** (+18 `cts1` this cycle; **0 changed, 0 removed**).
+**`c98_reproduce.py` STILL EXITS 1** — the same inherited stale numerals as at CORRECTIONS 141.6 / 142.6. Author fix; not touched here.
 
-## Queue — re-derived from `squeue` / `sacct` at this HEAD
+## Queue — re-derived from `squeue` at this HEAD
 
-**`cpk1` LANDED — 39/39, verdict below. `in489g2` still running. 39 rows ingested (2,444 → 2,483).**
+**`cts1` LANDED — 18/18, verdict below. `in489g2` still running on `alice`. `alice2` queue EMPTY. 18 rows ingested (2,483 → 2,501).**
 
-**`cpk1` — CIFAR-100 cut-position sweep, m=2. CORRECTIONS 146.**
+**`cts1` — single-tensor resolution of the k=49 → k=52 cliff. CORRECTIONS 147.**
 
 | verdict | |
 |---|---|
-| SHAPE | **POSITION-SINGLE-PEAKED** |
-| BOUNDARY account | **BOUNDARY-REFUTED** |
-| PARAM-BALANCE rival | **PARAM-BALANCE-FAVOURED** ← the rival named in advance WON |
-| replication of `cbl1` | **CBL1-ORDER-REPLICATES** |
+| CLIFF | **CLIFF-REPRODUCES** (TOTAL +0.3598, bar 0.1820) |
+| SPLIT | **SINGLE-TENSOR-MAJORITY** |
+| TENSOR | **`layer4.0.bn2.weight`** (512 params) |
+| A1 MASS (**the briefing's** account) | **MASS-REFUTED** — and with the wrong sign |
+| A2 BN LEVERAGE (the scorer's) | **BN-LEVERAGE-FAVOURED** — *class-level form WITHDRAWN, see below* |
+| SCALE-SHIFT | **SCALE-SHIFT-ASYMMETRIC** |
 
-| prediction | outcome |
+| step (each moves exactly ONE tensor) | params | dCAPTURE | pp / t (df 4) |
+|---|---|---|---|
+| k=49→50 `layer4.0.bn2.weight` | 512 | **+0.5289** | **+24.834** / +26.32 |
+| k=50→51 `layer4.0.bn2.bias` (matched control) | 512 | −0.0050 | −0.233 / −0.19 |
+| k=51→52 `layer4.0.shortcut.0.weight` | 131,072 | −0.1641 | −7.707 / −7.81 |
+| TOTAL | | +0.3598 | +16.894 / +25.95 |
+
+- **My own prediction was REFUTED.** I predicted the 131,072-param shortcut projection on mass grounds (Q2). It has SHARE **−0.4562** — moving it *gains* 7.7 pp. Second consecutive cycle the briefing's inherited reading lost (cf. 146.2 P5).
+- **Matched control:** DROP1 − DROP2 = **+0.5339 (24.4 SE)** between two 512-param tensors in the same BN module. Paired by seed: +24.294 / +25.932 / +24.276 pp, sign-consistent 3/3.
+- Gates: G0 18/18 · G1 manifest exact in sizes, params AND names · G1b one tensor per step · G2 18×100 epochs · G3 anchors −0.083 / +0.085 pp · G4 gap +46.951 pp. Scorer sha256 `91b2803005d4…` matches the digest frozen at `186d9ad`; re-run unedited on the Mac **and** alice2, verdict reproduces verbatim.
+
+**ADVERSARIAL ROUND — 5 lenses, 2 REFUTED. Both refutations re-derived here before acceptance.**
+
+| lens | verdict | finding |
+|---|---|---|
+| statistics & power | not refuted | SE honestly derived; leave-one-seed-out reproduces every gate. **k50/k51/k52 not converged at ep 99** (+0.046/+0.047/+0.066 pp/ep) |
+| implementation / off-by-one | not refuted | Live optimiser: no off-by-one, named tensor *is* the moved tensor, init & batch order shared |
+| same-data-twice | not refuted | 18 distinct job ids / md5s / 12 nodes, one submission. **But cpk1 & cts1 share seeds {0,1,2} — correlated, not independent** |
+| mechanism | **REFUTED** | Fine group ends at the `BETA_CLIP` floor **β=−15.000 in 12/12** cut runs; `MASS-REFUTED` is a theorem of `HF.py:189` (unnormalised sum) + `:881` (`sign()`) |
+| scope / overreach | **REFUTED** | A2's own condition holds at cpk1 k=**31/49/52/55** with captures **+0.219/+0.697/+0.332/+0.014** — it predicts nothing. Plus an **undocumented second cliff** k=52→55 (−0.3185) |
+
+**WITHDRAWN / NARROWED / SURVIVES**
+
+| | |
 |---|---|
-| P1 argmax k*=45 (stage boundary) | ❌ REFUTED |
-| P2 single-peaked | ✅ HELD |
-| P3 capture < 0.10 at k ≥ 52 | ❌ REFUTED (k=52 is +0.332) |
-| P4 range ≥ 0.30 | ✅ HELD (0.683) |
-| P5 parameter balance LOSES (k* ≠ 49) | ❌ REFUTED — k* = 49 exactly |
-| P6 both mirror pairs break | ✅ HELD |
+| **WITHDRAWN** | `BN-LEVERAGE-FAVOURED` **as a class claim**. Of cpk1's 10 steps moving a norm scale out of the fine group, **8 raise capture, 2 lower it**; the nearest analogue (k=45→47, `layer4.0.bn1.weight`, also 512 params, same block) **gains +3.449 pp** |
+| **NARROWED** | `MASS-REFUTED` → a restatement of Lion's `sign()`, not a discovery · `SCALE-SHIFT-ASYMMETRIC` → one site · `CLIFF-REPRODUCES` → same-seed replication on different hardware, **not** an independent batch · `SHARE1=1.47` is 147 % of a **non-monotone path**; against the manifold DROP1 = **52.9 %** |
+| **SURVIVES** | The intervention arithmetic, unanimously (5/5 lenses reproduced every number). `SINGLE-TENSOR-MAJORITY` and the naming of `layer4.0.bn2.weight` **as an intervention statement at one cut position** |
 
-- **Argmax k\* = 49**, capture **+0.6965**, plateau5 **55.447** — inside `layer4.0`, *not* at the `layer3|layer4` boundary.
-- **Position is settled as the operative variable.** Both mirror pairs break at identical normalised entropy: k=17 vs 45 at B=0.84742 → 16.290 pp (t +23.78); k=24 vs 38 at B=0.96290 → 8.535 pp (t +12.75).
-- **First pre-registered mechanism in the campaign to survive its own test.** Twelve earlier candidates did not. It was registered *because* it predicted a different grid point, so agreement is a surprise, not a confirmation.
-- **The shape is not explained by it** (descriptive, not registered): k=49 → k=52 loses **−0.364 capture (t −25.55)** on a parameter-share change of only **0.0118**. Three tensors holding 2.7 % of the fine group's parameters carry half the benefit. That is the next test.
-- Gates: G0 39/39 · G1 manifest exact in sizes AND parameter counts · G2 complete · G3 anchors −0.059 / +0.235 pp · G4 gap +46.990 pp.
-
-**IN FLIGHT — 14 jobs.**
+**IN FLIGHT — 14 jobs, all on `alice`. Not mine to touch beyond monitoring.**
 
 | account | batch | jobs | run | pend | done | decides | score with |
 |---|---|---|---|---|---|---|---|
 | `alice` | `in489g2` | 14 | 8 | 6 | 0 | **where** ImageNet-489 crosses CAPTURE 0.5 on `m` in (6,62) | `cI2_in489g2_score.py` (`571707b`) |
+| `alice2` | — | **0** | 0 | 0 | — | queue EMPTY since `cts1` completed | — |
 
-- `in489g2` pace: ~19 min/epoch under 8-way contention (vs `in489g1`'s 15.9 min) → ~27 h/run, inside the 34 h wall. seed-0 ≈ 06:00 7 Sep; seed-1 gated behind the 8-GPU `QOSMaxGRESPerUser` cap.
-- **`p08` is the arm that matters**: same m as `g08`, different cut. Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. It exists because `cbl1`'s mirror arm did exactly that to its balance statistic (CORRECTIONS 143) — and `cpk1` has now confirmed that position dominates, so R2 is a live risk, not a formality.
-- Pre-registered for `in489g2`: M50 ∈ [16,62], point 38.70 (CIFAR-100 crosses at 9.30 → the ladder is predicted to move RIGHT with class count).
+- `in489g2` seed-0 jobs at **5:34:47** elapsed at this HEAD; seed-1 still `PENDING`, gated behind the 8-GPU `QOSMaxGRESPerUser` cap. seed-0 ≈ 06:00 7 Sep.
+- **`p08` is the arm that matters**: same m as `g08`, different cut. Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. `cpk1` and now `cts1` both confirm position dominates, so R2 is a live risk.
+- **`in489g2` is NOT this session's batch. Never cancel, requeue or modify it.**
 
-**RULE 20 — `cpk1` DEBT RETIRED (39/39 PASS). `in489g2` 8/14, reopens when its 6 pending jobs start.**
+**RULE 20 — `cts1` DEBT RETIRED (18/18 PASS). `in489g2` 8/14, reopens when its 6 pending jobs start.**
 
 | account | audited | result |
 |---|---|---|
 | `alice` | 8/14 | **8 clean, 0 repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS** |
-| `alice2` | 12/39 | **12 clean, 0, 0 — VERDICT PASS** |
+| `alice2` | 18/18 (`cts1`) | **18 clean, 0, 0 — VERDICT PASS.** Independently confirmed: stripping the 4 axis flags collapses all 18 ARGS lines to **one** string, with **one** `ENV:` string |
 
-- Only STARTED jobs write an ARGS line. **Re-run the full audit on both batches before scoring.**
-- **The pending jobs cannot be audited from the queue.** `jobs/run_in489.sh` passes `"$@"`; `scontrol show job` shows no arguments, and `scontrol write batch_script` returns a script whose only `--stepsize-groups` occurrence is a **usage comment reading `scalar`**. That is a decoy — do not read it as a design mismatch.
+- Only STARTED jobs write an ARGS line. **Re-run the full audit on `in489g2` before scoring it.**
+- **The pending jobs cannot be audited from the queue.** `jobs/run_in489.sh` passes `"$@"`; `scontrol write batch_script` returns a script whose only `--stepsize-groups` occurrence is a **usage comment reading `scalar`**. That is a decoy — do not read it as a design mismatch.
 - `argsline_guard.py` is `81cea8b5…` byte-identical on Mac, `alice` and `alice2`.
 
 **ACCOUNT HYGIENE — clean on both.**
 
-- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **39**, all `cpk1-`. Nothing else queued on either.
-- **0 CANCELLED on either account since 05:00.** No job this cycle did not submit was touched.
-- `alice2`'s only other recent jobs are PaperFactory `pf-*`, all ended by **5 Sep 13:51**, ~15.4 h before `cpk1` was submitted. Not this cycle's, not touched.
+- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **0**. Nothing else queued on either.
+- **0 CANCELLED on either account this cycle.** No job this session did not submit was touched.
 - `bin/PROTECTED.txt` carries `cpk1-` and `in489g2-`.
-- Job `4911746` is absent from `alice`'s 14 — it is **another user's**, the jobid counter being cluster-global. Not ours, not missing.
+- Job `4912087` is absent from `cts1`'s id run 4912082–4912100 — it is **another user's** array task, the jobid counter being cluster-global. Not a censored arm.
 
 **COST — measured from history, not guessed.**
 
 | batch | reference | mean/run | projected | worst case (walltime cap) |
 |---|---|---|---|---|
 | `in489g2` | `in489g1` 12 runs = 298.7 GPU-h | **24.89 h** | **348.5 GPU-h** | 476.0 |
-| `cpk1` | `cbl1` 33 runs = 23.1 GPU-h | **42.0 min** | **27.3 GPU-h** | 97.5 |
-| **total** | | | **375.8 GPU-h** | **573.5** |
+| `cts1` (LANDED) | measured, `sacct` 18/18 | **41.5 min** | **12.46 GPU-h actual** | — |
+| **total in flight** | | | **348.5 GPU-h** | **476.0** |
 
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
@@ -81,7 +97,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,483 ro
 | Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours.** The 53 jobs in flight (`in489g2` 14 + `cpk1` 39, ~375.8 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
+| GPU to reach submission | **0 jobs, 0 hours.** The 14 jobs in flight (`in489g2` only, ~348.5 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
 
 **Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 
