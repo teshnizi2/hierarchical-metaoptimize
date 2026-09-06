@@ -13839,3 +13839,289 @@ one-factor instrument is valid; on 155.6's evidence it should carry a **scalar a
 a second treatment rather than a control**, and its registration must state a floor-binding
 prediction for `m=6` in advance. **No rung above `ms=1e-3` can be audited with a `-80` release**;
 auditing `nodewise`'s upper chord needs a different release level and a new registration.
+
+## 156. `cts3` LANDS AT 772 EPOCHS -- THE CLIFF **SURVIVES** THE HORIZON AND **SHRINKS** ON IT, BOTH ON THE REGISTERED RULE. THE CONSEQUENCE IS A **RESCOPING**: CORRECTIONS 147's CLIFF NUMERAL AND `cpk1`'s ARGMAX `k*=49` ARE **100-EPOCH OBJECTS** AND MUST BE WRITTEN AS SUCH
+
+### 156.1 THE RESCOPING -- READ THIS BEFORE ANY NUMERAL BELOW
+
+`cts3` was registered (commit `327e3f0`, 2026-09-06T12:46:11+02:00) to settle whether the
+`k=49 -> k=50` cut-position cliff is a property of the partition or a property of stopping the
+clock at 100 epochs. It ran to **772 epochs** -- **7.72x** the horizon of every other
+`ResNet18_c100` run in the corpus -- with its own 100-epoch control **in batch** (epochs 95-99 of
+the same six runs). The registered `SHRINKS` branch fired. **By the registration's own terms, three
+scope statements now bind, and they bind on every future quotation, not merely on this entry:**
+
+1. **CORRECTIONS 147's cliff numeral is BUDGET-DEPENDENT.** Every quotation of **24.834 pp**
+   (`cts1`), **25.163 pp** (`cts2` `D_C`) and **24.767 pp** (`cts2` `D_R`) must now carry
+   **"at 100 epochs"** *in the same sentence*. These are not wrong; they are **scoped**.
+2. **`cpk1`'s capture curve, its single-peakedness, and its argmax `k* = 49` are 100-EPOCH
+   MEASUREMENTS** and inherit that scope. `cpk1` was never run past 100 epochs; the argmax of a
+   curve measured at one budget is an argmax **at that budget**. Whether `k*` is still 49 at 772
+   epochs is **NOT MEASURED** -- `cts3` ran two cut positions, not a curve.
+3. **`cts1`'s, `cts2`'s and `scl1`'s conclusions all inherit the same scope.** Each is a
+   100-epoch measurement at this cell. `scl1`'s single-tensor attribution (the 512-parameter
+   normalisation scale, **15.8080 pp**) is a **100-epoch** attribution.
+
+**This is a scope annotation, NOT a re-litigation. No verdict in 146, 147, 150 or 152 moves.**
+
+### 156.2 THE TWO VERDICTS -- RECORDED TOGETHER, AND NEITHER IS QUOTABLE WITHOUT THE OTHER
+
+The registered scorer returns **two** verdicts on **two different axes**. They point in opposite
+rhetorical directions and the batch is only honestly reported when both are given:
+
+| axis | verdict | evidence |
+|---|---|---|
+| **(a) SIZE at the long budget** | **SURVIVED** | `DE` = **19.3427 pp** = **26.00 `SE_ARM_DIFF`** -- **1.56x** the survive bar (12.4170) and **13.00x** the collapse bar (1.4878) |
+| **(b) DIRECTION** | **SHRINKS** | `dD` = `DE - D100` = **-5.6747 pp** = **-5.39 `SE_dD`**, against a direction bar of **+/-2.1040 pp** |
+
+**SAYING ONLY "SURVIVED" OVERSTATES; SAYING ONLY "SHRINKS" UNDERSTATES.** The cliff at 772 epochs
+is still **26 SE** wide -- it is not an artefact of a short budget and the k=50 partition does not
+catch up. But it is **22.7% smaller** than the same six runs' own 100-epoch cliff, so the
+100-epoch numeral **overstates the cliff measured once the losing arm has converged** (R4 declares
+k50 converged at E and not at 100). **Said precisely, and no further:** 25.0173 pp at 100 epochs
+and 19.3427 pp at 772 are two measurements at two budgets. Calling the 100-epoch figure an *"upper
+bound on the converged cliff"* would assume the cliff falls **monotonically** in budget, which this
+batch does **not** measure -- it has two points, and the registration forbids the asymptote.
+
+**DECOMPOSITION -- the shrinkage is the losing arm improving, not the winning arm decaying.**
+`d(k49)` **+1.0133 pp**, `d(k50)` **+6.6880 pp**; `dD = d49 - d50 = -5.6747`. Both arms **gain**
+from the extra 672 epochs; k50 gains **6.60x** more.
+
+### 156.3 `SHRINKS` WAS THE **REGISTERED PREDICTION**. IT MAY NEVER BE RETOLD AS A SURPRISE OR AS A NULL
+
+The registration wrote the direction down in advance, and the scorer prints it from a frozen
+constant (`--selftest` section D: *"predicted dD -7.3320 pp = -6.97 SE_dD <-- SHRINKS is
+PREDICTED"*).
+
+| | pp | `SE_dD` |
+|---|---|---|
+| **REGISTERED PREDICTION** | **-7.3320** | -6.97 |
+| **MEASURED** | **-5.6747** | -5.39 |
+| measured - predicted | **+1.6573** | **+1.58** |
+
+The outcome landed **1.58 `SE_dD`** on the conservative side of its own point prediction, inside
+the same branch. **This batch confirmed a prediction; it did not discover an anomaly, and it did
+not return a null.** Any later retelling as "surprisingly, the cliff shrank" or "cts3 found no
+effect" is a misreport of a pre-registered, correctly-predicted result.
+
+### 156.4 PROVENANCE, AND THE RULE 16 / RULE 20 / RULE 21 AUDIT -- RE-RUN THIS CYCLE
+
+- **RULE 16.** `analysis/cO1_cts3_score.py` run **UNEDITED**. sha256
+  **`ba8cac2434914d7f6c5d3e8a0bc2cca039fe9fc4d748efab6b7acc0077ccf3ad`**, identical on the Mac and
+  in the `alice2` staging checkout (`hmo-cts3/`), and identical to the blob at the registration
+  commit. `git diff -- analysis/` **empty**.
+- **Documented invocation.** `runsdir` is **POSITIONAL**, not `--runs`; `--tb` is a documented
+  argument (`ap.add_argument("--tb", ...)`), so passing it is **not an edit**. Without it the
+  clamp scope note prints `UNREAD`. The scorer was run in the full documented form.
+- **RULE 21.** Registration `327e3f0` at **12:46:11**; earliest Slurm `Submit` **12:47:13** -- a
+  **62 s** margin, and **all six job ids (4912733-4912738) carry the identical Submit second**, so
+  it was **one submission**. Verified from `sacct`, not from a log.
+- **RULE 20** `argsline_guard.py --batch-consistency`: **6 clean, 0 with repeated flags or design
+  mismatch, 0 without an ARGS line, VERDICT PASS**; every non-axis flag identical across the six.
+- **G0 PROVENANCE PASS**: 6 runs, 6 job ids, **772/772** epochs, NAME == ARGS == ENV, no repeated
+  flag. 6/6 `COMPLETED`, 6/6 `RUN_DONE`, **0 tracebacks**. ENV audit **6/6 `AUGMENT=1`**, **6/6
+  `BETA_CLIP=-15:-2.3026`**, `PROBE=0` 6/6 (so there is no `probe.jsonl`; the clamp scope note
+  below comes from the TB `beta_block*` traces, which exist because `m=2`).
+- **Cost, measured not projected:** elapsed 04:33:01-05:33:11 over six runs = **31.12 GPU-h**
+  (projected 33.0).
+
+### 156.5 THE GATES, AND THE ARMS
+
+| arm | test@100 | test@E | train@100 | train@E |
+|---|---|---|---|---|
+| **k49** `[49,13]` | 55.2353 | **56.2487** | 62.4253 | 64.1033 |
+| **k50** `[50,12]` | 30.2180 | **36.9060** | 31.9353 | 43.8327 |
+
+- **R1 PREMISE PASS** (in batch, epochs 95-99 of these same runs): `D100` = **25.0173 pp** =
+  **33.63 `SE_ARM_DIFF`**, bar **12.4170**. `cts1`'s own 100-epoch cliff, **DESCRIPTIVE only**:
+  **24.8340 pp**. The in-batch control reproduces the cliff **without** splicing batches.
+- **R2 DIVERGENCE PASS** -- every run finished 772 epochs with `plateau5` > 5.00 pp.
+- **R3 NOISE PASS** -- `sigma_w` **0.9111** (df 50, 25 cells), `3*sigma` = **2.7333**; worst cell
+  SD at E **1.6129** (k50; k49 **0.5349**).
+- **R4 HORIZON EFFECTIVENESS PASS -- the batch bought what it was registered to buy.** k50's
+  terminal 20-epoch OLS slope falls **+0.03966 pp/epoch at 100 -> -0.00199 at E**, against a bar
+  of **0.024235** (`cts2` measured **0.04847** at 100). k49 **+0.00239 -> +0.00287** (already
+  converged at 100, and it stays converged). The registered prediction of the k50 slope at E was
+  **0.004329**; the arm arrived **flat-to-slightly-negative**, i.e. **at least** as converged as
+  registered. **The 772 epochs were not decorative: the losing arm's rise was still live at 100
+  and is dead at E.**
+
+### 156.6 CLAMP SCOPE (read with `--tb`) -- REPORTED, NEVER A GATE
+
+In **both** arms the fine group (`beta_block1`) sits on the **-15** floor for **95.2-95.4%** of the
+trace, last value exactly **-15.0000**. The arms differ on the **coarse** group (`beta_block0`):
+
+| arm | `block0` min | `block0` last | on-floor |
+|---|---|---|---|
+| **k49** (s0/s1/s2) | **-15.0000** (all three reach it) | -14.9230 / -14.4218 / -14.7449 | **4.3% / 6.1% / 3.1%** |
+| **k50** (s0/s1/s2) | **-13.8155** = the init, i.e. **never reaches the floor** | -13.4934 / -12.9812 / -12.9512 | **0.0% / 0.0% / 0.0%** |
+
+**The winning arm's coarse group touches the floor and the losing arm's never does, even over 772
+epochs.** This is a **SCOPE NOTE**, not a gate and not a mechanism claim: the standard clamp
+binding is the campaign-standard condition, and `cts2` already showed the cliff does not depend on
+it **at 100 epochs**. `cts3` does **not** re-test that at 772, and the released floor at long
+budget is explicitly outside what this batch may claim.
+
+### 156.7 THE INGEST -- AND THE **FIRST >100-EPOCH ROWS THE CORPUS HAS EVER HELD**
+
+`python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (to **STDOUT**, into
+the corpus -- CORRECTIONS 146.7's vacuous-check trap avoided) then `python3
+analysis/args_repair.py --apply`. The six `.out` files were pulled into `../runs_alice2` first.
+Keyed diff on `(run, job_id)`:
+
+| | count |
+|---|---|
+| **ADDED** | **6** -- exactly the `cts3` runs, job ids 4912733-4912738 |
+| **CHANGED** | **0** |
+| **REMOVED** | **0** |
+| corpus | **2,549 -> 2,555 rows** |
+
+**THE `epochs_requested=772` HANDLING WAS CHECKED, NOT ASSUMED.** **A LOOSER VERSION OF THIS
+CLAIM WAS DRAFTED AND IS WRONG; IT IS CORRECTED HERE RATHER THAN QUIETLY DROPPED.** It is **not**
+true that no earlier row exceeds 100 epochs: **72 rows already carry 300 or 600**, and **all 72 are
+`network=ResNet18`**. What is new is **(i)** the *value* 772, which no row anywhere carried, and
+**(ii)** any horizon above 100 **on `ResNet18_c100`**, whose previous maximum was **exactly 100**.
+Only (ii) makes a registered premise flip (156.9), so the distinction is load-bearing rather than
+pedantic. All six rows land with **`epochs_requested=772`,
+`epochs_done=772`, `window_ok=1`, `complete=1`** -- **not dropped, not truncated, not coerced to
+100**. `complete_of()` casts the field to float and compares `done >= 0.95*requested`, so 772 is
+handled as an ordinary number. Each row's `plateau5` equals the scorer's own per-seed `test@E` to
+the digit (56.838 / 55.794 / 56.114 / 37.918 / 35.046 / 37.754), so the CSV and the scorer agree
+by construction rather than by coincidence.
+
+**`args_repair --apply` reported *"36 rows updated"* and the keyed diff against the committed
+corpus shows **0 changed fields** -- and this cycle establishes WHY, which CORRECTIONS 155.10 left
+as an observation.** Diffing the tool's own pre-repair backup against its output shows the 36
+updates touch **exactly one field, `dup_group`**, and always in the direction `'' -> '<name>'`:
+`aggregate.py` **blanks** `dup_group` on every run and `args_repair` **restores** it. **The "36" is
+a fixed round-trip artefact of the aggregate/repair pair and will be reported on every future
+ingest.** It is not a corpus change and must never be read as one.
+
+### 156.8 DOES INGESTING 772-EPOCH ROWS PERTURB A CORPUS-DERIVED CONSTANT? -- CHECKED, AND **NO**
+
+CORRECTIONS 155.10 found that ingesting `cfr2` moved MASTER-TABLE row 24's own numerals through
+`cQ1`'s stratum. **The same class of effect was looked for here and does not occur.**
+`analysis/cQ1_row24_falloff_score.py` re-run **UNEDITED** (sha `aa0bf548...`, `git diff` over
+`analysis/` empty), `--selftest` **38/38**, post-`cts3`-ingest:
+
+| quantity | post-`cfr2` (155.10) | **post-`cts3` (HEAD)** |
+|---|---|---|
+| `sigma_w` | 0.1951 (df 222, 39 cells) | **0.1951 (df 222, 39 cells)** |
+| `scalar` falloff | 5.8884 +- 0.1547 | **5.8884 +- 0.1547** |
+| `blk6` | 0.9148 +- 0.1827 | **0.9148 +- 0.1827** |
+| `layerwise` | 1.7893 +- 0.1183 | **1.7893 +- 0.1183** |
+| `nodewise` | 0.7532 +- 0.1687 | **0.7532 +- 0.1687** |
+| B-ALT headline | 4.4219 / 0.9144 / 1.6749 | **4.4219 / 0.9144 / 1.6749** |
+
+**Bit-identical. Nothing moves, and the reason is structural rather than lucky:** `cQ1`'s stratum
+is CIFAR-10 / `ResNet18` at **100/100** epochs, and `cts3` is CIFAR-100 / `ResNet18_c100` at
+**772**. It is excluded on the dataset, the network **and** the epoch count. The same holds for
+`cts3`'s own noise stratum: `_in_cell()` requires `epochs_done == 100`, so the six new rows
+**cannot** enter the pooled SD that sets their own bars -- `sigma_w` reads **0.9173** on the
+corpus both **before and after** this ingest. **A 772-epoch row is, by every filter that matters,
+invisible to the constants -- which is the property that made this batch safe to ingest.**
+
+**WHAT THE INGEST DOES MOVE IS UNFILTERED CORPUS CENSUSES -- ENUMERATED, NOT LEFT TO BE FOUND
+LATER.** Every `analysis/*.py` that reads `results/all_runs.csv` was checked for whether its
+row-selection predicate admits a 772-epoch `ResNet18_c100` row. **Every scorer that carries a
+verdict pins the epoch count (usually twice) or reads by run-name prefix, and is therefore
+immune** -- `cQ1`, `cN1`/`cN2`, `cL1`/`cM1`/`cK1`/`cJ1`/`cP1` (the whole `cts`/`cpk`/`scl` family),
+`cfr1`/`cfr2`, `cI1`/`cI2`, `c69_c100_armset` (pins `epochs_done='100'` **and** `alpha0='1e-3'`).
+What moves is **bookkeeping**, and in every case **the counter was ALREADY stale before this
+cycle**:
+
+| script | quantity | before | **after** | already stale? |
+|---|---|---|---|---|
+| `c73_mastertable_check.py` | corpus rows / GPU-h vs the MASTER-TABLE header | 2,549 / 2,232.7 | **2,555 / 2,263.7** | **yes** -- header says 2,537 / 2,222.0 |
+| `c69_orphan_census.py` | corpus rows | 2,549 | **2,555** | n/a -- **`cts3` is STRICT-CITED, so NO new orphan**; ORPHAN stays **1 family / 1 run** |
+| `cH1_hb1_score.py` | *"corpus holds ZERO explicit int-list partitions"* | 105 | **111** | **yes** -- the check has asserted 0 against a non-zero corpus since `cpk1` |
+| `c98_reproduce.py` / `c98_release.py` / `c98_figures.py` | unfiltered row + admissible censuses | -- | +6 | **yes** -- asserts 2,177 rows; **exit 1 is inherited, author scope** |
+| `c68_window_blast.py` | *"the CSV is the 1707-run corpus"* | 2,549 | **2,555** | **yes** |
+| `c70_composition_audit.py` | scored cells | -- | **+1 cell** keyed `epochs_done='772'` | new, benign |
+| `c57_surface_truncation.py` | corpus truncation denominator | -- | +6 (0 truncated) | **yes** |
+
+**NO VERDICT ANYWHERE MOVES.** These are counters that were already wrong; `cts3` makes six of them
+six rows wronger. **They are recorded so the next cycle does not mistake pre-existing staleness for
+`cts3` damage** -- and `MASTER-TABLE.md`'s header was **deliberately NOT edited** this cycle,
+because two of `c73`'s five failures (74 vs 73 rows, CONFIRMED 32 vs 31) cannot be fixed without
+re-litigating verdicts, which this cycle is explicitly not doing.
+
+### 156.9 THE SCORER'S `--selftest` NOW **FAILS FIVE CHECKS**, AND FOUR OF THEM ARE **CORRECT BEHAVIOUR THE REGISTRATION ANTICIPATED IN WRITING**
+
+Reported in full because a silent FAIL is exactly what RULE 16 exists to prevent.
+
+| check | got | want | reading |
+|---|---|---|---|
+| `SIGMA_W reproduces` | **0.9173** | 0.9111 | **corpus drift -- see below** |
+| `SIGMA df reproduces` | **58** | 50 | same cause |
+| `SIGMA cells reproduce` | **29** | 25 | same cause |
+| `RULE 21: no cts3- row exists` | **6 found** | 0 | **CORRECT -- the rows landed** |
+| `no ResNet18_c100 run exceeds 100 epochs` | **772** | 100 | **CORRECT -- that is the entire point of the batch** |
+
+**The scorer registered this in advance**, at its own `selftest()` docstring: *"once cts3 rows
+land, the 'no cts3 row exists' check and the corpus-dependent noise floor may legitimately move,
+and the scorer is NOT edited to make them green (RULE 16, precedent CORRECTIONS 150.7)."* The last
+two FAILs are the batch succeeding.
+
+**THE `sigma_w` DRIFT IS NOT CAUSED BY `cts3`, AND IT WAS ALREADY PRESENT BEFORE THIS CYCLE
+STARTED.** Re-derived against the corpus **as committed at the registration commit `327e3f0`**, the
+scorer's hard-coded constants reproduce **exactly**: `sigma_w` **0.9111**, df **50**, **25** cells.
+The stratum then grew from **75 to 87** members, and the twelve additions are identified by name:
+
+| rows added to the `m=2` noise stratum | batch | cells added |
+|---|---|---|
+| `scl1-k52-s{0,1,2}` (4912717/21/25) | `scl1` | `[52,10]` |
+| `scl1-k53-s{0,1,2}` (4912718/22/26) | `scl1` | `[53,9]` |
+| `scl1-k54-s{0,1,2}` (4912719/23/27) | `scl1` | `[54,8]` |
+| `scl1-k55-s{0,1,2}` (4912720/24/28) | `scl1` | `[55,7]` |
+
+They entered at commit **`c6a282c` (15:17:43)**, **two and a half hours AFTER** the `cts3`
+registration at 12:46:11. **So: the registration was clean when made, `scl1`'s ingest moved the
+live corpus underneath it, and `cts3` itself added nothing.** This is FINDINGS 58.8(a)'s
+corpus-growth fragility again -- the mechanism that bit `nodewise` at 154 and `scalar`/`layerwise`
+at 155 -- now biting a **registered bar** rather than a printed numeral.
+
+**IT CHANGES NO VERDICT, AND THIS IS A PROPERTY OF THE SCORER'S DESIGN, NOT AN ARGUMENT.**
+`SIGMA_W = 0.9111` is a **frozen literal** (line 280) and every bar derives from it
+(`SE_ARM_DIFF`, `SE_dD`, `COLLAPSE_BAR`, `DIRECTION_BAR`, `NOISY_BAR`). The `--selftest` path
+re-derives from the live corpus; the **scoring** path never does. The scorer was therefore run
+**both before and after** the ingest and the PRIMARY block is **bit-identical** in both:
+`D100` 25.0173, `DE` 19.3427, `dD` -5.6747, **SURVIVED** + **SHRINKS**. Had the bars floated with
+the corpus, the verdict would have depended on the order in which unrelated batches were ingested.
+**They do not, and the FAIL is the audit working rather than the audit failing.**
+
+**Carried, NOT fixed here:** on the live corpus the honest bar would be `sigma_w` **0.9173**
+(`NOISY_BAR` 2.7519 rather than 2.7333). The worst cell SD at E is **1.6129**, so R3 passes under
+either; no future `cts*` registration should copy 0.9111 forward without re-deriving it.
+
+### 156.10 WHAT IS AND IS NOT CLAIMED
+
+**CLAIMED.** At CIFAR-100 / `ResNet18_c100` / SGDm+Lion / `ms=1e-3` / `alpha0=1e-6` / batch 100 /
+`AUGMENT=1` / `BETA_CLIP=-15:-2.3026` / `m=2` / seeds {0,1,2}, comparing **only** `[49,13]` against
+`[50,12]`, at **100 and 772 epochs**: (a) the cut-position cliff **SURVIVES** the horizon at
+**19.3427 pp = 26.00 SE**; (b) it **SHRINKS** by **-5.6747 pp = -5.39 SE**, as **predicted at
+registration** (-7.3320 pp); (c) the shrinkage is the **k50 arm improving** (+6.6880) far more than
+the k49 arm (+1.0133); (d) the k50 arm **is converged at E** by the registered criterion (terminal
+slope -0.00199 against a 0.024235 bar) and was **not** converged at 100 (+0.03966).
+
+**NOT CLAIMED.** **The asymptote** -- the registration states in advance that it is not
+identifiable from 60 epochs of curve, and 772 epochs does not make it so. **Any horizon but 100 and
+772.** **The released floor at long budget.** **Any cut but 49 and 50** -- in particular `cpk1`'s
+`k*` at long budget is **unmeasured**, and a two-point contrast cannot relocate an argmax. **Any
+CAPTURE quantity.** **Any other cell** -- dataset, architecture, optimiser pair, `ms`, `alpha0`,
+granularity or box. And **the mechanism of the shrinkage**: that k50 gains 6.6x more than k49 is
+**measured**, but *why* is not, and the clamp table in 156.6 is a scope note, not an explanation.
+
+**=> No MASTER-TABLE verdict moves. The cut-position thread is RESCOPED, not re-litigated.**
+
+**NEXT.** The cut-position thread's headline numerals are now **100-epoch objects**, and the one
+thing `cts3` establishes is that **the budget axis moves them by 22.7% while leaving them 26 SE
+wide**. The gap that matters is therefore **`cpk1`'s curve at a long budget**: `k*=49` is an argmax
+measured at 100 epochs, `cts3` shows the two arms either side of it converge at very different
+rates, and **nothing in the corpus establishes that the argmax is still at 49 once both arms have
+converged.** A `cpk2` should re-run a **short ladder around the peak** -- `k` in {45, 47, 49, 51,
+53} -- at the `cts3` horizon on **fresh seeds {3,4,5}** (which also breaks the seed reuse
+CORRECTIONS 152 flagged), with the 100-epoch control **in batch** as `cts3` did, and must register
+in advance **whether it predicts `k*` to move**. At ~5.2 GPU-h per run that is ~78 GPU-h for 15
+runs -- the most expensive single batch the thread has proposed, and the only one that can convert
+"`k*=49` at 100 epochs" into a budget-independent statement or kill it.
