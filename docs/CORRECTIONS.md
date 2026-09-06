@@ -11936,3 +11936,273 @@ threat is UNDISCHARGED.**  Precisely:
 
 **Corpus unchanged (2,501 rows).  No job submitted.  `cts2` and `in489g2` untouched.  Nothing under
 `paper/`.**
+
+## 150. `cts2` LANDS -- THE CLIFF SURVIVES THE CLAMP RELEASE.  THE CYCLE-123 MECHANISM OBJECTION IS TESTED AND DOES NOT SURVIVE: THE PINNING IS REAL, THE DEPENDENCE IS NOT
+
+Cycle 126.  12/12 complete, 0 failures, 8.8 GPU-h.  `cts2` is the one-factor floor release
+CORRECTIONS 148 registered and CORRECTIONS 147.5 demanded.  **Verdict: SURVIVED, with no
+moderation.**  This is a confirmatory result, not a discovery: it removes a named confound from a
+number already on the record and it changes no number.  Corpus **2,501 -> 2,513 rows**.  Nothing
+under `paper/` was read for edit or written.  `in489g2` on `alice` was not touched.
+
+### 150.1 PROVENANCE -- RULE 16, RULE 20, RULE 21, ALL RE-DERIVED HERE
+
+**RULE 16.**  `analysis/cM1_cts2_score.py` sha256
+`9e07e9dfffe8395432bd1c30ff02903a469e31f4a37150dad2e8950ebb825f08`, and that one digest is the
+worktree file, `git show 1a06a52:analysis/cM1_cts2_score.py`, `git show HEAD:...`, **and** the copy
+on alice2 at `/home/s5014158/metaopt/hmo-cts2/analysis/cM1_cts2_score.py`.  `git diff --stat
+analysis/` and `git status --porcelain analysis/` are both **empty**.  The scorer was run
+UNEDITED in both places.
+
+**RULE 21, by wall clock.**  Registration commit `1a06a52ba3bb158542a0d03df71a11d20106cae6`,
+committer date **2026-09-06T11:08:55+02:00**.  Earliest `sacct` `Submit` over all twelve job ids
+`4912582`-`4912593`: **2026-09-06T11:10:01**, latest **11:10:02**.  **MARGIN 66 s**; the 1-second
+spread is the wall-clock proof of ONE submission.  All twelve `sacct` rows read `COMPLETED`,
+`ExitCode 0:0`.  `RUN_DONE` in **12/12** `.out` files; `grep -il traceback` over the twelve = **0**.
+
+**RULE 20, run here with paths** (`METAOPT_WS=/home/s5014158/metaopt` exported):
+
+    python3 argsline_guard.py --name cts2- --batch-consistency runs/cts2-*.out
+    batch-consistency: every non-axis flag is identical across 12 runs
+    argsline_guard: 12 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+    VERDICT: PASS
+
+The guard's default allowed-to-vary set is `{seed, run-name, stepsize-groups, save-directory}`;
+the first three are `cts2`'s design axes and `--save-directory` is in fact **identical**
+(`/home/s5014158/metaopt/runs/cts2`, one distinct value over all twelve, checked separately).
+Every other flag is byte-identical across all twelve: `HF` / `SGDm` / `momentum 0.99` /
+`weight-decay-base 0.1` / `Lion` / `momentum-meta 0.99` / `Lion-beta2-meta 0.9` /
+`weight-decay-meta 0` / `CIFAR100` / `ResNet18_c100` / `batch 100` / `gamma 1` / `ms 1e-3` /
+`alpha0 1e-6` / `100 epochs`.  The manipulation cannot ride on the ARGS line -- `BETA_CLIP` is an
+environment variable -- so it was read from each run's own `ENV:` line: **6 at `-15:-2.3026`, 6 at
+`-80:-2.3026`**, with `AUGMENT=1 HIER=none PROBE=0` in all twelve, agreeing with the run NAME and
+with the ARGS line in every case.  The scorer's own G0 gate re-checks this and passes 7/7.
+
+**HYGIENE.**  `alice2`'s queue is **EMPTY** at this HEAD.  `alice` holds **14** jobs, all
+`in489g2-` (8 `RUNNING` at 7:07:47, 6 `PENDING` on `QOSMaxGRESPerUser`) -- **not this session's
+batch, and not touched**.  Zero `cts2-` jobs were cancelled; the one `CANCELLED` row on `alice2`
+today is `4912049 pf-microrun-smoke#a0`, which predates `cts2` and belongs to a different
+programme.
+
+### 150.2 THE MANIPULATION CHECK -- THIS IS WHAT MAKES THE BATCH EVIDENCE
+
+`cts2` is evidence about the clamp only if the clamp actually moved.  Twelve TensorBoard beta
+traces, **2 blocks each, 500 logged points each**, all present.  The scorer's R1 gate PASSES:
+every RELEASED run's floor is non-binding and every CLAMPED run's is binding.  The collapsed R1
+table hides which block is which, so the per-block terminal state was re-derived here from the
+same traces (block 0 = COARSE, indices `0..k-1`; block 1 = FINE):
+
+| cut | block | CLAMPED terminal beta (mean of 3) | RELEASED terminal beta (mean of 3) | shift `R - C` | ends below the OLD floor `-15` by |
+|---|---|---|---|---|---|
+| `k49` | 0 COARSE | **-14.8463** (at the wall) | **-16.6605** | **-1.8142** | 1.6605 nats |
+| `k49` | 1 FINE | **-15.0000** exactly, 3/3 (pinned) | **-47.2212** | **-32.2212** | **32.2212 nats** |
+| `k50` | 0 COARSE | -9.8379 (never near the wall) | -9.8099 | **+0.0280 -- unchanged** | -- (above it) |
+| `k50` | 1 FINE | **-15.0000** exactly, 3/3 (pinned) | **-46.5723** | **-31.5723** | **31.5723 nats** |
+
+Read this as three separate facts.
+
+* **The pinning CORRECTIONS 147.5(a) alleged is real, and reproduces in-batch.**  In all **6**
+  CLAMPED runs the FINE group's terminal beta is exactly `-15.0000`, and in `k49` the COARSE group
+  ends at `-14.85` mean, i.e. also at the wall.  The winning arm was indeed the one in which both
+  groups ended frozen.  The adversarial lens was not imagining the confound.
+* **The release moved the optimiser a very long way.**  Three blocks had been at or against the
+  wall.  The two FINE groups run **31.6 and 32.2 nats further down** once the floor is at `-80` --
+  alpha falls from `exp(-15) = 3.06e-07` to `3.11e-21` (`k49`) and `5.94e-21` (`k50`) -- and
+  `k49`'s COARSE group, which had annealed onto the wall, now finishes **1.66 nats below it**.  The
+  fourth -- `k50`'s coarse group, the one block that never touched the wall -- **does not move**
+  (`+0.028` nats), which is exactly how a one-factor manipulation should behave and is a check the
+  registration did not ask for.
+* **The released floor was never itself binding.**  Minimum beta over every released run and every
+  logged point is `-47.2352`, i.e. **32.7648 nats above `-80`**, so `-80` constrained nothing.  No
+  released run is `FROZEN` by the registered definition (last beta <= `-20.0` in BOTH blocks): the
+  scorer printed no `FROZEN` line, `k49`-R's coarse block ending at `-16.66` and `k50`-R's at
+  `-9.81`.  `COLLAPSED-BY-FREEZING` therefore never came into play.
+
+**And the accuracy contrast did not move.**  A manipulation that shifted the terminal stepsize by
+thirty-two nats changed the `k49`-vs-`k50` gap by **0.3953 pp, 0.38 SE_INT**.
+
+### 150.3 THE ARMS AND THE THREE CONTRASTS -- `plateau5` PRIMARY, `train5` ALONGSIDE
+
+Quoted from the scorer, and independently re-derived from `results/all_runs.csv` after the ingest
+(the four cell means and all three contrasts agree to 4 dp).  All twelve rows carry
+`epochs_done=100`, `window_ok=1`, `complete=1`, `superseded=0`, `collapsed=0`, so STANDING RULE 21
+-- the `window_ok==1 AND complete==1` filter, not the registration rule of 150.1 -- is satisfied
+without an exception.  The CSV `plateau` column was not read; `best_test` was not read.
+
+    cut  spec     clamp      plateau5     sd     train5     sd
+    k49  [49,13]  CLAMPED     55.5020  0.2150   62.3273   0.1013
+    k50  [50,12]  CLAMPED     30.3393  1.5518   32.0020   1.5987
+    k49  [49,13]  RELEASED    55.2200  0.3600   62.4367   0.3398
+    k50  [50,12]  RELEASED    30.4527  1.4523   32.1253   1.6401
+
+Per-seed `plateau5`, from the corpus: `k49`-C 55.300 / 55.478 / 55.728 · `k49`-R 55.600 / 54.884 /
+55.176 · `k50`-C 31.626 / 28.616 / 30.776 · `k50`-R 31.636 / 28.832 / 30.890.
+
+    D_C  (k49 - k50, CLAMPED )    25.1627 pp    34.55 SE   train   30.3253
+    D_R  (k49 - k50, RELEASED)    24.7673 pp    34.01 SE   train   30.3113
+    INT  (D_C - D_R)               0.3953 pp     0.38 SE_INT
+    cts1's own in-batch cliff     24.8340 pp  (DESCRIPTIVE, a different batch)
+
+**TRAIN AGREES WITH TEST AND IS NOT A SEPARATE CLAIM.**  The train-side cliff is `30.3253` clamped
+and `30.3113` released -- an interaction of `0.0140 pp` on a `30 pp` effect.  Whatever the clamp
+does, it does not do it to optimisation either.
+
+Gates, in the order they fire: **G0** provenance 7/7 PASS · **R1** manipulation PASS ·
+**R2** no run failed to train PASS · **R3** no cell SD above `3*sigma_w = 2.6757 pp` PASS (worst
+cell SD `1.5518`) · **R4** premise `D_C = 25.1627 >= 12.4170` PASS.
+
+### 150.4 THE VERDICT, VERBATIM
+
+    VERDICT  SURVIVED
+    D_R = 24.7673 pp >= 12.4170 pp: the cliff is NOT an artefact of the clamp, and
+    CORRECTIONS 147 is a statement about stepsize allocation
+    NO MODERATION at 2 SE_INT: |INT| = 0.3953 pp <= 2.0598 pp.
+
+    OUT OF SCOPE by registration: CAPTURE, scalar, layerwise, any m != 2,
+    any cut but 49/50, any other clamp setting, and which tensor carries
+    the step (cts1 owns that; cts2 re-scopes it, it does not re-derive it).
+
+Run on **alice2**, unedited, **exit 0**.  Re-run on the **Mac** against the local backup
+(`--runs ../runs_alice2 --beta-json results/cM1_cts2_beta.json`), unedited, **exit 0**, reproducing
+every line of the table above.  `results/cM1_cts2_beta.json` (323,520 bytes, sha256
+`d4cdca575dba16d2c24d6e329d0cf29e7b4661c1134bed78bd53feb910b4a4e0`) was written by the registered
+scorer's own `--dump-beta` path and is committed so that R1 is reproducible from the backup, where
+`Tensorboard_outputs/` is gitignored.
+
+**The registering agent's recorded prior was COLLAPSED or PARTIAL, not SURVIVED (CORRECTIONS
+148.2).  It was wrong.**  That is the third registered prior in this programme to be scored and
+lose, after 146.2 (P5) and 147.4.
+
+### 150.5 THE ADVERSARIAL MECHANISM OBJECTION FROM CYCLE 123 -- TESTED, AND IT DID NOT SURVIVE
+
+CORRECTIONS 147.5 scored the *mechanism / dull-account* lens as **REFUTED** on the strength of one
+observation: the fine group's terminal stepsize is the `BETA_CLIP` floor in **12/12** of `cts1`'s
+cut runs, so the arms differ in clamp-turnover timing rather than in stepsize allocation, and
+`cts1` was run inside FINDINGS 36.3's confound.  That objection has now been put to a direct
+one-factor test.
+
+**BOTH HALVES OF IT ARE ANSWERED, AND THEY ANSWER DIFFERENTLY.**
+
+* **The premise is CONFIRMED.**  The pinning is real and reproduces in this batch: `-15.0000`
+  exactly, 6/6 clamped runs, fine group (150.2).  Nothing about 147.5(a)'s observation is
+  withdrawn.
+* **The inference is REFUTED.**  With the wall moved 65 nats away and the same optimiser running
+  32 nats past where it used to stop, the cliff is `24.7673 pp` instead of `25.1627 pp`.  The
+  effect does not depend on the pinning.  **CORRECTIONS 147's surviving claim is a statement about
+  stepsize allocation, and does NOT need the scope "at `BETA_CLIP=-15:-2.3026`" attached to it.**
+
+The registration wrote the COLLAPSED branch's restatement in advance precisely so this could not be
+chosen after the fact; that branch did not fire, and the restatement is not applied.
+
+### 150.6 WHAT `cts2` RE-SCOPES, AND WHAT IT LEAVES EXACTLY WHERE IT WAS
+
+**IT RE-SCOPES ONE THING.**  The clamp caveat on CORRECTIONS 147's cliff -- and only on the cliff,
+at these two cuts, at `m=2`, on this cell.  `D_R = 24.7673 pp` at `34.01 SE`.
+
+**IT DOES NOT DO ANY OF THE FOLLOWING, AND MUST NOT BE CITED FOR THEM.**
+
+* **It does not re-derive which tensor carries the step.**  `cts1` owns
+  `layer4.0.bn2.weight` (CORRECTIONS 147.1-147.3).  `cts2` ran only the `k49`/`k50` endpoints; it
+  has no `k51`, no `k52`, no matched control, no CAPTURE, no scalar and no layerwise anchor.  It
+  re-scopes that finding; it does not re-establish it.
+* **Nothing withdrawn or narrowed at 147.6 is restored.**  `BN-LEVERAGE-FAVOURED` stays withdrawn
+  as a class-level mechanism claim; `MASS-REFUTED` stays a restatement of `HF.py:189` + `:881`;
+  `SCALE-SHIFT-ASYMMETRIC` stays descriptive at one site; `CLIFF-REPRODUCES` stays a same-seed,
+  correlated-batch replication.  `cts2` shares seeds `{0,1,2}` and every non-axis flag with `cts1`
+  and `cpk1`, so it is a third correlated batch, not an independent replicate.  **Do not write
+  "reproduces in an independent batch."**
+* **It does not touch MASTER-TABLE row 24.**  Row 24 is *"partitioning buys TOLERANCE to an
+  over-large meta-stepsize"* -- an `ms`-ladder falloff claim on **R18/CIFAR-10** (`5.871` scalar vs
+  blk6 `1.060`, layerwise `1.801`, nodewise `2.593` pp/decade; `c40`, 106 jobs).  Different
+  dataset, different regime, different contrast, over a granularity axis `cts2` does not carry.  Per
+  CORRECTIONS 149.8 that threat is **UNDISCHARGED** and stays undischarged.  `cts2` releases a
+  floor at `m=2` on CIFAR-100; row 24 needs a one-factor floor release at `ms=1e-3` with the
+  **scalar** anchor in batch, which has still never been run.
+* **The two open limitations CORRECTIONS 147.5 left are untouched.**  The horizon problem
+  (147.5f) applies verbatim to `cts2`, which is also 100 epochs, and it was re-measured here on
+  `cts2`'s own epoch lines.  Terminal OLS slopes on test accuracy over epochs 80-99 (pp/epoch,
+  mean of 3), with the gain over the last 20 epochs:
+
+      k49-C  +0.00426   -0.050 pp        k50-C  +0.04847   +1.233 pp
+      k49-R  -0.00310   -0.143 pp        k50-R  +0.04758   +1.247 pp
+
+  **`k49` has converged and `k50` has not** -- `plateau5` is a snapshot of a rising curve at the
+  `k50` arms, in both clamps, exactly as at `cts1`.  It does **not** threaten the interaction:
+  `k50`-C and `k50`-R agree to **2 %** on slope (`+0.04847` vs `+0.04758`) and to `0.014 pp` on the
+  20-epoch gain, so the truncation bias is common to both clamp levels and cancels in `INT`.  It
+  does bear on the ABSOLUTE size of `D_C` and `D_R`, which are lower bounds on a converged cliff.
+  And the **second, undecomposed cliff** at `k=52 -> k=55` (147.5e) is untouched.
+* **`m`, dataset, network, `ms`, `alpha0` and the ceiling are all held fixed and claim nothing.**
+
+### 150.7 THE INGEST, AND THE TWO THINGS IT MOVED
+
+`results/all_runs.csv` was snapshotted first (2,501 rows, sha256
+`881267a771e09ad72ff922c86e01b18d9d2ececf747e10cc0e82ae1e894016c7`), the twelve `.out` files copied
+into `../runs_alice2/`, then:
+
+    python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # 2513 runs aggregated
+    python3 analysis/args_repair.py --apply                                       # 36 rows updated
+
+`aggregate.py` writes to **STDOUT**; redirecting it anywhere but the corpus leaves the corpus
+untouched and makes a "0 rows changed" check pass vacuously (CORRECTIONS 146.7).  It was redirected
+to `results/all_runs.csv`, and the before/after files were diffed on the composite key
+`(run, job_id)` -- not by line, and reading all three directions:
+
+| | |
+|---|---|
+| **added** | **12** -- exactly `cts2-k{49,50}-{C,R}-s{0,1,2}` |
+| **changed** | **0** |
+| **removed** | **0** |
+
+`args_repair.py`'s 36 updates are `dup_group` stamps on pre-existing rows and reproduce the
+existing values byte-for-byte; its own report reads `accuracy / config values : 0 rows`,
+`superseded : 0 rows`.  `dup_group_guard.py` (RULE 22): **21 groups, 42 rows stamped, 3 superseded
+-- VERDICT PASS**, unmoved by the ingest.
+
+**THE NEW `beta_clip` VALUE SURVIVED THE PIPELINE INTACT.**  `-80:-2.3026` occurs **0** times in
+the pre-ingest corpus and **6** times after, on exactly the six RELEASED rows -- not dropped, not
+coerced to the `GUARD` default, not folded into the `-15:-2.3026` bucket that holds 2,027 rows.
+`aggregate.py:174` takes it straight from the `ENV` line (`e["BETA_CLIP"]`) with
+`provenance="env"`, so no name-inference path is reachable for these rows.  The corpus now carries
+14 distinct `beta_clip` values.
+
+**TWO THINGS MOVED, AND BOTH ARE DISCLOSED RATHER THAN FIXED.**
+
+* **`cM1_cts2_score.py --selftest` NOW FAILS, BY CONSTRUCTION, AND THAT IS NOT A DEFECT.**  Four
+  failures, all of them pre-registration checks that a landed batch necessarily breaks:
+  `no cts2- row exists in the corpus yet -- 12 found`, and the three noise-floor rows
+  (`SIGMA_W 0.9111 pp over df 50, 25 cells` against the registered `0.8919 / df 46`), which move
+  because `cts2`'s own four `m=2` cells now enter the pool the selftest re-derives it from
+  (`+4 df`, `+4 cells`).  The selftest is a **pre-registration** self-check; the `score()` path
+  never reads the CSV for a bar.  **RULE 16: the scorer is not edited to make it green.**
+* **The verdict is insensitive to that update.**  Re-scored on the post-ingest
+  `sigma_w = 0.9111`: `SE_ARM = 0.7439`, `SE_INT = 1.0520`, so `D_R = 24.7673 pp` is **33.29 SE**
+  (was 34.01) and still far above the `12.4170 pp` bar -- which is half `cts1`'s own cliff and is
+  `sigma`-independent anyway; `|INT| = 0.3953 <= 2*SE_INT = 2.1041`, still NO MODERATION; worst
+  cell SD `1.5518 <= 3*sigma = 2.7333`, still not NOISY.  **No gate and no branch changes.**
+
+**`c98_reproduce.py` EXITS 1 -- THE SAME 8 CHECKS AS BEFORE THE INGEST.**  Verified in both
+directions by re-running it with `--csv` against the pre-ingest snapshot: 8 failures before, 8
+after, the same 8 lines.  Three census counts move by exactly the twelve rows -- rows
+`2501 -> 2513`, admissible `2059 -> 2071`, wallclock `2486 -> 2498` -- and GPU-hours by
+`2193.483 -> 2202.283`, i.e. `+8.80`, which is `cts2`'s measured cost (528 wallclock-minutes over
+12 runs, 42-46 min each) to the decimal.  The four substantive numerals are bit-identical across
+the ingest: best R18/C10 arm `93.328`, deficit `1.796`, partition-family rows `437`, of those Lion
+`425`.  The partition-family counts do **not** move because `cts2`'s `[49,13]` / `[50,12]`
+granularities are not in that predicate (`nodewise`, `nodewise1d`, `chunk*`, `permnode*`).  **No
+new check went stale and no claim reverses.**  The 8 failures are the inherited stale draft
+numerals of CORRECTIONS 141.6 / 142.6; the fix is to edit both markups, which is **author scope**
+and was not done here.  `git status --porcelain paper/` is **empty**.
+
+### 150.8 THE HONEST SIZE OF THIS RESULT
+
+`cts2` is a **confirmatory** batch and should be written as one.  It discovered nothing, it moved
+no estimate (`25.1627 -> 24.7673 pp`; the `0.3953 pp` change is a fraction of the within-cell seed
+spread, which is `3.010 pp` at `k50`-C and `0.428 pp` at `k49`-C), and it added no arm to any
+table.  What it bought is narrow and real: **the largest single-tensor partition effect the
+campaign has measured (CORRECTIONS 147.3) is no longer confounded with the stepsize wall**, so
+CORRECTIONS 147's cliff can be stated without a regime qualifier, and FINDINGS 36.3's confound --
+which is corpus-wide and is not otherwise retired -- is discharged **at this one contrast** and
+nowhere else.  The `ms=1e-3` family is 78.0% floor-binding (CORRECTIONS 148.4); `cts2` moves the
+floor in **6 runs** and shows the cliff does not depend on it.  It does not release the floor for
+the family, and it re-rates nothing in the 148 census.

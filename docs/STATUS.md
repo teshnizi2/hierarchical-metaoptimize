@@ -1,38 +1,59 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 124**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **148**) > `docs/FINDINGS.md` > everything else.
-Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle.**
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 rows** — **no ingest this cycle**; `cts2` has not landed, `grep -c cts2 results/all_runs.csv` = **0**.
-**`c98_reproduce.py` STILL EXITS 1** — the same inherited stale numerals as at CORRECTIONS 141.6 / 142.6. Author fix; not touched here.
+Updated 6 Sep 2026 (**cycle 126**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **150**) > `docs/FINDINGS.md` > everything else.
+Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,513 rows** — **`cts2` ingested this cycle: 12 added, 0 changed, 0 removed** (2,501 → 2,513).
+**`c98_reproduce.py` STILL EXITS 1** — the **same 8** checks as before the ingest, verified both ways with `--csv` against the pre-ingest snapshot. Inherited stale numerals (CORRECTIONS 141.6 / 142.6). Author fix; not touched here.
 
 ## Queue — re-derived from `squeue` at this HEAD
 
-**`cts2` LAUNCHED AND RUNNING (12/12, alice2). `in489g2` still running on `alice` — NOT MINE. No ingest: corpus unchanged at 2,501 rows.**
+**`cts2` LANDED, SCORED AND INGESTED. `alice2` queue is EMPTY. `in489g2` still running on `alice` — NOT MINE, never touched.**
 
-| account | batch | jobs | run | pend | done | decides | score with |
+| account | batch | jobs | run | pend | done | state | score with |
 |---|---|---|---|---|---|---|---|
-| `alice2` | **`cts2`** | 12 | **12** | 0 | 0 | is `cts1`'s 24.8 pp cliff **stepsize allocation** or **clamp-turnover timing**? | `cM1_cts2_score.py` (`1a06a52`) |
-| `alice` | `in489g2` | 14 | 8 | 6 | 0 | **where** ImageNet-489 crosses CAPTURE 0.5 on `m` in (6,62) | `cI2_in489g2_score.py` (`571707b`) |
+| `alice2` | **`cts2`** | 12 | 0 | 0 | **12** | **DONE — `SURVIVED`, ingested, CORRECTIONS 150** | `cM1_cts2_score.py` (`1a06a52`) |
+| `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS** | `cI2_in489g2_score.py` (`571707b`) |
 
-- `cts2` elapsed **35:54** at this HEAD, 8 distinct nodes, no queueing. Landing expected **11:55–12:05 CEST**; measured basis `cpk1` 42.0 min/run over 39 jobs and `cts1` 18 jobs at ≈45 min. Cost ≈ **9 GPU-h**.
-- `in489g2` seed-0 jobs at **6:33:33** elapsed; seed-1 still `PENDING`, gated behind the 8-GPU `QOSMaxGRESPerUser` cap. **`in489g2` is NOT this session's batch. Never cancel, requeue or modify it.**
-- **`cts2` IS NOT SCORED.** It had not landed at this HEAD; only `--selftest` was ever run against its scorer.
+- `cts2`: all 12 `sacct` rows `COMPLETED` / `ExitCode 0:0`, 42–46 min each, **528 wallclock-min = 8.80 GPU-h** — matching `c98`'s GPU-hour delta to the decimal.
+- `in489g2` at this HEAD (my own `squeue -u salehkaleybars`): 8 `RUNNING` at **7:07:47** elapsed, 6 `PENDING` on `QOSMaxGRESPerUser`. **NOT this session's batch. Never cancel, requeue or modify it.**
+- **0 `cts2-` jobs cancelled.** The one `CANCELLED` row on `alice2` today is `4912049 pf-microrun-smoke#a0` — a different programme, not touched here.
 
-**`cts2` — 2×2×3 clamp × cut. CORRECTIONS 148.1–148.2.**
+**`cts2` — 2×2×3 clamp × cut. RESULT: `SURVIVED`, no moderation. CORRECTIONS 150.**
 
-| factor | levels |
-|---|---|
-| cut | `k49 = [49,13]` · `k50 = [50,12]` (the step moves exactly `layer4.0.bn2.weight`, 512 params) |
-| clamp | `C = BETA_CLIP -15:-2.3026` · `R = BETA_CLIP -80:-2.3026` (**only the floor moves**) |
-| seeds | 0, 1, 2 |
+Scorer run UNEDITED on `alice2` (**exit 0**) and re-run on the Mac against `../runs_alice2` with
+`--beta-json` (**exit 0**, same table). sha256 `9e07e9df…b825f08` = worktree = `1a06a52` = HEAD =
+alice2 copy; `git diff --stat analysis/` empty. RULE 21 margin **66 s**. RULE 20 **12 clean / 0 / 0 — PASS**,
+`--batch-consistency`: every non-axis flag identical across 12.
 
-- Cell: CIFAR-100 / `ResNet18_c100` / SGDm+Lion / `ms=1e-3` / `alpha0=1e-6` / 100 ep / `AUGMENT=1` / `HIER=none` / `PROBE=0`.
-- **Both CLAMPED cells run in batch.** `cts1`'s arms are NOT spliced in — batch is the unit of replication and the estimand is a within-batch interaction.
-- Released floor `-80` is non-binding **by arithmetic**: `|dβ| ≤ ms = 1e-3` per meta-step, 50,000 steps from `float32(log 1e-6) = −13.815511` reach at worst **−63.790127**.
-- Bars: `SURVIVE/PREMISE 12.4170` · `COLLAPSE 1.4564` · `INTERACTION 2.0598` · `NOISY 2.6757` · `DEAD 5.00` pp, from `σ_w = 0.8919 pp` (df 46, `m=2` restriction).
-- Gates in order, first failure decides: **G0** provenance → VOID · **R1** manipulation (fails **closed** if traces unreadable) · **R2** DEAD run → UNRESOLVED-DIVERGED · **R3** SD > 3σ_w → UNRESOLVED-NOISY · **R4** `D_C < 12.4170` → UNRESOLVED-PREMISE. `COLLAPSED-BY-FREEZING` is a distinct named outcome.
-- **Prior on record before the data:** COLLAPSED or PARTIAL, not SURVIVED. Both branches carry identical machinery and identical bars.
+| arm | plateau5 | sd | train5 | sd |
+|---|---|---|---|---|
+| `k49 [49,13]` CLAMPED | **55.5020** | 0.2150 | 62.3273 | 0.1013 |
+| `k50 [50,12]` CLAMPED | **30.3393** | 1.5518 | 32.0020 | 1.5987 |
+| `k49 [49,13]` RELEASED | **55.2200** | 0.3600 | 62.4367 | 0.3398 |
+| `k50 [50,12]` RELEASED | **30.4527** | 1.4523 | 32.1253 | 1.6401 |
+
+| contrast | test | train |
+|---|---|---|
+| `D_C` (k49−k50, CLAMPED) | **25.1627 pp**, 34.55 SE | 30.3253 |
+| `D_R` (k49−k50, RELEASED) | **24.7673 pp**, 34.01 SE | 30.3113 |
+| `INT` (`D_C − D_R`) | **0.3953 pp**, **0.38 SE_INT** | 0.0140 |
+
+- **VERDICT `SURVIVED`.** `D_R = 24.7673 ≥ 12.4170 pp` → the cliff is **NOT** a clamp artefact; CORRECTIONS 147 is a statement about **stepsize allocation**. **NO MODERATION**: `|INT| = 0.3953 ≤ 2 SE_INT = 2.0598 pp`.
+- All gates PASS: **G0** 7/7 · **R1** manipulation · **R2** no DEAD run · **R3** worst cell SD 1.5518 ≤ 2.6757 · **R4** premise `D_C = 25.1627 ≥ 12.4170`.
+- **MANIPULATION CHECK — this is what makes it evidence.** 12 traces, 2 blocks, 500 pts each. Per-block terminal β (mean of 3), re-derived here:
+
+| cut | block | CLAMPED | RELEASED | shift |
+|---|---|---|---|---|
+| `k49` | 0 coarse | −14.8463 (at wall) | −16.6605 | **−1.81 nats past the old floor** |
+| `k49` | 1 fine | **−15.0000 exactly, 3/3** | −47.2212 | **−32.22 nats** |
+| `k50` | 0 coarse | −9.8379 (never near wall) | −9.8099 | **+0.03 — unchanged** |
+| `k50` | 1 fine | **−15.0000 exactly, 3/3** | −46.5723 | **−31.57 nats** |
+
+- **The pinning is real** (6/6 clamped runs pin the fine group at exactly −15.0000; `k49`'s coarse group also ends at the wall) **and the cliff does not depend on it.** α falls 3.06e−07 → ~3e−21. The one block that never touched the wall does not move — a one-factor manipulation.
+- Released floor never binding: min β over all released runs `−47.2352`, **32.76 nats above −80**. No run `FROZEN` (last β ≤ −20 in both blocks); `COLLAPSED-BY-FREEZING` never in play.
+- **Registered prior lost.** 148.2 recorded COLLAPSED-or-PARTIAL; the data said SURVIVED.
+- **`--selftest` now FAILS 4/…, BY CONSTRUCTION, and the scorer is NOT edited (RULE 16).** All four are pre-registration checks a landed batch must break: `no cts2- row exists in the corpus yet` (12 found) and the three σ_w rows (`0.9111 / df 50 / 25 cells` vs registered `0.8919 / df 46`), because `cts2`'s own 4 `m=2` cells now enter the pool. `score()` never reads the CSV for a bar. **Verdict insensitive**: at σ_w = 0.9111, `D_R` = 33.29 SE, `2 SE_INT` = 2.1041, `3σ` = 2.7333 — no gate, no branch changes.
 
 **RULE 20 — `cts2` 12/12 PASS. `in489g2` 8/14, reopens when its 6 pending jobs start.**
 
@@ -57,11 +78,11 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 
 **ACCOUNT HYGIENE — clean on both.**
 
-- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **12**, all `cts2-`. Nothing else queued on either.
+- `alice` holds **14** jobs, all `in489g2-`; **`alice2` holds 0** — `cts2` completed. Nothing else queued on either.
 - **0 CANCELLED on either account this cycle.** No job this session did not submit was touched.
 - `bin/PROTECTED.txt` carries `cts2-` (18 prefixes), committed in `1a06a52`.
 
-**`cts1` — CARRIED FORWARD from cycle 123 (CORRECTIONS 147). This is what `cts2` is testing.**
+**`cts1` — CARRIED FORWARD from cycle 123 (CORRECTIONS 147). `cts2` has now tested its open limitation.**
 
 | | |
 |---|---|
@@ -69,7 +90,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 | the tensor | **`layer4.0.bn2.weight`** (512 params) — k=49→50 = **+24.834 pp** |
 | matched control | k=50→51 `layer4.0.bn2.bias`, also 512 params, same BN module = **−0.233 pp** |
 | withdrawn | `BN-LEVERAGE-FAVOURED` **as a class claim**; `MASS-REFUTED` is a theorem of `HF.py:189` + `:881`, not a result |
-| **the open limitation** | the fine group ends at the `BETA_CLIP` floor β=−15.000 in **12/12** cut runs. **Nothing in `cts1` separates stepsize allocation from clamp-turnover timing** — hence `cts2` |
+| **the open limitation — CLOSED** | the fine group ends at the `BETA_CLIP` floor β=−15.000 in **12/12** cut runs. `cts2` released it: **the pinning is real, the dependence is not** (`INT` 0.3953 pp, 0.38 SE_INT). CORRECTIONS 150 |
 
 ## Clamp census — CORRECTIONS 148.3–148.10
 
@@ -115,10 +136,10 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 | 7 | MASTER-TABLE row 27 (H4) | **OPEN, not worsened.** `bo6` 4/6 (all ceiling — already recorded as a failed gate); `bo7` **0/12 and on disk** |
 | 8 | rows 36/37/38, CLOSEOUT 2 — horizon reversal | **CLEAN.** `br6` 0/12, `bl5` 1/9, `sp8` 0/9, `ns5` 0/15 — already run in released boxes |
 | 9 | Direction C (53.1% sign-agreement, frozen profile, `N_eff/m`) | **UNTOUCHED.** Frozen 0/78; already box-tested at 52.3 |
-| 10 | CORRECTIONS 146/147 (`cpk1`, `cts1`) | **Nothing to add** — no probe dir exists; 147 already states the limitation. **This is what `cts2` settles** |
+| 10 | CORRECTIONS 146/147 (`cpk1`, `cts1`) | **SETTLED at this contrast by `cts2`** (CORRECTIONS 150): floor released 65 nats, cliff `24.7673 pp`, `INT` `0.3953 pp` = 0.38 SE_INT. 147's cliff needs no regime qualifier. Nothing else in 147.6 is restored |
 | 11 | `hz3` wrong-box rows (8114) | A known metadata discrepancy is now **measured to be a real regime difference** |
 
-**COVERAGE — the honest limit. 1,356 of 2,501 rows (54.2%) have a beta trajectory; 1,145 (45.8%) have none.**
+**COVERAGE — the honest limit. 1,356 of 2,501 rows (54.2%) have a beta trajectory; 1,145 (45.8%) have none.** *(Measured on the pre-`cts2` 2,501-row corpus; the 12 `cts2` rows all carry a trajectory, so the corpus figure is now 1,368/2,513 = 54.4%. Every stratum row below is unrestated.)*
 
 | stratum | with a trajectory |
 |---|---|
@@ -147,8 +168,8 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 | batch | reference | mean/run | projected | worst case (walltime cap) |
 |---|---|---|---|---|
 | `in489g2` | `in489g1` 12 runs = 298.7 GPU-h | **24.89 h** | **348.5 GPU-h** | 476.0 |
-| `cts2` (RUNNING) | `cpk1` 42.0 min over 39 jobs; `cts1` 18 jobs ≈45 min | **≈45 min** | **≈9 GPU-h** | 30.0 (`--time 02:30:00`) |
-| **total in flight** | | | **≈357.5 GPU-h** | **506.0** |
+| `cts2` (**DONE**) | measured: 528 wallclock-min over 12 runs | **44.0 min** | **8.80 GPU-h** (spent) | 30.0 (`--time 02:30:00`) |
+| **total in flight** | `in489g2` only | | **348.5 GPU-h** | **476.0** |
 
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
@@ -160,7 +181,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,501 ro
 | Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours.** The 26 jobs in flight (`in489g2` 14 + `cts2` 12, ~357.5 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
+| GPU to reach submission | **0 jobs, 0 hours.** The 14 jobs still in flight (`in489g2`, ~348.5 GPU-h projected) are the NEXT cycle's science, not this manuscript's; `cts2`'s 8.80 GPU-h are spent and recorded |
 
 **Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 
