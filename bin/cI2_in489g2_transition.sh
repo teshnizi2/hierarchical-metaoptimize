@@ -183,10 +183,10 @@ gf() { echo "!!! GUARD FAIL: $*" >&2; FAIL=1; }
 if [ ! -d "$DATA/train" ] || [ ! -d "$DATA/validation" ]; then
   gf "guard 0: $DATA does not hold train/ and validation/"
 else
-  NTR=$(ls "$DATA/train" | wc -l | tr -d ' ')
-  NVA=$(ls "$DATA/validation" | wc -l | tr -d ' ')
+  NTR=$( { ls -1 "$DATA/train" || true; } | wc -l | tr -d ' ')
+  NVA=$( { ls -1 "$DATA/validation" || true; } | wc -l | tr -d ' ')
   echo "guard 0: train class dirs=$NTR  validation class dirs=$NVA"
-  [ "$NTR" = 489 ] && [ "$NVA" = 489 ] || gf "guard 0: expected 489/489, got $NTR/$NVA"
+  if [ "$NTR" != 489 ] || [ "$NVA" != 489 ]; then gf "guard 0: expected 489/489, got $NTR/$NVA"; fi
 fi
 [ -f "$JOBS" ] || gf "guard 0b: missing runner $JOBS"
 
@@ -220,18 +220,18 @@ else
 fi
 if [ -f "$SCORER" ]; then
   python3 "$SCORER" --selftest >/tmp/in489g2_selftest.$$ 2>&1 \
-    && echo "guard 1c: scorer --selftest PASSES ($(grep -c '^  ok' /tmp/in489g2_selftest.$$) checks)" \
+    && echo "guard 1c: scorer --selftest PASSES ($(grep -c '^  ok' /tmp/in489g2_selftest.$$ || true) checks)" \
     || { gf "guard 1c: scorer selftest FAILED"; tail -20 /tmp/in489g2_selftest.$$; }
 fi
 
 # --- guard 2: RULE 21 premise -- no run of this batch may exist yet ----------
-EXIST=$(ls "$RUNS"/${BATCH}-*.out 2>/dev/null | wc -l | tr -d ' ')
+EXIST=$( { ls -1 "$RUNS"/${BATCH}-*.out 2>/dev/null || true; } | wc -l | tr -d ' ')
 echo "guard 2: existing ${BATCH}-*.out = $EXIST"
-[ "$EXIST" = 0 ] || [ "$MODE" != "--submit" ] || gf "guard 2: $EXIST ${BATCH}-*.out already exist; not fresh"
+if [ "$EXIST" != 0 ] && [ "$MODE" = "--submit" ]; then gf "guard 2: $EXIST ${BATCH}-*.out already exist; not fresh"; fi
 CSVP=$REPO/results/all_runs.csv
 if [ -f "$CSVP" ]; then
-  grep -q "^${BATCH}-" "$CSVP" && gf "guard 2b: ${BATCH}-* already in the CSV" \
-                               || echo "guard 2b: no ${BATCH}-* name collision in the corpus"
+  if grep -q "^${BATCH}-" "$CSVP"; then gf "guard 2b: ${BATCH}-* already in the CSV";
+  else echo "guard 2b: no ${BATCH}-* name collision in the corpus"; fi
 fi
 
 # --- guard 3: RULE 20 is unenforceable without its guard, so absence REFUSES -
@@ -327,12 +327,11 @@ print("guard 4: position control p08 has m=%d, IDENTICAL to g08, and a different
 open(out, "w").write("\n".join(lines) + "\n")
 print("guard 4: PARTITION-MANIFEST.txt written to %s" % out)
 PYEOF
-[ -s "$MANIFEST" ] && echo "guard 4b: manifest is non-empty ($(wc -l < "$MANIFEST") lines)" \
-                   || gf "guard 4b: no manifest"
+if [ -s "$MANIFEST" ]; then echo "guard 4b: manifest is non-empty ($(wc -l < "$MANIFEST") lines)"; else gf "guard 4b: no manifest"; fi
 
 # --- guard 5: capacity ------------------------------------------------------
-PEND=$(squeue -h -u "${USER:-$(whoami)}" -t PENDING 2>/dev/null | wc -l | tr -d ' ')
-RUN=$(squeue -h -u "${USER:-$(whoami)}" -t RUNNING 2>/dev/null | wc -l | tr -d ' ')
+PEND=$( { squeue -h -u "${USER:-$(whoami)}" -t PENDING 2>/dev/null || true; } | wc -l | tr -d ' ')
+RUN=$( { squeue -h -u "${USER:-$(whoami)}" -t RUNNING 2>/dev/null || true; } | wc -l | tr -d ' ')
 echo "guard 5: this account has $RUN running / $PEND pending; adding 14"
 
 [ "$FAIL" = 0 ] || { echo; echo "!!! ABORTED -- nothing submitted."; exit 2; }
