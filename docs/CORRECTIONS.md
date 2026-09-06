@@ -13235,3 +13235,261 @@ layerwise R 91.3520.
 
 `analysis/c98_reproduce.py` **exits 1** -- reported as-is, inherited, author scope, deliberately not
 fixed.
+
+## 154. `cfr2` LAUNCHED (NOT LANDED) AT `ms=3e-4`; AND MASTER-TABLE ROW 24'S FOUR FALLOFF NUMERALS ARE RE-DERIVED BY A COMMITTED SCORER -- **THE SENTENCE SURVIVES AT 2 SE, THREE OF THE FOUR NUMERALS SURVIVE, `nodewise` DOES NOT, AND THE ROW'S PROVENANCE IS A MIXED-COLUMN DEFECT**
+
+Nothing below is quoted from a landing briefing. Every figure was re-derived at this HEAD: the
+`cfr2` provenance from the runs' **own** `.out` `ARGS` and `ENV` lines and from `sacct`, and the row
+24 figures by re-running `analysis/cQ1_row24_falloff_score.py` **UNEDITED** with its two documented
+arguments. `cfr2` **HAS NOT LANDED**: it was not scored, not ingested, and no `cfr2-` row exists.
+Corpus unchanged at **2,537 rows**.
+
+### 154.1 THE NUMERAL QUESTION AND THE ORDERING QUESTION ARE SCORED SEPARATELY, AND THEY DO NOT AGREE
+
+This is the entry's main result and it is stated first so it cannot be collapsed in the retelling.
+`cQ1` registered **two independent tests** over row 24, and they come out **differently**:
+
+| question | registered test | outcome |
+|---|---|---|
+| **THE SENTENCE** -- "partitioning buys TOLERANCE to an over-large meta-stepsize" | Test B: `falloff(scalar)` exceeds every partition's | **HOLDS**, pointwise **and at 2 SE**, on both rung sets, and in the peak-location-free form |
+| **THE NUMERALS** -- 5.871 / 1.060 / 1.801 / 2.593 | Test A: `|recomputed - printed| <= 2*SE` **AND** `<= 0.50 pp/dec` | **3 of 4 AGREE**; `nodewise` **DISAGREES** by **-1.8398** |
+| **THE PROVENANCE** -- what column and what script | forensics + selftests T1/T2 | **DEFECTIVE**: mixed-column, computed by an uncommitted script |
+
+A verdict of CONFIRMED on the sentence therefore **may not** be read as a verdict on the numerals,
+and the numeral failure **may not** be read as a threat to the sentence. CORRECTIONS 153's
+annotation on row 24 said *"THE FOUR NUMERALS DO NOT RE-DERIVE"*; that is now **PARTLY SUPERSEDED**
+and the correction runs in **both** directions, which is why it is recorded rather than quietly
+dropped:
+
+* **153 was too broad on the values.** On `plateau5`, under the recipe recovered in 154.3, `scalar`
+  **5.8976** (printed 5.871), `resnet18_blocks` **0.9148** (1.060) and `layerwise` **1.8437** (1.801)
+  all AGREE at the registered bar. The printed values for those three arms are **not** materially
+  wrong.
+* **153 was right about `nodewise` and right about the provenance.** `nodewise` re-derives to
+  **0.7532** against a printed 2.593 -- a **-1.8398** miss, ~5.4x its own 2 SE.
+* **The column swap is not what broke it.** On the BANNED `plateau` column at this HEAD the same
+  recipe gives 5.8895 / 0.9249 / 1.8207 / 0.6745 -- every arm within **0.08 pp/decade** of its
+  `plateau5` value. The breakage is **corpus growth**, not metric: `nodewise`'s peak migrated
+  `1e-3 -> 3e-4` once `n` went **1 -> 11**. FINDINGS 58.8(a) had already flagged that peak as
+  *"decided by n=1 against n=1"*, and nothing acted on it.
+
+### 154.2 THE RECIPE, RECOVERED -- AND WHY THE ROW IS A MIXED-COLUMN ROW
+
+No committed script computes the printed row. Verified at this HEAD: every occurrence of `5.871`
+under `analysis/` and `bin/` is a **comment quoting the row** or a registered constant
+(`cN1`/`cN2` line 243, `cO1` line 16, `cQ1`'s own header and `PRINTED` table, `bin/c57_rsw_peak.sh`,
+`bin/cO1_floor_release_row24.sh`) -- **never a computation**. And
+`git show 775eb6b:results/all_runs.csv | head -1` has **`plateau` at column 33 and NO `plateau5`**
+(this HEAD has `plateau` 33 **and** `plateau5` 35), so the cycle-57 numerals **cannot** rest on
+`plateau5`. The row was computed ad hoc in cycle 57 and the code was never committed.
+
+Exactly one recipe reproduces the printed row:
+
+> `falloff(arm)` = the **arithmetic mean of the CHORD SLOPES** from the arm's peak to **every** rung
+> above it: `mean_j [ (m(peak) - m(ms_j)) / log10(ms_j / ms*) ]`.
+
+`cQ1`'s selftests **T1** and **T2** assert the consequence as a **test, not a remark**, and both
+passed on re-run here: on the cycle-57 corpus and the `plateau` column the recipe reproduces
+`blk6` **1.0603**, `layerwise` **1.8020** and `nodewise` **2.5926** (residuals `+0.0003`, `+0.0010`,
+`-0.0004`) but **FAILS** on `scalar` (**5.8919**, residual `+0.0209`, ~20x the others), while on
+**`best_test`** it reproduces `scalar` **5.8706** (residual `-0.0004`). **Most plausible reading,
+stated as such:** row 24 is a **MIXED-COLUMN** row -- three cells from `plateau`, the `scalar` cell
+from `best_test`. A single hand-arithmetic slip in the `scalar` cell is **not excluded**. Either way
+the entry that carries the sentence is the one off its stated column. Independent corroboration that
+the recipe is the *mean* chord and not an OLS fit or a single chord: FINDINGS 58.8(a) re-derives the
+`nodewise` entry as `(92.547-91.310)/log10(3) = 2.592`, the one-chord special case.
+
+CORRECTIONS 153's two trial recipes are **SUPERSEDED, NOT DELETED**: they are `cQ1`'s registered
+secondaries -- `SECONDARY_1` (peak->next rung) and `SECONDARY_2` (peak->highest rung) -- and should
+be labelled as such rather than left reading as failed attempts at an unknown target.
+
+### 154.3 THE RE-DERIVED SURFACE AND THE FOUR NUMERALS
+
+`analysis/cQ1_row24_falloff_score.py`, sha256
+`aa0bf548a9a0a60f594587d7391d55bfdebc8fdb6df147e2bacb93c962dac562`, run **UNEDITED**, `--selftest`
+**38/38** then `--score`. Stratum = the canonical box (R18 / CIFAR-10 / SGDm+Lion / `alpha0=1e-3` /
+`gamma 1` / batch 100 / `AUGMENT=1` / `beta_clip=-15:-2.3026` / `HIER` empty / 100 ep requested and
+done / `collapsed=0` / `superseded!=1` / `window_ok=1` / `complete=1` / `plateau5 > 50`), granularity
+unrestricted, no batch prefix excluded. Pooled within-cell `sigma_w(plateau5)` re-derived at run
+time = **0.1967 (df 216, 39 cells)** -- consistent in scale with `cfr1`'s restricted 0.2160 (df 76).
+
+PRIMARY = the canonical ladder, matched on the CSV's `meta_stepsize` **string**, so `3.947e-4`,
+`1.277e-4`, `3.307e-7`, `1.520e-5`, `5e-4`, `2e-4` and `3e-2` are excluded (admitting them changes
+which rung is *"above the peak"*, i.e. changes the estimand rather than the estimate).
+
+| arm | peak (n) | **falloff +- SE** | printed | delta | 2 SE | **Test A** |
+|---|---|---|---|---|---|---|
+| `scalar` | 92.2624 @ `1e-4` (5) | **5.8976 +- 0.1659** | 5.871 | +0.0266 | 0.3318 | **AGREE** |
+| `resnet18_blocks` | 92.5300 @ `1e-4` (5) | **0.9148 +- 0.1843** | 1.060 | -0.1452 | 0.3685 | **AGREE** [N1] |
+| `layerwise` | 92.8865 @ `1e-4` (11) | **1.8437 +- 0.1319** | 1.801 | +0.0427 | 0.2639 | **AGREE** |
+| `nodewise` | 92.4533 @ **`3e-4`** (11) | **0.7532 +- 0.1701** | 2.593 | **-1.8398** | 0.3401 | **DISAGREE** [N1] |
+
+Chords: `scalar` peak->`3e-4` (n=5) 7.3734, peak->`1e-3` (n=20) 4.4219. `blk6` ->`3e-4` (n=1)
+1.0689, ->`1e-3` (n=5) 0.9144, ->`3e-3` (n=1) 0.7609. `layerwise` ->`3e-4` (n=5) 2.0124, ->`1e-3`
+(n=20) 1.6749. `nodewise` ->`1e-3` (n=3) 0.3811, ->`3e-3` (n=1) 1.1253. Two of `blk6`'s three chords
+and one of `nodewise`'s two rest on **n=1** cells; both arms are flagged **N1-DEPENDENT**.
+
+The surface itself (`plateau5` mean, sd, n; `final_train` alongside, per discipline):
+
+| arm | `1e-8` | `1e-5` | `3e-5` | `1e-4` | `3e-4` | `1e-3` | `3e-3` |
+|---|---|---|---|---|---|---|---|
+| `scalar` | 90.4513 (.25, 3) | 90.8376 (.27, 5) | 91.6720 (.14, 5) | **92.2624** (.22, 5) | 88.7444 (.49, 5) | 87.8405 (.22, 20) | -- |
+| `scalar` train | 94.700 | 95.984 | 98.010 | 99.628 | 93.258 | 94.022 | -- |
+| `blk6` | -- | -- | 91.4430 (.12, 2) | **92.5300** (.14, 5) | 92.0200 (n=1) | 91.6156 (.10, 5) | 91.4060 (n=1) |
+| `blk6` train | -- | -- | 97.725 | 99.584 | 99.480 | 99.272 | 99.240 |
+| `layerwise` | 90.3160 (.16, 3) | 91.0568 (.05, 5) | 91.8696 (.25, 5) | **92.8865** (.17, 11) | 91.9264 (.18, 5) | 91.2116 (.17, 20) | -- |
+| `layerwise` train | 94.967 | 96.110 | 97.988 | 99.764 | 99.900 | 99.890 | -- |
+| `nodewise` | -- | -- | -- | 92.0436 (.20, 32) | **92.4533** (.24, 11) | 92.2540 (.27, 3) | 91.3280 (n=1) |
+| `nodewise` train | -- | -- | -- | 98.473 | 99.479 | 99.870 | 99.730 |
+
+`weightwise` is descriptive and in **no test**: 90.3470 (2) / 90.9410 (2) / 91.1464 (.15, 5) /
+90.9560 (2) / 91.0973 (.21, 3) at `1e-5`...`1e-3`.
+
+### 154.4 THE ORDERING -- REGISTERED SEPARATELY, AND IT PASSES ON EVERY FORM
+
+| contrast | PRIMARY (canonical ladder) | SECONDARY_ALL (every rung) |
+|---|---|---|
+| `scalar - resnet18_blocks` | **+4.9829** (2 SE 0.4959) | **+5.0228** (2 SE 0.8347) |
+| `scalar - layerwise` | **+4.0540** (2 SE 0.4239) | **+4.0939** (2 SE 0.7950) |
+| `scalar - nodewise` | **+5.1445** (2 SE 0.4752) | **+5.1844** (2 SE 0.8229) |
+| | **B-POINT HOLDS; B-2SE HOLDS** | **B-POINT HOLDS; B-2SE HOLDS** |
+
+So the ordering is **ROBUST in the registered sense** -- it holds on both rung sets, and no rung-set
+choice is carrying it. `SECONDARY_ALL` also leaves every Test A verdict unchanged (`scalar` 5.9376
++- 0.3754 AGREE, `blk6` 0.9148 AGREE, `layerwise` 1.8437 AGREE, `nodewise` 0.7532 DISAGREE).
+
+**Test B-ALT**, the peak-location-free restatement -- the loss each arm takes at the **fixed**
+over-large `ms=1e-3` below its **own** tuned peak -- **HOLDS**, and matters because it does not
+depend on where any peak sits: `scalar` **4.4219** >> `layerwise` **1.6749** > `blk6` **0.9144** >
+`nodewise` **0.1993** pp. This reproduces FINDINGS 58.8's own ordering (4.480 / 1.736 / 1.022 /
+0.098) at the enlarged `n`.
+
+Registered branch **(i)** therefore fires: **sentence CONFIRMED, numerals CORRECTED.**
+
+**NOT CLAIMED.** The sub-ordering *among* partitions now runs `nodewise` 0.7532 < `blk6` 0.9148 <
+`layerwise` 1.8437 -- i.e. finer partitions are **not** monotonically more tolerant, the reverse of
+what the printed row implied (`layerwise` 1.801 < `nodewise` 2.593). Both `blk6` and `nodewise`
+carry **n=1** cells, so this sub-ordering is **NOT a finding** and is not written as one. Only
+**partition-vs-none** is asserted. Also not claimed: this is a re-derivation of the **same,
+possibly-clamped** surface on a better column -- see 154.5.
+
+### 154.5 THE CLAMP SCOPE IS UNTOUCHED -- AND CORRECTIONS 148.4's CENSUS IS NARROWER THAN IT HAS BEEN CITED AS BEING
+
+`cQ1` changes **no** clamp language. Its stratum **is** the clamped box `-15:-2.3026`, so the
+recomputed `blk6` and `nodewise` falloffs are measured on a **still-clamped** surface and must carry
+that scope wherever they are quoted -- and those are precisely the two arms whose numerals moved.
+
+Separately, and re-verified here rather than inherited: **CORRECTIONS 148.4's *"ms=3e-4, n=15, floor
+100.0%"* does not say what 153.8 and row 24's CORRECTIONS-153 annotation cite it for.** Joining every
+`ms=3e-4` `HIER=none` run on `alice2` to its own `ENV` line, the runs that carry a probe are
+`chunk2325` (3), `chunk777` (3), `nodewise` (3) and `nodewise1d` (3), all at `PROBE=5` -- **every one
+`m >= 777` or `nodewise`** -- while **all 5 `scalar` and all 5 `layerwise` runs at this rung carry no
+`PROBE` at all**. (The remaining 3 of 148.4's 15 are the `at1-node` triple on the `alice` account.)
+The 7 `PROBE=100` `scalar`/`layerwise` runs now present are **`cfr2`'s own, launched this cycle**.
+
+**Consequence:** binding at `m=62` (layerwise) or `m=1` (scalar) at `ms=3e-4` is **UNMEASURED IN THE
+CORPUS**, so 148.4 is **not** evidence that the layerwise arm binds at this rung. The citation must
+be **narrowed** in CORRECTIONS 153.8 and in row 24's annotation. This is exactly the premise
+`cfr2`'s `R4(ii)` gate now tests, which is why that gate is live rather than a formality.
+
+### 154.6 `cfr2` -- REGISTERED AND LAUNCHED, **NOT LANDED**
+
+The one-factor floor release at **`ms=3e-4`**, the rung `cfr1` left open. 12 jobs on `alice2`
+(account `s5014158`), `{scalar, layerwise}` x box `{C = -15:-2.3026, R = -80:-2.3026}` x seeds
+`{0,1,2}`, **all four cells IN BATCH**. R18 / CIFAR-10 / SGDm+Lion / `alpha0=1e-3` / 100 ep / batch
+100 / `gamma 1` / `AUGMENT=1` / `HIER none` / `SCHED none` / `PROBE=100` with a per-run `PROBE_DIR` /
+`WALL 03:00:00`. Estimand `DID = [lay-sc]_R - [lay-sc]_C`. Byte-match to `cfr1` proven, not
+asserted: `diff` of the two launchers' sbatch composition blocks is **EMPTY**, and over every scalar
+setting the only difference is `MST=1e-3 -> MST=3e-4`.
+
+**ONE SUBMISSION, proven by wall clock.** All twelve job ids **4913096-4913107** are contiguous and
+every one has `sacct Submit = 2026-09-06T16:33:46` -- **zero spread across all twelve**.
+
+**RULE 21 -- 114 s margin.** Registration commit `dfd9339` committer date
+**2026-09-06T16:31:52+02:00**; earliest (and latest) Submit **16:33:46**. Commit strictly precedes
+every run.
+
+**RULE 16 -- additions only.** `git diff --name-status 90d314b..HEAD -- analysis/` returns **`A`,
+`A`** and nothing else; `--numstat` gives `1484/0` (`analysis/cO2_cfr2_score.py`), `662/0`
+(`bin/cO2_floor_release_ms3e4.sh`), `1/0` (`bin/PROTECTED.txt`) -- **0 deletions, 0 modifications**.
+`cfr2`'s scorer is a **NEW registration**, not an edit of `cfr1`'s. sha256
+`1e4f531a3094b2ebb84a1083cfa050aaf77f3bc0abc53effeba22117d2a3b3ba`, **identical on the Mac and on
+`alice2`** at `/home/s5014158/metaopt/hmo-cfr2`; launcher
+`ac782ce7b78cc7c4dc091437abf9d018f126585ba7e848997403ab80630d3731`, also identical. The `alice2`
+checkout is clean at `dfd9339`.
+
+**RULE 20 -- PASS, from the runs' OWN lines.** `argsline_guard.py --name cfr2- --batch-consistency`
+over the 7 started `.out` files (with `METAOPT_WS` exported first):
+*"batch-consistency: every non-axis flag is identical across 7 runs / 7 clean, 0 WITH REPEATED FLAGS
+OR DESIGN MISMATCH, 0 without an ARGS line / **VERDICT: PASS**"*. The axes were then checked
+**independently of the guard**, per run, name against `ARGS`:
+
+| run | `--meta-stepsize` | `--stepsize-groups` | `--seed` | `BETA_CLIP` (from **ENV**) |
+|---|---|---|---|---|
+| `cfr2-sc-C-s0` (4913096) | `3e-4` | `scalar` | 0 | `-15:-2.3026` |
+| `cfr2-lay-C-s0` (4913097) | `3e-4` | `layerwise` | 0 | `-15:-2.3026` |
+| `cfr2-sc-R-s0` (4913098) | `3e-4` | `scalar` | 0 | `-80:-2.3026` |
+| `cfr2-lay-R-s0` (4913099) | `3e-4` | `layerwise` | 0 | `-80:-2.3026` |
+| `cfr2-sc-C-s1` (4913100) | `3e-4` | `scalar` | 1 | `-15:-2.3026` |
+| `cfr2-lay-C-s1` (4913101) | `3e-4` | `layerwise` | 1 | `-15:-2.3026` |
+| `cfr2-sc-R-s1` (4913102) | `3e-4` | `scalar` | 1 | `-80:-2.3026` |
+
+**`BETA_CLIP` and `PROBE` are ENVIRONMENT variables and cannot ride the `ARGS` line**, so they were
+audited **separately from each run's own `ENV` line**: 4 clamped and 3 released, **each agreeing with
+its run NAME**, with `AUGMENT=1 HIER=none SCHED=none PROBE=100` and a **distinct `PROBE_DIR`** in all
+seven. **7/7 agree; no mismatch; nothing was cancelled.** The remaining 5 jobs are `PENDING` with
+reason `(None)` (scheduler backfill, no QOS block) and get the same audit when they start.
+
+**RE-RUN AT COMMIT TIME -- an 8th job started during this cycle and was audited too.** `cfr2-lay-R-s1` (4913103) went `RUNNING` after the table above was written; the guard was re-run over all 8 started `.out` files: *"batch-consistency: every non-axis flag is identical across 8 runs / **8 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH**, 0 without an ARGS line / **VERDICT: PASS**"*. Its own `ENV` line carries `BETA_CLIP=-80:-2.3026` (**R**, agreeing with its NAME), `PROBE=100` and its own `PROBE_DIR`; its own `ARGS` line carries `--meta-stepsize 3e-4 --stepsize-groups layerwise --seed 1`. **8/8 agree; still no mismatch; still nothing cancelled.** 4 remain `PENDING` and get the same audit on start.
+
+**The instrument was re-verified at this rung on the live source, not assumed.** Float32 travel bound
+at `ms=3e-4` = **[-21.907576, +8.090129]** (real-arithmetic -21.907755; the same simulation
+reproduces `cfr1`'s -56.888439 at `1e-3` and -11.914545 at `1e-4`). So **-80 is UNREACHABLE** --
+58.09 nats / 193,641 meta-steps that do not exist, a **wider** margin than `cfr1`'s 23.11 nats -- and
+**-15 IS reachable**, with 6.907576 nats (23,025 meta-steps) of spare travel, first attainable at
+meta-step **26,975 = 53.95%** of training, capping floor exposure at **46.05%** of a run (against
+83.81% at `cfr1`'s rung). `T` measured off the staged dataset: 50,000 images / batch 100 / no
+`drop_last` -> 500 it/epoch x 100 ep = **50,000 meta-steps**. Guard 4f fails closed on
+`not (fl_r < lo < fl_c)` and passed.
+
+**Pre-registration** (frozen in the scorer, gates fire IN ORDER, first failure decides): **G0**
+provenance; **R1** manipulation at the **coordinate** denominator over the **FULL** trajectory
+(released runs need `beta_true_min > -80 + 0.0304` with `n_at_lo = 0` at **every** record, >= 400
+records/run; an unreadable probe fails **CLOSED**); **R2** divergence (`UNRESOLVED-DIVERGED`, with
+`COLLAPSED-BY-FREEZING` its own label, **live** here since `-21.907576 < -20`); **R3** noise
+(`3*sigma_w = 0.6451`); **R4** premise, **both halves** -- `G_C >= 1.5910` **and** >= 2 of 3 clamped
+layerwise runs must actually reach the floor. Verdict on `DID` at `2*SE_DID = 0.4966`:
+`|DID| <= 0.4966` **SURVIVES**; `<= -0.4966` with `G_R >= 1.5910` **ATTENUATED**; `<= -0.4966` with
+`G_R < 1.5910` **WALL-DRIVEN**; `>= +0.4966` **BOX-SUPPRESSED**. Constants re-derived by the
+selftest, **not quoted**: `sigma_w` **0.2150** (df 80, 32 cells; `cfr2-` excluded, `cfr1`'s rows IN,
+which is why it differs from `cfr1`'s 0.2160/76/30), `SE_GAP` 0.1755, `SE_DID` 0.2483. Power
+**1.0000** against the registered stake, **0.8857** at 25% of the gap, 80% power against any wall
+carrying **>= 22.17%** of the gap.
+
+**Refusals, recorded.** (a) A `blk6` arm at this rung -- and **not** for `cfr1`'s reason: the
+`0% / 68.8% / 100%` ladder a `blk6` arm would convert into a dose-response is CORRECTIONS 148.5's
+table, headed **"Core set, ms=1e-3"**; at `ms=3e-4` `blk6`'s binding rate is **unmeasured** (zero of
+the probed runs at this rung is `blk6`), so the arm would open a **second** unmeasured premise beside
+the one `R4(ii)` already carries. `cfr3` at `ms=1e-3` is where that arm belongs. (b) Loosening
+`PROBE` to 333. (c) Repeating `cfr1`'s registration claim that its selftest would stay green
+post-ingest -- CORRECTIONS 153 A7 measured that **false**; `cfr2` instead states in the file header,
+the launcher header and the commit message that `--selftest` is a **PRE-INGEST GATE**, and makes the
+RULE 21 premise check **conditional on corpus state by construction**.
+
+### 154.7 STATE
+
+`analysis/c98_reproduce.py` **exits 1** -- reported **as-is**, inherited, **author scope,
+deliberately not fixed** (628 `chk()` sites, 411 distinct quantity numerals, **41.9%** coverage).
+`git status --porcelain paper/` **empty**; nothing under `paper/` was read for edit or written.
+`results/all_runs.csv` **unmodified at 2,537 rows** -- `cfr2` is **not ingested**. `cts3`'s six jobs
+(4912733-4912738) were left alone and are still RUNNING; `alice` was read with `squeue` only (14
+jobs, all `in489g2-`, **NOT OURS**) and nothing was submitted or cancelled there. Zero GPU-hours were
+spent by `cQ1`, which is a pure re-derivation over rows that predate it.
+
+**A caveat `cQ1` states about itself and this entry repeats rather than launders:** RULE 21's normal
+proof -- scorer commit strictly before the earliest `sacct Submit` of its own runs -- **does not
+apply** to `cQ1`, which has **no runs of its own**. What is proven is the weaker
+**commit-before-first-execution**: commit `573c08c` at **2026-09-06T16:23:31+02:00**, first execution
+3 s later. Disclosed: a `py_compile` byte-compile preceded the commit (the repo's guard-2 pattern);
+it compiles, it does not execute the module body, and it produced no scorer output. Anyone quoting
+`cQ1`'s numbers inherits that caveat rather than the RULE 21 label.

@@ -1,11 +1,81 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 129**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **153**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 130**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **154**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 rows** — `cfr1` INGESTED: **+12 added, 0 changed, 0 removed** (2,525 → 2,537). `cts3` **NOT ingested** (0 rows) and `in489g2` is **not ours**.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 rows, UNCHANGED this cycle — nothing ingested**. `cfr2` (launched) and `cts3` are **in flight, 0 rows**; `in489g2` is **not ours**.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**This cycle LANDED, SCORED and INGESTED `cfr1` only.** CORRECTIONS **153**. The registered verdict `ROW24-SURVIVES` is **accepted for the question it asked and refused as a discharge**: **MASTER-TABLE row 24 moves THREATENED → CONSTRAINED, not CLEARED.**
+**This cycle LAUNCHED `cfr2` (12 jobs, NOT landed, NOT scored, NOT ingested) and RE-DERIVED MASTER-TABLE row 24's four falloff numerals with a committed scorer.** CORRECTIONS **154**. **MASTER-TABLE row 24 WAS EDITED** — falloff clause replaced, CORRECTIONS 154 annotation appended; the row's verdict stays **CONFIRMED on its SENTENCE**. The numeral question and the ordering question were scored **separately and do not agree**: the ordering **holds at 2 SE**, **3 of 4 numerals AGREE**, **`nodewise` does not** (−1.840).
+
+## Cycle 130 — the three deliverables
+
+| # | deliverable | outcome |
+|---|---|---|
+| 1 | `cfr2` — one-factor floor release at **`ms=3e-4`** | **LAUNCHED**, 12 jobs, ONE submission. RULE 21 **114 s**, RULE 20 **PASS**, ENV audit **7/7**. Not landed |
+| 2 | `cQ1` — row 24's falloff numerals on `plateau5` | **SCORED**, 38/38 selftests. Sentence **CONFIRMED**, numerals **CORRECTED**, provenance **defective** |
+| 3 | `docs/MASTER-TABLE.md` row 24 | **UPDATED IN PLACE** (1 line changed, file line numbering preserved) |
+
+
+## Row 24 — the numerals RE-DERIVED (CORRECTIONS 154, `cQ1`)
+
+`analysis/cQ1_row24_falloff_score.py` (`573c08c`, sha256 `aa0bf548…`) run **UNEDITED**: `--selftest` **38/38**, then `--score`. Zero GPU. Pooled `sigma_w(plateau5)` re-derived at run time = **0.1967** (df 216, 39 cells). Recipe = **mean chord slope** from each arm's peak to every higher rung of the canonical ladder.
+
+**The two questions are scored SEPARATELY and they do not agree.**
+
+| arm | peak (n) | **falloff ± SE** | printed | Δ | 2 SE | **Test A** |
+|---|---|---|---|---|---|---|
+| `scalar` | 92.2624 @ `1e-4` (5) | **5.8976 ± 0.1659** | 5.871 | +0.0266 | 0.3318 | **AGREE** |
+| `blk6` | 92.5300 @ `1e-4` (5) | **0.9148 ± 0.1843** | 1.060 | −0.1452 | 0.3685 | **AGREE** [N1] |
+| `layerwise` | 92.8865 @ `1e-4` (11) | **1.8437 ± 0.1319** | 1.801 | +0.0427 | 0.2639 | **AGREE** |
+| `nodewise` | 92.4533 @ **`3e-4`** (11) | **0.7532 ± 0.1701** | 2.593 | **−1.8398** | 0.3401 | **DISAGREE** [N1] |
+
+| test | PRIMARY (ladder) | SECONDARY_ALL (every rung) |
+|---|---|---|
+| `scalar − blk6` | **+4.9829** (2 SE 0.4959) | +5.0228 (0.8347) |
+| `scalar − layerwise` | **+4.0540** (2 SE 0.4239) | +4.0939 (0.7950) |
+| `scalar − nodewise` | **+5.1445** (2 SE 0.4752) | +5.1844 (0.8229) |
+| verdict | **B-POINT + B-2SE HOLD** | **B-POINT + B-2SE HOLD** |
+
+- **B-ALT (peak-location-free, preferred headline)** — loss at the FIXED over-large `ms=1e-3` below each arm's own peak: scalar **4.4219** ≫ layerwise **1.6749** > blk6 **0.9144** > nodewise **0.1993** pp. **HOLDS**, and reproduces FINDINGS 58.8's ordering (4.480/1.736/1.022/0.098) at enlarged `n`.
+- **Registered branch (i) fires: sentence CONFIRMED, numerals CORRECTED.** Row 24's verdict stays **CONFIRMED** — attached to **the sentence, not the numerals**.
+- **CORRECTIONS 153's blanket "the four numerals do not re-derive" is PARTLY SUPERSEDED, in BOTH directions:** too broad on the values (3 of 4 AGREE), right about `nodewise` and right about the provenance.
+- **The column swap is NOT what broke the row.** On the banned `plateau` column the same recipe gives 5.8895 / 0.9249 / 1.8207 / 0.6745 — every arm within **0.08 pp/decade**. The breakage is **corpus growth**: `nodewise`'s peak migrated `1e-3 → 3e-4` as `n` went **1 → 11** — the fragility FINDINGS 58.8(a) flagged and nothing acted on.
+- **PROVENANCE DEFECT — the printed row is MIXED-COLUMN.** blk6/layerwise/nodewise reproduce on `plateau` (residuals ≤0.001); **scalar reproduces on `best_test`** (5.8706) and FAILS on `plateau` (+0.0209). Asserted as selftests **T1/T2**, not as a remark. Computed by an **uncommitted ad-hoc script** in cycle 57 (`775eb6b`) — whose CSV **has no `plateau5` column at all** (verified: `plateau` col 33 only; this HEAD has 33 **and** 35). Every `5.871` under `analysis/`+`bin/` is a comment or a registered constant, **never a computation**.
+- **NOT claimed:** the sub-ordering among partitions (nodewise 0.753 < blk6 0.915 < layerwise 1.844 — finer is **not** monotonically more tolerant). Both rest on **n=1** cells. Only **partition-vs-none** is asserted.
+- **Clamp scope UNCHANGED.** `cQ1`'s stratum **is** the clamped box `-15:-2.3026`; the recomputed `blk6` and `nodewise` falloffs sit on a **still-clamped** surface — and they are the two arms whose numerals moved.
+
+## `cfr2` — LAUNCHED, **NOT LANDED** (CORRECTIONS 154)
+
+One-factor floor release at **`ms=3e-4`**, the rung `cfr1` left open. `{scalar, layerwise}` × box `{C = -15:-2.3026, R = -80:-2.3026}` × seeds `{0,1,2}`, **all four cells IN BATCH**. Byte-match to `cfr1` proven: `diff` of the two launchers' sbatch composition blocks is **EMPTY**; the only scalar-setting difference is `MST=1e-3 → MST=3e-4`.
+
+| guard | result |
+|---|---|
+| **ONE submission** | ids **4913096–4913107** contiguous, **all `Submit` 16:33:46, zero spread across 12** |
+| **RULE 21** | commit `dfd9339` 16:31:52 → earliest Submit 16:33:46 = **114 s** |
+| **RULE 16** | `git diff --name-status 90d314b..HEAD -- analysis/` = **`A`,`A`**; 0 deletions, 0 modifications |
+| **RULE 20** | `--batch-consistency` over 7 started `.out`: *"every non-axis flag identical across 7 runs / 7 clean, 0 mismatch"* → **PASS** |
+| **ENV audit** (separate — `BETA_CLIP`/`PROBE` cannot ride `ARGS`) | **7/7 agree with run NAME**: 4 × `-15:-2.3026`, 3 × `-80:-2.3026`; `AUGMENT=1 HIER=none SCHED=none PROBE=100`, distinct `PROBE_DIR` each |
+| **axes, checked independently of the guard** | `--meta-stepsize 3e-4` in **7/7**; granularity and seed match the name in **7/7** |
+| **outcome** | **no mismatch → nothing cancelled.** Re-run at commit time after an 8th job started: **8 clean, 0 mismatch, PASS**; `cfr2-lay-R-s1` (4913103) carries `-80:-2.3026`/`layerwise`/`seed 1`/`3e-4`, all agreeing with its NAME. **4 `PENDING`** get the same audit on start |
+
+- **Instrument re-verified at this rung on the live source.** Float32 travel bound at `ms=3e-4` = **[−21.907576, +8.090129]**. **−80 UNREACHABLE** (58.09 nats / 193,641 non-existent meta-steps — a **wider** margin than `cfr1`'s 23.11). **−15 REACHABLE** (6.9076 nats / 23,025 steps spare; first attainable at meta-step **26,975 = 53.95%**), capping floor exposure at **46.05%** of a run vs 83.81% at `cfr1`'s rung. `T` measured: 50,000 imgs / batch 100 / no `drop_last` → **50,000 meta-steps**. Guard 4f fails closed and passed.
+- **Registered bars** (re-derived by the selftest, not quoted): `sigma_w` **0.2150** (df 80, 32 cells; `cfr2-` excluded, `cfr1`'s rows IN), `SE_GAP` 0.1755, `SE_DID` **0.2483**, bar **0.4966**. Power **1.0000** at the registered stake, **0.8857** at 25% of the gap; 80% power against any wall carrying **≥22.17%**.
+- **`R4(ii)` is a LIVE gate, not a formality** — see the census defect below.
+- **Refused:** a `blk6` arm at this rung (148.5's dose-response table is headed *"Core set, `ms=1e-3`"*; `blk6`'s binding rate at `3e-4` is **unmeasured**, so the arm would open a **second** unmeasured premise); loosening `PROBE` to 333; repeating `cfr1`'s false "selftest stays green post-ingest" claim.
+
+## CORRECTIONS 148.4's census is NARROWER than it has been cited as being
+
+Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to its **own** `ENV` line:
+
+| granularity at `ms=3e-4` | probe |
+|---|---|
+| `chunk2325` ×3, `chunk777` ×3, `nodewise` ×3, `nodewise1d` ×3 | `PROBE=5` — **all `m ≥ 777` or `nodewise`** |
+| **`scalar` ×5, `layerwise` ×5** | **NO `PROBE` AT ALL** |
+| `scalar` ×4, `layerwise` ×3 at `PROBE=100` | **`cfr2`'s own, launched this cycle** |
+
+- 148.4's *"ms=3e-4, n=15, floor 100.0%"* is measured on **`m ≥ 777` / `nodewise` runs ONLY**. **Binding at `m=1` or `m=62` at `ms=3e-4` is UNMEASURED IN THE CORPUS.**
+- It is cited in **CORRECTIONS 153.8** and in **row 24's CORRECTIONS-153 annotation** as evidence the layerwise arm binds at that rung. **It is not evidence of that.** Both citations must be **narrowed**; row 24's annotation was narrowed this cycle, 153.8 has not been.
+- `cfr2`'s **clamped layerwise arm is the measurement that settles it** — a deliverable whatever the `DID` does.
 
 ## `cfr1` — LANDED, SCORED, INGESTED (CORRECTIONS 153)
 
@@ -117,16 +187,22 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 ro
 
 | account | batch | jobs | run | pend | done | state | scorer |
 |---|---|---|---|---|---|---|---|
-| `alice2` | **`cfr1`** | 12 | 0 | 0 | **12** | **LANDED, SCORED, INGESTED** (CORRECTIONS 153) | `cO1_cfr1_score.py` (`dbf90db`), run UNEDITED |
-| `alice2` | **`cts3`** | 6 | **6** | 0 | 0 | **RUNNING — 772 ep**, elapsed 2:30–3:14 | `cO1_cts3_score.py` (`327e3f0`) |
-| `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS, never touch** | `cI2_in489g2_score.py` (`571707b`) |
+| `alice2` | **`cfr2`** | **12** | **8** | **4** | 0 | **RUNNING — launched this cycle, NOT landed.** ids 4913096–4913107, **all Submit 16:33:46, zero spread** | `cO2_cfr2_score.py` (`dfd9339`), **NOT yet run** |
+| `alice2` | `cfr1` | 12 | 0 | 0 | **12** | landed, scored, ingested last cycle (CORRECTIONS 153) | `cO1_cfr1_score.py` (`dbf90db`), run UNEDITED |
+| `alice2` | **`cts3`** | 6 | **6** | 0 | 0 | **RUNNING — 772 ep**, elapsed 3:05–3:49. **Left alone: not cancelled, not pulled, 0 rows** | `cO1_cts3_score.py` (`327e3f0`) |
+| `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS, never touch.** Re-read at this HEAD: 8 RUNNING (elapsed 11:31), 6 PENDING | `cI2_in489g2_score.py` (`571707b`) |
 | `alice2` | `scl1` | 12 | 0 | 0 | **12** | landed and ingested last cycle (CORRECTIONS 152) | `cP1_scl1_score.py` (`aac1bf0`) |
 
-- **This cycle ingested `cfr1` ONLY.** `cts3` is still running and was deliberately left out of the corpus (**0 rows**). Only `cfr1-*.out` and `runs/cfr1/probe_*` were pulled from `alice2`.
-- `in489g2` on `alice`: 8 `RUNNING` (elapsed 10:49), 6 `PENDING`. **Read with `squeue -u salehkaleybars` only. Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
-- **This session cancelled, requeued or modified nothing on either account, and submitted nothing.**
+- **This cycle ingested NOTHING.** `cfr2` and `cts3` are both in flight and both contribute **0 rows**; `results/all_runs.csv` is **byte-unchanged at 2,537 rows**. No `.out` and no probe was pulled from either account.
+- `in489g2` on `alice`: **8 `RUNNING` (elapsed 11:31), 6 `PENDING`** at this HEAD. **Read with `squeue -u salehkaleybars` only. Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
+- **This session cancelled, requeued or modified nothing on either account.** `cfr2`'s 12 jobs were submitted by the launch agent in ONE submission; **no mismatch was found, so nothing was cancelled**.
+- **`cfr2` scoring command when it lands** (run UNEDITED, after re-running the RULE 20 guard over all 12 `.out` files): `export METAOPT_WS=/home/s5014158/metaopt; cd /home/s5014158/metaopt/hmo-cfr2 && python3 analysis/cO2_cfr2_score.py --runs /home/s5014158/metaopt/runs --probes /home/s5014158/metaopt/runs/cfr2`
 
-## INGEST — the diff, read both ways (CORRECTIONS 146.7)
+## INGEST — **NOTHING INGESTED THIS CYCLE**
+
+`results/all_runs.csv` is **byte-unchanged at 2,537 rows**. `aggregate.py` was **not run**; no `.out` and no probe was pulled from either account. `cfr2` (12, in flight) and `cts3` (6, RUNNING) both contribute **0 rows**; `in489g2` is **not ours**. The table below is **last cycle's `cfr1` ingest, retained for the record**.
+
+## INGEST (cycle 129, `cfr1`) — the diff, read both ways (CORRECTIONS 146.7)
 
     python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # STDOUT, not a log
     python3 analysis/args_repair.py --apply
@@ -141,22 +217,34 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,537 ro
 | ingested rows spot-check | all 12 `epochs_done=100`; the four cell means reproduce the scorer exactly (87.8707 / 91.3133 / 87.8773 / 91.3520) |
 | **NOT ingested** | `cts3` (6 RUNNING) — **0 rows** |
 
-**RULE 20 — `cfr1` 12/12, re-derived at this HEAD. This CLOSES CORRECTIONS 151.4's 11/12 INCOMPLETE audit.**
+**RULE 20 — `cfr2` 8/8 started runs, re-derived at this HEAD** (4 `PENDING` get the same audit on start):
+
+    export METAOPT_WS=/home/s5014158/metaopt
+    python3 analysis/argsline_guard.py --name cfr2- --batch-consistency /home/s5014158/metaopt/runs/cfr2-*.out
+
+- **8 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS.** *"every non-axis flag is identical across 8 runs"*. (Audited at 7 started, re-run at 8 when `cfr2-lay-R-s1` began; both PASS.)
+- **`BETA_CLIP` and `PROBE` audited SEPARATELY from each run's own `ENV` line** — they are environment variables and **cannot ride the `ARGS` line**. 4 × `-15:-2.3026`, 3 × `-80:-2.3026`, **each agreeing with its run NAME**; `AUGMENT=1 HIER=none SCHED=none PROBE=100` and a distinct `PROBE_DIR` in all seven.
+- **Axes checked independently of the guard:** `--meta-stepsize 3e-4` in 7/7; `--stepsize-groups` and `--seed` match the run name in 7/7. **No mismatch → nothing cancelled.**
+
+**RULE 20 — `cfr1` 12/12 (cycle 129). This CLOSED CORRECTIONS 151.4's 11/12 INCOMPLETE audit.**
 
     python3 analysis/argsline_guard.py --name cfr1- --batch-consistency ../runs_alice2/cfr1-*.out   # exit 0
 
 - **12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS.** *"every non-axis flag is identical across 12 runs"*.
 - ENV audit (`BETA_CLIP` cannot ride the ARGS line — RULE 20's known blind spot): **6** runs `-15:-2.3026`, **6** runs `-80:-2.3026`, each agreeing with its own run NAME. `RUN_DONE` 12/12, tracebacks 0/12, 12 distinct job ids.
 
-**RULE 21 — `cfr1` 130 s.**
+**RULE 21 — `cfr2` 114 s.**
 
 | batch | commit | commit epoch | earliest `sacct` Submit | **margin** | spread |
 |---|---|---|---|---|---|
+| **`cfr2`** | **`dfd9339`** | 1788705112 (16:31:52) | 1788705226 (16:33:46) | **114 s** | **0 s across all 12** |
 | `cfr1` | `dbf90db` | 1788691708 (12:48:28) | 1788691838 (12:50:38) | **130 s** | 1 s |
 | `cts3` | `327e3f0` | 1788691571 | 1788691633 | 62 s | 0 s |
 | `scl1` | `aac1bf0` | 1788691465 | 1788691498 | 33 s | 1 s |
 
-**RULE 16 — no scorer edited, by anyone, at any point this cycle.**
+**RULE 16 — no scorer edited, by anyone, at any point this cycle.** `git diff --name-status 90d314b..HEAD -- analysis/` returns **`A`, `A` and nothing else**; `--numstat` gives `1484/0` (`cO2_cfr2_score.py`), `654/0` (`cQ1_row24_falloff_score.py`) — **0 deletions, 0 modifications**. sha256 parity Mac ↔ `alice2` holds for `cO2_cfr2_score.py` (`1e4f531a…`) and its launcher (`ac782ce7…`); the `alice2` checkout is clean at `dfd9339`.
+
+**RULE 21 does NOT apply to `cQ1`, and the weaker guarantee is stated instead of the label.** `cQ1` has **no runs of its own** — it is a zero-GPU re-derivation over rows that predate it, so no ordering against an `sacct` Submit exists. What is proven is **commit-before-first-execution**: `573c08c` at 16:23:31, first execution 3 s later. Disclosed: a `py_compile` byte-compile preceded the commit; it does not execute the module body.
 
 | check | result |
 |---|---|
