@@ -10779,3 +10779,118 @@ classes; 627,329 train images; val 24,450 @ 50/class with labels recovered from 
 annotations, not a devkit.  Chance 0.2045%.  NOT comparable to any published ImageNet-1k number.
 Budget 84 epochs, epoch-matched to the parent's protocol (422000/5004 = 84.3) but NOT step-matched,
 because the dataset is half the size.  window5 at ESTAR = 80, not a converged plateau.
+
+## 145. TWO BATCHES REGISTERED AND LAUNCHED -- THE TRANSITION HUNT AND THE CUT-POSITION SWEEP
+
+**Nothing landed this cycle and no verdict is claimed.**  53 jobs were registered, audited and
+submitted; the corpus is UNCHANGED at **2,444 rows** and holds **0** `in489g2` and **0** `cpk1`
+rows.  Both batches exist because CORRECTIONS 143 and 144 left one question adjacent to both:
+*where* on the granularity axis the scalar-to-layerwise gap is actually bought, and whether the
+axis is group COUNT at all.
+
+### 145.1 THE TWO DESIGNS
+
+| | A -- `in489g2` | B -- `cpk1` |
+|---|---|---|
+| account | `alice` (`salehkaleybars`) -- **forced**, the 87 GB tree is only at `/data1/salehkaleybars/metaopt/data/imagenet489` and `alice2` cannot read it | `alice2` (`s5014158`), worktree `hmo-cpk1` at `cc72198` |
+| decides | WHERE on `m` in (6,62) ImageNet-489 crosses CAPTURE 0.5 | WHETHER cut POSITION, not count, is the operative variable at fixed m=2 |
+| design | 7 arms x 2 seeds = 14, ONE submission | 13 arms x 3 seeds = 39, ONE submission |
+| arms | `g01` scalar, `g08`, `g16`, `g32`, `g45`, `g62` layerwise, **`p08` position control at m=8** | `k01` scalar, k in {17,24,31,38,42,45,47,49,52,55,60} at `[k,62-k]`, `k62` layerwise |
+| cell | ResNet-18(489) / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 84 ep / batch 256 / 24 CPU / 80G / `gpu-l4-24g` / 34:00:00 | CIFAR-100 / ResNet18_c100 / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 ep / batch 100 / AUGMENT=1 / 02:30:00 |
+| scorer | `analysis/cI2_in489g2_score.py`, `571707b` | `analysis/cK1_cpk1_score.py`, `3c3419e` |
+| primary | window5 TEST at common horizon ESTAR; TRAIN reported at every rung | plateau5; `train5` at every arm |
+
+**BOTH batches run their own anchors IN BATCH.**  Batch is the unit of replication (F(62,85)=5.47,
+p 6.9e-13) and seed is null (F(11,1976) = 0.152 over 310 cells / 1988 rows, re-derived by the `cI2`
+selftest); nothing is spliced from `in489g1` or `cbl1`, and A's seed budget was cut to 2 on that
+basis rather than dropping an arm.
+
+**A's RUNGS ARE `cbl1`'s OWN PARTITIONS, BYTE-FOR-BYTE.**  `g08`/`g16`/`g32` re-use the spec strings
+`cbl1` used on the same 62 tensors, so the CIFAR-100 and ImageNet-489 ladders sit on a SHARED GRID
+and the cross-dataset statement is a direct comparison, not an interpolation.  `g45` bisects the
+(32,62) hole in log space.  Nothing below m=8 was run: `in489g1` already measured CAPTURE = 0.008487
+at m=6, so a lower rung cannot inform a crossing at 0.5.
+
+**`p08` IS THE ARM THAT MATTERS AND IT IS THERE BECAUSE OF 143.**  `cbl1`'s registered balance
+statistic was disqualified by a mirror arm added BEYOND the briefed design.  `p08` = `[45,3,3,3,2,2,2,2]`
+has EXACTLY `g08`'s m=8 and a different cut structure (B 0.53636 vs 0.99923; 7 groups over tensors
+45..61 vs 3).  A count ladder with no in-batch rival is not a test.
+
+### 145.2 PRE-REGISTRATIONS -- FROZEN IN THE SCORERS BEFORE SUBMISSION
+
+**A predicts M50 in [16, 62], point 38.70.**  Re-derived by the `cI2` selftest from the corpus, not
+quoted: Model A (power in log m) calibrated on `in489g1`'s CAPTURE(m=6)=0.008487 gives p = 5.7158 ->
+M50 **38.70**; Model B (linear in log2 m) gives **19.10**.  The cheap shared consequence that can
+fail: **both put the crossing above m = 16**.  CIFAR-100's own ladder crosses at **M50 = 9.30**
+(bracket 8-16, best-fit p = 0.902), so the registered claim is that the ladder moves RIGHT with
+class count.  Not gating -- the scorer prints HIT/MISS and nothing depends on it.
+
+**B predicts a single-peaked curve with argmax k* = 45**, the layer3|layer4 STAGE boundary, tested
+in the weaker PEAK-SET form (within 0.05 of the argmax).  Also registered: RIGHT-COLLAPSE below 0.10
+at every k >= 52; RANGE >= 0.30; both mirror pairs break; and the ONE named rival, PARAMETER BALANCE,
+LOSES (k* != 49).  B deliberately registers a SHAPE claim, not a mechanism -- registering a fresh
+mechanistic statistic with `cbl1`'s five points already in view would repeat 143's error one level up.
+`B` is printed for every arm labelled DISQUALIFIED-BY-cbl1-R5 and gates nothing.
+
+**Refutation conditions.**  A: R1 non-monotone (adjacent CAPTURE drop > 0.05), **R2 position-dominates
+(|CAPTURE(p08) - CAPTURE(g08)| > 0.10, which DISQUALIFIES the count statistic and does not replace
+it)**, R3 cliff (> 0.60 rise in the bracket -> bracket stands, interpolated point does not), R4
+low-end-not-flat, R5 train/test divergence > 0.15.  B: X1 `POSITION-REFUTED-FLAT` (RANGE < 0.10),
+X2 multimodal, X3 peak-off-boundary, X4 broad plateau (>= 5 arms in the peak set -> no argmax may be
+named), X5 `cbl1`-order break.
+
+**A's G1 GATE DEPARTS FROM `cI1`'s, ON PURPOSE, REGISTERED PRE-DATA.**  `cI1` voided any arm below
+FLOOR_W5 = 5.0 pp; there scalar was a TREATMENT.  Here scalar is the ZERO OF THE CAPTURE SCALE and
+`in489g1` already measured it at ~1.03 pp, so importing that floor would void the denominator of the
+only statistic the batch computes and return UNRESOLVED for every possible dataset.  Replaced, not
+removed: G1a (at or below chance 0.2045 pp, or non-finite, is VOID as BROKEN) + G1b SCALE GATE
+(`M(g62) >= 5.0` and anchor gap `>= 10.0`, else `UNRESOLVED_NO_SCALE` and no capture is printed).
+
+### 145.3 VERIFICATION -- WHAT WAS ACTUALLY RUN, NOT ASSERTED
+
+| check | result |
+|---|---|
+| RULE 21, A | `cI2` committed **05:10:41**, first `in489g2` job submitted **05:12:22** -- 101 s margin |
+| RULE 21, B | `cK1` committed **05:10:56**, first `cpk1` job submitted **05:13:31** -- 155 s margin |
+| no scorer edited | `git diff --name-status 94c6e4f..HEAD` over `analysis/` = **2 `A`, 0 `M`**.  No pre-existing scorer was touched |
+| RULE 20, A | `argsline_guard.py` unedited: **8 clean, 0 repeated flags or design mismatch, 0 without an ARGS line, VERDICT PASS**; batch-consistency: every non-axis flag identical across 8 runs |
+| RULE 20, B | **12 clean, 0, 0, VERDICT PASS**; every non-axis flag identical across 12 runs |
+| guard integrity | `81cea8b5…` byte-identical on Mac, `alice` and `alice2` |
+| scorer selftests | `cI2` **41/41 PASS**, `cK1` **PASS** -- both re-derive their constants from `results/all_runs.csv` |
+| corpus untouched | 2,444 rows; **0** `in489g2` rows, **0** `cpk1` rows |
+| accounts | `alice` holds 14 jobs, ALL `in489g2-`; `alice2` holds 39, ALL `cpk1-`.  **0 CANCELLED on either account since 05:00** |
+| protected | `bin/PROTECTED.txt` carries `cpk1-` and `in489g2-` |
+
+**RULE 20 IS A PARTIAL AND THE DEBT IS OPEN -- 20 of 53.**  Only started jobs write an ARGS line.
+`alice` 8/14 (6 PENDING behind `QOSMaxGRESPerUser`, the per-user 8-GPU cap), `alice2` 12/39.  The
+pending jobs' argv **cannot** be audited from the queue: `jobs/run_in489.sh` passes `"$@"`, and
+`scontrol show job` reports only `Command=/data1/salehkaleybars/metaopt/jobs/run_in489.sh` with no
+arguments, while `scontrol write batch_script` returns the script whose only `--stepsize-groups`
+occurrence is a **usage comment reading `scalar`** -- a decoy that must not be read as a design
+mismatch.  **Re-run the full audit on both batches before scoring.**  The 53 composed command lines
+were audited pre-submission, but RULE 20's authoritative form is the run's own ARGS line.
+
+### 145.4 `c98_reproduce.py` -- STILL EXIT 1, AND THIS CYCLE DID NOT MOVE IT
+
+**Exit 1, 8 CHECK(S) FAILED** -- the SAME 8 recorded at 141.6 and 142.6, now against the 2,444-row
+corpus: rows 2444 vs paper 2177; admissible 2002 vs 1735; wallclock 2429 vs 2162; GPU-h 2153.85 vs
+1642; best R18/C10 arm 93.328 vs 93.317; deficit 1.796 vs 1.807; partition-family rows 437 vs 431,
+Lion 425 vs 419.  **Proved inherited, not caused here**: `git diff --name-only 94c6e4f..HEAD` over
+`paper/`, `results/` and `analysis/c98_reproduce.py` = **0 files**, so every input is byte-identical
+to the pre-cycle HEAD.  `git status paper/` is **clean**.  Fix = edit both markups together and
+re-run; **author scope**, unchanged.
+
+**A METHOD NOTE, because it nearly produced a false alarm.**  Re-running `c98` from a detached
+worktree at `94c6e4f` reports **14** failures, not 8.  The CSV is bit-identical (`md5
+713a9d32ea50cce17082989ef145e13c` both sides); the 6 extra are self-referential COVERAGE-CENSUS
+checks (sites 547 vs 628) that move only because section `[7] BUDGET` cannot run there -- the raw
+`hz3` `.out` series is gitignored and absent from a fresh checkout.  **A worktree is not a valid
+control for `c98`.**  Compare inputs with `git diff`, not exit codes across checkouts.
+
+### 145.5 COST, MEASURED NOT GUESSED
+
+`in489g1`'s 12 runs: **298.7 GPU-h total, mean 24.89 h** (min 21.69, max 31.81) -> `in489g2` at 14
+jobs projects **348.5 GPU-h**, worst case 476 at the 34 h cap.  `cbl1`'s 33 runs: **23.1 GPU-h, mean
+42.0 min** (min 30.9, max 48.5) -> `cpk1` at 39 jobs projects **27.3 GPU-h**, worst case 97.5.
+**Cycle total 375.8 GPU-h projected, 573.5 worst case.**  A is ~93% of the spend, which is why its
+GPU-hours went to rungs rather than seeds.

@@ -1,40 +1,58 @@
 # STATUS — operator dashboard
 
-Updated 4 Sep 2026 (**cycle 118**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **142**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 121**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **145**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,399 rows** (2,357 + 42 ingested this cycle: `lsm1` 24, `hb1` 18).
-**`c98_reproduce.py` STILL EXITS 1** — same 8 stale numerals as before this ingest; the 4 substantive ones did **not** move. Author fix, see CORRECTIONS 141.6 / 142.6.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,444 rows**, **unchanged this cycle** (nothing landed, nothing ingested).
+**`c98_reproduce.py` STILL EXITS 1** — the same 8 stale numerals as at CORRECTIONS 141.6 / 142.6, proved inherited (`git diff 94c6e4f..HEAD` over `paper/`, `results/`, `c98` = **0 files**). Author fix.
 
-## Queue — re-derived from `squeue` at this HEAD
+## Queue — re-derived from `squeue` / `sacct` at this HEAD
 
-**LANDED AND INGESTED THIS CYCLE — 2 batches, 42 runs, both RULE 20 `VERDICT: PASS`, both scorers unedited.**
+**NOTHING LANDED THIS CYCLE. NO VERDICT IS CLAIMED. 0 rows ingested.**
 
-| batch | n | decides | verdict |
-|---|---|---|---|
-| `lsm1` | 24 | is the surviving additive interior peak Lion-specific? | **UNRESOLVED-TRUNCATED** — `PEAK_A` **+0.075** is inside the vanishing band (≤ 0.20), but the Adam argmax sits on `r=0.03`, adjacent to the unsampled `(0, 0.03)`. Matched grid {0, 0.06, 1}: Lion **+0.826**, Adam **−0.239**, `DELTA` **+1.065**. Fix = rungs at r = 0.01, 0.015 — **not a softer bar** |
-| `hb1` | 18 | does a scalar step size fail at high C because it cannot serve the head? | **REFUTED-SMALL** — `SPEC` **−0.1753**. Head `[60,2]` captures **+0.0412** of the 46.904 pp gap; the arbitrary `[31,31]` midpoint captures **+0.2165**, five times more |
+**IN FLIGHT — 53 jobs, 2 batches, both registered before any run existed.**
 
-**IN FLIGHT — nothing complete, nothing scored, no verdict claimed.**
-
-| account | batch | jobs | done | run | pend | decides | score with |
+| account | batch | jobs | run | pend | done | decides | score with |
 |---|---|---|---|---|---|---|---|
-| `alice2` | `cbl1` | 33 | **0** | 5 | 28 | count ladder m = 1…62 **and** balance ladder at m=2 | `cJ1_cbl1_score.py` (`727eeca`) |
-| `alice` RO | `in489g1` | 12 | **0** | 8 | 4 | ImageNet-489 granularity ladder | `cI1_in489g1_score.py` |
+| `alice` | `in489g2` | 14 | 8 | 6 | 0 | **where** ImageNet-489 crosses CAPTURE 0.5 on `m` in (6,62) | `cI2_in489g2_score.py` (`571707b`) |
+| `alice2` | `cpk1` | 39 | 12 | 27 | 0 | **whether** cut POSITION, not count, is operative at fixed m=2 | `cK1_cpk1_score.py` (`3c3419e`) |
 
-**`in489g1` WAS NOT LOOKED AT.** Job states only; no `.out` opened, parsed, listed by size or scored.
-Nothing submitted or cancelled on `alice` — read-only.
+| batch | arms | seeds | ETA (all jobs) |
+|---|---|---|---|
+| `in489g2` | `g01` scalar · `g08` · `g16` · `g32` · `g45` · `g62` layerwise · **`p08` position control at m=8** | 2 | **~2 days** — seed-0 wave ≈ 06:00 7 Sep; seed-1 wave gated behind the 8-GPU `QOSMaxGRESPerUser` cap |
+| `cpk1` | `k01` scalar · `[k,62-k]` for k ∈ {17,24,31,38,42,45,47,49,52,55,60} · `k62` layerwise | 3 | **~2–3 h** — ≈ 07:30–08:00 6 Sep at 12-way concurrency |
 
-**`cbl1` RULE 20 is a PARTIAL and the debt is open.** 5 of 33 jobs have written an ARGS line; all 5
-audit clean (`argsline_guard.py` unedited, `VERDICT: PASS`). **Re-run the full 33-file audit before
-scoring.** Zero `cbl1` rows are in the corpus. ETA ≈ 4 h at ~5 concurrent GPU slots.
+- **Both batches carry their own anchors IN BATCH.** Batch is the unit of replication (F(62,85)=5.47, p 6.9e-13); seed is null (F(11,1976)=0.152). Nothing spliced from `in489g1` or `cbl1`.
+- **`in489g2`'s `g08`/`g16`/`g32` are `cbl1`'s spec strings byte-for-byte** — the two ladders share a grid, so the cross-dataset claim is a comparison, not an interpolation.
+- **`p08` is the arm that matters**: same m as `g08`, different cut (B 0.53636 vs 0.99923). Fires R2 → the count statistic is DISQUALIFIED and **not replaced**. This exists because `cbl1`'s mirror arm did exactly that to its balance statistic (CORRECTIONS 143).
+- Pre-registered: **A** M50 ∈ [16,62], point 38.70 (CIFAR-100 crosses at 9.30 → ladder predicted to move RIGHT with class count). **B** single-peaked, argmax k*=45 (the layer3\|layer4 stage boundary), parameter-balance rival (k*=49) predicted to LOSE.
 
-**Class-count law** (`docs/REGISTER-class-count-law.md`, `65ba0d0`, registered with **0** `in489g1`
-runs complete). Re-derived from the corpus at this HEAD under the register's own predicate (130
-matched rows), not from its registration: Q = scalar/layerwise on `plateau5` = **0.9669** (C=10) ·
-**0.3284** (C=100) · **0.1939** (C=200); least-squares b = **−0.5194** gives **Q(489) = 0.128**,
-inside the registered **[0.05, 0.30]**, far below FALSIFIED (> 0.60) and DECISIVELY FALSIFIED
-(≥ 0.95). This ingest moved it by **0.0001** (0.1283 → 0.1282). `in489g1` is its test.
+**RULE 20 — PASS, BUT PARTIAL: 20 of 53 audited. DEBT OPEN.**
+
+| account | audited | result |
+|---|---|---|
+| `alice` | 8/14 | **8 clean, 0 repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS** |
+| `alice2` | 12/39 | **12 clean, 0, 0 — VERDICT PASS** |
+
+- Only STARTED jobs write an ARGS line. **Re-run the full audit on both batches before scoring.**
+- **The pending jobs cannot be audited from the queue.** `jobs/run_in489.sh` passes `"$@"`; `scontrol show job` shows no arguments, and `scontrol write batch_script` returns a script whose only `--stepsize-groups` occurrence is a **usage comment reading `scalar`**. That is a decoy — do not read it as a design mismatch.
+- `argsline_guard.py` is `81cea8b5…` byte-identical on Mac, `alice` and `alice2`.
+
+**ACCOUNT HYGIENE — clean on both.**
+
+- `alice` holds **14** jobs, all `in489g2-`; `alice2` holds **39**, all `cpk1-`. Nothing else queued on either.
+- **0 CANCELLED on either account since 05:00.** No job this cycle did not submit was touched.
+- `alice2`'s only other recent jobs are PaperFactory `pf-*`, all ended by **5 Sep 13:51**, ~15.4 h before `cpk1` was submitted. Not this cycle's, not touched.
+- `bin/PROTECTED.txt` carries `cpk1-` and `in489g2-`.
+- Job `4911746` is absent from `alice`'s 14 — it is **another user's**, the jobid counter being cluster-global. Not ours, not missing.
+
+**COST — measured from history, not guessed.**
+
+| batch | reference | mean/run | projected | worst case (walltime cap) |
+|---|---|---|---|---|
+| `in489g2` | `in489g1` 12 runs = 298.7 GPU-h | **24.89 h** | **348.5 GPU-h** | 476.0 |
+| `cpk1` | `cbl1` 33 runs = 23.1 GPU-h | **42.0 min** | **27.3 GPU-h** | 97.5 |
+| **total** | | | **375.8 GPU-h** | **573.5** |
 
 **Every row below was re-derived at this HEAD. Do not quote this file as a source; re-run the command.**
 
@@ -46,7 +64,7 @@ inside the registered **[0.05, 0.30]**, far below FALSIFIED (> 0.60) and DECISIV
 | Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours.** The 45 jobs in flight (`cbl1` 33 + `in489g1` 12) are the NEXT cycle's science, not this manuscript's |
+| GPU to reach submission | **0 jobs, 0 hours.** The 53 jobs in flight (`in489g2` 14 + `cpk1` 39, ~375.8 GPU-h projected) are the NEXT cycle's science, not this manuscript's |
 
 **Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 
@@ -54,7 +72,7 @@ inside the registered **[0.05, 0.30]**, far below FALSIFIED (> 0.60) and DECISIV
 
 | check | result |
 |---|---|
-| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals, not a moved result. **The same 8 as before this cycle's ingest**, verified by restoring the pre-ingest CSV (which also exits 1; it exited 0 only against the 2,177-row corpus of cycle 116). This cycle moved only the 4 census counts; the 4 substantive numerals are bit-identical. See CORRECTIONS 141.6 / 142.6 |
+| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals, not a moved result. **This cycle ingested nothing and moved none of them**: `git diff --name-only 94c6e4f..HEAD` over `paper/`, `results/` and `c98_reproduce.py` = **0 files**, so every input is byte-identical to the pre-cycle HEAD. Derived vs paper: rows 2444/2177, admissible 2002/1735, wallclock 2429/2162, GPU-h 2153.85/1642, best R18/C10 93.328/93.317, deficit 1.796/1.807, partition rows 437/431, Lion 425/419. `c98` exited 0 only against the 2,177-row corpus of cycle 116. **A detached worktree is NOT a valid control** — it reports 14, the 6 extra being coverage-census checks that move because gitignored `hz3` `.out` files are absent. See CORRECTIONS 141.6 / 142.6 / 145.4 |
 | census fixpoint (measured on `DRAFT-v4.md`, asserted against both markups) | **628 / 411 / 982 / 41.9%** — **unmoved by Plan C, as designed** |
 | census internals | raw `\d+\.\d+` 3067 → **3098**, distinct **1007** (unchanged); quantities 2614 → **2615**, distinct **982** (unchanged). The `+1` is the Markdown heading numeral `1.2`; `1.2` already occurred twice as a quantity, so the asserted denominator did not move. `n_q` is asserted by nothing |
 | `python3 analysis/xref_check.py` | exit 0, **596 references** (section 500, table 51, figure 22, appendix 23), **0 unresolved, 0 stale**, 8 allowlisted parent-paper refs on lines `[41, 43, 45, 287, 291, 294, 295, 297]` |
