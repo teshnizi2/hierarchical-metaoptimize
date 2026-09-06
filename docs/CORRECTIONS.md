@@ -11705,3 +11705,234 @@ rows** and `grep -c cts2` = 0.  `aggregate.py` was not run and no row was added,
 `analysis/c98_reproduce.py` **still exits 1** on the same inherited stale numerals — author scope,
 CORRECTIONS 141.6 / 142.6, **not touched here**.  `git status` shows **nothing under `paper/`**;
 no file under `paper/` was read for edit or written this cycle.
+
+## 149. `cN1`/`cN2` REGISTERED AND RUN ON DATA ALREADY ON DISK -- THE TWO BOX-RELEASED SCALAR-CONTAINING CELLS DO NOT RESCUE MASTER-TABLE ROW 24, BECAUSE ONE OF THEM IS NOT ACTUALLY BOX-RELEASED
+
+Cycle 125.  **Zero GPU-hours; no job submitted on either account; `results/all_runs.csv`
+unchanged at 2,501 rows; nothing under `paper/` read for edit or written.**  `cts2` and
+`in489g2` were not touched.  CORRECTIONS 148 named **MASTER-TABLE row 24** as the one finding
+that rescoping does not save, because its content is the response surface ABOVE each arm's `ms`
+optimum and that region is CLAMPED for partitioned arms and INTERIOR for the scalar arm.  Row 24
+has no clamp-free replicate: every box ladder the campaign ran (`wc5`, `cl5`, `uc5`, `uc6`, `bl5`,
+`br6`, `bo6`, `bo7`, `bd7`, `bf8`, `bf9`, `ns5`, `sp8`) ran `{layerwise, nodewise, weightwise}`
+only, so the SCALAR axis -- the axis row 24 is about -- is the axis they never varied.  Two
+box-released cells DO carry a scalar arm and were already complete on disk.  This cycle registered
+a scorer for them, then ran it.  **The headline is that the rescue does not happen, and it does not
+happen for a measurement reason rather than a statistical one.**
+
+### 149.1 RULE 21, PROVED BY WALL CLOCK, INCLUDING THE PART THAT WENT WRONG
+
+Because the data already existed, RULE 21's ordering here is *scorer committed before the
+CONTRAST is computed*.  Two registrations, both disclosed:
+
+| file | commit | committed (CEST) | epoch | first run against data | margin |
+|---|---|---|---|---|---|
+| `analysis/cN1_box_row24_score.py` | `b59fc2e` | 2026-09-06T12:01:48+02:00 | 1788688908 | 12:02:45 (1788688965) | **57 s** |
+| `analysis/cN2_box_row24_score.py` | `bbf5918` | 2026-09-06T12:05:07+02:00 | 1788689107 | 12:05:20 (1788689120) | **13 s** |
+
+`cN1`, run unedited, **CRASHED** with `statistics.StatisticsError: mean requires at least one data
+point` inside its own noise-floor derivation.  The defect: in
+`pool[key][k2].append(float(r["plateau5"]))` Python resolves the subscript chain BEFORE the
+argument, so a row with a blank `plateau5` creates the `defaultdict` slot and only then raises
+inside `float()`; the `except: continue` left an EMPTY list under a real key.  The corpus holds 15
+such rows in the broad pool -- 2-4 epoch smoke/pin runs with `window_ok=0` (`sm_ResNet101`, the
+seven `zv-*`/`hv_*` runs, `c100pin_*`/`c100smoke_*`).
+
+**The crash fired BEFORE the per-cell loop.**  `cN1`'s dying output was its banner, the corpus row
+count and the `.out` index count and nothing else: no arm mean, no gap, no `D_GAP`, no occupancy
+rate and **no noise floor** was ever printed.  The contrast therefore still did not exist when
+`cN2` was registered, and RULE 21 holds across both registrations.
+
+**RULE 16 was honoured, not worked around.**  `cN1` is **NOT edited**; it stays in the tree frozen
+and broken, exactly as CORRECTIONS 9238 left the latent bug in `c97_bm2_score.py` and as
+CORRECTIONS 140.5 ruled for a frozen RULE-21 scorer.  `git diff --numstat eea6e23 HEAD -- analysis/`
+returns two lines, `1148 0 analysis/cN1_box_row24_score.py` and
+`1186 0 analysis/cN2_box_row24_score.py`: **two additions, 0 deletions, no pre-existing file
+touched.**  `diff cN1 cN2` outside the docstring is exactly two hunks -- the four-line
+value-before-slot fix and the tool name in the banner.  No bar, gate, matched cell, branch,
+estimand or SE formula differs between them.  `--selftest` **26/26 PASS** on the Mac and on alice2
+(Python 3.10.4).
+
+**Disclosure the registration itself carries (cN2 section 7).**  Verifying provenance required
+listing the 21 released rows, so the registering agent HAD SEEN their individual `plateau5` values;
+it had computed no mean, gap, `D_GAP`, noise floor or occupancy rate.  What the pre-registration
+buys is that the GATES, BARS, MATCHED CELLS and BRANCHES were frozen before the contrast existed,
+not that the sign was unknown.  Its recorded prior was **MIXED -> BRANCH C**.
+
+### 149.2 RULE 20, AND A `--run-name` COLLISION THE GATE CAUGHT
+
+`argsline_guard.py` at this HEAD, `METAOPT_WS=/home/s5014158/metaopt` exported:
+`tc1-` **12 clean, 0 repeated flags, VERDICT PASS**; `ub9-` **9 clean, 0 repeated flags, VERDICT
+PASS**.  Both cells re-derived from their runs' own `ARGS`/`ENV` lines: `--alg-base AdamW`,
+`--alg-meta Adam`, `--meta-stepsize 1e-3`, `--num-epochs 100`, `--NN-name ResNet18`,
+`--dataset CIFAR10`, `--batch-size 100`, `--gamma 1`.  **The briefing that commissioned this work
+said `tc1` was `SGDm+Lion`.  It is not; it is AdamW+Adam, and so is `ub9`.**  The briefing also
+placed `ub9` on `alice`; both cells are on **alice2** (`s5014158`).  `tc1`
+`ENV: AUGMENT=1 BETA_CLIP=-30:6.0 HIER=none PROBE=5`; `ub9`
+`ENV: AUGMENT=0 BETA_CLIP=-60:6.0 HIER=none PROBE=5`.  All 21 rows `complete=1`, `superseded=0`,
+`epochs_done=100`, and each run's `.out`-derived `plateau5` agrees with the CSV column to 0.01 pp.
+
+`cN2`'s first run **VOIDed both `tc1` cells on G0**, reporting `cannot form plateau5 from .out` for
+four `a0-*` canonical runs.  Cause: four abandoned resubmits (`4682513`-`4682516`, 0/50/50/55
+epochs) carry the SAME `--run-name` as the real 100-epoch runs (`46807xx`), and the scorer's
+`.out` index keyed by run name, so the truncated file shadowed the real one.  **The gate did its
+job -- it refused rather than silently scoring a 50-epoch file.**  The corpus already knew: those
+four rows sit in the CSV with `complete=0, superseded=1` and a populated `dup_group`.  The scorer
+was then re-run **UNEDITED** (`md5 192320c64d83d03f449e2b4ccc46ca16`, identical to the committed
+file) with `--outs` pointed at a directory de-duplicated by *the corpus's own bookkeeping* -- keep
+a `.out` iff `all_runs.csv` has a row with that run name AND that job id AND `complete=1` AND
+`superseded=0`, applied to the WHOLE tree, blind to any value.  1,104 files kept, 67 dropped, **0
+remaining name collisions**.  Documented arguments are not edits (RULE 16).
+
+### 149.3 THE MATCHED CANONICAL CELLS, FOUND BY THE SCORER'S OWN RULE
+
+Match = identical on network, dataset, base, meta, `ms`, `alpha0`, epochs, batch size, gamma,
+augment and `HIER`, differing ONLY in `BETA_CLIP` (canonical `-15:-2.3026`), and the batch must
+carry **all three arms**, because a within-batch arm gap needs its scalar anchor in the same batch.
+
+| released cell | matched canonical batches | dropped by the all-three-arms rule |
+|---|---|---|
+| `tc1` @ `alpha0=1e-3`, AUG=1 | `I1` (3/3/3), `a0` (3/3/3) | `dc`[layerwise], `i3b`[resnet18_blocks] |
+| `tc1` @ `alpha0=1e-4`, AUG=1 | `a0` (3/3/3) | `I1`[layerwise], `i3b`[resnet18_blocks] |
+| `ub9` @ `alpha0=1e-6`, AUG=0 | `PP` (3/3/3), `pp` (3/3/3) | none |
+
+Every comparison found a match; none was dropped for want of one and none was loosened.  `dc-aw-*`
+is excluded upstream by `HIER=additive`.  **All four canonical batches carry NO `PROBE` field in
+their own `ENV` line**, so canonical-side occupancy is UNMEASURABLE in all three comparisons -- 
+registered in advance as a limitation, not a gate, and printed with every contrast.
+
+### 149.4 THE OCCUPANCY GATE FIRES: `tc1` IS NOT CLAMP-FREE
+
+Read at the **coordinate** denominator (FINDINGS 51.1), by a FULL streaming pass over every one of
+the 10,000 records of each run's own `probe.jsonl` -- not the terminal-plus-10-interior sample
+CORRECTIONS 148.3 used -- with the `float32(wall)` comparison 148.3's trap requires.
+
+| released cell | scalar | `resnet18_blocks` | layerwise | spread | gate |
+|---|---|---|---|---|---|
+| `tc1` @ `alpha0=1e-3` | **0/2** | **2/2** | **2/2** | 1.000 | **VOID** |
+| `tc1` @ `alpha0=1e-4` | **0/2** | 0/2 | **2/2** | 1.000 | **VOID** |
+| `ub9` @ `alpha0=1e-6` | **1/3** | 0/3 | 0/3 | 0.333 | FLAGGED |
+
+**`tc1` reproduces the very confound it was supposed to break.**  Moving the floor from `-15` to
+`-30` did not release the partitioned arms; it moved the wall they run into.  `tc1-ly-a4-s0` is at
+`beta_true_min = -30.000000` for 2,905 of 10,000 records, first touching at step 12,445, while its
+scalar counterpart bottoms out at `-12.658` and never approaches any wall.  A box-released cell in
+which the fine arms bind 100% and the scalar arm binds 0% cannot separate "the fine arm degrades
+more slowly" from "the fine arm is caught by a wall the scalar never reaches" -- which is exactly
+row 24's problem, so the registered gate voided it.  **The two `tc1` contrasts are dead as a
+row-24 replicate and no amount of extra seeds would have helped.**
+
+`ub9` is the opposite and is the more interesting reading: the ONLY run touching a wall is the
+**scalar** one.  `ub9-sc-s1` reaches `beta_true_min = -60.000000` from step 41,650, in 1,183
+records; all six partitioned runs are clean on both rails.  The corpus-wide asymmetry
+(148.4: scalar 0/33, fine arms 100%) is **reversed** in this cell.
+
+### 149.5 THE ONE SCORABLE CONTRAST, VERDICT QUOTED AS ISSUED (RULE 16)
+
+`ub9` @ `alpha0=1e-6`, AUGMENT=0, 100 ep, `ms=1e-3`, primary `plateau5` from each run's own `.out`,
+train alongside:
+
+| box | arm | n | plateau5 | sd | train5 | sd |
+|---|---|---|---|---|---|---|
+| RELEASED `-60:6.0` | scalar | 3 | 72.422 | 0.850 | 99.907 | 0.088 |
+| RELEASED `-60:6.0` | `resnet18_blocks` | 3 | 74.797 | 0.456 | 99.997 | 0.002 |
+| RELEASED `-60:6.0` | layerwise | 3 | 73.991 | 0.129 | 99.994 | 0.002 |
+| canon `PP` | scalar | 3 | 73.811 | 0.332 | 99.990 | 0.017 |
+| canon `PP` | `resnet18_blocks` | 3 | 74.379 | 0.523 | 99.976 | 0.006 |
+| canon `PP` | layerwise | 3 | 73.498 | 0.295 | 99.969 | 0.006 |
+| canon `pp` | scalar | 3 | 73.849 | 0.221 | 99.999 | 0.002 |
+| canon `pp` | `resnet18_blocks` | 3 | 74.326 | 0.459 | 99.977 | 0.002 |
+| canon `pp` | layerwise | 3 | 73.400 | 0.344 | 99.969 | 0.003 |
+
+    ARM resnet18_blocks vs scalar
+      GAP released  = +2.3747 pp;  GAP canonical PP +0.5673 / pp +0.4773, mean +0.5223
+      D_GAP = +1.8523 pp;  SE_D 8.4944;  RESOLVE_D 16.9888;  |D_GAP|/SE_D = 0.22 SE
+      OUTCOME: UNRESOLVED  [NULL-AMBIGUOUS-TWO-WALL; OCCUPANCY-FLAGGED spread 0.333;
+                            CROSS-BATCH; CROSS-ACCOUNT (released alice2 / canonical alice)]
+    ARM layerwise vs scalar
+      GAP released  = +1.5687 pp;  GAP canonical PP -0.3133 / pp -0.4487, mean -0.3810
+      D_GAP = +1.9497 pp;  SE_D 8.4944;  RESOLVE_D 16.9888;  |D_GAP|/SE_D = 0.23 SE
+      OUTCOME: UNRESOLVED  [same modifiers]
+
+    ROLL-UP: cell tc1@a0=1e-3 -> VOID-OCCUPANCY; cell tc1@a0=1e-4 -> VOID-OCCUPANCY
+             scored contrasts 2 of 6;  SURVIVES 0  INFLATED 0  REDUCED 0  COLLAPSED 0
+             UNRESOLVED 2
+             VERDICT: DIRECTION-BRANCH-C          (exit 0)
+
+**BRANCH C -- OPEN.**  The scorer is structurally incapable of printing a settlement: that needs
+every cell at n>=3 AND a **one-factor** box manipulation, and the second is false for BOTH released
+cells by arithmetic on their own `ENV` lines.  `tc1`'s `-30:6.0` moves the floor **-15.0000** nats
+and the ceiling **+8.3026** nats; `ub9`'s `-60:6.0` moves the floor **-45.0000** and the ceiling
+**+8.3026**.  The commissioning brief flagged this two-wall ambiguity for `tc1`; **it is equally
+true of `ub9`**, and the scorer re-derived it rather than taking the brief's word.
+
+### 149.6 THE NOISE FLOOR IS CONTAMINATED.  DISCLOSED, AND NOT FIXED.
+
+`cN2` re-derived, as registered: `sigma_w = 7.0740 pp` (df 74, 39 cells);
+`sigma_BA` NARROW `0.7482` (df 4), BROAD `3.8395` (df 36), **USED = 3.8395**.
+
+`sigma_w = 7.07 pp` is not a seed floor, it is a **defect**.  One cell supplies SS 3,645 of the
+total: `i3b` / `resnet18_blocks` / `alpha0=1e-1` / canonical box, whose seeds read
+**86.994, 80.468, 10.000** -- seed 2 diverged to chance.  The registered family span deliberately
+included *any* `alpha0`, and the DEAD gate inspects only the cells inside a contrast, never the
+cells feeding the floor.  Dropping that one cell gives `sigma_w = 0.8948 pp` over df 72.
+**The file is NOT edited to fix this** (RULE 16); it is reported.
+
+**SENSITIVITY, LABELLED AND NOT A VERDICT.**  Recomputing `ub9`'s bars from the un-contaminated
+`sigma_w = 0.8948` and the NARROW `sigma_BA = 0.7482` gives `SE_D = 1.2808`, `RESOLVE_D = 2.5615`.
+`D_GAP` = +1.85 (**1.45 SE**) and +1.95 (**1.52 SE**) -- **both still UNRESOLVED**.  The released
+gaps would become resolvable (+2.375 = 3.25 SE, +1.569 = 2.15 SE), which would move `ub9`'s two
+contrasts from UNRESOLVED to SURVIVES.  **The ROLL-UP BRANCH DOES NOT MOVE EITHER WAY**: BRANCH A
+needs >=4 of 6 contrasts surviving, and 4 of 6 are VOID on occupancy.  BRANCH C stands under both
+floors.  Also worth recording: the NARROW batch-x-arm interaction re-derived here, **0.7482 pp**,
+is **3.6x** the `sd_batch ~ 0.21 pp` the campaign quotes (docs/PLAN.md:104) -- on the estimand that
+actually matters, cross-batch noise is larger than the standing figure.
+
+### 149.7 A MEASURED CORRECTION TO CORRECTIONS 148.4's NUMBERS FOR THESE TWO CELLS
+
+148.3's census sampled the terminal record plus 10 interior byte-quantile records.  On a run whose
+`beta` touches a wall and drifts back, that sampling misses the touch.  Both cells here do exactly
+that: `ub9-sc-s1` sits at `-60.000000` for 1,183 records but its **terminal** record reads
+`-59.9997`; `tc1-ly-a4-s0` sits at `-30.000000` for 2,905 records but terminates at `-29.9425`.
+
+| cell | census (148.4, sampled) | full trajectory (this cycle) |
+|---|---|---|
+| `tc1` | 1/12 | **6/12** |
+| `ub9` | 0/9 | **1/9** |
+
+**SCOPE, STATED NARROWLY.**  This is measured on 21 runs, not on the census's 1,171.  It does not
+re-rate the corpus and it does NOT touch 148.4's headline -- the `ms=1e-4` family at 2.7% and the
+`ms=1e-3` family at 78.0%, whose gap is far larger than any plausible sampling correction, and the
+direction of the correction is upward for both.  What it does establish is that **every rate in the
+148 census is a LOWER BOUND**, and that a cell cannot be certified clamp-free from sampled records.
+`tc1` was called "1/12 binding" on that basis and is in fact 100%-binding on both fine arms.
+
+### 149.8 WHAT THIS DOES AND DOES NOT DO TO MASTER-TABLE ROW 24
+
+**IT DOES NOT REFUTE ROW 24, AND IT DOES NOT RESCUE IT.  Row 24's verdict is UNCHANGED and its
+threat is UNDISCHARGED.**  Precisely:
+
+* **The clamp-free replicate row 24 needs still does not exist.**  Of the two candidate cells, one
+  (`tc1`) is not clamp-free -- measured, not assumed -- and the other (`ub9`) yields a null whose
+  bars are far wider than the effect and which is two-wall-ambiguous, cross-batch and
+  cross-account.  148's statement that row 24 is the finding rescoping does not save **stands
+  exactly as written**.
+* **`ub9`'s point estimates lean the row's way and settle nothing.**  With the floor 45 nats
+  further away the partitioned-over-scalar gap does not shrink: `+2.375` / `+1.569` released
+  against `+0.522` / `-0.381` canonical, i.e. `D_GAP` positive, the opposite sign from what the
+  clamp-artefact account predicts.  At 0.22-0.23 SE on the registered floor (1.45-1.52 SE on the
+  de-contaminated one) this is a DIRECTION, not a result, and it is one cell at one `alpha0` on
+  one dataset.
+* **Nothing here re-slopes row 24's numbers.**  5.871 / 1.060 / 1.801 / 2.593 pp per decade are
+  falloff slopes over an `ms` LADDER in an **SGDm+Lion** pool (FINDINGS 57.2).  These cells are ONE
+  `ms`, **AdamW+Adam**.  They cannot confirm, refute or restate a slope.
+* **The honest sentence for row 24 today** is what 148 already wrote plus one measured addition:
+  the row is a claim about the region above the `ms` optimum; in that region the partitioned arms
+  bind the floor and the scalar arm does not; the campaign has **no** cell that removes the wall
+  from the partitioned arms while keeping the scalar anchor -- `tc1` looked like one and is not.
+  **What would settle it is a ONE-FACTOR floor release (ceiling held at `-2.3026`) at `ms=1e-3`
+  with all three arms IN BATCH, verified clamp-free at the coordinate denominator over the FULL
+  trajectory before it is scored.**  That batch has never been run, and this cycle did not run it.
+
+**Corpus unchanged (2,501 rows).  No job submitted.  `cts2` and `in489g2` untouched.  Nothing under
+`paper/`.**
