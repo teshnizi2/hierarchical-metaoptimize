@@ -12206,3 +12206,319 @@ which is corpus-wide and is not otherwise retired -- is discharged **at this one
 nowhere else.  The `ms=1e-3` family is 78.0% floor-binding (CORRECTIONS 148.4); `cts2` moves the
 floor in **6 runs** and shows the cliff does not depend on it.  It does not release the floor for
 the family, and it re-rates nothing in the 148 census.
+
+## 151. THREE BATCHES REGISTERED AND LAUNCHED IN ONE CYCLE -- 30 JOBS ON `alice2`, NOTHING LANDED, NOTHING SCORED.  THE PROVENANCE AND THE REFUSALS ARE THE DELIVERABLE
+
+Cycle 127.  Three launch agents registered three scorers and submitted three batches to `alice2`
+(`s5014158`, `/home/s5014158/metaopt`), **30 jobs, one submission each**.  **No batch has landed,
+none was scored, nothing was ingested.**  The corpus stays at **2,513 rows** and holds **0** rows
+under `scl1`, `cts3` or `cfr1` (`grep -c` on `results/all_runs.csv`, run here).  `git status
+--porcelain paper/` is **empty**.  `in489g2` on `alice` was read with `squeue` only and not
+touched; **0 jobs were cancelled by this session on either account**.
+
+Every number in this entry was re-derived at this HEAD from `sacct`, `git`, the runs' own `.out`
+files and the live-model manifests.  Nothing is quoted from the launch agents' reports, and where
+I could not verify a claim I say so rather than repeating it.
+
+### 151.1 THE THREE BATCHES
+
+| batch | jobs | design | what it decides | primary |
+|---|---|---|---|---|
+| `scl1` | 12 | cuts `[52,10]`/`[53,9]`/`[54,8]`/`[55,7]` x seeds 0/1/2, CIFAR-100 / `ResNet18_c100`, 100 ep | whether the SECOND cliff (`k=52 -> 55`) is also carried by ONE tensor, and which | `plateau5` drops, in **pp** |
+| `cts3` | 6 | cuts `[49,13]`/`[50,12]` x seeds 0/1/2 at **772 epochs**, clamp held at `-15:-2.3026` | whether CORRECTIONS 147's cliff is a **100-epoch truncation artefact** | `plateau5` at ep 767-771, with the ep 95-99 control **in run** |
+| `cfr1` | 12 | granularity `{scalar, layerwise}` x box `{-15:-2.3026, -80:-2.3026}` x seeds 0/1/2, CIFAR-10 / `ResNet18`, `ms=1e-3`, 100 ep | whether MASTER-TABLE row 24's granularity tolerance is the **`BETA_CLIP` floor** | DID `= [lay-sc]_R - [lay-sc]_C`, in **pp** |
+
+All three are `SGDm` base + `Lion` meta, `AUGMENT=1`, `HIER=none`, `SCHED=none`,
+`--weight-decay-meta 0`, one submission, every comparison WITHIN batch, no other batch's arms
+spliced in.
+
+### 151.2 RULE 21 -- ALL THREE MARGINS RE-DERIVED BY WALL CLOCK, IN SECONDS
+
+Commit epochs from `git log -1 --format=%ct`; submit epochs from `sacct -X -o Submit` over every
+job id in the batch, converted here.  **The scorer commit precedes the earliest submit in all
+three cases.**
+
+| batch | registration commit | commit (epoch) | earliest Slurm `Submit` (epoch) | **margin** | spread over all ids |
+|---|---|---|---|---|---|
+| `scl1` | `aac1bf080e5fb14edbab1f8f3d70599819e7b084` | 2026-09-06T12:44:25+02:00 (**1788691465**) | 2026-09-06T12:44:58 (**1788691498**) | **33 s** | 12:44:58-12:44:59 = **1 s** |
+| `cts3` | `327e3f01239bced518d3edb1c6e01c6a4111548b` | 2026-09-06T12:46:11+02:00 (**1788691571**) | 2026-09-06T12:47:13 (**1788691633**) | **62 s** | all 6 at 12:47:13 = **0 s** |
+| `cfr1` | `dbf90db6c8367b1c71c2dc6f8c371ed4ce5694d4` | 2026-09-06T12:48:28+02:00 (**1788691708**) | 2026-09-06T12:50:38 (**1788691838**) | **130 s** | 12:50:38-12:50:39 = **1 s** |
+
+The 0-1 s spreads are the wall-clock proof of **one submission per batch**.  `scl1`'s **33 s** is
+the thinnest RULE 21 margin the campaign has recorded (`cts2` was 66 s, CORRECTIONS 150); it is
+stated as thin rather than rounded up.  The ordering is nevertheless unambiguous, on two
+independent clocks (`git` on the Mac, Slurm on ALICE), and the premise check is independent of
+both: the corpus at each registration commit contains **0** rows under that batch's prefix.
+
+### 151.3 RULE 16 -- ADDITIONS ONLY, AND ALL THREE SCORERS ARE BYTE-IDENTICAL ON BOTH MACHINES
+
+`git diff --numstat 5561cc6..HEAD -- analysis/` over the whole cycle names **three paths, all
+added, 0 deletions**:
+
+    1188  0  analysis/cO1_cfr1_score.py
+    1027  0  analysis/cO1_cts3_score.py
+    1159  0  analysis/cP1_scl1_score.py
+
+`git diff --name-status 5561cc6..HEAD` over the whole tree is **6 `A` and 1 `M`**: the three
+scorers, the three launchers (`bin/cP1_second_cliff_split.sh`, `bin/cO1_cliff_horizon.sh`,
+`bin/cO1_floor_release_row24.sh`), and `bin/PROTECTED.txt`, whose diff is **`+scl1-` `+cfr1-`
+`+cts3-`, three added lines, 0 removed**.  **No pre-existing scorer was modified anywhere in this
+cycle.**
+
+sha256, worktree vs the cluster checkout that ran the jobs -- **identical in all three cases**:
+
+| scorer | sha256 | cluster copy |
+|---|---|---|
+| `analysis/cP1_scl1_score.py` | `c2024f4b04fb77672717bddaba5635e72097264a5302f6906d2f0bb32880883e` | `/home/s5014158/metaopt/repo-scl1/...` |
+| `analysis/cO1_cts3_score.py` | `ba8cac2434914d7f6c5d3e8a0bc2cca039fe9fc4d748efab6b7acc0077ccf3ad` | `/home/s5014158/metaopt/hmo-cts3/...` |
+| `analysis/cO1_cfr1_score.py` | `3c52e678cbd086df5acaeb8d0c7b270dbc2d38a4f23c49f5ae48d79cbe41114c` | `/home/s5014158/metaopt/hmo-cfr1/...` |
+
+`--selftest` **PASSES on all three at this HEAD**, run here on the Mac
+(`SELFTEST PASSED (0 failures)` for `scl1` and `cfr1`, `SELFTEST PASS` for `cts3`).  Note that
+`scl1`'s RULE 21 premise check still passes **even though 10 of its 12 jobs have already
+COMPLETED** -- completing is not landing, and the corpus holds 0 `scl1` rows.  All three selftests
+will begin failing on their "no `<prefix>-` row exists yet" checks the moment the batches are
+ingested; **that is by construction and the scorers must NOT be edited for it** (RULE 16;
+precedent CORRECTIONS 150 and the `cN1`/`cN2` precedent at CORRECTIONS 149).
+
+### 151.4 RULE 20 -- 29 OF 30 RUNS AUDITED AND CLEAN; THE `cfr1` AUDIT REOPENS
+
+Run here with `METAOPT_WS=/home/s5014158/metaopt` exported so `bin/_lib_guards.sh` cannot clobber
+`WS`, using `analysis/argsline_guard.py` UNEDITED with `--batch-consistency`:
+
+| batch | audited | result | exit |
+|---|---|---|---|
+| `scl1` | **12/12** | 12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line -- **PASS**; batch-consistency: every non-axis flag identical across 12 | 0 |
+| `cts3` | **6/6** | 6 clean, 0, 0 -- **PASS**; every non-axis flag identical across 6 | 0 |
+| `cfr1` | **11/12** | 11 clean, 0, 0 -- **PASS**; every non-axis flag identical across 11 | 0 |
+
+**The `cfr1` audit is INCOMPLETE and is recorded as incomplete, not as passed.**  Job `4912756`
+(`cfr1-lay-R-s2`) was still `PENDING` at this HEAD and has no `.out` file, so it cannot be
+audited from the queue.  The audit reopens when it starts, and the batch may not be scored until
+all 12 are clean.
+
+Name-vs-ARGS agreement was checked per run over all 29 started runs and holds in every case:
+
+- `scl1` -- the ARGS `--stepsize-groups` reads `[52,10]`/`[53,9]`/`[54,8]`/`[55,7]` against the
+  run name's `k52`/`k53`/`k54`/`k55`, `--seed` matches the name's `sN`, and the 12 (spec, seed)
+  pairs are exactly the complete 4x3 grid.  `--num-epochs 100` in 12/12.
+- `cts3` -- `[49,13]`/`[50,12]` x seeds 0/1/2, **`--num-epochs 772` in 6/6**.  The horizon IS this
+  batch's manipulation and it DOES ride the ARGS line, so it is verified there directly.
+- `cfr1` -- `--stepsize-groups scalar`/`layerwise` against the name's `sc`/`lay`, seeds 0/1/2,
+  `--num-epochs 100` in 11/11.
+
+**No mismatch anywhere, so no `scancel` condition was met and nothing was cancelled.**
+
+### 151.5 THE ENV-LINE AUDIT -- RULE 20's KNOWN BLIND SPOT
+
+`BETA_CLIP` and `PROBE` are ENVIRONMENT variables and cannot ride the ARGS line, so they were read
+from each run's own `ENV:` line:
+
+| batch | `BETA_CLIP` | `PROBE` | agreement |
+|---|---|---|---|
+| `scl1` | `-15:-2.3026` in **12/12**, one identical ENV string | `PROBE=0` in 12/12 | this batch does **not** manipulate the clamp |
+| `cts3` | `-15:-2.3026` in **6/6**, one identical ENV string | `PROBE=0` in 6/6 | one clamp level, as registered |
+| `cfr1` | **6 at `-15:-2.3026`** (all 3 `lay-C`, all 3 `sc-C`), **5 at `-80:-2.3026`** (`lay-R` s0/s1, `sc-R` s0/s1/s2) | `PROBE=100` in **11/11** | every run's NAME agrees with its own `BETA_CLIP`; the missing 6th released run is the pending `lay-R-s2` |
+
+**The `-80` box moves the FLOOR ONLY -- the ceiling is `-2.3026` in both arms.**  This is the
+correction CORRECTIONS 149 demanded and is discussed at 151.8.
+
+### 151.6 `scl1` -- THE SECOND CLIFF, AND THE SINGLE-TENSOR STEPS VERIFIED HERE FROM THE MANIFEST
+
+I re-derived the steps myself by set-differencing the coarse-group NAME lists in
+`/home/s5014158/metaopt/runs/scl1/PARTITION-MANIFEST.txt`, rather than accepting the launcher's
+own report.  The partition is **nested** (no tensor ever moves back) and **each step moves exactly
+one tensor**:
+
+| step | tensor entering the COARSE group | params | coarse params before -> after |
+|---|---|---|---|
+| `[52,10] -> [53,9]` | `layer4.0.shortcut.1.weight` (a normalisation **SCALE**) | **512** | 6,447,168 -> 6,447,680 |
+| `[53,9] -> [54,8]` | `layer4.0.shortcut.1.bias` (the matched **SHIFT**, same `BatchNorm2d`) | **512** | 6,447,680 -> 6,448,192 |
+| `[54,8] -> [55,7]` | `layer4.1.conv1.weight` (first tensor of the next residual block) | **2,359,296** | 6,448,192 -> 8,807,488 |
+
+`NUM_PARAM_TENSORS 62`, `TOTAL_PARAMS 11,220,132`, live model.  The tensor-class sequence
+(BN scale -> BN shift -> conv) is the **same** as `cts1`'s at the first cliff.  The **disanalogy is
+real and I confirmed it**: the three steps move 512+512+2,359,296 = **2,360,320 params = 49.4519%**
+of the `k=52` fine group (4,772,964), against `cts1`'s 2.6931% at the first cliff.  **The two
+cliffs are homologous in tensor CLASS, not in moved MASS**, and the registration says so in
+advance rather than discovering it afterwards.
+
+Registered before the data: **B1** predicts the majority is DROP1, the 512-param normalisation
+scale whose own convolution is already coarse -- structurally identical to `cts1`'s winner
+`layer4.0.bn2.weight`.  **B2**, the rival, predicts DROP3, the 2.36M-param conv.  B1 predicts
+**against the corpus base rate and says so**: the class-level form of this claim was WITHDRAWN at
+CORRECTIONS 147.6 on `cpk1`'s own data, where 8 of 10 norm-scale-out steps RAISE capture.  The
+registered refutation branches are checked in order -- **R1 cliff-not-reproduced** (TOTAL < 7.4850
+pp, half of `cpk1`'s own 14.9700 pp) voids the question and **no tensor may be named**;
+**R2 split-even** (all three drops within 2.3476 pp of TOTAL/3) makes `cts1` a local accident and
+CORRECTIONS 147.6's withdrawal RIGHT; **R3 no-majority** requires the CONJUNCTION of majority AND
+separation before any tensor is named.  SHARED-MECHANISM is declared only if the cliff reproduces,
+a single tensor carries the majority, **and that tensor is DROP1**.
+
+`scl1` is registered in **pp, not CAPTURE**, and pays for it in the open: with no `scalar`/
+`layerwise` anchors it **cannot state cliff 2's size in CAPTURE units from its own data**, and a
+batch-level level shift against `cpk1` is neither detectable nor removable here.  That price is
+disclosed in the registration, guarded by R1, and is discussed at 151.9.
+
+### 151.7 `cts3` -- BUYING THE HORIZON, AND THE CONTROL THAT COSTS NOTHING
+
+772 epochs, **7.72x** any existing `ResNet18_c100` run in the corpus.  The horizon was chosen from
+a power fit to `cts2`'s own terminal-slope decay, and **the registration states the fit is not
+stable**: across six defensible window subsets the implied convergence epoch runs
+414 / 640 / 677 / 772 / 803 / 1821, and the 1821 variant has `p = 0.8220 < 1`, a regime with **no
+finite convergence epoch at all**.  772 is therefore **not claimed to reach convergence** -- gate
+**R4** settles that empirically, and fires `UNRESOLVED-HORIZON-INEFFECTIVE` if the `k50` terminal
+slope at E exceeds half its measured 100-epoch value.
+
+The 100-epoch control is **in batch and in run at zero GPU cost**, and the precondition was proved
+on the live `train.py` rather than asserted: the manifest records `NUM_EPOCHS_USES 2 DECL 42 LOOP
+135`, i.e. `args.num_epochs` occurs only in the argparse declaration and in
+`for epoch in range(args.num_epochs)` -- no schedule, no total-step count, no warmup, `SCHED=none`,
+`--max-time 999:00:00`.  So the epoch-99 readout of a 772-epoch run **is** a 100-epoch run of an
+identical configuration, the premise gate is measured within batch, and six extra control jobs
+(~4.5 GPU-h) buy only a weaker, between-run control.
+
+**The registration names its own predicted outcome in advance and forbids the flattering reading.**
+Two independent extrapolations from `cts2`'s curves -- integrating the fitted slope law, and a
+direct saturating fit -- agree to ~0.5 pp that `k50` gains about +7.3 pp by epoch 772 while `k49`
+stays flat, so **SHRINKS is predicted** at roughly -6.97 SE.  If SHRINKS fires it is **not** a
+null and may **not** be written as "the cliff held up": CORRECTIONS 147's cliff numeral becomes
+**budget-dependent**, every future quotation of 24.834 / 25.163 / 24.767 pp carries the scope
+"at 100 epochs" in the same sentence, and `cpk1`'s capture curve and its argmax `k* = 49`
+(CORRECTIONS 146) **inherit that scope** because they are 100-epoch measurements throughout.
+
+One arithmetic finding is recorded because it bounds what this batch can ever claim: at 772 epochs
+`META_STEPS 386000` and `|dbeta| <= ms`, so `beta` can reach **-399.815511** -- `cts2`'s released
+floor of **-80 is reachable at this horizon** (it was unreachable at 50,000 meta-steps, which is
+what justified it there), and `alpha = exp(beta)` is float32, underflowing to **exactly zero**
+below **-103.278930**.  At this horizon either the clamp binds or the stepsize becomes exactly 0.
+**`cts3` therefore claims nothing whatever about the released floor at long budget**, and the gap
+is stated rather than hidden.
+
+`cts3` also declares that it is a **fourth correlated batch** -- it shares seeds {0,1,2} and every
+non-horizon flag with `cts1`/`cts2`/`cpk1` -- so **"reproduces in an independent batch" may not be
+written of it**.
+
+### 151.8 `cfr1` -- THE ONE-FACTOR FLOOR RELEASE, AND WHAT IT REPLACES
+
+`cfr1` is the experiment `STATUS.md` had written as "Step 1", **executed with the defect removed**.
+The written Step 1 box was `{-15:-2.3026}` vs `{-30:6.0}`, which moves **both walls at once**;
+CORRECTIONS 149 showed that exact defect is what made `tc1` and `ub9` ambiguous.  `cfr1` holds the
+ceiling **identical at -2.3026** in both arms and releases **only** the floor, to `-80`.  The ENV
+audit at 151.5 confirms this on the runs themselves.  **`STATUS.md`'s Step 1 is superseded by
+`cfr1` and has been rewritten in this cycle.**
+
+The released floor is unreachable **by arithmetic, on the live source**, not merely unvisited.
+With `--weight-decay-meta 0` the Lion meta-update is `beta <- beta - ms*sign(.)` with
+`sign in {-1,0,+1}`, so `|dbeta| <= ms` exactly per meta-step.  `T` is measured, not assumed:
+50,000 CIFAR-10 images / batch 100, no `drop_last` = 500 iterations/epoch x 100 epochs =
+**50,000 meta-steps**.  The manifest records `META_STEPS 50000  TRAVEL_LO -56.888439
+TRAVEL_HI 43.079880` from `beta_init = float32 log(1e-3) = -6.907755`, so **-80 lies 23.111561
+nats -- 23,111 meta-steps -- past anything the run can reach**, while the clamped floor **-15 IS
+reachable** with room to spare.  The manifest also records `MS1E4_TRAVEL_LO -11.914545`: at the
+tuned `ms=1e-4` the floor is **3.085455 nats above** the `-15` wall, i.e. **unreachable**, so
+releasing it there would be a null **by construction**.  That is why there is no `ms=1e-4` arm, and
+it is a derivation rather than a saving.
+
+The instrument is live and at the **coordinate denominator**, which I checked directly on the
+running jobs: 11 probe directories, `n_beta = 62` in every `layerwise` run and `n_beta = 1` in
+every `scalar` run, with 68-164 records written so far against the gate's requirement of >= 400 at
+completion.  This matters because a per-tensor-MEAN reading could otherwise be mistaken for a
+coordinate one (FINDINGS 51.1), and because CORRECTIONS 149.7 established that sampled occupancy
+rates are **lower bounds**.  `cfr1`'s answer to 149.7 is the `PROBE=100` stride plus the
+`|dbeta| <= ms` bound: movement over one stride is at most `ms*PROBE = 0.1` nats, so the detector
+"min over records of `beta_true_min <= wall + 0.1004`" has **no false negatives** and is exact for
+the event; the exact-equality counter `n_at_lo` has **no false positives** and is reported beside
+it.  Both are printed per run.
+
+Two premise halves are registered, and the second is the one that stops a laundered null:
+**R4(ii) THE WALL MUST EXIST** -- at least 2 of the 3 CLAMPED LAYERWISE runs must actually reach
+the `-15` floor, else there was nothing to release, a null DID is null by construction, and the
+verdict is `UNRESOLVED-PREMISE-NOWALL` rather than a vindication of row 24.  The gate ordering is
+asserted on synthetic cells by `--selftest`.
+
+**Declared scope limit, stated up front.** The ceiling is held in both boxes, so a `SURVIVES`
+verdict discharges the **floor half** of the threat only.  Whether that is the whole threat is
+measured here for free, as a non-gating diagnostic: if no clamped layerwise run puts a coordinate
+on the `-2.3026` ceiling at any record, the floor is the only wall at this cell.
+
+### 151.9 THE REFUSALS ARE DELIVERABLES, AND ARE RECORDED AS SUCH
+
+No agent refused to submit; all three batches launched.  But each registration contains reasoned
+refusals of arms that would have been easy to add, and those are the part of this cycle worth
+keeping.  Recorded so they are not re-litigated by a later cycle that has forgotten the argument:
+
+| refused | batch | the reason, and what makes it a refusal rather than thrift |
+|---|---|---|
+| an `ms=1e-4` arm | `cfr1` | the `-15` floor is **provably unreachable** at `ms=1e-4` (`beta >= -11.914545`), so releasing it there is a null **by construction**.  All of row 24's box-dependence lives at `ms=1e-3` |
+| a `blk6` third granularity | `cfr1` | it would audit a falloff number MASTER-TABLE row 106 has **already refuted** (over 67 `rs-` rows: `scalar` 0/22 truncated, `layerwise` 0/22, `resnet18_blocks` 6/13, `nodewise` 6/10), at +50% cost and with a second uncorrected estimand.  Registered as the dose-response follow-up **if** the verdict returns WALL-DRIVEN |
+| releasing the CEILING as a third level | `cfr1` | FINDINGS 6190-6215 measured **2/2 fatal collapses** at `+6.0`, and a diverged arm is `UNRESOLVED-DIVERGED` by gate R2.  ~6 GPU-h to answer nothing |
+| `scalar`/`layerwise` anchors | `scl1` | the primary is in **pp**, and dividing all four arms by one common GAP is a positive rescaling that cannot change the drop ordering, the majority test, the separation test or the matched control.  CORRECTIONS 147.6 had to qualify `cts1`'s CAPTURE shares because their denominator is a non-monotone path sum; registering in pp avoids importing a ratio the parent cycle already walked back.  **Price disclosed**: no CAPTURE-unit statement of cliff 2's size, and no detectable level shift vs `cpk1` |
+| six separate 100-epoch control jobs | `cts3` | the control is **in run** at zero cost, and is PAIRED, whereas six extra jobs would buy a weaker BETWEEN-run control for ~4.5 GPU-h.  The precondition was proved on the live `train.py` (`NUM_EPOCHS_USES 2`) |
+| carrying the clamp axis to 772 epochs | `cts3` | `cts2` measured the clamp x cut interaction at **0.3953 pp = 0.38 SE_INT** (CORRECTIONS 150); carrying it would double the cost to re-answer an answered question.  And the released level is **not arithmetically available** at this horizon anyway (151.7) |
+| extending the clamp census | carried from 148 | the 1,145 un-instrumented rows cannot be re-instrumented without re-running them, and for the modern cells the answer is already "inert" |
+
+### 151.10 QUEUE HYGIENE -- AND ONE ROW ON `alice2` THAT IS NOT THIS CYCLE'S
+
+`alice2` at this HEAD holds **21** rows.  Twenty are this cycle's three batches.  **One is not**:
+
+    4912741  pf-headroom-probe#a0  PENDING (Priority)  Submit 2026-09-06T12:48:45
+
+It belongs to the PaperFactory programme, not to this campaign, was **not** submitted by this
+cycle, and was **not** touched.  The task's expectation that the queue would hold only this cycle's
+batches is therefore **not literally satisfied**, and this is reported rather than quietly
+absorbed.  Also on `alice2` today, neither of them this cycle's: `4912716 pf-microrun-smoke#a0`
+**FAILED**, and `4912049 pf-microrun-smoke#a0` **CANCELLED by uid 3263** at 08:46 -- which predates
+every batch here.  **This session cancelled nothing on either account.**
+
+`alice` holds **14** jobs, all `in489g2-`: **8 RUNNING** at 8:22:10-8:22:11 elapsed and **6
+PENDING** on `QOSMaxGRESPerUser`.  Read with `squeue -u salehkaleybars` only.  **Not this
+session's batch; not cancelled, not requeued, not modified**, and nothing was written to
+`/data1/salehkaleybars`.
+
+`bin/PROTECTED.txt` carries all three new prefixes (`scl1-`, `cfr1-`, `cts3-`), committed in this
+cycle.
+
+Three concurrent agents committed into the **same** working tree in a 4-minute window
+(`aac1bf0` -> `78f000d` -> `327e3f0` -> `dbf90db` -> `de53385`).  Each staged only its own paths;
+the `--name-status` diff at 151.3 confirms the result -- six added files, one appended
+`PROTECTED.txt`, and **no file modified that any of them did not create**.  The `cfr1` agent
+avoided a filename collision by registering its sibling's launcher-prefix `cP1` rather than `cO1`,
+which is why `scl1`'s scorer is `cP1_scl1_score.py`.
+
+### 151.11 COST AND LANDING TIMES
+
+`scl1` is **10/12 COMPLETED** at this HEAD (elapsed 35:07-46:12, all `COMPLETED`) with 2 still
+`RUNNING` at 49:43 and 1:40 of walltime left; **completing is not landing** and it has not been
+scored or ingested.
+
+| batch | projected GPU-h | walltime cap | worst case | ETA (local, 6 Sep) |
+|---|---|---|---|---|
+| `scl1` | **8.4** | `02:30:00` | 30.0 | ~13:45-14:15; hard bound 15:15 |
+| `cfr1` | **11.01** | `03:00:00` | 36.0 | 11 started 13:20-13:31 -> ~14:15-14:45; the pending `lay-R-s2` lands last, ~15:20 |
+| `cts3` | **33.0** | `11:00:00` | 66.0 | first ~17:25, last ~19:40-20:00 |
+| **total committed this cycle** | **52.41** | | **132.0** | all three land by ~20:00 |
+
+`cts3`'s partitions are `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` and **not** `gpu-short`, whose 4 h
+ceiling excludes 772 epochs by arithmetic; `gpu-2080ti-11g` was excluded by measurement (55.8-70.8
+s/epoch on this cell = ~15.2 h).  Every `cts3` run has 4.7-6.4 h of walltime headroom, so
+TIMEOUT is not a live risk.  `in489g2`'s ~348.5 projected GPU-h on `alice` are **not this
+campaign's** and are not counted here.
+
+### 151.12 WHAT THIS ENTRY DOES NOT CLAIM
+
+- **No result.**  Nothing landed, nothing was scored, nothing was ingested, and no number from any
+  of the three batches may be quoted until its runs complete and its registered scorer is run
+  UNEDITED.  `scl1`'s 10 completed jobs are **not** a result.
+- **`cfr1`'s RULE 20 audit is incomplete** (11/12) and reopens when `4912756` starts.
+- The three designs' arithmetic (float32 travel bounds, meta-step counts, the `PROBE=100`
+  detector, the power fit and its bracket) is recorded here **as registered and as re-derived by
+  each scorer's own `--selftest`**, which passes for all three.  I verified the manifests, the
+  single-tensor steps, the hashes, the clocks and the audits directly; I did **not** independently
+  re-derive every constant inside the three scorers.
+- `c98_reproduce.py` exits **1** at this HEAD, the same inherited failure as at CORRECTIONS 150.7
+  (stale draft numerals, CORRECTIONS 141.6 / 142.6).  It is **author scope** and was deliberately
+  not fixed.  The script reports 628 `chk()` sites over 411 distinct quantity numerals, 41.9%
+  coverage of the draft's 982 distinct quantity numerals.
+- **Nothing under `paper/` was read for edit or written.**  `git status --porcelain paper/` is
+  empty.
