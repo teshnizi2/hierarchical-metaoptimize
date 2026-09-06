@@ -2431,3 +2431,15 @@ sc50-1e3-scal-s0,4683472,salehkaleybars,ResNet50,CIFAR10,100,scalar,SGDm,Lion,1e
 sc50-1e6-scal-s0,4683469,salehkaleybars,ResNet50,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,100,100,89.28,89.15,98.84,0,node880,141,env,,0,33,48,,89.103,19,89.118,74.844,1,1
 sc50-1e3-scal-s1,4683478,salehkaleybars,ResNet50,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-3,1,1,-15:-2.3026,,na,na,1,100,100,89.42,89.3,99.04,0,node880,142,env,,0,19,39,,89.287,37,89.286,84.269,1,1
 sc50-1e6-scal-s1,4683475,salehkaleybars,ResNet50,CIFAR10,100,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,100,100,90.06,89.95,99.0,0,node851,189,env,,0,31,46,98,89.774,41,89.902,75.531,1,1
+in489g1-layerwise-s0,4887228,salehkaleybars,resnet18,?,256,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,84,84,49.63,49.63,45.02,0,node883,1359,env,,0,,,,48.603,0,49.334,39.027,1,1
+in489g1-layerwise-s1,4887232,salehkaleybars,resnet18,?,256,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,84,84,49.09,49.05,44.89,0,node880,1360,env,,0,,,,48.415,0,48.984,39.003,1,1
+in489g1-layerwise-s2,4887236,salehkaleybars,resnet18,?,256,layerwise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,84,84,49.43,49.43,44.95,0,node881,1301,env,,0,,,,48.596,0,49.234,39.099,1,1
+in489g1-nodewise-s0,4887229,salehkaleybars,resnet18,?,256,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,84,84,51.78,51.78,47.89,0,node883,1358,env,,0,,,,51.107,0,51.636,42.091,1,1
+in489g1-nodewise-s1,4887233,salehkaleybars,resnet18,?,256,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,81,84,51.93,51.82,47.97,0,node882,1908,env,,0,,,,51.164,0,51.614,41.965,1,1
+in489g1-nodewise-s2,4887237,salehkaleybars,resnet18,?,256,nodewise,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,84,84,51.84,51.84,47.84,0,node881,1301,env,,0,,,,50.984,0,51.542,42.048,1,1
+in489g1-resnet18_blocks-s0,4887227,salehkaleybars,resnet18,?,256,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,81,84,1.48,1.29,1.3,0,node882,1903,env,,0,,,,1.347,0,1.338,1.311,1,1
+in489g1-resnet18_blocks-s1,4887231,salehkaleybars,resnet18,?,256,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,80,84,1.66,1.51,1.51,0,node882,1900,env,,0,,,,1.539,0,1.56,1.484,1,1
+in489g1-resnet18_blocks-s2,4887235,salehkaleybars,resnet18,?,256,resnet18_blocks,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,84,84,1.5,1.44,1.41,0,node884,1322,env,,0,,,,1.426,0,1.428,1.374,1,1
+in489g1-scalar-s0,4887226,salehkaleybars,resnet18,?,256,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,0,84,84,0.94,0.88,0.91,0,node880,1359,env,,0,,,,0.886,0,0.89,0.871,1,1
+in489g1-scalar-s1,4887230,salehkaleybars,resnet18,?,256,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,1,84,84,1.18,1.12,1.13,0,node884,1322,env,,0,,,,1.112,0,1.116,1.09,1,1
+in489g1-scalar-s2,4887234,salehkaleybars,resnet18,?,256,scalar,SGDm,Lion,1e-3,1e-6,1,1,-15:-2.3026,,na,na,2,84,84,1.19,1.08,1.08,0,node882,1522,env,,0,,,,1.093,0,1.094,1.064,1,1

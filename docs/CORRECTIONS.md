@@ -10716,3 +10716,66 @@ baseline).  dup_group_guard: 21 groups / 42 rows / 3 superseded, VERDICT PASS (R
 hierarchical or shrinkage operator, about the interior r-peak, or about whether the optimum in m
 moves with class count -- that last rests on cross-batch CIFAR-10 pools one CIFAR-100 batch cannot
 settle.
+
+## 144. IMAGENET-489 LANDS.  THE PARENT'S BLOCKWISE CLAIM IS CORROBORATED AND ITS SCOPE IS BROKEN
+
+12 runs, ImageNet-489 (489 of 1000 classes, 627,329 train, 24,450 val @ 50/class, labels recovered
+from per-image XML annotations), ResNet-18 / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 84 epochs /
+batch 256 / box -15:-2.3026.  **This is the FIRST run of this project outside CIFAR resolution and
+the first test of the parent paper's own motivating anomaly.**
+RULE 20: 12 clean, 0 repeated flags, VERDICT PASS.  Scorer analysis/cI1_in489g1_score.py,
+registered at c7e032d BEFORE any run existed, md5 ebff2fc20a51a2f9cda6774d0d77691c identical local
+and remote, git-clean, run UNEDITED.
+
+**THE REGISTERED VERDICT IS `UNRESOLVED` AND IS NOT BEING DRESSED UP.**  The scorer's
+pre-registered G1 gate voids any arm whose window5 falls below `FLOOR_W5 = 5.0` pp as
+`G1_NOT_LEARNED` (selftest asserts the floor is >= 20x chance = 4.09).  Two arms fall below it, so
+both primary contrasts are refused:
+    VERDICT: UNRESOLVED   (BLOCK UNRESOLVED / GRAN UNRESOLVED / NODE FINER_HELPS)
+      No verdict.  Report the arm means and the curve; claim nothing.
+The one licensed contrast: **NODE = nodewise - layerwise = +2.509 pp, t +21.55 -> FINER_HELPS**
+against a registered bar of +0.423.
+
+**THE ARM MEANS** (window5 at the common horizon ESTAR = 80; chance = 0.2045%):
+    arm              m        TEST      TRAIN
+    scalar           1         1.031     1.041
+    resnet18_blocks  6         1.443     1.417
+    layerwise        62       48.878    44.512
+    nodewise         15378    51.387    47.630
+
+**WHAT THIS SAYS ABOUT THE PARENT PAPER, and it cuts both ways.**  docs/PAPER-CONFIG.md:71 records
+the parent's ImageNet sentence: *"Unlike CIFAR10, here the blockwise versions of MetaOptimize
+showed no improvement over the scalar versions."*  Measured here: **BLOCK = blk - scal = +0.413 pp**,
+both arms dead at ~1%.  **THE PARENT'S BLOCKWISE CLAIM IS CORROBORATED**, at full resolution, for
+the first time in this project.  But layerwise and nodewise reach 48.9 and 51.4 pp on the same
+task, so the broader reading -- that granularity does not help at ImageNet scale -- is **FALSE**.
+The correct statement is that **SIX GROUPS ARE NOT ENOUGH AT 489 CLASSES AND SIXTY-TWO ARE**:
+a 47.4 pp cliff between two adjacent rungs of the ladder.  That is consistent with `cbl1`'s count
+ladder and with the class-count law's own logic, and it is a scope correction to the parent, not a
+contradiction of its measurement.
+
+**THE CLASS-COUNT LAW (registered 65ba0d0, Q(489) = 0.132, band [0.05, 0.30]).**  The scorer
+REFUSED to compute Q because its scalar reference is voided, so no registered reading exists and
+none is claimed.  Descriptively, from the same window5 means, **Q = 1.031 / 48.878 = 0.0211**,
+which sits in the registered **DIRECTION-ONLY LOW** band (< 0.05): *direction right, the power law
+UNDER-predicts the collapse, functional form wrong.*  **This hand figure may not be promoted over
+the scorer's refusal.**  Unambiguous either way: it is NOT FALSIFIED (> 0.60) and NOT the parent's
+own claim (>= 0.95).
+The images-per-class rival is DEAD on this evidence: ImageNet-489 carries 1,283 images/class,
+MORE than CIFAR-100 or Tiny-ImageNet (500 each), and that account predicted Q would RECOVER above
+0.33.  It fell to 0.021 instead.
+
+**THE FAILURE IS TRAIN-SIDE, a third time.**  scalar trains at **1.041%** and tests at 1.031%;
+blocks 1.417 / 1.443.  Train ~= test throughout.  The coarse arms do not overfit and do not
+generalise badly -- they never fit at all.  Same shape as CIFAR-100 (train 22.8 vs 99.0) and
+Tiny-ImageNet (9.76 vs 88.67).
+
+**INGEST.**  2,432 -> 2,444 rows.  Pipeline proved BIT-IDENTICAL on unchanged mirrors before any
+.out was pulled: 12 added, **0 changed, 0 removed**.  `aggregate.py` THEN `args_repair.py --apply`.
+dup_group_guard: 21 groups / 42 rows / 3 superseded, VERDICT PASS.
+
+**SCOPE, mandatory with every number above.**  ImageNet-489, NEVER "ImageNet".  489 of 1000
+classes; 627,329 train images; val 24,450 @ 50/class with labels recovered from per-image XML
+annotations, not a devkit.  Chance 0.2045%.  NOT comparable to any published ImageNet-1k number.
+Budget 84 epochs, epoch-matched to the parent's protocol (422000/5004 = 84.3) but NOT step-matched,
+because the dataset is half the size.  window5 at ESTAR = 80, not a converged plateau.
