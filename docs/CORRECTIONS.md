@@ -12946,3 +12946,292 @@ scored as informative if the arm on either side is within 2 SE of the in-batch `
 Cheaper variants, both strictly weaker and recorded so they are not mistaken for this one: adding
 k = 56 and k = 57 to the `scl1` window (6 jobs) breaks the ordinal confound alone but lands on the
 saturated floor; a third cliff decomposed on seeds {0,1,2} adds a third step and **no** independence.
+
+## 153. `cfr1` LANDS -- THE `BETA_CLIP` FLOOR IS **NOT** CARRYING THE GRANULARITY GAP AT `ms=1e-3`.  THE VERDICT IS ACCEPTED FOR THE QUESTION IT ASKED AND **REFUSED AS A DISCHARGE**: MASTER-TABLE ROW 24 MOVES THREATENED -> **CONSTRAINED**, NOT CLEARED
+
+Every figure below was re-derived at this HEAD from the runs' own `.out` files and `probe.jsonl`
+traces with an independent parser and an independent probe reducer; nothing is quoted from the
+landing briefing.  Where the briefing and the re-derivation disagree, the re-derivation is printed
+and the disagreement is named.
+
+### 153.1 THE DESIGN, AND WHY IT IS THE ONE-FACTOR INSTRUMENT `tc1`/`ub9` WERE NOT
+
+12 runs, ONE submission, `2 x 2 x 3`: granularity `{scalar, layerwise}` x box
+`{C = -15:-2.3026, R = -80:-2.3026}` x seeds `{0,1,2}`.  ResNet18 / CIFAR-10 / SGDm base / Lion
+meta / `ms=1e-3` / `alpha0=1e-3` / 100 ep / batch 100 / `gamma 1` / `AUGMENT=1` / `HIER` unset /
+`PROBE=100` with a per-run `PROBE_DIR`.  **Only the FLOOR moves; the ceiling is `-2.3026` in both
+boxes.**  That is the defect CORRECTIONS 149 identified in `tc1` (`{-30:6.0}`) and `ub9`
+(`{-60:6.0}`), which move both walls at once, and it is not inherited.  All four cells sit in one
+batch, so the cross-batch offset (`F(62,85) = 5.47` for batch) cancels outright rather than being
+argued away.
+
+Registered at `dbf90db` (2026-09-06T12:48:28+02:00); earliest Slurm submit 12:50:38 = **130 s**
+RULE 21 margin.  Scorer `analysis/cO1_cfr1_score.py`, sha256
+`3c52e678cbd086df5acaeb8d0c7b270dbc2d38a4f23c49f5ae48d79cbe41114c`, run **UNEDITED**;
+`git diff -- analysis/` empty and `git status --porcelain analysis/ paper/` empty at this HEAD
+(RULE 16).
+
+### 153.2 PROVENANCE -- AND THIS CLOSES 151.4's 11/12 INCOMPLETE AUDIT
+
+| check | result |
+|---|---|
+| `RUN_DONE` | **12/12** |
+| tracebacks | **0/12** |
+| `epochs_done` | **100** on all 12 |
+| job ids | 12 distinct, `4912745`-`4912756` |
+| RULE 20 `argsline_guard --name cfr1- --batch-consistency` | **12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line, VERDICT PASS**; *"every non-axis flag is identical across 12 runs"* |
+| ENV audit (`BETA_CLIP` cannot ride the ARGS line -- RULE 20's known blind spot) | **6** runs `-15:-2.3026`, **6** runs `-80:-2.3026`, each agreeing with its own run NAME |
+
+**CORRECTIONS 151.4's `cfr1` RULE 20 audit, recorded as 11/12 INCOMPLETE, IS CLOSED AT 12/12.**
+
+### 153.3 THE MANIPULATION -- COORDINATE DENOMINATOR, FULL TRAJECTORY, INDEPENDENT REDUCER
+
+Re-read from the 12 `probe.jsonl` files with a reducer written here, not the scorer's
+(FINDINGS 51.1: per-tensor `beta[]` is the wrong resolution; CORRECTIONS 149.7: terminal and
+sampled rates are lower bounds).  500 records per run; `n_beta` **62** on every layerwise run and
+**1** on every scalar run, read from the probe and not assumed.
+
+| run | box | min beta | max beta | max `n_at_lo` | max `n_at_hi` | records with >=1 at floor | mean coord occupancy |
+|---|---|---|---|---|---|---|---|
+| `lay-C-s0` | C | **-15.0000** | -3.9840 | **27**/62 | 0 | **0.8340** | 0.1380 |
+| `lay-C-s1` | C | **-15.0000** | -3.7540 | **30**/62 | 0 | **0.8320** | 0.1584 |
+| `lay-C-s2` | C | **-15.0000** | -4.0460 | **29**/62 | 0 | **0.8320** | 0.1490 |
+| `lay-R-s0` | R | -56.6036 | -4.0340 | **0** | 0 | 0.0000 | 0.0000 |
+| `lay-R-s1` | R | -56.5116 | -3.8200 | **0** | 0 | 0.0000 | 0.0000 |
+| `lay-R-s2` | R | -56.5696 | -3.9360 | **0** | 0 | 0.0000 | 0.0000 |
+| `sc-C-s0/1/2` | C | -11.1920 / -11.2260 / -11.2560 | ~-5.14 | 0 | 0 | 0.0000 | 0.0000 |
+| `sc-R-s0/1/2` | R | -11.1179 / -11.1700 / -11.1980 | ~-5.20 | 0 | 0 | 0.0000 | 0.0000 |
+
+**ONE DISAGREEMENT WITH THE BRIEFING, PRINTED:** the briefing reported the clamped layerwise
+at-floor counts as **30/30/29** at a common occupancy 0.8320.  Re-derived they are **27/30/29** at
+0.8340 / 0.8320 / 0.8320.  No other figure differs, and no gate depends on it.
+
+**The wall BINDS in the clamped fine arm and CANNOT bind in the released one, by arithmetic.**
+`beta_0 = ln(1e-3) = -6.907755`; distance to the `-15` floor is `8.092245` nats; at `ms=1e-3` the
+floor is first reachable at meta-step **8092.2**, i.e. record 81 of 500, so the maximum attainable
+record-rate is **0.8380** against the **0.8320-0.8340 measured** -- the leading coordinates descend
+essentially monotonically from step 0.  The released runs bottom out at `-56.51`...`-56.60`, within
+**0.29-0.38 nats** of this configuration's exact float32 bound `-56.888439` and **23.4 nats clear**
+of `-80`; `n_at_lo = 0` at every record of every released run.  The scalar arm never comes within
+**3.74 nats** of the floor in either box, so the negative control is a control by construction as
+well as by measurement (census: scalar **0/33** corpus-wide).
+
+### 153.4 THE ARMS AND THE CONTRASTS -- `plateau5` PRIMARY, TRAIN ALONGSIDE
+
+| arm | box | **plateau5** | sd | train5 | sd |
+|---|---|---|---|---|---|
+| scalar | CLAMPED | **87.8707** | 0.2392 | 93.8987 | 0.1354 |
+| layerwise | CLAMPED | **91.3133** | 0.1406 | 99.8920 | 0.0072 |
+| scalar | RELEASED | **87.8773** | 0.0221 | 94.0340 | 0.1164 |
+| layerwise | RELEASED | **91.3520** | 0.3083 | 99.8933 | 0.0150 |
+
+| contrast | TEST pp | SE units | TRAIN pp |
+|---|---|---|---|
+| `G_C` (lay - sc, CLAMPED) | **3.4427** | 19.52 `SE_GAP` | 5.9933 |
+| `G_R` (lay - sc, RELEASED) | **3.4747** | 19.70 `SE_GAP` | 5.8593 |
+| **`DID = G_R - G_C`** | **+0.0320** | **0.13 `SE_DID`** | -- |
+| corpus clamped gap `ms=1e-3` | 3.3585 | DESCRIPTIVE, cross-batch, **never spliced** | -- |
+
+Gates: G0 PASS, R1 PASS, R2 PASS (no run failed to train), R3 PASS (no cell SD above
+`3*sigma_w = 0.6480`), R4(i) PASS (`G_C 3.4427 >= 1.6792`), R4(ii) PASS.
+Diagnostics: NEGATIVE CONTROL scalar `R - C` **+0.0067 pp** against the `+/-0.3527` bar,
+**unmoved**; layerwise `R - C` **+0.0387 pp**; CLAMPED layerwise runs reaching the `-15` floor
+**3 of 3**; CEILING SCOPE -- **no clamped layerwise run put a coordinate on the `-2.3026` ceiling
+at any record**, so the floor is the only wall AT THIS CELL and the one-factor release is a
+complete box audit here.
+
+### 153.5 THE VERDICT, VERBATIM
+
+> `VERDICT  ROW24-SURVIVES`
+> `DID = 0.0320 pp, within the registered bar 0.4988 pp (2 SE_DID): releasing the floor does not`
+> `move the granularity gap, so the tolerance row 24 reports is a property of the PARTITION and`
+> `not of the wall`
+
+**The verdict string is ACCEPTED as the answer to the question `cfr1` asked and REFUSED as a
+discharge of MASTER-TABLE row 24.**  Grounds in 153.6-153.7.
+
+### 153.6 THE ATTACKS
+
+**A1 -- SCOPE.  PARTLY LANDS, and it is the reason the row is CONSTRAINED rather than CLEARED.**
+The threat DOES make a sharp prediction at this rung and `cfr1` was overwhelmingly powered against
+it (A4), so the null is informative *here*.  But row 24 is a multi-rung object.
+
+* The window's LOWER endpoint `ms=1e-4` is clamp-free **by arithmetic** (min reachable
+  `beta = -11.9078 > -15`) and by census (2.7% binding, **0** among SGDm+Lion primaries at the
+  canonical box).  Both endpoints of the `1e-4 -> 1e-3` decade are therefore audited.
+* **`ms=3e-4` is NOT audited and it is where the effect switches on.**  Re-derived `plateau5` gaps
+  in the 57.2 stratum: `1e-4` **+0.625** -> `3e-4` **+3.182** -> `1e-3` **+3.359**.  **94.7% of the
+  `ms=1e-3` gap, and 93.5% of the whole rise across the decade, is already present at `3e-4`** --
+  and CORRECTIONS 148.4 measures the floor binding **100.0% (n=15)** at that rung.  There is no
+  clamp-free replicate at `3e-4` and `cfr1` supplies none.
+  The *derived* (NOT measured) argument for extension: the floor is first reachable at `3e-4` only
+  at meta-step **26,974**, capping floor exposure at **46.1%** of training against the **83.8%**
+  available at `1e-3` -- so the wall is at most **55%** as exposed at `3e-4` as at the rung where
+  removing it moved the gap by `+0.03 +/- 0.49 pp`.  That is an argument, not a replicate, and it
+  is recorded as one.
+* **Above `ms=1e-3` the INSTRUMENT does not transfer.**  Minimum reachable beta is `-156.91` at
+  `3e-3` and `-506.91` at `1e-2`, so `cfr1`'s own `-80` released floor **is itself reachable** at
+  every rung above `1e-3`.  The census binds **100.0%** at `1e-2` (n=12).  A wider box invites
+  float32 underflow.  Nothing above `1e-3` can be audited with this design.
+* **`blk6` and `nodewise` are unaudited by construction.**  `blk6` is censused at **68.8%** binding
+  at this cell -- between scalar's 0% and layerwise's 100% -- and is the registered dose-response
+  follow-up.  Two of row 24's four falloff numbers therefore still have no clamp-free replicate.
+
+**A2 -- WRONG CELL.  DOES NOT LAND.**  Re-derived from the CSV: FINDINGS 57.2's stratum, which is
+where row 24's numbers come from, is `ResNet18` / `CIFAR10` / `SGDm`+`Lion` / **`alpha0 = 1e-3`** /
+`AUGMENT=1` / `HIER` none / `BETA_CLIP=-15:-2.3026` / 100 ep -- byte-for-byte `cfr1`'s cell.  57.2
+states it applies *"no run-name prefix filter"*, and the `ms=1e-3` cell is **not** `rs-`-dominated:
+it is six families, **balanced arm-for-arm** (`a0L` 2, `a0h` 2, `ms` 3, `mx` 5, `rs` 2, `tl1` 3 per
+arm, with `cfr1` now a balanced seventh at 3).  The task's suspicion of an `alpha0` / architecture
+/ dataset mismatch is **factually wrong**; there is no cell mismatch to declare.
+
+**A3 -- WHICH ROW.  LANDS, AS A RE-LABEL.**  The 3.44 pp quantity is **ROW 23's** ("does a finer
+partition help at all", CONFIRMED: layerwise minus scalar at a shared `ms=1e-3`).  Row 24's
+quantity is the **pp-per-decade falloff**.  `cfr1` measures row 23's number under two boxes; it
+bears on row 24 only through the box-dependence of the **upper endpoint** of row 24's falloff
+window.  Two consequences, and the first is `cfr1`'s best result:
+
+* **ROW 23's HEADLINE NOW REPLICATES INSIDE A SINGLE SUBMISSION.**  `G_C = 3.4427 pp` within one
+  batch against `3.3585 pp` pooled cross-batch over six balanced families -- **0.084 pp apart, 0.48
+  `SE_GAP`**, with the cross-batch floor cancelled by design rather than argued away.  This is the
+  first within-batch replicate of row 23 in the corpus.
+* Row 24 is touched at one endpoint only, which is A1.
+
+**A4 -- STATISTICAL.  DOES NOT LAND.**  Every registered constant re-derived here, independently of
+the scorer: pooled within-(batch family x granularity x `ms`) SD of `plateau5` over the canonical-box
+`R18`/`CIFAR-10`/`SGDm`+`Lion`/`alpha0=1e-3`/`AUGMENT=1` stratum, granularity in
+`{scalar, layerwise}`, 100 ep, `collapsed = 0`, **excluding `cfr1`'s own rows** --
+**`sigma_w = 0.2160 pp`, df 76, 30 cells**, exactly the registered value; `SE_GAP = sigma*sqrt(2/3)
+= 0.1763`; `SE_DID = sigma*sqrt(4/3) = 0.2494`; bar `2*SE_DID = 0.4988`.
+
+| what the threat would have to be | implied `DID` | power of the registered rule |
+|---|---|---|
+| the wall carries the WHOLE `ms=1e-3` gap | -3.443 pp | **1.0000** |
+| the gap collapses to the tuned gap (the scorer's own registered stake, 2.7343 pp) | -2.819 pp | **1.0000** |
+| the wall carries 50% of the gap | -1.721 pp | 1.0000 |
+| the wall carries 25% | -0.861 pp | 0.9266 |
+| the wall carries 20% | -0.689 pp | 0.7766 |
+| the wall carries 15% | -0.516 pp | 0.5281 |
+
+**80% power against `|DID| >= 0.7087 pp = 20.6% of `G_C`.**  Observed `DID = +0.0320`, 95% CI
+**[-0.4569, +0.5209]** = **[-13.3%, +15.1%] of `G_C`**.  The wall's effect on the layerwise arm
+alone is `-(lay_R - lay_C) = **-0.0387 pp**`, 95% CI **[-0.3844, +0.3070]**.  The batch is
+underpowered only against a wall carrying **under ~15%** of the gap -- a magnitude nobody proposed
+and one that would not reorder row 24.  **This is NOT an underpowered null.**
+
+**A5 -- MANIPULATION.  HOLDS, and more strongly than the briefing states.**  See 153.3: exact
+`-15.0000` in 3/3 clamped layerwise runs with up to 27-30 of 62 coordinates simultaneously pinned
+and 83.2-83.4% of records carrying at least one pinned coordinate against a **theoretical maximum
+of 83.8%**; `n_at_lo = 0` at **every** record of **every** released run, 23.4 nats clear of `-80`.
+
+**A6 -- FOUND, NOT ASKED: ROW 24's FOUR PRINTED NUMBERS DO NOT RE-DERIVE, AND THEY SIT ON A BANNED
+METRIC COLUMN.**
+
+* **No script in `analysis/` computes** `5.871 / 1.060 / 1.801 / 2.593`; `grep` finds them only
+  inside scorers *quoting* the row.  The only recorded recipe is FINDINGS 58.8's nodewise
+  spot-check `(92.547 - 91.310)/log10(3) = 2.592`, i.e. peak-to-next-rung.
+* **The metric is `plateau`, not `plateau5`.**  57.2's peak row -- scalar 92.231 / `blk6` 92.581 /
+  layerwise 92.795 / nodewise 92.547 -- is exactly the set of values MASTER-TABLE's own tuned-peak
+  row records as *"the CSV's own k=20 `plateau` column"*, and `plateau` is **BANNED as primary** by
+  the campaign's metric rule.  The `plateau5` values at the same cells are **92.262 / 92.530 /
+  92.887 / 92.453**.
+* **Re-derived falloffs at this HEAD, neither recipe reproducing the printed four:**
+  peak-to-next-rung on `plateau` gives scalar **3.778** / `blk6` **1.119** / layerwise **1.942** /
+  nodewise **0.285**; peak-to-highest-rung on `plateau5` gives scalar **4.427** / `blk6` **0.761** /
+  layerwise **1.693** / nodewise **1.125**.  Nodewise has moved furthest because its peak has
+  migrated from `1e-3` (n=1 cells at cycle 57) to `3e-4` (n=11 now).  **UNSURE** which recipe
+  produced 5.871; it is not recoverable from anything on disk.
+* **What DOES re-derive is row 24's SENTENCE and 57.2's ratio statement.**  On `plateau5`, scalar's
+  drop below its own peak is **3.66x** layerwise's at `ms=3e-4` (3.518 vs 0.961) and **2.61x** at
+  `ms=1e-3` (4.427 vs 1.693), against 57.2's published **3.8x** and **2.6x**.
+* Consequence: `cfr1` audits the **`plateau5` form** of row 24's claim at one rung.  **Row 24's
+  printed numerals are stale and off-metric and may not be re-quoted until re-derived.**
+
+**A7 -- FOUND: THE REGISTRATION'S OWN CLAIM THAT THE SELFTEST "STAYS GREEN AFTER LANDING" IS
+FALSE.**  `--selftest` PASSED with **0 failures** pre-ingest.  Post-ingest it FAILS **exactly one**
+check -- `no cfr1- row exists in the corpus yet`, the RULE 21 pre-registration guard, which can
+only pass before landing.  `SIGMA_W`, `CORPUS_GAP`, `PREMISE_BAR`, `DID_BAR`, `NOISY_BAR` all still
+re-derive green (the registration exempted `SIGMA_W` from `cfr1`'s rows but not this guard).
+**RULE 16 forbids fixing it.**  Recorded so a future cycle does not read the red selftest as a
+defect in the result.  The score output is **byte-identical pre- and post-ingest** (the scorer
+reads `.out` files and probes, not the CSV).
+
+**A8 -- OPENED AS A BOOKKEEPING HAZARD, THEN CHECKED AND WITHDRAWN.  `row N` MEANS
+MASTER-TABLE **FILE LINE N**, AND EVERY CITATION IN THE `cfr1` REGISTRATION RESOLVES.**  The
+suspicion raised here was that `row 24` / `row 106` are stale labels, since MASTER-TABLE has only
+**74** data rows and `row 106` cannot be an ordinal.  **It is withdrawn:** the convention is
+`docs/MASTER-TABLE.md` **line number**.  Verified at this HEAD -- line 23 = *"does a finer partition
+help at all"*, line 24 = the falloff row, line 27 = H4 (base-optimizer), line 31 = the shared-`ms`
+confound row, line 100 = the `N_eff/m` base-optimizer row, and **line 106 = the `c40` truncation
+audit, REFUTED**, reading *"0 of 22 scalar and 0 of 22 layerwise runs truncated, but 6 of 13 blk6
+(46%) and 6 of 10 nodewise (60%)"* -- exactly what the registration attributes to it when it
+refuses a `blk6` arm.  **The `blk6` refusal is well-founded.**  What remains true is that the
+convention is **written down nowhere**, so any edit inserting or deleting a line above the tables
+silently re-numbers every `row N` citation in this file.  Recorded as a convention, not a defect.
+
+### 153.7 THE MECHANISM, DISCLOSED SO THE NULL IS NOT READ AS A RESCUE
+
+`exp(-15) = 3.059e-07`.  The same runs' largest coordinate sits at `exp(-3.75...-4.05) =
+1.75e-02 ... 2.34e-02`.  Releasing the floor moves the pinned coordinates from **4.8** orders of
+magnitude below the live ones to **22.8** orders below.  **Both boxes have them off.**  And both
+boxes reach **99.89%** train accuracy, so the frozen coordinates are surplus to fitting CIFAR-10 at
+this cell -- there is no headroom on the train side for the wall to express itself.
+
+The registration argued the floor is REACHABLE at `ms=1e-3`; it did **not** argue that reaching it
+is CONSEQUENTIAL.  `cfr1`'s measured content is therefore *"the difference between nearly-off and
+utterly-off is `+0.03 +/- 0.49 pp`"*.  That is a real answer to the floor half of CORRECTIONS 148's
+threat and it is close to derivable from the alpha arithmetic once stated.  It is written this way
+so the null is not banked as a surprising empirical rescue of a threatened claim.
+
+### 153.8 WHAT IS AND IS NOT DISCHARGED
+
+**DISCHARGED.**  At `ResNet18` / `CIFAR-10` / `SGDm`+`Lion` / `alpha0=1e-3` / 100 ep / `ms=1e-3`,
+with the ceiling held fixed: the `-15` `BETA_CLIP` floor contributes **-0.0387 pp** (95% CI
+`[-0.384, +0.307]`) to the layerwise arm and **+0.0320 pp** (95% CI `[-0.457, +0.521]`) to the
+scalar-vs-layerwise gap.  The scalar/layerwise falloff window's **upper** endpoint is box-free to
+within `+/-0.5 pp` by measurement and its **lower** endpoint (`1e-4`) is box-free by arithmetic.
+CORRECTIONS 148's reading -- *"the fine arm degrades more slowly"* and *"the fine arm's runaway
+groups hit a wall the scalar arm never reaches"* are the same observation -- is **REFUTED for this
+pair over this decade**.  The ceiling is not a wall at this cell (0 touches, 12/12).
+
+**NOT DISCHARGED.**  `ms=3e-4` (100% bound, 94.7% of the gap already present, no clamp-free
+replicate); every rung above `ms=1e-3` (the released floor is itself reachable there, so the
+instrument does not transfer); `blk6` (68.8% bound) and `nodewise`, i.e. two of row 24's four
+falloff numbers; row 24's printed numerals, which are off-metric and stale (A6); and anything at
+another `alpha0`, dataset, architecture, optimiser pair, granularity or box.
+
+**=> MASTER-TABLE row 24 moves THREATENED -> CONSTRAINED.  It is not CLEARED, and CORRECTIONS 148's
+statement that row 24 is the one finding scoping cannot save is NARROWED, not withdrawn.**
+
+### 153.9 WHAT WOULD FINISH THE JOB
+
+| batch | shape | why it closes something | cost |
+|---|---|---|---|
+| **`cfr2`** (the one that matters) | `{scalar, layerwise}` x `{-15:-2.3026, -80:-2.3026}` x seeds `{0,1,2}` at **`ms = 3e-4`**, every other flag byte-matched to `cfr1` | the only *binding* rung inside row 24's own decade that has no clamp-free replicate, and the rung where 93.5% of the granularity rise happens.  `-80` stays unreachable there (min reachable **-21.91**), so the one-factor instrument transfers unchanged | 12 jobs, ~11 GPU-h |
+| `cfr3` (dose-response) | `blk6` x `{-15, -80}` x 3 seeds at `ms=1e-3` | converts the census's 68.8% into the middle rung of a 0% / 68.8% / 100% dose-response, and audits the second of row 24's four numbers | 6 jobs, ~6 GPU-h |
+| re-derivation, no GPU | recompute row 24's four falloffs on `plateau5` with a committed script and a stated recipe | the printed numerals are stale, off-metric and non-reproducible (A6) | 0 |
+
+**Above `ms=1e-3` nothing can be audited with this box.  The honest move there is to SCOPE row 24
+to `ms <= 1e-3`, not to fund it.**
+
+### 153.10 INGEST
+
+`python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (to **STDOUT into the
+CSV**, not into a log -- CORRECTIONS 146.7), then `python3 analysis/args_repair.py --apply`.
+Keyed diff on `(run, job_id)` against the pre-ingest snapshot:
+
+| | count |
+|---|---|
+| **ADDED** | **12** -- all `cfr1`, all `epochs_done = 100` |
+| **CHANGED** | **0** |
+| **REMOVED** | **0** |
+
+**2,525 -> 2,537 rows.**  `args_repair` printed *"36 rows updated"* -- all of it `dup_group`
+bookkeeping it re-applies after every `aggregate`, and the keyed diff against the pre-ingest CSV
+confirms **0 changed**, so nothing moved.  `cts3` (6 RUNNING on `alice2`) and `in489g2` (14 jobs on
+`alice`, **NOT OURS**) were not pulled and contribute **0 rows**.  The four ingested cell means
+reproduce the scorer exactly: scalar C 87.8707 / layerwise C 91.3133 / scalar R 87.8773 /
+layerwise R 91.3520.
+
+`analysis/c98_reproduce.py` **exits 1** -- reported as-is, inherited, author scope, deliberately not
+fixed.
