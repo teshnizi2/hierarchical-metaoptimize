@@ -1,9 +1,9 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 132**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **156**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 133**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **157**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,555 rows (+6 this cycle: `cts3` ONLY)**. `alice2`'s queue is **EMPTY**; `in489g2` still runs on `alice` and is **not ours**.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,555 rows (UNCHANGED this cycle — `cpk2` LAUNCHED, nothing landed, nothing scored, nothing ingested)**. `alice2` now holds **18 `cpk2` jobs**; `in489g2` still runs on `alice` and is **not ours**.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 **This cycle LANDED, SCORED and INGESTED `cts3` — the 772-epoch horizon test.** CORRECTIONS **156**. **TWO verdicts, and neither is quotable without the other:** the `k=49 → k=50` cliff **SURVIVED** the horizon (`DE` **19.3427 pp = 26.00 SE**, 1.56× the survive bar) and **SHRINKS** on it (`dD` **−5.6747 pp = −5.39 SE**, bar ±2.1040). **`SHRINKS` was the REGISTERED PREDICTION** (−7.3320 pp; measured landed **+1.58 SE** inside the same branch) — **not a surprise and not a null.** **THE CONSEQUENCE IS A RESCOPING, NOT A RE-LITIGATION:** CORRECTIONS 147's cliff numerals (**24.834 / 25.163 / 24.767 pp**) are **budget-dependent** and now require **“at 100 epochs”** in the same sentence, and `cpk1`'s capture curve, its single-peakedness and its argmax **`k*=49`** are **100-epoch objects** that `cts1`/`cts2`/`scl1` all inherit. **No MASTER-TABLE verdict moves.**
 
@@ -311,16 +311,18 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 
 | account | batch | jobs | run | pend | done | state | scorer |
 |---|---|---|---|---|---|---|---|
+| `alice2` | **`cpk2`** | **18** | **5** | **13** | 0 | **REGISTERED AND LAUNCHED this cycle** (CORRECTIONS 157). Cut-position ladder `k∈{45,47,49,50,52}` + `scalar` floor anchor × seeds **{3,4,5}** at **772 ep**, ONE submission, ids **4914387–4914404**. 100-ep control **in run** (ep 95–99). **RULE 21 margin 94 s**; RULE 20 batch-consistency **PASS (5/18 started)**; ENV audit **1 distinct `ENV:` line**. ~93 GPU-h. **Do NOT score or ingest.** | `cR1_cpk2_score.py` (`d5c6eb6`) |
 | `alice2` | **`cts3`** | 6 | 0 | 0 | **6** | **LANDED, SCORED, INGESTED this cycle** (CORRECTIONS 156). 6/6 `COMPLETED`, 6/6 `RUN_DONE`, 0 tracebacks, **772/772 epochs** | `cO1_cts3_score.py` (`327e3f0`), run **UNEDITED** |
 | `alice2` | **`cfr2`** | 12 | 0 | 0 | **12** | landed, scored, ingested last cycle (CORRECTIONS 155) | `cO2_cfr2_score.py` (`dfd9339`) |
 | `alice2` | `cfr1` | 12 | 0 | 0 | **12** | landed, scored, ingested last cycle (CORRECTIONS 153) | `cO1_cfr1_score.py` (`dbf90db`), run UNEDITED |
 | `alice` | `in489g2` | 14 | — | — | — | **RUNNING — NOT OURS, never touch.** `squeue` read-only. Never `scancel`, never submit, nothing written to `/data1/salehkaleybars` | `cI2_in489g2_score.py` (`571707b`) |
 | `alice2` | `scl1` | 12 | 0 | 0 | **12** | landed and ingested last cycle (CORRECTIONS 152) | `cP1_scl1_score.py` (`aac1bf0`) |
 
-- **`alice2`'s queue is EMPTY.** `squeue -u s5014158` returns the header and nothing else. **Nothing of ours is in flight anywhere.**
-- **This cycle ingested `cts3` ONLY: +6 rows, 0 changed, 0 removed, 2,549 → 2,555.** The six `.out` files were pulled to `../runs_alice2` first; the TB traces were mirrored to `../runs_alice2/cts3/Tensorboard_outputs` (inert to `aggregate.py`, which globs `**/*.out` only).
+- **`alice2` holds 18 `cpk2` jobs** (5 RUNNING, 13 PENDING). Slurm's own `--start` puts the last (4914404) at **2026-09-09T16:15**; those estimates ignore backfill, so the honest range to completion is **~1.5–3.2 days**. `cts3` cleared its queue in 44 min, but that is **not** claimed here.
+- **NOTHING WAS INGESTED THIS CYCLE.** Corpus stays **2,555 rows**. `cpk2` has not landed; **do not score it and do not ingest it.**
+- Re-run when all 18 have started: `export METAOPT_WS=/home/s5014158/metaopt; python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cpk2- --batch-consistency --strict`
 - `in489g2` on `alice` is **NOT OURS**. **Read with `squeue` only. Never cancel, requeue, modify or submit.** Nothing was written to `/data1/salehkaleybars`.
-- **This session submitted nothing, cancelled nothing and requeued nothing on either account.** The only remote write was a staging copy to `/home/s5014158/metaopt/hmo-cts3/` (scorer + corpus snapshot) so the scorer could read TB traces with the cluster's `tensorboard` 2.21.0 — the Mac has none.
+- **This session cancelled nothing and requeued nothing on either account, and submitted only the 18 `cpk2` jobs on `alice2`.** Remote writes: the staging checkout `/home/s5014158/metaopt/hmo-cpk2/` (at `d5c6eb6`, tree clean, scorer sha256 identical to the Mac's) and `runs/cpk2/PARTITION-MANIFEST.txt`.
 
 ## INGEST — `cts3`, **+6 rows** (CORRECTIONS 156.7)
 

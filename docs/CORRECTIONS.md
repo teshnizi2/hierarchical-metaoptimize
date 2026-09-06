@@ -14125,3 +14125,296 @@ CORRECTIONS 152 flagged), with the 100-epoch control **in batch** as `cts3` did,
 in advance **whether it predicts `k*` to move**. At ~5.2 GPU-h per run that is ~78 GPU-h for 15
 runs -- the most expensive single batch the thread has proposed, and the only one that can convert
 "`k*=49` at 100 epochs" into a budget-independent statement or kill it.
+
+---
+
+## 157. `cpk2` REGISTERED AND LAUNCHED -- THE CUT-POSITION **LADDER** AT `cts3`'s 772-EPOCH HORIZON ON **FRESH SEEDS {3,4,5}**, WITH A POINT PREDICTION THAT THE ARGMAX **DOES NOT MOVE**. **NOTHING LANDED, NOTHING SCORED, NOTHING INGESTED.**
+
+**READ THIS FIRST: no result is reported here.** 18 jobs were submitted to `alice2` at
+20:24:48 on 2026-09-06 and 5 of them were running when this entry was written. Every number
+below is either a **pre-registration** or a **measurement on data that already existed**. The
+corpus is unchanged at **2,555 rows**.
+
+### 157.1 THE GAP, AND WHY A TWO-POINT CONTRAST COULD NOT CLOSE IT
+
+CORRECTIONS 156.10 left exactly one thing open. `cpk1`'s argmax `k* = 49` is a **100-epoch
+object**; `cts3` showed the arms either side of it converge at very different rates
+(`d(k49)` **+1.0133 pp** against `d(k50)` **+6.6880 pp**) but ran **two** cut positions. An
+argmax cannot be relocated from two points. `cpk2` draws the ladder.
+
+### 157.2 THE DESIGN, AND THE **TWO SUBSTITUTIONS** AGAINST THE GRID 156 PROPOSED
+
+156's close proposed `k in {45,47,49,51,53}` x seeds {3,4,5} at 772 epochs. **The horizon, the
+seeds, the in-run 100-epoch control and the one-submission rule are adopted unchanged. Two of
+the five cut positions are replaced, and each replacement is forced by data that was already in
+the corpus** -- the registered scorer's `--selftest` prints the table that forces them:
+
+| | proposed | **run** | why, measured |
+|---|---|---|---|
+| right-outer | `k = 53` | **`k = 52`** | `scl1` measured `[53,9]` at **22.0753 pp**; the pooled same-cell m=1 scalar baseline is **22.749176 pp**. **k = 53 sits 0.6739 pp BELOW the floor** and the registered R-FLOOR gate would score it NOT-INFORMATIVE *before it produced a number*. `k = 54` (22.2133) and `k = 55` (23.3113, +0.5622 pp, inside the 1.1488 pp bar) fail the same gate. **k = 52 is the last non-saturated cut on the right flank** -- **+15.4175 pp** clear of the floor -- **and has the largest 100-epoch terminal slope of any arm near the peak** (**+0.06072**, pooled `cpk1` +0.05858 / `cts1` +0.06600 / `scl1` +0.05757). On `cts3`'s own mechanism it is the single arm most able to move the argmax right. |
+| right-inner | `k = 51` | **`k = 50`** | `cts1` ran BOTH. `[51,11]` **30.5680 pp**, slope **+0.04670**; `[50,12]` **30.3347 pp**, slope **+0.04620**. They differ by **0.2333 pp = 0.31 `SE_ARM_DIFF`** and by **0.0005 pp/epoch**. `k = 50` at 772 epochs is *already measured* (`cts3`), so `k = 51` would buy a copy of it. `k = 50` on **fresh** seeds instead buys a **fresh-seed replication of `cts3`'s headline arm** and gives this batch its cliff premise (gate R1) **in batch**. |
+
+**A SIXTH ARM IS ADDED THAT 156 DID NOT PROPOSE: the `scalar` m = 1 FLOOR ANCHOR.** 156's own
+item 4 requires a floor gate, and **every m=1 scalar row in this cell anywhere in the corpus is
+100 epochs**. Applying a 100-epoch floor to a 772-epoch arm would *assume* the floor does not
+move with budget -- exactly the unmeasured carry-over that cost this thread **5.67 pp** at
+CORRECTIONS 156. `cpk1`'s scalar arm is converged at 100 (slope **-0.00053 +- 0.00464**), so
+the prediction is that it barely moves: a cheap, refutable check rather than an open-ended
+addition. **COST OF THE ANCHOR: 3 runs, ~15.6 GPU-h.** It raises the batch from 15 jobs / ~78
+GPU-h to **18 jobs / ~93 GPU-h**, and that increase is stated rather than absorbed.
+**NO CAPTURE.** There is no `layerwise` anchor here, so CAPTURE is not computable, the scorer
+computes none, and none may be computed from `cpk2` afterwards. The anchor is a **floor
+reference**, and `guard 4g` proves on the live source that `scalar` is routed by exact string
+match in `init_meta` and therefore takes a **different code path** from every sweep arm -- a
+**disclosed confound**, carried forward from `cpk1`.
+
+**FINAL DESIGN.** `k in {45, 47, 49, 50, 52}` (m = 2) **+ `scalar`** x seeds **{3,4,5}** at
+**772** epochs, ONE submission, **18 jobs**. Clamp at the campaign standard `-15:-2.3026`,
+`AUGMENT=1`, `PROBE=0`, `HIER` unset, everything else byte-identical to `cpk1`/`cts1`/`cts3`.
+The 100-epoch control is epochs **95-99 of the same runs**; no separate 100-epoch jobs.
+
+### 157.3 THE LIVE-MODEL PARTITION MANIFEST -- MEASURED AT SUBMISSION, NOT ASSUMED
+
+`guard 4` built `ResNet18_c100` and read `named_parameters()`: **62 parameter tensors,
+11,220,132 parameters**. **`k` is 1-BASED and is the SIZE of the first group**, so group 1 is
+tensors `1..k`.
+
+| arm | spec | sizes | params (first / second) | first-group share | group 1 ends at | group 2 starts at |
+|---|---|---|---|---|---|---|
+| `k45` | `[45,17]` | 45 / 17 | 2,775,104 / 8,445,028 | **0.247333** | 45 `layer3.1.bn2.bias` | 46 `layer4.0.conv1.weight` |
+| `k47` | `[47,15]` | 47 / 15 | 3,955,264 / 7,264,868 | **0.352515** | 47 `layer4.0.bn1.weight` | 48 `layer4.0.bn1.bias` |
+| `k49` | `[49,13]` | 49 / 13 | 6,315,072 / 4,905,060 | **0.562834** | 49 `layer4.0.conv2.weight` | 50 `layer4.0.bn2.weight` |
+| `k50` | `[50,12]` | 50 / 12 | 6,315,584 / 4,904,548 | **0.562880** | 50 `layer4.0.bn2.weight` | 51 `layer4.0.bn2.bias` |
+| `k52` | `[52,10]` | 52 / 10 | 6,447,168 / 4,772,964 | **0.574607** | 52 `layer4.0.shortcut.0.weight` | 53 `layer4.0.shortcut.1.weight` |
+| `k01` | `scalar` | m = 1 | -- | -- | (named path, not blockwise) | -- |
+
+Every arm composed to **m = 2** and split `named_parameters()` **BY NAME** at exactly `k`.
+What moves between consecutive grid points, on the live model:
+
+| step | tensors moved | names | params |
+|---|---|---|---|
+| 45 -> 47 | 2 | `layer4.0.conv1.weight` `layer4.0.bn1.weight` | 1,180,160 |
+| 47 -> 49 | 2 | `layer4.0.bn1.bias` `layer4.0.conv2.weight` | 2,359,808 |
+| **49 -> 50** | **1** | **`layer4.0.bn2.weight`** | **512** |
+| 50 -> 52 | 2 | `layer4.0.bn2.bias` `layer4.0.shortcut.0.weight` | 131,584 |
+
+**Recorded because it is the batch's own re-proof of `cts1`/`scl1`'s site, on the live model:
+the `k49 -> k50` step is ONE tensor of 512 parameters, and the first-group parameter share moves
+by 0.000046.** The cliff is not a mass effect. This is a **manifest fact, not a `cpk2` result.**
+
+`guard 4f` re-proved the in-run control precondition on the LIVE `train.py`: `num_epochs`
+occurs in **exactly two** places, the argparse declaration (line 42) and the loop bound
+`for epoch in range(args.num_epochs)` (line 135). No schedule, no total-step count, no warmup.
+`guard 4e` re-proved the clamp arithmetic: 772 x 500 = **386,000** meta-steps, worst-case
+reachable `beta` **-399.815511**, float32 `alpha` underflow at **-103.278930**, so **no
+clamp-free arm exists at this horizon** and the standard floor is kept.
+
+### 157.4 THE NOISE FLOOR AND THE SCALAR FLOOR -- **RE-DERIVED, NOT COPIED**
+
+CORRECTIONS 156.9's defect is not repeated. `SIGMA_W` was **re-derived from the live corpus at
+registration time**, not carried over from `cts3`'s frozen `0.9111`:
+
+| quantity | value | provenance |
+|---|---|---|
+| `SIGMA_W` | **0.917280** | pooled within-(batch x granularity) SD of `plateau5`, m = 2 arms, `ResNet18_c100`/CIFAR-100/SGDm+Lion/ms 1e-3/alpha0 1e-6/AUG 1/clip `-15:-2.3026`/batch 100, **100 epochs**, `collapsed=0` |
+| **df** | **58** | |
+| **cells** | **29** | `cbl1` 5, `cpk1` 11, `cts1` 4, `cts2` 2, `hb1` 3, `scl1` 4 |
+| **members** | **87** | |
+| scalar floor | **22.749176** | pooled mean `plateau5` of every m=1 `scalar` row in the same cell at 100 epochs, **17 runs across 6 batches** (`c100` 22.2740, `cts1` 22.6660, `cpk1` 22.7207, `cbl1` 22.7247, `hb1` 22.8407, `c100b` 23.1107; between-batch SD of those means **0.271657**) |
+
+Derived bars, each **frozen in the scorer** and re-derived by its `--selftest`:
+
+| bar | pp | in SE |
+|---|---|---|
+| `SE_ARM_DIFF` = `SIGMA_W * sqrt(2/3)` | **0.748956** | -- |
+| `SE_dD` = `SIGMA_W * sqrt(4/3)` | **1.059184** | -- |
+| `SE_FLOOR` = `SIGMA_W * sqrt(1/3 + 1/17)` | **0.574423** | -- |
+| `ARGMAX_BAR` = 2 `SE_ARM_DIFF` | **1.497910** | 2.00 |
+| `FLOOR_BAR` = 2 `SE_FLOOR` | **1.148848** | 2.00 |
+| `PREMISE_BAR` (half `cts1`'s own cliff) | **12.4170** | 16.58 |
+| `NOISY_BAR` = 3 `SIGMA_W` | **2.751840** | 3.00 |
+| `CONV_BAR` = half `cts2`'s measured k50 slope at 100 | **0.024235** pp/epoch | -- |
+| `TIGHT_BAR` = `s*`, the slope that DEFINED E = 772 | **0.00426** pp/epoch | -- |
+
+**Every bar derives from the FROZEN literal, never from the live corpus.** A later ingest can
+move the live value and the `--selftest` will then FAIL that check -- and, exactly as `cts3`
+established, **no verdict can move with it**.
+
+### 157.5 THE RULE 21 PREMISE IS NOW **CORPUS-CONDITIONAL**, AND THAT IS THE POINT
+
+CORRECTIONS 156.9 recorded that `cfr1`'s and `cts3`'s RULE 21 premise checks become
+**known-false assertions the moment their own rows land**. A scorer that must FAIL after a
+successful ingest teaches the next reader to ignore its own FAILs. `cR1_cpk2_score.py`
+therefore admits **exactly two** states and fails on everything else:
+
+* **`cpk2` rows in the corpus are 0 (PRE-REGISTRATION) or exactly 18 (POST-INGEST)** -- which
+  catches the state that actually matters: a partial ingest, a duplicate, or a name collision
+  before launch. **The ordering claim RULE 21 really makes is not checkable from inside a python
+  file at all**; it is proved by wall clock in 157.7 and lives there, not in the scorer.
+* **the above-100 horizon census on `ResNet18_c100` is `{}` or `{772}`.** `cts3`'s literal
+  check (`no run exceeds 100 epochs`) is already false and is **not copied**; `cpk2` runs at
+  exactly `cts3`'s E, so this stays true after `cpk2` lands too.
+
+The corpus-derived **constants** stay hard equalities against frozen literals. At registration
+the `--selftest` is **all PASS**.
+
+### 157.6 THE PRE-REGISTERED POINT PREDICTION -- **`k*` DOES NOT MOVE**
+
+**THE MODEL, WITH ITS WEAKNESS FIRST.** `cts3` gives exactly two (slope@100, gain 100->772)
+pairs -- k49 (+0.00239, +1.0134) and k50 (+0.03966, +6.6880). A line through two points has
+**ZERO residual degrees of freedom**; it is **not a tested model** and is not claimed to be one.
+It is the arithmetic that turns each arm's own measured slope into a refutable number:
+
+    gain(k) = 0.649507 + 152.256507 * slope100(k)
+
+**INPUTS, each measured** -- `slope100` is the OLS slope of test accuracy on epoch index over
+epochs 80-99 of the named batches' own `.out` files; `level100` is the mean of per-**batch**
+mean `plateau5` (batch is the unit of replication, F(62,85) = 5.47), plus `cts3`'s in-run
+100-epoch readout for k49/k50 which carries `epochs_done=772` and is invisible to a corpus query:
+
+| arm | slope@100 | from | level@100 | from | **pred gain** | **pred @ E = 772** |
+|---|---|---|---|---|---|---|
+| `k01` | **-0.00053** | cpk1 | 22.7228 | c100,c100b,cbl1,cpk1,cts1,hb1 | +0.5688 | **23.292** |
+| `k45` | **-0.00042** | cpk1 | 42.3457 | cbl1,cpk1 | +0.5856 | **42.931** |
+| `k47` | **+0.00496** | cpk1 | 45.6880 | cpk1 | +1.4047 | **47.093** |
+| `k49` | **-0.00043** | cpk1 +0.00005, cts1 -0.00374, cts3 +0.00239 | 55.3383 | cpk1,cts1,cts2,cts3 | +0.5840 | **55.922** |
+| `k50` | **+0.04293** | cts1 +0.04620, cts3 +0.03966 | 30.2973 | cts1,cts2,cts3 | +7.1859 | **37.483** |
+| `k52` | **+0.06072** | cpk1 +0.05858, cts1 +0.06600, scl1 +0.05757 | 38.1667 | cpk1,cts1,scl1 | +9.8945 | **48.061** |
+
+**=> REGISTERED BRANCH: `k*-UNMOVED`, argmax `k = 49`, predicted margin over the runner-up
+(`k = 52`) 7.8612 pp = 10.50 `SE_ARM_DIFF`.**
+
+**WHAT WOULD REFUTE IT, as a number rather than a mood:**
+
+| arm | must gain, to take the argmax | = x its predicted gain |
+|---|---|---|
+| `k52` | **17.756 pp** | **1.79x** |
+| `k50` | 25.625 pp | 3.57x |
+| `k47` | **10.234 pp** | **7.29x** |
+| `k45` | 13.577 pp | 23.19x |
+
+**TWO SANITY CHECKS THAT ARE NOT FREE** (the line was fitted on `cts3`'s **gains**, while the
+levels come from four- and three-batch pooled means): the model returns `k49` at **55.922**
+against `cts3`'s measured **56.2487** (**-0.326 pp**) and `k50` at **37.483** against measured
+**36.9060** (**+0.577 pp**).
+
+**THE DIRECTIONAL REASONING, so the forecast is not a bare number.** `cts3`'s mechanism is that
+arms not converged at 100 gain most. **The LEFT flank is converged and has nothing to gain**:
+`k45` **-0.00042** and `k49` **-0.00043** are inside `TIGHT_BAR` (0.00426), and `k47`
+**+0.00496** is marginally **OUTSIDE** it -- **by 0.00070 pp/epoch, 1.16x that bar and 0.20x
+`CONV_BAR`**. That 0.0007 is recorded rather than rounded away: `k47` is the only left-flank arm
+with any room at all, and the model gives it the largest left-flank gain because of it. **The
+RIGHT flank is not converged on any bar** (`k50` +0.04293 = 1.8x `CONV_BAR`, `k52` +0.06072 =
+2.5x). So:
+
+* **`k*` CANNOT MOVE LEFT on this mechanism. A `MOVES-LEFT` verdict would REFUTE it**, not
+  confirm it.
+* **`k*` can only move RIGHT**, and only if the right flank closes a 17.8 pp gap; on the
+  calibrated arithmetic it falls short by a factor of **1.8**.
+* The peak stays at 49 and the curve becomes **MORE** asymmetric, not less.
+
+**THE FIVE REGISTERED BRANCHES**, frozen in the scorer:
+
+| branch | fires when |
+|---|---|
+| **`k*-UNMOVED`** | best informative sweep arm at E is `k = 49`, by more than `ARGMAX_BAR` 1.4979 pp |
+| **`k*-MOVES-LEFT`** | best is `k < 49` by more than the bar |
+| **`k*-MOVES-RIGHT`** | best is `k > 49` by more than the bar |
+| **`PEAK-DISSOLVES`** | best - second <= the bar. **No argmax may be named at this horizon.** |
+| **`UNRESOLVED-NOT-CONVERGED`** | **any** arm's terminal 20-epoch slope at E exceeds `CONV_BAR` 0.024235. The 772-epoch argmax is still printed but **may NOT be called the converged argmax and MUST NOT be reported as final.** |
+
+### 157.7 THE GATES, THE FLOOR GATE, AND THE ORDER THEY FIRE IN
+
+`G0 PROVENANCE` -> `R2 DIVERGENCE` -> `R3 NOISE` -> `R1 PREMISE (the CLIFF)` ->
+`R-CTRL PREMISE (the PEAK)` -> `R-FLOOR` -> `R-CONV` -> the argmax verdict.
+
+* **`R1`** -- `D100 = M(k49,95-99) - M(k50,95-99)` must be **>= 12.4170 pp**. `cts1`/`cts2`/`cts3`
+  arms may **NOT** be spliced in to rescue it.
+* **`R-CTRL`** -- **this is the gate that makes any movement attributable to the BUDGET rather
+  than to the SEEDS.** At the 100-epoch readout of these same runs the argmax over the five
+  sweep arms **must be `k = 49`**, by more than `ARGMAX_BAR`. If it is not, `cpk1`'s peak has
+  not reproduced on fresh seeds and **no relocation may be attributed to the horizon** ->
+  `UNRESOLVED-CONTROL`.
+* **`R-FLOOR`** (156's item 4, and CORRECTIONS 152's `scl1` failure) -- an arm is
+  **NOT-INFORMATIVE** if it sits within **1.1488 pp** of the pooled same-cell m = 1 scalar
+  baseline, and is then **excluded from the argmax set**. **At E the baseline is THIS BATCH's
+  OWN `k01` arm at E**; at 100 it is this batch's own `k01` at 100. If `k49` itself fails ->
+  `UNRESOLVED-SATURATED`.
+* **`R-CONV`** -- two bars printed for every arm. `cts3`'s own arms landed at **+0.00287**
+  (k49) and **-0.00199** (k50), so both cleared even the tight bar.
+
+### 157.8 RULE 21, RULE 16 AND RULE 20 -- THE AUDIT, AT LAUNCH
+
+* **RULE 21, PROVED BY WALL CLOCK.** Registration commit **`d5c6eb6`** at
+  **2026-09-06T20:23:14+02:00**. Earliest Slurm `Submit` (from `sacct`, not from a log)
+  **2026-09-06T20:24:48**. **MARGIN 94 SECONDS.** The 18 `Submit` stamps span exactly two
+  consecutive seconds (**3** jobs at 20:24:48, **15** at 20:24:49) and the job ids are
+  contiguous **4914387-4914404** with no foreign id interleaved -- **one submission**.
+* **RULE 16.** `analysis/cR1_cpk2_score.py` sha256
+  **`06b7de18eeaeea29b7df56f839fbc85ba43d6037294bde20a4352eee5d5191f2`**, identical on the Mac
+  and in the `alice2` staging checkout `hmo-cpk2/` (checked out at `d5c6eb6`, `git status
+  --porcelain` empty). `bin/cR1_cut_position_horizon.sh` sha256
+  **`962df626...ca4e8042`**. **`git diff` over `analysis/` is EMPTY** -- this cycle **adds** one
+  file to `analysis/` and **modifies none**.
+* **RULE 20, PRE-SUBMISSION.** Dry run printed all **18** composed command lines;
+  `guard_presubmit` **18 composed, 0 failed**; an independent `shlex` re-scan of the 18 lines
+  found **0 repeated flags**.
+* **RULE 20, POST-LAUNCH.** `argsline_guard.py --batch-consistency --strict` over the runs that
+  had started: **5 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line,
+  VERDICT PASS**, and *"every non-axis flag is identical across 5 runs"*. **COVERAGE IS 5 OF 18
+  AND THAT IS STATED RATHER THAN GLOSSED** -- 13 jobs were still `PENDING`. **Re-run when all
+  18 have started:**
+  `export METAOPT_WS=/home/s5014158/metaopt; python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cpk2- --batch-consistency --strict`
+* **ENV AUDIT, SEPARATE FROM THE ARGS LINE** (`BETA_CLIP`, `AUGMENT` and `PROBE` are environment
+  variables and cannot ride the ARGS line). Across the started runs there is **exactly ONE
+  distinct `ENV:` line**: `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none ... SCHED=none ... PROBE=0
+  PROBE_DIR=none ...`, and every run's own `NODE=... | JOB=... | AUGMENT=1` header agrees.
+* `cpk2-` was added to `bin/PROTECTED.txt` **in the registration commit**, before submission.
+
+### 157.9 WALLTIME, PARTITIONS AND COST -- MEASURED ON `cts3`, NOT PROJECTED
+
+`cts3` ran this exact cell at this exact horizon on this account. Its six `sacct` `Elapsed`
+values: **04:34:59 04:33:01 05:24:20 05:29:51 05:32:02 05:33:11** -- total **31.12 GPU-h**, mean
+**5.187**, **max 05:33:11**. So:
+
+* `PARTS = gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, all **7-day** partitions.
+  `gpu-short`'s 4 h ceiling excludes it **by arithmetic**; `gpu-2080ti-11g` is excluded because
+  its measured 68-71 s/epoch would put 772 epochs at ~15 h.
+* `WALL = 11:00:00` -- **1.98x the worst `cts3` run**, and **`cts3`'s own request kept
+  unchanged** so this batch cannot be scheduled worse than the one it extends.
+* **QUEUE DEPTH, READ BEFORE COMMITTING** (`guard 5b`, at submission): `gpu-l4-24g` 20 running
+  (**20 multi-day**) / 9 pending; `gpu-mig-40g` 26 running (**19 multi-day**) / 4 pending;
+  `gpu-a100-80g` 9 running (**8 multi-day**) / 2 pending. **47 of the 55 running jobs on these
+  three partitions hold multi-day walltimes**, so an 11 h request is not priority-starved and
+  backfills. This is the `hz3` failure mode (unschedulable at 10 h) and it was **measured**.
+* **COST: 18 jobs x 4.55-5.55 h = 82-100 GPU-hours, expected ~93** at `cts3`'s mean.
+* **ETA.** 5 jobs started within 7 s of submission. Slurm's own `--start` estimates put the last
+  job (`cpk2-k52-s5`, 4914404) at **2026-09-09T16:15**, i.e. **~3.0 days** to the last start and
+  ~3.2 days to completion. **Those estimates ignore backfill from earlier completions and are
+  conservative** -- `cts3` cleared its whole queue in 44 minutes -- so the honest range is
+  **~1.5 to 3.2 days**. It is **not** claimed to be faster than Slurm says.
+
+### 157.10 WHAT IS AND IS NOT CLAIMED BY THIS ENTRY
+
+**CLAIMED.** That a scorer was registered and committed **94 s** before the first job was
+submitted; that its `--selftest` passes on the corpus at that commit; that `SIGMA_W`
+(**0.917280**, df **58**, **29** cells, **87** members) and the scalar floor (**22.749176**, 17
+runs, 6 batches) were **re-derived** rather than copied; that the live model composes all five
+specs at **62 tensors / 11,220,132 parameters** and that the `49 -> 50` step moves **one 512-parameter
+tensor**; that the grid substitutions are forced by corpus measurements printed by the scorer;
+that a point prediction (**`k*-UNMOVED`, margin 7.8612 pp = 10.50 SE**) and five branches were
+written down **before any run existed**; and that 18 jobs were accepted in one submission with
+RULE 20 and the ENV audit clean over the 5 runs that had started.
+
+**NOT CLAIMED.** **Any result.** Nothing has landed, nothing is scored, nothing is ingested, and
+the corpus is unchanged at **2,555 rows**. **That the prediction is right** -- it is a
+two-point-calibrated forecast with zero residual df and the batch exists to refute it. **That
+the batch will schedule inside any particular window.** **That `cpk2` can restore
+single-peakedness over `cpk1`'s grid** -- `cpk1`'s `k = 17/24/31/38/42/55/60` are NOT re-run and
+their 772-epoch behaviour stays unmeasured; and note the `cpk2` grid **contains `k = 50`**, which
+`cpk1`'s did not, so the 100-epoch curve across `49 -> 50 -> 52` is already non-monotone in
+`cts1`'s own data -- **that shape fact predates `cpk2` and is not a `cpk2` finding**. **That the
+`k01` 100-epoch readout is independent**: `c100b-1e6-scal-s3` (22.504) and `c100b-1e6-scal-s4`
+(23.426) are exact-configuration 100-epoch runs of this arm at two of its three seeds, so that
+readout is a **re-execution** at s3 and s4 -- a DESCRIPTIVE cross-check, never a gate and never
+independence. **=> No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
