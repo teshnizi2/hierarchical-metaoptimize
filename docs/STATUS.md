@@ -1,123 +1,151 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 127**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **151**) > `docs/FINDINGS.md` > everything else.
+Updated 6 Sep 2026 (**cycle 128**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **152**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,513 rows — UNCHANGED. Nothing was ingested this cycle**; 0 rows under `scl1`/`cts3`/`cfr1`.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,525 rows** — `scl1` INGESTED: **+12 added, 0 changed, 0 removed** (2,513 → 2,525). `cfr1` and `cts3` **NOT ingested** (0 rows each).
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**This cycle SUBMITTED and AUDITED only.** Three batches, 30 jobs, 52.41 GPU-h committed. **Nothing landed, nothing scored.** CORRECTIONS 151.
+**This cycle LANDED, SCORED and INGESTED `scl1` only.** CORRECTIONS **152**. The arithmetic survived five adversarial lenses; the scorer's registered verdict **prose** did not, and **CORRECTIONS 147.6's withdrawal STANDS**.
+
+## `scl1` — LANDED, SCORED, INGESTED (CORRECTIONS 152)
+
+12/12 COMPLETED, scorer `analysis/cP1_scl1_score.py` run **UNEDITED** (sha256 `c2024f4b…880883e` = `git show aac1bf0:` blob; `git diff -- analysis/` empty). Every figure re-derived from the raw `.out` files with an independent parser, exact to 4 dp, additivity exact.
+
+| cut | spec | n | **plateau5** | sd | train5 |
+|---|---|---|---|---|---|
+| k52 | `[52,10]` | 3 | **37.8833** | 1.0716 | 41.9247 |
+| k53 | `[53,9]` | 3 | **22.0753** | 0.8840 | 22.2713 |
+| k54 | `[54,8]` | 3 | **22.2133** | 0.7409 | 22.3507 |
+| k55 | `[55,7]` | 3 | **23.3347** | 1.0822 | 23.4853 |
+
+| step | k→k+1 | tensor that moves | params | **dTEST pp** | SE | **dTRAIN pp** |
+|---|---|---|---|---|---|---|
+| DROP1 | 52→53 | `layer4.0.shortcut.1.weight` (BN **scale**) | 512 | **15.8080** | **21.25** | **19.6533** |
+| DROP2 | 53→54 | `layer4.0.shortcut.1.bias` (same BN's **shift**) | 512 | **−0.1380** | −0.19 | −0.0793 |
+| DROP3 | 54→55 | `layer4.1.conv1.weight` (**conv**) | 2,359,296 | **−1.1213** | −1.51 | −1.1347 |
+| TOTAL | 52→55 | all three | 2,360,320 | **14.5487** | 19.56 | 18.4393 |
+
+- `FINAL: CLIFF CLIFF-REPRODUCES | SPLIT SINGLE-TENSOR-MAJORITY | TENSOR layer4.0.shortcut.1.weight | MECHANISM SHARED-MECHANISM`. R1/R2/R3 none fire. Q1/Q3/Q4/Q5/Q6/Q7 HELD, **Q2 REFUTED**. DROP1 leads **3/3** seeds (16.574 / 15.472 / 15.378).
+- Bars re-derived pre-ingest by calling the scorer's own functions: `SIGMA_W` **0.9110578** (df 50, 25 cells, **no `scl1` row** — not circular), `SE_ARM_DIFF` 0.743910, `SE_ADJ` 1.288490, `CLIFF_BAR` 7.4850, `EVEN_BAND`/`SEPARATION`/`ASYM` 2.3476.
+- `cpk1`'s own second cliff, DESCRIPTIVE, different batch: **14.9700 pp**.
+
+**Five lenses, 5 of 5 refuted or narrowed the interpretation. Not one dented a number.**
+
+| lens | found |
+|---|---|
+| arithmetic / narrowing | 147.6 withdrew a claim about predicting **capture LEVEL across cut positions**; `scl1` measured a **within-step attribution** at a step selected for being costly. Different propositions |
+| independence | **6 of 12 runs are exact-configuration re-executions** (`[52,10]` in `cpk1`+`cts1`; `[55,7]` in `cpk1`+`cbl1`); only `[53,9]`/`[54,8]` are new. `SIGMA_REPRO` **0.2266** vs `SIGMA_W` 0.9111 = **4.02×**; `CLIFF_BAR` sits **28.6 re-execution SE** below `cpk1`'s own value ⇒ **R1 had no power** |
+| structural / live model | the two winners are the **two branch scales of ONE `layer4.0` residual junction**, 1-based indices **50 and 53**; the structural condition holds at **20 of 61 cuts (32.8%)** — an artefact of `named_parameters()` order |
+| mechanism / optimiser state | at k53/k54/k55 **both** groups sit at the −15 clamp floor for **58–64%** of the logged trace — the same occupancy as the **scalar** arm `cts1-k01` (0.63); at k52 the leading group ends −10.21 with **0.00** at the floor |
+| implementation / provenance | **no defect.** Scorer byte-identical to registration, glob prefix-isolated under a deliberately contaminated run dir, `--selftest` clean pre-ingest, every bar traceable to the corpus |
+
+**THE CLAIM THE CORPUS IS ENTITLED TO** — CIFAR-100 / `ResNet18_c100`, SGDm+Lion, `ms=1e-3`, `alpha0=1e-6`, 100 ep, m=2, this `named_parameters()` order, seeds {0,1,2}: cliff 2 is carried by a single **512-parameter normalisation scale** — moving `layer4.0.shortcut.1.weight` out of the trailing group costs **15.8080 pp (21.25 SE)**, its own 512-param bias one step later costs **−0.1380 pp**, and the adjacent **2,359,296**-param conv **gains** 1.1213 pp; TRAIN agrees. That drop **exceeds the k=52 arm's entire 15.1342 pp advantage** over the pooled same-cell m=1 scalar baseline (**22.7492**, n=17, six batches).
+
+**WHAT MAY NOT BE WRITTEN.**
+
+| forbidden | why |
+|---|---|
+| *"147.6's withdrawal was TOO CAUTIOUS"* / *"a PATTERN for this sub-class"* | **in the registration blob `aac1bf0` (twice)** — pre-registered, and pre-registration does not license an inference. **147.6 STANDS.** Verdict string NOT edited (RULE 16); its **interpretation** is withheld, exactly as 147.6 did to `BN-LEVERAGE-FAVOURED` |
+| any **share-of-TOTAL** for DROP1 (≈109%) | 147.6's fifth narrowing: the denominator is a non-monotone path sum with two negative legs. **Print no percentage** |
+| *"reproduces in an INDEPENDENT batch"* | submission independent, **sample is not** — seeds {0,1,2} shared with `cpk1`/`cts1`/`cts2`; `cpk1-k55-s0` and `scl1-k55-s0` both return **23.696** |
+| *"at a DIFFERENT site"* | one residual junction, two branch scales, three indices apart |
+| *"the matched 512-vs-512 control shows a shift lacks a scale's leverage"* | **not identified at cliff 2** — k53 (−1.18 SE), k54 (−0.94 SE), k55 (+1.03 SE) are **at** the scalar baseline, so DROP2≈0 / DROP3≤0 is what a floor predicts for **any** class. And Q5's statistic `15.9460` is **bit-identical to R3's**. `cts1`'s k50 sits **+7.5855 pp / +13.30 SE** above the same baseline — cliff 1 has no such defect. `SCALE-SHIFT-ASYMMETRIC` stays **descriptive at ONE site** |
+
+**THE `first tensor to leave` RIVAL CANNOT BE SEPARATED BY EXISTING DATA — said plainly.** Both winners are `DROP1` and **had to be**: both cliff left-edges (k=49, k=52) are `cpk1` grid points immediately after a conv, so the tensor at k is necessarily a BN scale. All **six** single-tensor steps in the corpus run **scale → shift → conv**, because `named_parameters()` orders conv → `bn.weight` → `bn.bias` and `--stepsize-groups [k,62−k]` takes a **contiguous prefix** — **no contiguous-prefix cut on this architecture can move a shift before its own scale**. Three rivals stay live: **norm scale**, **first to leave**, **clamp turnover**.
+
+**147.6's grounds, all re-derived here and all untouched.**
+
+- Condition satisfied at `cpk1` k31/k49/k52/k55 with captures **+0.2190 / +0.6965 / +0.3324 / +0.0139** — the peak and the **worst** cut. It also holds at **both** k=52 (37.8833) and k=55 (23.3347) **inside `scl1`**, 14.5487 pp / 19.56 SE apart.
+- Base rate: of `cpk1`'s adjacent m=2 steps moving ≥1 norm scale out, **7 RAISE, 2 LOWER** — and `scl1` decomposed one of the 2. **Selection on the dependent variable.**
+- Counterexample k=45→47 moves a 512-param BN scale out and **GAINS +3.4487 pp**. Unaddressed.
+- **CORPUS NUMERAL CORRECTED:** 147.5c's *"10 steps, 8 raise, 2 lower"* is **7 of 9** on the same manifest (k47→49 moves no scale). 147.6's conclusion is unaffected; **do not re-quote 8/10**.
+
+**NEXT EXPERIMENT — one batch breaks BOTH confounds (class×ordinal and seed reuse).** Decompose `cpk1`'s **k=45 → k=49** window at single-tensor resolution, on seeds **{3,4,5}**, with in-batch anchors:
+
+| step | tensor | class | params |
+|---|---|---|---|
+| 45→46 | `layer4.0.conv1.weight` | **conv** | 1,179,648 |
+| 46→47 | `layer4.0.bn1.weight` | **scale** | 512 |
+| 47→48 | `layer4.0.bn1.bias` | **shift** | 512 |
+| 48→49 | `layer4.0.conv2.weight` | **conv** | 2,359,296 |
+
+- Class-by-position order is **conv, scale, shift, conv** ⇒ a conv is first to leave and a scale sits in position 2. **No code change, no non-contiguous partition, no scorer exemption.**
+- **Off the floor throughout**: `cpk1` M(45)=42.2393, M(47)=45.6880, M(49)=55.4473 — 19.5–32.7 pp above the 22.7492 scalar baseline — and the window **RISES** +13.21 pp net.
+- Seeds {3,4,5} make it the **first batch that samples the seed nuisance instead of re-executing it**.
+- Shape: k∈{45,46,47,48,49} × {3,4,5} = 15 jobs **+ `scalar` and `layerwise` anchors × {3,4,5}** = 6 ⇒ **21 jobs**, ~15 GPU-h, non-axis flags byte-matched to `scl1`.
+- Register in advance: (a) *norm scale* → largest step at 46→47; (b) *first to leave* → 45→46; (c) *clamp turnover* → wherever the leading group's terminal β crosses the floor. **The scorer MUST carry a floor gate**: no drop scored informative if either neighbouring arm is within 2 SE of the in-batch m=1 anchor.
+- Weaker variants, recorded so they are not confused with this one: k=56/57 added to `scl1` (6 jobs) breaks the ordinal confound alone **but lands on the saturated floor**; a third cliff on seeds {0,1,2} adds a step and **no** independence.
 
 ## Queue — re-derived from `squeue`/`sacct` at this HEAD
 
-**THREE batches registered and launched, 30 jobs, all on `alice2`. NOTHING LANDED, NOTHING SCORED, NOTHING INGESTED. Corpus stays 2,513 rows. `in489g2` on `alice` read-only, untouched. 0 jobs cancelled by this session on either account.**
-
-| account | batch | jobs | run | pend | done | state | score with (UNEDITED) |
+| account | batch | jobs | run | pend | done | state | scorer |
 |---|---|---|---|---|---|---|---|
-| `alice2` | **`scl1`** | 12 | 2 | 0 | **10** | **RUNNING — 10 COMPLETED, not landed** | `cP1_scl1_score.py` (`aac1bf0`) |
-| `alice2` | **`cts3`** | 6 | **6** | 0 | 0 | **RUNNING — 772 ep** | `cO1_cts3_score.py` (`327e3f0`) |
-| `alice2` | **`cfr1`** | 12 | **11** | **1** | 0 | **RUNNING — 1 pending** | `cO1_cfr1_score.py` (`dbf90db`) |
-| `alice2` | `pf-headroom-probe#a0` | 1 | 0 | 1 | 0 | **NOT OURS — PaperFactory, untouched** | n/a |
+| `alice2` | **`scl1`** | 12 | 0 | 0 | **12** | **LANDED, SCORED, INGESTED** (CORRECTIONS 152) | `cP1_scl1_score.py` (`aac1bf0`), run UNEDITED |
+| `alice2` | **`cfr1`** | 12 | 0 | 0 | **12** | **12/12 COMPLETED — NOT scored, NOT ingested.** 0 rows in the corpus | `cO1_cfr1_score.py` (`dbf90db`) |
+| `alice2` | **`cts3`** | 6 | **6** | 0 | 0 | **RUNNING — 772 ep**, elapsed 1:34–2:18 | `cO1_cts3_score.py` (`327e3f0`) |
 | `alice` | `in489g2` | 14 | **8** | **6** | 0 | **RUNNING — NOT OURS, never touch** | `cI2_in489g2_score.py` (`571707b`) |
 
-- **Completing is not landing.** `scl1`'s 10 `COMPLETED` rows (35:07–46:12) are **not** a result and may not be quoted; 0 `scl1`/`cts3`/`cfr1` rows exist in `results/all_runs.csv`.
-- `in489g2`: 8 `RUNNING` at **8:22:10**, 6 `PENDING` on `QOSMaxGRESPerUser`. **Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
-- The only `CANCELLED` row on `alice2` today is `4912049 pf-microrun-smoke#a0` (uid 3263, 08:46) — **predates every batch here**. `4912716 pf-microrun-smoke#a0` `FAILED`, also not ours.
+- **`cfr1` has COMPLETED but has NOT landed.** Completing is not landing: it has not been scored and **0 `cfr1` rows exist in `results/all_runs.csv`**. Its RULE 20 audit reopened at 12/12 and has **not** been re-run. Next cycle's work.
+- **This cycle ingested `scl1` ONLY.** `cfr1` and `cts3` were deliberately left out of the corpus.
+- `in489g2` on `alice`: 8 `RUNNING`, 6 `PENDING` on `QOSMaxGRESPerUser`. **Read with `squeue -u salehkaleybars` only. Never cancel, requeue or modify.** Nothing written to `/data1/salehkaleybars`.
+- **Not ours, on `alice2` today, and untouched by this session:** `4912716 pf-microrun-smoke#a0` **FAILED**; `4912049 pf-microrun-smoke#a0` **CANCELLED by uid 3263** at 08:46; `4912741 pf-headroom-probe#a0` **CANCELLED by uid 3263** (it was `PENDING` at CORRECTIONS 151.10 and is now cancelled — **not by this session**). **This session cancelled, requeued or modified nothing on either account.**
 
-**What each batch decides.**
+## INGEST — the diff, read both ways (CORRECTIONS 146.7)
 
-| batch | design | question | primary | verdict branches |
-|---|---|---|---|---|
-| `scl1` | cuts `[52,10]`/`[53,9]`/`[54,8]`/`[55,7]` × seeds 0/1/2, C100/`ResNet18_c100`, 100 ep | is the **second** cliff (k=52→55) also carried by ONE tensor, and which? | `plateau5` drops, **pp** | `R1` cliff-not-reproduced (TOTAL < 7.4850) → no tensor named · `R2` split-even (±2.3476 of TOTAL/3) → `cts1` is a local accident · `R3` no-majority → majority **AND** separation both required |
-| `cts3` | cuts `[49,13]`/`[50,12]` × seeds 0/1/2, **772 ep**, clamp held `-15:-2.3026` | is CORRECTIONS 147's cliff a **100-epoch truncation artefact**? | `plateau5` ep 767–771, control ep 95–99 **in run** | (a) SIZE `SURVIVED` ≥12.4170 / `ATTENUATED` / `COLLAPSED` ≤1.4878 · (b) DIRECTION `GROWS`/`HOLDS`/`SHRINKS` at ±2.1040 |
-| `cfr1` | `{scalar, layerwise}` × box `{-15:-2.3026, -80:-2.3026}` × seeds 0/1/2, C10/`ResNet18`, `ms=1e-3`, 100 ep | is MASTER-TABLE row 24's granularity tolerance **the floor**? | DID = `[lay−sc]_R − [lay−sc]_C`, **pp** | `SURVIVES` \|DID\|≤0.4988 · `ATTENUATED` · `WALL-DRIVEN` (row 24 rewritten) · `BOX-SUPPRESSED` |
+    python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # STDOUT, not a log
+    python3 analysis/args_repair.py --apply
 
-- **`cts3` names its own predicted outcome in advance**: `SHRINKS` at ≈ −6.97 SE. If it fires it is **not a null** — CORRECTIONS 147's cliff numeral becomes budget-dependent and `cpk1`'s capture curve + argmax `k*=49` **inherit the "at 100 epochs" scope**.
-- **`cfr1` releases the FLOOR ONLY**; ceiling identical at `-2.3026` in both arms.
+| | |
+|---|---|
+| before / after | **2,513 → 2,525 rows** |
+| **ADDED** | **12** — `scl1-k5{2,3,4,5}-s{0,1,2}`, job ids `4912717`–`4912728` |
+| **CHANGED** | **0** (keyed on `run`+`job_id`, whole-row compare, header identical) |
+| **REMOVED** | **0** |
+| `args_repair.py --apply` | 36 `dup_group` stamps re-applied (aggregate regenerates without them); **0 accuracy/config values changed**, 0 `superseded` changed. Net vs the committed CSV: **0 changed rows** |
+| ingested rows spot-check | all 12 `complete=1`, `superseded=0`, `epochs_done=100`, `beta_clip=-15:-2.3026`, `plateau5` identical to my independent parse |
+| **NOT ingested** | `cfr1` (12 COMPLETED), `cts3` (6 RUNNING) — **0 rows each** |
 
-**RULE 21 — all three margins re-derived by wall clock (`git %ct` vs `sacct Submit`).**
+**RULE 20 — `scl1` 12/12, re-derived at this HEAD.**
 
-| batch | commit | commit epoch | earliest submit | **margin** | spread |
+    python3 analysis/argsline_guard.py --name scl1 --batch-consistency ../runs_alice2   # exit 0
+
+- **12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line — VERDICT PASS.** *"every non-axis flag is identical across 12 runs"*.
+- Independently: 12 stripped ARGS lines collapse to **1** string, **1** ENV line (`BETA_CLIP=-15:-2.3026`, `PROBE=0`, `HIER=none`, `AUGMENT=1`), **12** distinct job ids, `RUN_DONE` 12/12, epochs 0..99 contiguous 12/12.
+
+**RULE 21 — 33 s, re-derived on two independent clocks.**
+
+| batch | commit | commit epoch | earliest `sacct` Submit | **margin** | spread |
 |---|---|---|---|---|---|
 | `scl1` | `aac1bf0` | 1788691465 (12:44:25) | 1788691498 (12:44:58) | **33 s** | 1 s |
-| `cts3` | `327e3f0` | 1788691571 (12:46:11) | 1788691633 (12:47:13) | **62 s** | **0 s** |
-| `cfr1` | `dbf90db` | 1788691708 (12:48:28) | 1788691838 (12:50:38) | **130 s** | 1 s |
+| `cts3` | `327e3f0` | 1788691571 | 1788691633 | 62 s | 0 s |
+| `cfr1` | `dbf90db` | 1788691708 | 1788691838 | 130 s | 1 s |
 
-- 0–1 s spreads = **one submission per batch**. `scl1`'s 33 s is the campaign's thinnest margin — stated as thin, not rounded.
-
-**RULE 16 — additions only; scorers byte-identical Mac ↔ cluster; all three `--selftest` PASS.**
+**RULE 16 — no scorer edited, by anyone, at any point this cycle.**
 
 | check | result |
 |---|---|
-| `git diff --numstat 5561cc6..HEAD -- analysis/` | **3 added files, `1188/1027/1159` insertions, `0` deletions.** No pre-existing scorer modified |
-| whole-tree `--name-status` | 6 `A` (3 scorers, 3 launchers) + 1 `M` `bin/PROTECTED.txt` (**+3 lines, 0 removed**) |
-| `cP1_scl1_score.py` | `c2024f4b…880883e` = `repo-scl1` copy |
-| `cO1_cts3_score.py` | `ba8cac24…077ccf3ad` = `hmo-cts3` copy |
-| `cO1_cfr1_score.py` | `3c52e678…be41114c` = `hmo-cfr1` copy |
-| `--selftest` at this HEAD | **PASS ×3** — incl. `scl1`'s RULE 21 premise, which still holds because 0 rows are ingested |
+| `git status --porcelain` at start | **empty** |
+| `git diff --stat -- analysis/` | **empty** |
+| `shasum -a 256 analysis/cP1_scl1_score.py` | `c2024f4b04fb77672717bddaba5635e72097264a5302f6906d2f0bb32880883e` |
+| `git show aac1bf0:analysis/cP1_scl1_score.py \| shasum -a 256` | **identical** |
+| `--selftest` **pre**-ingest | **PASSED, 0 failures** |
+| `--selftest` **post**-ingest | **FAILED, 4 failures — BY CONSTRUCTION, and predicted at CORRECTIONS 151**: *"no `scl1-` row exists yet"* (12 found) and the three `SIGMA_W` premises, because ingesting `scl1` moves the pool to **0.9172803 / df 58 / 29 cells**. **The scorer was NOT edited to fix this** (precedent `cN1`/`cN2`, CORRECTIONS 149: freeze and re-register) |
+| does the post-ingest σ change any verdict? | **No.** `SE_ARM_DIFF` would be 0.7490 ⇒ DROP1 21.11 SE, TOTAL 19.42; `CLIFF_BAR`/`EVEN_BAND` do not depend on σ. **No gate flips.** The registered SE unit stays the pre-ingest 0.9111 |
 
-- All three selftests **will fail by construction on ingest** (their "no `<prefix>-` row yet" checks). **Do NOT edit them for that** — freeze and re-register (precedent `cN1`/`cN2`, CORRECTIONS 149).
+**Live-model manifest — verified here, not accepted from the launcher.**
 
-**RULE 20 — 29/30 audited clean. `cfr1` REOPENS.**
+- `PARTITION-MANIFEST.txt`: **62** tensors, **11,220,132** params. I set-differenced the `FIRSTGROUP` name lists myself and checked the 1-based convention against **all four** specs (`FIRSTGROUP == names[:k]`). Partition **nested**, each step moves **exactly one** tensor, and it is the registered one. Leading-group params 6,447,168 → 6,447,680 → 6,448,192 → 8,807,488.
+- The three steps move **49.4519%** of the k=52 trailing group vs `cts1`'s 2.6931% — **homologous in CLASS, not in MASS**, and registered as such in advance.
+- **Terminology, once:** at m=2 both groups carry exactly **one** `β` (`HF.py` blockwise), so neither is "finer". Write **trailing → leading**, not "fine → coarse".
 
-| batch | audited | `argsline_guard --batch-consistency` | exit |
-|---|---|---|---|
-| `scl1` | **12/12** | 12 clean, 0 mismatch, 0 without ARGS — **PASS**; every non-axis flag identical | 0 |
-| `cts3` | **6/6** | 6 clean, 0, 0 — **PASS** | 0 |
-| `cfr1` | **11/12** | 11 clean, 0, 0 — **PASS** | 0 |
+**Cost — `scl1` spent, measured.**
 
-- **`cfr1` is INCOMPLETE, not passed.** `4912756 cfr1-lay-R-s2` is `PENDING` with no `.out`. **The audit reopens when it starts; do not score before 12/12.**
-- Run with `METAOPT_WS=/home/s5014158/metaopt` exported (`bin/_lib_guards.sh` clobbers `WS` otherwise).
-- Name↔ARGS checked per run over all 29 started: `scl1` the full 4×3 spec/seed grid at 100 ep · `cts3` `[49,13]`/`[50,12]`×{0,1,2} at **`--num-epochs 772` 6/6** (the horizon IS the manipulation and rides the ARGS line) · `cfr1` `scalar`/`layerwise`×{0,1,2} at 100 ep.
-- **No mismatch → nothing scancelled.**
-
-**ENV audit — `BETA_CLIP`/`PROBE` cannot ride the ARGS line.**
-
-| batch | `BETA_CLIP` | `PROBE` |
+| batch | state | GPU-h |
 |---|---|---|
-| `scl1` | `-15:-2.3026` **12/12**, one identical ENV string | `0` |
-| `cts3` | `-15:-2.3026` **6/6**, one identical ENV string | `0` |
-| `cfr1` | **6 @ `-15:-2.3026`** (`lay-C`×3, `sc-C`×3) · **5 @ `-80:-2.3026`** (`lay-R` s0/s1, `sc-R` s0/s1/s2) | `100` ×11 |
-
-- Every run's NAME agrees with its own `BETA_CLIP`. The 6th released run is the pending `lay-R-s2`.
-
-**Live-model manifests — verified here, not accepted from the launchers.**
-
-- `scl1` (`62` tensors, `11,220,132` params): I set-differenced the coarse NAME lists myself. The partition is **nested** and each step moves **exactly one** tensor — `[52,10]→[53,9]` `layer4.0.shortcut.1.weight` **512** · `→[54,8]` `layer4.0.shortcut.1.bias` **512** · `→[55,7]` `layer4.1.conv1.weight` **2,359,296**. Same tensor-class sequence as `cts1` (**BN scale → BN shift → conv**), but the three steps move **49.4519%** of the k=52 fine group vs `cts1`'s 2.6931% — **homologous in CLASS, not in MASS**, and registered as such in advance.
-- `cts3`: `STEP 49→50 MOVED layer4.0.bn2.weight 512` · `META_STEPS 386000  REACHABLE_MIN −399.815511  F32_UNDERFLOW_BETA −103.278930` · `NUM_EPOCHS_USES 2 DECL 42 LOOP 135` — the in-run 100-ep control's precondition, proved on the live `train.py`.
-- `cfr1`: `ARM scalar COORDS 1` / `ARM layerwise COORDS 62`, both `BETA_INIT −6.907755`; `META_STEPS 50000  TRAVEL_LO −56.888439  TRAVEL_HI 43.079880`; `MS1E4_TRAVEL_LO −11.914545`. **`−80` is 23.111561 nats past reachable; `−15` IS reachable at `ms=1e-3` and is NOT at `ms=1e-4`.**
-- `cfr1` instrument live at the **coordinate denominator** (FINDINGS 51.1): 11 probe dirs, `n_beta=62` layerwise / `n_beta=1` scalar, 68–164 records so far vs the gate's ≥400 at completion.
-
-**Cost committed this cycle — measured from this account's history, not guessed.**
-
-| batch | projected GPU-h | walltime cap | worst case | ETA (local, 6 Sep) |
-|---|---|---|---|---|
-| `scl1` | **8.4** | `02:30:00` | 30.0 | ~13:45–14:15 (hard bound 15:15) |
-| `cfr1` | **11.01** | `03:00:00` | 36.0 | ~14:15–14:45; pending `lay-R-s2` ~15:20 |
-| `cts3` | **33.0** | `11:00:00` | 66.0 | first ~17:25, last ~19:40–20:00 |
-| **total** | **52.41** | | **132.0** | all land by ~20:00 |
-
-- `cts3` runs on `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` — **not** `gpu-short` (4 h ceiling excludes 772 ep by arithmetic) and **not** `gpu-2080ti-11g` (55.8–70.8 s/ep ⇒ ~15.2 h). 4.7–6.4 h walltime headroom per run; **TIMEOUT not a live risk.**
-- `in489g2`'s ~348.5 projected GPU-h are **not this campaign's** and are not counted.
-
-**The refusals are deliverables — recorded so a later cycle does not re-litigate them.**
-
-| refused | batch | reason |
-|---|---|---|
-| an `ms=1e-4` arm | `cfr1` | floor **provably unreachable** there (`β ≥ −11.914545`) → null **by construction** |
-| a `blk6` third granularity | `cfr1` | audits a falloff **row 106 already refutes** (`rs-`: scalar 0/22, layerwise 0/22, `resnet18_blocks` 6/13, nodewise 6/10), +50% cost, second uncorrected estimand. Registered as the **dose-response follow-up if WALL-DRIVEN** |
-| releasing the **ceiling** | `cfr1` | FINDINGS 6190–6215 measured **2/2 fatal collapses** at `+6.0`; a diverged arm is `UNRESOLVED-DIVERGED` by R2. ~6 GPU-h to answer nothing |
-| `scalar`/`layerwise` anchors | `scl1` | primary is in **pp**; a common GAP divisor is a positive rescaling that cannot change ordering, majority, separation or the matched control. **Price disclosed**: no CAPTURE-unit size for cliff 2, no detectable level shift vs `cpk1` |
-| six separate 100-ep control jobs | `cts3` | control is **in run, PAIRED, zero cost**; separate jobs buy a **weaker** between-run control for ~4.5 GPU-h |
-| the clamp axis at 772 ep | `cts3` | `cts2` measured the interaction at **0.3953 pp = 0.38 SE_INT**; and `−80` is **not arithmetically available** at 386,000 meta-steps anyway |
-
-**Scope limits the three registrations declare up front (not discovered afterwards).**
-
-- `cfr1` holds the ceiling in both boxes → a `SURVIVES` verdict discharges the **floor half only**.
-- `cts3` at 772 ep can reach `β = −399.8` and float32 `α` underflows to **exactly 0** below `β = −103.28`, so it **claims nothing about the released floor at long budget**. It also shares seeds and every non-horizon flag with `cts1`/`cts2`/`cpk1` — a **fourth correlated batch**; "reproduces in an independent batch" **may not be written**.
-- `cts3`'s horizon fit is **not stable**: E across six defensible window subsets = 414 / 640 / 677 / **772** / 803 / 1821, the last with `p = 0.8220 < 1` (no finite convergence epoch). Gate **R4** settles convergence empirically or returns `UNRESOLVED-HORIZON-INEFFECTIVE`.
-- `scl1`'s **B1 predicts against the corpus base rate and says so**: the class-level form was withdrawn at CORRECTIONS 147.6 (8 of `cpk1`'s 10 norm-scale-out steps RAISE capture).
-
-**Three agents, one working tree, four minutes.** `aac1bf0` → `78f000d` → `327e3f0` → `dbf90db` → `de53385`. Each staged only its own paths; the `--name-status` diff confirms **no file was modified that its author did not create**. `cP1` vs `cO1` prefixes exist only to avoid a filename collision.
+| `scl1` | **SPENT** — 12 runs, elapsed 35:07–1:25:38, summed | **9.80** |
+| `cfr1` | **SPENT** — 12 COMPLETED, unscored | ~11.0 |
+| `cts3` | **in flight**, 6 running | ~33.0 projected |
+| `in489g2` | **NOT OURS** (`alice`) | ~348.5, **not counted** |
 
 ## Clamp census — CORRECTIONS 148.3–148.10
 
@@ -166,7 +194,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,513 ro
 | 10 | CORRECTIONS 146/147 (`cpk1`, `cts1`) | **SETTLED at this contrast by `cts2`** (CORRECTIONS 150): floor released 65 nats, cliff `24.7673 pp`, `INT` `0.3953 pp` = 0.38 SE_INT. 147's cliff needs no regime qualifier. Nothing else in 147.6 is restored |
 | 11 | `hz3` wrong-box rows (8114) | A known metadata discrepancy is now **measured to be a real regime difference** |
 
-**COVERAGE — the honest limit. 1,356 of 2,501 rows (54.2%) have a beta trajectory; 1,145 (45.8%) have none.** *(Measured on the pre-`cts2` 2,501-row corpus; the 12 `cts2` rows all carry a trajectory, so the corpus figure is now 1,368/2,513 = 54.4%. Every stratum row below is unrestated.)*
+**COVERAGE — the honest limit. 1,356 of 2,501 rows (54.2%) have a beta trajectory; 1,145 (45.8%) have none.** *(Measured on the pre-`cts2` 2,501-row corpus. The 12 `cts2` rows all carry a trajectory. `scl1`'s 12 rows ran `PROBE=0` and have **no `probe.jsonl`** (verified: 0 probe files under `runs/scl1/`), though they do carry TB `beta_block*` traces because m=2 — so the probe-based numerator is **unmoved** and the denominator is not: **1,368/2,525 = 54.2%**. Every stratum row below is unrestated.)*
 
 | stratum | with a trajectory |
 |---|---|
@@ -209,10 +237,10 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,513 ro
 | | |
 |---|---|
 | Q1 meta-gate | **DESK-ACCEPT, 9/10, `structural_gaps = []`, `passed = True`, 0 blocking.** Returned at cycle 111 on v8 (CORRECTIONS 135). **Carried, not re-derivable here** — the gate tool is not in this tree |
-| Audit | `c98_reproduce.py` **exit 1 — 8 CHECKS FAIL**, the **same 8** as before this cycle's ingest; verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
+| Audit | `c98_reproduce.py` **exit 1 — 6 CHECKS FAIL** at this HEAD after the `scl1` ingest (rows 2525/2177, admissible 2083/1735, wallclock 2510/2162, GPU-h 2212/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807). The **2 substantive** numerals are **bit-identical across the ingest**; only the 4 census counts moved. **No claim reverses.** Historical note, unchanged: verified both ways by restoring the pre-ingest CSV. The 4 **substantive** numerals are bit-identical across the ingest (best R18/C10 arm **93.328** vs paper 93.317; deficit **1.796** vs 1.807; partition-family rows **434** vs 431, Lion **422** vs 419). Only the 4 census counts moved: rows 2,357 → **2,399**, admissible 1,915 → **1,957**, wallclock 2,342 → **2,384**, GPU-h 1,805 → **1,833**. **No claim reverses**, no new claim went stale — baseline unmoved at 95.124 (se 0.047). Fix = edit both markups; **author scope**, CORRECTIONS 141.6 / 142.6 |
 | tex↔md | `paper_numeric_diff.py` **5 residuals over 4 distinct tokens** (2 tex-only: `0.05`, `3.0`; 3 md-only: `0.087`, `0.279`, `3.19`). **All pre-existing, 0 new this cycle** — nothing under `paper/` was touched. Both markups carry 994 distinct quantity numerals |
 | Science overturned | **none.** Contribution 1 intact at 4 sites; the withdrawal stays confined to the slope |
-| GPU to reach submission | **0 jobs, 0 hours.** The 30 jobs this cycle committed (`scl1`/`cts3`/`cfr1`, **52.41 GPU-h**) and the 14 on `alice` (`in489g2`, ~348.5 GPU-h, **not ours**) are the NEXT cycle's science, not this manuscript's; `cts2`'s 8.80 GPU-h are spent and recorded |
+| GPU to reach submission | **0 jobs, 0 hours.** `scl1`'s **9.80** GPU-h are spent and landed (CORRECTIONS 152); `cfr1`'s ~11.0 are spent but **unscored**; `cts3`'s ~33.0 are in flight; `in489g2`'s ~348.5 on `alice` are **not ours**. None of it is this manuscript's science |
 
 **Ready to submit: NO** — not for any manuscript defect, for the **seven** author items (§ TODO-FOR-AUTHOR).
 
@@ -220,7 +248,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,513 ro
 
 | check | result |
 |---|---|
-| `python3 analysis/c98_reproduce.py` | **exit 1, 8 CHECK(S) FAILED** — stale draft numerals, not a moved result. **This cycle ingested nothing and moved none of them**: `git diff --name-only 94c6e4f..HEAD` over `paper/`, `results/` and `c98_reproduce.py` = **0 files**, so every input is byte-identical to the pre-cycle HEAD. Derived vs paper: rows 2444/2177, admissible 2002/1735, wallclock 2429/2162, GPU-h 2153.85/1642, best R18/C10 93.328/93.317, deficit 1.796/1.807, partition rows 437/431, Lion 425/419. `c98` exited 0 only against the 2,177-row corpus of cycle 116. **A detached worktree is NOT a valid control** — it reports 14, the 6 extra being coverage-census checks that move because gitignored `hz3` `.out` files are absent. See CORRECTIONS 141.6 / 142.6 / 145.4 |
+| `python3 analysis/c98_reproduce.py` | **exit 1, 6 CHECK(S) FAILED** at this HEAD — stale draft numerals, not a moved result; **inherited, author scope, deliberately NOT fixed**. Derived vs paper after the `scl1` ingest: rows **2525**/2177, admissible **2083**/1735, wallclock **2510**/2162, GPU-h **2212**/1642, best R18/C10 **93.328**/93.317, deficit **1.796**/1.807. Historical detail from cycle 127, unchanged: `git diff --name-only 94c6e4f..HEAD` over `paper/`, `results/` and `c98_reproduce.py` = **0 files**, so every input is byte-identical to the pre-cycle HEAD. Derived vs paper: rows 2444/2177, admissible 2002/1735, wallclock 2429/2162, GPU-h 2153.85/1642, best R18/C10 93.328/93.317, deficit 1.796/1.807, partition rows 437/431, Lion 425/419. `c98` exited 0 only against the 2,177-row corpus of cycle 116. **A detached worktree is NOT a valid control** — it reports 14, the 6 extra being coverage-census checks that move because gitignored `hz3` `.out` files are absent. See CORRECTIONS 141.6 / 142.6 / 145.4 |
 | census fixpoint (measured on `DRAFT-v4.md`, asserted against both markups) | **628 / 411 / 982 / 41.9%** — **unmoved by Plan C, as designed** |
 | census internals | raw `\d+\.\d+` 3067 → **3098**, distinct **1007** (unchanged); quantities 2614 → **2615**, distinct **982** (unchanged). The `+1` is the Markdown heading numeral `1.2`; `1.2` already occurred twice as a quantity, so the asserted denominator did not move. `n_q` is asserted by nothing |
 | `python3 analysis/xref_check.py` | exit 0, **596 references** (section 500, table 51, figure 22, appendix 23), **0 unresolved, 0 stale**, 8 allowlisted parent-paper refs on lines `[41, 43, 45, 287, 291, 294, 295, 297]` |

@@ -12522,3 +12522,427 @@ campaign's** and are not counted here.
   coverage of the draft's 982 distinct quantity numerals.
 - **Nothing under `paper/` was read for edit or written.**  `git status --porcelain paper/` is
   empty.
+
+## 152. `scl1` LANDS -- THE SECOND CLIFF IS ALSO CARRIED BY ONE 512-PARAMETER NORMALISATION SCALE. THE ARITHMETIC SURVIVES FIVE LENSES; THE SCORER'S OWN "THE WITHDRAWAL WAS TOO CAUTIOUS" DOES NOT, AND CORRECTIONS 147.6 STANDS
+
+`scl1` decomposed `cpk1`'s **second** cliff, k = 52 -> k = 55, which had never been decomposed and
+appears in no earlier scorer.  Twelve runs landed, the registered scorer was run UNEDITED, and its
+verdict reproduces to 4 dp from the raw `.out` files with parsers that share no code with it.
+**Five adversarial lenses reported; 5 of 5 refuted or materially narrowed the interpretation, and
+none of them dented a number.**  This entry records the arithmetic as it stands, and refuses the
+inference the scorer's own registered verdict prose draws from it.
+
+### 152.1 THE DESIGN, AND WHAT IT COULD AND COULD NOT DECIDE
+
+CIFAR-100 / `ResNet18_c100`, SGDm base + Lion meta, batch 100, `ms = 1e-3`, `alpha0 = 1e-6`,
+`gamma 1`, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, `HIER=none`, `PROBE=0`, 100 epochs.
+Four cuts `[52,10]` / `[53,9]` / `[54,8]` / `[55,7]` x seeds {0,1,2} = **12 jobs**, one submission
+(`4912717`-`4912728`, `sacct` Submit 2026-09-06T12:44:58-59, 1 s spread), nine distinct nodes and
+three GPU types (2080 Ti x2, L4 x2, A100 x8).  Primary `plateau5` = mean TEST accuracy over epochs
+95-99, **in pp**; `train5` reported alongside.  The registration **refused** `scalar`/`layerwise`
+anchor arms, on the ground that a common GAP divisor is a positive rescaling that cannot change the
+drop ordering.  **That refusal was wrong, and 152.6 records why**: without an in-batch `m = 1`
+anchor the batch cannot see that three of its four arms are sitting on the clamp floor.
+
+The partition is nested and each step moves **exactly one** tensor.  Verified here by
+set-differencing the `FIRSTGROUP` name lists in the live-model `PARTITION-MANIFEST.txt` myself, and
+by checking the 1-based convention against all four specs (`FIRSTGROUP == names[:k]`, so the tensor
+at index `k` 0-based moves at k -> k+1; **no index was inherited**):
+
+| step | k -> k+1 | tensor that moves | params | leading-group params |
+|---|---|---|---|---|
+| DROP1 | 52 -> 53 | `layer4.0.shortcut.1.weight` (BatchNorm2d **scale**) | 512 | 6,447,168 -> 6,447,680 |
+| DROP2 | 53 -> 54 | `layer4.0.shortcut.1.bias` (the **same** BN's shift) | 512 | -> 6,448,192 |
+| DROP3 | 54 -> 55 | `layer4.1.conv1.weight` (convolution) | 2,359,296 | -> 8,807,488 |
+
+62 parameter tensors, 11,220,132 parameters, both re-derived from the manifest.  **Terminology,
+recorded once**: at m = 2 with `[k, 62-k]` **both** groups carry exactly one `beta`
+(`HF.py` blockwise: `self.beta = log(alpha0)*ones(len(stepsize_groups))`), so neither group is
+"finer" than the other.  "Moving out of the fine group" means moving from the 10-tensor **trailing**
+block into the 52-tensor **leading** block, and is written that way below.
+
+### 152.2 RULE 20, RULE 21, RULE 16 -- ALL RE-DERIVED HERE, NOT QUOTED
+
+| rule | evidence produced in this cycle | result |
+|---|---|---|
+| **RULE 20** | `analysis/argsline_guard.py --name scl1 --batch-consistency ../runs_alice2` | **12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line. VERDICT PASS**, exit 0; "every non-axis flag is identical across 12 runs" |
+| **RULE 20** (independently) | my own parser stripped `--stepsize-groups` / `--seed` / `--run-name` / `--save-directory` from all 12 ARGS lines | **1** distinct residual string, **1** distinct ENV line, **12** distinct job ids, `RUN_DONE` 12/12, epochs 0..99 contiguous 12/12 |
+| **RULE 21** | `git show -s --format=%ct aac1bf0` = **1788691465** (12:44:25) vs `sacct` earliest Submit **1788691498** (12:44:58) | **margin 33 s**, re-derived on two independent clocks. The campaign's thinnest margin; written as thin, not rounded |
+| **RULE 16** | `git status --porcelain` empty at HEAD `60b3c5b`; `git diff --stat -- analysis/` empty | no scorer edited by anyone |
+| **RULE 16** | `shasum -a 256 analysis/cP1_scl1_score.py` = `c2024f4b04fb77672717bddaba5635e72097264a5302f6906d2f0bb32880883e` == `git show aac1bf0:analysis/cP1_scl1_score.py \| shasum -a 256` | **byte-identical to the registration blob** |
+| scorer `--selftest` | run at pre-ingest HEAD | **PASSED, 0 failures** |
+
+### 152.3 THE RESULT.  TEST AND TRAIN SIDE BY SIDE
+
+Arms (`plateau5`, pp; per-seed from my own parse of the raw `.out` files, then confirmed by the
+registered scorer run unedited):
+
+| cut | spec | n | plateau5 | sd | per-seed (s0/s1/s2) | train5 |
+|---|---|---|---|---|---|---|
+| k52 | `[52,10]` | 3 | **37.8833** | 1.0716 | 38.656 / 36.660 / 38.334 | 41.9247 |
+| k53 | `[53,9]` | 3 | **22.0753** | 0.8840 | 22.082 / 21.188 / 22.956 | 22.2713 |
+| k54 | `[54,8]` | 3 | **22.2133** | 0.7409 | 22.312 / 21.428 / 22.900 | 22.3507 |
+| k55 | `[55,7]` | 3 | **23.3347** | 1.0822 | 23.696 / 22.118 / 24.190 | 23.4853 |
+
+The three single-tensor drops, **TEST and TRAIN alongside**:
+
+| step | k -> k+1 | tensor that moves | params | **dTEST pp** | SE units | **dTRAIN pp** |
+|---|---|---|---|---|---|---|
+| DROP1 | 52 -> 53 | `layer4.0.shortcut.1.weight` | 512 | **15.8080** | **21.25** | **19.6533** |
+| DROP2 | 53 -> 54 | `layer4.0.shortcut.1.bias` | 512 | **-0.1380** | -0.19 | -0.0793 |
+| DROP3 | 54 -> 55 | `layer4.1.conv1.weight` | 2,359,296 | **-1.1213** | -1.51 | -1.1347 |
+| TOTAL | 52 -> 55 | all three | 2,360,320 | **14.5487** | 19.56 | 18.4393 |
+
+DROP1 + DROP2 + DROP3 == the direct k52 - k55 difference exactly (additivity asserted, not assumed).
+`cpk1`'s own second cliff, DESCRIPTIVE and a different batch: **14.9700 pp**.
+Per-seed, DROP1 leads in **3 of 3**: 16.574 / 15.472 / 15.378, with DROP2 in {-0.230, -0.240,
++0.056} and DROP3 in {-1.384, -0.690, -1.290}.
+
+Every bar re-derived from the corpus by calling the scorer's own functions on the **pre-ingest**
+CSV, without editing the file: `SIGMA_W` **0.9110578** over **df 50, 25 cells** (batches `cbl1`,
+`cpk1`, `cts1`, `cts2`, `hb1`; **no `scl1` row**, so the SE unit is not circular with the batch it
+scores); `SE_ARM_DIFF` = `SIGMA_W*sqrt(2/3)` = **0.743910**; `SE_ADJ_STEPS` = `SIGMA_W*sqrt(2)` =
+**1.288490**; `CLIFF_BAR` = half of `cpk1`'s own 14.9700 = **7.4850**; `EVEN_BAND` =
+`SEPARATION_BAR` = `ASYM_BAR` = 0.05 x `cts1`'s own in-batch GAP 46.951333 = **2.3476**.
+Nothing was reverse-engineered from the result.
+
+### 152.4 THE VERDICT, VERBATIM
+
+The registered scorer's own output, quoted exactly and **not edited** (RULE 16):
+
+    -- R1, THEN R2, THEN R3, THEN THE VERDICT ------------------------
+           R1 CLIFF-NOT-REPRODUCED   TOTAL 14.5487 vs bar 7.4850 pp   does not fire
+           R2 SPLIT-EVEN             |DROP_i - 4.8496| <= 2.3476 pp   does not fire
+           R3 NO-MAJORITY            leader DROP1 15.8080 vs TOTAL/2 7.2743, gap over DROP2 15.9460 vs 2.3476 pp   does not fire
+
+    -- THE REGISTERED PREDICTIONS ------------------------------------
+           Q1 (B1) largest drop is DROP1                      HELD
+           Q2 (B2) largest drop is DROP3                      REFUTED
+           Q3 the cliff reproduces (TOTAL >= 7.4850)          HELD
+           Q4 the split is NOT even                           HELD
+           Q5 |DROP1 - DROP2| > 2.3476 pp                     HELD
+           Q6 TRAIN and TEST agree on the largest step        HELD
+           Q7 DROP3 <= 0 (the big conv does not cost)         HELD   (cts1's DROP3 = -7.707 pp)
+
+    -- VERDICT --------------------------------------------------------
+           VERDICT (the CLIFF):     CLIFF-REPRODUCES
+           VERDICT (the SPLIT):     SINGLE-TENSOR-MAJORITY
+           VERDICT (the TENSOR):    layer4.0.shortcut.1.weight
+           VERDICT (the MECHANISM): SHARED-MECHANISM
+           the majority is DROP1, the 512-parameter normalisation SCALE `layer4.0.shortcut.1.weight` leaving the fine group while its own convolution `layer4.0.shortcut.0.weight` is already coarse -- structurally the SAME step as cts1's winner `layer4.0.bn2.weight`, at a DIFFERENT site, in an INDEPENDENT submission.  'One tensor carries the step' is a PATTERN for this sub-class and CORRECTIONS 147.6's withdrawal was TOO CAUTIOUS.  B1 HELD, B2 REFUTED.
+
+    FINAL: CLIFF CLIFF-REPRODUCES | SPLIT SINGLE-TENSOR-MAJORITY | TENSOR layer4.0.shortcut.1.weight | MECHANISM SHARED-MECHANISM
+
+**On pre-registration.**  The `SHARED-MECHANISM` condition *and* the sentence "CORRECTIONS 147.6's
+withdrawal was TOO CAUTIOUS" are both in the registration blob `aac1bf0` (the string occurs
+**twice**; blob sha256 == working-tree sha256).  The prose therefore does **not** reach beyond the
+registered condition -- **the overclaim is IN the registered condition**.  It cannot be dismissed as
+post-hoc, and it cannot be accepted on that basis either: **pre-registering an inference does not
+make the inference valid.**  RULE 16 forbids editing the string.  Nothing forbids declining to
+repeat it, which is exactly what 147.6 did to `BN-LEVERAGE-FAVOURED`.
+
+### 152.5 THE ADVERSARIAL ROUND -- FIVE LENSES, WHAT EACH FOUND
+
+| lens | verdict | what it established |
+|---|---|---|
+| **arithmetic / narrowing** | refuted the interpretation | 147.6 withdrew a claim about predicting the capture **LEVEL** across cut positions; `scl1` measured a **within-step attribution** at a step selected for being costly. Different propositions. Also found the saturation floor (152.6) |
+| **independence** | refuted "INDEPENDENT" | six of twelve runs are exact-configuration **re-executions**; `SIGMA_REPRO` = 0.2266 vs `SIGMA_W` = 0.9111, a factor of **4.02**; `R1` had no power (152.7) |
+| **structural / live model** | refuted "a DIFFERENT site" | the two winners are the two branch-gain BN scales of **one** residual junction, `layer4.0`, three indices apart; the structural condition holds at **20 of 61** cuts (152.8) |
+| **mechanism / optimiser state** | refuted `SHARED-MECHANISM` | the two cliffs' `beta` traces move in **opposite** directions across their drop steps, and `scl1`'s post-cliff arms are dynamically **scalar** (152.6) |
+| **implementation / provenance** | confirmed, no defect | scorer byte-identical to registration, glob prefix-isolated (tested against a deliberately contaminated run directory), `--selftest` clean, every bar traceable to the corpus |
+
+Things the round **tried to break and could not**: every headline number (two independent parsers,
+exact to 4 dp, additivity exact); `SIGMA_W` (re-derived 0.9110578 / df 50 / 25 cells, and correctly
+excludes `scl1`); the scorer's integrity; the RULE 21 margin (two clocks); a batch-level level
+shift (`scl1` vs `cpk1` agree at k52 to **0.4587 pp** and at k55 to **0.0373 pp**); the partition
+manifest (each step moves exactly one tensor and it is the registered one); GPU heterogeneity
+(balanced across arms -- each arm got one non-A100 at seed 0 -- and `scl1-k55-s0` on an L4 lands on
+`cpk1-k55-s0`'s A100 `plateau5` at **23.696 vs 23.696**); asymmetric truncation (k52 is still
+rising at **+0.0576 pp/epoch** at epoch 99 while k53/k54/k55 are flat at +0.003 / -0.002 / -0.001 --
+which **understates** DROP1 and so cannot manufacture the majority, but does make 15.8080 pp a
+**lower bound** rather than an estimate).
+
+### 152.6 THE NARROWING THAT MATTERS: `Q5` IS NOT A CONTROL AT THIS CLIFF
+
+Two independent defects, both re-derivable from the scorer's own printed output plus the runs'
+own optimiser traces.
+
+**(i) `Q5` is not an independent statistic.**  `|DROP1 - DROP2| = 15.9460` is **bit-identical** to
+`R3`'s separation statistic (leader minus runner-up = 15.9460), against the **identical** bar
+2.3476.  The scorer prints both numbers, on its own two lines.  Q5 restates R3 and adds nothing.
+
+**(ii) The arm saturates at the clamp floor after DROP1, so `DROP2 ~ 0` and `DROP3 <= 0` are what a
+floor predicts for a tensor of ANY class.**  Pooled same-cell `m = 1` scalar baseline, re-derived
+here: **22.7492 pp**, n = 17 runs over six independent batches (`c100` 22.2740, `c100b` 23.1107,
+`cbl1` 22.7247, `cpk1` 22.7207, `cts1` 22.6660, `hb1` 22.8407), sd 0.6407.  With
+`SE = SIGMA_W*sqrt(1/3 + 1/17) = 0.5705 pp`:
+
+| arm | plateau5 | vs scalar baseline | SE units |
+|---|---|---|---|
+| `scl1` k52 | 37.8833 | **+15.1342** | +26.53 |
+| `scl1` k53 | 22.0753 | -0.6738 | **-1.18** |
+| `scl1` k54 | 22.2133 | -0.5358 | **-0.94** |
+| `scl1` k55 | 23.3347 | +0.5855 | **+1.03** |
+| `cts1` k50 (one step past **cliff 1**'s winner) | 30.3347 | **+7.5855** | **+13.30** |
+
+`DROP1` alone (15.8080 pp) **exceeds the k = 52 arm's entire 15.1342 pp advantage over that
+baseline**: moving that one tensor returns the partition to the scalar level.  `k53` and `k54` are
+in fact the two lowest m = 2 arms ever recorded in this cell (previous minimum `hb1` `[2,60]` =
+22.7087).
+
+The optimiser state says the same thing, and it is not a matter of interpretation.  I extracted
+`Optimizer_blockwise/beta_block{0,1}` (500 logged points per run) from the runs' own TensorBoard
+events on `alice2`:
+
+| arm | leading block `beta` end (s0/s1/s2) | frac of trace at the -15 floor | trailing block |
+|---|---|---|---|
+| `scl1` k52 | -10.4181 / -10.1800 / -10.0320 | **0.00** | -15.0000, frac 0.63-0.64 |
+| `scl1` k53 | **-15.0000 x3** | **0.62-0.63** | -15.0000, frac 0.62-0.63 |
+| `scl1` k54 | **-15.0000 x3** | **0.62-0.63** | -15.0000, frac 0.62-0.63 |
+| `scl1` k55 | **-15.0000 x3** | **0.58-0.63** | -15.0000, frac 0.63 |
+| `cts1` k01 (**scalar**, m = 1) | -15.0000 x3 | **0.63** | n/a |
+| `cts1` k49 | -14.9890 / -14.9870 / -14.2897 | **0.00-0.05** | -15.0000, frac 0.65 |
+| `cts1` k50 | -9.8279 / -9.8819 / -9.6998 | 0.00 | -15.0000, frac 0.63 |
+| `cts1` k51 | -9.8019 / -9.8359 / -9.7319 | 0.00 | -15.0000, frac 0.63 |
+| `cts1` k52 | -10.5422 / -10.1040 / -10.0720 | 0.00 | -15.0000, frac 0.63-0.64 |
+
+At k53, k54 and k55 **both** groups sit at the clamp floor (`alpha` = 3.06e-7) for **58-64 %** of
+the logged trace -- the same occupancy as the genuinely scalar arm `cts1-k01` (0.63).  **No `cts1`
+arm has that property**: the highest leading-block floor occupancy anywhere at cliff 1 is 0.05.
+So `cts1`'s cliff-1 matched control was measured with **7.59 pp / 13.30 SE** of live headroom, and
+`scl1`'s cliff-2 matched control was not measured with any.
+
+**Consequence.**  `SCALE-SHIFT-ASYMMETRIC` remains exactly where CORRECTIONS 147.6 put it --
+**descriptive at ONE site** -- and is **NOT** promoted to two.  If a scale-vs-shift number is
+wanted, quote `cts1`'s `DROP2 = -0.2333 pp`, and say that it was measured off the floor.
+The registered scorer has **no floor or saturation gate** (its only baseline machinery is the noise
+pool), and its own registered refusal of anchor arms is what made the saturation undetectable from
+inside the batch.  **Any successor scorer must carry a floor gate**: no drop may be scored as
+informative if the arm on either side is within 2 SE of the same-cell `m = 1` baseline.
+
+### 152.7 `CLIFF-REPRODUCES` IS A PIPELINE SMOKE TEST, NOT CORROBORATION
+
+Six of `scl1`'s twelve runs are **exact-configuration re-executions of arms already in the corpus,
+at the same three seeds**: `[52,10]` was run by `cpk1` and `cts1`; `[55,7]` by `cpk1` and `cbl1`.
+Only `[53,9]` and `[54,8]` are new (**0** prior live rows each).
+
+| arm | `cpk1` | `cts1` / `cbl1` | `scl1` |
+|---|---|---|---|
+| `[52,10]` s0/s1/s2 | 39.274 / 37.084 / 38.668 | 38.916 / 37.268 / 38.640 (`cts1`) | 38.656 / 36.660 / 38.334 |
+| `[55,7]` s0/s1/s2 | **23.696** / 22.228 / 24.192 | 23.748 / 22.178 / 23.756 (`cbl1`) | **23.696** / 22.118 / 24.190 |
+
+`cpk1-k55-s0` and `scl1-k55-s0` return `plateau5` **23.696 and 23.696** -- a difference of
+**zero** -- on an A100 and an L4 respectively.  Measured on this network's m = 2 arms, the
+cross-batch matched-seed reproducibility SD is **`SIGMA_REPRO` = 0.2266 pp** (df 33, 24 duplicated
+configurations) against the between-seed **`SIGMA_W` = 0.9111 pp** the scorer uses as its SE unit --
+**a factor of 4.02**.  Hence:
+
+- `|scl1 TOTAL 14.5487 - cpk1 14.9700|` = **0.4213 pp = 1.61 re-execution SE**.
+- `CLIFF_BAR` 7.4850 sits **28.6 such SE** below `cpk1`'s own 14.9700.
+- **`R1` could only have fired on a pipeline fault.**  It carries no evidential weight against B1,
+  and `CLIFF-REPRODUCES` must never be spent as confirmation.
+
+The independent submission does buy distinct job ids, a separate 1-second submit window, nine
+distinct nodes and three GPU types.  It does **not** buy independent sampling: seeds {0,1,2} are
+shared with `cpk1`, `cts1` and `cts2`, and same seed = same initialisation and same data order.
+**"the second cliff reproduces in an INDEPENDENT batch" may not be written** -- the standing
+instruction from 147.6's `CLIFF-REPRODUCES` narrowing applies here verbatim.
+
+**Corpus hygiene, and a numeral that must not be quoted without its key.**  `analysis/aggregate.py`
+assigns `dup_group` on run-NAME collisions only, so cross-batch configuration duplicates carry no
+flag.  A census over the 2,510 live rows **before** this ingest, keyed on
+(network, dataset, batch\_size, granularity, base, meta, meta\_stepsize, alpha0, gamma, augment,
+beta\_clip, hier, seed, epochs\_requested, epochs\_done), finds **285** configuration groups
+spanning more than one batch prefix, involving **1,128 rows (44.9 %)**.  A narrower key gives a
+smaller count; **the numeral is key-dependent and must be quoted with its key**.  The point that is
+not key-dependent: **"a different batch" never implies "a different configuration" in this corpus.**
+
+### 152.8 THE `first tensor to leave` RIVAL CANNOT BE SEPARATED BY EXISTING DATA. SAID PLAINLY
+
+**Tensor CLASS is perfectly aliased with ORDINAL POSITION in every single-tensor step the campaign
+owns.**  Both winners are `DROP1`, and both **had to be**: both cliff left-edges (k = 49, k = 52)
+are `cpk1` grid points sitting immediately after a convolution, so the tensor at index k is
+necessarily a BN scale.  All **six** single-tensor steps in the corpus come from two batches and
+both run **scale -> shift -> conv**.  This is architectural, not an oversight: `named_parameters()`
+on this ResNet always orders conv -> `bn.weight` -> `bn.bias`, and `--stepsize-groups [k, 62-k]`
+takes only a **contiguous prefix**, so **no contiguous-prefix cut on this architecture can ever move
+a normalisation shift before its own scale**.  For the record, `HF.py` is not the obstacle
+(`polish_the_stepsize_groups` accepts a list-of-lists of parameter names and `init_meta` resolves
+them by `name in group`); the constraint is `train.py`'s `--stepsize-groups type=str` grammar.
+
+Three rivals are live and **the existing data cannot choose between them**:
+
+1. **norm scale** -- the moved tensor's class carries the drop;
+2. **first to leave** -- the first step out of a `cpk1` local peak carries the drop, whatever moves;
+3. **clamp turnover** -- the step at which the leading group's clamp state turns over carries the
+   drop, and the moved tensor's class is incidental.
+
+Rival 3 is not idle speculation: it is the only one of the three that also accounts for 152.9's base
+rate, and the `beta` table in 152.6 is exactly a clamp turnover at k52 -> k53.
+
+Two further structural facts, re-derived on the live model and the manifest, that bound how much
+`scl1` can be asked to prove:
+
+- **The two winners are not two sites.**  `layer4.0.bn2.weight` (index 50) and
+  `layer4.0.shortcut.1.weight` (index 53) are the two branch-gain BatchNorm scales of **one**
+  residual junction -- `BasicBlock.forward` computes `out = bn2(conv2(out))` then
+  `out += shortcut(x)` -- three indices apart, and the two cliffs are contiguous halves of a single
+  6-tensor window (indices 50-55) in which `cts1`'s own DROP3 moves the very convolution
+  (`layer4.0.shortcut.0.weight`, index 52) whose becoming leading is what makes `scl1`'s winner
+  satisfy the structural condition.
+- **The structural condition is not rare.**  All 20 normalisation scales in this network are
+  registered immediately after their own convolution, so "a norm scale heads the trailing group with
+  its own conv already leading" holds at **20 of the 61 possible cuts (32.8 %)**, at k = 1, 4, 7,
+  ..., 58.  It is an automatic consequence of `named_parameters()` order, not a distinguishing
+  configuration.
+
+### 152.9 THE RELATIONSHIP TO CORRECTIONS 147.6, STATED PRECISELY
+
+**147.6 withdrew `BN-LEVERAGE-FAVOURED` as a CLASS-LEVEL MECHANISM claim** -- the sentence "a
+BatchNorm scale has leverage a BatchNorm shift does not".  Its grounds (147.5c) are all about
+**predicting the capture LEVEL across cut positions**.  `scl1`'s registered `SHARED-MECHANISM`
+condition tests something else: **conditional on a step `cpk1` already measured as costly, which of
+its three tensors carries the majority.**  These are different propositions and both can be true.
+`scl1` answers none of 147.5c's grounds, and every one of them is re-derived here and untouched:
+
+- **The condition does not predict the level.**  Re-derived from the manifest and the corpus, the
+  four `cpk1` cuts that satisfy it carry captures **+0.2190 (k31) / +0.6965 (k49) / +0.3324 (k52) /
+  +0.0139 (k55)** -- the sweep's peak and its **worst** cut.  Worse for the reinstatement,
+  **`scl1`'s own four arms reproduce the level refutation**: the same condition holds at k = 52
+  (`layer4.0.shortcut.1.weight` after `layer4.0.shortcut.0.weight`, `plateau5` **37.8833**) and at
+  k = 55 (`layer4.1.bn1.weight` after `layer4.1.conv1.weight`, `plateau5` **23.3347**) -- the same
+  structural condition, **14.5487 pp / 19.56 SE apart, inside this one batch**.
+- **The base rate is unmoved, and `scl1` decomposed one of the exceptions.**  Enumerated here from
+  the manifest index map: of `cpk1`'s adjacent m = 2 steps that move at least one normalisation
+  scale out of the trailing group, **7 RAISE `plateau5` and 2 LOWER it** -- and the 2 that lower are
+  exactly the two cliffs.  `scl1` decomposed one of those 2.  **That is selection on the dependent
+  variable.**
+- **The counterexample is not addressed.**  k = 45 -> k = 47 moves `layer4.0.bn1.weight` (also a
+  512-parameter BN scale, also in `layer4.0`) out and **GAINS +3.4487 pp / +0.0734 capture**.
+  Re-derived here to 4 dp; it is what confirms the index map is right.
+
+**CORRECTIONS 152 therefore RECORDS:**
+
+- **ADOPTED**, as intervention arithmetic at this cut position: `CLIFF-REPRODUCES` (with 152.7's
+  demotion to a pipeline check), `SINGLE-TENSOR-MAJORITY`, `TENSOR layer4.0.shortcut.1.weight`,
+  Q1/Q3/Q4/Q6.
+- **RECORDED BUT NOT ADOPTED AS A MECHANISM**: `SHARED-MECHANISM`.  It is the arithmetic outcome of
+  the registered condition at one further **step**, at the second branch scale of the **same**
+  residual junction.  The verdict string is **NOT edited** (RULE 16); its **interpretation** is
+  withheld, exactly as 147.6 did for `BN-LEVERAGE-FAVOURED`.
+- **NOT ADOPTED, EXPLICITLY**: the registered sentence *"'One tensor carries the step' is a PATTERN
+  for this sub-class and CORRECTIONS 147.6's withdrawal was TOO CAUTIOUS."*  **CORRECTIONS 147.6's
+  withdrawal STANDS.**  No lens established that it was too cautious; four established that it was
+  not.
+- **NOT PROMOTED**: `SCALE-SHIFT-ASYMMETRIC` stays descriptive at **one** site (152.6).
+
+**CORRECTION TO A CORPUS NUMERAL.**  CORRECTIONS 147.5c states "of `cpk1`'s **10** steps that move
+at least one normalisation scale from the fine group to the coarse group, **8** RAISE capture and 2
+lower it".  Enumerating the same eleven-cut ladder against the same manifest index map gives
+**9 steps: 7 RAISE, 2 LOWER** (k17->24 +1.4667, k24->31 +5.5933, k31->38 +2.9413, k38->42 +5.1213,
+k42->45 +1.1673, k45->47 +3.4487, k49->52 -17.1053, k52->55 -14.9700, k55->60 +1.3467; the step
+k47->49 moves `layer4.0.bn1.bias` and `layer4.0.conv2.weight` and **no scale**).  The two that
+LOWER agree in both counts and are exactly the two cliffs, so **147.6's conclusion is unaffected**;
+the numeral **8 of 10** is superseded by **7 of 9** and should not be re-quoted.
+
+### 152.10 WORDING THAT IS AND IS NOT ENTITLED
+
+**Entitled**, and this is the whole of it:
+
+> On CIFAR-100 / `ResNet18_c100` under SGDm+Lion at `ms = 1e-3`, `alpha0 = 1e-6`, 100 epochs, m = 2,
+> in this one `named_parameters()` order, `cpk1`'s previously undecomposed second cliff is carried by
+> a single 512-parameter normalisation scale: moving `layer4.0.shortcut.1.weight` from the trailing
+> group to the leading group costs **15.8080 pp** (21.25 SE, and it leads in 3 of 3 seeds), while its
+> own 512-parameter bias one step later costs **-0.1380 pp** (-0.19 SE) and the adjacent
+> **2,359,296**-parameter convolution **gains** 1.1213 pp; TRAIN agrees (19.6533 / -0.0793 /
+> -1.1347).  That single drop exceeds the k = 52 arm's entire 15.1342 pp advantage over the pooled
+> same-cell `m = 1` scalar baseline (22.7492 pp, n = 17, six batches): moving that one tensor returns
+> the partition to its scalar level.  `cts1`'s cliff-1 attribution and `scl1`'s cliff-2 attribution
+> agree on tensor CLASS and structural relation at the **two branch scales of the same `layer4.0`
+> residual junction**, on the **same seed draw {0,1,2}**, as a **within-step attribution at two steps
+> that were both selected for already being costly**.
+
+**Not entitled.  Do not write any of these:**
+
+- *"CORRECTIONS 147.6's withdrawal was TOO CAUTIOUS"* / *"one tensor carrying the step is a PATTERN
+  for this sub-class"* -- 152.9.  Pre-registered, and still not licensed.
+- *"one tensor accounts for 109 % of the second cliff"* -- banned by 147.6's fifth narrowing, for the
+  identical reason: the denominator 14.5487 pp is a non-monotone path sum with two negative legs.
+  **Print no share-of-TOTAL for DROP1 at all.**
+- *"the second cliff reproduces in an INDEPENDENT batch"* -- 152.7.  The submission is independent;
+  the sample is not.
+- *"at a DIFFERENT site"* -- 152.8.  One residual junction, two branch scales, three indices apart.
+- *"the matched 512-vs-512 control shows a shift lacks the leverage a scale has"* -- 152.6.  Not
+  identified at this cliff; and the statistic is `R3`'s.
+
+### 152.11 SCOPE
+
+Everything above is a statement about **one** cell: CIFAR-100 / `ResNet18_c100`, SGDm base + Lion
+meta, batch 100, `ms = 1e-3`, `alpha0 = 1e-6`, `gamma 1`, `AUGMENT=1`, clamp `-15:-2.3026`,
+`HIER=none`, **100 epochs**, m = 2 with contiguous-prefix cuts `[k, 62-k]`, in this one
+`named_parameters()` order, on seeds {0,1,2}.
+
+Explicitly **out of scope**, and none of it may be inferred from `scl1`:
+
+- **Any other architecture, dataset, granularity family, m, meta-stepsize, `alpha0`, optimiser pair,
+  hierarchical or shrinkage operator.**  `resnet18_blocks`, `nodewise`, CIFAR-10, Tiny-ImageNet,
+  ImageNet-489 and ResNet-50 are untouched.
+- **CAPTURE units.**  This batch registered no anchors, so CAPTURE is not defined in it; every
+  CAPTURE figure quoted above is `cpk1`'s, DESCRIPTIVE, and enters only through `CLIFF_BAR`.
+- **The asymptotic existence of either cliff.**  100-epoch snapshot, and k52 is still rising at
+  +0.0576 pp/epoch at epoch 99 (147.5f).  **15.8080 pp is a lower bound on DROP1, not an estimate.**
+  `cts3` (running, 772 epochs) addresses this at cliff **1** only.
+- **The clamp question at these cut positions.**  `cts2` released the floor at k = 49/50 only; the
+  `beta` traces in 152.6 are DESCRIPTIVE and were not registered.  Whether cliff 2 survives a floor
+  release is **unmeasured**, and 152.6 makes it a live question rather than a formality.
+- **Which of the three rivals in 152.8 is true.**  Unresolved, and unresolvable from existing data.
+- **Any seed draw other than {0,1,2}.**  Two cut positions in one architecture on one seed triple is
+  not a class-level pattern.
+
+Descriptive-and-not-registered, added after the data and gating nothing: the `beta`/clamp-occupancy
+table, the scalar-baseline comparison, `SIGMA_REPRO`, the duplicate-configuration census, the
+20-of-61 enumeration, the corrected 7-of-9 base rate, the terminal OLS slopes, and the per-seed and
+leave-one-seed-out breakdowns.  **No verdict above was changed by any of it.**  What changed is what
+the verdicts are allowed to mean.
+
+### 152.12 THE NEXT EXPERIMENT -- THE ONE DESIGN THAT BREAKS BOTH CONFOUNDS AT ONCE
+
+`scl1` and `cts1` are confounded in two independent ways: **class x ordinal position** (152.8) and
+**seed reuse** (152.7).  One batch fixes both, needs **no code change, no non-contiguous partition
+and no scorer exemption**, and is measured off the floor throughout.
+
+**Decompose `cpk1`'s k = 45 -> k = 49 window at single-tensor resolution, on a NEW seed triple, with
+in-batch anchors.**
+
+| arm | tensor that leaves at k -> k+1 | class | params |
+|---|---|---|---|
+| k45 -> k46 | `layer4.0.conv1.weight` | **conv** | 1,179,648 |
+| k46 -> k47 | `layer4.0.bn1.weight` | **scale** | 512 |
+| k47 -> k48 | `layer4.0.bn1.bias` | **shift** | 512 |
+| k48 -> k49 | `layer4.0.conv2.weight` | **conv** | 2,359,296 |
+
+Why this window.  Its class-by-position order is **conv, scale, shift, conv**, so a CONV is first
+to leave and a SCALE sits in position 2: "norm scale" is dissociated from "first step of the batch".
+That ordering is not unique -- every one of this network's 20 convolutions is followed by its own
+scale -- but this window is the one where `cpk1`'s existing grid already brackets it (`[45,17]` and
+`[47,15]` are ordinary specs already run by `cpk1`/`cbl1`, so only k = 46 and k = 48 are novel
+specs), and it is **off the floor** at every arm -- `cpk1` gives
+M(45) = 42.2393, M(47) = 45.6880, M(49) = 55.4473, i.e. **19.5 to 32.7 pp above** the 22.7492
+scalar baseline -- and the window **RISES** by +13.21 pp net, so every step is informative in both
+directions and no step can be a floor artefact.  Running it on seeds **{3,4,5}** makes it the first
+batch in this campaign that **samples** the seed nuisance instead of re-executing it, at the price
+that k45/k47/k49 must be re-run rather than reused -- which is the point.
+
+**Shape**: k in {45,46,47,48,49} x seeds {3,4,5} = 15 jobs, **plus `scalar` and `layerwise` anchors
+at seeds {3,4,5}** = 6 more.  **21 jobs**, one submission, every non-axis flag byte-matched to
+`scl1`.  ~15 GPU-h at this cell's measured rates.
+
+**Register in advance, before submission:** (a) *norm scale* predicts the largest single step at
+k46 -> k47; (b) *first to leave* predicts k45 -> k46; (c) *clamp turnover* predicts the largest step
+is whichever one moves the leading group's terminal `beta` off (or onto) the -15 floor, measured
+from the runs' own traces with `PROBE` on.  **And the scorer must carry a floor gate**: no drop is
+scored as informative if the arm on either side is within 2 SE of the in-batch `m = 1` anchor.
+
+Cheaper variants, both strictly weaker and recorded so they are not mistaken for this one: adding
+k = 56 and k = 57 to the `scl1` window (6 jobs) breaks the ordinal confound alone but lands on the
+saturated floor; a third cliff decomposed on seeds {0,1,2} adds a third step and **no** independence.
