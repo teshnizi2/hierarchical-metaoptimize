@@ -284,10 +284,20 @@ print("guard 4: named_parameters() structure, measured on the live model:")
 for name, lo, hi in groups:
     print("         %-12s tensors %2d..%-2d  params %9d"
           % (name, lo, hi, sum(numel[lo - 1:hi])))
-stage_ends = sorted(set(hi for name, lo, hi in groups
-                        if not name.startswith("layer")
-                        or name.endswith(".1")))
-print("guard 4: STAGE/segment boundaries at k = %s" % stage_ends)
+stages, cur = [], None
+for i, (n, _) in enumerate(nps, 1):
+    key = n.split(".")[0]
+    key = "stem" if key in ("conv1", "bn1") else key
+    if key != cur:
+        stages.append([key, i, i])
+        cur = key
+    else:
+        stages[-1][2] = i
+stage_ends = [hi for _, _, hi in stages]
+print("guard 4: TOP-LEVEL stages: %s"
+      % "  ".join("%s %d..%d" % (n, lo, hi) for n, lo, hi in stages))
+print("guard 4: STAGE boundaries at k = %s  (block boundaries at k = %s)"
+      % (stage_ends, [hi for _, _, hi in groups]))
 
 def B(sizes):
     m = len(sizes)
@@ -351,13 +361,31 @@ for a, b in ((17, 45), (24, 38)):
         print("!!! guard 4: mirror pair k=%d / k=%d is not both on the grid" % (a, b))
         bad += 1
 
-# the anchors are named, not listed, but must still compose
-for name, wantm in (("scalar", 1), ("layerwise", T)):
-    g = HF.polish_the_stepsize_groups(None, name, nps)
-    print("guard 4: anchor %-9s composes to m=%d" % (name, len(g)))
-    if len(g) != wantm:
-        print("!!! guard 4: anchor %s composed to m=%d, want %d" % (name, len(g), wantm))
-        bad += 1
+# The anchors are NAMED, not listed: init_meta routes them by exact string
+# match and they never reach polish_the_stepsize_groups.  That is the confound
+# the scorer discloses (the anchors use the scalar/layerwise code paths while
+# every sweep arm uses blockwise), so the guard proves the routing on the LIVE
+# source rather than assuming it.
+import inspect, re as _re
+src = inspect.getsource(HF.init_meta)
+mm = _re.search(r"stepsize_groups\s+in\s+\[([^\]]*)\]", src)
+if not mm:
+    print("!!! guard 4: could not find init_meta's exact-match routing list")
+    bad += 1
+else:
+    named = [x.strip().strip("'\"") for x in mm.group(1).split(",")]
+    print("guard 4: init_meta routes these names away from blockwise: %s" % named)
+    for name in ("scalar", "layerwise"):
+        if name in named:
+            print("guard 4: anchor %-9s takes its OWN code path (not blockwise)" % name)
+        else:
+            print("!!! guard 4: anchor %s is NOT in init_meta's named list; it would "
+                  "fall through to blockwise" % name)
+            bad += 1
+    for spec in specs:
+        if spec in named:
+            print("!!! guard 4: sweep spec %s collides with a named granularity" % spec)
+            bad += 1
 
 if bad:
     raise SystemExit(1)
