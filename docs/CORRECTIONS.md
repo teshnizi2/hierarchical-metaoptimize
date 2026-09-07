@@ -16007,3 +16007,345 @@ meta-stepsize or optimiser pair, or any hierarchical or shrinkage operator.
 4. **Do not re-run `cts1`/`scl1`'s window on new seeds before (1).**  It would add a fourth seed
    triple to a sign census that is already 15/15 and would not touch the alias that is actually
    blocking the claim.
+
+## 162. `cpr1` REGISTERED AND LAUNCHED -- THE **NAME-LIST PERMUTATION CONTROL**, AND THE HARNESS CHANGE THAT MAKES IT EXPRESSIBLE.  `PATCH_NAMESETS` ADDS **ONE** `--stepsize-groups` STRING FORM AND IS PROVED ADDITIVE AGAINST THE **UNPATCHED** CODE PATH ON **50 SPECS DRAWN FROM THE CORPUS'S OWN `granularity` COLUMN**.  **NOTHING OF `cpr1` HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,594 ROWS.**
+
+Cycle 137.  `alice2`, 15 jobs, 100 epochs, seeds {9,10,11}, ONE submission.  Two of the
+briefing's own statements are **contradicted** below and the contradictions are stated before the
+batch runs, not after: the swap does **not** separate class from a mass threshold, and the
+briefing's index set `{0..47, 50}` does **not** name the tensor its own prose names.
+
+### 162.1 WHY A HARNESS CHANGE WAS UNAVOIDABLE, AND WHAT WAS ACTUALLY CHANGED
+
+`161.7c(ii)` is the binding constraint: on `ResNet18_c100`, `class == index mod 3` at **every**
+tensor index 1..60, and `--stepsize-groups [k, 62-k]` is a **contiguous prefix**, so advancing the
+cut and moving a tensor into the coarse group are the same operation.  No prefix-cut batch can
+separate the two.
+
+The optimizer was never the blocker.  `HF.polish_the_stepsize_groups` **already** returns a
+list-of-lists of parameter NAMES, and `HF.init_meta`'s `blockwise` branch **already** resolves
+membership by name -- `[... if name in group ...]` and
+`[name in group for group in stepsize_groups].index(True)` -- neither of which assumes contiguity.
+The blocker is lexical: `train.py` declares `--stepsize-groups type=str` and
+`polish_the_stepsize_groups` knows only `resnet18_blocks`, `resnet50_blocks`, `[a,b,...]` (a list
+of BLOCK LENGTHS, contiguous by construction) and pass-through of an already-built list.
+
+`patches/patch_namesets.py` adds exactly one string form and nothing else:
+
+    --stepsize-groups sets:<group>/<group>/...
+    <group> := <item>[,<item>]*
+    <item>  := <1-based index> | <lo>-<hi> | <literal parameter name>
+
+Two insertions, no existing line edited: a module-level parser before `class HF():`, and ONE
+guarded early return at the top of `polish_the_stepsize_groups`.  Every pre-existing spec form
+fails `startswith('sets:')` and reaches the original body byte-unchanged.  Routing is untouched:
+`sets:...` is not in `init_meta`'s exact-match list, matches neither `^chunk(\d+)$` nor
+`^permnode(\d+)$`, and therefore takes the **same** `blockwise` path a `[k,62-k]` spec takes, with
+the same `stepsize_type`, the same `beta` shape and the same `block_product` reduction.
+
+### 162.2 THE BACKWARD-COMPATIBILITY PROOF.  MEASURED, NOT ARGUED
+
+`tests/test_namesets.py` compares the **PATCHED** file against the **UNPATCHED** file rather than
+against my expectation of either.  Run on `alice2` against the **LIVE** tree after the patch was
+applied: **56 checks, 56 PASS, 0 FAIL, exit 0.**
+
+| check | what it proves | result |
+|---|---|---|
+| **N0** | deleting the two inserted regions from the patched file reproduces the pre-patch file **BYTE FOR BYTE**; the dispatch block appears exactly once | PASS |
+| **N1** | over **50 specs** taken from `results/all_runs.csv`'s own `granularity` column -- `scalar`, `layerwise`, `nodewise`, `weightwise`, `nodewise1d`, `resnet18_blocks`, `resnet50_blocks`, 15 `chunk<K>`, 6 `permnode<S>`, and 21 `[a,b,...]` forms up to the 32-group `[2,2,...,1,1]` -- `polish_the_stepsize_groups` returns the identical object, or raises the identical exception type, before and after | **50 / 50 identical**; 23 composed a real partition on both sides, 27 raised on both sides |
+| **N2** | `sets:1-49/50-62` on the PATCHED code **equals** `[49,13]` on the UNPATCHED code, exactly; likewise `sets:1-31/32-62` vs `[31,31]`, `sets:1-2/3-62` vs `[2,60]`, `sets:1-16/17-32/33-47/48-62` vs `[16,16,15,15]` | 4 / 4 PASS |
+| **N3** | end to end through `init_meta`: `stepsize_type`, `param_groups_indices`, `map_layers_to_blocks` and every `beta` shape identical for `[49,13]` (pre) and `sets:1-49/50-62` (post) | PASS, both `blockwise`, sizes `[49,13]` |
+| **N4** | the three `cpr1` arms compose on the live model to `m=2`, sizes `[49,13]`, covering every tensor once, with the intended symmetric differences | PASS |
+| **N5** | the grammar is total and loud: eleven malformed specs (duplicate tensor within a group, duplicate across groups, missing tensor, index above `T`, index below 1, inverted range, unknown name, empty group, empty item, empty spec, missing tail) all raise `ValueError` | 11 / 11 PASS |
+| **N6** | no parameter name on this model is spelled `\d+` or `\d+-\d+`, so the parser's range-then-int-then-name order is unambiguous | PASS, zero ambiguous names |
+| **N7** | RULE 20 safety of every literal spec string | PASS -- see 162.3 |
+
+### 162.3 RULE 20.  THE GRAMMAR WAS CHOSEN TO FIT `argsline_guard.py` **AS IT STANDS**
+
+`analysis/argsline_guard.py` **IS NOT EDITED** (RULE 16; `git diff --stat -- analysis/` is empty
+of modifications, the only change under `analysis/` this cycle is one **added** file).  The spec
+is one shell token of `[A-Za-z0-9_.,:/-]` -- **no whitespace, no quote character, no `=`, and it
+does not begin with a dash** -- which is exactly what that file's `tokenize` (shlex) and
+`parse_flags` (a flag owns every following token that does not begin with `--`) require.
+Deliberately avoided: spaces (would be re-joined rather than round-tripped), `;`, `|`, `&`, `(`,
+`)`, `<`, `>`, `$`, `*`, `?` (shell metacharacters), and quotes.  `[` and `]` are avoided too, so
+the new forms need no shell quoting at all -- the legacy `[49,13]` form does, and always has.
+
+Three checks were run **before** composition, all on the real file:
+
+| # | check | result |
+|---|---|---|
+| A | `argsline_guard.py --cmdline "<a real composed sbatch line carrying the kS spec>" --expect stepsize-groups=<the kS spec> --expect num-epochs=100` | **VERDICT PASS, exit 0**; 7 launcher flags and 9 payload flags parsed, `--stepsize-groups` reported as ONE value, byte-identical to the spec |
+| B | `argsline_guard.py <dir> --name cpr1- --batch-consistency` over a **synthetic 15-file ARGS corpus** carrying all five specs | **15 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line; "every non-axis flag is identical across 15 runs"; VERDICT PASS** |
+| C | **NEGATIVE CONTROL** -- a second `--stepsize-groups sets:1-49/50-62` injected into one of those files | **DETECTED**: printed `sets:1-49/50-62  <-- LAST OF 2`, reported `DESIGN MISMATCH`, `VERDICT: FAIL -- STANDING RULE 20`, **exit 1** |
+
+C is the one that matters: the new grammar does not blind the guard to the bug the guard exists
+for.  The launcher additionally runs `guard_presubmit` **twice** per composed line -- once against
+the nine-flag design and once against that arm's own `--stepsize-groups` value -- and refuses to
+submit if either fails.  All 15 lines passed both.
+
+### 162.4 THE ARMS, AND THE LIVE-MODEL MANIFEST
+
+Five arms x 3 seeds = **15 runs, 100 epochs, PROBE=0**.  The briefing asked for 6; the three
+additions are each load-bearing and each is justified in the launcher header.
+
+| arm | `--stepsize-groups` | m | sizes | coarse params | fine params |
+|---|---|---|---|---|---|
+| `k01` | `scalar` | 1 | -- | -- | -- |
+| `kL` | `[49,13]` | 2 | 49 / 13 | 6,315,072 | 4,905,060 |
+| `kP` | `sets:1-49/50-62` | 2 | 49 / 13 | 6,315,072 | 4,905,060 |
+| `kS` | `sets:1-48,layer4.0.bn2.weight/layer4.0.conv2.weight,51-62` | 2 | 49 / 13 | 3,956,288 | 7,263,844 |
+| `kC` | `sets:1-48,layer4.0.shortcut.0.weight/layer4.0.conv2.weight,50-51,53-62` | 2 | 49 / 13 | 4,086,848 | 7,133,284 |
+
+Measured by the launcher's guard 4 on the **live** `ResNet18_c100` (62 tensors, 11,220,132
+parameters) and written to `runs/cpr1/PARTITION-MANIFEST.txt` with the **full name list of both
+groups for every arm**:
+
+    EQUIV kL kP IDENTICAL 1
+    SWAP kP kS OUT layer4.0.conv2.weight IN layer4.0.bn2.weight        DPARAMS -2358784
+    SWAP kP kC OUT layer4.0.conv2.weight IN layer4.0.shortcut.0.weight DPARAMS -2228224
+    MASS kP 6315072 kS 3956288 kC 4086848
+    ALIAS_MOD3_1_TO_60 1
+
+`kL` and `kP` compose to the **identical** partition in **both** groups.  Each swap arm exchanges
+**exactly one tensor out and exactly one in**, at **identical group size (49)** and identical group
+count (2).  Coarse group sizes across all four `m=2` arms: `{49}`.  The `class == index mod 3`
+alias was **re-derived on the live model** rather than quoted -- it HOLDS over tensors 1..60.
+
+**THE BRIEFING'S INDEX SET IS WRONG AND ITS NAMES ARE RIGHT.**  The briefing asks for coarse
+`{0..48}` versus `{0..47, 50}` and names the swap as `layer4.0.conv2.weight` for
+`layer4.0.bn2.weight`.  On the live model, 1-based, tensor **49** is `layer4.0.conv2.weight`,
+tensor **50** is `layer4.0.bn2.weight` and tensor **51** is `layer4.0.bn2.bias`.  Read 0-based,
+`{0..47, 50}` names tensor 51, the **shift**, not the scale.  The NAMES are authoritative and were
+followed; the discrepancy is recorded rather than silently resolved.
+
+**WHY `kC` IS NOT OPTIONAL.**  `kS` would be the only non-contiguous arm in a corpus of prefixes.
+If `kS` alone fell away from `kP`, four accounts would survive and be indistinguishable: the
+crossing tensor's **CLASS**, a **MASS THRESHOLD** on it, the coarse group's **TOTAL MASS**, and
+**CONTIGUITY** itself.  `kC` is non-contiguous like `kS` and low-mass like `kS` -- their coarse
+masses differ by **130,560 parameters, 3.30 %** -- but **conv-crossing** like `kP`.  So `kC ~ kP`
+refutes coarse-mass and contiguity together, and `kC ~ kS` confirms them together.  **WITHOUT
+`kC`, `cpr1` COULD NOT SAY `CLASS-OPERATIVE` AT ALL**; the most it could say is "the identity of
+the crossing tensor, or the contiguity of the partition, matters".  `kL` exists because the batch
+rests on a harness change and a **measured** equivalence at fixed seeds is worth 3 runs; `k01`
+exists because the registered prediction says `kS` lands **below the floor**.
+
+### 162.5 THE PRE-REGISTRATION.  BOTH ACCOUNTS, IN THE SAME UNITS, WITH THE BAR
+
+Scorer `analysis/cV1_cpr1_score.py`.  PRIMARY metric **plateau5 at 100 epochs** (mean of epochs
+95-99); TRAIN reported alongside TEST throughout.  Estimands `DS = M(kS) - M(kP)` and
+`DC = M(kC) - M(kP)`.
+
+**H-CLASS (the registered point prediction).**  Single-tensor moves are additive, so exchanging
+tensor 49 for tensor 50 moves the result by the difference of their measured single-tensor steps.
+Re-derived by `--selftest` from cpk3's **raw `.out` files** and cts1's corpus rows, never typed as
+a level:
+
+    DS_pred = [M_cpk3(k50) - M_cpk3(k49)] - [M_cpk3(k49) - M_cpk3(k48)]
+            = (30.752667 - 55.212000) - (55.212000 - 46.210000) = -33.461333 pp
+    DC_pred = [M_cts1(k52) - M_cts1(k51)] - [M_cpk3(k49) - M_cpk3(k48)]
+            =  (38.274667 - 30.568000) - 9.002000               =  -1.295333 pp
+
+**H-POSITION (the named alternative).**  Only group count and group sizes matter:
+`DS_pred = DC_pred = 0` exactly.
+
+**THE BAR.**  `SWAP_BAR = 2 * SE_ARM_DIFF = 1.497912 pp`.  The two accounts are **33.461333 pp =
+44.68 SE = 22.3 bars** apart on `DS`.  H-CLASS additionally predicts `|DC| = 1.295333 < SWAP_BAR`,
+i.e. `kC` **indistinguishable** from `kP`.  So the three accounts give three distinguishable
+patterns: `DS` significant + `DC` null (class), both null (position), both significant and equal
+(contiguity / coarse mass).
+
+**BRANCHES, all registered:** `CLASS-OPERATIVE` / `POSITION-OR-MASS-OPERATIVE` /
+`CONTIGUITY-OR-COARSE-MASS-OPERATIVE` / `UNRESOLVED-UNDERPOWERED` (the measured `DS` within one bar
+of BOTH predictions) / `UNRESOLVED-PATTERN-UNREGISTERED` / plus the gate branches
+`UNRESOLVED-PROVENANCE`, `UNRESOLVED-NOT-COMPARABLE`, `UNRESOLVED-DIVERGED`, `UNRESOLVED-NOISY`,
+`UNRESOLVED-PATCH-NOT-INERT`, `UNRESOLVED-CONTROL`, `UNRESOLVED-SATURATED`.  `--selftest` checks
+the branch map is exhaustive and mutually exclusive on six probe points and that the registered
+prediction maps to the registered branch.  **PREDICTED BRANCH: `CLASS-OPERATIVE`.**
+
+**THE FLOOR GATE, AND THE SATURATION THAT IS PREDICTED IN ADVANCE.**  `R-FLOOR` is against this
+batch's **own in-batch `m=1` anchor** `k01`, bar `2 * SE_FLOOR = 1.497912 pp`.  H-CLASS predicts
+`M(kS) ~ 55.212 - 33.461 = 21.751`, which is **BELOW** this cell's `m=1` floor (cpk3's own `k01`
+read 22.818 at 100 epochs).  So **if the registered prediction is right, `kS` is EXPECTED to be
+floor-saturated and `|DS|` is EXPECTED to be TRUNCATED.**  That does not block the branch, which
+turns on the sign and on `|DS| > SWAP_BAR`, both of which survive truncation; it **forbids quoting
+`|DS|` as an effect size**, and the scorer prints a BOUND instead.  If `kP` itself is at the floor
+the verdict is `UNRESOLVED-SATURATED` and nothing may be read.
+
+**THE OTHER GATES, in firing order.**  `G0` provenance (15 runs, 5x3, 15 distinct job ids, 100/100
+epoch lines, no repeated flag, NAME == ARGS `--run-name`, each arm's ARGS `--stepsize-groups`
+equal to its REGISTERED spec, exactly ONE distinct ENV line carrying `AUGMENT=1` /
+`BETA_CLIP=-15:-2.3026` / `HIER=none` / `PROBE=0`).  `G1` comparability, read from the manifest --
+this is the gate that fires `UNRESOLVED-NOT-COMPARABLE` if the arms differ in more than the
+intended swap.  `R2` divergence (`DEAD_BAR` 5.00).  `R3` noise (`NOISY_BAR = 3 * SIGMA_W =
+2.751840`).  **`R-EQUIV`**, the harness gate: `|M(kP) - M(kL)| <= 1.497912 pp` or
+`UNRESOLVED-PATCH-NOT-INERT`.  `R-CTRL`: `M(kL) - M(k01) >= CTRL_BAR = 16.197000`, half of cpk3's
+own `k49 - k01` at 100 epochs, re-derived.
+
+**`R-EQUIV`'s POWER IS STATED, NOT IMPLIED.**  At `SE_ARM_DIFF = 0.748956` it can only exclude
+patch effects **larger than 1.497912 pp**.  The PRIMARY inertness evidence is the **static** proof
+of 162.2 (byte-identical partition and byte-identical `init_meta` state); `R-EQUIV` corroborates it
+at runtime and does not replace it.
+
+### 162.6 THE NOISE FLOOR, RE-DERIVED AT REGISTRATION, AND MADE **ACTUALLY** INGEST-PROOF
+
+No sigma was copied forward (`156`, `159`, `161.9`).  Both horizons were re-derived from the live
+corpus at 2,594 rows with cR1's estimator -- the pooled within-(batch x granularity) SD of
+`plateau5` over `m = 2` arms in this exact cell -- and the frozen rule is
+`SIGMA_W = max(SIGMA_100, SIGMA_772)`:
+
+| stratum | sigma | df | cells | members |
+|---|---|---|---|---|
+| **100 epochs** (horizon-matched **and** the larger -> **USED**) | **0.917280** | 58 | 29 | 87 |
+| 772 epochs | 0.864841 | 26 | 13 | 39 |
+
+`SIGMA_W = 0.917280`; `SE_ARM_DIFF = SIGMA_W * sqrt(2/3) = 0.748956`; every bar derives from the
+frozen literal.
+
+**THE FIX FOR THE DEFECT `161.9` RECORDED AGAINST `cS2`.**  `161.9` found that cS2's header
+claimed cR1's ingest-proof pattern but only its section F actually had it, and that **4** of its
+checks became known-false the moment its own rows landed.  `cV1` does not use the "admit two
+states" trick.  **Every corpus reader in the file excludes rows whose `run` begins `cpr1-`**, so
+every frozen premise is **invariant** under this batch's own ingest -- identical answer
+pre-registration, during a partial ingest, and post-ingest -- and a future `--selftest` FAIL can
+only mean a **foreign** batch moved the corpus, which is the FAIL being useful.  The exclusion is
+not decorative: `kL`'s granularity is the literal `[49,13]`, so without it cpr1's own three `kL`
+rows would enter `SIGMA_100`'s cell list and move the bar after the fact.
+
+The premises covered, **all of them**, all through the excluding reader: `SIGMA_100` and its
+df/cells/members; `SIGMA_772` and its df/cells/members; `SIGMA_W` as the max; cts1's `[51,11]` and
+`[52,10]` means; the zero-duplicate premise (no foreign row in this cell carries seed 9, 10 or 11
+-- **0 found**); the new-grammar premise (no foreign row uses a `sets:` granularity -- **0
+found**); and the RULE 21 row-count premise (`cpr1` rows are 0 or exactly 15 -- **0 found ->
+PRE-REGISTRATION**).  cpk3's four 100-epoch anchors are re-derived from the **raw `.out` files**,
+which the CSV cannot supply because those runs carry `epochs_done=772`; when the files are
+unreachable the check **SKIPs** rather than passing or failing.  `--selftest` **PASSES** on this
+machine with all four cpk3 anchors re-derived to `< 5e-5`.
+
+### 162.7 WHAT `cpr1` **CANNOT** DO, SAID BEFORE IT RUNS.  TWO BRIEFING CLAIMS DECLINED
+
+**(a) IT DOES NOT SEPARATE CLASS FROM A MASS THRESHOLD.**  The briefing states the swap "separates
+class from the mass threshold in the same stroke."  **That is wrong**, and `161.7c(i)` is why: on
+ResNet-18 the smallest convolution is 131,072 parameters and the largest normalisation tensor is
+512 -- a **256x** gap with **no overlap anywhere** -- so "is a convolution" and "is above ~1e5
+parameters" are **the same predicate on this network**.  No partition of this model can pull them
+apart.  What the swap separates is **TENSOR IDENTITY (class-or-mass-threshold, jointly)** from
+**ORDINAL POSITION / GROUP SIZE / GROUP COUNT**; `kC` additionally separates it from
+**COARSE-GROUP TOTAL MASS** and from **CONTIGUITY**.  The scorer therefore prints
+`CLASS-OPERATIVE` **with a permanent rider** spelling this out, and its SCOPE block forbids
+dropping it.  Separating class from mass needs an architecture with a large normalisation tensor
+or a small convolution; `cpr1` is not that experiment.
+
+**(b) `PROBE` STAYS 0, SO `152.12`'s RIVAL (c) REMAINS UNTESTED.**  `161.12` asked for a
+PROBE-enabled arm so that rival (c) could finally be tested with per-tensor `<h,g>`.  **DECLINED,
+and structurally rather than for budget:** at `m = 2` `HF.block_product` has **already** reduced
+`<h,g>` to one scalar **per group** before `_probe` is reached, so **no** PROBE interval can
+recover a per-tensor quantity from these arms.  This is cts2's and cO1's reason and the launcher's
+guard 4g re-checks it on the live source.  Getting per-tensor `<h,g>` would need a **second**
+harness patch of `PATCH_PROBE7`'s pre-reduction shape shipped in the **same** batch as the grammar
+change -- two simultaneous harness changes under one RULE 20 audit, which is precisely the
+unauditable thing RULE 20 exists to prevent.  The block-level `beta_block{0,1}` traces that
+`161.7c` actually used are written to TensorBoard at `PROBE=0` regardless, so the mechanism trace
+is not lost.  **`cpr1` MAY NOT CLAIM TO HAVE TESTED `152.12` RIVAL (c).**
+
+**(c) 100 EPOCHS ONLY.**  The estimand is the sign and existence of a swap effect.  `161.8` records
+that the 772-epoch objects in this window are still attenuating, which is a reason to make **no**
+asymptotic claim rather than to spend 8x the GPU making one badly.  `cpr1` may make no claim at any
+other horizon and no claim about whether the swap effect attenuates.
+
+### 162.8 PROVENANCE.  RULE 16, RULE 20, RULE 21
+
+| rule | evidence produced this cycle | result |
+|---|---|---|
+| **RULE 16** | `git diff --stat -- analysis/` at pre-registration HEAD `36028ec` | **empty** -- no pre-existing scorer edited.  The only change under `analysis/` is one **added** file, `cV1_cpr1_score.py` |
+| **RULE 16** | `analysis/argsline_guard.py` | **NOT EDITED**; the spec grammar was chosen to fit it as it stands (162.3) |
+| **RULE 21** | registration commit `76a8fb2`, `git show -s --format=%cI` = **2026-09-07T22:39:15+02:00**; earliest `sacct` Submit = **2026-09-07T22:41:35** | **margin 140 s** |
+| **RULE 21** | Submit spread across all 15 jobs, 22:41:35 - 22:41:37 | **2 s = ONE submission** |
+| sha256 | scorer `390fb4a4...dd444abf`, patch `652c79f0...19648dfd`, test `9f724afa...01bf5506`, launcher `1a207317...5b79f786` -- computed on the Mac and on the `alice2` staging checkout `~/metaopt/hmo-cpr1` at `76a8fb2` | **all four byte-identical on both machines**; that checkout's `git status --porcelain` for the four files is empty |
+| live tree | `HF.py` pre-patch sha256 `3445ba52...92bfc7`, kept at `HF.py.pre_namesets`; post-patch `0d8ee431...42a3892` | the tested file **is** the shipped file |
+| dry run | `bash bin/cV1_namelist_permutation.sh` (no `--submit`) | exit 0, **15 composed command lines, 0 failed the RULE 20 pre-check**, every line printed |
+| job ids | 4918920-4918934 | **15 contiguous, no gap** |
+
+`in489g2` was not touched: `squeue` was read and nothing else; **0** `in489g2` rows in the corpus
+before and after, and no `in489g2` file was opened.
+
+### 162.9 POST-LAUNCH RULE 20, AND A SEPARATE ENV-LINE AUDIT
+
+**THE ARGS-LINE AUDIT IS PENDING, AND THAT IS SAID PLAINLY RATHER THAN PAPERED OVER.**
+`guard_postlaunch` watched `$WS/runs/cpr1-*.out` for 900 s and returned **RC = 2, UNVERIFIED** --
+its documented "no job started inside the window" state, which is **NOT** a mismatch and **NOT** a
+pass.  No `cpr1` job had started at the close of this cycle: all 15 are `PENDING` with
+`Reason=Priority`, this account's priority (**629,382**) is the **lowest** of the five users
+holding pending work on the three partitions, and Slurm's own earliest estimated start is
+**2026-09-08T02:46:44+02:00**, about **4.1 h** after submit.  **The audit that reads a run's own
+`ARGS` line must therefore be run when the first job starts**, and the command is exactly the one
+the guard printed:
+
+    python3 analysis/argsline_guard.py /home/s5014158/metaopt/runs --name cpr1- --batch-consistency
+
+**NO NUMBER FROM `cpr1` MAY BE QUOTED BEFORE THAT AUDIT PASSES.**
+
+**IN ITS PLACE, AN AUDIT OF SLURM'S OWN RECORD, AND ITS STRENGTH IS STATED.**  `sacct -X -o
+SubmitLine` returns the scheduler's stored command line for each job -- a record written by Slurm,
+not echoed by the launcher.  It is **weaker** than the `ARGS`-line audit (it proves what the
+SCHEDULER accepted, not what `train.py` received) and **stronger** than the pre-submission check
+(which audits a string the script is about to `eval`).  All 15 SubmitLines were materialised and
+put through the **UNEDITED** `analysis/argsline_guard.py`:
+
+| audit | result |
+|---|---|
+| `--batch-consistency` over the 15 | **15 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line**; *"every non-axis flag is identical across 15 runs"*; **VERDICT PASS** |
+| 9 `--expect` design flags (`alg-base=SGDm`, `alg-meta=Lion`, `meta-stepsize=1e-3`, `alpha0=1e-6`, `num-epochs=100`, `batch-size=100`, `gamma=1`, `dataset=CIFAR100`, `NN-name=ResNet18_c100`) | **15 clean, 0 mismatch, VERDICT PASS** |
+
+**THE SEPARATE ENV-LINE AUDIT**, written independently of `argsline_guard` and run over the same
+15 records:
+
+    runs audited                     15
+    distinct job ids                 15
+    distinct ARGS md5                15
+    distinct ENV/--export strings     1   ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=0
+    distinct NON-AXIS ARGS residual   1   (after stripping --stepsize-groups / --seed /
+                                           --run-name / --save-directory)
+    k01 scalar | kL [49,13] | kP sets:1-49/50-62 | kS ...bn2.weight... | kC ...shortcut.0.weight...
+        -- every arm's --stepsize-groups equals its REGISTERED spec, 5 / 5
+    ENV carries AUGMENT=1, BETA_CLIP=-15:-2.3026, HIER=none, SCHED=none, PROBE=0
+    ENV-LINE AUDIT: PASS
+
+**ONE OBSERVATION WORTH KEEPING.**  Slurm's `SubmitLine` reproduces the spec **unquoted**.  For the
+legacy arm that is `[49,13]`, a bash bracket **glob**, so a SubmitLine copied out of `sacct` and
+pasted into a shell is not safe for the old grammar.  The three `sets:` forms contain **no glob
+character at all**, so the new grammar is the safer of the two to round-trip through a scheduler
+record -- an unintended benefit of the RULE 20 character restriction, recorded because it is the
+kind of thing that bites later.
+
+**ETA.**  Submit **2026-09-07T22:41:35+02:00**.  Slurm's estimated starts run from
+**2026-09-08T02:46:44** (job `4918920`) to **2026-09-09T20:50:00** (job `4918934`), i.e. the
+scheduler is currently reserving the 15 x 3 h requests **serially** in its worst case.  Those
+estimates are conservative backfill bounds and are routinely beaten; the honest bracket is
+**~5 h to ~48 h from submit** for the full batch.  Nothing in this cycle depends on which end it
+lands at, because nothing of `cpr1` is read here.
+
+### 162.10 COST, AND A DEFECT IN A REGISTERED ARTEFACT, RECORDED RATHER THAN EDITED
+
+**COST.**  15 jobs x 100 epochs.  Measured per-epoch cost of this cell on the three partitions used
+(`gpu-l4-24g` 27.0-31.2 s, `gpu-mig-40g` 27.6-36.6 s, `gpu-a100-80g` 21.6-29.4 s; cpk3's own 21
+runs averaged 25.9 s/epoch): **0.60-1.02 h per run, ~12 GPU-hours for the batch**, against cpk3's
+~117.  `WALL = 03:00:00` is 2.9x the worst observed rate.  `gpu-short` fits arithmetically but is a
+different node set from every batch in this cell and is not used; `gpu-2080ti-11g` likewise.
+
+**A DEFECT IN `tests/test_namesets.py`, FOUND AFTER REGISTRATION AND NOT EDITED.**  Its own
+docstring suggests `--pre /path/to/HF.py.pre_namesets`, and `importlib.util.spec_from_file_location`
+returns `None` for a path that does not end in `.py`, so that literal invocation raises
+`AttributeError: 'NoneType' object has no attribute 'loader'` before any check runs.  The file is a
+registered artefact of this cycle and was **not** edited to hide this.  The documented working
+invocation is to copy the backup to a `.py` path first; the 56-check run reported in 162.2 was made
+that way, and `diff` proves the copy byte-identical to `HF.py.pre_namesets`.  Recorded so the next
+reader does not mistake a loader error for a patch failure.
+
+### 162.11 WHAT HAS **NOT** HAPPENED
+
+**Nothing of `cpr1` has landed, been scored or been ingested.**  `results/all_runs.csv` stands at
+**2,594 rows**; `grep -c '^cpr1-'` is **0**.  No MASTER-TABLE verdict moves, no FINDINGS entry
+moves, and `git status --porcelain paper/` is empty.  `bin/PROTECTED.txt` carries `cpr1-`.  The
+verdict of this batch is whatever `analysis/cV1_cpr1_score.py` prints when it is run **unedited**
+on the completed runs, and nothing in this entry anticipates it.

@@ -1,13 +1,37 @@
 # STATUS — operator dashboard
 
-Updated 7 Sep 2026 (**cycle 136**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **161**) > `docs/FINDINGS.md` > everything else.
+Updated 7 Sep 2026 (**cycle 137**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **162**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,594 rows** (`cpk3` LANDED and INGESTED, **+21**). `alice2` queue **EMPTY**; `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,594 rows**, unchanged this cycle. `alice2` queue holds **15 `cpr1` jobs** (launched this cycle, nothing landed); `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 **CYCLE 134 ran the FREE analysis first, then bought GPU.** CORRECTIONS **159**. (1) **`cS1`, ZERO GPU**, answers the one thing 158 left unexplained: `k50` and `k52` differ in **KIND**, not in rate — **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**. (2) **`cpk3` REGISTERED, DRY-RUN and LAUNCHED** on `alice2` — the **consecutive** grid `k` ∈ {45,46,47,48,49,50} + scalar floor × seeds **{6,7,8}**, 21 jobs, 772 ep, ~117 GPU-h. **Nothing of `cpk3` landed, scored or ingested.** **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
 
-## CYCLE 136 (this one) — **`cpk3` LANDS.** CORRECTIONS **161**
+## CYCLE 137 (this one) — **`cpr1` REGISTERED AND LAUNCHED.** CORRECTIONS **162**
+
+The batch that breaks the `class == index mod 3` alias `161.7c(ii)` says no prefix cut can break. **A HARNESS CHANGE WAS REQUIRED AND IS THE MAIN DELIVERABLE.** **NOTHING LANDED, SCORED OR INGESTED — corpus stands at 2,594 rows, `grep -c '^cpr1-'` = 0.**
+
+| # | deliverable | outcome |
+|---|---|---|
+| 1 | **`patches/patch_namesets.py`** — adds ONE `--stepsize-groups` form, `sets:<g1>/<g2>/…` over 1-based indices, ranges and literal parameter **names** | 2 insertions, **no existing line edited**; routing unchanged (`blockwise`, same `beta` shape, same `block_product`) |
+| 2 | **backward-compatibility proof** vs the **UNPATCHED** file, run on the LIVE tree | **56 checks, 56 PASS.** N1: **50/50** corpus-drawn specs byte-identical. N2: `sets:1-49/50-62` **==** `[49,13]` exactly. N3: identical `init_meta` state. N5: 11/11 malformed specs raise |
+| 3 | **RULE 20 compatibility** — `analysis/argsline_guard.py` **NOT EDITED** | spec is one token of `[A-Za-z0-9_.,:/-]`; `--cmdline` **PASS**, `--batch-consistency` over 15 synthetic runs **PASS**, and the **negative control** (injected duplicate `--stepsize-groups`) is still **DETECTED** → `FAIL`, exit 1 |
+| 4 | **the arms**, on the live-model manifest | `kL` `[49,13]` and `kP` `sets:1-49/50-62` compose to the **IDENTICAL** partition; `kS` and `kC` each exchange **exactly 1 out / 1 in** at **identical size 49**; coarse sizes across all four `m=2` arms = `{49}` |
+| 5 | **pre-registration** | H-CLASS `DS −33.461333`, `DC −1.295333`; H-POSITION `0`, `0`; bar `SWAP_BAR = 1.497912` → the accounts are **44.68 SE = 22.3 bars** apart on `DS`. Predicted branch **`CLASS-OPERATIVE`** |
+| 6 | **noise floor**, RE-DERIVED at registration | `SIGMA_100` **0.917280** (df 58, cells 29, members 87) — horizon-matched **and** the larger, so **USED**; `SIGMA_772` 0.864841 (df 26, cells 13, members 39); `SIGMA_W` **0.917280** |
+| 7 | **RULE 21** | commit `76a8fb2` **22:39:15+02:00**, earliest Submit **22:41:35** → **margin 140 s**; Submit spread **2 s = ONE submission**; 15 contiguous job ids |
+
+**ARMS.** 5 × 3 seeds {9,10,11} = **15 runs, 100 epochs, PROBE=0, ~12 GPU-h.** `k01` `scalar` (m=1 floor anchor) · `kL` `[49,13]` (legacy grammar) · `kP` `sets:1-49/50-62` (new grammar, same partition) · **`kS`** swaps `layer4.0.conv2.weight` (2,359,296, **conv**) for `layer4.0.bn2.weight` (512, **BN scale**) · **`kC`** swaps it for `layer4.0.shortcut.0.weight` (131,072, **conv**). Coarse mass `kP` 6,315,072 / `kS` 3,956,288 / `kC` 4,086,848 — `kS` and `kC` differ by **3.30 %**, so a coarse-mass account predicts `kS ≈ kC` while a class account predicts `kC ≈ kP`.
+
+**WHY 15 RUNS AND NOT THE BRIEFING'S 6.** `+k01` because the registered prediction says `kS` lands **below** the m=1 floor and the truncation must be detectable. `+kL` because the batch rests on a harness change and a **measured** equivalence is worth 3 runs (`R-EQUIV`, bar 1.497912; power stated — it can only exclude patch effects **> 1.5 pp**, the static proof is primary). **`+kC` because without it `CLASS-OPERATIVE` is not claimable at all** — `kS` alone leaves class, mass threshold, coarse mass and **contiguity** indistinguishable.
+
+**TWO BRIEFING CLAIMS DECLINED, IN ADVANCE.** (a) The swap does **NOT** separate class from a **mass threshold** — on ResNet-18 the smallest conv is 131,072 and the largest BN tensor 512, a **256×** gap with no overlap, so the two are the same predicate (`161.7c i`). `CLASS-OPERATIVE` therefore ships with a **permanent rider**. (b) **`PROBE` stays 0**, so `152.12`'s rival (c) **remains untested**: at `m=2` `block_product` reduces `<h,g>` to one scalar **per group** before `_probe`, so no interval recovers a per-tensor quantity; getting it needs a **second** patch in the same batch, which is exactly what RULE 20 exists to prevent. Also noted: the briefing's index set `{0..47, 50}` names the **shift**, not the scale — the **names** were followed and the discrepancy recorded.
+
+**POST-LAUNCH RULE 20 — PARTIALLY PENDING, SAID PLAINLY.** `guard_postlaunch` returned **RC=2 UNVERIFIED** (its documented "no job started in 900 s" state — **not** a mismatch): all 15 are `PENDING/Priority`, this account's priority **629,382** is the lowest of five users queued on the three partitions, and Slurm's earliest estimated start is **2026-09-08T02:46:44+02:00** (~4.1 h after submit; full-batch bracket **~5–48 h**). **The `ARGS`-line audit must be re-run when the first job starts** — `python3 analysis/argsline_guard.py $WS/runs --name cpr1- --batch-consistency` — and **no `cpr1` number may be quoted before it passes.** In its place, **Slurm's own `sacct SubmitLine` records** for all 15 jobs were put through the **UNEDITED** guard: **15 clean, 0 repeated-flag/design mismatch, VERDICT PASS** on `--batch-consistency` and again on 9 `--expect` design flags. **SEPARATE ENV audit: PASS** — 15 job ids, 15 distinct ARGS md5s, **1** distinct `--export` string, **1** distinct non-axis ARGS residual, and all 5 arms' `--stepsize-groups` equal to their registered specs.
+
+**No MASTER-TABLE verdict moves. No FINDINGS entry moves. Nothing under `paper/` touched.**
+
+## CYCLE 136 — **`cpk3` LANDS.** CORRECTIONS **161**
 
 **`FINAL: PEAK-CONFIRMED-AT-49 | CONVERGED`** (my own run, scorer `analysis/cS2_cpk3_score.py` **UNEDITED**, sha256 `603971aa…59286d99`, identical Mac / `alice2`; `runsdir` is **POSITIONAL**). 21/21 complete, RULE 20 **PASS** (21 clean, 0 mismatch, batch-consistency across 21, exactly **1** distinct ENV line), RULE 21 margin **120 s**, 1-s Submit spread = **ONE submission**, 12 nodes, 21 distinct md5s.
 
