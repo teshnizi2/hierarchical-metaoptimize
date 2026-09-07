@@ -32,7 +32,7 @@ Registered **before first execution**, run **UNEDITED**, sha256 `45b95380…0c6a
 | *exp. null* | *any* | — | *0.2877* | *0.6931* | *1.3863* | ***2.3026*** | — | — |
 
 - **Separation at f=0.90 only:** k52−k50 = **+2.5664**, bar **1.4350**, **1.79×**. At f = .25/.50/.75 the ratios are 0.26 / 0.73 / 0.65 — **no** separation.
-- **Eligibility was gated in advance.** `k01/k45/k47/k49` all fail **E1** (mean slope@100 between −0.00235 and +0.00051 = converged at 100) and are **printed in full, then excluded**. In-batch `SIGMA_TAIL` **0.109408** (df 882) → `AMP_BAR` **0.489287`.
+- **Eligibility was gated in advance.** `k01/k45/k47/k49` all fail **E1** (mean slope@100 between −0.00235 and +0.00051 = converged at 100) and are **printed in full, then excluded**. In-batch `SIGMA_TAIL` **0.109408** (df 882) → `AMP_BAR` **0.489287**.
 - **`PI` localises the break IN TIME.** `PI = [W(199)−W(99)]/[100·slope@100]`: k50 **0.684**, **k52 0.275**. **k52's slope@100 over-predicts even the NEXT 100 epochs by 3.6×** — the rate law is already wrong at epoch **199**, not slowly over 672.
 - **Cross-batch replication, descriptive:** `cts3`'s k50 (seeds {0,1,2}) gives ρ **0.2865 / 0.6735 / 1.4093 / 2.3759** vs `cpk2`'s. **k50 is exponential in two batches on disjoint seeds** — so k52's departure is not an estimator artefact.
 - **THE HONEST WEAKNESS:** the primary statistic is **1.79 bar on df 4**. Real on the registered rule, **not overwhelming**. Corroborated by signrun, R², the 1.87-bar departure from the parameter-free null, and cts3 — but it must be quoted as 1.79/df 4.
