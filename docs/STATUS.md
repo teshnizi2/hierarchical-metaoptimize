@@ -1,13 +1,53 @@
 # STATUS — operator dashboard
 
 Updated 7 Sep 2026 (**cycle 136**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **160**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **161**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,573 rows — UNCHANGED this cycle** (`cpk3` is launched and **unlanded**; `results/all_runs.csv` untouched). `alice2` now runs **`cpk3`, 21 jobs**; `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,594 rows** (`cpk3` LANDED and INGESTED, **+21**). `alice2` queue **EMPTY**; `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**This cycle ran the FREE analysis first, then bought GPU.** CORRECTIONS **159**. (1) **`cS1`, ZERO GPU**, answers the one thing 158 left unexplained: `k50` and `k52` differ in **KIND**, not in rate — **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**. (2) **`cpk3` REGISTERED, DRY-RUN and LAUNCHED** on `alice2` — the **consecutive** grid `k` ∈ {45,46,47,48,49,50} + scalar floor × seeds **{6,7,8}**, 21 jobs, 772 ep, ~117 GPU-h. **Nothing of `cpk3` landed, scored or ingested.** **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
+**CYCLE 134 ran the FREE analysis first, then bought GPU.** CORRECTIONS **159**. (1) **`cS1`, ZERO GPU**, answers the one thing 158 left unexplained: `k50` and `k52` differ in **KIND**, not in rate — **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**. (2) **`cpk3` REGISTERED, DRY-RUN and LAUNCHED** on `alice2` — the **consecutive** grid `k` ∈ {45,46,47,48,49,50} + scalar floor × seeds **{6,7,8}**, 21 jobs, 772 ep, ~117 GPU-h. **Nothing of `cpk3` landed, scored or ingested.** **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
 
-**CYCLE 135 (this one) WAS ZERO GPU AND AUDITED THE RECORD.** CORRECTIONS **160**. Two claims from a four-lens viability assessment were re-derived from `results/all_runs.csv`. **(A) The "cut position dominates group count" overclaim REPRODUCES as an overclaim** — the count range **exceeds** the position range — and three doc lines are corrected **in place, superseded wording kept verbatim**. **(B) The alleged 24.6 pp alpha0 confound on the headline CIFAR-100 cell DOES NOT EXIST** — `FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE | PREMISE PASS`. **Nothing submitted, nothing cancelled, nothing ingested; corpus unchanged at 2,573.**
+## CYCLE 136 (this one) — **`cpk3` LANDS.** CORRECTIONS **161**
+
+**`FINAL: PEAK-CONFIRMED-AT-49 | CONVERGED`** (my own run, scorer `analysis/cS2_cpk3_score.py` **UNEDITED**, sha256 `603971aa…59286d99`, identical Mac / `alice2`; `runsdir` is **POSITIONAL**). 21/21 complete, RULE 20 **PASS** (21 clean, 0 mismatch, batch-consistency across 21, exactly **1** distinct ENV line), RULE 21 margin **120 s**, 1-s Submit spread = **ONE submission**, 12 nodes, 21 distinct md5s.
+
+| # | deliverable | outcome |
+|---|---|---|
+| 1 | **`cpk3`** — the peak's LOCATION on the consecutive grid | **`PEAK-CONFIRMED-AT-49`**, best `k49` **56.0453** over `k46` **49.5060** by **6.5393 pp = 8.21 SE** (bar 1.5930) |
+| 2 | convergence | **ALL SEVEN ARMS CONVERGED** (`CONV_BAR` 0.024235). `k46` (+0.00549) and `k50` (+0.00607) converged but **NOT tight** (`TIGHT_BAR` 0.00426) |
+| 3 | in-batch `m=1` floor | **22.8180 @100 → 23.1780 @E**, moved **+0.3600 = 0.45 SE**. All six sweep arms **INFORMATIVE at both horizons** (+7.93 … +32.87) |
+| 4 | the five single-tensor steps | measured **in batch**, both horizons, **TRAIN agrees on every sign** (table below) |
+| 5 | the registered prediction | **branch HELD, mechanism HALF-REFUTED** — H-MASS mis-decomposes 2 of its 4 steps by **+4.19** and **−3.42 SE**; H-EQUI refuted outright |
+| 6 | ingest | **+21 added, 0 changed, 0 removed.** Corpus **2,573 → 2,594**. **0 `in489g2` rows** |
+| 7 | selftest audit (92 files, pre vs post) | **26 → 28 non-zero.** `cS2` fails as **PREDICTED** (159) and **no verdict moves** (`score()` output byte-identical pre/post); `cU1` is a **second, unpredicted** drifter and is **benign** |
+
+**THE FIVE CONSECUTIVE SINGLE-TENSOR STEPS** (step = `level(k+1) − level(k)`; positive = moving that tensor into the coarse group HELPS):
+
+| step | tensor | class | params | TEST@100 | TEST@E | SE | TRAIN@E | per-seed sign |
+|---|---|---|---|---|---|---|---|---|
+| 45→46 | `layer4.0.conv1.weight` | conv | 1,179,648 | **+5.7740** | **+5.7227** | +7.18 | +6.1967 | 3/3 |
+| 46→47 | `layer4.0.bn1.weight` | BN **scale** | 512 | **−2.5773** | **−2.7220** | −3.42 | −3.6367 | 3/3 |
+| 47→48 | `layer4.0.bn1.bias` | BN **shift** | 512 | +0.1087 | +0.0640 | +0.08 | +0.2573 | 2/3 |
+| 48→49 | `layer4.0.conv2.weight` | conv | 2,359,296 | **+9.0020** | **+9.1973** | +11.55 | +11.5767 | 3/3 |
+| 49→50 | `layer4.0.bn2.weight` | BN **scale** | 512 | **−24.4593** | **−18.2707** | −22.94 | −18.4107 | 3/3 |
+
+### THE CLASS PATTERN — **WHERE IT MAY AND MAY NOT BE QUOTED**
+
+**`CORRECTIONS 147.6` STANDS.** It withdrew *"a BatchNorm scale has leverage a BatchNorm shift does not"* **as a class-level MECHANISM claim**, on the ground that the property fails to predict the capture **LEVEL** across cut positions. **`cpk3` does not test that proposition** — it measures single-tensor **intervention signs** — so it neither restores nor weakens the withdrawal. **One of `147.6`'s three grounds IS retired**: the "opposite-way" counterexample `k45→k47` (+3.449 pp) is now split in batch into conv **+5.7227** and scale **−2.7220**; the aggregate was positive **because the conv outweighed the scale**.
+
+**MAY BE QUOTED** — as a **sign census**, with the scope sentence attached: over the whole corpus, **every** single-tensor prefix-cut step measured **off** the `m=1` floor carries its tensor's class sign — **conv 3/3 POSITIVE** (3 sites, +5.72…+9.20), **BN scale 7/7 NEGATIVE** (2 sites, −2.72…−25.16), **BN shift 2/2 NULL** (2 sites, both < 0.30 SE); **15/15 sign-consistent** including the 3 floor-saturated `scl1` steps, over 6 batches, 2 horizons, 2 clamp levels, **3 disjoint seed triples**.
+
+**MAY NOT BE QUOTED** — and the reason is structural, not statistical: **`class == index mod 3` holds at EVERY index 1…60 of `named_parameters()`** (tensors 1–60 are exactly 20 `conv/scale/shift` triples). `--stepsize-groups [k,62−k]` takes a **contiguous prefix**, so **no prefix cut on this architecture can ever separate tensor class from ordinal position** — `cpk3` cannot, and neither can any successor of the same shape (`152.8` reproduced). Class is **also** inseparable from a **mass threshold**: in the measured range the smallest conv (131,072) is **256×** the largest BatchNorm tensor (512), with no overlap anywhere in ResNet-18. So: **no leverage claim, no mechanism, no effect-size law by class, and nothing outside `layer4.0`** — every measured step lies in indices 45…55, one residual junction.
+
+**`152.12`'s three registered rivals, scored on this window:** *(a) norm scale* predicted the largest step at `46→47` — it is the **smallest** non-null magnitude there: **REFUTED**. *(b) first to leave* predicted `45→46` — it is second: **REFUTED**. *(c) clamp turnover* is the only survivor, and only on a loose reading; it explains the two **largest** steps and **fails outright at `45→46`**, which moves the coarse-group terminal `beta` by **0.0000 nats** and still buys **+5.7227 pp**. `PROBE=0`, so (c)'s registered per-tensor `<h,g>` test **was not run**.
+
+**`−18.2707 pp` IS A 772-EPOCH OBJECT AND IS STILL SHRINKING** — **−24.4593 @100 → −18.2707 @E**, a **25.3 %** in-batch attenuation, alongside the coarse-group `beta` gap falling **5.17 → 1.39 nats**. `k50`'s `beta` is still annealing (**−0.004413 nats/epoch** at E). Quote it **with its horizon**; the asymptote stays **UNMEASURED**. Not threatened: the sign (3/3), the rank, or the peak verdict.
+
+**NEXT:** **`cpr1`** — an explicit **name-list** partition (`HF.polish_the_stepsize_groups` already accepts one; the obstacle is `train.py`'s `--stepsize-groups type=str` grammar) that swaps `layer4.0.conv2.weight` for `layer4.0.bn2.weight` **at fixed group count and fixed cut position**. It is the **only** design that breaks the `index mod 3` alias. Then **`cpk4`**, the same five-step decomposition at `layer3.0` or `layer2.0`, for the first class measurement outside `layer4.0`.
+
+**No MASTER-TABLE verdict moves. No FINDINGS entry moves. Nothing under `paper/` touched.**
+
+**CYCLE 135 WAS ZERO GPU AND AUDITED THE RECORD.** CORRECTIONS **160**. Two claims from a four-lens viability assessment were re-derived from `results/all_runs.csv`. **(A) The "cut position dominates group count" overclaim REPRODUCES as an overclaim** — the count range **exceeds** the position range — and three doc lines are corrected **in place, superseded wording kept verbatim**. **(B) The alleged 24.6 pp alpha0 confound on the headline CIFAR-100 cell DOES NOT EXIST** — `FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE | PREMISE PASS`. **Nothing submitted, nothing cancelled, nothing ingested; corpus unchanged at 2,573.**
 
 ## Cycle 135 — the deliverables
 
@@ -109,7 +149,7 @@ Registered **before first execution**, run **UNEDITED**, sha256 `45b95380…0c6a
 - **THE HONEST WEAKNESS:** the primary statistic is **1.79 bar on df 4**. Real on the registered rule, **not overwhelming**. Corroborated by signrun, R², the 1.87-bar departure from the parameter-free null, and cts3 — but it must be quoted as 1.79/df 4.
 - **MAY NOT CLAIM:** any **mechanism**; any **repaired rate law**; an asymptote (A is fitted over a 672-epoch window); anything pooled across batches; anything about k46/k48 or any other cut, cell or horizon.
 
-## `cpk3` — REGISTERED AND LAUNCHED, **UNLANDED** (CORRECTIONS 159.5–159.11)
+## `cpk3` — **LANDED, SCORED, INGESTED** (CORRECTIONS 161); the design below is 159.5–159.11 as registered
 
 | | |
 |---|---|

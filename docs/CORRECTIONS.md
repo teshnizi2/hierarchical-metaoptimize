@@ -15461,3 +15461,549 @@ arms on CIFAR-100).  It issues **no meta-stepsize claim**.  The 6-block interact
 **two batches** and is not offered as a mechanism.  Nothing about `cpk3`: it is launched, unlanded,
 unread and unscored; the corpus stands at **2,573 rows** and `results/all_runs.csv` is
 **byte-unchanged**.
+
+## 161. `cpk3` LANDS -- `PEAK-CONFIRMED-AT-49 | CONVERGED`, AND THE FIVE CONSECUTIVE SINGLE-TENSOR STEPS ARE MEASURED IN BATCH.  A **TENSOR-CLASS SIGN PATTERN** APPEARS AND IS ADMITTED **ONLY AS A SIGN CENSUS**: `147.6` STANDS AS WRITTEN, ONE OF ITS THREE GROUNDS IS RETIRED, AND CLASS IS **PERFECTLY ALIASED WITH ORDINAL POSITION mod 3** ON THIS ARCHITECTURE
+
+Cycle 136.  21/21 complete, 0 failures, 772/772 epoch lines each, `RUN_DONE` 21/21.  Scorer
+`analysis/cS2_cpk3_score.py` run **UNEDITED** (RULE 16).  **+21 rows ingested; the corpus moves
+2,573 -> 2,594.**  Every number below was re-derived on this machine from the raw `.out` epoch
+lines by a parser that shares no code with the scorer, before the scorer was consulted; the two
+agree to **7.11e-15 pp** on all seven arms.
+
+### 161.1 PROVENANCE -- RULE 16, RULE 20, RULE 21, ALL RE-DERIVED HERE
+
+| rule | evidence produced this cycle | result |
+|---|---|---|
+| **RULE 16** | `git status --porcelain analysis/` empty; `git diff --stat -- analysis/` empty, at pre-ingest HEAD `d05572e` | no scorer edited |
+| **RULE 16** | `shasum -a 256 analysis/cS2_cpk3_score.py` = `603971aa7c3efeb128db9158fdb449fb6ca0a6051e2a645ed800bdaa59286d99`; `sha256sum` of the `alice2` staging checkout `~/metaopt/hmo-cpk3/analysis/cS2_cpk3_score.py` = **the same string**; that checkout's `git status --porcelain` for the file is empty at `a523c3e` | byte-identical on both machines |
+| **RULE 20** | `python3 analysis/argsline_guard.py ../runs_alice2 --name cpk3- --batch-consistency` | **21 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line. VERDICT PASS**; "every non-axis flag is identical across 21 runs" |
+| **RULE 20** (independently) | my own parser stripped `--stepsize-groups` / `--seed` / `--run-name` / `--save-directory` from all 21 ARGS lines | **1** distinct residual string; **1** distinct `ENV:` line (`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none ... PROBE=0 ...`); **21** distinct md5s; **21** distinct job ids |
+| **RULE 21** | `git show -s --format=%cI a523c3e` = **2026-09-07T08:33:20+02:00**; earliest `sacct` Submit = **2026-09-07T08:35:20** | **margin 120 s**; Submit spread 08:35:20-08:35:21 = **1 s** = **ONE submission** |
+| G0 (scorer) | in the scorer's own output | **PASS** 21 runs / 21 job ids / 772 of 772 epochs / NAME == ARGS == ENV / no repeated flag / **1 distinct ENV line** |
+| G1 (manifest) | `--manifest ../runs_alice2/cpk3/PARTITION-MANIFEST.txt`, a documented argument | `TOTAL_PARAMS` **11,220,132** matches; all six registered tensor sizes **ok**, none MISMATCH |
+
+**The job-id gap is not a missing run.**  The 21 ids are `4915304`-`4915306`, `4915308`-`4915325`.
+`sacct -j 4915307` resolves to `4795210_317` / `run.sh` / user **`dijkhuistm`** -- another user's
+array element, not ours.  **12 distinct nodes** (863, 864, 867, 868, 869, 872, 874, 876, 882, 883,
+884, 885); elapsed 04:38:54 - 07:33:55.
+
+**`in489g2` was not touched.**  `squeue` was read and nothing else; **0** `in489g2-*.out` files
+exist under `../runs` or `../runs_alice2`, and the corpus holds **0** `in489g2` rows before and
+after the ingest.
+
+### 161.2 THE VERDICT, QUOTED VERBATIM FROM MY OWN RUN
+
+    VERDICT (the PEAK at 772 epochs): PEAK-CONFIRMED-AT-49
+    VERDICT (convergence):           ALL INFORMATIVE ARMS CONVERGED
+    FINAL: PEAK-CONFIRMED-AT-49 | CONVERGED
+
+Invocation (**`runsdir` is POSITIONAL**), exit 0:
+
+    python3 analysis/cS2_cpk3_score.py ../runs_alice2 \
+            --manifest ../runs_alice2/cpk3/PARTITION-MANIFEST.txt
+
+### 161.3 THE ARMS, AND THE TWO GATES THAT DECIDE WHAT MAY BE READ
+
+    arm  spec      test@100  test@E   gain   train@100 train@E  tgain  slope@100  slope@E   SD@E
+    k01  scalar     22.8180  23.1780  0.3600  22.5920  22.9427  0.3507  +0.00041  +0.00328 0.3572
+    k45  [45,17]    42.9047  43.7833  0.8787  47.5920  48.8020  1.2100  +0.00459  +0.00274 0.3882
+    k46  [46,16]    48.6787  49.5060  0.8273  53.8313  54.9987  1.1673  -0.00461  +0.00549 0.6135
+    k47  [47,15]    46.1013  46.7840  0.6827  50.1580  51.3620  1.2040  +0.00483  +0.00112 0.1699
+    k48  [48,14]    46.2100  46.8480  0.6380  50.4113  51.6193  1.2080  +0.00304  -0.00041 0.3399
+    k49  [49,13]    55.2120  56.0453  0.8333  61.5920  63.1960  1.6040  -0.00068  +0.00162 0.8426
+    k50  [50,12]    30.7527  37.7747  7.0220  32.5647  44.7853 12.2207  +0.05521  +0.00607 1.2965
+
+**k46 and k48 are the first measurements of those cuts at any horizon anywhere in this corpus.**
+
+**R2** 21/21 alive (bar 5.00).  **R3** worst cell SD **1.2965** (k50) <= **2.9265**.
+**R1 PREMISE** `D100 = M(k49) - M(k50) = 24.4593 pp = 30.71 SE`, bar 12.4170 -- **PASS**.
+**R-CTRL** `k49 55.2120 > k47 46.1013 > k45 42.9047`, `k49 - k47 = 9.1107 pp = 11.44 SE` > 1.5930
+-- **PASS**: seeds {6,7,8} reproduce the cell's known 100-epoch order.
+
+**R-FLOOR.**  This batch's own `m = 1` floor: **22.8180 @100**, **23.1780 @E**, moved **+0.3600 pp
+= 0.45 SE** -- i.e. the scalar floor is flat over 672 extra epochs, which is why the sweep arms'
+gains are not a budget effect.  All six sweep arms are **INFORMATIVE at BOTH horizons**, bar 1.5930:
+
+    arm   above floor @100   above floor @E
+    k45        +20.0867          +20.6053
+    k46        +25.8607          +26.3280
+    k47        +23.2833          +23.6060
+    k48        +23.3920          +23.6700
+    k49        +32.3940          +32.8673
+    k50         +7.9347          +14.5967
+
+Nothing is excluded from the argmax set.  This satisfies, in batch, the floor gate that
+**CORRECTIONS 152.12 required in advance** ("no drop is scored as informative if the arm on either
+side is within 2 SE of the in-batch `m = 1` anchor") -- the gate that `scl1` did not have.
+
+**R-CONV.**  `CONV_BAR 0.024235`, `TIGHT_BAR 0.00426`.  **All seven arms CONVERGED.**  Two are
+converged but **NOT tight**: `k46` (+0.00549) and `k50` (+0.00607).  `k50` went **+0.05521 @100 ->
++0.00607 @E**, a factor of **9.1** decay in its own terminal slope.
+
+### 161.4 THE FIVE CONSECUTIVE SINGLE-TENSOR STEPS, ALL IN BATCH.  TEST AND TRAIN ALONGSIDE
+
+Step = `level(k+1) - level(k)`: **positive means moving that tensor into the coarse (leading) group
+HELPS.**  Tensor names and parameter counts from the launcher's live-model manifest, not from prose.
+
+| step | tensor moved into the coarse group | class | params | **TEST@100** | **TEST@E** | TEST@E in SE | **TRAIN@100** | **TRAIN@E** | per-seed sign at E |
+|---|---|---|---|---|---|---|---|---|---|
+| 45 -> 46 | `layer4.0.conv1.weight` | conv | 1,179,648 | **+5.7740** | **+5.7227** | **+7.18** | +6.2393 | +6.1967 | **3/3** |
+| 46 -> 47 | `layer4.0.bn1.weight` | BN scale | 512 | **-2.5773** | **-2.7220** | **-3.42** | -3.6733 | -3.6367 | **3/3** |
+| 47 -> 48 | `layer4.0.bn1.bias` | BN shift | 512 | **+0.1087** | **+0.0640** | **+0.08** | +0.2533 | +0.2573 | **2/3** |
+| 48 -> 49 | `layer4.0.conv2.weight` | conv | 2,359,296 | **+9.0020** | **+9.1973** | **+11.55** | +11.1807 | +11.5767 | **3/3** |
+| 49 -> 50 | `layer4.0.bn2.weight` | BN scale | 512 | **-24.4593** | **-18.2707** | **-22.94** | -29.0273 | -18.4107 | **3/3** |
+
+**TRAIN agrees with TEST on the sign of every one of the five steps, at both horizons.**
+Per-seed at E: 45->46 {+5.4580, +5.7100, +6.0000}; 46->47 {-2.0900, -3.1280, -2.9480};
+47->48 {-0.0760, +0.0060, +0.2620} -- **the only sign-inconsistent step, and it is the null**;
+48->49 {+8.4980, +9.5380, +9.5560}; 49->50 {-18.8080, -17.3800, -18.6240}.
+
+`cpk2`'s two-tensor aggregates at 772, CROSS-BATCH and DESCRIPTIVE: 45->47 **+2.3847**,
+47->49 **+10.5140**, 49->50 **-20.4993**.
+
+### 161.5 THE PEAK AT E, OVER THE INFORMATIVE SWEEP ARMS
+
+    k49  56.0453     k46  49.5060     k48  46.8480
+    k47  46.7840     k45  43.7833     k50  37.7747
+    best k49 over k46 by 6.5393 pp = 8.21 SE_ARM_DIFF   bar 1.5930
+
+**The runner-up changed identity.**  Under `cpk2`'s five-cut grid the runner-up was `k47`
+(45.8987); on the consecutive grid it is **`k46`**, a cut that had never been run.  `k46` beats
+`k47` by **+2.7220 pp = 3.42 SE**.  The margin therefore **narrowed from 10.5140 pp (cpk2) to
+6.5393 pp (cpk3)** -- filling the grid cost the peak 4 pp of headroom, exactly the risk the
+never-run cuts represented.  It did not cost it the peak.
+
+### 161.6 PREDICTION vs MEASURED -- **THE BRANCH HELD, THE MECHANISM IS HALF-REFUTED**
+
+Registered branch **`PEAK-CONFIRMED-AT-49`**, registered argmax `k49`.  **Measured branch
+`PEAK-CONFIRMED-AT-49`, measured argmax `k49`.**  The branch is decided entirely within cpk3.
+
+Level residuals (**cross-batch and cross-seed**, against `cpk2`'s seeds {3,4,5} anchors; descriptive):
+
+    arm     H-MASS    H-EQUI  measured  res(MASS)  res(EQUI)
+    k01    23.3680   23.3680   23.1780    -0.1900    -0.1900
+    k45    43.5140   43.5140   43.7833    +0.2693    +0.2693
+    k46    45.8976   44.7063   49.5060    +3.6084    +4.7997
+    k47    45.8987   45.8987   46.7840    +0.8853    +0.8853
+    k48    45.9009   51.1557   46.8480    +0.9471    -4.3077
+    k49    56.4127   56.4127   56.0453    -0.3673    -0.3673
+    k50    35.9133   35.9133   37.7747    +1.8613    +1.8613
+    mean |residual| over the sweep arms:  H-MASS 1.3231   H-EQUI 2.0818
+
+**Both hypotheses are refuted as mechanisms, and the level table hides it.**  The decisive
+comparison is at the **step** level, where the batch effect cancels because both endpoints are
+cpk3's own arms:
+
+| step | tensor | H-MASS predicts | H-EQUI predicts | measured | error(H-MASS) | in SE |
+|---|---|---|---|---|---|---|
+| 45 -> 46 | conv1 (1.18M) | **+2.3836** | +1.1923 | **+5.7227** | **+3.3390** | **+4.19** |
+| 46 -> 47 | bn1.weight (512) | **+0.0010** | +1.1923 | **-2.7220** | **-2.7230** | **-3.42** |
+| 47 -> 48 | bn1.bias (512) | **+0.0023** | +5.2570 | **+0.0640** | +0.0617 | +0.08 |
+| 48 -> 49 | conv2 (2.36M) | **+10.5117** | +5.2570 | **+9.1973** | -1.3144 | -1.65 |
+
+**The cross-batch anchoring cannot be blamed for the two failures.**  cpk3 reproduces cpk2's
+*aggregates* well: 45->47 differs by **+0.6160 pp = 0.77 SE**, 47->49 by **-1.2527 = -1.57 SE**,
+45->49 by **-0.6367 = -0.80 SE**.  With the aggregates replicating inside 1.6 SE, the **+4.19 SE**
+and **-3.42 SE** step errors are errors of the *decomposition*, not of the anchor.
+
+**Where H-MASS holds and where it breaks is itself the class pattern.**  H-MASS assigned the
+512-parameter member **0.0434 %** of the 45->47 step; that tensor -- a BN **scale** -- actually
+carried **-90.7 %** of the measured aggregate.  It assigned the 512-parameter member **0.0217 %**
+of the 47->49 step; that tensor -- a BN **shift** -- actually carried **+0.7 %**, which is
+0.08 SE from the prediction.  **Mass-proportionality is accurate for the BatchNorm shift and
+wrong by 3.4 SE with the wrong sign for the BatchNorm scale.**
+
+This is recorded plainly, as `CORRECTIONS 158` had to record about `cpk2`: **a right branch from a
+wrong model is luck, and the model must not be retold as confirmed.**  `cpk2`'s forecast got its
+branch right and predicted three rank swaps of which zero occurred; `cpk3`'s got its branch right
+and mis-decomposed two of its four steps.  **Two consecutive batches have now confirmed a
+registered branch while refuting the curve/mechanism model that generated it.**
+
+The one thing the level table does say, and it is worth keeping: `k48 - k46 = -2.6580 pp`.  H-MASS
+predicted `|k48 - k46| ~ 0` (**+0.0033**) and H-EQUI predicted **+6.4494**.  The measurement is
+2.66 pp from H-MASS and 9.11 pp from H-EQUI, so **H-EQUI is refuted outright and H-MASS is refuted
+in sign** on the one contrast the registration named as separating them.
+
+### 161.7 THE APPARENT CLASS PATTERN.  WHAT IT IS, WHAT IT IS NOT, AND WHY `147.6` STANDS
+
+The five steps read as a tensor-class pattern: **both convolutions HELP (+5.72, +9.20), both
+BatchNorm SCALES HURT (-2.72, -18.27), the BatchNorm SHIFT does nothing (+0.06).**  That is close
+to the sentence `CORRECTIONS 147.6` **WITHDREW**, and this campaign has already been burned once
+(`CORRECTIONS 152`) for reinstating a withdrawn claim on thin evidence.  Five attacks were run
+before any of it was allowed near the record.
+
+#### 161.7a WHAT `147.6` ACTUALLY WITHDREW, AND WHETHER `cpk3` SPEAKS TO IT
+
+`147.6`, in its own words, withdrew **"`BN-LEVERAGE-FAVOURED` *as a class-level mechanism claim*"**
+-- specifically the sentence *"a BatchNorm scale has leverage a BatchNorm shift does not --
+multiplicative gains carry the partition effect."*  Its stated ground: *"It is contradicted by data
+already in the corpus at three other sites (147.5c)."*  `147.5c` is three separate arguments:
+
+1. **A2's structural condition holds at four `cpk1` cuts (k = 31, 49, 52, 55) whose CAPTURE spans
+   +0.0139 to +0.6965** -- nearly the whole sweep, including the worst cut in the grid.  *"The
+   property A2 names does not predict capture; cut position does."*
+2. **Of `cpk1`'s 10 steps that move at least one normalisation scale from fine to coarse, 8 RAISE
+   capture and 2 lower it.**
+3. **The `k = 45 -> k = 47` step, which moves `layer4.0.bn1.weight`, GAINS +3.449 pp** -- described
+   there as *"the only other BN-scale-out move in the corpus and it points the opposite way"*, with
+   the acknowledgement that it *"is confounded (`layer4.0.conv1.weight` moves with it)."*
+
+**Grounds 1 and 2 are a DIFFERENT PROPOSITION from what `cpk3` measures, and `cpk3` does not touch
+them.**  Both are about predicting the **LEVEL (capture) of an ARM** from a structural property of
+the cut, across **multi-tensor** steps on a sparse grid.  `cpk3` measures the **SIGN and SIZE of a
+SINGLE-TENSOR intervention**.  A tensor class can systematically move a single-tensor step and
+still fail completely to predict where a 5-to-13-tensor jump lands -- indeed `cpk3` shows exactly
+that, because its own two conv steps and its own scale step land in the same arm-level
+neighbourhood.  **`147.6`'s withdrawal is not overturned by `cpk3`, because `cpk3` does not test
+what `147.6` withdrew.**  `152.5`'s first lens reached the same conclusion about `scl1` and it is
+reaffirmed here.
+
+**Ground 3 is RETIRED, and `cpk3` is what retires it.**  `k45 -> k47` moves **two** tensors:
+`layer4.0.conv1.weight` (1,179,648) and `layer4.0.bn1.weight` (512).  `cpk3` splits it in batch:
+the conv contributes **+5.7227** and the BN scale contributes **-2.7220**, summing to **+3.0007**,
+which reproduces `cpk1`'s **+3.449** and `cpk2`'s **+2.3847** aggregates.  **The aggregate was
+positive because the convolution outweighed the scale, not because the scale helps.**  The
+"counterexample that points the opposite way" was an artefact of the confound `147.5c` itself
+flagged, and it is now measured to point the **same** way as every other BN-scale step in the
+corpus.
+
+**`147.6` therefore STANDS AS WRITTEN.**  One of its three supporting grounds is withdrawn in turn;
+two survive untouched; and the withdrawn *mechanism* sentence is not reinstated, because nothing
+here is a mechanism.  **The verdict string is not edited (RULE 16) and the withdrawal is not
+edited.**
+
+#### 161.7b THE CORPUS-WIDE SINGLE-TENSOR CENSUS -- `n` IS NOT 2
+
+The briefing framing "n = 2 per tensor class" is `cpk3`-only and is **an understatement**.  Every
+adjacent cut pair `(k, k+1)` within one batch, one cell and one horizon is a single-tensor step.
+Enumerated over the whole post-ingest corpus (all 2,594 rows, all networks, all horizons; the only
+`[k, 62-k]` batches with adjacent cuts are `cpk2`, `cpk3`, `cts1`, `cts2`, `cts3`, `scl1`):
+
+| batch | ep | clip | step | tensor | class | params | step pp | SE | lo vs floor | hi vs floor | informative |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| cpk3 | 772 | -15 | 45->46 | `layer4.0.conv1.weight` | **conv** | 1,179,648 | **+5.7227** | +7.18 | +20.51 | +26.23 | YES |
+| cts1 | 100 | -15 | 51->52 | `layer4.0.shortcut.0.weight` | **conv** | 131,072 | **+7.7067** | +9.68 | +7.82 | +15.53 | YES |
+| cpk3 | 772 | -15 | 48->49 | `layer4.0.conv2.weight` | **conv** | 2,359,296 | **+9.1973** | +11.55 | +23.58 | +32.77 | YES |
+| scl1 | 100 | -15 | 54->55 | `layer4.1.conv1.weight` | **conv** | 2,359,296 | +1.1213 | +1.41 | -0.54 | +0.59 | **no (floor)** |
+| cpk3 | 772 | -15 | 46->47 | `layer4.0.bn1.weight` | **scale** | 512 | **-2.7220** | -3.42 | +26.23 | +23.51 | YES |
+| cpk3 | 772 | -15 | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-18.2707** | -22.94 | +32.77 | +14.50 | YES |
+| cts3 | 772 | -15 | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-19.3427** | -24.28 | +32.98 | +13.63 | YES |
+| cpk2 | 772 | -15 | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-20.4993** | -25.74 | +33.14 | +12.64 | YES |
+| cts1 | 100 | -15 | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-24.8340** | -31.18 | +32.42 | +7.59 | YES |
+| cts2 | 100 | -15 | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-25.1627** | -31.59 | +32.75 | +7.59 | YES |
+| cts2 | 100 | **-80** | 49->50 | `layer4.0.bn2.weight` | **scale** | 512 | **-24.7673** | -31.10 | +32.47 | +7.70 | YES |
+| scl1 | 100 | -15 | 52->53 | `layer4.0.shortcut.1.weight` | **scale** | 512 | -15.8080 | -19.85 | +15.13 | **-0.67** | **no (floor)** |
+| cpk3 | 772 | -15 | 47->48 | `layer4.0.bn1.bias` | **shift** | 512 | **+0.0640** | +0.08 | +23.51 | +23.58 | YES |
+| cts1 | 100 | -15 | 50->51 | `layer4.0.bn2.bias` | **shift** | 512 | **+0.2333** | +0.29 | +7.59 | +7.82 | YES |
+| scl1 | 100 | -15 | 53->54 | `layer4.0.shortcut.1.bias` | **shift** | 512 | +0.1380 | +0.17 | -0.67 | -0.54 | **no (floor)** |
+
+"vs floor" is against the pooled same-cell `m=1` scalar baseline re-derived here -- **22.7492 pp**
+at 100 epochs (n = 17 over six batches, sd 0.6407; the `152.6` figure, reproduced) and **23.2730 pp**
+at 772 (n = 6 over two batches).  "informative" applies `152.12`'s registered rule: **both**
+endpoints more than `2 SE = 1.5930 pp` above the floor.
+
+**Applying that gate strictly:**
+
+| class | informative steps | distinct sites | sign census | range |
+|---|---|---|---|---|
+| **conv** | 3 | **3** (46, 49, 52) | **3 / 3 POSITIVE** | +5.7227 .. +9.1973 |
+| **BN scale** | 7 | **2** (47, 50) | **7 / 7 NEGATIVE** | -25.1627 .. -2.7220 |
+| **BN shift** | 2 | **2** (48, 51) | **2 / 2 NULL** (both < 0.30 SE) | +0.0640 .. +0.2333 |
+
+Including the three floor-saturated `scl1` steps -- whose **signs** agree and whose **magnitudes**
+are truncated by the floor and must not be quoted -- the census is **15 / 15 sign-consistent, at
+4 conv sites, 3 scale sites and 3 shift sites, over 6 batches, 2 horizons, 2 clamp levels and
+3 disjoint seed triples ({0,1,2}, {3,4,5}, {6,7,8}).**  **Zero disagreements.**
+`cts2`'s clamp-released arm is a fourth *condition*, not a fourth seed set -- it reuses {0,1,2} --
+and it matters because the `49 -> 50` scale step keeps its sign and **98.4 %** of its size
+(**-24.7673** vs **-25.1627**) when the `-15` floor is moved to `-80`.
+
+**What that is worth, stated honestly.**  It is a *sign* census, not an effect-size law: within the
+scale class the informative steps span **-2.72 to -25.16 pp, a factor of 9.2**, and within the conv
+class **+5.72 to +9.20**.  Every measured step lies in the index range **45..55** -- the
+`layer4.0` BasicBlock plus its immediate boundary -- so this is **one residual junction, in one
+architecture, in one `named_parameters()` order**.  `layer1`, `layer2` and `layer3` have **zero**
+single-tensor steps in the corpus at any horizon.  And, decisively, see 161.7c.
+
+#### 161.7c IS CLASS CONFOUNDED WITH SOMETHING ELSE?  **YES -- PERFECTLY, AND `cpk3` CANNOT SEPARATE IT AT ALL**
+
+Three rivals, checked here rather than assumed.
+
+**(i) MASS.  Not separable within cpk3; partially refuted as an ordering by the corpus.**  Inside
+`cpk3`'s own window class and mass are perfectly aligned: the convs are 1,179,648 and 2,359,296
+parameters, the scales and the shift are 512.  **cpk3 alone cannot distinguish "is a convolution"
+from "is a large tensor".**  Across the corpus, mass fails as an *ordering*: the smallest measured
+conv, `layer4.0.shortcut.0.weight` at **131,072** params, gives **+7.7067**, *larger* than the
+1,179,648-parameter `conv1` step's **+5.7227**, and the two 2,359,296-parameter conv steps give
+**+9.1973** and **+1.1213** at **identical** mass -- though the second (`scl1` `54 -> 55`) is
+floor-saturated on both sides, so only the **off-floor** comparison carries weight.  That one is
+already decisive: **131,072 params buys MORE (+7.7067) than 1,179,648 (+5.7227)**.  Mass does not
+order steps within class.  **But that does not rescue class**, because a *threshold* model ("tensors above
+~10^5 parameters help, 512-parameter tensors hurt or do nothing") fits every row of 161.7b exactly
+as well.  In the measured index range 43..56 the manifest gives conv sizes {131,072; 589,824;
+1,179,648; 2,359,296} and BatchNorm sizes {256; 512} -- **the smallest conv is 256x the largest
+normalisation tensor, with no overlap at all**.  ResNet-18 offers no large BatchNorm tensor and no
+512-parameter convolution, so **class and mass-threshold are structurally inseparable on this
+network**, not merely unseparated by this batch.
+
+**(ii) ORDINAL POSITION.  Perfectly aliased, and this is architectural.**  Re-derived here from the
+manifest's own `FIRSTGROUP`/`LASTGROUP` name lists (all 62 tensors, not from prose): with
+`{1: conv, 2: BN scale, 0: BN shift}`, **`class == index mod 3` holds at EVERY index from 1 to 60,
+with zero exceptions**; only 61 and 62 (`linear.weight`, `linear.bias`) break it.  Tensors 1..60
+are exactly 20 `(conv, bn.weight, bn.bias)` triples, the shortcut paths included.  Consequently
+**every** conv step in 161.7b sits at an index `== 1 mod 3`, **every** scale step at `== 2`, and
+**every** shift step at `== 0`.  **This reproduces the `cpk2` adversarial finding (`152.8`) exactly
+and it is not fixable by adding cuts:** `--stepsize-groups [k, 62-k]` takes a contiguous prefix, so
+*no* prefix cut on this architecture can ever move a shift before its own scale, or a scale before
+its own conv.  **`cpk3` cannot separate tensor class from ordinal position, and neither can any
+other prefix-cut batch on `ResNet18_c100`.  That is the finding.**  It also disposes of two
+narrower rivals: the convs are **not** "the first step of each block" (`48->49` is the fourth
+tensor of `layer4.0`), and they are not "the first step of the batch" (see 161.7d).
+
+**(iii) CLAMP TURNOVER.  Explains the two largest steps, and fails outright on the third.**
+DESCRIPTIVE, NOT REGISTERED, added after the data, gating nothing.  From the runs' own TensorBoard
+scalars (`Optimizer_blockwise/beta_block{0,1}`, 3,860 logged points = 5/epoch; `PROBE=0`, so there
+is **no** per-tensor `<h,g>` and no mechanism is claimed):
+
+    arm   COARSE beta@ep100  COARSE beta@E   floorfrac@100  floorfrac@E   FINE beta@E  FINE floorfrac@E
+    k01        -15.0000        -15.0000          0.630          0.952        --            --
+    k45        -14.9957        -14.9990          0.099          0.320     -15.0000        0.952
+    k46        -14.9997        -14.9990          0.257          0.597     -15.0000        0.953
+    k47        -14.9990        -14.9933          0.197          0.421     -15.0000        0.953
+    k48        -14.9980        -14.9913          0.218          0.450     -15.0000        0.953
+    k49        -14.9847        -14.7859          0.067          0.087     -15.0000        0.954
+    k50         -9.8172        -13.3953          0.000          0.000     -15.0000        0.952
+
+**The fine group is pinned at the `-15` floor in all 21 runs (95.2-95.4 % of the log), the scalar
+anchor included** -- so `FINDINGS 36.3` binds in every cpk3 arm and **cpk3 lifts nothing there**.
+**`147.5a`'s mediation reproduces in batch on a third seed set**: at epoch 100 `cpk3`'s k49 coarse
+beta is -14.960/-14.997/-14.997 and k50's is **-9.946/-9.778/-9.728**, against `cts1`'s
+-14.989/-14.987/-14.290 and -9.828/-9.882/-9.700.
+
+Ranking the five steps by `|Delta terminal coarse beta|` at E gives 49->50 (**1.3906**),
+48->49 (0.2054), 46->47 (0.0057), 47->48 (0.0020), 45->46 (**0.0000**), against `|step|` of
+18.2707, 9.1973, 2.7220, 0.0640, 5.7227.  **The top two agree exactly** (Spearman rho **0.70** on
+n = 5, which is *not* significant -- the 5 % critical value is 0.90).  **The counterexample is
+decisive: `45 -> 46` moves the coarse-group terminal beta by 0.0000 nats and still buys +5.7227 pp
+at 7.18 SE.**  So clamp turnover accounts for the *magnitude* of the two big steps and **cannot
+account for the conv1 step at all**, and it does not explain why `46 -> 47` is negative while both
+its arms sit pinned at the floor.
+
+**Net:** class explains the **signs**, clamp turnover explains the **magnitudes** of the two
+largest steps, neither explains both, and class is inseparable from index-mod-3 and from a
+mass threshold.  **No mechanism is established, and the scorer's own scope forbids claiming one.**
+
+#### 161.7d `152.12` PRE-REGISTERED THIS EXACT WINDOW WITH THREE NAMED RIVALS.  THEY ARE SCORED
+
+`CORRECTIONS 152.12` ("THE ONE DESIGN THAT BREAKS BOTH CONFOUNDS AT ONCE") specified decomposing
+`k = 45 -> 49` at single-tensor resolution on a new seed triple with in-batch anchors and a floor
+gate, and registered three rivals.  **`cpk3` is that design** (seeds {6,7,8} rather than the
+suggested {3,4,5}, which is *stronger* since {3,4,5} is `cpk2`'s; scalar anchor present, layerwise
+anchor absent; `PROBE` off).  Scored on the **largest single step inside the 45..49 window**:
+
+| rival (registered in 152.12) | predicted largest step | measured | verdict |
+|---|---|---|---|
+| **(a) norm scale** | `46 -> 47` | `\|-2.7220\|` -- the **smallest** non-null magnitude in the window | **REFUTED** |
+| **(b) first to leave** | `45 -> 46` | `+5.7227`, second largest | **REFUTED** |
+| **(c) clamp turnover** | whichever step moves the leading group's terminal beta **off (or onto)** the `-15` floor | **STRICT reading: it predicts NO large step in 45..49**, since no arm there leaves the floor (terminal -14.999 to -14.786) -- and a **+9.1973 / 11.55 SE** step occurs anyway.  **LOOSE reading** (largest beta *movement*): `48 -> 49` is both the largest beta move (0.2054 nats) and the largest step | **strict REFUTED; loose survives in-window, refuted at `45 -> 46` (161.7c)** |
+
+**`152.12` registered rival (c) as "measured from the runs' own traces with `PROBE` on"; `cpk3` ran
+`PROBE=0`, so the per-tensor `<h,g>` test it specified WAS NOT RUN.**  What is scored above is the
+weaker block-level `beta` substitute, and it is descriptive.  Both readings are printed because
+choosing the favourable one is exactly the failure mode this campaign keeps having to record.
+
+Two of `152.12`'s three rivals are dead on the reading it registered.  **"The norm scale carries the drop" is refuted as a
+statement about step MAGNITUDE by the very window designed to test it** -- and this is precisely
+why the sign census of 161.7b may not be promoted into a leverage claim.
+
+#### 161.7e **THE SENTENCE THE CORPUS IS NOW ENTITLED TO -- AND THE ONE IT IS NOT**
+
+**ENTITLED (a sign census, an intervention statement, no mechanism):**
+
+> On CIFAR-100 / `ResNet18_c100` under SGDm+Lion at ms 1e-3, alpha0 1e-6, batch 100,
+> `BETA_CLIP=-15:-2.3026`, `AUGMENT=1`, in this one `named_parameters()` order, **every one of the
+> twelve single-tensor prefix-cut steps measured off the `m = 1` floor carries the sign of its
+> tensor's class**: moving a convolution into the coarse group **raises** plateau5 (3 sites, 3/3,
+> +5.72 to +9.20 pp), moving a BatchNorm **scale** **lowers** it (2 sites, 7/7, -2.72 to -25.16 pp),
+> and moving a BatchNorm **shift** does **nothing** (2 sites, 2/2, both below 0.30 SE).  All twelve
+> lie inside the single residual junction `layer4.0`.
+
+**NOT ENTITLED, and each for a stated reason:**
+
+- **"a BatchNorm scale has leverage a BatchNorm shift does not"** -- `147.6`'s withdrawn sentence.
+  Still withdrawn.  It is a **mechanism** claim; nothing above is a mechanism, and `161.7d(a)`
+  refutes its magnitude form on the window built to test it.
+- **"tensor class governs the partition response"** -- class is **perfectly aliased with
+  `index mod 3`** (161.7c ii) and with a **mass threshold** (161.7c i) on this architecture.
+- **any effect-size law by class** -- the informative scale steps span a factor of **9.2**
+  (-2.72 to -25.16 pp) and the informative conv steps are **non-monotone in mass** (131,072
+  parameters buys more than 1,179,648).
+- **"this holds across the network"** -- every measured step is in indices 45..55, one block.
+  There is **no** single-tensor measurement in `layer1`, `layer2` or `layer3` at any horizon.
+- **"replicated in independent batches"** -- `cts1`, `cts2`, `scl1` and `cpk1` all share seeds
+  {0,1,2} (`152.7`).  The genuinely disjoint seed triples are {0,1,2}, {3,4,5} and {6,7,8}; the
+  **scale** class is the only one measured on all three, and the **conv** and **shift** classes
+  have exactly **one** measurement each outside `cpk3`.
+- **anything about `m`, CAPTURE, an asymptote, a pooled cpk2/cts3/cpk3 estimate, `k <= 44` or
+  `k >= 51`** -- the scorer's own scope block, unchanged.
+
+`147.6` **STANDS**.  What changes is one of its three grounds (161.7a), and what is added is a sign
+census that `147.6` never ruled on.
+
+### 161.8 IS `k50`'s NON-TIGHTNESS A THREAT TO THE -18.2707 pp STEP?
+
+`k50` is CONVERGED (`|slope@E| = 0.00607 <= CONV_BAR 0.024235`) but **not tight**
+(`> TIGHT_BAR 0.00426`); so is `k46` (0.00549).  `k49` is tight (0.00162).  The step is therefore
+still attenuating, and this is measured, not inferred:
+
+- **In batch, on one seed set, for the first time:** `-24.4593 @100 -> -18.2707 @E`, a **25.30 %**
+  shrinkage.  `cts3` measured the same attenuation cross-batch (`dD = -5.6747`, `CORRECTIONS 156`).
+- **The underlying optimiser state is still moving too.**  `k50`'s coarse-group beta went
+  `-9.8172 @100 -> -13.3953 @E` and its terminal 20-epoch OLS slope at E is **-0.004413 nats/epoch**
+  -- still annealing toward the `-15` floor -- while `k49`'s is **+0.001176**.  The k49-k50 coarse
+  beta gap fell from **5.17 nats @100 to 1.39 nats @E** (-73 %) alongside the accuracy step's -25 %.
+  **The accuracy attenuation and the mechanism attenuation move together.**
+- **How far it could go, under a deliberately naive constant-slope extrapolation** (descriptive; the
+  slopes have already decayed 9.1x for k50 between the two horizons, so this is an *upper* bound on
+  the closure rate): `k50` would need **~4,100** further epochs to reach `k49`, and `k46` **~1,690**
+  to overtake it.  After another **772** epochs the k49-k46 margin would still be **~3.55 pp**,
+  above `PEAK_BAR 1.5930`.
+
+**Consequence for quotability.**  `-18.2707 pp` is a **772-epoch object and is still shrinking**;
+it must be written with its horizon, exactly as `CORRECTIONS 156` required of `24.834`.  It may
+**not** be quoted as an asymptote, and the asymptotic existence of the cliff remains **UNMEASURED**.
+What is *not* threatened: the **sign** (3/3 per seed, TRAIN agreeing at -18.4107), the **rank** (the
+next largest step is +9.1973; ~2,000 further epochs would be needed to close that), and
+`PEAK-CONFIRMED-AT-49`, which survives the extrapolation above.  Cross-batch the same step at 772
+reads `cpk2 -20.4993`, `cts3 -19.3427`, `cpk3 -18.2707` -- a spread of **2.2287 pp** between the
+extremes = 2.80 of cpk3's own **within-batch** SE -- an estimator that **understates** cross-batch
+variance, quoted only to give the spread a scale.  It is real batch/seed variation and is **not**
+poolable.
+
+### 161.9 INGEST LEDGER, AND THE SELFTEST AUDIT
+
+    python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+    python3 analysis/args_repair.py --apply
+
+(stdout redirected to the corpus itself, per `146.7`; RULE 22.)  Diff against the pre-ingest
+snapshot, keyed on (`run`, `job_id`), reading **added AND changed AND removed**:
+
+    added 21 | changed 0 | removed 0     2,573 -> 2,594 rows; field list identical (38 fields)
+
+The 21 added are exactly `cpk3-k{01,45,46,47,48,49,50}-s{6,7,8}`.  `args_repair` reported **36 rows
+updated** relative to the freshly regenerated file (`dup_group` backfill only; 0 accuracy/config
+values, 0 supersessions); against the pre-ingest corpus the net change on pre-existing rows is
+**zero**.  All 21 rows carry `epochs_done=772`, `epochs_requested=772`, `complete=1`,
+`window_ok=1`, `collapsed=0`, `superseded=0`, seeds {6,7,8}, granularities
+`scalar`/`[45,17]`..`[50,12]`.  Ingested `plateau5` matches my independent `.out` re-parse to
+**7.11e-15 pp** on all seven arms.  **0 `in489g2` rows** before and after.
+`c98_reproduce.py` **still exits 1** on the same inherited stale numerals (author scope, not fixed
+here).  `git status --porcelain paper/` is **empty**.
+
+**Every `--selftest` under `analysis/` was run before and after the ingest** (the 92 files under `analysis/` that expose a `--selftest` path)
+and the two runs were diffed.  **26 non-zero before, 28 after.**  Three moved:
+
+| scorer | before | after | reading |
+|---|---|---|---|
+| **`cS2_cpk3_score.py`** | PASS (52 checks) | **FAIL (6 checks)** | **PREDICTED IN ADVANCE** (`159`, and `docs/STATUS.md`) |
+| **`cU1_alpha0_granularity_score.py`** | PASS | **FAIL (2 checks)** | **NOT predicted.  A frozen-count drift only** |
+| `c68_window_blast.py` | 27/32 | **28/32** | an **improvement**, and an artefact of my own ordering |
+
+**`cS2` -- the predicted failure, and three that were not predicted.**  `159` predicted exactly one:
+*"cS2's `--selftest` will FAIL on the `SIGMA_772` equality check after its own ingest, and that FAIL
+is correct behaviour."*  Measured, `SIGMA_772` moved **0.975496 -> 0.864841** with df/cells/members
+**14/7/21 -> 26/13/39**, i.e. **+18 members, +6 cells, +12 df** -- exactly cpk3's own 18 `m=2` rows,
+which is `159`'s arithmetic.  `SIGMA_W` consequently re-derives as **0.917280** (`SIGMA_100` is now
+the max).  But **three further checks also went false**, and `159` named none of them: `[46,16]` and
+`[48,14]` now hold **3 rows each** instead of zero, and seeds {6,7,8} now **do** appear in the cell.
+All four failures are the same defect -- a premise assertion that becomes **known-false the moment
+the batch's own rows land** (`156.9`) -- and the scorer's own header claims it copied `cR1`'s
+ingest-proof pattern.  **That claim is true only of its section F**, the RULE-21 row-count premise,
+which is written to admit `0` or exactly `21` and duly went `0 found -> PRE-REGISTRATION` to
+`21 found -> POST-INGEST`, **PASS in both states**.  Sections C and E are **not** ingest-proof.
+Recorded so the next scorer author copies the right half.
+**NO VERDICT MOVES WITH IT, and this was verified rather than asserted:** every bar derives from the
+**frozen literal** `SIGMA_W = 0.975496`, and re-running `score()` after the ingest produces output
+**byte-identical** to the pre-ingest run (`diff` empty), `FINAL` line included.
+
+**`cU1` -- the unpredicted drifter, and it is benign.**  Two checks fail: *"CIFAR-100 has exactly 33
+scalar rows"* (now **36**) and *"every CIFAR-100 scalar row sits at ms=1e-3"*, which is coded as
+`count(ms == 1e-3) == 33` and so fails on the **same frozen count**.  The three new scalar rows are
+cpk3's own `k01` arm, all at `ms=1e-3`.  **The substantive assertion is not merely intact but
+strengthened: 36 of 36 CIFAR-100 scalar rows sit at ms=1e-3**, so `160`'s scope line ("on CIFAR-100
+meta-stepsize and alpha0 are PERFECTLY ALIASED off ms=1e-3") holds a fortiori.  `cU1`'s **score**
+was re-run post-ingest and exits 0 with its `160` verdict unchanged, character for character:
+`FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE |
+PREMISE PASS`.
+
+**`c68_window_blast` improved for a reason that is mine, not the corpus's.**  Its T12 (*"locally
+re-derived superseded flags agree with the CSV's"*) read `raw_only=21` before and `raw_only=0`
+after: I copied the 21 `.out` files to `../runs_alice2` **before** ingesting, so for the duration of
+the pre-ingest snapshot there were 21 runs on disk absent from the CSV.  That is a transient of the
+landing procedure, **not** a defect the ingest repaired.  Its T24 (*"the CSV is the 1707-run corpus
+the docs describe"*) still fails, as it has for many cycles, now reading 2,594.
+
+Six further scorers changed printed text without changing status, all row-count echoes
+(`c69_c100_armset`, `c69_orphan_census`, `c70_composition_audit`, `cH1_hb1_score`,
+`cI1_in489g1_score`, `cI2_in489g2_score`); `cH1`'s standing FAIL count moved 126 -> 144, the +18
+being cpk3's `m=2` rows.  **No other scorer drifted, and no verdict anywhere moved.**
+
+### 161.10 REGISTERED-AND-TESTED vs DESCRIPTIVE
+
+**REGISTERED AND TESTED** (frozen at `a523c3e`, 120 s before the first submit): G0; R2; R3; R1
+PREMISE; R-CTRL; R-FLOOR; R-CONV; the peak branch map; `SIGMA_W = 0.975496` and every bar derived
+from it; H-MASS as the point prediction and H-EQUI as the named alternative; the predicted branch
+`PEAK-CONFIRMED-AT-49`.  Outcome: **all gates pass, the branch is confirmed, and both level
+hypotheses are refuted as decompositions.**
+
+**DESCRIPTIVE, NOT REGISTERED, NOT GATING** (added this cycle, after the data): everything in
+161.7b, 161.7c, 161.7d and 161.8's extrapolation -- the corpus-wide single-tensor census, the
+floor gating of `scl1`'s three steps, the `class == index mod 3` derivation, the mass-within-class
+comparison, the beta/floorfrac table and its Spearman rho, the scoring of `152.12`'s three rivals,
+the per-seed sign counts, the terminal beta slopes, and the constant-slope extrapolations.
+**No verdict above was changed by any of it.**  What changed is what the verdicts are allowed to
+mean.
+
+### 161.11 SCOPE
+
+CIFAR-100 / `ResNet18_c100` / SGDm+Lion / meta-stepsize 1e-3 / alpha0 1e-6 / gamma 1 / batch 100 /
+772 epochs with an in-run 100-epoch control / `BETA_CLIP=-15:-2.3026` / `AUGMENT=1` / `HIER` unset /
+`PROBE=0` / seeds {6,7,8}.  **Measured bracket `k = 45..50` ONLY**; `k <= 44` and `k >= 51` are
+unmeasured at this horizon, so **no monotonicity on 44 -> 49** and **no argmax over any wider
+range**.  Every sweep arm is `m = 2`; the anchor is an anchor, so **no `m` claim**.  **No layerwise
+anchor, so CAPTURE is not computable from this batch and may not be computed from it later.**  No
+asymptote.  No pooled estimate across `cpk2`/`cts3`/`cpk3`.  No mechanism for any step.  The
+`scalar` anchor still takes a different code path (exact string match in `init_meta`) -- it is a
+**floor reference and nothing else**, and that confound is **NOT lifted**.  The `BETA_CLIP` floor
+binds the fine group in **all 21 runs**, so `FINDINGS 36.3` still stands and nothing here separates
+stepsize allocation from clamp-turnover timing.  `CORRECTIONS 117` objection 7 (*"'size-1 groups'
+and 'BatchNorm' are the same measurement seen five times"*) remains **OPEN**, and 161.7c(ii)
+strengthens it: on this architecture the two cannot be separated by any prefix cut.
+Nothing here touches CIFAR-10, Tiny-ImageNet, ImageNet-489, ResNet-50, `resnet18_blocks`, any other
+meta-stepsize or optimiser pair, or any hierarchical or shrinkage operator.
+
+### 161.12 THE NEXT EXPERIMENT -- BREAK THE `index mod 3` ALIAS, WHICH NO PREFIX CUT CAN
+
+161.7c(ii) makes the priority unambiguous, and it is **not** more prefix cuts.
+
+1. **`cpr1` -- the name-list permutation control.**  `HF.polish_the_stepsize_groups` already accepts
+   a list-of-lists of parameter **names** and `init_meta` resolves them by `name in group`; the
+   obstacle is `train.py`'s `--stepsize-groups type=str` grammar, not the optimiser (`152.8`).  With
+   an explicit name-list spec, run the **same partition sizes** at `k = 49` with the coarse group
+   `{0..48}` versus `{0..47, 50}` -- i.e. swap `layer4.0.conv2.weight` for `layer4.0.bn2.weight`
+   **holding the group COUNT and the cut POSITION fixed**.  That is the only design that separates
+   *"this tensor"* from *"this ordinal position"*, and it separates class from a mass threshold in
+   the same stroke.  6 runs at 100 epochs on seeds {9,10,11} is enough for the sign; register the
+   floor gate and a `PROBE=1` arm so `152.12`'s rival (c) can finally be tested with per-tensor
+   `<h,g>` rather than block betas.  **This is the deliverable 161.7c says is missing.**
+2. **`cpk4` -- the same five-step decomposition at a HOMOLOGOUS junction.**  `layer3.0` (`k = 34`)
+   or `layer2.0` (`k = 19`) gives the identical `conv, scale, shift, conv, scale` pattern at
+   1/4 and 1/16 the parameter mass.  If the sign census is architectural it repeats; if it is a
+   property of the **last** block it does not.  Either answer is worth 18 runs, and it is the only
+   way to get a class measurement outside `layer4.0`.
+3. **`k = 44` and `k = 51`, declined by `cS2` for good reasons, are now cheap.**  Adding them makes
+   the bracket 44..51 and gives the `44 -> 45` step (`layer3.1.bn2.bias`, a **shift outside
+   layer4**) and the `50 -> 51` step at 772 (`layer4.0.bn2.bias`, currently 100-epoch only).  6 runs.
+4. **Do not re-run `cts1`/`scl1`'s window on new seeds before (1).**  It would add a fourth seed
+   triple to a sign census that is already 15/15 and would not touch the alias that is actually
+   blocking the claim.
