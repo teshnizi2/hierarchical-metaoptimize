@@ -10793,7 +10793,7 @@ axis is group COUNT at all.
 | | A -- `in489g2` | B -- `cpk1` |
 |---|---|---|
 | account | `alice` (`salehkaleybars`) -- **forced**, the 87 GB tree is only at `/data1/salehkaleybars/metaopt/data/imagenet489` and `alice2` cannot read it | `alice2` (`s5014158`), worktree `hmo-cpk1` at `cc72198` |
-| decides | WHERE on `m` in (6,62) ImageNet-489 crosses CAPTURE 0.5 | WHETHER cut POSITION, not count, is the operative variable at fixed m=2 |
+| decides | WHERE on `m` in (6,62) ImageNet-489 crosses CAPTURE 0.5 | WHETHER cut POSITION, not count, is the operative variable at fixed m=2 **[WORDING SUPERSEDED, kept verbatim -- CORRECTIONS 160: at fixed m=2 the group COUNT is held CONSTANT, so no design in column B can contrast position against count. What `cpk1` decides is position against the pre-registered PARAMETER-BALANCE / normalised-entropy rival.]** |
 | design | 7 arms x 2 seeds = 14, ONE submission | 13 arms x 3 seeds = 39, ONE submission |
 | arms | `g01` scalar, `g08`, `g16`, `g32`, `g45`, `g62` layerwise, **`p08` position control at m=8** | `k01` scalar, k in {17,24,31,38,42,45,47,49,52,55,60} at `[k,62-k]`, `k62` layerwise |
 | cell | ResNet-18(489) / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 84 ep / batch 256 / 24 CPU / 80G / `gpu-l4-24g` / 34:00:00 | CIFAR-100 / ResNet18_c100 / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 ep / batch 100 / AUGMENT=1 / 02:30:00 |
@@ -10897,6 +10897,17 @@ GPU-hours went to rungs rather than seeds.
 
 ## 146. `cpk1` LANDS -- CUT POSITION IS THE OPERATIVE VARIABLE, AND THE PRE-REGISTERED RIVAL WON
 
+**[SCOPE CORRECTION, CORRECTIONS 160. The heading above is kept verbatim and it is TOO BROAD.
+`cpk1` holds `m = 2` FIXED in all eleven cut arms, so it cannot contrast position against group
+COUNT at all; what it settles is position against the pre-registered PARAMETER-BALANCE /
+normalised-entropy rival. Read the heading as "CUT POSITION BEATS THE PRE-REGISTERED BALANCE
+RIVAL AT FIXED m = 2". Re-derived on the matched cell: the count ladder spans 46.783 pp
+(scalar 22.7492 -> layerwise 69.5321) against the m=2 position ladder's 33.297 pp
+([53,9] 22.0753 -> [49,13] 55.3727) -- position recovers ~71% of the count range, it does not
+exceed it. `cbl1`'s own registered verdict is `COUNT-LAW-UNRESOLVED-BALANCE-COMPARABLE` at
+ratio 0.522. 143's careful sentence -- "the operative variable is neither group count nor size
+balance" -- is the one that stands.]**
+
 Cycle 122.  39/39 complete, 0 failures.  Scorer `analysis/cK1_cpk1_score.py` run UNEDITED
 (sha256 `9d82f309bed13499e05f75e0…`, identical on the Mac and alice2, matching the digest frozen
 at registration commit `3c3419e`, 155 s before the first job was submitted).  RULE 20:
@@ -10947,7 +10958,7 @@ pre-registered mechanism in the campaign to survive its own test; twelve earlier
     62   layerwise 69.711    0.228   +1.0000   --
 
 RANGE 0.6826 (X1 fires below 0.10 -- nowhere near).  PEAK SET = {49} alone.  Half-maximum span
-7 tensors: the hump covers k in [42,49].  **Position is settled as the operative variable**: both
+7 tensors: the hump covers k in [42,49].  **Position is settled as the operative variable** *[SUPERSEDED WORDING, kept verbatim -- CORRECTIONS 160: read "the operative variable AMONG THE m = 2 ARMS, against normalised entropy". `cpk1` never varies the group count, and the count range on this cell is LARGER than the position range, not smaller.]*: both
 mirror pairs break at identical normalised entropy -- k=17 vs k=45 at B=0.84742 differ by 16.290 pp
 (t +23.78), k=24 vs k=38 at B=0.96290 by 8.535 pp (t +12.75).
 
@@ -15247,3 +15258,206 @@ move it from 0.975496. **That drift is predicted here, in advance**, so that whe
 observed it is an audit working and not a discovery: `cS2`'s bars derive from the **frozen**
 literal, so no `cpk3` verdict can move with it, but `cS2`'s `--selftest` **will FAIL on the
 `SIGMA_772` equality check after its own ingest**, and that FAIL is correct behaviour.
+
+## 160. THE "CUT POSITION DOMINATES GROUP COUNT" OVERCLAIM **REPRODUCES AS AN OVERCLAIM AND IS CORRECTED IN PLACE**; AND `cU1` -- THE alpha0 x GRANULARITY CONFOUND ON THE HEADLINE CIFAR-100 CELL **DOES NOT EXIST AT THE SIZE ALLEGED**: `INTERACTION-ALPHA0-x-GRANULARITY | ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE`. **ZERO GPU. NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING INGESTED; THE CORPUS STANDS AT 2,573 ROWS.**
+
+Cycle 135.  A four-lens ICML-viability assessment made two claims about the CORPUS.  Both were
+re-derived here from `results/all_runs.csv` at 2,573 rows.  **One is upheld, one is refuted.**
+No job was submitted on either account, no `cpk3`/`in489g2`/`cpk1`/`cbl1` `.out` file was read,
+`results/all_runs.csv` is byte-unchanged, and **no MASTER-TABLE verdict and no FINDINGS entry
+moves**.
+
+### 160.1 FINDING A -- THE OVERCLAIM IS REAL, AND THE ASSESSMENT'S ARITHMETIC REPRODUCES EXACTLY
+
+**GROUND 1, `cbl1`'s OWN REGISTERED VERDICT -- REPRODUCED FROM THE CSV, NOT QUOTED.**
+Filter: `run` prefix `cbl1`, all 33 rows, one batch.  `CAPTURE(arm) = (p5(arm) - p5(scalar)) /
+(p5(layerwise) - p5(scalar))` with `p5` = mean `plateau5`.  Anchors `scalar` **22.7247**,
+`layerwise` **69.6693**, gap **46.9447**.
+
+| statistic | as defined in `analysis/cJ1_cbl1_score.py` | re-derived |
+|---|---|---|
+| `BAL_RANGE` | spread of CAPTURE over the **five m=2 arms** (`[45,17]` +0.4202 ... `[55,7]` +0.0107) | **0.4095** |
+| `CNT_RANGE` | spread of CAPTURE over the **balanced count ladder** m in {2,4,8,16,32,62} (`[31,31]` +0.2159 -> `layerwise` +1.0000) | **0.7841** |
+| ratio | `BAL_RANGE / CNT_RANGE` | **0.5222** |
+
+The scorer's own bars: `DOMINANCE_BAR = 0.50` (below it the count law is clean) and R2
+`BALANCE-DOMINATES` fires only at ratio **>= 1.000**.  0.522 sits **above the first and far below
+the second**, which is exactly why the registered verdict is
+`COUNT-LAW-UNRESOLVED-BALANCE-COMPARABLE` (CORRECTIONS 143).  **Nothing in `cbl1` licenses
+"dominates".**
+
+**GROUND 2, THE TWO RANGES ON THE MATCHED CELL -- REPRODUCED.**  Filter, stated in full:
+`network=ResNet18_c100`, `dataset=CIFAR100`, `base=SGDm`, `meta=Lion`, `meta_stepsize=1e-3`,
+`alpha0=1e-6`, `gamma=1`, `augment=1`, `beta_clip=-15:-2.3026`, `batch_size=100`,
+`epochs_done=100`, `hier=''`, `collapsed=0`, `complete=1`, `superseded=0`.  Column `plateau5`.
+
+| axis | low | high | range |
+|---|---|---|---|
+| **COUNT** (m = 1 -> 62) | `scalar` **22.7492** (n=17, 6 batches) | `layerwise` **69.5321** (n=20, 7 batches) | **46.783 pp** |
+| **POSITION** at fixed m = 2 (16 cut arms) | `[53,9]` **22.0753** (n=3) | `[49,13]` **55.3727** (n=9, 3 batches) | **33.297 pp** |
+
+Ratio **0.7117**.  Pooling per batch first (batch is the unit of replication) instead of per row
+changes nothing material: 33.297 / 46.829 = **0.7110**.  **The COUNT range EXCEEDS the POSITION
+range by 13.5 pp.**  The assessment's proposed replacement is upheld and is adopted here:
+**"position at fixed count recovers ~71% of the range the entire count ladder spans."**
+
+**WHERE THE OVERCLAIM ACTUALLY LIVES IN `docs/`, AND WHERE IT DOES NOT.**  The literal string
+"dominates group count" occurs **0 times** anywhere in the repository outside this entry.  `docs/STATUS.md`,
+`docs/FINDINGS.md`, `docs/MASTER-TABLE.md` and every file under `paper/` contain **0** occurrences
+of the claim in any phrasing.  What does exist is a weaker but still unqualified
+*"position is THE operative variable"* framing in **three** places, all in this file, all corrected
+**in place with the superseded wording kept verbatim**:
+
+| line | superseded wording | correction |
+|---|---|---|
+| 145.1 design table | *"WHETHER cut POSITION, not count, is the operative variable at fixed m=2"* | at fixed m=2 the count is CONSTANT; no design in that column can contrast position against count |
+| 146 heading | *"CUT POSITION IS THE OPERATIVE VARIABLE"* | too broad; read *"BEATS THE PRE-REGISTERED BALANCE RIVAL AT FIXED m = 2"* |
+| 146.3 | *"Position is settled as the operative variable"* | read *"among the m = 2 arms, against normalised entropy"* |
+
+**NOT TOUCHED, ON PURPOSE:** CORRECTIONS 143's quotation of `cJ1`'s own R5 output
+(*"Normalised entropy is NOT the operative variable here; cut POSITION is"*) is a **verbatim scorer
+quote**, its scope is entropy-vs-position, and it is correct as written.  143's own prose sentence
+-- *"the operative variable is neither group count nor size balance: the LATE layers need their own
+step size"* -- was **already right** and is the sentence that stands.
+
+### 160.2 FINDING B -- `cU1`, AND WHAT IT CLAIMS ABOUT ITSELF **BEFORE** ITS RESULT
+
+`analysis/cU1_alpha0_granularity_score.py`, registered at **`c47934c`**, run **UNEDITED**,
+`--selftest` **all PASS (21/21)**.
+
+**RULE 21 STATUS: THE LABEL IS NOT CARRIED.**  Precedent `cQ1` (149) and `cS1` (159).  A scorer
+over rows that already exist has **no runs of its own**, so the "commit precedes the earliest
+`sacct` Submit" proof **does not exist** and is not claimed.  What is claimed is
+**COMMIT-BEFORE-FIRST-EXECUTION** only: commit `2026-09-07T07:59:16Z`, first execution
+`2026-09-07T07:59:21Z`, **margin 5 s**.  (The file was syntax-checked with `ast.parse` before the
+commit; that parses and does not execute.)
+
+**AND IT IS NOT A BLIND TEST, SAID IN THE FILE'S OWN HEADER.**  Building the census required
+listing the stratum, and that listing **printed the primary cells' individual `plateau5` values**;
+the assessment had also quoted its four alleged figures before any work began.  `cU1`'s value is a
+fixed verdict map and reproducibility, **not** pre-registration.  A blind test of this question
+needs a new batch.
+
+**THE PREMISE CHECK IS CORPUS-CONDITIONAL (`cR1`'s pattern, 157.5).**  The frozen stratum admits
+only `granularity in {scalar, resnet18_blocks, layerwise}` at `epochs_done=100`.  `cpk3`'s 21
+in-flight rows are `[k,62-k]` at 772 epochs and **provably cannot enter**, so the census equality
+stays TRUE after that ingest instead of becoming a known-false assertion.  The selftest asserts
+this directly and it PASSES.
+
+**THE NOISE FLOOR, RE-DERIVED AT REGISTRATION, NOT COPIED.**  156.9's defect is not repeated.
+`SIGMA_W` = pooled within-(batch x granularity x alpha0) SD of `plateau5` over the full frozen
+100-epoch / ms=1e-3 stratum = **0.552209**, **df 40, 23 cells, 63 members, 0 singleton cells**;
+`SIGMA_TRAIN` (column `final_train`) = **0.385535**.  Bars are arithmetic consequences of the
+frozen census, not literals: `MAIN_BAR` **0.712899**, `INTERACTION_BAR` **1.008191**,
+`ARGMAX_BAR` **0.712899**; TRAIN `MAIN_BAR_TR` **0.497724**, `INTERACTION_BAR_TR` **0.703887**.
+
+### 160.3 THE CELLS THAT EXIST, WITH n -- AND WHY THE DESIGN IS *WITHIN-BATCH*
+
+At 100 epochs, ms=1e-3, `hier` unset, box `-15:-2.3026`, `ResNet18_c100`/CIFAR-100:
+
+| granularity | alpha0=1e-6 | alpha0=1e-3 |
+|---|---|---|
+| `scalar` | **17** (`c100` 2, `c100b` 3, `cbl1` 3, `cpk1` 3, `cts1` 3, `hb1` 3) | **5** (`c100` 2, `c100b` 3) |
+| `resnet18_blocks` | **8** (`c100` 2, `c100b` 3, `hb1` 3) | **5** (`c100` 2, `c100b` 3) |
+| `layerwise` | **20** (`c100` 2, `c100b` 3, `c1b` 3, `cbl1` 3, `cpk1` 3, `cts1` 3, `hb1` 3) | **8** (`c100` 2, `c100b` 3, `c1b` 3) |
+| `nodewise` | 0 | 3 (`c100f`) |
+| `weightwise` | 0 | 3 (`c100f`) |
+
+Exactly **two** batches carry BOTH alpha0 levels for ALL THREE arms -- `c100` (n=2/cell) and
+`c100b` (n=3/cell) -- giving a perfectly balanced 2 x 3 x 2 block, **5 rows and the same 5 seeds on
+each side**.  That block is the PRIMARY.  `c1b` (layerwise only) is a reported SECONDARY and is
+never pooled into it.
+
+**THE meta_stepsize AXIS IS NOT JUST OPEN, IT IS ALIASED.**  Re-derived: all **33** CIFAR-100
+`scalar` rows in the corpus sit at ms=1e-3; the entire CIFAR-100 ms=1e-4 stratum is **20 rows**,
+**all 20 at alpha0=1e-3**, and its granularities are exactly `{chunk2293, chunk771, nodewise,
+nodewise1d}` -- **no `scalar`, no `layerwise`, no `resnet18_blocks`, no cut-position arm**.  So on
+CIFAR-100, off ms=1e-3, **meta-stepsize and alpha0 are perfectly collinear** and no ms contrast at
+fixed alpha0 exists for any arm in the primary set.  `cU1` issues **no ms claim**.  (The corpus's
+best CIFAR-100 `plateau5` anywhere in that ms=1e-4 stratum is **72.4080**, and it is a `nodewise`
+or `chunk` row, not a granularity-ladder arm.)
+
+### 160.4 THE RESULT -- **THE 24.6 pp SWING IS AN ARTEFACT OF AN UNMATCHED POOL**
+
+`DELTA(g) = mean plateau5 at alpha0=1e-3 minus mean at alpha0=1e-6`, batch-pooled over `{c100,
+c100b}`:
+
+| granularity | TEST a0=1e-6 | TEST a0=1e-3 | **DELTA (TEST)** | TRAIN a0=1e-6 | TRAIN a0=1e-3 | **DELTA (TRAIN)** |
+|---|---|---|---|---|---|---|
+| `scalar` | 22.6923 | 22.5387 | **-0.1537** | 22.9008 | 22.5342 | **-0.3667** |
+| `resnet18_blocks` | 53.0803 | 51.5753 | **-1.5050** | 64.5450 | 63.0942 | **-1.4508** |
+| `layerwise` | 69.5532 | 69.7433 | **+0.1902** | 99.0150 | 99.2917 | **+0.2767** |
+
+TRAIN is `final_train`; the campaign's `train5` is computed from `.out` files and is not in the CSV.
+
+**THE ASSESSMENT'S CLAIM, SCORED AGAINST ITS OWN PRE-STATED ARITHMETIC** (`DELTA(layerwise) <=
+-20.0` AND `|DELTA(scalar)| <= 1.0`): measured **`DELTA(layerwise) = +0.1902`**, **`DELTA(scalar) =
+-0.1537`**.  ==> **`ASSESSMENT-DOES-NOT-REPRODUCE`.**  Layerwise does not fall 24.6 pp; it moves
+**+0.19 pp**, in the **opposite direction**, and by less than a third of `MAIN_BAR`.
+
+**WHERE 44.968 COMES FROM.**  `cU1` prints the pool ladder for `layerwise` at alpha0=1e-3:
+
+| pool | n | mean `plateau5` |
+|---|---|---|
+| P0 matched primary stratum | 5 | **69.6540** |
+| P1 matched stratum, all batches | 8 | **69.5945** |
+| P2 + 20/5-epoch rows, `hier` still excluded | 26 | 56.0968 |
+| P3 + `hier` additive/shrink, box C, epochs >= 20 | 39 | 48.2268 |
+| P4 everything: any `hier`, any box, any horizon | 46 | **44.9773** |
+
+The assessment reported **n=39, 44.968**.  **No single pool reproduces both**: its VALUE is P4's
+(44.9773, 0.009 away) and its COUNT is P3's.  Either way the figure is only reachable by mixing
+20-epoch runs, `additive`/`shrink` hierarchical arms and an off-box clip into a 100-epoch,
+`hier`-free stratum.  **It is a stratification artefact, not an alpha0 effect.**  The comparison
+was also not count-matched on its own terms: n=20 (the clean 100-epoch a0=1e-6 cell) against n=39
+(a contaminated pool).
+
+### 160.5 WHAT *IS* THERE -- A SMALL, RESOLVED INTERACTION AT THE **6-BLOCK** ARM, NOT AT `layerwise`
+
+Pairwise `DELTA` differences against `INTERACTION_BAR = 1.008191`:
+
+| pair | TEST | TRAIN (bar 0.7039) |
+|---|---|---|
+| `scalar` - `resnet18_blocks` | **+1.3513 OVER BAR** | **+1.0842 OVER BAR** |
+| `scalar` - `layerwise` | -0.3438 within bar | -0.6433 within bar |
+| `resnet18_blocks` - `layerwise` | **-1.6952 OVER BAR** | **-1.7275 OVER BAR** |
+
+**VERDICT (TEST and TRAIN, agreeing): `INTERACTION-ALPHA0-x-GRANULARITY`** -- but the interaction
+is **~1.7 pp and it is carried entirely by `resnet18_blocks`**, which loses 1.505 pp when alpha0
+rises while the two endpoints move by less than 0.2 pp.  Both endpoint arms are flat.
+
+**VERDICT (ORDER): `ORDER-PRESERVED`.**  `layerwise 69.553 > resnet18_blocks 53.080 > scalar
+22.692` at alpha0=1e-6 and `layerwise 69.743 > resnet18_blocks 51.575 > scalar 22.539` at
+alpha0=1e-3; every adjacent gap is far outside `ARGMAX_BAR = 0.7129`.  **The headline cell's arm
+ORDERING does NOT depend on alpha0.**
+
+### 160.6 WHAT THIS CHANGES -- PLAINLY
+
+**IT CHANGES NO INTERPRETATION.  IT ADDS ONE SCOPE LINE AND SHARPENS ONE EXISTING ROW.**
+
+* **No MASTER-TABLE verdict moves.  No FINDINGS entry moves.**  The CIFAR-100 transfer row
+  (*"a0=1e-6: scalar 22.78 -> blk6 52.48 -> layerwise 69.31 ... a0=1e-3: scalar 22.57 -> blk6
+  51.32 -> layerwise 69.59.  Essentially insensitive to alpha0"*, **CONFIRMED**) is **corroborated**
+  by an independent, count-matched, within-batch re-derivation on `plateau5`.
+* **The one refinement it earns:** *"essentially insensitive to alpha0"* is exact for the two
+  ENDPOINT arms (|DELTA| <= 0.19 pp, inside `MAIN_BAR`) and **slightly too strong for the 6-block
+  arm**, which moves **-1.505 pp**, resolvably (2.11 x `MAIN_BAR`) and in the same direction on
+  TRAIN.  That is a **scope line**, not a reversal, and it is recorded here rather than by editing
+  the row.
+* **The cut-position thread is untouched.**  Every cut-position result in the campaign lives at
+  alpha0=1e-6, and **no cut-position arm exists at alpha0=1e-3 at all** -- so this cycle neither
+  supports nor threatens `k* = 49`; it simply cannot speak to it.  That absence is now on the
+  record as a scope line on the whole thread.
+* **The RULE 11 meta-stepsize confound is NOT closed and is now known to be WORSE than recorded:**
+  on CIFAR-100 the ms axis is not merely unmapped, it is **perfectly aliased with alpha0** off
+  ms=1e-3, and the only arms that exist at ms=1e-4 are ones the granularity ladder does not use.
+
+### 160.7 WHAT IS **NOT** CLAIMED
+
+`cU1` carries **no RULE 21 label** and **is not a blind test** (160.2).  It says nothing about
+CIFAR-10, Tiny-ImageNet, ImageNet-489, ResNet-50, any hierarchical or shrinkage operator, any
+cut-position arm, the 20-epoch budget, or `alpha0 = 1e-4` (which does not exist for these three
+arms on CIFAR-100).  It issues **no meta-stepsize claim**.  The 6-block interaction is measured on
+**two batches** and is not offered as a mechanism.  Nothing about `cpk3`: it is launched, unlanded,
+unread and unscored; the corpus stands at **2,573 rows** and `results/all_runs.csv` is
+**byte-unchanged**.

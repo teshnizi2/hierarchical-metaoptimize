@@ -1,11 +1,82 @@
 # STATUS — operator dashboard
 
-Updated 7 Sep 2026 (**cycle 135**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **159**) > `docs/FINDINGS.md` > everything else.
+Updated 7 Sep 2026 (**cycle 136**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **160**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,573 rows — UNCHANGED this cycle** (`cpk3` is launched and **unlanded**; `results/all_runs.csv` untouched). `alice2` now runs **`cpk3`, 21 jobs**; `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 **This cycle ran the FREE analysis first, then bought GPU.** CORRECTIONS **159**. (1) **`cS1`, ZERO GPU**, answers the one thing 158 left unexplained: `k50` and `k52` differ in **KIND**, not in rate — **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**. (2) **`cpk3` REGISTERED, DRY-RUN and LAUNCHED** on `alice2` — the **consecutive** grid `k` ∈ {45,46,47,48,49,50} + scalar floor × seeds **{6,7,8}**, 21 jobs, 772 ep, ~117 GPU-h. **Nothing of `cpk3` landed, scored or ingested.** **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
+
+**CYCLE 135 (this one) WAS ZERO GPU AND AUDITED THE RECORD.** CORRECTIONS **160**. Two claims from a four-lens viability assessment were re-derived from `results/all_runs.csv`. **(A) The "cut position dominates group count" overclaim REPRODUCES as an overclaim** — the count range **exceeds** the position range — and three doc lines are corrected **in place, superseded wording kept verbatim**. **(B) The alleged 24.6 pp alpha0 confound on the headline CIFAR-100 cell DOES NOT EXIST** — `FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE | PREMISE PASS`. **Nothing submitted, nothing cancelled, nothing ingested; corpus unchanged at 2,573.**
+
+## Cycle 135 — the deliverables
+
+| # | deliverable | outcome |
+|---|---|---|
+| 1 | **A — the overclaim** | **UPHELD as an overclaim.** Count range **46.783 pp** > position range **33.297 pp**; position recovers **71.2%** of the count span |
+| 2 | A — `cbl1`'s registered verdict, re-derived from the CSV | `COUNT-LAW-UNRESOLVED-BALANCE-COMPARABLE`, `BAL_RANGE` **0.4095** / `CNT_RANGE` **0.7841** = **0.5222** (R2 `BALANCE-DOMINATES` fires only at ≥ 1.000) |
+| 3 | A — doc corrections | **3 lines**, all in `docs/CORRECTIONS.md`; **0** in STATUS / FINDINGS / MASTER-TABLE / `paper/` |
+| 4 | **B — `cU1`** registered (`c47934c`), run **UNEDITED** | `--selftest` **21/21 PASS**; **`ASSESSMENT-DOES-NOT-REPRODUCE`** |
+| 5 | `cU1`'s RULE-21 status | **NOT a RULE 21 label** and **NOT a blind test** — states both in its own header. Commit-before-first-execution only: **07:59:16Z → 07:59:21Z, margin 5 s** |
+| 6 | ingest / GPU | **NONE.** Corpus stays **2,573**. `results/all_runs.csv` byte-unchanged. No job touched on either account |
+
+### A — the two ranges, re-derived (filters stated in CORRECTIONS 160.1)
+
+Cell: `ResNet18_c100`/CIFAR100/SGDm+Lion/ms 1e-3/α₀ 1e-6/γ=1/AUG 1/box `-15:-2.3026`/batch 100/**100 ep**/`hier` unset/`collapsed=0`/`complete=1`/`superseded=0`. Column **`plateau5`**.
+
+| axis | low | high | range |
+|---|---|---|---|
+| **COUNT** m = 1 → 62 | `scalar` **22.7492** (n=17) | `layerwise` **69.5321** (n=20) | **46.783 pp** |
+| **POSITION** at fixed m = 2 (16 arms) | `[53,9]` **22.0753** (n=3) | `[49,13]` **55.3727** (n=9) | **33.297 pp** |
+
+- Batch-pooled instead of row-pooled: **33.297 / 46.829 = 0.7110**. Same answer.
+- Defensible replacement, adopted: **"position at fixed count recovers ~71% of the range the entire count ladder spans."**
+- Corrected in place (original wording kept): **145.1 design table**, **146 heading**, **146.3**. `cJ1`'s verbatim R5 quote at 143 is **NOT touched** — it is a scorer quote and its scope (entropy vs position) is correct.
+
+### B — `cU1`: the α₀ × granularity table, TEST and TRAIN
+
+`DELTA = mean plateau5 @ α₀=1e-3 − @ α₀=1e-6`, batch-pooled over the only two batches carrying **both** α₀ levels for **all three** arms (`c100` n=2/cell, `c100b` n=3/cell — balanced 2×3×2, same 5 seeds each side). `SIGMA_W` **0.552209** (df 40, 23 cells, 63 members) re-derived at registration; `MAIN_BAR` **0.712899**, `INTERACTION_BAR` **1.008191**, `ARGMAX_BAR` **0.712899**.
+
+| arm | TEST 1e-6 | TEST 1e-3 | **Δ TEST** | TRAIN 1e-6 | TRAIN 1e-3 | **Δ TRAIN** |
+|---|---|---|---|---|---|---|
+| `scalar` | 22.6923 | 22.5387 | **−0.1537** | 22.9008 | 22.5342 | **−0.3667** |
+| `resnet18_blocks` | 53.0803 | 51.5753 | **−1.5050** | 64.5450 | 63.0942 | **−1.4508** |
+| `layerwise` | 69.5532 | 69.7433 | **+0.1902** | 99.0150 | 99.2917 | **+0.2767** |
+
+TRAIN column = `final_train` (the campaign's `train5` is not in the CSV).
+
+- **The claim tested, pre-stated:** `Δ(layerwise) ≤ −20.0` AND `|Δ(scalar)| ≤ 1.0`. Measured **+0.1902** and **−0.1537** ⇒ **`ASSESSMENT-DOES-NOT-REPRODUCE`**. Layerwise moves in the **opposite** direction, by **less than a third of `MAIN_BAR`**.
+- **`ORDER-PRESERVED`.** `layerwise > blk6 > scalar` at **both** α₀; every adjacent gap ≫ `ARGMAX_BAR`. **The headline cell's arm ordering does NOT depend on α₀.**
+- **What IS there:** a **~1.7 pp** interaction carried **entirely by `resnet18_blocks`** (−1.505 pp = 2.11 × `MAIN_BAR`, same sign on TRAIN). Both endpoint arms are flat.
+- **Where 44.968 came from — a stratification artefact:**
+
+| pool (layerwise @ α₀=1e-3) | n | mean `plateau5` |
+|---|---|---|
+| P0 matched primary stratum | 5 | **69.6540** |
+| P1 matched stratum, all batches | 8 | **69.5945** |
+| P2 + 20/5-ep rows | 26 | 56.0968 |
+| P3 + `hier` additive/shrink, box C, ep ≥ 20 | **39** | 48.2268 |
+| P4 everything (any `hier`, box, horizon) | 46 | **44.9773** |
+
+  The assessment reported **n=39, 44.968**: its **value** is P4's, its **count** is P3's — **no single pool reproduces both**.
+
+### Cell census — CIFAR-100, 100 ep, ms=1e-3, `hier` unset, box C
+
+| granularity | α₀=1e-6 | α₀=1e-3 |
+|---|---|---|
+| `scalar` | **17** (6 batches) | **5** (`c100`,`c100b`) |
+| `resnet18_blocks` | **8** (3) | **5** (`c100`,`c100b`) |
+| `layerwise` | **20** (7) | **8** (`c100`,`c100b`,`c1b`) |
+| `nodewise` / `weightwise` | 0 | 3 / 3 (`c100f`) |
+
+**The meta-stepsize axis on CIFAR-100 is ALIASED, not merely unmapped.** All **33** CIFAR-100 `scalar` rows sit at ms=1e-3; the whole ms=1e-4 stratum is **20 rows, all 20 at α₀=1e-3**, granularities exactly `{chunk2293, chunk771, nodewise, nodewise1d}` — **no scalar, no layerwise, no blk6, no cut-position arm**. Best `plateau5` anywhere in it: **72.4080**. ⇒ **no ms contrast at fixed α₀ exists for any granularity-ladder arm**; `cU1` issues **no ms claim**.
+
+### What cycle 135 changes
+
+- **No MASTER-TABLE verdict moves. No FINDINGS entry moves. `paper/` untouched.**
+- MASTER-TABLE's CIFAR-100 transfer row (*"essentially insensitive to alpha0"*, **CONFIRMED**) is **corroborated** by an independent count-matched re-derivation — **one scope line added**: that phrase is exact for the two endpoint arms and **slightly too strong for blk6** (−1.505 pp, resolved).
+- **The cut-position thread is untouched and cannot be touched by this:** every cut-position arm in the corpus lives at α₀=1e-6 and **none exists at α₀=1e-3**. Recorded as a scope line on the whole thread.
+- **RULE 11 is not closed and is worse than recorded:** on CIFAR-100 ms and α₀ are **perfectly collinear** off ms=1e-3.
 
 ## Cycle 134 — the deliverables
 
