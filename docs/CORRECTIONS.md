@@ -14822,3 +14822,428 @@ Two candidates, and they are not equal:
   run before any further GPU time is bought.**
 
 **Recommended order: the free analysis first, then `cpk3`.**
+
+---
+
+## 159. `cS1` -- THE `k50`/`k52` RATE-LAW BREAK IS A **DIFFERENCE IN KIND, NOT IN RATE** (ZERO GPU, FROM `.out` FILES ALREADY ON DISK); AND `cpk3` REGISTERED AND LAUNCHED -- THE **CONSECUTIVE** CUT GRID 45..50 AT 772 EPOCHS ON SEEDS {6,7,8}, WHICH TURNS `cpk2`'s TWO-TENSOR STEPS INTO **FIVE SINGLE-TENSOR STEPS IN BATCH**. **NOTHING OF `cpk3` LANDED, SCORED OR INGESTED.**
+
+### 159.1 WHAT THIS ENTRY IS AND IS NOT
+
+Two deliverables, and the second is **UNLANDED**.
+
+1. **`cS1`, a ZERO-GPU trajectory analysis, RUN AND REPORTED.** It answers the one
+   genuinely new negative result CORRECTIONS 158 left unexplained: `k52`'s slope at 100
+   epochs is **1.80x** `k50`'s while its gain to 772 is **0.41x**, so gain is not monotone
+   in `slope@100` on the right flank. `cS1` asks whether the two arms differ in **KIND** or
+   only in **RATE**, from the 100->772 trajectories the `cpk2` and `cts3` `.out` files
+   already carry.
+2. **`cpk3`, REGISTERED, DRY-RUN, LAUNCHED.** 21 jobs, 772 epochs, on `alice2`. **No
+   `cpk3` result is read, scored or ingested in this entry.** The corpus is unchanged at
+   **2,573 rows**.
+
+`in489g2` remains **not this agent's batch**: `squeue` was read on `alice` **never**, no
+`in489g2` file was opened, and `grep -c in489g2 results/all_runs.csv` is still **0**.
+
+### 159.2 `cS1`'s RULE-21 STATUS -- STATED BEFORE ITS RESULT, BECAUSE IT LIMITS IT
+
+`analysis/cS1_ratelaw_shape.py` scores rows **that already existed**. It has **no batch of
+its own**, so the normal RULE 21 proof -- registration commit before the batch's earliest
+`sacct` **Submit** -- **DOES NOT EXIST FOR IT AND IS NOT CLAIMED**. This is the situation
+CORRECTIONS 149 recorded for `cQ1`.
+
+**WHAT IS CLAIMED, AND IT IS THE ONLY THING CLAIMED: COMMIT BEFORE FIRST EXECUTION.**
+
+| | |
+|---|---|
+| registration commit | **`0d82018`** |
+| commit time | **2026-09-07T08:23:00+02:00** (epoch 1788762180) |
+| first execution against ANY `cpk2`/`cts3` trajectory | **2026-09-07T08:23:05+02:00** (epoch 1788762185) |
+| **margin** | **5 s** |
+| sha256 of the registered blob | `45b95380…0c6ae8f9` |
+| `git diff -- analysis/` at run time | **empty** |
+
+**THE FILE SAYS THIS IN ITS OWN HEADER** -- *"THIS FILE DOES NOT CARRY THE RULE 21 LABEL"* --
+so no later reader can promote it. **Nothing from `cS1` may be reported as RULE 21
+registered.** Its `--selftest` opens **no** `cpk2` or `cts3` `.out` file (synthetic data and
+the corpus CSV only), which is why running `--selftest` during authoring, **before** the
+commit, does not spend the claim; that authoring run is disclosed here rather than hidden.
+`git diff --stat` over `analysis/` for this whole cycle is **additions only, 0 deletions**
+(2,468 insertions across two new files) -- RULE 16's standing requirement.
+
+### 159.3 `cS1` -- WHAT WAS REGISTERED, IN ADVANCE
+
+* **QUANTITY.** Per RUN, the time constant `tau` of the approach to its own asymptote,
+  from `W(e) = A - D*exp(-(e-100)/tau)` fitted over `e` in `[100, 771]` by a **registered,
+  dependency-free, deterministic** 1-D scan of `tau` on a geometric grid (1 .. 4000, 600
+  points, ratio 1.0139), solving the 2x2 normal equations in closed form at each point.
+  Then the **deciding** quantity, `rho`, which is **`tau`-FREE by construction**.
+* **PRIMARY COLUMN.** `W(e)` = the mean TEST accuracy over epoch lines `e-4 .. e` -- a
+  **plateau5-style window evaluated at every epoch**. It agrees with `cR1` *by
+  construction*: `W(771)` **IS** `cR1`'s `tail5(772)` (epochs 767-771) and `W(99)` **IS**
+  `cR1`'s `tail5(100)` (epochs 95-99). **The CSV `plateau` column is BANNED as a primary
+  and this file never reads it**; `best_test` is a maximum over a run, is not a plateau,
+  and is never read. TRAIN is read and reported alongside TEST at every arm.
+* **STRATUM.** PRIMARY = `cpk2`, 18 runs, seeds {3,4,5}; every deciding comparison within
+  it. SECONDARY = `cts3`, 6 runs, seeds {0,1,2}, **descriptive, never pooled, never a bar**.
+* **ARMS ALREADY CONVERGED AT 100** are handled by two gates that must BOTH hold, both
+  **re-derived at run time**, and the excluded arms are **printed in full, not dropped**:
+  **E1** the arm's mean `slope@100` must exceed `CONV_BAR = 0.024235` (half `cts2`'s
+  measured `k50` slope 0.04847 -- `cts3`'s R4 bar and `cR1`'s R-CONV bar, **re-used**);
+  **E2** the arm's mean fitted amplitude `D` must exceed `AMP_BAR = 10 * SIGMA_WIN`, where
+  `SIGMA_WIN` is derived **in batch** from the per-epoch jitter over the last 50 epochs.
+* **WHAT WOULD SHOW *KIND* RATHER THAN *RATE*, WRITTEN DOWN FIRST.** Under a single
+  exponential of **ANY** `tau`, `rho(f) = ln(1/(1-f))` is a **pure number** carrying no
+  fitted quantity: `0.287682 / 0.693147 / 1.386294 / 2.302585` at `f = 0.25/0.50/0.75/0.90`.
+  So: **DIFFERENT-KIND** iff some `f` has `|rho_A(f) - rho_B(f)| > RHO_BAR(f)`, with
+  `RHO_BAR(f) = 2 * sigma_rho(f) * sqrt(2/3)` and `sigma_rho` pooled **within arm across
+  seeds**; **SAME-KIND-DIFFERENT-RATE** otherwise.
+
+### 159.4 `cS1` -- THE RESULT.  **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**
+
+`G0` PASS: 18 runs, 18 job ids, 772/772 epoch lines, NAME == ARGS == ENV, **one** distinct
+ENV line. The endpoints reproduce CORRECTIONS 158 **to the last digit** (`k49` 56.4127,
+`k47` 45.8987, `k45` 43.5140, `k52` 39.8387, `k50` 35.9133, `k01` 23.3680).
+
+In-batch noise scales, re-derived at run time: `SIGMA_TAIL` **0.109408** pp (per-epoch test
+jitter, last 50 epochs, **df 882**), `SIGMA_WIN` **0.048929**, **`AMP_BAR` 0.489287**.
+
+**SHAPE-ELIGIBLE: `k50` and `k52` ONLY.** `k01/k45/k47/k49` all fail **E1** -- their mean
+`slope@100` is between **-0.00235 and +0.00051**, i.e. converged -- and are excluded by a
+bar fixed before the data were read.
+
+| arm | mean `tau` (sd) | mean `A` | mean `D` | `rho(.25)` | `rho(.50)` | `rho(.75)` | **`rho(.90)`** | `R2` | **signrun** |
+|---|---|---|---|---|---|---|---|---|---|
+| **`k50`** | **194.90** (48.28) | 36.0808 | 5.9176 | 0.2999 | 0.6848 | 1.3647 | **2.4135** | 0.996-0.998 | 0.054-0.068 |
+| **`k52`** | **80.19** (23.91) | 39.7246 | 1.9856 | 0.3205 | 0.5487 | 1.5469 | **4.9799** | 0.889-0.970 | **0.171-0.347** |
+| *exponential null* | *any* | — | — | *0.287682* | *0.693147* | *1.386294* | ***2.302585*** | — | — |
+
+| f | `RHO_BAR` (df 4) | `k52 - k50` | `/bar` | SEPARATED? |
+|---|---|---|---|---|
+| 0.25 | 0.07862 | +0.02064 | 0.26 | no |
+| 0.50 | 0.18630 | -0.13616 | 0.73 | no |
+| 0.75 | 0.28002 | +0.18219 | 0.65 | no |
+| **0.90** | **1.43496** | **+2.56640** | **1.79** | **YES** |
+
+**`k50` IS A TEXTBOOK SINGLE EXPONENTIAL AND `k52` IS NOT.** `k50` sits within **0.16 bar**
+of the parameter-free exponential signature at every `f` (worst deviation 0.11093 at
+`f=0.90`); `k52` is **1.87 bar** off it at `f=0.90` (deviation **+2.67733**). Three
+independent readings of the same fact, none of which was needed to reach the verdict:
+`k50`'s fit holds `R2` 0.996-0.998 against `k52`'s 0.889-0.970; `k50`'s longest same-sign
+residual run covers **5.4-6.8%** of the window against `k52`'s **17.1-34.7%**; and the
+scorer's own synthetic **two-timescale** control -- the literal DIFFERENT-KIND alternative,
+run in `--selftest` -- produces `signrun` **0.467** and a `rho` departure of **0.667**.
+**`k52` looks like a two-timescale curve. `k50` does not.**
+
+**THE CROSS-BATCH REPLICATION, DESCRIPTIVE AND NOT POOLED.** `cts3`'s `k50` on seeds
+{0,1,2}, through the identical pipeline, gives `rho` **0.2865 / 0.6735 / 1.4093 / 2.3759**
+against `cpk2`'s **0.2999 / 0.6848 / 1.3647 / 2.4135`. **Two batches, disjoint seed sets:
+`k50` is exponential in both.** So the `k52` departure is not an artefact of the estimator.
+(`cts3`'s `k49` arms are **not readable** -- converged at 100, `tau` runs to the grid edge
+and the `f=0.90` level leaves the data range. Reported, never a gate.)
+
+**PI -- WHERE IN TIME THE RATE LAW BREAKS.** `PI = [W(199)-W(99)] / [100*slope@100]` is 1
+if the 100-epoch slope describes the next 100 epochs:
+
+| arm | `slope@100` | `W(199)-W(99)` | **`PI`** | gain@E |
+|---|---|---|---|---|
+| `k50` | +0.03750 | 2.5660 | **0.684** | 5.9380 |
+| **`k52`** | +0.06763 | 1.8593 | **0.275** | **2.4420** |
+
+**`k52`'s slope@100 over-predicts even the VERY NEXT 100 EPOCHS by 3.6x.** The rate law does
+not fail slowly over 672 epochs; **it is already wrong at epoch 199**. `k52` completes about
+three quarters of its approach with `tau ~ 80` and then carries a slow residual a single
+exponential cannot hold -- which is exactly what pushes `rho(0.90)` to 4.98.
+
+**WHAT `cS1` DOES NOT SAY, and the file says so itself.** **No mechanism** -- it measures
+the shape of two approaches and explains neither. **No repaired rate law** -- a two-arm
+shape comparison cannot fit one, and any refit would carry the same zero-residual-df defect
+that made `cts3`'s line untested. **No asymptote** -- `A` is a fitted asymptote of a
+672-epoch window, not a limit. **Nothing pooled across batches.** **Nothing about `k46`,
+`k48`, any other cut, cell or horizon, or which tensor carries anything.**
+
+**THE HONEST WEAKNESS, STATED RATHER THAN BURIED.** The deciding statistic separates at
+**1.79 bar on df 4** -- three seeds per arm, two arms. It is a real separation on the
+registered rule and it is **not overwhelming**. It is corroborated by `signrun`, `R2`, the
+1.87-bar departure from the parameter-free null, and `cts3`'s independent replication of
+`k50`'s exponential shape, but the primary number is 1.79 bar on four degrees of freedom
+and must be quoted that way.
+
+### 159.5 `cpk3` -- THE DESIGN, AND EVERY DEPARTURE FROM THE CYCLE-133 PROPOSAL
+
+The close of CORRECTIONS 158 proposed `k` in {46,48} x seeds {3,4,5}, 6 runs, ~33 GPU-h.
+**What was launched is 21 runs and ~117 GPU-h.** Every addition is justified separately with
+what is LOST if it is dropped, so the expansion is a decision and not drift:
+
+| addition | +runs | +GPU-h | what it buys | what is lost without it |
+|---|---|---|---|---|
+| `k46`, `k48` (the proposal) | 6 | 33 | the two cuts the corpus has **never run at any horizon** | — |
+| **+ `k49` in batch** | 3 | 16.5 | the headline branch decided **WITHIN** batch | *"`k48 > k49` relocates the peak"* would be a **CROSS-BATCH** comparison, and BATCH is the unit of replication (**F(62,85) = 5.47**) |
+| **+ `k47`** | 3 | 16.5 | `47 -> 48` becomes a **single-tensor** step in batch | the decomposition of the **+10.5140 pp** step is cross-batch |
+| **+ `k45`** | 3 | 16.5 | `45 -> 46` in batch -- the **only** place a 1,179,648-param conv moves ALONE | the mass hypothesis is untested on a large conv |
+| **+ `k50`** | 3 | 16.5 | `k49` becomes **STRICTLY INTERIOR**; the cliff premise in batch; a **third** seed set on the cliff | the argmax sits at the **grid edge** -- the exact defect `cpk2` was criticised for |
+| **+ `k01` scalar floor** | 3 | 16.5 | the informativeness gate is **in batch, at the horizon it is applied at** | see 159.7 |
+| **total** | **21** | **~117** | | |
+
+**`k = 44` IS DECLINED, and this is the decision, not an oversight.** **WHAT IT BUYS:**
+contiguity 44..50 instead of 45..50, and the `44 -> 45` single-tensor step
+(`layer3.1.bn2.bias`). **WHAT IT COSTS:** 3 runs, ~16.5 GPU-h, a 16% larger batch.
+**WHY DECLINED:** it closes **no gap inside the bracket** -- 46 and 48 are the only
+unsampled integers between 45 and 50 -- and it **cannot move the peak**: `k45` measured
+**43.5140** at 772, **12.8987 pp** below `k49`, while every left-flank arm is converged at
+100 and gains about **1 pp** over the whole extra 672 epochs (`cpk2`: `k45` +1.0180, `k47`
++0.8180, `k49` +0.9247). **WHAT `cpk3` THEREFORE MAY NOT CLAIM:** that the curve is monotone
+on `44 -> 49`, or that `k*` is the argmax over **any contiguous range wider than 45..50**.
+`k <= 44` and `k >= 51` are **UNMEASURED** at this horizon.
+
+**SEEDS {6,7,8}, NOT {3,4,5}, AND THE REASON IS ARITHMETIC.** `cpk3` re-runs `k45/k47/k49/k50`,
+all of which `cpk2` ran at 772 on {3,4,5}. At {3,4,5}, **12 of these 21 runs would be
+EXACT-CONFIGURATION RE-EXECUTIONS** of existing corpus rows -- the CORRECTIONS 152 defect
+that cost `scl1` its independence claim. The scorer's `--selftest` **re-derives** that
+{6,7,8} appear **nowhere in this cell** (cell seeds are exactly `0,1,2,3,4,5`); the only
+`ResNet18_c100` rows carrying 6/7/8 are batch `p7` at `alpha0 = 1e-3`, **20 epochs**, named
+granularities -- a different cell on three axes. So `cpk3` produces **ZERO duplicate rows**
+and buys a **THIRD disjoint seed set** for `k49` at 772 (`cts3` {0,1,2}, `cpk2` {3,4,5},
+`cpk3` {6,7,8}). **THE PRICE, STATED:** every level comparison to `cpk2` is cross-batch
+**and** cross-seed and is therefore descriptive. **Every gate is within `cpk3`.**
+
+**THE 100-EPOCH IN-RUN CONTROL IS REGISTERED AGAIN.** It is free, and guard 4f re-proved the
+precondition **on the live `train.py`**: `num_epochs` occurs **exactly twice** in that file,
+at line 42 (`add_argument`) and line 135 (`for epoch in range(...)`), and **nowhere else**,
+so the epoch-99 readout of a 772-epoch run **is** a 100-epoch run of the same configuration.
+It buys the first 100-epoch measurement of `k46` and `k48` that has ever existed, the
+in-batch gain `d = M(E) - M(100)` for every arm, and the seed-reproduction control.
+
+### 159.6 THE LIVE-MODEL MANIFEST -- WHY THIS BATCH IS A DECOMPOSITION, NOT AN INFILL
+
+Measured by guard 4 on the **live** `ResNet18_c100` (**62** parameter tensors, **11,220,132**
+parameters) and written to `runs/cpk3/PARTITION-MANIFEST.txt`. **`k` is 1-BASED and is the
+SIZE of the first group.**
+
+| tensor | name | params | group-1 share at that `k` |
+|---|---|---|---|
+| 45 | `layer3.1.bn2.bias` | 256 | **0.247333** |
+| 46 | `layer4.0.conv1.weight` | **1,179,648** | **0.352469** |
+| 47 | `layer4.0.bn1.weight` | 512 | **0.352515** |
+| 48 | `layer4.0.bn1.bias` | 512 | **0.352561** |
+| 49 | `layer4.0.conv2.weight` | **2,359,296** | **0.562834** |
+| 50 | `layer4.0.bn2.weight` | 512 | **0.562880** |
+
+**guard 4d proved on the live model that EVERY step of this grid moves EXACTLY ONE TENSOR,
+by name** -- the property that makes `cpk3` a decomposition:
+
+    45 -> 46  layer4.0.conv1.weight   1,179,648
+    46 -> 47  layer4.0.bn1.weight           512
+    47 -> 48  layer4.0.bn1.bias             512
+    48 -> 49  layer4.0.conv2.weight   2,359,296
+    49 -> 50  layer4.0.bn2.weight           512
+
+`cpk2` could only measure the **two-tensor aggregates** `45->47` (**+2.3847 pp**) and
+`47->49` (**+10.5140 pp**). `cpk3` splits both, **in batch**.
+
+### 159.7 THE FLOOR ARM -- THE DECISION, REGISTERED
+
+`cpk2` measured the `m=1` scalar floor at 772 (**23.3680**) and found it had **not** moved
+from the 100-epoch corpus floor (**+0.3513 pp = 0.47 SE**, inside the bar). A cross-batch
+splice was therefore **defensible on the numbers**. It is **declined anyway**, and the
+in-batch arm is bought for 3 runs / ~16.5 GPU-h, for two reasons: (i) **one measurement on
+one seed set is not a replication** -- `cpk3` gives the 772-epoch floor its first, on a
+disjoint seed set; (ii) splicing would make **the only gate that decides whether an arm is
+INFORMATIVE** a cross-batch quantity, weakening precisely the sentence this batch exists to
+strengthen. **HAD IT BEEN SKIPPED**, `cpk3` could not have claimed in batch that any arm is
+above the `m=1` floor and every FLOOR verdict would carry a cross-batch qualifier.
+**THE HONEST PRICE OF THE IN-BATCH CHOICE:** `SE_FLOOR` here is a 3-seed vs 3-seed contrast
+(`0.796489`), so `FLOOR_BAR = 1.5930` is **WIDER** than `cR1`'s 1.1488, which pooled a
+3-seed arm against a 17-run corpus baseline. That widening is stated in the scorer, not
+disguised.
+
+### 159.8 THE NOISE FLOOR -- **RE-DERIVED**, BOTH HORIZONS, NOT COPIED
+
+CORRECTIONS 156 found `cts3`'s `sigma_w` had drifted **0.9111 -> 0.9173** because `scl1`'s
+rows landed after its registration. **No sigma is copied forward here.** `--selftest`
+re-derives both, by `cR1`'s estimator (pooled within `(batch x granularity)` SD of
+`plateau5`, `m = 2` arms only, in this exact cell):
+
+| stratum | `sigma_w` | df | cells | members |
+|---|---|---|---|---|
+| **100 epochs** | 0.917280 | **58** | 29 | 87 |
+| **772 epochs** | **0.975496** | **14** | **7** | 21 |
+
+**FROZEN RULE: `SIGMA_W = max(SIGMA_100, SIGMA_772) = 0.975496`.** The 772 stratum is the
+**horizon-matched** one **and** the **larger**, so the choice is conservative on both
+readings; the `max` rule is frozen so a future ingest cannot narrow the bar. Its 7 cells are
+`cpk2`'s five `m=2` arms plus `cts3`'s two. **The 100-epoch value is UNCHANGED from `cR1`'s
+registered 0.917280** -- `cpk2`'s rows carry `epochs_done = 772` and are outside that
+stratum, which `cS1`'s `--selftest` independently confirms.
+
+| bar | value | in SE |
+|---|---|---|
+| `SE_ARM_DIFF` | **0.796489** | — |
+| `PEAK_BAR` | **1.592978** | 2.00 `SE_ARM_DIFF` |
+| `FLOOR_BAR` | **1.592978** | 2.00 `SE_FLOOR` |
+| `NOISY_BAR` | **2.926488** | 3.00 `SIGMA_W` |
+| `PREMISE_BAR` | **12.4170** | 15.59 -- half `cts1`'s own cliff **24.8340**, re-derived |
+| `CONV_BAR` | **0.024235** pp/epoch | half `cts2`'s measured `k50` slope 0.04847, **re-used** |
+| `TIGHT_BAR` | **0.00426** pp/epoch | `s*`, the slope that defined `E = 772` |
+
+### 159.9 THE POINT PREDICTION -- **SHARP, ARITHMETIC, AND SEPARABLE FROM ITS ALTERNATIVE**
+
+**THE CORPUS ALREADY PROVES PARAMETER MASS IS NOT A COMPLETE LAW:** group 1 at `k=49` and
+`k=50` differs by **512 of 11,220,132** parameters (**0.00456%**) and those arms are
+**20.4993 pp** apart. **BUT MASS IS NOT IRRELEVANT:** `45->47` moves 1,180,160 params for
+**+2.3847 pp**, `47->49` moves 2,359,808 for **+10.5140 pp** -- 2.00x the mass, 4.41x the
+gain.
+
+**REGISTERED HYPOTHESIS `H-MASS`:** within a multi-tensor step each tensor carries a share
+proportional to its parameter count. Re-derived by `--selftest` from `cpk2`'s measured steps
+and the live tensor sizes:
+
+| arm | **`H-MASS` (registered)** | `H-EQUI` (the named alternative) | measured (cpk2, cross-batch anchor) |
+|---|---|---|---|
+| `k45` | 43.5140 | 43.5140 | 43.5140 |
+| **`k46`** | **45.8976** | 44.7063 | *never run* |
+| `k47` | 45.8987 | 45.8987 | 45.8987 |
+| **`k48`** | **45.9009** | 51.1557 | *never run* |
+| `k49` | 56.4127 | 56.4127 | 56.4127 |
+| `k50` | 35.9133 | 35.9133 | 35.9133 |
+
+**`H-MASS` PREDICTS `k46` AND `k48` BOTH LAND ON TOP OF `k47`**, the entire +2.3847 arriving
+at `45->46` and the entire +10.5140 at `48->49`. **The two hypotheses are 5.2547 pp = 6.60
+`SE_ARM_DIFF` apart on `k48`, so this batch SEPARATES THEM** -- which is the only reason a
+point prediction is worth registering.
+
+**THE REASONING, so the forecast is not a bare number.** The only large-mass move in the
+neighbourhood (2,359,296 params at `48->49`) coincides with the only large positive step
+(+10.5140). The two 512-parameter batch-norm moves whose effect is separately constrained
+are tensor 47 (inside the *small* +2.3847 step) and tensor 50 (the **-20.4993 cliff**).
+**`cpk3` IS EXACTLY THE TEST OF WHETHER THE OTHER TWO `layer4.0` BATCH-NORM PARAMETERS ARE
+SPECIAL THE WAY TENSOR 50 IS.** `H-MASS` says they are ordinary. A large `|k47 - k48|` or
+`|k46 - k47|` says they are not, and would be the **first mechanistic handle this thread has
+had**.
+
+**PREDICTED BRANCH: `PEAK-CONFIRMED-AT-49`**, predicted margin over the runner-up
+**10.5117 pp = 13.20 `SE_ARM_DIFF`**. To relocate the peak, `k48` must gain **10.5117 pp**
+over its predicted level and `k46` **10.5150 pp**.
+
+**THE STANDING SHARP PREDICTION IS SATISFIED AT AN ENDPOINT, AND THAT IS RECORDED NOW.**
+The prediction on record -- *"`k48` lands between 45.8987 and 56.4127, and `k48 > k49`
+RELOCATES THE PEAK"* -- is satisfied by `H-MASS` **at its LOWER endpoint**, not in the
+middle. This is written down in advance so nobody may later retell `H-MASS` as an
+unremarkable interval prediction. **The predicted LEVELS are cross-batch and cross-seed
+anchors; the BRANCH VERDICT is computed entirely from `cpk3`'s own arms.**
+
+### 159.10 THE REGISTERED BRANCHES AND GATES
+
+Gates fire **IN ORDER**; the first failure decides. `G0` PROVENANCE -> `R2` DIVERGENCE
+(`DEAD_BAR` 5.00) -> `R3` NOISE (`NOISY_BAR` 2.9265) -> `R1` PREMISE (the cliff in batch at
+100, `>= 12.4170`) -> **`R-CTRL`** -> `R-FLOOR` -> `R-CONV`.
+
+**`R-CTRL` IS DELIBERATELY *NOT* `cpk2`'s, AND THE CHANGE IS JUSTIFIED RATHER THAN SILENT.**
+`cpk2` required the 100-epoch argmax to be `k49`, because its question was whether the
+**budget** moved the peak. `cpk3`'s question is the peak's **LOCATION at a fixed budget**,
+and asserting the 100-epoch argmax over a grid that **contains the two never-run cuts would
+prejudge the very thing being measured**. So `cpk3`'s `R-CTRL` asserts only what is already
+known about the arms `cpk2` also ran, on this third seed set: **(a)** the 100-epoch order
+`M(k49) > M(k47) > M(k45)` holds and **(b)** `M(k49) - M(k47) > PEAK_BAR`. Failure ->
+`UNRESOLVED-CONTROL`. **`k46` and `k48` are not in this gate, by construction.**
+
+**BRANCHES:** `PEAK-CONFIRMED-AT-49` / `PEAK-RELOCATES-TO-46` / `PEAK-RELOCATES-TO-48`
+(and `-45` / `-47` / `-50`, named explicitly so the scorer can never be unable to report
+what it measured) / **`PEAK-PLATEAU`** (best - second `<= PEAK_BAR`: no location may be
+named) / `UNRESOLVED-NOT-CONVERGED` / `UNRESOLVED-PROVENANCE` / `-DIVERGED` / `-NOISY` /
+`-PREMISE` / `-CONTROL` / **`UNRESOLVED-SATURATED`** (the FLOOR/SATURATION gate: an arm
+within `FLOOR_BAR = 2 SE` of **this batch's own** `m=1` floor is **NOT-INFORMATIVE** and is
+**excluded from the argmax set**; if `k49` itself is not informative at `E` the batch is
+`UNRESOLVED-SATURATED`).
+
+**THE RULE-21 PREMISE CHECK IS CORPUS-CONDITIONAL, COPYING `cR1`'s PATTERN AND NOT THE OLDER
+ONE.** CORRECTIONS 156.9 recorded that `cfr1`'s and `cts3`'s premise checks become
+**KNOWN-FALSE** assertions the moment their own rows land -- a scorer that must FAIL after a
+successful ingest teaches the next reader to ignore its own FAILs. `cR1` was the first
+scorer in this campaign that did not acquire one. `cS2` admits **exactly two states**: `0`
+rows (pre-registration) or **exactly 21** (post-ingest), and FAILS on anything else -- a
+partial ingest, a duplicate, or a name collision before launch. It currently reads
+**`0 found -> PRE-REGISTRATION`**. The horizon census admits `{}` or `{772}` and reads
+`[772]`.
+
+### 159.11 `cpk3` -- RULE 21, RULE 20 AND THE ENV AUDIT, MEASURED
+
+| | |
+|---|---|
+| registration commit | **`a523c3e`** (`analysis/cS2_cpk3_score.py` + `bin/cS2_cut_position_infill.sh`) |
+| commit time | **2026-09-07T08:33:20+02:00** |
+| **earliest `sacct` Submit** | **2026-09-07T08:35:20** (3 jobs), the other **18** at 08:35:21 |
+| **RULE 21 margin** | **120 s**, and the 1-second Submit spread proves **ONE submission** |
+| job ids | **4915304 - 4915325**, 21 jobs (**NOT contiguous** -- 4915307 belongs to another user) |
+| sha256 scorer / launcher | `603971aa…59286d99` / `769a3630…0910c8fc7` |
+| Mac vs `alice2` checkout | **byte-identical**, both files, plus `cS1` `45b95380…` |
+| `alice2` staging | `/home/s5014158/metaopt/hmo-cpk3` at **`a523c3e`**, `git status --porcelain` **empty** |
+
+**RULE 20, POST-LAUNCH, AT THE COVERAGE AVAILABLE.** `guard_postlaunch` PASSED against the
+first run's own ARGS line. A full `argsline_guard.py --batch-consistency` over every `cpk3`
+run that had started reads: **13 clean, 0 with repeated flags or design mismatch, 0 without
+an ARGS line -- VERDICT PASS**, and *"every non-axis flag is identical across 13 runs"*.
+**The horizon rides the ARGS line and was verified there: 13/13 `--num-epochs 772`.**
+`--stepsize-groups` across those 13: `[45,17]`, `[46,16]` x2, `[47,15]` x2, `[48,14]` x2,
+`[49,13]` x2, `[50,12]` x2, `scalar` x2 -- **no unregistered spec.** **This is PARTIAL
+COVERAGE (13 of 21) because 8 jobs had not started; it will be re-run at full coverage
+before any number is quoted**, exactly as 157.8 -> 158 did.
+
+**ENV AUDIT, SEPARATE FROM ARGS because `BETA_CLIP`/`AUGMENT`/`PROBE` cannot ride the ARGS
+line.** **ONE distinct `ENV:` line across all 13**: `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`,
+`HIER=none`, `SCHED=none`, `PROBE=0`, 13/13 each.
+
+**GUARDS, ALL PASSED IN THE DRY RUN AND AT SUBMIT.** guard 1b scorer+launcher committed;
+guard 1c `--selftest` PASSES; guard 2 no `cpk3-` in the CSV; guard 2b no `cpk3-*.out` on
+disk; guard 4c grid strictly increasing **AND CONSECUTIVE**, `k49` strictly interior (4
+left, 1 right); guard 4d **every step moves exactly 1 tensor**; guard 4g `scalar` routes by
+exact string match in `init_meta` (`['scalar','layerwise','nodewise','weightwise','nodewise1d']`)
+and **no sweep spec collides** -- the `scalar` code-path confound is **DISCLOSED, NOT
+LIFTED**; guard 4e the clamp verified on the live source in `HF.step`, 386,000 meta-steps,
+worst-case reachable beta **-399.8155** against float32 underflow at **-103.2789**;
+guard 4f as 159.5; guard 5 2009 GB free, **0** jobs pending before this batch; guard 5b all
+three partitions `7-00:00:00`; **guard 6: 21 composed command lines, 0 failed the RULE 20
+pre-check, 21 distinct job names.**
+
+**BYTE-MATCH TO `cpk2`.** `bin/cR1_cut_position_horizon.sh` was **read**, not reconstructed.
+A `diff` of the composed `CMD` block against `cpk2`'s shows **exactly two differing lines**,
+both `cpk2-` -> `cpk3-` in `--job-name` and `--run-name`. The constants block is identical
+except `SEEDS` (an axis) and the grid. `PARTS` `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`,
+`WALL` `11:00:00`, `CLIP_C`, `MST`, `ALPHA0`, `EPOCHS`, `BATCH`, `GAMMA`, `AUG`, `DSET`,
+`NET`, `NTENS` all unchanged.
+
+**WALLTIME AND SCHEDULABILITY, CHECKED BEFORE COMMITTING (the `hz3` failure mode).** At
+design time the three partitions held **44 RUNNING (43 multi-day) and 10 PENDING**, and this
+account's own queue was **EMPTY**. `gpu-short` is excluded by arithmetic (4 h ceiling, ~5.5 h
+needed). **6 of 21 jobs were RUNNING within 3 seconds of submission.** `bin/PROTECTED.txt`
+carries **`cpk3-`**.
+
+**COST AND ETA.** 21 jobs x `cpk2`'s measured mean **5.546 h** = **~117 GPU-hours**
+(`cpk2`'s max elapsed was 06:20:34, so the worst case is ~133); the request is 11:00:00 each,
+**1.73x** `cpk2`'s worst run. Slurm's own estimate puts the last start at
+**2026-09-09T08:25** (completion ~2026-09-09T19:30). **THAT ESTIMATE SHOULD BE TREATED AS AN
+UPPER BOUND AND NOT AS AN ETA:** for `cpk2` Slurm predicted a last start of 2026-09-09T16:15
+and the actual was 2026-09-07T01:57 -- **2 d 14 h early** -- with submit -> last completion
+measured at **10 h 58 m** for 18 jobs.
+
+### 159.12 WHAT IS **NOT** CLAIMED IN THIS ENTRY
+
+**NOTHING ABOUT `cpk3`'s RESULT.** It is launched and unlanded; no `cpk3` `.out` file was
+read for a number, nothing was scored, nothing was ingested, the corpus stands at **2,573
+rows** and `results/all_runs.csv` is **untouched**. **NO MASTER-TABLE VERDICT MOVES. NO
+FINDINGS ENTRY MOVES.** Neither file cites `cpk1`, `cts1`, `cts2`, `cts3`, `scl1`, `cpk2`,
+`cpk3` or any cut-position numeral; the whole thread lives in `docs/STATUS.md` and this file.
+**`cS1` carries no RULE 21 label** (159.2). **`cS1` supplies no mechanism and no replacement
+rate law.** **`cpk3` may not be quoted for anything at all until it lands and is scored by
+`analysis/cS2_cpk3_score.py` run UNEDITED.**
+
+### 159.13 THE NEXT STEP THIS ENTRY POINTS AT
+
+Land `cpk3`, run `analysis/cS2_cpk3_score.py` **UNEDITED** (positional `runsdir`;
+`--manifest runs/cpk3/PARTITION-MANIFEST.txt` is a **documented** argument and passing it is
+not an edit), re-run `argsline_guard.py --batch-consistency` at **full 21-run coverage**, and
+run the CORRECTIONS-155 class check -- every `--selftest` under `analysis/` before and after
+the ingest -- because `cpk3`'s 18 `m=2` rows land in **`SIGMA_772`'s own stratum** and will
+move it from 0.975496. **That drift is predicted here, in advance**, so that when it is
+observed it is an audit working and not a discovery: `cS2`'s bars derive from the **frozen**
+literal, so no `cpk3` verdict can move with it, but `cS2`'s `--selftest` **will FAIL on the
+`SIGMA_772` equality check after its own ingest**, and that FAIL is correct behaviour.
