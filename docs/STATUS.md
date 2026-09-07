@@ -1,13 +1,57 @@
 # STATUS — operator dashboard
 
-Updated 6 Sep 2026 (**cycle 133**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **157**) > `docs/FINDINGS.md` > everything else.
+Updated 7 Sep 2026 (**cycle 134**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **158**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,555 rows (UNCHANGED this cycle — `cpk2` LAUNCHED, nothing landed, nothing scored, nothing ingested)**. `alice2` now holds **18 `cpk2` jobs**; `in489g2` still runs on `alice` and is **not ours**.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,573 rows (`cpk2` LANDED, SCORED and INGESTED: +18, 0 changed, 0 removed)**. `alice2` queue **EMPTY**; `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**.
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**This cycle LANDED, SCORED and INGESTED `cts3` — the 772-epoch horizon test.** CORRECTIONS **156**. **TWO verdicts, and neither is quotable without the other:** the `k=49 → k=50` cliff **SURVIVED** the horizon (`DE` **19.3427 pp = 26.00 SE**, 1.56× the survive bar) and **SHRINKS** on it (`dD` **−5.6747 pp = −5.39 SE**, bar ±2.1040). **`SHRINKS` was the REGISTERED PREDICTION** (−7.3320 pp; measured landed **+1.58 SE** inside the same branch) — **not a surprise and not a null.** **THE CONSEQUENCE IS A RESCOPING, NOT A RE-LITIGATION:** CORRECTIONS 147's cliff numerals (**24.834 / 25.163 / 24.767 pp**) are **budget-dependent** and now require **“at 100 epochs”** in the same sentence, and `cpk1`'s capture curve, its single-peakedness and its argmax **`k*=49`** are **100-epoch objects** that `cts1`/`cts2`/`scl1` all inherit. **No MASTER-TABLE verdict moves.**
+**This cycle LANDED, SCORED and INGESTED `cpk2` — the cut-position ladder at 772 epochs on FRESH seeds {3,4,5}.** CORRECTIONS **158**. **`FINAL: k*-UNMOVED | CONVERGED`.** The argmax at `E = 772` is **`k49` 56.4127 pp**, runner-up `k47` 45.8987 — **margin 10.5140 pp = 14.04 SE**, bar 1.4979; **every arm converged** at `E`. The in-batch 100-epoch control reproduces `cpk1`'s peak on seeds that batch never used (**`k49` by 10.4073 pp = 13.90 SE**), so the un-moved argmax is attributable to the **budget**, not the seed draw. **THE PRE-REGISTERED BRANCH IS CONFIRMED AND ITS CURVE MODEL IS REFUTED:** the forecast predicted **three rank swaps** with `k52` rising to runner-up; **zero** occurred, and `k52` misses by **−8.2225 pp** where every other arm is within 1.6. **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
 
-## Cycle 132 — the deliverables
+## Cycle 133 — the deliverables
+
+| # | deliverable | outcome |
+|---|---|---|
+| 1 | `cpk2` — the argmax at a converged budget | **LANDED 18/18, SCORED, INGESTED.** `k*-UNMOVED` **and** `CONVERGED`, both on the registered rule |
+| 2 | four attacks pressed before banking | **`k52` residual = weak MODEL, not a different shape** (0 rank inversions); **argmax is grid-edge-bounded** (`k=46,48` unrun anywhere); **0 of 18 runs duplicate a corpus row**; **the floor did not move** (+0.3513 pp, 0.47 SE) |
+| 3 | ingest | **+18 rows, 0 changed, 0 removed.** Corpus **2,555 → 2,573**. **0 `in489g2` rows** |
+| 4 | corpus-derived constant drift (CORRECTIONS 155 class) | **ALL 88 `--selftest`s run pre- and post-ingest. 0 changed exit code; 8 changed output.** One real move: **`cI2_in489g2`'s seed-null `F(11,2087)=0.170`/328 cells → `F(11,2105)=0.171`/332 cells** — still null, **flagged for whoever lands `in489g2`** |
+| 5 | one prose claim withdrawn | 157.6's *"the curve becomes MORE asymmetric"* — measured **2.451 → 1.950**, i.e. **LESS**; the registered model implied the same. **No gate, no verdict touched** |
+
+## `cpk2` — LANDED, SCORED, INGESTED (CORRECTIONS 158)
+
+Scorer `analysis/cR1_cpk2_score.py` run **UNEDITED**, sha256 `06b7de18…5d5191f2`, **byte-identical on the Mac and in the `alice2` staging checkout**; both machines' full outputs `diff` **IDENTICAL**; `git diff -- analysis/` **empty**. **`runsdir` is POSITIONAL.**
+
+    python3 analysis/cR1_cpk2_score.py /home/s5014158/metaopt/runs
+
+| arm | spec | test@100 | **test@E** | gain | train@100 | **train@E** | slope@100 | slope@E |
+|---|---|---|---|---|---|---|---|---|
+| **`k49`** | `[49,13]` | 55.4880 | **56.4127** | +0.9247 | 62.4660 | **64.0633** | −0.00228 | −0.00047 |
+| `k47` | `[47,15]` | 45.0807 | **45.8987** | +0.8180 | 49.7480 | 50.9860 | −0.00235 | −0.00293 |
+| `k45` | `[45,17]` | 42.4960 | **43.5140** | +1.0180 | 47.2487 | 48.6227 | +0.00051 | −0.00509 |
+| `k52` | `[52,10]` | 37.3967 | **39.8387** | +2.4420 | 41.3967 | 46.0113 | **+0.06763** | −0.00338 |
+| `k50` | `[50,12]` | 29.9753 | **35.9133** | **+5.9380** | 31.9287 | 42.4307 | +0.03750 | −0.00331 |
+| `k01` | `scalar` | 23.0167 | 23.3680 | +0.3513 | 23.2427 | 23.5307 | +0.00048 | **+0.00243** |
+
+**TRAIN ranks the arms exactly as TEST at both horizons — no dissociation anywhere.**
+
+- **Gates, all in batch.** `G0` PASS (18 runs, 18 job ids, 772/772, NAME==ARGS==ENV). **`R1` CLIFF PASS** `D100` **25.5127 pp = 34.06 SE**, bar 12.4170 (`DE` **20.4993**, `dD` **−5.0133 = −4.73 SE_dD`**; `cts3`'s −5.6747 is **CROSS-BATCH, descriptive, not poolable**). **`R-CTRL` PEAK PASS.** `R2` PASS. `R3` PASS (worst SD 1.7857 ≤ 2.7518). **`R-FLOOR` PASS — 5 of 5 informative at `E`**, closest `k50` **+12.5453 = 10.9×** bar. **`R-CONV` PASS — every arm converged**, 5 of 6 TIGHT.
+- **Prediction vs measured.** Branch `k*-UNMOVED` ✔, argmax `k49` ✔, **runner-up predicted `k52` / measured `k47`** ✘, margin 7.8612 → **10.5140**. Residuals `k01` +0.0764, `k45` +0.5828, `k49` +0.4903, `k47` −1.1940, `k50` −1.5699, **`k52` −8.2225**.
+- **The `k52` miss is the MODEL, not the shape.** Re-feeding the same line `cpk2`'s **own** in-batch `slope@100` (**+0.06763**, larger than the +0.06072 registered) makes it **worse**: predicted +10.9469 vs measured **+2.4420**. `k52`'s slope is **1.80×** `k50`'s but its gain is **0.41×** — **gain is NOT monotone in `slope@100` on the right flank**. `cts3`'s rate law is **true of `k50`, false of `k52`**. New, negative, unexplained.
+- **RULE 21 margin 94 s** (`d5c6eb6` `20:23:14+02:00` → earliest `sacct` `Submit` `20:24:48`; 3 stamps at :48, 15 at :49; ids **4914387–4914404** contiguous). **RULE 20 at FULL coverage: 18 clean, 0 mismatch, 0 without an ARGS line — PASS** (157.8 could only reach 5 of 18). **ONE distinct `ENV:` line across all 18.** 18/18 `COMPLETED`, 18/18 `RUN_DONE`, 0 tracebacks.
+- **Cost measured:** 18 × elapsed = **99.84 GPU-h**, mean **5.546 h**, max **06:20:34** (request 11:00:00). **The ETA was far too conservative** — Slurm put the last start at `2026-09-09T16:15`, actual `2026-09-07T01:57`, **2 d 14 h earlier**; submit → last completion **10 h 58 m** against a registered *1.5–3.2 days*.
+- **`--selftest` PASSES pre- AND post-ingest.** 157.5's corpus-conditional RULE 21 check flips `0 → 18` and **stays PASS** — **the first landed batch in this thread whose own scorer did not acquire a known-false assertion on ingest** (the 156.9 defect, fixed in practice).
+
+**WHAT IS NOW LIFTED from CORRECTIONS 156's 100-epoch scope:** `k* = 49` **among {45,47,49,50,52}** at 772 ep with every arm converged on fresh seeds; the `k49→k50` cliff at 772 now has a **fresh-seed replication** (`DE` 20.4993 vs `cts3`'s 19.3427); the shrinkage **direction**; and the `m=1` scalar floor at 772 (**23.3680**).
+
+**WHAT IS STILL 100-EPOCH-SCOPED — 156's qualifier stands:** `cpk1`'s **single-peakedness** (`k = 17,24,31,38,42,55,60` unrun above 100 ep); `cpk1`'s **CAPTURE** curve (**no `layerwise` anchor in `cpk2`** — CAPTURE is not computable from it and may not be computed from it later); **147's cliff numerals 24.834 / 25.163 / 24.767 pp**; the peak's **sub-grid location**; every other horizon and every other cell.
+
+**MAY NOT CLAIM:** an asymptote; a **mechanism** for `k52`; a **pooled `dD`** across `cts3`+`cpk2`; any `CAPTURE`; that the prediction was a good model (**confirmed on its branch, refuted on its curve**); that the `scalar` code-path confound is lifted (it is not — `scalar` still routes by exact string match in `init_meta`).
+
+**NEXT EXPERIMENT — `cpk3`, close the grid-edge hole.** `k ∈ {46, 48}` × seeds {3,4,5} at 772 ep = **6 runs, ~33 GPU-h**. **Neither cut has ever been run at ANY horizon** in this cell, and they are the only measurement that converts *"`k*` = 49 among the five sampled cuts"* into *"`k*` = 49"*. Sharp prediction: `k48` should land between `k47` **45.8987** and `k49` **56.4127`**; **`k48 > k49` relocates the peak.** **BUT FIRST, A FREE ANALYSIS:** the broken rate law on the right flank needs the 100→772 **trajectory** for `k50` vs `k52`, which the existing `.out` files **already contain**. Register and run that before buying GPU time.
+
+## Cycle 132 — the deliverables (CORRECTIONS 156)
+
+**Cycle 132 LANDED, SCORED and INGESTED `cts3` — the 772-epoch horizon test.** CORRECTIONS **156**. **TWO verdicts, and neither is quotable without the other:** the `k=49 → k=50` cliff **SURVIVED** the horizon (`DE` **19.3427 pp = 26.00 SE**, 1.56× the survive bar) and **SHRINKS** on it (`dD` **−5.6747 pp = −5.39 SE**, bar ±2.1040). **`SHRINKS` was the REGISTERED PREDICTION** (−7.3320 pp; measured landed **+1.58 SE** inside the same branch) — **not a surprise and not a null.** **THE CONSEQUENCE IS A RESCOPING, NOT A RE-LITIGATION:** CORRECTIONS 147's cliff numerals (**24.834 / 25.163 / 24.767 pp**) are **budget-dependent** and now require **“at 100 epochs”** in the same sentence, and `cpk1`'s capture curve, its single-peakedness and its argmax **`k*=49`** are **100-epoch objects** that `cts1`/`cts2`/`scl1` all inherit. **No MASTER-TABLE verdict moves.** — **SUPERSEDED IN PART by CORRECTIONS 158 (cycle 133): `cpk2` lifts the 100-epoch scope on the ARGMAX, for the five cuts {45,47,49,50,52} only. The capture curve, the single-peakedness and 147's three cliff numerals stay 100-epoch objects.**
 
 | # | deliverable | outcome |
 |---|---|---|
@@ -70,7 +114,7 @@ Scorer `analysis/cO1_cts3_score.py` run **UNEDITED**, sha256 `ba8cac24…77ccf3a
 |---|---|---|---|
 | `docs/STATUS.md` | **483** (threat row 10) | `cts2`'s cliff **24.7673 pp** → "**at 100 epochs**"; *"147's cliff needs no regime qualifier"* now carries an explicit **budget** qualifier, with the 772-epoch value **19.3427 pp** beside it | **YES** |
 | `docs/STATUS.md` | **285** | cliff left-edges **k=49 / k=52** — flagged as `cpk1` grid points **measured at 100 epochs** | **YES** |
-| `docs/STATUS.md` | **294** | `cpk1`'s **k=45 → k=49** window — flagged **a 100-epoch window**, and `k*=49` a 100-epoch argmax | **YES** |
+| `docs/STATUS.md` | **294** | `cpk1`'s **k=45 → k=49** window — flagged **a 100-epoch window**, and `k*=49` a 100-epoch argmax | **YES** — **partially lifted at CORRECTIONS 158** |
 | `docs/STATUS.md` | **261** | `cpk1`'s second cliff **14.9700 pp** — **at 100 epochs** | **YES** |
 | `docs/STATUS.md` | **273** | `scl1`'s **15.8080 pp** single-tensor attribution | **no** — the sentence already opens *"CIFAR-100 / `ResNet18_c100`, …, 100 ep"*. **Checked, correct as written** |
 | `docs/FINDINGS.md` | — | — | **no** — 0 occurrences of the numerals or the batch names |
@@ -282,7 +326,7 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 | *"at a DIFFERENT site"* | one residual junction, two branch scales, three indices apart |
 | *"the matched 512-vs-512 control shows a shift lacks a scale's leverage"* | **not identified at cliff 2** — k53 (−1.18 SE), k54 (−0.94 SE), k55 (+1.03 SE) are **at** the scalar baseline, so DROP2≈0 / DROP3≤0 is what a floor predicts for **any** class. And Q5's statistic `15.9460` is **bit-identical to R3's**. `cts1`'s k50 sits **+7.5855 pp / +13.30 SE** above the same baseline — cliff 1 has no such defect. `SCALE-SHIFT-ASYMMETRIC` stays **descriptive at ONE site** |
 
-**THE `first tensor to leave` RIVAL CANNOT BE SEPARATED BY EXISTING DATA — said plainly.** Both winners are `DROP1` and **had to be**: both cliff left-edges (k=49, k=52 — **`cpk1` grid points measured at 100 epochs**, CORRECTIONS 156) are `cpk1` grid points immediately after a conv, so the tensor at k is necessarily a BN scale. All **six** single-tensor steps in the corpus run **scale → shift → conv**, because `named_parameters()` orders conv → `bn.weight` → `bn.bias` and `--stepsize-groups [k,62−k]` takes a **contiguous prefix** — **no contiguous-prefix cut on this architecture can move a shift before its own scale**. Three rivals stay live: **norm scale**, **first to leave**, **clamp turnover**.
+**THE `first tensor to leave` RIVAL CANNOT BE SEPARATED BY EXISTING DATA — said plainly.** Both winners are `DROP1` and **had to be**: both cliff left-edges (k=49, k=52 — **`cpk1` grid points measured at 100 epochs**, CORRECTIONS 156; both are **also measured at 772 ep** by `cts3`/`cpk2`, but **this single-tensor decomposition is 100-epoch**, CORRECTIONS 158) are `cpk1` grid points immediately after a conv, so the tensor at k is necessarily a BN scale. All **six** single-tensor steps in the corpus run **scale → shift → conv**, because `named_parameters()` orders conv → `bn.weight` → `bn.bias` and `--stepsize-groups [k,62−k]` takes a **contiguous prefix** — **no contiguous-prefix cut on this architecture can move a shift before its own scale**. Three rivals stay live: **norm scale**, **first to leave**, **clamp turnover**.
 
 **147.6's grounds, all re-derived here and all untouched.**
 
@@ -291,7 +335,7 @@ Re-verified this cycle by joining every `ms=3e-4` `HIER=none` run on `alice2` to
 - Counterexample k=45→47 moves a 512-param BN scale out and **GAINS +3.4487 pp**. Unaddressed.
 - **CORPUS NUMERAL CORRECTED:** 147.5c's *"10 steps, 8 raise, 2 lower"* is **7 of 9** on the same manifest (k47→49 moves no scale). 147.6's conclusion is unaffected; **do not re-quote 8/10**.
 
-**NEXT EXPERIMENT — one batch breaks BOTH confounds (class×ordinal and seed reuse).** Decompose `cpk1`'s **k=45 → k=49** window (**a 100-epoch window**; CORRECTIONS 156 makes `k*=49` a 100-epoch argmax) at single-tensor resolution, on seeds **{3,4,5}**, with in-batch anchors:
+**NEXT EXPERIMENT — one batch breaks BOTH confounds (class×ordinal and seed reuse).** Decompose `cpk1`'s **k=45 → k=49** window (**a 100-epoch window**; CORRECTIONS 156 made `k*=49` a 100-epoch argmax and **CORRECTIONS 158 lifts that for `k* = 49` among {45,47,49,50,52} at 772 ep, converged, on fresh seeds — the WINDOW's single-tensor decomposition is still 100-epoch, and `k=46`/`k=48` are unrun at any horizon**) at single-tensor resolution, on seeds **{3,4,5}**, with in-batch anchors:
 
 | step | tensor | class | params |
 |---|---|---|---|
