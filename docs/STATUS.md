@@ -1,11 +1,19 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 143**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **174**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **175**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,740 rows** (**+60: `cru1` INGESTED this cycle** — keyed on `(run, job_id)`: **60 added, 0 changed, 0 removed**). **BOTH CLUSTER QUEUES ARE EMPTY. ALL THREE BATCHES OF THE 24-HOUR PUSH ARE COMPLETE, SCORED AND INGESTED.** `cru1` cost **39.2000 GPU-h** (60 jobs, ingested `wallclock_min`). **Nothing was submitted or cancelled this cycle, and no job this campaign did not submit was touched on either account.**
 **`c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately not fixed**. **10 checks fail, the SAME 10 as before this ingest**: only the derived counts move — rows 2,680 → **2,740** (paper 2,177), admissible 2,238 → **2,298**, wallclock-carrying 2,665 → **2,725**, GPU-h 2,857.30 → **2,896.5**. **This ingest introduced no new failing check.** 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 **RULE 16: `git diff -- analysis/` EMPTY** — no registered scorer or guard edited. `cY1_cru1_score.py` `sha256 0de0604ca5995335…` and `argsline_guard.py` `sha256 81cea8b586e124a6…` unchanged on Mac and `alice2`.
+
+## CYCLE 144 (TRACK C) — **`cdn2` REGISTERED AS THE SUCCESSOR TO THE CRASHING `cdn1` SCORER, RUN UNEDITED, VERDICT REPRODUCED. CORRECTIONS 175. ZERO GPU, CORPUS UNCHANGED AT 2,740.**
+
+* **Registered** `analysis/cdn2_denominator_score.py` at **`50d8bdf`** (2026-09-08T19:24:04+02:00), **commit-before-first-execution only, NOT the RULE 21 label** (no runs of its own). **Margin is sub-second** — commit object written 1788888244.135, first execution's stdout last written 1788888244.322; ordering by a single `&&` chain and nanosecond mtimes, not by git's 1-s stamp. `cdn1` (`sha256 7644703b…`) **left unedited and broken** (RULE 16).
+* **Non-comment diff vs `cdn1`: one fixed line** (`_cell_of(have[n])`, the row, with `n in have` first), **two banner strings, three imports, and a new `--selftest` section J that runs `score()` on synthetic corpora** (29/29 ok, Mac 3.14.5 and `alice2` 3.10.4). **No constant, threshold, stratum, gate, bar, branch or reader moved.** Inherited sections A–I are **30/34** on the live corpus — D-df, E×2, I — all census drift already recorded at `171.3a`/`174.12`, none a premise of a quantity; **deliberately not re-tuned**.
+* **Verdict, verbatim, first execution, exit 0:** `GAP_in +5.699 pp = +18.80 SE`, `BRANCH: BELOW-BY-A-LOT`, `V2 PASS` (`argmax lr=0.1 at 77.593 pp -- INTERIOR`), `V3 -0.161 pp (-0.53 SE) PASS`, `GAP_corpus +5.539 pp = +18.27 SE (quotable)`, `DELTA_H +1.235 pp (4.07 SE) RESOLVED`, `VERDICT: USABLE`. **Reproduces `171` at 4 dp** (77.5927 − 71.8933 = +5.6993; +1.2353). Second run byte-identical.
+* **`171.3b`'s "second latent fault" withdrawn** — a list comprehension's `if` runs before its element expression; there was one fault.
+* Sibling commit `9de9256` (`cms1`, another track) was on the branch and was carried by this track's push; not scored here.
 
 ## CYCLE 143 — **`cru1` LANDS. CORRECTIONS 174. `FINAL: 1e-3:GAP-SHRINKS | 1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE | ALIAS-BROKEN`**
 
@@ -50,7 +58,7 @@ FINAL: 1e-3:GAP-SHRINKS | 1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE | ALIAS-BROKEN
 
 | batch | acct | jobs | verdict | corpus | entry |
 |---|---|---|---|---|---|
-| `cdn1` | `alice2` | 24 | **`GAP_in = +5.699 pp = +18.80 SE`, `BELOW-BY-A-LOT`** (scored **by hand** — the registered scorer crashes unconditionally, left unedited) | 2,638 → 2,662 | `171`, `167.1` |
+| `cdn1` | `alice2` | 24 | **`GAP_in = +5.699 pp = +18.80 SE`, `BELOW-BY-A-LOT`** (scored **by hand** at `171` — the registered scorer crashes unconditionally, left unedited; **re-scored by its registered successor `cdn2` at `175`, verdict reproduced line for line**) | 2,638 → 2,662 | `171`, `167.1`, **`175`** |
 | `crn1` | `alice` | 18 | **`COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED`** — both halves narrowed by the audit | 2,662 → 2,680 | `172`, `173` |
 | `cru1` | `alice2` | 60 | **`1e-3:GAP-SHRINKS | 1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE | ALIAS-BROKEN`** | 2,680 → **2,740** | **`174`** |
 

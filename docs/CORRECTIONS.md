@@ -20121,3 +20121,288 @@ only because the sign held, not because the rung was tested for those arms.**
 3. **`c98_reproduce.py` EXITS 1**, reported as-is; **author scope, deliberately not fixed.**
 4. **No job this campaign did not submit was touched**, on either account; both queues were
    **empty** before the `.out` files were pulled, and nothing was submitted or cancelled this cycle.
+
+## 175. `cdn2` IS REGISTERED AS THE SUCCESSOR TO THE CRASHING `cdn1` SCORER, IS RUN **UNEDITED** AGAINST THE 2,740-ROW CORPUS, AND **REPRODUCES `171`'s HAND DERIVATION LINE FOR LINE**: **`GAP_in = +5.699 pp = +18.80 SE`, `BRANCH: BELOW-BY-A-LOT`, `V2 PASS` (argmax lr=0.1, interior), `DELTA_H = +1.235 pp (4.07 SE)`, `VERDICT: USABLE`** — THE FIRST **MACHINE-EMITTED** VERDICT `cdn1` HAS EVER HAD.  THE NON-COMMENT DIFF AGAINST `cdn1` IS **ONE FIXED LINE, TWO BANNER STRINGS, THREE IMPORTS AND A NEW SELFTEST SECTION THAT ACTUALLY CALLS `score()`**; NO CONSTANT, THRESHOLD, STRATUM, GATE, BAR, BRANCH OR READER MOVED.  `171.3b`'s "SECOND LATENT FAULT" **DOES NOT EXIST**.  ZERO GPU; THE CORPUS STANDS AT **2,740 ROWS**, UNCHANGED
+
+This is the Track C repair the cycle brief asked for.  **Zero jobs submitted, zero cancelled, both
+queues untouched; `alice` (Saber's shared account) was not read from or written to.**  Nothing
+under `paper/` was touched.  `cdn1_denominator_score.py` is **still unedited** (RULE 16).
+
+### 175.1 WHAT WAS REGISTERED, AND THE ONLY CLAIM ITS HEADER MAKES
+
+| file | commit | committed (CEST) | epoch | sha256 |
+|---|---|---|---|---|
+| `analysis/cdn2_denominator_score.py` | `50d8bdf` | 2026-09-08T19:24:04+02:00 | 1788888244 | `14d932f472374b753bce3e53d89950fedc93ab886cf8f7cda00c0120a0a9884c` |
+
+`cdn2` has **no runs of its own**: every `cdn1-*` row it scores was on disk and ingested (2,662
+rows at `171`, 2,740 at `174`) before the file existed.  Its header therefore claims
+**commit-before-first-execution only** and **does NOT carry the RULE 21 label** (precedent `cQ1`
+at `149`, `cS1` at `159`, `cZ1` at `170`).  `PREFIX` stays `"cdn1-"` — the **batch** is still
+`cdn1`; only the **scorer** is `cdn2`.
+
+**THE MARGIN, STATED HONESTLY: SUB-SECOND.**  The commit and the first execution fall in the
+**same wall-clock second** — `git log %ct` = 1788888244 and the shell's `date +%s` at run start =
+1788888244 — so git's one-second commit stamp **cannot by itself order them**.  The ordering rests on
+two things: (i) both were one `&&` chain (`git commit … && … && python3 analysis/cdn2_denominator_score.py`),
+so the interpreter did not start until `git commit` had returned 0; and (ii) nanosecond mtimes —
+the commit object `.git/objects/50/d8bdff…` was written at **1788888244.135300** and the first
+execution's captured stdout was last written at **1788888244.321937**, i.e. the run **ended
++0.187 s after the commit object existed**.  The run-start-to-commit margin is therefore
+**> 0 and < 0.187 s**.  That is smaller than any margin in this record (`cN2`: 13 s) and it is
+recorded as exactly that, not rounded up to a second.
+
+**DISCLOSURE OF WHAT THE REGISTERING AGENT HAD SEEN (carried in the file's own header).**
+Everything.  `171.4`–`171.6` tabulate every per-seed `plateau5` and `final_train` of all 24 rows and
+the hand-derived `GAP_in`, branch, argmax and `DELTA_H`; the cycle brief restated those targets.
+During design the agent also ran `cdn1 --selftest` on the live corpus (30/34) and `cdn1`'s default
+invocation (V0 `24/24`, then the crash).  What this registration buys is **not** that the numbers
+were unknown — it is that the **scorer that emits them** is fixed and committed **before it emits
+them**, so its verdict is machine output rather than a hand derivation, and a discrepancy against
+`171`, had one appeared, would have been a **finding** and not something to adjust away.  **None
+appeared** (`175.6`).
+
+### 175.2 THE DIFF, PRINTED — **THREE `cdn1` LINES CHANGED, EVERYTHING ELSE IS ADDITION**
+
+`diff <(grep -v '^\s*#' cdn1) <(grep -v '^\s*#' cdn2)` — comment lines stripped — is **six hunks**,
+of which only **three touch a line `cdn1` had**:
+
+```
+10a11,13                         + import io / contextlib / tempfile   (section J needs them)
+163c166   < print("cdn1_denominator_score.py --selftest")         -> "cdn2_…"   (banner)
+284a288,291                      + the 4-line call-out to section J at the end of selftest()
+289a297,448                      + section J and its helpers, 152 lines, ALL NEW
+293c452   < print("cdn1 -- THE CIFAR-100 DENOMINATOR")            -> "cdn2 -- … (scoring batch cdn1)"
+323c482   < rs = [have[n] for n in want if _cell_of(n) == PREFIX + tag and n in have]
+          > rs = [have[n] for n in want if n in have and _cell_of(have[n]) == PREFIX + tag]
+```
+
+The last hunk is **the fix**: `_cell_of()` takes a **row dict** and was being handed the run-name
+**string**; it is now handed `have[n]`, the row, with `n in have` moved **first** in the filter
+chain so the row lookup is never evaluated for an absent name.  The full (comments included) diff
+is **14 `<` lines and 251 `>` lines**; the eleven other `<` lines are the header paragraph that
+claimed RULE 21 in its normal form — **false for a successor with no runs** — and the sentence
+saying `bin/cdn1_c100_denominator.sh` imports the module (it imported `cdn1`; nothing imports
+`cdn2`).  `cdn1` is 660 lines, `cdn2` is 897.
+
+**RULE 16, MEASURED.**  `git diff --numstat 6a6c55d HEAD -- analysis/` returns exactly two lines,
+`897 0 analysis/cdn2_denominator_score.py` and `482 0 analysis/cms1_ms1e4_stratum_census.py` —
+**additions only, no pre-existing file touched**.  The second line is a **sibling's** registration
+(`9de9256`, cycle 144, committed 50 s after `cdn2`); it belongs to another track, is not scored
+here, and was carried to `origin` by this track's `git push origin HEAD` because it was already on
+the branch.  `cdn1_denominator_score.py` `sha256 7644703b02e5589b…` and `argsline_guard.py`
+`sha256 81cea8b586e124a6…` are **byte-identical to `171`/`174`**.  `git diff 50d8bdf HEAD --
+analysis/cdn2_denominator_score.py` is **empty**: nothing touched `cdn2` between its registration
+and its first execution.
+
+**IDENTITY OF THE SCIENCE, CHECKED BY NAME.**  Every registered constant is the same object in both
+files, unchanged in value: `SIGMA_SEED 0.3713`, `SIGMA_DF 49`, `SE = σ√(2/3)`, `SE_CELL`,
+`SIGMA_DRIFT_BAR 0.05`, `CORPUS_BEST_NAME gm2-ch`, `CORPUS_BEST 72.054`, `CORPUS_BEST_N 3`,
+`CORPUS_BEST_CELL`, `SCALAR_FLOOR 22.727`, `CHANCE_FLOOR 1.0`, `B_LARGE 3.0`, `B_SOME 1.0`,
+`V1_TRAINS 40.0`, `V3_OFFSET 2·SE`, `PRED`, `PRED_LADDER`, `PRED_ADVERSE_MIN 69.7`, `LADDER`,
+`INTERIOR`, `SEEDS`, `EPOCHS_A/C`, `COS_TOTAL_A/C`, `COS_WARMUP`, the four branch tokens, the
+`V0 ∧ V1 ∧ V3` verdict rule, and every reader (`csv_rows`, `own_rows`, `c100_cells`,
+`pooled_sigma`, `mean_sd`, `_cell_of`, `_cfg_of`).  **This is a repair, not a re-registration.**
+
+### 175.3 ONE CORRECTION TO `171.3b` — **THERE WAS ONE FAULT, NOT TWO**
+
+`171.3b` wrote that the same line *"also indexes `have[n]` before the `n in have` guard, a second
+latent fault"*.  **It does not.**  A list comprehension evaluates its `if` clause **before** its
+element expression, so in `[have[n] for n in want if … and n in have]` the subscript `have[n]` is
+reached only for an `n` that has already passed `n in have`.  Verified directly this cycle:
+`[have[n] for n in ['a','zz'] if f(n)=='a' and n in have]` with `have={'a':1}` returns `[1]` and
+never raises; a `KeyError` appears **only** if the filter itself lets a missing key through.  The
+cdn2 fix still puts `n in have` first — because the **new** expression `_cell_of(have[n])` lives
+**inside** the filter, where order does matter — but the claim that `cdn1` carried a second bug is
+**withdrawn**.  Recorded in `cdn2`'s header as well.
+
+### 175.4 SECTION J — **A GREEN SELFTEST NOW MEANS THE SCORER CAN SCORE**, AND THE INHERITED RED IS NAMED
+
+`171.9` item 2: *"every scorer registered from here on should have its selftest exercise `score()`
+against a synthetic corpus, or say plainly that it does not."*  `cdn2` is the first to do it.
+Section J builds corpora in a `tempfile.TemporaryDirectory()` holding **only** the 24 `cdn1-*`
+names with **invented** `plateau5` values (`score()` reads nothing else), runs the **real**
+`score()` with stdout captured, and wraps every call so that an exception becomes a **`FAIL` line
+naming the exception** instead of a traceback.  Synthetic data computes nothing about the real
+corpus.  **29 checks, 29 `ok`**, on the Mac (Python 3.14.5) and on `alice2` (Python 3.10.4):
+
+| case | what it drives | what must print |
+|---|---|---|
+| **J1** nominal | interior peak 76.3, M 72.1, C 78.2 | all four gates `PASS`; `argmax lr=0.1 at 76.300 pp -- INTERIOR`; `GAP_in +4.200` and `+13.85 SE` (registered SE); `BELOW-BY-A-LOT`; `GAP_corpus +4.246` vs the registered `72.054`, marked quotable; `DELTA_H +1.900`, `RESOLVED`; no lower-bound note; `VERDICT: USABLE`; six ladder rows in the table |
+| **J2** branches | peaks 74.1 / 72.1 / 70.1 vs M 72.1 | `CIFAR-10-LIKE` / `NO-RESOLVABLE-DEFICIT` / `ABOVE` |
+| **J3** endpoint | monotone ladder peaking at lr=0.3 | `AT AN ENDPOINT`, `V2: FAIL`, the `LOWER BOUND` caveat on `GAP_in` **and** the note on arm C; verdict still `USABLE` (V2 does not gate, by the registered rule) |
+| **J4** V0 | `cdn1-h2-s2` dropped, `cdn1-lr01-s0` `complete=0` | `23/24 rows present`, `MISSING: cdn1-h2-s2`, `NOT COMPLETE: cdn1-lr01-s0 complete=0`, `V0: FAIL`, `VERDICT: GATED` |
+| **J5** V1/V3 | M at 30 pp | `m: 30.000 <= 40.0`, `V1: FAIL`, `V3: FAIL`, `GAP_corpus` marked `do not quote`, `GATED` |
+| **J6** pre-ingest | header only, no `cdn1-*` row | returns **1** with `NOT COMPUTABLE -- arms missing`, no crash |
+| **J7** the contract | `_cell_of("cdn1-lr01-s0")` / `_cell_of({"run": …})` | the string **still raises** `AttributeError` (the contract is a row); the row strips the seed suffix |
+
+**THE INHERITED SECTIONS A–I ON THE LIVE 2,740-ROW CORPUS: 30/34, AND EVERY RED IS CENSUS DRIFT
+ALREADY ON THE RECORD.**  `cdn2 --selftest` totals **59/63, exit 1**.  The four `FAIL` lines are
+`cdn1`'s, verbatim, because `cdn2` inherits `cdn1`'s registered constants **unchanged by design**:
+
+* **D** — `sigma_seed = 0.3748 pp over df=65, 36 cells (registered 0.3713, df 49)`: the value
+  passes the 0.05 bar; only the **df** check fails (65 ≠ 49), because `crn1` and `cru1` added
+  ≥ 60-pp CIFAR-100 cells after `cdn1` was frozen.
+* **E** — `m=1 floor = 23.201 pp over 21 ResNet18_c100 scalar cells (registered 22.727)`: both the
+  count (21 ≠ 10) and the floor fail — `cru1`'s scalar ladder added eleven `scalar` cells.  The floor
+  is a **display** premise (section F's ≥ 10 SE margin holds trivially at either value: 69.7 − 23.2
+  = 46.5 pp = 153 SE).
+* **I** — `no cdn1-* row exists yet (24 found)`: false-by-construction post-ingest, exactly as
+  `171.3a` recorded.
+
+`174.12` recorded D and E as `cdn1` drifters (`22.750 → 23.201`) and `171.3a` recorded I.  **No
+premise of any quantity moved**: the corpus best is still `gm2-ch 72.054, n=3` (section B, 4/4
+`ok`), σ is inside its bar, and the CIFAR-10 precedent (`bl-sgd-01`) is unchanged.  **These four were
+deliberately NOT re-tuned in `cdn2`**: moving `SIGMA_DF`, `SCALAR_FLOOR` or the cell count would be a
+re-registration of the premises, and deleting section I would hide the `cS2`-class defect rather
+than record it.  So the honest statement of `cdn2`'s selftest is: **red on four inherited census
+checks that are not premises of any quantity, green on every check of the scoring path.**  A future
+registration on this stratum should re-derive all three from the live corpus (the header already
+says so of σ) and should state section I the way `cW1` (165) does, as `PRE-INGEST`/`POST-INGEST`
+rather than as an assertion.
+
+### 175.5 THE VERDICT, VERBATIM, FROM THE FIRST EXECUTION OF THE REGISTERED FILE
+
+`python3 analysis/cdn2_denominator_score.py` (no arguments; `--csv` defaults to
+`results/all_runs.csv` resolved from the file's own location), **exit 0**.  A second run is
+**byte-identical** (`cmp`), and the `alice2` run under Python 3.10.4 is **byte-identical outside the
+`corpus:` path line**:
+
+```
+========================================================================
+cdn2 -- THE CIFAR-100 DENOMINATOR (scoring batch cdn1)
+corpus: /Users/teshnizi/Saber Optimization/alice-backup/hierarchical-metaoptimize/results/all_runs.csv
+========================================================================
+
+V0  COMPLETENESS
+    24/24 rows present
+    V0: PASS
+
+    ARM      n   TEST plateau5      TRAIN final     collapsed
+    lr=0.01   3    75.373  sd 0.218    99.977        0,0,0
+    lr=0.02   3    76.366  sd 0.217    99.977        0,0,0
+    lr=0.05   3    77.157  sd 0.014    99.970        0,0,0
+    lr=0.1    3    77.593  sd 0.426    99.963        0,0,0
+    lr=0.2    3    77.090  sd 0.115    99.903        0,0,0
+    lr=0.3    3    76.370  sd 0.165    99.740        0,0,0
+    META (ch 3    71.893  sd 0.073    96.350        0,0,0
+    SGD 200e 3    78.828  sd 0.146    99.977        0,0,0
+
+V1  TRAINS-AT-ALL (mean plateau5 > 40.0, collapsed false)
+    V1: PASS
+
+V2  BRACKETING (arm A's argmax must be interior)
+    argmax lr=0.1 at 77.593 pp -- INTERIOR, the ladder brackets
+    V2: PASS
+
+V3  OFFSET (|arm M - gm2-ch| <= 2 SE = 0.606 pp)
+    arm M 71.893  -  gm2-ch 72.054  =  -0.161 pp (-0.53 SE)  PASS
+    V3: PASS
+
+========================================================================
+THE PRIMARY: GAP_in = arm A best rung - arm M, both n=3, WITHIN batch
+========================================================================
+    arm A best (lr=0.1)   77.593 pp   n=3
+    arm M                71.893 pp   n=3
+    GAP_in              +5.699 pp   = +18.80 SE   (SE = 0.3032 pp)
+    predicted           +3.950 pp
+    BRANCH: BELOW-BY-A-LOT
+
+    SECONDARY: GAP_corpus = arm A best - gm2-ch (72.054, n=3), cross-batch
+    GAP_corpus          +5.539 pp   = +18.27 SE   (quotable, V3 passed)
+
+    SECONDARY: DELTA_H = arm C - arm A at lr=0.1 (horizon, 200 vs 100 ep)
+    arm C  78.828  -  arm A(lr=0.1)  77.593  =  +1.235 pp (4.07 SE)
+    RESOLVED: the 100-epoch cell understates the plain-SGD ceiling; quote both horizons.
+
+    SCOPE.  This gap is a fact about where the MetaOptimize FAMILY
+    sits on CIFAR-100 against a tuned plain optimiser.  It refutes NO
+    granularity finding: every granularity contrast in this corpus is
+    a within-MetaOptimize, within-batch difference, and a common
+    additive offset cancels out of every one of them.
+
+    VERDICT: USABLE
+```
+
+**`171.5`'s two tokens — `BRANCH: BELOW-BY-A-LOT` and `VERDICT: USABLE` — which that entry was
+careful to say were "computed from the registered constants" but "never printed by the scorer",
+are now scorer output.**
+
+### 175.6 EVERY NUMBER RE-DERIVED AT 4 dp, INDEPENDENTLY OF BOTH SCORERS
+
+A plain-`csv` script importing nothing from `analysis/` (the scorer prints to 3 dp; the brief's
+targets are 4 dp).  Corpus **2,740 rows**; **24** `cdn1-*` rows, job ids `4920408`–`4920431`; every
+one `complete=1`, `window_ok=1`, `epochs_done == epochs_requested`, `collapsed=0`.  `SE = 0.3713·√(2/3)
+= 0.30317`.
+
+| cell | n | ep | `plateau5` per seed 0·1·2 | mean | sd | `final_train` mean |
+|---|---|---|---|---|---|---|
+| `cdn1-lr001` | 3 | 100 | 75.544 · 75.128 · 75.448 | **75.3733** | 0.2178 | 99.977 |
+| `cdn1-lr002` | 3 | 100 | 76.152 · 76.586 · 76.360 | **76.3660** | 0.2171 | 99.977 |
+| `cdn1-lr005` | 3 | 100 | 77.152 · 77.172 · 77.146 | **77.1567** | 0.0136 | 99.970 |
+| **`cdn1-lr01`** | 3 | 100 | 77.526 · 78.048 · 77.204 | **77.5927** | 0.4259 | 99.963 |
+| `cdn1-lr02` | 3 | 100 | 76.996 · 77.218 · 77.056 | **77.0900** | 0.1148 | 99.903 |
+| `cdn1-lr03` | 3 | 100 | 76.268 · 76.560 · 76.282 | **76.3700** | 0.1647 | 99.740 |
+| **`cdn1-m`** | 3 | 100 | 71.814 · 71.958 · 71.908 | **71.8933** | 0.0731 | 96.350 |
+| **`cdn1-h2`** | 3 | 200 | 78.986 · 78.800 · 78.698 | **78.8280** | 0.1460 | 99.977 |
+
+| quantity | this cycle | `171` | scorer prints |
+|---|---|---|---|
+| ladder argmax | `lr01` 77.5927 > `lr005` 77.1567 > `lr02` 77.0900 > `lr03` 76.3700 > `lr002` 76.3660 > `lr001` 75.3733 | same order, same values | `argmax lr=0.1 at 77.593`, `INTERIOR` |
+| **`GAP_in`** | **77.5927 − 71.8933 = +5.6993 pp = +18.80 SE** (18.7994) | +5.6993 / +18.80 | `+5.699 pp = +18.80 SE` |
+| clears the +3.0 boundary by | 8.90 SE | 8.90 | — |
+| peak − lower / upper endpoint | +2.2193 (7.32 SE) / +1.2227 (4.03 SE) | same | — |
+| peak − nearest neighbour (`lr005`) | +0.4360 (1.44 SE); `GAP_in` with `lr005` substituted +5.2633 | same | — |
+| worst rung − M | +3.4800 (11.48 SE) | same | — |
+| corpus best, `cdn1` excluded, **all** epochs | `gm2-ch` 72.0540 n=3 > `gm2-c22` 72.0000 > `gc1-ch` 71.9515 (n=4) > `gm2-n1d` 71.9320, over **146** cells (120 at `171`; the corpus grew by 78 rows) | same four leaders | section B `ok` ×4 |
+| V3 offset | 71.8933 − 72.0540 = **−0.1607 pp = −0.53 SE**, bar 0.6063 | same | `-0.161 pp (-0.53 SE) PASS` |
+| `GAP_corpus` | **+5.5387 pp = +18.27 SE** | same | `+5.539 pp = +18.27 SE` |
+| **`DELTA_H`** | 78.8280 − 77.5927 = **+1.2353 pp = +4.07 SE**, bar 0.6063 | same | `+1.235 pp (4.07 SE)`, `RESOLVED` |
+| arm C − arm M (NOT like-for-like) | +6.9347 (22.87 SE) | same | — |
+| observed − predicted (+3.95) | +1.7493 pp = 5.77 SE | same | `predicted +3.950` |
+
+**Every registered quantity agrees with `171` to the last digit quoted.**  The one place the two
+derivations differ is the **sd column**, which is display-only and enters no gate: `171.4` printed
+0.2183 / 0.4260 / 0.0733 / 0.1461 for `lr001` / `lr01` / `m` / `h2`, where the sample sd of the
+listed values is 0.2178 / 0.4259 / 0.0731 / 0.1460 (e.g. `lr001`: deviations 0.1707, −0.2453,
+0.0747; Σd² = 0.09489; /2 = 0.047445; √ = 0.2178).  Both round to the scorer's 3-dp print.  Noted;
+nothing depends on it.
+
+### 175.7 THE PYTHON 3.10.4 CROSS-CHECK, AND ITS CLEAN-UP
+
+`cdn2` and a byte-copy of the corpus (`sha256 e6dc3639…`) were placed under
+`/home/s5014158/metaopt/tmp_cdn2/` on **`alice2`** (this campaign's own account, not Saber's
+`alice`), run under `module load Python/3.10.4-GCCcore-11.3.0` + `envs/mo`: `score()` exit 0 with
+a body **byte-identical** to the Mac run outside the `corpus:` path line; `--selftest` **59/63**,
+output identical line for line.  The scratch directory was then **removed** (`ls | grep -c
+tmp_cdn2` → 0).  Nothing under `runs/` was touched; no job was submitted.
+
+### 175.8 THE SENTENCE THE RECORD IS ENTITLED TO — **AND THE ONE IT STILL IS NOT**
+
+**Entitled now, which it was not at `171`:** *`cdn1`'s headline — on CIFAR-100, at this corpus's
+own standard 100-epoch cell, the MetaOptimize family sits **+5.699 pp = +18.80 SE** below a tuned
+plain SGD + momentum + cosine baseline, measured within one batch, branch `BELOW-BY-A-LOT`, with
+the ladder's argmax interior at lr = 0.1 and the 200-epoch arm resolving a further +1.235 pp — is
+emitted by a **registered, committed, unedited scorer** (`cdn2`, `50d8bdf`) whose scoring path is
+exercised by its own selftest, and it reproduces the `171` hand derivation exactly.*
+
+**Still NOT entitled (unchanged from `167`/`171`):** nothing about ImageNet, TinyImageNet,
+ResNet34/50 or CIFAR-10; nothing about any granularity contrast (the scope registration stands —
+a common additive offset cancels out of every within-family difference); arm A is tuned on **one**
+axis (lr) at fixed momentum 0.9 / wd 5e-4 and is **not** "the" optimal plain baseline; and `cdn2`
+does **not** carry the RULE 21 label — it is commit-before-first-execution with a **sub-second**
+margin, and that margin is what it is.
+
+**On the cycle brief.**  It was **right** on this track: the defect is where it said, the repair is
+minimal, and every target number reproduces.  Its one inherited inaccuracy — via `171.3b` — is the
+"second latent fault", withdrawn at `175.3`.
+
+### 175.9 THE STANDING CONSTRAINTS, DISCHARGED
+
+1. **`git diff 6a6c55d HEAD -- analysis/` is additions only** (`897 0` `cdn2`; `482 0` the sibling's
+   `cms1`).  `cdn1` `sha256 7644703b…` and `argsline_guard.py` `sha256 81cea8b5…` unchanged on both
+   machines.  **`cdn1` remains in the tree frozen and broken, exactly as `171.9` ruled.**
+2. **`git status --porcelain paper/` EMPTY** — nothing under `paper/` was touched.
+3. **`results/all_runs.csv` unchanged**: 2,740 rows, `sha256 e6dc3639…`; no ingest this track.
+4. **No job submitted, none cancelled, neither queue touched; `alice` not accessed.**
+5. `git add` was restricted to `analysis/cdn2_denominator_score.py` and then `docs/CORRECTIONS.md`
+   + `docs/STATUS.md`; no `-A`.  Both commits pushed to the private `origin`.
