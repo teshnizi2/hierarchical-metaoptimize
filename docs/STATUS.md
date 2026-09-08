@@ -1,7 +1,7 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 141**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **169**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **170**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (nothing ingested this cycle). **`alice2` NOW CARRIES THREE REGISTERED BATCHES AND NOTHING HAS LANDED: `cdn1` 24 jobs (167), `cru1` 60 jobs (168), `crn1` 18 jobs (169) — 102 jobs, ~81 GPU-h. `alice` (Saber's shared account) is READ-ONLY here and was not touched.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
@@ -111,6 +111,47 @@ Two more measured facts, same probe: an **EQUAL VOTE PER TENSOR** reproduces the
 **TWO SENTINELS WILL TRIP LATER, RECORDED NOW (169.9):** `cru1` uses seeds {15,16,17} too, so `--selftest` J's *"zero foreign rows carry seed 15/16/17"* (0 at registration) will read non-zero once `cru1` lands — an assertion about the rest of the corpus, **to be LEFT UNFIXED under RULE 16**; and `SIGMA_100`/the level anchors may move under a foreign ingest. Every premise is invariant under **`crn1`'s own** ingest, which is what was claimed and checked.
 
 **SCOPE:** 100 epochs; `m = 1` and cut positions 49/50 only; nothing about `layerwise`/`nodewise`/`weightwise`/`chunk*`/`permnode*` (inert by construction); **no claim that either weighting is a better optimizer** — the chain rule gives the unnormalised sum, so `tn:` is deliberately the wrong gradient and is a mechanism probe; no test of `152.12` rival (c); **RULE 11 open** (single shared `ms = 1e-3`).
+
+
+## CYCLE 141 — **VERIFICATION PASS (a fourth agent, NOT a fourth batch).** CORRECTIONS **170**. ZERO GPU, ZERO JOBS SUBMITTED, ZERO CANCELLED, NOTHING INGESTED
+
+**RULE 20 + THE SEPARATE ENV AUDIT, AT THE COVERAGE THAT EXISTS.** Through the **UNEDITED, PRE-EXISTING** `analysis/argsline_guard.py` (`81cea8b5…b04e5388`, byte-identical at `HEAD` and in all three `alice2` checkouts, last touched **2 Sep**), `METAOPT_WS` exported first.
+
+| batch | `.out` | ARGS guard | `--batch-consistency` | ENV audit | coverage |
+|---|---|---|---|---|---|
+| `cdn1` | **24/24** | **PASS** 24 clean, 0/0/0 | **PASS** per family 18/3/3 | **PASS**, exactly **3** distinct `ENV:` lines = the 3 families | **FULL** |
+| `cru1` | **8/60** | **PASS** 8 clean, 0/0/0 | **PASS** with the 4 declared axes as **documented** `--vary` args | **PASS**, exactly **1** distinct `ENV:` line | **PARTIAL** |
+| `crn1` | **0/18** | no candidate files (all 18 `PENDING`) | n/a | n/a | **NONE** |
+
+`168`'s `ACROSS-RUN INCONSISTENCY` on `--meta-stepsize` is **confirmed as correct guard behaviour and nothing else**: supplying `cru1`'s four axes as `--vary` (documented arguments, not an edit) returns *"every non-axis flag is identical across 8 runs"*. **NO MISMATCH ANYWHERE, SO NOTHING WAS CANCELLED. THE PROHIBITION STANDS: no number from `cru1` (8/60) or `crn1` (0/18) may be quoted until 60/60 and 18/18.** `cdn1`'s audit prohibition is discharged (`167.1`); its **science** prohibition stands — nothing scored, nothing ingested.
+
+**RULE 21, RE-MEASURED FROM `git` AND `sacct` HERE, NOT TAKEN FROM THE REPORTS.** `cdn1` `1e8e538` → **+72 s** (Submit spread **0 s**, 24 rows one timestamp) · `cru1` `180755c` → **+193 s** (spread 4 s) · `crn1` `2cb2783` → **+317 s** (spread 2 s). `crn1`'s reported **+32 s** measured from the later *launcher* commit `11dbcc0`; **both are correct and the conservative one is upheld** — the scorer, `patch_rednorm.py` and `test_rednorm.py` were all first added in `2cb2783`. The `crn1probe-` pre-registration job (Submit 08:23:42, before the scorer commit) is verified harmless: outputs only in `$WS/crn1_stage/`, **no `crn1probe-*.out` under `$WS/runs/`**, **0** `crn1` rows in the CSV.
+
+**RULE 16, whole cycle:** `git diff 579dd08..HEAD -- analysis/` is **ADDITIONS ONLY** — 7 new files, **0 deletions, 0 modified**; `argsline_guard.py` untouched. Only `bin/PROTECTED.txt`, `docs/CORRECTIONS.md`, `docs/STATUS.md` are modified anywhere. **`git status --porcelain paper/` EMPTY; `git diff … -- paper/` 0 files.**
+
+**`167`/`168`/`169` DO NOT COLLIDE** — three distinct top-level entries, disjoint sub-numbering (`167.1`; `168.1–.9`; `169.1–.10`). One cosmetic wart **recorded rather than repaired**: `167.1` sits at the END of the file after `169` because it was appended later in wall-clock time; the file is append-ordered and authority is *highest number wins*, so **moving it would be an edit to the authority document for no gain**. This STATUS file was checked and is coherent, not three fragments.
+
+**THE ZERO-GPU RESULT — `FINAL: CONV2-NOT-PRIVILEGED`.** `analysis/cZ1_conv1_prefix_step.py`, committed `73cab28` **09:29:43 CEST**, **never executed before that commit**, then run **UNEDITED**: `--selftest` all PASS, **0 FAIL, exit 0**. **NO RULE 21 CLAIM** — zero GPU, no runs of its own, so only **commit-before-first-execution** is asserted, in its own header (`cQ1` 149, `cS1` 159). **Disclosed there:** the `cpk3` cell means were visible at design time, so this is an **audit with a registered branch map, not a prediction test**; `FRAC=0.25` and `CLIFF_MIN=5.0` are stated with grounds and were not fitted.
+
+**TWO BRIEF PREMISES ARE FALSE AND THE FILE'S OWN GATES SAY SO.** (1) `[46,16]` exists at **exactly one horizon in 2,638 rows — 772 ep, `cpk3` only, n=3**; there is **no `plateau5@100` measurement of tensor 46**, so by `156` these numbers **may not be composed** with `166.7(5)`'s 100-epoch `[49,13]` fits. (2) All six non-scalar `cpk3` arms are **contiguous prefixes** — **`cpk3` cannot test the out-of-prefix null at all**, and that half of the brief is **REFUSED**.
+
+Bar **re-derived at write time**, four ways, the three in-flight prefixes excluded from the single reader and the exclusion **verified** (0 rows) not asserted: `SIGMA_772_CUT` 0.864841 · `SIGMA_772_WIDE` 0.813024 · **`SIGMA_100_CUT` 0.897761 (df 74) ← max, USED** · `SIGMA_ALLH_CUT` 0.889319. **`SE_STEP` 0.733018 · `READ_BAR` 1.466037.** All five consecutive single-tensor prefix steps, **in one batch, one horizon, seeds {6,7,8}**:
+
+| t | tensor | pp | SE_STEP |
+|---|---|---|---|
+| **46** | **`layer4.0.conv1.weight`** (1,179,648) | **+5.722667** | **+7.81** |
+| 47 | `layer4.0.bn1.weight` (512) | −2.722000 | −3.71 |
+| 48 | `layer4.0.bn1.bias` (512) | +0.064000 | +0.09 (within bar) |
+| **49** | **`layer4.0.conv2.weight`** (2,359,296) | **+9.197333** | **+12.55** |
+| 50 | `layer4.0.bn2.weight` (512) | −18.270667 | −24.93 |
+
+**`S46/S49 = 0.6222`; 4 of the 5 steps resolved at 2 SE.** Gates: G0 all 7 cells n=3 at 772 ep in one cell, seeds exactly {6,7,8}; **G1 anchor** `S49` 12.55 SE > `CLIFF_MIN`; **G2 floor** every scored cell **≥ 28.16 SE_CELL** above the **in-batch** m=1 anchor 23.178 (worst `[50,12]`; best `[49,13]` +63.41 SE) — **no arm near the floor, the `cpr1` defect closed by construction.** `S46` is **UNREPLICATED** (`cpk2` has no `[46,16]`) and the scorer says so; the two-tensor composite `S46+S47` **does** replicate across disjoint seed triples: `cpk3` +3.000667 vs `cpk2` +2.384667, **+0.59 SE**.
+
+**CONSEQUENCE, NARROW:** `conv1` buys **62 % of what `conv2` buys** at 7.81 SE, so **tensor 49 is NOT privileged among the `layer4.0` convolutions** and `166.7(5)/(7)`'s rival **may not be named *"only `conv2` matters"*** — it must be renamed to cover ≥ 2 tensors. **Its SUBSTANCE is untouched, and `CONTIGUITY-OPERATIVE` is neither revived nor refuted.** What changes is a **NAME**. It also names the next experiment: tensor 46 is a **second candidate with a large in-prefix value**, so put it **out of prefix at fixed size** and see whether, like 52, it pays ~0. **`cZ1` cannot answer that.**
+
+**`c98_reproduce.py` → EXIT 1**, 8 checks failed, all the known stale-draft drift (rows 2638 vs 2177, GPU-h 2827.38 vs 1642, deficit 1.7964 vs 1.807, …). **AUTHOR SCOPE, DELIBERATELY NOT FIXED.**
+
+**QUEUE:** 7 `cdn1` RUNNING (17/24 `COMPLETED`), 8 `cru1` RUNNING + 52 PENDING, 18 `crn1` PENDING, all pending on `QOSMaxGRESPerUser`. **≈ 81 GPU-h committed this cycle over 102 jobs; this pass cost 0.**
 
 
 ## CYCLE 140 — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
