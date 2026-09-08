@@ -21534,3 +21534,173 @@ only, from `~/cHE1_scratch`).  RULE 16: `analysis/` additions only (one new file
 untouched; `paper/` untouched.  RULE 20 not applicable (no launch).  `git add` by path.  No nested
 `claude -p`.  This entry took the next free number at the moment of writing (`181`); the header authority
 line in `docs/STATUS.md` moves `180 → 181`.
+
+## 182. TRACK B — **`ctd1` REGISTERED AND LAUNCHED: H-DOMINATE AT THE TENSOR LEVEL, THE FIFTEENTH CANDIDATE'S FIRST DIRECT TEST UNDER SCALAR DYNAMICS.**  AN ADDITIVE, OPT-IN PATCH (`PATCH_PROBE_TENSOR`, PROVED INERT BIT-FOR-BIT ON THE LIVE TREE) LOGS THE 62 PER-TENSOR TERMS THE SCALAR REDUCTION DISCARDS, **AND THE PER-TENSOR EMA THE LION SIGN ACTUALLY CONSUMES.**  THE BRIEF IS WRONG **THREE TIMES FROM THE SOURCE** AND **TWICE FROM THE CORPUS**; ONE OF THE SOURCE ERRORS (THE SIGN CONVENTION) GOT INTO THE FIRST REGISTERED SCORER, WHICH IS **FROZEN** AND SUCCEEDED BY `cTD2` **BEFORE ANY RECORD WAS READ.**  6 JOBS, ONE SUBMISSION, ~5 GPU-h.  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,740 ROWS.**
+
+Everything below is re-derived this cycle from the live source on `alice2`, from the corpus, from the
+launcher's and the test's own output, or from arithmetic.  Nothing is quoted from the cycle briefing.
+This entry takes the next free number (`182`) because Track A wrote `181` in the same cycle.
+
+### 182.1 THE BRIEF, AGAINST THE SOURCE AND THE CORPUS
+
+**(1) The sign convention is inverted, and it matters for the hypothesis.**  `Lion_meta_update`, verbatim
+off the live `Optimizers/HF.py` (guard 4f of the launcher re-checks it):
+
+    self.beta[i] = (1-ms*wd)*self.beta[i] - ms * torch.sign(b2*self.momentum_meta[i] + (1-b2)*HtT_gradft[i])
+    self.momentum_meta[i] = mp*self.momentum_meta[i] + (1-mp)*HtT_gradft[i]
+
+so a **POSITIVE** sign argument moves `beta` **DOWN**.  H-DOMINATE's content — *"votes DOWN persistently,
+which is why beta pins at the floor"* — therefore requires the aggregate to be **positive**; the brief's
+prediction (2) says *"the aggregate is NEGATIVE (down)"*.  `cTD1` copied that; `cTD2` corrects it (182.4).
+
+**(2) Beta does not move by `sign(Σ_i <h_i,g_i>)`.**  It moves by `sign(L)`, `L = 0.9·m + 0.1·z`, with `m` a
+zero-initialised EMA of `z` at 0.99 (every command line of this cell passes `--momentum-param-meta 0.99
+--Lion-beta2-meta 0.9 --weight-decay-meta 0`).  Both `m` and `z` are linear in the 62 per-tensor terms, so
+`L = Σ_i L_i`, `L_i = 0.9·m_i + 0.1·z_i`, **exactly** — and `m_i` cannot be reconstructed from every-100th-step
+samples of `z_i`.  The patch keeps the per-tensor EMA at every meta-step (182.2).  The PRIMARY vote is `L_i`;
+the brief's instantaneous `z_i` is SECONDARY.
+
+**(3) `frac_neg` is not an element-majority statistic in the scalar arm** (`_probe`: `zall = z[0].reshape(-1)`,
+and for scalar `z[0]` is the already-reduced sum; `n_tot = 1`, `t_n = [1]`, `frac_neg ∈ {0,1}` on cru1's own
+records).  Track A's `181` establishes the same fact independently; here it is only used as a free
+cross-check of the capture (`frac_neg == 1` iff harness `z < 0`, scorer section A).
+
+**(4) "The corpus's 23 scalar rows at this cell" is stale.**  Re-derived from `results/all_runs.csv` at 2,740
+rows (network `ResNet18_c100`, `scalar`, SGDm/Lion, `ms 1e-3`, `alpha0 1e-6`, 100/100 epochs, clip
+`-15:-2.3026`, `hier` empty, `AUGMENT=1`, gamma 1, batch 100, CIFAR100, `superseded 0`): **n = 29**,
+`plateau5` **22.8361 ± 0.5568**, `final_train` mean 22.897; `layerwise` **n = 23**, **69.5345 ± 0.4916**,
+`final_train` 99.008.  Floor band = mean ± 4 SD: **[20.609, 25.064]** scalar, **[67.568, 71.501]** layerwise.
+
+**(5) "Pins at −15 for ~76 % of training" is the wrong rung.**  On cru1's three standard-cell scalar probes
+(`probe_cru1-sc-m1e-3-a1e-6-s15/16/17`, 500 records each) `beta` starts at −13.815, **ascends** to
+**−5.126 / −5.216 / −5.214 at step 8,700 / 8,600 / 8,600** (`alpha` 5.9e−3 / 5.4e−3 / 5.4e−3), first touches
+−15 at step **18,600 / 18,500 / 18,500** (37 % of training) and the record-level floor occupancy is
+**0.6280 / 0.6300 / 0.6300**.  (Track A's `181` reports 0.6293 by the same route.)
+
+### 182.2 THE PATCH — `patches/patch_probe_tensor.py`, ADDITIVE, OPT-IN, READ-ONLY
+
+Three insertions into the live `HF.py` (sha256 `9abd4318…` → `4732b74a…`, backup `HF.py.pre_probe_tensor`),
+no existing line edited: (i) one call after `HtT_gradft = self.block_product(self.h_condenced, g)` and
+**before** `base_update` overwrites `h_condenced`; (ii) one call before `_probe` writes its record;
+(iii) three methods.  Active only when `PROBE_TENSOR=1` **and** `PROBE>0` **and** `PROBE_DIR` are set.
+It recomputes `(h_i·g_i).sum()` per tensor from the same `(h, g)` `block_product` consumed, keeps
+`m_i ← 0.99·m_i + 0.01·z_i` per tensor in float32, and at probe steps **appends** to the existing record:
+`z_tensor`, `m_tensor` (62 each), and the harness's own pre-update `z_agg`, `mom_pre`, `beta_pre`
+(clones), plus `pt_mp`, `pt_b2`.  It writes `probe_tensor.json` (numels, coefficients) and prints one
+`PROBE_TENSOR: on …` line into the `.out` so the ENV audit can see it without editing the runner.  It never
+assigns to any attribute the optimizer reads.
+
+**Inertness, `tests/test_probe_tensor.py`, run on `alice2` against the live tree (log at
+`runs/ctd1/inertness_test.log`, `POST_SHA256 4732b74a…`):  ALL PASS.**  R0: deleting the three regions
+reproduces the pre-patch file **byte for byte**; marker count 3.  R1 (control): the unpatched optimizer is
+deterministic on the CPU path.  R2, for `scalar` and `layerwise`, real `ResNet18_c100`, 130 steps,
+`PROBE=40`: with `PROBE_TENSOR` unset, `beta` **bit-identical at every step** (130×1 and 130×62 coordinates)
+and `probe.jsonl` **byte-identical**; with `PROBE_TENSOR=1`, `beta` bit-identical and every record equal to
+the unpatched record once the appended keys are removed.  R3: `Σ_i z_i` vs the harness's `z` worst relative
+deviation **6.5e−8** (scalar; float64 re-summation of float32 terms), **exact** elementwise for layerwise;
+`Σ_i m_i` vs `momentum_meta` **2.1e−7** / exact.  R4: `−(beta − beta_pre)/ms == sign(0.9·mom_pre + 0.1·z_agg)`
+on every unclamped coordinate (4 and 248 checked).  R5: `PROBE_TENSOR=1` without `PROBE` is a no-op.
+
+### 182.3 THE BATCH — `bin/cTD1_tensor_dominate.sh`, 6 JOBS, ONE SUBMISSION
+
+CIFAR-100 / `ResNet18_c100` / SGDm(0.99, wd 0.1) + Lion(0.99, 0.9, wd 0) / gamma 1 / `AUGMENT=1` /
+`BETA_CLIP=-15:-2.3026` / batch 100 / 100 epochs / `ms 1e-3` / `alpha0 1e-6` / `PROBE=100` /
+`PROBE_TENSOR=1`.  **`scalar` × seeds {18, 19, 20} (PRIMARY) + `layerwise` × {18, 19, 20} (COMPANION).**
+Guard 2c: zero `ResNet18_c100` rows anywhere carry seeds 18–20.
+
+| | |
+|---|---|
+| job ids | **4924919–4924924**; sacct `Submit` **`2026-09-08T21:12:39` CEST on all six** = ONE submission |
+| partitions | `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, composed by `slurm_parts_for_wall` at `WALL 03:00:00` (`178`); source-time hook PASS |
+| started at submit+6 s | `sc-s18` node851, `lay-s18` node887, `sc-s19` node887 (all `gpu-short`); `lay-s19`, `sc-s20`, `lay-s20` PENDING (Priority) |
+| cost | ~5 GPU-h (cru1 median 42 min/run + probe overhead; node851 is a 2080ti node, 55–70 s/epoch per `178`) |
+| provenance | `runs/ctd1/PROVENANCE.txt`: `HF_SHA256 4732b74a…`, pre-patch `9abd4318…`, 3 markers |
+
+**Why the companion, in one paragraph.**  `177.5` showed that under layerwise dynamics the layer4 convs and
+`linear.weight` ascend while the `bn2` scales descend, and the scalar `beta` descends — the per-tensor signs
+under shared-beta dynamics are not those under layerwise dynamics, so no layerwise probe may stand in for
+scalar (and none does here).  Running both arms with the same logging in the same batch makes prediction (4)
+a within-batch measurement at matched seed and step, and lets the capture be validated on the live GPU where
+the harness's own `z` **is** per-tensor (`z_tensor == z[0]`, `m_tensor == momentum_meta[0]`, elementwise).
+2.5 GPU-h.
+
+### 182.4 THE REGISTRATION — `cTD1` (FROZEN) AND ITS SUCCESSOR `cTD2`
+
+| | |
+|---|---|
+| `analysis/cTD1_tensor_dominate_score.py` | commit `586e98d`, `2026-09-08T21:12:19+02:00` = epoch **1788894739**; earliest Submit epoch **1788894759**; **MARGIN 20 s** — positive, thin, and the normal RULE 21 claim.  sha256 `f2460b9e…`.  `--selftest` 26/0. |
+| `analysis/cTD2_tensor_dominate_score.py` | commit `5c0f04b`, `21:15:19+02:00`, **after** Submit and **before any `ctd1` record was opened** (at that moment the six `probe.jsonl` held 15/0/0/6/14/0 lines, counted with `wc` only).  Claims commit-before-any-record-read, precedent cN1/cN2 (`149`), cdn1/cdn2 (`175`).  sha256 `c3122e1f…`.  `--selftest` 27/0.  **The documented scorer for `ctd1` is `cTD2`.** |
+| what `cTD2` changes | exactly two definitions and their labels: `DOWN := share of DISAGREE records with s_agg > 0` (the sign that lowers `beta`; `cTD1` had `< 0`), and `opp_j := P(scalar L_j > 0 and layerwise L_j < 0)` (`cTD1` had both inequalities reversed).  The brief-literal share is kept as `AGG-NEG-SHARE`, descriptive.  72 differing lines, all header / the two definitions / labels / one selftest check. |
+
+**Quantities, per scalar record, for X ∈ {L (PRIMARY), z (SECONDARY)}:** `s_agg` = sign of the **harness's
+own** aggregate (`0.9·mom_pre + 0.1·z_agg`, resp. `z_agg`), with `sign(Σ_i X_i)` checked against it;
+`s_maj = sign(#pos − #neg)`; `DISAGREE = s_agg ≠ s_maj`; **`R_T`** = DISAGREE share, pooled over the three
+seeds and per seed; **carrying set** = shortest prefix of the |X_i|-ranked tensors whose partial sum has
+`s_agg`'s sign *and* exceeds the remainder's Σ|X_i| in magnitude; `DOWN`; `NAMED-CARRIED` (carrying set ⊆
+{`layer4.0.conv2.weight`, `layer4.1.conv2.weight`, `linear.weight`}); the PINNED phase (`n_at_lo == 1`) split
+out; `agree_j` / `opp_j` against the companion.
+
+**Bars, frozen:** (1) `R_T ≥ 0.10` on PRIMARY; (2) `DOWN ≥ 0.75`; (3) `NAMED-CARRIED ≥ 0.75`; (4) companion:
+`opp_j ≥ 0.50` on ≥ 2 of 3 NAMED → `PATH-DEPENDENT-OPPOSITE`; `agree_j ≥ 0.75` on all 3 → `PATH-INDEPENDENT`;
+else `PATH-DEPENDENT-MIXED`.  Floor: each run's `plateau5` inside its cell's mean ± 4 SD — provenance only.
+Decomposition tolerances `1e−5` (z), `1e−4` (m) relative to Σ|term|, applied-sign identity on ≥ 99 % of
+unclamped coordinates.
+
+**Branches, first match:** `UNRESOLVED-PATCH-NOT-INERT` > `UNRESOLVED-PROVENANCE` > `UNRESOLVED-DIVERGED` >
+`UNRESOLVED-DECOMPOSITION` > **`NO-TENSOR-DOMINATION`** (`R_T < 0.10`) > `DOMINATION-BUT-NOT-DOWN` >
+`DOMINATION-BY-OTHER-TENSORS` (informative; carriers printed by frequency) > `TENSOR-DOMINATION-SUPPORTED`.
+Stamps: `SECONDARY-z:<ladder>`, `PATH-…`|`NO-COMPANION`, `PINNED-R_T`, `PINNED-FRAC`, `PINNED-AGG-NEG`,
+`FLOOR-OK`|`FLOOR-OUTSIDE`, `FLOOR-NOT-INGESTED`.
+
+**Disclosure — an audit with a registered bar, not a blind test.**  `results/crn1_reduction_probe/REPORT.txt`
+(`169.3`) was visible: on the true scalar trajectory, seed 0, 6,000 steps (12 % of the horizon), a pure
+sign-vote differs from the unnormalised sum on **0.0008** of steps (last half 0.0017); `sign(z)` equals the
+sign of the largest |term| on 0.9968; that term is `linear.weight` 95 % / `layer4.1.conv2` 4 % /
+`layer4.0.conv2` 1 %, at 0.38 of Σ|t|; unanimity 0.0002.  That is the SECONDARY statistic on the early phase
+and it is small, so prediction (1) was disfavoured before registration; the bar (0.10) sits 125× above it,
+not on it.  Untested and unseen: the PRIMARY (L) statistic anywhere, steps > 6,000, the pinned phase, seeds
+18–20.  `crn1_stage/*.terms.npy` were not opened.  `177.5` and `179.8` (descriptive) were visible.
+
+### 182.5 RULE 20 AND THE ENV AUDIT — **PARTIAL, 3 OF 6, PASS ON THE COVERAGE THAT EXISTS**
+
+`argsline_guard.py $WS/runs --name ctd1- --batch-consistency` (unedited, sha256 `81cea8b5…`): **`3 clean, 0
+WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line, VERDICT: PASS`; `batch-consistency: every
+non-axis flag is identical across 3 runs`.**  `guard_postlaunch` PASSED against `ctd1-sc-s18`'s own ARGS line
+at submission.  ENV audit: modulo `PROBE_DIR`, **ONE** distinct `ENV:` line across the 3 started runs
+(`BETA_CLIP=-15:-2.3026` 3/3, `PROBE=100` 3/3, `AUGMENT=1` 3/3).  `PROBE_TENSOR` audit (the patch's own line,
+modulo `dir=`): `type=scalar` ×2, `type=layerwise` ×1, all `every=100 tensors=62 meta_alg=Lion
+momentum_param=0.99 Lion_beta2=0.9`.  **Coverage 3/6; no number may be quoted until 6/6.**
+
+**Liveness on the live GPU (a provenance look, not a scoring run; counts and tolerances only).**  At
+21:16 CEST: `sc-s18` 12 records, `sc-s19` 25, `lay-s18` 27 — **every record carries the five appended fields
+with 62 terms**; `Σ_i z_i` vs the harness's `z` worst relative deviation **1.0e−7 / 1.4e−7** (scalar), **exact**
+elementwise (layerwise); `Σ_i m_i` vs `momentum_meta` **5.1e−7 / 7.9e−7** / exact; `probe_tensor.json` present
+with the right `stepsize_type`; no traceback; epochs advancing.  Scalar `beta` is **ascending** (−12.714 and
+−11.414 at steps 1,100 and 2,400, `beta − beta_pre = +1e−3`), which is what 182.1(5) says this cell does
+first — reported as a liveness check, not a result.
+
+### 182.6 WHAT IS **NOT** DONE
+
+**Nothing has landed, been scored or been ingested; the batch was not scored on partial data.**  The RULE 20
+and ENV audits are OPEN OBLIGATIONS at 6/6.  When all six carry `RUN_DONE`:
+
+    export METAOPT_WS=/home/s5014158/metaopt
+    python3 analysis/argsline_guard.py $METAOPT_WS/runs --name ctd1- --batch-consistency
+    grep -h '^ENV:' $METAOPT_WS/runs/ctd1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c      # ONE line, x6
+    grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/ctd1-*.out | sed 's/ dir=.*//' | sort | uniq -c    # scalar x3, layerwise x3
+    python3 analysis/cTD2_tensor_dominate_score.py $METAOPT_WS/runs                              # cTD2, NOT cTD1
+
+**ETA.**  The three started runs finish ~45–115 min after 21:12 CEST (node887 runs at l4/mig pace, node851 is a
+2080ti); the three pending ones start when `gpu-short` frees a slot (7 pending ahead of or beside them at
+submit) and take the same again — **all six plausibly by ~01:00 CEST 9 Sep, UNSURE beyond the queue's
+behaviour.**  Walltime 03:00:00 is 1.51× the slowest 100-epoch run on this cell.
+
+### 182.7 THE STANDING CONSTRAINTS, DISCHARGED
+
+`git diff HEAD --numstat -- analysis/` shows additions only; `argsline_guard.py` and every registered scorer
+untouched; `cTD1` frozen, not edited.  `paper/` untouched.  `git add` by path.  No nested `claude -p`.
+Everything on `alice2`; `alice` not accessed, nothing under `/data1/salehkaleybars` touched, nothing
+cancelled.  The live `HF.py` on `alice2` now carries `PATCH_PROBE_TENSOR` (opt-in; the queue held 0 jobs when
+it was applied, so no other batch ran across the change).  `ctd1-` added to `bin/PROTECTED.txt` on both hosts.
+The registered scorer's own note: **the accuracy of every `ctd1` run is a provenance check against 182.1(4)'s
+bands, never a result.**
