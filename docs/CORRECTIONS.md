@@ -18922,3 +18922,246 @@ numerals, **41.9 %** coverage.
    say plainly that it does not.
 3. **`cru1` (19+/60) and `crn1` (0/18) remain in flight and were NOT ingested.**  Their rows are
    proved absent on both sides of this ingest (`171.1`).  Nothing about them is scored here.
+
+## 172. `crn1` IS **MOVED OFF `alice2` AND RE-SUBMITTED ON THE SHARED `alice` ACCOUNT**, ALL 18 ORIGINAL JOBS CANCELLED WITH **0 STARTED AND 0 ROWS**.  THE MOVE FORCED A DISCOVERY THAT WOULD HAVE SILENTLY RUINED THE BATCH: **`alice`'s SHARED HARNESS IS NOT THE HARNESS THIS CORPUS WAS PRODUCED BY, AND ITS `HF.py` CANNOT PARSE `crn1`'s REGISTERED SPECS AT ALL.**  THE DEPLOYMENT IS SELF-CONTAINED, THE PATCH RE-VERIFIES **BYTE-FOR-BYTE AGAINST `alice2`'s OWN PATCHED FILE**, AND **NOTHING SCORED, NOTHING INGESTED — THE CORPUS STANDS AT 2,662 ROWS**
+
+### 172.1 WHY THE BATCH MOVED, AND THE PRE-CANCEL PROOF THAT NOTHING WAS LOST
+
+`crn1` sat **last** in the `s5014158` queue behind the whole of the 60-job `cru1` ladder, at
+`(Priority)`, with **0 of 18 started**.  Before a single `scancel` was issued, four independent
+facts were measured on `alice2`, and all four had to hold:
+
+| check | command | result |
+|---|---|---|
+| no job carries elapsed time | `sacct -X` over `crn1-*`, `Elapsed != 00:00:00` | **0** |
+| every job is still queued | `squeue -h -o '%j %T'`, `State != PENDING` | **0** |
+| no run wrote a log | `ls $WS/runs/crn1-*.out` | **0** |
+| no run wrote a directory | `ls $WS/runs/crn1/` minus the manifest | **0** |
+
+and independently, in the repo at this HEAD, `grep -c '^crn1' results/all_runs.csv` = **0**.
+`sacct` further reported every one of the 18 with `Start = Unknown`.  **No data existed to lose.**
+
+The 18 cancelled ids were `4920535`–`4920539` and `4920541`–`4920553`.  **`4920540` is NOT ours** —
+`sacct -j 4920540` resolves it to `4915420_990`, `lbi_endemics`, an array element belonging to
+another user.  It was neither cancelled nor touched, and the `scancel` was driven from an explicit
+list of 18 ids filtered on the `crn1-` job-name prefix, never from a bare user-wide selector.
+
+**`cru1` WAS NOT DISTURBED, AND THIS IS MEASURED RATHER THAN ASSERTED.**  After the cancel,
+`sacct` over `cru1-*` on 2026-09-08 gives **22 `COMPLETED` + 35 `PENDING` + 3 `RUNNING` = 60**, the
+full ladder, with **zero** `cru1` rows in any `CANCELLED` state.  The `crn1` census is
+**18 `CANCELLED`**, all at zero elapsed.
+
+### 172.2 THE DISCOVERY THE MOVE FORCED — **`alice`'s SHARED HARNESS IS A DIFFERENT PROGRAM**
+
+The obvious deployment — point the registered launcher at `alice`'s workspace and run — **would
+have produced a batch that either crashed or silently ran different code**, and the campaign would
+have had no way to tell from the row data.  Hashing the four core harness files on both accounts:
+
+| file | `alice` (shared) | `alice2` (the corpus harness) | |
+|---|---|---|---|
+| `train.py` | `3fea309e…` | `3fea309e…` | same |
+| `Optimizers/HF.py` | `ff3420ff…` | `0d8ee431…` (`HF.py.pre_rednorm`) | **DIFFER** |
+| `build_network.py` | `3300ce74…` | `86b5e2df…` | **DIFFER** |
+| `load_data.py` | `98c173c3…` | `b52b58a3…` | **DIFFER** |
+
+and the decisive one, measured not inferred: **`grep -c 'sets:'` on `alice`'s live `HF.py` returns
+`0`**, against `4` on `alice2`'s `HF.py.pre_rednorm`.  Enumerating the `PATCH_*` markers in each
+file, `alice`'s harness is missing **three** patches that the corpus harness carries —
+**`PATCH_NAMESETS`, `PATCH_EBJS` and `PATCH_TWOLEVEL`** (it has 16 markers; `alice2` has 19).
+`PATCH_NAMESETS` is the one that defines the `sets:` grammar, so **four of `crn1`'s six registered
+arms — `sets:1-49/50-62`, `tn:sets:1-49/50-62`, `sets:1-50/51-62`, `tn:sets:1-50/51-62` — are
+unparseable on `alice`'s shared tree.**
+
+**CONSEQUENCE, AND IT IS THE REASON THIS ENTRY EXISTS.**  The self-contained tree was therefore
+built from **`alice2`'s harness**, not from a copy of `alice`'s.  A "self-contained checkout" that
+had copied the shared account's own tree would have been self-contained *and wrong*.
+
+### 172.3 THE DEPLOYMENT — SELF-CONTAINED, AND **NOTHING OUTSIDE IT WAS MODIFIED**
+
+Everything lives under **`/data1/salehkaleybars/metaopt/hmo-crn1`**, created by this batch:
+
+```
+hmo-crn1/
+  hierarchical-metaoptimize/   git clone from a bundle, checked out at c2d89b9, TREE CLEAN
+  cifar10/                     alice2's harness code + CIFAR-100 data, HF.py PATCHED here
+  jobs/run_cifar.sh            this batch's own runner
+  runs/                        SAVE + StdOut for all 18 jobs
+  envs -> ../envs              SYMLINK; the shared venv is READ, never written
+```
+
+`alice` cannot reach the private GitHub remote (`git ls-remote` fails for want of credentials), so
+the repo arrived as a **git bundle** built on the Mac at `HEAD` and cloned on the cluster — the
+campaign's established transfer for this account.  The clone verifies at `c2d89b9`,
+`git status --short` **empty**, `results/all_runs.csv` **2,663 lines = 2,662 data rows**,
+`grep -c '^crn1'` **0**.
+
+**THE RUNNER IS THE ONE POINT WHERE A SHARED FILE WOULD HAVE HAD TO CHANGE, AND IT DID NOT.**
+`alice`'s shared `jobs/run_cifar.sh` hard-codes both
+`cd …/metaopt/MetaOptimize/…/cifar10` and `--output=…/metaopt/runs/%x-%j.out`, so using it would
+have made all 18 jobs import **Saber's unpatched harness** and write into **Saber's runs directory**.
+Instead this batch carries **its own** runner, a copy of the `alice2` runner that produced the
+corpus with **exactly three paths repointed** into `hmo-crn1` (`cd`, `--output`, venv).  Its
+`NODE:` / `ARGS:` / `ENV:` echo lines are **unchanged in format**, so `argsline_guard.py` and the
+ENV audit parse these runs exactly as they parse every other run in the corpus.
+
+The CIFAR-100 data was **copied, not symlinked**, precisely so that nothing in the shared tree can
+be written to by a running job.  All four files are byte-identical across the accounts
+(`meta a5d47863…`, `test 4b67687d…`, `train 735e79b0…`, `file.txt~ e3b0c442…`).
+
+### 172.4 THE PATCH, RE-VERIFIED **ON THAT TREE**, PLUS A CHECK `169` COULD NOT MAKE
+
+`patches/patch_rednorm.py` was applied to `hmo-crn1/cifar10/Optimizers/HF.py` (a copy of
+`HF.py.pre_rednorm`) and `tests/test_rednorm.py` was re-run **on that tree**:
+
+```
+python3 $R/tests/test_rednorm.py --pre /tmp/crn1_pre_alice.py --post $C/Optimizers/HF.py \
+        --cifar-dir $C --argsline-guard $R/analysis/argsline_guard.py
+```
+
+→ **`ALL PASS`**, exit `0`, reproducing what `169` recorded, including the two the brief singles out:
+
+* **R0** — *"deleting the three inserted regions reproduces `--pre` **BYTE FOR BYTE**"* **PASS**,
+  with each inserted region appearing **exactly once** and `PATCH_REDNORM` appearing **exactly 6**
+  times.
+* **R5** — *"`tn:X` == `X` **BITWISE**"* **PASS** at **all eight** single-tensor granularities
+  (`layerwise`, `nodewise`, `weightwise`, `nodewise1d`, `chunk1024`, `chunk65536`, `permnode0`,
+  `permnode101`).
+
+R1 (34/34 corpus specs build identically), R2 (every corpus spec's reduction bitwise identical
+pre vs post), R3, R4, R6 and R7 all pass as well.
+
+**AND ONE STRONGER CHECK THAT ONLY A SECOND ACCOUNT MAKES POSSIBLE.**  The patched file on `alice`
+hashes to `9abd4318834d2ea191581e3b6004a18f53a0c1e60e9b741721ddd164a0dc0c94` — **byte-for-byte the
+`alice2` live patched `HF.py`** — from a `pre_rednorm` that itself matches at
+`0d8ee431a8caa51c14fa632776349db32b42e346299a91b69c4c6680142a3892`.  The relocated batch will run
+**the identical program**, proved by hash and not by argument.
+
+The registered launcher then passed **every** guard on the deployed tree: `1b` committed, `1c`
+scorer `--selftest` **142 checks / 0 failures**, `1d` the patch tests, `1e` the no-op proof (16
+checks on the pre-patch file; on the patched file the **only** 2 FAILs are section A's line-window
+quotes of `block_product` that the patch legitimately moves, and **all 5 LION bitwise-invariance
+checks pass**), `2`/`2b`/`2c` no collision and **zero** corpus rows at seed 15/16/17, `3` the data,
+`4c` all six spec strings **byte-identical in launcher and scorer**, `4h` the patch live,
+`4`/`4d`/`4e`/`4f`/`4g`/`4i` the live model, and `8` the manifest resolver.  The live model reports
+**62 parameter tensors / 11,220,132 parameters**, matching the batch's `NTENS`/`TOTPAR` exactly.
+
+### 172.5 THE DESIGN IS IDENTICAL — ARM BY ARM, FROM THE LIVE MODEL ON THE NEW TREE
+
+The **same launcher file at the same commit** composed both submissions; the only inputs that
+differed are `METAOPT_WS` and `CIFAR10_DIR`.  Everything below is hard-coded in that file and was
+re-verified on `alice`'s live model:
+
+| arm | spec | type | m | sizes | params | `_rednorm` |
+|---|---|---|---|---|---|---|
+| `k01`  | `scalar`               | scalar    | 1 | `[62]`     | `[11220132]`         | `False` |
+| `k01n` | `tn:scalar`            | scalar    | 1 | `[62]`     | `[11220132]`         | `True`  |
+| `k49`  | `sets:1-49/50-62`      | blockwise | 2 | `[49, 13]` | `[6315072, 4905060]` | `False` |
+| `k49n` | `tn:sets:1-49/50-62`   | blockwise | 2 | `[49, 13]` | `[6315072, 4905060]` | `True`  |
+| `k50`  | `sets:1-50/51-62`      | blockwise | 2 | `[50, 12]` | `[6315584, 4904548]` | `False` |
+| `k50n` | `tn:sets:1-50/51-62`   | blockwise | 2 | `[50, 12]` | `[6315584, 4904548]` | `True`  |
+
+Each `tn:` arm is guard-`4d`-proved the **same partition** as its standard twin (same type, groups,
+`map_layers_to_blocks` and `beta` shapes), and guard `4e` measures the reduction actually differing
+for all three pairs, with per-group ratio **spreads 6.419 (`k49n`) and 4.877 (`k50n`)** — not a
+single common constant, so the intervention is not the per-group rescaling `1e` proves inert.
+
+Seeds `{15,16,17}`, `100` epochs (**50,000 meta-steps**), batch `100`, `CIFAR100` /
+`ResNet18_c100`, `ms 1e-3`, `alpha0 1e-6`, `gamma 1`, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`,
+`HIER=none`, `SCHED=none`, `PROBE=0`, partitions `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`,
+`--time=03:00:00`, `--gres=gpu:1`, `--cpus-per-task=6`, `--mem=16G`.  **6 arms × 3 seeds = 18
+jobs, one submission.**
+
+**THE 18 JOB NAMES ARE SET-IDENTICAL TO THE CANCELLED BATCH** — `diff` of the sorted `alice`
+`squeue` names against the sorted `alice2` `sacct` names is **empty**.  New ids `4921226`–`4921243`,
+contiguous.
+
+### 172.6 RULE 21 — THE MARGIN FROM THE **ORIGINAL** REGISTRATION COMMIT
+
+`analysis/cX1_crn1_score.py` was committed at **`2cb2783`**, `2026-09-08 08:50:59 +0200`, **before
+any `crn1` run existed** — and it still is, because **0 runs have ever existed**.  The scorer was
+**not** re-registered and **not** edited for this move.
+
+Earliest `Submit` of the new batch, from `sacct` on `alice`: **`2026-09-08T12:28:47`**.  Both
+clusters and the commit are on **CEST (+0200)**, so the times are directly comparable:
+
+> **MARGIN = 13,068 s = 3 h 37 min 48 s**, registration **before** the earliest new Submit.
+
+RULE 21 holds on the original registration, not on a fresh one.  **RULE 16** holds too:
+`git diff` over `analysis/` is **empty**, and `analysis/argsline_guard.py` is untouched at
+`617b6c8`.
+
+### 172.7 RULE 20 AND THE SEPARATE ENV AUDIT — **COVERAGE IS 0 OF 18, AND THAT IS STATED PLAINLY**
+
+The registered post-launch guard was run at the documented invocation:
+
+```
+python3 $MY/hierarchical-metaoptimize/analysis/argsline_guard.py $MY/runs --name crn1- --batch-consistency
+```
+
+→ `argsline_guard: no candidate files … with prefix crn1-`, **exit 2**.  Exit 2 is the guard's
+**UNVERIFIED** code, **not** a mismatch.  The **separate ENV audit** — necessary because
+`BETA_CLIP` and `PROBE` travel in `--export` and cannot ride the ARGS line, and done as `171.2` did
+it, from the runs' own `ENV:` lines rather than from any script header — is likewise **0 of 18**.
+
+| audit | covered | of | state |
+|---|---|---|---|
+| RULE 20 ARGS-line batch-consistency | **0** | 18 | UNVERIFIED — no run has started |
+| separate `ENV:`-line audit | **0** | 18 | UNVERIFIED — no run has started |
+
+**NO `crn1` NUMBER MAY BE QUOTED, IN ANY DOCUMENT, BEFORE BOTH AUDITS REACH FULL 18/18 COVERAGE.**
+This prohibition is the same one `167` placed on `cdn1` and `167.1` discharged only at 24/24.
+
+**THE DOCUMENTED SCORER INVOCATION FOR THIS RELOCATED BATCH**, to be used unedited when the rows
+eventually exist:
+
+```
+python3 /data1/salehkaleybars/metaopt/hmo-crn1/hierarchical-metaoptimize/analysis/cX1_crn1_score.py \
+        /data1/salehkaleybars/metaopt/hmo-crn1/runs
+```
+
+`--manifest` stays optional and defaulted; guard `8` proved on this tree that the resolver finds
+`…/hmo-crn1/runs/crn1/PARTITION-MANIFEST.txt` by its **DEFAULT** `<runsdir>/crn1/…` rule.
+
+### 172.8 COST AND ETA — **AND THE MOVE DID NOT BUY THE PRIORITY IT WAS EXPECTED TO**
+
+Cost, from `cpg1`'s measured 15 jobs at this exact cell and horizon (11.95 GPU-h → 0.7967 h/job):
+**18 × 0.7967 = 14.34 GPU-hours** projected.  `--time=03:00:00` is **1.883×** the slowest `cpg1`
+run (`01:35:36`).
+
+**The premise that `alice` is "idle" was true of the ACCOUNT and false of the CLUSTER.**  Measured
+now, rather than assumed:
+
+| | `alice` (new) | `alice2` (old) |
+|---|---|---|
+| account jobs before submit | 0 | 38 (`cru1`) |
+| `FairShare` | **0.280672** | **0.286555** |
+| job `Priority` | 624664 | 629600 |
+| Slurm estimated start | **2026-09-10T04:30** (last 22:00) | **`N/A`** — unschedulable estimate |
+
+The two accounts' fair-share is **effectively identical**, and `alice2`'s is marginally *higher*.
+What the move actually bought is narrower than the cycle brief supposed: `crn1` no longer queues
+behind **35 pending same-account `cru1` jobs** competing for the same share, and Slurm will now
+**give it a start estimate at all**.  What it did **not** buy is a faster account.  **`crn1` will
+not land inside the 24-hour push**; on Slurm's own (backfill-pessimistic) estimate the batch
+completes around **2026-09-11**.  Recorded here so no later entry treats the relocation as having
+solved a scheduling problem it did not solve.
+
+### 172.9 `c98_reproduce.py` — REPORTED AS-IS, **EXIT 1**, INHERITED, NOT FIXED
+
+Re-run at this HEAD: **exit `1`**, **10** `derived … vs paper …` mismatches — re-counted from the
+output, not carried from `171`.  The count-matched-family pair reads **derived 244 vs paper 241**,
+which is `171.8`'s `+3` from `cdn1`'s three `chunk771` rows, unchanged by this entry.  This batch
+**ingested nothing**, so it moved none of these numbers.  Author scope; **not fixed**.
+
+### 172.10 THE TWO STANDING CONSTRAINTS, DISCHARGED EXPLICITLY
+
+1. **No file outside `/data1/salehkaleybars/metaopt/hmo-crn1` was created, modified or deleted on
+   the `alice` account.**  The shared harness, the shared `jobs/run_cifar.sh`, the shared
+   `envs/mo`, the pre-existing `$WS/hierarchical-metaoptimize` checkout (which is at `5454dc6` and
+   carries **uncommitted local modifications that are not ours** — `analysis/aggregate.py`,
+   `docs/FINDINGS.md`, `jobs/run_cifar.sh`) and `$WS/runs` are **all untouched**.  The shared venv
+   is reached through a symlink and is only ever **read**.
+2. **No job that this campaign did not submit was cancelled, held, or altered on either account.**
+   The only `scancel` issued named 18 explicit ids, every one of them a `crn1-` job submitted by
+   this campaign, and `4920540` — an unrelated user's array element sitting inside that id range —
+   was deliberately excluded.

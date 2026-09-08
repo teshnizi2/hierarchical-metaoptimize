@@ -1,10 +1,26 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 141**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **171**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **172**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,662 rows** (**+24: `cdn1` INGESTED this cycle** — 24 added, 0 changed, 0 removed). **`alice2`: `cdn1` 24/24 COMPLETE, SCORED, INGESTED (171). `cru1` 19/60 done, 41 PENDING (168). `crn1` 0/18, 18 PENDING (169). NEITHER `cru1` NOR `crn1` CONTRIBUTED A ROW — 0 before, 0 after.** `cdn1` cost **16.70 GPU-h** measured (`sacct`, 24 jobs). `alice` (Saber's shared account) is READ-ONLY here and was not touched.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,662 rows** (**+24: `cdn1` INGESTED this cycle** — 24 added, 0 changed, 0 removed). **`alice2`: `cdn1` 24/24 COMPLETE, SCORED, INGESTED (171). `cru1` 22/60 done, 35 PENDING, 3 RUNNING (168). `crn1` CANCELLED HERE at 0/18 started and RE-SUBMITTED ON `alice` (172).** **`alice`: `crn1` 18/18 PENDING**, ids `4921226`-`4921243`, in a **self-contained** deployment at `/data1/salehkaleybars/metaopt/hmo-crn1`. **NEITHER `cru1` NOR `crn1` HAS CONTRIBUTED A ROW — 0 before, 0 after.** `cdn1` cost **16.70 GPU-h** measured (`sacct`, 24 jobs). **Nothing outside `hmo-crn1` was modified on `alice`, and no job this campaign did not submit was touched on either account.**
 **`c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately not fixed**. **10 checks fail, up from 8**: 6 are the inherited stale-draft drift (141.6 / 142.6) with moved counts, and **2 are NEW and caused by this ingest** — the count-matched-family census goes **241 → 244** (paper 241) because `cdn1-m-s0/s1/s2` carry `chunk771`. A **draft** number to move, not a corpus defect. 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
+
+## CYCLE 141 (continued) — **`crn1` MOVED `alice2` -> `alice`. CORRECTIONS 172. NOTHING SCORED, NOTHING INGESTED, CORPUS UNCHANGED AT 2,662**
+
+**CANCELLED CLEAN.** 18 `crn1` jobs cancelled on `alice2` with **0 started**: 0 rows (`grep -c '^crn1'` = 0), 0 `crn1-*.out`, 0 entries in `runs/crn1/`, `sacct` `Start = Unknown` / `Elapsed = 00:00:00` on all 18. `cru1` untouched — **22 COMPLETED + 35 PENDING + 3 RUNNING = 60**, zero `cru1` in any CANCELLED state. Id `4920540`, inside the cancelled range, is **another user's** `lbi_endemics` array element and was excluded.
+
+**THE FINDING THAT JUSTIFIES THE WHOLE DEPLOYMENT.** `alice`'s **shared** harness is **not** the harness this corpus was produced by — `HF.py`, `build_network.py` and `load_data.py` all differ from `alice2` (only `train.py` matches), and `alice`'s `HF.py` is missing **`PATCH_NAMESETS`, `PATCH_EBJS`, `PATCH_TWOLEVEL`** (16 markers vs 19). `grep -c 'sets:'` = **0**, so **4 of `crn1`'s 6 arms are unparseable there**. The self-contained tree was therefore built from **`alice2`'s** harness, not `alice`'s.
+
+**PATCH RE-VERIFIED ON THE DEPLOYED TREE:** `tests/test_rednorm.py` -> **ALL PASS**, exit 0, incl. **R0** (deleting the 3 inserted regions reproduces `--pre` **byte for byte**) and **R5** (`tn:X == X` **bitwise** at all 8 single-tensor granularities). Stronger: patched `HF.py` sha256 **`9abd4318...`** is **byte-identical to `alice2`'s live patched file**, from a `pre_rednorm` matching at `0d8ee431...`. Every launcher guard passed (scorer `--selftest` **142/0**; `4c` all 6 specs byte-identical launcher-vs-scorer; live model **62 tensors / 11,220,132 params**).
+
+**DESIGN IDENTICAL** — 6 arms x seeds {15,16,17}, 100 ep, same specs/resources/env; the 18 job names `diff` **empty** against the cancelled set. **RULE 21:** scorer `2cb2783` `2026-09-08 08:50:59 +0200` -> earliest new Submit `2026-09-08T12:28:47` (both CEST) = **margin 13,068 s = 3 h 37 m 48 s**; scorer **not** re-registered, **not** edited. **RULE 16:** `git diff -- analysis/` **EMPTY**.
+
+**RULE 20 + ENV AUDIT: COVERAGE 0/18 — nothing has started.** `argsline_guard.py ... --batch-consistency` -> `no candidate files`, **exit 2 = UNVERIFIED, not a mismatch**. **NO `crn1` NUMBER MAY BE QUOTED BEFORE BOTH REACH 18/18.**
+
+**COST/ETA, AND THE HONEST CAVEAT.** ~**14.34 GPU-h** projected (`cpg1` measured 0.7967 h/job x 18); wall `03:00:00` = **1.883x** the slowest `cpg1` run. **The move did NOT buy priority**: FairShare `alice` **0.280672** vs `alice2` **0.286555** — effectively identical. What it bought is that `crn1` no longer queues behind 35 same-account `cru1` jobs, and Slurm now gives it a start estimate at all (**first 2026-09-10T04:30**, last 22:00) where `alice2`'s tail was `N/A`. **`crn1` will NOT land inside the 24-hour push.**
+
+**SCORE IT WITH, AND ONLY WITH:** `python3 /data1/salehkaleybars/metaopt/hmo-crn1/hierarchical-metaoptimize/analysis/cX1_crn1_score.py /data1/salehkaleybars/metaopt/hmo-crn1/runs` (guard 8 proved the default resolver finds `<runsdir>/crn1/PARTITION-MANIFEST.txt`).
 
 ## CYCLE 141 (continued) — **`cdn1` LANDS, INGESTED, SCORED BY HAND. CORRECTIONS 171. `GAP_in` = +5.699 pp = +18.80 SE — `BELOW-BY-A-LOT`**
 
