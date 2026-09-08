@@ -18024,8 +18024,8 @@ dependence — it is precisely what the ladder holds fixed while `ms` and `alpha
 | **RULE 21** | scorer committed at `180755c`, `2026-09-08T08:33:38+02:00` = epoch **1788849218**; earliest sacct `Submit` `2026-09-08T08:36:51` = epoch **1788849411**. **MARGIN 193 s**, the NORMAL claim (this batch has runs of its own). Guard 2 confirmed no `cru1-` row in the CSV and no `cru1-*.out` on disk before submission. A later commit `fa690a5` fixed two **launcher** guards; the scorer is byte-identical and its sha256 is unchanged. |
 | **RULE 16** | `git diff HEAD --numstat -- analysis/` shows **no deletions**; `analysis/argsline_guard.py` is **NOT** edited; the scorer is registered as a NEW file. |
 | **RULE 20, pre-submission** | **60/60 composed lines PASS** `guard_presubmit` through the UNEDITED `argsline_guard.py`, checked twice per line — once against the design and once against all five axis flags. 0 repeated flags, 0 duplicate job names, 60 lines composed against a design that says 60. |
-| **RULE 20, post-launch** | **PENDING — see 168.7.** |
-| ENV audit | **PENDING — see 168.7.** `BETA_CLIP` and `PROBE` are environment variables and cannot ride the ARGS line; they are audited separately and the scorer's `G1` re-checks them from every run's own `ENV:` line. |
+| **RULE 20, post-launch** | **PARTIAL, 5 of 60 — PASS on the coverage that exists.** `argsline_guard.py --batch-consistency` over the first 5 `.out`: **`5 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line, VERDICT: PASS`**, 20 flags each. The guard also prints `ACROSS-RUN INCONSISTENCY … --meta-stepsize 1e-4 \| 1e-5 \| 3e-5`. **That is the guard behaving correctly on a three-axis batch, not a defect**: `meta-stepsize`, `alpha0`, `stepsize-groups` and `seed` are this batch's declared AXES and were deliberately excluded from the `DESIGN` array, so `--batch-consistency` — which has no way to know that — reports them as varying. **`argsline_guard.py` IS NOT EDITED to silence it.** The per-run check that actually matters is the scorer's `G1`, which compares every landed run's own ARGS line against the axes encoded in its file name and fails on any mismatch. **COVERAGE IS NOT FULL. NO NUMBER MAY BE QUOTED UNTIL 60/60.** |
+| ENV audit | **PARTIAL, 5 of 60 — PASS.** `BETA_CLIP` and `PROBE` are environment variables and cannot ride the ARGS line, so they get their own audit. Modulo the per-run `PROBE_DIR`, the 5 landed runs carry **exactly ONE distinct `ENV:` line**: `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`. Censuses: `BETA_CLIP=-15:-2.3026` **5/5**, `PROBE=100` **5/5**, `AUGMENT=1` **5/5**. The scorer's `G1` re-checks all four from every run's own `ENV:` line at score time. |
 | live-source provenance | live `HF.py` sha256 `0d8ee431a8caa51c14fa632776349db32b42e346299a91b69c4c6680142a3892`, **0** `PATCH_REDNORM` markers at submit time, written to `runs/cru1/PROVENANCE.txt`. The sibling reduction batch's patch is **opt-in by spec prefix** (`tn:`); **none** of these 60 lines carries one, and `G1` re-checks every landed run's `stepsize-groups` against exactly `scalar` / `layerwise`, so a mid-flight application is behaviourally inert here. |
 | invocation | `python3 analysis/cY1_cru1_score.py <runsdir>` — **no second argument to forget**. `--probe-dir` is OPTIONAL and DEFAULTED, and **guard 8 imports the scorer and proves the default resolver returns `/home/s5014158/metaopt/runs/cru1`** before any job can finish (`164.2`'s defect, closed by construction). |
 | account hygiene | everything on `alice2` (`s5014158`). Nothing submitted to `alice`, nothing written under `/data1/salehkaleybars`, nothing cancelled. `cru1-` added to `bin/PROTECTED.txt`. |
@@ -18037,6 +18037,11 @@ At the time of writing **all 60 jobs are `PENDING (QOSMaxGRESPerUser)`** — the
 GPU cap is saturated by the sibling `cdn1` batch (22 RUNNING). **No `.out` file exists yet, so the
 RULE 20 post-launch audit and the separate ENV audit CANNOT have been run, and are recorded here as
 OPEN OBLIGATIONS. NO NUMBER FROM THIS BATCH MAY BE QUOTED UNTIL BOTH PASS AT FULL 60/60 COVERAGE.**
+**UPDATE, same cycle:** 5 jobs have since started and **both audits PASS on those 5** — see the two
+rows in `168.6`. **Coverage is 5/60. The obligation stands unchanged.** The 5 are healthy (epochs
+advancing, probe files writing, no traceback); at `ms=1e-5`/`alpha0=1e-3` beta has moved `0.068`
+(scalar) and `0.168` (layerwise) against a TRAVEL bound of `0.50`, which is what a FROZEN rung is
+supposed to look like — **reported as a liveness check, not as a result.**
 The exact commands are in the launcher's own output and are repeated here:
 
 ```
@@ -18051,7 +18056,30 @@ ETA is ~11:30 CEST. `cru1` should complete **between ~14:00 and ~19:00 CEST toda
 window. Walltime `03:00:00` is 1.51x the slowest CIFAR-100/100-epoch run ever observed (119 min), so
 nothing here is at risk of being unschedulable in the way `hz3-R2` was.
 
-### 168.8 SCOPE, REGISTERED IN ADVANCE AND BINDING
+### 168.8 THE REGISTERED SCORER'S PROBE READER IS **WRONG**, AND IT IS **NOT EDITED**
+
+Once the first 5 runs began writing probes, `cY1`'s `[PROBE]` section was found to read each record
+looking for a key named `beta_min` or `min_beta`. **The live probe writes neither.** The actual
+schema, read off the first `cru1` probe file on disk, is `step, beta[], z_mean[], z_std[], snr[],
+frac_neg, frac_zero, z_skew, mom_norm, h_absmax, beta_true_min, beta_true_max, n_beta, n_at_lo,
+n_at_hi, t_neg[], t_zero[], t_n[], z_sub, z_sub_k, probe_idx[]` — the minimum is **`beta_true_min`**.
+`cY1` therefore aggregates nothing and its probe section degrades to **its own registered SKIP**.
+
+**NO `cru1` VERDICT IS AFFECTED.** `cY1`'s registration states, in advance and in its header, that
+the probe is *"a SKIP, never a FAIL: no verdict depends on it"* — the failure mode the defect
+produces is exactly the one that was registered as harmless.
+
+**`cY1` IS NOT EDITED.** Its data exist, so under RULE 16 it is FROZEN even though this part of it is
+wrong: it is wrong in public and a SUCCESSOR says so. Precedent `cN1`/`cN2` at `149`. The successor
+is **`analysis/cY2_cru1_probe.py`** (`4f3a34a`), which reads the real schema, produces **no verdict,
+no branch and no bar**, and exists only to measure the descent confound `168.5` named in advance. Its
+`--selftest` (4/4) checks its design constants against the registered scorer's so the two cannot
+drift, and **asserts that the defect it exists for is real** rather than taking it on trust.
+**`cY2` MAKES NO RULE 21 CLAIM**: it has no runs of its own — zero GPU, a pure re-analysis of files
+already on disk — so the wall-clock proof does not exist for it, and it claims **only
+commit-before-first-execution**. Precedent `cQ1` at `149`, `cS1` at `159`.
+
+### 168.9 SCOPE, REGISTERED IN ADVANCE AND BINDING
 
 `resnet18_blocks` (m = 6, the parent paper's own partition) and the `k49` cut-position arm are
 **NOT** in this batch. Either at the full ladder is 30 more jobs and ~22 more GPU-hours, which does
