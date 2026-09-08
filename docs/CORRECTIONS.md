@@ -22766,8 +22766,9 @@ one of them.  Three are the carriers; the two non-carriers are 47 and 56.**  A t
 class-matched (BN scale), depth-matched (`layer4`) and non-carrier therefore **does not exist on this model** —
 the same architectural fact that killed the original brief's control at `185.1`, one stage lower.
 
-**The arm that would settle it, named and priced.**  `DEPTH` = `sets:1-46,48-55,57-62/layer4.0.bn1.weight,layer4.1.bn1.weight,layer4.0.bn1.bias`
-(equivalently any non-carrier third member from {48, 51, 54, 57, 60}): sizes **[59,3]**, isolated numel
+**The arm that would settle it, named and priced.**  `DEPTH` = `sets:1-46,49-55,57-62/layer4.0.bn1.weight,layer4.0.bn1.bias,layer4.1.bn1.weight`
+— isolate 47, 48, 56; the coarse ranges are the complement, and any other non-carrier 512-param third member from
+{51, 54, 57, 60} works with its own complement: sizes **[59,3]**, isolated numel
 **1,536** — *identical* to `ISO` on group sizes, on isolated parameter count and on depth, differing **only** in
 which layer-4 512-parameter BN parameters are isolated.  Disclosure it must carry: one member is a BN *bias*,
 because only two non-carrier BN scales exist.  A strictly class-matched variant, `DEPTH2` =
@@ -22793,6 +22794,12 @@ with a fresh in-batch `k01` anchor ≈ **4.30 GPU-h**; `DEPTH` + `DEPTH2` + anch
 
 **Consequence, binding on every sentence in this entry:** `ciso1` licenses "isolating *these three* rescues and
 isolating *those three* does not."  It does **not** license "it is their identity, not their depth."
+
+*(Typo corrected in place immediately after `5d707cf`: the `DEPTH` spec first written here read
+`sets:1-46,48-55,57-62/…,layer4.0.bn1.bias`, which lists tensor 48 on **both** sides of the `/` and would give
+[60,3] = 63 slots, not [59,3].  The corrected string above isolates {47, 48, 56} against the complement
+1-46, 49-55, 57-62 = 59 tensors.  `DEPTH2`'s string was and is correct.  No number, contrast or verdict in this
+entry depends on either string — the arm was never run.)*
 
 ### 187.5 ATTACK 2 — **`ISO` EXCEEDS LAYERWISE BY +1.184 pp, WHICH IS *INSIDE* THE READ BAR.  `ISO` IS INDISTINGUISHABLE FROM THE CEILING, NOT BETTER THAN IT.**
 
