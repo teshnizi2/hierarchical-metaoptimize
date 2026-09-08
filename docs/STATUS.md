@@ -1,11 +1,21 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 144**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **177**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **179**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,740 rows** (**+60: `cru1` INGESTED this cycle** — keyed on `(run, job_id)`: **60 added, 0 changed, 0 removed**). **BOTH CLUSTER QUEUES ARE EMPTY. ALL THREE BATCHES OF THE 24-HOUR PUSH ARE COMPLETE, SCORED AND INGESTED.** `cru1` cost **39.2000 GPU-h** (60 jobs, ingested `wallclock_min`). **Nothing was submitted or cancelled this cycle, and no job this campaign did not submit was touched on either account.**
 **`c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately not fixed**. **10 checks fail, the SAME 10 as before this ingest**: only the derived counts move — rows 2,680 → **2,740** (paper 2,177), admissible 2,238 → **2,298**, wallclock-carrying 2,665 → **2,725**, GPU-h 2,857.30 → **2,896.5**. **This ingest introduced no new failing check.** 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 **RULE 16: `git diff -- analysis/` EMPTY** — no registered scorer or guard edited. `cY1_cru1_score.py` `sha256 0de0604ca5995335…` and `argsline_guard.py` `sha256 81cea8b586e124a6…` unchanged on Mac and `alice2`.
+
+## CYCLE 144 (TRACK B) — **H-DISAGREE, THE FIRST DYNAMICS CANDIDATE, REGISTERED AND REFUTED ON ITS FIRST RUN. CORRECTIONS 179. `FINAL: PRIMARY H-DISAGREE-REFUTED-PEAK-ELSEWHERE | CONTROL-NUMEL H-DISAGREE-REFUTED-PEAK-ELSEWHERE | WEIGHTING-ROBUST | SEEDS-DISAGREE`. ZERO GPU, CORPUS UNCHANGED AT 2,740.**
+
+* **Registered** `analysis/cHD1_hdisagree_score.py` at `8982b65` (`17:36:55Z`, sha256 `97336bd7…`); first execution 13 s later on the Mac, 19 s on `alice2`; outputs identical. Commit-before-first-execution only, **no RULE 21 label**. `--selftest` 23/23.
+* **The brief was wrong twice, from the source:** the layerwise `z` is an unnormalised per-tensor SUM (`torch.stack([(u[i]*v[i]).sum() ...])`), so numel weighting is a distortion, not the harness — it is the CONTROL, not the primary; and `z_mean` is CUMULATIVE (`_z_sum += zv`, never reset), so the registered unit is the 100-step window sum recovered by differencing with `n = step + 2` (confirmed by `z_std == |z_mean|` at step 0 on all 3 seeds).
+* **Data:** every row at the frozen cell is listed (23, 8 batches); 3 have probes (`cru1-lay-m1e-3-a1e-6-s15/16/17`), 1,497 windows, G-checks 3/3, indeterminate share 0.0000 at the argmax.
+* **Result:** D(k) is monotone-decreasing — **0.3834 at k=1, 0.0615 at k=49, floor 0.0414 at k=53–57**; argmax k=1 on every seed; rho(D, CAPTURE) **−0.0455** (MC p 0.559). X2 fires; X3 would have. The numel CONTROL is refuted by the same limb and is anti-correlated (rho −0.8428). Time-resolved: D(49) is 0.0000 in epochs 0–9 and from epoch 70 on.
+* **The one direct m=2 measurement** (crn1's per-step terms on the TRUE `[49,13]` trajectory, 6,000 steps): the two groups disagree in sign on **0.45 %** of meta-steps. Cross-check only, no bar; agrees.
+* **Descriptive:** `linear.weight` carries 49 % of the window-sum magnitude; the D(k) steps at k=32 and k=41 are two 256-parameter BN scales entering the prefix. Not a finding.
+* **Entitled sentence** in 179.9; scoped to the proxy and to 100 epochs. Fifteen candidates, fourteen dead.
 
 ## CYCLE 144 (TRACK A) — **ACCOUNT `F`'s PREMISE IS FALSE ON `cru1`'s OWN PROBE; `174.8`'s "NOT A STEP-SIZE-ADAPTATION PHENOMENON" IS SUPERSEDED IN PLACE. CORRECTIONS 177. ZERO GPU, CORPUS UNCHANGED AT 2,740.**
 

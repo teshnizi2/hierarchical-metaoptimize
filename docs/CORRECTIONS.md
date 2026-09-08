@@ -20991,3 +20991,233 @@ carried **two `## 177.` headings** for a few minutes.  This commit renumbers **o
 sweep; every hunk of `git diff HEAD -U0 -- docs/CORRECTIONS.md` lies inside this block, and Track A's
 text is untouched.  The corpus stands at
 **2,740 rows**.
+
+## 179. TRACK B — **H-DISAGREE, THE FIFTEENTH MECHANISM AND THE FIRST DYNAMICS CANDIDATE, IS PRE-REGISTERED AGAINST `cpk1`'s CUT-POSITION CURVE AND IS REFUTED ON ITS FIRST RUN: `FINAL: PRIMARY H-DISAGREE-REFUTED-PEAK-ELSEWHERE | CONTROL-NUMEL H-DISAGREE-REFUTED-PEAK-ELSEWHERE | WEIGHTING-ROBUST | SEEDS-DISAGREE`.**  THE DISAGREEMENT RATE IS **MONOTONE-DECREASING IN k** — 0.3834 AT k=1, 0.0615 AT k=49, 0.0414 AT k=53–57 — WITH rho −0.0455 AGAINST THE CAPTURE CURVE, AND ON THE ONE **TRUE m=2** TRAJECTORY ON DISK THE TWO GROUPS OF `[49,13]` DISAGREE ON **0.45 %** OF META-STEPS.  **THE CYCLE BRIEF'S RECIPE WAS WRONG TWICE, FROM THE SOURCE, AND BOTH CORRECTIONS WERE REGISTERED BEFORE THE FIRST RUN.**  ZERO GPU.  NOTHING SUBMITTED, NOTHING INGESTED.  THE CORPUS STANDS AT **2,740 ROWS**
+
+### 179.1 THE BRIEF WAS WRONG TWICE.  READ THIS BEFORE THE NUMBERS, BECAUSE IT DECIDES WHICH NUMBER IS PRIMARY
+
+The brief said: `z_mean` is a per-tensor MEAN, so the per-tensor contribution to a group's reduction is
+`z_mean[i] * numel[i]`; and: for each probe record compute the sign of the prefix and suffix sums.
+Both premises were checked against the harness before anything was computed, and both are false.
+
+**(1) The layerwise `z` is an UNNORMALISED per-tensor SUM, not a mean.**  Read off the live
+`Optimizers/HF.py` (sha256 `9abd4318…`), off the pre-namesets snapshot (`3445ba52…`, the parent of
+`cru1`'s pinned `0d8ee431…`), off `HF_pinned_d3202635.py`, and off the repo's own
+`patches/HF_patched.py` — byte-identical in all four:
+
+    if self.stepsize_type == 'layerwise':
+        return [torch.stack([(u[i]*v[i]).sum() for i in range(self.num_layers)])]
+
+So the blockwise reduction of a `[k,62-k]` spec is `sum_{i in group} z_i` with **no numel factor**,
+exactly as the `blockwise` branch computes it.  The word "mean" in `z_mean` is a mean over **time**
+(see (2)); `_probe`'s comment "(weightwise/nodewise: per-tensor means)" applies only to the
+non-layerwise types, where `zv` is built with `.mean()` — for `layerwise`, `zv = z[0]` verbatim.
+**Multiplying by numel is not the harness; it is a distortion that hands the layer4 convs a
+2,359,296× weight.**  The scorer therefore registers the UNWEIGHTED sum as PRIMARY and the brief's
+numel-weighted sum as CONTROL-NUMEL — the reverse of the brief's roles — and prints both in full.
+
+**(2) `z_mean` is CUMULATIVE.**  `patches/patch_probe.py`: `self._z_sum += zv; self._z_n += 1;
+mean = self._z_sum / max(self._z_n, 1)`, never reset (already on record at CORRECTIONS 18 and at the
+note near line 3325).  The record at step *s* carries the running mean over **every** meta-step so
+far; its sign is the sign of the whole history and is not independent of the previous record's.  The
+accumulator is exactly recoverable, though: with `S_j = z_mean_j * n_j`, `S_j − S_{j−1}` is the SUM of
+`z` over the 100 meta-steps between records.  `n_j = step_j + 2`, because `HF.__init__` sets
+`counter = −1`, `step()` calls `_probe` **before** `counter += 1`, and `_probe` increments `_z_n`
+before the `counter % PROBE` test — the step-0 record is written on the **second** call with
+`_z_n = 2`.  The data confirm it: at step 0 every one of the 62 tensors has `z_std == |z_mean|`
+**exactly** on all three seeds, which `n = 2` with a zero first term (`h_condenced` is
+zero-initialised) predicts and `n = 1` forbids (`n = 1` gives `std 0`).  The scorer's G-check
+re-tests this identity on every file it reads.  **The registered unit is therefore the 100-step
+WINDOW sum**, `W_j[i] = z_mean_j[i](step_j+2) − z_mean_{j−1}[i](step_{j−1}+2)`, j = 1..499, with a
+float32 precision floor (a window is INDETERMINATE at a cut if either group sum is within
+`102·2⁻²³·max|S|` of zero) whose excluded share is printed at every k.  The literal-brief statistic
+(sign of the cumulative sums per record) is computed and printed as TERTIARY, descriptive only.
+
+### 179.2 REGISTRATION
+
+| | |
+|---|---|
+| scorer | `analysis/cHD1_hdisagree_score.py`, sha256 `97336bd7d8c6d74d99b2c86eeed66b810e7759384b6bd6658fab243eb57f63c9` |
+| commit | `8982b65`, `2026-09-08T19:36:55+02:00` = `17:36:55Z`, pushed to `origin/master` |
+| first execution | Mac `17:37:08Z` (**13 s** after the commit), `alice2` `17:37:14Z` (**19 s**); outputs **identical line for line** outside the path lines (272 lines) |
+| claim | **commit-before-first-execution ONLY.  NO RULE 21 label** — this file has no runs of its own (precedent `cQ1` 149, `cS1` 159, `cZ1` 170, `cY2` 174) |
+| `--selftest` | **23/23 PASS** before the commit; the source premises (1) and (2) are asserted against `patches/HF_patched.py` and `patches/patch_probe.py` (S2), differencing is verified to recover window sums to 1.4e−14 (S3), and the tree is walked on synthetic humps (S4) |
+| disclosed | `cpk1`'s curve and `k* = 49` (146.3), `cts3`'s rescoping (156), `crn1`'s reduction-probe REPORT (169.3), `cY2`'s cru1 numbers (174) were all visible; the probe schema, record layout and the step-0 `n = 2` identity were inspected before registration; **no sign statistic, no D(k), no group sum was computed on any probe before the commit** |
+| housekeeping | the first `git push` went to a new `origin/main` ref by mistake; it was pushed again to `origin/master` and the stray `main` ref deleted.  Nothing else touched |
+
+**THE HYPOTHESIS AS REGISTERED.**  At cut k, a 2-group partition beats scalar to the extent that the
+two groups' reductions DISAGREE IN SIGN over training.  **PREDICTIONS.**  P1: `argmax_{k=1..61} D(k)`
+lands in `[47, 52]` (`k* = 49` or its neighbours on `cpk1`'s grid).  P2: single-peaked on the eleven,
+`cK1`'s rule verbatim (`RANGE_BAR 0.05`, `WOBBLE_BAR 0.05`; 0.05 ≈ 4 SE of a proportion at n = 1,497).
+P3: Spearman rho(D, CAPTURE) over the eleven ≥ +0.60 with one-sided p ≤ 0.05 against 1,000,000
+Monte-Carlo permutations (numpy `default_rng(20260908)`).  **WHAT REFUTES OUTRIGHT, in order:**
+X1 FLAT (range of D over k = 1..61 below 0.05); X2 PEAK-ELSEWHERE (`k_hat` outside `[42, 55]`);
+X3 ANTI (rho ≤ 0).  Tree: X1 → `REFUTED-FLAT`; X2 → `REFUTED-PEAK-ELSEWHERE`; X3 →
+`REFUTED-ANTICORRELATED`; P1 ∧ P3 ∧ P2 → `SUPPORTED`; else `INDETERMINATE`.  Same tree, same bars on
+the CONTROL.  Stamps `WEIGHTING-ROBUST/DEPENDENT`, `SEEDS-AGREE/DISAGREE`, `PRECISION-FLAG` annotate
+and never move a token.  **THE PROXY CAVEAT** is registered in the header and printed under every
+verdict: in a layerwise run every tensor has its own beta, so the `<h_i, g_i>` trajectory is the
+m = 62 trajectory, not the one a `[k,62-k]` run would produce; **no number from the primary section
+may be quoted as a direct m = 2 measurement.**
+
+### 179.3 THE DATA PREMISE, STATED SO IT STAYS TRUE
+
+The frozen cell is CIFAR100 / `ResNet18_c100` / `layerwise` / SGDm+Lion / ms 1e-3 / alpha0 1e-6 /
+100 ep / batch 100 / gamma 1 / augment 1 / clip `-15:-2.3026` / `hier` unset, `complete = 1`,
+`superseded = 0`.  The scorer lists **every** such row in the 2,740-row corpus — **23 rows from 8
+batches** (`c100` 2, `c100b` 3, `c1b` 3, `cbl1` 3, `cpk1` 3, `cru1` 3, `cts1` 3, `hb1` 3; the 18
+same-cell rows carrying `hier = additive/shrink` are a different cell) — and looks for
+`probe_<run>` under every root.  **20 print `NO PROBE`; 3 have one**: `cru1-lay-m1e-3-a1e-6-s{15,16,17}`
+(`PROBE=100`, 500 records, steps 0..49900, `PROVENANCE.txt` HF sha `0d8ee431…`, 0 `PATCH_REDNORM`
+markers).  Every other layerwise probe on disk (`bd7 bf8 bf9 bl5 br6 cfr1 cfr2 cl5 fr5 gate1 gate2
+ml5 p5 sp8 wc5`) is CIFAR-10, or a different alpha0 / clip / horizon, or `hier=shrink`, and is
+off-cell by the premise.  **G-checks 3/3 PASS** (layerwise, `n_b` == the frozen 62-tensor table,
+11,220,132 params, 500 records, contiguous steps, the `n = 2` identity).  1,497 windows.  Indeterminate
+share at the PRIMARY argmax **0.0000** (max over k: 0.037 at k = 61, where the suffix is `linear.bias`
+alone).  A future ingest of a probed layerwise run at this cell is picked up with no edit.
+
+### 179.4 THE CAPTURE CURVE, RE-DERIVED, AND THE D(k) CURVE
+
+CAPTURE from `cpk1`'s own rows (`plateau5`, 3 seeds): anchors `k01 22.7207`, `k62 69.7107`, span
+46.9900; argmax re-derived **k = 49** (+0.6965); range 0.6826.  PRIMARY D(k) on the eleven, pooled
+(per-seed s15 / s16 / s17 in brackets):
+
+    k    CAPTURE   D(k) POOLED   per seed
+    17   +0.0687   0.3329        0.3233 / 0.3447 / 0.3307
+    24   +0.0999   0.3262        0.3273 / 0.3267 / 0.3246
+    31   +0.2190   0.3001        0.2892 / 0.2986 / 0.3126
+    38   +0.2815   0.1069        0.1122 / 0.1142 / 0.0942
+    42   +0.3905   0.0728        0.0762 / 0.0802 / 0.0621
+    45   +0.4154   0.0721        0.0741 / 0.0802 / 0.0621
+    47   +0.4888   0.0635        0.0681 / 0.0701 / 0.0521
+    49   +0.6965   0.0615        0.0641 / 0.0762 / 0.0441     <- k*
+    52   +0.3324   0.0448        0.0541 / 0.0482 / 0.0321
+    55   +0.0139   0.0441        0.0541 / 0.0441 / 0.0341
+    60   +0.0425   0.0461        0.0501 / 0.0461 / 0.0421
+
+Over the full grid: **D(1) = 0.3834** (the maximum; ties none), falling in steps to D(31) = 0.3001,
+**D(32) = 0.1283**, D(40) = 0.1062, **D(41) = 0.0728**, D(49) = 0.0615, D(50) = 0.0508, a floor of
+**0.0414 at k = 53–57**, and **D(61) = 0.3454** (suffix = `linear.bias`, 100 parameters).  RANGE
+0.3420.  The curve is the opposite shape of the hypothesis: the two halves disagree **most** when the
+prefix is the stem conv alone and **least** across the whole region where `cpk1`'s capture is high.
+
+### 179.5 THE VERDICT, VERBATIM, FROM THE UNEDITED SCORER (BOTH MACHINES)
+
+    PRIMARY VERDICT
+       units (determinate windows at k_hat) ... 1497
+       RANGE of D over k = 1..61 .............. 0.3420   (X1 fires below 0.05)
+       argmax k_hat ........................... 1   ties [1]   P1 window [47,52] -> FAILS
+       shape on the eleven: fall 0.0000 rise 0.0020 (WOBBLE_BAR 0.05) -> SINGLE-PEAKED
+       Spearman rho(D, CAPTURE) over the eleven  -0.0455   MC p (N=1000000, seed 20260908)  0.558833
+       P3 (rho >= 0.60 and p <= 0.05) ............ REFUTE
+       VERDICT: H-DISAGREE-REFUTED-PEAK-ELSEWHERE
+
+    CONTROL-NUMEL VERDICT (same tree, same bars)
+       units (determinate windows at k_hat) ... 1492
+       RANGE of D over k = 1..61 .............. 0.1375   (X1 fires below 0.05)
+       argmax k_hat ........................... 5   ties [5, 6]   P1 window [47,52] -> FAILS
+       shape on the eleven: fall 0.0000 rise 0.0534 (WOBBLE_BAR 0.05) -> MULTIMODAL
+       Spearman rho(D, CAPTURE) over the eleven  -0.8428   MC p (N=1000000, seed 20260908)  0.999185
+       P3 (rho >= 0.60 and p <= 0.05) ............ REFUTE
+       VERDICT: H-DISAGREE-REFUTED-PEAK-ELSEWHERE
+
+    STAMPS
+       per-seed PRIMARY argmax: {'15': 1, '16': 1, '17': 2} -> SEEDS-DISAGREE
+       indeterminate share at PRIMARY k_hat = 0.0000 -> precision ok
+       PRIMARY vs CONTROL tokens -> WEIGHTING-ROBUST
+
+    FINAL: PRIMARY H-DISAGREE-REFUTED-PEAK-ELSEWHERE | CONTROL-NUMEL H-DISAGREE-REFUTED-PEAK-ELSEWHERE | WEIGHTING-ROBUST | SEEDS-DISAGREE
+
+The tree walk: X1 does not fire (0.3420 ≥ 0.05); **X2 fires** (`k_hat = 1`, outside `[42, 55]`); the
+token is `REFUTED-PEAK-ELSEWHERE`.  Had X2 not fired, **X3 would have** (rho −0.0455 ≤ 0).  P1 fails
+on every seed individually (argmax 1, 1, 2), so `SEEDS-DISAGREE` here means "every seed disagrees
+with the prediction", not "the seeds disagree with each other" — they agree with each other to
+within 0.03 at every k.  The brief's own numel weighting does not rescue it: the CONTROL is
+refuted by the same limb and is **strongly anti-correlated** with capture (rho −0.8428, MC p 0.9992)
+— its minimum, D = 0.2646, sits at k = 47, one grid point from the capture maximum.
+
+### 179.6 THE DESCRIPTIVE SECTIONS — TIME, THE LITERAL-BRIEF STATISTIC, THE OFF-CELL SWEEP
+
+**Time-resolved (PRIMARY, pooled, by epoch decile).**  D(49) is **0.0000** in epochs 0–9, rises to a
+peak of 0.1800 (20–29) / 0.1667 (30–39) / 0.1600 (40–49), and is back at 0.0400, 0.0067, 0.0067,
+0.0000, 0.0000 from epoch 50 on.  D(1) climbs monotonically from 0.0000 to 0.5170.  Whatever the
+`[49,13]` split does, it is not sustained by sign disagreement in the second half of training.
+
+**TERTIARY-CUMULATIVE** (the brief's literal reading; descriptive): unweighted argmax 61, range
+0.7001, rho −0.0545; numel-weighted argmax 1 (ties 1, 2, 3), range 0.8056, rho −0.7273.  Same
+conclusion, and inflated by the autocorrelation that makes the statistic unusable as a rate.
+
+**OFF-CELL** (the other 27 `cru1` layerwise probes, other `(ms, alpha0)` rungs; descriptive): the
+PRIMARY argmax lands in `[47, 52]` on **0 of 27**.  It is at k ≤ 6 or k = 59–61 on 26 of 27
+(the one exception, `m3e-3-a1e-6-s15`, is at 31).  D(49) is at most 0.2631 (the `FROZEN` rungs
+`ms=1e-5` / `3e-5`, where the meta-optimiser barely moves) and is **0.0000** on all three
+`m1e-4-a1e-6` probes.  rho with the capture curve is positive only on the six `FROZEN`-rung probes
+(+0.50 to +0.54) and is ≤ +0.16 everywhere else.  Nothing here is a test; it says the cell result is
+not a seed accident of one rung.
+
+### 179.7 THE PER-STEP CROSS-CHECK — THE ONE DIRECT m = 2 MEASUREMENT ON DISK, AND IT SAYS THE SAME
+
+`crn1`'s reduction probe (`crn1_stage/probe_*.terms.npy`, 169.3) holds the 62 per-tensor
+`<h_i, g_i>` at **every** meta-step for 6,000 steps (12 epochs, seed 0, the standard cell) along the
+**true `[49,13]`**, the true `[50,12]` and the scalar trajectory.  No windowing, no float32 floor,
+no proxy at k = 49.  Unedited scorer, PER-STEP section:
+
+    spec [49,13]  steps 6000  trajectory = TRUE m=2 at k=49
+       per-step   D(49) 0.0045  argmax  2  rho -0.4091  range 0.3282
+       100-step   D(49) 0.0000  argmax  1  rho +nan   max_k |D_step - D_win| = 0.3322
+       numel-wtd  D(49) 0.0020  argmax  1  rho -0.7863  (per-step)
+       per-step D on the eleven: 17:0.111  24:0.080  31:0.036  38:0.023  42:0.015  45:0.010  47:0.008  49:0.005  52:0.004  55:0.005  60:0.014
+    spec [50,12]  ...  per-step D(49) 0.0042  argmax 2  rho -0.4282
+    spec scalar   ...  per-step D(49) 0.0042  argmax 2  rho -0.4091
+
+**On the real two-group trajectory at the capture argmax, the two groups' reductions disagree in
+sign on 27 of 6,000 meta-steps (0.45 %).**  The `[49,13]` optimiser is, in sign, one beta driving
+two groups in lockstep 99.55 % of the time — precisely the case in which H-DISAGREE says the split
+buys nothing.  This is 12 % of the horizon and one seed and was registered as a cross-check with
+no bar; it cannot be the verdict.  It agrees with the verdict.  The windowing cost (max
+`|D_step − D_win|` = 0.33, at low k) is large, so 179.4's D(k) values are **window** rates and
+must not be read as per-step rates; both readings refute.
+
+### 179.8 WHAT SETS THE SIGN — DESCRIPTIVE, UNREGISTERED, NOT A FINDING
+
+An ad-hoc pass over the same 1,497 windows (not in the scorer; recorded so the shape of 179.4 is not
+a mystery): `linear.weight` (51,200 params) carries **49.0 %** of `Σ_i |W_i|`; the three 256-parameter
+BN scales `layer3.1.bn1.weight`, `layer3.0.bn1.weight`, `layer3.0.bn2.weight` carry 7.0 / 6.2 / 3.5 %;
+`conv1.weight` 3.4 %; no conv above 1.4 %.  The two step-drops in D(k) are where a dominant BN scale
+crosses from suffix to prefix: k = 31→32 (`layer3.0.bn1.weight` enters the prefix; D 0.3001 → 0.1283)
+and k = 40→41 (`layer3.1.bn1.weight`; 0.1062 → 0.0728).  `layer3.0.bn1.weight`'s sign alone equals
+the sign of the whole suffix `Σ_{i>31} W_i` in 86.2 % of windows.  This is the same picture
+169.3/`crn1` drew at the group level (a group's sign is its largest term's sign 99 % of the time,
+`linear.weight` 95 %) and `scl1`'s single-tensor attribution at 156 — the reduction is dominated by a
+handful of small normalisation scales and the classifier, and the numel weighting the brief proposed
+would have buried exactly those tensors.  DESCRIPTIVE.  It is the obvious next registration, not a
+result.
+
+### 179.9 WHAT IS AND IS NOT ENTITLED
+
+**Entitled, exactly:** *"Along the m = 62 (layerwise) trajectory at CIFAR-100 / `ResNet18_c100` /
+SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 epochs, the prefix/suffix sign-disagreement rate of the
+harness's own reduction is maximal at k = 1 and monotone-decreasing through `cpk1`'s hump, is
+uncorrelated with the capture curve (rho −0.05), and on the true `[49,13]` trajectory for 12 epochs
+the two groups disagree on 0.45 % of meta-steps; the sign-disagreement account of the cut-position
+effect is refuted at this cell, on the registered proxy and on the one direct measurement."*
+
+**Not entitled:** "sign disagreement plays no role in any granularity effect" (one cell, one
+horizon, one stand-in trajectory for 60 of the 61 cuts); "the cut-position effect is explained by
+sign AGREEMENT" (the anti-correlation of the CONTROL is a descriptive observation on a statistic
+that is not the harness's, and was not registered as a hypothesis); any m = 2 number other than
+179.7's, which is 12 epochs and one seed.  `cpk1`'s `k* = 49` remains a 100-epoch object (156), and
+so is every number here.  Fifteen mechanism candidates have now been registered against the
+partition-outcome map; **fourteen have died**, and this one — the first to ask the trajectory rather
+than the partition — dies with the cleanest margin of any of them: its predicted peak is where the
+curve's floor is.
+
+### 179.10 THE STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU: **no job submitted, cancelled or touched on either account**; `alice` not written to (the
+probe files were read from `alice2`, my own account; the crn1 terms from `crn1_stage/` there).
+RULE 16: `git diff HEAD~1 -- analysis/` is **one new file, additions only**; no registered scorer,
+no `argsline_guard.py` touched.  `paper/` untouched (`git status --porcelain paper/` empty).
+`git add` by path only.  No nested `claude -p`.  Sibling commits (`c046c42` 177, `49e5f5f` 178)
+landed during this cycle; this entry took the next free number at the moment of writing.  The
+corpus stands at **2,740 rows**.
