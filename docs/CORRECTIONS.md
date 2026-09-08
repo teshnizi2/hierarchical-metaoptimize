@@ -16909,3 +16909,379 @@ separation of class from a mass threshold** — structurally impossible on ResNe
 **No test of `152.12` rival (c).**  **No generalisation outside `layer4.0` and its boundary** — the
 three crossing tensors are 49, 50 and 52 of 62.  The `scalar` anchor still takes a different code
 path in `init_meta`; it is a **floor reference only** and that confound is **not** lifted.
+
+## 165. `cpg1` REGISTERED AND LAUNCHED -- THE ARM THAT NAMES THE CONTEXT VARIABLE `164.7` LEFT UNIDENTIFIED. **THREE** ACCOUNTS ARE REGISTERED, NOT TWO; **NO LIVE ACCOUNT PUTS ANY ARM WITHIN 30 SE OF THE FLOOR**; AND THE SCORER'S REQUIRED INVOCATION IS MADE **IMPOSSIBLE TO GET WRONG**. **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,623 ROWS.**
+
+Cycle 139.  `cpg1` runs on **`alice2`** (ours).  15 runs, CIFAR-100 / `ResNet18_c100` / SGDm+Lion /
+ms `1e-3` / alpha0 `1e-6` / gamma 1 / batch 100 / 100 epochs / `BETA_CLIP=-15:-2.3026` /
+`AUGMENT=1` / `HIER` unset / `PROBE=0` / seeds **{12,13,14}** / `m = 2` and sizes **[49,13]
+THROUGHOUT**.  Registered scorer `analysis/cW1_cpg1_score.py`.  Launcher
+`bin/cW1_cogroup_contiguity.sh`.  `alice` was read only (`squeue`); nothing was submitted there and
+nothing under `/data1/salehkaleybars` was written.
+
+### 165.1 WHAT `164.7` LEFT OPEN, AND THE ONE ARM THAT CLOSES IT
+
+`164.7` refuted **single-tensor additivity**: `layer4.0.shortcut.0.weight` (tensor 52, a
+131,072-parameter convolution) is worth **+7.706667 pp** joining the coarse group `{1..51}`
+(`cts1` k51->k52) and **-0.032667 pp** joining `{1..48}` (`cpr1`'s `kC`).  But `cpr1`'s `kC` moved
+**three** things at once relative to `kP` -- `conv2` left the coarse group, contiguity broke, and
+the two paths of block `layer4.0` stopped being co-governed -- so the operative **context variable**
+is unidentified.
+
+`cpg1` adds **one** arm, `kE`, whose coarse group is `{1..47, 49, 52}`: `conv2` **IN**,
+`shortcut.0` **IN**, and **NON-contiguous by the same three holes and at the same maximum coarse
+ordinal as `kC`**.  Everything else in the batch is an anchor, a replicate or a control.
+
+### 165.2 THE ARMS, AND THE LIVE-MODEL MANIFEST (`PARTITION-MANIFEST.txt`, 9,273 bytes, written at submit time)
+
+Composed by `HF.polish_the_stepsize_groups` itself on the live `ResNet18_c100`
+(**62 tensors, 11,220,132 parameters**).  Indices are **1-BASED**.
+
+| arm | `--stepsize-groups` | coarse index set | m | sizes | coarse params | fine params | max ord | holes | prefix depth |
+|---|---|---|---|---|---|---|---|---|---|
+| `k01` | `scalar` | -- (m = 1 floor anchor) | 1 | -- | -- | -- | -- | -- | -- |
+| `kP` | `sets:1-49/50-62` | `{1..49}` | 2 | [49,13] | **6,315,072** | 4,905,060 | 49 | none | 49 |
+| `kE` | `sets:1-47,layer4.0.conv2.weight,layer4.0.shortcut.0.weight/layer4.0.bn1.bias,50-51,53-62` | `{1..47, 49, 52}` | 2 | [49,13] | **6,445,632** | 4,774,500 | 52 | {48,50,51} | 47 |
+| `kC` | `sets:1-48,layer4.0.shortcut.0.weight/layer4.0.conv2.weight,50-51,53-62` | `{1..48, 52}` | 2 | [49,13] | **4,086,848** | 7,133,284 | 52 | {49,50,51} | 48 |
+| `kG` | `sets:1-48,layer4.0.bn2.bias/layer4.0.conv2.weight,50,52-62` | `{1..48, 51}` | 2 | [49,13] | **3,956,288** | 7,263,844 | 51 | {49,50} | 48 |
+
+Coarse symmetric differences, **all five measured on the live model** and all EXACTLY as registered:
+`kP^kE` = {48 `layer4.0.bn1.bias`, 52 `layer4.0.shortcut.0.weight`} ·
+`kP^kC` = {49 `layer4.0.conv2.weight`, 52} ·
+`kP^kG` = {49, 51 `layer4.0.bn2.bias`} ·
+`kE^kC` = {48, 49} · `kC^kG` = {51, 52}.
+All four coarse groups have size **49**.  `kE` and `kC` are **MATCHED** on hole count (3) and on
+maximum coarse ordinal (52); they differ by prefix depth 47 vs 48 and, decisively, by whether
+`layer4.0.conv2.weight` is in the coarse group.
+**`kG`'s coarse AND fine masses are EXACTLY `cpr1` `kS`'s 3,956,288 / 7,263,844** -- a free,
+**exact** mass control where `cpr1`'s was a 3.30 % one.
+
+**NO ARM PUTS `layer4.0.bn2.weight` (tensor 50) IN THE COARSE GROUP**, and the launcher fails if one
+does.  Section J of `--selftest` re-derives the reason from the corpus, `cpg1` excluded: among m = 2
+arms in this cell at 100 epochs with coarse size >= 17, **every floor-saturated row (21) has tensor
+50 in its coarse group and every row without it (51) is INFORMATIVE**.  That is the empirical form
+of the floor-safety argument; the point predictions in `165.5` are the arithmetic form.
+
+### 165.3 THE BN-SHIFT BALLAST -- VERIFIED HERE, NOT INHERITED, AND `161.7b`'s "< 0.30 SE" IS SIGMA-DEPENDENT
+
+Holding the group SIZES fixed forces every arm that gains a tensor to shed one.  `kE` sheds
+tensor 48 `layer4.0.bn1.bias`; `kG` gains tensor 51 `layer4.0.bn2.bias`.  Both are **BN SHIFTS**.
+Re-derived here at **100 epochs**, from `cpk3`'s raw `.out` files and `cts1`'s corpus rows:
+
+| ballast | step | measured at 100 ep | in SE (`cpg1`'s re-derived SE 0.755682) | in SE (`161`'s printed figure) | endpoints off the floor? |
+|---|---|---|---|---|---|
+| tensor 48 | `cpk3` k47 -> k48 | **+0.108667** | **+0.14** | +0.08 (772 ep value +0.0640) | +23.33 / +23.44 YES |
+| tensor 51 | `cts1` k50 -> k51 | **+0.233333** | **+0.31** | +0.29 | +7.56 / +7.79 YES |
+
+**THE BRIEFING'S CLAIM "both < 0.30 SE" IS CORRECTED, AND THE CORRECTION IS ENTIRELY IN THE
+DENOMINATOR.**  `161.7b` printed +0.29 SE for tensor 51 using `cS2`'s pre-ingest sigma; against
+`cpg1`'s re-derived `SIGMA_W = 0.925518` the same step is **+0.3088 SE**.  The step did not move;
+the noise floor did.  The corpus's **third** BN-shift step (`scl1` k53 -> k54, **+0.138000**) is
+**EXCLUDED** because both of its arms are floor-saturated -- which is why `161`'s census has two
+entries and not three.
+
+**AND THE SEPARATION IS BALLAST-FREE, WHICH IS WHY THIS MATTERS LESS THAN IT LOOKS.**  The two
+readings of `kE` differ by
+`DE_COGROUP - DE_CONTIG = S52 - W52 = 7.706667 - (-0.032667) = +7.739334` **exactly**, with no
+ballast term in it: the ballast shifts BOTH predictions by the same `-S48`.  `--selftest` asserts
+that identity to 5e-6.
+
+### 165.4 THE NOISE FLOOR, RE-DERIVED AT REGISTRATION WITH `cpg1`'s OWN ROWS EXCLUDED FROM **EVERY** READER
+
+No sigma is copied.  `cR1`'s estimator -- pooled within-(batch x granularity) SD of `plateau5` over
+m = 2 arms in this exact cell -- computed **both ways at both horizons** on the live 2,623-row
+corpus:
+
+| estimator | value | df | cells | members |
+|---|---|---|---|---|
+| `SIGMA_100` (`^\[\d+,\d+\]$` matcher, the cR1/cV1 one) | **0.925518** | 60 | 30 | 90 |
+| `SIGMA_772` (same matcher) | 0.864841 | 26 | 13 | 39 |
+| `SIGMA_100_WIDE` (matcher extended to `sets:` m = 2) | 0.920909 | 66 | 33 | 99 |
+| `SIGMA_772_WIDE` | 0.864841 | 26 | 13 | 39 |
+| **`SIGMA_W` = max of all four, the frozen rule** | **0.925518** | | | |
+
+**WHY THE WIDENING.**  `cR1`/`cV1`'s matcher silently drops the **nine** `sets:`-grammar m = 2 rows
+`cpr1` added to the corpus; dropping real m = 2 replicate spread from a noise estimate is not
+conservative.  Computing both and freezing the **max** makes the bar `>=` what the campaign-standard
+estimator gives **and** `>=` what the widened one gives, so the change cannot have loosened
+anything.  The 100 stratum is the horizon-matched one **and** the largest of the four.
+
+`SE_ARM_DIFF = SIGMA_W*sqrt(2/3) = ` **0.755682** · `SE_INT = SIGMA_W*sqrt(4/3) = ` **1.068696**.
+`READ_BAR = FLOOR_BAR = 2*SE_ARM_DIFF = ` **1.511363** ·
+`INT_BAR = REPL_BAR = 2*SE_INT = ` **2.137394** ·
+`NOISY_BAR = 3*SIGMA_W = ` **2.776554** · `DEAD_BAR = 5.00` ·
+`CTRL_BAR = ` **16.197000** (half of `cpk3`'s own k49 - k01 at 100 ep, re-derived from its `.out`
+files).
+
+**EVERY frozen premise in `cW1` is read through a corpus reader that excludes rows named `cpg1-*`**
+-- both sigmas, both WIDE sigmas, the scalar floor reference, the layerwise ceiling reference, all
+three anchor sets, the duplicate-seed premise, the new-granularity premise, the saturation census
+and the row-count premise.  Not "admits two states": **ACTUALLY INVARIANT** under this batch's own
+ingest, which is the defect `161.9` recorded against `cS2` (which claimed `cR1`'s pattern with only
+1 of 6 failing checks having it) and the pattern `164.9` measured `cV1` to have.
+
+### 165.5 THE ACCOUNTS -- **THREE ON THE PRIMARY CONTRAST, NOT TWO** -- AND EVERY PREDICTED LEVEL
+
+Single-tensor steps at 100 epochs, all re-derived by `--selftest`:
+
+    S48 = cpk3 k48 - k47                 = +0.108667   BN SHIFT (the kE ballast)
+    S49 = cpk3 k49 - k48                 = +9.002000   CONVOLUTION
+    S51 = cts1 k51 - k50                 = +0.233333   BN SHIFT (the kG ballast)
+    S52 = cts1 k52 - k51                 = +7.706667   tensor 52, conv2 PRESENT, contiguous
+    W52 = (cpr1 kC - kP) + S49           = -0.032667   tensor 52, conv2 ABSENT, 3 holes
+
+**H-COGROUP (A).**  Tensor 52 pays its value when it shares a group with `layer4.0.conv2.weight`.
+`DE = -S48 + S52 = ` **+7.598000**.
+**H-CONTIG (B).**  Tensor 52 pays only when it EXTENDS a contiguous prefix; contiguity governs the
+ADDED tensor only, so `conv2` still pays `S49` inside `kE`.  `DE = -S48 + W52 = ` **-0.141334**.
+**H-INERT (C).**  A coarse group behaves as its **maximal contiguous prefix**; everything past the
+first hole is inert.  `kE`'s maximal prefix is `{1..47}`, so `DE = cpk3 k47 - k49 = ` **-9.110667**.
+**H-MASS (D).**  Level is a function of coarse mass.  `kG` has EXACTLY `cpr1` `kS`'s coarse mass, so
+`DG = cpr1 kS - kP = ` **-33.462667**.  Dead before this batch runs (`164.5`); `kG` re-kills it at
+an exact match.
+
+| contrast | H-COGROUP | H-CONTIG | H-INERT | H-MASS |
+|---|---|---|---|---|
+| `DE = kE - kP` | **+7.598000** | **-0.141334** | **-9.110667** | undefined (no anchor at kE's mass) |
+| `DC = kC - kP` | -9.034667 | -9.034667 | -9.002000 | -9.034667 (definitional) |
+| `DG = kG - kP` | -8.768667 | -9.002000 | -9.002000 | **-33.462667** |
+| `I = (kE-kP) - (kC-kG)` | **+7.864000** | **-0.108667** | **-9.110667** | -- |
+
+Separations on `DE`: **A-B 7.739334 pp = 10.24 SE = 5.12 bars** · B-C 8.969333 = 11.87 SE = 5.93
+bars · A-C 16.708667 = 22.11 SE = 11.06 bars.  On `I`: A-B 7.972667 = 7.46 SE_INT · B-C 9.002000 =
+8.42 SE_INT.  On `DG`, H-MASS vs the live accounts: **24.460667 pp = 32.37 SE**.
+
+**WHY THREE AND NOT THE TWO `164.11` PROPOSED.**  `164.11`'s `E - kP ~ -0.06` reading is the
+**narrow** contiguity reading (contiguity penalises only the tensor being ADDED).  The **broad**
+reading -- the group behaves as its maximal prefix -- is `H-INERT-EXTRA`, which `164.7` **named**,
+which fits `cpr1`'s `DC` to **-0.04 SE** with **zero fitted parameters**, and which predicts `kE` at
+`cpk3`'s k47, i.e. **-9.110667**, **11.87 SE** from the narrow reading.  Registering only two would
+have sent a completely predictable, already-published third outcome to
+`UNRESOLVED-PATTERN-UNREGISTERED`.  **`164.5`'s DESIGN NOTE asked for exactly this** -- enumerate the
+contrasts that can kill a rival, not only the ones the predicted branch needs.
+**B and C agree EXACTLY on `kC` and on `kG`.  `kE` is the ONLY arm that separates them**, which is
+also why `kE` is not optional and why the 2x2 interaction, though fully in-batch and worth having,
+carries the same information as `DE` rather than adding a fourth degree of freedom.
+
+**PREDICTED LEVELS AND THE FLOOR MARGINS -- `164.6`'s DEFECT IS DESIGNED OUT AND THE SELFTEST
+ENFORCES IT.**  Anchored on `kP = 55.140000` (`cpr1`'s measurement of the byte-identical spec
+string) and a predicted in-batch floor of **22.773900** (the corpus's 20 same-cell `scalar` rows
+over 7 batches, `cpg1` excluded):
+
+| arm | H-COGROUP | H-CONTIG | H-INERT | H-MASS | worst margin over the floor |
+|---|---|---|---|---|---|
+| `k01` | 22.7739 | 22.7739 | 22.7739 | -- | -- (it **is** the floor) |
+| `kP` | 55.1400 | 55.1400 | 55.1400 | -- | **+32.3661 = 42.83 SE** |
+| `kE` | **62.7380** | **54.9987** | **46.0293** | -- | **+23.2554 = 30.77 SE** |
+| `kC` | 46.1053 | 46.1053 | 46.1380 | -- | **+23.3314 = 30.87 SE** |
+| `kG` | 46.3713 | 46.1380 | 46.1380 | *21.6773* | **+23.3641 = 30.92 SE** |
+
+**The worst of 4 sweep arms x 3 LIVE accounts is +23.255433 pp above the floor = 30.77 SE = 15.39
+FLOOR_BARs.**  `--selftest` section I FAILS if any cell falls below 10 SE.  **H-MASS is the only
+account that predicts a saturated arm** (`kG` at 21.677333, 1.096567 pp *below* the floor) and it is
+dead before the batch runs, so it cannot make the primary read unfalsifiable the way `cpr1`'s
+`kS` did.
+
+**AND A CEILING NOTE, BECAUSE `164.6`'s LESSON IS ABOUT SATURATION AND NOT ABOUT THE FLOOR
+SPECIFICALLY.**  The highest predicted level, `kE` under H-COGROUP at **62.738000**, sits
+**6.794100 pp = 8.99 SE BELOW** the corpus's pooled same-cell `layerwise` (m = 62) reference of
+**69.532100** (n = 20, 7 batches).  That reference is **CROSS-BATCH**: gate `R-CEIL` is
+**DESCRIPTIVE and GATES NOTHING**, and this batch carries **no in-batch ceiling anchor**.  Recorded
+as a scope limit rather than dressed up as a gate.
+
+**A CONSEQUENCE OF H-COGROUP, REGISTERED NOW SO IT CANNOT BE CLAIMED AS A DISCOVERY LATER.**  If
+`kE` reads ~62.74 it beats the prefix-cut argmax `k* = 49` by **+7.598000 pp**, i.e. the argmax over
+**prefix cuts** (`cpk1`/`cpk2`/`cpk3`) would not be the argmax over **partitions** at fixed `m` and
+fixed group sizes.
+
+### 165.6 THE PRE-REGISTRATION -- GATES IN ORDER, BRANCH MAP, AND EVERY BAR IN SE
+
+**GATES** (first failure decides `FINAL`).  **G0 PROVENANCE** -> `UNRESOLVED-PROVENANCE`: 15 runs,
+5 arms x 3 seeds, 15 distinct job ids, exactly 100 epoch lines each, `RUN_DONE` on every file, no
+repeated flag on any ARGS line, run name == ARGS `--run-name`, ARGS `--stepsize-groups` == the
+registered spec, `--num-epochs 100`, ARGS `--seed` == the file name's seed, exactly ONE distinct ENV
+line carrying `AUGMENT=1 / BETA_CLIP=-15:-2.3026 / HIER=none / PROBE=0`.
+**G1 COMPARABILITY** -> `UNRESOLVED-NOT-COMPARABLE`: the manifest's live model must match the 62
+frozen `(name, numel)` pairs; every arm m = 2 sizes [49,13]; every arm's coarse **index set** EXACTLY
+as registered; all five pairwise symmetric differences EXACTLY the registered pairs; every
+coarse/fine parameter count EXACTLY as registered; `kE`/`kC` matched at 3 holes and max ordinal 52;
+and **no arm with tensor 50 coarse**.
+**R2 DIVERGENCE** -> `UNRESOLVED-DIVERGED` (`DEAD_BAR` 5.00) ·
+**R3 NOISE** -> `UNRESOLVED-NOISY` (`NOISY_BAR` 2.776554 = 3 sigma) ·
+**R-CTRL** -> `UNRESOLVED-CONTROL` (`kP - k01 >= ` 16.197000) ·
+**R-FLOOR** -> `UNRESOLVED-SATURATED` **if `kP` or `kE` is within `FLOOR_BAR` 1.511363 of the
+batch's own `k01`** (a saturated `kC` or `kG` does not stop the primary read; it changes the mass /
+replication token and says so) · **R-CEIL** DESCRIPTIVE, gates nothing.
+
+**BRANCH MAP, PRIMARY, on `DE = kE - kP` against `READ_BAR = 1.511363 pp = 2 SE`:**
+
+| measured `DE` within `READ_BAR` of | `FINAL` primary token |
+|---|---|
+| H-COGROUP only (+7.598000) | **`CONTIGUITY-REFUTED-COGROUPING-OPERATIVE`** |
+| H-CONTIG only (-0.141334) | **`CONTIGUITY-OPERATIVE`** |
+| H-INERT only (-9.110667) | **`INERT-BEYOND-FIRST-HOLE`** |
+| two or more | `UNRESOLVED-UNDERPOWERED` (needs SE to inflate **2.56x**) |
+| none | `UNRESOLVED-PATTERN-UNREGISTERED` |
+
+**SECONDARY, fully in-batch:** `I = (kE - kP) - (kC - kG)`.  Up to a ballast term bounded by
+`|S48| + |S51| = 0.342000 pp`, `I` **is** the contextuality of tensor 52.
+`|I| <= INT_BAR` -> `INTERACTION-ABSENT` · `I > INT_BAR` -> `INTERACTION-PRESENT-POSITIVE` ·
+`I < -INT_BAR` -> `INTERACTION-PRESENT-NEGATIVE`.  Primary and secondary must agree
+(A<->POSITIVE, B<->ABSENT, C<->NEGATIVE); a disagreement appends
+`INCONSISTENT-PRIMARY-vs-INTERACTION`.
+**MASS TOKEN** from `kG` against the in-batch floor: `COARSE-MASS-REFUTED-AT-EXACT-MATCH` /
+`COARSE-MASS-NOT-REFUTED`.
+**REPLICATION TOKEN**, cross-batch, DESCRIPTIVE, gates nothing: `DC` against `cpr1`'s own
+-9.034667 at `REPL_BAR` 2.137394 -> `KC-REPLICATES` / `KC-DOES-NOT-REPLICATE`.
+
+`plateau5` @ 100 epochs is the PRIMARY metric; the CSV `plateau` column is not read anywhere;
+**TRAIN is printed beside TEST at every arm and every contrast**.
+
+### 165.7 THE SCORER, ITS **DEFAULT** INVOCATION, AND THE RULE 21 MARGIN IN SECONDS
+
+    analysis/cW1_cpg1_score.py
+    sha256 939ba875a73e471176e12205e09b4450090cbacdccad3e4b18c0dcca7c755b16
+           (IDENTICAL on the Mac and on alice2)
+    --selftest: 137 checks, 137 PASS, 0 FAIL, exit 0 -- IDENTICALLY on BOTH hosts,
+    including the re-derivation of cpk3's k01/k47/k48/k49/k50 (TEST and TRAIN) from
+    the raw .out files on each.
+
+**THE DOCUMENTED INVOCATION, WHICH HAS NO SECOND ARGUMENT TO FORGET:**
+
+    python3 analysis/cW1_cpg1_score.py <runsdir>
+
+**`164.2`'s DEFECT IS CLOSED BY CONSTRUCTION, NOT BY A NOTE.**  `--manifest` is **OPTIONAL and
+DEFAULTED**.  `resolve_manifest()` searches, in order, `<runsdir>/cpg1/PARTITION-MANIFEST.txt`,
+`<runsdir>/cpg1-PARTITION-MANIFEST.txt`, `<runsdir>/PARTITION-MANIFEST.txt`,
+`<runsdir>/../cpg1/PARTITION-MANIFEST.txt`, then a bounded glob; **the launcher writes the manifest
+to BOTH of the first two paths**; and **launcher guard 8 imports the scorer and proves the resolver
+finds it, at submit time, before a single job can finish** -- it printed
+`/home/s5014158/metaopt/runs/cpg1/PARTITION-MANIFEST.txt (DEFAULT <runsdir>/cpg1/...)`.  The
+resolved path and **how** it resolved print at the top of every `score()` run, so a silently wrong
+manifest is not possible either.  A missing manifest can now only mean the file is not beside the
+runs, and `G1` says exactly that instead of blaming the arms.
+
+**RULE 21, BY WALL CLOCK ON VERIFIED-SYNCHRONISED CLOCKS.**  Registration commit
+**`faac2001a7ab610c50a108e7782d8159c98b600f`**, `2026-09-08T05:12:26+02:00` (epoch **1788837146**),
+pushed to `origin` (`13b8fb7..faac200`) before submission.  Earliest `sacct` Submit
+`2026-09-08T05:12:55` (epoch **1788837175**).  **MARGIN = 29 SECONDS.**  The Mac and `alice2` both
+reported epoch **1788837231** inside one command, so the clocks agree to the second and the margin
+is not an artefact of skew.  **The margin is thin -- `cpr1`'s was 140 s and `cpk3`'s 120 s -- and it
+is reported as measured rather than rounded up.**  It is positive, the commit is public, and the
+staged launcher and scorer on `alice2` are **byte-identical** to the committed files
+(`sha256 939ba875...c7755b16` and `05b935a4...36e66d3` on both hosts).
+
+**RULE 16.**  `git diff --stat -- analysis/` at the registration commit is **ADDITIONS ONLY**: one
+added file, zero modifications.  `analysis/argsline_guard.py` **NOT EDITED** -- sha256
+`81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`, unchanged since `617b6c8`, the
+same hash `164.1` quotes.  No pre-existing scorer was touched.  `git status --porcelain paper/` is
+**empty**.
+
+**THE HARNESS IS UNCHANGED FROM `cpr1`.**  `PATCH_NAMESETS` is already registered and already
+present in the live `HF.py` (guard 4h; live sha256 `0d8ee431...142a3892`).  `cpg1` adds no patch.
+`kG`'s spec is the first in the corpus to use the grammar's **bare single index** form (`50`);
+guard 1d and the live-model composition in guard 4 both exercise it.
+
+**INERTNESS IS RE-ESTABLISHED STATICALLY, WHICH IS THE ONLY WAY `164.10` ALLOWS.**  There is **no
+`kL` arm and no `R-EQUIV` gate**.  `164.10` recorded that `cpr1`'s R-EQUIV rested on a premise that
+was false for 2 of its 3 pairs, that it discarded the pairing the design paid for, and that its PASS
+"must never be quoted as empirical proof of inertness".  Three runs bought a corroboration that may
+not be quoted; the same three spent on `kG` buy a 32.37-SE exact-mass refutation.  In its place,
+launcher **guard 1d re-runs `tests/test_namesets.py` on the LIVE tree** -- `ALL CHECKS PASSED`,
+including `argsline_guard` seeing exactly 3 flags on a composed line -- and **G1 checks `kP`'s live
+composition name by name**.  `cpr1`'s measured `kL - kP` (-0.408000 pp, -0.54 SE) is printed by
+`cW1` as DESCRIPTIVE and gates nothing.
+
+### 165.8 THE LAUNCH RECORD, AND THE RULE 20 / ENV AUDITS
+
+**ONE SUBMISSION.**  15 jobs, ids **4919796-4919811 with 4919800 absent** (that id went to another
+submitter in the same second; the block is otherwise contiguous).  Submit times span
+`2026-09-08T05:12:55` .. `05:12:57` -- **a 2-second spread**.  Partitions
+`gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, `--time=03:00:00`, `--gres=gpu:1 --cpus-per-task=6
+--mem=16G`.  At submit the three partitions held 45 RUNNING / 9 PENDING and this account's queue was
+**EMPTY**.
+
+**GUARD 7, RULE 20 POST-LAUNCH: PASS** -- against a real run's own ARGS line
+(`cpg1-kE-s13-4919804.out`), inside the window, with the guard **UNEDITED**.  `cpr1`'s equivalent
+check sat at `RC=2 UNVERIFIED` for a day (`162.9`); this one did not.
+
+    python3 analysis/argsline_guard.py /home/s5014158/metaopt/runs --name cpg1- --batch-consistency
+    -> N clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+       "every non-axis flag is identical across N runs"     VERDICT: PASS
+
+`N` grows as jobs start; at the time of writing **11 of 15 had started and the audit read 11 clean,
+0 mismatch, 0 without an ARGS line, PASS**, batch-consistency included.  **The audit over all 15 `.out` files is PENDING until the last job starts, and
+no `cpg1` number may be quoted before it passes.**  In its place, and reading the same guard file:
+
+**SLURM'S OWN `SubmitLine` RECORDS FOR ALL 15 JOBS, THROUGH THE UNEDITED GUARD: 15 clean, 0
+mismatch**, each against **10** `--expect` design flags (`alg-base`, `alg-meta`, `meta-stepsize`,
+`alpha0`, `num-epochs`, `batch-size`, `gamma`, `dataset`, `NN-name`, `run-name`).
+
+**THE SEPARATE ENV-LINE AUDIT** (`BETA_CLIP` and `PROBE` are environment variables and cannot ride
+the ARGS line).  Over the `.out` files that exist: **exactly 1 distinct `ENV:` line**, carrying
+`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none ... SCHED=none ... PROBE=0`; **1 distinct non-axis ARGS
+residual**; one distinct ARGS md5 per job.  Over all 15 `SubmitLine` records: **exactly 1 distinct
+`--export` string**, `ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=0`, and
+**exactly 5 distinct `--stepsize-groups` values, 3 jobs each**, byte-identical to the registered
+`SPEC` table (launcher guard 4c proves the launcher's and the scorer's tables agree, so neither can
+drift).
+
+**COST AND ETA.**  `cpr1` ran the identical shape on the identical partitions on 2026-09-07:
+elapsed `00:37:50` .. `01:35:36`, **11.83 GPU-hours** over 15 jobs.  `cpg1` is budgeted at **~12
+GPU-hours**.  11 of 15 started within 5 seconds of submission; Slurm's backfill estimates for the
+four `s14` jobs are 08:13, 11:15, 14:15 and 17:15 local, so the batch is expected complete by
+**~18:15 on 2026-09-08** and possibly much earlier (backfill estimates are upper bounds).
+`bin/PROTECTED.txt` carries `cpg1-` (added in the registration commit, and re-asserted by the
+launcher at submit).
+
+### 165.9 WHAT `cpg1` CANNOT DO, SAID BEFORE IT LANDS
+
+**NO claim at any horizon other than 100 epochs and NO claim about attenuation** -- every anchor the
+predictions are built from is a 100-epoch readout.  **NO `m` claim** -- every sweep arm is m = 2 with
+sizes [49,13] and the `scalar` anchor is an anchor.  **NO CAPTURE and NO ceiling claim** -- there is
+no `layerwise` arm in this batch, `R-CEIL` is cross-batch and descriptive, and no in-batch ceiling
+anchor may be spliced in later.  **NO separation of tensor CLASS from a MASS THRESHOLD** -- that is
+structurally impossible on ResNet-18 (`161.7c i`) and this batch does not attempt it; it separates
+**context variables**, not classes.  **NO test of `152.12` rival (c)** -- `PROBE=0`, and at m = 2
+`block_product` has already reduced `<h,g>` to one scalar per GROUP before `_probe` is reached
+(guard 4g re-checks it on the live source); that rival stays **UNTESTED**.  **NO generalisation
+outside `layer4.0` and its boundary** -- the four tensors that move are 48, 49, 51 and 52 of 62.
+**NO empirical claim about `PATCH_NAMESETS`' inertness from this batch** -- there is no `kL` arm and
+`164.10` forbids reading `cpr1`'s R-EQUIV as proof.  The `scalar` anchor still takes a different
+code path in `init_meta`; it is a **FLOOR REFERENCE ONLY** and that confound is **NOT** lifted.
+Nothing here touches CIFAR-10, Tiny-ImageNet, ImageNet-489, ResNet-50, `resnet18_blocks`, any other
+meta-stepsize or optimiser pair, or any hierarchical or shrinkage operator.
+
+### 165.10 EVERY DEVIATION FROM `164.11`'s PROPOSED DESIGN, AND WHY
+
+1. **Arms renamed `E` -> `kE`, `G` -> `kG`.**  Cosmetic; it keeps every run name the same shape
+   (`cpg1-<arm>-s<seed>`) and lets `NAME_RE` stay a single alternation.
+2. **THREE registered accounts on `DE`, not two** (`165.5`).  The third, `H-INERT`, is `164.7`'s own
+   named zero-parameter rival and is 11.87 SE from the briefing's contiguity reading.
+3. **`kG`'s ballast is entered at its MEASURED value** `S51 = +0.233333` under H-COGROUP and at 0
+   under H-CONTIG/H-INERT, rather than assumed null.  The consequence is stated rather than hidden:
+   **`kG` does not separate the readings** (they differ on it by 0.31 SE); `kG` is the exact-mass
+   control and the 2x2's fourth cell, and nothing else.
+4. **The BN-shift ballast bound was re-derived and `164.11`'s "both < 0.30 SE" is corrected**
+   (`165.3`): it is +0.14 and **+0.31** SE at `cpg1`'s re-derived sigma, and the third BN-shift step
+   in the corpus is excluded as on-floor.  The separation is ballast-free anyway.
+5. **No `kL` / `R-EQUIV` arm**, on `164.10`'s own conclusion; inertness is re-established statically
+   by guard 1d and G1 (`165.7`).
+6. **A CEILING note and an `R-CEIL` gate were added** and immediately labelled DESCRIPTIVE, because
+   `164.6`'s lesson is about saturation in general and this batch's largest prediction is the
+   corpus's largest m = 2 level.
+7. **`SIGMA_W` is the max of FOUR estimators, not two** (`165.4`), because `cpr1`'s own nine `sets:`
+   rows are invisible to the cR1/cV1 matcher.
+8. **The manifest carries all 62 `TENSOR` lines** (`cpr1`'s carried 14) plus `STRUCT` (coarse index
+   set, max ordinal, holes, prefix depth), `SYMDIFF`, `MATCH`, `NO_T50_IN_COARSE`, `CLASS` and `MASS`
+   lines, so `G1` checks the live model's whole name order against the scorer's frozen copy.
+9. **`--manifest` is defaulted and guard 8 proves the default works** (`164.2`'s explicit ask).
+10. **A corpus-wide saturation census (`--selftest` section J) was added** as the empirical form of
+    the floor-safety argument, alongside the arithmetic form.
+
+### 165.11 STATUS AT THIS ENTRY
+
+**NOTHING OF `cpg1` HAS LANDED, BEEN SCORED OR BEEN INGESTED.**  `grep -c '^cpg1-'
+results/all_runs.csv` = **0**; the corpus stands at **2,623 rows**; `git status --porcelain paper/`
+is **empty**.  The `.out`-file RULE 20 batch-consistency audit over all 15 runs is **PENDING** until
+the last job starts, and **no `cpg1` number may be quoted before it passes.**

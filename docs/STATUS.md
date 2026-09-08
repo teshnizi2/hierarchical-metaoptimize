@@ -1,12 +1,43 @@
 # STATUS — operator dashboard
 
-Updated 8 Sep 2026 (**cycle 138**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **164**) > `docs/FINDINGS.md` > everything else.
+Updated 8 Sep 2026 (**cycle 139**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **165**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,623 rows** (+29 this cycle: 14 `in489g2` + 15 `cpr1`). **BOTH cluster queues are EMPTY.**
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,623 rows** (+0 this cycle — `cpg1` has NOT landed). `alice` queue EMPTY; **`alice2` holds `cpg1`'s 15 jobs.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 
-## CYCLE 138 (this one) — **BOTH BATCHES LAND, SCORED AND INGESTED.** CORRECTIONS **163** (`in489g2`) + **164** (`cpr1`)
+## CYCLE 139 (this one) — **`cpg1` REGISTERED AND LAUNCHED.** CORRECTIONS **165**. NOTHING LANDED, SCORED OR INGESTED
+
+`cpg1` on **`alice2`**: 15 jobs (`4919796`–`4919811`, `4919800` is another submitter's), Submit spread **2 s** = ONE submission, 100 ep, m = 2 and sizes **[49,13] throughout**, seeds **{12,13,14}** (zero `ResNet18_c100` rows anywhere carry them), `PROBE=0`, **~12 GPU-h**, ETA **≤ 18:15 today** (11 started within 5 s; Slurm's backfill puts the four `s14` jobs at 08:13/11:15/14:15/17:15).
+
+**THE QUESTION.** `164.7` killed single-tensor additivity — tensor 52 `layer4.0.shortcut.0.weight` is worth **+7.706667 pp** joining `{1..51}` and **−0.032667 pp** joining `{1..48}` — but `cpr1`'s `kC` moved **three** things at once, so the operative **context variable** is unidentified. `cpg1` adds **one** arm, `kE`, coarse `{1..47, 49, 52}`: `conv2` **IN**, shortcut **IN**, non-contiguous by the **same 3 holes and same max ordinal 52** as `kC`.
+
+| arm | coarse | coarse params | max ord | holes | role |
+|---|---|---|---|---|---|
+| `k01` `scalar` | — | — | — | — | in-batch m=1 **FLOOR ANCHOR** |
+| `kP` | `{1..49}` | 6,315,072 | 49 | 0 | anchor; spec byte-identical to `cpr1`'s `kP` |
+| `kE` | `{1..47,49,52}` | 6,445,632 | 52 | 3 | **THE ARM** |
+| `kC` | `{1..48,52}` | 4,086,848 | 52 | 3 | fresh-seed replicate of `cpr1`'s `kC` |
+| `kG` | `{1..48,51}` | **3,956,288** | 51 | 2 | coarse **AND** fine mass **EXACTLY `cpr1` `kS`'s** — free EXACT-mass control |
+
+**THREE ACCOUNTS REGISTERED, NOT `164.11`'s TWO.** `SIGMA_W` **0.925518** (max of four re-derived estimators, `cpg1` excluded from every reader), `SE_ARM_DIFF` **0.755682**, `READ_BAR` **1.511363**.
+
+| contrast | H-COGROUP | H-CONTIG | H-INERT | H-MASS |
+|---|---|---|---|---|
+| `DE = kE − kP` | **+7.598000** | **−0.141334** | **−9.110667** | undefined |
+| `DC = kC − kP` | −9.034667 | −9.034667 | −9.002000 | −9.034667 |
+| `DG = kG − kP` | −8.768667 | −9.002000 | −9.002000 | **−33.462667** |
+| `I = (kE−kP)−(kC−kG)` | **+7.864000** | **−0.108667** | **−9.110667** | — |
+
+Separations on `DE`: **A−B 10.24 SE**, B−C 11.87 SE, A−C 22.11 SE — all ≥ 5.1 bars. `H-INERT` is `164.7`'s own zero-parameter rival (fits `cpr1`'s `DC` to −0.04 SE); B and C agree **exactly** on `kC` and `kG`, so **`kE` is the only separating arm**. `kG` re-kills H-MASS at **32.37 SE** at an EXACT mass match.
+
+**NO LIVE ACCOUNT PUTS ANY ARM NEAR THE FLOOR — `164.6`'s defect is designed out and `--selftest` §I enforces it.** Worst of 4 sweep arms × 3 live accounts: **+23.2554 pp above the predicted in-batch floor 22.7739 = 30.77 SE = 15.39 FLOOR_BARs** (`kE` under H-INERT). Predicted levels: `kP` 55.14 · `kE` **62.7380 / 54.9987 / 46.0293** · `kC` 46.11 · `kG` 46.37/46.14. Highest prediction sits **6.7941 pp = 8.99 SE BELOW** the pooled same-cell `layerwise` reference 69.5321 — `R-CEIL` is **cross-batch, DESCRIPTIVE, gates nothing**. **No arm puts tensor 50 `layer4.0.bn2.weight` in the coarse group**: §J re-derives that all 21 floor-saturated m=2 rows (coarse ≥ 17) in this cell have it there and all 51 rows without it are informative.
+
+**THE INVOCATION IS IMPOSSIBLE TO GET WRONG (`164.2`).** `--manifest` is **OPTIONAL and DEFAULTED**; the launcher writes the manifest to **both** of the resolver's first two paths; **guard 8 imports the scorer and proves the default resolves, at submit time**. Documented invocation: `python3 analysis/cW1_cpg1_score.py <runsdir>`.
+
+**RECEIPTS.** Scorer `analysis/cW1_cpg1_score.py` sha256 `939ba875…c7755b16`, **identical Mac/`alice2`**, `--selftest` **137/137 PASS on both**. **RULE 21 margin 29 s** (commit `faac2001` `05:12:26+02:00` → earliest Submit `05:12:55`; both hosts reported epoch `1788837231` in one command, so the clocks agree — **thin vs `cpr1`'s 140 s, reported as measured**). **RULE 16: `git diff -- analysis/` is additions only**, `argsline_guard.py` untouched (`81cea8b5…b04e5388`). **RULE 20 post-launch guard 7 PASS** on a real ARGS line inside the window (`cpr1`'s sat at `RC=2` for a day). `--batch-consistency` **11 clean / 0 mismatch / PASS** at 11 of 15 started — **the 15-run audit is PENDING and no `cpg1` number may be quoted before it passes**; in its place all **15 `SubmitLine` records passed the UNEDITED guard, 0 mismatch, 10 `--expect` flags each**. **ENV audit:** 1 distinct `ENV:` line, 1 distinct non-axis residual, 1 distinct `--export` string, exactly 5 `--stepsize-groups` values × 3 jobs. **No `kL`/`R-EQUIV` arm** — `164.10` forbids quoting it as proof of inertness; guard 1d re-runs `tests/test_namesets.py` on the LIVE tree instead (`ALL CHECKS PASSED`). `bin/PROTECTED.txt` carries `cpg1-`. Corpus **unchanged at 2,623**; `git status --porcelain paper/` **empty**.
+
+## CYCLE 138 — **BOTH BATCHES LAND, SCORED AND INGESTED.** CORRECTIONS **163** (`in489g2`) + **164** (`cpr1`)
 
 | batch | where | runs | scorer (UNEDITED) | **FINAL** |
 |---|---|---|---|---|
