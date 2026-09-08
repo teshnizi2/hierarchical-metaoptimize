@@ -78,6 +78,39 @@ python3 analysis/cY1_cru1_score.py $METAOPT_WS/runs
 
 **SCOPE, BINDING:** `resnet18_blocks` and the `k49` cut-position arm were **dropped** — either at the full ladder is +30 jobs and +22 GPU-h, and the standing instruction is to prioritise **bracketing** over adding arms. **`cru1` closes RULE 11 for `scalar`-vs-`layerwise` on CIFAR-100/`ResNet18_c100` at 100 ep ONLY — not for blk6, not for cut position, not for class count, not for ImageNet.** The scorer prints that under every verdict.
 
+## CYCLE 141 (this one, third batch) — **`crn1` REGISTERED AND LAUNCHED: THE FOURTEENTH MECHANISM, THE REDUCTION ITSELF.** CORRECTIONS **169**. NOTHING LANDED, SCORED OR INGESTED
+
+**TWO ZERO-GPU RESULTS THAT STAND WHATEVER THE BATCH RETURNS.**
+
+1. **"NORMALISE THE GROUP REDUCTION" IS A NULL BY CONSTRUCTION AND WAS NOT RUN.** `momentum_meta` is a zero-initialised LINEAR recursion in the reduction and `Lion_meta_update` applies `torch.sign()` to it, so dividing a GROUP's reduction by any positive per-group constant — tensor count, parameter count, anything — leaves the beta trajectory **BITWISE IDENTICAL**. `analysis/cX1_reduction_noop_proof.py` drives the **LIVE** meta-update methods and confirms it at `c = 1, 62, 49/13, 1e-3/7, 6315072/4905060`: **16/16 PASS, exit 0**. (RMSProp/Adam meta are invariant only above their hard-coded `epsilon = 1e-10`; the cell is `--alg-meta Lion`.)
+2. **THE 25.07 pp CUT-POSITION CLIFF IS NOT A REDUCTION EFFECT.** Instrumenting the REAL optimizer for **6,000 meta-steps** at the standard cell (`analysis/cX1_reduction_probe.py`, wraps `block_product` then calls the unmodified method, writes nothing under `$WS/runs`): REMOVING `layer4.0.bn2.weight` (512 params) from the `[50,12]` **coarse** group flips that group's sign in **0.0003** of steps — three in ten thousand — yet moving it across the cut costs **25.068667 pp = 46.91 SE_ARM**. A quantity that changes 0.03 % of a group's sign decisions cannot produce a 25 pp effect: **the cliff acts through WHICH ALPHA GOVERNS tensor 50, not through the group's meta-signal.** The cycle brief's sharpest prediction — *"normalising should collapse the cliff"* — is **refuted at the mechanism level for zero GPU-hours.**
+
+Two more measured facts, same probe: an **EQUAL VOTE PER TENSOR** reproduces the unnormalised sum's sign in **99.22–99.92 %** of steps at every group of every configuration (so the sum is **not** hijacked by the big tensors); and `1/numel` weighting **INVERTS** size rather than neutralising it — the 1-D BatchNorm parameters are 65 % of the tensors and **0.087 %** of the parameters and their share of `sum|t|` goes **0.0259–0.0463 → 0.4480–0.9324**. Full output: `results/crn1_reduction_probe/REPORT.txt`.
+
+**WHAT `crn1` THEREFORE ASKS.** `patches/patch_rednorm.py` adds opt-in `--stepsize-groups tn:<spec>` (`z_G = Σ_{i∈G} <h_i,g_i>/numel_i`), additive, three insertions, **no existing line edited**, and **INERT BY CONSTRUCTION** at every single-tensor granularity — so the brief's `{scalar, layerwise} × {standard, intervened}` has **three** distinct cells, not four. The question that survives: **if 7.62–19.10 % of all meta-update signs are flipped, by handing a group's vote from the 99.9 % of parameters to the 0.087 % of them, does 100-epoch accuracy move?**
+
+**18 jobs, ONE submission, `alice2`, ids `4920535`–`4920553` (`4920540` is another submitter's), Submit spread 2 s, seeds {15,16,17}, 100 epochs, PROBE=0, ~14.4 GPU-h** — the smallest of the three batches this cycle.
+
+| arm | spec | m | sizes | `_rednorm` | corpus level (crn1 excluded) |
+|---|---|---|---|---|---|
+| `k01` | `scalar` | 1 | [62] | False | 22.795652 (n=23, 8 batches) — FLOOR ANCHOR |
+| `k01n` | `tn:scalar` | 1 | [62] | **True** | — |
+| `k49` | `sets:1-49/50-62` | 2 | [49,13] | False | 55.405667 (n=18, 5 batches) |
+| `k49n` | `tn:sets:1-49/50-62` | 2 | [49,13] | **True** | — |
+| `k50` | `sets:1-50/51-62` | 2 | [50,12] | False | 30.337000 (n=6, 2 batches) |
+| `k50n` | `tn:sets:1-50/51-62` | 2 | [50,12] | **True** | — |
+
+**ACCOUNTS.** PRIMARY, on the three same-partition pairs: **H-COMP-INERT** predicts `P01 = P49 = P50 = 0.000000`; **H-COMP-LIVE** is its complement. SECONDARY, the cliff: **H-CLIFF-GOV** `I = 0`; **H-CLIFF-RED** `|D_TN| > |D_STD| + INT_BAR` (**AMPLIFIED** — direction fixed in advance by the 490× rise in tensor 50's steering power); **H-CLIFF-COLLAPSE** (`D_TN = 0`, the brief's account) registered as **ALREADY EXCLUDED**.
+
+**FLOOR.** `SIGMA_W` **0.925518** re-derived four ways with `crn1-` excluded from every reader (df 60, 30 cells, 90 members; max of the four). `SE_ARM 0.534348` · `READ_BAR 1.511365` · `INT_BAR 2.137392` · `FLOOR_BAND 2.776554` · `CTRL_BAR 16.305008`. Worst predicted margin over the m=1 anchor under the only level-predicting account: **+7.5413 pp = +14.11 SE_ARM** (`k50`/`k50n`); `k49`/`k49n` **+61.03 SE_ARM**. `k01`/`k01n` are the designated anchor and twin, **exempt and named in advance**, their pair registered **ONE-SIDED** (the m=1 level is a plateau `[53,9]`/`[54,8]`/`[2,60]` also sit on). **The `cpr1` defect (164) is closed by construction:** branches `T` and `S` fire whenever an intervened arm lands within `FLOOR_BAND` of the in-batch `k01` while its twin does not, and then **no account is supported**.
+
+**RULE 21 margin 32 s** (`11dbcc0` epoch 1788850544 → earliest Submit 1788850576; 317 s from the registration commit `2cb2783`), the conservative figure. **RULE 20 pre-submission: 18/18 composed lines PASS through UNEDITED `argsline_guard.py`, no repeated flag, 18 distinct run-names. POST-LAUNCH COVERAGE IS NOT YET FULL — all 18 are PENDING behind the two sibling batches — SO NO NUMBER FROM `crn1` MAY BE QUOTED.** **RULE 16:** `git diff` over `analysis/` is **additions only**; scorer `--selftest` **142/142 PASS, exit 0**, sha256 `1d1e4fa8…9bfb4898`. `tests/test_rednorm.py` **ALL PASS on the LIVE pre/post pair**; the composite stack was verified too (stripping the three `PATCH_REDNORM` regions reproduces `HF.py.pre_rednorm` byte for byte, 54,124 bytes, and `test_namesets.py` on `pre_namesets → pre_rednorm` is ALL CHECKS PASSED).
+
+**TWO SENTINELS WILL TRIP LATER, RECORDED NOW (169.9):** `cru1` uses seeds {15,16,17} too, so `--selftest` J's *"zero foreign rows carry seed 15/16/17"* (0 at registration) will read non-zero once `cru1` lands — an assertion about the rest of the corpus, **to be LEFT UNFIXED under RULE 16**; and `SIGMA_100`/the level anchors may move under a foreign ingest. Every premise is invariant under **`crn1`'s own** ingest, which is what was claimed and checked.
+
+**SCOPE:** 100 epochs; `m = 1` and cut positions 49/50 only; nothing about `layerwise`/`nodewise`/`weightwise`/`chunk*`/`permnode*` (inert by construction); **no claim that either weighting is a better optimizer** — the chain rule gives the unnormalised sum, so `tn:` is deliberately the wrong gradient and is a mechanism probe; no test of `152.12` rival (c); **RULE 11 open** (single shared `ms = 1e-3`).
+
+
 ## CYCLE 140 — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
 
 **`FINAL: CONTIGUITY-OPERATIVE | INTERACTION-ABSENT | COARSE-MASS-REFUTED-AT-EXACT-MATCH | KC-REPLICATES`** (scorer `cW1_cpg1_score.py` `939ba875…c7755b16`, UNEDITED, exit 0; `--selftest` **137/137 PASS**).
