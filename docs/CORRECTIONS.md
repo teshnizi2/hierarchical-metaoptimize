@@ -19606,3 +19606,518 @@ results that never depended on the batch landing.
 2. **No job this campaign did not submit was touched, on either account.**  `alice`'s queue was
    **empty** when the `.out` files were pulled; **`cru1` on `alice2` was neither queried for control
    nor modified, and none of its rows was ingested** (0 before, 0 after).
+
+## 174. `cru1` LANDS, IS INGESTED AND IS SCORED BY ITS REGISTERED SCORER — **`FINAL: 1e-3:GAP-SHRINKS | 1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE | ALIAS-BROKEN`.**  RULE 11 IS **CLOSED** FOR `scalar`-vs-`layerwise` ON CIFAR-100/`ResNet18_c100` AT 100 EPOCHS, AND THE ANSWER IS THAT **THE GAP SURVIVES TUNING**: `+47.4607 → +35.2907 pp`, `RATIO 0.7436`, `ACCOUNT T SUPPORTED / ACCOUNT D REFUTED`.  **`hz9` IS NOT OVERTURNED — IT WAS NOT TESTED**: different dataset, different contrast, and a gap **41× smaller**.  THE NEGATIVE CONTROL **`F` FAILS AT `alpha0=1e-3`**, WHICH IS THE MOST CONSEQUENTIAL RESULT IN THE BATCH.  THE CORPUS STANDS AT **2,740 ROWS**
+
+### 174.1 THE DESIGN, AND WHAT IT WAS FOR
+
+`cru1` exists because **RULE 11 — compare tuned arms at their own optima — was OPEN on the exact
+cell every recent headline comes from**, and because `160` measured that on CIFAR-100 the
+meta-stepsize axis was **perfectly aliased** with `alpha0`.  `168` established that the alias is
+**mechanically forced**, not a scheduling accident: in `HF.Lion_meta_update` the meta step is
+`beta[i] = (1-ms*wd_meta)*beta[i] - ms*sign(...)` and every `cru1` job passes
+`--weight-decay-meta 0`, so `|dbeta| = ms` **exactly**, once per minibatch.  With 100 epochs ×
+500 minibatches, `TRAVEL = 50000*ms` bounds the total distance `beta` can move, whatever the loss
+surface does.  A ladder in `ms` alone therefore **cannot** break the alias; `cru1` crosses both axes.
+
+**60 jobs, ONE submission, `alice2`.**  CIFAR-100 / `ResNet18_c100` / `SGDm`+`Lion` / 100 epochs /
+batch 100 / `AUGMENT=1` / `BETA_CLIP -15:-2.3026` / `gamma 1` / `hier` unset / `PROBE=100`,
+seeds `{15,16,17}`.  Arms `sc = scalar` (m=1) and `lay = layerwise` (m=62).  Two ladders:
+
+* **LADDER A**, `alpha0 = 1e-3`, `ms ∈ {1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3}` (6 rungs)
+* **LADDER B**, `alpha0 = 1e-6`, `ms ∈ {1e-4, 3e-4, 1e-3, 3e-3}` (4 rungs)
+
+crossing at the **four common `ms` levels** `{1e-4, 3e-4, 1e-3, 3e-3}`.  `resnet18_blocks` and the
+`k49` cut-position arm were **dropped in advance** to buy bracketing rather than arms; the cost is
+registered and binding (174.9).
+
+### 174.2 GATES, RE-DERIVED THIS CYCLE FROM THIS CYCLE'S OWN RUNS
+
+**THE DOCUMENTED INVOCATION**, run on `alice2` against the registration-time corpus:
+
+```
+cd /home/s5014158/metaopt/hmo-cru1 && python3 analysis/cY1_cru1_score.py /home/s5014158/metaopt/runs
+```
+
+* **`G1` PASS (60/60 usable).**  60 `.out` matching `cru1-*`, **0 unparseable names**; `RUN_DONE`
+  60/60; 100 epochs 60/60; `plateau5` computable 60/60; **tracebacks 0**; **runs with a repeated
+  flag 0**; **non-axis `ARGS` flags that VARY: NONE**; **name-vs-`ARGS` mismatches 0**.
+* **`G2` `ALIAS-BROKEN`.**  All four crossed `ms` levels are present at **both** `alpha0` for
+  **both** arms at **3/3 seeds**.  Realised: `1e-3 → {1e-5,3e-5,1e-4,3e-4,1e-3,3e-3}`,
+  `1e-6 → {1e-4,3e-4,1e-3,3e-3}`.
+* **`SIGMA`.**  registered **0.613640**, in-batch **0.423030** (df 40), **USED 0.613640** under the
+  registered `max(SIGMA_W, sigma_in_batch)` rule.  `SE_CELL 0.354285` · `SE_GAP 0.501035` ·
+  `SE_DGAP 0.708570` · **BARS 1.002070 / 1.417141**.
+* **RULE 20, CLOSED AT FULL COVERAGE.**  Guard **UNEDITED**, `sha256 81cea8b586e124a6…`, run this
+  cycle with the batch's four declared axes supplied as documented `--vary` arguments
+  (`--vary meta-stepsize --vary alpha0 --vary stepsize-groups --vary seed --vary run-name
+  --vary save-directory`): **`60 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an
+  ARGS line`, `VERDICT: PASS`**, and **`batch-consistency: every non-axis flag is identical across
+  60 runs`**.
+* **ENV audit.**  **Exactly 1 distinct `ENV:` line** across all 60 runs modulo the per-run
+  `PROBE_DIR`: `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default
+  COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100
+  EB_RHO=na EB_LOG=0`.
+* **RULE 21, re-derived independently, not quoted.**  `cY1_cru1_score.py` first appears at
+  `180755cd10b08aeebda2259660407911571b1a9e`, committer date **2026-09-08T08:33:38+02:00**; the
+  earliest `cru1` `sacct` Submit is **2026-09-08T08:36:51**.  **Margin = 193 s.**
+  `argsline_guard.py` was last touched **2026-09-02T18:29:33+02:00**, six days earlier.
+* **RULE 16.**  `git diff -- analysis/` **EMPTY**.  Scorer `sha256 0de0604ca5995335…`, **identical
+  on Mac and `alice2`**, `git status` clean on both.
+
+### 174.3 THE LADDER — `plateau5` PRIMARY, TRAIN ALONGSIDE, PER-SEED
+
+`plateau5` is PRIMARY throughout; the CSV `plateau` column is BANNED as primary and `best_test` is
+not a plateau.  Per-seed values are the raw `.out` series, re-derived independently of the scorer
+and agreeing with it to the last printed digit.
+
+**LADDER A — `alpha0 = 1e-3`**
+
+| `ms` | TRAVEL | `sc` p5 | `sc` per-seed 15/16/17 | `sc` tr5 | `lay` p5 | `lay` per-seed 15/16/17 | `lay` tr5 | gap (SE) | reach |
+|---|---|---|---|---|---|---|---|---|---|
+| `1e-5` | 0.5 | 24.7147 | 24.85 / 24.09 / 25.20 | 25.33 | 32.3207 | 32.35 / 32.94 / 31.68 | 33.81 | **+7.6060** (+15.2) | `FROZEN` |
+| `3e-5` | 1.5 | 28.9507 | 28.97 / 29.36 / 28.52 | 30.24 | 53.5940 | 53.60 / 54.01 / 53.17 | 61.73 | **+24.6433** (+49.2) | `FROZEN` |
+| `1e-4` | 5.0 | **35.7920** | 35.83 / 35.62 / 35.93 | 39.20 | **71.0827** | 70.68 / 71.55 / 71.01 | 97.48 | **+35.2907** (+70.4) | `ADEQUATE` |
+| `3e-4` | 15.0 | 29.7820 | 29.95 / 29.90 / 29.49 | 30.79 | 70.1927 | 69.66 / 70.34 / 70.58 | 99.00 | **+40.4107** (+80.7) | `FREE` |
+| `1e-3` | 50.0 | 22.3787 | 23.13 / 22.03 / 21.97 | 22.44 | 69.8393 | 69.48 / 69.94 / 70.10 | 99.23 | **+47.4607** (+94.7) | `FREE` |
+| `3e-3` | 150.0 | 16.3547 | 16.59 / 16.33 / 16.14 | 16.53 | 69.8560 | 69.70 / 70.20 / 69.67 | 99.71 | **+53.5013** (+106.8) | `FREE` |
+
+**LADDER B — `alpha0 = 1e-6`**
+
+| `ms` | TRAVEL | `sc` p5 | `sc` per-seed 15/16/17 | `sc` tr5 | `lay` p5 | `lay` per-seed 15/16/17 | `lay` tr5 | gap (SE) | reach |
+|---|---|---|---|---|---|---|---|---|---|
+| `1e-4` | 5.0 | 10.5467 | 10.76 / 10.29 / 10.59 | 10.17 | 10.9573 | 11.20 / 10.73 / 10.94 | 10.53 | **+0.4107** (+0.8) | `FROZEN` |
+| `3e-4` | 15.0 | **28.6340** | 28.61 / 29.11 / 28.19 | 29.21 | 68.2927 | 67.82 / 68.59 / 68.47 | 91.23 | **+39.6587** (+79.2) | `ADEQUATE` |
+| `1e-3` | 50.0 | 23.0020 | 23.74 / 22.52 / 22.75 | 22.85 | 69.5507 | 68.96 / 69.88 / 69.82 | 98.92 | **+46.5487** (+92.9) | `FREE` |
+| `3e-3` | 150.0 | 16.8087 | 17.10 / 16.85 / 16.48 | 17.05 | **69.6100** | 69.37 / 69.64 / 69.81 | 99.44 | **+52.8013** (+105.4) | `FREE` |
+
+`reach` is pure arithmetic off `|dbeta| = ms`: `r = TRAVEL / D_up` with `D_up = -2.3026 - ln(alpha0)`;
+`r < 0.5` `FROZEN`, `< 1` `STARVED`, `< 3` `ADEQUATE`, else `FREE`.
+
+### 174.4 THE VERDICT, VERBATIM
+
+```
+FINAL: 1e-3:GAP-SHRINKS | 1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE | ALIAS-BROKEN
+  stamps a0=1e-3: MONOTONE-IN-TRAVEL, F-FAILS
+  stamps a0=1e-6: MONOTONE-IN-TRAVEL, F-HOLDS
+```
+
+**`alpha0 = 1e-3`** — `G_shared` (`ms=1e-3`, the rung every headline uses) **`+47.4607 pp`
+(+94.73 SE)**; corpus reference with `cru1` excluded `+47.0345`.  `argmax_ms(sc) = 1e-4` at
+**35.7920** (`ADEQUATE`); `argmax_ms(lay) = 1e-4` at **71.0827** (`ADEQUATE`).
+**`G_tuned = +35.2907 pp` (+70.44 SE)**; **`G_shared - G_tuned = +12.1700 pp` (+17.18 SE_DGAP)**;
+**`RATIO = 0.7436`** against Account T's registered `>= 0.50`.
+**`ACCOUNT T SUPPORTED | ACCOUNT D REFUTED`.  BRANCH: `GAP-SHRINKS`.**
+
+**`alpha0 = 1e-6`** — `G_shared` **`+46.5487 pp`** (+92.91 SE); corpus reference `+46.7364`.
+`argmax_ms(sc) = 3e-4` at **28.6340** (`ADEQUATE`); `argmax_ms(lay) = 3e-3` at **69.6100** (`FREE`)
+— **a non-frozen endpoint of its own ladder**, which fires `E1`.
+`G_tuned = +40.9760` (+81.78 SE); `G_shared - G_tuned = +5.5727` (+7.86 SE_DGAP);
+`RATIO = 0.8803`.  **`ACCOUNT T SUPPORTED | ACCOUNT D REFUTED`.
+BRANCH: `UNRESOLVED-OPTIMUM-AT-LADDER-EDGE` — NO tuned comparison may be claimed at this `alpha0`.**
+
+The `alpha0=1e-6` numbers are printed because the scorer prints them; **they carry no tuned
+comparison**, by the scorer's own precedence.  Ladder B's job in the record is `G2` (breaking the
+alias) and the `F-HOLDS` stamp, not a RULE 11 answer.
+
+### 174.5 ATTACK 1 — **THE GAP GENUINELY SURVIVES TUNING, AND `GAP-SHRINKS` IS THE CORRECT TOKEN BUT NOT THE CORRECT SENTENCE**
+
+Both `alpha0=1e-3` optima are **interior** rungs of the ladder, so a tuned comparison is licensed:
+
+| arm | argmax | lower neighbour | separation | upper neighbour | separation |
+|---|---|---|---|---|---|
+| `sc` | `1e-4` (35.7920) | `3e-5` 28.9507 | **+6.8413 pp = 13.65 SE_GAP** | `3e-4` 29.7820 | **+6.0100 pp = 12.00 SE_GAP** |
+| `lay` | `1e-4` (71.0827) | `3e-5` 53.5940 | **+17.4887 pp = 34.91 SE_GAP** | `3e-4` 70.1927 | **+0.8900 pp = 1.78 SE_GAP** |
+
+**`scalar`'s optimum is bracketed on both sides at ≥ 12 SE — it is not in doubt.  `layerwise`'s is
+bracketed on both sides but its UPPER separation, 1.78 SE_GAP, is INSIDE the 2·SE bar (1.0021 pp),
+so `layerwise`'s argmax is NOT statistically resolved**: rungs `1e-4`, `3e-4`, `1e-3` and `3e-3`
+form a **four-rung plateau spanning only 1.24 pp**.  This is the one weak point in the batch and it
+is recorded as such.  **It does not move the branch.**  Re-derived over every member of that
+plateau, against `scalar`'s own optimum 35.7920:
+
+| assumed `lay` optimum | `G_tuned` | `G_shared - G_tuned` | `RATIO` | branch |
+|---|---|---|---|---|
+| `1e-4` (the argmax) | +35.2907 | +12.1699 (17.18 SE) | 0.7436 | `GAP-SHRINKS` |
+| `3e-4` | +34.4007 | +13.0599 (18.43 SE) | 0.7248 | `GAP-SHRINKS` |
+| `1e-3` | +34.0473 | +13.4133 (18.93 SE) | 0.7174 | `GAP-SHRINKS` |
+| `3e-3` | +34.0640 | +13.3966 (18.91 SE) | 0.7177 | `GAP-SHRINKS` |
+
+**The branch is `GAP-SHRINKS` under every choice, `RATIO` never leaves `[0.717, 0.744]`, and Account
+T's `>= 0.50` is met with ≥ 43 % headroom in all four.**
+
+**THE HONEST READING.**  The registered branch names are **mutually exclusive**, and `B3
+GAP-SHRINKS` fires because `G_shared - G_tuned = 12.1700 > BAR_DGAP = 1.417141` **while**
+`G_tuned = 35.2907 > BAR_GAP = 1.002070`.  `B4 GAP-SURVIVES-TUNING` is the branch for a gap whose
+shrink is **not** resolvable, and this shrink is resolvable at **17.18 SE**.  So the token is
+correct.  **But the token alone misreads the result.**  The entitled sentence is:
+
+> **At its own optimum each arm is still separated by `+35.2907 pp` = `+70.44 SE_GAP`; per-arm
+> tuning removes `12.1700 pp` = **25.6 %** of the shared-`ms` gap and leaves **74.4 %** standing.**
+
+`GAP-SHRINKS` must never be quoted as "the gap goes away", "the gap is a tuning artefact", or
+"the granularity effect does not survive RULE 11".  All three are refuted by this batch at ≥ 70 SE.
+
+### 174.6 ATTACK 2 — **`hz9` IS NOT OVERTURNED.  IT WAS NOT TESTED.**
+
+`hz9` was re-scored this cycle by its own registered scorer (`python3 analysis/c72_hz9_score.py
+--score`), and its numbers re-derive exactly:
+
+* `H2`, the **fixed-`ms` cell**, paired within seed at `ms=1e-3`: seed 3 `+1.094`, seed 4 `+1.182`,
+  **paired mean `+1.138 pp`, 2/2 favouring `nodewise`** — registered expectation `+1.0 .. +2.0` and
+  2/2, **MET**.
+* `H1b`, the **level at each arm's own `ms`**: `node@3e-4` `92.450 ± 0.136` (n=5) vs `lay@1e-4`
+  `92.811 ± 0.075` (n=5), **level `-0.360`, se `0.155`, `|level|/se = 2.32`**, against a registered
+  `±0.50` bar ⇒ **`TIED`**.
+
+**THE THREE DIFFERENCES THAT MAKE `cru1` NOT A TEST OF `hz9`:**
+
+1. **DIFFERENT DATASET AND NETWORK.**  `hz9` is **CIFAR-10 / `ResNet18`** (all nine rows, verified
+   in the corpus).  `cru1` is **CIFAR-100 / `ResNet18_c100`**.
+2. **DIFFERENT CONTRAST.**  `hz9` is **`nodewise` vs `layerwise`** — two *fine* partitions.  `cru1`
+   is **`scalar` (m=1) vs `layerwise` (m=62)** — the *coarsest possible* partition against a fine
+   one.  Neither arm of `hz9` is `scalar`; neither contrast contains the other.
+3. **THE GAPS DIFFER BY 41×.**  `hz9`'s shared-`ms` gap is **`+1.138 pp`**; `cru1`'s is
+   **`+47.4607 pp`** — a factor of **41.7**.
+
+**THE ASYMMETRY MUST BE STATED PLAINLY, BECAUSE IT CUTS AGAINST THIS BATCH.**  A **~1 pp gap
+reversing sign** under tuning is a strong result: it says the shared-`ms` comparison was measuring
+the wrong thing entirely.  A **~47 pp gap retaining ~74 % of its magnitude** under tuning is a much
+**weaker** result: a gap that large has enormous room to shrink and still dominate every bar in
+sight.  **`cru1` does not overturn `hz9`, does not weaken it, and does not bear on it.**  The
+campaign's standing lesson from `102.5` — *a granularity contrast at one shared meta-stepsize is
+confounded with which meta-stepsize that partition prefers* — **stands entirely unamended.**  What
+`cru1` adds is a **second, disjoint data point**: that confound is real and measurable here too
+(12.17 pp of it), but at this cell it is **not large enough to change the conclusion's sign**.
+
+**AND NOTE WHAT `hz9`'s OWN VERDICT WAS.**  `H1b` returned **`TIED`**, not "reversed": the `-0.360`
+point estimate is *inside* the registered `±0.50` bar.  Any future prose contrasting the two batches
+must say **`+1.138` shared → `TIED` (point estimate `-0.360`) tuned**, not "reverses".
+
+### 174.7 ATTACK 3 — **THE SHRINK IS ENTIRELY A `scalar` STORY, AND THE PROBE SAYS WHY**
+
+Decomposed at `alpha0=1e-3` (`shrink = Δ_scalar − Δ_layerwise` identically):
+
+| arm | shared `ms=1e-3` | tuned `ms=1e-4` | Δ | in SE_GAP |
+|---|---|---|---|---|
+| `sc` | 22.3787 | 35.7920 | **+13.4133** | +26.77 |
+| `lay` | 69.8393 | 71.0827 | **+1.2434** | +2.48 |
+| | | **shrink** | **12.1699** | (scorer prints 12.1700) |
+
+**`scalar` supplies 110.2 % of the shrink; `layerwise` supplies −10.2 %** — `layerwise`'s own gain
+works *against* the shrink.  At `alpha0=1e-6` the same decomposition is `+5.6320` / `+0.0593` →
+`5.5727`, i.e. **`layerwise` moves 0.0593 pp across its entire four-rung ladder.**  *"Tuning
+narrows the granularity gap"* is, at this cell, **exactly and only** *"tuning rescues the `scalar`
+arm from a bad meta-stepsize."*
+
+**WHAT `FROZEN` MEANS, READ OFF THE SCORER.**  `reach()` computes `r = TRAVEL / D_up`; `r < 0.5` is
+`FROZEN`.  At `alpha0=1e-3`, `D_up = 4.6052`, so `ms=1e-5` gives `r = 0.109` and `ms=3e-5` gives
+`r = 0.326`: `beta` cannot travel even half the distance to the clip ceiling, and `alpha` is
+confined to a narrow band around `alpha0`.
+
+**DOES A `FROZEN` LOWER NEIGHBOUR WEAKEN `scalar`'s BRACKETING?  NO — AND THE REGISTRATION SAYS SO
+IN ADVANCE.**  `E0`'s registered rationale is that *the rungs below a frozen rung are mechanically
+identical* — as `ms → 0` the arm converges to a **fixed** step size `alpha0`, monotonically — so
+there is nothing left to bracket below.  The data agree: `scalar` rises **monotonically**
+`24.7147 → 28.9507 → 35.7920` across `1e-5 → 3e-5 → 1e-4`, with `TRAVEL` shrinking at each step
+down.  The lower bracket is real and, if anything, conservative.  **`E0` correctly does not fire:
+neither argmax at `alpha0=1e-3` is itself `FROZEN`.**
+
+**THE MECHANISM, MEASURED — `cY2_cru1_probe.py`, 60/60 probe files, 500 records each, last step
+49,900.**  (Successor reader; `cY1`'s own probe section reads a key the live probe never writes and
+correctly degrades to its registered `SKIP`.  `cY1` **NOT** edited — RULE 16.)
+
+| arm | `ms` | `a0` | reach | beta min | `frac@lo` | `|beta-beta0|` |
+|---|---|---|---|---|---|---|
+| `sc` | `1e-3` | `1e-3` | `FREE` | −15.0000 | **0.7620** | 8.0922 |
+| `sc` | `1e-4` | `1e-3` | `ADEQUATE` | −10.8578 | **0.0000** | 3.9501 |
+| `lay` | `1e-3` | `1e-3` | `FREE` | −15.0000 | 0.8267 | 8.0922 |
+| `lay` | `1e-4` | `1e-3` | `ADEQUATE` | −11.8494 | **0.0000** | 4.9417 |
+
+**Account D's mechanism is CONFIRMED and is the whole of `scalar`'s gain.**  At the shared rung
+`scalar`'s single `beta` sits on the `-15` clamp floor in **76.2 %** of probe records; at its
+optimum `ms=1e-4` it **never touches the floor** (`frac@lo = 0.0000`).  **But D's PREDICTION is
+refuted**: removing the pinning buys `scalar` **+13.41 pp**, not the ~47 pp D needs, so `RATIO`
+lands at 0.7436 instead of D's registered `<= 0.50`.  **D names a real mechanism that accounts for
+~26 % of the gap.**
+
+**`frac@lo` IS NOT COMPARABLE ACROSS ARMS AND MUST NOT BE QUOTED AS IF IT WERE** — for `sc` it is
+"the one and only coordinate is pinned", for `lay` it is "**at least one of 62** coordinates is
+pinned".  This is exactly the distinction `155` drew on CIFAR-10 (31.8 % occupancy for scalar vs
+5.5 % *coordinate*-occupancy for layerwise).  The successor probe reports occupancy of the former
+kind only.
+
+### 174.8 **`F-FAILS` — THE MOST CONSEQUENTIAL RESULT IN THE BATCH, AND IT WAS REGISTERED AS SUCH**
+
+Account **F** (`GRANULARITY-INOPERATIVE-AT-FROZEN`) is the batch's registered **negative control**:
+at `TRAVEL/D_up < 0.5` — rungs `1e-5` and `3e-5` at `alpha0=1e-3` — `beta` is confined near `beta0`,
+both arms are within a factor of a few of a **fixed** `alpha0=1e-3`, and F predicts
+**`|gap| <= 2·SE_GAP = 1.0021 pp`**.  On CIFAR-10 at the comparable frozen rungs the measured gaps
+are `+0.004` and `+0.027` pp: **F had a precedent.**
+
+**OBSERVED: `+7.6060 pp` (15.2 SE) at `ms=1e-5` and `+24.6433 pp` (49.2 SE) at `ms=3e-5`** —
+**7.6× and 24.6× the bar.**  `F-FAILS`.
+
+The registration states the consequence in advance: *"IF F FAILS — if a large gap survives where
+beta cannot move — then the gap is NOT a step-size-adaptation phenomenon at all and BOTH T and D are
+incomplete."*  **That is now the measured state, and it is recorded as the batch's strongest
+finding.**
+
+**THE PROBE SHOWS WHERE F's PREMISE BREAKS, AND IT IS A PREMISE ERROR, NOT A MEASUREMENT ERROR.**
+F assumed that a `beta` confined to a narrow **absolute** band leaves granularity "almost nothing to
+act on".  The probe shows the band is narrow while the **relative differentiation across groups is
+near-maximal**.  At `ms=3e-5`, `alpha0=1e-3` (`beta0 = -6.9078`):
+
+* `lay` reaches `beta_min ≈ -8.385` and `beta_max ≈ -5.409` — a **simultaneous spread of ≈ 2.98 in
+  log-space, a ≈ 19.6× ratio between the largest and smallest per-layer step size** — while its
+  displacement `|beta-beta0| = 1.4991` is **99.9 % of the arithmetic maximum `TRAVEL = 1.5`.**
+* `sc` has **one** coordinate: its `[-8.025, -6.723]` range is a *trajectory over time*, not a
+  spread across the network, and its displacement `1.1117` is only **74 %** of `TRAVEL`.
+
+So at a `FROZEN` rung `layerwise` still differentiates step sizes across the network by ~20×, and
+`scalar` **structurally cannot**.  **Granularity is about relative differentiation across
+coordinates, not about the absolute range `beta` can reach** — which is why freezing `TRAVEL` does
+not disable it.  **This interpretation is MECHANISM EVIDENCE, not a scored branch**: the probe
+carries no bar and can never overturn `cY1`'s verdict.  What is *measured* is the spread and the
+displacement fraction; what is *inferred* is that the spread is the operative variable.
+
+### 174.9 ATTACK 4 — **PREDICTOR `X` IS REFUTED, AND IT IS A FINDING, BUT A NARROWER ONE THAN "CIFAR-10 DOES NOT TRANSFER"**
+
+`X` is a **CIFAR-10 → CIFAR-100 error-ratio transfer**: `R(arm) = mean over alpha0 of
+(100 − C100(arm, ms=1e-3, a0)) / (100 − C10(arm, ms=1e-3, a0))`, then
+`pred = 100 − R·(100 − C10(rung))`.  The scorer reports **mean `-7.277` pp, `|max| 37.206` over 14
+cells**.
+
+**THE 14 CELLS ARE NOT 14 TESTS.  `R` IS FITTED AT `ms=1e-3`, SO THE FOUR `ms=1e-3` CELLS ARE A
+CALIBRATION IDENTITY:**
+
+| cells | n | mean resid | `|max|` |
+|---|---|---|---|
+| all, as printed | 14 | **−7.277** | 37.206 |
+| **calibration** (`ms=1e-3`, both arms × both `alpha0`) | 4 | **+0.076** | **0.494** |
+| **out-of-sample** — the only cells that TEST `X` | **10** | **−10.219** | **37.206** |
+
+**7 of the 10 out-of-sample residuals are negative: `X` systematically OVER-predicts CIFAR-100.**
+
+**THE FAILURE IS STRUCTURED, NOT RANDOM.**  The live error ratio `err(C100)/err(C10)` is not
+constant along `ms`; it **inflates as `ms` falls below the calibration rung**:
+
+| arm | `R` fitted | `1e-3` | `3e-4` | `1e-4` | `3e-5` | `1e-5` |
+|---|---|---|---|---|---|---|
+| `lay` | 3.4074 | 3.432 | 3.716 | 4.065 | 5.708 | **7.568 (2.22×)** |
+| `sc` | 6.3780 | 6.384 | 6.243 | 8.298 | 8.531 | **8.217 (1.29×)** |
+
+`layerwise` inflates **monotonically**; `scalar` steps to a **second level** (~8.3) across the three
+low rungs.
+
+**THE PRECISE FINDING, AND ITS LIMITS.**
+
+> **Entitled:** *A CIFAR-10 → CIFAR-100 error-ratio transfer calibrated at `ms=1e-3` does **not**
+> extrapolate along the meta-stepsize axis.  The error ratio is itself a function of `ms`, inflating
+> by up to **2.22×** (`layerwise`) and **1.29×** (`scalar`) as `ms` falls three decades, so CIFAR-100
+> degrades **super-proportionally** to CIFAR-10 when the meta-optimiser is starved of travel.  Over
+> the ten out-of-sample cells the model's mean error is `-10.219 pp` and its worst is `37.206 pp`,
+> inside its own declared-valid domain (`C10 >= 85`).*
+
+> **NOT entitled:** *"CIFAR-10 behaviour does not transfer to CIFAR-100."*  `X` reproduces its
+> calibration rung to `|max| 0.494 pp` **by construction**, and is within `2.5 pp` at the adjacent
+> rung `3e-4/a0=1e-3` for both arms.  The refutation is of the **`ms`-invariance of the error
+> ratio**, i.e. of this model's functional form, **not** of cross-dataset transfer in general.  It is
+> **not** an artefact of matching hyperparameters across datasets — the residuals are ordered by
+> distance from the calibration rung, which random mismatch would not produce.
+
+**THE PIVOTAL CELL.**  `layerwise @ ms=1e-4 / alpha0=1e-3`: **observed 71.0827**; `X` said
+**75.761**; `Y` (corpus-internal: at least `layerwise`'s own `ms=1e-3` level, at most the corpus
+best) said **[69.594, 72.408]**.  **`Y` wins.**  `X` predicted a value **3.35 pp above the corpus
+best CIFAR-100 `plateau5` that exists (72.408)** — it forecast a new corpus record that did not
+occur.  The observed value **does not exceed** the corpus best.
+
+### 174.10 ATTACK 5 — **NO BATCH EFFECT.  `cru1` REPRODUCES THE CAMPAIGN'S STANDARD CELL TO WITHIN 0.6 SE ON ALL FOUR ARMS.**
+
+At the standard cell `ms=1e-3` (corpus computed with `cru1` excluded, which is the state at scoring
+time), residual SE computed as `SIGMA_W·sqrt(1/3 + 1/n)`:
+
+| arm | `a0` | corpus | n / batches | `cru1` | residual | in SE |
+|---|---|---|---|---|---|---|
+| `sc` | `1e-3` | 22.5600 | 5 / 2 | 22.3787 | −0.1813 | **−0.40** |
+| `lay` | `1e-3` | 69.5945 | 8 / 3 | 69.8393 | +0.2448 | **+0.59** |
+| `sc` | `1e-6` | 22.8170 | 26 / 9 | 23.0020 | +0.1850 | **+0.49** |
+| `lay` | `1e-6` | 69.5321 | 20 / 7 | 69.5507 | +0.0186 | **+0.05** |
+
+and on the gap itself: `a0=1e-3` corpus `+47.0345` vs `cru1` `+47.4606`, residual **+0.70 SE**;
+`a0=1e-6` corpus `+46.7151` vs `cru1` `+46.5487`, residual **−0.31 SE**.  The `1e-6` rows are
+matched against **nine** and **seven** prior batches respectively.  **Nothing in this batch is a
+batch effect; every number above may be believed on the same terms as the rest of the corpus.**
+
+### 174.11 THE INGEST
+
+* `rsync` of the 60 `cru1-*.out` from `alice2` into `../runs_alice2`, then
+  `python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` **to STDOUT,
+  redirected into the corpus itself** (`146.7`: redirecting to a log leaves the corpus untouched and
+  makes a "0 rows changed" check pass **vacuously**), then `python3 analysis/args_repair.py --apply`.
+* **Keyed on `(run, job_id)` against the pre-ingest snapshot: ADDED 60 · CHANGED 0 · REMOVED 0.**
+  All 60 added rows carry the `cru1-` prefix; field list identical before and after.
+  **Corpus 2,680 → 2,740.**
+* `args_repair --apply` touched **36 rows**, all the standing `dup_group` re-tagging, **0
+  accuracy/config values, 0 `superseded` flags** — and **net-zero against the pre-ingest CSV**,
+  which is why `CHANGED` is 0.
+* All 60 rows: `complete=1`, `window_ok=1`, `epochs_done=100`, `epochs_requested=100`,
+  `collapsed=0`, `superseded=0`; 30 `scalar` / 30 `layerwise`; 36 at `alpha0=1e-3` / 24 at `1e-6`;
+  20 per seed.  **`cru1` cost 39.2000 GPU-h** (60 jobs, ingested `wallclock_min`).
+* `aggregate.py` reported its three standing duplicate run-names (`a0-blk6-1e4_s0`,
+  `a0-layer-1e4_s0`, `a0-scal-1e4_s0`); unchanged, pre-existing, `superseded` handled.
+
+### 174.12 THE FULL PRE- AND POST-INGEST `--selftest` SWEEP — **17 DRIFTERS, ONE EXIT CODE MOVED, AND NO VERDICT MOVED**
+
+**99** files under `analysis/` carrying `--selftest` were run **before** and **after** the ingest and
+diffed.  Exits **63 PASS / 36 FAIL → 62 / 37**.
+
+**EXACTLY ONE EXIT CODE MOVED: `cX1_crn1_score.py` 0 → 1** (142 PASS/0 FAIL → 137/5).  All five
+failures are `cru1`'s own ingest moving `crn1`'s frozen corpus anchors:
+`L_FLOOR 22.795652 (n=23, 8) → 22.819462 (n=26, 9)`;
+`L_CEIL 69.532100 (n=20, 7) → 69.534522 (n=23, 8)`;
+and section J `ZERO foreign rows anywhere in the corpus carry seed 15, 16 or 17 → 60`.
+
+**17 stdout drifters**, every one corpus-census drift of the same two kinds — row counts
+(`2680 → 2740`) and the standard-cell `scalar`/`layerwise` anchors gaining `cru1`'s three rows each
+(`ARCH_SCAL 22.817 → 22.836`, `ARCH_LAY 69.5321 → 69.5345`, `SIGMA_W 0.7832/df 127 → 0.7779/df 131`,
+`cdn1` `m=1` floor `22.750 → 23.201`, `cU1` `SIGMA_W 0.534570 → 0.537049`):
+`c68_window_blast`, `c69_c100_armset`, `c69_orphan_census`, `c70_composition_audit`, `cH1_hb1_score`,
+`cI1_in489g1_score`, `cI2_in489g2_score`, `cJ1_cbl1_score`, `cK1_cpk1_score`, `cL1_cts1_score`,
+`cR1_cpk2_score`, `cU1_alpha0_granularity_score`, `cW1_cpg1_score`, `cX1_crn1_score`,
+`cY1_cru1_score`, `cZ1_conv1_prefix_step`, `cdn1_denominator_score`.
+
+**Three checks moved FAIL → PASS** and are recorded so they are not mistaken for regressions:
+`c68_window_blast` `T12` (`raw_only=60 → 0` — the 60 `.out` on disk are now in the CSV, which is
+precisely what the ingest was for) and `cK1_cpk1_score`'s `ARCH_GAP` / `MANIFOLD_BAR` (the live gap
+moved **toward** `cK1`'s frozen literal).
+
+**VERDICT STABILITY, DEMONSTRATED NOT ASSERTED.**  Every drifter was re-run under **both** CSVs — the
+post-ingest corpus and a shadow tree holding the pre-ingest snapshot — with its documented
+invocation, and the outputs diffed:
+
+* **`cX1_crn1_score.py ../runs` is byte-identical under both CSVs (exit 0).  `crn1`'s
+  `FINAL: COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED` does NOT move.**
+* `cU1_alpha0_granularity_score.py`:
+  **`FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE
+  | PREMISE CENSUS-CHANGED`** — identical.
+* `cZ1_conv1_prefix_step.py`: **`FINAL: CONV2-NOT-PRIVILEGED`** — identical.
+* `cW1_cpg1_score.py ../runs_alice2`: **`FINAL: UNRESOLVED-NOT-COMPARABLE`** — identical.
+* `c70_composition_audit.py --report`: **`G4 VERDICT: LOCALISED`**, **`G5 VERDICT: MATERIAL`** —
+  identical.
+* `cH1`, `cJ1`, `cK1`, `cL1`, `cR1`, `cI1`, `cI2`: byte-identical under both CSVs.
+* `cdn1_denominator_score.py` **crashes identically under both CSVs**, as `171` recorded; left
+  unedited under RULE 16.
+
+**`cY1_cru1_score.py` is invariant under its own ingest by design** — every corpus reader in it
+excludes `cru1-` rows — and this is confirmed: **47 PASS / 11 FAIL before, 46 / 11 after**, the only
+change being `H5`'s RULE-21 own-row gate correctly reporting `[INFO] NOT APPLICABLE — 60 cru1- rows
+are already in the corpus (post-ingest run)` instead of passing.  **The scoring path is identical on
+`alice2` (registration-time corpus) and on the Mac post-ingest**, `FINAL` line for `FINAL` line.
+
+**A NOTE ON `cY1 --selftest` ITSELF, WHICH MUST NOT BE MISREAD.**  On `alice2`, against the corpus as
+it stood at registration (2,638 data rows), `cY1 --selftest` is **58 PASS / 0 FAIL**.  On the Mac it
+is 47/11 **before `cru1` was ingested at all** — every one of the 11 caused by `cdn1` (24 rows) and
+`crn1` (18 rows) landing **after** `cY1` was frozen: `A1` (a blank `ms` level now exists — `cdn1`'s
+non-meta baseline), `C1`/`C2` (corpus best is now `cdn1-h2-s0` at **78.9860**, a **tuned plain SGD**
+row, not a MetaOptimize arm), `C3`, `D1`, `D2`, `E1`, `F1`×2, `F2`, `H4`.  **None can move the
+verdict**: `SIGMA_W` is a frozen literal in the scoring path, and the live re-derivation
+`0.613640 → 0.609456` is *smaller*, which would **tighten** the bars, not loosen them.  All left
+**UNFIXED under RULE 16**.
+
+### 174.13 `169.9`'s SENTINEL 1 — **IT FIRES, IN BOTH DIRECTIONS, AND IS LEFT UNFIXED**
+
+`169.9` registered the sentinel that **`cru1` shares seeds `{15,16,17}` with `crn1`**.  `173.11`
+recorded it as **NOT YET FIRED** (`cX1` section J read 0).  **IT NOW FIRES ON BOTH SIDES:**
+
+| scorer | check | before | after |
+|---|---|---|---|
+| `cX1_crn1_score` §J | `ZERO foreign rows carry seed 15, 16 or 17` | 0 | **60** (`cru1`'s) |
+| `cY1_cru1_score` `H4` | `ZERO ResNet18_c100 rows carry seed 15, 16 or 17` | **18** (`crn1`'s, already firing pre-ingest) | **78** |
+
+**LEFT UNFIXED UNDER RULE 16.**  **AND THE SUBSTANTIVE ASSESSMENT: THE SEED OVERLAP DOES NOT
+CONTAMINATE EITHER VERDICT.**  `cru1`'s entire verdict — ladders, argmaxes, `G_shared`, `G_tuned`,
+every branch — is computed **within batch** from its own 60 `.out` files and pools nothing with
+`crn1`; `crn1`'s scoring path is byte-identical under both CSVs (174.12).  What the overlap **does**
+mean, and what must be carried forward: **any FUTURE pooled analysis over `ResNet18_c100` at seeds
+`{15,16,17}` must treat `crn1` and `cru1` as sharing seed streams and may not count them as
+independent draws.**
+
+### 174.14 WHAT `cru1` FALSIFIED BY CONSTRUCTION — `cU1`'s PREMISE IS NOW HISTORICAL
+
+Two `cU1_alpha0_granularity_score.py --selftest` checks moved **PASS → FAIL**:
+*"`ms=1e-4` granularities are exactly (`chunk2293`, `chunk771`, `nodewise`, `nodewise1d`)"* and
+*"no primary-set arm exists at `ms=1e-4` on CIFAR-100"*.
+
+**This is not a defect; it is the batch's stated purpose.**  `cY1`'s registration named it as fact
+(3): the corpus's best CIFAR-100 number sits at `ms=1e-4 / alpha0=1e-3`, *"a rung where NO HEADLINE
+ARM HAS EVER BEEN RUN"*.  `cru1` put `scalar` and `layerwise` there.  **`160`/`cU1`'s alias premise
+is now true only of the corpus as it stood before this cycle**, and any prose resting on *"the
+headline arms have never been run at `ms=1e-4`"* must be rewritten.  `cU1`'s own verdict already
+carries a `PREMISE CENSUS-CHANGED` token and prints its census diff, naming `cru1`'s four new cells
+explicitly; **its FINAL line is unchanged** (174.12).
+
+`c70_composition_audit` additionally reports one previously-reconstructable published cell as
+`*** UNRECONSTRUCTABLE from the CSV ***` post-ingest, and its `G6 DIRECTION` line accordingly moves
+from *"margin shrinks in 1, grows in 0"* to *"shrinks in 0, grows in 0"*.  **`G4 VERDICT: LOCALISED`
+and `G5 VERDICT: MATERIAL` are unchanged.**  Recorded, not fixed.
+
+### 174.15 THE BINDING SCOPE — REGISTERED IN ADVANCE, QUOTED FROM THIS CYCLE'S OWN RUN
+
+```
+SCOPE, REGISTERED IN ADVANCE AND BINDING: this closes RULE 11 for the
+scalar-vs-layerwise contrast on CIFAR-100/ResNet18_c100 at 100 epochs
+ONLY.  NOT for resnet18_blocks, NOT for cut position, NOT for class
+count, NOT for ImageNet.
+```
+
+**`resnet18_blocks` (m=6, the parent paper's own partition) and the `k49` cut-position arm were
+deliberately dropped** to buy bracketing rather than arms — 30 more jobs and ~22 more GPU-h that did
+not fit a three-way-shared 24 h window.  **RULE 11 therefore remains OPEN for `blk6`, for cut
+position, for class count and for ImageNet, and no verdict in this entry may be quoted as if it were
+not.**  In particular, `173`'s `R-CTRL` premise (`k49 − k01 = +32.8667 pp`) is a **coarse-vs-`m=1`
+contrast at a shared `ms`** and `cru1` has **not** tuned either of its arms; `173.10`'s
+"`WOULD NOT SURVIVE`" list is **not** discharged by this batch — it was written against
+`GAP-REVERSES`, which did not occur, so the `SECONDARY` survives on the terms `173.10` set, **but
+only because the sign held, not because the rung was tested for those arms.**
+
+### 174.16 WHAT IS AND IS NOT ENTITLED
+
+**ENTITLED:**
+
+* *On CIFAR-100 / `ResNet18_c100` at 100 epochs, the `scalar`-vs-`layerwise` accuracy gap **survives
+  per-arm meta-stepsize tuning**: `+47.4607 pp` at the shared `ms=1e-3` becomes `+35.2907 pp`
+  (`+70.44 SE`) with each arm at its own optimum `ms=1e-4`, a resolvable shrink of `12.1700 pp`
+  (`17.18 SE`) leaving **74.4 %** of the gap standing.  Account **T** is supported at
+  `RATIO = 0.7436` against its registered `>= 0.50`; Account **D** is refuted.*
+* *The shrink is **entirely** a `scalar` effect (`+13.4133` vs `+1.2434` pp), and the probe
+  identifies its mechanism: `scalar`'s single `beta` is pinned on the `-15` clamp floor in 76.2 % of
+  probe records at the shared rung and **never** at its optimum.*
+* *The registered negative control **`F` FAILS at `alpha0=1e-3`**: gaps of `+7.6060` and `+24.6433`
+  pp survive at rungs where `TRAVEL/D_up < 0.5`.  By the registration's own words, **the gap is not
+  purely a step-size-adaptation phenomenon and both T and D are incomplete.***
+* *A CIFAR-10 → CIFAR-100 error-ratio transfer calibrated at `ms=1e-3` fails out of sample along the
+  `ms` axis (mean `-10.219` pp over 10 cells, `|max| 37.206`), because the error ratio is itself a
+  function of `ms`.*
+
+**NOT ENTITLED:**
+
+* *"`hz9` is overturned."*  Different dataset, different contrast, 41× smaller gap.  **Not tested.**
+* *"The granularity gap is a tuning artefact"* / *"`GAP-SHRINKS` means the gap goes away."*
+  Refuted at `+70.44 SE`.
+* *Any tuned comparison at `alpha0 = 1e-6`.*  `E1` fired: `layerwise`'s argmax is at the ladder edge.
+* *A resolved `layerwise` argmax.*  Its top four rungs span 1.24 pp and the argmax's upper
+  separation is **1.78 SE**, inside the bar.  The **branch** is robust to this; the **argmax** is not.
+* *"CIFAR-10 does not transfer to CIFAR-100."*  `X` reproduces its calibration rung by construction;
+  what is refuted is the `ms`-invariance of the ratio.
+* *Anything about `resnet18_blocks`, cut position, class count or ImageNet.*  See 174.15.
+
+### 174.17 THE STANDING CONSTRAINTS, DISCHARGED
+
+1. **`git diff -- analysis/` EMPTY** — no registered scorer and no guard was edited.  `cY1`
+   `sha256 0de0604ca5995335…` and `argsline_guard.py` `sha256 81cea8b586e124a6…` are unchanged on
+   both machines.
+2. **`git status --porcelain paper/` EMPTY** — nothing under `paper/` was touched.
+3. **`c98_reproduce.py` EXITS 1**, reported as-is; **author scope, deliberately not fixed.**
+4. **No job this campaign did not submit was touched**, on either account; both queues were
+   **empty** before the `.out` files were pulled, and nothing was submitted or cancelled this cycle.
