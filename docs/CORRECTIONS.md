@@ -22440,3 +22440,175 @@ queue held 0 of this account's jobs when the batch was submitted.  The live `HF.
 modified — both patches were already in place from `162` and `182`.  Ledger: **seventeen registered**,
 fifteen dead (`184`), one live (`crn1` composition), **one in flight (H-ISOLATE)**.  Next free number:
 **186**.
+
+## 186. CYCLE 146 RECONCILIATION — **TRACKS A (`184`, `b841cf7`) AND B (`be15a15` + `185`, `d7e11a5`) DO NOT COLLIDE; H-DOMINATE's POSITION AFTER THE FIVE ATTACKS IS STATED IN ONE PLACE.**  AS NAMED (LAYER-4 CONVS + CLASSIFIER CARRYING THE SIGN DOWN) IT IS **DEAD** AT THE TENSOR LEVEL (BAR 3: `NAMED-CARRIED` 0.0000) AND **UNTESTABLE** AT THE ELEMENT LEVEL (`181`).  WHAT SURVIVES IS A **DESCRIPTIVE RESIDUE** — THREE `layer4` BN SCALES (0.014 % OF THE PARAMETERS) CARRY THE SCALAR LION SIGN DOWN ON 944/944 PINNED RECORDS, PATH-INDEPENDENTLY, FROM A STATE FROZEN AT THE ASCENT PEAK — WHOSE **CAUSAL** STANDING IS EXACTLY WHAT `ciso1` (H-ISOLATE, THE SEVENTEENTH REGISTERED CANDIDATE) WILL DECIDE.  THE GRADIENT-SCALE ATTACK SPLITS: PER-ELEMENT BN-SCALE DOMINANCE IS GENERIC TO BOTH ARMS; THE CARRIERS' *TOTAL* DOMINANCE (×106–212, RANKS 1-2-3) IS TRAJECTORY-SPECIFIC.  THE LAYERWISE COMPANION CONFIRMS THE CARRIERS AND THE CONVS AND **BREAKS AT `linear.weight`**.  `ciso1`: 7/15 RUNNING, 8 PENDING, 0/15 `RUN_DONE` AT 23:40 CEST; RULE 20 + ENV RE-RUN PASS ON THE 7; **NO NUMBER QUOTABLE.**  LEDGER: **SEVENTEEN REGISTERED, FIFTEEN DEAD, ONE LIVE, ONE PENDING.**  ZERO GPU THIS ENTRY.  CORPUS **2,746**, UNCHANGED HERE.
+
+Everything below is re-derived this entry from `git`, `sacct`/`squeue` on `alice2`, the unedited guards
+and scorers (`argsline_guard.py` `81cea8b5…`, `cTD2` `c3122e1f…`, `cIS1` `f9310405…`, sha256-identical on
+the Mac and on `alice2`), the CSV at `9ef4ac3` vs `HEAD`, and `c98_reproduce.py`.  Nothing is quoted
+from the cycle briefing.  This entry takes the next free number (`186`).
+
+### 186.1 THE BRIEFING, AGAINST THE RECORD
+
+**(1) "Both queues EMPTY" — false at the time of writing.**  `alice2` holds the 15 `ciso1` jobs
+4925518–4925532 (Track B, `185`): at 23:40:53 CEST, `squeue` shows **7 RUNNING** (all started 23:28:49;
+`k01-s21`, `k62-s21`, `ISO-s21` on node851; `CTRL-s21`, `ONE-s21`, `k01-s22`, `k62-s22` on node887) and
+**8 PENDING (Priority)**.  `alice` not accessed.  **(2) "2,740 rows, HEAD `9ef4ac3`" — stale.**  Track A
+ingested `ctd1` (`184.9`): the CSV is **2,746 rows** and `HEAD` is `d7e11a5` = `origin/master`, tree
+clean.  **(3) "Sixteen candidates registered" — pre-`185`.**  `185` registered H-ISOLATE as the
+**seventeenth** (a causal proposition about the three-tensor residue, distinct from H-DOMINATE's named
+content); the ledger in 186.5 uses that count.  **(4) The briefing's "carrying sets including the convs"
+reading and its two narrowing mechanisms** were already corrected by `184.1`; they are not repeated as
+fact here.
+
+### 186.2 THE TWO TRACKS DO NOT COLLIDE
+
+| check | result |
+|---|---|
+| history | linear: `9ef4ac3` → `be15a15` (B, 23:27:23) → `b841cf7` (A, 23:33:00) → `d7e11a5` (B, 23:38:58); `HEAD == origin/master == d7e11a5`; `git status` clean |
+| CORRECTIONS numbers | `184` (A) and `185` (B) are disjoint; headings `## 184.` and `## 185.` each occur once; next free number **186** (this entry) |
+| files per commit | `be15a15`: `analysis/cIS1_ciso1_isolate_score.py`, `bin/cIS1_isolate_carriers.sh`, `tests/test_probe_tensor_blockwise.py` (1,732 +, 0 −).  `b841cf7`: `analysis/ctd1_attack_rederive.py`, `docs/CORRECTIONS.md`, `docs/STATUS.md`, `results/all_runs.csv`, `results/ctd1_tensor_dominate/ATTACK_REPORT.txt`.  `d7e11a5`: `bin/PROTECTED.txt`, `docs/CORRECTIONS.md`, `docs/STATUS.md`.  The only files both tracks touched are the two docs, sequentially, with no overlapping text (the `184` and `185` sections, and separate STATUS blocks) |
+| RULE 16 | `git diff 9ef4ac3..HEAD -- analysis/ patches/ tests/ bin/`: **5 files, 2,076 insertions, 0 deletions** (`analysis/` 1,449 additions: 1,106 + 343); no registered scorer, test, patch or `argsline_guard.py` edited; the four shas above identical on both hosts |
+| STATUS coherence | authority line `185`; cycle-146 (B) and cycle-145 (A) blocks present and consistent with their entries.  One stale header line found: the `c98` line still carries cycle-144's counts (rows 2,740, GPU-h 2,896.5) with no rider — annotated this entry (186.6), wording kept |
+| `paper/` | `git status --porcelain paper/` empty; `git diff 9ef4ac3..HEAD -- paper/` empty |
+
+### 186.3 TRACK A, RE-DERIVED — VERDICT, INGEST, `c98`
+
+**`cTD2` re-run unedited on the Mac mirror `../runs_alice2` (this entry):** every gate line `PASS`, 0
+`FAIL` (69 `PASS` lines by grep; `184` reports 64 gates — the grouping differs, the failures are 0 either
+way); `[A]` worst rel 1.59e−7 (`z`), 9.61e−7 (`m`), applied sign 0/82,722 fail, 11,778 clamped;
+`R_T` **0.8266** (1,239/1,499; seeds 413/500, 413/500, 413/499); PINNED 944, `R_T` 1.0000, `agg<0`
+0.0000; UNPINNED 555, 0.5315; DOWN 1.0000; NAMED-CARRIED 0.0000; carrying set size 3 on 1,207; the three
+carriers on 1,239/1,239 each, next 0.026; SECONDARY-z 0.6958.
+
+    FINAL: PRIMARY DOMINATION-BY-OTHER-TENSORS | SECONDARY-z:DOMINATION-BY-OTHER-TENSORS | PINNED-R_T=1.0000 | PINNED-FRAC=0.6298 | PINNED-AGG-NEG=0.0000 | PATH-DEPENDENT-MIXED | FLOOR-OK
+
+— identical to `184.2`'s post-ingest line.  `ATTACK_REPORT.txt` on disk carries the same digits.
+
+**Ingest, re-derived keyed on `(run, job_id)` between `9ef4ac3:results/all_runs.csv` and `HEAD`:**
+2,740 → 2,746, **ADDED 6** (`ctd1-sc-s18/19/20` 4924919/4924921/4924923, `ctd1-lay-s18/19/20`
+4924920/4924922/4924924), **CHANGED 0, REMOVED 0, other-batch 0**; `plateau5` 24.132 / 22.598 / 23.172
+and 68.856 / 69.108 / 69.524; `wallclock_min` 94 / 43 / 44 and 41 / 44 / 39 = **5.083 GPU-h**;
+`superseded` 0 on all six.  The corpus anchors re-derived through the unedited `cIS1 --selftest` (Mac,
+against the mirror): scalar **n 32, 22.8797 ± 0.5812**; layerwise **n 26, 69.4916 ± 0.4863** — the
+four selftest FAILs are exactly these against the frozen 22.8361 ± 0.5568 (n 29) / 69.5345 ± 0.4916
+(n 23); `SIGMA_NARROW` 0.925518, `SIGMA_WIDE` 0.889041, k49 55.4688 (n 21), k50 30.3370 (n 6), k53
+22.0753 (n 3), the seed-absence and never-run premises, and the `ctd1` premise block (1,499 / 1,239;
+carriers 1.000 ×3; 944 pinned, 59-rest UP on all; trio dominates 0.9799; tensor 50 alone 0.0000, pair
+0.0000) all `PASS`: **64 PASS / 4 FAIL**, as `185.10` states.  The `alice2` mirror CSV is still 2,740
+rows (left so, `185.10`).
+
+**`c98_reproduce.py` exit 1**, author scope, **the same 10 checks**: rows 2,746 (paper 2,177), admissible
+2,304 (1,735), wallclock-carrying 2,731 (2,162), GPU-h 2,902 (1,642), best C10 arm 93.328 (93.317),
+deficit 1.796 (1.807), partition families 440 / Lion 428 (431 / 419), count-matched 244 / 244 (241 / 241).
+Not fixed.
+
+### 186.4 TRACK B, RE-DERIVED — RULE 20, ENV, COVERAGE
+
+Run this entry on `alice2` with the unedited guard: `argsline_guard.py $WS/runs --name ciso1-
+--batch-consistency` → **7 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line;
+"every non-axis flag is identical across 7 runs"; VERDICT: PASS.**  ENV modulo `PROBE_DIR`: **ONE**
+distinct line × 7 (`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … SCHED=none … PROBE=100 EB_RHO=na
+EB_LOG=0`).  `PROBE_TENSOR` modulo `dir=`: `type=blockwise` × 3, `type=layerwise` × 2, `type=scalar` × 2,
+all `every=100 tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` — 7/7.  `sacct`: all 15
+`Submit` 23:27:52–53; the 7 RUNNING started 23:28:49, elapsed 12:04 at 23:40:53; the 8 PENDING have no
+node.  **0/15 `RUN_DONE`, 0 tracebacks; the seven `.out` files are at 11–28 epochs** (the three node851
+runs slowest).  `ciso1-` is line 31 of `bin/PROTECTED.txt` on `alice2` and in the Mac copy.  RULE 21
+unchanged from `185.7` (`be15a15` 21:27:23Z vs Submit 21:27:52Z, +29 s).
+
+**Coverage 7/15.  The RULE 20 and ENV audits are open obligations at 15/15.  No accuracy, beta or
+per-tensor number from any `ciso1` run is quoted in this entry, and none may be quoted before 15/15
+`RUN_DONE` and `185.10`'s command block.**  The first `.out` files are mid-training and carry epoch lines;
+those values are liveness, not results.
+
+### 186.5 H-DOMINATE AFTER THE ATTACKS — THE POSITION, IN ONE PLACE
+
+**Registered content (`182.4`, `cTD2` bars):** a minority of layer-4 convolutions and the classifier
+(`layer4.0.conv2.weight`, `layer4.1.conv2.weight`, `linear.weight`) carry the scalar meta-gradient sign
+against the count-majority and vote `beta` DOWN.
+
+| what | standing | evidence |
+|---|---|---|
+| (E) element level | **untestable on the record** | `181`: `frac_neg` is `1[z<0]` of the one aggregate; no element statistic on disk; a new probe + inertness proof + GPU would be needed |
+| (T) as named | **DEAD** — refuted on its named content | bar 3 `NAMED-CARRIED` 0.0000 (bar 0.75); the NAMED tensors have `L_i < 0` on 100 % of the 1,500 scalar records in every phase — they carry the *ascent* and are the opposition once the carriers ramp (`184.1`, `184.6`) |
+| (T) bars 1–2 | met | `R_T` 0.8266 ≥ 0.10; DOWN 1.0000 ≥ 0.75 — a minority does carry the sign DOWN against the count-majority; it is just not the minority that was named |
+| the residue | **ESTABLISHED, DESCRIPTIVE** | `layer4.1.bn2.weight`, `layer4.0.bn2.weight`, `layer4.0.shortcut.1.weight` (512 each, 1,536 = 0.0137 % of 11,220,132) carry the sign on 1,239/1,239 DISAGREE records and are the *entire* carrying set on 1,207 of them; on the 944 pinned records (63 % of training) their `L_i > 0` on 100 %, the aggregate is never negative, and the 59-rest's own sum votes UP on 944/944; the state is frozen from the ascent peak (`h_absmax` 0.3658–0.3668 across the pinned phase; no per-tensor sign change in 314 records) |
+| seeds | one trajectory | harness `sign(L)` agrees 500/500 on every ctd1 pair; six seeds (ctd1 + cru1) peak −5.13…−5.22 at 8,600–8,700 and pin at 18,500–18,600.  n = 6 concordant trajectories for "this cell does this"; ~1 sample for `R_T` as a random variable; **n = 1 cell** beyond it |
+
+**The gradient-scale attack, split in two.**  *Generic, and conceded:* per **element**, BN scales are the
+largest class under **both** dynamics (the top-6 `|X_i|/numel` are BN scales in both arms); a 512-element
+channel scale's `<h, g>` per element runs two to three orders above a conv element's, and BN scales as a
+class lean DOWN under both dynamics (`P(L>0)` pinned 0.655 scalar / 0.631 layerwise) while convs lean UP
+(0.016 / 0.454).  So "a BN-scale minority carries the reduction's sign" is partly a property of what the
+unnormalised sum does to tensors of very different per-element scale — a reduction artefact in the plain
+sense.  *Not generic, and the part that decides the sign:* the carriers' **total** `|L_i|` at ×124–212 the
+median tensor (×106–180 pinned), ranks 1-2-3 of 62, 60 % of `Σ|L|` for the BN-scale class, holds along
+the **scalar trajectory** only; under layerwise dynamics the same three tensors, same seeds and steps, are
+×5–10, ranks 5/6/11, `|L|` ~30× smaller (0.0106 vs 0.315), and `linear.weight` is the largest term (0.307,
+51 % of `Σ|L|`).  The record's proximate account is the shared `beta`'s excursion to −5.16 (`alpha`
+5.8e−3; `h_absmax` 7e−3 → 0.37), which the *other* tensors carried it on, versus the carriers' own-beta
+peaks at −8.3…−8.9.  **Consequence:** the magnitude comparison across arms is a comparison across
+different `alpha` histories, not a controlled test of "BN scales dominate anywhere"; and no CIFAR-10 run
+carries per-tensor terms, so the generic claim is **unmeasured** beyond this cell.  The artefact reading
+is therefore neither confirmed nor excluded; it is bounded: real per element, not sufficient to explain
+the 30× cross-trajectory difference.
+
+**The layerwise companion — what it confirmed and what it did not.**  *Confirmed:* the three carriers,
+under their own betas, go to the floor (first pin 11,100–12,300; `pin_share` 0.754–0.778; own-vote DOWN
+0.888–0.902, 1.000 in the last half; PATH `agree` 0.999–1.000, `opp` ≤ 0.001) — they are path-independent
+DOWN voters; the two layer-4 convs ascend (terminal −7.49…−7.95), never pin, vote ~0.40–0.48.  *Not
+confirmed:* `linear.weight` pins at −15 from step 18,400 in all three seeds under its own beta and votes
+DOWN 0.828, while under the shared beta it votes UP on 100 % of records (`agree` 0.172).  The registered
+stamp `PATH-DEPENDENT-MIXED` sits on the NAMED set because bar 4 was written there; on the measured
+carriers it would read path-independent.  The "each tensor drags the shared beta where it wants to go"
+story holds for the carriers and the convs and **fails at the classifier**; a per-tensor "preference" is
+not a path-independent property of the 62.
+
+**The cut-position coincidence.**  Index 49 (`layer4.0.bn2.weight`) is the tensor `[49,13]→[50,12]`
+moves (`147`, +24.834 pp); index 52 (`layer4.0.shortcut.1.weight`) is the tensor `[52,10]→[53,9]` moves
+(`152`, DROP1 15.808 pp) — verified on the live manifest (`184.7`).  **Entitled:** two of the three
+carriers are, by name and index, the tensors the two cliff audits found.  **Not entitled:** that they
+dominate the coarse groups' sums or cause the cliffs — a 13-tensor or 10-tensor group's reduction on its
+own trajectory was never logged per tensor, and magnitudes move 30× between trajectories.  `ONE` (isolate
+50 alone) is the first arm that speaks to this under a logged reduction; `185.3`.
+
+**What `ciso1` decides (bars frozen at `185.4`, `SE_ARM_DIFF` 0.755682 pp).**  `D_ISO = ISO − k01 ≥
++25 pp` (33.08 SE) *and* `ISO`'s 59-group `beta[0]` free (floor occupancy ≤ 0.10, terminal > −13.0) →
+`CAUSAL-SUPPORTED`: removing the three votes from the shared reduction is *sufficient* to lift the scalar
+arm off the floor at this cell — the residue becomes a mechanism.  `D_ISO ≤ +5` → `CAUSAL-REFUTED`: the
+domination is a symptom, the floor has another cause, and the residue stays descriptive.  `D_CTRL ≥ +25`
+→ `NOT-SPECIFIC`, read before `ISO`.  `ONE` discriminates the static reading (any one carrier's removal
+breaks the domination → `ONE` rescues) from the ladder reading (the pair re-dominates → `ONE-FLOOR`).
+**None of these outcomes is on the record yet.**  Whatever `ciso1` returns, it is one cell, one `ms`, one
+horizon (`184.8`); a CAUSAL-SUPPORTED at this cell does not by itself say why scalar MetaOptimize fails on
+CIFAR-100 elsewhere.
+
+**Entitled now, verbatim from `184.10`, unchanged.**  *At the standard CIFAR-100 cell, under the scalar
+reduction, the Lion sign that pins the single `beta` at −15 for the last 63 % of training is carried on
+every pinned record by three 512-parameter BatchNorm scales in `layer4` whose terms are ×106–180 the median
+tensor's and positive on 100 % of those records, against a majority of ~47 tensors that includes the
+classifier and, on all but a few records, every convolution; the same three tensors descend to the floor
+under their own betas, and the state is frozen from the ascent peak on.*  **Not entitled:** causation (no
+intervention has landed), generality to BatchNorm or to CIFAR-10, the cliff mechanism, "the convs wanted to
+recover", "`linear.weight` wants up".
+
+**Ledger.**  **Seventeen registered** (`183.1`'s count of sixteen + H-ISOLATE at `185`), **fifteen dead**
+(the thirteen observational candidates, `H-DISAGREE` at `179`, H-DOMINATE (T) as named at `184`; (E)
+untestable and not counted separately), **one live** (`crn1` composition, `169`/`173`, an intervention at
+one cell that explains no measured contrast), **one pending** (H-ISOLATE, `ciso1`, 7/15 running).  The
+three-tensor residue is not itself a registered candidate; `ciso1` is its causal test.  The briefing's
+"sixteen registered, fourteen dead" is `183`'s count and is superseded by `184` and `185`.
+
+### 186.6 LINES ANNOTATED IN `docs/STATUS.md` (superseded wording kept verbatim)
+
+The `c98` header line (cycle-144 counts: rows 2,740, admissible 2,298, wallclock 2,725, GPU-h 2,896.5)
+gets a rider with the 2,746-row counts from 186.3; the RULE 16 header line gets a rider for
+`9ef4ac3..d7e11a5` (5 new files, 0 deletions); the corpus/queue line gets the 23:40 CEST queue state.  A
+cycle-146 reconciliation block is added above the Track B block; the authority line moves `185 → 186`.
+
+### 186.7 THE STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU: nothing submitted, cancelled or touched on either account; `alice` not accessed; `alice2` read
+only (`squeue`, `sacct`, `grep`, `wc`, `sha256sum`, one unedited guard run).  `paper/` untouched.
+RULE 16: `git diff -- analysis/ patches/ tests/ bin/` empty this entry.  `git add` restricted to
+`docs/CORRECTIONS.md` and `docs/STATUS.md`.  No nested `claude -p`.  Next free number: **187**.
