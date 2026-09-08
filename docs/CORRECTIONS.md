@@ -17825,3 +17825,238 @@ is not a tuned 200-epoch number unless arm A's argmax is 0.1.
 **NEXT:** when 24/24 land — re-run the ARGS audit at full coverage, re-run `--envaudit`, ingest,
 then `python3 analysis/cdn1_denominator_score.py` with **no arguments**, and score `V0 → V1 → V2 →
 V3` **before** `GAP_in` is quoted.
+
+## 168. `cru1` REGISTERED AND LAUNCHED — **RULE 11 ON THE HEADLINE CIFAR-100 CELL.**  THE ALIAS `160` MEASURED IS **MECHANICALLY FORCED BY `|dbeta| = ms` EXACTLY**, SO A LADDER IN `ms` ALONE CANNOT BREAK IT; AND THE CORPUS'S OWN BEST CIFAR-100 NUMBER SITS AT `ms=1e-4`, A RUNG WHERE **NO HEADLINE ARM HAS EVER BEEN RUN**.  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,638 ROWS.**
+
+Everything below is re-derived this cycle from the live corpus, from the live source on `alice2`, or
+from arithmetic. Nothing is quoted from the launch briefing or from any earlier CORRECTIONS entry.
+
+### 168.1 THE BATCH
+
+`cru1` — CIFAR-100 / `ResNet18_c100` / SGDm base + Lion meta / gamma 1 / `AUGMENT=1` /
+`BETA_CLIP=-15:-2.3026` / `HIER` unset / batch 100 / **100 epochs** / `PROBE=100`.
+**2 arms x 10 `(ms, alpha0)` cells x 3 seeds = 60 jobs, ONE submission.**
+
+| | |
+|---|---|
+| arms | `sc` = `scalar` (m = 1), `lay` = `layerwise` (m = 62) |
+| **LADDER A**, `alpha0=1e-3` | `ms` in {`1e-5`, `3e-5`, `1e-4`, `3e-4`, `1e-3`, `3e-3`} |
+| **LADDER B**, `alpha0=1e-6` | `ms` in {`1e-4`, `3e-4`, `1e-3`, `3e-3`} |
+| seeds | **{15, 16, 17}** — guard 2c: **ZERO** `ResNet18_c100` rows anywhere carry them |
+| job ids | 4920444–4920503 |
+| sacct `Submit` | earliest `2026-09-08T08:36:51`, latest `08:36:55`, **spread 4 s = ONE submission** |
+| scorer | `analysis/cY1_cru1_score.py`, sha256 `0de0604ca5995335c72f2485a143262cfdf0d181d693d394c2d1d0631f516204` |
+| launcher | `bin/cY1_rule11_ms_alpha0.sh` |
+| cost | **~45 GPU-hours** (corpus median wallclock 42.0 min over 274 CIFAR-100/100-ep runs; `PROBE=100` cost `cfr2` +7.2 % over `cfr1` on the same cell, 53.5 vs 49.9 min) |
+
+**FOUR `ms` levels — {`1e-4`, `3e-4`, `1e-3`, `3e-3`} — appear at BOTH `alpha0` for BOTH arms.
+The alias is broken BY CONSTRUCTION**, and the scorer's gate `G2` verifies the crossing is
+realised in the landed runs rather than asserted in a header.
+
+**The `cX1` prefix was already taken by the sibling reduction batch when this one was written, so
+this batch's artefacts were renumbered to `cY1` rather than overwriting them.**
+
+### 168.2 THE THREE FACTS THAT MOTIVATE IT, ALL RE-DERIVED (scorer `--selftest`, 58 PASS / 0 FAIL)
+
+**(a) RULE 11 is open on the exact cell, and the axis is aliased — sections A1–A5.** CIFAR-100
+carries **EXACTLY TWO** `meta_stepsize` levels, `1e-3` (393 rows) and `1e-4` (20 rows). Every one
+of the **42** CIFAR-100 `scalar` rows, all **101** `layerwise` rows and all **38**
+`resnet18_blocks` rows sit at `ms=1e-3`. The **entire** `ms=1e-4` stratum is 20 rows, **all** at
+`alpha0=1e-3`, whose granularities are only {`chunk771` 7, `nodewise` 7, `chunk2293` 3,
+`nodewise1d` 3} — **no scalar, no layerwise, no blk6, no cut-position arm.** (`160` reported 33
+scalar rows; the corpus has since grown and the count is now 42. The structure is unchanged.)
+
+**(b) THE ALIAS IS MECHANICALLY FORCED, NOT A SCHEDULING ACCIDENT.** Guard 4b quotes
+`HF.Lion_meta_update` off the **live** source on `alice2`:
+
+```
+self.beta[i] = (1-self.args_meta['meta_stepsize']*self.args_meta['weight_decay'])*self.beta[i] \
+             - self.args_meta['meta_stepsize'] * torch.sign(...)
+```
+
+Every `cru1` command line passes `--weight-decay-meta 0`, so this is exactly
+`beta <- beta - ms*sign(.)` and **`|dbeta| = ms` EXACTLY, once per minibatch.** 100 epochs x 500
+minibatches = **50,000 meta-steps**, so beta's TOTAL travel is `TRAVEL = 50000*ms` whatever the loss
+surface does. With the clamp at `[-15, -2.3026]` the ceiling is `D_up = -2.3026 - ln(alpha0)` above
+the start. **At `alpha0=1e-6`, `D_up = 11.513` and `ms=1e-4` buys `TRAVEL = 5.0`: alpha can NEVER
+exceed `exp(-13.8155+5) = 1.4841e-4` in the entire run.** That is *why* the corpus has no such row,
+and it is why **a ladder that varies only `ms` cannot break the alias** — the briefing's warning is
+confirmed with an arithmetic reason attached. The full table (launcher guard 4e, scorer section B):
+
+| `ms` | `alpha0` | TRAVEL | `D_up` | T/`D_up` | `alpha_max` | status |
+|---|---|---|---|---|---|---|
+| 1e-5 | 1e-3 | 0.50 | 4.605 | 0.109 | 1.649e-03 | **FROZEN** |
+| 3e-5 | 1e-3 | 1.50 | 4.605 | 0.326 | 4.482e-03 | **FROZEN** |
+| 1e-4 | 1e-3 | 5.00 | 4.605 | 1.086 | 1.000e-01 | ADEQUATE |
+| 3e-4 | 1e-3 | 15.00 | 4.605 | 3.257 | 1.000e-01 | FREE |
+| 1e-3 | 1e-3 | 50.00 | 4.605 | 10.857 | 1.000e-01 | FREE |
+| 3e-3 | 1e-3 | 150.00 | 4.605 | 32.572 | 1.000e-01 | FREE |
+| **1e-4** | **1e-6** | **5.00** | **11.513** | **0.434** | **1.484e-04** | **FROZEN** |
+| 3e-4 | 1e-6 | 15.00 | 11.513 | 1.303 | 1.000e-01 | ADEQUATE |
+| 1e-3 | 1e-6 | 50.00 | 11.513 | 4.343 | 1.000e-01 | FREE |
+| 3e-3 | 1e-6 | 150.00 | 11.513 | 13.029 | 1.000e-01 | FREE |
+
+**(c) THE HEADLINE CELL IS NOT AT ANYONE'S OPTIMUM, AND THE CORPUS ALREADY SAYS SO — section C.**
+The best CIFAR-100 `plateau5` **anywhere** in the corpus is **72.408** (`gm2-ch-s1`, `chunk771`) and
+the best `best_test` is **72.80** (`gc1-ch-s3`) — **both at `ms=1e-4` / `alpha0=1e-3`**, the standard
+cell in every other respect. At that rung `chunk771` = **71.9954** (n 7), `chunk2293` = **72.0000**
+(n 3), `nodewise1d` = **71.9320** (n 3) and `nodewise` = **70.4220** (n 7) — **every one above the
+headline `layerwise` 69.5945 / 69.5321 at `ms=1e-3`.** The headline arms have never been run there.
+
+**And on CIFAR-10, the ONLY place this contrast has ever been laddered, it ALREADY collapses under
+tuning — section D4/D5.** At `alpha0=1e-3`, 100 epochs, same clamp: `layerwise - scalar` is
+**+3.3711 pp** at the shared `ms=1e-3` and **+0.6241 pp** at `ms=1e-4` where **both** arms peak — a
+**5.40x SHRINK**. Both CIFAR-10 argmaxes are at `ms=1e-4`, **interior** to this batch's ladder.
+
+### 168.3 THE PRE-REGISTRATION
+
+**PRIMARY** `plateau5` (the CSV `plateau` column is banned as primary); `train5` reported alongside
+at every arm. `G_shared(a0)` = `lay - sc` at `ms=1e-3` **in batch**; `G_tuned(a0)` = `lay - sc` with
+each arm at its OWN argmax rung; `RATIO = G_tuned / G_shared`.
+
+**The number every headline uses, re-derived (D2):** `G_shared` = **+47.0345 pp** at `alpha0=1e-3`
+and **+46.7364 pp** at `alpha0=1e-6`.
+
+**THE NOISE FLOOR, RE-DERIVED AT REGISTRATION TIME, NEVER COPIED** (section F; every corpus reader
+in the scorer EXCLUDES the `cru1-` prefix, so each premise is invariant under this batch's own
+ingest — the property `cW1` achieved at `165` and `cS2` only claimed at `161.9`). Pooled
+within-(batch x granularity x ms x alpha0) across-seed SD of `plateau5` on the standard cell:
+
+| derivation | sigma | df | cells | members |
+|---|---|---|---|---|
+| scalar + layerwise | 0.528555 | 36 | 20 | 56 |
+| **scalar only** | **0.613640** | 18 | 10 | 28 |
+| layerwise only | 0.426833 | 18 | 10 | 28 |
+
+**FROZEN RULE: `SIGMA_W` = max of the three = 0.613640** — the conservative choice, and the arm
+whose level this batch actually moves. `SE_CELL` 0.354285, **`SE_GAP` 0.501035**, `SE_DGAP`
+0.708570; bars `2 SE` = **1.002070** and **1.417141**. **REGISTERED IN ADVANCE: the gate uses
+`max(SIGMA_W, sigma_in_batch)`**, so a batch noisier than the corpus cannot borrow the corpus's bar.
+
+**THREE ACCOUNTS, MAKING DIFFERENT PREDICTIONS.**
+
+* **T — TUNING-IRRELEVANT.** The gap is a property of the partition and survives per-arm tuning.
+  Predicts `RATIO >= 0.5` at **both** `alpha0`.
+* **D — DESCENT-LIMIT.** The gap at `ms=1e-3` is produced by the scalar arm's single beta descending
+  to the clamp floor while layerwise's 62 coordinates do not (`155` measured 31.8 % coordinate
+  occupancy at `-15` for scalar vs 5.5 % for layerwise). Because `|dbeta| = ms`, the descent is
+  TRAVEL-limited. Predicts `RATIO < 0.5`, the gap monotone non-decreasing in `ms` within each
+  ladder, and `gap <= 2 SE_GAP` at every FROZEN rung.
+* **F — GRANULARITY-INOPERATIVE-AT-FROZEN, a NEGATIVE CONTROL both T and D must respect.** At
+  `T/D_up < 0.5` beta is confined near `beta0` and both arms are within a small factor of a FIXED
+  step size, so granularity has almost nothing to act on. Predicts `|gap| <= 2 SE_GAP` at
+  `ms in {1e-5, 3e-5}` / `alpha0=1e-3`. Precedent: on CIFAR-10 at the two comparable frozen rungs
+  the measured gaps are **+0.004 pp** and **+0.027 pp**. **IF F FAILS — a large gap where beta cannot
+  move — the gap is not a step-size-adaptation phenomenon at all and BOTH T and D are incomplete.**
+  That is the most consequential single outcome available here.
+
+**TWO POINT-PREDICTORS, REGISTERED SEPARATELY BECAUSE THEY DISAGREE.**
+**X**, CIFAR-10 error-ratio transfer: `R(arm)` = mean over `alpha0` of
+`(100 - C100(arm, ms=1e-3, a0)) / (100 - C10(arm, ms=1e-3, a0))`, giving `R_sc` = **6.377982** and
+`R_lay` = **3.407429**; `pred = 100 - R*(100 - C10(rung))`. Declared VALID only where the CIFAR-10
+anchor >= 85 pp (outside that the ratio form returns a *negative* accuracy). E2 checks it reproduces
+its own calibration rung to within 0.5 pp. **Y**, corpus-internal: at `ms=1e-4`/`alpha0=1e-3`,
+`layerwise` in **[69.5945, 72.408]**. **X says 75.762 there; Y caps at 72.408. They disagree by
+3.354 pp, both are reported, and NEITHER adjudicates a branch.**
+
+| `ms` | `a0` | X(sc) | X(lay) | X(gap) |
+|---|---|---|---|---|
+| 1e-5 | 1e-3 | 41.562 | 69.527 | +27.965 |
+| 3e-5 | 1e-3 | 46.884 | 72.296 | +25.412 |
+| **1e-4** | **1e-3** | **50.650** | **75.762** | **+25.112** |
+| 3e-4 | 1e-3 | 28.268 | 72.667 | +44.398 |
+| 1e-3 | 1e-3 | 22.447 | 70.054 | +47.608 |
+| 3e-4 | 1e-6 | 21.227 | 66.701 | +45.475 |
+| 1e-3 | 1e-6 | 22.908 | 69.057 | +46.150 |
+| 3e-3 (x2), 1e-4/1e-6 | — | — | — | **NO POINT PREDICTION** (see 168.4) |
+
+**BRANCHES**, evaluated separately at each `alpha0`, first match wins:
+`ADAPTATION-NOT-NEEDED` (the argmax rung is FROZEN — **TERMINAL, not unresolved**: the rungs below a
+frozen rung are mechanically identical, so there is nothing left to bracket, and the finding is that
+a nearly FIXED step size beats the meta-learned one) > `UNRESOLVED-OPTIMUM-AT-LADDER-EDGE` (a
+non-frozen endpoint argmax; **no tuned comparison may be claimed for that `alpha0`**) >
+`GAP-REVERSES` (`G_tuned < -1.0021`, `hz9`'s outcome) > `GAP-CLOSES` (`|G_tuned| <= 1.0021`) >
+`GAP-SHRINKS` (`G_shared - G_tuned > 1.4171`) > `GAP-SURVIVES-TUNING`.
+**STAMPS reported alongside, never as the branch:** `TRAVEL-CONFOUNDED`,
+`MONOTONE-IN-TRAVEL` / `NOT-MONOTONE`, `F-HOLDS` / `F-FAILS`, `ALIAS-BROKEN` / `ALIAS-NOT-BROKEN`.
+
+### 168.4 NO ARM IS PREDICTED AT OR NEAR A FLOOR (section G)
+
+Floors: **CHANCE = 1.00 pp** (100 classes) and **DEGENERATE-SATURATION = 22.7957 pp**, the
+collapsed-alpha level, empirically the scalar arm at the FREE rungs (n = 23, the corpus's largest
+single cell). Under predictor X:
+
+* **Every model-valid cell clears CHANCE by > 30 SE; the worst is +57.1 SE** (`sc`, `ms=3e-4`,
+  `a0=1e-6`, predicted 21.227).
+* **The BRANCH-DECIDING cells — the low `alpha0=1e-3` rungs where scalar must rise if D or T is
+  right — are predicted 53.0, 68.0 and 78.6 SE ABOVE the saturation level.** A content-free "the arm
+  just died" model cannot produce them. **This is the specific defect `164` recorded in `cpr1`,
+  addressed by construction rather than by assertion.**
+* The scalar cells predicted *at* ~22.5 are the FREE rungs — the anchor half of the contrast, whose
+  level is already established at n = 23. They are calibration, not discrimination, and are labelled
+  as such.
+* **Three cells get NO point prediction and carry NO branch weight:** `ms=3e-3` at both `alpha0`
+  (D6: **every** CIFAR-10 `ms=3e-3` row in the corpus carries `hier=additive`, so **no flat-cell
+  anchor exists** — the top rung is an EXTRAPOLATED BRACKET whose only job is to show the argmax is
+  not at the `1e-3` endpoint), and `ms=1e-4`/`alpha0=1e-6`, a **MECHANISM CONTROL** for the alias.
+  None is near chance: their CIFAR-10 counterparts are 45.594 (`sc`) and 46.362 (`lay`).
+
+### 168.5 THE CENTRAL CONFOUND, NAMED IN THE REGISTRATION RATHER THAN DISCOVERED AFTERWARDS
+
+**Lowering `ms` does two things at once: it tunes the meta-optimiser AND it mechanically limits how
+far beta can descend.** A `GAP-SHRINKS` result at a low rung is therefore not, by the level alone,
+attributable between "the arm was tuned" and "the arm was prevented from collapsing". Three things
+address it and none is a rhetorical move: (i) the `TRAVEL-CONFOUNDED` stamp fires automatically
+whenever a winning rung has `T/D_up < 1`; (ii) crossing `alpha0` varies `D_up` (4.605 vs 11.513) at
+matched TRAVEL, which no `ms`-only ladder can do; (iii) **`PROBE=100`** records 500 beta snapshots
+per run, so the descent can be measured directly. **The probe is a SKIP, never a FAIL: no verdict
+depends on it.**
+
+**A SECOND DISCLOSED CONFOUND (guard 4d).** `scalar` takes its own m=1 code path in
+`HF.init_meta`'s exact-match routing list, `layerwise` takes the layerwise branch. This is a
+property of the CONTRAST, is identical at every rung, and therefore cannot produce an `ms`
+dependence — it is precisely what the ladder holds fixed while `ms` and `alpha0` move.
+
+### 168.6 DISCIPLINE
+
+| check | evidence |
+|---|---|
+| **RULE 21** | scorer committed at `180755c`, `2026-09-08T08:33:38+02:00` = epoch **1788849218**; earliest sacct `Submit` `2026-09-08T08:36:51` = epoch **1788849411**. **MARGIN 193 s**, the NORMAL claim (this batch has runs of its own). Guard 2 confirmed no `cru1-` row in the CSV and no `cru1-*.out` on disk before submission. A later commit `fa690a5` fixed two **launcher** guards; the scorer is byte-identical and its sha256 is unchanged. |
+| **RULE 16** | `git diff HEAD --numstat -- analysis/` shows **no deletions**; `analysis/argsline_guard.py` is **NOT** edited; the scorer is registered as a NEW file. |
+| **RULE 20, pre-submission** | **60/60 composed lines PASS** `guard_presubmit` through the UNEDITED `argsline_guard.py`, checked twice per line — once against the design and once against all five axis flags. 0 repeated flags, 0 duplicate job names, 60 lines composed against a design that says 60. |
+| **RULE 20, post-launch** | **PENDING — see 168.7.** |
+| ENV audit | **PENDING — see 168.7.** `BETA_CLIP` and `PROBE` are environment variables and cannot ride the ARGS line; they are audited separately and the scorer's `G1` re-checks them from every run's own `ENV:` line. |
+| live-source provenance | live `HF.py` sha256 `0d8ee431a8caa51c14fa632776349db32b42e346299a91b69c4c6680142a3892`, **0** `PATCH_REDNORM` markers at submit time, written to `runs/cru1/PROVENANCE.txt`. The sibling reduction batch's patch is **opt-in by spec prefix** (`tn:`); **none** of these 60 lines carries one, and `G1` re-checks every landed run's `stepsize-groups` against exactly `scalar` / `layerwise`, so a mid-flight application is behaviourally inert here. |
+| invocation | `python3 analysis/cY1_cru1_score.py <runsdir>` — **no second argument to forget**. `--probe-dir` is OPTIONAL and DEFAULTED, and **guard 8 imports the scorer and proves the default resolver returns `/home/s5014158/metaopt/runs/cru1`** before any job can finish (`164.2`'s defect, closed by construction). |
+| account hygiene | everything on `alice2` (`s5014158`). Nothing submitted to `alice`, nothing written under `/data1/salehkaleybars`, nothing cancelled. `cru1-` added to `bin/PROTECTED.txt`. |
+
+### 168.7 WHAT IS **NOT** DONE, STATED BEFORE ANYONE ASKS
+
+**NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED. THE CORPUS STANDS AT 2,638 ROWS.**
+At the time of writing **all 60 jobs are `PENDING (QOSMaxGRESPerUser)`** — the account's concurrent
+GPU cap is saturated by the sibling `cdn1` batch (22 RUNNING). **No `.out` file exists yet, so the
+RULE 20 post-launch audit and the separate ENV audit CANNOT have been run, and are recorded here as
+OPEN OBLIGATIONS. NO NUMBER FROM THIS BATCH MAY BE QUOTED UNTIL BOTH PASS AT FULL 60/60 COVERAGE.**
+The exact commands are in the launcher's own output and are repeated here:
+
+```
+export METAOPT_WS=/home/s5014158/metaopt
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cru1- --batch-consistency
+grep -h '^ENV:' $METAOPT_WS/runs/cru1-*.out | sort | uniq -c      # must be ONE line, x60
+python3 analysis/cY1_cru1_score.py $METAOPT_WS/runs
+```
+
+**ETA.** ~45 GPU-hours at an account-wide concurrency of ~22 GPUs shared three ways; `cdn1`'s own
+ETA is ~11:30 CEST. `cru1` should complete **between ~14:00 and ~19:00 CEST today**, inside the
+window. Walltime `03:00:00` is 1.51x the slowest CIFAR-100/100-epoch run ever observed (119 min), so
+nothing here is at risk of being unschedulable in the way `hz3-R2` was.
+
+### 168.8 SCOPE, REGISTERED IN ADVANCE AND BINDING
+
+`resnet18_blocks` (m = 6, the parent paper's own partition) and the `k49` cut-position arm are
+**NOT** in this batch. Either at the full ladder is 30 more jobs and ~22 more GPU-hours, which does
+not fit a three-way-shared window, and the standing instruction is to prioritise **bracketing each
+arm's optimum** over adding arms. **CONSEQUENCE: `cru1` closes RULE 11 for the
+`scalar`-vs-`layerwise` contrast on CIFAR-100 / `ResNet18_c100` at 100 epochs ONLY. It does NOT
+close it for `blk6`, for cut position, for class count, or for ImageNet, and no verdict this scorer
+produces may be quoted as if it did.** The scorer prints that sentence itself, under every verdict.
