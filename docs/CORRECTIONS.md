@@ -18364,3 +18364,36 @@ tuning, so a `COMPOSITION-INERT` verdict would be a statement about **THIS CELL*
 operator.  `169.2` and `169.4` are the two results that do **not** depend on the batch landing: they
 are properties of the live source and of the live optimizer's own recorded reduction, and they stand
 whatever the 18 runs return.
+
+## 167.1 `cdn1` — **RULE 20 IS NOW CLOSED AT FULL COVERAGE (24/24), AND THE SEPARATE ENV AUDIT WITH IT.**  The prohibition in `167` is DISCHARGED
+
+`167` recorded the audit at **21 of 24** because arm C's three jobs were still PENDING on
+`QOSMaxGRESPerUser`, and it forbade quoting any number until coverage was full.  All three started
+~35 min after submission and all 24 `.out` files now exist.  Re-run of **UNEDITED**
+`analysis/argsline_guard.py`:
+
+* **FULL COVERAGE: 24 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line, VERDICT PASS.**
+* `--batch-consistency --strict`, per family, **all PASS**: *"every non-axis flag is identical
+  across 18 runs"* (arm A, `--vary seed --vary run-name --vary save-directory --vary alpha0`),
+  across **3** (arm C), across **3** (arm M).
+* **SEPARATE ENV AUDIT PASS at 24/24** (`bash bin/cdn1_c100_denominator.sh --envaudit`): 18/18 +
+  3/3 + 3/3 files, **0 violations**.  Exactly **one** distinct `ENV:` line per family, modulo arm
+  M's per-run `PROBE_DIR`:
+  A `COS_TOTAL=50000 COS_WARMUP=1000 BETA_CLIP=none PROBE=0` ·
+  C `COS_TOTAL=100000 COS_WARMUP=1000 BETA_CLIP=none PROBE=0` ·
+  M `COS_TOTAL=default COS_WARMUP=default BETA_CLIP=-15:-2.3026 PROBE=5`.
+  Arm C's horizon rescale is therefore **verified from the runs' own logs**, not from the script.
+
+**STILL OPEN, and it is the only thing standing between this batch and a verdict:** the runs have
+not finished, nothing is ingested, and **`analysis/cdn1_denominator_score.py` has not been run on
+data**.  No `GAP_in`, no branch and no ladder argmax may be quoted until `V0`→`V1`→`V2`→`V3` have
+been scored in that order on ingested rows.
+
+**IN-FLIGHT OBSERVATION, EXPLICITLY NOT A RESULT.**  At epoch 83–92 of 100, single seeds, before
+the cosine has closed and before any gate: `lr01-s0` 76.96 TEST / 99.77 TRAIN, `lr02-s0` 76.92 /
+99.81, `lr005-s0` 76.77 / 99.94, `lr03-s0` 71.47 / 88.97.  Recorded here only because it discharges
+the **floor** question the registration was required to answer in advance — every rung is far above
+both registered floors and the *"arm just died"* model is not in play — and because it says the
+central point prediction (**A_best 76.0**) was not wildly off.  **These are mid-run per-seed
+numbers, not `plateau5`, not cell means, not gated, and they are not to be quoted as the
+denominator.**
