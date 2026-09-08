@@ -1,10 +1,43 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 141**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **170**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **171**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (nothing ingested this cycle). **`alice2` NOW CARRIES THREE REGISTERED BATCHES AND NOTHING HAS LANDED: `cdn1` 24 jobs (167), `cru1` 60 jobs (168), `crn1` 18 jobs (169) — 102 jobs, **~76.4 GPU-h** (17 + 45 + 14.4; corrected from an earlier ~81 slip, CORRECTIONS 170.6). `alice` (Saber's shared account) is READ-ONLY here and was not touched.**
-**`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,662 rows** (**+24: `cdn1` INGESTED this cycle** — 24 added, 0 changed, 0 removed). **`alice2`: `cdn1` 24/24 COMPLETE, SCORED, INGESTED (171). `cru1` 19/60 done, 41 PENDING (168). `crn1` 0/18, 18 PENDING (169). NEITHER `cru1` NOR `crn1` CONTRIBUTED A ROW — 0 before, 0 after.** `cdn1` cost **16.70 GPU-h** measured (`sacct`, 24 jobs). `alice` (Saber's shared account) is READ-ONLY here and was not touched.
+**`c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately not fixed**. **10 checks fail, up from 8**: 6 are the inherited stale-draft drift (141.6 / 142.6) with moved counts, and **2 are NEW and caused by this ingest** — the count-matched-family census goes **241 → 244** (paper 241) because `cdn1-m-s0/s1/s2` carry `chunk771`. A **draft** number to move, not a corpus defect. 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
+
+## CYCLE 141 (continued) — **`cdn1` LANDS, INGESTED, SCORED BY HAND. CORRECTIONS 171. `GAP_in` = +5.699 pp = +18.80 SE — `BELOW-BY-A-LOT`**
+
+**THE HEADLINE, AND IT IS THE ONE A REVIEWER ASKS FIRST.** On CIFAR-100, at this corpus's own standard cell, **the MetaOptimize family sits 5.70 pp below a tuned plain SGD+momentum+cosine baseline**, measured **WITHIN ONE BATCH** at **18.80 SE**. On CIFAR-10 the same deficit is 1.796 pp, so **the CIFAR-100 gap is ~3.2x larger and the CIFAR-10 figure MUST NOT be generalised.**
+
+| quantity | value | n | in-batch? |
+|---|---|---|---|
+| best tuned plain SGD, `cdn1-lr01` (lr 0.1, 100 ep) | **77.5927** | 3 | — |
+| this batch's own MetaOptimize replicate `cdn1-m` (`gm2-ch` recipe) | **71.8933** | 3 | — |
+| **`GAP_in` — PRIMARY, THE ONE THAT GATES** | **+5.6993 pp = +18.80 SE** | 3v3 | **YES** |
+| corpus best CIFAR-100 cell at **any** setting, `cdn1` excluded: `gm2-ch` | **72.0540** | 3 | — |
+| `GAP_corpus` — SECONDARY | **+5.5387 pp = +18.27 SE** | 3v3 | **NO (cross-batch)** |
+| `DELTA_H` — arm C 200 ep **78.8280** minus arm A lr 0.1 100 ep | **+1.2353 pp = +4.07 SE** | 3v3 | YES |
+
+Batch is the unit of replication (**F(62,85)=5.47**), so only `GAP_in` gates. `GAP_corpus` is quotable **only** because **V3** measured this batch's offset against `gm2` at **-0.1607 pp = -0.53 SE** (bar 2 SE = 0.606) and found it null — the two figures agree to 0.16 pp, which is the whole point of arm M.
+
+**GATES: V0 24/24 PASS · V1 PASS (min cell 71.89) · V2 BRACKETING PASS — argmax lr=0.1 is INTERIOR** (beats the lower endpoint by 7.32 SE, the upper by 4.03 SE), so **`GAP_in` is a tuned comparison, NOT a lower bound** · **V3 PASS**. Branch **`BELOW-BY-A-LOT`** (bar >= +3.0, cleared by 8.90 SE). Registered rule `V0 and V1 and V3` -> **`USABLE`**.
+
+**EVERY RUNG WINS.** The **worst** rung (lr=0.01, 75.3733) still beats arm M by **+11.48 SE** and `gm2-ch` by **+10.95 SE**. After ingest the corpus's **top six** CIFAR-100 cells at 100 epochs are **all six `cdn1` SGD rungs**. **No tuning story is left in which the baseline was handicapped** — and the SGD arms end at **99.74-99.98 % train** against arm M's **96.35 %**, so the gap is not an under-training artefact either.
+
+**THE 200-EPOCH ARM.** Published ResNet-18/CIFAR-100 numbers are usually quoted at **200** epochs; this campaign's standard cell is **100**. Arm C says the 100-epoch cell **understates the plain-SGD ceiling by +1.24 pp (4.07 SE)**. `167` registered arm C as a **LOWER BOUND unless arm A's argmax was 0.1** — **it is 0.1**, so **arm C is a tuned 200-epoch number in its own right.** Arm C - arm M (+6.93 pp) is **NOT like-for-like** and is not the primary.
+
+**SCOPE — BOTH DIRECTIONS, UNCHANGED FROM ITS ADVANCE REGISTRATION AT `167`.** The gap is a **SCOPE** fact about where the **whole family** sits. It **refutes NO granularity finding**: every granularity contrast in this corpus (D, G, U, T, the count-matched partition audit, the cut-position ladder) is a **within-MetaOptimize, within-batch** difference, and a common additive offset **cancels exactly** out of all of them. A small gap would have strengthened none of them either. **It constrains one sentence in the abstract and nothing else** — and it is not softened: the abstract must carry the CIFAR-100 deficit explicitly.
+
+**THE SCORER IS BROKEN AND WAS LEFT BROKEN (RULE 16).** `analysis/cdn1_denominator_score.py` reads the **corpus**, not a runs dir, so `cdn1` had to be **ingested before it could be scored** — the reverse of every prior batch. Two separate findings:
+* **Premises survive ingest-then-score, with exactly ONE exception.** `--selftest` **34/34 pre-ingest**, **33/34 post-ingest**; the only failure is section I, `no cdn1-* row exists yet (24 found)` — the `cS2` defect (161.9 / 165) in a **narrower** form. Sections A-H all carry `cdn1`-excluding readers and **re-derive identically before and after**, so **no quantity depends on it**.
+* **The scoring path CRASHES.** `python3 analysis/cdn1_denominator_score.py` -> `AttributeError: 'str' object has no attribute 'get'` at line 524 (`_cell_of(n)` is handed a run-name string; it takes a row). **Exit 1. NO VERDICT LINE WAS EVER PRINTED.** The crash is **corpus-independent** (same failure against the pre-ingest CSV), so it is **not** an ordering defect. `--selftest` never calls `score()` — **a green selftest is not evidence that a scorer can score.**
+
+Every number above was re-derived by a throwaway script **outside `analysis/`** that imports the registered module and uses **its** constants and readers unmodified, replacing only the one defective expression. `git diff -- analysis/` **EMPTY**; scorer sha256 `7644703b...` unchanged from `1e8e538`; `argsline_guard.py` sha256 `81cea8b5...` unchanged.
+
+**RULE 20:** 24/24 `.out`, verbatim `argsline_guard: 24 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line / VERDICT: PASS`, exit 0. `--batch-consistency --strict` PASS per family (18 with `--vary alpha0`, the declared LR axis; 3; 3). **ENV audit: exactly 3 distinct designs, one per family** — arm C's `COS_TOTAL=100000` with `--num-epochs 200` verified **from the runs' own logs**. **RULE 21:** commit `1e8e538` epoch 1788848854 -> earliest Submit 1788848926, **margin +72 s**, Submit spread **0 s**; 24/24 `COMPLETED`, `ExitCode 0:0`, 0 tracebacks.
+
+**NEXT:** `cru1` at 19/60 and `crn1` at 0/18 stay in flight and untouched. Any future re-score of `cdn1` must repeat the hand derivation or register a **NEW** file — **the existing scorer is not to be patched in place.**
 
 ## CYCLE 141 (this one) — **`cdn1` REGISTERED AND LAUNCHED: THE CIFAR-100 DENOMINATOR.** CORRECTIONS **167**. NOTHING LANDED, SCORED OR INGESTED
 

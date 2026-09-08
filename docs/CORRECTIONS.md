@@ -18600,3 +18600,325 @@ and of `docs/STATUS.md` said **≈ 81 GPU-h**, an arithmetic slip inherited from
 pre-launch *estimates* (`cdn1` had estimated ~22 and measured ~17).  `17 + 45 + 14.4 = 76.4`, not 81.
 The three per-batch figures were always right; only the total was wrong.  `STATUS.md`'s header line
 and queue line carry the corrected figure.
+
+## 171. `cdn1` LANDS, IS INGESTED AND IS SCORED **BY HAND, BECAUSE THE REGISTERED SCORER CANNOT RUN**: `analysis/cdn1_denominator_score.py` **CRASHES UNCONDITIONALLY IN ITS SCORING PATH** AND IS **LEFT UNEDITED** (RULE 16; precedent `cN1`/`cN2` at `149`, `cV1` at `166`). THE NUMBER STANDS ANYWAY AND IT IS LARGE: **`GAP_in` = +5.699 pp = +18.80 SE, IN BATCH — `BELOW-BY-A-LOT`.** A TUNED PLAIN SGD BASELINE BEATS THE BEST MetaOptimize CELL THIS CORPUS OWNS ON CIFAR-100 **BY MORE THAN THREE TIMES THE CIFAR-10 DEFICIT**, AND **EVERY RUNG OF THE LADDER, INCLUDING THE WORST, BEATS IT**. THE CORPUS STANDS AT **2,662 ROWS**
+
+`cdn1` is the batch registered at `167`, audited to full coverage at `167.1`, and re-audited at
+`170.1`.  It is now **complete, ingested and scored**.  **Zero jobs were submitted, zero cancelled,
+and no job belonging to another submitter was touched** — `cru1` (in flight) and `crn1` (in flight)
+were **read from `sacct` only** and **neither contributed a single row**.  `alice` (Saber's shared
+account) was not read from or written to at all.
+
+### 171.1 THE INGEST — **`cdn1` ONLY**, AND THE TWO IN-FLIGHT BATCHES ARE PROVED ABSENT ON BOTH SIDES
+
+24 `.out` files pulled from `alice2:/home/s5014158/metaopt/runs/` into `../runs_alice2/` by an
+explicit `cdn1-*.out` glob, then
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+python3 analysis/args_repair.py --apply
+```
+
+`aggregate.py` writes to **STDOUT** and the redirect goes to the corpus itself, not to a log
+(`146.7`: redirecting it to a log leaves the corpus untouched and makes a *"0 rows changed"* check
+pass **vacuously**).  Diffed row-by-row on the `(run, job_id)` key against a byte-copy of the
+pre-ingest CSV:
+
+| | count |
+|---|---|
+| rows BEFORE | **2,638** |
+| rows AFTER | **2,662** |
+| **ADDED** | **24** — every one `cdn1-*`, ids `4920408`–`4920431` |
+| **CHANGED** | **0** |
+| **REMOVED** | **0** |
+| `cru1` rows, before → after | **0 → 0** |
+| `crn1` rows, before → after | **0 → 0** |
+
+`args_repair.py --apply` reported *"APPLIED: 36 rows updated"* — **all 36 are `dup_group` repairs on
+PRE-EXISTING rows**, the same repairs `aggregate.py` discards every time it regenerates the file, and
+the row-level diff above confirms **0 CHANGED** against the pre-ingest corpus.  **No `cdn1` row was
+touched by the repair**; *"accuracy / config values: 0 rows"*, *"superseded: 0 rows"*.
+
+### 171.2 RULE 20, RULE 21 AND RULE 16 — **RE-MEASURED HERE, NOT QUOTED FROM `167.1` OR `170.1`**
+
+**RULE 20.**  `analysis/argsline_guard.py`, sha256
+`81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388` — **byte-identical to its value
+at `170.1`, unedited**.  Over all 24 `.out` files, **verbatim**:
+
+```
+argsline_guard: 24 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+```
+
+exit **0**.  `--batch-consistency --strict` **per family**: `cdn1-h2` **PASS** (3), `cdn1-m`
+**PASS** (3), `cdn1-lr` **PASS** (18) *with `--vary alpha0`*, which is the honest form — `--alpha0`
+**is** arm A's declared design axis (it is the flag `build_optimizer.py` routes to `torch.optim.SGD`'s
+`lr`).  Run **without** `--vary alpha0` the same family returns `VERDICT: FAIL` naming exactly
+`--alpha0   0.01 | 0.02 | 0.05 | 0.1 | 0.2 | 0.3`, i.e. **the guard sees the ladder and nothing
+else** — that FAIL is the guard working, and it is recorded here rather than hidden.
+
+**THE SEPARATE ENV AUDIT**, from the runs' own logs rather than any script header.  The 24 `ENV:`
+lines collapse to **exactly 3 distinct designs**, one per registered family, once `PROBE_DIR` (a
+per-seed path, a declared vary axis) is masked:
+
+| n | family | the line's own evidence |
+|---|---|---|
+| **18** | arm A | `COS_TOTAL=50000 COS_WARMUP=1000`, `BETA_CLIP=none`, `PROBE=0` |
+| **3** | arm C | **`COS_TOTAL=100000`** `COS_WARMUP=1000`, `BETA_CLIP=none`, `PROBE=0` |
+| **3** | arm M | `BETA_CLIP=-15:-2.3026`, `COS_TOTAL=default`, `PROBE=5` |
+
+and the paired `ARGS:` lines carry `--num-epochs 200` for arm C against `--num-epochs 100` for
+arm A.  **Arm C's 200-epoch cosine rescale is therefore verified from the runs themselves**:
+`COS_TOTAL = 100000 = 500 × 200`, exactly as `COS_TOTAL = 50000 = 500 × 100` for arm A.
+
+**RULE 21, re-measured from `git` and `sacct`.**  Scorer registered at `1e8e538`, commit epoch
+**1788848854** (`2026-09-08T08:27:34+02:00`).  Earliest — and only — `Submit` over all 24 jobs:
+**`2026-09-08T08:28:46`**, **Submit spread 0 s** (one submission).  **Margin +72 s.**  All 24
+`sacct` states `COMPLETED`, `ExitCode 0:0`; 24/24 `.out` carry `RUN_DONE`; **0 tracebacks**.
+Elapsed sums to **16.70 GPU-h** over 24 jobs (mean 41.7 min), against the ~17 h recorded at `170.6`.
+
+**RULE 16.**  `git diff -- analysis/` is **EMPTY**.  `analysis/cdn1_denominator_score.py` sha256
+`7644703b02e5589bff8efbea46d20bee8ceca061658e0989801026712307b147`, **unchanged from its
+registration commit `1e8e538`**, and it is **left that way even though it does not work** (below).
+
+### 171.3 THE SCORER — **ITS PREMISES SURVIVE INGEST-THEN-SCORE, AND THEN IT CRASHES ANYWAY**
+
+`cdn1_denominator_score.py` is the **first scorer in this campaign that reads the CORPUS rather than
+a runs directory**.  It takes `--csv` and `--selftest` and no runs path, so `cdn1` **must be ingested
+before it can be scored** — the reverse of the score-then-ingest order used for every prior batch.
+Both questions the cycle brief raises are answered here, and they have **different** answers.
+
+**(a) THE PREMISES: ONE CHECK IS FALSE-BY-CONSTRUCTION UNDER INGEST-THEN-SCORE, AND IT IS THE ONLY
+ONE.**  `--selftest` run **before** the ingest: **34/34 checks passed**, exit 0.  Run **after** the
+ingest, unedited, same command: **33/34**, exit 1, with exactly one line changed, **verbatim**:
+
+```
+I. this batch is absent from the corpus at registration time
+    FAIL no cdn1-* row exists yet (24 found)
+```
+
+That is the `cS2` defect recorded at `161.9` and fixed in `cW1` at `165`, **recurring in a narrower
+form**.  It is narrower because sections **A–H — every premise that carries a number — are invariant
+by construction**: `csv_rows()` filters `run.startswith("cdn1-")` out of the corpus, so the best
+CIFAR-100 cell (`gm2-ch` 72.054, n=3), `σ_seed` (0.3713, df 49, 28 cells), the m=1 floor (22.727, 10
+cells) and the CIFAR-10 precedent (`bl-sgd-01` 95.124, n=5) **all re-derive identically before and
+after ingest** and were verified to do so.  Only **section I**, which asserts `len(own_rows()) == 0`,
+is a statement *about the ingest itself*.  **It is not a premise of any quantity.**  So: the scorer's
+own header claim that *"every corpus reader excludes `cdn1-*` so every frozen premise is invariant
+under this batch's own ingest"* is **TRUE**, and its parenthetical *"(verified, not asserted: section
+I checks 0 cdn1 rows exist)"* is the one part that is **self-defeating** — the check that verifies
+the exclusion is itself the only thing the exclusion cannot protect.  **RECORDED, NOT EDITED.**
+
+**(b) THE SCORING PATH DOES NOT RUN AT ALL.  THIS IS NOT AN ORDERING DEFECT — IT IS A BUG.**
+The documented default invocation, unedited:
+
+```
+$ python3 analysis/cdn1_denominator_score.py
+========================================================================
+cdn1 -- THE CIFAR-100 DENOMINATOR
+corpus: .../results/all_runs.csv
+========================================================================
+
+V0  COMPLETENESS
+    24/24 rows present
+    V0: PASS
+
+    ARM      n   TEST plateau5      TRAIN final     collapsed
+Traceback (most recent call last):
+  File ".../analysis/cdn1_denominator_score.py", line 660, in <module>
+    sys.exit(main(sys.argv[1:]))
+  File ".../analysis/cdn1_denominator_score.py", line 656, in main
+    return score(a.csv)
+  File ".../analysis/cdn1_denominator_score.py", line 535, in score
+    te, tr, col = cell("lr" + tag)
+  File ".../analysis/cdn1_denominator_score.py", line 524, in cell
+    rs = [have[n] for n in want if _cell_of(n) == PREFIX + tag and n in have]
+  File ".../analysis/cdn1_denominator_score.py", line 292, in _cell_of
+    return re.sub(r"-s\d+$", "", str(r.get("run") or ""))
+AttributeError: 'str' object has no attribute 'get'
+```
+
+exit **1**.  **THERE IS NO VERDICT LINE TO QUOTE.  THE SCORER NEVER PRINTED ONE.**  `_cell_of()`
+takes a CSV **row** and calls `.get("run")` on it; line 524 hands it a **run name string**.  The
+same line also indexes `have[n]` *before* the `n in have` guard, a second latent fault.
+
+**THE CRASH IS CORPUS-INDEPENDENT.**  Re-run against the **pre-ingest** CSV it fails at the same
+line with the same exception, so it is **not** caused by scoring after ingest and would have fired
+whichever order was used.  **The reason `167` could report `34/34 --selftest` on a broken scorer is
+that `--selftest` never calls `score()`** — the two paths share constants and readers but not one
+line of the tabulation.  **A green `--selftest` is not evidence that a scorer can score.**  That is
+the lesson of this entry and it is new.
+
+**WHAT WAS DONE ABOUT IT: NOTHING, BY RULE.**  RULE 16 — a registered scorer is never edited.  The
+numbers below are re-derived by a **throwaway script outside `analysis/`** which `import`s the
+registered module and uses **its** constants and **its** corpus readers unmodified (`S.LADDER`,
+`S.SE`, `S.CORPUS_BEST`, `S.INTERIOR`, `S.V1_TRAINS`, `S.V3_OFFSET`, `S.B_SOME`, `S.B_LARGE`,
+`S.own_rows`, `S.csv_rows`, `S._cell_of`, `S.mean_sd`, `S.arm_names`), replacing **only** the one
+defective expression with `S._cell_of(have[n])` — the row, which is what the function was written
+for.  **Every constant below is the registered one; nothing was retyped.**  The branch token and the
+`USABLE`/`GATED` token are evaluated **by the registered rules** but were **never emitted by the
+scorer**, and are not presented as scorer output.
+
+### 171.4 THE LR SWEEP — **TEST AND TRAIN, PER SEED**, AND THE BRACKETING CHECK
+
+`plateau5` is primary throughout; the CSV `plateau` column is **banned** as primary and `best_test`
+is not a plateau.  Seeds in order 0, 1, 2.  `collapsed = 0` for all 24 rows.
+
+| arm | n | `plateau5` per seed | mean | sd | `final_train` per seed | mean |
+|---|---|---|---|---|---|---|
+| A lr=0.01 | 3 | 75.544 · 75.128 · 75.448 | **75.3733** | 0.2183 | 99.980 · 99.970 · 99.980 | 99.977 |
+| A lr=0.02 | 3 | 76.152 · 76.586 · 76.360 | **76.3660** | 0.2171 | 99.980 · 99.970 · 99.980 | 99.977 |
+| A lr=0.05 | 3 | 77.152 · 77.172 · 77.146 | **77.1567** | 0.0136 | 99.980 · 99.970 · 99.960 | 99.970 |
+| **A lr=0.1** | 3 | 77.526 · 78.048 · 77.204 | **77.5927** | 0.4260 | 99.960 · 99.960 · 99.970 | 99.963 |
+| A lr=0.2 | 3 | 76.996 · 77.218 · 77.056 | **77.0900** | 0.1148 | 99.920 · 99.890 · 99.900 | 99.903 |
+| A lr=0.3 | 3 | 76.268 · 76.560 · 76.282 | **76.3700** | 0.1647 | 99.740 · 99.720 · 99.760 | 99.740 |
+| **M** (`gm2-ch` replicate) | 3 | 71.814 · 71.958 · 71.908 | **71.8933** | 0.0733 | 96.430 · 96.380 · 96.240 | **96.350** |
+| **C** (SGD, 200 ep, lr 0.1) | 3 | 78.986 · 78.800 · 78.698 | **78.8280** | 0.1461 | 99.990 · 99.970 · 99.970 | 99.977 |
+
+**THE TRAIN COLUMN IS NOT DECORATION.**  Every SGD arm ends at **99.74–99.98 % train**, i.e. at
+interpolation; arm M ends at **96.35 %**.  The gap below is therefore **not** an
+under-training artefact of the baseline — the baseline fits the training set *harder* than the meta
+arm does and still generalises **5.7 pp better**.  Whatever the meta optimiser is doing on CIFAR-100,
+it is **not** buying its position with extra regularisation that shows up as lower train accuracy.
+
+**GATES, IN THE REGISTERED ORDER.**
+
+* **V0 COMPLETENESS — PASS.**  24/24 rows present, every one `complete=1`, `window_ok=1`,
+  `epochs_done == epochs_requested` (100 for arms A/M, **200** for arm C).
+* **V1 TRAINS-AT-ALL — PASS.**  Lowest cell mean **71.8933** ≫ 40.0; `collapsed=0` everywhere.
+* **V2 BRACKETING — PASS.  THE ARGMAX IS INTERIOR.**  Ranked: **lr=0.1 77.5927** · lr=0.05 77.1567
+  · lr=0.2 77.0900 · lr=0.3 76.3700 · lr=0.02 76.3660 · lr=0.01 75.3733.  The ladder is **unimodal**
+  and the peak beats the **lower** endpoint by **+2.2193 pp = 7.32 SE** and the **upper** endpoint by
+  **+1.2227 pp = 4.03 SE**.  **The optimum is not at a ladder edge, so `GAP_in` is a tuned
+  comparison and NOT a lower bound.**  Stated against itself: the peak beats its *nearest neighbour*
+  (lr=0.05) by only **+0.4360 pp = 1.44 SE**, which does **not** resolve lr=0.1 from lr=0.05 at 2 SE —
+  but the registered quantity is the **max over the ladder**, and substituting lr=0.05 moves `GAP_in`
+  to **+5.263 pp**, still deep in `BELOW-BY-A-LOT`.  **The verdict does not depend on which of the
+  top two rungs is the argmax.**
+* **V3 OFFSET — PASS.**  Arm M **71.8933** − `gm2-ch` **72.054** = **−0.1607 pp = −0.53 SE**, inside
+  the registered bar 2 SE = 0.6063.  **This batch carries no measurable offset against `gm2`**, which
+  is what licenses the cross-batch figure to be quoted alongside the in-batch one.
+
+### 171.5 **THE NUMBER.**  IN-BATCH FIRST, BECAUSE **BATCH IS THE UNIT OF REPLICATION** (`F(62,85)=5.47`)
+
+| quantity | value | n each | **in-batch?** |
+|---|---|---|---|
+| **this batch's best tuned plain SGD**, cell `cdn1-lr01` (lr 0.1, 100 ep) | **77.5927 pp** | 3 | — |
+| **this batch's own MetaOptimize replicate**, cell `cdn1-m` (`gm2-ch` recipe, 100 ep) | **71.8933 pp** | 3 | — |
+| **`GAP_in` = PRIMARY** | **+5.6993 pp = +18.80 SE** | 3 vs 3 | **YES — IN-BATCH.  THIS IS THE ONE THAT GATES.** |
+| the corpus's best CIFAR-100 cell **at any setting**, `cdn1` excluded: `gm2-ch` | **72.0540 pp** | 3 | — |
+| `GAP_corpus` = SECONDARY | **+5.5387 pp = +18.27 SE** | 3 vs 3 | **NO — CROSS-BATCH** |
+
+**`BRANCH: BELOW-BY-A-LOT`** (registered boundary ≥ +3.0 pp; the observed gap clears it by
+**8.90 SE**).  **`VERDICT: USABLE`** by the registered rule `V0 ∧ V1 ∧ V3`, with **V2 also PASS**.
+Both tokens are computed from the registered constants; **neither was printed by the scorer**
+(`171.3b`).  The registered point prediction was **+3.95 pp**; the observed gap is **+5.70**, i.e.
+the batch landed **in the predicted branch but 1.75 pp = 5.77 SE more adverse than predicted** —
+arm A over-performed (77.59 vs 76.0 predicted) and arm M came in slightly low (71.89 vs 72.05).
+
+**THE CORPUS BEST WAS RE-DERIVED, NOT QUOTED.**  Over **120 CIFAR-100 cells** (complete,
+`window_ok`, `cdn1-*` excluded, **all** `epochs_requested` values — the corpus carries 100, 772, 20,
+5 and 3), the maximum cell mean `plateau5` is **`gm2-ch` = 72.0540, n=3**
+(`ResNet18_c100 / chunk771 / ms 1e-4 / α₀ 1e-3 / −15:−2.3026 / batch 100 / AUGMENT=1 / SGDm+Lion`);
+runners-up `gm2-c22` 72.0000 (n=3), `gc1-ch` 71.9515 (n=4), `gm2-n1d` 71.9320 (n=3).  Restricting to
+`epochs_requested=100` gives **the same cell and the same four leaders** — **no long-horizon cell in
+this corpus beats it.**  The best single CIFAR-100 **row** is `gm2-ch-s1` at **72.408**.  The brief's
+*"around 72.0 from a `gm2` chunk arm"* is **confirmed exactly**.
+
+**WHICH COMPARISON GATES.**  `GAP_in` is **within batch `cdn1`**: arm A and arm M were submitted in
+the same `sbatch` call, 0 s apart, on the same account, the same partition and the same harness, and
+arm M's submit line is byte-identical to `bin/c91_c100_mech.sh`'s `gm2-ch` arm bar the run name and
+save directory.  **Every batch offset cancels out of it exactly.**  `GAP_corpus` compares across
+batches (`cdn1` vs `gm2`) and is exposed to the batch effect the campaign has measured at
+**`F(62,85)=5.47`**; it is quotable **only because V3 measured this batch's offset against `gm2` at
+−0.53 SE and found it null**.  **The two agree to 0.16 pp, which is the point of arm M.**
+
+**AND THE LADDER DOES NOT NEED ITS OPTIMUM TO WIN.**  The **worst** rung on the ladder, lr=0.01 at
+**75.3733**, still beats arm M by **+3.4800 pp = +11.48 SE** and `gm2-ch` by **+3.3193 pp =
++10.95 SE**.  **All six rungs — every tuning choice on the ladder, including the deliberately bad
+ones — sit above the best MetaOptimize cell this corpus has ever produced on CIFAR-100.**  After
+this ingest the corpus's top six CIFAR-100 cells at 100 epochs are **all six `cdn1` SGD rungs**, and
+the best CIFAR-100 cell at any horizon is `cdn1-h2` (78.828).  **There is no tuning story left in
+which the baseline was handicapped.**
+
+### 171.6 WHAT THE 200-EPOCH ARM BOUGHT — **AND IT IS A TUNED NUMBER, NOT A LOWER BOUND**
+
+`DELTA_H` = arm C **78.8280** − arm A at lr=0.1 **77.5927** = **+1.2353 pp = +4.07 SE**, i.e.
+**RESOLVED at 2 SE**.  Doubling the horizon with the cosine rescaled to match buys **+1.24 pp**.
+
+**THE REGISTERED LIMITATION IS VOIDED BY THE DATA.**  `167` fixed arm C's lr at 0.1 *a priori* and
+registered it as a **LOWER BOUND unless arm A's argmax turned out to be 0.1**.  **Arm A's argmax
+IS 0.1** (`171.4`, V2).  **Arm C is therefore a tuned 200-epoch baseline in its own right and is
+reported as one, not as a bound.**
+
+**WHY IT MATTERS AND WHAT IT MAY NOT BE USED FOR.**  Published ResNet-18/CIFAR-100 numbers are
+usually quoted at **200 epochs**, while this campaign's standard cell is **100**.  Arm C is what
+makes the outside comparison **honest**: it says the 100-epoch cell **understates** the plain-SGD
+ceiling by **1.24 pp**, so a reviewer who compares this corpus's CIFAR-100 numbers against a
+published 200-epoch table is comparing against **78.83**, not 77.59.  **Arm C is NOT part of
+`GAP_in`.**  Arm C − arm M is **+6.9347 pp = +22.87 SE** and is **NOT like-for-like** (200 ep vs
+100 ep); it is recorded here so nobody re-derives it later and mistakes it for the primary.  The
+primary stays at the **100-epoch, horizon-matched** figure.
+
+### 171.7 **THE SCOPE, STATED ONCE, IN BOTH DIRECTIONS**
+
+**The sentence a reviewer asks for first, and it is not softened:** on CIFAR-100, at this corpus's
+own standard cell, **the MetaOptimize family sits 5.70 pp below a tuned plain SGD + momentum +
+cosine baseline** — measured **within one batch**, at **18.80 SE**, against a baseline that reaches
+interpolation on the training set and whose *worst* ladder rung still wins by 11.48 SE.  On CIFAR-10
+the same comparison is a deficit of **1.796 pp** (`c98_reproduce.py`'s own re-derivation this cycle;
+the draft prints 1.807).  **The CIFAR-100 deficit is ≈ 3.2× the CIFAR-10 one, so the CIFAR-10 figure
+MUST NOT be generalised** — this is the `BELOW-BY-A-LOT` branch and it requires the abstract's scope
+sentence to carry the CIFAR-100 deficit **explicitly**.
+
+**And it is not overreached, either.**  A gap of any size is a **SCOPE** fact about **where the whole
+family sits**.  It **refutes no granularity finding in this corpus**, because **every granularity
+contrast the campaign owns is internal to MetaOptimize** — D, G, U, T, the count-matched partition
+audit, the cut-position ladder — a **within-family, within-batch** difference between two arms
+sharing base optimiser, meta optimiser, horizon and box.  **A common additive offset between the
+family and SGD cancels exactly out of every one of them.**  Symmetrically, had the gap been small it
+would have **strengthened none of them**.  The gap constrains **one sentence in the abstract** and
+nothing else.  This is the scope registered **in advance** at `167` and it is **unchanged by the
+result**, which is the only reason it can be trusted now.
+
+**What this batch may still not claim** (from `167`, unchanged): nothing about ImageNet,
+TinyImageNet, ResNet34/50 or CIFAR-10; and **arm A is not THE optimal plain baseline** — it is tuned
+over **one** axis, `lr`, on a 6-point ladder at fixed momentum 0.9 and weight decay 5e-4.  A
+momentum/weight-decay sweep is a different batch and was not funded here.
+
+### 171.8 `c98_reproduce.py` — **EXIT 1**, AND **THIS INGEST CREATED TWO NEW FAILURES**
+
+`python3 analysis/c98_reproduce.py` → **exit code 1**, **10 checks failed**, up from **8** at
+`170.5`.  **Reported as-is.  AUTHOR SCOPE.  DELIBERATELY NOT FIXED, and `paper/` was not touched.**
+Run against a byte-copy of the pre-ingest CSV the same script reports **8**, so the difference is
+attributable to this ingest and to nothing else:
+
+* **Six pre-existing failures move their numbers only** (stale-draft drift, `141.6`/`142.6`):
+  rows **2662** vs paper 2177; admissible **2220** vs 1735; runs with a wallclock **2647** vs 2162;
+  GPU-hours **2844** vs 1642; best R18/C10 MetaOptimize arm 93.328 vs 93.317; deficit **1.796** vs
+  1.807.
+* **Two more move from PASS to FAIL and they are NEW:** *"count-matched-family rows outside the
+  in-flight `rp1` batch"* **241 → 244** (paper 241), and *"…of which admissible"* **241 → 244**.
+* **Two partition-family counts move within an existing failure:** 437 → **440** admissible, 425 →
+  **428** with `meta = Lion`.
+
+**THE CAUSE IS IDENTIFIED, NOT GUESSED.**  All four movements are **exactly +3**, and the three rows
+are **`cdn1-m-s0/s1/s2`** — the only `cdn1` rows carrying a partition granularity (`chunk771`; the
+other 21 carry `granularity = ?` because arms A and C have no step-size groups at all).  Arm M is a
+deliberate replicate of `gm2-ch`, so it **legitimately** joins the count-matched family; the
+consequence is that **§4.3/§8's "241" is now 244 in the corpus**, and that is a **draft** number for
+the author to move, not a corpus defect.  Census unchanged: 628 `chk()` sites, 411 distinct quantity
+numerals, **41.9 %** coverage.
+
+### 171.9 STANDING WORK THIS ENTRY LEAVES OPEN
+
+1. **`analysis/cdn1_denominator_score.py` IS BROKEN AND REMAINS BROKEN.**  It is registered, it is
+   unedited, and it **cannot produce its own verdict**.  Any future re-scoring of `cdn1` must either
+   repeat the hand derivation of `171.3b`–`171.5` or register a **new** file; **the existing one is
+   not to be patched in place** (RULE 16), and its `34/34 --selftest` **must not** be cited again as
+   evidence that it works.
+2. **A `--selftest` that never calls the scoring path is not a test of the scorer.**  Every scorer
+   registered from here on should have its selftest exercise `score()` against a synthetic corpus, or
+   say plainly that it does not.
+3. **`cru1` (19+/60) and `crn1` (0/18) remain in flight and were NOT ingested.**  Their rows are
+   proved absent on both sides of this ingest (`171.1`).  Nothing about them is scored here.
