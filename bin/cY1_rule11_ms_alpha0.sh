@@ -318,7 +318,8 @@ if len(shared) < 4:
           "broken"); bad += 1
 tp = os.path.join(cif, "train.py")
 srcl = open(tp).read().split("\n")
-hits = [(i + 1, l.strip()) for i, l in enumerate(srcl) if "num_epochs" in l]
+hits = [(i + 1, l.strip()) for i, l in enumerate(srcl)
+        if "num_epochs" in l or "num-epochs" in l]
 decl = [h for h in hits if "add_argument" in h[1]]
 loop = [h for h in hits if h[1].startswith("for epoch in range(")]
 other = [h for h in hits if h not in decl and h not in loop]
@@ -387,7 +388,7 @@ PROV="$SAVE/PROVENANCE.txt"
 mkdir -p "$SAVE"
 if [ -f "$HFLIVE" ]; then
   HFSHA=$( (sha256sum "$HFLIVE" 2>/dev/null || shasum -a 256 "$HFLIVE") | awk '{print $1}')
-  NRED=$(grep -c 'PATCH_REDNORM' "$HFLIVE" 2>/dev/null || echo 0)
+  NRED=$(grep -c 'PATCH_REDNORM' "$HFLIVE" 2>/dev/null); NRED=${NRED:-0}
   echo "guard 4i: live HF.py sha256 $HFSHA"
   echo "guard 4i: PATCH_REDNORM markers in the live HF.py at submit time: $NRED"
   echo "          (inert for this batch either way -- no spec here starts with tn:)"
