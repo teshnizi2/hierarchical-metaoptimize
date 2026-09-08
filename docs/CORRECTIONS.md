@@ -21844,3 +21844,357 @@ Zero GPU in this entry: nothing submitted, cancelled or touched; `alice` not acc
 quantity numerals, 41.9 % coverage, unchanged.  `git add` restricted to `docs/CORRECTIONS.md` and
 `docs/STATUS.md`.  No nested `claude -p`.  This entry takes the next free number (`183`); the authority
 line in `docs/STATUS.md` moves `182 → 183`.
+
+## 184. `ctd1` LANDS, IS ATTACKED, AND IS INGESTED — **H-DOMINATE (T) RESOLVES TO `DOMINATION-BY-OTHER-TENSORS`: THREE 512-PARAMETER BATCHNORM SCALES (`layer4.1.bn2.weight`, `layer4.0.bn2.weight`, `layer4.0.shortcut.1.weight`, 0.014 % OF THE PARAMETERS) CARRY THE SCALAR META-GRADIENT SIGN AGAINST THE OTHER 59 TENSORS AND VOTE `beta` DOWN ON EVERY PINNED RECORD.**  EVERY SECTION-[B] NUMBER RE-DERIVES EXACTLY WITH AN INDEPENDENT PARSER.  **THE BRIEFING'S READING OF THE NARROWING IS WRONG** (THE CONVS SIT IN THE EARLY 21-TENSOR PREFIX WITH THE *OPPOSITE* SIGN, AS OPPONENTS; THEY NEVER VOTE DOWN IN ANY PHASE), **THE "COHERENT STORY" IS BROKEN AT `linear.weight`** (IT PINS AT THE FLOOR UNDER ITS OWN BETA), **THE THREE SEEDS ARE NEAR-REPLICATES** (`sign(L)` AGREES ON 500/500 RECORDS FOR EVERY PAIR), AND THE CARRIERS' DOMINANCE IS **NOT A GENERIC BN-GRADIENT ARTEFACT** (UNDER LAYERWISE DYNAMICS THE SAME TENSORS RANK 5/6/11 WITH `|L|` 30× SMALLER).  **INGESTED: 2,740 → 2,746, ADDED 6 · CHANGED 0 · REMOVED 0; 5.08 GPU-h.**  THE CUT-POSITION UNIFICATION IS **NOT LICENSED** BY THIS BATCH (184.6).
+
+Everything below is re-derived this cycle from the six `probe.jsonl` files (sha256-identical on `alice2`
+and in the mirror), the six `.out` files, `sacct`, the live model built from the live `build_network.py`,
+the corpus, and arithmetic.  Nothing is quoted from the cycle briefing; where the briefing is wrong it is
+said so.  This entry takes the next free number (`184`); `183` is the verification entry.
+
+### 184.1 THE BRIEFING, AGAINST THE RECORD — FOUR CORRECTIONS, STATED FIRST
+
+**(1) "Early DISAGREE records have 21-tensor carrying sets *including the convs*."**  True as a count,
+wrong as a reading.  `cTD2`'s carrying set is the shortest **prefix** of the `|L_i|`-ranked tensors whose
+partial sum has the aggregate's sign *and* out-weighs the remainder; a prefix contains every large term,
+whichever way it points.  At seed 18, step 8,700 (the first DISAGREE record; `s_agg = +1`, `L = +8.56e−3`,
+20 positive / 42 negative) the 21-tensor prefix is
+
+    l4.1.bn2.w +0.097   l4.0.bn2.w +0.076   l4.0.conv2.w −0.046   l4.1.conv2.w −0.046
+    l4.0.shortcut.1.w +0.040   linear.w −0.037   l4.1.conv1.w −0.023   …
+
+— the three BN scales are the top-3 **positive** terms and the three NAMED tensors are the top-3
+**negative** terms.  The convs and the classifier are in the prefix as the opposition that had to be
+out-weighed, not as carriers.  Sum of positives 0.246 vs sum of negatives −0.237, carriers alone 0.214.
+By step 9,000 the positives sum to 0.370 against the same −0.241 and the prefix is exactly the three
+carriers.  **The NAMED tensors have `L_i < 0` on 100 % of the 1,500 scalar records, in every phase.**
+
+**(2) The two mechanisms the briefing offers for the narrowing ("convs change sign" vs "convs shrink")
+are both wrong.**  Neither happens (184.5): the convs' `L_i` never changes sign and their `|L_i|` is
+*constant* (median 0.048 unpinned → 0.060 pinned); the carriers' `|L_i|` **grows three orders of
+magnitude** at the ascent peak (median 2.0e−4 before step 8,600 → 0.24 in steps 8,600–12,000 → 0.32 from
+12,000 on) and then freezes.  The prefix shrinks from 21 to 3 within 300 meta-steps because the carriers'
+EMA (time constant 100 steps) is still ramping at step 8,700.
+
+**(3) "The convs and `linear.weight` ASCEND under layerwise" — two of three.**  The two layer4 convs do
+(terminal −7.49 … −7.95, never at the floor); **`linear.weight` does not**: under its own beta it first
+pins at −15 at step **18,400 in all three seeds** and votes DOWN (`L_j > 0`) on 0.828 of its records
+(184.4).  Under scalar dynamics the same tensor votes UP on 100 % of records — it is the most
+path-dependent tensor of the 62 (`agree` 0.172).
+
+**(4) The three scalar seeds are not three independent samples of `R_T`.**  Their harness `sign(L)`
+agrees on **500/500** records for every pair; the DISAGREE step-sets have Jaccard **1.000**; the floor is
+first touched at 18,600 / 18,500 / 18,500 and `max_t |beta_s − beta_s'|` ≤ 0.092 nats (184.7).  The
+per-seed `R_T` 0.826 / 0.826 / 0.828 is one trajectory measured three times.
+
+### 184.2 THE SCORER, RE-RUN UNEDITED — VERDICT VERBATIM
+
+`analysis/cTD2_tensor_dominate_score.py` sha256 `c3122e1f283ed336b38cd2427910398b61bbf82f3d80c8dec2056c8a81249510`
+(unchanged since `5c0f04b`; `git diff -- analysis/ patches/` **empty**; this entry adds one new file,
+`analysis/ctd1_attack_rederive.py`, and one results directory).  Run with the positional `runsdir` on the
+Mac mirror `../runs_alice2` (probe files sha256-identical to `alice2`: `sc-s18 7fafff3e…`, `sc-s19
+f78f0e7a…`, `sc-s20 a566cb85…`, `lay-s18 b31013b7…`, `lay-s19 cb702125…`, `lay-s20 531624e3…`):
+
+    FINAL: PRIMARY DOMINATION-BY-OTHER-TENSORS | SECONDARY-z:DOMINATION-BY-OTHER-TENSORS | PINNED-R_T=1.0000 | PINNED-FRAC=0.6298 | PINNED-AGG-NEG=0.0000 | PATH-DEPENDENT-MIXED | FLOOR-OK | FLOOR-NOT-INGESTED
+
+**Gates: 64/64 PASS** (inertness ALL PASS on `4732b74a…` = `PROVENANCE HF_SHA256` = the live
+`cifar10/Optimizers/HF.py` today; 3 markers; 6 × 500 records at steps 0…49,900, 0 unparsable; registered
+header, numels, ARGS, ENV-modulo-`PROBE_DIR`, `PROBE_TENSOR` line, `RUN_DONE`, no traceback on all six).
+**[A]:** `Σ_i z_i` vs harness `z` worst relative **1.59e−7**, `Σ_i m_i` vs `momentum_meta` **9.61e−7**
+(0/3,000 fail); `sign(Σ_i L_i) == sign(harness L)` on **every** scalar record; `frac_neg == 1 ⇔ z < 0`
+on every record; `−(beta − beta_pre)/ms == sign(0.9·mom_pre + 0.1·z_agg)` on **82,722/82,722** unclamped
+coordinates (11,778 clamped).  Re-run after the ingest: identical except the `FLOOR-NOT-INGESTED` stamp
+drops (the band cells stay n 29 / n 23 by design — the scorer excludes `ctd1-` rows from its own band).
+
+`sacct`: jobs 4924919–4924924, Submit `2026-09-08T21:12:39` on all six, all `COMPLETED`; Elapsed
+`sc-s18` 1:35:16 (node851, a 2080ti node), `lay-s18` 41:11, `sc-s19` 43:48, `lay-s19` 45:03, `sc-s20`
+44:21, `lay-s20` 40:02.
+
+### 184.3 SECTION [B] RE-DERIVED — INDEPENDENT PARSER, EVERY NUMBER
+
+`analysis/ctd1_attack_rederive.py` (numpy, written from the definitions in `cTD2`'s header, not from its
+code; output at `results/ctd1_tensor_dominate/ATTACK_REPORT.txt`).  `L_i = 0.9·m_i + 0.1·z_i` from each
+record's own `m_tensor`/`z_tensor`; `s_agg = sign(0.9·mom_pre + 0.1·z_agg)` from the harness's own
+pre-update values; PINNED = `n_at_lo == 1` (identical to `beta_post ≤ −15 + 1e−6` on 500/500 records per
+seed).
+
+| PRIMARY `L_i` | pooled | s18 | s19 | s20 |
+|---|---|---|---|---|
+| determinate records | **1,499** (aggregate-zero 0, majority tie 1) | 500 | 500 | 499 |
+| DISAGREE | **1,239** | 413 | 413 | 413 |
+| **`R_T`** | **0.8266** | 0.8260 | 0.8260 | 0.8277 |
+| PINNED: det / DISAGREE / `R_T` / `s_agg < 0` | **944 / 944 / 1.0000 / 0.0000** | 314/314 | 315/315 | 315/315 |
+| UNPINNED: det / DISAGREE / `R_T` | **555 / 295 / 0.5315** | 186/99 | 185/98 | 184/98 |
+| PINNED-FRAC | **0.6298** | 0.628 | 0.630 | 0.630 |
+| DOWN among DISAGREE (`s_agg > 0`) | **1.0000** (bar 0.75) | | | |
+| NAMED-CARRIED | **0.0000** (bar 0.75) | | | |
+| carrying-set size on DISAGREE | **3 on 1,207 of 1,239**; 7:1, 8:1, 9:15, 10:6, 11:3, 12:1, 15:2, 16:1, 20:1, 21:1 | | | |
+| carriers (share of DISAGREE) | `layer4.1.bn2.weight` **1239 / 1.000**; `layer4.0.bn2.weight` **1239 / 1.000**; `layer4.0.shortcut.1.weight` **1239 / 1.000**; next: `layer4.0.conv2.weight`, `layer4.1.conv2.weight`, `linear.weight` 32 / 0.026 each, `layer4.0.shortcut.0.weight` 31, `layer3.1.conv2.weight` 28 | | | |
+
+**SECONDARY `z_i`:** determinate 1,486 (ties 14); DISAGREE 1,034; `R_T` **0.6958** (0.6949 / 0.6834 /
+0.7093); PINNED 934, `R_T` 0.8298, `s_agg < 0` 0.1531; UNPINNED 552, 0.4692; DOWN 0.9981; NAMED-CARRIED
+0.0000; carriers 1034 / 1033 / 1033 (1.000 / 0.999 / 0.999), then `linear.weight` 919 (0.889),
+`layer4.0.conv2.weight` 748 (0.723), `layer4.0.shortcut.0.weight` 746, `layer4.1.conv2.weight` 683,
+`conv1.weight` 682.  Every number above equals `cTD2`'s to the printed digit.
+
+### 184.4 ATTACK 1 — IS BN-SCALE DOMINANCE A GENERIC GRADIENT-SCALE ARTEFACT?  **PARTLY, AND THE PART THAT MATTERS IS NOT.**
+
+Median `|X_i|` over records (per tensor; "×" = ratio to the median tensor's median):
+
+| arm, statistic | median tensor | `l4.1.bn2.w` | `l4.0.bn2.w` | `l4.0.shortcut.1.w` | `l4.0.conv2.w` | `l4.1.conv2.w` | `linear.w` |
+|---|---|---|---|---|---|---|---|
+| SCALAR `L`, all | 1.49e−3 | **0.315 (×212, rank 1)** | **0.280 (×188, 2)** | **0.185 (×124, 3)** | 0.060 (×40, 5) | 0.050 (×34, 7) | 0.133 (×90, 4) |
+| SCALAR `L`, pinned | 1.77e−3 | 0.319 (×180, 1) | 0.283 (×160, 2) | 0.188 (×106, 3) | 0.060 (5) | 0.051 (7) | 0.135 (4) |
+| SCALAR `L`, unpinned | 4.28e−4 | 0.159 (×372, 1) | 0.135 (×315, 2) | 0.080 (×186, 3) | 0.049 (5) | 0.048 (6) | 0.057 (4) |
+| SCALAR `z`, all | 4.67e−3 | 0.308 (×66, 1) | 0.274 (×59, 2) | 0.181 (×39, 3) | 0.058 (5) | 0.049 (7) | 0.127 (4) |
+| **LAYERWISE `L`**, all | 1.03e−3 | **1.06e−2 (×10, rank 5)** | **9.6e−3 (×9, 6)** | **5.5e−3 (×5, 11)** | 2.3e−3 (29) | 1.1e−3 (31) | **0.307 (×300, rank 1)** |
+| LAYERWISE `z`, all | 6.06e−3 | 1.05e−2 (×2, 25) | 9.5e−3 (×2, 26) | 5.3e−3 (×1, 34) | 1.2e−2 (24) | 6.3e−3 (30) | 0.302 (×50, 1) |
+
+*Generic part (true).*  Per **element**, BN scales are the largest class in **both** arms: the top-6
+`|X_i|/numel` are all BN scales under scalar (6.2e−4 / 5.5e−4 / 3.6e−4 for the carriers, then
+`layer3.1.bn2.weight` 1.4e−4) and all BN scales under layerwise (`layer3.1.bn1.weight` 1.3e−4, …).  A
+512-element channel scale sees `<h, g>` per element two to three orders above a conv element.  That is
+a property of what a BN scale is, not of CIFAR-100.
+
+*Non-generic part (the one that decides the sign).*  The three carriers' **total** `|L_i|` being ×124–212
+the median tensor and ranks 1-2-3 of 62 is a property of the **scalar trajectory**, not of the tensors:
+under layerwise dynamics, same seeds, same steps, the same three tensors are ×5–10 and rank 5 / 6 / 11,
+their `|L|` is **~30× smaller** (0.0106 vs 0.315), and the largest term is `linear.weight` (0.307, rank 1,
+51 % of `Σ|L|` vs 8.8 % under scalar).  Class share of `Σ|L_i|`, median over records: scalar
+**BN-scale 0.598** / conv 0.312 / linear 0.088 / bias 0.003; layerwise BN-scale 0.245 / conv 0.207 /
+**linear 0.51**.  The proximate reason is on the record: under scalar dynamics the shared `beta` is carried
+to **−5.158 / −5.212 / −5.212** (`alpha` 5.8e−3) at step 8,600–8,700 and `h_absmax` climbs from a median
+7.0e−3 (steps < 8,600) to 0.30 at step 8,500 and 0.37 at 9,500; under layerwise the carriers' own betas
+peak at only **−8.67 / −8.62 / −8.33** (seed 18; `alpha` ≈ 1.7–2.4e−4, 25–35× lower) at steps
+5,200–5,500.  The carriers' `h` — and hence their `|z|` — is inflated by the excursion the *other* tensors
+carried the shared beta on.  That is a description of the record, not an intervention (184.9).
+
+*The sign.*  On the 944 pinned scalar records the carriers' `L_i > 0` on **1.000 / 1.000 / 1.000**; the
+NAMED tensors' `L_i > 0` on **0.000 / 0.000 / 0.000**.  By class, `P(L_i > 0 | pinned)`: BN scales mean
+**0.655** (13 of 20 ≥ 0.5; min 0.000, max 1.000), convs **0.016**, `linear.weight` 0.000, biases 0.084;
+unpinned: 0.485 / 0.044 / 0.000 / 0.061.  Of the 15.2 positive tensors per pinned record (min 10, max 24),
+13.1 are BN scales.  Under layerwise the class lean is the same but weaker: BN scales 0.631, convs 0.454.
+So on this cell BN scales as a class lean DOWN and convolutions lean UP under both dynamics.  **Whether the
+carriers' sign would be positive "anywhere" cannot be answered from this batch: no CIFAR-10 run carries
+`PROBE_TENSOR`, and no per-tensor term exists for CIFAR-10 on disk.**  (`181`'s CIFAR-10 observation — a
+persistent aggregate DOWN vote at 88.8 % — is an aggregate-level fact from another batch and is **not**
+re-derived here.)
+
+### 184.5 ATTACK 2 — THE LAYERWISE COMPANION: THE CARRIERS DESCEND, THE CONVS ASCEND, **`linear.weight` DESCENDS**
+
+Each tensor under its own beta, from the harness's own per-group `beta`, `z_agg`, `mom_pre` in the three
+layerwise runs.  **Columns:** tensor | seed | `beta_T` = terminal beta at step 49,900 | `beta_min` |
+`pin_share` = fraction of the 500 records with `beta_j ≤ −15 + 1e−6` | `first_pin` = first such step |
+`P(L_j > 0)` = own vote DOWN, all records | same, last 50 % | `net` = `Σ sign(L_j)` over 500 records.
+
+    tensor                       seed  beta_T   beta_min  pin_share  first_pin  P(L>0)  last50%  net
+    layer4.1.bn2.weight          s18   -15.000  -15.000   0.768      11600      0.896   1.000   +396
+    layer4.1.bn2.weight          s19   -15.000  -15.000   0.778      11100      0.900   1.000   +400
+    layer4.1.bn2.weight          s20   -15.000  -15.000   0.778      11100      0.902   1.000   +402
+    layer4.0.bn2.weight          s18   -15.000  -15.000   0.766      11700      0.894   1.000   +394
+    layer4.0.bn2.weight          s19   -15.000  -15.000   0.770      11500      0.896   1.000   +396
+    layer4.0.bn2.weight          s20   -15.000  -15.000   0.764      11800      0.896   1.000   +396
+    layer4.0.shortcut.1.weight   s18   -15.000  -15.000   0.754      12300      0.888   1.000   +388
+    layer4.0.shortcut.1.weight   s19   -15.000  -15.000   0.762      11900      0.894   1.000   +394
+    layer4.0.shortcut.1.weight   s20   -15.000  -15.000   0.760      12000      0.890   1.000   +390
+    layer4.0.conv2.weight        s18    -7.950  -13.815   0.000      never      0.484   0.552    -16
+    layer4.0.conv2.weight        s19    -7.806  -13.815   0.000      never      0.424   0.456    -76
+    layer4.0.conv2.weight        s20    -7.834  -13.815   0.000      never      0.420   0.456    -80
+    layer4.1.conv2.weight        s18    -7.656  -13.815   0.000      never      0.448   0.500    -52
+    layer4.1.conv2.weight        s19    -7.564  -13.815   0.000      never      0.400   0.476   -100
+    layer4.1.conv2.weight        s20    -7.486  -13.815   0.000      never      0.406   0.468    -94
+    linear.weight                s18   -15.000  -15.000   0.632      18400      0.828   1.000   +328
+    linear.weight                s19   -15.000  -15.000   0.632      18400      0.828   1.000   +328
+    linear.weight                s20   -15.000  -15.000   0.632      18400      0.828   1.000   +328
+
+Class summary (pooled, `beta_T` mean / share of (tensor, seed) with `beta_T ≤ −14` / mean `P(L_j > 0)`):
+BN scales **−12.47 / 0.500 / 0.631**; convs **−8.74 / 0.000 / 0.454**; `linear.weight` −15.00 / 1.000 /
+0.828; biases −11.29 / 0.175 / 0.486.  All 14 layer4 tensors: every BN **scale** (`bn1`, `bn2`,
+`shortcut.1`) ends at −15.000 with `P(L > 0)` 0.84–0.90; every conv ends at −7.08 … −8.36 with 0.42–0.45.
+
+**PATH, re-derived for the ACTUAL carriers** (same seed, same step; `cTD2`'s columns `agree` /
+`opp(sc>0, lay<0)` / `P(L<0|sc)` / `P(L<0|lay)`): `layer4.1.bn2.weight` **0.999 / 0.001 / 0.100 /
+0.101**; `layer4.0.bn2.weight` **1.000 / 0.000 / 0.105 / 0.105**; `layer4.0.shortcut.1.weight` **1.000 /
+0.000 / 0.109 / 0.109**.  For the NAMED set: `layer4.0.conv2.weight` 0.557 / 0.000 / 1.000 / 0.557,
+`layer4.1.conv2.weight` 0.582 / 0.000 / 1.000 / 0.582, `linear.weight` **0.172 / 0.000 / 1.000 / 0.172**.
+The registered stamp is `PATH-DEPENDENT-MIXED` because bar (4) was written on the NAMED set (opp ≥ 0.50 on
+0 of 3; agree ≥ 0.75 on 0 of 3).  On the measured carriers it would read PATH-INDEPENDENT: they vote DOWN
+under both dynamics and go to the floor alone.
+
+**What this does to H-DOMINATE's story.**  "The carriers drag the shared beta where they themselves want
+to go" **holds** for the three carriers (own-beta floor by step 11,100–12,300; DOWN 100 % in the last
+half).  "The convs want up" **holds** (ascend from −13.815 to −7.5 … −7.9, never pin, mixed vote).
+"`linear.weight` wants up" **fails**: under its own beta it pins at −15 from step 18,400 on and votes DOWN
+0.828 — while under the shared beta it votes UP on 100 % of records.  The classifier is the counter-example
+to a path-independent per-tensor "preference".
+
+### 184.6 ATTACK 3 — THE NARROWING IS NEITHER A SIGN CHANGE NOR A QUIETING; IT IS THE CARRIERS' EMA RAMP AFTER THE ASCENT PEAK, AND THEN A FROZEN STATE
+
+Per phase (pooled three scalar seeds; `P(L_i > 0)` for carriers | NAMED; median `|L_i|`; `h_absmax`;
+`Σ|L|` over 62; median count of positive tensors):
+
+    steps            n   pinned  h_absmax  Σ|L|    #pos  carriers P(L>0)   carriers |L|            NAMED P(L>0)   NAMED |L|                NAMED/carrier
+    [0, 8600)      258   0.00    7.0e-3    0.094    5    0.42 0.39 0.36    2.0e-4 1.8e-4 1.8e-4    0.00 0.00 0.00  8.4e-3 1.2e-2 2.4e-2    47  67  131
+    [8600, 12000)  102   0.00    0.37      1.08    19    1.00 1.00 1.00    0.24   0.21   0.14      0.00 0.00 0.00  0.054  0.048  0.091     0.25 0.23 0.43
+    [12000, 18600) 198   0.01    0.37      1.51    15    1.00 1.00 1.00    0.32   0.28   0.19      0.00 0.00 0.00  0.060  0.051  0.134     0.21 0.18 0.48
+    [18600, 30000) 342   1.00    0.37      1.53    15    1.00 1.00 1.00    0.32   0.28   0.19      0.00 0.00 0.00  0.060  0.051  0.135     0.21 0.18 0.48
+    [30000, 50000) 600   1.00    0.37      1.53    15    1.00 1.00 1.00    0.32   0.28   0.19      0.00 0.00 0.00  0.060  0.051  0.134     0.21 0.18 0.48
+
+Three facts.  **(i) The NAMED tensors never vote DOWN**: `L_i < 0` on every record of every phase (and
+`sign(L_i) == s_agg` on 1.00 during the ascent, when the aggregate is negative, i.e. they *carry the
+ascent*, 0.00 after).  Their `m_i` changes sign exactly once in 500 records (the departure from zero).
+So "the network wanted to recover and three tensors vetoed it" is not what happened — the convs and the
+classifier wanted UP throughout, before and after the pin, at a constant magnitude.  **(ii) Nothing goes
+quiet**: `Σ|L|` is 1.53 in every pinned bin, the NAMED `|L_i|` is *larger* pinned than unpinned, and the
+harness's `h_absmax` is **0.3658–0.3668** across the entire pinned phase of seed 18 (31,400 meta-steps —
+at `alpha = e^{−15} = 3.1e−7` the trace `h` cannot move).  **(iii) What changed is the carriers**: their
+`|L_i|` rises from 2e−4 to 0.24 across the peak (steps 8,600–9,000) and to 0.32 by 12,000, positive on
+1.00 of records from step 8,700 on.  At seed 18: 8,600 → aggregate −1.3e−2 (last UP step; positives 0.239,
+negatives −0.252); 8,700 → +8.6e−3 (prefix 21); 8,800 → +4.2e−2 (prefix 15); 9,000 → +0.130 (prefix 3);
+9,100 → +0.150 (prefix 3).  The pinned phase is a **frozen state**: per-tensor `z_i` has CV 0.12–0.15 and
+never changes sign for any of the six tensors in 314 records, `m_i` has SD ≤ 1 % of its mean, the same ~15
+tensors are positive on every record.  The 62-tensor vote is decided once, at the peak, and does not move
+again for the remaining 82 % of training.
+
+### 184.7 ATTACK 4 — THE UNIFICATION: NAMES VERIFIED ON THE LIVE MANIFEST; **THE CLIFF CLAIM IS NOT LICENSED**
+
+Built `ResNet18_c100` from the live `build_network.py` on `alice2` and enumerated `named_parameters()`:
+0-based index **49 = `layer4.0.bn2.weight` (512)**, **52 = `layer4.0.shortcut.1.weight` (512)**, **58 =
+`layer4.1.bn2.weight` (512)**, 62 tensors, **11,220,132** parameters (the three carriers are 1,536 =
+0.0137 %).  `bin/cL1_cliff_tensor_split.sh` cuts `[49,13]` → `[50,12]` (`G_K49`/`G_K50`): the first coarse
+tensor at k = 49 is index 49, so the k 49 → 50 step moves exactly `layer4.0.bn2.weight` fine — the tensor
+`147` names (+24.834 pp at that step).  `bin/cP1_second_cliff_split.sh` cuts `[52,10]` → `[53,9]`: the
+tensor that moves is index 52, `layer4.0.shortcut.1.weight` — the tensor `152` names (DROP1 15.808 pp).
+**Verified by name and index.**  `161`'s class census (BN scales negative 7/7 when moved coarse) concerns
+the same class.
+
+**What `ctd1` licenses.**  *Under the scalar reduction at the standard cell, the sign the single beta
+follows is carried on every pinned record by `layer4.1.bn2.weight`, `layer4.0.bn2.weight` and
+`layer4.0.shortcut.1.weight`, which vote it DOWN against 47 of the other 59 tensors; two of those three are
+the tensors the cut-position audits (`147`, `152`) found carrying the two cliffs.*
+
+**What it does not license, and the sentence that would overreach.**  *"The cliffs happen because these
+scales dominate the coarse group's sign."*  `ctd1` logged 62 terms under **one** reduction (the 62-tensor
+sum) along **one** trajectory (`scalar`).  A `[49,13]` fine group of 49 and a coarse group of 13, or
+`[52,10]` / `[53,9]`, are **different reductions over different sets along different trajectories**; their
+per-tensor terms were never logged, and `184.4` shows per-tensor magnitudes are trajectory-dependent by
+30×.  Whether `layer4.0.bn2.weight` dominates a 13-tensor coarse group's sum the way it co-dominates the
+62-tensor sum is **unmeasured**.  The coincidence of names is on the record; the mechanism linking it to
+the cliffs is not.  The batch that would test it is a `PROBE_TENSOR` run at `[49,13]` and `[50,12]` (and
+`[52,10]`/`[53,9]`), which was not run.
+
+### 184.8 ATTACK 5 — THREE SEEDS, ONE TRAJECTORY
+
+    seed  beta0     peak    at step   first n_at_lo==1   floor share   pinned recs   beta_T
+    15    -13.815  -5.126   8700      18600              0.6280        314          -15.000   (cru1)
+    16    -13.815  -5.216   8600      18500              0.6300        315          -15.000   (cru1)
+    17    -13.815  -5.214   8600      18500              0.6300        315          -15.000   (cru1)
+    18    -13.815  -5.158   8700      18600              0.6280        314          -15.000   (ctd1)
+    19    -13.815  -5.212   8600      18500              0.6300        315          -15.000   (ctd1)
+    20    -13.815  -5.212   8700      18500              0.6300        315          -15.000   (ctd1)
+
+`max_t |beta_s(t) − beta_s'(t)|` over all 15 pairs of the six seeds: **0.004 … 0.132 nats** (ctd1 pairs
+0.092 / 0.054 / 0.044; mean 0.001–0.026), always at step 8,700–11,600.  Lion moves beta by exactly ±`ms`
+per step, and `(peak − beta0)/ms` = 8,656 / 8,602 / 8,602 = the peak step: **the vote is unanimous UP for
+~8,600 steps and unanimous DOWN for ~9,800**, seed-independent to ±100 steps (`181`'s per-window
+unanimity, re-derived at record level).  Harness `sign(L)` agrees across ctd1 seeds on **500/500**
+records for every pair; the PRIMARY DISAGREE step-sets have Jaccard **1.000**.  The identical `R_T` is
+arithmetic: PINNED-`R_T` is 1 by construction of the frozen state and the pinned phase is 314–315 records
+in every seed; the unpinned DISAGREE count is 99 / 98 / 98.
+
+**What that means for n.**  For the claim *"at this cell the scalar trajectory does this"*, six of six
+seeds (three of them from an independent submission, `cru1`) are concordant to ±100 steps and n = 6
+trajectories is ample — the phenomenon is deterministic with respect to the seed.  For any claim about
+`R_T` as a *random variable* the three seeds carry the information of about one sample; there is no
+seed-to-seed spread to estimate.  And for anything beyond the cell, **n = 1 cell**: one dataset, one
+network, one `(ms, alpha0)`, one horizon.
+
+### 184.9 INGEST, THE SELFTEST SWEEP, AND `c98`
+
+`python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (stdout; `# 2746 runs
+aggregated`, the three standing duplicate run-names), then `analysis/args_repair.py --apply` (36 rows, all
+the standing `dup_group` re-tag; backup `all_runs.csv.pre-argsrepair-20260908-232209.bak`, untracked like
+its predecessors).  Keyed on `(run, job_id)` against the pre-ingest CSV: **2,740 → 2,746, ADDED 6 ·
+CHANGED 0 · REMOVED 0 · other-batch rows 0.**
+
+    run           job      plateau5  final_train  best_test  epochs  complete  window_ok  wallclock_min
+    ctd1-sc-s18   4924919  24.132    24.26        24.37      100     1         1          94
+    ctd1-sc-s19   4924921  22.598    23.00        22.83      100     1         1          43
+    ctd1-sc-s20   4924923  23.172    23.23        23.40      100     1         1          44
+    ctd1-lay-s18  4924920  68.856    98.72        69.76      100     1         1          41
+    ctd1-lay-s19  4924922  69.108    98.89        69.56      100     1         1          44
+    ctd1-lay-s20  4924924  69.524    98.99        70.07      100     1         1          39
+
+Cost **305 min = 5.08 GPU-h** (ingested `wallclock_min`; `sc-s18` on the 2080ti node is 94).  Corpus
+cells after ingest (scorer filter, `superseded 0`): scalar **n 32, 22.8797 ± 0.5812**; layerwise **n 26,
+69.4916 ± 0.4863** (were n 29, 22.8361 ± 0.5568 / n 23, 69.5345 ± 0.4916).  All six inside their
+pre-ingest ±4 SD bands.  `plateau5` PRIMARY; `plateau` not used.
+
+**The `--selftest` sweep.**  103 files under `analysis/` carrying `--selftest` were run before and after
+the ingest (a 104th, `cIS1_ciso1_isolate_score.py`, appeared untracked in the tree from another session
+between the two sweeps — since committed by that session as `be15a15` — and is excluded; it is not this entry's).  **Exit codes: 66 → 65 zero; exactly one
+moved — `cHE1_hdominate_element_score.py` 0 → 1, because its check S5 asserts the literal "corpus has
+2,740 rows" (now 2,746); every other check in it still passes.**  The standing 37-file non-zero set is
+unchanged in membership.  **21 drifters** (output differs pre/post), every one a corpus-count or cell-mean
+re-derivation moving with the six new rows: `c68` (T12 superseded-flag check now PASS, 27 → 28/32), `c69
+×2`, `c70`, `cH1`, `cHE1`, `cI1`, `cI2`, `cJ1`, `cK1` (6 → 7 failed: `SIGMA_W`/`SIGMA_DF` 0.7779 df 131 →
+0.7732 df 135), `cL1` (8 → 7), `cR1`, `cS2`, `cU1` (`SIGMA_W` 0.537 → 0.541, df 54 → 58), `cW1`, `cX1`,
+`cY1` (46/11 → 43/14: D1 layerwise 69.5321 → 69.4839 n 20 → 23 now FAIL, E1 `R_lay`, F1 `sigma LAY`
+0.4268 → 0.4187), `cZ1`, `cdn1`, `cdn2` (`sigma_seed` 0.3748 df 65 → 0.3737 df 67), `cms1`.  **No batch
+verdict moved**: `cTD2`'s FINAL is unchanged apart from the `FLOOR-NOT-INGESTED` stamp, and no other
+scorer's registered FINAL is produced by its selftest.
+
+**`c98_reproduce.py` exits 1**, author scope, **the same 10 checks** as before the ingest: rows 2,746
+(paper 2,177), admissible 2,304, wallclock-carrying 2,731, **GPU-h 2,902** (2,896.5 + 5.1), partition
+families 440 / Lion 428, count-matched 244 / 244, best C10 arm 93.328, deficit 1.796.  **No new failing
+check.**
+
+### 184.10 H-DOMINATE — WHAT `ctd1` ESTABLISHED, THE ENTITLED SENTENCE, AND THE LEDGER
+
+| registered bar | result |
+|---|---|
+| (1) `R_T ≥ 0.10` on `L` | **0.8266 — met** (pinned 1.0000, unpinned 0.5315) |
+| (2) DOWN ≥ 0.75 | **1.0000 — met** |
+| (3) NAMED-CARRIED ≥ 0.75 | **0.0000 — failed**: the carriers are three BN scales, not the convs and the classifier |
+| (4) companion | `PATH-DEPENDENT-MIXED` on the NAMED set; the measured carriers are path-independent DOWN voters |
+| branch | **`DOMINATION-BY-OTHER-TENSORS`** on PRIMARY and SECONDARY |
+
+**Entitled:** *At the standard CIFAR-100 cell, under the scalar reduction, the Lion sign that pins the
+single `beta` at −15 for the last 63 % of training is carried on every pinned record by three
+512-parameter BatchNorm scales in `layer4` (`layer4.1.bn2.weight`, `layer4.0.bn2.weight`,
+`layer4.0.shortcut.1.weight`) whose terms are ×106–180 the median tensor's and positive on 100 % of those
+records, against a majority of ~47 tensors that includes the classifier and, on all but a few records, every convolution; the same three
+tensors descend to the floor under their own betas, and the state is frozen from the ascent peak on.*
+
+**Not entitled:** *that this is why scalar MetaOptimize fails on CIFAR-100* (no intervention: nothing was
+clamped, excluded or re-weighted, and the accuracy consequence of removing the three votes is
+unmeasured); *that the carriers' dominance is generic to BatchNorm* (184.4: trajectory-dependent by 30×;
+CIFAR-10 unmeasured); *that these tensors dominate the cut-position groups' sums* (184.7); *that the
+convs "wanted to recover"* (184.6: they voted UP at constant magnitude throughout and carried the
+ascent); *that `linear.weight` wants up* (184.5).
+
+**H-DOMINATE as registered — a minority of layer4 convolutions and the classifier carrying the sign DOWN
+— is refuted at the tensor level on its named content (bar 3), while the descriptive residue (a
+three-tensor BN-scale minority carrying the sign DOWN, path-independently) is on the record and
+unexplained causally.**  Ledger, by this entry's count: sixteen registered, **fifteen dead** (H-DOMINATE
+(T) as named joins the fourteen), one live (`crn1` composition); (E) remains untestable on the record
+(`181`).  The residue is not a registered candidate; the intervention that would make it one (a
+`PROBE_TENSOR` run with the three carriers' terms removed from the scalar reduction, or the three tensors
+given their own beta, at ≥ 3 seeds with the floor band as the bar) is GPU and was not launched **by this
+entry**.  Disclosed: while this entry was being written, another session (Track B, cycle 146) committed
+`be15a15` (`analysis/cIS1_ciso1_isolate_score.py`, `bin/cIS1_isolate_carriers.sh`,
+`tests/test_probe_tensor_blockwise.py`) registering exactly that causal test as `ciso1` and submitted 15
+jobs (4925518–4925532, Submit `23:27:52` CEST, 7 running + 8 pending at 23:31).  Nothing from `ciso1` is
+read, scored or quoted here; this entry's numbers are `ctd1`'s alone.
+
+### 184.11 THE STANDING CONSTRAINTS, DISCHARGED
+
+GPU this entry: **zero submitted**; the 5.08 GPU-h are `182`'s batch, now landed and ingested.  `alice`
+not accessed; `alice2` read only (`ls`, `wc`, `sha256sum`, `sacct`, one CPU model build).  `paper/`
+untouched.  RULE 16: `git diff -- analysis/ patches/` empty; the scorer ran unedited before and after the
+ingest.  RULE 21 unchanged from `182.4` (`cTD2` committed before any record was read; `cTD1` frozen).
+`git add` restricted to `docs/CORRECTIONS.md`, `docs/STATUS.md`, `results/all_runs.csv`,
+`analysis/ctd1_attack_rederive.py`, `results/ctd1_tensor_dominate/`.  Another session's commit `be15a15`
+(cycle 146 Track B, `ciso1` registration) landed on HEAD while this entry was written; this entry's commit
+sits on top of it, and that session's uncommitted `bin/PROTECTED.txt` edit (`+ciso1-`) is **not** added here.
+No nested `claude -p`.  The authority line in `docs/STATUS.md` moves `183 → 184`.

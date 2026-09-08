@@ -1,0 +1,211 @@
+loaded: scalar [18, 19, 20] layerwise [18, 19, 20] cru1 [15, 16, 17]; records [500, 500, 500]
+  seed 18: n_at_lo==1 on 314 records; beta_post<=-15+1e-6 on 314; disagree 0
+  seed 19: n_at_lo==1 on 315 records; beta_post<=-15+1e-6 on 315; disagree 0
+  seed 20: n_at_lo==1 on 315 records; beta_post<=-15+1e-6 on 315; disagree 0
+
+[B-PRIMARY-L] X = L, s_agg from harness Lh
+  determinate 1499 (indeterminate: aggregate 0, tie 1); DISAGREE 1239; R_T = 0.8266
+    seed 18: R_T 0.8260 (413/500)  pinned det 314 dis 314  unpinned det 186 dis 99
+    seed 19: R_T 0.8260 (413/500)  pinned det 315 dis 315  unpinned det 185 dis 98
+    seed 20: R_T 0.8277 (413/499)  pinned det 315 dis 315  unpinned det 184 dis 98
+  PINNED det 944 R_T 1.0000 agg<0 0.0000 | UNPINNED det 555 R_T 0.5315 | PINNED-FRAC 0.6298
+  DOWN among DISAGREE 1.0000   NAMED-CARRIED 0.0000
+  carrying-set sizes: {3: 1207, 7: 1, 8: 1, 9: 15, 10: 6, 11: 3, 12: 1, 15: 2, 16: 1, 20: 1, 21: 1}
+  carriers (share of DISAGREE):
+    layer4.1.bn2.weight             1239  1.000
+    layer4.0.bn2.weight             1239  1.000
+    layer4.0.shortcut.1.weight      1239  1.000
+    layer4.0.conv2.weight             32  0.026
+    layer4.1.conv2.weight             32  0.026
+    linear.weight                     32  0.026
+    layer4.0.shortcut.0.weight        31  0.025
+    layer3.1.conv2.weight             28  0.023
+
+[B-SECONDARY-z] X = z, s_agg from harness zh
+  determinate 1486 (indeterminate: aggregate 0, tie 14); DISAGREE 1034; R_T = 0.6958
+    seed 18: R_T 0.6949 (344/495)  pinned det 311 dis 258  unpinned det 184 dis 86
+    seed 19: R_T 0.6834 (341/499)  pinned det 314 dis 256  unpinned det 185 dis 85
+    seed 20: R_T 0.7093 (349/492)  pinned det 309 dis 261  unpinned det 183 dis 88
+  PINNED det 934 R_T 0.8298 agg<0 0.1531 | UNPINNED det 552 R_T 0.4692 | PINNED-FRAC 0.6285
+  DOWN among DISAGREE 0.9981   NAMED-CARRIED 0.0000
+  carrying-set sizes: {3: 55, 4: 54, 5: 98, 6: 41, 7: 36, 8: 28, 9: 48, 10: 61, 11: 48, 12: 63, 13: 48, 14: 44, 15: 53, 16: 37, 17: 38, 18: 34, 19: 30, 20: 33, 21: 28, 22: 18, 23: 24, 24: 21, 25: 18, 26: 12, 27: 15, 28: 11, 29: 11, 30: 8, 31: 6, 32: 3, 33: 3, 36: 1, 38: 3, 39: 1, 42: 1, 44: 1}
+  carriers (share of DISAGREE):
+    layer4.1.bn2.weight             1034  1.000
+    layer4.0.bn2.weight             1033  0.999
+    layer4.0.shortcut.1.weight      1033  0.999
+    linear.weight                    919  0.889
+    layer4.0.conv2.weight            748  0.723
+    layer4.0.shortcut.0.weight       746  0.721
+    layer4.1.conv2.weight            683  0.661
+    conv1.weight                     682  0.660
+
+[A1] IS BN-SCALE DOMINANCE A GRADIENT-SCALE ARTEFACT?  median |X_i| over records, per arm
+  SCALAR L ALL     : median-tensor median|X| 1.486e-03; carriers: l4.1.bn2.weight 3.152e-01 (x212, rank 1), l4.0.bn2.weight 2.796e-01 (x188, rank 2), l4.0.shortcut.1.weight 1.849e-01 (x124, rank 3)
+      NAMED: l4.0.conv2.weight 5.964e-02 (x40.1, rank 5), l4.1.conv2.weight 5.049e-02 (x34.0, rank 7), linear.weight 1.329e-01 (x89.5, rank 4)
+      top-6 by median|X|: layer4.1.bn2.weight 3.15e-01, layer4.0.bn2.weight 2.80e-01, layer4.0.shortcut.1.weight 1.85e-01, linear.weight 1.33e-01, layer4.0.conv2.weight 5.96e-02, layer4.0.shortcut.0.weight 5.85e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 6.16e-04, layer4.0.bn2.weight 5.46e-04, layer4.0.shortcut.1.weight 3.61e-04, layer3.1.bn2.weight 1.39e-04, layer3.0.shortcut.1.weight 1.35e-04, layer2.0.shortcut.1.weight 1.10e-04
+      median share of sum|X| by class: {'bias': 0.003, 'bnscale': 0.598, 'conv': 0.312, 'linear': 0.088}
+  SCALAR L PINNED  : median-tensor median|X| 1.773e-03; carriers: l4.1.bn2.weight 3.192e-01 (x180, rank 1), l4.0.bn2.weight 2.830e-01 (x160, rank 2), l4.0.shortcut.1.weight 1.877e-01 (x106, rank 3)
+      NAMED: l4.0.conv2.weight 6.023e-02 (x34.0, rank 5), l4.1.conv2.weight 5.093e-02 (x28.7, rank 7), linear.weight 1.345e-01 (x75.9, rank 4)
+      top-6 by median|X|: layer4.1.bn2.weight 3.19e-01, layer4.0.bn2.weight 2.83e-01, layer4.0.shortcut.1.weight 1.88e-01, linear.weight 1.35e-01, layer4.0.conv2.weight 6.02e-02, layer4.0.shortcut.0.weight 5.95e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 6.23e-04, layer4.0.bn2.weight 5.53e-04, layer4.0.shortcut.1.weight 3.67e-04, layer3.1.bn2.weight 1.41e-04, layer3.0.shortcut.1.weight 1.39e-04, layer2.0.shortcut.1.weight 1.19e-04
+      median share of sum|X| by class: {'bias': 0.003, 'bnscale': 0.599, 'conv': 0.31, 'linear': 0.088}
+  SCALAR L UNPINNED: median-tensor median|X| 4.282e-04; carriers: l4.1.bn2.weight 1.594e-01 (x372, rank 1), l4.0.bn2.weight 1.348e-01 (x315, rank 2), l4.0.shortcut.1.weight 7.978e-02 (x186, rank 3)
+      NAMED: l4.0.conv2.weight 4.850e-02 (x113.3, rank 5), l4.1.conv2.weight 4.763e-02 (x111.2, rank 6), linear.weight 5.661e-02 (x132.2, rank 4)
+      top-6 by median|X|: layer4.1.bn2.weight 1.59e-01, layer4.0.bn2.weight 1.35e-01, layer4.0.shortcut.1.weight 7.98e-02, linear.weight 5.66e-02, layer4.0.conv2.weight 4.85e-02, layer4.1.conv2.weight 4.76e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 3.11e-04, layer4.0.bn2.weight 2.63e-04, layer4.0.shortcut.1.weight 1.56e-04, layer3.1.bn2.weight 5.96e-05, layer3.0.shortcut.1.weight 5.43e-05, layer2.0.shortcut.1.weight 3.01e-05
+      median share of sum|X| by class: {'bias': 0.002, 'bnscale': 0.586, 'conv': 0.329, 'linear': 0.089}
+  SCALAR z ALL     : median-tensor median|X| 4.672e-03; carriers: l4.1.bn2.weight 3.080e-01 (x66, rank 1), l4.0.bn2.weight 2.736e-01 (x59, rank 2), l4.0.shortcut.1.weight 1.812e-01 (x39, rank 3)
+      NAMED: l4.0.conv2.weight 5.767e-02 (x12.3, rank 5), l4.1.conv2.weight 4.911e-02 (x10.5, rank 7), linear.weight 1.272e-01 (x27.2, rank 4)
+      top-6 by median|X|: layer4.1.bn2.weight 3.08e-01, layer4.0.bn2.weight 2.74e-01, layer4.0.shortcut.1.weight 1.81e-01, linear.weight 1.27e-01, layer4.0.conv2.weight 5.77e-02, layer4.0.shortcut.0.weight 5.59e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 6.02e-04, layer4.0.bn2.weight 5.34e-04, layer4.0.shortcut.1.weight 3.54e-04, bn1.weight 3.37e-04, layer1.0.bn2.weight 3.11e-04, layer1.1.bn2.weight 2.42e-04
+      median share of sum|X| by class: {'bias': 0.003, 'bnscale': 0.559, 'conv': 0.365, 'linear': 0.075}
+  SCALAR z PINNED  : median-tensor median|X| 6.318e-03; carriers: l4.1.bn2.weight 3.230e-01 (x51, rank 1), l4.0.bn2.weight 2.865e-01 (x45, rank 2), l4.0.shortcut.1.weight 1.900e-01 (x30, rank 3)
+      NAMED: l4.0.conv2.weight 6.025e-02 (x9.5, rank 6), l4.1.conv2.weight 5.104e-02 (x8.1, rank 8), linear.weight 1.339e-01 (x21.2, rank 4)
+      top-6 by median|X|: layer4.1.bn2.weight 3.23e-01, layer4.0.bn2.weight 2.86e-01, layer4.0.shortcut.1.weight 1.90e-01, linear.weight 1.34e-01, conv1.weight 6.30e-02, layer4.0.conv2.weight 6.02e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 6.31e-04, layer4.0.bn2.weight 5.60e-04, bn1.weight 4.71e-04, layer1.0.bn2.weight 4.44e-04, layer4.0.shortcut.1.weight 3.71e-04, layer1.1.bn2.weight 3.23e-04
+      median share of sum|X| by class: {'bias': 0.003, 'bnscale': 0.568, 'conv': 0.357, 'linear': 0.073}
+  SCALAR z UNPINNED: median-tensor median|X| 1.630e-03; carriers: l4.1.bn2.weight 1.678e-01 (x103, rank 1), l4.0.bn2.weight 1.336e-01 (x82, rank 2), l4.0.shortcut.1.weight 7.666e-02 (x47, rank 4)
+      NAMED: l4.0.conv2.weight 4.699e-02 (x28.8, rank 5), l4.1.conv2.weight 4.326e-02 (x26.5, rank 6), linear.weight 7.832e-02 (x48.1, rank 3)
+      top-6 by median|X|: layer4.1.bn2.weight 1.68e-01, layer4.0.bn2.weight 1.34e-01, linear.weight 7.83e-02, layer4.0.shortcut.1.weight 7.67e-02, layer4.0.conv2.weight 4.70e-02, layer4.1.conv2.weight 4.33e-02
+      per-ELEMENT median|X|/numel top-6: layer4.1.bn2.weight 3.28e-04, layer4.0.bn2.weight 2.61e-04, layer4.0.shortcut.1.weight 1.50e-04, bn1.weight 8.33e-05, layer1.0.bn2.weight 8.07e-05, layer3.1.bn2.weight 5.73e-05
+      median share of sum|X| by class: {'bias': 0.002, 'bnscale': 0.517, 'conv': 0.403, 'linear': 0.082}
+  LAYERWISE Lh ALL     : median-tensor median|X| 1.025e-03; carriers: l4.1.bn2.weight 1.064e-02 (x10, rank 5), l4.0.bn2.weight 9.640e-03 (x9, rank 6), l4.0.shortcut.1.weight 5.505e-03 (x5, rank 11)
+      NAMED: l4.0.conv2.weight 2.284e-03 (x2.2, rank 29), l4.1.conv2.weight 1.135e-03 (x1.1, rank 31), linear.weight 3.071e-01 (x299.6, rank 1)
+      top-6 by median|X|: linear.weight 3.07e-01, layer3.1.bn1.weight 3.24e-02, layer3.0.bn1.weight 1.83e-02, conv1.weight 1.08e-02, layer4.1.bn2.weight 1.06e-02, layer4.0.bn2.weight 9.64e-03
+      per-ELEMENT median|X|/numel top-6: layer3.1.bn1.weight 1.27e-04, layer1.0.bn1.weight 7.71e-05, layer3.0.bn1.weight 7.17e-05, layer1.1.bn1.weight 5.08e-05, layer3.0.bn2.weight 2.94e-05, layer2.0.bn1.weight 2.36e-05
+      median share of sum|X| by class: {'bias': 0.004, 'bnscale': 0.245, 'conv': 0.207, 'linear': 0.51}
+  LAYERWISE zh ALL     : median-tensor median|X| 6.062e-03; carriers: l4.1.bn2.weight 1.052e-02 (x2, rank 25), l4.0.bn2.weight 9.537e-03 (x2, rank 26), l4.0.shortcut.1.weight 5.329e-03 (x1, rank 34)
+      NAMED: l4.0.conv2.weight 1.232e-02 (x2.0, rank 24), l4.1.conv2.weight 6.312e-03 (x1.0, rank 30), linear.weight 3.017e-01 (x49.8, rank 1)
+      top-6 by median|X|: linear.weight 3.02e-01, conv1.weight 7.95e-02, layer3.0.bn1.weight 6.02e-02, layer1.0.conv1.weight 4.61e-02, layer1.0.bn1.weight 3.69e-02, layer3.0.conv2.weight 3.43e-02
+      per-ELEMENT median|X|/numel top-6: layer1.0.bn1.weight 5.77e-04, layer1.1.bn1.weight 4.16e-04, layer3.0.bn1.weight 2.35e-04, layer2.0.bn1.weight 1.95e-04, bn1.weight 1.12e-04, layer2.0.shortcut.1.weight 1.01e-04
+      median share of sum|X| by class: {'bias': 0.011, 'bnscale': 0.279, 'conv': 0.499, 'linear': 0.183}
+
+  SIGN census on scalar PINNED records (fraction of records with L_i > 0 = votes DOWN), by class:
+    bnscale  n=20  mean P(L_i>0|pinned) 0.655  [min 0.000 max 1.000]   unpinned 0.485
+    conv     n=20  mean P(L_i>0|pinned) 0.016  [min 0.000 max 0.300]   unpinned 0.044
+    linear   n= 1  mean P(L_i>0|pinned) 0.000  [min 0.000 max 0.000]   unpinned 0.000
+    bias     n=21  mean P(L_i>0|pinned) 0.084  [min 0.000 max 0.337]   unpinned 0.061
+    carriers P(L>0|pinned): layer4.1.bn2.weight 1.000, layer4.0.bn2.weight 1.000, layer4.0.shortcut.1.weight 1.000
+    NAMED    P(L>0|pinned): layer4.0.conv2.weight 0.000, layer4.1.conv2.weight 0.000, linear.weight 0.000   unpinned: 0.000, 0.000, 0.000
+    all 62 BN scales that vote DOWN >= 0.5 on pinned: 13 of 20
+    #pos among 62 on pinned records: mean 15.2 (min 10 max 24); #pos of the 22 BN scales: mean 13.1
+  LAYERWISE arm, rank of each carrier by median|L_j| among 62: layer4.1.bn2.weight 5, layer4.0.bn2.weight 6, layer4.0.shortcut.1.weight 11
+
+[A2] LAYERWISE COMPANION -- each tensor under its OWN beta (from the harness's own per-group z_agg/mom_pre/beta)
+  columns: tensor | seed | beta_T (terminal, step 49900) | beta_min | pin_share (records with beta_j <= -15+1e-6) | first_pin_step | P(L_j>0) all records (own vote DOWN) | P(L_j>0) last 50% | net sign votes sum(sign L_j) over 500 records
+    layer4.1.bn2.weight          s18  beta_T  -15.000  beta_min  -15.000  pin_share 0.768  first_pin  11600  P(L>0) 0.896  last50% 1.000  net +396
+    layer4.1.bn2.weight          s19  beta_T  -15.000  beta_min  -15.000  pin_share 0.778  first_pin  11100  P(L>0) 0.900  last50% 1.000  net +400
+    layer4.1.bn2.weight          s20  beta_T  -15.000  beta_min  -15.000  pin_share 0.778  first_pin  11100  P(L>0) 0.902  last50% 1.000  net +402
+    layer4.0.bn2.weight          s18  beta_T  -15.000  beta_min  -15.000  pin_share 0.766  first_pin  11700  P(L>0) 0.894  last50% 1.000  net +394
+    layer4.0.bn2.weight          s19  beta_T  -15.000  beta_min  -15.000  pin_share 0.770  first_pin  11500  P(L>0) 0.896  last50% 1.000  net +396
+    layer4.0.bn2.weight          s20  beta_T  -15.000  beta_min  -15.000  pin_share 0.764  first_pin  11800  P(L>0) 0.896  last50% 1.000  net +396
+    layer4.0.shortcut.1.weight   s18  beta_T  -15.000  beta_min  -15.000  pin_share 0.754  first_pin  12300  P(L>0) 0.888  last50% 1.000  net +388
+    layer4.0.shortcut.1.weight   s19  beta_T  -15.000  beta_min  -15.000  pin_share 0.762  first_pin  11900  P(L>0) 0.894  last50% 1.000  net +394
+    layer4.0.shortcut.1.weight   s20  beta_T  -15.000  beta_min  -15.000  pin_share 0.760  first_pin  12000  P(L>0) 0.890  last50% 1.000  net +390
+    layer4.0.conv2.weight        s18  beta_T   -7.950  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.484  last50% 0.552  net -16
+    layer4.0.conv2.weight        s19  beta_T   -7.806  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.424  last50% 0.456  net -76
+    layer4.0.conv2.weight        s20  beta_T   -7.834  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.420  last50% 0.456  net -80
+    layer4.1.conv2.weight        s18  beta_T   -7.656  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.448  last50% 0.500  net -52
+    layer4.1.conv2.weight        s19  beta_T   -7.564  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.400  last50% 0.476  net -100
+    layer4.1.conv2.weight        s20  beta_T   -7.486  beta_min  -13.815  pin_share 0.000  first_pin     -1  P(L>0) 0.406  last50% 0.468  net -94
+    linear.weight                s18  beta_T  -15.000  beta_min  -15.000  pin_share 0.632  first_pin  18400  P(L>0) 0.828  last50% 1.000  net +328
+    linear.weight                s19  beta_T  -15.000  beta_min  -15.000  pin_share 0.632  first_pin  18400  P(L>0) 0.828  last50% 1.000  net +328
+    linear.weight                s20  beta_T  -15.000  beta_min  -15.000  pin_share 0.632  first_pin  18400  P(L>0) 0.828  last50% 1.000  net +328
+  class summary under LAYERWISE (pooled 3 seeds): class | n | mean beta_T | share of (tensor,seed) with beta_T <= -14 | mean P(L_j>0)
+    bnscale  n=20  mean beta_T -12.469  frac beta_T<=-14 0.500  mean P(L>0) 0.631
+    conv     n=20  mean beta_T  -8.737  frac beta_T<=-14 0.000  mean P(L>0) 0.454
+    linear   n= 1  mean beta_T -15.000  frac beta_T<=-14 1.000  mean P(L>0) 0.828
+    bias     n=21  mean beta_T -11.285  frac beta_T<=-14 0.175  mean P(L>0) 0.486
+  per-tensor terminal beta under layerwise, seed-mean, the 14 layer4 tensors + linear:
+    45 layer4.0.conv1.weight        beta_T   -8.339  P(L>0) 0.452
+    46 layer4.0.bn1.weight          beta_T  -15.000  P(L>0) 0.840
+    47 layer4.0.bn1.bias            beta_T  -12.410  P(L>0) 0.459
+    48 layer4.0.conv2.weight        beta_T   -7.864  P(L>0) 0.443
+    49 layer4.0.bn2.weight          beta_T  -15.000  P(L>0) 0.895
+    50 layer4.0.bn2.bias            beta_T  -15.000  P(L>0) 0.607
+    51 layer4.0.shortcut.0.weight   beta_T   -7.083  P(L>0) 0.438
+    52 layer4.0.shortcut.1.weight   beta_T  -15.000  P(L>0) 0.891
+    53 layer4.0.shortcut.1.bias     beta_T  -15.000  P(L>0) 0.607
+    54 layer4.1.conv1.weight        beta_T   -8.356  P(L>0) 0.447
+    55 layer4.1.bn1.weight          beta_T  -15.000  P(L>0) 0.838
+    56 layer4.1.bn1.bias            beta_T  -14.404  P(L>0) 0.529
+    57 layer4.1.conv2.weight        beta_T   -7.569  P(L>0) 0.418
+    58 layer4.1.bn2.weight          beta_T  -15.000  P(L>0) 0.899
+    59 layer4.1.bn2.bias            beta_T  -15.000  P(L>0) 0.553
+    60 linear.weight                beta_T  -15.000  P(L>0) 0.828
+    61 linear.bias                  beta_T   -9.848  P(L>0) 0.477
+  PATH re-derived (same seed, same step): tensor | agree | opp(sc>0 & lay<0) | P(L<0|sc) | P(L<0|lay)
+    layer4.1.bn2.weight          0.999  0.001  0.100  0.101
+    layer4.0.bn2.weight          1.000  0.000  0.105  0.105
+    layer4.0.shortcut.1.weight   1.000  0.000  0.109  0.109
+    layer4.0.conv2.weight        0.557  0.000  1.000  0.557
+    layer4.1.conv2.weight        0.582  0.000  1.000  0.582
+    linear.weight                0.172  0.000  1.000  0.172
+
+[A3] THE NARROWING -- NAMED convs vs the carriers under SCALAR dynamics, by phase
+  phase bins by step; per bin: P(L_i>0) for NAMED and carriers; median |L_i|; ratio median|L_NAMED|/median|L_carrier|; h_absmax; sum|L| all 62
+  steps [    0, 8600) n=258 pinned 0.00  h_absmax med 7.01e-03  sum|L| med 9.44e-02  #pos med 5
+      carriers P(L>0): 0.42 0.39 0.36   median|L|: 2.03e-04 1.76e-04 1.81e-04
+      NAMED    P(L>0): 0.00 0.00 0.00   median|L|: 8.44e-03 1.21e-02 2.38e-02   ratio to carrier-median: 46.648 66.624 131.393
+      NAMED sign == s_agg: 1.00 1.00 1.00 ; carriers sign == s_agg: 0.58 0.61 0.64
+  steps [ 8600,12000) n=102 pinned 0.00  h_absmax med 3.70e-01  sum|L| med 1.08e+00  #pos med 19
+      carriers P(L>0): 1.00 1.00 1.00   median|L|: 2.44e-01 2.13e-01 1.35e-01
+      NAMED    P(L>0): 0.00 0.00 0.00   median|L|: 5.36e-02 4.78e-02 9.07e-02   ratio to carrier-median: 0.252 0.225 0.427
+      NAMED sign == s_agg: 0.03 0.03 0.03 ; carriers sign == s_agg: 0.97 0.97 0.97
+  steps [12000,18600) n=198 pinned 0.01  h_absmax med 3.68e-01  sum|L| med 1.51e+00  #pos med 15
+      carriers P(L>0): 1.00 1.00 1.00   median|L|: 3.17e-01 2.81e-01 1.86e-01
+      NAMED    P(L>0): 0.00 0.00 0.00   median|L|: 6.01e-02 5.10e-02 1.34e-01   ratio to carrier-median: 0.214 0.181 0.475
+      NAMED sign == s_agg: 0.00 0.00 0.00 ; carriers sign == s_agg: 1.00 1.00 1.00
+  steps [18600,30000) n=342 pinned 1.00  h_absmax med 3.68e-01  sum|L| med 1.53e+00  #pos med 15
+      carriers P(L>0): 1.00 1.00 1.00   median|L|: 3.19e-01 2.83e-01 1.88e-01
+      NAMED    P(L>0): 0.00 0.00 0.00   median|L|: 6.03e-02 5.09e-02 1.35e-01   ratio to carrier-median: 0.213 0.180 0.475
+      NAMED sign == s_agg: 0.00 0.00 0.00 ; carriers sign == s_agg: 1.00 1.00 1.00
+  steps [30000,50000) n=600 pinned 1.00  h_absmax med 3.67e-01  sum|L| med 1.53e+00  #pos med 15
+      carriers P(L>0): 1.00 1.00 1.00   median|L|: 3.19e-01 2.83e-01 1.88e-01
+      NAMED    P(L>0): 0.00 0.00 0.00   median|L|: 6.02e-02 5.09e-02 1.34e-01   ratio to carrier-median: 0.213 0.180 0.476
+      NAMED sign == s_agg: 0.00 0.00 0.00 ; carriers sign == s_agg: 1.00 1.00 1.00
+  On PINNED records: NAMED tensors with L_i > 0 (same sign as aggregate) but outside the size-3 carrying set -- magnitude, not sign, is why they are absent:
+    pinned records: median sum|L| carriers 7.897e-01 vs rest-59 7.405e-01; carriers > rest on 0.9799 of records; NAMED sum|L| / carriers sum|L| median 0.3073
+    pinned records: P(all three NAMED have L_i>0) 0.000 ; P(all three carriers L_i>0) 1.000
+  per-tensor m_i trajectory sign for NAMED (seed 18): number of sign changes across 500 records, and P(m>0) pre-pin / pinned
+    layer4.0.conv2.weight        flips   1  P(m>0|pre-pin) 0.000  P(m>0|pinned) 0.000  median|m| pre 4.93e-02 pinned 6.18e-02
+    layer4.1.conv2.weight        flips   1  P(m>0|pre-pin) 0.000  P(m>0|pinned) 0.000  median|m| pre 4.84e-02 pinned 5.15e-02
+    linear.weight                flips   1  P(m>0|pre-pin) 0.000  P(m>0|pinned) 0.000  median|m| pre 5.67e-02 pinned 1.38e-01
+    layer4.1.bn2.weight          flips   2  P(m>0|pre-pin) 0.720  P(m>0|pinned) 1.000  median|m| pre 1.69e-01 pinned 3.41e-01
+    layer4.0.bn2.weight          flips   2  P(m>0|pre-pin) 0.715  P(m>0|pinned) 1.000  median|m| pre 1.42e-01 pinned 3.02e-01
+    layer4.0.shortcut.1.weight   flips   2  P(m>0|pre-pin) 0.699  P(m>0|pinned) 1.000  median|m| pre 8.31e-02 pinned 2.01e-01
+
+[A5] SEED INDEPENDENCE -- scalar beta trajectories, ctd1 s18-20 and cru1 s15-17 (same cell)
+    seed 15: beta0 -13.815 peak -5.126 at step 8700, first n_at_lo==1 at step 18600, floor share 0.6280, pinned records 314, beta_T -15.000
+    seed 16: beta0 -13.815 peak -5.216 at step 8600, first n_at_lo==1 at step 18500, floor share 0.6300, pinned records 315, beta_T -15.000
+    seed 17: beta0 -13.815 peak -5.214 at step 8600, first n_at_lo==1 at step 18500, floor share 0.6300, pinned records 315, beta_T -15.000
+    seed 18: beta0 -13.815 peak -5.158 at step 8700, first n_at_lo==1 at step 18600, floor share 0.6280, pinned records 314, beta_T -15.000
+    seed 19: beta0 -13.815 peak -5.212 at step 8600, first n_at_lo==1 at step 18500, floor share 0.6300, pinned records 315, beta_T -15.000
+    seed 20: beta0 -13.815 peak -5.212 at step 8700, first n_at_lo==1 at step 18500, floor share 0.6300, pinned records 315, beta_T -15.000
+  max |beta_s(t) - beta_s'(t)| over 500 records, and mean |diff|:
+    s15 vs s16: max 0.110  mean 0.022  at step 11600
+    s15 vs s17: max 0.132  mean 0.026  at step 11600
+    s15 vs s18: max 0.036  mean 0.007  at step 11600
+    s15 vs s19: max 0.128  mean 0.025  at step 11600
+    s15 vs s20: max 0.086  mean 0.017  at step 8700
+    s16 vs s17: max 0.022  mean 0.004  at step 11500
+    s16 vs s18: max 0.074  mean 0.015  at step 11600
+    s16 vs s19: max 0.018  mean 0.004  at step 11500
+    s16 vs s20: max 0.026  mean 0.005  at step 11500
+    s17 vs s18: max 0.096  mean 0.019  at step 11600
+    s17 vs s19: max 0.004  mean 0.001  at step 11500
+    s17 vs s20: max 0.048  mean 0.009  at step 11500
+    s18 vs s19: max 0.092  mean 0.018  at step 11600
+    s18 vs s20: max 0.054  mean 0.010  at step 8700
+    s19 vs s20: max 0.044  mean 0.009  at step 11500
+  sign(L) agreement across ctd1 seeds at the same record (harness aggregate):
+    s18 vs s19: 1.0000
+    s18 vs s20: 1.0000
+    s19 vs s20: 1.0000
+  A trajectory moves by exactly +-ms per step; the ascent length in steps = (peak - beta0)/ms:
+    seed 18: (peak-beta0)/ms = 8656 steps; descent to floor = (peak - (-15))/ms = 9842 steps; peak step + descent = 18542
+    seed 19: (peak-beta0)/ms = 8602 steps; descent to floor = (peak - (-15))/ms = 9788 steps; peak step + descent = 18388
+    seed 20: (peak-beta0)/ms = 8602 steps; descent to floor = (peak - (-15))/ms = 9788 steps; peak step + descent = 18488
+
+  DISAGREE-record step sets (PRIMARY) across seeds: Jaccard s18/s19 1.000 s18/s20 1.000 s19/s20 1.000
