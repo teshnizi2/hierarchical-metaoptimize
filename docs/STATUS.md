@@ -1,13 +1,75 @@
 # STATUS — operator dashboard
 
-Updated 7 Sep 2026 (**cycle 137**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **162**) > `docs/FINDINGS.md` > everything else.
+Updated 8 Sep 2026 (**cycle 138**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **164**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,594 rows**, unchanged this cycle. `alice2` queue holds **15 `cpr1` jobs** (launched this cycle, nothing landed); `in489g2` still runs on `alice` and is **not ours** — **0 `in489g2` rows in the corpus**, and no `in489g2` file was opened.
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,623 rows** (+29 this cycle: 14 `in489g2` + 15 `cpr1`). **BOTH cluster queues are EMPTY.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
-**CYCLE 134 ran the FREE analysis first, then bought GPU.** CORRECTIONS **159**. (1) **`cS1`, ZERO GPU**, answers the one thing 158 left unexplained: `k50` and `k52` differ in **KIND**, not in rate — **`FINAL: DIFFERENT-KIND | NON-EXPONENTIAL`**. (2) **`cpk3` REGISTERED, DRY-RUN and LAUNCHED** on `alice2` — the **consecutive** grid `k` ∈ {45,46,47,48,49,50} + scalar floor × seeds **{6,7,8}**, 21 jobs, 772 ep, ~117 GPU-h. **Nothing of `cpk3` landed, scored or ingested.** **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
 
-## CYCLE 137 (this one) — **`cpr1` REGISTERED AND LAUNCHED.** CORRECTIONS **162**
+## CYCLE 138 (this one) — **BOTH BATCHES LAND, SCORED AND INGESTED.** CORRECTIONS **163** (`in489g2`) + **164** (`cpr1`)
+
+| batch | where | runs | scorer (UNEDITED) | **FINAL** |
+|---|---|---|---|---|
+| **`in489g2`** | `alice` (read-only) | 14/14 COMPLETE | `cI2_in489g2_score.py` `a01ffd94…` | **`COUNT-DISQUALIFIED-POSITION-DOMINATES`** |
+| **`cpr1`** | `alice2` | 15/15 COMPLETE | `cV1_cpr1_score.py` `390fb4a4…` | **`UNRESOLVED-PATTERN-UNREGISTERED`** |
+
+**RULE 20 PASS on both** (14 clean / 15 clean, batch-consistency, guard UNEDITED) — this **discharges** the `cpr1` ARGS audit `162.9` left PENDING, so `cpr1` numbers are quotable. RULE 16 clean: `git diff -- analysis/` empty.
+
+**`cpr1`'s VERDICT WAS CORRECTED UPWARD.** `UNRESOLVED-NOT-COMPARABLE` is what the scorer prints when `--manifest` is **omitted**; the manifest was written by the launcher at submit time. Run as documented: **G0/G1/R2/R3/R-EQUIV/R-CTRL all PASS**, `FINAL: UNRESOLVED-PATTERN-UNREGISTERED`.
+
+### `in489g2` — the count statistic is dead, the verdict token is not English
+
+`CAPTURE` at m = 1, 8, 16, 32, 45, 62 = **+0.0000, +0.0080, +0.0250, +0.4566, +0.8762, +1.0000** (TEST 0.9610 … 49.2460; TRAIN 0.9960 … 44.8560; TRAINCAP within 0.0031 everywhere). **R2 FIRES:** at matched **m = 8**, `[8,8,8,8,8,8,7,7]` 1.3450 vs `[45,3,3,3,2,2,2,2]` **8.1870** — **dTEST +6.8420 pp, dCAPTURE +0.1417, t +25.68**, TRAIN agreeing to 0.0010 in capture. Capture is **not** a function of `m`. Pooled within-arm SD 0.266388 (df 7). M50 bracket (32,45], interpolated 33.15, registered `[16,62]` **HIT**, never gating.
+
+- **`POSITION-DOMINATES` is a BAR NAME (`SHAPE_BAR = 0.10`) and is BARRED FROM PROSE.** The position range is **14.17 %** of the count range here, against **71.17 %** on CIFAR-100 — the figure **`160` struck as an overclaim** — and `cJ1` reserves `-DOMINATES` for ratio **≥ 1.000**. Entitled: position **disqualifies** count; it is **not** shown to exceed it. 14.17 % is a **lower bound** (one alternative arm).
+- **`144`'s "SIX GROUPS ARE NOT ENOUGH … 47.4 pp cliff" is SUPERSEDED IN PLACE.** Not a cliff (largest adjacent rise +0.4316 < 0.60 bar, R3 silent); not about six (at m = 8 capture spans +0.0080…+0.1497 on cut position alone). Parent-paper corroboration untouched.
+- **The `in489g1` anchor pair REPLICATES** at matched E = 84: scalar 1.0333 → 0.9610, layerwise 49.1840 → 49.2460, gap 48.1507 → 48.2850 — both shifts **< 0.3** pooled SD.
+- `cI2`'s printed "capture SE ~0.00552" is the **pooled per-run SD** in capture units; the SE of an arm mean at n=2 is **0.003901**. Conservative, no bar affected, not edited (RULE 16).
+
+### `cpr1` — the class account fails on its own control
+
+`SIGMA_W` 0.917280, `SE_ARM_DIFF` 0.748956, bar **1.497912**.
+
+| arm | TEST | sd | TRAIN | vs floor |
+|---|---|---|---|---|
+| `k01` `scalar` | 22.9140 | 0.1180 | 22.9287 | — |
+| `kL` `[49,13]` | 55.5480 | 1.1388 | 62.5387 | +32.6340 INFORMATIVE |
+| `kP` `sets:1-49/50-62` | 55.1400 | 1.2741 | 62.2073 | +32.2260 INFORMATIVE |
+| `kS` conv2→bn2.weight | 21.6773 | 0.5267 | 21.7187 | **−1.2367 NOT-INFORMATIVE (floor)** |
+| `kC` conv2→shortcut.0.weight | 46.1053 | 0.6231 | 50.6920 | **+23.1913 INFORMATIVE** |
+
+`DS = −33.462667` (−44.68 SE, TRAIN −40.488667) · `DC = −9.034667` (−12.06 SE, TRAIN −11.515333).
+Registered **H-CLASS** `DS −33.461333`, `DC −1.295333`; **H-POSITION** 0, 0.
+**Residual on `DC`: −7.739333 = −10.33 SE** (TRAIN −10.152000). `CLASS-OPERATIVE` needs `|DC| ≤ 1.4979` — it misses by **6.03×**; `CONTIGUITY-OR-COARSE-MASS` needs `|DS−DC| ≤ 1.4979` — **24.4280**, **16.31×**. **The registered branch is arithmetically unreachable.**
+
+**WHAT THE ATTACKS ESTABLISHED — the class account is 0-for-1 on informative arms:**
+1. **The `DS` "hit" is WITHDRAWN as evidence.** `kS` is floor-saturated, and the empirical saturation band for this cell at 100 ep is **[21.188, 24.192]** (3.004 pp = 4.01 SE) — H-CLASS's implied level 21.6787 sits inside it. A **content-free** rival, **H-FLOOR** ("the arm just died and reads the floor"), predicts `−32.226000` and is **1.65 SE** from the measurement — **not rejected**; H-CLASS and H-FLOOR are **1.65 SE apart — not separable**. Quotable: the **sign** and the **BOUND `DS ≤ −30.728088`**. **Not** quotable: `−33.462667` as an effect size, or the −0.001333 residual as agreement.
+2. **The refuted object is SINGLE-TENSOR ADDITIVITY, not merely "class".** `layer4.0.shortcut.0.weight` (a conv) is worth **+7.706667 pp** joining a coarse group that holds 49/50/51, and **−0.032667 pp** joining `{1..48}` with 49/50/51 fine — **+7.739333 pp = +10.33 SE** vs the registered literal, **+5.97 SE** with all six anchors' noise propagated. Mass and class are **context-invariant**; neither can produce this. (Honest limit: the miss localises to the **pair**, not to either tensor.)
+3. **Coarse mass and contiguity die on `cpr1`'s own rows.** `kS`/`kC` are **3.30 %** apart in coarse mass and **≥ 21.69 pp** apart in outcome, while `kP`/`kC` are 35.28 % apart and 9.03 pp apart — no monotone mass function fits both. `kC` has **3 holes** to `kS`'s **1**, its extra tensor at a **farther** ordinal, and beats it by **≥ +21.693421 = +28.96 SE**: **contiguity is refuted with the sign reversed.**
+4. **A mass-proportional model fitted exactly to `DC`** then predicts the `cts1` `k51→k52` step at **+0.531451** against a measured **+7.706667** — **+9.58 SE**. Dead.
+5. `kS < k01` is **NOT significant** (−1.651 SE, bar 1.4979); 2 of 3 `kS` seeds sit inside the corpus scalar range. **No claim that two groups beat one in reverse.**
+6. **A zero-parameter POST-HOC rival, `H-INERT-EXTRA`** ("the out-of-prefix tensor buys nothing", `DC = −9.002000`), fits `DC` to **−0.04 SE** and is **refuted on `DS` at −32.66 SE**. Named as a description of the residual, **never** as a confirmed account.
+
+### WHAT THIS DOES TO CORRECTIONS 161's CLASS PATTERN
+
+**The 15/15 sign census is NOT withdrawn** — every row is a directly measured **prefix-cut** step and `cpr1` contradicts none of them. `161.7e`'s ENTITLED sentence **stands verbatim** (already scoped to prefix cuts). **Three things are narrowed, materially,** and a rider is placed at `161.7e` in place:
+- **the boundary is measured** — the first **non-prefix** conv addition in the corpus (site 52, one of the census's own conv sites) reads **NULL, −0.032667 ± 0.748956**. "Moving a convolution into the coarse group raises plateau5" is **false outside contiguous prefixes**;
+- **the census's values may NOT be composed** — any per-tensor ledger built by adding/differencing these steps is refuted at **10.33 SE**;
+- **`CLASS-OPERATIVE` is retired as an available conclusion** — `cpr1` was the batch built to lift the `index mod 3` alias and it failed to reach the claim on its own control.
+
+`147.6` untouched. `161.7c(i)`'s 256× class/mass alias untouched. `152.12` rival (c) still **UNTESTED**.
+
+### INGEST + SELFTEST AUDIT
+
+`aggregate.py … > results/all_runs.csv` then `args_repair.py --apply` (stdout **to the corpus**, per `146.7`). **added 29 | changed 0 | removed 0**, **2,594 → 2,623**, 38 fields identical. Ingested `plateau5` matches an independent `.out` re-parse to **7.105e-15 pp** on all 29. `args_repair`: 36 rows updated vs the freshly regenerated file (`dup_group` backfill only), **net zero** on pre-existing rows.
+
+**Selftest sweep over the 93 `analysis/` files that mention `selftest`, pre- and post-ingest: 28 → 31 non-zero.** Drifters: **`cI2`** (its own RULE-21 "zero `in489g2` rows" premise — the `156.9` defect), **`cR1`** (`SIGMA_W` 0.917280 → 0.925518, scalar baseline n 17→20, `[49,13]` 9→12 rows — all `cpr1`'s own rows), **`cS1`** (the same equality, inherited). Verified by running each scorer with identical arguments against both corpora: **`cI2` and `cV1` score output byte-identical; no verdict moves anywhere.** The **only** `FINAL` string that changes is `cU1`'s **PREMISE token, `PASS` → `CENSUS-CHANGED`** — a designed self-report; its four substantive tokens are unchanged, so `160`'s recorded `cU1` string is stale in that token only. **`cV1` is the first genuinely ingest-proof scorer in the corpus** (every reader excludes `cpr1-*`); `162.6`'s claim is confirmed by measurement. **Copy `cV1`, not `cI2`.**
+
+**NEXT:** one `cpr1`-sized batch (5 arms × 3 seeds, 100 ep, `m = 2`, sizes `[49,13]`, ~12 GPU-h) to separate **CO-GROUPING WITH `conv2`** from **CONTIGUITY** — the two readings `kC` cannot tell apart. Arms `k01` / `kP` / **`E`** (conv2 IN, shortcut IN, non-contiguous) / `kC` (replicate) / **`G`** (both OUT, coarse mass exactly `kS`'s, a free mass control). Registered read: `E − kP ≈ +7.65` refutes contiguity, `≈ −0.06` keeps it — **10.3 SE apart, no arm near the floor.** Register predictions and scorer **before** submission (RULE 21). See `CORRECTIONS 164.11`.
+
+**No MASTER-TABLE verdict moves. No FINDINGS entry moves. Nothing under `paper/` touched.**
+
+## CYCLE 137 — **`cpr1` REGISTERED AND LAUNCHED.** CORRECTIONS **162**
 
 The batch that breaks the `class == index mod 3` alias `161.7c(ii)` says no prefix cut can break. **A HARNESS CHANGE WAS REQUIRED AND IS THE MAIN DELIVERABLE.** **NOTHING LANDED, SCORED OR INGESTED — corpus stands at 2,594 rows, `grep -c '^cpr1-'` = 0.**
 
@@ -60,6 +122,8 @@ The batch that breaks the `class == index mod 3` alias `161.7c(ii)` says no pref
 **`CORRECTIONS 147.6` STANDS.** It withdrew *"a BatchNorm scale has leverage a BatchNorm shift does not"* **as a class-level MECHANISM claim**, on the ground that the property fails to predict the capture **LEVEL** across cut positions. **`cpk3` does not test that proposition** — it measures single-tensor **intervention signs** — so it neither restores nor weakens the withdrawal. **One of `147.6`'s three grounds IS retired**: the "opposite-way" counterexample `k45→k47` (+3.449 pp) is now split in batch into conv **+5.7227** and scale **−2.7220**; the aggregate was positive **because the conv outweighed the scale**.
 
 **MAY BE QUOTED** — as a **sign census**, with the scope sentence attached: over the whole corpus, **every** single-tensor prefix-cut step measured **off** the `m=1` floor carries its tensor's class sign — **conv 3/3 POSITIVE** (3 sites, +5.72…+9.20), **BN scale 7/7 NEGATIVE** (2 sites, −2.72…−25.16), **BN shift 2/2 NULL** (2 sites, both < 0.30 SE); **15/15 sign-consistent** including the 3 floor-saturated `scl1` steps, over 6 batches, 2 horizons, 2 clamp levels, **3 disjoint seed triples**.
+
+> **[NARROWED BY CYCLE 138 / CORRECTIONS `164.8`. The sentence above stands — it is scoped to **prefix-cut** steps — but its boundary is now measured and its values may not be composed.]** `cpr1`'s first **non-prefix** conv addition (site 52, one of the three conv sites counted above) reads **NULL, −0.032667 ± 0.748956**, against **+7.706667** for the same tensor in the prefix context. So "moving a convolution into the coarse group raises plateau5" is **false outside contiguous prefixes**, and any per-tensor ledger built by adding/differencing these steps is **refuted at 10.33 SE** (`cpr1`'s `DC`). **`CLASS-OPERATIVE` is retired as an available conclusion.**
 
 **MAY NOT BE QUOTED** — and the reason is structural, not statistical: **`class == index mod 3` holds at EVERY index 1…60 of `named_parameters()`** (tensors 1–60 are exactly 20 `conv/scale/shift` triples). `--stepsize-groups [k,62−k]` takes a **contiguous prefix**, so **no prefix cut on this architecture can ever separate tensor class from ordinal position** — `cpk3` cannot, and neither can any successor of the same shape (`152.8` reproduced). Class is **also** inseparable from a **mass threshold**: in the measured range the smallest conv (131,072) is **256×** the largest BatchNorm tensor (512), with no overlap anywhere in ResNet-18. So: **no leverage claim, no mechanism, no effect-size law by class, and nothing outside `layer4.0`** — every measured step lies in indices 45…55, one residual junction.
 
