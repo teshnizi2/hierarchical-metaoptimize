@@ -1433,6 +1433,7 @@ commit-pinned and self-verifying.
 
 - `plateau5` PRIMARY; the CSV `plateau` column **BANNED** as primary.
 - RULE 16 registered scorers run **unedited** · RULE 20 the ARGS line is the truth · RULE 21 scorer before batch · RULE 22 `dup_group` guard.
+- **Partition lists are composed, not hand-written** (CORRECTIONS 178): `PARTS=$(slurm_parts_for_wall "$WALL")`; `bin/_lib_guards.sh` aborts (exit 2) any launcher whose `PARTS`/`WALL` disagree with `gpu-short`'s cap at source time. `tests/test_partition_composer.py` 87/0.
 - **Ingest is `aggregate.py` THEN `args_repair.py --apply`** — `aggregate.py` alone silently reverts the `dup_group` repair and drops `ml2`'s `se` from 0.195 to 0.142.
 - **Re-derive every number at write time. Never quote prose, including this dashboard.**
 - Never fabricate an ORCID, affiliation, grant number or DOI.

@@ -20854,9 +20854,9 @@ ImageNet, or any other batch.
    written; this entry took the next free number at the moment of writing, and its in-place pointers
    carry that number.
 
-## 177. TRACK D — **THE LAUNCHER PARTITION DEFECT IS CLOSED IN THE SHARED HELPER, AND THE BRIEF WAS WRONG ON FIVE COUNTS.**  `bin/_lib_guards.sh` NEVER COMPOSED A PARTITION LIST — EVERY LAUNCHER HARD-CODED `PARTS` — SO THE FIX IS A NEW COMPOSER (`slurm_parts_for_wall`), A TWO-DIRECTION GUARD (`guard_parts_for_wall`) AND A **SOURCE-TIME HOOK** THAT ABORTS ANY LAUNCHER WHOSE `PARTS`/`WALL` DISAGREE, **BEFORE ITS `sbatch` LOOP**.  THE MECHANISM IS **PER-PARTITION QOS CAPS** (`sacctmgr`: l4 8, mig 8, a100 2, short 12 GPU/user), NOT PRIORITY; `gpu-short`'s NODE SET IS A **SUPERSET** OF THE THREE 7-DAY PARTITIONS' (20 shared + 10 more).  **FOUR** LAUNCHERS CARRY THE PAIR, NOT THREE.  `crn1` WAS SUBMITTED **08:56:16**, NOT 05:12, SAT **3h31m23s** WITH 0/18 STARTED, NOT SIX HOURS, AND WAS **CANCELLED AND RESUBMITTED ON `alice`**, NOT `scontrol`-UPDATED.  **ZERO GPU. NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING INGESTED; NO LAUNCHER EDITED; THE CORPUS STANDS AT 2,740 ROWS.**
+## 178. TRACK D — **THE LAUNCHER PARTITION DEFECT IS CLOSED IN THE SHARED HELPER, AND THE BRIEF WAS WRONG ON FIVE COUNTS.**  `bin/_lib_guards.sh` NEVER COMPOSED A PARTITION LIST — EVERY LAUNCHER HARD-CODED `PARTS` — SO THE FIX IS A NEW COMPOSER (`slurm_parts_for_wall`), A TWO-DIRECTION GUARD (`guard_parts_for_wall`) AND A **SOURCE-TIME HOOK** THAT ABORTS ANY LAUNCHER WHOSE `PARTS`/`WALL` DISAGREE, **BEFORE ITS `sbatch` LOOP**.  THE MECHANISM IS **PER-PARTITION QOS CAPS** (`sacctmgr`: l4 8, mig 8, a100 2, short 12 GPU/user), NOT PRIORITY; `gpu-short`'s NODE SET IS A **SUPERSET** OF THE THREE 7-DAY PARTITIONS' (20 shared + 10 more).  **FOUR** LAUNCHERS CARRY THE PAIR, NOT THREE.  `crn1` WAS SUBMITTED **08:56:16**, NOT 05:12, SAT **3h31m23s** WITH 0/18 STARTED, NOT SIX HOURS, AND WAS **CANCELLED AND RESUBMITTED ON `alice`**, NOT `scontrol`-UPDATED.  **ZERO GPU. NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING INGESTED; NO LAUNCHER EDITED; THE CORPUS STANDS AT 2,740 ROWS.**
 
-### 177.1 WHAT THE BRIEF SAID, AND WHAT THE RECORD SAYS
+### 178.1 WHAT THE BRIEF SAID, AND WHAT THE RECORD SAYS
 
 Every number below is re-derived at write time from `sacct -a -X -S 2026-09-06 -P` on `alice2`
 (read-only; `sacct` shows the last requested partition list for a job that never ran and the
@@ -20868,7 +20868,7 @@ the brief is marked **WRONG**; where the record cannot decide, **UNSURE**.
 |---|---|---|
 | "find where `bin/_lib_guards.sh` or the common launcher library composes the sbatch partition list" | **No shared code composes it.**  `_lib_guards.sh` (234 lines at `6a6c55d`) defines `guard_presubmit`, `guard_postlaunch`, `guard_scorer_registered` and nothing partition-related; `grep -rn '^PARTS=' bin/*.sh` finds **57** launchers each hard-coding its own list | **WRONG** premise; the fix therefore ADDS composition where none existed |
 | "three of this week's launchers (`cX1`, `cY1`, `cW1`)" | **four**: `cV1` (`cpr1-`, 15 jobs, 2026-09-07 22:41) carries the identical `PARTS=gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` / `WALL=03:00:00`; the guard census over all 57 pairs fails exactly `cV1 cW1 cX1 cY1` and passes 53 | **WRONG** by one |
-| "that omission" | `162.10` recorded it as a **decision** — *gpu-short fits arithmetically but is a different node set from every batch in this cell and is not used* — for `cpr1`'s cell; `cW1`/`cX1`/`cY1` inherited the pair by copy.  `sinfo -N`: `gpu-short` = 30 nodes = **all 7** `gpu-l4-24g` nodes (880–886) + **all 7** `gpu-mig-40g` (863–869) + **all 6** `gpu-a100-80g` (871–876) + node870, node887 and 8 `2080ti` nodes (851,852,854,856–860).  It is a **strict superset**, so the "different node set" premise holds only in that it *adds* nodes | premise of the recorded decision **REFUTED** by the node table; the exclusion remains available as a loud, reason-bearing opt-out (177.3) |
+| "that omission" | `162.10` recorded it as a **decision** — *gpu-short fits arithmetically but is a different node set from every batch in this cell and is not used* — for `cpr1`'s cell; `cW1`/`cX1`/`cY1` inherited the pair by copy.  `sinfo -N`: `gpu-short` = 30 nodes = **all 7** `gpu-l4-24g` nodes (880–886) + **all 7** `gpu-mig-40g` (863–869) + **all 6** `gpu-a100-80g` (871–876) + node870, node887 and 8 `2080ti` nodes (851,852,854,856–860).  It is a **strict superset**, so the "different node set" premise holds only in that it *adds* nodes | premise of the recorded decision **REFUTED** by the node table; the exclusion remains available as a loud, reason-bearing opt-out (178.3) |
 | "`crn1` at 0/18 started for six hours … after a 05:12 submission" | `crn1` ids `4920535–4920553` (18): **Submit 2026-09-08T08:56:16–18**, `Start=None`, **CANCELLED by 3263 (`s5014158`) at 12:27:39** with the three-partition list still on record.  Pending span **3h31m23s**.  The **05:12:55** submission is **`cpg1`** (`cW1`), whose 15 jobs started 05:12:55–05:56:26 on the same list | **WRONG** on the time (08:56, not 05:12), the batch (that was `cpg1`) and the duration (3h31m, not 6h) |
 | "on Slurm (Priority)" | `172.1` read `(Priority)` from `squeue`; `sacct` records **`QOSMaxGRESPerUser`** as the last pending reason on **all 60** `cru1` jobs, which sat ahead of `crn1` (submitted 08:36:51–55) on the same three QOSes.  `sacctmgr`: **`qos-gpu-l4` gres/gpu=8, `qos-gpu-mig` 8, `qos-gpu-a100` 2, `qos-short-gpu` 12** per user.  The three-partition list caps the account at **18** concurrent GPUs; `gpu-short` is a separate **12**-GPU pool on a superset of the same nodes | `(Priority)` is a faithful `squeue` reading; the **cause** is the per-QOS GPU cap saturated by the sibling batch, which the brief did not name |
 | "adding `gpu-short` via `scontrol update` started 7 jobs within 45 s" | For `crn1` this did **not** happen: it was **cancelled** (12:27:39) and **resubmitted from `salehkaleybars`** (`172`), ids `4921226–4921243`, Submit **12:28:47–50**, partition `gpu-short`, **7 jobs started at 12:39:32** (`4921226–4921232`) — **10m45s** after resubmission, **3h43m16s** after the original 08:56:16.  The `scontrol`-update signature belongs to **`cru1`**: **34 of 60** jobs ran on `gpu-short` under their **original ids**, first such start **13:49:35** (**5h12m44s** after submission), last **15:52:26** (**7h15m35s**) | **WRONG** for `crn1`; plausible for `cru1`, but the "45 s" and the moment of the update are **not in `sacct`** — **UNSURE** |
@@ -20880,7 +20880,7 @@ The one launcher of the week that *did* carry `gpu-short` is the control: **`cdn
 cost of the defect is **load-dependent, from 0 s to more than 3.5 h without a start**, which is
 exactly why a rule and not a habit has to carry it.
 
-### 177.2 WHAT WAS REGISTERED, AND THE MARGIN
+### 178.2 WHAT WAS REGISTERED, AND THE MARGIN
 
 `tests/test_partition_composer.py` — **87 checks**, RULE 13 style (a real configuration must PASS
 and an injected violation must FAIL) — was written and committed **before** `bin/_lib_guards.sh`
@@ -20896,15 +20896,16 @@ Against the unmodified library: **21 PASS, 66 FAIL, exit 1** — the 21 are the 
 direction passing vacuously because the functions did not exist.  After the implementation
 (written 17:29:21Z): **87 PASS, 0 FAIL, exit 0**, under macOS `/bin/bash 3.2.57` (the local
 `bash`) and — for the library alone, with the *real* `sinfo` — under the cluster's
-`bash 5.1.8` (177.4).
+`bash 5.1.8` (178.4).
 
-**A stale label, recorded not edited.**  Two sibling entries (`175` `cdn2`, `176` Track E) took
-the next numbers between the test's registration and this write-up.  The library block (uncommitted
-work at the time) was relabelled to `177`; the **registered test still says `CORRECTIONS 175`** in
-its docstring and banner.  It never asserts on the number.  Left as-is by the precedent of `162.10`
+**A stale label, recorded not edited.**  Three sibling entries (`175` `cdn2`, `176` Track E, `177`
+Track A) took the next numbers between the test's registration and this write-up, the last of them
+in the seconds between this entry's number check and its append.  The library block (uncommitted
+work at the time) was relabelled `175→177→178`; the **registered test still says `CORRECTIONS 175`**
+in its docstring and banner.  It never asserts on the number.  Left as-is by the precedent of `162.10`
 and STATUS open item 6: a registered artefact is not edited for a cosmetic pointer.
 
-### 177.3 THE FIX — 180 LINES APPENDED TO `bin/_lib_guards.sh`, ZERO DELETED
+### 178.3 THE FIX — 180 LINES APPENDED TO `bin/_lib_guards.sh`, ZERO DELETED
 
 `git diff --stat`: `bin/_lib_guards.sh | 180 +`, and `git diff | grep -c '^-[^-]'` = **0**.
 `guard_presubmit`, `guard_postlaunch` and `guard_scorer_registered` are byte-identical and the new
@@ -20944,10 +20945,10 @@ block sits after them (the test asserts both).  No registered scorer and no laun
 * **The pattern for a new launcher**, now in the library header:
   `WALL=03:00:00; PARTS=$(slurm_parts_for_wall "$WALL"); . "$REPO/bin/_lib_guards.sh"`.
 
-### 177.4 VERIFIED, NOT ASSUMED
+### 178.4 VERIFIED, NOT ASSUMED
 
 1. **Local**: `python3 tests/test_partition_composer.py` → 87/0, exit 0 (twice: before and after the
-   `175→177` relabel of the library block).
+   `175→177→178` relabels of the library block).
 2. **Census**: every `^PARTS=`/`^WALL=` pair in `bin/*.sh` through the guard — **57 pairs, 53 PASS,
    4 FAIL** (`cV1 cW1 cX1 cY1`); the `11:00:00` launchers (`cO1`, `cR1`, `cS2`) and `cdn1` pass.
    The composer, fed each defective launcher's own pair, writes
@@ -20964,7 +20965,7 @@ block sits after them (the test asserts both).  No registered scorer and no laun
    own guard 5b enumerates only its three partitions, reads their `7-00:00:00` limits and prints
    *nothing here is unschedulable* — the launcher's guard logic never looked at `gpu-short` at all.
 
-### 177.5 WHAT THE RECORD IS ENTITLED TO
+### 178.5 WHAT THE RECORD IS ENTITLED TO
 
 **From this commit, any launcher that sets `PARTS` and `WALL` before sourcing
 `bin/_lib_guards.sh` — the pattern of all 17 launchers since `cH1` — is aborted with exit 2 before
@@ -20977,11 +20978,16 @@ Not entitled: that `gpu-short` would have started `crn1` sooner — under the pe
 probably would (12 more GPUs on the same nodes), but the counterfactual was not run and the batch
 was in any case moved to another account; and any statement about the "45 s".
 
-### 177.6 STANDING CONSTRAINTS, DISCHARGED
+### 178.6 STANDING CONSTRAINTS, DISCHARGED
 
 Zero GPU; no `sbatch`, no `scancel`, no `scontrol`; `alice` (shared) neither read nor written;
 `alice2` read via `sacct`/`sinfo`/`sacctmgr`/`scontrol show`, written only under a scratch
 directory that was removed.  `paper/` untouched.  No registered scorer edited; `analysis/` diff
-empty.  `git add` by path only.  Sibling commits (`52f5f67`, `8d34335`) landed in this tree during
-the cycle; this entry took the next free number at the moment of writing.  The corpus stands at
+empty.  `git add` by path only.  Sibling commits (`52f5f67`, `8d34335`, `8982b65`, `c046c42`) landed in
+this shared working tree during the cycle.  **One of them swept this entry in**: `c046c42` (Track A)
+staged `docs/CORRECTIONS.md` while this block sat in the working tree still labelled `177`, so `HEAD`
+carried **two `## 177.` headings** for a few minutes.  This commit renumbers **only this block's own
+11 heading and self-reference lines** to `178` and rewrites two of its own paragraphs to disclose the
+sweep; every hunk of `git diff HEAD -U0 -- docs/CORRECTIONS.md` lies inside this block, and Track A's
+text is untouched.  The corpus stands at
 **2,740 rows**.

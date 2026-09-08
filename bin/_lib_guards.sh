@@ -230,3 +230,183 @@ guard_scorer_registered() {
   echo "guard_scorer_registered: $scorer  sha256 ${h:-unavailable}"
   return 0
 }
+
+# =============================================================================
+# PARTITION COMPOSITION -- added 2026-09-08 (CORRECTIONS 178).  APPEND-ONLY.
+#
+# THE DEFECT THIS CLOSES.  Four launchers (cV1, cW1, cX1, cY1) hard-coded
+#   PARTS=gpu-l4-24g,gpu-mig-40g,gpu-a100-80g      WALL=03:00:00
+# -- the three 7-day partitions, at a walltime that fits gpu-short's 4:00:00
+# MaxTime.  On ALICE every partition carries its OWN QOS with its OWN per-user
+# GPU cap (sacctmgr, 2026-09-08: qos-gpu-l4 8, qos-gpu-mig 8, qos-gpu-a100 2,
+# qos-short-gpu 12), so that list caps the account at 18 concurrent GPUs and
+# forfeits gpu-short's independent 12-GPU pool -- whose node set is a SUPERSET
+# of the three partitions' nodes (plus the 2080ti nodes 851-860).  crn1 sat
+# 0/18 started for 3h31m behind cru1 on exactly that list before it was
+# cancelled; 34 of cru1's 60 jobs eventually ran on gpu-short only after the
+# pending jobs' partition was changed by hand.
+#
+# WHAT IS PROVIDED
+#   slurm_time_secs  <T>                 seconds for a Slurm --time, parsed the
+#                                        way sbatch parses it: M | M:S | H:M:S |
+#                                        D-H | D-H:M | D-H:M:S.  NOTE the trap:
+#                                        "04:01" is FOUR MINUTES ONE SECOND.
+#   slurm_parts_for_wall <WALL> [BASE]   stdout: the partition list -- BASE
+#                                        (default $SLURM_LONG_PARTS) with
+#                                        $SLURM_SHORT_PART prepended iff WALL
+#                                        <= its MaxTime, and REMOVED otherwise
+#                                        (sbatch rejects a multi-partition
+#                                        request whose --time exceeds ANY
+#                                        member's MaxTime).  stderr: one line
+#                                        saying which list was chosen and why.
+#   guard_parts_for_wall <PARTS> <WALL>  0 iff PARTS is consistent with WALL in
+#                                        BOTH directions.  A deliberate
+#                                        exclusion of gpu-short below the cap
+#                                        (node-set consistency, precedent
+#                                        CORRECTIONS 162.10) is allowed ONLY
+#                                        with a non-empty PARTS_NO_SHORT_REASON,
+#                                        which is printed.
+#   the SOURCE-TIME HOOK                 every launcher since cH1 sets PARTS and
+#                                        WALL BEFORE `. _lib_guards.sh`, and that
+#                                        line sits just before its sbatch loop.
+#                                        If both are set when this file is
+#                                        sourced, guard_parts_for_wall runs and
+#                                        a disagreement ABORTS the launcher
+#                                        (exit 2) before anything is submitted.
+#                                        ARGSGUARD_PARTS_CHECK=0 bypasses it --
+#                                        say why in CORRECTIONS.  A launcher that
+#                                        sources this file BEFORE setting the
+#                                        pair must call guard_parts_for_wall
+#                                        itself.
+#
+# HOW TO USE IT IN A NEW LAUNCHER
+#   WALL=03:00:00
+#   PARTS=$(slurm_parts_for_wall "$WALL")          # prints the rationale to stderr
+#   . "$REPO/bin/_lib_guards.sh"                   # the hook re-checks the pair
+#
+# FROZEN PREMISES (stated so they stay true under future cluster changes)
+#   SLURM_SHORT_MAXTIME=04:00:00  gpu-short's MaxTime as read from sinfo on
+#                                 2026-09-08.  When a `sinfo` is on PATH the cap
+#                                 is RE-READ LIVE and the rationale says so;
+#                                 otherwise the frozen value is used and the
+#                                 rationale says "frozen".
+#   SLURM_LONG_PARTS              the three 7-day partitions this campaign has
+#                                 used since cts3; gpu-2080ti-11g is left out by
+#                                 measurement (55.8-70.8 s/epoch, CORRECTIONS
+#                                 12525) and can be passed as BASE explicitly.
+# =============================================================================
+SLURM_SHORT_PART=${SLURM_SHORT_PART:-gpu-short}
+SLURM_SHORT_MAXTIME=${SLURM_SHORT_MAXTIME:-04:00:00}
+SLURM_LONG_PARTS=${SLURM_LONG_PARTS:-gpu-l4-24g,gpu-mig-40g,gpu-a100-80g}
+
+slurm_time_secs() {
+  local t="$1" d=0 h=0 m=0 s=0 rest v
+  case "$t" in
+    infinite|INFINITE|unlimited|UNLIMITED) echo 999999999; return 0 ;;
+    "") echo "slurm_time_secs: empty --time" >&2; return 1 ;;
+  esac
+  if [ "${t#*-}" != "$t" ]; then
+    d=${t%%-*}; rest=${t#*-}
+    case "$rest" in
+      *:*:*:*) echo "slurm_time_secs: cannot parse '$t'" >&2; return 1 ;;
+      *:*:*)   h=${rest%%:*}; m=${rest#*:}; s=${m#*:}; m=${m%%:*} ;;
+      *:*)     h=${rest%%:*}; m=${rest#*:} ;;
+      *)       h=$rest ;;
+    esac
+  else
+    case "$t" in
+      *:*:*:*) echo "slurm_time_secs: cannot parse '$t'" >&2; return 1 ;;
+      *:*:*)   h=${t%%:*}; m=${t#*:}; s=${m#*:}; m=${m%%:*} ;;
+      *:*)     m=${t%%:*}; s=${t#*:} ;;            # MINUTES:SECONDS -- the trap
+      *)       m=$t ;;                              # MINUTES
+    esac
+  fi
+  for v in "$d" "$h" "$m" "$s"; do
+    case "$v" in
+      ""|*[!0-9]*) echo "slurm_time_secs: cannot parse '$t'" >&2; return 1 ;;
+    esac
+  done
+  echo $(( 10#$d * 86400 + 10#$h * 3600 + 10#$m * 60 + 10#$s ))
+}
+
+# stdout: "<cap-seconds> <source>"  where source is "sinfo(live)" or "frozen"
+_slurm_short_cap() {
+  local live="" cap=""
+  if command -v sinfo >/dev/null 2>&1; then
+    live="$(sinfo -h -p "$SLURM_SHORT_PART" -o '%l' 2>/dev/null | awk 'NF{print $1; exit}')"
+    if [ -n "$live" ] && cap="$(slurm_time_secs "$live" 2>/dev/null)"; then
+      echo "$cap sinfo(live)"; return 0
+    fi
+  fi
+  cap="$(slurm_time_secs "$SLURM_SHORT_MAXTIME")" || cap=14400
+  echo "$cap frozen"
+}
+
+slurm_parts_for_wall() {
+  local wall="$1" base="${2:-$SLURM_LONG_PARTS}" ws cap src parts="" p why
+  ws="$(slurm_time_secs "$wall")" || { echo "slurm_parts_for_wall: cannot parse --time='$wall'" >&2; return 1; }
+  set -- $(_slurm_short_cap); cap=$1; src=$2
+  # normalise BASE: split on commas, trim blanks, drop the short partition, keep order, no dupes
+  for p in $(printf '%s' "$base" | tr ',' ' '); do
+    [ -z "$p" ] && continue
+    [ "$p" = "$SLURM_SHORT_PART" ] && continue
+    case ",$parts," in *,"$p",*) continue ;; esac
+    parts="${parts:+$parts,}$p"
+  done
+  if [ "$ws" -le "$cap" ]; then
+    parts="$SLURM_SHORT_PART${parts:+,$parts}"
+    why="--time=$wall (${ws}s) <= $SLURM_SHORT_PART MaxTime (${cap}s, $src): $SLURM_SHORT_PART ADDED -- its own QOS (qos-short-gpu, 12 GPU/user as read 2026-09-08) is an independent pool and its node set is a superset of $base"
+  else
+    why="--time=$wall (${ws}s) > $SLURM_SHORT_PART MaxTime (${cap}s, $src): $SLURM_SHORT_PART OMITTED -- sbatch rejects a multi-partition request whose --time exceeds any member's MaxTime"
+  fi
+  echo "partitions: $parts  -- chosen because $why" >&2
+  printf '%s\n' "$parts"
+}
+
+guard_parts_for_wall() {
+  local parts="$1" wall="$2" ws cap src has=0 want
+  ws="$(slurm_time_secs "$wall" 2>/dev/null)" || {
+    echo "!!! GUARD FAIL (PARTITIONS, CORRECTIONS 178): cannot parse --time='$wall'"; return 1; }
+  set -- $(_slurm_short_cap); cap=$1; src=$2
+  case ",$parts," in *,"$SLURM_SHORT_PART",*) has=1 ;; esac
+  want="$(slurm_parts_for_wall "$wall" "$parts" 2>/dev/null)"
+  if [ "$ws" -le "$cap" ] && [ "$has" = 0 ]; then
+    if [ -n "${PARTS_NO_SHORT_REASON:-}" ]; then
+      echo "guard_parts_for_wall: $SLURM_SHORT_PART DELIBERATELY EXCLUDED at --time=$wall (${ws}s fits its ${cap}s cap, $src)."
+      echo "guard_parts_for_wall:   reason given: $PARTS_NO_SHORT_REASON   (precedent CORRECTIONS 162.10 -- record it in CORRECTIONS)"
+      return 0
+    fi
+    echo "!!! GUARD FAIL (PARTITIONS, CORRECTIONS 178): --time=$wall (${ws}s) fits $SLURM_SHORT_PART's MaxTime"
+    echo "!!! (${cap}s, $src) but PARTS=$parts omits it.  This is the crn1/cru1 defect: the three 7-day"
+    echo "!!! partitions cap the account at 8+8+2 concurrent GPUs while $SLURM_SHORT_PART is a separate"
+    echo "!!! 12-GPU pool on a superset of the same nodes.  Fix:"
+    echo "!!!   PARTS=\$(slurm_parts_for_wall \"\$WALL\")   ->  $want"
+    echo "!!! or, to exclude it ON PURPOSE (node-set consistency, 162.10):"
+    echo "!!!   export PARTS_NO_SHORT_REASON='<why>'"
+    return 1
+  fi
+  if [ "$ws" -gt "$cap" ] && [ "$has" = 1 ]; then
+    echo "!!! GUARD FAIL (PARTITIONS, CORRECTIONS 178): --time=$wall (${ws}s) exceeds $SLURM_SHORT_PART's MaxTime"
+    echo "!!! (${cap}s, $src) and PARTS=$parts includes it -- sbatch would reject the WHOLE batch"
+    echo "!!! (\"Requested time limit is invalid\").  Fix:"
+    echo "!!!   PARTS=\$(slurm_parts_for_wall \"\$WALL\" \"\$PARTS\")   ->  $want"
+    return 1
+  fi
+  echo "guard_parts_for_wall: PASS -- PARTS=$parts is consistent with --time=$wall (${ws}s vs $SLURM_SHORT_PART cap ${cap}s, $src)"
+  return 0
+}
+
+# ---- the source-time hook ----------------------------------------------------
+if [ "${ARGSGUARD_PARTS_CHECK:-1}" != 0 ] && [ -n "${PARTS:-}" ] && [ -n "${WALL:-}" ]; then
+  if ! guard_parts_for_wall "$PARTS" "$WALL"; then
+    echo "!!! _lib_guards.sh: PARTS and WALL were already set when this library was sourced and they"
+    echo "!!! DISAGREE.  NOTHING SUBMITTED.  (ARGSGUARD_PARTS_CHECK=0 bypasses this hook -- say why in"
+    echo "!!! CORRECTIONS.)"
+    case $- in
+      *i*) return 2 ;;
+      *)   exit 2 ;;
+    esac
+  fi
+elif [ "${ARGSGUARD_PARTS_CHECK:-1}" = 0 ] && [ -n "${PARTS:-}" ] && [ -n "${WALL:-}" ]; then
+  echo "_lib_guards.sh: ARGSGUARD_PARTS_CHECK=0 -- the PARTS/WALL consistency hook is BYPASSED for PARTS=$PARTS WALL=$WALL"
+fi
