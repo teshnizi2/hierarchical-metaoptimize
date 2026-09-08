@@ -18145,6 +18145,14 @@ terms, without running anything.  In the `[50,12]` **COARSE** group, **REMOVING*
 | `layer4.0.bn2.weight` (512 params) | **0.0003** | **0.1470** |
 | `layer4.0.conv2.weight` (2,359,296 params) | 0.0030 | 0.0003 |
 
+**AND THE OTHER SIDE OF THE CUT IS COVERED TOO, WHICH IS WHAT CLOSES THE ARGUMENT.**  Moving
+tensor 50 across the cut changes **two** groups, not one, so both must be checked.  In the
+`[49,13]` run, where 50 sits in the **FINE** group, removing it flips that group's sign in
+**0.0002** of steps.  So tensor 50's inner product contributes essentially nothing to the sign of
+**whichever group it is in** — the reduction channel is shut on **both** sides of the cut, and the
+only thing left that moving it can change is **which alpha governs it** (and the group memberships
+themselves).
+
 **Three meta-steps in ten thousand.**  Over the whole 50,000-step run that is ~15 flipped signs,
 ~0.03 in log-alpha of displacement on a single group beta.  Yet moving that one tensor across the
 cut costs **25.068667 pp** (`[49,13]` 55.405667 pooled n=18 vs `[50,12]` 30.337000 n=6, same cell,
@@ -18152,6 +18160,14 @@ cut costs **25.068667 pp** (`[49,13]` 55.405667 pooled n=18 vs `[50,12]` 30.3370
 decisions **cannot** be producing a 25 pp effect.  **The cliff acts through WHICH ALPHA GOVERNS
 tensor 50, not through the group's meta-signal.**  This is the first *mechanism-level* discrimination
 in the campaign between GOVERNANCE and REDUCTION, and it cost no GPU time.
+
+**THE SCOPE OF THAT REFUTATION, STATED SO IT IS NOT OVERSOLD.**  It is measured on **one seed (0)**
+over the **first 12 epochs = 6,000 of the 50,000 meta-steps** of the standard-cell trajectory, at
+`[49,13]` and `[50,12]`.  It is a statement about the reduction's arithmetic along those
+trajectories, not a 100-epoch outcome measurement, and it does **not** by itself say what the cliff
+**is** — only what it is **not**.  Twelve epochs is, however, where the beta trajectory is decided:
+`|dbeta| = ms = 1e-3` exactly and `BETA_CLIP` spans 12.70 in log-alpha, so 12,700 steps traverse the
+whole box and 6,000 is nearly half of it.
 
 ### 169.5 AND PER-TENSOR `1/numel` DOES NOT NEUTRALISE SIZE — **IT INVERTS IT**
 
