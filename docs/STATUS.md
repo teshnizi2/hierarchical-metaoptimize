@@ -16,7 +16,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,662 ro
 
 **DESIGN IDENTICAL** — 6 arms x seeds {15,16,17}, 100 ep, same specs/resources/env; the 18 job names `diff` **empty** against the cancelled set. **RULE 21:** scorer `2cb2783` `2026-09-08 08:50:59 +0200` -> earliest new Submit `2026-09-08T12:28:47` (both CEST) = **margin 13,068 s = 3 h 37 m 48 s**; scorer **not** re-registered, **not** edited. **RULE 16:** `git diff -- analysis/` **EMPTY**.
 
-**RULE 20 + ENV AUDIT: COVERAGE 0/18 — nothing has started.** `argsline_guard.py ... --batch-consistency` -> `no candidate files`, **exit 2 = UNVERIFIED, not a mismatch**. **NO `crn1` NUMBER MAY BE QUOTED BEFORE BOTH REACH 18/18.**
+**RULE 20, TWO LIMBS.** **PRE-SUBMIT: 18/18 PASS** — `guard 6: 18 composed command lines, 0 failed the RULE 20 pre-check`, `18 jobs (ACCEPTED BY SLURM); 0 rejected`; this is what proves `tn:sets:1-49/50-62` survives the shell as ONE token. **POST-LAUNCH + ENV AUDIT: 0/18** — nothing has started; `argsline_guard.py ... --batch-consistency` -> `no candidate files`, **exit 2 = UNVERIFIED, not a mismatch**, and `guard 7` timed out its 600 s window with the same verdict. **NO `crn1` NUMBER MAY BE QUOTED BEFORE BOTH REACH 18/18.**
 
 **COST/ETA, AND THE HONEST CAVEAT.** ~**14.34 GPU-h** projected (`cpg1` measured 0.7967 h/job x 18); wall `03:00:00` = **1.883x** the slowest `cpg1` run. **The move did NOT buy priority**: FairShare `alice` **0.280672** vs `alice2` **0.286555** — effectively identical. What it bought is that `crn1` no longer queues behind 35 same-account `cru1` jobs, and Slurm now gives it a start estimate at all (**first 2026-09-10T04:30**, last 22:00) where `alice2`'s tail was `N/A`. **`crn1` will NOT land inside the 24-hour push.**
 

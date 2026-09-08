@@ -19092,7 +19092,23 @@ RULE 21 holds on the original registration, not on a fresh one.  **RULE 16** hol
 
 ### 172.7 RULE 20 AND THE SEPARATE ENV AUDIT — **COVERAGE IS 0 OF 18, AND THAT IS STATED PLAINLY**
 
-The registered post-launch guard was run at the documented invocation:
+**RULE 20 HAS TWO LIMBS AND THEY LAND DIFFERENTLY.  THE PRE-SUBMIT LIMB PASSED 18/18.**  Before
+any `sbatch`, the launcher ran `guard_presubmit` over every composed command line three times — for
+the nine declared design flags, for `stepsize-groups=<spec>`, and for `seed` / `run-name` — and
+reported verbatim:
+
+```
+guard 6: 18 composed command lines, 0 failed the RULE 20 pre-check
+---- 18 jobs (ACCEPTED BY SLURM); 0 rejected ----
+```
+
+This is the limb that matters for the `tn:` grammar: it proves each spec, `tn:sets:1-49/50-62`
+included, survives the shell as **one** token with the value it was declared with.  `crn1-` was
+already present in `bin/PROTECTED.txt` (committed at registration), so the launcher appended
+nothing and the deployed clone's `git status` stays **clean**.
+
+**THE POST-LAUNCH LIMB IS UNVERIFIED, BECAUSE NOTHING HAS RUN.**  The registered post-launch guard
+was run at the documented invocation:
 
 ```
 python3 $MY/hierarchical-metaoptimize/analysis/argsline_guard.py $MY/runs --name crn1- --batch-consistency
@@ -19103,9 +19119,13 @@ python3 $MY/hierarchical-metaoptimize/analysis/argsline_guard.py $MY/runs --name
 `BETA_CLIP` and `PROBE` travel in `--export` and cannot ride the ARGS line, and done as `171.2` did
 it, from the runs' own `ENV:` lines rather than from any script header — is likewise **0 of 18**.
 
+It also waited its full 600 s window inside the submitting process and timed out, printing
+`guard 7: UNVERIFIED -- no crn1 job started inside the window.  This is NOT a mismatch.`
+
 | audit | covered | of | state |
 |---|---|---|---|
-| RULE 20 ARGS-line batch-consistency | **0** | 18 | UNVERIFIED — no run has started |
+| RULE 20 **pre-submit** command-line guard | **18** | 18 | **PASS** — 0 failed, 0 rejected by Slurm |
+| RULE 20 **post-launch** ARGS-line batch-consistency | **0** | 18 | UNVERIFIED — no run has started |
 | separate `ENV:`-line audit | **0** | 18 | UNVERIFIED — no run has started |
 
 **NO `crn1` NUMBER MAY BE QUOTED, IN ANY DOCUMENT, BEFORE BOTH AUDITS REACH FULL 18/18 COVERAGE.**
