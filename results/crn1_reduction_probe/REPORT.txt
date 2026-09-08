@@ -1,0 +1,104 @@
+==============================================================================
+probe_scalar   spec=scalar  steps=6000  type=scalar  groups=1
+  group 0: 62 tensors, 11220132 params
+    Q1 sign(z) == sign(largest |t|) in 0.9968 of steps (last half 0.9937)
+       largest |t| is 0.3842 of sum|t| on average (median 0.4015)
+       terms UNANIMOUS in sign in 0.0002 of steps (last half 0.0000); minority share of |t| median 0.0096
+       argmax|t| is tensor linear.weight (95%), layer4.1.conv2.weight (4%), layer4.0.conv2.weight (1%)
+    Q2 w=1/n       sign differs from the standard sum in 0.0762 of steps (last half 0.1523)
+    Q2 w=1/sqrt(n) sign differs from the standard sum in 0.0077 of steps (last half 0.0153)
+    Q2 sign-vote   sign differs from the standard sum in 0.0008 of steps (last half 0.0017)
+    Q4 w=1/n float32 left-to-right sum disagrees in sign with the float64 sum in 0.0000 of steps
+    Q4 STANDARD float32 left-to-right sum disagrees in sign with its own float64 sum in 0.0000 of steps
+
+==============================================================================
+probe_4913   spec=[49,13]  steps=6000  type=blockwise  groups=2
+  group 0: 49 tensors, 6315072 params
+    Q1 sign(z) == sign(largest |t|) in 0.9920 of steps (last half 0.9883)
+       largest |t| is 0.2341 of sum|t| on average (median 0.2354)
+       terms UNANIMOUS in sign in 0.0002 of steps (last half 0.0000); minority share of |t| median 0.0218
+       argmax|t| is tensor layer4.0.conv2.weight (93%), layer1.0.conv1.weight (6%), layer1.0.conv2.weight (0%)
+    Q2 w=1/n       sign differs from the standard sum in 0.1910 of steps (last half 0.1687)
+    Q2 w=1/sqrt(n) sign differs from the standard sum in 0.0520 of steps (last half 0.0593)
+    Q2 sign-vote   sign differs from the standard sum in 0.0022 of steps (last half 0.0037)
+    Q4 w=1/n float32 left-to-right sum disagrees in sign with the float64 sum in 0.0000 of steps
+    Q4 STANDARD float32 left-to-right sum disagrees in sign with its own float64 sum in 0.0000 of steps
+  group 1: 13 tensors, 4905060 params
+    Q1 sign(z) == sign(largest |t|) in 0.9982 of steps (last half 0.9963)
+       largest |t| is 0.6201 of sum|t| on average (median 0.6377)
+       terms UNANIMOUS in sign in 0.7390 of steps (last half 0.4900); minority share of |t| median 0.0000
+       argmax|t| is tensor linear.weight (95%), layer4.1.conv2.weight (4%), layer4.1.conv1.weight (0%)
+    Q2 w=1/n       sign differs from the standard sum in 0.1113 of steps (last half 0.2227)
+    Q2 w=1/sqrt(n) sign differs from the standard sum in 0.0330 of steps (last half 0.0660)
+    Q2 sign-vote   sign differs from the standard sum in 0.0073 of steps (last half 0.0147)
+    Q4 w=1/n float32 left-to-right sum disagrees in sign with the float64 sum in 0.0000 of steps
+    Q4 STANDARD float32 left-to-right sum disagrees in sign with its own float64 sum in 0.0000 of steps
+
+==============================================================================
+probe_5012   spec=[50,12]  steps=6000  type=blockwise  groups=2
+  group 0: 50 tensors, 6315584 params
+    Q1 sign(z) == sign(largest |t|) in 0.9927 of steps (last half 0.9887)
+       largest |t| is 0.2317 of sum|t| on average (median 0.2330)
+       terms UNANIMOUS in sign in 0.0002 of steps (last half 0.0000); minority share of |t| median 0.0230
+       argmax|t| is tensor layer4.0.conv2.weight (93%), layer1.0.conv1.weight (6%), layer1.0.conv2.weight (0%)
+    Q2 w=1/n       sign differs from the standard sum in 0.0963 of steps (last half 0.1703)
+    Q2 w=1/sqrt(n) sign differs from the standard sum in 0.0385 of steps (last half 0.0637)
+    Q2 sign-vote   sign differs from the standard sum in 0.0028 of steps (last half 0.0047)
+    Q4 w=1/n float32 left-to-right sum disagrees in sign with the float64 sum in 0.0000 of steps
+    Q4 STANDARD float32 left-to-right sum disagrees in sign with its own float64 sum in 0.0000 of steps
+  group 1: 12 tensors, 4904548 params
+    Q1 sign(z) == sign(largest |t|) in 0.9980 of steps (last half 0.9960)
+       largest |t| is 0.6239 of sum|t| on average (median 0.6413)
+       terms UNANIMOUS in sign in 0.7555 of steps (last half 0.5223); minority share of |t| median 0.0000
+       argmax|t| is tensor linear.weight (95%), layer4.1.conv2.weight (4%), layer4.1.conv1.weight (0%)
+    Q2 w=1/n       sign differs from the standard sum in 0.0950 of steps (last half 0.1900)
+    Q2 w=1/sqrt(n) sign differs from the standard sum in 0.0228 of steps (last half 0.0457)
+    Q2 sign-vote   sign differs from the standard sum in 0.0078 of steps (last half 0.0157)
+    Q4 w=1/n float32 left-to-right sum disagrees in sign with the float64 sum in 0.0000 of steps
+    Q4 STANDARD float32 left-to-right sum disagrees in sign with its own float64 sum in 0.0000 of steps
+
+==============================================================================
+EXTRAS -- single-tensor steering power, and the BN share
+------------------------------------------------------------------------------
+probe_scalar   spec=scalar  steps=6000
+  g0 DROP layer4.0.bn2.weight            (n=512)
+     STANDARD sign flips in 0.0000 of steps (last half 0.0000)
+     w=1/n    sign flips in 0.0228 of steps (last half 0.0453)
+  g0 DROP layer4.0.conv2.weight          (n=2359296)
+     STANDARD sign flips in 0.0000 of steps (last half 0.0000)
+     w=1/n    sign flips in 0.0000 of steps (last half 0.0000)
+  g0 DROP linear.weight                  (n=51200)
+     STANDARD sign flips in 0.0013 of steps (last half 0.0027)
+     w=1/n    sign flips in 0.0157 of steps (last half 0.0313)
+  g0 62 tensors, 40 of them 1-D BN (64.5% of tensors, 0.0856% of params)
+     BN share of sum|t|:  STANDARD 0.0259   w=1/n 0.8404
+------------------------------------------------------------------------------
+probe_4913   spec=[49,13]  steps=6000
+  g0 DROP layer4.0.conv2.weight          (n=2359296)
+     STANDARD sign flips in 0.0040 of steps (last half 0.0047)
+     w=1/n    sign flips in 0.0013 of steps (last half 0.0013)
+  g0 49 tensors, 32 of them 1-D BN (65.3% of tensors, 0.0872% of params)
+     BN share of sum|t|:  STANDARD 0.0367   w=1/n 0.9282
+  g1 DROP layer4.0.bn2.weight            (n=512)
+     STANDARD sign flips in 0.0002 of steps (last half 0.0003)
+     w=1/n    sign flips in 0.0202 of steps (last half 0.0403)
+  g1 DROP linear.weight                  (n=51200)
+     STANDARD sign flips in 0.0023 of steps (last half 0.0047)
+     w=1/n    sign flips in 0.0227 of steps (last half 0.0453)
+  g1 13 tensors, 8 of them 1-D BN (61.5% of tensors, 0.0835% of params)
+     BN share of sum|t|:  STANDARD 0.0198   w=1/n 0.5371
+------------------------------------------------------------------------------
+probe_5012   spec=[50,12]  steps=6000
+  g0 DROP layer4.0.bn2.weight            (n=512)
+     STANDARD sign flips in 0.0003 of steps (last half 0.0003)
+     w=1/n    sign flips in 0.1470 of steps (last half 0.1037)
+  g0 DROP layer4.0.conv2.weight          (n=2359296)
+     STANDARD sign flips in 0.0030 of steps (last half 0.0040)
+     w=1/n    sign flips in 0.0003 of steps (last half 0.0007)
+  g0 50 tensors, 33 of them 1-D BN (66.0% of tensors, 0.0953% of params)
+     BN share of sum|t|:  STANDARD 0.0463   w=1/n 0.9324
+  g1 DROP linear.weight                  (n=51200)
+     STANDARD sign flips in 0.0022 of steps (last half 0.0043)
+     w=1/n    sign flips in 0.0263 of steps (last half 0.0527)
+  g1 12 tensors, 7 of them 1-D BN (58.3% of tensors, 0.0731% of params)
+     BN share of sum|t|:  STANDARD 0.0138   w=1/n 0.4480
