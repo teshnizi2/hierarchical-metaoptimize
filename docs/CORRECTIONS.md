@@ -22612,3 +22612,430 @@ Zero GPU: nothing submitted, cancelled or touched on either account; `alice` not
 only (`squeue`, `sacct`, `grep`, `wc`, `sha256sum`, one unedited guard run).  `paper/` untouched.
 RULE 16: `git diff -- analysis/ patches/ tests/ bin/` empty this entry.  `git add` restricted to
 `docs/CORRECTIONS.md` and `docs/STATUS.md`.  No nested `claude -p`.  Next free number: **187**.
+
+---
+
+## 187. `ciso1` LANDS, IS ATTACKED, AND IS INGESTED — **H-ISOLATE RETURNS `UNRESOLVED-PARTIAL`: ISOLATING THE THREE CARRIER BATCHNORM SCALES RECOVERS THE *ENTIRE* SCALAR→LAYERWISE GAP (+46.9307 pp, +62.10 SE) AND ISOLATING THEIR LAYER-2 HOMOLOGUES RECOVERS NOTHING (−0.0633 pp, −0.08 SE) — BUT THE DESIGN CANNOT SEPARATE TENSOR *IDENTITY* FROM NETWORK *DEPTH*, AND THE REGISTERED "DOMINATION" ACCOUNT IS **NOT** THE OPERATIVE MECHANISM.**  `ONE` (tensor 50 alone, 512 parameters, 0.0046 % of the model) ALSO RESCUES (+41.4693 pp) — NOT A PARADOX: THE OPERATIVE QUANTITY IS THE **SIGN OF THE REMAINDER SUM**, NOT DOMINATION, AND REMOVING TENSOR 50 ALONE FLIPS IT ON **1.0000** OF THE PINNED RECORDS.  `ISO` IS **STATISTICALLY INDISTINGUISHABLE FROM THE LAYERWISE CEILING**, NOT BETTER THAN IT (+1.184 pp = 1.57 SE, inside the 2-SE read bar).  `ISO-59-NEITHER` IS **NOT A COLLAPSE**: THE 59-GROUP PEAKS AT −4.95, IS STILL DESCENDING AT THE HORIZON, AND FIRST CROSSES −14.0 AT EPOCH 92–98.  **INGESTED: 2,746 → 2,761, ADDED 15 · CHANGED 0 · REMOVED 0; 12.82 GPU-h (`.out`) / 13.02 h (`sacct` Elapsed).**  **H-DOMINATE AS NAMED REMAINS DEAD (`184`/`186`); NOTHING HERE REVIVES IT.**
+
+### 187.1 THE SCORER, RE-RUN UNEDITED — PROVENANCE AND VERDICT VERBATIM
+
+`analysis/cIS1_ciso1_isolate_score.py` sha256 `f9310405331ce486e14ef806abca1d3c40d96cecc1c9582f033883096992faa4` in the
+worktree, at HEAD `64a55b6`, and at its registration commit `be15a15e4` — identical, and identical to the copy
+on `alice2`.  `git diff -- analysis/ patches/ tests/ bin/` is empty for this entry (RULE 16).  Run through the
+documented invocation, no second argument, no flags:
+
+```
+python3 analysis/cIS1_ciso1_isolate_score.py ../runs_alice2
+```
+
+Gate totals in my run: **0 FAIL** anywhere — `[G1]` manifest 6/6 PASS, `[G0]` provenance 76/76 PASS
+(15 runs × ARGS + ENV + `PROBE_TENSOR` + `probe_tensor.json` + 500-record checks, plus the run-count check),
+`[A]` decomposition 3/3 PASS (`z_tensor` group sums vs the harness's own `z` 0/7500 fail, worst rel 2.26e-07;
+`m_tensor` vs `momentum_meta` 0/7500 fail, worst rel 1.08e-06; applied-sign identity 0/88,241 unclamped
+coordinates fail, 15,259 clamped), `[R]` completion/anchors 19/19 PASS.
+
+**FINAL, verbatim, pre-ingest run:**
+
+```
+FINAL: UNRESOLVED-PARTIAL | FLOOR-NOT-INGESTED | ISO-59-NEITHER | ISO-3-PINS | CTRL-59-PINS | ONE-61-FREE | PREMISE-REPLICATES | ONE-RESCUES | SPECIFIC:CTRL-NULL | ISO-RESCUES-BUT-59-NOT-FREE
+```
+
+**FINAL, verbatim, post-ingest run (the *only* difference in the entire 168-line output is the dropped
+`FLOOR-NOT-INGESTED` stamp — every number is invariant under this batch's own ingest, as `165.4` requires):**
+
+```
+FINAL: UNRESOLVED-PARTIAL | ISO-59-NEITHER | ISO-3-PINS | CTRL-59-PINS | ONE-61-FREE | PREMISE-REPLICATES | ONE-RESCUES | SPECIFIC:CTRL-NULL | ISO-RESCUES-BUT-59-NOT-FREE
+```
+
+### 187.2 RULE 20, RULE 21, RULE 16 AND THE ENV / `PROBE_TENSOR` AUDIT — 15/15, RE-RUN HERE
+
+`analysis/argsline_guard.py` sha256 `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`, unedited,
+run with the batch's declared axes as `--vary` arguments:
+
+```
+python3 analysis/argsline_guard.py ../runs_alice2 --name ciso1- --batch-consistency \
+        --vary seed --vary run-name --vary stepsize-groups --vary save-directory
+```
+
+```
+batch-consistency: every non-axis flag is identical across 15 runs
+argsline_guard: 15 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+```
+
+**ENV audit** (`ciso1-*.out`, `PROBE_DIR` stripped): exactly **one** distinct line, ×15 —
+`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`.
+**`PROBE_TENSOR`**: 9 `blockwise` + 3 `layerwise` + 3 `scalar`, all `every=100 tensors=62 meta_alg=Lion
+momentum_param=0.99 Lion_beta2=0.9`.  **`--stepsize-groups`**: the five registered specs at exactly 3 jobs each.
+15/15 `RUN_DONE`, 0 tracebacks, 100 epoch lines each, `sacct` 15/15 `COMPLETED 0:0`.
+
+**RULE 21.** `be15a15e42a4562b7cff5a81190ecdcbae946574` committed `2026-09-08T23:27:23+02:00` = **21:27:23Z**;
+earliest `sacct` `Submit` **2026-09-08T23:27:52** (CEST) = **21:27:52Z** → margin **+29 s**.  The batch's own
+`PROVENANCE.txt` records `SUBMIT_UTC 2026-09-08T21:27:51Z` (the launcher's clock, one second earlier than the
+scheduler's) → **+28 s** by that source.  Both are positive; `185.7`'s +29 s stands on the `sacct` reading.
+
+### 187.3 EVERY NUMBER RE-DERIVED WITH AN INDEPENDENT PARSER
+
+A numpy parser written from the documented semantics (not from the scorer's code path) reads the fifteen `.out`
+files and the fifteen 500-record `probe.jsonl` files directly.  `plateau5` = mean test accuracy over `Epoch
+95..99` (the `.out` files number epochs 0..99).  **Every value below is my parser's, and every one equals the
+scorer's to the printed precision.**
+
+| arm | spec | TEST plateau5 | per-seed (21, 22, 23) | range | TRAIN plateau5 | per-seed TRAIN |
+|---|---|---|---|---|---|---|
+| `k01`  | `scalar` | **23.2807** | 23.040, 23.604, 23.198 | 0.564 | 23.1693 | 23.190, 23.328, 22.990 |
+| `k62`  | `layerwise` | **69.0273** | 68.276, 69.444, 69.362 | 1.168 | 98.8493 | 98.722, 98.946, 98.880 |
+| `ISO`  | `sets:1-49,51-52,54-58,60-62/`(50,53,59) | **70.2113** | 69.946, 70.206, 70.482 | 0.536 | 94.2373 | 94.432, 94.216, 94.064 |
+| `CTRL` | `sets:1-19,21-22,24-28,30-62/`(20,23,29) | **23.2173** | 23.236, 23.388, 23.028 | 0.360 | 23.1767 | 23.304, 23.236, 22.990 |
+| `ONE`  | `sets:1-49,51-62/`(50) | **64.7500** | 64.162, 65.398, 64.690 | 1.236 | 83.3127 | 83.260, 84.094, 82.584 |
+
+Every within-arm range is below `DEAD_BAR` 5.00.  `SE_ARM_DIFF` = `SIGMA_W` 0.925518 × √(2/3) = **0.755682 pp**,
+re-multiplied here, not quoted.
+
+| contrast | pp | SE | TRAIN pp |
+|---|---|---|---|
+| `D_ISO  = ISO − k01`  | **+46.9307** | **+62.10** | +71.068 |
+| `D_CTRL = CTRL − k01` | **−0.0633** | **−0.08** | +0.007 |
+| `D_ONE  = ONE − k01`  | **+41.4693** | **+54.88** | +60.143 |
+| `D_CEIL = k62 − k01`  | **+45.7467** | **+60.54** | +75.680 |
+| `ISO − k62` (in batch) | **+1.1840** | **+1.57** | −4.612 |
+| `ISO − ONE`            | +5.4613 | +7.23 | +10.925 |
+| `ONE − k62`            | −4.2773 | −5.66 | −15.536 |
+
+Bars: `SUPPORT` 25.0 pp = 33.08 SE, `REFUTE` 5.0 pp = 6.62 SE, `READ` 2 SE = **1.511363 pp**, `DEAD` 5.00 pp.
+Descriptive: `ISO` 70.2113 against its registered point prediction 50.0 [45, 56] — **20.2 pp above the point and
+14.2 pp above the top of the range**; against corpus `k49` 55.4688, **+14.743**.
+
+**Floor dynamics** (occupancy = share of the 500 probe records with that `beta` coordinate at ≤ −15 + 1e-6;
+coordinate 0 = the big group, 1 = the isolated group), per seed and pooled:
+
+| arm | coord | occ s21 / s22 / s23 | pooled | terminal s21 / s22 / s23 | mean | stamp |
+|---|---|---|---|---|---|---|
+| `ISO`  | 0 (59) | 0.0000 / 0.0040 / 0.0000 | **0.0013** | −14.385 / −14.945 / −14.733 | **−14.688** | `NEITHER` |
+| `ISO`  | 1 (3)  | 0.7760 / 0.7680 / 0.7640 | **0.7693** | −15.000 ×3 | −15.000 | `PINS` |
+| `CTRL` | 0 (59) | 0.6300 / 0.6320 / 0.6300 | **0.6307** | −15.000 ×3 | −15.000 | `PINS` |
+| `CTRL` | 1 (3)  | 0.0000 ×3 | **0.0000** | −10.909 / −10.871 / −10.513 | **−10.765** | `FREE` |
+| `ONE`  | 0 (61) | 0.0000 ×3 | **0.0000** | −11.850 / −11.908 / −11.762 | **−11.840** | `FREE` |
+| `ONE`  | 1 (1)  | 0.7800 / 0.7720 / 0.7680 | **0.7733** | −15.000 ×3 | −15.000 | `PINS` |
+| `k01`  | 0 (62) | 0.6300 ×3 | **0.6300** | −15.000 ×3 | −15.000 | (the floor) |
+
+`CTRL`'s 59-group occupancy (0.6307) is the scalar arm's own (0.6300) to three decimals, and both first reach the
+floor at record **185** (meta-step 18,500, epoch 37) — `CTRL` s22 at 184.  `ISO`'s and `ONE`'s isolated groups
+reach the floor at records **112 / 116 / 118** and **110 / 114 / 116** (epochs 22–23) and never leave.
+
+**[P] premise, re-measured on `ciso1`'s own scalar arm** (`L_i = 0.9 m_i + 0.1 z_i`, `cTD2`'s statistic):
+determinate **1500**, DISAGREE **1238**, `R_T` **0.8253**, pinned **945**.  Carrier share on the DISAGREE records:
+`layer4.0.bn2.weight` **1.0000**, `layer4.0.shortcut.1.weight` **1.0000**, `layer4.1.bn2.weight` **1.0000**;
+exactly **three** tensors exceed 0.5 and the next-largest share is **0.0323** (a tie among several tensors — the
+scorer and my parser break that tie differently and print different names at 0.032; the *values* agree).  On the
+945 pinned records: trio dominates **0.9714**, tensor 50 alone **0.0000**, pair {53,59} **0.0000**, the 59-rest
+votes UP on **1.0000**.  `PREMISE-REPLICATES`.  This reproduces `ctd1`/`cTD2` (`184`: `R_T` 0.8266, pinned 944)
+on an entirely different batch's scalar runs.
+
+**Corpus anchor bands, re-derived independently** with the scorer's cell predicate (`ResNet18_c100`/`CIFAR100`/
+`SGDm`/`Lion`/ms 1e-3/α₀ 1e-6/γ=1/AUGMENT=1/`-15:-2.3026`/no `hier`/batch 100/`epochs_done` 100/`collapsed`=0,
+`superseded`≠1, `ciso1-*` excluded): scalar **n 32, 22.8797 ± 0.5812**, band [20.555, 25.204] ∋ `k01` 23.2807;
+layerwise **n 26, 69.4916 ± 0.4863**, band [67.547, 71.437] ∋ `k62` 69.0273.  Both anchors inside.
+
+### 187.4 ATTACK 1 — **IS THE CONTROL MATCHED ON THE RIGHT THING?  NO: `ciso1` CANNOT SEPARATE IDENTITY FROM DEPTH.  THIS IS THE BATCH'S BINDING LIMITATION.**
+
+`ISO` isolates tensors 50/53/59 (`layer4.0.bn2.weight`, `layer4.0.shortcut.1.weight`, `layer4.1.bn2.weight`);
+`CTRL` isolates 20/23/29 (`layer2.0.bn2.weight`, `layer2.0.shortcut.1.weight`, `layer2.1.bn2.weight`).  The two
+arms differ **simultaneously** in three ways — tensor identity, network depth (stage 4 vs stage 2), and isolated
+parameter count (1,536 vs 384).  Nothing in `ciso1` breaks that three-way confound.  **The reader's question —
+"would isolating *any* three late-network BatchNorm scales rescue?" — is not answered by this batch.**
+
+The inventory, re-verified name-by-name on the live model recorded in `PARTITION-MANIFEST.txt` (62 tensors,
+11,220,132 parameters, cross-checked against the harness's own `param_numels` in every `probe_tensor.json`):
+
+```
+idx 47  layer4.0.bn1.weight          512  SCALE
+idx 48  layer4.0.bn1.bias            512  bias
+idx 50  layer4.0.bn2.weight          512  SCALE  <== CARRIER
+idx 51  layer4.0.bn2.bias            512  bias
+idx 53  layer4.0.shortcut.1.weight   512  SCALE  <== CARRIER
+idx 54  layer4.0.shortcut.1.bias     512  bias
+idx 56  layer4.1.bn1.weight          512  SCALE
+idx 57  layer4.1.bn1.bias            512  bias
+idx 59  layer4.1.bn2.weight          512  SCALE  <== CARRIER
+idx 60  layer4.1.bn2.bias            512  bias
+```
+
+**ResNet-18 has exactly five BatchNorm *scales* in `layer4`, and every 512-wide BN scale in the whole model is
+one of them.  Three are the carriers; the two non-carriers are 47 and 56.**  A three-element arm that is
+class-matched (BN scale), depth-matched (`layer4`) and non-carrier therefore **does not exist on this model** —
+the same architectural fact that killed the original brief's control at `185.1`, one stage lower.
+
+**The arm that would settle it, named and priced.**  `DEPTH` = `sets:1-46,48-55,57-62/layer4.0.bn1.weight,layer4.1.bn1.weight,layer4.0.bn1.bias`
+(equivalently any non-carrier third member from {48, 51, 54, 57, 60}): sizes **[59,3]**, isolated numel
+**1,536** — *identical* to `ISO` on group sizes, on isolated parameter count and on depth, differing **only** in
+which layer-4 512-parameter BN parameters are isolated.  Disclosure it must carry: one member is a BN *bias*,
+because only two non-carrier BN scales exist.  A strictly class-matched variant, `DEPTH2` =
+`sets:1-46,48-55,57-62/layer4.0.bn1.weight,layer4.1.bn1.weight`, is [60,2] / 1,024 params — matched on class and
+depth, unmatched on count.  **Price**, at this batch's median run of 43 min: `DEPTH` ×3 seeds ≈ **2.15 GPU-h**;
+with a fresh in-batch `k01` anchor ≈ **4.30 GPU-h**; `DEPTH` + `DEPTH2` + anchor ≈ **6.45 GPU-h**.
+
+**Two pieces of adjacent evidence.  Neither is a substitute for that arm.**
+
+1. *Observational, on `ciso1`'s own scalar records.*  The two non-carrier layer-4 BN scales carry nothing: share
+   on the 1,238 DISAGREE records **0.0000** for 47 and **0.0000** for 56, and removing either from the pinned
+   sum flips the remainder's sign on **0.0000** of the 945 pinned records — against **1.0000** for tensor 50.
+   Depth alone does not make a layer-4 BN scale a carrier.  This is measured on the *collapsed* trajectory only;
+   it predicts `DEPTH` would be null, it does not demonstrate it.
+2. *Corpus, different design.*  A count-matched swap at fixed depth already exists: `[49,13]` scores
+   **55.4165** (n 12) while `sets:1-48,layer4.0.bn2.weight/layer4.0.conv2.weight,51-62` — the same partition
+   with tensor 50 and conv 49 exchanged between the groups — scores **21.6773** (n 3), a **−33.74 pp** collapse
+   from moving one layer-4 BN scale into the coarse group; the corresponding 48↔52 swap
+   (`sets:1-47,layer4.0.conv2.weight,layer4.0.shortcut.0.weight/layer4.0.bn1.bias,50-51,53-62`) scores
+   **55.5013**, **+0.08 pp**.  Same depth, different identity, 33.8 pp apart.  But the isolated group there is a
+   13-tensor tail, not a 3-tensor carrier set, and `184.7`'s standing position is that **the cliff mechanism is
+   not licensed**.  A hint, not a control.
+
+**Consequence, binding on every sentence in this entry:** `ciso1` licenses "isolating *these three* rescues and
+isolating *those three* does not."  It does **not** license "it is their identity, not their depth."
+
+### 187.5 ATTACK 2 — **`ISO` EXCEEDS LAYERWISE BY +1.184 pp, WHICH IS *INSIDE* THE READ BAR.  `ISO` IS INDISTINGUISHABLE FROM THE CEILING, NOT BETTER THAN IT.**
+
+`ISO` 70.2113 − `k62` 69.0273 = **+1.1840 pp = +1.57 SE**; the `READ` bar is **2 SE = 1.511363 pp**.
+|+1.1840| < 1.511363 → **inside**.  Against the corpus layerwise mean (69.4916, n 26) the gap is +0.72 pp, well
+inside the same bar.  **Any prose claiming three tensors beat sixty-two is wrong and is corrected here before it
+is written.**  `D_ISO` / `D_CEIL` = 46.9307 / 45.7467 = **1.026**: `ISO` recovers the whole of the in-batch
+scalar→layerwise gap, and the 2.6 % overshoot is noise.
+
+What is **not** noise is the training-side difference, which no stamp records: `ISO` reaches TRAIN 94.2373 while
+`k62` reaches **98.8493** (−4.612 pp) at the same test accuracy.  A two-group partition that isolates three BN
+scales matches the sixty-two-group ceiling on test **while fitting the training set substantially less**.  That
+is a real, un-predicted observation about this cell; it is not evidence for any mechanism and is recorded, not
+interpreted.  `ONE` sits below the ceiling on both (test −4.2773 pp = −5.66 SE; train −15.536 pp).
+
+### 187.6 ATTACK 3 — **THE JOINT-DOMINATION PARADOX DISSOLVES, AND IT NARROWS WHAT `ciso1` LICENSES.  "DOMINATION" IS NOT THE OPERATIVE QUANTITY; THE SIGN OF THE REMAINDER SUM IS.**
+
+The registered statistic is *domination*: `S` dominates when `sign(Σ_{i∈S} L_i) = s_agg` **and**
+`|Σ_{i∈S} L_i| > Σ_{i∉S} |L_i|`.  On `ciso1`'s own 945 pinned scalar records the trio dominates on 0.9714,
+tensor 50 alone on 0.0000, the pair {53,59} on 0.0000.  But **domination is sufficient, never necessary, for
+isolation to change the shared group's vote.**  What isolating `S` actually does is remove `S` from the shared
+sum; whether that changes the group's direction is governed by `sign(Σ_{i∉S} L_i)`.  Measured on the same 945
+records:
+
+| `S` removed | dominates | **removing `S` flips the remainder's sign** |
+|---|---|---|
+| {50, 53, 59} | 0.9714 | **1.0000** |
+| {50} alone   | **0.0000** | **1.0000** |
+| {53, 59}     | **0.0000** | **1.0000** |
+| {47} `layer4.0.bn1.weight` | 0.0000 | **0.0000** |
+| {56} `layer4.1.bn1.weight` | 0.0000 | **0.0000** |
+
+Over all 1,500 determinate records the flip shares are 0.8260 (trio), **0.8000** ({50}), 0.8260 ({53,59}),
+0.0000 (47), 0.0000 (56); the 61-rest (everything but 50) sums negative — votes `beta` UP — on **0.9740** of
+determinate records and **1.0000** of pinned ones.  Tensor 50's mean `|L|` is only **0.2283** of the rest's total
+`Σ|L|` (the trio's is 1.0740), so it *cannot* dominate — and it does not need to.  **`ONE` rescuing is exactly
+what the sign statistic predicts.  There is no paradox; there was a wrong predictor.**
+
+The mean-`|L|` ranking on the pinned scalar records puts the three carriers at ranks 1–3
+(`layer4.1.bn2.weight` 3.188e-01, `layer4.0.bn2.weight` 2.812e-01, `layer4.0.shortcut.1.weight` 1.833e-01)
+against a median tensor of 1.940e-03 — ×94 to ×164 — with `linear.weight` 4th (1.273e-01) and the layer-4 convs
+5th–7th.
+
+**And the registered "ladder reading" is refuted by `ONE`'s own records.**  `185.3`/the scorer header predicted
+that if `ISO` were supported while `ONE` floored, the remaining pair would "re-dominate under its own dynamics".
+`ONE` did not floor, and the pair does not re-dominate: on `ONE`'s own 500 records per seed, {53,59} dominates
+the 61-group on **0.0000**, removing {53,59} flips the remainder's sign on only **0.4600 / 0.4800 / 0.4660**, and
+the 61-group's own sum is near-balanced — it votes UP on **0.5400 / 0.5200 / 0.5340**, against the scalar arm's
+one-sided 0.9740.  `ISO`'s 59-group is likewise balanced (UP on 0.5000 / 0.4800 / 0.5180).  **The rescue is not
+"the carriers stopped dominating"; it is "the remaining group's signed sum stopped being one-sided."**
+
+**What this narrows.**  `ciso1` does **not** support "the trio dominates the shared reduction, therefore
+isolating the trio rescues."  It supports the weaker and more precise "removing the large positive carrier terms
+leaves the other 59 or 61 tensors' signed sum no longer voting `beta` down, and the shared `beta` then does not
+pin."  Domination was the statistic `cTD2` happened to register; it over-specifies the mechanism by requiring a
+magnitude condition the data never needed.  The residual `ISO − ONE` gap (+5.4613 pp, +7.23 SE) is real and is
+**not** explained by re-domination; it is unexplained by anything measured here.
+
+### 187.7 ATTACK 4 — **`ISO-59-NEITHER` IS NOT A COLLAPSE.  THE 59-GROUP IS STILL DESCENDING AT THE HORIZON.  THE VERDICT IS RIGHT, FOR A DIFFERENT REASON THAN THE BAR'S WORDING SUGGESTS.**
+
+`beta[0]` of `ISO`'s 59-group over its 500 records (record `i` = meta-step 100 `i` = epoch `i`/5):
+
+| seed | max | at record (epoch) | rec 100 | rec 200 | rec 300 | rec 400 | rec 499 | terminal slope (last 50) |
+|---|---|---|---|---|---|---|---|---|
+| 21 | **−4.952** | 89 (17) | −5.90 | −7.87 | −9.30 | −11.64 | **−14.385** | −0.02645 /rec |
+| 22 | −5.008 | 89 (17) | −5.92 | −7.85 | −9.49 | −11.92 | **−14.945** | −0.03580 /rec |
+| 23 | −4.892 | 90 (18) | −5.87 | −7.93 | −9.40 | −11.65 | **−14.733** | −0.02925 /rec |
+
+It **rises** from −13.815 to ≈ −4.95 by epoch 17 — the same ascent peak every arm in the batch reaches — and then
+descends monotone-in-trend but not monotone in steps (last 150 records: 113/111/116 down-steps against
+34/35/31 up-steps; net −4.03 / −4.41 / −4.36 nats).  It **first crosses −14.0 at record 491 / 464 / 474 =
+epoch 98 / 92 / 94**, and only seed 22 ever touches −15 (2 records of 500, occupancy 0.0040, in the final ten
+records).  Contrast `k01` and `CTRL`, which reach the floor at record **185/184** (epoch 36–37) and sit there for
+the last **63 %** of training, and `ONE`, whose 61-group never reaches the floor and ends at −11.840.
+
+**So the honest reading is "still descending, not yet pinned at epoch 100", not "near-collapsed".**  The
+registered freedom bar (`occupancy ≤ 0.10` **and** `terminal > −13.0`) is a *terminal-value* test; `ISO` passes
+the occupancy half by a factor of 77 and fails the terminal half by 1.688 nats **because the horizon happens to
+cut the descent mid-flight**.
+
+**But it is not merely a bar artefact, and the verdict should not be softened.**  At the observed terminal slope
+the 59-group would reach −15 within roughly **10–20 further records (2–4 more epochs)**.  Whether the rescue
+survives a longer horizon is **untested**: no `ciso1` arm ran past 100 epochs.  `UNRESOLVED-PARTIAL` is therefore
+the right verdict — not because the group collapsed, but because "did isolation stop the 59 from being dragged to
+the floor?" is genuinely unanswered at this horizon, and a 200-epoch `ISO` is the arm that answers it.  `ONE`'s
+much shallower terminal slope (−0.0132 / −0.0103 / −0.0079 /rec) makes the same question less pressing for the
+61-group, and `ONE` scores **lower**, so a higher terminal `beta[0]` is not itself the good thing.
+
+### 187.8 ATTACK 5 — PROVENANCE AND POWER
+
+**The partitions, re-verified on the live model, name by name, by an independent parser.**  The manifest's 62
+`TENSOR` lines match the frozen 62 on index, name and numel, and match the `param_numels` array the harness
+itself wrote into every `probe_tensor.json`.  For each m = 2 arm, `GROUP0 ∪ GROUP1` is exactly the 62 names with
+no duplication, `GROUP1` is exactly the names of the declared isolated indices, and:
+
+| arm | isolated (1-based) | names | sizes | numels |
+|---|---|---|---|---|
+| `ISO`  | 50, 53, 59 | `layer4.0.bn2.weight`, `layer4.0.shortcut.1.weight`, `layer4.1.bn2.weight` | (59, 3) | (11,218,596 / **1,536**) |
+| `CTRL` | 20, 23, 29 | `layer2.0.bn2.weight`, `layer2.0.shortcut.1.weight`, `layer2.1.bn2.weight` | (59, 3) | (11,219,748 / **384**) |
+| `ONE`  | 50 | `layer4.0.bn2.weight` | (61, 1) | (11,219,620 / **512**) |
+
+`ISO △ CTRL` = exactly the six names, `ISO ∩ CTRL` = ∅, `ISO △ ONE` = {53, 59}.  The `ISO`/`CTRL` numel mismatch
+(1,536 vs 384) is architecturally unavoidable and is disclosed — see `187.4`.
+
+**Are the three seeds one trajectory, as `184.8` found for `ctd1`?  For the *floored* arm yes; for the *rescued*
+arms no.**  On `ciso1`'s own `k01` arm the aggregate `sign(Σ L)` agrees on **500/500** records for every seed
+pair — `184.8`'s pathology replicates exactly.  On `ISO` it agrees on **370 / 378 / 364 of 500** and on `ONE` on
+**370 / 366 / 390 of 500** (≈ 73–78 %).  `beta[0]` seed-pair max |diff|: `ISO` 0.996 / 0.604 / 0.458 nats,
+`ONE` 0.460 / 0.414 / 0.366, against `CTRL` 0.108 / **0.006** / 0.104 — the collapsed control is a near-replicate,
+the rescued arms are not.  **The rescued arms carry genuine seed-to-seed variation; the floor does not.**
+
+**Power is not a live threat at this size.**  Within-arm `plateau5` SDs: `k01` 0.2909, `k62` 0.6520,
+`ISO` 0.2680, `CTRL` 0.1807, `ONE` 0.6202 — all at or below the pooled `SIGMA_W` 0.925518 the bars were built
+on.  Even in the worst case, treating each arm as `n = 1` and using `SIGMA_W` directly,
+`D_ISO / (SIGMA_W·√2)` = **35.9 SE**.  Both anchors sit inside their corpus bands (`187.3`).
+
+### 187.9 INGEST, THE SELFTEST SWEEP, AND `c98`
+
+Ingest through the documented commands, `aggregate.py` redirected **into the corpus**, not into a log (`146.7`):
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+python3 analysis/args_repair.py --apply
+```
+
+`aggregate.py` reports `# 2761 runs aggregated` and the three long-standing duplicate run-names (`a0-blk6-1e4_s0`,
+`a0-layer-1e4_s0`, `a0-scal-1e4_s0`).  `args_repair.py --apply` updates **36** `dup_group` fields (its standing
+re-normalisation, identical to the values the pre-ingest corpus already carried), `0` accuracy/config rows and
+`0` `superseded` rows, and writes `results/all_runs.csv.pre-argsrepair-20260909-013425.bak`.
+
+**Diff of the pre-ingest snapshot against the post-ingest corpus, keyed on `(run, job_id)`, actual counts:**
+
+```
+PRE rows 2746   POST rows 2761
+ADDED 15   CHANGED 0   REMOVED 0
+  + ciso1-{k01,k62,ISO,CTRL,ONE}-s{21,22,23}   (job_ids 4925518 … 4925532)
+other-batch rows added: 0     ciso1 rows in POST: 15
+```
+
+**Cost.**  Sum of the `.out` `minutes` lines: **769 min = 12.82 GPU-h**; sum of `sacct` `Elapsed`: **13.02 h**.
+`185.9`'s "~13 GPU-h" estimate holds.
+
+**Selftest sweep, 104 scorers, pre- and post-ingest, diffed.**  **Exit codes: zero moved** (39 scorers exit 1
+before and the same 39 after).  **`FINAL:` / `VERDICT` lines: zero moved in any of the 104.**  **25 scorers'
+output drifted**, every one a corpus-count, cell-mean or pooled-sigma re-derivation that moves mechanically when
+15 rows arrive: `c68_window_blast`, `c69_c100_armset`, `c69_orphan_census`, `c70_composition_audit`,
+`cH1_hb1_score`, `cHE1_hdominate_element_score`, `cI1_in489g1_score`, `cI2_in489g2_score`,
+`cIS1_ciso1_isolate_score`, `cJ1_cbl1_score`, `cK1_cpk1_score`, `cL1_cts1_score`, `cR1_cpk2_score`,
+`cS2_cpk3_score`, `cTD1_tensor_dominate_score`, `cTD2_tensor_dominate_score`, `cU1_alpha0_granularity_score`,
+`cV1_cpr1_score`, `cW1_cpg1_score`, `cX1_crn1_score`, `cY1_cru1_score`, `cZ1_conv1_prefix_step`,
+`cdn1_denominator_score`, `cdn2_denominator_score`, `cms1_ms1e4_stratum_census`.
+
+Four of the 25 moved an **internal check** count, disclosed individually because they are the only PASS/FAIL
+transitions in the sweep and **none is a batch verdict**:
+
+* `c68_window_blast` FAIL 5 → 4 — `T12` (locally re-derived `superseded` flags vs the CSV's) goes
+  `raw_only=15 → raw_only=0`: the fifteen `ciso1` runs were on disk and not yet in the corpus, and now are.
+* `cH1_hb1_score` FAIL 10 → 8 and `cJ1_cbl1_score` FAIL 9 → 7 — `ARCH_GAP` and `MANIFOLD_BAR` land back on their
+  archived literals (46.530 pp / 23.265) as the cell means move (scalar 22.880 → 22.914 n 32 → 35; layerwise
+  69.492 → 69.444 n 26 → 29).  `ARCH_SCAL`, `ARCH_LAY`, `SIGMA_W`, `SIGMA_DF` fail before and after.
+* `cX1_crn1_score` FAIL 6 → 8 — `SIGMA_100_WIDE` re-derives 0.883894 → 0.857264 against its frozen literal
+  (df/cells/members 74/37/111 → 80/40/120).  The same class of frozen-literal-vs-live-corpus check, moving the
+  other way.  `cX1`'s batch verdict is unchanged.
+
+`cTD1`/`cTD2`'s anchor blocks move as expected (scalar n 29 → 32, 22.8361 → 22.8778; layerwise n 23 → 26,
+69.5345 → 69.4760); **their `FINAL` lines do not.**  `cIS1`'s own drift is the single line
+`ciso1-* rows present in the file (excluded everywhere): 0 → 15`.
+
+**`c98_reproduce.py`: exit `1`, reported as-is, inherited, author scope, not fixed.**  The same ten
+draft-vs-corpus checks as `184.9`/`186.3`, now reading rows 2,761 (paper 2,177), admissible 2,319 (1,735),
+wallclock-carrying 2,746 (2,162), GPU-hours 2,914.4 (1,642), best R18/C10 arm 93.328 (93.317), deficit 1.7964
+(1.807), partition-family admissible 440 (431) and 428 with `meta = Lion` (419), count-matched rows outside `rp1`
+244 (241) twice.  Zero `FAIL` lines inside the run; the exit is the draft-freeze mismatch, unchanged in kind.
+
+### 187.10 WHAT `ciso1` ESTABLISHED — THE ENTITLED SENTENCE AND THE OVER-REACHING ONE
+
+**ENTITLED.**  *At the standard CIFAR-100 cell (`ResNet18_c100`, SGDm + Lion, meta-stepsize 1e-3, α₀ 1e-6, batch
+100, 100 epochs, `BETA_CLIP -15:-2.3026`, AUGMENT 1), moving three named 512-parameter `layer4` BatchNorm scales
+— `layer4.0.bn2.weight`, `layer4.0.shortcut.1.weight`, `layer4.1.bn2.weight`, 1,536 of 11,220,132 parameters —
+out of MetaOptimize's single shared step-size group into a group of their own lifts `plateau5` from 23.2807 to
+70.2113 (+46.9307 pp, +62.10 SE): the whole of the in-batch scalar→layerwise gap (+45.7467 pp), landing
+statistically indistinguishable from the layerwise ceiling (+1.184 pp, 1.57 SE, inside the 2-SE read bar) on a
+substantially lower training accuracy (94.24 vs 98.85).  Isolating `layer4.0.bn2.weight` alone — one tensor,
+0.0046 % of the parameters — recovers +41.4693 pp (+54.88 SE).  Isolating instead the three layer-2 structural
+homologues at identical group sizes [59,3] recovers nothing (−0.0633 pp, −0.08 SE, inside the read bar) and
+leaves the 59-tensor group pinned at the −15 floor on 0.6307 of probe records, which is the scalar arm's own
+0.6300, from the same epoch 37.  In every arm that rescues, the isolated group's own `beta` reaches the floor by
+epoch 22–23 and never leaves, and the shared group's `beta` never pins within the horizon.*
+
+**NOT ENTITLED, and each clause is refused by a specific measurement in this entry:**
+
+* *"It is the **identity** of these three tensors, not their depth or their size, that matters."*  `ISO` and
+  `CTRL` differ in identity **and** depth **and** isolated numel; no arm isolated a non-carrier `layer4` BN
+  scale.  `187.4` names and prices the arm that would decide it.
+* *"Three BatchNorm scales **beat** the layerwise ceiling."*  +1.184 pp is 1.57 SE, inside the 2-SE read bar
+  (`187.5`).
+* *"The three carriers **dominate** the shared reduction, and that domination is why isolating them works."*
+  Tensor 50 alone dominates on 0.0000 yet rescues; the operative quantity is the sign of the remainder sum, and
+  removing 50 alone flips it on 1.0000 of pinned records (`187.6`).  Domination over-specifies the mechanism.
+* *"Isolation **frees** the other 59 tensors from the floor."*  By the registered bar it does not: terminal
+  `beta[0]` −14.688, 1.688 nats below the freedom threshold, still descending at −0.03 nats/record at the
+  horizon (`187.7`).  What is established is that it does not **pin** within 100 epochs.
+* *"This explains why scalar MetaOptimize fails on CIFAR-100."*  One cell, one meta-stepsize, one horizon, one
+  dataset, one architecture (`184.8`); CIFAR-10 has no per-tensor terms measured at all.
+* *"H-DOMINATE is alive again."*  See `187.11`.
+
+### 187.11 H-DOMINATE IS STILL DEAD; `ciso1` TESTED SOMETHING ELSE
+
+**H-DOMINATE *as named* — that the `layer4` convolutions and the classifier carry the shared Lion sign down —
+remains DEAD, exactly as `184` and `186` left it, and nothing in `ciso1` bears on it.**  Bar 3 killed it at the
+tensor level (`NAMED-CARRIED` 0.0000: the named set carries the sign on **zero** records, and in the early
+21-tensor prefixes the convs and `linear.weight` sit with the *opposite* sign, as opponents); at the element
+level it is untestable (`181`).  `ciso1` tested **H-ISOLATE**, the causal standing of the *descriptive
+three-tensor residue* that survived that refutation — a different proposition about different tensors.  A
++62 SE rescue by three BatchNorm scales is not evidence about convolutions and a classifier; if anything
+`187.6` narrows the residue further, from "the trio dominates" to "the remainder's signed sum is one-sided until
+the carriers leave it."
+
+**Ledger.**  **Seventeen registered.**  **Fifteen dead** (the thirteen observational candidates, `H-DISAGREE`
+at `179`, H-DOMINATE (T) as named at `184`; (E) untestable, not counted separately).  **Two live**: `crn1`
+composition (`169`/`173`) and **H-ISOLATE, now `UNRESOLVED-PARTIAL`** — `D_ISO` clears `SUPPORT_BAR` by 25 SE and
+`D_CTRL` is null, but the gating `ISO-59-FREE` prediction fails, so the registered branch is neither
+`CAUSAL-SUPPORTED` nor `CAUSAL-REFUTED`.  **None pending** (`186`'s "one pending" is discharged by this entry).
+The three-tensor residue is still not itself a registered candidate.
+
+**The three arms this batch names for whoever runs next, in priority order:** (1) `DEPTH` / `DEPTH2` — the
+identity-vs-depth control, ≈ 2.15–6.45 GPU-h (`187.4`); (2) `ISO` at 200 epochs — does the rescue survive once
+the 59-group's descent completes (`187.7`); (3) an explicit freeze of tensors 50/53/59 under `scalar` — `ISO`'s
+isolated `beta` pins at −15 by epoch 22 and never moves, so "give them their own step size" and "freeze them" may
+be the same intervention, and that is cheap to distinguish.  **None of the three was run here.**
+
+### 187.12 LINES ANNOTATED IN `docs/STATUS.md`
+
+The corpus/queue line moves to **2,761** rows with the `ciso1` ingest recorded; the `c98` rider gains the
+2,761-row counts; the RULE 16 header line gains `64a55b6..HEAD` (no `analysis/` `patches/` `tests/` `bin/`
+change this entry); a cycle-147 block is added above the cycle-146 reconciliation block; the authority line moves
+`186 → 187`.  Superseded wording is kept verbatim.
+
+### 187.13 THE STANDING CONSTRAINTS, DISCHARGED
+
+**Zero GPU submitted, cancelled or touched** on either account; `alice` not accessed at all; `alice2` read only
+(`ls`, `du`, `cat`, `sacct`, `rsync` pull).  **`paper/` untouched** — `git status --porcelain -- paper/` empty.
+**RULE 16**: `git diff -- analysis/ patches/ tests/ bin/` empty this entry; both registered scorers and
+`argsline_guard.py` run unedited at their committed sha256.  **plateau5 primary** throughout; the CSV `plateau`
+column read nowhere; `best_test` used nowhere.  No nested `claude -p`.  `git add` restricted to
+`docs/CORRECTIONS.md`, `docs/STATUS.md` and `results/all_runs.csv`.  Next free number: **188**.
