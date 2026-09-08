@@ -21704,3 +21704,143 @@ cancelled.  The live `HF.py` on `alice2` now carries `PATCH_PROBE_TENSOR` (opt-i
 it was applied, so no other batch ran across the change).  `ctd1-` added to `bin/PROTECTED.txt` on both hosts.
 The registered scorer's own note: **the accuracy of every `ctd1` run is a provenance check against 182.1(4)'s
 bands, never a result.**
+
+## 183. CYCLE 145 VERIFICATION — **H-DOMINATE IS THE SIXTEENTH REGISTERED CANDIDATE, NOT THE FIFTEENTH; BOTH TRACKS VERIFIED AGAINST THE RECORD, NOT THE BRIEF.**  TRACK A's REFUSAL STANDS AS ITS DELIVERABLE (SCORER RE-RUN UNEDITED, BYTE-IDENTICAL TO ITS FIRST EXECUTION, `FINAL: UNRESOLVED-FRAC-NEG-NOT-THE-RIGHT-STATISTIC | ELEMENT-STATISTIC-NOT-ON-DISK | BARS-NOT-APPLIED`); TRACK B's BATCH IS IN FLIGHT (RULE 20 PASS ON 3/6, COVERAGE NOW 4 RUNNING + 2 PENDING, NO NUMBER QUOTABLE).  **NO LAYERWISE-PROBE PROXY WAS USED AS A MEASUREMENT OF SCALAR DYNAMICS BY EITHER TRACK.**  ZERO GPU THIS ENTRY.  CORPUS **2,740**.
+
+Everything below was re-derived at `HEAD f0015b1` from git, from the filesystem on the Mac and on `alice2`
+(`sacct`, `squeue`, nanosecond mtimes, sha256), from the unedited scorers' own output, and from the
+corpus.  Nothing is quoted from the cycle briefing; where the briefing is wrong it is said here.
+
+### 183.1 THE COUNT — THE BRIEFING AND `182`'s HEADER ARE OFF BY ONE
+
+`179`'s header registers H-DISAGREE as **"THE FIFTEENTH MECHANISM"**; `180.3`'s ledger tallies **"fifteen
+registered, fourteen dead"** with `crn1` composition the one live account — and that tally is taken
+*before* H-DOMINATE exists.  H-DOMINATE is therefore the **sixteenth** registered candidate.  `181`'s
+header says sixteenth (correct); this cycle's briefing and `182`'s header say fifteenth (inherited from the
+briefing; `182`'s header is left verbatim and corrected here).  `180.3`'s own caveat carries over
+unchanged: the enumeration of the thirteen earlier observational candidates is a running tally, not a
+named ledger, and remains **UNSURE**; the count sixteen rests on `179` + `180.3` + `181`/`182`, not on a
+rebuilt list.
+
+**Ledger after this entry: sixteen registered — fourteen dead, one live (`crn1` composition, `169`/`173`),
+one PENDING at both of its levels (H-DOMINATE: (E) untestable on the record, (T) in flight).**  Nothing
+moved from pending to dead or to supported this cycle.  The briefing's conditional — "if Track A REFUTED
+element-level domination … fourteen dead at one level with the other level pending" — does **not** fire:
+Track A did not refute anything; it established that the element-level statistic has never been recorded.
+
+### 183.2 TRACK A, VERIFIED — REGISTRATION BEFORE FIRST EXECUTION, RE-RUN UNEDITED, THE REFUSAL IS THE DELIVERABLE
+
+| | re-derived |
+|---|---|
+| scorer sha256 at `HEAD` and at `49fab7f` | `4a6a8479d1c2099d85a86970a4ee42a5dc863de41d46cd2796b0c0309b77a462` — identical (`git show 49fab7f:analysis/cHE1_hdominate_element_score.py | shasum`) |
+| commit | `49fab7f`, author = committer `2026-09-08T21:00:23+02:00` (`19:00:23Z`) |
+| first execution, Mac | output `cHE1_mac.txt` mtime `21:00:37+02:00` (`19:00:37Z`) — last write of a ~1 s run; **≥ 14 s after the commit** |
+| first execution, `alice2` | `~/cHE1_scratch/` created `21:00:43.2`, output `cHE1_alice2.txt` last written `21:00:46.69+02:00` (`19:00:46.7Z`); **≥ 20 s after the commit**.  The two outputs differ only on the probe-root path line |
+| re-run this entry | `python3 analysis/cHE1_hdominate_element_score.py --probe-root <scratch>/runs` at `19:22:21Z`, exit 0, **byte-identical** (`diff` empty) to the `19:00:37Z` output; `--selftest` **ALL PASS** (33) |
+| claim | commit-before-first-execution only, **no RULE 21 label** — as `181.2` states; no runs of its own |
+
+**Verdict, verbatim, from the re-run:**
+
+    FINAL: UNRESOLVED-FRAC-NEG-NOT-THE-RIGHT-STATISTIC | ELEMENT-STATISTIC-NOT-ON-DISK | BARS-NOT-APPLIED
+    files scored 42 (G-check failures 0); n_tot seen {1: 42}; element-level sidecars found none;
+    R_E_INST == 0.0000 on every file YES
+
+**Recorded as the deliverable: a refusal.**  `frac_neg` in the scalar arm is `1[z_step < 0]` of the one
+reduced aggregate (`n_tot = 1` on 42/42 probes, `181.1`), so the brief's element-majority statistic does not
+exist on disk and H-DOMINATE (E) is **neither supported nor refuted**.  What `181` licenses: that sentence,
+and the labelled descriptive companions (unanimous per-window Lion vote at the standard cell; a negative
+aggregate moves `beta` UP; a persistent DOWN vote with floor occupancy also on CIFAR-10 at `ms 3e-4`).
+What it does **not** license: any element-level domination rate in either direction; `R_E_LIT` as a
+domination rate; any layerwise-probe stand-in.  The instrument that would test (E) — one
+`n_neg_elem / n_zero_elem` count per record on the pre-reduction products, additive and opt-in with an
+inertness proof — does not exist and was not built this cycle; `cHE1`'s header bars are its
+pre-registration.
+
+### 183.3 TRACK B, VERIFIED — RULE 20 AND THE ENV AUDIT RE-RUN; COVERAGE 3/6 AT AUDIT TIME; COMMIT-BEFORE-ANY-RUN HOLDS WITH ONE DISCLOSURE
+
+**RULE 20, re-run at `21:20–21:22` CEST from the unedited guard** (`argsline_guard.py` sha256
+`81cea8b586e124a6…` on both hosts): `python3 analysis/argsline_guard.py $METAOPT_WS/runs --name ctd1-
+--batch-consistency` → **`3 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line,
+VERDICT: PASS`; `batch-consistency: every non-axis flag is identical across 3 runs`.**  SEPARATE ENV audit
+(`grep -h '^ENV:' runs/ctd1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c`): **ONE** distinct line,
+×3 — `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default
+SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`.
+`PROBE_TENSOR` audit (modulo `dir=`): `type=scalar` ×2, `type=layerwise` ×1, all `every=100 tensors=62
+meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9`.  0 tracebacks.  **Coverage 3 of 6 at audit time — the
+three `.out` files that exist.**  Both audits are OPEN OBLIGATIONS at 6/6 (`182.6`'s command block).
+
+**Queue, `squeue` at `21:23:46` CEST:** `sc-s18` node851, `lay-s18` + `sc-s19` node887 (all 11 min),
+**`lay-s19` started `21:23:28` on node870**, `sc-s20` / `lay-s20` PENDING.  Records at `21:20`: `sc-s18` 33,
+`sc-s19` 73, `lay-s18` 78 of 500; epochs 7 / 17 / 19 of 100.  **No `RUN_DONE` anywhere.  Nothing landed,
+scored or ingested; nothing was scored on partial data; no number from `ctd1` is quotable.**
+
+**Commit before any run existed — the wall clock:**
+
+| event | time (CEST) | source |
+|---|---|---|
+| `tests/test_probe_tensor.py` inertness log `END` on the live tree | `21:11:38.59` | log mtime; `END 2026-09-08T19:11:38Z` in the file |
+| **commit `586e98d`** (patch, test, launcher, `cTD1`) | **`21:12:19`** | git author = committer stamp |
+| `runs/ctd1/PROVENANCE.txt` written by the launcher | `21:12:38.71` | mtime; `SUBMIT_UTC 2026-09-08T19:12:38Z` |
+| `sacct Submit`, all six jobs | **`21:12:39`** | `sacct -X` |
+| first job `Start` (the first `.out` can exist) | `21:12:45` | `sacct -X` |
+| commit `5c0f04b` (`cTD2`) | `21:15:19` | git |
+
+**Margin commit → Submit = 20 s, positive; no `ctd1` run, `.out`, probe record or corpus row existed before
+`586e98d`** (corpus: 0 `ctd1` rows; 0 `ResNet18_c100` rows at seeds 18–20).  **Disclosure:** the patch was
+applied to the live `HF.py` and the inertness test finished **41 s before** its commit — the test is a CPU
+run of 130 steps on the real model (`182.2`'s R1–R5), not a `ctd1` run, and the claim `182.4` makes is
+commit-before-*submission*, which holds.  Stated so no one reads "before any run existed" as "before the
+patch touched the live tree".
+
+**Provenance, re-derived on `alice2`:** the launcher's `HFLIVE` is
+`$CIF/Optimizers/HF.py` = `MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10/Optimizers/HF.py`:
+sha256 **`4732b74aa3a10508…`, 1,093 lines, exactly 3 `PATCH_PROBE_TENSOR` markers**; `HF.py.pre_probe_tensor`
+**`9abd4318834d2ea1…`, 1,012 lines, 0 markers**; both equal `PROVENANCE.txt`'s `HF_SHA256` /
+`HF_PRE_PATCH_SHA256`.  (No other `HF.py` under the workspace carries a marker; the `imagenet` and
+`tinystories` copies are untouched.)  `patches/patch_probe_tensor.py` (`bc5a28f8…`),
+`tests/test_probe_tensor.py` (`586d60c2…`) and `bin/cTD1_tensor_dominate.sh` (`bdc552de…`) are
+**byte-identical** between the Mac `HEAD` and the `alice2` staged copies.  `ctd1-` is in
+`bin/PROTECTED.txt` on both hosts.
+
+**RULE 16 over the whole cycle (`git diff --numstat eb51d27..HEAD`):** `analysis/` = three **new** files,
+`841 / 922 / 958` insertions, **0 deletions** (`cHE1`, `cTD1`, `cTD2`); `patches/` = one new file
+`210 / 0`, **no pre-existing patch touched**; `tests/` = one new file; `bin/PROTECTED.txt` `+1/−0`
+(`ctd1-`); `bin/cTD1_tensor_dominate.sh` new; `docs/` two files.  `argsline_guard.py` unchanged.  `cTD1`
+(frozen) and `cTD2` both `--selftest ALL PASS` on the Mac at `HEAD`; they differ on **72** lines.
+The floor bands `182.1(4)` registers re-derive exactly under `cTD2`'s own filter (`CIFAR100`,
+`ResNet18_c100`, `ms 1e-3`, `alpha0 1e-6`, clip `-15:-2.3026`, `hier ""`, `superseded 0`): scalar **n 29,
+22.8361 ± 0.5568 → [20.609, 25.064]**; layerwise **n 23, 69.5345 ± 0.4916 → [67.568, 71.501]**.
+
+### 183.4 THE STATEMENT THE BRIEFING ASKED FOR, MADE EXPLICIT
+
+**No layerwise-probe proxy was used as a measurement of scalar dynamics in this cycle, by either track.**
+Track A's scorer reads the **42 scalar** probes only (its G-check requires `stepsize_type scalar`,
+`n_beta 1`, `t_n [1]`); every layerwise probe on disk was excluded by construction, and `181.6` forbids the
+substitution in words.  Track B's layerwise arm (`lay-s18/19/20`) is a **COMPANION** — the same logging on
+the other dynamics at matched seed and step, so that `agree_j` / `opp_j` become a within-batch
+measurement of *whether* the per-tensor signs differ between dynamics (the `177.5` fact) rather than a
+substitute for the scalar arm; its accuracy is provenance only; it has not been scored.  The PRIMARY
+statistic (`R_T` on `L`) is defined on the **scalar** runs' own per-tensor terms, captured under
+shared-`beta` dynamics.
+
+### 183.5 H-DOMINATE — THE HONEST CURRENT POSITION
+
+| level | state | what would move it |
+|---|---|---|
+| **(E)** element | **NOT TESTED — untestable on the record.**  The element-majority sign of the scalar meta-gradient has never been recorded; `frac_neg` is `1[z < 0]` of the one aggregate | a new additive opt-in probe count on the pre-reduction products + inertness proof, then ≥ 3 seeds at the standard cell + the `cfr1-C` control (and a CIFAR-10 `alpha0 1e-6` arm); bars in `cHE1`'s header.  GPU, not launched |
+| **(T)** tensor | **PENDING — registered (`cTD2`, bars frozen: `R_T ≥ 0.10` on `L`, `DOWN ≥ 0.75`, `NAMED-CARRIED ≥ 0.75`), batch `ctd1` in flight, 4 running + 2 pending, 0/6 `RUN_DONE`** | 6/6 `RUN_DONE` → `182.6`'s command block (guard, ENV, `PROBE_TENSOR`, then `cTD2` — **not** `cTD1`).  Disclosed prior: on the SECONDARY `z` statistic, seed 0, first 12 % of training, sign-vote-vs-sum disagreement 0.0008 (`169.3`) — prediction (1) was disfavoured for the early phase before registration |
+
+The reframe the cycle tests — "the headline gap is really *scalar MetaOptimize fails*" — is unchanged in
+standing: the standard-cell numbers (`scalar` 22.8361 / `layerwise` 69.5345 `plateau5`; train 22.897 /
+`182.1(4)`) are corpus facts; the *mechanism* offered for the failure (a minority of large-magnitude
+contributions carrying the sign against the majority and voting DOWN) is untested at (E) and awaiting data
+at (T).  Nothing in this cycle's record supports it, and nothing refutes it.
+
+### 183.6 THE STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU in this entry: nothing submitted, cancelled or touched; `alice` not accessed; `alice2` read only
+(`squeue`, `sacct`, `ls`, `sha256sum`, `grep`, and one guard run).  `paper/` untouched (`git status
+--porcelain paper/` empty).  `c98_reproduce.py` **exit 1**, reported as-is, author scope: 411 distinct
+quantity numerals, 41.9 % coverage, unchanged.  `git add` restricted to `docs/CORRECTIONS.md` and
+`docs/STATUS.md`.  No nested `claude -p`.  This entry takes the next free number (`183`); the authority
+line in `docs/STATUS.md` moves `182 → 183`.
