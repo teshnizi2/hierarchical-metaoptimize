@@ -1,9 +1,9 @@
 # STATUS — operator dashboard
 
 Updated 8 Sep 2026 (**cycle 141**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **167**) > `docs/FINDINGS.md` > everything else.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **169**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (+15 this cycle — `cpg1` LANDED, SCORED, INGESTED). **BOTH queues EMPTY.**
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (nothing ingested this cycle). **`alice2` NOW CARRIES THREE REGISTERED BATCHES AND NOTHING HAS LANDED: `cdn1` 24 jobs (167), `cru1` 60 jobs (168), `crn1` 18 jobs (169) — 102 jobs, ~81 GPU-h. `alice` (Saber's shared account) is READ-ONLY here and was not touched.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 
 ## CYCLE 141 (this one) — **`cdn1` REGISTERED AND LAUNCHED: THE CIFAR-100 DENOMINATOR.** CORRECTIONS **167**. NOTHING LANDED, SCORED OR INGESTED
