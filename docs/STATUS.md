@@ -1,12 +1,44 @@
 # STATUS — operator dashboard
 
-Updated 8 Sep 2026 (**cycle 139**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **165**) > `docs/FINDINGS.md` > everything else.
+Updated 8 Sep 2026 (**cycle 140**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **166**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
-Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,623 rows** (+0 this cycle — `cpg1` has NOT landed). `alice` queue EMPTY; **`alice2` holds `cpg1`'s 15 jobs.**
+Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (+15 this cycle — `cpg1` LANDED, SCORED, INGESTED). **BOTH queues EMPTY.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 
-## CYCLE 139 (this one) — **`cpg1` REGISTERED AND LAUNCHED.** CORRECTIONS **165**. NOTHING LANDED, SCORED OR INGESTED
+## CYCLE 140 (this one) — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
+
+**`FINAL: CONTIGUITY-OPERATIVE | INTERACTION-ABSENT | COARSE-MASS-REFUTED-AT-EXACT-MATCH | KC-REPLICATES`** (scorer `cW1_cpg1_score.py` `939ba875…c7755b16`, UNEDITED, exit 0; `--selftest` **137/137 PASS**).
+
+**RULE 20 CLOSED AT FULL COVERAGE:** UNEDITED `argsline_guard.py` (`81cea8b5…b04e5388`) over all **15** `.out` files → **15 clean, 0 mismatch, 0 without an ARGS line, batch-consistency across 15, VERDICT PASS**. **`165.8`'s prohibition is DISCHARGED.** ENV audit: **1** distinct `ENV:` line; exactly **5** `--stepsize-groups` values × 3 jobs. **RULE 21 margin 29 s** as measured (`faac2001` `05:12:26` → earliest Submit `05:12:55`); 15 jobs `COMPLETED`, Submit spread **2 s**, **11.95 GPU-h**. **RULE 16:** `git diff -- analysis/` **EMPTY**; scorer hash identical at `faac2001`, `HEAD`, worktree, `alice2`.
+
+| arm | coarse | TEST (sd) | TRAIN | per-seed TEST s12/s13/s14 |
+|---|---|---|---|---|
+| `k01` `scalar` | — | **22.9407** (0.3668) | 22.7340 | 22.7420 / 22.7160 / 23.3640 |
+| `kP` | `{1..49}` | **55.6280** (0.4118) | 62.6193 | 55.4860 / 56.0920 / 55.3060 |
+| `kE` | `{1..47,49,52}` | **55.5013** (0.6579) | 61.9947 | 56.1780 / 55.4620 / 54.8640 |
+| `kC` | `{1..48,52}` | **46.6053** (0.2230) | 51.0733 | 46.8260 / 46.3800 / 46.6100 |
+| `kG` | `{1..48,51}` | **45.7567** (0.5180) | 50.2673 | 46.3360 / 45.3380 / 45.5960 |
+
+Gates: **G0/G1 PASS** · **R2** 15/15 alive · **R3** worst sd 0.6579 vs bar 2.7766 · **R-CTRL** +32.6873 vs bar 16.1970 · **R-FLOOR** all four INFORMATIVE (worst +30.19 SE) · **R-CEIL** descriptive.
+
+Contrasts (bar **1.511363** = 2 SE, SE 0.755682): `DE` **−0.126667** (−0.17 SE, TRAIN −0.624667) · `DC` **−9.022667** (−11.94 SE, TRAIN −11.546000) · `DG` **−9.871333** (−13.06 SE, TRAIN −12.352000). **Registered vs measured on `DE`: H-COGROUP +7.598000 → resid −7.724667 = −10.22 SE EXCLUDED · H-CONTIG −0.141334 → resid +0.014667 = +0.02 SE WITHIN BAR · H-INERT −9.110667 → resid +8.984000 = +11.89 SE EXCLUDED.** 2×2 `I` **−0.975333 = −0.91 SE_INT** → `INTERACTION-ABSENT`, agrees with primary. Cross-batch `DC` replication resid **+0.012000 = +0.01 SE**.
+
+**KILLS:** co-grouping (−10.22 SE) · inert-beyond-first-hole (+11.89 SE) · **coarse mass AT EXACT MATCH** — `kG` and `cpr1` `kS` share **3,956,288** coarse params and read **45.7567 vs 21.6773**; H-MASS resid **+31.22 SE**, a lower bound since `kS` is floor-saturated.
+
+**`164.5` IS SUPERSEDED IN PLACE (`166.6`) — the prior author's self-correction is UPHELD.** Its `kS`-vs-`kC` contrast conflated hole count with tensor identity: **both leave `conv2` FINE**, and the pair's symmetric difference is a BN scale (50) vs a conv (52). Identity alone predicts `kC − kS = +32.166000` vs measured **+24.428000** — it **over**-predicts by **−10.24 SE**, so the residual has the **opposite** sign to the one claimed. Per arm: `kS` pays **−24.460667** vs `S50 −24.459333` (**−0.00 SE**); `kC` pays **−0.032700** vs `S52 +7.706667` (**−10.24 SE shortfall**). Non-contiguity **costs**. `164.4` had already published that residual three paragraphs earlier. Superseded wording kept verbatim; the **mass** bullet stands.
+
+**WHAT `CONTIGUITY-OPERATIVE` DOES NOT LICENSE (`166.7`) — READ THIS BEFORE QUOTING IT.** (a) **Not** "any hole-separated tensor pays ~0": `cpr1`'s `kS` puts tensor 50 **one** hole out and it pays in **full** (−0.00 SE). The effect rests on **ONE tensor**, `layer4.0.shortcut.0.weight`. (b) **`cpg1` cannot separate it from a no-contiguity "is `conv2` coarse" account** — `level = kP − S49·[conv2 fine]` fits all four sweep arms within bar (worst −1.15 SE), and with one `bn2.weight` term fits **all five** `[49,13]` arms in **both** batches. The two accounts differ on `DE` by **0.19 SE**, 8× under the bar. The only thing favouring contiguity is the prefix-cut anchor `S52` measured at a **different group size** — the composition `164.8(b)` forbids. (c) Structurally unresolvable at `[49,13]`: making 52 contiguous with 49 forces `bn2.weight` in.
+
+**INGEST.** `aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (**to STDOUT**, `146.7` avoided) then `args_repair.py --apply` (36 `dup_group` recomputations). Row-keyed diff: **2,623 → 2,638, ADDED 15, CHANGED 0, REMOVED 0**, header identical. **Selftest sweep: all 91 `--selftest` files captured in full pre and post, 15 drift, 76 byte-identical, rc=0 62 → 61.** **`165`'s invariance claim HELD and was checked:** `cW1` differs in **exactly one line**, its own designed `0 found → 15 found` sentinel, **137/137 PASS both sides**. **Three verdicts moved:** **`cV1_cpr1_score.py` PASS → FAIL** (its *"no FOREIGN row uses the `sets:` grammar"* exclusivity check, 0 → 12 found — **false-by-construction, LEFT UNFIXED under RULE 16**; `cpr1`'s **scored** `FINAL: UNRESOLVED-PATTERN-UNREGISTERED` and every arm level are **unchanged**), `cK1` 7 → 8 failed checks, `cL1` 6 → 7. All other drift is row counts and the pooled `scalar` archive (22.7739 n=20/7 → 22.7957 n=23/8). **No `FINAL` of any landed batch changes.**
+
+**`161.7e` NEEDS NO NEW RIDER (`166.9`)** — it is already scoped to single-tensor **PREFIX-CUT** steps and `cpg1` adds none; the `161.7b` census table is untouched and no row changes `informative` status. `cpg1` only **strengthens `164.8`'s rider (a)**: the site-52 non-prefix null is now measured twice, on disjoint seed triples, and **with `conv2` coarse**.
+
+**`c98_reproduce.py` STILL EXITS 1** — inherited, author scope, **not fixed**. `git status --porcelain paper/` **empty**.
+
+**NEXT:** second-tensor replication of the out-of-prefix null at **`layer4.0.conv1.weight` (46)** — `cpk3`'s `[45,17]`/`[46,16]` rows give `S46` at `plateau5@100` for **zero GPU**, then one 15-run `[49,13]` batch. If 46 also collapses, contiguity generalises; if it pays in full, the *"only `conv2` matters"* account wins and the token must be renamed.
+
+## CYCLE 139 — **`cpg1` REGISTERED AND LAUNCHED.** CORRECTIONS **165**. NOTHING LANDED, SCORED OR INGESTED
 
 `cpg1` on **`alice2`**: 15 jobs (`4919796`–`4919811`, `4919800` is another submitter's), Submit spread **2 s** = ONE submission, 100 ep, m = 2 and sizes **[49,13] throughout**, seeds **{12,13,14}** (zero `ResNet18_c100` rows anywhere carry them), `PROBE=0`, **~12 GPU-h**, ETA **≤ 18:15 today** (11 started within 5 s; Slurm's backfill puts the four `s14` jobs at 08:13/11:15/14:15/17:15).
 

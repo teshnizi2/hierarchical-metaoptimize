@@ -16666,6 +16666,34 @@ Coarse-group masses, re-derived from the manifest (total 11,220,132): `kL` = `kP
   `{1..48, 52}`, **3 holes** `{49,50,51}`, prefix depth 48.  **`kC` is strictly more non-contiguous
   and its out-of-prefix tensor sits at a FARTHER ordinal, and it performs ≥ 21.69 pp BETTER**
   (`kC − kS = +24.428000`; truncation-safe bound **≥ +21.693421 = +28.96 SE**).
+
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 166.6` (cycle 140).  The bullet above is kept verbatim and
+> is NOT to be quoted.]**  The inference **conflated hole count with the identity of the swapped-in
+> coarse tensor**.  `kS` coarse = `{1..48, 50}` and `kC` coarse = `{1..48, 52}` **both leave
+> `layer4.0.conv2.weight` (49) FINE**; the pair's symmetric difference is
+> {`layer4.0.bn2.weight` (50), `layer4.0.shortcut.0.weight` (52)} — **a BatchNorm scale versus a
+> convolution**.  Hole count was never manipulated independently: it moves as an arithmetic
+> consequence of which tensor was swapped in, so the contrast **cannot** separate the two.
+> And `161.7b`'s own census already carried those two tensors' single-tensor prefix-step values at
+> 100 epochs — `S50 = −24.459333`, `S52 = +7.706667` — so **tensor identity ALONE predicts
+> `kC − kS = S52 − S50 = +32.166000`** against a measured `+24.428000`: identity alone
+> **OVER-predicts** the observed gap by **−7.738000 pp = −10.24 SE**.  There is no residual calling
+> for a reversed-sign contiguity term; **the residual has the OPPOSITE sign**.  Decomposed per arm
+> against contiguity-free additivity (the swapped-in tensor's implied paid value is
+> `(arm − kP) + S49`): **`kS` pays `−24.460667` against a contiguous `S50` of `−24.459333`, a
+> `−0.00 SE` match, while `kC` pays `−0.032700` against a contiguous `S52` of `+7.706667`, a
+> `−10.24 SE` SHORTFALL.**  The whole discrepancy lives in `kC`, and it is a **COST** of
+> non-contiguity, not a benefit.  Two further defects: `kS` is **FLOOR-SATURATED** by `164.3`'s own
+> `R-FLOOR` (`−1.2367`, `NOT-INFORMATIVE`), so its level is a bound and not a magnitude; and
+> **`164.4`, three paragraphs earlier in this same entry, had already recorded the `DC` residual of
+> `−7.739333 = −10.33 SE`** — `164.5` contradicted its own parent section.
+> **READ INSTEAD:** *"`cpr1` refutes SINGLE-TENSOR ADDITIVITY (`164.8`); its `kS`/`kC` pair does NOT
+> bear on contiguity in either direction, because hole count is perfectly confounded with tensor
+> class within it."*  The clean contiguity contrast is `cpg1`'s `kE` vs `kP` — **3 holes versus 0
+> with `conv2` coarse in BOTH** — and it costs **−0.126667 pp = −0.17 SE** (`166.4`).
+> **The COARSE-GROUP MASS bullet above is UNAFFECTED and stands**; `cpg1`'s `kG` re-kills mass at an
+> **exact** 3,956,288-parameter match (`166.5`).
+
 - **DESIGN NOTE.**  `cV1`'s branch map expected contiguity and coarse mass to die via `kC ≈ kP`.
   They died via **`kS` vs `kC`**, a contrast the registered map does not use.  Recorded so the next
   scorer author enumerates the contrasts that can kill a rival, not only the ones the predicted
@@ -17285,3 +17313,337 @@ meta-stepsize or optimiser pair, or any hierarchical or shrinkage operator.
 results/all_runs.csv` = **0**; the corpus stands at **2,623 rows**; `git status --porcelain paper/`
 is **empty**.  The `.out`-file RULE 20 batch-consistency audit over all 15 runs is **PENDING** until
 the last job starts, and **no `cpg1` number may be quoted before it passes.**
+
+## 166. `cpg1` LANDS, SCORED and INGESTED — **`FINAL: CONTIGUITY-OPERATIVE | INTERACTION-ABSENT | COARSE-MASS-REFUTED-AT-EXACT-MATCH | KC-REPLICATES`**.  CO-GROUPING DIES AT **−10.22 SE**, INERT-BEYOND-FIRST-HOLE AT **+11.89 SE**, AND COARSE MASS AT AN **EXACT 3,956,288-PARAMETER MATCH**.  `164.5`'s *"CONTIGUITY REFUTED WITH THE SIGN REVERSED"* IS **SUPERSEDED IN PLACE** — IT CONFLATED HOLE COUNT WITH TENSOR IDENTITY.  AND THE TOKEN IS **NOT** SEPARABLE FROM A NO-CONTIGUITY *"IS `conv2` COARSE"* ACCOUNT ON THIS BATCH'S OWN ARMS
+
+### 166.1 THE RULE 20 AUDIT AT **FULL COVERAGE** — `165.8`'s PENDING PROHIBITION IS **DISCHARGED**
+
+`165.8` registered a prohibition: *"the audit over all 15 `.out` files is PENDING until the last job
+starts, and no `cpg1` number may be quoted before it passes."*  All 15 jobs are `COMPLETED`.  With
+the guard **UNEDITED** (sha256 `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`,
+unchanged since `617b6c8`):
+
+    python3 analysis/argsline_guard.py /home/s5014158/metaopt/runs --name cpg1- --batch-consistency
+    -> batch-consistency: every non-axis flag is identical across 15 runs
+       argsline_guard: 15 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+       VERDICT: PASS      exit 0
+
+**15 of 15, not the 11 of 15 `165.8` could reach.  THE PROHIBITION IS LIFTED.**
+
+**THE ENV AUDIT, over all 15 `.out` files**: **exactly 1 distinct `ENV:` line**, carrying
+`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none ... SCHED=none ... PROBE=0`.  **Exactly 5 distinct
+`--stepsize-groups` values, 3 jobs each**, matching the registered `SPEC` table byte for byte.
+
+**PROVENANCE, re-derived by a parser written here from the file format** (not by the registered
+scorer): 15 files, 15 **distinct** job ids, `RUN_DONE` on every one, **exactly 100 epoch lines
+numbered 0..99** in each, and on every file the ARGS `--seed`, `--run-name` and `--num-epochs 100`
+agree with the file name.
+
+### 166.2 RULE 21, RULE 16 AND THE LAUNCH RECORD, RE-MEASURED HERE
+
+**RULE 21.**  Registration commit `faac2001a7ab610c50a108e7782d8159c98b600f`,
+`2026-09-08T05:12:26+02:00` (epoch **1788837146**).  `sacct` earliest `Submit`
+**`2026-09-08T05:12:55`** (epoch **1788837175**).  **MARGIN = 29 SECONDS**, re-measured here and
+**reported as measured, not rounded up.**  It is the thinnest margin in the campaign (`cpr1` 140 s,
+`cpk3` 120 s).  It is positive and the commit was public before submission, so the rule holds — but
+it is thin enough to name as a process risk rather than a comfort.
+
+**ONE SUBMISSION.**  15 jobs, ids `4919796`–`4919811` with `4919800` absent (that id went to another
+submitter in the same second).  `Submit` spans `05:12:55`..`05:12:57` — **a 2-second spread**.  All
+15 `COMPLETED`.  Elapsed `00:35:50`..`02:06:43`, **43,018 s = 11.95 GPU-hours** against a ~12 GPU-h
+budget.  Partitions `gpu-a100-80g` / `gpu-l4-24g` / `gpu-mig-40g`.  The last file landed at **07:19**,
+far inside the `~18:15` backfill upper bound `165.8` quoted.
+
+**RULE 16.**  `git diff -- analysis/` is **EMPTY**; `git diff HEAD -- analysis/` is **EMPTY**.  The
+scorer's sha256 is **`939ba875a73e471176e12205e09b4450090cbacdccad3e4b18c0dcca7c755b16`** at the
+registration commit `faac2001`, at `HEAD`, in the working tree, **and** on `alice2` at
+`/home/s5014158/metaopt/cpg1_stage/analysis/cW1_cpg1_score.py` — four places, one hash.  **No
+scorer was edited in this cycle, `cV1` included** — see `166.8`, where `cV1`'s selftest turns red
+and is deliberately **left** red.
+
+### 166.3 THE SCORER RUN — THE DOCUMENTED INVOCATION, RE-RUN HERE
+
+`--selftest` on `alice2`: **137 checks, 137 PASS, 0 FAIL, exit 0** — reproducing `165.7`'s
+registered count exactly.  Then, with **no second argument to forget** (`164.2`'s defect closed by
+construction):
+
+    cd /home/s5014158/metaopt/cpg1_stage && python3 analysis/cW1_cpg1_score.py /home/s5014158/metaopt/runs
+
+    manifest : /home/s5014158/metaopt/runs/cpg1/PARTITION-MANIFEST.txt
+               (DEFAULT <runsdir>/cpg1/PARTITION-MANIFEST.txt)
+    G0 PASS | G1 PASS | R2 PASS | R3 PASS | R-CTRL PASS | R-FLOOR all four INFORMATIVE
+    FINAL: CONTIGUITY-OPERATIVE | INTERACTION-ABSENT | COARSE-MASS-REFUTED-AT-EXACT-MATCH | KC-REPLICATES
+    exit 0
+
+The resolver printed its path **and how it resolved**, so a silently wrong manifest was not
+possible.  **`G1`** checked the live model's 62 `(name, numel)` pairs against the frozen copy (0
+disagreements), all four coarse groups at size **49**, all five registered symmetric differences
+**exact**, `kE`/`kC` matched at **3 holes and max ordinal 52**, **no arm with tensor 50 coarse**, and
+**`kG`'s coarse mass 3,956,288 EXACTLY `cpr1` `kS`'s**.
+
+**EVERY NUMBER BELOW WAS RE-DERIVED INDEPENDENTLY** from the 15 raw `.out` files by a parser written
+here from the file format, and agrees with the scorer to 4 dp.
+
+### 166.4 THE ARMS, THE CONTRASTS, AND THE THREE REGISTERED ACCOUNTS
+
+`plateau5` @ 100 epochs (mean of epochs 95–99) is the **PRIMARY** metric.  The CSV `plateau` column
+is **not read anywhere**.  `SE_ARM_DIFF` **0.755682**; `READ_BAR` = 2 SE = **1.511363**.
+
+| arm | spec | TEST | sd | TRAIN | per-seed TEST s12 / s13 / s14 | per-seed TRAIN s12 / s13 / s14 |
+|---|---|---|---|---|---|---|
+| `k01` | `scalar` | **22.9407** | 0.3668 | 22.7340 | 22.7420 / 22.7160 / 23.3640 | 22.7160 / 22.4300 / 23.0560 |
+| `kP` | `sets:1-49/50-62` | **55.6280** | 0.4118 | 62.6193 | 55.4860 / 56.0920 / 55.3060 | 62.1600 / 62.6820 / 63.0160 |
+| `kE` | `sets:1-47,conv2,shortcut.0 / bn1.bias,50-51,53-62` | **55.5013** | 0.6579 | 61.9947 | 56.1780 / 55.4620 / 54.8640 | 62.4920 / 62.0420 / 61.4500 |
+| `kC` | `sets:1-48,shortcut.0 / conv2,50-51,53-62` | **46.6053** | 0.2230 | 51.0733 | 46.8260 / 46.3800 / 46.6100 | 51.1820 / 50.9800 / 51.0580 |
+| `kG` | `sets:1-48,bn2.bias / conv2,50,52-62` | **45.7567** | 0.5180 | 50.2673 | 46.3360 / 45.3380 / 45.5960 | 50.6740 / 49.5040 / 50.6240 |
+
+Coarse index sets, from the manifest's own `STRUCT` lines:
+`kP` `{1..49}` 0 holes · `kE` `{1..47, 49, 52}` holes `{48,50,51}` · `kC` `{1..48, 52}` holes
+`{49,50,51}` · `kG` `{1..48, 51}` holes `{49,50}`.  Ordinals: **48** `layer4.0.bn1.bias`,
+**49** `layer4.0.conv2.weight`, **50** `layer4.0.bn2.weight`, **51** `layer4.0.bn2.bias`,
+**52** `layer4.0.shortcut.0.weight`.
+
+**GATES.**  `R2` **PASS** (15/15 alive, bar 5.00).  `R3` **PASS** (worst arm sd **0.6579** against
+`NOISY_BAR` 2.776554).  `R-CTRL` **PASS** (`kP − k01 = +32.687333` against a bar of 16.197000).
+`R-FLOOR`: all four sweep arms **INFORMATIVE**, the worst margin **`kG` at +22.8160 = +30.19 SE**
+above this batch's own `k01` — `164.6`'s saturation defect is designed out and stayed out.
+`R-CEIL` is **DESCRIPTIVE and gates nothing** (no in-batch ceiling anchor exists).
+
+**THE CONTRASTS.**
+
+| contrast | what crosses vs `kP` | TEST | in SE | TRAIN |
+|---|---|---|---|---|
+| `DE = kE − kP` | OUT `bn1.bias` (48) / IN `shortcut.0.weight` (52) | **−0.126667** | **−0.17** | −0.624667 |
+| `DC = kC − kP` | OUT `conv2.weight` (49) / IN `shortcut.0.weight` (52) | **−9.022667** | **−11.94** | −11.546000 |
+| `DG = kG − kP` | OUT `conv2.weight` (49) / IN `bn2.bias` (51) | **−9.871333** | **−13.06** | −12.352000 |
+
+**THE THREE ACCOUNTS, REGISTERED AT `165.5` BEFORE ANY RUN EXISTED, vs MEASURED on the PRIMARY
+contrast `DE`:**
+
+| account | registered `DE` | measured | residual | in SE | verdict |
+|---|---|---|---|---|---|
+| **H-COGROUP** | **+7.598000** | −0.126667 | **−7.724667** | **−10.22** | **EXCLUDED** |
+| **H-CONTIG** | **−0.141334** | −0.126667 | **+0.014667** | **+0.02** | **WITHIN BAR** |
+| **H-INERT** | **−9.110667** | −0.126667 | **+8.984000** | **+11.89** | **EXCLUDED** |
+
+Exactly one account survives, and the two dead ones are **10.22 SE** and **11.89 SE** out.  The
+registered branch map sends this to **`CONTIGUITY-OPERATIVE`**.
+
+**THE 2×2 INTERACTION, FULLY IN-BATCH.**  `I = (kE − kP) − (kC − kG) = ` **−0.975333 pp = −0.91
+SE_INT** against `INT_BAR` 2.137392 → **`INTERACTION-ABSENT`**, which is the token H-CONTIG requires
+(H-COGROUP wanted +7.864000, H-INERT −9.110667).  **Primary and secondary AGREE**, so no
+`INCONSISTENT-PRIMARY-vs-INTERACTION` flag is appended.
+
+**CROSS-BATCH REPLICATION, DESCRIPTIVE, GATES NOTHING.**  `cpg1`'s `DC` **−9.022667** against
+`cpr1`'s **−9.034667**: residual **+0.012000 = +0.01 SE**, against `REPL_BAR` 2.137394.  **Different
+batch AND different seeds** ({12,13,14} vs {9,10,11}) → **`KC-REPLICATES`**.  `kP` itself, on the
+byte-identical spec string, reads 55.6280 here against `cpr1`'s 55.1400: **+0.4880 = +0.65 SE**.
+
+### 166.5 WHAT THE BATCH KILLS, PLAINLY
+
+1. **CO-GROUPING IS DEAD (`−10.22 SE`).**  H-COGROUP said tensor 52 pays its value
+   (`S52 = +7.706667`) whenever it shares a coarse group with `layer4.0.conv2.weight`.  `kE` puts
+   **both** in the coarse group and 52 still pays essentially **nothing**: its implied contribution
+   is **−0.020667** (from `kC`) and `DE` lands **7.724667 pp** below H-COGROUP.  This also kills
+   `165.5`'s registered consequence: `kE` does **not** beat the prefix-cut argmax `k* = 49`, so the
+   argmax over prefix cuts is **not** shown to be beaten by a same-`m`, same-size partition here.
+2. **INERT-BEYOND-FIRST-HOLE IS DEAD (`+11.89 SE`).**  H-INERT said a coarse group behaves as its
+   maximal contiguous prefix, so `kE` (`{1..47, 49, 52}`) should read `cpk3`'s `k47`.  It reads
+   `kP`'s level instead.  **`conv2`'s own contribution SURVIVES an upstream hole at 48.**
+3. **COARSE MASS IS DEAD AT AN EXACT MATCH.**  `kG`'s coarse group is **3,956,288 parameters —
+   EXACTLY `cpr1` `kS`'s**, to the parameter.  `kG` reads **45.7567**, `kS` reads **21.6773**:
+   **+24.0794 pp apart at identical mass**.  Batch-adjusted, `DG = −9.871333` against H-MASS's
+   `−33.462700`, a residual of **+23.591400 pp = +31.22 SE** — and since `kS` is **floor-saturated**
+   that is a **LOWER bound**.  `164.5` killed mass by an inequality across unequal masses; `cpg1`
+   kills it at **equality**, which is the stronger form.
+
+### 166.6 `164.5` IS SUPERSEDED IN PLACE — THE PRIOR AUTHOR'S SELF-CORRECTION IS **UPHELD**
+
+The suspicion carried into this cycle was that `164.5`'s *"CONTIGUITY-DEGRADATION is REFUTED WITH
+THE SIGN REVERSED"* conflated hole count with tensor identity.  **Checked against the manifests and
+the corpus's own anchors, it is CORRECT, and the defect is worse than under-determination — the
+cited evidence points the OPPOSITE way.**  The rider is written in place at `164.5` with the
+superseded wording kept verbatim, as `160`, `161` and `163.6` did.  In summary:
+
+- `kS` coarse `{1..48, 50}` and `kC` coarse `{1..48, 52}` **both leave `conv2` (49) FINE**.  Their
+  symmetric difference is {`bn2.weight` (50), `shortcut.0.weight` (52)} — **a BN scale versus a
+  convolution**, two classes `161.7b` had already measured as far apart as any pair in the corpus.
+  Hole count moves only as a consequence of that swap; it is **not independently manipulated**.
+- Tensor identity alone predicts `kC − kS = S52 − S50 = +7.706667 − (−24.459333) = ` **+32.166000**
+  against a measured **+24.428000** — identity **OVER-predicts** by **−7.738000 pp = −10.24 SE**.
+  **The residual has the opposite sign to the one `164.5` claimed.**
+- Per-arm, against contiguity-free additivity: **`kS` pays `−24.460667` vs `S50 = −24.459333`
+  (`−0.00 SE`)** while **`kC` pays `−0.032700` vs `S52 = +7.706667` (`−10.24 SE` SHORTFALL)**.  Non-
+  contiguity **costs**; it does not pay.
+- `kS` is **FLOOR-SATURATED** (`164.3`'s own `R-FLOOR`), so its level is a bound, not a magnitude.
+- **`164.4` had already published the `−7.739333 = −10.33 SE` `DC` residual three paragraphs
+  earlier.**  `164.5` contradicted its own parent section within one entry.
+
+**Nothing else in `164.5` is disturbed.**  The COARSE-GROUP MASS bullet stands and is now
+**strengthened** by `kG`'s exact-mass match, and the DESIGN NOTE stands — indeed `165.5` acted on it.
+
+### 166.7 WHAT **`CONTIGUITY-OPERATIVE`** DOES AND DOES **NOT** LICENSE
+
+**IT LICENSES, exactly:**
+1. On the registered branch map, `DE` landed within `READ_BAR` of **H-CONTIG only**, and H-COGROUP
+   and H-INERT are out at **−10.22 SE** and **+11.89 SE**.  That is the entitled reading of the
+   token and nothing more.
+2. **Tensor 52's collapse is NOT repaired by co-grouping it with `conv2`.**  `cpr1`'s `kC` (conv2
+   FINE) and `cpg1`'s `kE` (conv2 **COARSE**) both leave 52 paying ~0 — `−0.032700` and `−0.020667`
+   — against `+7.706667` contiguous.  **Two batches, two disjoint seed triples, same answer.**
+3. **A hole does not sterilise what lies beyond it.**  `kE` carries a hole at 48 and `conv2` still
+   pays in full.  H-INERT is dead.
+
+**IT DOES NOT LICENSE:**
+
+4. **"Any hole-separated coarse tensor pays ~0" — FALSE, and the corpus already contains the
+   counterexample.**  `cpr1`'s `kS` puts `bn2.weight` (50) **ONE hole** out of prefix and it pays its
+   **FULL** contiguous value: implied **−24.460667** against `S50 = −24.459333`, **−0.00 SE**.  A
+   hole neutralised tensor 52 and did **not** neutralise tensor 50.  `kG`'s tensor 51 cannot
+   discriminate (`S51 = +0.233333` is itself ~0; implied **−0.869300**, **−1.46 SE**).
+   **The whole contiguity effect in this corpus rests on ONE tensor, `layer4.0.shortcut.0.weight`.**
+5. **AND — the point that must not be buried — `cpg1` CANNOT SEPARATE `CONTIGUITY-OPERATIVE` FROM A
+   NO-CONTIGUITY *"IS `conv2` IN THE COARSE GROUP"* ACCOUNT.**  The one-parameter model
+   `level = kP − S49·[conv2 fine]` fits **all four** `cpg1` sweep arms **inside the read bar**:
+
+   | arm | `conv2` | predicted | measured | residual | in SE |
+   |---|---|---|---|---|---|
+   | `kP` | COARSE | 55.6280 | 55.6280 | +0.0000 | +0.00 |
+   | `kE` | COARSE | 55.6280 | 55.5013 | −0.1267 | −0.17 |
+   | `kC` | FINE | 46.6260 | 46.6053 | −0.0207 | −0.03 |
+   | `kG` | FINE | 46.6260 | 45.7567 | −0.8693 | −1.15 |
+
+   Add one term for `bn2.weight` and it fits **all five** `m = 2` `[49,13]` arms across **both**
+   batches within bar: `level = kP(batch) − 9.002·[conv2 fine] − 24.459·[bn2.weight coarse]` gives
+   residuals `kS −0.00 SE`, `cpr1 kC −0.04`, `kE −0.17`, `cpg1 kC −0.03`, `kG −1.15`.  **This model
+   has NO contiguity term at all.**  It says only that tensors **49** and **50** matter and that
+   **48, 51 and 52 are each worth ~0 as coarse members at size 49**.  H-CONTIG and this account
+   differ on `DE` by **0.141334 pp = 0.19 SE**, i.e. **8× below the read bar** — `DE` was never
+   capable of separating them, and no other `cpg1` arm separates them either.
+6. **What breaks the tie is not an arm in either batch — it is the PREFIX-CUT anchor
+   `S52 = +7.706667` from `cts1`, and that anchor is a `[52,10]`-vs-`[51,11]` comparison, i.e. a
+   DIFFERENT COARSE-GROUP SIZE from the `[49,13]` swaps.**  Reconciling the two therefore requires
+   **either** a contiguity term **or** a group-size/count term, and `cpg1` contains no arm that
+   separates those.  This is exactly the composition that `164.8(b)` forbade — *"the census's values
+   may NOT be COMPOSED"* — so the interpretation must be stated as under-determined rather than
+   settled.
+7. **THE HONEST SUMMARY SENTENCE.**  *"Placing `layer4.0.shortcut.0.weight` in the coarse group
+   buys its `+7.71 pp` prefix-step value only in the contiguous prefix configuration in which that
+   value was measured; at fixed `m = 2` and fixed sizes `[49,13]`, out of prefix, it buys nothing —
+   whether or not `layer4.0.conv2.weight` is coarse alongside it.  Whether the operative variable is
+   CONTIGUITY or simply GROUP MEMBERSHIP OF `layer4.0.conv2.weight` (with 48, 51 and 52 all null at
+   this size) is NOT determined by this batch."*  No claim beyond that sentence is entitled.
+8. **AND IT IS STRUCTURALLY UNRESOLVABLE ON THIS ARCHITECTURE AT THIS SIZE.**  To make 52 contiguous
+   with 49 inside one coarse group requires 50 and 51 to join it, which forces `bn2.weight` — a
+   −24.46 pp tensor — into the coarse group and destroys the comparison.  **No `[49,13]` partition of
+   `ResNet18_c100` can present a contiguous coarse 52 with `conv2` and without `bn2.weight`.**
+
+### 166.8 THE INGEST, AND THE SELFTEST DRIFT AUDIT
+
+`aggregate.py` was run **to STDOUT into the corpus**, not redirected to a log — `146.7`'s vacuous-
+check defect avoided:
+
+    python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+    python3 analysis/args_repair.py --apply        -> APPLIED: 36 rows updated
+
+**THE DIFF, computed row-by-row on the `(run, job_id)` key against the pre-ingest snapshot:**
+
+| | count |
+|---|---|
+| PRE rows | **2,623** |
+| POST rows | **2,638** |
+| **ADDED** | **15** (every one `cpg1-*`, the 15 registered job ids) |
+| **CHANGED** | **0** |
+| **REMOVED** | **0** |
+
+Header identical.  `args_repair`'s 36 updates are `dup_group` recomputations on pre-existing rows
+that reproduced the values already in the corpus — hence **CHANGED 0** against the pre-ingest
+snapshot.  `grep -c '^cpg1-'` = **15**.
+
+**THE SELFTEST SWEEP.**  All **91** `analysis/*.py` files carrying `--selftest` were run and their
+**full output captured** before and after the ingest, then diffed file by file.  **15 files drift;
+76 are byte-identical.**  Exit codes: **62 → 61 at rc=0**.
+
+**`165`'s CLAIM — that `cW1` was built so every frozen premise is invariant under its own ingest —
+HELD, and this was checked rather than assumed** (`161.9` recorded that `cS2` claimed the same and
+only 1 of 6 checks had it).  `cW1_cpg1_score.py --selftest` differs pre-vs-post in **exactly one
+line**, and it is the **deliberate sentinel**:
+
+    < PASS cpg1 rows in the corpus are 0 or exactly 15    0 found -> PRE-REGISTRATION
+    > PASS cpg1 rows in the corpus are 0 or exactly 15   15 found -> POST-INGEST
+
+**137/137 PASS, exit 0, both before and after.**  Every anchor, every `S`-value, every registered
+prediction, the branch map, the floor census and `SIGMA_W` are **byte-identical across its own
+ingest.**
+
+**BUT `cW1`'s OWN INVARIANCE DID NOT PROTECT ITS NEIGHBOURS, AND THREE VERDICTS MOVED:**
+
+| scorer | pre | post | what moved |
+|---|---|---|---|
+| **`cV1_cpr1_score.py`** | **SELFTEST PASS, exit 0** | **SELFTEST FAIL, exit 1** | *"no FOREIGN row uses the `sets:` grammar (it is new with this batch)"* — **0 found → 12 found** |
+| `cK1_cpk1_score.py` | FAIL, 7 checks | FAIL, **8** checks | *"archived scalar UNDERFITS"* PASS → FAIL |
+| `cL1_cts1_score.py` | FAIL, 6 checks | FAIL, **7** checks | *"MANIFOLD_BAR is exactly half the archived gap"* PASS → FAIL |
+
+**`cV1`'s failure is FALSE-BY-CONSTRUCTION and is LEFT UNFIXED under RULE 16.**  The check asserts
+corpus **exclusivity** — that `cpr1` is the only batch using the `sets:` grammar — and `cpg1`
+legitimately uses that grammar, contributing exactly **12** non-`scalar` rows.  It is an assertion
+about the rest of the corpus, **not** about `cpr1`'s own rows.  **`cpr1`'s SCORED verdict does NOT
+move:** re-run in scoring mode post-ingest it still reports `R2/R3/R-EQUIV/R-CTRL` **PASS**, arm
+levels identical to `164.3` (`k01` 22.9140, `kL` 55.5480, `kP` 55.1400, `kS` 21.6773, `kC` 46.1053),
+`kS` still **floor-saturated**, and **`FINAL: UNRESOLVED-PATTERN-UNREGISTERED`** — unchanged.
+**Recorded, not repaired: any future `sets:` batch will trip it again.**
+
+The remaining 12 drifters move only bookkeeping: corpus row counts `2623 → 2638`, and the pooled
+same-cell `scalar` archive `22.7739 (n=20, 7 batches) → 22.7957 (n=23, 8 batches)` as `cpg1`'s three
+`k01` rows join it, with `SIGMA_W` re-derivation widening from `df=105, 54 cells` to `df=115, 59
+cells`.  **Every one of those checks was ALREADY FAILING before this ingest** — their frozen
+literals had drifted in earlier cycles — and `cK1`/`cL1` each tipped one further borderline check.
+**No `FINAL` verdict of any landed batch changes.**
+
+**`c98_reproduce.py` exits `1`** — inherited, author scope, **NOT fixed here** as instructed.
+`git status --porcelain paper/` is **EMPTY**.
+
+### 166.9 `161`'s CENSUS ENTITLEMENT — ONE STRENGTHENING, NO NEW RIDER
+
+`161.7e`'s entitled sentence is **already scoped to single-tensor PREFIX-CUT steps** and `164.8`
+already measured its boundary at site 52.  **`cpg1` adds no new single-tensor prefix-cut step** —
+every sweep arm is an `m = 2`, `[49,13]` **swap**, so the census table of `161.7b` is **untouched**
+and no row changes its `informative` status (the pooled 100-epoch floor moves by ~+0.02 pp; the
+tightest informative margin in the table is +7.59).  **The entitlement sentence STANDS VERBATIM and
+needs no further rider.**  What `cpg1` does is **strengthen `164.8`'s existing rider (a)**: the
+non-prefix null at site 52 is now measured **twice, in two batches, on two disjoint seed triples**,
+and — new here — **with `conv2` PRESENT in the coarse group**, which removes the last available
+explanation that the null was an artefact of `conv2`'s absence.  **Do not over-correct: `161.7e` is
+not re-opened.**
+
+### 166.10 WHAT `cpg1` CANNOT DO, AND WHAT COMES NEXT
+
+**SCOPE, unchanged from `165.9` and re-asserted by the scorer's own trailer:** no claim at any
+horizon but 100 epochs; no claim about attenuation; **no `m` claim** (every sweep arm is `m = 2`,
+sizes `[49,13]`, and `scalar` is an anchor on a different `init_meta` code path — a **FLOOR REFERENCE
+ONLY**, confound **NOT** lifted); **no CAPTURE and no ceiling claim** (no `layerwise` arm, `R-CEIL`
+cross-batch and descriptive); **no separation of tensor CLASS from a MASS THRESHOLD** (structurally
+impossible on ResNet-18, `161.7c i`); **no test of `152.12` rival (c)** (`PROBE=0`; still
+**UNTESTED**); **no generalisation outside `layer4.0` and its boundary** — the four tensors that move
+are 48, 49, 51 and 52 of 62; **no empirical claim about `PATCH_NAMESETS`' inertness** (no `kL` arm;
+`164.10` forbids quoting `cpr1`'s `R-EQUIV`).  Nothing here touches CIFAR-10, Tiny-ImageNet,
+ImageNet-489, ResNet-50, `resnet18_blocks`, any other meta-stepsize or optimiser pair, or any
+hierarchical or shrinkage operator.
+
+**AND ONE NEW SCOPE LIMIT, FROM `166.7`:** the token `CONTIGUITY-OPERATIVE` is the correct read of
+the registered branch map, but the **physical** variable behind it is **not identified** — a
+no-contiguity *"`conv2` membership, with 48/51/52 null at size 49"* account fits all five arms in
+both batches within bar, and the only thing standing against it is a prefix-cut anchor measured at a
+**different group size**.
+
+**THE NEXT EXPERIMENT — a SECOND-TENSOR replication of the out-of-prefix null.**  The contiguity
+finding rests on **one** tensor.  The test that would move it from `n = 1` to `n = 2` is to take a
+different, independently-anchored convolution and put **it** out of prefix at fixed `m = 2` and fixed
+sizes `[49,13]`.  The candidate is **`layer4.0.conv1.weight` (ordinal 46)**: `cpk3`'s corpus rows
+already carry the `[45,17]` and `[46,16]` prefix cuts, so a **zero-GPU** re-derivation of `S46` at
+`plateau5@100` from `.out` files already on disk supplies the anchor — the same move `164.4` made for
+`k47`..`k50`.  Then one 15-run batch: `kP` `{1..49}`, an arm placing 46 out of prefix with 49 coarse,
+its co-grouping control, and the `scalar` floor.  **If tensor 46 also collapses to ~0 out of prefix,
+contiguity generalises beyond `shortcut.0.weight`; if it pays its full step, the *"only `conv2`
+matters"* account of `166.7(5)` wins and `CONTIGUITY-OPERATIVE` must be renamed.**  Either way the
+`166.7` ambiguity is resolved by measurement rather than by argument.
