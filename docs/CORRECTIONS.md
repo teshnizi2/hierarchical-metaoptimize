@@ -19185,3 +19185,424 @@ which is `171.8`'s `+3` from `cdn1`'s three `chunk771` rows, unchanged by this e
    The only `scancel` issued named 18 explicit ids, every one of them a `crn1-` job submitted by
    this campaign, and `4920540` — an unrelated user's array element sitting inside that id range —
    was deliberately excluded.
+
+## 173. `crn1` LANDS ON `alice`, IS INGESTED AND IS SCORED BY ITS REGISTERED SCORER — **`FINAL: COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED`.**  THE FOURTEENTH CANDIDATE IS THE FIRST NOT TO DIE, AND THE AUDIT NARROWS IT TWICE: `COMPOSITION-OPERATIVE`'s **TOKEN** RESTS ON **ONE** CLEAN PAIR (THE **NULL** IS EXCLUDED ON ALL THREE), AND `CLIFF-AMPLIFIED` IS **NOT SEPARABLE FROM A ONE-SIDED DEATH** — `k50n` LANDS **BELOW EVERY ONE OF THE 192 SAME-CELL ROWS THE CORPUS OWNS** AND `|D_TN|` IS **99.39 % OF THE LARGEST VALUE AVAILABLE** IF IT IS PINNED THERE.  THE CYCLE BRIEF'S COLLAPSE ACCOUNT IS EXCLUDED AT **−75.53 SE**.  THE CORPUS STANDS AT **2,680 ROWS**
+
+Everything below was RE-DERIVED in this cycle from the `.out` files and the corpus, by running the
+registered scorer, the registered guard and the registered test.  No number is inherited from the
+cycle brief, from `169`, or from `172`.
+
+### 173.1 PROVENANCE — WHAT LANDED, AND THAT IT IS THE REGISTERED THING
+
+18/18 `COMPLETED` (`sacct`, ids `4921226`–`4921243`), all at the deployment path
+`/data1/salehkaleybars/metaopt/hmo-crn1/runs/`.  Submit spread `2026-09-08T12:28:47` →
+`12:28:50` = **3 s = ONE submission**.  Elapsed **00:42:15** to **01:30:34** (one slow node,
+`crn1-k49-s16`); **13.4667 GPU-h** summed from the ingested `wallclock_min` column, against `169.8`'s
+~14.4 h projection.  **A `tn:` arm is not measurably slower than its twin** — `k01` 42:27 vs `k01n`
+43:04, `k49` 42:30 vs `k49n` 42:53, `k50` 42:43 vs `k50n` 42:47 — as registered.
+
+**RULE 21.** Registration commit `2cb2783` `2026-09-08 08:50:59 +0200`; earliest Submit
+`2026-09-08T12:28:47` CEST.  **MARGIN 13,068 s = 3 h 37 m 48 s.**  The scorer was **not**
+re-registered and **not** edited between registration and landing.
+
+**RULE 16, re-checked here.** `git diff -- analysis/` is **EMPTY**.
+`analysis/cX1_crn1_score.py` sha256 `1d1e4fa8ee9a3a8ccda25b18f27a64beed608678f97b9a6ef26b39a19bfb4898`,
+`analysis/argsline_guard.py` sha256 `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`
+— both the registered values, unchanged.
+
+**RULE 20, POST-LAUNCH LIMB, RE-RUN IN THIS CYCLE AT FULL COVERAGE** through the **UNEDITED** guard:
+
+    python3 analysis/argsline_guard.py ../runs --name crn1- --batch-consistency \
+        --vary seed --vary run-name --vary stepsize-groups
+    -> batch-consistency: every non-axis flag is identical across 18 runs
+    -> argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+    -> VERDICT: PASS      (exit 0)
+
+**THE SEPARATE ENV AUDIT, likewise re-derived**: exactly **1** distinct `ENV:` line across all 18
+(`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … PROBE=0 …`); exactly **6** distinct
+`--stepsize-groups` values at **3 jobs each** — `scalar`, `tn:scalar`, `sets:1-49/50-62`,
+`tn:sets:1-49/50-62`, `sets:1-50/51-62`, `tn:sets:1-50/51-62`, every `tn:` form surviving the shell
+as a **single token**; **18** distinct `--run-name`s.
+
+### 173.2 THE INGEST, WITH ACTUAL NUMBERS
+
+    cp <deployment>/runs/crn1-*.out            ../runs/          # 18 files, NOT the shared runs dir
+    cp <deployment>/runs/crn1-PARTITION-MANIFEST.txt ../runs/
+    python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # STDOUT, per 146.7
+    python3 analysis/args_repair.py --apply
+
+| | before | after |
+|---|---|---|
+| rows in `results/all_runs.csv` | **2,662** | **2,680** |
+| sha256 (first 16) | `53347296e5b7c44a` | `a40e3ef4cfea9f01` |
+
+Keyed on `(run, job_id)`: **ADDED 18 · CHANGED 0 · REMOVED 0.**  `aggregate.py` reported
+`2680 runs aggregated` and the same 3 pre-existing duplicated run-names as last cycle;
+`args_repair.py --apply` updated **36** rows, all of them the standing `dup_group` re-tagging it
+re-applies after every regeneration, and **0 accuracy/config values and 0 `superseded` flags**.
+
+**`cru1` CONTRIBUTED 0 ROWS** — `../runs` and `../runs_alice2` hold **0** `cru1*` files, the CSV holds
+**0** `cru1` rows before and after, and **`runs_alice2` was NOT re-synced this cycle**.  The
+pre-registration probe contributed **0** rows (`crn1probe-` count 0), as `169.8` required.  All 18 new
+rows are `complete=1`, `window_ok=1`, `epochs_done=100`.
+
+### 173.3 THE VERDICT, VERBATIM, FROM THIS CYCLE'S OWN RUN OF THE REGISTERED SCORER
+
+`python3 analysis/cX1_crn1_score.py ../runs` (the documented invocation; the manifest resolved with
+no flag, from `<runsdir>/crn1-PARTITION-MANIFEST.txt`), exit 0.  Run **twice** — once against the
+raw pull before ingest and once against `../runs` after it — and the two outputs are **identical
+line for line** apart from the runsdir and manifest paths.
+
+    G0 PASS   (18 .out matched, 0 rejected, 1 distinct ENV line)
+    G1 PASS   (live model matches the frozen 62-tensor table name by name; every `tn:` arm is the
+               SAME PARTITION as its twin AND its reduction differs; `tn:` BITWISE inert at layerwise)
+    R2 ALIVE  18/18 reached 100 epochs with a full 5-epoch tail -> PASS
+    R3 NOISE  worst arm sd 1.1978 vs bar 2.7766 -> PASS
+    R-CTRL    k49 - k01 = +32.866667 (+43.49 SE) vs bar 16.3050 -> PASS
+    ...
+    pair tokens O/U/T
+    FINAL: COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED
+
+### 173.4 THE ARM LEVELS — `plateau5` PRIMARY, **TRAIN ALONGSIDE TEST**, AND EVERY SEED
+
+Re-derived independently from the raw `.out` epoch lines (mean of the last five epochs) and
+cross-checked against the ingested `plateau5` column — they agree exactly.
+
+| arm | spec | TEST `plateau5` | sd | TRAIN `plateau5` | per-seed TEST s15 / s16 / s17 | per-seed TRAIN s15 / s16 / s17 |
+|---|---|---|---|---|---|---|
+| `k01` | `scalar` | **22.9807** | 0.5704 | 22.8773 | 23.538 / 22.398 / 23.006 | 23.534 / 22.664 / 22.434 |
+| `k01n` | `tn:scalar` | **7.2127** | 0.7048 | 6.9520 | 6.898 / 6.720 / 8.020 | 6.554 / 6.706 / 7.596 |
+| `k49` | `sets:1-49/50-62` | **55.8473** | 1.1978 | 62.7513 | 56.626 / 54.468 / 56.448 | 63.426 / 61.238 / 63.590 |
+| `k49n` | `tn:sets:1-49/50-62` | **64.6413** | 0.3033 | 71.2067 | 64.346 / 64.952 / 64.626 | 71.316 / 71.570 / 70.734 |
+| `k50` | `sets:1-50/51-62` | **30.2887** | 0.6954 | 32.0093 | 29.490 / 30.760 / 30.616 | 31.180 / 32.572 / 32.276 |
+| `k50n` | `tn:sets:1-50/51-62` | **7.5647** | 0.5823 | 7.2327 | 7.148 / 7.316 / 8.230 | 6.794 / 7.050 / 7.854 |
+
+`SIGMA_W 0.925518` · `SE_ARM 0.534348` · `SE_ARM_DIFF 0.755682` · `SE_INT 1.068696` ·
+`READ_BAR 1.511365` · `INT_BAR 2.137392` · `FLOOR_BAND 2.776554` · `CTRL_BAR 16.305008` ·
+`CLIFF_MIN 10`.
+
+**TRAIN MOVES WITH TEST IN EVERY PAIR**, so no pair difference is a generalisation artefact:
+`k01→k01n` TRAIN **−15.9253** (TEST −15.7680); `k49→k49n` TRAIN **+8.4553** (TEST +8.7940);
+`k50→k50n` TRAIN **−24.7767** (TEST −22.7240).
+
+**EVERY PAIR IS SIGN-CONSISTENT ACROSS ALL THREE SEEDS**, matched seed by seed:
+
+| pair | s15 | s16 | s17 | mean | same sign in 3/3 |
+|---|---|---|---|---|---|
+| `k01→k01n` | −16.640 | −15.678 | −14.986 | **−15.7680** | yes |
+| `k49→k49n` | **+7.720** | **+10.484** | **+8.178** | **+8.7940** | yes |
+| `k50→k50n` | −22.342 | −23.444 | −22.386 | **−22.7240** | yes |
+
+### 173.5 REGISTERED ACCOUNTS vs MEASURED, WITH EVERY RESIDUAL IN SE
+
+**PRIMARY — COMPOSITION**, bar `1.511365 pp = 2 * SE_ARM_DIFF`:
+
+| pair | P (tn: − standard) | in SE | token | `H-COMP-INERT` predicts | residual | status |
+|---|---|---|---|---|---|---|
+| `k01 → k01n` | **−15.768000** | **−20.87** | `O` DOWN-NOT-INTERPRETABLE | +0.000000 | −15.768000 | **EXCLUDED** |
+| `k49 → k49n` | **+8.794000** | **+11.64** | `U` MOVED-UP | +0.000000 | +8.794000 | **EXCLUDED** |
+| `k50 → k50n` | **−22.724000** | **−30.07** | `T` SATURATED | +0.000000 | −22.724000 | **EXCLUDED** |
+
+→ branch `LIVE` = **`COMPOSITION-OPERATIVE`** ("at least one pair MOVED-UP or MOVED-DOWN").
+
+**SECONDARY — THE CLIFF UNDER THE TWO WEIGHTINGS:**
+
+| quantity | value | in SE |
+|---|---|---|
+| `D_STD = k50 − k49` | **−25.5587** | **−33.82 SE** |
+| `D_TN = k50n − k49n` | **−57.0767** | **−75.53 SE** |
+| `I = D_TN − D_STD` | **−31.5180** | **−29.49 SE_INT** |
+| corpus `D_STD` (same cell, 100 ep, `crn1` excluded) | −25.068667 | — |
+| **in-batch replication residual** | **−0.490000** | **−0.46 SE_INT** |
+
+| account | prediction | measured | residual | status |
+|---|---|---|---|---|
+| `H-CLIFF-GOV` | `I = 0.000000` | −31.518000 | −31.518000 | **EXCLUDED at −29.49 SE_INT** |
+| `H-CLIFF-COLLAPSE` (**the cycle brief's own account**) | `D_TN = 0.000000` | −57.076667 | −57.076667 | **EXCLUDED at −75.53 SE** |
+| `H-CLIFF-RED` | `\|D_TN\| > \|D_STD\| + 2.137392 = 27.696059` | 57.0767 | — | **MET** |
+
+in-batch `|D_STD| = 25.5587` vs `CLIFF_MIN 10` → branch `R` = **`CLIFF-AMPLIFIED`**.
+
+**RECORDED PLAINLY, BECAUSE IT IS THE POINT OF `169`:** the cycle brief's account — that normalising
+the reduction would **COLLAPSE** the cliff — was registered in advance as **ALREADY EXCLUDED** by a
+pre-registration measurement on the live optimizer (`169.4`/`169.5`: `tn:` multiplies tensor 50's
+steering power ~490-fold, in the **opposite** direction), and the data now exclude it at **−75.53
+SE**.  The prediction that survived was written **AGAINST** the brief.  The in-batch `D_STD`
+reproduces the corpus `D_STD` to **−0.46 SE_INT**, so the batch is measuring the same cliff the
+corpus measures.
+
+### 173.6 ATTACK 1 — **CAN ONE CLEAN PAIR CARRY `COMPOSITION-OPERATIVE`?**  SPLIT THE QUESTION AND THE ANSWER IS "THE TOKEN, YES; THE READING, ONLY PARTLY"
+
+Two of three pairs are not cleanly interpretable by the scorer's own tokens: `k01`'s is `O`
+(registered **ONE-SIDED in advance**, because the m = 1 level is a plateau other degenerate same-cell
+arms already occupy) and `k50`'s is `T` (`SATURATED`).  Only `k49 → k49n` is `U`.
+
+**THE DISTINCTION THAT MATTERS, AND IT WAS NOT MADE IN THE CYCLE BRIEF.**
+
+* The **NULL** — `H-COMP-INERT`, `P = 0.000000`, the only account in this batch with a point
+  prediction — is **EXCLUDED ON ALL THREE PAIRS**, at **20.87**, **11.64** and **30.07 SE**, with
+  the sign consistent in **9 of 9** matched-seed comparisons and TRAIN moving with TEST every time.
+  The tokens `O` and `T` are bookkeeping about **whether a direction is readable**, not about
+  whether the null survived.  It did not, three times.
+* The **VERDICT TOKEN** `COMPOSITION-OPERATIVE` does rest on **one** pair, because branch `LIVE`
+  requires a `U` or `D`.  A hostile reviewer is entitled to say so, and this record says it first.
+
+**WHAT A HOSTILE REVIEWER WOULD PRESS NEXT, AND WHAT THE DATA ANSWER.**
+
+* *Is `k49n` near a floor or a ceiling, so that `+8.794` is an artefact of the scale?*  **No.**
+  `k49n = 64.6413` sits **4.8908 pp (9.15 SE_ARM) BELOW** the registered corpus ceiling
+  `L_CEIL = 69.5321` and **5.9147 pp below** the same-cell corpus maximum **70.556**; it is
+  **41.8456 pp ABOVE** the corpus floor `L_FLOOR = 22.7957`.  Its TRAIN is **71.2067** — not
+  saturated — and its TRAIN−TEST gap (**6.5654 pp**) is an ordinary generalisation gap.  Its seed
+  spread is the tightest in the batch (**sd 0.3033**).  It is in the middle of the live range.
+* *Could `+8.794` be produced by anything other than the reduction change?*  The candidates and
+  their disposals: **partition change** — excluded by `173.7` (byte-identical, name by name, on the
+  live model); **seed / initialisation / data order** — the pair is matched seed by seed, and
+  epoch-0 test accuracy agrees across all six arms to within **0.02 pp** within each seed;
+  **another code path** — `test_rednorm` R2 proves every corpus spec's reduction is **bitwise
+  identical** pre- vs post-patch and R3 that `_rednorm` is the only differing attribute, and this
+  cycle additionally confirmed that `base_update` and `meta_update` resolve to the **same underlying
+  functions** (`SGDm_base_update`, `Lion_meta_update`, `is` identity `True`) in both arms; **an
+  effective meta-stepsize change** — impossible under `Lion`, where `|dbeta| = ms` **exactly** and
+  `169.2` proved per-group rescaling **bitwise inert**; **noise** — 11.64 SE.
+* *Is the effect a law?*  **No, and this is the honest limit.**  The same intervention on three
+  partitions differing by **one tensor** gives **+8.794**, **−15.768** and **−22.724**.  There is no
+  monotone reading; what is established is that the channel is **live**, not that it is **orderly**.
+
+### 173.7 ATTACK 2 — **IS `tn:` ACTUALLY INERT WHERE IT CLAIMS TO BE?**  RE-VERIFIED THIS CYCLE ON THE LIVE DEPLOYMENT TREE, AND YES
+
+`tests/test_rednorm.py` re-run in the deployment against the live pre/post pair — `HF.py.pre_rednorm`
+sha256 `0d8ee431a8caa51c14fa632776349db32b42e346299a91b69c4c6680142a3892` (**exactly the sha `169`
+quotes for the file the corpus's rows were produced by**) and the live patched `HF.py` sha256
+`9abd4318834d2ea191581e3b6004a18f53a0c1e60e9b741721ddd164a0dc0c94` — **ALL PASS, exit 0**, including:
+
+* **R0** — the three inserted regions each appear exactly once, and **deleting them reproduces the
+  pre-patch file BYTE FOR BYTE**.
+* **R5** — **`tn:X == X` BITWISE** at `layerwise`, `nodewise`, `weightwise`, `nodewise1d`,
+  `chunk1024`, `chunk65536`, `permnode0`, `permnode101` — all eight single-tensor granularities.
+* R1 34/34 corpus specs build identically; R2 every corpus spec's reduction bitwise identical;
+  R3 only `_rednorm` differs; R4 `tn:` equals `sum_i <u_i,v_i>/numel_i` to `1.06e-07`–`1.72e-07`;
+  R6 every spec a single safe shell token, round-tripped through `argsline_guard.py` as ONE value;
+  R7 `tn:`, `tn:nonsense`, `tn:sets:1-61`, `tn:[49,14]` all **raise** rather than defaulting.
+
+**HOW THE TEST HAD TO BE RUN, RECORDED SO IT IS NOT MISTAKEN FOR A FIX.**  Pointed straight at
+`Optimizers/HF.py.pre_rednorm`, the harness passes R0 and then dies in `load_hf` with
+`AttributeError: 'NoneType' object has no attribute 'loader'` — `importlib` returns **no loader** for
+a path that does not end in `.py`.  A **byte-identical copy** was staged as
+`_stage/rednorm_verify/HF_pre_rednorm.py` (sha256 verified equal) and `--pre` pointed at it.
+**`tests/test_rednorm.py` WAS NOT EDITED** (RULE 16); the input path was.
+
+**THE PARTITION, RE-DERIVED NAME BY NAME ON THE LIVE MODEL, INDEPENDENTLY OF THE TEST AND OF THE
+LAUNCHER'S GUARD 4d.**  A fresh script built both members of each pair from the live
+`ResNet18_c100` (62 tensors, 11,220,132 parameters) and hashed everything that defines the
+partition — `stepsize_type`, `len_beta_list`, beta shapes **and values**, `param_groups_indices`,
+`map_layers_to_blocks`, `param_numels`, and the full group membership **as tensor names**:
+
+| pair | partition sha256 (standard) | partition sha256 (`tn:`) | identical |
+|---|---|---|---|
+| `k01`/`k01n` | `1ef5ad258a8094f39696b4b60289079e…` | `1ef5ad258a8094f39696b4b60289079e…` | **YES** |
+| `k49`/`k49n` | `0c81135207526acd5231254a180566ca…` | `0c81135207526acd5231254a180566ca…` | **YES** |
+| `k50`/`k50n` | `bb78a41a99b9e6d9bc7d34feee806525…` | `bb78a41a99b9e6d9bc7d34feee806525…` | **YES** |
+
+Name-by-name group membership identical in **every** group of **every** pair.  The group boundaries
+are exactly the registered ones: `k49` coarse = tensors 1..49 ending at **`layer4.0.conv2.weight`**
+(6,315,072 params), fine = 50..62 beginning at **`layer4.0.bn2.weight`** (4,905,060); `k50` coarse =
+1..50 ending at **`layer4.0.bn2.weight`** (6,315,584), fine = 51..62 beginning at
+`layer4.0.bn2.bias` (4,904,548).  The whole-object attribute sweep found **three** attributes
+differing: `_rednorm` (the intervention) and `base_update`/`meta_update`, which are **bound-method
+objects on two different instances** — their `__func__` are **the same function objects**
+(`is` → `True`), so this is instance identity, not a code difference.
+
+### 173.8 ATTACK 3 — **`CLIFF-AMPLIFIED` MEETS ITS REGISTERED RULE AND IS NOT SEPARABLE FROM A ONE-SIDED DEATH.  THIS IS THE STRONGEST FINDING OF THE AUDIT AND IT CUTS AGAINST THE BRANCH**
+
+`D_TN = −57.0767` is enormous.  The degeneracy reading asks whether `k50n` is simply at a floor, in
+which case `|D_TN|` is a **distance to that floor**, not an amplified cliff.  Four measurements, all
+made in this cycle:
+
+1. **`k50n` IS BELOW EVERYTHING THE CELL HAS EVER PRODUCED.**  Across the **192** same-cell
+   (`ResNet18_c100`/`CIFAR100`/`SGDm`+`Lion`/`ms=1e-3`/`alpha0=1e-6`/`AUGMENT=1`/`BETA_CLIP -15:-2.3026`/
+   batch 100/100 epochs) rows the corpus holds with `crn1` **excluded**, the **minimum** `plateau5`
+   is **10.640** and only **2** rows fall below 12.  `k50n = 7.5647` is **3.075 pp (5.76 SE_ARM)
+   BELOW that minimum**; `k01n = 7.2127` is **3.427 pp (6.41 SE_ARM)** below it.  Across all **433**
+   CIFAR-100 rows in the corpus, **zero** sit below 8.5 at this network and horizon.
+2. **THE TWO COLLAPSED `tn:` ARMS ARE INDISTINGUISHABLE FROM EACH OTHER.**  `k50n − k01n =
+   +0.3520 = +0.47 SE_ARM_DIFF`, **inside `READ_BAR`**.  Two arms whose partitions differ as much as
+   `m = 1` differs from `[50,12]` land at the **same** level, with the **same** seed ordering
+   (s17 high at 8.02/8.23, s15 and s16 low at 6.72–7.32).  That is the signature of a **common
+   attractor**, not of two independent outcome measurements.
+3. **NEITHER ARM EVER ROSE ABOVE IT.**  Over all 100 epochs the **maximum** test accuracy `k50n`
+   ever reached is **7.22 / 7.48 / 8.41** and `k01n` **6.98 / 6.94 / 8.28**.  Both were flat from
+   about epoch 24 onward.  Nothing rose and then decayed; they were pinned.
+4. **`|D_TN|` IS AT THE BOUND THAT PINNING IMPLIES.**  If `k50n` is pinned at the `k01n` level
+   (7.2127), the largest `|D_TN|` available given `k49n = 64.6413` is **57.4287**.  Measured
+   **57.0767 = 99.39 %** of it.
+
+**THE ASYMMETRY THAT MAKES THE POINT IN ONE LINE.**  Under the standard reduction the cut-position
+cliff falls between **two live levels** — `k50` clears the in-batch `k01` anchor by **+7.3080 pp =
++13.68 SE_ARM**.  Under `tn:` it falls **into a floor** — `k50n` is **−15.4160 pp = −28.85 SE_ARM**
+*below* that anchor.  So `|D_TN| / |D_STD| = 2.233` is **not** established as "the cliff got 2.2x
+steeper"; on the evidence it is "the `k50` side stopped training".
+
+**WHY THE REGISTERED SATURATION OVERRIDE DID NOT CATCH THIS, STATED AS A DEFECT IN THE BRANCH MAP
+AND LEFT UNFIXED UNDER RULE 16.**  Branch `S` (`UNRESOLVED-CLIFF-SATURATED`) fires only when **BOTH**
+`k49n` **AND** `k50n` are on the plateau.  `k49n` is at 64.64, so `S` cannot fire.  **A guard that
+requires both ends of a difference to be dead can never fire on a one-sided death — which is the
+only way a cliff contrast degenerates.**  Separately, the scorer's plateau predicate is `margin <=
+FLOOR_BAND`, i.e. **one-sided upward**, so an arm **15 pp BELOW** the m = 1 anchor is printed as
+`ON THE PLATEAU`; the registered floor census (`169.7`) anticipated arms landing **near** the anchor
+and did not anticipate arms landing **far below** it.  Both are noted here and **NEITHER IS
+CORRECTED IN CODE**.
+
+**DOES THE BRANCH SURVIVE?**  `CLIFF-AMPLIFIED` **stands as the scorer's token** — it is what the
+registered rule returns on the registered inputs, and it is recorded as such.  **The reading it
+invites does not.**  What is established is the weaker, defensible pair of statements: (a) the
+cut-position ordering **replicates under a completely different within-group weighting** —
+`k49n > k50n` just as `k49 > k50`, with the standard cliff reproducing the corpus to −0.46 SE_INT;
+and (b) under `tn:`, the `[50,12]` configuration **does not train at all**.  **`|D_TN| = 57.08` must
+not be quoted as a cliff magnitude**, and `I = −31.52` must not be quoted as an amplification.
+
+### 173.9 ATTACK 4 — WHAT `COMPOSITION-OPERATIVE` LICENSES, AND THE SENTENCE IT DOES NOT
+
+**THE SENTENCE THE CORPUS IS ENTITLED TO, VERBATIM:**
+
+> At CIFAR-100 / `ResNet18_c100` / `SGDm`+`Lion` / `ms = 1e-3` / `alpha0 = 1e-6` / 100 epochs, on
+> `m = 1` and the two `m = 2` cut positions 49 and 50, **how a group's per-tensor inner products are
+> COMBINED into that group's meta-signal is not outcome-inert**: holding the partition
+> **byte-identical** and the seeds matched, and changing **only** the within-group weighting, moves
+> 100-epoch test accuracy by **−22.72 to +8.79 pp**, and the null of no change is excluded on all
+> three pairs at **11.64 SE or more**.  The one pair whose direction is cleanly readable
+> (`k49 → k49n`, **+8.794 pp = +11.64 SE**) moves **UP**.
+
+**THE TEMPTING SENTENCE THAT IS NOT LICENSED, AND WHY.**
+
+* **"The reduction is THE mechanism behind the granularity phenomenon."**  **NO.**  `169.4` measured
+  the opposite on the live optimizer for the one granularity effect this batch sits next to:
+  removing `layer4.0.bn2.weight` from the `[50,12]` coarse group flips that group's sign in
+  **0.0003** of meta-steps, and removing it from `[49,13]`'s fine group in **0.0002** — the
+  reduction channel is **shut on both sides of the cut**, so the 25.07 pp cliff acts through
+  **WHICH ALPHA GOVERNS** tensor 50.  `crn1` shows the reduction's composition is **A** live channel;
+  it does **not** attach that channel to **any** granularity contrast this corpus has measured, and
+  for the cut-position cliff the pre-registration measurement **detaches** it.
+* **"Normalising the reduction is better", or any optimiser claim.**  **NO** — barred by the
+  registered scope and by construction: the chain rule gives the **unnormalised** sum, so `tn:` is
+  deliberately the **wrong** gradient, and the same intervention **destroys two of the three arms**.
+  That `k49n` beat `k49` refutes the intuition "the wrong gradient must be worse"; it does not make
+  `tn:` an optimiser.
+* **"The fourteenth mechanism lives."**  **PRECISION REQUIRED.**  Thirteen candidates died as
+  **explanations**, and every one was an **observational** statistic or a post-hoc operator on beta.
+  `crn1` is the first **INTERVENTION** on the reduction, and what survives is narrower than
+  "a mechanism": **the reduction's composition has outcome consequences at this cell.**  It is not a
+  surviving explanation of anything the corpus has previously measured.  **What has actually changed
+  is the class of evidence, not the size of the claim.**
+
+### 173.10 ATTACK 5 — **RULE 11 IS OPEN, THE SCORER SAYS SO, AND HERE IS EXACTLY WHAT WOULD AND WOULD NOT SURVIVE `cru1` RETURNING `GAP-REVERSES`**
+
+Every `crn1` arm sits at the single shared `ms = 1e-3`.  `hz9` showed a granularity contrast can
+**REVERSE SIGN** under per-arm tuning.  `cru1` (registered at `168`, scorer
+`analysis/cY1_cru1_score.py`, branches `B1 GAP-REVERSES` / `B2 GAP-CLOSES` / `B3 GAP-SHRINKS` /
+`B4 GAP-SURVIVES-TUNING`) is measuring precisely that on this cell and is **47/60 at the time of
+writing — NOT LANDED, NOT INGESTED, NOT TOUCHED**.
+
+**WOULD SURVIVE `GAP-REVERSES`:**
+
+* `173.7` and `169.2`/`169.4` in full — they are properties of the **live source** and of the live
+  optimizer's **own recorded reduction**, not outcome measurements at any meta-stepsize.  In
+  particular, `tn:` cannot be re-described as an effective-stepsize change, because under `Lion`
+  `|dbeta| = ms` exactly and per-group rescaling is **bitwise inert**.
+* The **exclusion of `H-COMP-INERT`** as a statement about **this cell**: within a pair the partition,
+  the seeds and the meta-stepsize are all held fixed, so "changing the within-group weighting changes
+  the outcome at `ms = 1e-3`" does not depend on `ms = 1e-3` being the right rung for any arm.
+
+**WOULD NOT SURVIVE:**
+
+* **The entire SECONDARY.**  `D_STD`, `D_TN`, `I`, the corpus anchor `D_STD_CORPUS = −25.068667` and
+  the `CLIFF-AMPLIFIED` token are **all shared-`ms` contrasts drawn from a shared-`ms` population**.
+* **The `R-CTRL` gate's premise.**  `k49 − k01 = +32.8667 pp` is exactly the coarse-vs-`m = 1`
+  contrast whose sign `cru1` is testing; a reversal makes it a shared-setting artefact, and with it
+  the sense in which this batch "reproduces the granularity effect at all".
+* **Any reading of the `+8.794` DIRECTION** — a granularity-adjacent contrast's sign is the specific
+  thing `hz9` showed can flip.  The entitled sentence of `173.9` is written to survive this: it
+  claims **not inert**, and quotes the direction only as an in-cell observation.
+* **Any extrapolation of the two collapses.**  Whether `tn:` kills `m = 1` and `[50,12]` at a tuned
+  `ms` is untested.
+
+### 173.11 THE TWO SENTINELS OF `169.9` — WHICH FIRED, WHICH DID NOT, AND BOTH LEFT UNFIXED
+
+**SENTINEL 1 (`cru1` shares seeds `{15,16,17}`) HAS NOT FIRED.**  `cX1_crn1_score.py --selftest`
+section J still reads `ZERO foreign rows anywhere in the corpus carry seed 15, 16 or 17 -> 0` and
+`ZERO foreign rows use the tn: grammar -> 0`.  It will fire when `cru1` lands; it is an assertion
+about the **rest of the corpus**, not about `crn1`.
+
+**SENTINEL 2 (`SIGMA` and level anchors move under a FOREIGN ingest) FIRED — WITH `crn1` AS THE
+FOREIGN BATCH.**  `169.9` registered the risk in the direction *"a foreign batch moves `crn1`'s
+frozen literals"*; what actually happened is the **mirror image**, and it is the same mechanism:
+`crn1`'s **three `scalar` rows (`k01`)** joined every other scorer's frozen `scalar`/floor anchor.
+The three `tn:scalar` rows did **not**, because `tn:scalar` is a **new grammar** that matches no
+existing `scalar` filter — which is why every affected anchor moved by exactly **+3 rows**:
+
+| scorer | frozen literal | before | after |
+|---|---|---|---|
+| `cW1_cpg1_score` | `L_FLOOR` | 22.773900 (n=20, 7 batches) | **22.800870 (n=23, 8)** |
+| `cW1_cpg1_score` | `SIGMA_100_WIDE` | 0.920909 (df 66) | **0.924351 (df 70)** |
+| `cH1_hb1_score` / `cJ1_cbl1_score` | `ARCH_SCAL` | 22.796 (n=23, 8) | **22.817 (n=26, 9)** |
+| `cY1_cru1_score` | `D1` scalar floor | 22.795652 (n=23) | **22.817000 (n=26)** |
+| `cdn1_denominator_score` | `m=1` floor / `sigma_seed` df | 22.727 (10 cells) / df 49 | **22.750 (11 cells) / df 51** |
+
+**`crn1`'s OWN scorer is INVARIANT under its own ingest, as designed** — `--selftest` **142 PASS,
+0 FAIL** both before and after, the only textual change being its own dual-state check flipping
+`0 found -> PRE-REGISTRATION` to `18 found -> POST-INGEST`.  The `cW1` pattern held.
+
+**ALL OF THESE ARE LEFT UNFIXED UNDER RULE 16.**  A frozen literal that moves after a foreign ingest
+means **the corpus moved, not that the batch is wrong**.
+
+### 173.12 THE FULL PRE- AND POST-INGEST `--selftest` SWEEP, AND THE VERDICT-STABILITY CHECK
+
+All **96** scorers carrying `--selftest` were run **before** and **after** the ingest and diffed.
+
+* **Exit codes: 63 zero / 33 nonzero before; 62 / 34 after.  Exactly ONE exit code moved:
+  `cW1_cpg1_score` 0 → 1** (its `L_FLOOR` and `SIGMA_100_WIDE`, above).  The other 33 were **already
+  failing before this ingest** — the inherited baseline, unchanged by it.
+* **19 scorers' stdout changed**: `c68_window_blast`, `c69_c100_armset`, `c69_orphan_census`,
+  `c70_composition_audit`, `cH1_hb1_score`, `cI1_in489g1_score`, `cI2_in489g2_score`,
+  `cJ1_cbl1_score`, `cK1_cpk1_score`, `cL1_cts1_score`, `cR1_cpk2_score`, `cS2_cpk3_score`,
+  `cU1_alpha0_granularity_score`, `cV1_cpr1_score`, `cW1_cpg1_score`, `cX1_crn1_score`,
+  `cY1_cru1_score`, `cZ1_conv1_prefix_step`, `cdn1_denominator_score`.  Only **three** changed a
+  PASS/FAIL count (`cW1`, `cH1` 65/11 → 64/12, `cJ1` 125/12 → 124/13), plus `cY1` 54/4 → 47/11 and
+  `cdn1` 33/34 → 30/34, both already failing.  Every one is the `scalar`-anchor drift of `173.11`.
+* **NO VERDICT MOVED.**  Each of the 19 was run for its **verdict** under the pre-ingest CSV and
+  again under the post-ingest CSV (the CSV was swapped and restored; final sha256
+  `a40e3ef4cfea9f01…` re-verified), trying `<no args>`, `../runs` and `../runs_alice2`.  The two
+  verdict tables **diff EMPTY**.  Unmoved verdicts include `cR1` `k*-UNMOVED | CONVERGED`,
+  `cS2` `PEAK-CONFIRMED-AT-49 | CONVERGED`, `cZ1` `CONV2-NOT-PRIVILEGED`, and `cX1`
+  `COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED`.
+
+**`analysis/c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately NOT fixed**.
+**10 checks fail, both before and after this ingest, and they are the SAME 10**: only the derived
+counts move, by exactly the ingest — rows 2,662 → **2,680** (paper 2,177), admissible 2,220 →
+**2,238** (paper 1,735), runs carrying a wallclock 2,647 → **2,665** (paper 2,162), GPU-hours
+2,843.83 → **2,857.30** (paper 1,642).  628 `chk()` sites, 411 distinct quantity numerals, 41.9 %
+coverage.  **This ingest introduced no new failing check.**
+
+### 173.13 SCOPE, RESTATED AT LANDING
+
+**100 epochs only.**  `m = 1` and the two `m = 2` cut positions **49 and 50** only.  **NOTHING** about
+`layerwise`, `nodewise`, `weightwise`, `nodewise1d`, `chunk*` or `permnode*` — `tn:` is **BITWISE
+inert** there and `173.7` R5 re-asserts it.  **NOTHING** about `m` in general, about CIFAR-10,
+Tiny-ImageNet, ImageNet-489, ResNet-50, any other meta-stepsize, `alpha0`, optimiser pair, or any
+hierarchical operator.  **NO claim that either weighting is a better optimizer** — `tn:` is
+deliberately the wrong gradient and is a mechanism probe only.  **NO test of `152.12` rival (c)**
+(`PROBE=0`; at `m <= 2` `block_product` has already reduced `<h,g>` to one scalar per group before
+`_probe` is reached).  **RULE 11 IS OPEN** and `173.10` states exactly what falls if `cru1` returns
+`GAP-REVERSES`.  **`|D_TN|` AND `I` ARE NOT QUOTABLE AS CLIFF MAGNITUDES** (`173.8`).  And nothing
+here revises any earlier CORRECTIONS entry: `169.2` and `169.4` stand as written, and were the two
+results that never depended on the batch landing.
+
+### 173.14 THE TWO STANDING CONSTRAINTS, DISCHARGED AGAIN
+
+1. **Nothing outside `/data1/salehkaleybars/metaopt/hmo-crn1` was created, modified or deleted on
+   `alice`.**  This cycle wrote **two** files there, both under `hmo-crn1/_stage/rednorm_verify/`:
+   a byte-identical `.py`-named copy of `HF.py.pre_rednorm` and a partition-verification script.
+   `Optimizers/HF.py`, `HF.py.pre_rednorm`, `runs/` and every shared path were **read only**.
+2. **No job this campaign did not submit was touched, on either account.**  `alice`'s queue was
+   **empty** when the `.out` files were pulled; **`cru1` on `alice2` was neither queried for control
+   nor modified, and none of its rows was ingested** (0 before, 0 after).
