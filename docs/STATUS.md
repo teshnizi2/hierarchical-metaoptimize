@@ -1,12 +1,40 @@
 # STATUS — operator dashboard
 
-Updated 8 Sep 2026 (**cycle 140**). Detail lives here; chat stays short.
-Authority: `docs/CORRECTIONS.md` (highest number wins, now **166**) > `docs/FINDINGS.md` > everything else.
+Updated 8 Sep 2026 (**cycle 141**). Detail lives here; chat stays short.
+Authority: `docs/CORRECTIONS.md` (highest number wins, now **167**) > `docs/FINDINGS.md` > everything else.
 Manuscript and deposit are both at **`2f4fd9a`** (parent `58c0c85`). **Nothing under `paper/` touched this cycle** (`git status --porcelain paper/` empty).
 Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,638 rows** (+15 this cycle — `cpg1` LANDED, SCORED, INGESTED). **BOTH queues EMPTY.**
 **`c98_reproduce.py` STILL EXITS 1** — reported as-is, inherited, **author scope, deliberately not fixed**. Stale draft numerals (CORRECTIONS 141.6 / 142.6). 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage.
 
-## CYCLE 140 (this one) — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
+## CYCLE 141 (this one) — **`cdn1` REGISTERED AND LAUNCHED: THE CIFAR-100 DENOMINATOR.** CORRECTIONS **167**. NOTHING LANDED, SCORED OR INGESTED
+
+**THE HOLE.** There is **no tuned non-meta baseline anywhere in this corpus outside CIFAR-10**, so nobody knows how far below a plain optimiser the CIFAR-100 phenomenon sits. On CIFAR-10 the denominator is in the abstract (`bl-sgd-01` **95.124** n=5 vs 93.317 n=3 = **−1.807 pp**, `119.11`). On CIFAR-100 there is nothing. Corpus best CIFAR-100 cell, **re-derived this cycle** with `cdn1-*` excluded: **`gm2-ch` 72.054, n=3** (`ResNet18_c100 / chunk771 / ms 1e-4 / α₀ 1e-3 / −15:−2.3026 / batch 100 / AUGMENT=1 / SGDm+Lion`); runners-up `gm2-c22` 72.000, `gc1-ch` 71.951, `gm2-n1d` 71.932.
+
+**24 jobs, ONE submission, `alice2`, ids `4920408`–`4920431`, Submit spread 0 s, seeds {0,1,2}.**
+
+| arm | n | what | horizon |
+|---|---|---|---|
+| **A** `cdn1-lr{001,002,005,01,02,03}-s*` | 18 | plain **SGD** m 0.9 / wd 5e-4 / cosine-to-0, 1000-step warmup; LR **{0.01,0.02,0.05,0.1,0.2,0.3}** | 100 ep |
+| **M** `cdn1-m-s*` | 3 | **in-batch replicate of `gm2-ch`** — makes the gap WITHIN batch and MEASURES the offset | 100 ep |
+| **C** `cdn1-h2-s*` | 3 | arm A at lr 0.1, cosine rescaled; **SECONDARY** | 200 ep |
+
+**NOTHING PATCHED.** `--optimizer SGD` routes through the **pre-existing** `SGD_optimizer` branch (cycle 35) in `build_optimizer.py`, sha256 `25a899b3…54c7ec2` pinned by guard 3. `SGD_WD`/`SGD_MOM` **deliberately left at 5e-4/0.9** because `run_cifar.sh` does not echo them and an env value would be unauditable; `COS_TOTAL`/`COS_WARMUP` **are** echoed, so they are passed and audited (**50000**/1000 at 100 ep, **100000**/1000 at 200 — 500 steps/epoch). Live-model checks before submission: `chunk771` allocates **m = 14,595** on today's `HF.py`, byte-matching `gm2`; `ResNet18_c100` is the **CIFAR-style** 3×3-stem R18, 11,220,132 params.
+
+**FLOOR, RE-DERIVED (not copied):** `σ_seed` **0.3713** pp (df **49**, 28 cells, C100/100ep/complete/mean ≥ 60; the unrestricted pool 0.7624 is dominated by the collapsed cut-position arms and is **not** the bar). **SE = 0.30317 pp.** CIFAR-10 tuned-SGD σ is 0.1201, so the bar is conservative by 3.1×.
+
+**PRIMARY `GAP_in` = arm A best − arm M**, both n=3, within batch. Predictions **A 76.0 / M 72.05 / C 77.5** ⇒ **+3.95 pp = 13.0 SE**. Branches (6.60 SE apart): **BELOW-BY-A-LOT** ≥ +3.0 · **CIFAR-10-LIKE** +1.0…+3.0 · **NO-RESOLVABLE-DEFICIT** \|g\| < 1.0 · **ABOVE** ≤ −1.0. Gates in order **V0** 24/24 complete · **V1** every arm > 40.0 · **V2 BRACKETING** argmax must be INTERIOR or every gap is a **LOWER BOUND** · **V3** \|M − 72.054\| ≤ 2 SE = 0.606.
+
+**NO ARM NEAR A FLOOR** (the `cpr1` defect designed out): floors **1.000** (chance) and **22.727** (the corpus's m=1 `ResNet18_c100` `scalar` floor, 10 cells). Worst level under **any** registered account, adverse included, is **+154.9 SE** above m=1 and **+226.6 SE** above chance; the *"arm just died"* model sits **≥ 226 SE** from every account. Live at epoch 6: `lr01-s0` 47.26/52.51, `lr03-s0` 33.36/41.95 — all climbing.
+
+**SCOPE REGISTERED IN ADVANCE:** a gap of any size is a **SCOPE** fact about where the **family** sits, and **refutes no granularity finding** — every granularity contrast is within-MetaOptimize and within-batch, and a common additive offset cancels out of all of them. A small gap would strengthen none of them either.
+
+**RULE 21 margin 72 s** (`1e8e538` epoch **1788848854** → earliest Submit **1788848926**), the NORMAL claim: this scorer has runs of its own. **RULE 20:** 24/24 composed lines PASS pre-submission; post-launch **21/24** `.out` audited clean (arm C PENDING on `QOSMaxGRESPerUser`), `--batch-consistency --strict` PASS per family. **Coverage is NOT yet FULL — no number may be quoted until 24/24.** **Separate ENV audit PASS**, arm A exactly **1** distinct `ENV:` line. Scorer `analysis/cdn1_denominator_score.py` **34/34 `--selftest`**, **default invocation takes no arguments**, guard 5 imports it and proves the default resolves and that the script's ladder **is** the scorer's ladder (`164.2`); every corpus reader excludes `cdn1-*` and §I **verifies** it (`161.9`). **RULE 16:** `git diff -- analysis/` is **additions only** (one new file, 660 lines).
+
+**BUDGET ≈ 22 GPU-h** (A 13.5 / M 3.5 / C 5), ~32 worst case, inside the ~60 h share. Every arm fits `gpu-short`'s 4 h so nothing stalls (`hz3-R2` lesson). 21/24 started within 1 s. **ETA ≈ 11:30 CEST today.**
+
+**NEXT:** at 24/24 — re-run the ARGS audit at FULL coverage, re-run `--envaudit`, ingest, then `python3 analysis/cdn1_denominator_score.py` (no arguments) and score **V0 → V1 → V2 → V3** before `GAP_in` is quoted.
+
+## CYCLE 140 — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
 
 **`FINAL: CONTIGUITY-OPERATIVE | INTERACTION-ABSENT | COARSE-MASS-REFUTED-AT-EXACT-MATCH | KC-REPLICATES`** (scorer `cW1_cpg1_score.py` `939ba875…c7755b16`, UNEDITED, exit 0; `--selftest` **137/137 PASS**).
 

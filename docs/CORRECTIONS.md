@@ -17647,3 +17647,181 @@ its co-grouping control, and the `scalar` floor.  **If tensor 46 also collapses 
 contiguity generalises beyond `shortcut.0.weight`; if it pays its full step, the *"only `conv2`
 matters"* account of `166.7(5)` wins and `CONTIGUITY-OPERATIVE` must be renamed.**  Either way the
 `166.7` ambiguity is resolved by measurement rather than by argument.
+
+## 167. `cdn1` REGISTERED AND LAUNCHED — **THE CIFAR-100 DENOMINATOR.**  A TUNED NON-META BASELINE EXISTS NOWHERE IN THIS CORPUS OUTSIDE CIFAR-10, SO THE WHOLE FAMILY MAY SIT BELOW THE PLAIN OPTIMISER IT IS IMPLICITLY COMPARED TO AND NOBODY HAS LOOKED.  NOTHING LANDED, SCORED OR INGESTED (cycle 141)
+
+**THE HOLE, RE-DERIVED THIS CYCLE, NOT QUOTED.**  On **CIFAR-10** the denominator exists and is
+already in the abstract: `bl-sgd-01` **95.124** (n=5, pooled seed sd **0.1201** over the four-rung
+ladder, df 16) against a best MetaOptimize cell of 93.317 (n=3) — the **−1.807 pp** deficit of
+`119.11`.  On **CIFAR-100** there is **nothing**: every CIFAR-100 number in the corpus is a
+MetaOptimize number compared to another MetaOptimize number.  The corpus's own best CIFAR-100 cell,
+re-derived at registration over every complete `window_ok` 100-epoch row with `cdn1-*` excluded, is
+**`gm2-ch` 72.054 pp, n = 3**, cell `ResNet18_c100 / chunk771 / ms 1e-4 / α₀ 1e-3 / box −15:−2.3026
+/ batch 100 / AUGMENT=1 / SGDm base / Lion meta` (runners-up `gm2-c22` 72.000 n=3, `gc1-ch` 71.951
+n=4, `gm2-n1d` 71.932 n=3).  Published ResNet-18/CIFAR-100 numbers for the same architecture are
+commonly ~76–78 at 200 epochs.  **The gap is unmeasured, and a referee asks for it first.**
+
+**THE ARMS — 24 jobs, ONE submission, `alice2`, seeds {0,1,2} throughout, tag `cdn1-*`.**
+
+| arm | n | what | horizon |
+|---|---|---|---|
+| **A** `cdn1-lr{001,002,005,01,02,03}-s{0,1,2}` | 18 | plain **SGD**, momentum 0.9, wd 5e-4, cosine-to-zero, 1000-step warmup; LR ladder **{0.01, 0.02, 0.05, 0.1, 0.2, 0.3}** | 100 ep |
+| **M** `cdn1-m-s{0,1,2}` | 3 | **in-batch replicate of `gm2-ch`**, the corpus's best CIFAR-100 cell | 100 ep |
+| **C** `cdn1-h2-s{0,1,2}` | 3 | arm A at **lr = 0.1**, cosine horizon rescaled; **SECONDARY** | 200 ep |
+
+**WHY ARM M EXISTS, AND WHY IT IS NOT GOLD-PLATING.**  BATCH is this campaign's unit of
+replication (**F(62,85) = 5.47**), so a gap measured against a cell from another batch is exposed
+to an offset a within-batch gap is not.  Arm M costs **3 jobs / ~3.5 GPU-h** and makes the headline
+**GAP_in** a within-batch difference while simultaneously **measuring** this batch's offset against
+`gm2` (`V3`).  Its submit line is byte-identical to `bin/c91_c100_mech.sh`'s `gm2-ch` arm bar the
+run name and the save directory — including `PROBE=5 / PROBE5=1 / PROBE5_WRITE_EVERY=500`, kept so
+the replicate is faithful rather than merely similar.  Its granularity was verified **on the live
+tree at submit time**, not assumed: `chunk771` allocates **m = 14,595**, byte-matching `gm2`'s
+registered allocation, on today's `HF.py` (`0d8ee431…142a3892`, mtime 7 Sep 22:40, i.e. after
+`cpg1`'s `PATCH_NAMESETS`).
+
+**WHAT IS MATCHED AND WHAT DIFFERS, STATED EXPLICITLY.**  *Matched* to the campaign's standard
+CIFAR-100 cell: dataset `CIFAR100`, network `ResNet18_c100`, batch 100, `AUGMENT=1`, 100 epochs,
+one GPU, the same harness, the same aggregator, `plateau5` primary, TRAIN reported beside TEST.
+*Differs*: **the optimiser** — that is the whole point, it is the one axis introduced.  Arms A and
+C carry no meta optimiser, hence no meta-stepsize, no α₀-as-β₀, no `BETA_CLIP` box and no step-size
+groups; `--alpha0` carries the SGD learning rate because that is the flag `build_optimizer.py`
+routes to `torch.optim.SGD`'s `lr`.  *Differs*: arm C's horizon, which is why it is SECONDARY.
+
+**NOTHING IS PATCHED.  LIVE SOURCE, READ FROM THE CLUSTER TREE, NOT FROM A HEADER.**
+`Optimizers/build_optimizer.py` already carries a non-meta SGD path, added at cycle 35 and never
+used outside CIFAR-10:
+
+    if args.optimizer == 'SGD':
+        return SGD_optimizer(net, lr=args.alpha0, writer=writer)
+    ...
+        wd  = float(_os_sgd.environ.get('SGD_WD', 5e-4))
+        mom = float(_os_sgd.environ.get('SGD_MOM', 0.9))
+        self.optimizer = torch.optim.SGD(net.parameters(), lr=lr, momentum=mom,
+                                         weight_decay=wd, nesterov=False)
+        total_steps  = int(_os_sgd.environ.get('COS_TOTAL', 422000))
+        warmup_steps = int(_os_sgd.environ.get('COS_WARMUP', 10000))
+        self.scheduler = CosineDecayWithWarmupScheduler(self.optimizer, warmup_steps, total_steps)
+
+**`SGD_WD` and `SGD_MOM` are DELIBERATELY NOT SET.**  5e-4 / 0.9 is the standard recipe, and
+`jobs/run_cifar.sh` does **not** echo those two names — a value passed through the environment
+would be **unauditable from the runs' own logs**.  Left at their defaults they are pinned by the
+file's sha256 **`25a899b3745e9d66fbf630795a1202c6075e2067daffa077e4a54c28e54c7ec2`**, which guard 3
+checks before anything is submitted.  `COS_TOTAL` and `COS_WARMUP` **are** echoed, so they **are**
+passed and **are** audited.  **500 optimiser steps per epoch** (50,000 CIFAR-100 train images ÷
+batch 100) ⇒ `COS_TOTAL` **50000** at 100 epochs and **100000** at 200; the warmup stays at **1000
+steps** in both, so the horizon is the only thing that moves.  Live-model checks, all run before
+submission: `ResNet18_c100` is the **CIFAR-style** ResNet-18 (3×3 stride-1 stem, no max-pool),
+**11,220,132** parameters; `load_data.py`'s `CIFAR100` branch normalises with (0.5071, 0.4865,
+0.4409)/(0.2673, 0.2564, 0.2762) and, under `AUGMENT=1`, applies `RandomCrop(32, padding=4)` +
+`RandomHorizontalFlip` — the standard recipe, unchanged.
+
+**THE NOISE FLOOR, RE-DERIVED AT REGISTRATION, NOT COPIED.**  `σ_seed` = **0.3713 pp**, the pooled
+within-cell seed sd of `plateau5` over every CIFAR-100 / 100-epoch / `complete` / `window_ok` cell
+whose mean is ≥ 60 pp — **df 49, 28 cells**.  Restricted to that regime **on purpose**: the
+unrestricted pool is **0.7624** (df 187) and is dominated by the collapsed cut-position arms in the
+20s, which is not the regime any arm of this batch lives in.  **SE** = σ·√(2/3) = **0.30317 pp**
+(difference of two n=3 cell means); se of one cell mean = 0.21437.  The CIFAR-10 tuned-SGD ladder's
+own seed sd is **0.1201**, so using the meta-arm σ as the SGD arms' bar is conservative by **3.1×**.
+
+**THE PRE-REGISTRATION.**  **PRIMARY: `GAP_in` = arm A's best rung − arm M, both n=3, within
+batch.**  Point predictions **A_best 76.0 / M 72.05 / C 77.5** ⇒ `GAP_in` predicted **+3.95 pp =
+13.0 SE**.  Branches, boundaries **6.60 SE** apart:
+
+| branch | `GAP_in` | what it means |
+|---|---|---|
+| **BELOW-BY-A-LOT** | ≥ **+3.0** (9.90 SE) | the family sits materially below tuned SGD on CIFAR-100, and by **more** than on CIFAR-10; the abstract must carry the CIFAR-100 figure and must not generalise −1.807 |
+| **CIFAR-10-LIKE** | +1.0 … +3.0 | same order as CIFAR-10; one scope sentence covers both |
+| **NO-RESOLVABLE-DEFICIT** | \|g\| < 1.0 (3.30 SE) | the CIFAR-10 deficit does **not** generalise; reported as such, at the same bar as the others |
+| **ABOVE** | ≤ −1.0 | MetaOptimize **beats** tuned SGD here; a positive result, and arm A's ladder is re-checked for a tuning failure before it is believed |
+
+**GATES, SCORED IN ORDER, BEFORE ANY GAP IS QUOTED.**  **V0** 24/24 rows, all `complete` and
+`window_ok`, `epochs_done == epochs_requested` · **V1** every arm mean > 40.0 and not `collapsed` ·
+**V2 BRACKETING** — arm A's argmax must be **INTERIOR** to the ladder; **at an endpoint the
+baseline is not tuned, RULE 11 is not satisfied, and every gap is reported as a LOWER BOUND, never
+as a tuned comparison** · **V3 OFFSET** \|arm M − `gm2-ch` 72.054\| ≤ 2 SE = **0.606**; failing it,
+only `GAP_in` is quoted and the offset is reported as the finding it is.
+
+**NO ARM IS PREDICTED AT OR NEAR A FLOOR — the `cpr1` defect at `164` is designed out.**  Two
+floors registered: **chance 1.000** and the corpus's own **m = 1** floor for this network, the
+unweighted mean of the ten `ResNet18_c100` `scalar` 100-epoch cells = **22.727 pp** (re-derived
+with `cdn1-*` excluded).  The lowest level **any** arm is predicted to reach under **any**
+registered account — including the most adverse credible one, in which the SGD recipe
+underperforms all the way down to the corpus's best CIFAR-100 *layerwise* cell, 69.7 — is **+46.97
+pp = 154.9 SE** above the m=1 floor and **+68.70 pp = 226.6 SE** above chance.  A content-free
+*"the arm just died"* model predicts ~1.0 pp and therefore sits **≥ 226 SE** from every registered
+account; it cannot be mistaken for one.  §F of `--selftest` FAILS the file if any registered
+prediction ever comes within 10 SE of either floor.  **Live confirmation at epoch 6**, before any
+claim: `lr01-s0` 47.26 TEST / 52.51 TRAIN, `lr03-s0` 33.36 / 41.95 — every rung is climbing, none
+is near anything.
+
+**THE SCOPE REGISTRATION, FIXED IN ADVANCE SO IT CANNOT BE RE-INTERPRETED LATER.**  A gap of **any**
+size is a **SCOPE** fact about where the MetaOptimize **family** sits on CIFAR-100 against a tuned
+plain optimiser.  It is **NOT** a refutation of any granularity finding in this corpus.  Every
+granularity contrast the campaign owns — `D`, `G`, `U`, `T`, the count-matched partition audit, the
+cut-position ladder — is a **within-MetaOptimize, within-batch** difference between two arms that
+share the base optimiser, the meta optimiser, the horizon and the box, and **a common additive
+offset between the family and SGD cancels exactly out of every one of them**.  The gap constrains
+**one sentence in the abstract** and nothing else.  Symmetrically: **a small gap would strengthen
+no granularity finding either.**
+
+**WHY 100 EPOCHS IS PRIMARY AND 200 IS BOUGHT ANYWAY.**  The like-for-like cell is 100 epochs —
+every CIFAR-100 number in this corpus is at 100, so a 100-epoch baseline is the only one that
+compares to them without a horizon confound, and this campaign has already watched a headline
+**invert** across horizons (+3.444 → −0.361).  But the *literature* number a referee has in mind is
+quoted at 200, so a 100-epoch-only answer would understate the plain-SGD ceiling by an unknown
+amount and leave the scope sentence hedged.  Arm C costs **3 jobs** and fits inside `gpu-short`'s
+4 h (measured: plain SGD is ~18–42 s/epoch here), so it is bought.  **Registered limitation:** one
+submission cannot condition on arm A's argmax, so arm C's lr is fixed a priori at 0.1 — the
+standard recipe **and** the CIFAR-10 ladder's argmax in this same harness.  **If arm A's argmax is
+not 0.1, arm C is a LOWER BOUND on the tuned 200-epoch baseline and is reported as one.**
+`DELTA_H = C − A(lr=0.1)`; predicted **+1.5 pp**; resolved at ≥ 2 SE = 0.606.
+
+**RULE 21 — the NORMAL claim, proved by wall clock.**  This scorer has runs of its own, so the
+`cQ1`/`cS1` weakening does not apply.  `analysis/cdn1_denominator_score.py` committed at `1e8e538`,
+**epoch 1788848854** (2026-09-08T06:27:34Z); earliest `sacct` Submit over all 24 jobs
+**1788848926** (2026-09-08T08:28:46 CEST).  **MARGIN = 72 s.**  Job ids **4920408–4920431**;
+**exactly ONE distinct Submit timestamp across all 24 rows — spread 0 s = ONE submission.**
+
+**RULE 20 — ARGS audit.**  Pre-submission, all **24** composed command lines through **UNEDITED**
+`analysis/argsline_guard.py --cmdline`: **24/24 PASS, no repeated flag in launcher or payload.**
+Post-launch, at the time of writing **21 of 24** `.out` files exist (arm C's three sat PENDING on
+`QOSMaxGRESPerUser` and start as the first jobs retire): **21 clean, 0 repeated-flag, 0 design
+mismatch, 0 without an ARGS line**; `--batch-consistency --strict` **PASS** per family — arm A
+"every non-axis flag is identical across 18 runs" with `--vary seed --vary run-name --vary
+save-directory --vary alpha0`, arm M identical across 3.  **Coverage is NOT yet FULL and NO NUMBER
+FROM THIS BATCH MAY BE QUOTED until arm C lands and the audit is re-run at 24/24.**
+
+**THE SEPARATE ENV AUDIT** (`BETA_CLIP`, `PROBE` and the cosine horizon are environment variables
+and cannot ride the ARGS line), run as `bash bin/cdn1_c100_denominator.sh --envaudit`: **PASS**,
+18/18 arm-A files and 3/3 arm-M files, 0 violations.  Arm A has **exactly ONE distinct `ENV:`
+line** — `AUGMENT=1 BETA_CLIP=none … COS_TOTAL=50000 COS_WARMUP=1000 SCHED=none … PROBE=0`.  Arm M
+has one distinct line modulo its per-run `PROBE_DIR` — `BETA_CLIP=-15:-2.3026 … PROBE=5`, matching
+`gm2`.  Arm C's three are pending with the audit.
+
+**MADE IMPOSSIBLE TO GET WRONG (the `164.2` lesson).**  The scorer's **default invocation takes no
+arguments**: `--csv` resolves from the file's own location to the repo's `results/all_runs.csv`, so
+it cannot be pointed at the wrong corpus by being run from the wrong directory.  **Guard 5 imports
+the scorer at submit time** and asserts (a) that default actually resolves to an existing file,
+(b) that the submit script's LR ladder **is** the scorer's `LADDER` object, and (c) that the
+scorer expects exactly the 24 names the script submits — so the design and the scorer cannot
+drift.  Guard 6 runs `--selftest` (**34/34**) before anything is submitted.  Every corpus reader in
+the scorer excludes `cdn1-*`, and §I **verifies rather than asserts** it by checking that zero
+`cdn1` rows exist at registration (the `161.9` defect against `cS2`).
+
+**BUDGET.**  Measured, not guessed, from the live logs: plain SGD runs at **~18 s/epoch** on the L4
+nodes and ~42 s/epoch on the slowest node drawn; arm M at ~42 s/epoch.  **≈ 22 GPU-h expected**
+(A ≈ 13.5, M ≈ 3.5, C ≈ 5), ~32 worst case — inside the ~60 GPU-h share.  **Every arm fits
+`gpu-short`'s 4 h limit, arm C included**, so no arm needs a long partition and nothing should
+stall (the `hz3-R2` lesson).  **21 of 24 started within 1 s of submission**; ETA **≈ 11:30 CEST
+today**.
+
+**WHAT THIS BATCH MAY NOT CLAIM.**  Nothing about ImageNet, TinyImageNet, ResNet34/50 or CIFAR-10.
+Nothing about any granularity contrast (see the scope registration).  No claim that arm A is *the*
+optimal plain baseline: it is tuned over **one** axis, lr, on a 6-point ladder at fixed momentum
+0.9 and wd 5e-4 — a weight-decay/momentum sweep is a different batch and is not funded here.  Arm C
+is not a tuned 200-epoch number unless arm A's argmax is 0.1.
+
+**NEXT:** when 24/24 land — re-run the ARGS audit at full coverage, re-run `--envaudit`, ingest,
+then `python3 analysis/cdn1_denominator_score.py` with **no arguments**, and score `V0 → V1 → V2 →
+V3` **before** `GAP_in` is quoted.
