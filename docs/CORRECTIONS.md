@@ -21359,3 +21359,178 @@ read for the two re-runs from a scratch copy of the two committed scorers under 
 hashes matched the repo).  RULE 16: `analysis/` additions only across the whole cycle; nothing edited
 here.  `paper/` untouched.  `git add` by path (`docs/CORRECTIONS.md`, `docs/STATUS.md`).  No nested
 `claude -p`.  This entry took the next free number at the moment of writing (`180`).
+
+
+## 181. TRACK A — **H-DOMINATE (E), THE SIXTEENTH CANDIDATE'S ELEMENT-LEVEL TEST, IS REGISTERED AND CANNOT BE RUN ON THE RECORD: `FINAL: UNRESOLVED-FRAC-NEG-NOT-THE-RIGHT-STATISTIC | ELEMENT-STATISTIC-NOT-ON-DISK | BARS-NOT-APPLIED`.**  IN THE SCALAR ARM `frac_neg` IS THE INDICATOR `1[z_step < 0]` OF THE **ONE** REDUCED AGGREGATE (`n_tot = 1` ON ALL 42 SCALAR PROBES), NOT AN ELEMENT-COUNT MAJORITY, SO THE BRIEF'S `R_E` IS A TAUTOLOGY (0.0000 ON 42/42 FILES) AND NO ELEMENT-LEVEL STATISTIC EXISTS ANYWHERE ON DISK.  THE BRIEF WAS WRONG ON THREE FURTHER COUNTS, FROM THE SOURCE AND THE CORPUS.  DESCRIPTIVELY, THE STANDARD CELL'S SCALAR `beta` IS DRIVEN BY A **UNANIMOUS** PER-STEP LION VOTE (100/100 UP PER WINDOW FOR THE FIRST ~8,700 META-STEPS, THEN 100/100 DOWN UNTIL THE FLOOR AT STEP 18,500–18,600, PINNED FOR THE REMAINING 63 %), NOT BY A MINORITY-VERSUS-MAJORITY SIGN FIGHT AT STEP LEVEL.  ZERO GPU.  NOTHING SUBMITTED, NOTHING INGESTED.  THE CORPUS STANDS AT **2,740 ROWS**
+
+### 181.1 WHAT `frac_neg` IS, FROM THE SOURCE — THIS DECIDES THE TRACK
+
+The brief asked, before anything else, what `frac_neg` is the fraction OF.  Read off `patches/HF_patched.py`
+(asserted by the scorer's `--selftest` S2 on the repo's own copy; the live `Optimizers/HF.py` on `alice2` is
+sha256 `9abd4318…`, which `179.1` records as byte-identical on the `block_product` branch to `cru1`'s pinned
+`0d8ee431…`):
+
+    block_product, scalar branch:   return [sum([(u_*v_).sum() for u_,v_ in zip(u,v)])]
+    _probe, PATCH_PROBE2:           zall = z[0].detach().reshape(-1).float();  n_tot = zall.numel()
+                                    frac_neg  = (zall < 0).sum().item() / max(n_tot, 1)
+                                    frac_zero = (zall == 0).sum().item() / max(n_tot, 1)
+
+In the scalar arm `z` is a list holding **one 0-d tensor** — the fully reduced sum over all 11.2M elementwise
+products — so `zall` has **`n_tot = 1`**, and `frac_neg` is the indicator `1[z_step < 0]` of that single
+aggregate at the record's own step.  It is instantaneous and model-wide, and it is **the sign of the sum, not a
+count over elements**.  `frac_zero` is `1[z_step == 0]`; `t_neg / t_zero / t_n` (PATCH_PROBE4) are
+`[1[z<0]] / [1[z==0]] / [1]`; `z_sub` draws `k = min(PROBE_SUB, n_tot) = 1` coordinate — the same sign again.
+PATCH_PROBE5/6/7's own docstrings say the same thing in other words ("`zall` is the arm's OWN partition vector:
+62 entries layerwise, 14,420 nodewise, 11.17M weightwise").  The elementwise products are summed away inside
+`block_product` and are never returned to the probe.
+
+**Verified on the data, not inferred**: all 42 scalar probes (`cru1` 30, `cfr1` 6, `cfr2` 6) have
+`probe_index.json` `n_tot 1, k 1`, `t_n == [1]` on every record, `frac_neg ∈ {0.0, 1.0}` on all 21,000
+records, 0 records with `frac_zero == 1`, 500 records at steps 0..49,900; and **no** PATCH_PROBE5/6/7 sidecar
+(`neg_counts.npy`, `coord_signs.npy`, `tensor_signs.npy`, `coord_neg_counts.npy`) exists under any of the
+three run roots — those patches were never enabled on these batches.  The one per-step scalar-trajectory
+instrument on disk, `crn1_stage/probe_scalar.terms.npy` (`169.3`), holds the 62 per-**tensor** terms for
+6,000 steps of seed 0: that is level (T), not (E), and is outside this track.
+
+**Consequence.**  (a) The like-for-like statistic — sign of the instantaneous aggregate versus
+`sign(0.5 − frac_neg)` at the same step — is identically zero by construction.  (b) The brief's *literal*
+recipe compares `sign(dz)` (the 100-step **window** sum recovered by differencing, `179.1`'s `n = step + 2`)
+against `frac_neg` at the record step, i.e. the sign of the window's **last** step: two different time
+objects of the same scalar.  It is nonzero, but it measures within-window sign volatility, not element
+domination.  (c) The element-majority sign the hypothesis needs is **not on disk** and cannot be recovered
+from anything that is.  The primary branch is therefore decided by the source, not the data:
+**`UNRESOLVED-FRAC-NEG-NOT-THE-RIGHT-STATISTIC`**, sharpened to **`ELEMENT-STATISTIC-NOT-ON-DISK`**.
+H-DOMINATE (E) is **not tested** — neither supported nor refuted — and the brief's bars (`R_E ≥ 0.25`
+domination, `< 0.10` refutation, DOWN share at disagreement `≥ 0.60`, CIFAR-10 within 0.05 → not specific,
+`R_E` ordered like floor occupancy across rungs) are **registered nominally in the scorer header** for a
+future instrument and applied to nothing.
+
+### 181.2 REGISTRATION
+
+| | |
+|---|---|
+| scorer | `analysis/cHE1_hdominate_element_score.py`, sha256 `4a6a8479d1c2099d85a86970a4ee42a5dc863de41d46cd2796b0c0309b77a462` |
+| commit | `49fab7f`, `2026-09-08T21:00:23+02:00` = `19:00:23Z`, pushed to `origin/master` |
+| first execution | Mac `19:00:37Z` (**14 s** after the commit), `alice2` `19:00:44Z` (**21 s**, from a scratch copy under `~/cHE1_scratch` whose sha matched); outputs **identical line for line** outside the two path lines (142 lines) |
+| claim | **commit-before-first-execution ONLY.  NO RULE 21 label** — no runs of its own (precedent `cQ1` 149, `cS1` 159, `cZ1` 170, `cY2` 174, `cHD1` 179) |
+| `--selftest` | **33/33 PASS** before the commit (two synthetic-test *expectations* were corrected before the commit; no scorer logic moved): the source premises (S2), the `n = step + 2` recovery to 5.8e−13, the step-0 sign identity, `R_E_INST ≡ 0` at `n_tot = 1`, the Lion vote recovery from `Δbeta` against a simulated ground truth, floor-pinned windows marked UNCERTAIN |
+| disclosed | the source facts in `181.1`; the schema of every scalar probe (`n_tot`, record count, step layout, `t_n`, `n_b`); the first three records of **one** file (`cru1-sc-m1e-3-a1e-6-s15`: `frac_neg 1.0`, `beta −13.81 → −13.51` rising, `z_std == |z_mean|` at step 0); the sidecar search coming back empty; `174`/`177`/`179`'s numbers and the 42 rows' `plateau5`/`final_train`.  **No `R_E`, no share, no window sum, no floor fraction and no Lion count was computed on any file before the commit** |
+| RULE 16 | `git diff eb51d27 -- analysis/` is one **new** file; no scorer or guard edited; `paper/` untouched; `git add` by path.  Two untracked files belonging to another track (`patches/patch_probe_tensor.py`, `tests/test_probe_tensor.py`) were present in the tree and were **not** added |
+
+### 181.3 THE BRIEF WAS WRONG ON THREE MORE COUNTS
+
+**(1) The update rule.**  The brief: "scalar's ONE beta moves by `−ms·sign(Σ_i <h_i,g_i>)` each meta-step."
+The harness (`Lion_meta_update`): `beta ← (1 − ms·wd)·beta − ms·sign(0.9·m + 0.1·z)`, `m ← 0.99·m + 0.01·z`,
+with `--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0` passed verbatim by
+`bin/cY1_rule11_ms_alpha0.sh` (466–467) and `bin/cO1_floor_release_row24.sh` (541–542), and identical to
+`train.py`'s defaults on `alice2`.  The per-step direction is the sign of a momentum-dominated mixture, not
+of `z`.  With `wd = 0`, `|Δbeta| = ms` exactly per step off the clip bounds, so on any 100-step window that
+cannot reach a bound, `n_down − n_up = −Δbeta / ms` **exactly** — the scorer recovers the true per-window
+DOWN-vote count from the recorded `beta` (fp32 residual ≤ 0.182 of a count on every window at
+`ms ≥ 1e-4`; at `ms = 3e-5` the residual reaches 0.50 and 20 windows fail parity, so those counts carry ±1).
+
+**(2) "Aggregate negative" is not "beta DOWN".**  Under `beta − ms·sign(z)` a **negative** `z` moves `beta`
+**UP**.  The brief's "that minority votes DOWN … does the aggregate go DOWN (negative)?" conflates the two.
+The registered scorer inherits the slip in one **comment** (it glosses `P[frac_neg == 1]` as the aggregate
+being negative "(Lion would vote DOWN if momentum agreed)"); the printed columns `dwINST` / `dwWIN` are
+`P[z_step < 0]` / `P[window sum < 0]` exactly as labelled in the header table and are correct as numbers —
+**read them as UP-vote shares**.  `LION` is the true DOWN-vote share.  The comment is not edited (RULE 16);
+this paragraph is its correction.  The data are consistent only under the corrected reading (`181.5`).
+
+**(3) The standard-cell numbers.**  Re-derived from the 2,740-row corpus, `plateau5` for
+`cru1-sc-m1e-3-a1e-6-s{15,16,17}` = 23.740 / 22.520 / 22.746, **mean 23.002** (brief: 22.7 — that is `cpk1`'s
+`k01` anchor, `179.4`); `final_train` 23.65 / 22.48 / 22.50, **mean 22.877** (brief: 22.9); layerwise
+**69.551**.  "Pins the floor for ~76 % of training" is the **`alpha0 = 1e-3`** rung (`0.7620`, 1,143/1,500
+records); at the standard cell (`alpha0 = 1e-6`) it is **`0.6293`** (944/1,500).  And `beta` does not
+"descend to the floor": it first **ascends** from `−13.815` to `−5.13 / −5.22 / −5.21` (`alpha` 5.4–5.9e−3,
+above the `alpha0 = 1e-3` rung's start) over records 0–87, then descends 9.9 nats to `−15` by step
+18,500–18,600 (37 % of training), and pins for the remaining 63 %.
+
+### 181.4 THE VERDICT, VERBATIM, FROM THE UNEDITED SCORER (BOTH MACHINES)
+
+    VERDICT
+       files scored .................... 42   (G-check failures 0)
+       n_tot seen ...................... {1: 42}
+       element-level sidecars found .... none
+       R_E_INST == 0.0000 on every file  YES
+       FINAL: UNRESOLVED-FRAC-NEG-NOT-THE-RIGHT-STATISTIC | ELEMENT-STATISTIC-NOT-ON-DISK | BARS-NOT-APPLIED
+       NOT ELEMENT-LEVEL: in the scalar arm frac_neg is 1[z_step < 0] of the ONE aggregate (n_tot = 1).
+       R_E_INST is a tautology; R_E_LIT is a temporal (window-vs-last-step) statistic of the same scalar.
+       Neither may be quoted as an element-domination rate, and no layerwise probe may stand in for
+       scalar dynamics (CORRECTIONS 177).
+
+G-checks **42/42 PASS** (scalar type; `Σ n_b` = 11,220,132 c100 / 11,173,962 c10; 500 records; the `n = 2`
+step-0 identity; the **step-0 sign identity** `sign(z_mean_0) == the sign `frac_neg_0` encodes`, which is the
+requested verification of the differencing recovery on the step-0 record — it holds on all 42 files;
+`t_n == [1]`; `n_beta == 1`).  Indeterminate windows under the fp32 floor: 2 of 20,958.
+
+### 181.5 THE DESCRIPTIVE COMPANIONS (LABELLED; NO BAR; NONE IS A TEST OF (E))
+
+Per rung, pooled over 3 seeds (`P[z<0]` = instantaneous aggregate negative = UP vote; `LION` = true
+DOWN-vote share over CLEAN windows; `floor` = share of records at `−15`; `R_E_LIT` = window-vs-last-step
+sign disagreement, temporal):
+
+    dataset   ms    a0    clip   P[z<0]  P[win<0]  LION   clean/unc   floor   R_E_LIT  plateau5  train
+    CIFAR10   1e-3  1e-3  -15    0.5047  0.4763    0.5424 1497/0      0.0000  0.4469   87.871    93.91
+    CIFAR10   1e-3  1e-3  -80    0.4947  0.4579    0.5420 1497/0      0.0000  0.4693   87.877    94.10
+    CIFAR10   3e-4  1e-3  -15    0.3393  0.0701    0.8937 1024/473    0.3153  0.2933   88.768    93.56
+    CIFAR10   3e-4  1e-3  -80    0.3380  0.0708    0.9268 1497/0      0.0000  0.2939   89.078    93.68
+    CIFAR100  1e-3  1e-3  -15    0.1640  0.0361    0.8399  354/1143   0.7620  0.1303   22.379    22.52
+    CIFAR100  1e-3  1e-6  -15    0.3253  0.1710    0.5305  553/944    0.6293  0.1583   23.002    22.88   <- standard cell
+    CIFAR100  1e-4  1e-3  -15    0.1067  0.1035    0.8953 1497/0      0.0000  0.0187   35.792    39.25
+    CIFAR100  1e-4  1e-6  -15    0.9980  1.0000    0.0000 1497/0      0.0000  0.0020   10.547    10.71
+    CIFAR100  1e-5  1e-3  -15    0.1407  0.1363    0.8601 1497/0      0.0000  0.0334   24.715    25.06
+    CIFAR100  3e-3  1e-3  -15    0.1300  0.0174    0.7954  135/1362   0.9080  0.1136   16.355    16.62
+    CIFAR100  3e-3  1e-6  -15    0.1747  0.0621    0.5228  201/1296   0.8640  0.1136   16.809    17.13
+    CIFAR100  3e-4  1e-3  -15    0.0913  0.0701    0.8958 1019/478    0.3187  0.0301   29.782    30.75
+    CIFAR100  3e-4  1e-6  -15    0.5693  0.5040    0.4944 1497/0      0.0000  0.0842   28.634    29.20
+    CIFAR100  3e-5  1e-3  -15    0.1327  0.1276    0.8708 1497/0      0.0000  0.0301   28.951    30.11
+
+Per dataset: CIFAR-10 `P[z<0]` 0.4192, `LION` 0.7118, floor 0.0788, `R_E_LIT` 0.3758; CIFAR-100 0.2833,
+0.6553, 0.3482, 0.0714.
+
+**What the standard cell's trajectory actually is.**  By decile of training, `floor` = 0.00 0.00 0.00
+0.28–0.30 1.00 ×6 on all three seeds; `LION` = **0.00, 0.26–0.27, 1.00, 1.00**, then no clean window.  Per
+window, `−Δbeta/ms` is **−100** on every one of the first ~87 windows and **+100** on every window from ~88
+to the floor: the Lion direction is **unanimous** in both phases, and the instantaneous aggregate's sign
+agrees with it (`P[z<0]` by decile, s15: 1.00, 0.76, 0.04, 0.18, 0.14, 0.10, 0.14, 0.20, 0.12, 0.10).  There
+is no step-level minority-versus-majority contest to be seen in the aggregate: the hypergradient says
+"grow alpha" for 8,700 steps, then "shrink alpha" for 9,900 steps, then keeps saying it from the floor.
+Whether the **element** majority disagrees inside each of those steps is exactly the thing the record
+cannot say.
+
+**The CIFAR-10 companion, in the only form available** (not the registered control — that needed `R_E`).
+At the same `(ms 1e-3, clip −15, alpha0 1e-3)` as `cru1`'s `m1e-3-a1e-3` rung, `cfr1-C` has `LION` 0.54 and
+never touches the floor (`beta` ends near −11) while CIFAR-100 has `LION` 0.84 and floor 0.76.  But at
+`ms = 3e-4` CIFAR-10 votes DOWN **0.89–0.93** of the time, pins the floor 31.5 % of training with the `−15`
+clip (`cfr2-C`) and descends to `beta −19.7` (`alpha ≈ 2.8e−9`) with the clip released (`cfr2-R`) — and
+reaches **88.8 / 89.1 %**.  A persistent DOWN vote and floor occupancy coexist with a working scalar arm on
+CIFAR-10, which is `155`'s finding restated at the meta-step level; the *direction* of scalar's `beta` is
+not what separates the two datasets.  `R_E_LIT` is 5× higher on CIFAR-10 (0.376 vs 0.071): the CIFAR-100
+aggregate's sign is the more *persistent* of the two, not the more contested.
+
+**The `m1e-4 / alpha0 1e-6` rung** (`plateau5` 10.5 %): `P[z<0]` 0.998, `LION` 0.000, `beta` rises
+`−13.815 → −8.819` = 4.9968 nats over 499 windows against the 4.99 that 100 % UP votes would give.  The
+network asks for a larger step size at every meta-step of 100 epochs and never gets one: `174`'s
+`1e-6:UNRESOLVED-OPTIMUM-AT-LADDER-EDGE` seen from the probe.
+
+### 181.6 WHAT THIS LICENSES, AND WHAT IT DOES NOT
+
+Licensed: **H-DOMINATE (E) is untestable on the record**; the element-majority sign of the scalar
+aggregate has never been measured in this campaign, and the instrument that could measure it does not exist
+yet — PATCH_PROBE7 counts signs on `u·v` before the reduction but stores only a *cumulative* per-coordinate
+count, so a new **additive, opt-in** probe field (one `n_neg_elem` / `n_zero_elem` per record in the scalar
+arm) with an inertness proof in the style of `tests/test_rednorm.py` is the prerequisite, and the test then
+costs runs (≥ 3 seeds at the standard cell + the `cfr1-C` control), i.e. GPU.  The brief's bars in the
+scorer header are the pre-registration for that batch.  **Not licensed, either way:** any statement about
+element-level domination; any use of `R_E_LIT` as a domination rate; any layerwise-probe stand-in
+(`177`).  The descriptive sections say only that scalar's `beta` at the standard cell moves under a
+*unanimous* per-step vote and that a persistent DOWN vote is not specific to the failing dataset.
+
+### 181.7 THE STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU: nothing submitted, cancelled or touched on either account (`alice` not accessed; `alice2` read
+only, from `~/cHE1_scratch`).  RULE 16: `analysis/` additions only (one new file); `argsline_guard.py`
+untouched; `paper/` untouched.  RULE 20 not applicable (no launch).  `git add` by path.  No nested
+`claude -p`.  This entry took the next free number at the moment of writing (`181`); the header authority
+line in `docs/STATUS.md` moves `180 → 181`.
