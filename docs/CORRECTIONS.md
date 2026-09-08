@@ -21221,3 +21221,141 @@ no `argsline_guard.py` touched.  `paper/` untouched (`git status --porcelain pap
 `git add` by path only.  No nested `claude -p`.  Sibling commits (`c046c42` 177, `49e5f5f` 178)
 landed during this cycle; this entry took the next free number at the moment of writing.  The
 corpus stands at **2,740 rows**.
+
+## 180. CYCLE 144 RECONCILIATION — **FIVE TRACKS, FIVE ENTRIES (`175`–`179`), NO COLLISION; TRACKS A AND B RECONCILED WITH EACH OTHER AND WITH `174`.**  `F-FAILS` STANDS AS A MEASUREMENT AND LICENSES **NOTHING ABOUT MECHANISM** — ITS PREMISE IS FALSE ON THE PROBE (`177`, RE-RUN HERE: `PREMISE-FALSE`), SO `174.8`'s SUPERSESSION **STANDS AND IS NOT SPLIT**.  `H-DISAGREE` IS A **REFUTATION** (`179`, RE-RUN HERE: `REFUTED-PEAK-ELSEWHERE` ON BOTH STATISTICS AND ON THE ONE DIRECT m = 2 MEASUREMENT).  **THE MECHANISM QUESTION IS OPEN**: OF THE ACCOUNTS ON RECORD, ONE IS LIVE (`crn1`'s COMPOSITION, ONE CLEAN PAIR), `D`, `H-DISAGREE` AND THE THIRTEEN OBSERVATIONAL CANDIDATES ARE DEAD, `F` WAS NEVER A CONTROL, AND SPREAD / `TRAVEL` ARE **UNTESTED**.  ZERO GPU; THE CORPUS STANDS AT **2,740 ROWS**, UNCHANGED
+
+Cycle 144, reconciliation.  Written after all five track entries were on `origin/master` (HEAD `a3004c0`).
+Every number below was re-derived at write time: the `cru1` gaps and the bar from
+`results/all_runs.csv` (2,740 rows, `sha256 e6dc3639…`) by an independent plain-csv pass; the `cY3`
+and `cHD1` verdicts by re-running the **committed, unedited** files (`sha256 35982fc7…` and
+`97336bd7…`, identical on the Mac and on `alice2`) on `alice2` at 17:46:26–17:46:33Z against the
+default probe roots and the staged 2,740-row CSV — both exit 0, both `FINAL` lines identical to `177`
+and `179`.  Nothing on `alice` was read or written.
+
+### 180.1 THE FIVE TRACKS DO NOT COLLIDE
+
+| track | entry | commit(s) | registered file | what it established |
+|---|---|---|---|---|
+| C | `175` | `50d8bdf` → `52f5f67` | `analysis/cdn2_denominator_score.py` | `cdn1`'s hand-derived `GAP_in = +5.699 pp = +18.80 SE`, `BELOW-BY-A-LOT`, `USABLE` is now machine-emitted by an unedited successor scorer; `171.3b`'s "second latent fault" withdrawn |
+| E | `176` | `9de9256` → `8d34335` | `analysis/cms1_ms1e4_stratum_census.py` | the CIFAR-100 `ms=1e-4` stratum is 35 rows (not 20, not 32); headline arms present at both α₀; 12 stale "never run at 1e-4" sentences rewritten in place; FINDINGS/MASTER-TABLE carry none |
+| A | `177` | `f4acc33` → `c046c42` | `analysis/cY3_cru1_spread.py` | Account `F`'s premise is false on the probe (`PREMISE-FALSE`); `174.8`'s inference superseded in place; dose-response `TRAVEL-TRACKS-BETTER` (ρ +0.939 vs +0.539); `G2` fired on float32 drift ≤ 0.14 % of `TRAVEL`, recorded not edited |
+| D | `178` | `4e5b17c` → `49e5f5f` | `tests/test_partition_composer.py`; `bin/_lib_guards.sh` +180/−0 | partition composer + two-direction guard + source-time hook; mechanism is per-QOS GPU caps, `gpu-short` a node superset; `crn1` timeline corrected (08:56:16, 3h31m23s, cancelled + resubmitted); 4 launchers fail the census, none edited |
+| B | `179` | `8982b65` → `a3004c0` | `analysis/cHD1_hdisagree_score.py` | `H-DISAGREE` refuted: D(k) monotone-decreasing, argmax k=1, ρ −0.0455; true `[49,13]` groups disagree on 0.45 % of steps; brief corrected twice from the source (SUM not mean; cumulative `z_mean`) |
+
+* **Numbers disjoint:** `grep -c '^## 17[5-9]\.'` = one header each; the duplicate `## 177.` that
+  `c046c42` swept in from track D was renumbered to `178` by `49e5f5f` (all hunks inside D's own
+  block); one `## 177.` header remains.
+* **RULE 16:** `git diff --numstat 6a6c55d HEAD -- analysis/` = four files, **+3,209 / −0**
+  (`cHD1` 1013, `cY3` 817, `cdn2` 897, `cms1` 482); `argsline_guard.py` `sha256 81cea8b5…`
+  byte-identical; `cdn1`, `cU1`, `cY1`, `cY2` untouched.  `bin/_lib_guards.sh` +180/−0 (not a
+  scorer; RULE 16 does not reach it, and track D's test was committed before the library changed).
+* **`paper/`:** `git status --porcelain paper/` empty at every one of the ten commits and now.
+* **`c98_reproduce.py`: exit 1**, re-run here, author scope, not fixed (STATUS line 6 already
+  carries the same 10 failing checks; this cycle ingested nothing, so no derived count moved).
+* **STATUS.md:** the five track blocks were five fragments in arrival order (B, A, C, E, and D as a
+  `Standing` bullet only); a `RECONCILIATION` section now sits above them and indexes all five; the
+  close-out's three stale sentences are annotated (§180.5).
+
+### 180.2 TRACKS A AND B AGAINST `174` — RECONCILED, NOT SPLIT
+
+`174` recorded three things about the `scalar`-vs-`layerwise` gap at CIFAR-100 / `ResNet18_c100` /
+100 epochs: **(i)** the gap survives per-arm tuning (`RATIO 0.7436`, `ACCOUNT T SUPPORTED / D
+REFUTED`); **(ii)** the negative control `F` fails at α₀ = 1e-3; **(iii)** the *inference* from (ii),
+in the registration's own words, that *"the gap is NOT a step-size-adaptation phenomenon at all and
+BOTH T and D are incomplete"*.  Track A tested the premise (ii) rests on and found it false; track B
+tested a different account at a different cell.  **They do not conflict with each other and only (iii)
+moves.**
+
+**Re-derived, the measurement (ii):** `SIGMA 0.613640` → `SE_GAP 0.501035`, `BAR 1.002070`.  Frozen
+rungs at α₀ = 1e-3: `ms=1e-5` `sc` 24.7147 / `lay` 32.3207, gap **+7.6060** (15.18 SE); `ms=3e-5`
+28.9507 / 53.5940, gap **+24.6433** (49.18 SE).  Both exceed the bar; the `F-FAILS` stamp is correct
+as a scorer token and **stands**.  Every other rung reproduces `174.1`/`177.6` to 4 dp (ladder A
++35.2907, +40.4107, +47.4607, +53.5013; ladder B +0.4107, +39.6587, +46.5487, +52.8013).
+
+**Re-derived, the premise:** `cY3`, unedited, on `alice2`: `PREMISE VERDICT over F's registered rungs
+[('1e-5','1e-3'), ('3e-5','1e-3')]: PREMISE-FALSE [1e-5/1e-3:SUBSTANTIAL | 3e-5/1e-3:SUBSTANTIAL]`.
+`S_T` 0.9942 of `CEIL` 1.000 (`FRAC_CEIL` 0.9942, `exp` 2.70×, `POS_T` 0.135) and 2.9762 of 3.000
+(0.9921, 19.61×, 0.123).  The registration's arithmetic — each coordinate confined to
+`beta0 ± TRAVEL`, i.e. within 1.65× / 4.5× of α₀ — is **true** (`disp/T` 0.999 at both rungs); its
+conclusion, *"the granularity variable then has almost nothing to act on"*, is **false**, because
+per-coordinate confinement does not bound the between-coordinate spread, and the `layerwise` arm
+realised 99 % of that spread while the `scalar` arm can realise none.  **A control whose premise
+is false is not a control.  `174.8`'s supersession by `177` is confirmed and is not softened here.**
+
+**What `F-FAILS` licenses after `177`:** *the gap persists (+7.61 and +24.64 pp, 15 and 49 SE) at
+rungs where every step size is confined within a factor of 1.65 / 4.5 of α₀ = 1e-3 and the
+`layerwise` arm's only expressible advantage is a 2.7× / 19.6× between-layer ratio.*  That is all.
+**What it does not license, in either direction:** *"not a step-size-adaptation phenomenon"* (its
+premise is false); *"T and D are incomplete"* (nothing rescored them); and equally *"the gap IS
+between-layer step-size adaptation"* — on the registered pooled dose-response the gap tracks
+`TRAVEL` (ρ +0.939) better than terminal spread (ρ +0.539), spread is non-monotone in `ms` where the
+gap is monotone, and the `(1e-4, 1e-6)` cell pairs 99.95 % of ceiling spread with a 0.41 pp gap.  The
+`1e-5` rung is worth naming as the sharpest open datum: the arms' realisable difference is at its
+smallest there (2.7×) and the gap is still 7.6 pp; no registered account predicts that number and
+none is claimed.
+
+**Track B does not bear on `F`.**  `H-DISAGREE` was registered against `cpk1`'s cut-position curve
+at the frozen cell `ms=1e-3` / α₀ = 1e-6, on the m = 62 trajectory as proxy, and refuted:
+`cHD1`, unedited, on `alice2`: `FINAL: PRIMARY H-DISAGREE-REFUTED-PEAK-ELSEWHERE | CONTROL-NUMEL
+H-DISAGREE-REFUTED-PEAK-ELSEWHERE | WEIGHTING-ROBUST | SEEDS-DISAGREE`; D(1) 0.3834, D(49) 0.0615,
+floor 0.0414 at k = 53–57, RANGE 0.3420, argmax 1 (per seed 1/1/2), ρ −0.0455 (MC p 0.5588);
+CONTROL argmax 5, ρ −0.8428; on the true `[49,13]` trajectory (6,000 steps, seed 0) per-step
+D(49) 0.0045 = 27/6,000.  It is a **refutation**, not "unresolved": X2 fired, X3 would have, both
+statistics and the direct measurement agree.  Its scope is the cut-position effect at that cell;
+it says nothing about the `scalar`-vs-`layerwise` gap at the frozen rungs, and `179.6`'s off-cell
+remark that ρ is positive only on the six `FROZEN`-rung probes (+0.50 to +0.54) is **descriptive,
+carries no bar, and is not to be quoted as a link between the two tracks.**
+
+### 180.3 THE MECHANISM QUESTION — PRECISE CURRENT STATUS
+
+The question: *what makes a finer step-size partition beat a coarser one on this corpus's headline
+cell?*  Accounts on record, with their standing after `175`–`179`:
+
+| account | registered at | status | scope of the verdict |
+|---|---|---|---|
+| **T** tuning-irrelevant | `168` / `cY1` | **SUPPORTED** (`RATIO 0.7436 ≥ 0.5`, `174`) | a verdict on *robustness to tuning*, not a mechanism; `layerwise`'s argmax unresolved (1.78 SE) |
+| **D** descent-limit | `168` / `cY1` | **DEAD as a prediction** (`RATIO < 0.5` fails); its *mechanism* — `scalar` floor-pinning — is confirmed for `scalar`'s +13.41 pp of gain (`174.7`) | explains ~26 % of the shared-`ms` gap, not the gap |
+| **F** granularity-inoperative-at-frozen (negative control) | `168` / `cY1` | **NOT A CONTROL** — premise false (`177`, re-run here); `F-FAILS` stands as a measurement | licenses nothing about mechanism (§180.2) |
+| between-layer **spread** operative | never registered as a hypothesis | **UNTESTED**; on the registered dose-response *ranking* it loses to `TRAVEL` (`177.6`) | not entitled in either direction |
+| **`TRAVEL`** operative | never registered | **UNTESTED**; ρ +0.939 over 10 cells with tied values is a ranking, and `scalar`'s `TRAVEL`-dependence is floor pinning (`174.7`) | not entitled |
+| **composition** of the within-group reduction (`crn1`) | `169` | **LIVE — the only surviving candidate.** `H-COMP-INERT` excluded on 3/3 pairs (≥ 11.64 SE); the `COMPOSITION-OPERATIVE` token rests on one clean pair; `CLIFF-AMPLIFIED` not separable from a one-sided death (`173`) | an *intervention* at one cell and `ms=1e-3`; per `173.9` it is *not* a surviving explanation of the `scalar`-vs-`layerwise` gap or of any previously measured contrast |
+| **`H-DISAGREE`** sign-disagreement (first dynamics candidate) | `179` | **DEAD** — refuted on the registered proxy and on the one direct m = 2 measurement | cut-position effect at `ms=1e-3` / α₀ = 1e-6, 100 epochs |
+| the **thirteen** earlier observational candidates | across the campaign before `169` | **DEAD** per `173.9` / `179.9` (fifteen registered, fourteen dead) | **UNSURE of the enumeration**: the record keeps a running tally, not a named ledger; `146.2` already counted "twelve earlier candidates" plus its own balance rival, whose *shape* claim `146` itself withdrew.  Anyone needing the list must rebuild it entry by entry; none is revived here |
+
+**Net position, in one sentence:** *the gap is large, real and robust to per-arm tuning (T); it is
+not wholly a floor artefact (`153`/`155`; `174.7`: `scalar`'s pinning accounts for ~26 % of the shared-`ms` gap) and not a tuning artefact (`174`); the one
+negative control that would have ruled out step-size adaptation was not a control (`177`), so
+adaptation of the between-layer kind is neither excluded nor shown; the one intervention that
+survives says within-group composition is outcome-relevant (`crn1`) without explaining this gap; and
+the first dynamics account is dead (`179`).*  **No registered account explains the gap.  The question
+is OPEN, and it is open at zero GPU: the next registration is an analysis over the 60 `cru1` probes
+already on disk (the small-tensor dominance `179.8` describes; the spread-vs-`TRAVEL` question with a
+bar), not a batch.**
+
+### 180.4 WHAT DOES NOT MOVE
+
+`cY1`'s `FINAL` line and every stamp in it; `ACCOUNT T SUPPORTED / D REFUTED`; `crn1`'s
+`COMPOSITION-OPERATIVE | CLIFF-AMPLIFIED` with `173`'s narrowing; `cpk1`'s `k* = 49` as a 100-epoch
+object (`156`); `cdn1`'s `+5.699 pp` (`171`, now `175`); `160`'s over-claim correction; RULE 11
+open for `resnet18_blocks`, cut position, class count, ImageNet (`174.15`); `hz9` unamended.  Nothing
+in `175`–`179` touches the paper's claims, which stand at `2f4fd9a`.
+
+### 180.5 LINES ANNOTATED IN `docs/STATUS.md` (superseded wording kept verbatim)
+
+Close-out, *WHAT THE THREE TOGETHER ESTABLISHED*: "the gap persists … where `beta` mechanically
+cannot move" → rider (`177`: every coordinate moved the full `TRAVEL`; the spread reached its
+ceiling).  Close-out, *WHAT EACH LEAVES OPEN*: `cdn1` "A successor scorer is unwritten" →
+DISCHARGED (`175`, `cdn2`); `cru1` "`F-FAILS` is unexplained by any registered account — T and D
+are both incomplete and no successor account is registered" → rider (`177`/`180`: `F` was not a
+control; T and D are not incomplete on its account; the successor is an analysis, not a batch).
+The close-out's *READ TOGETHER* sentence already carries track A's rider and now points here.
+Header authority `179 → 180`.  A `CYCLE 144 — RECONCILIATION` section is added above the five
+track blocks.
+
+### 180.6 THE STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU: no job submitted, cancelled or touched on either account (`alice` not accessed; `alice2`
+read for the two re-runs from a scratch copy of the two committed scorers under my own home, whose
+hashes matched the repo).  RULE 16: `analysis/` additions only across the whole cycle; nothing edited
+here.  `paper/` untouched.  `git add` by path (`docs/CORRECTIONS.md`, `docs/STATUS.md`).  No nested
+`claude -p`.  This entry took the next free number at the moment of writing (`180`).
