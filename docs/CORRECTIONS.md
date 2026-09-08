@@ -18499,7 +18499,7 @@ appended later in wall-clock time.  The file is append-ordered and the authority
 number wins*, so ordering is not load-bearing — **moving it would be an edit to the authority
 document for no gain, and it is deliberately left alone.**  `docs/STATUS.md` was likewise checked and
 is **coherent, not three fragments**: one header block naming all three batches and the 102-job /
-~81 GPU-h total, then three clearly-labelled cycle-141 sections in submission order, then cycle 140.
+~76.4 GPU-h total, then three clearly-labelled cycle-141 sections in submission order, then cycle 140.
 
 ### 170.4 THE ZERO-GPU RESULT — **`FINAL: CONV2-NOT-PRIVILEGED`**
 
@@ -18590,6 +18590,13 @@ meta = Lion.  Coverage census unchanged: 628 `chk()` sites, 411 distinct quantit
 PENDING**, **18 `crn1` PENDING**, every pending job on `QOSMaxGRESPerUser` — the account's own
 concurrent-GPU cap, shared three ways.  **Nothing is misconfigured**: every walltime (`cdn1` and
 `crn1` inside `gpu-short`'s 4 h, `cru1` at `03:00:00`) is far under its partition's 7-day limit, so
-this is queueing, not the `hz3-R2` unschedulability failure.  **Total committed this cycle ≈ 81
-GPU-h** (`cdn1` ~17 measured, `cru1` ~45 projected, `crn1` ~14.4 projected) across **102 jobs**.
+this is queueing, not the `hz3-R2` unschedulability failure.  **Total committed this cycle ≈ 76.4
+GPU-h** (`cdn1` ~17 measured, `cru1` ~45 projected, `crn1` ~14.4 projected) across **102 jobs**;
+**19.86 GPU-h of elapsed time is already consumed** (`sacct`, all three prefixes, at this entry).
 This verification pass itself cost **0 GPU-h**.
+
+**CORRECTED IN PLACE, IN THE SAME CYCLE, BY THE AGENT THAT WROTE IT.**  The first push of this entry
+and of `docs/STATUS.md` said **≈ 81 GPU-h**, an arithmetic slip inherited from the launch agents'
+pre-launch *estimates* (`cdn1` had estimated ~22 and measured ~17).  `17 + 45 + 14.4 = 76.4`, not 81.
+The three per-batch figures were always right; only the total was wrong.  `STATUS.md`'s header line
+and queue line carry the corrected figure.
