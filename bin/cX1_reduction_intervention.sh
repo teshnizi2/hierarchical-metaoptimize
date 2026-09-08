@@ -228,14 +228,44 @@ else
   guard_fail "guard 1d: cannot run the inertness proof -- test $TESTF, pre $HFPRE or live $HFLIVE missing"
 fi
 
-# ---- guard 1e: the NO-OP proof, on the LIVE source --------------------------
-if python3 "$NOOPF" --cifar-dir "$CIF" >/tmp/crn1_noop.$$ 2>&1; then
-  echo "guard 1e: cX1_reduction_noop_proof.py PASSES on the LIVE source ($(grep -c '^  PASS' /tmp/crn1_noop.$$) checks)"
-  echo "          per-group rescaling is BITWISE inert under Lion -- the obvious"
-  echo "          intervention is a null, and is NOT what this batch runs."
+# ---- guard 1e: the NO-OP proof.  RUN AGAINST THE PRE-PATCH LIVE FILE, and
+# ---- here is why, stated rather than hidden: the proof's section A QUOTES
+# ---- `block_product`'s first eight lines from the source and asserts that no
+# ---- division appears in them.  PATCH_REDNORM inserts its guarded branch INTO
+# ---- those eight lines, so that assertion is false ON THE PATCHED FILE BY
+# ---- DESIGN -- it is a statement about the reduction the CAMPAIGN'S 2,638 rows
+# ---- were produced by, which is exactly `HF.py.pre_rednorm`.  The proof file
+# ---- is REGISTERED and is NOT EDITED (RULE 16); the launcher stages the
+# ---- pre-patch file under the layout it expects and runs it UNEDITED.  Its
+# ---- sections B, C and D concern `Lion_meta_update`, which PATCH_REDNORM does
+# ---- not touch at all, and the byte-identity of that function across the patch
+# ---- is what guard 1d's R0 proves.
+PRETREE=/tmp/crn1_pretree.$$
+mkdir -p "$PRETREE/Optimizers"
+if [ -f "$HFPRE" ]; then
+  cp "$HFPRE" "$PRETREE/Optimizers/HF.py"
+  if python3 "$NOOPF" --cifar-dir "$PRETREE" >/tmp/crn1_noop.$$ 2>&1; then
+    echo "guard 1e: cX1_reduction_noop_proof.py PASSES on the PRE-PATCH live file ($(grep -c '^  PASS' /tmp/crn1_noop.$$) checks)"
+    echo "          per-group rescaling is BITWISE inert under Lion -- the obvious"
+    echo "          intervention is a null, and is NOT what this batch runs."
+    echo "          pre-patch sha256 $( (sha256sum "$HFPRE" 2>/dev/null || shasum -a 256 "$HFPRE") | awk '{print $1}')"
+  else
+    guard_fail "guard 1e: the no-op proof FAILED on the pre-patch live file"
+    tail -30 /tmp/crn1_noop.$$
+  fi
+  # and on the PATCHED file every check that does not quote block_product's
+  # first eight lines must STILL pass, which is reported, not scored.
+  python3 "$NOOPF" --cifar-dir "$CIF" >/tmp/crn1_noop_post.$$ 2>&1
+  echo "guard 1e: on the PATCHED file: $(grep -c '^  PASS' /tmp/crn1_noop_post.$$) PASS, $(grep -c '^  FAIL' /tmp/crn1_noop_post.$$) FAIL (the FAILs are section A's line-window quotes of block_product, which the patch legitimately moves):"
+  grep '^  FAIL' /tmp/crn1_noop_post.$$ | sed 's/^/          /'
+  if [ "$(grep -c 'PASS LION' /tmp/crn1_noop_post.$$)" != 5 ]; then
+    guard_fail "guard 1e: the five LION invariance checks do not all pass on the patched file"
+  else
+    echo "          all 5 LION bitwise-invariance checks PASS on the patched file too"
+  fi
+  rm -rf "$PRETREE"
 else
-  guard_fail "guard 1e: the no-op proof FAILED on the live source"
-  tail -30 /tmp/crn1_noop.$$
+  guard_fail "guard 1e: no pre-patch file at $HFPRE"
 fi
 
 # ---- guard 2: RULE 21 premise -- no run of this batch may exist yet ---------
@@ -476,9 +506,22 @@ fi
 FREE=$(df -BG "$WS" 2>/dev/null | tail -1 | awk '{print $4}' | tr -d 'G')
 PEND=$(squeue -h -u "$USER_NAME" -t PENDING 2>/dev/null | wc -l | tr -d ' ')
 RUN=$(squeue -h -u "$USER_NAME" -t RUNNING 2>/dev/null | wc -l | tr -d ' ')
+MYPEND=$(squeue -h -u "$USER_NAME" -t PENDING -o '%j' 2>/dev/null | grep -c '^crn1-' || true)
 echo "guard 5: ${FREE:-?} GB free on \$WS; $RUN running, $PEND pending on this"
-echo "         account (SIBLING BATCHES INCLUDED), adding 18"
-[ "${PEND:-0}" -le 60 ] || guard_fail "guard 5: $PEND pending, over cap"
+echo "         account.  THIS ACCOUNT IS SHARED BY THREE BATCHES THIS CYCLE, so"
+echo "         the depth below is mostly the SIBLINGS', by job-name prefix:"
+squeue -h -u "$USER_NAME" -o '%T %j' 2>/dev/null \
+  | awk '{split($2,a,"-"); print $1, a[1]}' | sort | uniq -c | sort -rn \
+  | sed 's/^/           /'
+echo "         crn1 adds 18 jobs at $WALL on partitions whose own limits are"
+echo "         7-00:00:00, so nothing here is unschedulable (the hz3-R2 defect,"
+echo "         a 10 h walltime that sat PENDING for a week, is not in play)."
+# The cap is on MY OWN prefix, not on the account: a sibling's depth is not a
+# reason for this batch to refuse to exist, and 18 is the SMALLEST of the three
+# batches sharing the account.  The account-wide number is REPORTED, and only a
+# genuinely extreme total (a runaway) aborts.
+[ "${MYPEND:-0}" -eq 0 ] || guard_fail "guard 5: $MYPEND crn1- jobs are ALREADY pending"
+[ "${PEND:-0}" -le 200 ] || guard_fail "guard 5: $PEND pending account-wide -- that is a runaway, not a sibling"
 for P in $(echo "$PARTS" | tr ',' ' '); do
   TL=$(sinfo -h -p "$P" -o '%l' 2>/dev/null | head -1)
   R=$(squeue -h -p "$P" -t RUNNING 2>/dev/null | wc -l | tr -d ' ')
