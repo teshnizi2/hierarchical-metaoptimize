@@ -22198,3 +22198,245 @@ ingest.  RULE 21 unchanged from `182.4` (`cTD2` committed before any record was 
 (cycle 146 Track B, `ciso1` registration) landed on HEAD while this entry was written; this entry's commit
 sits on top of it, and that session's uncommitted `bin/PROTECTED.txt` edit (`+ciso1-`) is **not** added here.
 No nested `claude -p`.  The authority line in `docs/STATUS.md` moves `183 → 184`.
+
+## 185. TRACK B — **`ciso1` REGISTERED AND LAUNCHED: H-ISOLATE, THE CAUSAL TEST OF `ctd1`'s THREE-TENSOR DOMINATION — THE SEVENTEENTH REGISTERED CANDIDATE.**  THE THREE CARRIERS (`layer4.0.bn2.weight` 50, `layer4.0.shortcut.1.weight` 53, `layer4.1.bn2.weight` 59, 1-BASED — VERIFIED BY NAME ON THE LIVE MODEL; `184` QUOTES THE SAME TENSORS 0-BASED AS 49/52/58) GET THEIR OWN STEP SIZE AT m = 2 (`ISO`, [59,3]); THEIR LAYER-2 STRUCTURAL HOMOLOGUES (20/23/29) ARE THE CONTROL (`CTRL`, [59,3]); A FIFTH ARM ISOLATES TENSOR 50 ALONE (`ONE`, [61,1]) BECAUSE ON `ctd1`'s OWN PINNED RECORDS NEITHER 50 ALONE NOR THE PAIR {53,59} EVER DOMINATES THE REST (0.0000 / 0.0000) WHILE THE TRIO DOES (0.9799).  **THE BRIEF'S CONTROL ("512-PARAM BN SCALES FROM layer1/layer2") DOES NOT EXIST ON THIS MODEL.**  15 JOBS, ONE SUBMISSION, ~13 GPU-h, RULE 21 MARGIN 29 s.  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED BY THIS TRACK; THE CORPUS STANDS AT 2,746 ROWS (`184`'s `ctd1` INGEST), UNCHANGED HERE.**
+
+Everything below is re-derived this cycle from the live source on `alice2`, from the corpus, from `ctd1`'s
+probe records through the **unedited** `cTD2`, from the launcher's and the tests' own output, or from
+arithmetic.  Nothing is quoted from the cycle briefing.  This entry takes the next free number (`185`);
+Track A wrote `184` (`b841cf7`) while this batch was being registered and launched, on top of this track's
+registration commit `be15a15`.  The registration and its selftest were made against the 2,740-row corpus at
+`9ef4ac3`/`be15a15`; 185.10 states exactly what `184`'s ingest does to them.
+
+### 185.1 THE BRIEF, AGAINST THE RECORD
+
+**(1) The control the brief asked for does not exist.**  "Three NON-carrier 512-param BN scales from
+layer1/layer2": on the live `ResNet18_c100` the BN widths are 64 (layer1), 128 (layer2), 256 (layer3),
+512 (layer4).  512-wide BN scales live only in layer4, and layer4 holds exactly **two** non-carrier BN
+scales (`layer4.0.bn1.weight` 47, `layer4.1.bn1.weight` 56) — the scorer's selftest asserts this count.  A
+numel-matched non-carrier triple is therefore impossible.  `CTRL` is the carriers' **structural
+homologue two stages earlier**: the block-0 `bn2` scale, the block-0 shortcut BN scale and the block-1
+`bn2` scale of layer2 — `layer2.0.bn2.weight` (20), `layer2.0.shortcut.1.weight` (23),
+`layer2.1.bn2.weight` (29), 128 parameters each.  Matched on class, count, role and group sizes; matched
+on **measured non-involvement** — their carrier share on `ctd1`'s 1,239 DISAGREE records is
+**0.0000 / 0.0000 / 0.0008** (share of all 1,499 determinate records 0.0000 / 0.0007 / 0.0007).  The
+layer3 homologues (35/38/44) were rejected for the same reason they were considered: `layer3.1.bn2.weight`
+is itself a minor carrier (0.0218 of DISAGREE records, the ninth most frequent tensor in `cTD2`'s list).
+**Not matched on numel (384 vs 1,536), disclosed in the scorer header and the launcher.**
+
+**(2) The indices, from the live model, not inherited.**  Guard 4 of the launcher prints the full
+partition per arm by name.  `layer4.0.bn2.weight` = **50**, `layer4.0.shortcut.1.weight` = **53**,
+`layer4.1.bn2.weight` = **59** (1-based, the manifest convention; 512 parameters each).  The brief's belief
+was correct this time; it was verified, not trusted.  The isolated group is written by **name** and the big
+group by index **ranges**, so an off-by-one in either half is a duplicate or a gap and `PATCH_NAMESETS`
+raises at parse time — the launcher composes every arm on the live model before anything is submitted.
+
+**(3) The corpus premises, re-derived at 2,740 rows with `ciso1-*` excluded from every reader.**
+Seeds 21–23: **0** `ResNet18_c100` rows anywhere (all seeds on that network: 0–17; still 0 at 2,746).  None
+of the three `sets:` specs has ever been run.  The brief's "k49 (55.4, from cpk1/cpr1/cpg1)": pooled over
+both spellings (`[49,13]` n 12, 55.4165 ± 0.6078 over cpk1/cpr1/cts1/cts2; `sets:1-49/50-62` n 9,
+55.5384 ± 0.9514 over cpg1/cpr1/crn1) the level is **55.4688** (n 21, 7 batch-cells).  Floor `scalar`
+**22.8361 ± 0.5568** (n 29, 10 batches); ceiling `layerwise` **69.5345 ± 0.4916** (n 23, 8 batches); k50
+**30.3370** (n 6), k53 **22.0753** (n 3).
+
+**(4) `ctd1`'s numbers, re-derived with the unedited `cTD2`** (sha256 `c3122e1f…`, identical on both
+hosts) on a byte-for-byte `rsync` copy of the six probe directories and six `.out` files on the Mac, before
+`184` was written: `FINAL: PRIMARY DOMINATION-BY-OTHER-TENSORS | SECONDARY-z:DOMINATION-BY-OTHER-TENSORS |
+PATH-DEPENDENT-MIXED | PINNED-R_T=1.0000 | PINNED-FRAC=0.6298 | PINNED-AGG-NEG=0.0000 | FLOOR-OK |
+FLOOR-NOT-INGESTED`; R_T **0.8266** (1,239 / 1,499; seeds 0.8260 / 0.8260 / 0.8277); PINNED 944 records,
+R_T 1.0000, aggregate negative 0.0000; carriers on DISAGREE **1239/1239 × 3**, next most frequent
+`layer4.0.conv2.weight` / `layer4.1.conv2.weight` / `linear.weight` at 0.026; carrying-set size 3 on 1,207.
+The briefing's summary of `ctd1` is confirmed on every count, independently of `184`'s parser.  **New, and
+the reason for the fifth arm** (computed on the same records before registration, disclosed in the scorer
+header, re-derived by its `--selftest`): on the 944 pinned records the trio's `L` sum dominates the other 59
+on **0.9799**; tensor 50 alone on **0.0000**; the pair {53, 59} on **0.0000**; the mean |L| ratios to the
+remainder's Σ|L_i| are 0.387 / 0.257 / 0.436 (trio 1.080 — an 8 % margin); the 59-rest's own sum is
+negative (`beta` UP) on **944 / 944**.
+
+**(5) Cost.**  `ctd1`'s six runs took 95 / 44 / 44 / 41 / 45 / 40 min = 5.15 GPU-h by `sacct` elapsed
+(0.86 h/run; `184` ingests 5.08 by `wallclock_min`; the 95-min run was on the 2080ti node851).  Fifteen
+runs of the same shape: **~13 GPU-h**, not the brief's ~10 for twelve.
+
+### 185.2 THE ARMS AND THE LIVE-MODEL MANIFEST (`PARTITION-MANIFEST.txt`, 6,657 bytes, both paths)
+
+| arm | spec (ONE shell token, RULE 20) | m | sizes | params | isolated |
+|---|---|---|---|---|---|
+| `k01` | `scalar` | 1 | 62 | 11,220,132 | — |
+| `k62` | `layerwise` | 62 | 1 each | — | — |
+| `ISO` | `sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight` | 2 | [59,3] | 11,218,596 / 1,536 | 50, 53, 59 |
+| `CTRL` | `sets:1-19,21-22,24-28,30-62/layer2.0.bn2.weight,layer2.0.shortcut.1.weight,layer2.1.bn2.weight` | 2 | [59,3] | 11,219,748 / 384 | 20, 23, 29 |
+| `ONE` | `sets:1-49,51-62/layer4.0.bn2.weight` | 2 | [61,1] | 11,219,620 / 512 | 50 |
+
+Group order fixes the coordinate: the big group is `beta[0]`, the isolated group `beta[1]`.  On the live
+model every m = 2 arm routes through `init_meta` to `stepsize_type blockwise` with `beta` shapes `[(2,)]`
+and `_rednorm False` (the `sets:` prefix is not `tn:`; `block_product`'s blockwise branch is the
+**unnormalised** per-group sum, quoted off the live source by guard 4f).  **`ISO ^ CTRL` = exactly the six
+names, in both groups, at identical sizes [59,3]** (guard 4d).  `ONE` ⊂ `ISO`: 50 alone, `ISO` adds 53
+and 59.  × seeds {21, 22, 23}.  Standard cell otherwise: CIFAR-100 / SGDm(0.99, wd 0.1) + Lion(0.99, 0.9,
+wd 0) / gamma 1 / `AUGMENT=1` / `BETA_CLIP=-15:-2.3026` / batch 100 / 100 epochs / `ms 1e-3` /
+`alpha0 1e-6` / `PROBE=100` / `PROBE_TENSOR=1` on **every** arm (so the in-batch `k01` re-measures the
+premise at fresh seeds, and every m = 2 arm's two-coordinate sign dynamics are on disk).
+
+### 185.3 THE FIFTH ARM — INCLUDED, AND WHY
+
+`ONE` costs 3 jobs (~2.6 GPU-h) and is the cheapest possible discriminator between two readings the
+record supports simultaneously.  The **static** reading of 185.1(4): the domination needs all three
+(removing any one of them leaves a set that never dominates on any pinned record), so isolating 50 alone
+should also free the big group and rescue.  The **ladder** reading from the corpus: adding tensors to a
+coarse prefix collapses it one carrier at a time (k49 55.47 → k50 30.34 → k53 22.08), so the domination
+re-forms under its own dynamics and `ONE` should not rescue.  (`184.6` records that the cut-position
+unification is not licensed by `ctd1` — `ONE` is the first arm that can speak to it under a logged
+reduction.)  Both outcomes are informative and both are registered (185.4).  Without `ONE`, a
+`CAUSAL-SUPPORTED` verdict could not say whether the intervention needs the whole set.
+
+### 185.4 THE NOISE FLOOR, THE BARS (pp AND SE), AND EVERY REGISTERED PREDICTION
+
+Noise floor, `cR1`'s estimator, re-derived at registration with `ciso1-*` excluded from **every** reader
+(`--selftest` re-derives it and every anchor to 1e-6 / 5e-5):
+
+| estimator | value | df | cells | members |
+|---|---|---|---|---|
+| `SIGMA_NARROW` (`^\[\d+,\d+\]$`) | **0.925518** | 60 | 30 | 90 |
+| `SIGMA_WIDE` (+ `sets:` m = 2) | 0.889041 | 78 | 39 | 117 |
+| `SIGMA_W` = max | **0.925518** | | | |
+
+`SE_ARM_DIFF = SIGMA_W·√(2/3) =` **0.755682 pp** (a 3-seed arm against a 3-seed arm).
+
+**Contrasts, all in batch:** `D_ISO = ISO − k01`, `D_CTRL = CTRL − k01`, `D_ONE = ONE − k01`, plateau5 from
+each run's own `.out` (epochs 95–99), TRAIN printed beside TEST.
+
+| bar | pp | SE | rationale |
+|---|---|---|---|
+| `SUPPORT_BAR` | **+25.0** | **33.08** | 77 % of the largest rescue any m = 2 partition of this cell has produced (k49 − k01 = +32.63) |
+| `REFUTE_BAR` | **+5.0** | **6.62** | below the ladder's worst non-floor partial state (k50 − k01 = +7.50) |
+| `READ_BAR` | 1.511363 | 2.00 | `|D_CTRL| ≤ READ_BAR` is `CTRL-NULL` |
+| `DEAD_BAR` | 5.00 | 6.62 | within-arm seed **range** in `k01` or `ISO` → `UNRESOLVED-DIVERGED` (a bimodal `ISO` is reported, not averaged) |
+| anchor bands | mean ± 4 SD | | `k01` / `k62` against the corpus cell, re-derived **at score time** |
+
+**H-ISOLATE-CAUSAL** (gating): `D_ISO ≥ +25` **and** `ISO`'s big-group `beta[0]` does **not** pin —
+at the floor (`≤ −15 + 1e-6`) on ≤ 10 % of the 500 records **and** terminal `beta[0] > −13.0`
+(`BETA_LO + 2.0`) → `ISO-59-FREE`.  `D_ISO ≤ +5` → `CAUSAL-REFUTED`.  Between → `UNRESOLVED-PARTIAL`.
+**H-ISOLATE-SPECIFIC**: `CTRL` within `READ_BAR` of `k01` (`CTRL-NULL`) and `CTRL`'s `beta[0]` pins
+(floor occupancy ≥ 0.50; `scalar`'s own is 0.63) → `CTRL-59-PINS`.  `D_CTRL ≥ +25` → **`NOT-SPECIFIC`**,
+checked *before* the `ISO` read because it changes what any `ISO` rescue means.
+**Consistency, non-gating**: `ISO`'s isolated `beta[1]` pins (occupancy ≥ 0.50, `ISO-3-PINS`) — the
+three want DOWN.  **Premise, non-gating**: the in-batch `k01`'s own DISAGREE carrying set is {50, 53, 59}
+at ≥ 0.90 each → `PREMISE-REPLICATES`.
+**Point predictions, descriptive**: `ISO` ≈ **50 pp**, range [45, 56] — one free `beta` shared by 59
+tensors is at best k49 (55.47) and plausibly below the 6-group `resnet18_blocks` (53.11), since the layer4
+convolutions and the classifier no longer have a group of their own; far below `layerwise` (69.53), which
+m = 2 cannot express.  `ONE`: **RESCUES** (`D_ONE ≥ +25`) under the static reading; `ONE-FLOOR` with
+`ISO` supported is registered to read "the remaining pair re-dominates under its own dynamics".  `CTRL`:
+NULL and pinned.
+
+### 185.5 THE BRANCH MAP, FIRST MATCH WINS
+
+`UNRESOLVED-MANIFEST-MISMATCH` (no manifest; live model ≠ the frozen 62; any arm's index sets, sizes or
+params ≠ registered; `ISO ^ CTRL` ≠ the six names) > `UNRESOLVED-PROVENANCE` (ARGS / ENV / `PROBE_TENSOR`
+line not the registered one; run count ≠ 15; missing probe records or header; per-group decomposition
+Σ_{i∈g} z_i = z_g, Σ m_i = m_g or the applied sign failing on > 1 % of records) > `UNRESOLVED-DIVERGED`
+(no `RUN_DONE` / < 100 epochs / traceback; `k01` or `k62` outside its band; seed range > 5 pp in `k01` or
+`ISO`) > **`NOT-SPECIFIC`** > **`CAUSAL-SUPPORTED`** > **`CAUSAL-REFUTED`** > `UNRESOLVED-PARTIAL`.
+Stamps: `SPECIFIC:CTRL-NULL|CTRL-PARTIAL|CTRL-RESCUES`, `ISO-59-FREE|PINS|NEITHER`, `ISO-3-…`,
+`CTRL-59-…`, `ONE-61-…`, `ONE-RESCUES|PARTIAL|FLOOR`, `PREMISE-REPLICATES|NOT-REPLICATED`,
+`ISO-RESCUES-BUT-59-PINS`, `FLOOR-NOT-INGESTED`.  The CSV `plateau` column is not read anywhere.
+
+### 185.6 INERTNESS ON THE LIVE TREE — THREE PROOFS, NONE INHERITED
+
+`tests/test_probe_tensor.py` (registered at `182`) proves `PATCH_PROBE_TENSOR` for `scalar` and
+`layerwise` only, and its spec tuple is literal, so it is **not edited**; `tests/test_probe_tensor_blockwise.py`
+(new, additive; imports the registered test's `run_one` / `strip_pt` / `load_hf` unchanged) re-proves the
+claims on the **three exact `sets:` strings** against `HF.py.pre_probe_tensor` on `alice2`
+(`runs/ciso1/inertness_blockwise.log`, `POST_SHA256 4732b74a…` = the live file, 72 s on nodelogin04):
+for each of `ISO`, `CTRL`, `ONE` — `beta` bit-identical to unpatched at every one of 130 steps × 2
+coordinates with `PROBE_TENSOR` unset **and** set; `probe.jsonl` byte-identical (unset) and identical modulo
+the appended keys (set); per-group sums of `z_tensor` / `m_tensor` equal the harness's own per-group `z` /
+momentum at every record (worst rel 6.1e−8 / 2.7e−7); applied sign exact on 8/8 unclamped coordinates;
+header `stepsize_type blockwise`.  **ALL PASS.**  Guard 4c re-runs the registered test's structural R0 on
+the live file (PASS); guard 4d requires `ctd1`'s `ALL PASS` log to carry the live sha (it does).
+`PATCH_NAMESETS`: `tests/test_namesets.py`'s N0 demands byte-identity against `HF.py.pre_namesets`, which
+predates `PATCH_REDNORM` and `PATCH_PROBE_TENSOR`, so it can no longer pass as written.  **Disclosed
+substitution:** guard 1d builds `--pre` as the live file minus the two namesets regions by the test's own
+recipe (59,450 → 55,620 bytes), so N0 is true by construction and the load-bearing checks are N1–N3 on the
+**live** code — backward compatibility over the corpus specs, `sets:1-49/50-62 == [49,13]` exactly,
+`init_meta` end to end, `argsline_guard` tokenisation: **ALL CHECKS PASSED**.  Neither test file was edited.
+
+### 185.7 THE REGISTRATION — RULE 21, WITH THE MARGIN IN SECONDS
+
+| | |
+|---|---|
+| `analysis/cIS1_ciso1_isolate_score.py` | sha256 **`f9310405…`**, identical Mac ↔ `alice2`; `--selftest` at registration **68 PASS / 0 FAIL / 0 SKIP on both hosts** (Mac against the `rsync` copy of `ctd1`; `alice2` against the live `runs/ctd1`), including every 2,740-row corpus anchor and the 185.1(4) premise statistics |
+| `bin/cIS1_isolate_carriers.sh` | sha256 `439c00f8…`; guard 4c′ proves its five spec strings are byte-identical to the scorer's `SPEC` table |
+| `tests/test_probe_tensor_blockwise.py` | sha256 `22f6599e…` |
+| commit | **`be15a15`**, `2026-09-08T23:27:23+02:00` = **21:27:23Z**, pushed to the private origin |
+| earliest sacct Submit | **`2026-09-08T23:27:52` CEST** = 21:27:52Z, all 15 jobs within 23:27:52–23:27:53 |
+| **RULE 21 margin** | **+29 s** — positive, thin, the normal claim; the scorer was executed (selftest, dry run) before the commit, which is the standard pattern here and is not the cHE1 "commit-before-first-execution" label |
+
+`git diff 9ef4ac3..be15a15 --numstat -- analysis/`: **1106 additions, 0 deletions**; `argsline_guard.py` sha
+`81cea8b5…` unchanged on both hosts; no registered scorer touched; `cTD1`/`cTD2` untouched.
+
+### 185.8 THE LAUNCH RECORD, RULE 20 AND THE ENV / `PROBE_TENSOR` AUDITS — **7 OF 15, PASS ON THE COVERAGE THAT EXISTS**
+
+**ONE SUBMISSION.**  Jobs **4925518–4925532** (contiguous), `Submit` 23:27:52 × 11 and 23:27:53 × 4,
+partitions `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` composed by `178`'s helper at `WALL 03:00:00`
+(hook PASS; gpu-short cap 4:00:00 read live), `--gres=gpu:1 --cpus-per-task=6 --mem=16G`.  At submit this
+account's queue was empty; gpu-short held 3 running / 9 pending.  **Seven started at 23:28:49**: `k01-s21`,
+`k62-s21`, `ISO-s21` on node851 (2080ti), `CTRL-s21`, `ONE-s21`, `k01-s22`, `k62-s22` on node887 (L4);
+eight PENDING (Priority).  Guard 7, RULE 20 post-launch: **PASS** against `ciso1-k01-s21-4925518.out`'s own
+ARGS line, unedited guard.
+
+    python3 analysis/argsline_guard.py $METAOPT_WS/runs --name ciso1- --batch-consistency
+    -> 7 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+       batch-consistency: every non-axis flag is identical across 7 runs     VERDICT: PASS
+
+**ENV audit** (`BETA_CLIP`, `PROBE` ride the runner's line): modulo `PROBE_DIR`, **ONE** distinct `ENV:`
+line × 7 (`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … PROBE=100`).  **`PROBE_TENSOR` audit** (the patch's
+own line, modulo `dir=`): `type=blockwise` × 3, `type=layerwise` × 2, `type=scalar` × 2, all
+`every=100 tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` — 7/7.  **Liveness at 23:33–23:36
+CEST (counts and shapes only, not a scoring run):** every m = 2 arm's records carry 62 per-tensor terms and
+**2-coordinate** `z_agg` / `mom_pre` / `beta_pre`; `beta` ascending on every started arm (−12.2 … −10.3 at
+steps 1,500–3,800; `n_at_lo` 0 on all scalar / m = 2 records), which is what this cell does first
+(`182.1(5)`); 6–16 epochs each at 23:36; 0/15 `RUN_DONE`; no traceback.  **Coverage 7/15; the RULE 20 and
+ENV audits are OPEN OBLIGATIONS at 15/15 and no number may be quoted before then.**
+
+### 185.9 COST AND ETA
+
+~13 GPU-h (15 × ~52 min; the three node851 runs ~90 min).  The seven started runs finish ~00:15–01:05
+CEST 9 Sep; the eight pending start as gpu-short frees slots under the 12-GPU/user QOS and the other
+users' 9 pending jobs — **all fifteen plausibly by ~03:00–04:00 CEST 9 Sep, UNSURE beyond the queue's
+behaviour.**  `ciso1-` is in `bin/PROTECTED.txt` on both hosts (the launcher appends it in the submitting
+command; the Mac copy is in this commit).
+
+### 185.10 WHAT IS **NOT** DONE, AND WHAT `184`'s INGEST DOES TO THE SELFTEST
+
+**Nothing has landed, been scored or been ingested by this track.**  At 15/15 `RUN_DONE`:
+
+    export METAOPT_WS=/home/s5014158/metaopt
+    python3 analysis/argsline_guard.py $METAOPT_WS/runs --name ciso1- --batch-consistency
+    grep -h '^ENV:' $METAOPT_WS/runs/ciso1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c    # ONE line, x15
+    grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/ciso1-*.out | sed 's/ dir=.*//' | sort | uniq -c  # blockwise x9, layerwise x3, scalar x3
+    python3 analysis/cIS1_ciso1_isolate_score.py $METAOPT_WS/runs
+
+**`184` ingested `ctd1` (2,740 → 2,746) after this scorer was registered.**  The scorer's `--selftest`
+freezes the floor / ceiling anchors at the 2,740-row values (scalar n 29 / 22.8361 ± 0.5568, layerwise
+n 23 / 69.5345 ± 0.4916); re-run on the Mac against `b841cf7`'s CSV it now reads **64 PASS / 4 FAIL**, the
+four being exactly those anchor equalities — scalar re-derives to **n 32 / 22.8797 ± 0.5812**, layerwise to
+**n 26 / 69.4916 ± 0.4863** (the same values `184` reports).  `SIGMA_NARROW`, `SIGMA_WIDE`, k49, k50, k53,
+the seed-absence and never-run premises, and the `ctd1` premise section are unchanged and PASS.  **Nothing
+gates on the four:** `score()` reads the anchor bands **live** from the CSV, every bar is frozen in pp, and
+`ciso1-*` is excluded from every reader, so the verdict is invariant under both ingests.  RULE 16: the
+scorer is not edited for this; the FAIL is a record, the `164.9` / `cV1` situation, and the `alice2` mirror's
+CSV (still 2,740 rows) is left as it is so the launcher's own guard 1c record stands.
+
+### 185.11 THE STANDING CONSTRAINTS, DISCHARGED
+
+`analysis/` additions only; `argsline_guard.py` and every registered scorer untouched; `cTD2` run
+unedited.  `paper/` untouched (`git status --porcelain paper/` empty).  `git add` by path
+(`analysis/cIS1_ciso1_isolate_score.py`, `bin/cIS1_isolate_carriers.sh`,
+`tests/test_probe_tensor_blockwise.py` in `be15a15`; `docs/CORRECTIONS.md`, `docs/STATUS.md`,
+`bin/PROTECTED.txt` in this commit); Track A's files not touched.  No nested `claude -p`.  Everything on
+`alice2` (`alice` not accessed, nothing under `/data1/salehkaleybars` touched); nothing cancelled; the
+queue held 0 of this account's jobs when the batch was submitted.  The live `HF.py` (`4732b74a…`) was not
+modified — both patches were already in place from `162` and `182`.  Ledger: **seventeen registered**,
+fifteen dead (`184`), one live (`crn1` composition), **one in flight (H-ISOLATE)**.  Next free number:
+**186**.
