@@ -15389,6 +15389,9 @@ fixed alpha0 exists for any arm in the primary set.  `cU1` issues **no ms claim*
 best CIFAR-100 `plateau5` anywhere in that ms=1e-4 stratum is **72.4080**, and it is a `nodewise`
 or `chunk` row, not a granularity-ladder arm.)
 
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The wording above is kept verbatim and is NOT to be quoted as a current fact.]**  `cru1` (`CORRECTIONS 174`) put `scalar` and `layerwise` at `ms=1e-4` at BOTH `alpha0`.  Re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows): the CIFAR-100 `ms=1e-4` stratum is **35 rows**, at **two** `alpha0` levels: `scalar` **6** (3 at `alpha0=1e-6`, mean `plateau5` 10.5467; 3 at `alpha0=1e-3`, 35.7920), `layerwise` **6** (3 at `1e-6`, 10.9573; 3 at `1e-3`, 71.0827) — all twelve `cru1-*`, seeds {15,16,17}; `chunk771` **10** (71.9648; `gm2` 3 + `gc1` 4 + **`cdn1` 3**), `nodewise` **7** (70.4220), `chunk2293` **3** (72.0000), `nodewise1d` **3** (71.9320), those four all at `alpha0=1e-3`; `resnet18_blocks` **0**, cut-position **0**. Every one of the 35 passes every `cU1` filter. `scalar` and `layerwise` each now carry an `ms` contrast at fixed `alpha0` (6 rungs at `1e-3`, 4 at `1e-6`); `resnet18_blocks` (38/38) and every cut-position arm still sit ONLY at `ms=1e-3`, so for THOSE arms no such contrast exists and RULE 11 stays open (`174.15`). The stratum's best `plateau5` is still **72.4080** (`gm2-ch-s1`, `chunk771`); the best primary-arm row is **71.5520** (`cru1-lay-m1e-4-a1e-3-s16`).  `FINAL: HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT | PREDICTIONS:FAIL`.
+  Also superseded in the same paragraph: *"all 33 CIFAR-100 `scalar` rows sit at ms=1e-3"* — the corpus now holds **75** CIFAR-100 `scalar` rows, **51** at `ms=1e-3` (33 + `cpk3` 3 + `crn1` 3 + `cru1` 30 across six `ms` levels).
+
 ### 160.4 THE RESULT -- **THE 24.6 pp SWING IS AN ARTEFACT OF AN UNMATCHED POOL**
 
 `DELTA(g) = mean plateau5 at alpha0=1e-3 minus mean at alpha0=1e-6`, batch-pooled over `{c100,
@@ -15462,7 +15465,7 @@ ORDERING does NOT depend on alpha0.**
   record as a scope line on the whole thread.
 * **The RULE 11 meta-stepsize confound is NOT closed and is now known to be WORSE than recorded:**
   on CIFAR-100 the ms axis is not merely unmapped, it is **perfectly aliased with alpha0** off
-  ms=1e-3, and the only arms that exist at ms=1e-4 are ones the granularity ladder does not use.
+  ms=1e-3, and the only arms that exist at ms=1e-4 are ones the granularity ladder does not use. **[SUPERSEDED WORDING, kept verbatim -- CORRECTIONS 176.5 (cycle 144, 2026-09-08): `cru1` (174) put `scalar` and `layerwise` at `ms=1e-4` at both `alpha0`; the stratum is now 35 rows (scalar 6, layerwise 6, chunk771 10, nodewise 7, chunk2293 3, nodewise1d 3; blk6 0, cut-position 0), re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows).  The confound is CLOSED for scalar-vs-layerwise by 174 and remains OPEN for blk6, cut position, class count and ImageNet (174.15).]**
 
 ### 160.7 WHAT IS **NOT** CLAIMED
 
@@ -15963,6 +15966,9 @@ meta-stepsize and alpha0 are PERFECTLY ALIASED off ms=1e-3") holds a fortiori.  
 was re-run post-ingest and exits 0 with its `160` verdict unchanged, character for character:
 `FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE |
 PREMISE PASS`.
+
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The wording above is kept verbatim and is NOT to be quoted as a current fact.]**  `cru1` (`CORRECTIONS 174`) put `scalar` and `layerwise` at `ms=1e-4` at BOTH `alpha0`.  Re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows): the CIFAR-100 `ms=1e-4` stratum is **35 rows**, at **two** `alpha0` levels: `scalar` **6** (3 at `alpha0=1e-6`, mean `plateau5` 10.5467; 3 at `alpha0=1e-3`, 35.7920), `layerwise` **6** (3 at `1e-6`, 10.9573; 3 at `1e-3`, 71.0827) — all twelve `cru1-*`, seeds {15,16,17}; `chunk771` **10** (71.9648; `gm2` 3 + `gc1` 4 + **`cdn1` 3**), `nodewise` **7** (70.4220), `chunk2293` **3** (72.0000), `nodewise1d` **3** (71.9320), those four all at `alpha0=1e-3`; `resnet18_blocks` **0**, cut-position **0**. Every one of the 35 passes every `cU1` filter. `scalar` and `layerwise` each now carry an `ms` contrast at fixed `alpha0` (6 rungs at `1e-3`, 4 at `1e-6`); `resnet18_blocks` (38/38) and every cut-position arm still sit ONLY at `ms=1e-3`, so for THOSE arms no such contrast exists and RULE 11 stays open (`174.15`). The stratum's best `plateau5` is still **72.4080** (`gm2-ch-s1`, `chunk771`); the best primary-arm row is **71.5520** (`cru1-lay-m1e-4-a1e-3-s16`).  `FINAL: HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT | PREDICTIONS:FAIL`.
+  The *"36 of 36 ... holds a fortiori"* sentence is the one superseded: **51 of 75** CIFAR-100 `scalar` rows sit at `ms=1e-3` now, and `cU1`'s FINAL reads `... | PREMISE CENSUS-CHANGED` (unchanged since `174.12`).
 
 **`c68_window_blast` improved for a reason that is mine, not the corpus's.**  Its T12 (*"locally
 re-derived superseded flags agree with the CSV's"*) read `raw_only=21` before and `raw_only=0`
@@ -17828,6 +17834,8 @@ V3` **before** `GAP_in` is quoted.
 
 ## 168. `cru1` REGISTERED AND LAUNCHED — **RULE 11 ON THE HEADLINE CIFAR-100 CELL.**  THE ALIAS `160` MEASURED IS **MECHANICALLY FORCED BY `|dbeta| = ms` EXACTLY**, SO A LADDER IN `ms` ALONE CANNOT BREAK IT; AND THE CORPUS'S OWN BEST CIFAR-100 NUMBER SITS AT `ms=1e-4`, A RUNG WHERE **NO HEADLINE ARM HAS EVER BEEN RUN**.  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,638 ROWS.**
 
+> **[RIDER, `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The heading above is kept verbatim as the registration's statement AT LAUNCH.]**  *"No headline arm has ever been run"* at `ms=1e-4` on CIFAR-100 was true at 2,638 rows and is **false since `174`**: `cru1` put `scalar` and `layerwise` there at both `alpha0`, n=3 each (re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows)).  The other half of the heading — the corpus's best CIFAR-100 `plateau5` sits at `ms=1e-4` — is still true (**72.4080**, `gm2-ch-s1`; the best `cru1` row there is 71.5520).
+
 Everything below is re-derived this cycle from the live corpus, from the live source on `alice2`, or
 from arithmetic. Nothing is quoted from the launch briefing or from any earlier CORRECTIONS entry.
 
@@ -17866,6 +17874,9 @@ of the **42** CIFAR-100 `scalar` rows, all **101** `layerwise` rows and all **38
 `nodewise1d` 3} — **no scalar, no layerwise, no blk6, no cut-position arm.** (`160` reported 33
 scalar rows; the corpus has since grown and the count is now 42. The structure is unchanged.)
 
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The wording above is kept verbatim and is NOT to be quoted as a current fact.]**  `cru1` (`CORRECTIONS 174`) put `scalar` and `layerwise` at `ms=1e-4` at BOTH `alpha0`.  Re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows): the CIFAR-100 `ms=1e-4` stratum is **35 rows**, at **two** `alpha0` levels: `scalar` **6** (3 at `alpha0=1e-6`, mean `plateau5` 10.5467; 3 at `alpha0=1e-3`, 35.7920), `layerwise` **6** (3 at `1e-6`, 10.9573; 3 at `1e-3`, 71.0827) — all twelve `cru1-*`, seeds {15,16,17}; `chunk771` **10** (71.9648; `gm2` 3 + `gc1` 4 + **`cdn1` 3**), `nodewise` **7** (70.4220), `chunk2293` **3** (72.0000), `nodewise1d` **3** (71.9320), those four all at `alpha0=1e-3`; `resnet18_blocks` **0**, cut-position **0**. Every one of the 35 passes every `cU1` filter. `scalar` and `layerwise` each now carry an `ms` contrast at fixed `alpha0` (6 rungs at `1e-3`, 4 at `1e-6`); `resnet18_blocks` (38/38) and every cut-position arm still sit ONLY at `ms=1e-3`, so for THOSE arms no such contrast exists and RULE 11 stays open (`174.15`). The stratum's best `plateau5` is still **72.4080** (`gm2-ch-s1`, `chunk771`); the best primary-arm row is **71.5520** (`cru1-lay-m1e-4-a1e-3-s16`).  `FINAL: HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT | PREDICTIONS:FAIL`.
+  Every count in the paragraph above has moved: CIFAR-100 now carries **six** numeric `ms` levels (RAW rows: `1e-5` 6, `3e-5` 6, `1e-4` 35, `3e-4` 12, `1e-3` 423, `3e-3` 12, plus 21 `cdn1` baseline rows with no `ms`); `scalar` **75** rows (42 + `crn1` 3 + `cru1` 30; 51 at `ms=1e-3`), `layerwise` **131** (101 + `cru1` 30; 107 at `ms=1e-3`), `resnet18_blocks` **38** (unchanged, all at `ms=1e-3`).  And the *"20 rows"* was already **23** when `171` ingested `cdn1` (`cdn1-m-s0/1/2`, `chunk771`, `alpha0=1e-3`, `plateau5` 71.814 / 71.958 / 71.908) — that step broke only `cU1`'s row-count check, not its structure, and was not recorded at the time.
+
 **(b) THE ALIAS IS MECHANICALLY FORCED, NOT A SCHEDULING ACCIDENT.** Guard 4b quotes
 `HF.Lion_meta_update` off the **live** source on `alice2`:
 
@@ -17896,12 +17907,17 @@ confirmed with an arithmetic reason attached. The full table (launcher guard 4e,
 | 1e-3 | 1e-6 | 50.00 | 11.513 | 4.343 | 1.000e-01 | FREE |
 | 3e-3 | 1e-6 | 150.00 | 11.513 | 13.029 | 1.000e-01 | FREE |
 
+> **[RIDER, `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The sentence *"That is why the corpus has no such row"* above is kept verbatim and is now historical.]**  The corpus holds **6** rows at `ms=1e-4` / `alpha0=1e-6` on CIFAR-100 since `174` — the `cru1` MECHANISM CONTROL, `scalar` n=3 mean `plateau5` 10.5467 (`final_train` 10.7067) and `layerwise` n=3 10.9573 (11.0600), re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows).  The table's **FROZEN** row was a prediction; the numbers are its outcome, and their reading belongs to `174`, not here.
+
 **(c) THE HEADLINE CELL IS NOT AT ANYONE'S OPTIMUM, AND THE CORPUS ALREADY SAYS SO — section C.**
 The best CIFAR-100 `plateau5` **anywhere** in the corpus is **72.408** (`gm2-ch-s1`, `chunk771`) and
 the best `best_test` is **72.80** (`gc1-ch-s3`) — **both at `ms=1e-4` / `alpha0=1e-3`**, the standard
 cell in every other respect. At that rung `chunk771` = **71.9954** (n 7), `chunk2293` = **72.0000**
 (n 3), `nodewise1d` = **71.9320** (n 3) and `nodewise` = **70.4220** (n 7) — **every one above the
 headline `layerwise` 69.5945 / 69.5321 at `ms=1e-3`.** The headline arms have never been run there.
+
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 176.5` (cycle 144, 2026-09-08). The wording above is kept verbatim and is NOT to be quoted as a current fact.]**  `cru1` (`CORRECTIONS 174`) put `scalar` and `layerwise` at `ms=1e-4` at BOTH `alpha0`.  Re-derived by `analysis/cms1_ms1e4_stratum_census.py` (`9de9256`, run UNEDITED at 2,740 rows): the CIFAR-100 `ms=1e-4` stratum is **35 rows**, at **two** `alpha0` levels: `scalar` **6** (3 at `alpha0=1e-6`, mean `plateau5` 10.5467; 3 at `alpha0=1e-3`, 35.7920), `layerwise` **6** (3 at `1e-6`, 10.9573; 3 at `1e-3`, 71.0827) — all twelve `cru1-*`, seeds {15,16,17}; `chunk771` **10** (71.9648; `gm2` 3 + `gc1` 4 + **`cdn1` 3**), `nodewise` **7** (70.4220), `chunk2293` **3** (72.0000), `nodewise1d` **3** (71.9320), those four all at `alpha0=1e-3`; `resnet18_blocks` **0**, cut-position **0**. Every one of the 35 passes every `cU1` filter. `scalar` and `layerwise` each now carry an `ms` contrast at fixed `alpha0` (6 rungs at `1e-3`, 4 at `1e-6`); `resnet18_blocks` (38/38) and every cut-position arm still sit ONLY at `ms=1e-3`, so for THOSE arms no such contrast exists and RULE 11 stays open (`174.15`). The stratum's best `plateau5` is still **72.4080** (`gm2-ch-s1`, `chunk771`); the best primary-arm row is **71.5520** (`cru1-lay-m1e-4-a1e-3-s16`).  `FINAL: HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT | PREDICTIONS:FAIL`.
+  At that rung the headline arms now read `layerwise` **71.0827** (n=3) and `scalar` **35.7920** (n=3), both below `chunk771` 71.9648 (n=10), `chunk2293` 72.0000 and `nodewise1d` 71.9320.
 
 **And on CIFAR-10, the ONLY place this contrast has ever been laddered, it ALREADY collapses under
 tuning — section D4/D5.** At `alpha0=1e-3`, 100 epochs, same clamp: `layerwise - scalar` is
@@ -20055,7 +20071,7 @@ ARM HAS EVER BEEN RUN"*.  `cru1` put `scalar` and `layerwise` there.  **`160`/`c
 is now true only of the corpus as it stood before this cycle**, and any prose resting on *"the
 headline arms have never been run at `ms=1e-4`"* must be rewritten.  `cU1`'s own verdict already
 carries a `PREMISE CENSUS-CHANGED` token and prints its census diff, naming `cru1`'s four new cells
-explicitly; **its FINAL line is unchanged** (174.12).
+explicitly; **its FINAL line is unchanged** (174.12).  **[DISCHARGED BY `CORRECTIONS 176` (cycle 144, 2026-09-08): every such sentence in `CORRECTIONS.md` and `STATUS.md` is located and corrected in place, list at `176.5`; `FINDINGS.md` and `MASTER-TABLE.md` contain none.  `cU1 --selftest` now fails **10 of 21**, not two — see `176.4`.]**
 
 `c70_composition_audit` additionally reports one previously-reconstructable published cell as
 `*** UNRECONSTRUCTABLE from the CSV ***` post-ingest, and its `G6 DIRECTION` line accordingly moves
@@ -20406,3 +20422,168 @@ minimal, and every target number reproduces.  Its one inherited inaccuracy — v
 4. **No job submitted, none cancelled, neither queue touched; `alice` not accessed.**
 5. `git add` was restricted to `analysis/cdn2_denominator_score.py` and then `docs/CORRECTIONS.md`
    + `docs/STATUS.md`; no `-A`.  Both commits pushed to the private `origin`.
+
+## 176. TRACK E — **THE PROSE `cru1` FALSIFIED BY CONSTRUCTION IS REWRITTEN IN PLACE.**  `cms1_ms1e4_stratum_census.py` IS REGISTERED AND READS **`HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT`**.  THE CIFAR-100 `ms=1e-4` STRATUM IS **35 ROWS, NOT 20 AND NOT 20 + 12**: `cdn1` HAD ALREADY ADDED THREE AT `171`, UNRECORDED.  **ZERO GPU. NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING INGESTED; THE CORPUS STANDS AT 2,740 ROWS.**
+
+### 176.1 WHAT WAS REGISTERED, AND WHAT IT CLAIMS ABOUT ITSELF
+
+`analysis/cms1_ms1e4_stratum_census.py`, committed **`9de9256`** at **2026-09-08T19:24:54+02:00**
+(17:24:54Z), first executed at **17:25:00Z** — **margin 6 s**.  `ast.parse` before the commit (parses, does
+not execute).  **RULE 21 label NOT carried** — the file has no runs of its own; precedent `cQ1` (149),
+`cS1` (159), `cZ1` (170).  **COMMIT-BEFORE-FIRST-EXECUTION only.**
+
+**Disclosure, from the header.**  Designed from the PROSE of `168`/`174`/STATUS cycle 143 (60 `cru1` rows,
+arms `scalar`/`layerwise`, seeds {15,16,17}, ladder A six `ms` at `alpha0=1e-3`, ladder B four at `1e-6`,
+the pre-`cru1` 20-row census, 72.408, 71.0827) and from the CSV's **distinct label sets** only (no counts,
+no values).  `cU1` had **not** been executed by this author before the commit.  The scorer freezes NO
+count: its tokens are rules over the live corpus (header), and its four design-time PREDICTIONS are
+labelled corpus-conditional AS OF the row count printed, so a later ingest changes numbers, never rules.
+It reads every row; the RAW census excludes nothing and prints every flag; a second census applies
+`cU1`'s filters verbatim.  `plateau5` primary, `final_train` alongside; `plateau` and `best_test` not read.
+
+### 176.2 THE VERDICT, VERBATIM, FROM THIS CYCLE'S OWN RUN
+
+```
+FINAL: HEADLINE-ARMS-AT-MS1E4:PRESENT | MS1E4-ALPHA0-LEVELS=2 | ALIAS:BROKEN | BLK6-AT-MS1E4:ABSENT | CUTPOS-AT-MS1E4:ABSENT | PREDICTIONS:FAIL
+```
+
+`--selftest` **25 PASS / 2 FAIL of 27**, exit 1.  Both FAILs are the design-time predictions, and both
+fail in the same direction: **PRED-A** expected `20 + 2 arms × 2 alpha0 × 3 seeds = 32` rows and got
+**35**; **PRED-D** expected the non-`cru1` rows to be `168.2`'s census and got `chunk771` **10**, not 7.
+PRED-B (`scalar`/`layerwise` n=3 at each `alpha0`, all `cru1-*`) and PRED-C (`resnet18_blocks` 0,
+cut-position 0) HOLD.  The FAILs are recorded, not fixed (RULE 16; header P3 says exactly this).
+
+### 176.3 THE STRATUM NOW — RE-DERIVED, BY ARM AND `alpha0`, WITH n
+
+CIFAR-100, `meta_stepsize = 1e-4`, **35 rows**; every one passes every `cU1` filter (`ResNet18_c100`,
+`SGDm`+`Lion`, `gamma` 1, `augment` 1, `-15:-2.3026`, batch 100, `hier` unset, `collapsed` 0,
+`complete` 1, `superseded` 0, `epochs_done` 100), so RAW and `cU1`-STRATUM censuses coincide.
+
+| arm | `alpha0` | n | mean `plateau5` | mean `final_train` | batches | seeds |
+|---|---|---|---|---|---|---|
+| `scalar` | 1e-6 | **3** | 10.5467 | 10.7067 | `cru1` | 15,16,17 |
+| `scalar` | 1e-3 | **3** | 35.7920 | 39.2500 | `cru1` | 15,16,17 |
+| `layerwise` | 1e-6 | **3** | 10.9573 | 11.0600 | `cru1` | 15,16,17 |
+| `layerwise` | 1e-3 | **3** | 71.0827 | 97.7567 | `cru1` | 15,16,17 |
+| `chunk771` | 1e-3 | **10** | 71.9648 | 96.3420 | `gm2` 3, `gc1` 4, **`cdn1` 3** | 0,0,0,1,1,1,2,2,2,3 |
+| `nodewise` | 1e-3 | **7** | 70.4220 | 92.7043 | `gc1` 4, `gm2` 3 | 0,0,1,1,2,2,3 |
+| `chunk2293` | 1e-3 | **3** | 72.0000 | 97.2233 | `gm2` | 0,1,2 |
+| `nodewise1d` | 1e-3 | **3** | 71.9320 | 96.5567 | `gm2` | 0,1,2 |
+| `resnet18_blocks` | — | **0** | | | | |
+| cut-position `[k,62-k]` | — | **0** | | | | |
+| name-list `sets:`/`tn:` | — | **0** | | | | |
+
+By batch: `gm2` 12, `gc1` 8, `cdn1` 3, `cru1` 12.  `alpha0` levels present: {`1e-6`, `1e-3`}.
+Best `plateau5` in the stratum: **72.4080** (`gm2-ch-s1`, `chunk771`) — unchanged by `cru1`; best
+primary-arm row **71.5520** (`cru1-lay-m1e-4-a1e-3-s16`).  (The RAW CIFAR-100 maximum anywhere is
+78.9860, `cdn1-h2-s0`, granularity `?`, no `ms` — the `cdn1` denominator baseline, outside every
+MetaOptimize stratum, as `171` already noted.)
+
+**The primary arms across the whole `ms` axis** (`cU1`-STRATUM, n per `ms` at each `alpha0`):
+
+| arm | `alpha0` | 1e-5 | 3e-5 | 1e-4 | 3e-4 | 1e-3 | 3e-3 |
+|---|---|---|---|---|---|---|---|
+| `scalar` | 1e-6 | 0 | 0 | 3 | 3 | 29 | 3 |
+| `scalar` | 1e-3 | 3 | 3 | 3 | 3 | 8 | 3 |
+| `resnet18_blocks` | 1e-6 | 0 | 0 | 0 | 0 | 8 | 0 |
+| `resnet18_blocks` | 1e-3 | 0 | 0 | 0 | 0 | 5 | 0 |
+| `layerwise` | 1e-6 | 0 | 0 | 3 | 3 | 23 | 3 |
+| `layerwise` | 1e-3 | 3 | 3 | 3 | 3 | 11 | 3 |
+
+RAW counts for the sentences that quoted them: CIFAR-100 `scalar` **75** rows (`168`'s 42 + `crn1` 3 +
+`cru1` 30), **51** at `ms=1e-3`; `layerwise` **131** (101 + `cru1` 30), **107** at `ms=1e-3`;
+`resnet18_blocks` **38**, all at `ms=1e-3`, unchanged.  CIFAR-100 carries **six** numeric `ms` levels
+(RAW rows `1e-5` 6, `3e-5` 6, `1e-4` 35, `3e-4` 12, `1e-3` 423, `3e-3` 12) plus 21 rows with no `ms`
+(`cdn1` baselines).  The three-arm reconciliation is exact; the per-batch counts were an ad-hoc
+`csv` count, quoted here as such and not from a registered scorer.
+
+### 176.4 `cU1`, RUN UNEDITED — AND WHERE THE BRIEF WAS WRONG
+
+`python3 analysis/cU1_alpha0_granularity_score.py` exits 0 with, verbatim:
+`FINAL: INTERACTION-ALPHA0-x-GRANULARITY | ORDER ORDER-PRESERVED | ASSESSMENT-DOES-NOT-REPRODUCE | PREMISE CENSUS-CHANGED`
+— identical to `174.12`.  Its census diff names exactly `cru1`'s four cells (`frozen 0 -> live 3` each), and
+its own ms block now prints *"CIFAR-100 ms=1e-4 rows: 35, of which alpha0=1e-3: 29"* and a granularity list
+containing `layerwise` and `scalar` — **three lines above its hard-coded print** *"=> no `scalar`, no
+`layerwise`, no `resnet18_blocks`, no cut-position arm exists at ms=1e-4 on CIFAR-100, and every ms=1e-4
+row sits at alpha0=1e-3"*.  That print is **frozen-false** and is left as it is under RULE 16; anyone
+quoting `cU1`'s output must quote the census lines, not the sentence under them.
+
+`cU1 --selftest`: **10 FAIL / 21**, exit 1.  The brief and `174.14` said **two** checks moved
+PASS → FAIL.  The ten now failing: `CENSUS_100` equality; `SIGMA_W` re-derives (0.552209 → 0.537049);
+its df/cells/members line; `SIGMA_TRAIN` (0.385535 → 0.398459); *"exactly 33 scalar rows"*; *"every
+scalar row at ms=1e-3"*; *"exactly 20 ms=1e-4 rows"*; *"every ms=1e-4 row at alpha0=1e-3"*; the
+granularity tuple; *"no primary-set arm at ms=1e-4"*.  Two of those (33 / all-at-1e-3) were already
+failing at `161.9`; the sigma trio drifted at `173`/`174`; so `174.14`'s "two" is the count of checks
+that moved **in that ingest**, and is not wrong as a delta — but as a description of `cU1`'s state it
+undercounts by five, and this entry records the full state.
+
+**Where the brief's arithmetic was wrong.**  The brief (and `168.2`) carried *"the entire ms=1e-4
+stratum is 20 rows"* into this cycle as the pre-`cru1` fact.  It was **23** by then: `171`'s `cdn1`
+ingest added `cdn1-m-s0`, `-s1`, `-s2` (`chunk771`, `alpha0=1e-3`, `plateau5` 71.814 / 71.958 / 71.908)
+to the rung.  That step preserved every STRUCTURAL clause of `160`'s premise (still all `alpha0=1e-3`,
+still no primary arm) and broke only the row count, and **neither `171` nor `173.12` recorded it** —
+`173.12` lists `cU1` among 19 stdout drifters without saying which check moved.  So the premise died
+in two steps: **count** at `171` (unrecorded), **structure** at `174` (recorded).  The brief's thesis —
+that every sentence resting on *"the headline arms have never been run at `ms=1e-4`"* is stale since
+`174` — is **correct**, and that is what this entry acts on.
+
+### 176.5 EVERY LINE CHANGED — RIDERS ONLY, SUPERSEDED WORDING KEPT VERBATIM
+
+`docs/CORRECTIONS.md`:
+
+| where | superseded wording (verbatim, kept) | rider |
+|---|---|---|
+| `160.3` alias paragraph | *"the entire CIFAR-100 ms=1e-4 stratum is 20 rows, all 20 at alpha0=1e-3 ... no `scalar`, no `layerwise`, no `resnet18_blocks`, no cut-position arm ... perfectly collinear"* and *"all 33 CIFAR-100 `scalar` rows ... sit at ms=1e-3"* | block rider, `176.5` |
+| `160.6` RULE 11 bullet | *"perfectly aliased with alpha0 off ms=1e-3, and the only arms that exist at ms=1e-4 are ones the granularity ladder does not use"* | inline rider |
+| `161.9` | *"36 of 36 CIFAR-100 scalar rows sit at ms=1e-3, so 160's scope line ... holds a fortiori"* | block rider |
+| `168` heading | *"A RUNG WHERE NO HEADLINE ARM HAS EVER BEEN RUN"* | block rider under the heading, marked AT LAUNCH |
+| `168.2(a)` | *"EXACTLY TWO meta_stepsize levels ... 42 scalar ... 101 layerwise ... 38 resnet18_blocks rows sit at ms=1e-3 ... entire ms=1e-4 stratum is 20 rows"* | block rider, with the 23-at-`171` note |
+| `168.2(b)` | *"That is why the corpus has no such row"* (`ms=1e-4`/`alpha0=1e-6`) | block rider after the TRAVEL table |
+| `168.2(c)` | *"The headline arms have never been run there."* | block rider |
+| `174.14` | *"any prose resting on ... must be rewritten"* | inline DISCHARGED pointer |
+
+`docs/STATUS.md`:
+
+| where | superseded wording | rider |
+|---|---|---|
+| cycle 143, `cru1` FALSIFIED paragraph | *"must be rewritten"* | inline DISCHARGED pointer |
+| cycle 141 (second batch), *THE HOLE* | *"entire ms=1e-4 stratum is 20 rows, all at α₀=1e-3 ... no scalar, no layerwise, no blk6, no cut-position arm"* | block rider |
+| cycle 141 (second batch), mechanism paragraph | *"That is why no such row exists"* | block rider |
+| cycle 135, alias paragraph | *"whole ms=1e-4 stratum is 20 rows, all 20 at α₀=1e-3 ... no ms contrast at fixed α₀ exists for any granularity-ladder arm"* | block rider |
+| header | cycle 143 → 144; authority 175 → 176 (Track C had already moved it 174 → 175) | edited |
+| new | CYCLE 144 (Track E) section | added |
+
+**NOT TOUCHED, ON PURPOSE.**  `docs/FINDINGS.md` and `docs/MASTER-TABLE.md` contain **no** such
+sentence: grep for `alias`/`aliased`, `never been run`, `never run`, `no scalar, no layerwise`,
+`collinear`, `cU1`, `CORRECTIONS 160`, `72.408`, `20 rows`, `ms=1e-4`, `ms = 1e-4`, `1e-4 stratum` —
+every `ms=1e-4` hit in `FINDINGS.md` (35 lines) and `MASTER-TABLE.md` (5 rows) is CIFAR-10, and the one
+`collinear` hit (FINDINGS 7016) is granularity-vs-`1/√m`.  `160`'s CIFAR-100 alias finding was never
+propagated to either file, so there is nothing there to supersede.  `174.1` (*"`160` measured that ...
+the meta-stepsize axis WAS perfectly aliased"*) is already past tense and correct.  `168.4`'s
+*"`ms=1e-4`/`alpha0=1e-6`, a MECHANISM CONTROL for the alias"* is a design sentence and stands.
+`cU1_alpha0_granularity_score.py` **not edited** (RULE 16).  `paper/` untouched.
+
+### 176.6 THE SENTENCE THE RECORD IS ENTITLED TO
+
+*On CIFAR-100 / `ResNet18_c100` at 100 epochs, the `meta_stepsize = 1e-4` rung holds `scalar` and
+`layerwise` at both `alpha0` (n = 3 each, `cru1`, seeds 15–17), so the meta-stepsize axis is no longer
+aliased with `alpha0` for the headline arms — each carries an `ms` contrast at fixed `alpha0` (six rungs at
+`1e-3`, four at `1e-6`).  It remains aliased — `ms = 1e-3` only — for `resnet18_blocks` (38/38) and for
+every cut-position arm, so RULE 11 stays open for those exactly as `174.15` says.  The rung's best
+`plateau5` is still a `chunk771` row (72.4080); the headline arms there read `layerwise` 71.0827 and
+`scalar` 35.7920.*
+
+**NOT ENTITLED:** any restatement of `174`'s gap arithmetic from this census (it issues no gap and no SE);
+anything about `resnet18_blocks`, cut position, class count or ImageNet at `ms=1e-4` (n = 0 there);
+*"`cU1`'s selftest failed because of `cru1`"* without the `cdn1` and sigma-drift qualifications of `176.4`.
+
+### 176.7 THE STANDING CONSTRAINTS, DISCHARGED
+
+1. **`git diff -- analysis/` is additions only** — one new file, `cms1_ms1e4_stratum_census.py`;
+   `cU1` `sha256 a915a5aa5b95ff3a…`, `cY1` `0de0604ca5995335…`, `argsline_guard.py`
+   `81cea8b586e124a6…` unchanged.
+2. **`paper/` untouched.**
+3. **ZERO GPU.**  No job submitted, cancelled or touched on either account; `alice` not written to.
+4. **Nothing ingested**; the corpus stands at **2,740 rows** (`wc -l` 2,741 including the header).
+5. Sibling commits landed in this tree during the cycle (`50d8bdf` `cdn2`, `f4acc33` `cY3`); this entry
+   took the next free number at the moment of writing and touched only its own paths.
