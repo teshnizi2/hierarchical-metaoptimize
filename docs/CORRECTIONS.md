@@ -19879,6 +19879,16 @@ beta cannot move — then the gap is NOT a step-size-adaptation phenomenon at al
 incomplete."*  **That is now the measured state, and it is recorded as the batch's strongest
 finding.**
 
+> **[SUPERSEDED IN PLACE BY `CORRECTIONS 177` (cycle 144).  The inference above — *"the gap is NOT a
+> step-size-adaptation phenomenon at all and BOTH T and D are incomplete"* — is kept verbatim and is NOT
+> to be quoted.  `F-FAILS` as a measurement stands.]**  `cY3_cru1_spread.py`, registered and run
+> unedited, finds that at the two rungs F was registered on the `layerwise` arm's 62 step sizes span
+> **0.9942 of a 1.000 ceiling** (`ms=1e-5`, a 2.70× ratio) and **2.9762 of a 3.000 ceiling** (`ms=3e-5`,
+> 19.6×) — `PREMISE-FALSE`.  `beta` was not confined; every coordinate moved at the maximum rate, some up,
+> some down, and the `scalar` arm's single `beta` sat at 0.13 of that envelope.  F was not a negative
+> control for step-size adaptation, so its failure is not evidence against it.  The next paragraph's
+> "premise error" reading is the one that stands, and 177 quantifies it.
+
 **THE PROBE SHOWS WHERE F's PREMISE BREAKS, AND IT IS A PREMISE ERROR, NOT A MEASUREMENT ERROR.**
 F assumed that a `beta` confined to a narrow **absolute** band leaves granularity "almost nothing to
 act on".  The probe shows the band is narrow while the **relative differentiation across groups is
@@ -20112,6 +20122,10 @@ only because the sign held, not because the rung was tested for those arms.**
 * *The registered negative control **`F` FAILS at `alpha0=1e-3`**: gaps of `+7.6060` and `+24.6433`
   pp survive at rungs where `TRAVEL/D_up < 0.5`.  By the registration's own words, **the gap is not
   purely a step-size-adaptation phenomenon and both T and D are incomplete.***
+  > **[SECOND SENTENCE SUPERSEDED IN PLACE BY `CORRECTIONS 177` (cycle 144); kept verbatim, NOT to be
+  > quoted.  The first sentence stands.]**  Read instead: *the premise F was registered on is false — at
+  > those rungs `layerwise` realises 99.4 % / 99.2 % of the largest between-layer spread arithmetic allows
+  > — so `F-FAILS` is consistent with, and not evidence against, between-layer step-size adaptation.*
 * *A CIFAR-10 → CIFAR-100 error-ratio transfer calibrated at `ms=1e-3` fails out of sample along the
   `ms` axis (mean `-10.219` pp over 10 cells, `|max| 37.206`), because the error ratio is itself a
   function of `ms`.*
@@ -20587,3 +20601,387 @@ anything about `resnet18_blocks`, cut position, class count or ImageNet at `ms=1
 4. **Nothing ingested**; the corpus stands at **2,740 rows** (`wc -l` 2,741 including the header).
 5. Sibling commits landed in this tree during the cycle (`50d8bdf` `cdn2`, `f4acc33` `cY3`); this entry
    took the next free number at the moment of writing and touched only its own paths.
+
+## 177. ACCOUNT `F`'s PREMISE IS **FALSE ON `cru1`'s OWN PROBE**, AND `174.8`'s INFERENCE FROM `F-FAILS` — *"THE GAP IS NOT A STEP-SIZE-ADAPTATION PHENOMENON AT ALL AND BOTH T AND D ARE INCOMPLETE"* — IS **SUPERSEDED IN PLACE**.  AT THE TWO RUNGS `F` WAS REGISTERED ON, THE `layerwise` ARM REALISES **99.4 % AND 99.2 % OF THE LARGEST BETWEEN-LAYER SPREAD ARITHMETIC ALLOWS** — A **`2.70×`** AND A **`19.6×`** RATIO BETWEEN ITS LARGEST AND SMALLEST STEP SIZE — WHILE THE `scalar` ARM CAN EXPRESS NONE.  **`F-FAILS` STANDS AS A MEASUREMENT; IT IS NOT EVIDENCE AGAINST STEP-SIZE ADAPTATION.**  BUT THE SPREAD IS **NOT** SHOWN TO BE THE OPERATIVE VARIABLE: ON THE REGISTERED POOLED COMPARISON THE GAP TRACKS `TRAVEL` (`ρ = +0.939`) BETTER THAN TERMINAL SPREAD (`ρ = +0.539`).  ZERO GPU; THE CORPUS STANDS AT **2,740 ROWS**, UNCHANGED
+
+Cycle 144, track A.  **The briefing for this track asserted that Account F was registered on a false
+premise and that the inference from `F-FAILS` is void.  That assertion was tested, not assumed, with a
+scorer registered and committed before it touched a probe record.  On its core claim the briefing is
+RIGHT.  On its secondary expectation — that the gap would track the between-layer spread better than
+it tracks `TRAVEL` — it is WRONG, and that is recorded with the same weight.**
+
+### 177.1 THE ARITHMETIC THE PREMISE TURNS ON
+
+`cY1` registered Account F in these words (cY1, `THE REGISTERED ACCOUNTS`): *"At TRAVEL/D_up < 0.5
+(rungs 1e-5 and 3e-5 at alpha0=1e-3) beta is confined to a narrow interval around beta0 and BOTH arms
+are within a factor of a few of a FIXED step size alpha0=1e-3.  The granularity variable then has
+almost nothing to act on."*  With `--weight-decay-meta 0` (launcher line 447, and the meta-update at
+line 959 of the `HF.py` whose sha256 `0d8ee431…` `PROVENANCE.txt` records, is
+`beta[i] -= ms * sign(...)`), `|dbeta_i| = ms` for **every coordinate** `i`, so after `t` steps each
+`beta_i(t)` lies in `[beta0 − ms·t, beta0 + ms·t]`.  **That bounds each coordinate's distance from
+`beta0`.  It does not bound the SPREAD across the 62 `layerwise` coordinates**: coordinate A may sit at
+`beta0 − TRAVEL` while coordinate B sits at `beta0 + TRAVEL`, every coordinate inside its own bound,
+and the between-layer ratio of step sizes is then `exp(2·TRAVEL)` — `exp(1.0) = 2.72×` at `ms=1e-5`,
+`exp(3.0) = 20.1×` at `ms=3e-5`.  The `scalar` arm has one `beta` and can express no between-layer
+ratio at any `ms`.  Whether the realised spread is near zero (premise stands) or near that ceiling
+(premise false) is an empirical question about the probe, and `174.8` itself already reported a
+"≈19.6× simultaneous spread" at `ms=3e-5` **and then still recorded the `F-FAILS` inference**.  The two
+cannot both stand.  This entry decides which.
+
+### 177.2 REGISTRATION — COMMIT-BEFORE-FIRST-EXECUTION ONLY, WITH DISCLOSURE
+
+* **`analysis/cY3_cru1_spread.py`**, committed **`f4acc334406ccec5caa4060566845543387435e8`**,
+  committer date **2026-09-08T19:26:45+02:00**, pushed to the private `origin` at 19:26:47.
+  `sha256 35982fc79bbdf13d6f1f1bcf02b3c9b269ff23214057c61da5df528b0425f18a`.  `--selftest`
+  **13/13 PASS** before the commit (it touches no probe file and no `cru1` CSV row).
+* **First execution 2026-09-08T19:26:59+02:00** on the Mac, against a copy of the 60 `probe.jsonl`
+  pulled from `alice2` and verified **md5-identical 60/60**, with the documented `--probe-root` /
+  `--out-root` overrides and the default CSV.  **Margin: 14 s.**  Second execution 19:27:05 on `alice2`
+  at the documented default roots (`/home/s5014158/metaopt/runs/cru1`, `/home/s5014158/metaopt/runs`)
+  with `--csv /dev/null/none`; the `CENSUS … PREMISE VERDICT` sections and the Q4 layer names are
+  **byte-identical** between the two runs.
+* **NO RULE 21 CLAIM.**  The file has no runs of its own; precedent `cQ1` (149), `cS1` (159), `cZ1`
+  (170), `cY2` (174).  **DISCLOSURE, in the file's header**: visible to the author while designing it were
+  (a) all twenty `cru1` cell means and every per-rung gap; (b) `174.8`'s "≈19.6× / 99.9 % of TRAVEL"
+  statement at `ms=3e-5`; (c) the last record of one run, `probe_cru1-lay-m3e-5-a1e-3-s15`
+  (`beta_true_min/max −8.3905/−5.4087`), printed while reading the schema.  **At the `ms=3e-5` rung this
+  is therefore an audit with a registered bar, not a prediction test.**  Not seen in advance: anything
+  at `ms=1e-5`, the `(1e-4, 1e-6)` frozen rung, the `scalar` arm's position anywhere, the spread at any
+  non-frozen rung, the dose-response comparison, every layer identity.
+* **RULE 16.**  `git diff -- analysis/` **EMPTY** after both executions.  `cY1` `sha256 0de0604c…` and
+  `argsline_guard.py` `81cea8b5…` unchanged on both machines.  `cY1` and `cY2` are not touched.  The
+  `alice2` clone `hmo-cru1` now carries an **untracked** byte-identical copy of `cY3` (`git status`
+  there: `?? analysis/cY3_cru1_spread.py`); nothing tracked there moved.
+* **The registered bar, verbatim from the file:** `FRAC_CEIL = S_T / CEIL`, `CEIL = min(beta0+TRAVEL,
+  BETA_HI) − max(beta0−TRAVEL, BETA_LO)`; cell mean over seeds; `< 0.10 NEAR-ZERO`, `≥ 0.50
+  SUBSTANTIAL`, else `INTERMEDIATE`; over F's two rungs, both `SUBSTANTIAL → PREMISE-FALSE`, both
+  `NEAR-ZERO → PREMISE-STANDS`, else `PREMISE-MIXED`.  Dose-response: pooled Spearman over all cells,
+  `SPREAD-TRACKS-BETTER` / `TRAVEL-TRACKS-BETTER` at a 0.05 margin.
+
+### 177.3 GATES — AND ONE REGISTERED GATE THAT FIRED ON FLOAT32, RECORDED NOT EDITED
+
+`CENSUS`: 60 `probe_*` directories with a `probe.jsonl`, **60 parseable, 0 UNCLASSIFIED**, 30 `layerwise`
++ 30 `scalar`, 500 records each, every run terminal at step **49,900**.  **`G0` PASS** — every one of the
+60 `probe_index.json` `param_numels` equals the registered 62-tensor `TENSOR_NUMEL`, so the layer names
+in §177.5 cannot be misaligned (the probe writes `beta` as `self.beta[0].reshape(-1)`, i.e. in
+`named_parameters()` order; `probe_index.json`'s `idx` permutation governs only the `z_sub` sign
+subsample).  **`G0b` PASS** (62 / 1 entries).  **`G1` PASS** — in all 30,000 records the spread computed
+from the `beta` list equals the writer's own `beta_true_max − beta_true_min` within 1e-4 (0 mismatches;
+0 `n_beta` mismatches).
+
+**`G2` FAIL, and its registered consequence line is NOT borne out.**  The gate asserts
+`|beta_i(t) − beta_i(0)| ≤ ms·step + 1e-3` for every coordinate of both arms; **6,082 of 30,000 records
+exceed it**, and the file prints, verbatim, `FAIL -- EVERY TRAVEL NUMBER IN 174 IS SUSPECT`.  Diagnosed
+outside the scorer, which is not edited:
+
+* The violations sit **only** in `lay 3e-5/1e-3` (762), `lay 1e-4/1e-3` (630), `lay`+`sc 1e-4/1e-6`
+  (1,278 each), `lay`/`sc 3e-4/1e-6` (996 / 681), `lay`/`sc 1e-3/1e-6` (273 / 184); **zero** at
+  `1e-5/1e-3`, at `3e-4`, `1e-3`, `3e-3` with `alpha0=1e-3`, and at `3e-3/1e-6`.  The first violating
+  step is **identical across the three seeds** of every affected cell: 24,600 (`3e-5`), 7,400 (`1e-4`,
+  both `alpha0`), 2,500 (`3e-4` and `1e-3` at `1e-6`).  Maximum excess per cell: 0.002033, 0.003857,
+  0.006777, 0.007884, 0.002345 nats.
+* A float32 simulation of `fl32(beta ± fl32(ms))` from `fl32(ln alpha0)` reproduces those numbers to the
+  digit: `ms=3e-5` from `ln(1e-3)`: excess **0.0010022 at step 24,600** and **0.0020330 at 49,900**;
+  `ms=1e-4` from `ln(1e-6)`: **0.0010049 at 7,400**, **0.0067766 at 49,900**; `3e-4` and `1e-3` from
+  `ln(1e-6)`: 0.0010185 and 0.0010109 at 2,500.  `beta` is float32; at `|beta| ∈ [4, 8)` one ulp is
+  4.77e-7 and `fl32(3e-5)` is 62.9 ulps, so each exact-`ms` update rounds to 63 ulps and the surplus
+  accumulates linearly wherever a coordinate moves monotonically — which is why FREE rungs, where signs
+  flip, show none.
+* **Consequence.**  `|dbeta| = ms` holds to float32 precision in all 30,000 records of both arms; the
+  accumulated drift is **≤ 0.0079 nats in any run, ≤ 0.14 % of `TRAVEL` at any rung** (0.00203/1.5 at
+  `3e-5`; 0.00678/5.0 at `1e-4/1e-6`).  **Every `TRAVEL` number in `174` stands.**  `TOL_B = 1e-3` was
+  set ~20× too tight for float32 over 5×10⁴ steps (≈ 50,000 × ½ ulp ≈ 0.024 would have been right).
+  The scorer is **not** edited (RULE 16); the mislabel is corrected here, precedent `163.7`.
+
+### 177.4 THE PREMISE TEST — **`PREMISE-FALSE`**
+
+Cell means over three seeds; per-seed values in parentheses.  `disp/T` is the largest per-coordinate
+displacement as a fraction of `TRAVEL`; `POS_T` places the `scalar` arm's single terminal `beta` in the
+`layerwise` envelope (0 = at its lowest coordinate, 1 = at its highest).
+
+| `ms` | `a0` | reach | `TRAVEL` | `CEIL` | `S_T` | `FRAC_CEIL` | `exp(S_T)` | `disp/T` | `scalar beta_T` | `POS_T` | token |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| `1e-5` | `1e-3` | `FROZEN` | 0.5 | **1.000** | **0.9942** (0.9964 / 0.9929 / 0.9933) | **0.9942** | **2.70** | 0.999 | −7.2683 / −7.2656 / −7.2689 | 0.135 | **`SUBSTANTIAL`** — F rung |
+| `3e-5` | `1e-3` | `FROZEN` | 1.5 | **3.000** | **2.9762** (2.9818 / 2.9729 / 2.9739) | **0.9921** | **19.61** | 0.999 | −8.0248 / −8.0081 / −8.0254 | 0.123 | **`SUBSTANTIAL`** — F rung |
+| `1e-4` | `1e-6` | `FROZEN` | 5.0 | 6.184 (clip-bound) | 6.1814 (×3) | 0.9995 | 483.65 | 0.999 | −8.8186 (×3) | 1.000 | `SUBSTANTIAL` — not an F rung |
+
+```
+PREMISE VERDICT over F's registered rungs [('1e-5', '1e-3'), ('3e-5', '1e-3')]: PREMISE-FALSE   [1e-5/1e-3:SUBSTANTIAL | 3e-5/1e-3:SUBSTANTIAL]
+```
+
+**The spread is not merely substantial; it is at the ceiling.**  The trajectory (cell-mean `S` at steps
+0 / 500 / 2,500 / 5,000 / 10,000 / 25,000 / 40,000 / 49,900) is `0.0000, 0.0076, 0.0449, 0.0950, 0.1951,
+0.4956, 0.7960, 0.9942` at `ms=1e-5` and `0.0001, 0.0221, 0.1345, 0.2847, 0.5852, 1.4864, 2.3861, 2.9762`
+at `3e-5` — i.e. **`S(t) ≈ 2·ms·t` from the first record to the last** (at step 25,000 the ceiling is
+0.5 and 1.5; observed 0.4956 and 1.4864).  At the frozen rungs the `layerwise` arm is a bang-bang
+system: every coordinate moves at the maximum rate arithmetic allows, some up, some down, for the whole
+run.  `174.8`'s "≈19.6×" re-derives as `exp(2.9762) = 19.61` (per seed 19.72 / 19.55 / 19.57) and its
+"99.9 % of `TRAVEL`" as `disp/T = 0.999`.
+
+### 177.5 WHICH LAYERS, AND WHERE THE `scalar` ARM SITS
+
+Names from the 62-tensor `named_parameters()` order, verified by `G0` against every run's own
+`param_numels`.  `beta0 = ln(1e-3) = −6.9078`.
+
+* **`ms=3e-5`.**  Top-3 by cell-mean terminal `beta`: **`linear.weight`, `layer4.1.conv2.weight`,
+  `layer4.0.shortcut.1.bias`**, all at **−5.409 = `beta0 + TRAVEL`** (`alpha = 4.48e-3`, **4.5× `alpha0`**)
+  — ascended every step.  Bottom-3: **`layer4.0.bn2.weight`, `layer4.1.bn2.weight`,
+  `layer3.1.bn2.weight`** at **−8.382 ≈ `beta0 − TRAVEL`** (`alpha = 2.29e-4`, **0.23× `alpha0`**).  45 of
+  62 coordinates end below `beta0`, 17 above.  Per seed the top set is {`linear.weight`,
+  `layer4.1.conv2.weight`, `layer4.0.conv2.weight`, `layer4.1.bn2.bias`, `layer4.0.shortcut.1.bias`} and
+  the bottom set is the three residual-block `bn2.weight` scales plus `layer4.0.shortcut.1.weight` —
+  stable across seeds 15/16/17.
+* **`ms=1e-5`.**  Top-3: **`layer4.0.conv2.weight`, `layer4.1.conv2.weight`, `layer4.0.shortcut.1.bias`**
+  at **−6.408 = `beta0 + TRAVEL`** (1.65× `alpha0`); bottom-3: **`layer3.1.bn2.weight`,
+  `layer4.0.bn2.weight`, `layer4.1.bn2.weight`** at **−7.402** (0.61× `alpha0`).  32 below `beta0`, 30 above.
+* **The `scalar` arm follows the majority.**  Its single `beta` descends to −7.27 (`ms=1e-5`;
+  displacement 0.36 = 72 % of `TRAVEL`) and −8.02 (`3e-5`; 1.11 = 74 %), landing at **`POS_T` 0.13** of
+  the `layerwise` envelope with **84–87 % of the 62 `layerwise` coordinates above it**; its time-mean
+  position is 0.41 / 0.39.  So at a frozen rung the `scalar` arm applies to `layer4`'s convolutions and to
+  `linear.weight` a step size **~11× smaller** (`3e-5`: `exp(−8.02) / exp(−5.41)`) than the `layerwise`
+  arm gives them, and to the late `bn2` scales one **~1.4× larger**.
+* **Train alongside (tail-5 from the `.out` with `cY1`'s `EPTR_RE`; CSV `final_train` in parentheses).**
+  `ms=1e-5`: `sc` **25.33** (25.06), `lay` **33.81** (33.37); test `plateau5` 24.7147 / 32.3207.
+  `ms=3e-5`: `sc` **30.24** (30.11), `lay` **61.73** (61.74); test 28.9507 / 53.5940.  The train gap
+  (8.5 and 31.5 pp) exceeds the test gap (7.6 and 24.6 pp) at both rungs: the `layerwise` arm fits
+  more, it does not merely generalise better.
+* `(1e-4, 1e-6)`, reported but not an F rung: the `scalar` `beta` ascends monotonically to −8.8186 —
+  **the very top of the `layerwise` envelope, `POS_T = 1.000`** — and both arms sit at chance
+  (10.55 / 10.96 pp; train 10.17 / 10.53): a cell with 99.95 % of its ceiling spread and a gap of
+  **+0.4107 pp (0.82 SE)**.
+
+### 177.6 DOSE-RESPONSE — **`TRAVEL-TRACKS-BETTER`**.  THE BRIEFING's SECONDARY EXPECTATION FAILS
+
+`gap` re-derived from the CSV (`plateau5`, `lay − sc`, 60 rows), `Spread` = cell-mean terminal `S_T`,
+`SAT = S_T / 12.6974` (the clip width):
+
+| `ms` | `a0` | reach | `TRAVEL` | gap | gap/SE | `Spread` | `SAT` |
+|---|---|---|---|---|---|---|---|
+| `1e-5` | `1e-3` | `FROZEN` | 0.5 | +7.6060 | 15.18 | 0.9942 | 0.078 |
+| `3e-5` | `1e-3` | `FROZEN` | 1.5 | +24.6433 | 49.18 | 2.9762 | 0.234 |
+| `1e-4` | `1e-3` | `ADEQUATE` | 5.0 | +35.2907 | 70.44 | 7.2963 | 0.575 |
+| `3e-4` | `1e-3` | `FREE` | 15.0 | +40.4107 | 80.65 | **8.5806** | 0.676 |
+| `1e-3` | `1e-3` | `FREE` | 50.0 | +47.4607 | 94.73 | 7.7059 | 0.607 |
+| `3e-3` | `1e-3` | `FREE` | 150.0 | +53.5013 | 106.78 | 7.3213 | 0.577 |
+| `1e-4` | `1e-6` | `FROZEN` | 5.0 | **+0.4107** | 0.82 | **6.1814** | 0.487 |
+| `3e-4` | `1e-6` | `ADEQUATE` | 15.0 | +39.6587 | 79.15 | 11.3014 | 0.890 |
+| `1e-3` | `1e-6` | `FREE` | 50.0 | +46.5487 | 92.91 | 7.7618 | 0.611 |
+| `3e-3` | `1e-6` | `FREE` | 150.0 | +52.8013 | 105.38 | 7.4702 | 0.588 |
+
+```
+ladder a0=1e-6 (4 rungs): rho(gap,Spread)=+0.200  rho(gap,TRAVEL)=+1.000
+ladder a0=1e-3 (6 rungs): rho(gap,Spread)=+0.771  rho(gap,TRAVEL)=+1.000
+POOLED over 10 cells (THE REGISTERED COMPARISON): rho(gap,Spread)=+0.539  rho(gap,TRAVEL)=+0.939  -> TRAVEL-TRACKS-BETTER   [Pearson r: Spread +0.617, log10 TRAVEL +0.845]
+```
+
+Two facts drive it.  **(i) Terminal spread is not monotone in `ms` while the gap is**: in ladder A it
+peaks at `3e-4` (8.58) and **contracts** at `1e-3` / `3e-3` (7.71, 7.32) because the minimum pins at
+−15 while the maximum itself descends (−6.43 → −7.36 → −7.34), yet the gap keeps rising
+40.41 → 47.46 → 53.50.  **(ii) The `(1e-4, 1e-6)` cell** has 99.95 % of its ceiling spread and a gap
+of 0.41 pp: a large between-layer spread of step sizes that are all far too small buys nothing.  Post hoc
+and **unregistered**: with the time-mean spread `S_mean` instead of `S_T` the pooled `ρ` is +0.842 —
+closer, still below `TRAVEL`'s +0.939.  With 10 cells none of this carries a p-value and none is
+claimed; it is mechanism evidence, as registered.
+
+### 177.7 WHAT IS SUPERSEDED, VERBATIM, AND WHAT IS NOT
+
+Kept verbatim at their sites with a pointer here (as `160`/`163.6`/`166.6` did):
+
+* `174.8`: *"The registration states the consequence in advance: 'IF F FAILS — if a large gap survives
+  where beta cannot move — then the gap is NOT a step-size-adaptation phenomenon at all and BOTH T and D
+  are incomplete.'  That is now the measured state, and it is recorded as the batch's strongest
+  finding."*  **Superseded.**  `beta` did move — every coordinate, at the maximum rate, in both
+  directions — and the arms differ by exactly the quantity granularity exists to express.
+* `174.16`, ENTITLED bullet 3, second sentence: *"By the registration's own words, the gap is not purely
+  a step-size-adaptation phenomenon and both T and D are incomplete."*  **Superseded.**  Its first
+  sentence (the measured gaps against the bar) stands.
+* `STATUS.md` cycle-143 bullet *"`F-FAILS` IS THE BATCH'S STRONGEST RESULT … the gap is not a
+  step-size-adaptation phenomenon and both T and D are incomplete"* and the close-out sentence *"not
+  explained by step-size adaptation (`cru1`)"*: annotated in place.
+
+**NOT superseded:** `cY1`'s `FINAL` line and every branch and stamp in it, including the `F-FAILS` stamp
+itself (a scorer token: gap > bar at the frozen rungs, which is true); `ACCOUNT T SUPPORTED / ACCOUNT D
+REFUTED`; `174.8`'s own "premise error" paragraph, which this entry quantifies rather than contradicts;
+`174.7`'s pinning mechanism for `scalar`'s gain.  The registration text of Account F (the `cru1`
+registration entry and `cY1`'s header) is a prediction and is left untouched; predictions are not
+superseded, their inferences are.
+
+### 177.8 WHAT THE RECORD IS NOW ENTITLED TO
+
+**ENTITLED:**
+
+* *The registered negative control `F` fails at `alpha0=1e-3` (`+7.6060` and `+24.6433` pp against a
+  `1.0021` pp bar), but the premise `F` was registered on — that at the frozen rungs "the granularity
+  variable has almost nothing to act on" — is false on `cru1`'s own probe: at `ms=3e-5` the `layerwise`
+  arm's 62 step sizes span `2.9762` nats, a `19.6×` between-layer ratio and `99.2 %` of the arithmetic
+  ceiling `2·TRAVEL = 3.0`, and at `ms=1e-5` they span `0.9942` nats (`2.70×`, `99.4 %` of `1.0`), while
+  the `scalar` arm's single `beta` sits near the bottom of that envelope (`POS` 0.12–0.14) and can express
+  no between-layer ratio at all.  `F-FAILS` is therefore consistent with, and not evidence against,
+  step-size adaptation of the between-layer kind, and the sentence "the gap is NOT a step-size-adaptation
+  phenomenon at all" is withdrawn.*
+* *At the frozen rungs the coordinates the `layerwise` arm drives UP are `layer4`'s convolutions and
+  `linear.weight`; those it drives DOWN are the late residual-block `bn2` scales; the `scalar` arm
+  follows the descending majority.*
+
+**NOT ENTITLED:**
+
+* *"The between-layer spread is the operative variable"* / *"the gap is explained by step-size
+  adaptation."*  On the registered pooled comparison the gap tracks `TRAVEL` (`+0.939`) better than
+  terminal spread (`+0.539`); terminal spread is non-monotone in `ms` where the gap is monotone; and
+  `(1e-4, 1e-6)` pairs a ceiling spread with a 0.41 pp gap.  What is established is that `F`'s control
+  was not a control; what is *not* established is what the gap is.
+* *"Both T and D are now complete"* or any change to their verdicts.  Nothing here rescored them.
+* *"`TRAVEL` is the operative variable."*  `ρ = +0.939` over 10 cells with tied `TRAVEL` values is a
+  ranking, not a mechanism, and `174.7` already showed the `scalar` arm's `TRAVEL`-dependence is floor
+  pinning.
+* *The briefing's remark that `MONOTONE-IN-TRAVEL` is "precisely what adaptation predicts."*  Not tested
+  by anything here; not adopted.
+
+### 177.9 SCOPE, AND THE STANDING CONSTRAINTS DISCHARGED
+
+Scope: `cru1`'s 60 probe files only — CIFAR-100 / `ResNet18_c100` / 100 epochs / `scalar` vs
+`layerwise` / the two ladders of `174.1`.  Nothing about `resnet18_blocks`, cut position, class count,
+ImageNet, or any other batch.
+
+1. **Zero GPU.  No job submitted, none cancelled; both queues untouched.  `alice` not accessed** — only
+   `alice2` (ours), read, plus one untracked file copy into our own `hmo-cru1` clone.
+2. **`git diff -- analysis/` EMPTY**; `git add` restricted to `analysis/cY3_cru1_spread.py` (the
+   registration commit) and then `docs/CORRECTIONS.md` + `docs/STATUS.md`; no `-A`.  A sibling's
+   working-tree modification of `bin/_lib_guards.sh` was present throughout and is **not** touched or
+   staged.
+3. **`paper/` untouched**; **`results/all_runs.csv` unchanged** at 2,740 rows.
+4. Numbering: `175` was taken by track C and `176` announced by track E while this entry was being
+   written; this entry took the next free number at the moment of writing, and its in-place pointers
+   carry that number.
+
+## 177. TRACK D — **THE LAUNCHER PARTITION DEFECT IS CLOSED IN THE SHARED HELPER, AND THE BRIEF WAS WRONG ON FIVE COUNTS.**  `bin/_lib_guards.sh` NEVER COMPOSED A PARTITION LIST — EVERY LAUNCHER HARD-CODED `PARTS` — SO THE FIX IS A NEW COMPOSER (`slurm_parts_for_wall`), A TWO-DIRECTION GUARD (`guard_parts_for_wall`) AND A **SOURCE-TIME HOOK** THAT ABORTS ANY LAUNCHER WHOSE `PARTS`/`WALL` DISAGREE, **BEFORE ITS `sbatch` LOOP**.  THE MECHANISM IS **PER-PARTITION QOS CAPS** (`sacctmgr`: l4 8, mig 8, a100 2, short 12 GPU/user), NOT PRIORITY; `gpu-short`'s NODE SET IS A **SUPERSET** OF THE THREE 7-DAY PARTITIONS' (20 shared + 10 more).  **FOUR** LAUNCHERS CARRY THE PAIR, NOT THREE.  `crn1` WAS SUBMITTED **08:56:16**, NOT 05:12, SAT **3h31m23s** WITH 0/18 STARTED, NOT SIX HOURS, AND WAS **CANCELLED AND RESUBMITTED ON `alice`**, NOT `scontrol`-UPDATED.  **ZERO GPU. NOTHING SUBMITTED, NOTHING CANCELLED, NOTHING INGESTED; NO LAUNCHER EDITED; THE CORPUS STANDS AT 2,740 ROWS.**
+
+### 177.1 WHAT THE BRIEF SAID, AND WHAT THE RECORD SAYS
+
+Every number below is re-derived at write time from `sacct -a -X -S 2026-09-06 -P` on `alice2`
+(read-only; `sacct` shows the last requested partition list for a job that never ran and the
+partition it ran in otherwise), `scontrol show partition`, `sacctmgr show qos` and `sinfo -N`,
+plus this tree at `8d34335`.  Where the brief and the record disagree, the record is stated and
+the brief is marked **WRONG**; where the record cannot decide, **UNSURE**.
+
+| brief | record | verdict |
+|---|---|---|
+| "find where `bin/_lib_guards.sh` or the common launcher library composes the sbatch partition list" | **No shared code composes it.**  `_lib_guards.sh` (234 lines at `6a6c55d`) defines `guard_presubmit`, `guard_postlaunch`, `guard_scorer_registered` and nothing partition-related; `grep -rn '^PARTS=' bin/*.sh` finds **57** launchers each hard-coding its own list | **WRONG** premise; the fix therefore ADDS composition where none existed |
+| "three of this week's launchers (`cX1`, `cY1`, `cW1`)" | **four**: `cV1` (`cpr1-`, 15 jobs, 2026-09-07 22:41) carries the identical `PARTS=gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` / `WALL=03:00:00`; the guard census over all 57 pairs fails exactly `cV1 cW1 cX1 cY1` and passes 53 | **WRONG** by one |
+| "that omission" | `162.10` recorded it as a **decision** — *gpu-short fits arithmetically but is a different node set from every batch in this cell and is not used* — for `cpr1`'s cell; `cW1`/`cX1`/`cY1` inherited the pair by copy.  `sinfo -N`: `gpu-short` = 30 nodes = **all 7** `gpu-l4-24g` nodes (880–886) + **all 7** `gpu-mig-40g` (863–869) + **all 6** `gpu-a100-80g` (871–876) + node870, node887 and 8 `2080ti` nodes (851,852,854,856–860).  It is a **strict superset**, so the "different node set" premise holds only in that it *adds* nodes | premise of the recorded decision **REFUTED** by the node table; the exclusion remains available as a loud, reason-bearing opt-out (177.3) |
+| "`crn1` at 0/18 started for six hours … after a 05:12 submission" | `crn1` ids `4920535–4920553` (18): **Submit 2026-09-08T08:56:16–18**, `Start=None`, **CANCELLED by 3263 (`s5014158`) at 12:27:39** with the three-partition list still on record.  Pending span **3h31m23s**.  The **05:12:55** submission is **`cpg1`** (`cW1`), whose 15 jobs started 05:12:55–05:56:26 on the same list | **WRONG** on the time (08:56, not 05:12), the batch (that was `cpg1`) and the duration (3h31m, not 6h) |
+| "on Slurm (Priority)" | `172.1` read `(Priority)` from `squeue`; `sacct` records **`QOSMaxGRESPerUser`** as the last pending reason on **all 60** `cru1` jobs, which sat ahead of `crn1` (submitted 08:36:51–55) on the same three QOSes.  `sacctmgr`: **`qos-gpu-l4` gres/gpu=8, `qos-gpu-mig` 8, `qos-gpu-a100` 2, `qos-short-gpu` 12** per user.  The three-partition list caps the account at **18** concurrent GPUs; `gpu-short` is a separate **12**-GPU pool on a superset of the same nodes | `(Priority)` is a faithful `squeue` reading; the **cause** is the per-QOS GPU cap saturated by the sibling batch, which the brief did not name |
+| "adding `gpu-short` via `scontrol update` started 7 jobs within 45 s" | For `crn1` this did **not** happen: it was **cancelled** (12:27:39) and **resubmitted from `salehkaleybars`** (`172`), ids `4921226–4921243`, Submit **12:28:47–50**, partition `gpu-short`, **7 jobs started at 12:39:32** (`4921226–4921232`) — **10m45s** after resubmission, **3h43m16s** after the original 08:56:16.  The `scontrol`-update signature belongs to **`cru1`**: **34 of 60** jobs ran on `gpu-short` under their **original ids**, first such start **13:49:35** (**5h12m44s** after submission), last **15:52:26** (**7h15m35s**) | **WRONG** for `crn1`; plausible for `cru1`, but the "45 s" and the moment of the update are **not in `sacct`** — **UNSURE** |
+| "`cru1` had the identical defect" | `cru1` (`cY1`): 60 jobs, same pair; first start **08:58:32** (21m41s); ran 22 on `gpu-l4-24g`, 4 on `gpu-a100-80g`, 34 on `gpu-short` | **CORRECT** |
+
+The one launcher of the week that *did* carry `gpu-short` is the control: **`cdn1`** (24 jobs,
+`03:50:00`, list of five) submitted 08:28:46 and had **21/24 started within 1 s**, 12 of them on
+`gpu-short`.  And `cpg1`, on the defective list at a quiet hour, started all 15 within 43m31s — the
+cost of the defect is **load-dependent, from 0 s to more than 3.5 h without a start**, which is
+exactly why a rule and not a habit has to carry it.
+
+### 177.2 WHAT WAS REGISTERED, AND THE MARGIN
+
+`tests/test_partition_composer.py` — **87 checks**, RULE 13 style (a real configuration must PASS
+and an injected violation must FAIL) — was written and committed **before** `bin/_lib_guards.sh`
+gained any of the functions it exercises.  Commit **`4e5b17c`** at **2026-09-08T19:28:20+02:00**
+(= 17:28:20Z); first execution **17:28:20Z**, the same second, sequentially after the commit.
+**Commit-before-first-execution only**; the file has no runs and claims no RULE 21 label
+(precedent `cQ1` at `149`, `cS1` at `159`, `cZ1` at `170`).  Its header discloses the premises
+visible while designing: `sinfo -o '%P %l'` (gpu-short `4:00:00`, the other four GPU partitions
+`7-00:00:00`) and the brief's rule "include gpu-short whenever the walltime is ≤ 04:00:00".  No
+result number existed to be visible.
+
+Against the unmodified library: **21 PASS, 66 FAIL, exit 1** — the 21 are the injected-violation
+direction passing vacuously because the functions did not exist.  After the implementation
+(written 17:29:21Z): **87 PASS, 0 FAIL, exit 0**, under macOS `/bin/bash 3.2.57` (the local
+`bash`) and — for the library alone, with the *real* `sinfo` — under the cluster's
+`bash 5.1.8` (177.4).
+
+**A stale label, recorded not edited.**  Two sibling entries (`175` `cdn2`, `176` Track E) took
+the next numbers between the test's registration and this write-up.  The library block (uncommitted
+work at the time) was relabelled to `177`; the **registered test still says `CORRECTIONS 175`** in
+its docstring and banner.  It never asserts on the number.  Left as-is by the precedent of `162.10`
+and STATUS open item 6: a registered artefact is not edited for a cosmetic pointer.
+
+### 177.3 THE FIX — 180 LINES APPENDED TO `bin/_lib_guards.sh`, ZERO DELETED
+
+`git diff --stat`: `bin/_lib_guards.sh | 180 +`, and `git diff | grep -c '^-[^-]'` = **0**.
+`guard_presubmit`, `guard_postlaunch` and `guard_scorer_registered` are byte-identical and the new
+block sits after them (the test asserts both).  No registered scorer and no launcher was touched;
+`analysis/argsline_guard.py` was not opened for writing.
+
+* **`slurm_time_secs <T>`** — seconds for a Slurm `--time`, parsed as `sbatch` parses it:
+  `M`, `M:S`, `H:M:S`, `D-H`, `D-H:M`, `D-H:M:S`; anything else is rejected.  **The trap the brief
+  walked into**: its walltimes "01:00, 03:00, 04:00, 04:01, 11:00" are, to Slurm, **minutes:seconds**
+  — `04:01` is **241 s** and fits `gpu-short`.  The test asserts the brief's five values in the
+  `HH:MM:SS` form every launcher writes (`01:00:00 03:00:00 04:00:00` → with `gpu-short`;
+  `04:01:00 11:00:00` → without) **and** the literal two-field forms (all three → with `gpu-short`,
+  at 60 s, 241 s, 660 s), so the parser cannot drift from `sbatch` unnoticed.
+* **`slurm_parts_for_wall <WALL> [BASE]`** — stdout: `BASE` (default the three 7-day partitions)
+  with `gpu-short` **prepended iff `secs(WALL) ≤ cap`** and **removed otherwise** (`sbatch` rejects a
+  multi-partition request whose `--time` exceeds *any* member's MaxTime — the `229`/`2185`/`2531`
+  failure class).  The cap is **re-read live** from `sinfo -h -p gpu-short -o '%l'` when a `sinfo`
+  is on `PATH` and falls back to the **frozen `04:00:00`** otherwise; stderr carries one line —
+  `partitions: … -- chosen because --time=… (Ns) <= gpu-short MaxTime (14400s, sinfo(live)|frozen): …`
+  — naming the list, the walltime, the cap, its source and the QOS reason.  The test proves the live
+  path with a fake `sinfo` that reports `2:00:00` (then `03:00:00` *excludes* `gpu-short`) and the
+  fallback with a silent one.
+* **`guard_parts_for_wall <PARTS> <WALL>`** — both directions: `gpu-short` missing at or below the
+  cap **FAILS** (the cap is inclusive: `04:00:00` fails, `04:00:01` passes); `gpu-short` present
+  above the cap **FAILS**; unparsable `--time` **FAILS**.  The `162.10` decision survives as an
+  explicit opt-out: a **non-empty `PARTS_NO_SHORT_REASON`** passes below the cap and is **printed**
+  with a pointer to `162.10`; an empty reason is no opt-out; no reason rescues `gpu-short` above the
+  cap.
+* **The source-time hook.**  The census over the 25 launchers that source the library: **17**
+  (every one since `cH1`, including all four defective ones) set `PARTS` and `WALL` **before**
+  `. _lib_guards.sh`, and that line sits immediately before their `sbatch` loop, after their own
+  `FAIL` gate.  If both are set when the library is sourced, `guard_parts_for_wall` runs and a
+  disagreement prints the fix and **`exit 2`** (a `return 2` in an interactive shell).
+  `ARGSGUARD_PARTS_CHECK=0` bypasses it and says so.  The **8** launchers that source first
+  (`c97_sm4`, `c98`, `c99`, `cA1`–`cA3`, `cG1`, `cG16`) are not covered by the hook and must call
+  the guard themselves — stated here so nobody reads "cannot recur" as unconditional.
+* **The pattern for a new launcher**, now in the library header:
+  `WALL=03:00:00; PARTS=$(slurm_parts_for_wall "$WALL"); . "$REPO/bin/_lib_guards.sh"`.
+
+### 177.4 VERIFIED, NOT ASSUMED
+
+1. **Local**: `python3 tests/test_partition_composer.py` → 87/0, exit 0 (twice: before and after the
+   `175→177` relabel of the library block).
+2. **Census**: every `^PARTS=`/`^WALL=` pair in `bin/*.sh` through the guard — **57 pairs, 53 PASS,
+   4 FAIL** (`cV1 cW1 cX1 cY1`); the `11:00:00` launchers (`cO1`, `cR1`, `cS2`) and `cdn1` pass.
+   The composer, fed each defective launcher's own pair, writes
+   `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`.
+3. **Cluster** (`alice2`, my own account, a scratch copy under `~/scratch_c175`, removed
+   afterwards; `squeue -u s5014158` = **0 before and 0 after**): under `bash 5.1.8` with the real
+   `sinfo` (`4:00:00`), `slurm_parts_for_wall 03:00:00` → the four-partition list with
+   `sinfo(live)` in the rationale; `11:00:00` → the three; the guard on `cX1`'s pair → `GUARD FAIL`,
+   rc 1; the exact launcher pattern with `cX1`'s pair → the abort banner, **rc 2**.
+4. **The unedited `cX1` itself cannot be driven through the hook** — locally its guard 8 (cluster
+   manifest paths) and on `alice2` its guard 2 (*`crn1-*` already in the CSV*) abort it, by design,
+   before the `. _lib_guards.sh` line.  So the end-to-end claim is for the *pattern*, proven on the
+   cluster's shell, not for a registered launcher re-run.  One thing that dry run did show: `cX1`'s
+   own guard 5b enumerates only its three partitions, reads their `7-00:00:00` limits and prints
+   *nothing here is unschedulable* — the launcher's guard logic never looked at `gpu-short` at all.
+
+### 177.5 WHAT THE RECORD IS ENTITLED TO
+
+**From this commit, any launcher that sets `PARTS` and `WALL` before sourcing
+`bin/_lib_guards.sh` — the pattern of all 17 launchers since `cH1` — is aborted with exit 2 before
+its `sbatch` loop if the pair omits `gpu-short` at a walltime within `gpu-short`'s MaxTime (read
+live from `sinfo`, frozen at 04:00:00 off-cluster) or includes it above that cap, unless a printed
+`PARTS_NO_SHORT_REASON` says why; `slurm_parts_for_wall` composes the right list and prints why;
+4 of the 57 registered launcher pairs fail that guard and 53 pass; no launcher was edited.**
+
+Not entitled: that `gpu-short` would have started `crn1` sooner — under the per-QOS caps it very
+probably would (12 more GPUs on the same nodes), but the counterfactual was not run and the batch
+was in any case moved to another account; and any statement about the "45 s".
+
+### 177.6 STANDING CONSTRAINTS, DISCHARGED
+
+Zero GPU; no `sbatch`, no `scancel`, no `scontrol`; `alice` (shared) neither read nor written;
+`alice2` read via `sacct`/`sinfo`/`sacctmgr`/`scontrol show`, written only under a scratch
+directory that was removed.  `paper/` untouched.  No registered scorer edited; `analysis/` diff
+empty.  `git add` by path only.  Sibling commits (`52f5f67`, `8d34335`) landed in this tree during
+the cycle; this entry took the next free number at the moment of writing.  The corpus stands at
+**2,740 rows**.
