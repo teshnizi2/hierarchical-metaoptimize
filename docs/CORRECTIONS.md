@@ -24616,3 +24616,264 @@ this entry was being drafted.  **This entry therefore takes 193**, per `186`'s p
 **renumbers nothing of anyone else's**.  `docs/MASTER-TABLE.md` is Track C's file this cycle: it is
 **not** touched here, and `193` adds no row to it — the `cdep1` row is Track C's to add, and this
 entry does not pre-empt it.  Next free number: **194**.
+
+## 194. TRACK B — **`cvg1` LANDS 6/6 AND THE CAMPAIGN HAS ITS FIRST NON-ResNet RESULT: `GAP-REPLICATES`.**  ON `VGG11_bn_c100`/CIFAR-100 — A PLAIN BATCHNORM CONV STACK WITH **NO RESIDUAL ADDITION ANYWHERE** — `D = plateau5(layerwise) − plateau5(scalar)` = **+31.2687 pp = +65.42 SE**, ALL GATES CLEAN, TRAIN AGREEING (**+64.1587 pp**).  THE SCALAR→LAYERWISE GAP IS **NOT A ResNet ARTEFACT**, AND THE SCOPE OBJECTION IS ANSWERED **FOR THE GAP**.  RULE 20 IS AT **FULL 6/6 COVERAGE**, PASS, WITH A SEPARATE ENV AUDIT; EVERY HEADLINE NUMBER RE-DERIVES **DIGIT FOR DIGIT** UNDER AN INDEPENDENT PARSER SHARING NO CODE WITH THE SCORER.  **THE BRIEFING'S OWN CARRIER GUESS IS REFUTED BY THIS BATCH'S RECORDS: VGG's DOMINANT TENSOR IS `bn8.weight` ALONE — *NOT* THE FOUR 512-WIDE BN SCALES AT 14/17/20/23.**  **CORPUS 2,779 → 2,785 (+6, EXACTLY `cvg1`; 0 PRE-EXISTING ROWS CHANGED IN ANY FIELD).**  ZERO NEW GPU JOBS; `cvg1`'s OWN SPEND **4.29 GPU-h**.
+
+### 194.1 THREE BRIEFING CORRECTIONS, LED WITH BECAUSE THEY ARE LOAD-BEARING
+
+The cycle-149 briefing was written against a tree that has since moved. Measured, not quoted:
+
+1. **"docs/CORRECTIONS.md … now 191, next free 192" is STALE.** Two entries landed between the
+   briefing and this work: `192` (Track C, `656d8d8`, the `MASTER-TABLE.md` refresh) and `193`
+   (Track A, `062c6da`, `cdep1` lands at `IDENTITY-OPERATIVE`). **This entry takes 194** and
+   renumbers nothing.
+2. **"results/all_runs.csv = 2,761 rows" is STALE.** `193` ingested `cdep1`'s 18 rows; the corpus
+   was **2,779** when this track began. `wc -l` read 2,762 on my first measurement and 2,780 forty
+   minutes later — the second reading, not the first, is the one this entry builds on. (The file is
+   CRLF; `wc -l` and `csv.reader` agree at 2,780 lines = header + 2,779 rows.)
+3. **"HEAD b95152e" is STALE** — HEAD was `062c6da` before this entry, in sync with `origin/master`.
+4. **The queue reading was stale in the batch's favour, not against it.** The briefing put `cvg1` at
+   "2 of 6, 4 running, ~1.4 h each". Re-measured, the runs are far cheaper than `189.8` budgeted:
+   `sacct` Elapsed 22:22 / 19:15 / 63:06 / 61:04 / 63:20 / 28:30 = **4.2936 GPU-h** total (`.out`
+   "minutes" lines, a second witness: 256 min = 4.267 h). `189.8` corrected the launcher's "≤ 5
+   GPU-h" comment *upward* to "~9 GPU-h honest"; **the outturn is 4.29 h, so the launcher's original
+   comment was right and `189.8`'s correction was itself pessimistic.** Disclosed rather than left
+   standing. The whole batch completed within **~35 minutes** of the wait beginning (last job
+   `4929677` ended 16:21:41 CEST), so the bounded wait was cheap and no partial verdict was needed.
+
+### 194.2 RULE 20 AND THE SEPARATE ENV AUDIT — `cvg1` AT **FULL 6/6**, AND COVERAGE RAISED TO **27 OF 36**
+
+`189.9`'s outstanding audit, run **verbatim as it was written there**, with the **unedited** guard
+(`analysis/argsline_guard.py`, sha256 `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`,
+byte-identical in my worktree and in all four copies on `alice2`):
+
+```
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cvg1- --batch-consistency \
+        --vary stepsize-groups --vary seed --vary run-name
+  -> batch-consistency: every non-axis flag is identical across 6 runs
+  -> argsline_guard: 6 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+  -> VERDICT: PASS
+grep -h '^ENV:' $METAOPT_WS/runs/cvg1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c
+  -> 6  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none ... PROBE=100 EB_RHO=na EB_LOG=0     (ONE line x6)
+grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/cvg1-*.out | sed 's/ dir=.*//' | sort | uniq -c
+  -> 3  PROBE_TENSOR: on every=100 type=scalar    tensors=26 ...
+  -> 3  PROBE_TENSOR: on every=100 type=layerwise tensors=26 ...
+```
+
+Exactly as `189.9` predicted: one ENV line ×6 modulo `PROBE_DIR` (six distinct probe dirs, one per
+run), `PROBE_TENSOR` scalar ×3 / layerwise ×3. **`BETA_CLIP`, `PROBE` and `PROBE_TENSOR` ride the ENV
+line and cannot ride ARGS**, which is why the two audits are separate and both were run.
+
+**Coverage discharged beyond my own track, since the guard is read-only and cheap.** `191` left the
+campaign at **9 of 36**. Re-run now: `cdep1` **18/18 PASS** (one ENV line ×18), `cvg1` **6/6 PASS**,
+`ciso2` **3/12 PASS** — only 3 of its 12 have started, so it stays honestly `PARTIAL`, not `FAIL`.
+**Coverage is now 27 of 36**, and the two batches that have landed are both at 100 %.
+**`analysis/argsline_guard.py` was not edited; `git diff` over `analysis/` for this entry is empty.**
+
+### 194.3 THE REGISTERED SCORER, RUN UNEDITED, AND THE PREMISE IT ACTUALLY READ
+
+`analysis/cVG1_vggbn_gap_score.py`, sha256
+`ca23c3507b0a64727c2851972f886c6c7b8d0a2dbf8064f07911d3577989a908` — **identical in my worktree and
+in every copy on `alice2`**, and identical to the value `189.4` registered before launch. Run through
+the documented one-argument invocation, no flags, no edits.
+
+```
+FINAL: GAP-REPLICATES | GATES-CLEAN | SIGMA-PRIOR-DOMINATES | TRAIN-AGREES | FAMILY-NOT-VARIABLE
+```
+
+| arm | spec | m | TEST plateau5 (s31 / s32 / s33) | mean | range | TRAIN5 mean |
+|---|---|---|---|---|---|---|
+| `k01` | `scalar` | 1 | 35.6140 / 34.9380 / 34.5000 | **35.0173** | 1.1140 | 35.1233 |
+| `kL` | `layerwise` | 26 | 66.2380 / 66.3760 / 66.2440 | **66.2860** | 0.1380 | 99.2820 |
+
+**`D`(TEST) = +31.2687 pp = +65.42 SE. `D`(TRAIN) = +64.1587 pp.** Gates, all PASS: `G-SOUND` 6/6
+`RUN_DONE`, 100 epoch lines, 0 tracebacks; `G-FLOOR` max arm mean 66.2860 ≥ 15.00 against a 1.00 pp
+chance floor; `G-CEIL` 66.2860 ≤ 90.00; `G-DIVERGE` both ranges ≤ 5.00; `G-STRUCT` 26 tensors /
+9,274,532 params / four 512-wide `*.weight` at 14, 17, 20, 23 / **no name contains `shortcut`**;
+`G-ENV` one ENV line, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, `PROBE=100`, `PROBE_TENSOR: on` ×6.
+
+**A DISCLOSURE ABOUT THE SCORER'S OWN PREMISES, WHICH `193` MOVED UNDER IT.** The copy staged on
+`alice2` holds the **2,761-row** corpus (0 `cdep1` rows, 0 `cvg1` rows), so at score time it read
+exactly the corpus `189` registered against, and printed the registered reference
+`ResNet18_c100/CIFAR100 D +40.371 (scalar n35, layerwise n47)`. Re-run **unedited** on the Mac against
+the **post-ingest 2,785-row** corpus, the verdict, `D`, `SIGMA_PRIOR`, `SIGMA_USED`, `SE_ARM_DIFF` and
+every gate are **bit-identical**; the only line that moves is the descriptive reference, to
+**+40.689 (n38, n50)** — because `cdep1`'s `k01`/`k62` arms added 3 scalar and 3 layerwise
+`ResNet18_c100` rows. `cvg1`'s `D` is 77.5 % of the registered reference and 76.8 % of the live one.
+**`165.4`'s invariance holds: this batch's own ingest does not move its own bars** — `cvg1-` is
+excluded from every corpus reader — and the one number that did move was moved by *another track*, not
+by `cvg1`. `SIGMA_PRIOR` is a **frozen registered literal** (0.585420), correctly not recomputed; an
+independent re-derivation at the registered 2,761-row corpus reproduces it **exactly** (df 71, 11
+cells, 82 members), and at the live 2,779-row corpus it would be 0.586232 — a +0.0008 pp drift that
+moves `D/SE` from +65.42 to +65.33 and nothing else.
+
+### 194.4 THE ATTACK — AN INDEPENDENT PARSER, AND THE VGG-SPECIFIC FAILURE MODE CHECKED EXPLICITLY
+
+A parser written for this entry (`indep_cvg1_c149.py`), reading **only** the raw `.out` files and the
+batch's own probe JSON, sharing **no code** with `cVG1_vggbn_gap_score.py`, reproduces **every**
+headline number digit for digit: all six per-run `plateau5`, both arm means, both `TRAIN5` means,
+`D`(TEST) **+31.2687**, `D`(TRAIN) **+64.1587**, `SIGMA_INBATCH` **0.400658** (df 4), `SE_ARM_DIFF`
+**0.477993**, `D/SE` **+65.42**, both seed ranges, and every gate — and returns the same verdict,
+`GAP-REPLICATES`, from bars it applies itself. The six `.out` files were verified **byte-identical**
+(sha256) between `alice2` and the Mac before any of this was read.
+
+**The arity check the task named, and it is clean.** 26 tensors instead of 62 changes the reduction's
+arity, so the runs' own `block_sizes.json` — written by the live model, not by any scorer — was read:
+
+| arm | `stepsize_type` | `m` = `len(n_b)` | `sum(n_b)` | `len(beta)` | `len(z_tensor)` | probe records |
+|---|---|---|---|---|---|---|
+| `k01` ×3 | `scalar` | **1** | 9,274,532 | 1 | 26 | 500 |
+| `kL` ×3 | `layerwise` | **26** | 9,274,532 | 26 | 26 | 500 |
+
+**Scalar really composed one group over all 9,274,532 parameters; layerwise really composed 26 groups
+whose sizes sum to 9,274,532 — the manifest's total, exactly.** Neither arm silently fell back to a
+ResNet partition, and `[49,13]`/`resnet18_blocks` never entered.
+
+**The runs really trained, and they failed in the registered way.** Test-accuracy trajectories
+(every 10 epochs) run 0.9→9.5→34.4→35.8→…→35.6 for `k01` and 0.9→9.5→47.2→61.1→…→66.3 for `kL`.
+`189.8`'s warning holds and is now vindicated from the other side: **the 3-epoch smoke's 1.01 % was
+chance and told us nothing**, because at `alpha0` 1e-6 both arms are still at ~1 % at epoch 0 and
+~10 % at epoch 10 before separating at epoch 20.
+
+**The scalar arm's collapse is mechanically the same object as ResNet's.** The single `beta` starts at
+log(1e-6) = −13.8145, rises to a peak of −5.51/−5.48/−5.51, then descends and **first pins at the −15
+clamp at epoch 35.8 / 36.0 / 35.8** and stays pinned for 64 % of records — against `190.2`'s measured
+ResNet18_c100 figure of **record 184 = epoch 36.8**. Test accuracy is flat from epoch ~30 onward.
+`kL` ends with **12 of 26 groups pinned and 14 free** (max `beta` −7.21 to −7.55), on all three seeds,
+with the identical pinned index set `{2,5,8,9,11,14,17,20,21,23,24,25}`.
+
+### 194.5 THE CARRIER NOMINATION — **A HYPOTHESIS FOR A FUTURE BATCH, NOT A RESULT — AND IT REFUTES THE BRIEFING'S GUESS**
+
+The gate passed, so `189.7`(b)'s follow-on nomination is licensed and was done **from this batch's own
+`PROBE_TENSOR` records with zero extra GPU**, using `ctd1`'s convention re-implemented independently:
+`L_i = 0.9·m_i + 0.1·z_i` (the pre-sign Lion quantity), ranked on the **scalar** arm's **pinned**
+records (321 / 320 / 321 of 500).
+
+The task asked whether VGG's top set is "the four 512-wide BN scales at 1-based 14/17/20/23."
+**Measured, the answer is NO, and the truth is sharper.** Mean over the three seeds:
+
+| rank | idx | name | numel | share of Σ mean&#124;L_i&#124; | frac `L>0` |
+|---|---|---|---|---|---|
+| 1 | **23** | **`bn8.weight`** | **512** | **0.5784** | **1.000** |
+| 2 | 22 | `conv8.weight` | 2,359,296 | 0.1175 | 0.000 |
+| 3 | 19 | `conv7.weight` | 2,359,296 | 0.0562 | 0.000 |
+| 4 | 16 | `conv6.weight` | 2,359,296 | 0.0547 | 0.000 |
+| 11 | 20 | `bn7.weight` | 512 | 0.0021 | 1.000 |
+| 19 | 14 | `bn5.weight` | 512 | 0.0000 | 0.000 |
+| 20 | 17 | `bn6.weight` | 512 | 0.0000 | 0.000 |
+
+And on `187`'s **operative** statistic — the sign of the **remainder** sum, not domination — computed
+here independently on every pinned record of every seed:
+
+* `Σ_i L_i > 0` (`beta` DOWN) on **1.0000** of pinned records, all three seeds.
+* Removing **`{23}` alone** flips the remainder's sign on **1.0000** and dominates it on **1.0000**.
+* Removing `{20,23}` or `{14,17,20,23}`: also 1.0000 — they merely contain 23.
+* Removing **`{14,17,20}` — the other three 512-wide BN scales — flips nothing: 0.0000.**
+* Removing `{22}` `conv8.weight` or `{25}` `linear.weight`: **0.0000**.
+
+**So VGG's nominated carrier set is `{bn8.weight}` — ONE tensor, 512 parameters, 0.0055 % of the
+model — not four.** Corroboration in the same records: under **layerwise** dynamics `bn8.weight`'s
+mean &#124;L&#124; falls by ×69 and it drops to rank 10, exactly the trajectory-specific signature
+`184` reported for ResNet's carriers (ranks 5/6/11, ×30 smaller under layerwise).
+
+**REGISTERED AS A HYPOTHESIS. NOTHING WAS SUBMITTED.** The composed spec `189.7`(b) priced —
+`sets:…/bn5.weight,bn6.weight,bn7.weight,bn8.weight`, sizes `[22,4]` — is **now the wrong arm to run
+first**; this batch's own records say the arm to run is **`sets:1-22,24-26/bn8.weight`, sizes
+`[25,1]`**, with `{14,17,20}` as a **numel-, width- and class-matched non-carrier control** that does
+not exist on ResNet (which has only two such non-carriers). That is a strictly better-founded and
+cheaper design than the one registered in advance, and it is recorded here so the next cycle inherits
+it rather than the superseded guess. **`189.7`(b) is not edited; it is superseded by measurement.**
+
+### 194.6 WHAT THIS RESULT DOES **NOT** LICENSE
+
+* **It is NOT a one-variable ablation, and `189.2` declared this before any run existed. Hold the
+  line.** `VGG11_bn` differs from `ResNet18` in depth, channel schedule and downsampling as well as in
+  the residual connection. **`GAP-REPLICATES` does NOT license "residual connections are irrelevant
+  to the gap."** The clean one-variable object — `ResNet18` with `out += self.shortcut(x)` deleted —
+  was deliberately not built and is still not built.
+* **What it *does* license about `189.2`'s hypothesis is narrower than it looks.** `189.2` observed
+  that on ResNet, "the carriers are the BN scales that feed a residual add" and "the carriers are the
+  deepest, widest BN scales" are the same measurement seen twice. VGG has **no** residual addition, so
+  the first description is not even statable here — and a dominant carrier appears anyway. That makes
+  the **strong** residual account hard to hold, and it is consistent with the **depth** description
+  surviving. It does **not** establish the depth description: **`cvg1` registered no isolation arm and
+  ran no intervention on VGG.** §194.5 is an observation on records, of exactly the kind `184` was, and
+  `184`→`187` is the campaign's own demonstration that an observation of this shape can survive
+  intervention and still have the wrong mechanism attached to it.
+* **The magnitude confound of `188.3` has an exact analogue here, and it is worse.** `bn8.weight`
+  carries 0.5784 of the mass while `bn5`/`bn6` carry ~0.0000; **no carrier-free set of 512-wide VGG BN
+  scales can be magnitude-matched to it either.** Any future VGG isolation result will separate
+  identity from depth and class, and will **not** separate identity from term magnitude. Say so
+  wherever it is stated.
+* **RULE 11 mistuning is untested on VGG.** No argmax over granularity was located on this
+  architecture; `cvg1` compares two registered points, not two tuned optima. Mistuning can only
+  *suppress* a gap, so it cannot manufacture `GAP-REPLICATES` — but it does mean +31.2687 pp is a
+  **lower bound on the achievable gap**, not an estimate of it, and the 77 %-of-ResNet comparison is
+  descriptive only.
+* **One arm-level asymmetry, disclosed.** `kL` reaches 99.28 % TRAIN against 66.29 % TEST — it
+  memorises the training set — while `k01` sits at 35.12 / 35.02, under-fitting from a collapsed step
+  size. The gap is therefore an **optimisation** gap at this cell, not a generalisation gap; the same
+  is true of the ResNet rows it is being compared with, so the comparison is like-for-like, but
+  neither is evidence about generalisation.
+* **`BATCH` is the unit of replication.** Every number above is within `cvg1`. No `cvg1` arm is
+  spliced against any other batch's arm; the corpus rows in §194.3 appear only as a **descriptive
+  reference**, never as a contrast term.
+* **GPU heterogeneity, disclosed, and it is not matched pairwise.** `s31` ran both arms on node887
+  (L4); `s32` both on node851 (2080 Ti); **`s33` split — `k01` on node851 (2080 Ti), `kL` on node868
+  (A100)**. This affects wall time only (19–63 min), and the `s33` pair's `plateau5` sits inside both
+  arms' seed ranges, but the design is not GPU-matched and this was not planned.
+
+### 194.7 THE INGEST, IN THE DOCUMENTED ORDER, WITH BOTH HALVES OF THE CHECK
+
+`146.7`'s trap avoided: `aggregate.py` was redirected **into the corpus**, never into a log. The six
+`.out` files, `cvg1-PARTITION-MANIFEST.txt` and the `cvg1/` artefact tree were first rsynced from
+`alice2` and **sha256-verified byte-identical** to the cluster's copies.
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+  # 2785 runs aggregated
+  # WARNING: 3 duplicated run-name(s)   [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply
+  APPLIED: 36 rows updated   (all dup_group only; accuracy/config 0 rows, superseded 0 rows)
+```
+
+**BOTH halves verified, because `changed == 0` alone proves nothing.** A comparator keyed
+`(run, job_id)` across the pre-ingest snapshot and the post-`args_repair` corpus:
+
+* **ADDED 6** — exactly `cvg1-{k01,kL}-s{31,32,33}`, no more, no fewer.
+* **REMOVED 0.**
+* **Pre-existing rows differing in ANY field: 0** — not "0 accuracy fields", **0 field-cells of 37**.
+* All 6 new rows carry `window_ok == 1` **and** `complete == 1`, `epochs_done` 100, `superseded 0`,
+  `collapsed 0`, `network VGG11_bn_c100`, `dataset CIFAR100`, seeds {31,32,33}.
+* CSV `plateau5` per run **equals** the raw-`.out` re-derivation exactly (35.614 / 34.938 / 34.500 /
+  66.238 / 66.376 / 66.244). **Three independent parsers agree**: my attack parser, the registered
+  scorer, and `aggregate.py`'s own parse.
+
+**`results/all_runs.csv`: 2,779 → 2,785 rows.** The corpus now holds **twelve** `network` values and
+is **no longer 100 % ResNet**: 6 rows fail `^[Rr]es[Nn]et`, and they are exactly `cvg1`'s.
+**plateau5 is primary throughout; the banned `plateau` column and `best_test` are read nowhere.**
+
+### 194.8 COST AND THE STANDING CONSTRAINTS
+
+**ZERO new GPU jobs. Nothing submitted, nothing cancelled, nothing requeued.** `cvg1`'s own spend from
+`sacct` at completion: **6/6 `COMPLETED`, 4.2936 GPU-h** (`.out` "minutes" second witness 4.267 h),
+against `189.8`'s honest estimate of ~9 h and its `WALL 03:00:00 × 6 = 18` h bound — **under both, and
+under the launcher comment's original "≤ 5 GPU-h" that `189.8` had corrected upward** (§194.1). The
+account's remaining batch was not touched: **`ciso2` still has 12 jobs in `squeue`** (4 RUNNING, 8
+PENDING at 16:27 CEST) and lands tomorrow; **it is not this entry's business and no `ciso2` number is
+quotable** (RULE 20 `PARTIAL` at 3/12). **`alice` — Saber's shared account — was not contacted at
+all.** `paper/paper.tex` and `paper/DRAFT-v4.md` untouched. No nested `claude -p`. `git add`
+restricted to this track's own paths. **RULE 16 honoured: `git diff` over `analysis/` is EMPTY —
+not one tracked file there was modified, no registered scorer and not `analysis/argsline_guard.py`
+was edited.** This entry's four attack/nomination scripts are **pure additions** in `analysis/`
+(the `ctd1_attack_rederive.py` precedent): `cvg1_attack_rederive.py`, `cvg1_attack_beta_traj.py`,
+`cvg1_nominate_vgg_carriers.py`, `cvg1_nominate_remainder_sign.py`. Each takes the runs directory as
+its one argument and **every number in §§194.4–194.5 was re-reproduced from the committed copies**
+against `../runs_alice2` on the Mac, matching the cluster run digit for digit. `analysis/c98_reproduce.py` exit code
+reported as-is: **1** (inherited, author scope, not fixed).
+
+**LEDGER.** The registered-candidate ledger is **unchanged** by this entry — `cvg1` tested a *scope*
+question, not a mechanism candidate. Seventeen registered, fifteen dead, two live. What changes is the
+**scope** of the campaign's headline: the scalar→layerwise gap now has **two architecture families**.
+
+Next free number: **195**.
