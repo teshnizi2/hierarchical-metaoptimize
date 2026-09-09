@@ -209,9 +209,46 @@ def chart_arch():
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="The granularity gap on ResNet and VGG">' + "".join(p) + '</svg>'
 
 
+
+# ============ CHART 7 : the horizon test, 100 -> 250 epochs ============
+def chart_horizon():
+    rows = [
+        ("k62",  "m = 62 &#183; still training",        69.0813, 70.3667, "hi",   "not pinned on 3/3"),
+        ("ISO",  "[59,3] &#183; the 3 carriers",         69.9093, 69.8967, "win",  "pins ep 99.4&#8211;103.0"),
+        ("ONE",  "[61,1] &#183; tensor 50 alone",        64.7960, 64.9440, "win",  "first touch ep 135.8&#8211;151.0"),
+        ("k01",  "m = 1 &#183; the floor",               23.0640, 23.1573, "lo",   "pinned since ep 37"),
+    ]
+    W,H = 760, 300; L,R,T,B = 168, 172, 34, 48
+    x0,x1 = L, W-R; y0,y1 = T, H-B
+    vmin,vmax = 20,74
+    X = lambda v: lin(v,vmin,vmax,x0,x1)
+    band = (y1-y0)/len(rows)
+    p=[]
+    for v in range(20,75,10):
+        p.append(f'<line x1="{X(v):.1f}" y1="{y0-10:.1f}" x2="{X(v):.1f}" y2="{y1:.1f}" class="grid"/>')
+        p.append(f'<text x="{X(v):.1f}" y="{y1+18:.1f}" class="ax ax-c">{v}</text>')
+    for i,(name,sub,a,b,kind,note) in enumerate(rows):
+        yc = y0 + band*i + band/2
+        p.append(f'<text x="{L-16:.1f}" y="{yc-2:.1f}" class="rowname ax-r">{name}</text>')
+        p.append(f'<text x="{L-16:.1f}" y="{yc+13:.1f}" class="rowsub ax-r">{sub}</text>')
+        lo,hi = min(a,b), max(a,b)
+        p.append(f'<line x1="{X(lo):.1f}" y1="{yc:.1f}" x2="{X(hi):.1f}" y2="{yc:.1f}" class="dumb"/>')
+        p.append(f'<circle cx="{X(a):.1f}" cy="{yc:.1f}" r="5" class="dot dot-open"/>')
+        p.append(f'<circle cx="{X(b):.1f}" cy="{yc:.1f}" r="4.2" class="dot dot-{kind}"/>')
+        d = b - a
+        sign = "+" if d >= 0 else "&#8722;"
+        p.append(f'<text x="{x1+14:.1f}" y="{yc+1:.1f}" class="val">{sign}{fmt(abs(d),3)} pp</text>')
+        p.append(f'<text x="{x1+14:.1f}" y="{yc+15:.1f}" class="rowsub">{note}</text>')
+    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{y0-18:.1f}" class="rowsub ax-c">hollow = epoch 95&#8211;99 (read in-run)  &#183;  solid = epoch 245&#8211;249</text>')
+    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-8:.1f}" class="axtitle ax-c">plateau5 (%) &#183; the same 12 runs read at both horizons &#183; RHO = 0.9977</text>')
+    return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="The horizon test from 100 to 250 epochs">' + "".join(p) + '</svg>'
+
+
 # ---------- content tables ----------
 HOLDS = [
  ("It is those tensors, not that depth","Isolating three <code>layer4</code> BatchNorm parameters matched to the carriers on group sizes, isolated numel (1,536 <em>exactly</em>), width, stage and normalisation-layer membership &#8212; but containing no carrier &#8212; recovers <strong>0.36 %</strong> of the gap. <code>&#916;_ID = +46.52 pp = +61.56 SE</code>. Every seed clears the bar alone.","cdep1","18 runs, 6 arms, fresh seeds {24,25,26}","188, 193"),
+ ("The rescue is not a delay","At 250 epochs &#8212; 2.5&#215; the horizon &#8212; <code>RHO = D_ISO@250 / D_ISO@100 = 0.9977</code>. ISO freezes on schedule around epoch 102 and then holds 69.9 % for 148 further epochs while the floor holds 23.1 %. The registered &#8220;it is only a delay&#8221; account needed &#8804;5 pp and missed by 41.7.","ciso2","12 runs, 250 ep, in-run paired control","190, 196"),
+ ("Batch is the unit of replication","Tested directly and twice. The same intervention re-run in two fresh batches at disjoint seeds reproduced its contrasts: <code>D_ONE</code> +41.4693&#8594;+41.4747, <code>D_ISO</code> +46.9307&#8594;+46.8453. Against a 2-SE read bar of 1.51 pp.","cdep1 / ciso2","3 disjoint seed blocks, byte-identical partitions","191, 193, 196"),
  ("The gap is not a ResNet artefact","On <code>VGG11_bn_c100</code> &#8212; a plain BatchNorm conv stack with <em>no residual addition anywhere</em> &#8212; scalar&#8594;layerwise is <strong>+31.27 pp = +65.42 SE</strong>. The corpus is no longer 100 % ResNet.","cvg1","6 runs, first non-ResNet batch in the campaign","189, 194"),
  ("Cut position beats group count","At m = 2, <em>where</em> the 62 tensors are split moves test accuracy by 25.07 pp; adding groups does not. Argmax <code>k* = 49</code>.","cpk1 / cpk2 / cpk3","39+18+21 runs, 3 fresh-seed batches, 100 &amp; 772 ep","158, 161"),
  ("The cut-position peak survives the horizon","Re-run at 772 epochs on fresh seeds {3,4,5} and again on {6,7,8}: the argmax does not move. The forecast predicted three rank swaps; zero occurred.","cpk2 / cpk3","772 ep &#183; converged budget","156, 158, 161"),
@@ -239,11 +276,11 @@ CAND = [
  ("14","the reduction &#8212; <code>crn1</code>","LIVE","<code>COMPOSITION-OPERATIVE</code> on one clean pair; the null is excluded on all three","169, 173"),
  ("15","H-DISAGREE","DEAD","argmax at k = 1, &#961; = &#8722;0.05","179"),
  ("16","H-DOMINATE","DEAD","dead as named; element statistic does not exist on disk","181, 184, 186"),
- ("17","H-ISOLATE &#8212; <code>ciso1</code> / <code>cdep1</code>","LIVE","Supported on the identity-vs-depth leg (<code>IDENTITY-OPERATIVE</code>). Magnitude leg architecturally unreachable; horizon leg in flight.","185, 187, 193"),
+ ("17","H-ISOLATE &#8212; <code>ciso1</code> &#183; <code>cdep1</code> &#183; <code>ciso2</code>","LIVE","All three legs have reported. Identity: closed. Magnitude: architecturally unreachable. Horizon: measured, registered gate not cleared. Does not die &#8212; the collapse account was reachable and was refuted. Does not graduate.","185, 187, 193, 196"),
 ]
 
 RUNNING = [
- ("ciso2","<strong>12 jobs</strong> &#183; 4 arms &#215; seeds {31,32,33} &#183; <strong>250 epochs</strong>, horizon derived from the measured descent slope. Spec strings byte-identical to <code>ciso1</code>&#8217;s; the 100-epoch control is read in-run and paired.","Whether the rescue is a regime or a ~68-epoch delay. Also carries the second, stronger half of the replication test at a longer horizon.","190"),
+ ("cvi1","<strong>Registered, launch-ready, not submitted.</strong> 12 jobs &#183; ~13 GPU-h &#183; 4 arms &#215; fresh seeds {41,42,43} on <code>VGG11_bn_c100</code>. Isolates <code>bn8.weight</code> at [25,1] against <code>bn7.weight</code> as an <em>exact</em> twin &#8212; the two arms differ in precisely two tensor memberships and nothing else.","The scope leg: the first isolation intervention off ResNet. VGG has four 512-wide BN scales &#8212; one nominated carrier and three matched non-carriers &#8212; so the control is one-for-one. ResNet-18 has only two, which is why <code>cdep1</code> needed a set matched on totals.","198"),
 ]
 
 def tr_holds():
@@ -290,10 +327,12 @@ def tr_corpus():
                    for a,b,c in CORPUS)
 
 HOUSE = [
- ("Only <code>ciso2</code> is still spending","<code>cdep1</code> cost 16.25 GPU-h and <code>cvg1</code> 4.29. A fourth batch still should not launch until <code>ciso2</code> drains.","warn"),
- ("RULE 20 coverage is 28 of 36","<code>cdep1</code> 18/18 and <code>cvg1</code> 6/6 both PASS at full coverage with clean ENV audits &#8212; their numbers became quotable only at that point. <code>ciso2</code> sits at 4/12: <em>unverified</em> on the rest, not failed. No <code>ciso2</code> number is quoted anywhere.","warn"),
- ("<code>docs/MASTER-TABLE.md</code> went stale inside its own cycle","Brought current at entry 192 &#8212; 74 &#8594; 105 rows, header re-derived twice, bottom line rewritten onto the CIFAR-100 denominator. Then two batches ingested behind it. It now needs <code>cdep1</code> and <code>cvg1</code> rows. Reported rather than half-patched from a reconciliation entry.","warn"),
- ("Seeds {31,32,33} are used twice","<code>ciso2</code> and <code>cvg1</code> both reserved them. Both freshness claims were correct against the corpus; neither track could see the other. Different architectures, different prefixes, every contrast in batch &#8212; not a defect, but next free triple is {34,35,36}.","warn"),
+ ("Queue empty, ~42 GPU-h spent this week","<code>cdep1</code> 16.25 h, <code>ciso2</code> 21.65 h, <code>cvg1</code> 4.29 h. Nothing running; <code>cvi1</code> is registered and waiting.","ok"),
+ ("The freedom gate measures the wrong thing","<code>PIN_OCC_MIN</code> scores dwell time at exactly &#8722;15.000 rather than step-size magnitude, so it bucketed ISO with the free arm despite a hundredfold difference in step size. Registered before the data existed and fired honestly; the defect is measured and disclosed, and the scorer is frozen. A successor must fix it by registration.","warn"),
+ ("The <code>AUGMENT=0</code> fairness objection is still open","The parent paper&#8217;s own setup. Open since cycle 13; the only runs at that setting were submitted against a standing rule and cannot be pooled. The last fairness objection with teeth, and a cheap batch.","warn"),
+ ("RULE 20 closed at 36 of 36","All three cycle-148 batches PASS at full coverage on the unedited guard, with clean separate ENV audits. All 36 <code>.out</code> files verified byte-identical between the cluster and the local mirror before any number was read.","ok"),
+ ("<code>docs/MASTER-TABLE.md</code> is current","74 &#8594; 108 rows across two passes; the registered checker goes exit 1 &#8594; exit 0 unedited. Its bottom line now carries the CIFAR-100 denominator, the off-ResNet gap replication, and an explicit marking that the gap and the isolation must never travel together.","ok"),
+ 
  
  ("<code>paper/paper.tex</code> predates this week entirely","5,173 lines, untouched since 2026-09-03. None of the isolation, denominator or RULE 11 work is in it.","warn"),
  ("<code>analysis/c98_reproduce.py</code> exits 1","Ten stale-numeral failures, inherited, author scope. Deliberately not fixed &#8212; fixing it would edit registered scorers.","warn"),
@@ -470,6 +509,9 @@ figcaption b {{ color:var(--ink); font-weight:600; }}
 .ln-a {{ stroke:var(--series-a); }} .ln-b {{ stroke:var(--series-b); stroke-dasharray:5 3; }}
 .dot {{ stroke:var(--surface); stroke-width:1.5; }}
 .dot-a {{ fill:var(--series-a); }} .dot-b {{ fill:var(--series-b); }}
+.dot-open {{ fill:var(--surface); stroke:var(--rule-2); stroke-width:1.8; }}
+.dot-win {{ fill:var(--ok); }} .dot-hi {{ fill:var(--accent); }} .dot-lo {{ fill:var(--faint); }}
+.dumb {{ stroke:var(--rule-2); stroke-width:2.5; stroke-linecap:round; }}
 .ref-hi {{ stroke:var(--ok); stroke-width:1.2; stroke-dasharray:2 4; }}
 .ref-lo {{ stroke:var(--faint); stroke-width:1.2; stroke-dasharray:2 4; }}
 .reflab {{ font-family:"IBM Plex Mono",monospace; font-size:11px; fill:var(--muted); }}
@@ -526,20 +568,20 @@ footer {{
   <p class="eyebrow">
     <span>Hierarchical MetaOptimize</span><span class="dot">/</span>
     <span>ALICE &#183; Leiden</span><span class="dot">/</span>
-    <span>cycles 1&#8211;149</span><span class="dot">/</span>
-    <span>CORRECTIONS 195</span>
+    <span>cycles 1&#8211;150</span><span class="dot">/</span>
+    <span>CORRECTIONS 199</span>
   </p>
-  <h1>What 2,785 runs actually established</h1>
-  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Nine results hold.</strong> Nine died, including the one the project was named for. The strongest is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap &#8212; and that it is those specific tensors, not merely three tensors at that depth. The gap now also reproduces on an architecture with no residual connections at all.</p>
+  <h1>What 2,797 runs actually established</h1>
+  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Eleven results hold.</strong> Nine died, including the one the project was named for. The strongest is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap &#8212; and that it is those specific tensors, not merely three tensors at that depth. The gap now also reproduces on an architecture with no residual connections at all, and the rescue survives 2.5&#215; the horizon losing one tenth of one percent. What the campaign still cannot do is <em>name</em> the mechanism &#8212; and this report says plainly which sentences that rules out.</p>
 </header>
 
 <div class="rail">
-  <div class="stat"><span class="n">2,785</span><span class="k">runs</span></div>
-  <div class="stat"><span class="n">2,935</span><span class="k">GPU-hours</span></div>
-  <div class="stat"><span class="n">195</span><span class="k">corrections</span></div>
-  <div class="stat"><span class="n" style="color:var(--ok)">9</span><span class="k">results hold</span></div>
+  <div class="stat"><span class="n">2,797</span><span class="k">runs</span></div>
+  <div class="stat"><span class="n">2,956</span><span class="k">GPU-hours</span></div>
+  <div class="stat"><span class="n">199</span><span class="k">corrections</span></div>
+  <div class="stat"><span class="n" style="color:var(--ok)">11</span><span class="k">results hold</span></div>
   <div class="stat"><span class="n" style="color:var(--bad)">9</span><span class="k">results dead</span></div>
-  <div class="stat"><span class="n" style="color:var(--accent)">12</span><span class="k">jobs in flight</span></div>
+  <div class="stat"><span class="n" style="color:var(--accent)">0</span><span class="k">jobs in flight</span></div>
 </div>
 
 <section>
@@ -625,6 +667,19 @@ footer {{
 </section>
 
 <section>
+  <div class="sechead"><h2>Not a delay &#8212; a regime</h2><span class="seckey">figure 7 &#183; CORRECTIONS 190, 196</span></div>
+  <p class="deck">The obvious objection to the rescue was that it merely postponed the scalar collapse. At 100 epochs ISO&#8217;s coarse group was still descending toward the clamp, so the accuracy might have been borrowed from a group that had not yet frozen. Re-running the identical intervention to 250 epochs settles it. The 100-epoch column below is read in-run from the same twelve runs, so the two horizons are <em>paired</em>.</p>
+  <figure>
+    {chart_horizon()}
+    <figcaption><b>Nothing moved.</b> ISO&#8217;s coarse group reached the clamp at epoch 99&#8211;103, within 2.7 epochs of the prediction made from the 100-epoch descent slope &#8212; and accuracy then held flat to &#177;0.046 pp across 150 further epochs. The floor arm was checked first as the batch&#8217;s null model: pinned since epoch 37, it drifts +0.09 pp over the same span, so nothing here is a drift artefact.</figcaption>
+  </figure>
+  <div class="callout">
+    <h3>The registered verdict is not <code>RESCUE-SURVIVES</code>, and I am not going to write it as though it were.</h3>
+    <p>The scorer returned <code>UNRESOLVED-NOT-PINNED</code>, because a freedom gate sits <em>ahead</em> of the primary bar in the branch map and ISO failed it. That gate measures dwell time at exactly &#8722;15.000, and ISO chatters: it makes ~140 departures after first touch and sits within 0.05 nats of the clamp on 92&#8211;94 % of records. Move the threshold by that 0.05 nats &#8212; a 5 % change in step size &#8212; and occupancy jumps to 0.93. ISO&#8217;s step size never exceeds 1.2&#215; the floor; the genuinely free arm runs at <b>86&#8211;131&#215;</b> it. So the gate puts two arms whose step sizes differ hundredfold in the same bucket. That is a measured defect in the instrument, disclosed &#8212; and the fix is a successor scorer by registration, never an edit to this one.</p>
+  </div>
+</section>
+
+<section>
   <div class="sechead"><h2>Off ResNet for the first time</h2><span class="seckey">figure 6 &#183; CORRECTIONS 189, 194</span></div>
   <p class="deck">Until this week every one of the campaign&#8217;s runs was a ResNet. That was the objection every finding shared. <code>VGG11_bn_c100</code> keeps convolutions and keeps BatchNorm, and has no residual addition anywhere &#8212; which matters because on a ResNet &#8220;feeds a residual add&#8221; and &#8220;is the deepest, widest BatchNorm scale&#8221; are the same measurement seen twice.</p>
   <figure>
@@ -656,9 +711,10 @@ footer {{
 </section>
 
 <section>
-  <div class="sechead"><h2>Running now</h2><span class="seckey">launched this cycle</span></div>
+  <div class="sechead"><h2>Next, awaiting your go-ahead</h2><span class="seckey">CORRECTIONS 198 &#183; nothing submitted</span></div>
+  <p class="deck">The queue is empty for the first time in a week. Four candidates were ranked; this one won because it is the only one that moves the only leg still open. Second place &#8212; deleting ResNet&#8217;s residual add for a true one-variable ablation &#8212; turned out to be mispriced: three shortcuts carry nine real parameters, so removing the addition alone would orphan them.</p>
   <div class="tscroll"><table>
-    <thead><tr><th>Arm</th><th>What it is</th><th>What it decides</th><th>Cost</th></tr></thead>
+    <thead><tr><th>Batch</th><th>What it is</th><th>What it decides</th><th>Entry</th></tr></thead>
     <tbody>{tr_running()}</tbody>
   </table></div>
 </section>
@@ -677,6 +733,32 @@ footer {{
 </section>
 
 <section>
+  <div class="sechead"><h2>What can actually be written</h2><span class="seckey">CORRECTIONS 199 &#183; asked of each result separately</span></div>
+  <p class="deck">Four claims, judged one at a time against what the corpus can defend. One of them is a no.</p>
+  <div class="tscroll"><table>
+    <thead><tr><th></th><th>Claim</th><th>Qualifier that must travel with it</th></tr></thead>
+    <tbody>
+      <tr><td class="c-st"><span class="pill pill-ok">as-is</span></td>
+        <td><div class="t-claim">The denominator</div><div class="t-detail">MetaOptimize does not beat a tuned non-meta baseline. CIFAR-100: <code>+5.699 pp = +18.80 SE</code> in one batch, every rung of the SGD ladder beating the meta cell. CIFAR-10: &#8722;1.807 pp on plateau5, flat across 100/300/600 epochs. <strong>The strongest thing the campaign owns.</strong></div></td>
+        <td class="t-detail">It <em>does</em> beat the fixed-step baseline the parent paper used, +1.551 pp, t = +12.2 &#8212; state that. One fairness objection still has teeth: the parent paper&#8217;s own <code>AUGMENT=0</code> setup has never been run cleanly. Cheap, and 150 cycles have not run it.</td></tr>
+      <tr><td class="c-st"><span class="pill pill-ok">as-is</span></td>
+        <td><div class="t-claim">Cut position</div><div class="t-detail">The granularity effect localises to a single step, <code>k* = 49</code>, replicated at a converged 772-epoch budget on fresh seeds. Group count and size balance both independently disqualified. The cleanest localisation the campaign owns &#8212; and it does not depend on the isolation line at all.</div></td>
+        <td class="t-detail">Still ResNet-only. A cut-position replication on VGG has never been registered and would be cheap.</td></tr>
+      <tr><td class="c-st"><span class="pill pill-warn">with care</span></td>
+        <td><div class="t-claim">The granularity gap</div><div class="t-detail">Now demonstrably off ResNet: <code>+31.27 pp = +65.42 SE</code> on a non-residual BatchNorm conv stack, train agreeing at +64.16.</div></td>
+        <td class="t-detail">Non-<em>residual</em>, not non-<em>BatchNorm</em>. And no granularity sentence may be written without the &#8220;at a shared <code>ms</code> = 1e-3&#8221; qualifier &#8212; tuning each arm at its own optimum reverses the early-epoch trend. The VGG figure is a <strong>lower bound</strong>, not an estimate.</td></tr>
+      <tr><td class="c-st"><span class="pill pill-bad">not as written</span></td>
+        <td><div class="t-claim">The isolation</div><div class="t-detail">Three limits bind it at once, and <em>each alone</em> sinks a mechanism claim: magnitude is architecturally unreachable on ResNet-18, so &#8220;those tensors&#8221; cannot be separated from &#8220;the three largest terms&#8221;; the line is 100 % ResNet and VGG&#8217;s carrier set has cardinality <em>one</em>; and the registered freedom gate has now failed at both 100 and 250 epochs.</div></td>
+        <td class="t-detail"><strong>Writable:</strong> &#8220;a 512-parameter subset of a step-size partition determines whether the optimiser reaches the layerwise ceiling or the scalar floor, and controls matched on depth, layer class, width and isolated numel do not reproduce it.&#8221; <strong>Not writable:</strong> &#8220;these three BatchNorm scales are the mechanism&#8221; &#8212; or any sentence pairing the VGG gap with the ResNet isolation.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout">
+    <h3>One sentence.</h3>
+    <p>The paper this corpus supports is <strong>a negative result with a sharp localisation attached</strong>: MetaOptimize loses to a tuned baseline by a margin that is large, replicated and horizon-stable; the granularity of its step-size partition matters enormously, now demonstrably off ResNet; and the effect localises to a single cut and a tiny parameter subset whose mechanism the campaign has measured thoroughly and <em>cannot yet name</em>.</p>
+  </div>
+</section>
+
+<section>
   <div class="sechead"><h2>Publication placement</h2><span class="seckey">assessed against the four-lens rubric</span></div>
   <p class="deck">An honest read, not an encouraging one. The middle number moved this week, but not to where it needs to be: <code>VGG11_bn</code> is non-<em>residual</em>, not non-<em>BatchNorm</em>, so the normalisation question the isolation result turns on is still untested.</p>
   <div class="venues">
@@ -690,7 +772,7 @@ footer {{
       <div class="vn">ICML &#8212; cut-position paper</div>
       <div class="vp" style="color:var(--warn)">15&#8211;20&#8202;%</div>
       <div class="meter"><i style="width:18%;background:var(--warn)"></i></div>
-      <div class="vd">Two of the three things that move this landed today: cross-family evidence for the gap, and the identity leg of the mechanism. Still missing &#8212; a normalisation family that is not BatchNorm, and any isolation result off ResNet.</div>
+      <div class="vd">Identity and horizon legs both closed this week, and the gap went cross-family. Still missing, and this is what caps it: any isolation result off ResNet (<code>cvi1</code> is registered), and a normalisation family that is not BatchNorm.</div>
     </div>
     <div class="venue">
       <div class="vn">ICML &#8212; current manuscript</div>
@@ -710,7 +792,7 @@ footer {{
 </section>
 
 <footer>
-  Compiled from <code>results/all_runs.csv</code> at 2,785 rows and <code>docs/CORRECTIONS.md</code> at entry 195.<br>
+  Compiled from <code>results/all_runs.csv</code> at 2,797 rows and <code>docs/CORRECTIONS.md</code> at entry 199. The corpus now owns its first 250-epoch rows.<br>
   Primary metric <code>plateau5</code>; the CSV <code>plateau</code> column is barred as primary and <code>best_test</code> is not a plateau.<br>
   Tensor indices are 1-based. Every comparison in-batch. Numbers re-derived for this report, not copied from prose.
 </footer>
