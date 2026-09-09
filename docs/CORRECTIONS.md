@@ -25778,3 +25778,418 @@ restricted to `docs/CORRECTIONS.md` and `docs/MASTER-TABLE.md`, so neither is in
 `analysis/c98_reproduce.py` exit code reported **AS-IS: 1** (expected, inherited, author scope —
 **NOT fixed**).  Coordination: `196` was taken by Track A while this pass was running; **this entry
 took number 197**; next free number **198**.
+
+## 198. TRACK C — **THE NEXT BATCH IS CHOSEN, FULLY REGISTERED AND LAUNCH-READY, AND *NOTHING WAS SUBMITTED*.**  `cvi1` — THE CAMPAIGN'S **FIRST ISOLATION INTERVENTION OFF ResNet** — 12 JOBS, 4 ARMS × 3 FRESH SEEDS {41,42,43}, 100 EPOCHS ON `VGG11_bn_c100`, **~13 GPU-h EXPECTED, HARD BOUND 36**.  IT ATTACKS THE **ONE CAVEAT `197` HAS JUST RE-AFFIRMED IN THE MASTER TABLE**: the isolation line is *still* 100 % ResNet.  **THE CONTROL IS ONE ResNet CANNOT BUY** — `ISO` and `CTL` isolate ONE 512-parameter BatchNorm scale each, cardinality 1 vs 1, numel 512 vs 512, same class, same width, adjacent depth, group sizes byte-identical `[25,1]`, spec strings differing in ONE tensor name.  PRIMARY `DELTA_ID = plateau5(ISO) − plateau5(CTL)`, **BOUNDED IN NEITHER DIRECTION** — and the obvious ratio is rejected as primary *precisely because* it is bounded at 1 and would sit at its ceiling under the account being confirmed.  **THE FLOOR GATE IS THE BEST THIS CAMPAIGN HAS EVER HAD: the lowest level ANY registered account predicts for ANY arm is ~35 pp, 34 pp clear of chance.**  SCORER COMMITTED WITH `--selftest` (**58 checks, 0 failures, 0 skipped** on the cluster host), LAUNCHER DRY-RUN **CLEAN AT 0 GUARD FAILURES AND 12 COMPOSED LINES**.  **ZERO GPU SUBMITTED.  ZERO JOBS QUEUED.  `alice` NOT CONTACTED.  CORPUS 2,797, UNCHANGED BY THIS ENTRY.**  THIS ENTRY TOOK NUMBER **198**; NEXT FREE **199**.
+
+### 198.1 THREE BRIEFING CORRECTIONS, LED WITH BECAUSE THEY ARE LOAD-BEARING
+
+1. **"HEAD b2fe952, tree clean … 2,785 rows" WAS STALE BEFORE THIS TRACK READ IT.**  The corpus
+   moved three times while this entry was written: 2,785 committed at `b2fe952`; **2,821** in the
+   working tree when this track first derived its noise floor (12 `ciso2` rows plus 24 rows that
+   `196.8` later identified as misfiled byte-identical `.out` copies); **2,797** committed at
+   `2fd87f6` when this entry was finished.  Re-derived here, not quoted.
+2. **"THE alice2 QUEUE IS NOW EMPTY … `ciso2` IS UNSCORED" IS SUPERSEDED BY `196`, WRITTEN THIS
+   CYCLE BY ANOTHER AGENT.**  `ciso2` landed 12/12, was scored, and was ingested; RULE 20 closed at
+   36/36.  This track therefore did **not** re-score it and quotes no `ciso2` number as its own.
+   The one consequence that matters for a *ranking* is stated in `198.2`.
+3. **THE BRIEFING SAID THIS ENTRY WOULD BE `196`.  IT IS `198`.**  Two other agents took `196` and
+   `197` while this work was in progress.  Numbers were re-read from the file immediately before
+   writing rather than inherited; nobody's entry was renumbered.
+
+**AND ONE SELF-CORRECTION, DISCLOSED RATHER THAN QUIETLY FIXED.**  While pricing candidate (a) this
+track read `BasicBlock.forward` off the live `build_network.py` with a regex and got
+`F.softplus(..., beta=10)` — which would have made `189.2`'s quoted `F.relu` forward wrong.  It is
+not wrong.  The regex matched **`class BasicBlock_soft` at line 142**, which precedes the real
+**`class BasicBlock` at line 202**, whose forward is `F.relu` exactly as `189.2` quotes.  `189.2`
+stands; the first reading was this track's error and is recorded because a false accusation against
+the record is worse than a silent one.
+
+### 198.2 THE RANKING — WHAT EACH CANDIDATE BUYS PER GPU-HOUR, AGAINST WHAT IS ACTUALLY OPEN
+
+The state of H-ISOLATE after `193`, `194`, `196` and `197`, re-derived from those entries' own
+tokens rather than from the briefing:
+
+| leg | status |
+|---|---|
+| identity vs **depth** | **CLOSED** by `cdep1` (`IDENTITY-OPERATIVE`), on ResNet |
+| **horizon** | **CLOSED** by `ciso2` (`UNRESOLVED-NOT-PINNED`, informative; the rescue is intact at 2.5× the horizon), on ResNet |
+| identity vs **magnitude** | **ARCHITECTURALLY UNREACHABLE** by set-matching — `188.3` on ResNet, `194.6` on VGG |
+| **scope** | **OPEN, AND IT IS THE ONLY OPEN LEG.**  `197` re-affirms it in the master table: *the isolation caveat is NOT lifted; it is still 100 % ResNet* |
+
+Every candidate is judged against that table.
+
+**1st — (b) THE VGG ISOLATION ARM.  RUN IT.  ~13 GPU-h.**
+It is the only candidate that moves the **only open leg**.  It is also the cheapest of the four,
+because its build cost is **zero**: `PATCH_VGGBN` is already applied, committed and proved additive
+by 68 checks (`189.3`), and `tests/test_vggbn.py` **PASSES on the live tree with 69 PASS lines**,
+verified by this track today.  And its arms are not guessed — they are **measured**, from `cvg1`'s
+own probe records, re-derived independently in `198.4`.
+*What it moves:* `195.8`'s and `197`'s caveat, directly.  *What it does NOT move:* the magnitude
+confound (worse on VGG than on ResNet), and nothing whatever about residual connections.
+**The decisive point, and it is the reason this ranks first rather than merely cheap:** VGG has
+**four** 512-wide BN scales — one nominated carrier and **three** matched non-carriers — so the
+control can be a one-for-one twin.  ResNet18 has only **two** 512-wide non-carrier BN scales against
+a carrier set of cardinality **three**, which is exactly why `cdep1` had to build a `[59,3]` set
+matched on *totals* instead.  **`cvi1` runs a strictly tighter control than the campaign's best
+existing isolation result, on a second architecture family, for a third of `ciso2`'s spend.**
+
+**2nd — (a) PlainNet18.  DO NOT RUN IT YET, AND ITS PRICE IN `189.7`(a) IS WRONG.**
+It is the clean one-variable residual ablation and it is the right *eventual* object.  Two reasons
+it is not this batch.
+*The price.*  `189.7`(a) says "~30 lines, 53 tensors, ~1 h of work".  The tensor count is right, and
+this track re-derived **why**: the live `BasicBlock` builds `self.shortcut = nn.Sequential()`
+(empty) unless `stride != 1 or in_planes != expansion*planes`, so the three **projection** shortcuts
+(`layer2.0`, `layer3.0`, `layer4.0`) carry `conv.weight` + `bn.weight` + `bn.bias` = **9 tensors**;
+62 − 9 = 53.  But that means **deleting `out += self.shortcut(x)` alone is not the change** — it
+would leave 9 parameters with no gradient path, which `HF.init_meta` consumes positionally from
+`named_parameters()` regardless.  The shortcut **construction** must go too, which makes this a new
+class needing the same 68-check-grade additivity proof `PATCH_VGGBN` needed.  That is the cost of
+`PATCH_VGGBN`, not one hour.
+*The ordering.*  A residual ablation is worth most **after** the isolation is known to exist off
+ResNet.  If `cvi1` returns `NO-RESCUE-VGG`, the nomination method itself is in question and
+PlainNet18 would be asking a question built on a premise that just failed.
+**Run it second, and price it as a build.**
+
+**3rd — (c) A NON-BATCHNORM NORMALISATION FAMILY.  THE BRIEFING OVERRATES THIS, AND HERE IS THE
+MEASUREMENT.**  The briefing calls it "the single thing most likely to move the paper's venue
+placement".  Re-derived on the live tree today:
+
+* `ResNet18_gn` **builds**: 62 tensors, **11,173,962 parameters**, and its 512-wide `*.weight`
+  tensors sit at **47/50/53/56/59** with the *same names* (`layer4.*.bn{1,2}.weight`,
+  `layer4.0.shortcut.1.weight`) — so `patch_resnet_gn` substitutes GroupNorm while keeping the `bn`
+  attribute names, and **the isolation is statable there.**  That much of the briefing's intuition
+  holds.
+* **`ResNet18_gn_c100` DOES NOT EXIST.**  It raises `ZeroDivisionError` — `build_network.py`'s own
+  loud failure for an unknown name.  11,173,962 parameters is a **10-class** head.
+* Therefore candidate (c) is available **only on CIFAR-10**, and this campaign's own corpus says the
+  CIFAR-10 cell is **ceiling-compressed**: re-derived at the standard cell today, `ResNet18`/CIFAR-10
+  scalar→layerwise is **+5.412 pp** with both arms in the high 80s / low 90s, against
+  **+40.689** on `ResNet18_c100`/CIFAR-100.  `cVG1` chose CIFAR-100 for exactly this reason.
+
+So (c) is **not** a cheap batch riding an existing model.  It needs a `ResNet18_gn_c100` build
+first — a smaller build than PlainNet18, but a build — and until then it can only be run in the cell
+where the phenomenon is compressed eightfold.  **Its true cost is a build plus ~13 GPU-h, and it
+answers a scope question that (b) answers more sharply and for free.**  Ranked third, not refused.
+
+**4th — (d) RULE 11 ON VGG.  REFUSED, AND THIS IS THE REASONED REFUSAL THE TASK INVITES.**
+`194.6` registers the argument that kills it: **mistuning can only *suppress* a gap, so it cannot
+manufacture one.**  `cvg1`'s `+31.2687 pp` is therefore already a valid **lower bound**, and every
+sentence the campaign wants to write from it ("the gap replicates off ResNet") is licensed by a
+lower bound.  Locating the argmax would convert a lower bound into an estimate — and **no registered
+claim depends on the estimate**.  A granularity ladder on VGG is a multi-arm sweep: at 3 seeds and
+~1.05 h/job it is ~4.2 GPU-h **per rung**, so a 6-rung ladder is ~25 GPU-h — *twice `cvi1`* — to
+defend against an objection that cannot bite in the direction of the result.  **Do not run it.**  If
+a reviewer demands it, it is cheap to run *then*, and it will be cheaper still once `cvi1` has said
+whether VGG's carrier is real, because the ladder can then be centred rather than swept blind.
+
+### 198.3 `cvi1` — THE DESIGN, RE-DERIVED FROM THE LIVE MODEL BY NAME AND NUMEL
+
+Built `VGG11_bn_c100` on the live tree (`$WS/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10`)
+and listed `named_parameters()`: **26 tensors, 9,274,532 parameters**.  The four 512-wide 1-D
+`*.weight` tensors — every 512-wide BatchNorm scale in the model — are at 1-based **14, 17, 20, 23**
+= `bn5.weight`, `bn6.weight`, `bn7.weight`, `bn8.weight`, each **numel 512**.  **No parameter name
+contains `shortcut`.**  Nothing here is inherited from prose — `187.4` records a spec string that was
+wrong as first written, and the launcher's guard 4 re-derives all of it at launch time and writes
+`PARTITION-MANIFEST.txt`.
+
+| arm | spec string | m | sizes | isolated | isolated numel |
+|---|---|---|---|---|---|
+| `k01` | `scalar` | 1 | `[26]` | — | — |
+| `kL` | `layerwise` | 26 | `[1]×26` | — | — |
+| **`ISO`** | `sets:1-22,24-26/bn8.weight` | 2 | **`[25,1]`** | **23 `bn8.weight`** | **512** |
+| **`CTL`** | `sets:1-19,21-26/bn7.weight` | 2 | **`[25,1]`** | **20 `bn7.weight`** | **512** |
+
+Both compose through the **live** `HF.polish_the_stepsize_groups` to `[25, 1]` with parameter totals
+`[9,274,020, 512]`, and both route through the **live** `HF.init_meta` to
+`stepsize_type blockwise, beta shapes [(2,)], rednorm False`.  `k01` and `kL` route to
+`scalar`/`beta ()` and `layerwise`/`beta (26,)`.  Verified end-to-end, printed per arm.  The
+grammar's own error paths were exercised too: a duplicated name raises *"tensor 23 (bn8.weight) is
+claimed by group 1 and group 1"*, and dropping `linear.bias` raises *"1 of 26 tensors are in no
+group"* — the parser is total and loud.  `resnet18_blocks` and `resnet50_blocks` both raise
+`ZeroDivisionError` on 26 tensors, as `189.1` requires.
+
+**WHY `bn7.weight` IS THE CONTROL, AND WHY IT IS A CONTROL ResNet CANNOT BUY.**  `ISO` and `CTL`
+isolate **one** tensor each, of the **same numel (512)**, the **same width (512 channels)**, the
+**same class** (a BatchNorm scale, a 1-D `*.weight`) and **adjacent depth** — `bn7` is the
+second-deepest 512-wide BN scale, `bn8` the deepest.  Their group sizes are byte-identical `[25,1]`
+and their spec strings differ in **one tensor name and two range boundaries**.  On ResNet18 this
+design is impossible: the carrier set has cardinality **three** and only **two** 512-wide
+non-carrier BN scales exist, which is why `cdep1`'s control is a `[59,3]` set matched on totals.
+
+**FRESH SEEDS {41, 42, 43}, VERIFIED AGAINST THE WHOLE CORPUS, NOT ASSUMED.**  The seeds present
+anywhere in `results/all_runs.csv` are `0–26, 31, 32, 33`.  Zero rows carry 41, 42 or 43.  Checked by
+the scorer's `--selftest` and again by the launcher's guard 2c.
+
+### 198.4 THE NOMINATION THAT PICKS `bn8` — RE-DERIVED INDEPENDENTLY, AND IT REPRODUCES `194.5`
+
+`194.5` nominated VGG's carrier from `cvg1`'s records.  A design must not rest on prose, so this
+track re-derived it with a reader sharing **no code** with `cVG1`'s scorer, over **962 pinned scalar
+records across seeds 31/32/33**, using `L_i = b2·m_i + (1−b2)·z_i` with `b2 = 0.9` read **from the
+record itself** rather than hard-coded.
+
+| rank | idx | name | numel | share of Σ mean&#124;L&#124; | frac `L>0` |
+|---|---|---|---|---|---|
+| 1 | **23** | **`bn8.weight`** | **512** | **0.5783** | **1.0000** |
+| 2 | 22 | `conv8.weight` | 2,359,296 | 0.1176 | 0.0000 |
+| 3 | 19 | `conv7.weight` | 2,359,296 | 0.0562 | — |
+| 11 | 20 | `bn7.weight` | 512 | 0.0021 | — |
+| 19 | 14 | `bn5.weight` | 512 | 0.0000 | — |
+| 20 | 17 | `bn6.weight` | 512 | 0.0000 | — |
+
+And on `187`'s **operative** statistic — the sign of the **remainder** sum — on every pinned record
+of every seed: `Σ L_i > 0` on **1.0000**; removing **{23} alone** flips it on **1.0000**; removing
+**{14,17,20}** — the other three 512-wide BN scales — flips **0.0000**; removing `{22}` or `{25}`
+flips **0.0000**.  **`194.5` reproduces to four decimals.**  This re-derivation is built into the
+scorer's `--selftest` and the launcher's **guard 1c2 REQUIRES it to have RUN on the cluster host,
+not to have been skipped** — so the arms cannot be chosen by prose even by accident.
+
+### 198.5 THE NOISE FLOOR, RE-DERIVED AT REGISTRATION WITH `cvi1-` EXCLUDED FROM EVERY READER
+
+Pooled within-cell SD of `plateau5` over `scalar`/`layerwise` rows at the standard cell,
+superseded / collapsed / incomplete dropped, cell = the 15 design columns:
+
+* `SIGMA_VGG` **0.400658** df 4, 2 cells, 6 members — *this architecture*
+* `SIGMA_NARROW` **0.586232** df 77, 11 cells, 88 members — `ResNet18_c100`/CIFAR-100
+* `SIGMA_WIDE` **2.934974** df 394, 107 cells, 501 members
+
+`SIGMA_WIDE` is **not used**, and the departure from the `max()` precedent of `149/156/159/187` is
+disclosed and **re-derived rather than inherited from `189.5`**: **98.84 %** of its total sum of
+squares is **one** cell (`ResNet18`/`scalar`, n=4) — a bimodal cell in which some seeds escape the
+floor and some do not.  It estimates *bimodality*, not seed noise; bimodality is handled separately
+by the `DIVERGED` gate.  So `SIGMA_PRIOR := max(SIGMA_VGG, SIGMA_NARROW) = 0.586232`, and
+`SE_PRIOR = 0.586232 × √(2/3) = 0.478656` pp.
+
+**THE CORPUS MOVED THREE TIMES WHILE THESE WERE FROZEN, SO THE FROZEN NUMBER IS A FLOOR, NEVER A
+CLAIM.**  At score time
+`SIGMA_USED = max(SIGMA_PRIOR_frozen, SIGMA_NARROW_live, SIGMA_VGG_live, SIGMA_INBATCH)` — monotone
+and conservative, so drift in **either** direction can only *widen* the bars in SE.  No gate on the
+row count is needed, and none is used.  The three constants were first derived at 2,821 rows and
+**re-derived identically to six decimal places at 2,797** after `196.8`'s fix removed 24 rows; the
+selftest proves **constructively** why — all 36 of those rows are 250-epoch rows and `std_cell()`
+requires `epochs_requested == 100`, so none can enter any reader here.
+
+**A DISCLOSED CORRECTION TO AN INHERITED BAR ANCHOR.**  `cVG1` set its `+10.0` bar as *a quarter of
+the smallest uncompressed corpus gap*, which was `ResNet18_tin`'s `+40.975` when VGG was not yet in
+the corpus.  `cvg1`'s own landing **made VGG the smallest uncompressed gap (+31.269)**, so that
+anchor is now **circular** for a VGG batch.  It is reported and **not used**.  (Re-derived in the
+same pass: `ResNet18_c100`/CIFAR-100's gap has itself moved from `cVG1`'s frozen `+40.371` to
+`+40.689` under `cdep1`'s ingest.  Frozen corpus numbers in this campaign go stale in days.)
+
+### 198.6 THE PRIMARY, THE BARS AND THE BRANCH MAP — ALL FROZEN BEFORE ANY RUN EXISTS
+
+**PRIMARY: `DELTA_ID = plateau5(ISO) − plateau5(CTL)`**, both 3-seed **in-batch** means, both arms
+isolating exactly one 512-parameter BatchNorm scale from a 25-tensor complement.  It is **bounded in
+neither direction** and no registered account places it at a bound: `~+25..+31` under
+`IDENTITY-OPERATIVE`, `~0` under `CLASS-OPERATIVE` and `NO-RESCUE`, negative without limit under
+`CONTROL-DOMINATES`.  **The obvious alternative, `RECOVERY = D_ISO / (kL − k01)`, is REJECTED as
+primary precisely because it is bounded at 1 and would sit AT its ceiling under the account this
+batch is trying to confirm.**  It is printed as a descriptive secondary and nothing branches on it.
+
+| bar | pp | SE at the frozen prior | anchor |
+|---|---|---|---|
+| `RESCUE_BAR` | +10.0 | 20.89 | under a **third** of this cell's own gap (31.2687) |
+| `IDENTITY_BAR` | +15.0 | 31.34 | under **half** of this cell's own gap (half = 15.634) |
+| `NULL_BAR` | +2.0 | 4.18 | 6.4 % of the gap; far outside seed noise |
+| `DIVERGED_BAR` | 5.0 | — | a bimodal arm is reported, never averaged |
+
+**BRANCH MAP.  Order matters: `NO-RESCUE` is tested FIRST, because a failed rescue makes `DELTA_ID`
+uninterpretable.**
+
+* **`NO-RESCUE-VGG`** — `D_ISO < 10.0`.  `194.5`'s nomination is **refuted by intervention**: the
+  mean|L| / remainder-sign statistic that picked ResNet's carriers does **not** predict intervention
+  off ResNet, and the campaign's nomination *method* loses its claim to generality.  A real,
+  registered, publishable negative — and `184`→`187` is this campaign's own proof that an
+  observation of this shape can survive intervention with the wrong mechanism attached.
+* **`IDENTITY-OPERATIVE-VGG`** — `D_ISO ≥ 10.0` and `DELTA_ID ≥ 15.0`.  The isolation is no longer
+  ResNet-only; `195.8`/`197`'s caveat lifts **for the identity claim only**.  Note the carrier
+  **cardinality differs across families** (3 on ResNet18, 1 on VGG11_bn), so what would generalise
+  is the *mechanism*, not the tensor list.
+* **`CLASS-OPERATIVE-VGG`** — `D_ISO ≥ 10.0`, `D_CTL ≥ 10.0`, `|DELTA_ID| ≤ 2.0`.  **Any** deep
+  512-wide BN scale rescues; identity is **not** operative on VGG.  Either `cdep1`'s ResNet verdict
+  is architecture-specific, or the operative variable is position/class and `cdep1`'s `[59,3]`
+  control was matched on the wrong axis.  **This is a result AGAINST the campaign's current reading
+  and it is registered in advance as an outcome, not a failure.**
+* **`CONTROL-DOMINATES`** — `DELTA_ID ≤ −15.0`.  Unexpected under every account.  Report and stop.
+* **`IDENTITY-ATTENUATED`** — otherwise; sub-stamped `MILD` / `SEVERE`.
+* **`HARNESS-UNSOUND`** (G-FLOOR fails) and **`UNRESOLVED-DIVERGED`** (a bimodal arm) suspend the
+  branch; a failed gate is **not** an adverse result.
+
+**STAMPS, NEVER THE BRANCH**, four of them **unconditional** because they are what the batch cannot
+do: `MAGNITUDE-NOT-SEPARATED`, `NOT-A-ONE-VARIABLE-ABLATION`, `CARDINALITY-ONE-vs-THREE`,
+`MISTUNING-NOT-EXCLUDED`.  Plus `GATES-CLEAN`, `SIGMA-…-DOMINATES`, `TRAIN-AGREES/DISAGREES`,
+`ISO-TRACKS-KL / ISO-BELOW-KL / ISO-ABOVE-KL`, `CTL-AT-FLOOR / CTL-ABOVE-FLOOR`, and
+`GAP-REPLICATES-CVG1 / GAP-DIFFERS-FROM-CVG1` — the last **explicitly BETWEEN-BATCH and
+NON-GATING**, since BATCH is the unit of replication (F(62,85)=5.47) and **no `cvg1` arm enters any
+`cvi1` contrast**.
+
+**THE FLOOR GATE (`164.6`), AND IT IS THE BEST POSITION THIS CAMPAIGN HAS HAD.**  Chance on
+CIFAR-100 is 1.00 pp; the ceiling is 100.  `cvg1` measured this exact cell at `k01` **35.0173** and
+`kL` **66.2860**.  Under `IDENTITY-OPERATIVE` / `CLASS-OPERATIVE`, `ISO`/`CTL` sit at ~55–66; under
+`NO-RESCUE`, at ~35.  **The lowest level ANY registered account predicts for ANY arm is ~35 pp — 34
+pp clear of chance — and the highest is ~66 pp, 34 pp clear of the ceiling.**  Compare the
+`ResNet18_c100` cell every previous isolation batch used, where `k01` sits at ~23 and `ciso1`'s
+`CTRL` landed at ~23.  `FLOOR_MIN = 15.00`, `CEIL_MAX = 90.00`; **the only route to a floored batch
+is total training failure, which is exactly `G-FLOOR`'s job, and under which no claim is made.**
+
+### 198.7 WHAT WAS BUILT, WHAT IT PROVES, AND THE RULE 16 EVENT ALONG THE WAY
+
+Three new files, **additions only**; no pre-existing scorer, test or `analysis/argsline_guard.py`
+was edited.
+
+| file | sha256 |
+|---|---|
+| `analysis/cVI1_vggiso_identity_score.py` | `86a2b80ffd1ea8907544bfc9d79fa0db3f7772c34fd7d70f1f98aa8fc17ea96a` |
+| `bin/cVI1_vgg_isolate.sh` | `4a37df9e2e4a951cc15e463ba487b38fb97ca7f2ac952f842fb899c86618b8a5` |
+| `tests/test_probe_tensor_blockwise_cvi1.py` | `a7469c1752a69f968df83131e9f31e8db2751a3a71331ea117ea664326171c84` |
+
+**A RULE 16 EVENT, AND IT IS WHY THE THIRD FILE EXISTS.**  `cvi1` is the **first blockwise (`sets:`)
+batch this campaign has ever run on a non-ResNet architecture**, so no existing inertness log covers
+the blockwise path on a 26-tensor model.  The registered `tests/test_probe_tensor_blockwise.py`
+(sha `22f6599e8c5239635a3ebeb859c9045c288645ba45fe397b8071765603dff46f`) has a `--net` flag, but its
+`SPECS` dict is a **literal** holding `ciso1`'s ResNet arms, so `--net VGG11_bn_c100` alone fails
+with
+
+```
+ValueError: PATCH_NAMESETS: range '1-49' is not inside 1..26
+```
+
+— the parser being correctly loud.  RULE 16 forbids editing it, so it was **FROZEN** and a successor
+registered (the `cN1/cN2` at 149, `cdn1/cdn2` at 175 and `test_probe_tensor_blockwise_cdep1.py` at
+193 precedents).  The successor **imports the registered module and re-binds `SPECS` and the `--net`
+default at runtime, then calls the registered `main()`** — every check that runs is the registered
+test's own code, byte for byte.  It also **cross-checks its two spec strings against the scorer's
+`SPEC` table and exits 2 on drift**, so scorer, launcher and test cannot disagree.
+
+**IT WAS RUN, ON THE LIVE TREE, AND IT IS `ALL PASS`** (zero GPU; CPU only) — `B0` preconditions,
+`B2` inertness for **both** arms (beta bit-identical at every one of 130 steps × 2 coords with
+`PROBE_TENSOR` unset; `probe.jsonl` byte-identical; every record equal once the appended keys are
+removed with `PROBE_TENSOR=1`), `B3` decomposition (group sums of `z_tensor`/`m_tensor` equal the
+harness's per-group values at every record, worst relative error `4.69e-08` / `2.71e-07`), `B4` the
+applied sign on every unclamped coordinate, `B5` the header.  Log at
+`$WS/runs/cvi1/inertness_blockwise_vgg.log`, stamped with the live `HF.py` sha
+`4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd`.
+
+**THE SCORER'S `--selftest`: 58 checks, 0 failures, 0 skipped** on the cluster host (44 of them
+reachable from the laptop, which has no probe records).  It re-derives the corpus census, all three
+sigmas, this cell's own levels, both bar anchors, the fresh-seed check against the whole corpus, the
+nomination from `cvg1`'s raw records, the floor-gate arithmetic, and it **exercises the branch map on
+six synthetic triples to prove it is total**.  One check **failed on first run and was fixed
+honestly rather than deleted** — the inherited quarter-anchor of `198.5`.
+
+**`tests/test_vggbn.py` PASSES on the live tree, 69 PASS lines**, run through its documented
+`--pre`/`--post` signature against the patch's own `build_network.py.pre_vggbn` backup (11,806 bytes,
+matching `189.3`'s byte-identity figure).
+
+### 198.8 THE LAUNCHER, THE DRY RUN, AND THE EXACT COMMAND THE OPERATOR WOULD RUN
+
+`bin/cVI1_vgg_isolate.sh` sets `WALL` **before** sourcing `bin/_lib_guards.sh` and composes
+`PARTS` with the library's own **`slurm_parts_for_wall`** (`178`), so `PARTS` and `WALL` **cannot**
+disagree — the source-time hook re-checks the pair and `guard 5c` checks it again.  Live output:
+
+```
+partitions: gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g -- chosen because --time=03:00:00
+  (10800s) <= gpu-short MaxTime (14400s, sinfo(live)): gpu-short ADDED
+guard_parts_for_wall: PASS -- PARTS=... is consistent with --time=03:00:00
+```
+
+`gpu-short` is **included by arithmetic**, not hard-coded: `WALL=03:00:00` fits its 4:00:00 MaxTime,
+so the batch reaches its independent 12-GPU pool (`178`'s whole point) and all 12 jobs can run at
+once.  **`WALL` is derived, not chosen round:** `cvg1`'s own 6 runs took 19–22 min (L4), 28 min
+(A100) and **61–63 min (2080 Ti)** for 100 epochs; the corpus-worst 2080 Ti rate (`152`) is 70.8
+s/epoch = **1.97 h**.  `03:00:00` is **1.52×** that and **2.86×** `cvg1`'s own worst.
+
+**THE DRY RUN IS CLEAN: 0 guard failures, 12 composed command lines, 0 RULE 20 pre-check failures.**
+It was run on `alice2` from a scratch stage; every guard from 0 through 8 passes, including
+`guard 1c2` (the nomination ran, not skipped), `guard 2c` (zero rows carry 41/42/43), `guard 4c'`
+(all four spec strings byte-identical in launcher and scorer), `guard 4d` (the twin is exact),
+`guard 4e` (blockwise-on-VGG inertness `ALL PASS` at the live sha) and `guard 8` (the scorer's
+**default** manifest resolution finds the manifest with no `--manifest`).  A guard failure is fatal
+for `--submit`; in `--dry-run` it is reported and the composition still prints, because printing the
+lines **is** the point of a dry run.
+
+One composed line, verbatim (the other eleven differ only in `--stepsize-groups`, `--seed`,
+`--run-name`, `--job-name` and `PROBE_DIR`):
+
+```
+sbatch --job-name=cvi1-ISO-s41 --partition=gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g \
+  --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 \
+  --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,\
+PROBE_DIR=/home/s5014158/metaopt/runs/cvi1/probe_cvi1-ISO-s41 \
+  /home/s5014158/metaopt/jobs/run_cifar.sh --optimizer HF --alg-base SGDm \
+  --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 \
+  --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name VGG11_bn_c100 \
+  --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 \
+  --num-epochs 100 --stepsize-groups sets:1-22,24-26/bn8.weight --seed 41 \
+  --save-directory /home/s5014158/metaopt/runs/cvi1 --run-name cvi1-ISO-s41
+```
+
+**COST.**  12 jobs × 100 epochs.  `cvg1`-mixed-pool expectation ~35 min/job → **7.0 GPU-h**;
+`cvg1`-worst (63 min) → **12.6 GPU-h**; corpus-worst (70.8 s/epoch) → **23.6 GPU-h**; **hard bound
+`WALL` × 12 = 36 GPU-h.**  Storage ~15 MB of probe records.
+
+**THE EXACT COMMAND THE OPERATOR WOULD RUN**, after staging the three new files into
+`$HOME/metaopt/hierarchical-metaoptimize/` on `alice2` (its mirror is a staged copy, not a git
+checkout, and it currently lacks `tests/test_vggbn.py` as well):
+
+```
+export METAOPT_WS=/home/s5014158/metaopt
+bash bin/cVI1_vgg_isolate.sh --dry-run      # read the 12 lines first
+bash bin/cVI1_vgg_isolate.sh --submit       # <-- the only submitting form
+```
+
+and, at 12/12 `RUN_DONE`, the documented one-argument invocation, **unedited**:
+
+```
+python3 analysis/cVI1_vggiso_identity_score.py $METAOPT_WS/runs
+```
+
+RULE 21 is satisfied by the commit carrying this entry: the scorer is committed **before** any
+`cvi1` job exists, and the launching agent records the margin in seconds against the earliest
+`sacct` Submit, as `189.4` and `190` did.
+
+### 198.9 WHAT `cvi1` WILL NOT LICENSE, WRITTEN NOW SO IT CANNOT BE WRITTEN LATER
+
+* **NOT identity versus MAGNITUDE, and the stamp is unconditional.**  `bn8.weight` carries **0.5783**
+  of the mean|L| mass against `bn7`'s **0.0021** and `bn5`/`bn6`'s ~**0.0000** — a ratio of ~277×.
+  **No carrier-free set of 512-wide VGG BN scales can be magnitude-matched to it.**  The ResNet
+  analogue is `188.3` (isolated-set totals ×308; the best admissible carrier-free triple still
+  ×225).  On **both** architectures the magnitude confound is unreachable by set-matching, so
+  `IDENTITY-OPERATIVE` on either net means *"not ANY matched BN scale of the same numel, width, class
+  and comparable depth"* — it does **not** mean *"identity rather than magnitude"*.
+* **NOTHING about residual connections.**  `VGG11_bn` differs from `ResNet18` in depth, channel
+  schedule and downsampling as well as in the residual connection (`189.2`, `194.6`).  PlainNet18 is
+  still not built.  A positive here does not license *"residuals are irrelevant"*; a null does not
+  license *"residuals cause it"*.
+* **RULE 11 mistuning is untested on VGG.**  No argmax over granularity has been located on this
+  architecture, so any `D_ISO` is a **lower bound**, not an estimate.
+* **The `cvg1` comparison is BETWEEN-BATCH and NON-GATING.**  It is stamped and printed; it enters no
+  contrast.
+* **A carrier-cardinality mismatch survives every branch.**  ResNet's nominated set has cardinality
+  **3**; VGG's has cardinality **1**.  Even `IDENTITY-OPERATIVE-VGG` would generalise a *mechanism*,
+  never a tensor list.
+
+### 198.10 DISCIPLINE AND COST
+
+**ZERO GPU SUBMITTED.  ZERO JOBS QUEUED — `squeue -u s5014158` returns 0 rows and `sacct` shows no
+`cvi1` job has ever existed.  ZERO `cvi1-*.out` on disk.  `alice`, the shared account, was NOT
+contacted, read or written.  Nothing was cancelled.  CORPUS 2,797, UNCHANGED BY THIS ENTRY** —
+`results/all_runs.csv` is not touched, no aggregate was run, and no row was ingested or re-scored.
+**`paper/` untouched**: `git status --porcelain -- paper/` is empty.  `analysis/c98_reproduce.py` was
+not run by this entry.  **RULE 16**: `git diff` over `analysis/ bin/ tests/ patches/` for this entry
+is **additions only** — three new files, zero modifications, zero deletions;
+`analysis/argsline_guard.py` was not touched.  **plateau5 is PRIMARY** throughout; the CSV `plateau`
+column is read nowhere and `best_test` is used nowhere; TRAIN is printed beside TEST at every arm.
+No nested `claude -p` at any point.  `git add` was restricted to this track's own three paths.
+
+**PRE-FLIGHT ARTIFACTS LEFT ON `alice2`, DISCLOSED.**  The dry runs and the inertness test wrote
+three files under `$WS/runs/cvi1/`: `PARTITION-MANIFEST.txt` (2,504 bytes), `PROVENANCE.txt` —
+which records **`MODE DRY-RUN`** and deliberately carries **no `SUBMIT_UTC`** — and
+`inertness_blockwise_vgg.log`.  None is a run; `guard 2b` checks for `*.out` and finds none; the
+launcher regenerates the manifest and provenance at submit time.  A scratch stage at
+`$HOME/cvi1_stage` holds copies of the three new files for the dry run and can be deleted.
+
+**COST OF THIS ENTRY: ZERO GPU-HOURS.**  Everything above is CPU on a login node — model
+construction, spec composition through the live `HF.py`, the probe-record re-derivation, the
+inertness test and four dry runs.
+
+Next free number: **199**.
