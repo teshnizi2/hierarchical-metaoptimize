@@ -24157,3 +24157,186 @@ guard.  **Nothing was submitted and nothing was cancelled by this entry; zero GP
 `docs/STATUS.md`; the three tracks' untracked run artefacts were left alone.  Every number above was re-derived
 from `git`, `sacct`, the live `.out` files, the two live manifests or the CSV — **nothing was quoted from the
 cycle briefing or from `188`/`189`/`190`'s prose.**  Next free number: **192**.
+
+## 192. TRACK C — **`docs/MASTER-TABLE.md` IS BROUGHT CURRENT AFTER A FOURTEEN-CYCLE DEFERRAL: 74 → 105 ROWS, +31 FOR CYCLES 130–148, EACH CARRYING ITS REGISTERED SCORER'S TOKEN VERBATIM.**  THE HEADER'S CORPUS FIGURES WERE STALE BY **224 RUNS AND 692.4 GPU-HOURS**; THE THREE VERDICT COUNTS IN CIRCULATION (HEADER 32/26/9/3/2/2, CHECKER 31/26/9/3/2/2, BRIEF 33/26/8/3/2/2) ARE **ADJUDICATED, AND ALL THREE WERE WRONG ABOUT SOMETHING**.  **ZERO GPU; THE CLUSTER WAS NOT WRITTEN TO OR READ FROM; THE CORPUS IS UNCHANGED AT 2,761 ROWS AND NO ROW WAS INGESTED, RE-SCORED OR RE-SORTED.**
+
+### 192.1 THE REGISTERED CHECKER, RUN FIRST AND RUN UNEDITED (RULE 16)
+
+`analysis/c73_mastertable_check.py` is a **checker, not a generator** — it validates column arity,
+unescaped pipes, the corpus figures and the verdict tally, and makes no judgement about the science.
+It was run before anything was written, unedited, and it is what identified the stale rows. Its
+output at the start of this cycle, pasted:
+
+    MASTER-TABLE.md: 73 data rows, 7 columns each
+    CSV: 2761 runs / 2914.4 GPU-hours
+    FAILURES:
+      - line 24: 9 cells, expected 7 -- likely an UNESCAPED '|' inside a cell
+      - header says 2537 runs; the CSV has 2761
+      - header says 2222.0 GPU-hours; the CSV gives 2914.4
+      - header claims 74 rows; the table has 73
+      - header claims CONFIRMED 32; the table has 31
+    EXIT=1
+
+After this entry's edits, run again unedited: **`105 data rows, 7 columns each` / `CSV: 2761 runs /
+2914.4 GPU-hours` / `header is consistent with both the table and the CSV  OK` / EXIT=0**, and
+`--selftest` **6/6 passed**. `git diff --stat analysis/` is **EMPTY** — no scorer, checker or guard
+was edited, added or frozen this cycle.
+
+### 192.2 THE THREE COUNTS, ADJUDICATED — AND **NONE** OF THE THREE WAS RIGHT ABOUT EVERYTHING
+
+| source | CONFIRMED / REFUTED / OPEN / WITHDRAWN / DEAD / UNINT | rows | wrong how |
+|---|---|---|---|
+| the file's own cycle-129 header | 32 / 26 / 9 / 3 / 2 / 2 | 74 | **Right as a count of the verdict COLUMN.** Wrong about the science: it counted old line 13 as `OPEN` when that cell's own CLOSEOUT says otherwise. |
+| `c73_mastertable_check.py` | 31 / 26 / 9 / 3 / 2 / 2 | 73 | **Right to fail.** Its check 2 correctly rejected old line 24 for an unescaped `\|` inside a cell, so it dropped that row from the tally — and that row is `**CONFIRMED**`, which is the whole of the 1-row / 1-CONFIRMED shortfall. Not a counting bug; a **markdown defect in the table** that the checker exists to catch. |
+| the cycle-148 brief ("counted with a regex") | 33 / 26 / 8 / 3 / 2 / 2 | — | **Wrong as a count of the file, right about the science.** |
+
+**THE BRIEF'S 33/8 IS FULLY EXPLAINED BY EXACTLY ONE ROW, AND THAT ROW WAS GENUINELY STALE.** A
+scan for rows where a verdict token appears somewhere in the row but not in the verdict cell returns
+five rows; only **one** of them has a stray `CONFIRMED` against an `OPEN` cell — old line 13, the
+cosine-schedule row. Moving that one row is arithmetically the entire 32→33 / 9→8 difference, and
+the other four counts are untouched, which matches the brief exactly. That row's verdict cell has
+carried, since cycle 83, the annotation **`[CLOSEOUT, CORRECTIONS 115 — VERDICT MOVES OPEN ->
+CONFIRMED, re-scored on PRIMARY plateau5.]`** — and the verdict COLUMN was never updated to match.
+
+**THIS IS THE ONLY VERDICT CELL THIS CYCLE CHANGED**, it is not a new judgement, and the superseded
+token is kept verbatim in the cell as this campaign does everywhere:
+`**CONFIRMED, CLOSED-OUT 115** *(superseded verdict token kept verbatim: **OPEN** …)*`. The family
+root is `CONFIRMED`, following the existing `CONFIRMED, RESCOPED c73` precedent. **No surviving
+verdict was changed.** Anyone who disagrees can revert one cell.
+
+### 192.3 THE HEADER FIGURES, RE-DERIVED TWICE
+
+Not taken from the checker's arithmetic: an **independent** `csv.DictReader` pass was written for
+this entry and agrees with it to the printed precision.
+
+| | cycle-129 header | live corpus (re-derived) | drift |
+|---|---|---|---|
+| runs | 2537 | **2761** | **+224** |
+| GPU-hours (`sum(wallclock_min)/60`) | 2222.0 | **2914.4** | **+692.4** |
+| rows in the table | 74 (73 parseable) | **105** | **+31** |
+
+**A DISCLOSURE ON THE GPU-HOURS.** `2914.4` is the sum over the **2,746 rows that carry a
+`wallclock_min`**; **15 rows carry none** and contribute zero. The figure is therefore a **lower
+bound**, and it was a lower bound at cycle 129 too — this entry does not fix that, it names it.
+
+### 192.4 THE MARKDOWN DEFECT, FIXED, AND NOTHING ELSE IN THAT ROW TOUCHED
+
+Old line 24 (`Is the granularity axis just a reparameterisation of the meta-stepsize axis?`) contains
+the string `|Δ| ≤ 2 SE` inside its CORRECTIONS-154 annotation. The two absolute-value bars are
+unescaped pipes, so the cell silently split in two and the verdict column shifted for every
+downstream reader — the exact failure mode `c73` was written to catch. Fixed to `\|Δ\| ≤ 2 SE`.
+**No word, numeral, verdict or annotation in that row was altered.** The row's content — `cfr1`,
+`cfr2` and `cQ1`, CORRECTIONS 153/154/155 — was already annotated into it by earlier cycles and is
+therefore **not duplicated** in the new section.
+
+### 192.5 THE BOTTOM LINE IS REWRITTEN TO CARRY THE STRONGER, CORRECTLY-SCOPED RESULT
+
+The old bottom line led with *"MetaOptimize does not beat a properly tuned non-meta baseline on
+CIFAR-10 … 1.46 pp"*. That is still true and is now the **weaker** of the two measurements. The
+**CIFAR-100** denominator (`cdn1`, 24 runs, ONE batch, CORRECTIONS 171 by hand / 175 by `cdn2`) is
+**more than three times larger**, and it was **re-derived independently from `results/all_runs.csv`
+for this entry** rather than quoted:
+
+    arm                        n   plateau5   sd
+    cdn1-m-      (MetaOptimize) 3   71.8933   0.0731
+    cdn1-lr001-  (SGDm+cos)     3   75.3733   0.2178
+    cdn1-lr002-                 3   76.3660   0.2171
+    cdn1-lr005-                 3   77.1567   0.0136
+    cdn1-lr01-   <- ARGMAX      3   77.5927   0.4259   INTERIOR
+    cdn1-lr02-                  3   77.0900   0.1148
+    cdn1-lr03-                  3   76.3700   0.1647
+    cdn1-h2-     (SGDm, 200 ep) 3   78.8280   0.1460
+
+`GAP_in` = 77.5927 − 71.8933 = **+5.6993 pp**, i.e. **+5.699 pp = +18.80 SE** at the registered SE
+of 0.3032 — reproducing `175`'s `+5.6993 / +18.80` **to four decimals**. The peak is **INTERIOR**
+(flanked by 77.1567 and 77.0900). **Every rung of the ladder beats the meta cell**, smallest margin
+**+3.480 pp**. `BRANCH: BELOW-BY-A-LOT`.
+
+**WHAT THE NEW BOTTOM LINE DOES NOT SAY.** It does not retract the CIFAR-10 line; it demotes it.
+It keeps `115`'s finding that **against the fixed-step baseline the parent paper actually used,
+MetaOptimize WINS** (+1.551 pp, t +12.2) — the deficit is against a *scheduled* baseline. And it
+leaves the cycle-73 / `hz9` paragraph **verbatim**, because that correction is load-bearing.
+
+### 192.6 WHAT MOVED, AND WHAT DELIBERATELY DID NOT
+
+**MOVED.** (i) The header: corpus figures, verdict tally, row count, the compile cycle, and a
+paragraph adjudicating the three counts. (ii) The bottom line, plus one new paragraph tracing the
+cycles 130–148 arc. (iii) One markdown escape (192.4). (iv) One verdict cell (192.2). (v) A new
+**section 9** with **31 rows**.
+
+**SUPERSESSIONS RECORDED IN THE NEW ROWS, EACH WITH THE SUPERSEDED WORDING KEPT IN BRACKETS.**
+`163.6` supersedes `144`'s cliff sentence (**the brief called it a "cliff numeral"; it is a
+SENTENCE** — *"SIX GROUPS ARE NOT ENOUGH AT 489 CLASSES AND SIXTY-TWO ARE: a 47.4 pp cliff…"* — and
+`163.6` is explicit that the parent-paper corroboration in `144` is **untouched**, which the brief's
+phrasing does not convey); `166.6` supersedes `164.5`; `177.7` supersedes `174.8`; `160` corrects the
+"cut position dominates group count" overclaim **in place** and is recorded on the `cpk1` row;
+`156.1` rescopes `cpk1`'s argmax and `cts1`/`cts2`/`scl1`'s cliff numerals as **100-EPOCH objects**
+and is recorded on all four rows.
+
+**DID NOT MOVE.** No surviving verdict. No row in sections 1–8 other than the two edits at 192.2 and
+192.4. `results/all_runs.csv` **as this entry found it and as it stands at `HEAD`** (2,761 rows) — **but see `192.9`, which is not a caveat, it is a finding**. Anything under `paper/`. Any file under
+`analysis/`. And **`cdep1`, `cvg1` and `ciso2` have NO ROW** — this pass did not score them, their
+rows are theirs to add, and every reader written for this entry excluded those prefixes so the work
+is **invariant under their ingest** (verified: **0** rows in the corpus carry any of the three
+prefixes, so the exclusion is currently a no-op that will still hold after they land).
+
+### 192.7 ONE ROW IS RECORDED WITH A GAP IN ITS PROVENANCE, DELIBERATELY
+
+`hb1`'s verdict token `REFUTED-SMALL` is taken from **`142.2`'s re-derivation sentence** (*"`SPEC` =
+head − max(control) = **−0.1753**. REFUTED-SMALL stands."*) and from the branch table inside the
+registered scorer `analysis/cH1_hb1_score.py`. **No CORRECTIONS entry quotes an `hb1` scorer run
+verbatim the way `142.1` does for `lsm1`.** The token and its arithmetic reproduce from the corpus,
+so the row is written — but the provenance is **weaker than every other row in section 9** and is
+flagged here rather than smoothed over.
+
+### 192.8 SCOPE — WHAT THIS ENTRY DOES **NOT** LICENSE
+
+* **It is bookkeeping, not evidence.** Not one verdict in this table was re-scored. A row's presence
+  means a registered scorer emitted that token and this pass copied it; it does **not** mean the
+  claim was re-verified this cycle. The only numbers re-derived from data here are the header
+  figures and `cdn1`'s eight cell means.
+* **The section-9 verdict column is NOT the six-verdict vocabulary.** Those 31 rows carry scorer
+  tokens in backticks and are counted separately in the header. Do not aggregate them with
+  CONFIRMED/REFUTED/OPEN counts.
+* **RULE 20.** This entry quotes **no accuracy, beta, per-tensor or timing number from `cdep1`,
+  `cvg1` or `ciso2`**, whose coverage stands at **9 of 36** (`191.2`). The prohibition is respected
+  by exclusion, not by argument.
+* **`c98_reproduce.py` exits 1**, unchanged, reported as-is; inherited and author scope, not touched.
+
+### 192.9 A CONCURRENT TRACK INGESTED `cdep1` INTO THE SHARED WORKING TREE **WHILE THIS ENTRY WAS BEING WRITTEN**, AND THAT IS RECORDED, NOT ABSORBED
+
+Between this pass's first read of the corpus and its verification pass, `results/all_runs.csv` grew
+from **2,761 to 2,779 rows** in the working tree — **+18, changed 0, removed 0**, and the 18 are
+exactly `cdep1`'s full batch (`k01`, `k62`, `ISO`, `ONE`, `DEPTH`, `DEPTH2` x seeds {24,25,26}),
+file mtime **2026-09-09 15:58:30**. **This pass did not write them and did not ask for them.** It
+was caught because the registered checker, re-run after the edits, went from `EXIT=0` to
+`EXIT=1` with *"header says 2761 runs; the CSV has 2779"* — the shared-tree hazard `140.3` flagged,
+firing again.
+
+**RULED OUT, NOT ASSUMED.** `analysis/c98_reproduce.py` — the one script this pass executed that
+touches the corpus — **only reads** it (`chk("rows in results/all_runs.csv", …)`); it contains no
+write path to that file. No other process of this pass's was running against the tree.
+
+**WHAT WAS DONE ABOUT IT, AND WHY.** Nothing. The 18 rows are **left uncommitted and unstaged**;
+`git add` here is restricted to this entry's own two `docs/` paths, per the standing rule. Adopting
+another track's ingest under this entry would mean publishing `cdep1`'s landing without having
+verified `changed == 0` **and** `added == the expected count` on it (`146.7`), and this pass did not
+score, audit or ingest that batch.
+
+**THE HEADER IS THEREFORE CORRECT AGAINST `HEAD`, AND THIS IS SHOWN RATHER THAN ASSERTED.** With
+`git show HEAD:results/all_runs.csv` checked out beside an unedited copy of the checker, the table
+validates: *"105 data rows, 7 columns each / CSV: 2761 runs / 2914.4 GPU-hours / header is
+consistent with both the table and the CSV  OK"*, `EXIT=0`. The dirty-tree failure is entirely the
+uncommitted ingest.
+
+**AN OWED ITEM, STATED SO IT IS NOT A SILENT TRAP.** The moment that ingest is committed, this
+header goes stale by 18 rows and `c73_mastertable_check.py` will fail on it. **That is the ingesting
+track's line to fix in its own entry, and the successor row count it must write is 2,779.** This
+entry **deliberately does NOT supply the matching GPU-hours figure**: that total sums
+`wallclock_min` over rows that would then include `cdep1`'s, and **RULE 20 bars a timing number from
+`cdep1` while its coverage stands at 9 of 36**. Re-derive it there, at full coverage.
+
+`git add` restricted to `docs/MASTER-TABLE.md` and `docs/CORRECTIONS.md`. No nested `claude -p`.
+No job submitted, cancelled or read on either account; `alice` (Saber's shared account) was not
+contacted at all. **`plateau5` is primary throughout**; the banned `plateau` column and `best_test`
+are read nowhere in this entry. Next free number: **193**.
