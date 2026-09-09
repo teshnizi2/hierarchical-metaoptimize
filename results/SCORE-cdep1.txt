@@ -1,0 +1,243 @@
+==============================================================================
+cDP1 -- IDENTITY vs DEPTH on `cdep1`.  runsdir ../runs_alice2
+==============================================================================
+
+[G1] MANIFEST -- the live model and the partitions, as written at submit time
+  manifest: ../runs_alice2/cdep1/PARTITION-MANIFEST.txt (<runsdir>/cdep1/PARTITION-MANIFEST.txt)
+  PASS live model == the frozen 62 (index, name, numel)
+  PASS ISO: spec, m=2, sizes (59, 3), params (11218596, 1536), both groups EXACTLY as registered; isolated (50, 53, 59)
+       GROUP1 = layer4.0.bn2.weight layer4.0.shortcut.1.weight layer4.1.bn2.weight
+  PASS DEPTH: spec, m=2, sizes (59, 3), params (11218596, 1536), both groups EXACTLY as registered; isolated (47, 48, 56)
+       GROUP1 = layer4.0.bn1.weight layer4.0.bn1.bias layer4.1.bn1.weight
+  PASS DEPTH2: spec, m=2, sizes (60, 2), params (11219108, 1024), both groups EXACTLY as registered; isolated (47, 56)
+       GROUP1 = layer4.0.bn1.weight layer4.1.bn1.weight
+  PASS ONE: spec, m=2, sizes (61, 1), params (11219620, 512), both groups EXACTLY as registered; isolated (50,)
+       GROUP1 = layer4.0.bn2.weight
+  PASS ISO ^ DEPTH == exactly the six names, three swapped at identical group sizes [59,3]   ['layer4.0.bn1.bias', 'layer4.0.bn1.weight', 'layer4.0.bn2.weight', 'layer4.0.shortcut.1.weight', 'layer4.1.bn1.weight', 'layer4.1.bn2.weight']
+  PASS isolated numels MATCHED: ISO [512, 512, 512] == DEPTH [512, 512, 512] (1,536 each)
+  PASS every isolated tensor of ISO and DEPTH lives in layer4 -- DEPTH IS MATCHED
+  PASS DEPTH's isolated group contains NO carrier
+  PASS DEPTH2 isolates the only two non-carrier layer4 BN SCALES, and no carrier
+  PASS ONE isolates exactly layer4.0.bn2.weight; ISO adds exactly 53 and 59
+
+[G0] PROVENANCE -- every run's OWN lines
+  PASS 18 (arm, seed) runs with a .out   18
+  PASS k01-s24: ARGS line is the registered line for k01
+  PASS k01-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k01-s24: PROBE_TENSOR line present, type=scalar
+  PASS k01-s24: probe_tensor.json is the registered header
+  PASS k01-s24: 500 probe records at steps 0..49900
+  PASS k01-s25: ARGS line is the registered line for k01
+  PASS k01-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k01-s25: PROBE_TENSOR line present, type=scalar
+  PASS k01-s25: probe_tensor.json is the registered header
+  PASS k01-s25: 500 probe records at steps 0..49900
+  PASS k01-s26: ARGS line is the registered line for k01
+  PASS k01-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k01-s26: PROBE_TENSOR line present, type=scalar
+  PASS k01-s26: probe_tensor.json is the registered header
+  PASS k01-s26: 500 probe records at steps 0..49900
+  PASS k62-s24: ARGS line is the registered line for k62
+  PASS k62-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k62-s24: PROBE_TENSOR line present, type=layerwise
+  PASS k62-s24: probe_tensor.json is the registered header
+  PASS k62-s24: 500 probe records at steps 0..49900
+  PASS k62-s25: ARGS line is the registered line for k62
+  PASS k62-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k62-s25: PROBE_TENSOR line present, type=layerwise
+  PASS k62-s25: probe_tensor.json is the registered header
+  PASS k62-s25: 500 probe records at steps 0..49900
+  PASS k62-s26: ARGS line is the registered line for k62
+  PASS k62-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS k62-s26: PROBE_TENSOR line present, type=layerwise
+  PASS k62-s26: probe_tensor.json is the registered header
+  PASS k62-s26: 500 probe records at steps 0..49900
+  PASS ISO-s24: ARGS line is the registered line for ISO
+  PASS ISO-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ISO-s24: PROBE_TENSOR line present, type=blockwise
+  PASS ISO-s24: probe_tensor.json is the registered header
+  PASS ISO-s24: 500 probe records at steps 0..49900
+  PASS ISO-s25: ARGS line is the registered line for ISO
+  PASS ISO-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ISO-s25: PROBE_TENSOR line present, type=blockwise
+  PASS ISO-s25: probe_tensor.json is the registered header
+  PASS ISO-s25: 500 probe records at steps 0..49900
+  PASS ISO-s26: ARGS line is the registered line for ISO
+  PASS ISO-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ISO-s26: PROBE_TENSOR line present, type=blockwise
+  PASS ISO-s26: probe_tensor.json is the registered header
+  PASS ISO-s26: 500 probe records at steps 0..49900
+  PASS DEPTH-s24: ARGS line is the registered line for DEPTH
+  PASS DEPTH-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH-s24: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH-s24: probe_tensor.json is the registered header
+  PASS DEPTH-s24: 500 probe records at steps 0..49900
+  PASS DEPTH-s25: ARGS line is the registered line for DEPTH
+  PASS DEPTH-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH-s25: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH-s25: probe_tensor.json is the registered header
+  PASS DEPTH-s25: 500 probe records at steps 0..49900
+  PASS DEPTH-s26: ARGS line is the registered line for DEPTH
+  PASS DEPTH-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH-s26: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH-s26: probe_tensor.json is the registered header
+  PASS DEPTH-s26: 500 probe records at steps 0..49900
+  PASS DEPTH2-s24: ARGS line is the registered line for DEPTH2
+  PASS DEPTH2-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH2-s24: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH2-s24: probe_tensor.json is the registered header
+  PASS DEPTH2-s24: 500 probe records at steps 0..49900
+  PASS DEPTH2-s25: ARGS line is the registered line for DEPTH2
+  PASS DEPTH2-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH2-s25: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH2-s25: probe_tensor.json is the registered header
+  PASS DEPTH2-s25: 500 probe records at steps 0..49900
+  PASS DEPTH2-s26: ARGS line is the registered line for DEPTH2
+  PASS DEPTH2-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS DEPTH2-s26: PROBE_TENSOR line present, type=blockwise
+  PASS DEPTH2-s26: probe_tensor.json is the registered header
+  PASS DEPTH2-s26: 500 probe records at steps 0..49900
+  PASS ONE-s24: ARGS line is the registered line for ONE
+  PASS ONE-s24: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ONE-s24: PROBE_TENSOR line present, type=blockwise
+  PASS ONE-s24: probe_tensor.json is the registered header
+  PASS ONE-s24: 500 probe records at steps 0..49900
+  PASS ONE-s25: ARGS line is the registered line for ONE
+  PASS ONE-s25: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ONE-s25: PROBE_TENSOR line present, type=blockwise
+  PASS ONE-s25: probe_tensor.json is the registered header
+  PASS ONE-s25: 500 probe records at steps 0..49900
+  PASS ONE-s26: ARGS line is the registered line for ONE
+  PASS ONE-s26: ENV line (modulo PROBE_DIR) is the registered line
+  PASS ONE-s26: PROBE_TENSOR line present, type=blockwise
+  PASS ONE-s26: probe_tensor.json is the registered header
+  PASS ONE-s26: 500 probe records at steps 0..49900
+
+[A] DECOMPOSITION -- group sums of z_tensor / m_tensor vs the harness's own z / momentum; applied sign
+  PASS group sums of z_tensor == harness z within 1e-05 on >= 99% of records   0/9000 fail, worst rel 2.16e-07
+  PASS group sums of m_tensor == harness momentum_meta within 1e-04 on >= 99% of records   0/9000 fail, worst rel 1.09e-06
+  PASS -(beta - beta_pre)/ms == sign(b2*mom_pre + (1-b2)*z_agg) on >= 99%% of unclamped coordinates   0/88045 fail, 18455 clamped
+
+[R] COMPLETION, ANCHOR BANDS, WITHIN-ARM DIVERGENCE
+  PASS k01-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 22.700 (train 23.358)
+  PASS k01-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 23.182 (train 23.326)
+  PASS k01-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 24.174 (train 23.728)
+  k01    plateau5 23.3520 (seeds 22.700, 23.182, 24.174)  range 1.474   TRAIN 23.471
+  PASS k62-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 69.164 (train 98.920)
+  PASS k62-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 69.502 (train 98.892)
+  PASS k62-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 68.802 (train 98.872)
+  k62    plateau5 69.1560 (seeds 69.164, 69.502, 68.802)  range 0.700   TRAIN 98.895
+  PASS ISO-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 69.706 (train 94.150)
+  PASS ISO-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 70.456 (train 94.216)
+  PASS ISO-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 69.970 (train 94.126)
+  ISO    plateau5 70.0440 (seeds 69.706, 70.456, 69.970)  range 0.750   TRAIN 94.164
+  PASS DEPTH-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 22.774 (train 23.268)
+  PASS DEPTH-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 23.694 (train 23.690)
+  PASS DEPTH-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 24.094 (train 23.648)
+  DEPTH  plateau5 23.5207 (seeds 22.774, 23.694, 24.094)  range 1.320   TRAIN 23.535
+  PASS DEPTH2-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 22.814 (train 23.346)
+  PASS DEPTH2-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 23.448 (train 23.438)
+  PASS DEPTH2-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 24.082 (train 23.690)
+  DEPTH2 plateau5 23.4480 (seeds 22.814, 23.448, 24.082)  range 1.268   TRAIN 23.491
+  PASS ONE-s24: RUN_DONE, no traceback, 100 epoch lines, plateau5 64.322 (train 83.428)
+  PASS ONE-s25: RUN_DONE, no traceback, 100 epoch lines, plateau5 65.150 (train 83.382)
+  PASS ONE-s26: RUN_DONE, no traceback, 100 epoch lines, plateau5 65.008 (train 83.582)
+  ONE    plateau5 64.8267 (seeds 64.322, 65.150, 65.008)  range 0.828   TRAIN 83.464
+  corpus scalar    n 35  22.9141 +/- 0.5709  band [20.631, 25.198]
+  PASS k01 in-batch level 23.3520 inside the corpus band
+  corpus layerwise n 29  69.4436 +/- 0.5120  band [67.395, 71.492]
+  PASS k62 in-batch level 69.1560 inside the corpus band
+
+[B] BETA STATES on the m=2 arms (coordinate 0 = the coarse group, 1 = the isolated group)
+  ISO    s24  beta[0] (coarse  ) floor occupancy 0.0040  terminal -14.975  -> NEITHER
+  ISO    s25  beta[0] (coarse  ) floor occupancy 0.0060  terminal -14.991  -> NEITHER
+  ISO    s26  beta[0] (coarse  ) floor occupancy 0.0000  terminal -14.995  -> NEITHER
+  ISO        beta[0] pooled occupancy 0.0033  mean terminal -14.987  -> NEITHER
+  ISO    s24  beta[1] (isolated) floor occupancy 0.7720  terminal -15.000  -> PINS
+  ISO    s25  beta[1] (isolated) floor occupancy 0.7700  terminal -15.000  -> PINS
+  ISO    s26  beta[1] (isolated) floor occupancy 0.7640  terminal -15.000  -> PINS
+  ISO        beta[1] pooled occupancy 0.7687  mean terminal -15.000  -> PINS
+  DEPTH  s24  beta[0] (coarse  ) floor occupancy 0.6280  terminal -15.000  -> PINS
+  DEPTH  s25  beta[0] (coarse  ) floor occupancy 0.6280  terminal -15.000  -> PINS
+  DEPTH  s26  beta[0] (coarse  ) floor occupancy 0.6300  terminal -15.000  -> PINS
+  DEPTH      beta[0] pooled occupancy 0.6287  mean terminal -15.000  -> PINS
+  DEPTH  s24  beta[1] (isolated) floor occupancy 0.6500  terminal -15.000  -> PINS
+  DEPTH  s25  beta[1] (isolated) floor occupancy 0.6540  terminal -15.000  -> PINS
+  DEPTH  s26  beta[1] (isolated) floor occupancy 0.6520  terminal -15.000  -> PINS
+  DEPTH      beta[1] pooled occupancy 0.6520  mean terminal -15.000  -> PINS
+  DEPTH2 s24  beta[0] (coarse  ) floor occupancy 0.6280  terminal -15.000  -> PINS
+  DEPTH2 s25  beta[0] (coarse  ) floor occupancy 0.6280  terminal -15.000  -> PINS
+  DEPTH2 s26  beta[0] (coarse  ) floor occupancy 0.6300  terminal -15.000  -> PINS
+  DEPTH2     beta[0] pooled occupancy 0.6287  mean terminal -15.000  -> PINS
+  DEPTH2 s24  beta[1] (isolated) floor occupancy 0.6540  terminal -15.000  -> PINS
+  DEPTH2 s25  beta[1] (isolated) floor occupancy 0.6560  terminal -15.000  -> PINS
+  DEPTH2 s26  beta[1] (isolated) floor occupancy 0.6560  terminal -15.000  -> PINS
+  DEPTH2     beta[1] pooled occupancy 0.6553  mean terminal -15.000  -> PINS
+  ONE    s24  beta[0] (coarse  ) floor occupancy 0.0000  terminal -11.710  -> FREE
+  ONE    s25  beta[0] (coarse  ) floor occupancy 0.0000  terminal -11.900  -> FREE
+  ONE    s26  beta[0] (coarse  ) floor occupancy 0.0000  terminal -11.546  -> FREE
+  ONE        beta[0] pooled occupancy 0.0000  mean terminal -11.718  -> FREE
+  ONE    s24  beta[1] (isolated) floor occupancy 0.7800  terminal -15.000  -> PINS
+  ONE    s25  beta[1] (isolated) floor occupancy 0.7700  terminal -15.000  -> PINS
+  ONE    s26  beta[1] (isolated) floor occupancy 0.7660  terminal -15.000  -> PINS
+  ONE        beta[1] pooled occupancy 0.7720  mean terminal -15.000  -> PINS
+
+[P] PREMISE -- the in-batch scalar anchor's own records (`187.6`'s flip statistic is PRIMARY)
+  determinate 1498  DISAGREE 1237  R_T 0.8258  pinned 942  59-rest votes UP 1.0000
+    layer4.0.bn2.weight            carrier share on DISAGREE 0.9992
+    layer4.0.shortcut.1.weight     carrier share on DISAGREE 1.0000
+    layer4.1.bn2.weight            carrier share on DISAGREE 0.9992
+    REMOVING S FLIPS THE REMAINDER'S SIGN (`187.6`) -- determinate / pinned / dominates(pinned):
+      TRIO    (50, 53, 59) = 0.8258 / 1.0000 / 0.9968      (ciso1 ex ante: 0.8260 / 1.0000)
+      ONE     (50,) = 0.7884 / 1.0000 / 0.0000      (ciso1 ex ante: 0.8000 / 1.0000)
+      DEPTH   (47, 48, 56) = 0.0000 / 0.0000 / 0.0000      (ciso1 ex ante: 0.0000 / 0.0000)
+      DEPTH2  (47, 56) = 0.0000 / 0.0000 / 0.0000      (ciso1 ex ante: 0.0000 / 0.0000)
+    mean |L| on pinned records, the two isolated sets:
+      idx 50 layer4.0.bn2.weight            2.9155e-01   rank  2
+      idx 53 layer4.0.shortcut.1.weight     1.9526e-01   rank  3
+      idx 59 layer4.1.bn2.weight            3.2984e-01   rank  1
+      idx 47 layer4.0.bn1.weight            1.1298e-03   rank 36
+      idx 48 layer4.0.bn1.bias              1.7399e-06   rank 62
+      idx 56 layer4.1.bn1.weight            1.5166e-03   rank 33
+      SUM ISO 8.1665e-01   SUM DEPTH 2.6482e-03   ratio 308.4  (the magnitude match this design CANNOT make)
+
+[H] H-BROKEN -- 'any partition other than ISO floors'.  ONE is the arm that kills it.
+  D_ONE = ONE - k01 : +41.4747 pp = +54.88 SE   (ciso1 reference +41.8359)
+  ONE rescues in batch at a DIFFERENT isolated set and a DIFFERENT size [61,1]:
+  H-BROKEN is DEAD in batch, so a floored DEPTH is a null about WHICH tensors, not about
+  'not being ISO'.
+
+[D] CONTRASTS, ALL WITHIN BATCH (SE_ARM_DIFF 0.755682 pp)
+  *** PRIMARY ***  DELTA_ID  = ISO - DEPTH  : +46.5233 pp = +61.56 SE
+  D_ISO     = ISO    - k01 : +46.6920 pp = +61.79 SE
+  D_DEPTH   = DEPTH  - k01 : +0.1687 pp = +0.22 SE
+  D_DEPTH2  = DEPTH2 - k01 : +0.0960 pp = +0.13 SE
+  D_ONE     = ONE    - k01 : +41.4747 pp = +54.88 SE
+  D_CEIL    = k62    - k01 : +45.8040 pp = +60.61 SE
+  DELTA_ID2 = ISO - DEPTH2  : +46.5960 pp = +61.66 SE
+  DELTA_BIAS= DEPTH - DEPTH2 : +0.0727 pp = +0.10 SE
+  TRAIN (plateau5-window mean train accuracy), all vs k01:
+    k62 +75.424  ISO +70.693  DEPTH +0.065  DEPTH2 +0.021  ONE +59.993
+  bars: SUPPORT 25.0 pp (33.08 SE)  REFUTE 5.0 pp (6.62 SE)  READ 1.511364 pp (2 SE)  IDENTITY 25.0 pp
+  FRACTION OF THE IN-BATCH SCALAR->ISO GAP RECOVERED BY DEPTH: D_DEPTH / D_ISO = 0.0036
+  D_ISO / D_CEIL = 1.0194 (ISO vs the in-batch layerwise ceiling)
+  registered saturation band re-derived: [21.0940, 27.9520] (35 scalar + 42 m=2 rows over 14 cells, cap 27.9141)
+  DEPTH level 23.5207 is INSIDE the registered saturation band: its level is a BOUND, NOT a
+     magnitude.  Entitled: 'D_DEPTH <= 5.0 pp'.  NOT entitled: the point value as an effect
+     size, or any residual against the floor read as agreement (`164.6`).
+  DEPTH2 level 23.4480 is INSIDE the registered saturation band: its level is a BOUND, NOT a
+     magnitude.  Entitled: 'D_DEPTH2 <= 5.0 pp'.  NOT entitled: the point value as an effect
+     size, or any residual against the floor read as agreement (`164.6`).
+  ISO in batch 70.0440 vs ciso1 70.2113: |shift| 0.1673 against 4*SIGMA_W = 3.7021 -> ISO-REPLICATES
+
+==============================================================================
+FINAL: IDENTITY-OPERATIVE | ISO-59-NEITHER | ISO-3-PINS | DEPTH-59-PINS | DEPTH-3-PINS | DEPTH2-60-PINS | DEPTH2-2-PINS | ONE-61-FREE | PREMISE-REPLICATES | H-BROKEN-DEAD | ONE-RESCUES | DEPTH-FLOOR-SATURATED | DEPTH2-FLOOR-SATURATED | ISO-REPLICATES | BIAS-NULL | DEPTH2-FLOOR
+==============================================================================
+PRIMARY: DELTA_ID = plateau5(ISO) - plateau5(DEPTH) @ 100 epochs, from the runs' own .out files;
+every contrast WITHIN batch; bars frozen in this file (SE_ARM_DIFF 0.755682 from a corpus reader
+that excludes cdep1-* rows).  SCOPE, BINDING ON EVERY SENTENCE: this batch matches DEPTH to ISO on
+group sizes, isolated numel, width, depth and normalisation-layer type.  It does NOT and CANNOT
+match them on DYNAMICAL MAGNITUDE -- on the scalar trajectory the carriers' mean |L| exceeds every
+512-parameter layer-4 non-carrier's by two to five orders of magnitude, and no set of members
+closes that gap.  An IDENTITY-OPERATIVE reading therefore means 'not any three matched layer-4 BN
+parameters', and does NOT separate tensor identity from term magnitude.

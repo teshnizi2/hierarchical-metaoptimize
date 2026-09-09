@@ -24340,3 +24340,279 @@ entry **deliberately does NOT supply the matching GPU-hours figure**: that total
 No job submitted, cancelled or read on either account; `alice` (Saber's shared account) was not
 contacted at all. **`plateau5` is primary throughout**; the banned `plateau` column and `best_test`
 are read nowhere in this entry. Next free number: **193**.
+
+---
+
+## 193. TRACK A — **`cdep1` LANDS AT 18/18 AND THE VERDICT IS `IDENTITY-OPERATIVE`.**  A SET OF THREE `layer4` 512-PARAMETER BatchNorm PARAMETERS MATCHED TO THE CARRIERS ON GROUP SIZES, ISOLATED NUMEL (**1,536, EXACTLY**), WIDTH, DEPTH AND NORMALISATION-LAYER TYPE **DOES NOT RESCUE AT ALL**: `DELTA_ID` = **+46.5233 pp = +61.56 SE**, `D_DEPTH` = **+0.1687 pp = +0.22 SE**.  THE POSITIVE CONTROL FIRED (`D_ISO` **+46.6920 pp = +61.79 SE**) AND `ISO` **REPLICATED** `ciso1` TO **0.1673 pp**.  **H-BROKEN IS DEAD IN BATCH** — `ONE` RESCUED **+41.4747 pp** AT A DIFFERENT SET AND A DIFFERENT SIZE.  **AND THE RESULT IS BOUND BY `188.3`, WHICH WAS REGISTERED BEFORE THE ARM RAN: THIS BATCH CANNOT AND DOES NOT SEPARATE TENSOR *IDENTITY* FROM TERM *MAGNITUDE*.**  RULE 20 IS AT **FULL 18/18 COVERAGE**, PASS, WITH A SEPARATE ENV AUDIT.  **CORPUS 2,761 → 2,779 (+18, EXACTLY `cdep1`; 0 PRE-EXISTING ROWS CHANGED IN ANY FIELD).**  ZERO NEW GPU JOBS.
+
+### 193.1 THE BRIEFING WAS WRONG ON THE COUNT, AND IT IS CORRECTED FIRST
+
+The cycle-148 briefing states `cdep1` at **16/18** (its own text says "16/18" in one place and the
+prose "both stragglers RUNNING and minutes from done").  **Measured at 15:44 CEST on re-entry: 16
+`RUN_DONE`, two RUNNING** — `DEPTH2-s26` (4929665) and `ONE-s26` (4929666).  `DEPTH2-s26` completed
+during the first poll and `ONE-s26` at **+390 s** into a bounded wait.  **18/18 `RUN_DONE`, 0
+tracebacks, `sacct` 18/18 `COMPLETED`, no `FAILED`, no `TIMEOUT`.**  Nothing was scored at partial
+coverage.  Nothing was submitted, cancelled or requeued; `alice` was not contacted.
+
+**A second briefing claim does not hold and is recorded rather than repeated.**  `188.5` states the
+scorer is "sha-identical on the Mac and on `alice2`".  On re-entry
+`analysis/cDP1_cdep1_depth_score.py` **was not present anywhere under `$METAOPT_WS` on `alice2`** —
+`find $METAOPT_WS -name 'cDP1*'` returned nothing, and that workspace's checkout is not a git repo,
+so it cannot be restored by checkout.  It was re-shipped from the Mac by `scp` and its sha verified
+**on arrival**: `4ba6c888f36e8c512ac64e791774df112ae8556453452dea74225f80be1e0dd6`, byte-identical to
+the registered value and to the Mac's.  `analysis/argsline_guard.py` **was** present and **was**
+sha-identical (`81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`).  Copying a file is
+not editing it, and RULE 16 is intact: `git diff -- analysis/ patches/ tests/ bin/` is **empty**, and
+this entry adds no file to `analysis/`.
+
+### 193.2 RULE 20 AT FULL COVERAGE, AND THE ENV AUDIT, BOTH DISCHARGED
+
+`191` left this at **9 of 36** campaign-wide and **9/9** on `cdep1`'s started runs.  It is now
+**18 of 18 on `cdep1`**, on the unedited guard at its registered sha, with `188.5`'s three declared
+axes as documented `--vary` arguments:
+
+```
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cdep1- --batch-consistency \
+        --vary stepsize-groups --vary seed --vary run-name
+  batch-consistency: every non-axis flag is identical across 18 runs
+  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+  VERDICT: PASS
+```
+
+**ENV audit, run SEPARATELY because `BETA_CLIP`, `PROBE` and `PROBE_TENSOR` cannot ride the `ARGS`
+line.**  All 18 `.out` files carry an `ENV:` line and a `PROBE_TENSOR:` line.  Modulo `PROBE_DIR`
+there is **exactly one distinct ENV line, ×18**:
+
+```
+ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default
+     COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none
+     PROBE=100 EB_RHO=na EB_LOG=0
+```
+
+`PROBE_TENSOR` census **resolves to the full arm mix**, as `191` said it must: **12 `type=blockwise`**
+(`ISO`, `DEPTH`, `DEPTH2`, `ONE` × 3 seeds) / **3 `type=layerwise`** (`k62`) / **3 `type=scalar`**
+(`k01`).  `191`'s 8/9 census was a run that had not yet emitted the line; it is now emitted.
+
+**Every `--stepsize-groups` string was read off each run's own `ARGS` line and checked against
+`188.1`'s registered strings, character for character** — `ISO`
+`sets:1-49,51-52,54-58,60-62/…bn2.weight,…shortcut.1.weight,…bn2.weight` (59+3), `DEPTH`
+`sets:1-46,49-55,57-62/…bn1.weight,…bn1.bias,…bn1.weight` (59+3), `DEPTH2`
+`sets:1-46,48-55,57-62/…bn1.weight,…bn1.weight` (60+2), `ONE` `sets:1-49,51-62/…bn2.weight` (61+1),
+`k01` `scalar`, `k62` `layerwise`; `--num-epochs 100` and seeds {24,25,26} on all 18.  **No run's
+ARGS or ENV line departs from the registered one.**
+
+### 193.3 THE REGISTERED SCORER, RUN UNEDITED, WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION
+
+```
+python3 analysis/cDP1_cdep1_depth_score.py --selftest --runsdir $METAOPT_WS/runs   -> SELFTEST ALL PASS
+python3 analysis/cDP1_cdep1_depth_score.py $METAOPT_WS/runs                        -> exit 0
+```
+
+`--manifest` was **not** passed: the default resolution found
+`<runsdir>/cdep1/PARTITION-MANIFEST.txt`, exactly as `188.8`'s guard 8 promised.  Gate blocks
+[G1] manifest, [G0] provenance (90 checks, 18 runs × ARGS/ENV/PROBE_TENSOR/header/500 records), [A]
+decomposition (0/9000 group-sum failures; 0/88045 applied-sign failures, 18455 clamped) and [R]
+completion/anchors/divergence **all PASS**.  `--selftest` PASSes including section [H], the ex-ante
+premise on `ciso1`'s own records, which `188.5` notes is SKIPped on hosts without them.
+
+### 193.4 THE NUMBERS, RE-DERIVED THREE INDEPENDENT WAYS BEFORE ANY OF THEM WAS WRITTEN DOWN
+
+**The attack was run first and the scorer second.**  A parser written from scratch for this entry
+reads only the raw `.out` files, asserts `RUN_DONE`, asserts the epoch indices are exactly `0..99`
+with no gap, and computes `plateau5` as the mean of the run's own last five **test** epochs.  Its
+output was then compared against (a) the registered scorer and (b) the freshly-ingested CSV column
+`plateau5`, which comes from `aggregate.py`'s own independent parse.  **All three agree**; the
+largest disagreement anywhere is **3.3e-05 pp**, pure float accumulation order.
+
+| arm | spec | seeds 24 / 25 / 26 (`plateau5` TEST) | **TEST mean** | **TRAIN mean** | range |
+|---|---|---|---|---|---|
+| `k01` | `scalar` [62] | 22.700 / 23.182 / 24.174 | **23.3520** | 23.4707 | 1.474 |
+| `k62` | `layerwise` 62×[1] | 69.164 / 69.502 / 68.802 | **69.1560** | 98.8947 | 0.700 |
+| `ISO` | `…/50,53,59` [59,3] | 69.706 / 70.456 / 69.970 | **70.0440** | 94.1640 | 0.750 |
+| `DEPTH` | `…/47,48,56` [59,3] | 22.774 / 23.694 / 24.094 | **23.5207** | 23.5353 | 1.320 |
+| `DEPTH2` | `…/47,56` [60,2] | 22.814 / 23.448 / 24.082 | **23.4480** | 23.4913 | 1.268 |
+| `ONE` | `…/50` [61,1] | 64.322 / 65.150 / 65.008 | **64.8267** | 83.4640 | 0.828 |
+
+**Contrasts, ALL WITHIN BATCH.**  `SE_ARM_DIFF` = **0.755682 pp**, from `188.4`'s frozen
+`SIGMA_W` = 0.925518 — and the scorer **re-derived both estimators from the post-ingest corpus and
+they did not move** (`SIGMA_NARROW` 0.925518, `SIGMA_WIDE` 0.863472, max still the narrow one).
+`165.4`'s invariance held: the batch's own ingest does not move its own bars.
+
+| statistic | value | in SE | bar |
+|---|---|---|---|
+| **`DELTA_ID` = `ISO` − `DEPTH`  — THE PRIMARY** | **+46.5233 pp** | **+61.56** | `IDENTITY_BAR` +25.0 |
+| `D_ISO` = `ISO` − `k01` | +46.6920 pp | +61.79 | `SUPPORT_BAR` +25.0 |
+| `D_DEPTH` = `DEPTH` − `k01` | **+0.1687 pp** | **+0.22** | `REFUTE_BAR` +5.0 |
+| `D_DEPTH2` = `DEPTH2` − `k01` | +0.0960 pp | +0.13 | — |
+| `D_ONE` = `ONE` − `k01` | +41.4747 pp | +54.88 | — |
+| `D_CEIL` = `k62` − `k01` | +45.8040 pp | +60.61 | — |
+| `DELTA_ID2` = `ISO` − `DEPTH2` | +46.5960 pp | +61.66 | — |
+| `DELTA_BIAS` = `DEPTH` − `DEPTH2` | +0.0727 pp | +0.10 | `READ_BAR` 1.511364 → **`BIAS-NULL`** |
+
+**GATE 0 FIRST, as the branch map requires.**  `UNRESOLVED-NO-POSITIVE-CONTROL` fires when
+`D_ISO` < +25.0.  `D_ISO` = **+46.6920 = +61.79 SE**.  **The gate does not fire; the depth contrast
+is readable.**  Anchors are in their registered corpus bands: `k01` 23.3520 ∈ [20.6306, 25.1976],
+`k62` 69.1560 ∈ [67.3954, 71.4918].  `DEAD_BAR` 5.00 pp on within-arm seed range: `k01` 1.474,
+`ISO` 0.750, `DEPTH` 1.320 — **no breach**.  Seeds are {24,25,26} on all 18, and `--selftest`
+re-confirmed no other corpus row carries them.
+
+**The per-seed paired differences, which the scorer does not print and which are computed here as a
+further attack** — every seed clears the bar on its own, so the mean is not carried by one run:
+
+| seed | `DELTA_ID` | `D_DEPTH` | `D_DEPTH2` |
+|---|---|---|---|
+| 24 | +46.9320 | +0.0740 | +0.1140 |
+| 25 | +46.7620 | +0.5120 | +0.2660 |
+| 26 | +45.8760 | −0.0800 | −0.0920 |
+
+**`DEPTH` NEVER ESCAPES AT ANY EPOCH, NOT ONLY AT THE TAIL — a check no gate required.**  Maximum
+test accuracy over **all 100 epochs**: `DEPTH` 22.92 / 23.97 / 24.27 against `k01`'s 22.93 / 23.43 /
+24.34.  `DEPTH`'s best epoch anywhere in its run is within a fraction of a point of the scalar
+anchor's.  So this is **not** a rescue that decayed, nor a late collapse: `DEPTH` tracks the collapsed
+scalar trajectory from start to finish.  For contrast, `ISO` at seed 25 reads 21.0 / 54.5 / 68.1 /
+70.3 at epochs 20 / 30 / 50 / 70 while `DEPTH` reads 21.0 / 23.6 / 23.4 / 23.6.
+
+**`H-BROKEN` — the content-free rival `188.4` registered — IS DEAD IN BATCH.**  `ONE` isolates a
+*different* set (tensor 50 alone) at a *different* size ([61,1], 512 params) and rescued
+**+41.4747 pp = +54.88 SE**, against `ciso1`'s +41.8359.  "Any two-group partition other than the
+exact `ISO` set floors" is false, measured here, at these seeds, in this batch.  The floored `DEPTH`
+is therefore a null about **which tensors are isolated**, not an artefact of "not being `ISO`".
+`cpr1`'s headline died at `164.6` for want of exactly this arm; the 3 jobs and ≈2.2 GPU-h bought the
+insurance that makes the modal outcome readable.
+
+**`ISO-REPLICATES`, and it is the campaign's first in-batch replication of the `187` rescue at
+disjoint seeds.**  In-batch `ISO` 70.0440 against `ciso1`'s 70.2113 — |shift| **0.1673 pp** against
+4·`SIGMA_W` = 3.7021.  This is descriptive and gates nothing, exactly as `188.2` registered it, but
+it is worth stating: `191` predicted that the byte-identical `ISO`/`ONE` spec strings would give the
+`187` result two independent replications, and the first has now arrived.  `D_ISO / D_CEIL` =
+**1.0194** — `ISO` is at, and by a hair above, the in-batch layerwise ceiling.
+
+**`PREMISE-REPLICATES`, measured on `cdep1`'s OWN `k01`, not inherited.**  1,498 determinate / 942
+pinned.  Removing the trio flips the remainder's sign on 0.8258 determinate / **1.0000 pinned**;
+removing `ONE`'s single tensor 0.7884 / **1.0000**; removing `DEPTH`'s set **0.0000 / 0.0000**;
+removing `DEPTH2`'s **0.0000 / 0.0000**.  `ciso1`'s ex-ante values were 0.8260 / 1.0000, 0.8000 /
+1.0000, 0.0000, 0.0000.  The sign account of `187.6` predicted this batch's outcome **before it
+ran**, on a different batch's records, and the prediction held.
+
+**`beta` states, `187.7`'s reading re-measured at fresh seeds** — and one line of it is the
+mechanistic content of the null.  `ISO`: coarse group **NEITHER** (occupancy 0.0033, terminal
+−14.987), isolated group **PINS** (0.7687).  `ONE`: coarse **FREE** (0.0000, terminal −11.718),
+isolated **PINS** (0.7720).  `DEPTH`: **BOTH groups PIN** (coarse 0.6287, isolated 0.6520, both
+terminal −15.000); `DEPTH2` likewise (0.6287 / 0.6553).  **In the two arms that rescue, the coarse
+group stays off the floor; in the two that do not, the whole network pins.**  Splitting off the wrong
+three tensors does not merely fail to help — it leaves the collapse exactly where `scalar` leaves it.
+
+**TRAIN, reported beside TEST at every arm as the standing rule requires, and the `188` open
+question replicates.**  Against `k01`: `k62` **+75.424**, `ISO` **+70.693**, `ONE` **+59.993**,
+`DEPTH` **+0.065**, `DEPTH2` **+0.021**.  So `ISO` matches the layerwise ceiling on **test**
+(70.0440 vs 69.1560, +0.888) while sitting **4.731 pp BELOW it on train** (94.164 vs 98.895).  That
+is the same signature the briefing flags from `ciso1` at 4.6 pp, reproduced here at fresh seeds.
+**It is not explained by this batch and nothing here should be read as explaining it.**  `ONE` shows
+the pattern more sharply still: 15.4 pp below the ceiling on train, only 4.3 pp below on test.
+
+### 193.5 THE VERDICT, AND — IN THE SAME BREATH — WHAT IT DOES NOT LICENSE
+
+```
+FINAL: IDENTITY-OPERATIVE | ISO-59-NEITHER | ISO-3-PINS | DEPTH-59-PINS | DEPTH-3-PINS
+     | DEPTH2-60-PINS | DEPTH2-2-PINS | ONE-61-FREE | PREMISE-REPLICATES | H-BROKEN-DEAD
+     | ONE-RESCUES | DEPTH-FLOOR-SATURATED | DEPTH2-FLOOR-SATURATED | ISO-REPLICATES
+     | BIAS-NULL | DEPTH2-FLOOR
+```
+
+(The pre-ingest run additionally stamped `FLOOR-NOT-INGESTED`; it is absent from the post-ingest run,
+which is the stamp doing its job.)
+
+**WHAT `cdep1` ESTABLISHES.**  `ciso1`'s three-way confound of identity, depth and isolated numel is
+broken on **two** of its three legs.  `DEPTH` is matched to `ISO` on group count (m=2), coarse-group
+size (59), isolated-group size (3), isolated parameter count (**1,536, exactly**), per-tensor width
+(512 each), network stage (every isolated tensor in `layer4`), normalisation-layer membership, batch,
+cell, horizon and seeds; it differs **only in which `layer4` BatchNorm parameters are isolated**; and
+it does not rescue at all — `D_DEPTH` recovers **0.36 %** of the in-batch scalar→`ISO` gap.  `DEPTH2`,
+the class-pure variant that isolates the only two non-carrier `layer4` BN **scales**, recovers
+**0.21 %**.  `BIAS-NULL` holds (`DELTA_BIAS` +0.0727 pp = +0.10 SE), so "the BatchNorm *bias* member
+ruined it" — the one place `DEPTH`'s match is imperfect — is **tested and dead in batch**, not left
+as a caveat in prose.
+
+**WHAT IT DOES *NOT* ESTABLISH, AND `188.3` REGISTERED THIS BEFORE THE ARM RAN.**  The arm **cannot
+be matched on dynamical magnitude, and no choice of members could have been.**  Re-measured here on
+`cdep1`'s own `k01` records: mean |L| on pinned records is 2.9155e-01 (idx 50, rank 2), 1.9526e-01
+(53, rank 3), 3.2984e-01 (59, rank **1**) for the carriers, against 1.1298e-03 (47, rank 36),
+1.7399e-06 (48, rank **62 of 62**), 1.5166e-03 (56, rank 33).  Isolated-set totals **8.1665e-01** vs
+**2.6482e-03** — a ratio of **×308** on this batch's own data (`ciso1`'s was ×348, and `188.3` proved
+the best admissible carrier-free triple still leaves ×225).  **Therefore:**
+
+* The sentence this batch licenses is *"isolating three `layer4` 512-parameter BatchNorm parameters
+  matched to the carriers on size, numel, width and depth **but not on |L|** does not rescue, while
+  isolating the carriers does."*
+* It **does not** license *"it is their identity, not their magnitude"*, and **no batch on this
+  architecture can**, because on this trajectory the only large-|L| 512-parameter `layer4` tensors
+  **are** the three carriers.  Anyone quoting `cdep1` carries this sentence; the scorer prints it in
+  its own `FINAL` block so it cannot be dropped in transit.
+* `DEPTH` and `DEPTH2` both land **inside** the registered saturation band [21.0940, 27.9520], so
+  `164.6` applies: their levels are **BOUNDS** (`D_DEPTH` ≤ 5.0 pp, `D_DEPTH2` ≤ 5.0 pp), **not**
+  magnitudes.  The point values above are reported for completeness and **may not** be read as effect
+  sizes, and no residual against 22.9141 may be read as agreement with a prediction.  The phrase
+  *"`DEPTH` floored exactly as predicted"* is **not** available.  The primary `DELTA_ID` is a
+  difference of two arms, is bounded in neither direction, and is what carries the result.
+* `189.2`'s structural finding is **not** tested here.  The three carriers are exactly the 512-wide
+  BN scales feeding a residual addition and the two non-carriers exactly the mid-branch `bn1` scales;
+  `cdep1` cannot tell "feeds an add" from "is a carrier", because on a ResNet those are the same
+  measurement.  **`cvg1` is the batch that bears on it, and `cvg1` has not landed.**
+* Nothing here bears on `ciso2`'s 250-epoch question — whether the rescue is a change of regime or a
+  ~68-epoch delay.  `ISO`'s isolated group `PINS` here too (occupancy 0.7687), which is the premise
+  of `190`'s question, not an answer to it.
+* **`cdep1` registers no new hypothesis.**  It is a control on an existing one.  The ledger is
+  unchanged: **seventeen registered, fifteen dead, two live**.  H-ISOLATE stays live and moves from
+  `UNRESOLVED-PARTIAL` to *supported on the identity-vs-depth leg, with the magnitude leg
+  architecturally unreachable*.  H-DOMINATE remains **DEAD as named** (`184`/`186`/`187.11`).
+
+### 193.6 THE INGEST, IN THE DOCUMENTED ORDER, WITH BOTH HALVES OF THE CHECK
+
+`146.7`'s trap avoided: `aggregate.py` was redirected **into the corpus**, never into a log.
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv
+  # 2779 runs aggregated
+  # WARNING: 3 duplicated run-name(s)   [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply
+  APPLIED: 36 rows updated   (all dup_group only; accuracy/config 0 rows, superseded 0 rows)
+```
+
+**BOTH halves verified, because `changed == 0` alone proves nothing.**  A comparator written for this
+entry keyed `(run, job_id)` across the pre-ingest snapshot and the post-`args_repair` corpus:
+
+* **ADDED 18** — exactly `cdep1-{k01,k62,ISO,DEPTH,DEPTH2,ONE}-s{24,25,26}`, no more, no fewer.
+* **REMOVED 0.**
+* **Pre-existing rows differing in ANY field: 0.**  Not "0 accuracy fields" — **0 fields, of 37**.
+  (`args_repair`'s 36 updates restore the `dup_group` values `aggregate.py` regenerates blank; the
+  net effect against the pre-ingest snapshot is nil.)
+* All 18 new rows carry `window_ok == 1` **and** `complete == 1` (STANDING RULE 21), `epochs_done`
+  100, seeds {24,25,26}.
+* CSV `plateau5` per arm equals the raw-`.out` re-derivation to **≤ 3.3e-05 pp**.
+
+**`results/all_runs.csv`: 2,761 → 2,779 rows.**  The banned `plateau` column and `best_test` are read
+nowhere in this entry.
+
+### 193.7 COST, AND THE STANDING CONSTRAINTS
+
+**ZERO new GPU jobs.  Nothing submitted, nothing cancelled, nothing requeued.**  `cdep1`'s own spend,
+from `sacct` at completion: **18/18 `COMPLETED`, total 16.25 GPU-h**, mean 54.16 min, slowest
+94.32 min (`k01-s24`, node851).  `188.6` planned 15.6 GPU-h on the mean-based figure — the outturn is
+**+0.65 GPU-h over the honest estimate** and far inside the 28.5 GPU-h worst case; stated rather than
+rounded away.  The account's other two batches were **not touched**: `ciso2` (12 jobs, seeds
+{31,32,33}) and `cvg1` (6 jobs) were left to run, and at the close of this entry 18 jobs remained in
+`squeue`.  **`alice` — Saber's shared account — was not contacted at all.**
+
+`paper/paper.tex` and `paper/DRAFT-v4.md` untouched (`git status --porcelain -- paper/` empty).
+**RULE 16**: `git diff -- analysis/ patches/ tests/ bin/` **empty**; this entry adds no analysis file
+and edits none; `argsline_guard.py` never edited.  **RULE 21** is `188.5`'s and unaffected — this
+entry registers nothing.  Indices **1-BASED** throughout.  `plateau5` primary throughout.  No nested
+`claude -p`.  `analysis/c98_reproduce.py` exit code reported as-is: **1** (expected, inherited, author
+scope — NOT fixed).
+
+**NUMBER COLLISION, HANDLED.**  This track intended **192**; on re-entry Track C had already written
+`## 192` (the `MASTER-TABLE.md` refresh) into the working tree, and committed it as `656d8d8` while
+this entry was being drafted.  **This entry therefore takes 193**, per `186`'s precedent, and
+**renumbers nothing of anyone else's**.  `docs/MASTER-TABLE.md` is Track C's file this cycle: it is
+**not** touched here, and `193` adds no row to it — the `cdep1` row is Track C's to add, and this
+entry does not pre-empt it.  Next free number: **194**.
