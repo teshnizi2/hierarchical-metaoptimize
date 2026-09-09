@@ -25258,3 +25258,275 @@ contrast.  TRAIN is reported beside TEST at every arm.  No nested `claude -p` at
 **AS-IS: 1** (expected, inherited, author scope — **NOT fixed**).
 
 Next free number: **196**.
+
+## 196. TRACK A — **`ciso2` LANDS 12/12 AND THE HORIZON LEG RETURNS THE REGISTERED *INFORMATIVE* BRANCH: `UNRESOLVED-NOT-PINNED | ISO-59-NOT-PINNED-AT-250`, 106 GATES PASS / 0 FAIL / 0 SKIP.**  RULE 20 CLOSES THE CYCLE AT **36 OF 36**.  **THE PRIMARY QUANTITY IS NEVERTHELESS MEASURED AND IT IS NOT AMBIGUOUS: `RHO` = D_ISO@250 / D_ISO@100 = **0.997737**, D_ISO@250 = **+46.7393 pp** = **+61.85 SE** — THE RESCUE IS INTACT AT 2.5× THE HORIZON.  BUT THE REGISTERED BRANCH MAP PUTS THE PINNING GATE *BEFORE* THE PRIMARY BAR, SO `RESCUE-SURVIVES` **DID NOT LAND AND IS NOT CLAIMED HERE.**  **THE SCORER'S OWN PRINTED EXPLANATION OF ITS VERDICT IS REFUTED BY ITS OWN DATA:** IT PRINTS "the descent must decelerate near the floor"; THE DESCENT DID **NOT** DECELERATE — `190`'s EXTRAPOLATION LANDED THE PIN EPOCH TO WITHIN **2.4–2.7 EPOCHS ON ALL THREE `ISO` SEEDS**.  WHAT ACTUALLY HAPPENS IS **CHATTER AT THE CLAMP**, AND THE GATE THAT FIRED IS **DEFINITIONAL, NOT PHYSICAL**.  **A PRE-EXISTING INGEST DEFECT WAS FOUND AND FIXED BEFORE IT ENTERED THE CORPUS (24 MISFILED BYTE-IDENTICAL `.out` COPIES); CORPUS 2,785 → 2,797, `ADDED 12`, `REMOVED 0`, `0 PRE-EXISTING ROWS CHANGED IN ANY FIELD`.**
+
+### 196.1 RULE 20 AT FULL COVERAGE — **36 OF 36**, PLUS THE SEPARATE ENV AUDIT
+
+`analysis/argsline_guard.py` **unedited**, sha256 `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`
+— identical on this worktree and on `alice2`, and identical to the value registered at `188.5`/`189.9`/
+`190`/`194.2`/`195.2`.  Run with each batch's own declared axes as documented `--vary` arguments:
+
+| batch | runs | `--batch-consistency` | verdict |
+|---|---|---|---|
+| `ciso2` | 12 | every non-axis flag identical across 12 runs | **12/12 PASS** |
+| `cdep1` | 18 | every non-axis flag identical across 18 runs | 18/18 PASS (re-run, confirms `195.2`) |
+| `cvg1` | 6 | every non-axis flag identical across 6 runs | 6/6 PASS (re-run, confirms `195.2`) |
+
+**CAMPAIGN COVERAGE 36 OF 36.**  `195.2` left `ciso2` at 4/12 PARTIAL; that is now closed.
+
+**SEPARATE ENV-LINE AUDIT** — `BETA_CLIP`, `PROBE` and `PROBE_TENSOR` are environment variables, cannot
+ride the `ARGS` line, and the guard cannot see them:
+
+```
+grep -h '^ENV:' ciso2-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c
+  12  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default
+      COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100
+      EB_RHO=na EB_LOG=0
+grep -h '^PROBE_TENSOR:' ciso2-*.out | sed 's/ dir=.*//' | sort | uniq -c
+   6  type=blockwise tensors=62      3  type=layerwise tensors=62      3  type=scalar tensors=62
+```
+
+**ONE distinct ENV line × 12** and the **exact** registered census, `scalar ×3 / layerwise ×3 /
+blockwise ×6`.  The four `--stepsize-groups` spec strings are **byte-identical to `ciso1`'s**, verified
+directly against `ciso1`'s own `.out` files, so this is the same intervention at a different horizon.
+12/12 `RUN_DONE`, **0 tracebacks**, 250 `Epoch` lines each, 1,250 probe records each.
+
+### 196.2 THE REGISTERED SCORER, RUN UNEDITED, WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION
+
+`analysis/cIS2_ciso2_horizon_score.py`, sha256 `ab935f682b6bc0e6715b387c431e3bdc0559acb05e9bc39347f164449e563d98`
+— **identical on both hosts and identical to the value registered at `190.9`**, committed `0a60f05`
+before any `ciso2` run existed (RULE 21 margin +152 s).  `python3 analysis/cIS2_ciso2_horizon_score.py
+$METAOPT_WS/runs`, exit 0.
+
+```
+GATES: 106 PASS  0 FAIL  0 SKIP
+FINAL: UNRESOLVED-NOT-PINNED | ISO-59-NOT-PINNED-AT-250
+```
+
+`git diff` over `analysis/` is **empty** — zero edits, zero additions; this entry registered no new
+analysis file, and the independent parser below was written and run **outside the repo**.
+
+### 196.3 THE NUMBERS, RE-DERIVED BY AN INDEPENDENT PARSER SHARING NO CODE WITH THE SCORER
+
+Written from scratch against the raw `.out` files and the raw `probe.jsonl` records.  plateau5 =
+mean TEST over epochs 95–99 (`@100`) and 245–249 (`@250`).  **Every value reproduces the scorer digit
+for digit**, and `aggregate.py`'s own independent parse agrees to `max|diff| = 0.000000` on all 12 rows
+— **three code paths, one answer**.
+
+| arm | TEST @100 | TEST @250 | Δ | TRAIN @100 | TRAIN @250 | Δ |
+|---|---|---|---|---|---|---|
+| `k01` (floor) | 23.0640 | 23.1573 | **+0.0933** | 23.1413 | 23.2533 | +0.1120 |
+| `k62` (ceiling) | 69.0813 | 70.3667 | **+1.2853** | 98.8413 | 99.9260 | +1.0847 |
+| `ISO` [59,3] | 69.9093 | 69.8967 | **−0.0127** | 94.3260 | 94.5627 | +0.2367 |
+| `ONE` [61,1] | 64.7960 | 64.9440 | **+0.1480** | 83.6573 | 84.5540 | +0.8967 |
+
+**THE PRIMARY.**  `D_ISO@100` = **+46.8453 pp** (+61.99 SE); `D_ISO@250` = **+46.7393 pp** (+61.85 SE);
+**`RHO` = 0.997737**.  Per-seed paired `RHO` = 0.997855 / 0.998962 / 0.996407, mean 0.997741 — the
+retention is not an artefact of arm-mean cancellation.  `SURVIVE` needed `D_ISO@250 ≥ 0.80 × 46.8453
+= 37.4763` **and** `≥ 25.0`: **both met, with 9.26 pp of slack**.  `COLLAPSE` needed `≤ 5.0`: **not met,
+by 41.7 pp**.  `ISO` loses **one tenth of one percent** of its rescue over 150 further epochs.
+
+### 196.4 THE BATCH'S OWN NULL MODEL, CHECKED FIRST — **FLOOR-HOLDS**
+
+`k01` is pinned from epoch 37.0–37.2 with last-quarter floor occupancy **1.0000 on 3/3 seeds**.  Over
+the 150 further epochs it moves **+0.0933 pp** (per seed +0.0720 / +0.1020 / +0.1060) = **+0.12 SE**,
+against `READ_BAR` 1.5114.  **FLOOR-HOLDS.**  A pinned arm at this cell does not drift, so nothing in
+this batch is a drift artefact and the rest of the entry is licensed to be read.
+
+### 196.5 THE ATTACK: THE SCORER'S PRINTED EXPLANATION IS WRONG, AND THE GATE IS DEFINITIONAL
+
+The scorer prints, on reaching its gate: *"The descent must decelerate near the floor; ISO-59-NEITHER is
+then a PERMANENT state, not a mid-flight cut."*  **Both halves of that inference fail against the same
+records the scorer just read.**
+
+**(a) THE DESCENT DID NOT DECELERATE.  `190`'s EXTRAPOLATION WAS NEARLY EXACT.**  `190.3` predicted
+`ISO`'s 59-group would pin at epoch 104.7 / 100.3 / 101.8.  Measured first arrival at β = −15.0:
+
+| arm·seed | predicted | **measured** | error | pre-touch slope (OLS, 50 recs) |
+|---|---|---|---|---|
+| `ISO` s31 | 104.7 | **102.2** (rec 511) | −2.5 ep (−2.4 %) | −0.03493 /rec |
+| `ISO` s32 | 100.3 | **103.0** (rec 515) | **+2.7 ep** (+2.7 %) | −0.03676 /rec |
+| `ISO` s33 | 101.8 | **99.4** (rec 497) | −2.4 ep (−2.4 %) | −0.03174 /rec |
+| `ONE` s31 | 147.6 | **148.4** (rec 742) | **+0.8 ep** | −0.01118 /rec |
+| `ONE` s32 | 160.3 | **151.0** (rec 755) | −9.3 ep | −0.00728 /rec |
+| `ONE` s33 | 182.1 | **135.8** (rec 679) | −46.3 ep (−25.4 %) | −0.01489 /rec |
+
+The terminal slopes measured here (−0.032 to −0.037 /rec on `ISO`) are **steeper** than the −0.026 to
+−0.036 measured at `ciso1` — the descent **accelerated**, exactly as `190.3` said, and did not
+decelerate at all.  **DISCLOSED HONESTLY: `190` registered the extrapolation as an UPPER BOUND ("pins
+NO LATER than this"), and the bound is VIOLATED on 2 of 6 arm·seeds** — `ISO` s32 by +2.7 epochs and
+`ONE` s31 by +0.8 epochs.  The bound is **approximately** right, not strictly right, and it should be
+quoted that way from now on.  The horizon choice is vindicated with room: the worst case that set
+E = 250 (`ONE` s33 at 182.1) actually arrived at **135.8**.
+
+**(b) WHAT ACTUALLY HAPPENED IS CHATTER AT THE CLAMP, AND `ISO` IS PHYSICALLY PINNED.**  The gate is
+`PIN_OCC_MIN = 0.50` occupancy at **exactly** β = −15 over the last quarter of the records.  `ISO`
+reaches 0.3974 / 0.3365 / 0.4295 and fails on all three seeds.  But α = exp(β), and moving the
+threshold by **0.05 nats** — a **5 %** change in step size — reverses the verdict:
+
+| arm·seed | occ ≤ −15.0 (registered) | occ ≤ −14.95 | occ ≤ −14.90 | occ ≤ −14.50 | max α / α_floor in that window |
+|---|---|---|---|---|---|
+| `ISO` s31 | 0.3974 **FAIL** | **0.9391** | 1.0000 | 1.0000 | **1.10×** |
+| `ISO` s32 | 0.3365 **FAIL** | **0.9295** | 0.9840 | 1.0000 | **1.19×** |
+| `ISO` s33 | 0.4295 **FAIL** | **0.9167** | 0.9872 | 1.0000 | **1.13×** |
+| `ONE` s31 | 0.1795 FAIL | 0.5962 | 0.7660 | 1.0000 | 1.43× |
+| `ONE` s32 | 0.0705 FAIL | 0.4776 | 0.6571 | 0.9968 | 1.66× |
+| `ONE` s33 | 0.1667 FAIL | 0.5160 | 0.7083 | 1.0000 | 1.44× |
+| `k01` ×3 | **1.0000 PASS** | 1.0000 | 1.0000 | 1.0000 | 1.00× |
+| `k62` ×3 | 0.0000 FAIL | 0.0000 | 0.0000 | **0.0000** | **85.7× / 114.8× / 131.0×** |
+
+After first touch `ISO` makes 149 / 129 / 141 departures from the clamp and, when off it, sits at mean
+β = −14.982 / −14.973 / −14.978.  **Its step size never exceeds 1.25× the floor for the rest of the
+run.**  `k62`, the genuinely free arm, runs at **86–131× the floor**.  **The registered gate puts `ISO`
+and `k62` in the same bucket — "not pinned" — while their step sizes differ by a factor of ~100.**  It
+is measuring exact-equality dwell time, not step-size magnitude.  `ISO`'s 59-group is pinned in every
+sense that can affect training; it is *unpinned* only in the sense that a clamped quantity being
+re-clamped every few records is not literally resting on the clamp.
+
+**(c) AND THE ACCURACY BEHAVES EXACTLY AS A FROZEN NETWORK SHOULD.**  Arm-mean trailing-5 TEST:
+
+| epochs | 95–99 | 105–109 | 125–129 | 145–149 | 175–179 | 195–199 | 225–229 | 245–249 |
+|---|---|---|---|---|---|---|---|---|
+| `k01` | 23.064 | 23.073 | 23.097 | 23.077 | 23.112 | 23.105 | 23.118 | 23.157 |
+| **`ISO`** | **69.909** | **69.927** | **69.901** | **69.943** | **69.916** | **69.927** | **69.931** | **69.897** |
+| `ONE` | 64.796 | 64.887 | 64.921 | 64.985 | 64.979 | 64.960 | 65.006 | 64.944 |
+| `k62` | 69.081 | 69.241 | 69.653 | 69.777 | 70.115 | 70.235 | 70.431 | 70.367 |
+
+`ISO` is flat to **±0.046 pp across 150 epochs** while `k62`, still training, climbs +1.29.  So the
+**RESCUE-COLLAPSES** account registered at `190` — that the +46.93 pp is a ~68-epoch *delay* of the
+scalar collapse — **is refuted by the data, not by the branch token**: `ISO` freezes on schedule at
+≈ epoch 102 and then holds 69.9 % for 148 further epochs while the floor holds 23.1 %.  Freezing at a
+good point is not the same event as collapsing to the floor, and this batch separates them.
+
+### 196.6 THE STAMPS — **NOT ONE OF THEM WAS EMITTED BY THE REGISTERED CODE**, AND THAT IS STATED PLAINLY
+
+`return finish("UNRESOLVED-NOT-PINNED", stamps)` at **line 993** short-circuits **before** lines
+1019–1077, where `FROZEN-AT-PIN`, `CEIL-*`, `ORDER-*`, `FLOOR-HOLDS`, `ISO-TRAIN-*`, `TRAIN-GAP-*` and
+`REPLICATES-CISO1` are computed.  **The registered scorer emitted exactly two tokens.**  The table below
+is therefore **this entry's own arithmetic**, applying the registered formulas and the registered
+`READ_BAR = 1.5113646` to the measured values — **it is a counterfactual, not a scorer output, and must
+never be quoted as one.**  `E_pin` is taken as the mean measured **first-touch** epoch, 101.533.
+
+| registered stamp | measured value | counterfactual token | `190`'s prediction |
+|---|---|---|---|
+| post-pin (ep 107–111 → 245–249) | −0.0400 pp | **FROZEN-AT-PIN** | FROZEN-AT-PIN — **held** |
+| `ISO` − `k62` @250 | −0.4700 pp | **CEIL-TRACKS** | CEIL-TRACKS at 100 ep — **held** |
+| `ISO` − `ONE` @250 | +4.9527 pp | **ORDER-HELD** | ORDER-HELD, shrinking toward ≈ +3 — **direction held, magnitude did not** (+5.1133 → +4.9527, a shrink of 0.16 pp, not 2) |
+| `k01` @250 − @100 | +0.0933 pp | **FLOOR-HOLDS** | the null model — **held** |
+| `ISO` TRAIN @250 − @100 | +0.2367 pp | **ISO-TRAIN-FROZEN** | ISO-TRAIN-FROZEN — **held** |
+| TRAIN gap `k62`−`ISO` | +4.5153 → +5.3633, change **+0.8480** | **TRAIN-GAP-HELD** | TRAIN-GAP-WIDENS — **NOT reached** |
+| `D_ISO@100` vs `ciso1`'s 46.9307 | −0.0854 pp (−0.11 SE) | **REPLICATES-CISO1** | between-batch, non-gating |
+| `k62` pinned 0/3 | — | **CEIL-STILL-TRAINING** | pre-registered |
+| `ONE` tail-occ 0.07–0.18 | — | **ONE-NOT-PINNED** + `CROSSOVER-UNTESTED` | ONE-PINS-BY-E — **not reached on the registered occupancy rule**, though `ONE` first touches at 135.8–151.0 |
+
+**§5 OF THE TASK, ANSWERED WITHOUT SPIN.**  `190.7` registered `TRAIN-GAP-WIDENS` as the *explanation*
+of `187.5`'s unstamped ~4.7 pp train deficit, and registered that **a narrowing gap refutes the
+account**.  **The gap did not narrow — it widened, by +0.8480 pp (4.5153 → 5.3633), in the predicted
+direction.  The account is therefore NOT refuted.  But +0.8480 is inside the 2-SE stamp bar, so the
+registered code would have stamped `TRAIN-GAP-HELD`, not `TRAIN-GAP-WIDENS`: the prediction is
+directionally confirmed and NOT confirmed at stamp resolution.**  Both halves of that sentence are
+required; quoting either alone misreports the batch.
+
+### 196.7 REPLICATION, AND THE SECOND HALF OF `191`'s CONCORDANCE TEST
+
+`ciso1` re-derived here from its own `.out` files: `ISO` 70.2113 / `k01` 23.2807 / `k62` 69.0273 /
+`ONE` 64.7500, `D_ISO` **+46.9307** — reproducing `187`/`190.1` digit for digit.  `ciso2`'s free in-run
+100-epoch readout, at **disjoint seeds {31,32,33}** and byte-identical spec strings: `D_ISO` **+46.8453**.
+**Difference −0.0854 pp = −0.11 SE.**  **REPLICATES-CISO1** — and this is `191`'s concordance test
+completing: `cdep1` gave the first half (`D_ONE` +41.4693 → +41.4747), `ciso2` gives the second.
+**BATCH-as-unit-of-replication survives both halves.**  Registered as **BETWEEN-BATCH and NON-GATING**;
+no `ciso1` arm enters any contrast in §196.3–196.6.  This batch's own pooled within-arm SD at 250
+epochs is **0.409934** (df 8), **2.26× smaller** than the registered conservative `SIGMA_W` 0.925518,
+so every SE quoted above is an under-statement of significance, not an over-statement.
+
+### 196.8 THE INGEST — AND A PRE-EXISTING DEFECT CAUGHT BEFORE IT ENTERED THE CORPUS
+
+`python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv` (to **STDOUT**, `146.7`'s
+trap avoided constructively), then `python3 analysis/args_repair.py --apply`.
+
+**THE FIRST RUN PRODUCED 2,821 ROWS, NOT THE EXPECTED 2,797.**  A comparator keyed `(run, job_id)` —
+not a row count — showed **12 keys added (all `ciso2`), 0 removed, and 24 keys whose multiplicity went
+1 → 2**: all 18 `cdep1` and all 6 `cvg1` runs.  Cause, verified: those 24 `.out` files had been placed
+in **both** aggregation roots by last cycle's concurrent tracks, and `cmp` confirms all **24 pairs are
+byte-identical**.  The committed 2,785-row CSV carries each exactly once with `superseded=0`, so the
+duplicate copies post-date it.  **They are `alice2` runs sitting in the `alice` mirror; `runs_alice2/`
+is their correct home.**  The 24 misfiled copies were **quarantined, not deleted** (preserved at
+`<scratchpad>/quarantine_misfiled_alice2_copies/`, originals untouched in `runs_alice2/`), and the
+ingest re-run.  **`alice` the account was not contacted at any point; `runs/` is a local mirror
+directory outside the repo and outside git.**
+
+**BOTH HALVES VERIFIED, FIELD BY FIELD:**
+
+```
+before  rows 2785  distinct (run,job_id) keys 2785
+after   rows 2797  distinct (run,job_id) keys 2797
+ADDED   : 12  (all ciso2)          REMOVED : 0          MULTIPLICITY CHANGES : 0
+PRE-EXISTING ROWS CHANGED, all 38 fields : 0
+```
+
+**CORPUS 2,785 → 2,797.**  The 12 new rows carry a single value each of `beta_clip=-15:-2.3026`,
+`augment=1`, `epochs_requested=250`, `meta_stepsize=1e-3`, `alpha0=1e-6`, `batch_size=100`,
+`network=ResNet18_c100`, `dataset=CIFAR100`, seeds {31,32,33}.  **The corpus now owns its first
+250-epoch rows**, which retires `190.6`'s disclosed horizon-extrapolation in the noise model for any
+future batch.
+
+### 196.9 THE VERDICT, AND WHAT IT DOES **NOT** LICENSE
+
+**VERDICT.**  The registered token is **`UNRESOLVED-NOT-PINNED | ISO-59-NOT-PINNED-AT-250`** — the
+branch `190.7` registered in advance as **INFORMATIVE, not a failure**.  The horizon leg of H-ISOLATE
+**does not close on its registered gate.**  Underneath it, the primary quantity is measured, replicated
+across three seeds, and unambiguous: `RHO = 0.9977`, `D_ISO@250 = +46.7393 pp = +61.85 SE`.
+
+**WHAT IT DOES NOT LICENSE — and each of these is a sentence someone will otherwise write:**
+
+1. **NOT `RESCUE-SURVIVES`.**  That branch was never reached.  The correct sentence is *"the registered
+   scorer returned `UNRESOLVED-NOT-PINNED`; the primary quantity underneath it is `RHO` = 0.998."*
+   Reporting the branch that *would* have landed as the branch that *did* is the exact failure this
+   campaign's branch maps exist to prevent.
+2. **NOT "the 59-group never pinned."**  It reached the clamp at epoch 99.4–103.0 on 3/3 seeds, within
+   2.7 epochs of prediction, and spent the rest of the run within 0.05 nats of it on 92–94 % of records.
+   It failed a **dwell-time** criterion, not a **pinning** one.
+3. **NOT "the gate was wrong, so ignore it."**  `PIN_OCC_MIN` was registered before the data existed and
+   it fired honestly.  Its defect — measuring exact-equality dwell rather than step-size magnitude — is
+   now **measured and disclosed**, and any successor must fix it *by registration*, not by editing this
+   scorer (RULE 16: `cIS2` is frozen as of this entry).
+4. **NOT `TRAIN-GAP-WIDENS`.**  See §196.6.  Directionally confirmed, inside the stamp bar.
+5. **NOT a magnitude claim.**  Confound (a) is untouched: the carriers rank 1/2/3 of 62 by mean |L_i|
+   and isolated-set totals run ×308.  `IDENTITY-OPERATIVE` (`193`) means *"not any three matched layer4
+   512-parameter BN parameters"* and **does not separate tensor IDENTITY from term MAGNITUDE**.  No
+   batch on this architecture can, and 250 epochs did not change that.
+6. **NOT an architecture claim.**  Confound (b) is untouched: the three-BN-scale isolation is
+   **ResNet-only**.  `cvg1` lifted the scope caveat for the **GAP** and for the gap only, and VGG's own
+   probe records nominate a carrier set of **cardinality one**.  **These two claims must never travel
+   together**, and `ciso2` ran no VGG arm.
+7. **NOT a horizon claim beyond 250 epochs**, and not one about any other cell.  Every number here is
+   CIFAR-100 / ResNet18_c100 / SGDm+Lion / ms 1e-3 / α₀ 1e-6 / batch 100 / AUGMENT=1.
+
+### 196.10 WHERE H-ISOLATE NOW STANDS, ACROSS ALL THREE LEGS
+
+| leg | status | by what |
+|---|---|---|
+| **identity** | **CLOSED** | `cdep1` (`193`) `IDENTITY-OPERATIVE`: a count-, numel-, width-, stage- and BN-membership-matched carrier-free set recovers **0.36 %** of the gap (+0.1687 pp = +0.22 SE) against ΔID +46.5233 pp = +61.56 SE |
+| **magnitude** | **ARCHITECTURALLY UNREACHABLE** | `188.3`, re-measured on `cdep1`'s own `k01`: no admissible carrier-free triple on this net gets within ×225 of the carriers' term magnitude |
+| **horizon** | **MEASURED, GATE NOT CLEARED** | this batch: `UNRESOLVED-NOT-PINNED`; `RHO` = 0.9977 under it, `FLOOR-HOLDS`, `ISO` flat to ±0.046 pp over 150 epochs |
+
+**THE LEDGER DOES NOT MOVE: SEVENTEEN REGISTERED, FIFTEEN DEAD, TWO LIVE, NONE PENDING.**  H-ISOLATE
+stays **live**.  It does not die — the rescue did not collapse, and `RESCUE-COLLAPSES` was reachable by
+the data (`ISO` had 46.9 pp of room to fall and fell 0.1).  It does not graduate — its registered
+horizon gate did not clear.  **`ciso2` is the batch that moved H-ISOLATE from "untested at long horizon"
+to "tested at long horizon, and the registered instrument is the thing that needs replacing."**
+
+### 196.11 THE STANDING CONSTRAINTS, DISCHARGED
+
+`alice` **not contacted at all** — every remote command ran on `alice2` (`s5014158`), and nothing was
+written or `scancel`led anywhere.  **RULE 16:** `git diff` over `analysis/` is **empty**; no registered
+scorer or guard was edited, and `argsline_guard.py` is unedited at its registered sha.  **RULE 20** at
+36/36 with the separate ENV audit.  **plateau5 PRIMARY** throughout, read from the runs' own `.out`;
+the CSV `plateau` column is quoted nowhere and `best_test` nowhere.  **TRAIN reported beside TEST at
+every arm** (§196.3).  Every comparison is **WITHIN batch**; the only `ciso1` figures that appear are
+the between-batch replication check, explicitly flagged non-gating.  `paper/paper.tex` and
+`paper/DRAFT-v4.md` untouched — `git status --porcelain -- paper/` is **empty**.  No nested `claude -p`.
+`git add` restricted to this track's own paths (`docs/CORRECTIONS.md`, `results/all_runs.csv`).
+`analysis/c98_reproduce.py` exit code reported **AS-IS: 1** (expected, inherited, author scope — **NOT
+fixed**).  Coordination: **this entry took number 196**; next free number **197**.
