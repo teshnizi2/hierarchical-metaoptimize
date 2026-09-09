@@ -23642,3 +23642,232 @@ tests/ bin/` for this entry is **additions only** — four new files, plus one a
 primary** throughout; the CSV `plateau` column read nowhere; `best_test` used nowhere.  No nested `claude -p`.
 `git add` restricted to this track's own paths — a concurrent batch's untracked `cdep1`/`ciso2` files were
 left untouched.  Next free number: **190**.
+
+## 190. TRACK B — **`ciso2` REGISTERED AND LAUNCHED: DOES THE H-ISOLATE RESCUE SURVIVE THE 59-GROUP'S PINNING?  12 JOBS, ONE SUBMISSION, 250 EPOCHS, ≈21 GPU-h, RULE 21 MARGIN +152 s (scorer).**  THE HORIZON IS **DERIVED FROM THE MEASURED DESCENT, NOT CHOSEN ROUND**, AND THE 100-EPOCH CONTROL IS **FREE, IN-RUN AND PAIRED**, PROVED ON THE LIVE `train.py` RATHER THAN ASSERTED.  **RE-DERIVED HERE, BEFORE ANY REGISTRATION: `ISO`'s ISOLATED GROUP HAS BEEN PINNED SINCE EPOCH 22.4–23.6, SO WHEN THE 59-GROUP PINS *EVERY* TENSOR SITS ON exp(−15) AND THE WHOLE NETWORK FREEZES** — which turns `187.7`'s open question into a sharp one: is the rescue a change of regime, or only a ~68-epoch **DELAY** of the scalar collapse?  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,761 ROWS AND NO `ciso2` NUMBER IS QUOTABLE.**
+
+### 190.1 EVERY `187` NUMBER THIS BATCH RESTS ON, RE-DERIVED BY AN INDEPENDENT PARSER
+
+Read from `ciso1`'s raw `.out` files and its 15 `probe.jsonl` files on `alice2`, not from prose.  Every
+value reproduces `187` **digit for digit**:
+
+| quantity | seed 21 | seed 22 | seed 23 | mean | `187` says |
+|---|---|---|---|---|---|
+| `ISO` plateau5 (test, ep 95–99) | 69.9460 | 70.2060 | 70.4820 | **70.2113** | 70.2113 |
+| `k01` plateau5 | 23.0400 | 23.6040 | 23.1980 | **23.2807** | 23.2807 |
+| `k62` plateau5 | 68.2760 | 69.4440 | 69.3620 | **69.0273** | 69.0273 |
+| `CTRL` plateau5 | 23.2360 | 23.3880 | 23.0280 | **23.2173** | 23.2173 |
+| `ONE` plateau5 | 64.1620 | 65.3980 | 64.6900 | **64.7500** | 64.7500 |
+| `ISO` train5 | 94.4320 | 94.2160 | 94.0640 | **94.2373** | 94.2373 |
+| `k62` train5 | 98.7220 | 98.9460 | 98.8800 | **98.8493** | 98.8493 |
+| `ISO` β[0] terminal | −14.3847 | −14.9450 | −14.7329 | — | −14.385/−14.945/−14.733 |
+| `ISO` β[0] slope, OLS last 50 rec | −0.02645 | −0.03580 | −0.02925 | — | identical |
+| `ISO` β[0] first ≤ −14.0, record | 491 | 464 | 474 | — | 491/464/474 |
+| `ONE` β[0] terminal | −11.8497 | −11.9077 | −11.7617 | **−11.8397** | −11.840 |
+| `ONE` β[0] slope, last 50 | −0.01323 | −0.01025 | −0.00789 | — | −0.0132/−0.0103/−0.0079 |
+
+**plateau5 is confirmed to be the mean TEST accuracy over epochs 95–99 of the run's own `.out`** — the
+reader reproduces all five arm means exactly, which is what licenses reading a 100-epoch control out of a
+250-epoch run at epochs 95–99.
+
+### 190.2 THE FACT `187` DID NOT STATE, AND IT CHANGES THE QUESTION
+
+`187.7` analysed `ISO`'s β[0].  **Nobody read its β[1].**  Measured here on the same records:
+
+| arm | β[1] terminal | first at −15.0 (record → epoch) | floor occupancy |
+|---|---|---|---|
+| `ISO` s21/22/23 | −15.0000 ×3 | 112 → 22.4 · 116 → 23.2 · 118 → 23.6 | 0.7760 / 0.7680 / 0.7640 |
+| `ONE` s21/22/23 | −15.0000 ×3 | 110 → 22.0 · 114 → 22.8 · 116 → 23.2 | 0.7800 / 0.7720 / 0.7680 |
+| `CTRL` s21/22/23 | −10.9093 / −10.8713 / −10.5132 | never | 0.0000 |
+
+**`ISO`'s isolated carriers are pinned from epoch ≈ 23 and stay pinned.**  `ISO-3-PINS` was already stamped
+at `187`, but its consequence at a longer horizon was not drawn: the moment the 59-group pins too, all 62
+tensors are on α = exp(−15) = 3.06e−07 and the network stops moving.  And the corpus says what that does —
+`k01` and `CTRL` reach the floor at record **184 = epoch 36.8**, and their trailing-5-epoch test accuracy is
+inside **±0.5 pp of its terminal value from epoch 37 onward and flat for the remaining 63.2 epochs**.  At
+this cell the accuracy consequence of pinning is **immediate and permanent**, not a slow decay.
+
+**So the registered account is now falsifiable in a way it was not at `187`:** if `ISO` at 250 epochs equals
+`ISO` at ≈ 105 epochs, isolation **delayed** the collapse by ≈ 68 epochs rather than preventing it, and 68
+epochs is simply enough to reach 70 % on this cell.  The stamp `FROZEN-AT-PIN` / `DECAYS-AFTER-PIN` /
+`IMPROVES-AFTER-PIN` separates that from the alternatives.
+
+### 190.3 THE HORIZON, DERIVED
+
+1. `ISO`'s 59-group is 0.6153 / 0.0550 / 0.2671 nats from the clamp and closing at 0.02645 / 0.03580 /
+   0.02925 nats per record ⇒ **pins at epoch 104.7 / 100.3 / 101.8**.  Its per-100-record OLS slopes are
+   −0.0188, −0.0153, −0.0232, −0.0263: the descent **accelerates**, so linear extrapolation is an upper bound.
+2. `ONE`'s 61-group ⇒ **pins at epoch 147.6 / 160.3 / 182.1** (last-50 slopes; last-100 gives 145.1 / 149.6 /
+   154.0).  **182.1 is the worst case and it is the number the horizon is set by.**
+3. The only post-pin observation window this campaign has ever measured is `k01`'s **63.2 epochs**.
+   ⇒ **E = 250**: the latest-pinning arm still gets 250 − 182.1 = **67.9 ≥ 63.2** post-pin epochs, and `ISO`
+   gets 145.3.  **E = 240 gives `ONE` only 57.9 and is rejected.**  E = 772 (the `cts3` horizon) costs 3.1×
+   and decides nothing extra, precisely because pinning's effect is measured to be immediate.
+
+`k62` will **not** pin inside this horizon — β[0] terminal −10.0810 / −10.1290 / −10.2171 with last-100
+slopes −0.001517 / −0.002676 / **+0.000473** ⇒ pin epoch 749 / 464 / never.  **This is pre-registered because
+it makes `D_ISO/D_CEIL` fall even if `ISO` does not move a single point**: the ceiling keeps training while
+`ISO` freezes.  The ratio is therefore a **STAMP**, and the PRIMARY is the absolute retention
+`RHO = D_ISO@250 / D_ISO@100` against this batch's **own** in-run 100-epoch readout.
+
+### 190.4 THE DESIGN, AND THE TWO TRADES IT MAKES IN THE OPEN
+
+**4 arms × 3 seeds = 12 jobs, ONE submission, seeds {31,32,33}.**  `k01` `scalar`, `k62` `layerwise`, `ISO`
+`sets:1-49,51-52,54-58,60-62/…` [59,3], `ONE` `sets:1-49,51-62/layer4.0.bn2.weight` [61,1] — the four spec
+strings **byte identical to `ciso1`'s**, proved by guard 4c′ against the scorer's own `SPEC` table, so this
+is the same intervention at a different horizon.
+
+* **`CTRL` IS DROPPED.**  At 100 epochs it is −0.0633 pp = −0.08 SE from `k01`, reaches the floor at the
+  *same* record 184, and its seed-pair β differences are 0.006–0.108 nats.  A second floor arm answers
+  nothing this batch asks, and the identity-vs-depth question it half-answered is `cdep1`'s (`188`).  The
+  three saved jobs pay for the longer horizon.  **A trade, stated, not an omission.**
+* **`ONE` IS KEPT** because it pins **43–77 epochs later** than `ISO` and scores **5.4613 pp lower**.  If
+  pinning destroys the rescue, the later-freezing arm must end **higher** — `CROSSOVER`.  If the rescue
+  survives, `ORDER-HELD`.  That is the only reason a fourth arm is here.
+* **SEEDS ARE FRESH.**  Guard 2c proves **zero rows anywhere in the 2,761-row corpus carry seed 31, 32 or
+  33**, so the free 100-epoch readout is an independent seed triple and also tests whether `187`'s headline
+  replicates — stamped `REPLICATES-CISO1` / `DIFFERS-FROM-CISO1` and **explicitly BETWEEN-BATCH and
+  NON-GATING**: BATCH is the unit of replication (F(62,85) = 5.47) and **no `ciso1` arm enters any `ciso2`
+  contrast**.
+
+### 190.5 THE FREE 100-EPOCH CONTROL IS *PROVED*, NOT ASSERTED — guard 4h
+
+Guard 4h reads the **live** `train.py` (sha256 `3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7`)
+and prints what it found:
+
+```
+guard 4h: num_epochs occurs on lines [42, 135] of the live train.py:
+            42  parser.add_argument("--num-epochs", type=int, default=100,
+           135  for epoch in range(args.num_epochs):  # loop over the dataset multiple times
+guard 4h: no lr_scheduler / cosine / StepLR / OneCycle / total_steps / warmup anywhere in train.py
+```
+
+Exactly two occurrences, no schedule keyed to the horizon, `SCHED=none`, and `--max-time 999:00:00` keeps
+`train.py`'s own time break from firing.  **Epochs 95–99 of a 250-epoch run therefore ARE a 100-epoch run of
+an identical configuration** — and a **within-run paired** control, which twelve separate 100-epoch jobs
+could not buy at any price.  (`cts3`/`cpk2`/`cpk3` precedent, `152`/`158`/`161`.)
+
+### 190.6 THE NOISE FLOOR, RE-DERIVED, AND THE ONE EXTRAPOLATION IT MAKES
+
+`cR1`'s estimator against the live **2,761-row** CSV with `ciso2-` excluded from every reader.  **Four**
+defensible variants, maximum registered:
+
+| variant | sigma | df | cells |
+|---|---|---|---|
+| 100 ep, m=2 NARROW | **0.925518** | 60 | 30 |
+| 100 ep, m=2 WIDE | 0.863472 | 84 | 42 |
+| 772 ep, m=2 | 0.864841 | 26 | 13 |
+| 772 ep, all granularities | 0.813024 | 30 | 15 |
+
+`SIGMA_W = 0.925518`, `SE_ARM_DIFF = 0.7556823`, `READ_BAR = 1.5113646`.  **DISCLOSED: the corpus owns NO
+250-epoch row, so this is an extrapolation in horizon.**  The 772-epoch stratum — the only long-horizon
+evidence there is — gives a **smaller** sigma, so taking the 100-epoch maximum is conservative, and that is
+**checked by the selftest, not assumed**.  `ciso1`'s own pooled within-arm SD was 0.446954 (df 10), 2.07×
+smaller again.
+
+**`SURVIVE_FRAC = 0.80` is corpus-anchored, not round:** 0.80 × 46.9307 = **37.5446 pp**, which is **above**
+the best rescue any two-group partition of this cell has ever produced — `k49` (pooled `[49,13]` and
+`sets:1-49/50-62`, n 21) 55.4688 against the scalar mean 22.9141 = **+32.5547 pp**.  So `RESCUE-SURVIVES`
+means "`ISO` still beats the corpus's best m = 2 partition".  The tolerated loss, 9.3861 pp, is **12.42 SE**:
+this is a **scientific** threshold, not a statistical one, and it is registered as such.  `SUPPORT_BAR` 25.0
+pp (33.08 SE) and `REFUTE_BAR` 5.0 pp (6.62 SE) are carried **unchanged from `ciso1`** so the two horizons
+are read on one scale.
+
+### 190.7 THE BRANCH MAP, INCLUDING WHY `UNRESOLVED-NOT-PINNED` IS INFORMATIVE
+
+`UNRESOLVED-MANIFEST-MISMATCH` → `-PROVENANCE` → `-DIVERGED` → **`UNRESOLVED-NOT-PINNED`** →
+`RESCUE-COLLAPSES` (`D_ISO@250 ≤ 5.0`) → `RESCUE-SURVIVES` (`D_ISO@250 ≥ 0.80 × D_ISO@100` **and** `≥ 25.0`)
+→ `RESCUE-ATTENUATES`.
+
+`UNRESOLVED-NOT-PINNED` fires when `ISO`'s 59-group has not pinned and held on ≥ 2 of 3 seeds.  **It is
+registered as a result, not a failure:** the extrapolation says a 0.055–0.615 nat gap closes at 0.026–0.036
+nats per record.  If **750 further records** do not close it, the descent decelerates near the floor,
+`ISO-59-NEITHER` is a **permanent** state rather than `187.7`'s mid-flight cut, and the mechanism changes.
+
+**Stamps** (never the branch): `FROZEN-AT-PIN` / `DECAYS-AFTER-PIN` / `IMPROVES-AFTER-PIN`;
+`CEIL-TRACKS` / `-BELOW` / `-ABOVE`; `ORDER-HELD` / `ORDER-TIED` / `CROSSOVER`; `ONE-PINS-BY-E` /
+`ONE-NOT-PINNED` (+ `CROSSOVER-UNTESTED`); `CEIL-STILL-TRAINING` / `CEIL-PINNED`; **`FLOOR-HOLDS` /
+`FLOOR-DRIFTS`** — the batch's **null model**: if a pinned arm drifts over 150 further epochs, nothing here
+is attributable to isolation; `ISO-TRAIN-FROZEN` / `-MOVES`; `TRAIN-GAP-WIDENS` / `-HELD` / `-NARROWS`;
+`REPLICATES-CISO1` / `DIFFERS-FROM-CISO1`; `FLOOR-NOT-INGESTED`.
+
+**`TRAIN-GAP-WIDENS` is the registered *explanation* of `187.5`'s unstamped, unexplained 4.612 pp train
+deficit.**  `ISO` stops fitting when it freezes; `k62` keeps fitting at +0.083 to +0.097 train pp/epoch
+(measured over epochs 80–99).  The gap must widen.  **A narrowing gap refutes the account.**
+
+### 190.8 EVERY ARM'S PREDICTED LEVEL UNDER EVERY ACCOUNT, AND ITS FLOOR MARGIN (the `cpr1` rule, `164`)
+
+| arm | SURVIVE account | ATTENUATE | COLLAPSE | margin over the in-batch m=1 floor |
+|---|---|---|---|---|
+| `k01` | 23.3 | 23.3 | 23.3 | 0 — **it IS the floor**, disclosed |
+| `k62` | 69–73 | 69–73 | 69–73 | ≥ +45.7 pp = **60.5 SE** |
+| `ISO` | **70.2** [68.5, 71.5] | 35–60 | ≤ 28.3 | +46.9 pp = **62.1 SE** |
+| `ONE` | 65.0–68.0 | 35–60 | ≤ 28.3 | ≥ +41.7 pp = **55.2 SE** |
+
+**No arm is predicted at or near the floor under the account being tested.**  Under the registered account
+(`SURVIVE` / `FROZEN-AT-PIN`) `ISO` sits 62.1 SE above the in-batch floor with **46.9 pp of room to fall**
+before reaching it, so `RESCUE-COLLAPSES` is reachable by the data rather than excluded by the design.  The
+`cpr1` defect was a **treatment** arm saturated under its **own** account; a refutation branch landing at the
+floor is not that.  Also registered: `ISO` pin epoch [100.3, 104.7], `ONE` pin epoch [145.1, 182.1],
+`ISO − ONE` predicted to stay positive but **shrink** from +5.4613 toward ≈ +3.
+
+### 190.9 RULE 21, RULE 20, RULE 16 AND THE COST
+
+* **RULE 21.**  Scorer `analysis/cIS2_ciso2_horizon_score.py` committed **`0a60f05` at 2026-09-09T13:39:25
+  CEST**; launcher `bin/cIS2_isolate_horizon.sh` at **`d593069`, 13:40:48**; earliest `sacct`
+  `Submit` **2026-09-09T13:41:57** (jobs 4929327–4929338).  **MARGIN +152 s (scorer) / +69 s (launcher)**,
+  with a **measured** Mac↔`alice2` clock skew of **1 s**.  Scorer sha256
+  `ab935f682b6bc0e6715b387c431e3bdc0559acb05e9bc39347f164449e563d98`, identical on both hosts.
+* **A LAUNCHER FIX BETWEEN THE TWO COMMITS, DISCLOSED.**  The first dry run **aborted at guard 4** —
+  `init_meta` routes `scalar`/`layerwise` by exact string match and only `blockwise` reaches
+  `polish_the_stepsize_groups`, whose `if not isinstance(stepsize_groups, list): 0/0` fired on the bare
+  string.  `d593069` checks the two m = 1 anchors **end to end through `init_meta`** instead (stepsize_type
+  `scalar` / β shape `()`; `layerwise` / β shape `(62,)`; `_rednorm` False on both) — the stronger check.
+  **The guard chain aborted exactly as designed (`!!! SUBMIT ABORTED -- nothing submitted.`), the REGISTERED
+  SCORER WAS NOT TOUCHED (sha unchanged), and nothing had been submitted.**
+* **RULE 20.**  `guard_presubmit` passed **12/12 with 0 failures** on the composed lines, and an
+  **independent** parse of all 12 confirmed: no repeated flag, 12 distinct job names, and every one of
+  `num-epochs=250`, `batch-size=100`, `dataset`, `NN-name`, `meta-stepsize`, `alpha0`, `gamma`, `alg-base`,
+  `alg-meta`, `max-time`, the per-arm `stepsize-groups`, `seed`, `run-name`, `save-directory`,
+  `--time=05:00:00`, the partition list and `AUGMENT=1 BETA_CLIP=-15:-2.3026 SCHED=none PROBE=100
+  PROBE_TENSOR=1 HIER=none PROBE_DIR=…` correct.  Slurm's own record (`scontrol show job`) audits **PASS**
+  on `TimeLimit`, `Partition`, `gres/gpu:1`, `16G`, `StdOut` and 12 distinct names — **note that Slurm's
+  `Command=` field records only the script path, never its arguments**, so the run's-own-ARGS-line audit is
+  a separate step.  **`guard_postlaunch` returned rc = 2 UNVERIFIED: no job started inside its 600 s window**
+  (all 12 `PENDING`, `Reason=Priority`).  **THE BATCH IS THEREFORE UNVERIFIED AT THE ARGS-LINE LEVEL AND NO
+  NUMBER FROM IT MAY BE QUOTED UNTIL THIS IS RUN:**
+
+```
+export METAOPT_WS=/home/s5014158/metaopt
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name ciso2- --batch-consistency \
+        --vary seed --vary run-name --vary stepsize-groups --vary save-directory
+grep -h '^ENV:' $METAOPT_WS/runs/ciso2-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c   # ONE line, x12
+grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/ciso2-*.out | sed 's/ dir=.*//' | sort | uniq -c   # scalar x3, layerwise x3, blockwise x6
+```
+
+* **RULE 16.**  `git diff` over `analysis/ patches/ tests/ bin/` since `0a60f05^` is **additions only, zero
+  deletions**; the only pre-existing file touched is `bin/PROTECTED.txt`, appended with `ciso2-`.
+  `analysis/argsline_guard.py` is unedited at sha256
+  `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`.
+* **SELFTEST: 41 PASS / 0 FAIL / 0 SKIP** on `alice2`, re-deriving all four sigmas, the three corpus levels,
+  both partitions, the design arithmetic and `ciso1`'s own plateau5 and β trajectories from the raw records.
+* **COST.**  12 jobs × 250 epochs: **expected 21.3 GPU-h**, `ciso1`-worst 24.0, corpus-worst 30.5.
+  **`gpu-short` is excluded BY ARITHMETIC, not by choice** — a 2080ti node at the corpus-worst 70.8 s/epoch
+  needs 4.92 h against its 4:00:00 MaxTime — so `WALL=05:00:00` makes `_lib_guards.sh`'s own composer drop
+  it and **no `PARTS_NO_SHORT_REASON` override is used**.  `PARTS=gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`.
+* **QUEUE, CHECKED NOT ASSUMED.**  All 12 `PENDING` with `Reason=Priority` and Slurm-assigned start times
+  from **2026-09-09T21:15** to **2026-09-10T12:15** — backlogged behind other users and behind this
+  account's two concurrent tracks (`cdep1` 18 jobs, `cvg1` 6), **not unschedulable**: this is not the `hz3`
+  failure mode.  Expect completion ≈ 2026-09-10T14:15 CEST.
+
+### 190.10 THE STANDING CONSTRAINTS, DISCHARGED
+
+`alice` **not accessed at all**; everything on `alice2` (`s5014158`).  `paper/` untouched —
+`git status --porcelain -- paper/` empty.  **plateau5 primary** throughout, read from the runs' own `.out`;
+the CSV `plateau` column is read nowhere in the scorer and `best_test` nowhere.  No nested `claude -p`.
+`git add` restricted to this track's own paths (`analysis/cIS2_…`, `bin/cIS2_…`, `bin/PROTECTED.txt`,
+`docs/CORRECTIONS.md`); the concurrent tracks' `cdep1`/`cvg1` files were left untouched.  **ONE
+housekeeping action is disclosed: the deployed repo copy at `alice2:…/hierarchical-metaoptimize/results/all_runs.csv`
+held a STALE 2,740-row CSV while committed `HEAD` carries 2,761.  It was refreshed to the committed file
+(the stale copy preserved at `results/all_runs.csv.bak_2740_pre_ciso2`) so every scorer on that host reads
+the same corpus the repo does.  No row was added, changed or removed anywhere; the corpus is 2,761.**
+Next free number: **191**.
