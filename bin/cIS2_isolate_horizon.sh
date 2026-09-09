@@ -363,15 +363,25 @@ lines = ["NUM_PARAM_TENSORS %d" % T, "TOTAL_PARAMS %d" % tot, "CLIP_C %s" % clip
          "META_STEPS %d" % (epochs * (50000 // bsz))]
 for i in range(T):
     lines.append("TENSOR %d %s %d" % (i + 1, names[i], numel[i]))
-for arm, spec in (("k01", "scalar"), ("k62", "layerwise")):
-    g = HF.polish_the_stepsize_groups(None, spec, nps)
-    print("guard 4: %-4s %-10s m=%d  sizes %s" % (arm, spec, len(g), [len(x) for x in g]))
-    if (arm == "k01" and (len(g) != 1 or len(g[0]) != T)) or (arm == "k62" and (len(g) != T or any(len(x) != 1 for x in g))):
-        print("!!! guard 4: %s does not compose to the registered m" % arm); bad += 1
+# k01 / k62 never reach polish_the_stepsize_groups -- init_meta routes 'scalar' and
+# 'layerwise' by exact string match and only 'blockwise' is polished.  They are checked
+# END TO END through init_meta on the live class instead, which is the stronger check.
+for arm, spec, want_type, want_shape in (("k01", "scalar", "scalar", ()),
+                                         ("k62", "layerwise", "layerwise", (T,))):
+    o = HF.__new__(HF); o.num_layers = T; o._device = torch.device("cpu")
+    HF.init_meta(o, spec, nps, 1e-6)
+    shapes = [tuple(b.shape) for b in o.beta]
+    print("guard 4: %-4s %-10s init_meta: stepsize_type %s  beta shapes %s  rednorm %s"
+          % (arm, spec, o.stepsize_type, shapes, getattr(o, "_rednorm", None)))
+    if o.stepsize_type != want_type or shapes != [want_shape] or getattr(o, "_rednorm", False):
+        print("!!! guard 4: %s does not route to a %s beta of shape %s without rednorm"
+              % (arm, want_type, want_shape)); bad += 1
+    m_arm = 1 if arm == "k01" else T
+    sizes = [T] if arm == "k01" else [1] * T
+    pars = [tot] if arm == "k01" else list(numel)
     lines.append("ARMSPEC %s SPEC %s M %d SIZES %s PARAMS %s GROUP0 %s GROUP1 %s"
-                 % (arm, spec, len(g), ",".join(str(len(x)) for x in g),
-                    ",".join(str(sum(numel[names.index(n)] for n in x)) for x in g),
-                    " ".join(g[0]), " ".join(g[1]) if len(g) > 1 else "-"))
+                 % (arm, spec, m_arm, ",".join(str(x) for x in sizes),
+                    ",".join(str(x) for x in pars), " ".join(names), "-"))
 CAR = ("layer4.0.bn2.weight", "layer4.0.shortcut.1.weight", "layer4.1.bn2.weight")
 want_iso = {"ISO": (50, 53, 59), "ONE": (50,)}
 want_sizes = {"ISO": [59, 3], "ONE": [61, 1]}
