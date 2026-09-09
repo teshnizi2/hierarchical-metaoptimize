@@ -25530,3 +25530,251 @@ the between-batch replication check, explicitly flagged non-gating.  `paper/pape
 `git add` restricted to this track's own paths (`docs/CORRECTIONS.md`, `results/all_runs.csv`).
 `analysis/c98_reproduce.py` exit code reported **AS-IS: 1** (expected, inherited, author scope — **NOT
 fixed**).  Coordination: **this entry took number 196**; next free number **197**.
+
+---
+
+## 197. TRACK C — **`docs/MASTER-TABLE.md` IS CURRENT AGAIN, AND THE REGISTERED CHECKER GOES `EXIT 1` → `EXIT 0` WITHOUT BEING TOUCHED.**  THE TWO MISSING ROWS ARE ADDED — `cdep1` (193) AND `cvg1` (194), EACH CARRYING ITS REGISTERED SCORER'S TOKEN **VERBATIM** — AND THE BOTTOM LINE TAKES ITS **SECOND AMENDMENT**: THE GRANULARITY GAP NOW **REPLICATES OFF ResNet**, THE ISOLATION IS **IDENTITY-OPERATIVE AND NOT DEPTH**, AND THE **ISOLATION CAVEAT IS NOT LIFTED** — IT IS STILL 100 % ResNet, ITS MAGNITUDE LEG IS ARCHITECTURALLY UNREACHABLE, AND VGG's CARRIER CARDINALITY **DISAGREES AT ONE TENSOR**.  **AND THE `.out` DEFECT `196.8` FOUND WAS NOT PRE-EXISTING AND NOT LAST CYCLE'S: IT WAS MINE, MADE THIS CYCLE, MINUTES BEFORE ITS INGEST — THAT CORRECTION LEADS THIS ENTRY.**  **ZERO GPU SUBMITTED, NOTHING CANCELLED, `alice` THE ACCOUNT NOT CONTACTED.  CORPUS 2,797, UNCHANGED BY THIS ENTRY.**  THIS ENTRY TOOK NUMBER **197**; NEXT FREE **198**.
+
+### 197.1 THE DEFECT `196.8` CAUGHT WAS **MINE**, AND ITS ATTRIBUTION IS WRONG — LED WITH, BECAUSE IT IS THE ONE THING IN THIS CYCLE THAT ALMOST ENTERED THE CORPUS
+
+`196.8` records that its first ingest produced **2,821 rows instead of 2,797**, that the excess was
+**24 `.out` files present in both aggregation roots** (all 18 `cdep1` + all 6 `cvg1`, byte-identical
+pairs), and that the copies were quarantined and the ingest re-run.  **All of that is correct, and
+its diagnosis and its fix were right.**  Its *attribution* is not: it says the files
+
+> had been placed in **both** aggregation roots by last cycle's concurrent tracks
+
+**They were placed there by THIS track, in THIS cycle, at roughly 00:0x on 2026-09-10 — minutes
+before that ingest ran.**  Compiling the two new section-9 rows requires the runs' own `.out` files
+and probe records, which live on `alice2`; I pulled them with `rsync` into
+`<alice-backup>/runs/`, which is the **`alice` mirror**, not the `alice2` mirror.  That is the whole
+cause.  The corrections to the record:
+
+* **NOT pre-existing.**  The committed 2,785-row corpus was clean, as `196.8` itself proves by
+  observing that it carries each of the 24 runs exactly once.
+* **NOT last cycle's concurrent tracks.**  `193` and `194` ingested from `runs_alice2/` and neither
+  put an `.out` file in `runs/`; the mirror had no `ciso1-`, no `ciso2-` and no `cdep1-`/`cvg1-`
+  material before this cycle, which is exactly what one expects of a mirror of a **different**
+  account.
+* **The quarantine was incomplete, and I completed it.**  `196.8` quarantined the 24 `.out` files.
+  My `rsync` had also copied **two probe-record directories** — `runs/cdep1/` (23 entries) and
+  `runs/cvg1/` (9 entries) — which `196.8` did not see because `aggregate.py` reads `.out` files.
+  `diff -rq` against `runs_alice2/` shows both are **byte-identical duplicates**, so nothing is at
+  risk; they were **moved, not deleted**, to `<scratchpad>/quarantine/`, and
+  `ls runs/ | grep -E '^(cdep1|cvg1|ciso)'` is now **empty**.  Originals untouched in `runs_alice2/`.
+* **What it cost: nothing, because the guard held.**  The duplicate rows never reached a commit.
+  `196.8`'s `(run, job_id)` multiplicity comparator caught it — the INGEST-ORDER discipline working
+  exactly as designed, on a defect introduced by a sibling agent it had no way to see.
+* **The lesson, registered:** `analysis/aggregate.py` is run over **both** mirror roots, so a mirror
+  is an **ingest input**, not scratch space.  Never `rsync` run artefacts into `runs/` or
+  `runs_alice2/` to read them; read them where they are, or copy them somewhere no aggregator sees.
+
+**Every number in this entry was re-derived AFTER that cleanup, against `runs_alice2/`**, and every
+scorer output below is bit-identical to the same scorer run against the polluted path earlier in the
+cycle (`diff` empty modulo the path string) — the pollution was a duplicate, never a mutation.
+
+### 197.2 THE REGISTERED CHECKER, RUN **UNEDITED**, BEFORE AND AFTER
+
+`analysis/c73_mastertable_check.py`, sha256
+`dec9ec68242e0dda9f6786cfdc3302bd74e8ef9f18c423233eefad22253a3af6`, run through its documented
+invocation with no flags.  **BEFORE** (start of this pass, corpus at 2,785, `ciso2` not yet
+ingested):
+
+```
+MASTER-TABLE.md: 105 data rows, 7 columns each
+CSV: 2785 runs / 2934.7 GPU-hours
+FAILURES:
+  - header says 2761 runs; the CSV has 2785
+  - header says 2914.4 GPU-hours; the CSV gives 2934.7
+EXIT=1
+```
+
+**AFTER** (corpus at 2,797, `ciso2` ingested by Track A mid-pass):
+
+```
+MASTER-TABLE.md: 107 data rows, 7 columns each
+CSV: 2797 runs / 2956.4 GPU-hours
+header is consistent with both the table and the CSV  OK
+EXIT=0
+```
+
+`--selftest` **6/6 passed**.  **The checker was not edited**; `git diff` over `analysis/` for this
+entry is **EMPTY** — this track added no analysis file and changed none.  Both new rows parse at
+exactly **7 cells**, so neither carries an unescaped `|`; the verdict-family tally is untouched
+(CONFIRMED 33 / REFUTED 26 / OPEN 8 / WITHDRAWN 3 / DEAD 2 / UNINTERPRETABLE 2) because both new
+verdict cells carry **scorer tokens in backticks**, which by `192`'s own convention join none of the
+six families.  Header row counts moved **31 → 33** section-9 rows and **105 → 107** total.
+
+### 197.3 THE HEADER FIGURES, RE-DERIVED TWICE, AND THE BOUND DISCLOSED THE WAY `192.3` DISCLOSED IT
+
+Not taken from the checker's arithmetic and not copied from `195.9`'s prose: an independent parser
+was written for this entry — a hand-rolled RFC4180 splitter, **no `csv` module, no `DictReader`,
+no shared code with the checker** — and it agrees with the checker to the printed precision.
+
+| | cycle-148 header | `195.9`'s figure | live corpus, re-derived here | 
+|---|---|---|---|
+| runs | 2,761 | 2,785 | **2,797** |
+| GPU-hours (`sum(wallclock_min)/60`) | 2914.4 | 2934.7 | **2956.4** |
+| rows carrying a `wallclock_min` | — | 2,770 | **2,782** |
+| rows carrying none (contribute ZERO) | — | 15 | **15** |
+| rows in the table | 105 | 105 | **107** |
+
+**`195.9` IS VERIFIED, NOT QUOTED.**  With `ciso2-` excluded, my parser returns **2,785 runs /
+2934.7167 GPU-h over 2,770 timed rows, 15 untimed** — digit for digit what `195.9` re-derived.  The
+live figure differs from it by exactly `ciso2`'s 12 rows and **21.65 GPU-h**, re-summed here from
+those rows' own `wallclock_min`.
+
+**THE GPU-HOUR FIGURE IS A LOWER BOUND.**  15 rows carry no `wallclock_min` and contribute zero.
+That was true at cycle 129, true at `192`, and is true now; this entry names it in the header rather
+than fixing it, exactly as `192.3` did.
+
+### 197.4 THE TWO ROWS, AND THE TOKENS THEY CARRY **VERBATIM**
+
+Both registered scorers were re-run **UNEDITED**, at their registered sha256, through their
+**documented one-argument invocation** (`<runsdir>`; `--csv` and `--manifest` are documented optional
+arguments and were used only for the invariance test in `197.7`).  RULE 16 is intact: no registered
+scorer was edited, and no new analysis file was added by this track.
+
+```
+analysis/cDP1_cdep1_depth_score.py  4ba6c888f36e8c512ac64e791774df112ae8556453452dea74225f80be1e0dd6  -> exit 0
+FINAL: IDENTITY-OPERATIVE | ISO-59-NEITHER | ISO-3-PINS | DEPTH-59-PINS | DEPTH-3-PINS |
+       DEPTH2-60-PINS | DEPTH2-2-PINS | ONE-61-FREE | PREMISE-REPLICATES | H-BROKEN-DEAD |
+       ONE-RESCUES | DEPTH-FLOOR-SATURATED | DEPTH2-FLOOR-SATURATED | ISO-REPLICATES | BIAS-NULL |
+       DEPTH2-FLOOR
+
+analysis/cVG1_vggbn_gap_score.py    ca23c3507b0a64727c2851972f886c6c7b8d0a2dbf8064f07911d3577989a908  -> exit 0
+FINAL: GAP-REPLICATES | GATES-CLEAN | SIGMA-PRIOR-DOMINATES | TRAIN-AGREES | FAMILY-NOT-VARIABLE
+```
+
+Both verdict cells carry those tokens **verbatim**, backticked one by one and joined with ` + ` —
+`192`'s section-9 convention, and the same rendering the existing `ciso1`, `ctd1` and `crn1` rows use
+for scorers that print `FINAL: branch | stamp | stamp`.  **The `|` separators are deliberately not
+carried into the cells**: an unescaped `|` splits a markdown cell and shifts the verdict column, which
+is the exact defect `c73`'s check 2 exists to catch and which `192.4` had to repair.  Nothing else in
+either cell paraphrases the scorer.
+
+### 197.5 THE ATTACK — AN INDEPENDENT PARSER OVER THE RAW `.out`, SHARING NO CODE WITH EITHER SCORER
+
+`plateau5` is PRIMARY and is read from the runs' own `.out` files; the CSV `plateau` column is read
+**nowhere**, and `best_test` is read nowhere.  A parser written for this entry (mean of the TEST
+column over the last 5 epoch lines; TRAIN over the same window) reproduces **every** number in both
+new rows:
+
+| batch | arm | plateau5 (mine) | plateau5 (scorer) | TRAIN5 |
+|---|---|---|---|---|
+| `cdep1` | `k01` `scalar` | 23.3520 | 23.3520 | 23.4707 |
+| `cdep1` | `k62` `layerwise` | 69.1560 | 69.1560 | 98.8947 |
+| `cdep1` | `ISO` | 70.0440 | 70.0440 | 94.1640 |
+| `cdep1` | `DEPTH` | 23.5207 | 23.5207 | 23.5353 |
+| `cdep1` | `DEPTH2` | 23.4480 | 23.4480 | 23.4913 |
+| `cdep1` | `ONE` | 64.8267 | 64.8267 | 83.4640 |
+| `cvg1` | `k01` `scalar` | 35.0173 | 35.0173 | 35.1233 |
+| `cvg1` | `kL` `layerwise` | 66.2860 | 66.2860 | 99.2820 |
+
+Contrasts, all **WITHIN batch**: `DELTA_ID` **+46.5233**, `D_ISO` **+46.6920**, `D_DEPTH` **+0.1687**,
+`D_DEPTH2` **+0.0960**, `D_ONE` **+41.4747**, `D_CEIL` **+45.8040**, `D_DEPTH/D_ISO` **0.0036**,
+`D_ISO/D_CEIL` **1.0194**; `cvg1` `D`(TEST) **+31.2687**, `D`(TRAIN) **+64.1587**.  All 24 runs:
+`RUN_DONE`, 100 epoch lines, **0 tracebacks**.
+
+**`188.3`'s MAGNITUDE BOUND, RE-DERIVED ON `cdep1`'s OWN `k01` RECORDS** rather than inherited —
+`L_i = 0.9 m_i + 0.1 z_i`, ranked by mean absolute value over the **942 pinned records** of the three
+`k01` seeds: the carriers are ranks **1, 2, 3 of 62** (`layer4.1.bn2.weight`, `layer4.0.bn2.weight`,
+`layer4.0.shortcut.1.weight`), and **every other 512-parameter `layer4` tensor ranks 33rd or worse and
+sits BELOW the corpus median** (2.030e-03).  This is why the row says IDENTITY-OPERATIVE means "not
+ANY three matched `layer4` 512-parameter BN parameters" and **not** that identity beats magnitude.
+
+**`cvg1`'s CARRIER NOMINATION, RE-DERIVED** from the batch's own `probe.jsonl` under `ctd1`'s
+convention: on the `k01` arm `bn8.weight` (512 params) ranks **1 of 26** with **0.5784** of the mean
+absolute mass, and on its own it flips the remainder sign on **1.0000** of pinned records at all three
+seeds (321/320/321).  The four 512-wide BN scales at 14/17/20/23 are **not** the top set: the other
+three rank **19, 20 and 11**.  A nomination, **not a result**.
+
+### 197.6 RULE 20 AND THE SEPARATE ENV AUDIT, RE-RUN BY THIS ENTRY FOR BOTH ROWS
+
+`analysis/argsline_guard.py` **UNEDITED**, sha256
+`81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`, with each batch's own declared
+axes as documented `--vary` arguments:
+
+```
+--name cdep1- --batch-consistency --vary stepsize-groups --vary seed --vary run-name
+  -> every non-axis flag identical across 18 runs; 18 clean, 0 repeated-flag, 0 without ARGS; VERDICT: PASS
+--name cvg1-  --batch-consistency --vary stepsize-groups --vary seed --vary run-name
+  -> every non-axis flag identical across  6 runs;  6 clean, 0 repeated-flag, 0 without ARGS; VERDICT: PASS
+```
+
+**ENV audited SEPARATELY**, because `BETA_CLIP`, `PROBE` and `PROBE_TENSOR` cannot ride the `ARGS`
+line: modulo `PROBE_DIR` there is **exactly one distinct ENV line ×18** on `cdep1` and **×6** on
+`cvg1`, both `AUGMENT=1 BETA_CLIP=-15:-2.3026 ... PROBE=100`.  `PROBE_TENSOR` census: `cdep1`
+**12 `blockwise` / 3 `layerwise` / 3 `scalar`, `tensors=62`**; `cvg1` **3 `layerwise` / 3 `scalar`,
+`tensors=26`**.  **No number in the two new rows was read before these ran.**
+
+### 197.7 INVARIANCE UNDER TRACK A's `ciso2` INGEST — **DEMONSTRATED, NOT ASSERTED**
+
+The brief required this pass's work to be invariant under a concurrent `ciso2` ingest.  It is, and the
+proof is constructive rather than a claim about readers: each registered scorer was run twice against
+**the same runs** and two different corpora — the committed **2,785-row** CSV (no `ciso2`) via the
+documented `--csv`, and the **live 2,797-row** CSV (12 `ciso2` rows) — and `diff` over the two full
+outputs is **EMPTY** for both scorers.  `cvg1`'s descriptive corpus reference stays at
+`ResNet18_c100/CIFAR100 D +40.689 (scalar n38, layerwise n50)` in both, and `SIGMA_PRIOR` stays at the
+frozen literal `0.585420`.  So both new rows, verdict cells included, are **bit-invariant** under that
+ingest.
+
+**What is NOT invariant, and is disclosed in the header rather than hidden:** the run count and the
+GPU-hours.  They are corpus-wide by construction, the checker compares them against the live CSV, and
+`ciso2`'s 12 rows are in it.  The header therefore reads **2,797 / 2956.4** and says so explicitly.
+**`ciso2` has NO row in this table and its row is Track A's to add** — excluded from every reader I
+used, named in section 9's own intro, and the section-9 tally (33) will need one more when it lands.
+
+### 197.8 THE BOTTOM LINE'S **SECOND AMENDMENT** — AND THE THREE THINGS IT REFUSES TO SAY
+
+`192` rewrote the bottom line onto the CIFAR-100 denominator when the corpus was **100 % ResNet** and
+the isolation's identity leg was **open**.  Both changed inside one cycle.  The amendment is appended
+in place with the superseded wording preserved in brackets, and it carries exactly three claims:
+
+1. **THE GAP REPLICATES OFF ResNet.**  `+31.2687 pp = +65.42 SE` on `VGG11_bn_c100`, a plain BN conv
+   stack with **no residual addition anywhere** — 26 tensors, 9,274,532 parameters, no parameter name
+   containing `shortcut` — TRAIN agreeing at `+64.1587`.  The `network` column now holds **12 distinct
+   values and 6 non-ResNet rows** (re-derived here).  **The scope caveat is lifted FOR THE GAP.**
+2. **THE ISOLATION IS IDENTITY-OPERATIVE, NOT DEPTH.**  A matched carrier-free triple recovers
+   **0.36 %** of the in-batch gap against `DELTA_ID +46.5233 pp = +61.56 SE`.
+3. **THE ISOLATION CAVEAT IS *NOT* LIFTED.**  It is still **100 % ResNet** — no isolation arm has run
+   on VGG — its **magnitude leg is architecturally unreachable** on `ResNet18_c100` (`197.5`), and
+   VGG's nominated carrier set has **cardinality ONE, not three**.
+
+**WHAT THE AMENDMENT DELIBERATELY DOES NOT SAY.**  (a) It does **not** say the isolation replicates off
+ResNet; claims (1) and (3) are marked as claims that **must never travel together**.  (b) It does
+**not** say `VGG11_bn` is non-BatchNorm — it is **non-RESIDUAL**, and the text says so in bold, because
+`cvg1` licenses nothing about a network without BN.  (c) It does **not** touch the deficit the bottom
+line leads with: the `cdn1` `GAP_in +5.699 pp = +18.80 SE` `BELOW-BY-A-LOT` result and the CIFAR-10
+figures stand exactly as `192` wrote them, unedited.
+
+### 197.9 VERDICTS UNTOUCHED, AND THE SUPERSESSION AUDIT
+
+**No surviving verdict was changed by this pass, and NO supersession was executed, because none is
+pending.**  All five `[CLOSEOUT, CORRECTIONS 115 …]` annotations still in the file were read one by
+one: the only one that ever moved a verdict column was executed at `192` (`OPEN → CONFIRMED,
+CLOSED-OUT 115`, superseded token kept verbatim in the cell); the other four read *THE 0.254 pp SPAN IS
+DEMOTED*, *LABEL CORRECTED, VERDICT HELD*, *CHECKED AND CLEARED* and *STAYS OPEN*, and none of them
+moves a verdict.  The one `[SUPERSEDED IN PLACE by CORRECTIONS 177.7 …]` marker (the `cru1` row) is a
+prose supersession already applied inside its own cell, and its verdict cell carries registered scorer
+tokens, which are results and are not mine to move.  Section 9's intro sentence about the three
+in-flight batches is superseded in brackets and replaced, since two of the three now have rows.
+
+**COST AND STANDING CONSTRAINTS.**  **ZERO GPU jobs submitted, nothing cancelled, nothing requeued;
+`alice` — Saber's SHARED account — was NOT contacted at any point.**  The only remote traffic was
+read-only `ssh`/`rsync` from `alice2` (`s5014158`), which is ours.  `plateau5` is primary everywhere;
+TRAIN is reported beside TEST at every arm of both rows; every comparison is **WITHIN batch** and no
+arm from another batch appears in any contrast (the two cross-batch quantities that appear —
+`ISO-REPLICATES` at 0.1673 pp and the `cvg1`-vs-corpus reference — are the registered replication test
+and a descriptive reference, both printed by the scorers themselves).  `git add` restricted to this
+track's own paths (`docs/MASTER-TABLE.md`, `docs/CORRECTIONS.md`); **never `-A`**.  `git diff` over
+`analysis/ patches/ tests/ bin/` is **EMPTY** for tracked files, and this track added none;
+`analysis/argsline_guard.py` untouched.  **DISCLOSED SO THEY ARE NOT MIS-ATTRIBUTED:** at the
+moment of my commit the working tree also carried two UNTRACKED files from a third concurrent
+track — `analysis/cVI1_vggiso_identity_score.py` and `bin/cVI1_vgg_isolate.sh`, a VGG isolation
+registration.  **They are not mine, I did not read them into any number here, and `git add` was
+restricted to `docs/CORRECTIONS.md` and `docs/MASTER-TABLE.md`, so neither is in my commit.**
+`git status --porcelain -- paper/` is **empty**.  No nested `claude -p` at any point.
+`analysis/c98_reproduce.py` exit code reported **AS-IS: 1** (expected, inherited, author scope —
+**NOT fixed**).  Coordination: `196` was taken by Track A while this pass was running; **this entry
+took number 197**; next free number **198**.
