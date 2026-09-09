@@ -23871,3 +23871,289 @@ held a STALE 2,740-row CSV while committed `HEAD` carries 2,761.  It was refresh
 (the stale copy preserved at `results/all_runs.csv.bak_2740_pre_ciso2`) so every scorer on that host reads
 the same corpus the repo does.  No row was added, changed or removed anywhere; the corpus is 2,761.**
 Next free number: **191**.
+
+## 191. CYCLE 148 RECONCILIATION — **THREE TRACKS, THREE ENTRIES (`188`, `189`, `190`), NO COLLISION; 36 JOBS IN FLIGHT ON `alice2` AND NOT ONE NUMBER QUOTABLE.**  RULE 20 `--batch-consistency` **PASSES 9/9 ON `cdep1`** WITH THE UNEDITED GUARD AND IS **`UNVERIFIED` — NOT FAILED — ON `ciso2` AND `cvg1`, WHICH HAVE STARTED ZERO JOBS**; COVERAGE IS **9 OF 36**.  ALL THREE RULE 21 MARGINS RE-DERIVED BY WALL CLOCK FROM `sacct` AND `git`, ALL POSITIVE (**+231 s / +152 s / +415 s**).  **RE-DERIVED HERE AND NOT PLANNED BY ANY TRACK: `cdep1`'s AND `ciso2`'s `ISO` AND `ONE` SPEC STRINGS ARE *BYTE-IDENTICAL* TO EACH OTHER AND TO `ciso1`'s, AT DISJOINT SEEDS — SO THE `187` RESCUE ACQUIRES *TWO INDEPENDENT* IN-BATCH REPLICATIONS, AND ITS FAILURE TO REPLICATE IN EITHER IS A GATING RESULT.**  **CORPUS 2,761, UNCHANGED; NOTHING SCORED, NOTHING INGESTED; ZERO GPU SPENT BY THIS ENTRY.**
+
+### 191.1 THE THREE ENTRIES DO NOT COLLIDE
+
+`git log --oneline d39d147..HEAD` is **linear**, eight commits, no merge.  Authorship is disjoint by file:
+
+| entry | track | batch | commits | `docs/` files touched |
+|---|---|---|---|---|
+| **188** | A | `cdep1` | `654497f` (registration), `6f90afe` | `CORRECTIONS.md`, `STATUS.md` |
+| **189** | C | `cvg1` | `77b499d` (registration), `a56083e` | `CORRECTIONS.md` |
+| **190** | B | `ciso2` | `0a60f05` (registration), `d593069` (launcher fix), `ca8926e`, `8594975` | `CORRECTIONS.md` |
+
+`grep -cE '^## <n>\.'` returns **exactly 1** for each of 188, 189, 190 and **0** for 191 — no top-level number
+is duplicated among them, and each entry's own closing line names the next free number correctly
+(188 → 189 → 190 → **191**).  **Nothing was renumbered, because nothing collided.**
+
+`git diff --numstat d39d147..HEAD -- analysis/ patches/ tests/ bin/` = **10 files, 5,873 insertions, 0 deletions**
+— seven new registered artefacts, three new launchers/tests, plus **3 appended lines** in `bin/PROTECTED.txt`
+(`cvg1-`, `cdep1-`, `ciso2-`, all present, all three tracks' prefixes protected).  **No pre-existing file under
+`analysis/` was edited by anyone.**  `analysis/argsline_guard.py` is `sha256 81cea8b586e124a6981…4b04e5388`,
+**last touched at `617b6c8`, 2026-09-02** — six days before this cycle — and is byte-identical on the Mac and
+at four separate deployed trees on `alice2`.  `git status --porcelain -- paper/` is **empty**; `paper/paper.tex`
+and `paper/DRAFT-v4.md` were not opened.
+
+### 191.2 RULE 20 AND THE ENV AUDIT — COVERAGE **9 OF 36**, STATED HONESTLY
+
+Audited **2026-09-09T14:13:27+0200** on `alice2`, `runsdir` `/home/s5014158/metaopt/runs`, with the **unedited**
+guard invoked from a tree whose copy is sha-identical to the registered one.  Each batch's own declared axes were
+supplied as documented `--vary` arguments; the guard was not modified.
+
+| batch | started / submitted | `--batch-consistency` | ENV line | `PROBE_TENSOR` |
+|---|---|---|---|---|
+| `cdep1` | **9 / 18** | **9 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line — `VERDICT: PASS`**, *"every non-axis flag is identical across 9 runs"* | **ONE line ×9** modulo `PROBE_DIR` | 4 blockwise / 2 layerwise / **2 scalar = 8** |
+| `ciso2` | **0 / 12** | `no candidate files … with prefix ciso2-` → **UNVERIFIED, not failed** | — | — |
+| `cvg1` | **0 / 6** | `no candidate files … with prefix cvg1-` → **UNVERIFIED, not failed** | — | — |
+
+Exact command, for the next agent to repeat verbatim:
+
+```
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cdep1- --batch-consistency \
+        --vary stepsize-groups --vary seed --vary run-name
+grep -h '^ENV:' $METAOPT_WS/runs/cdep1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c
+grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/cdep1-*.out | sed 's/ dir=.*//' | sort | uniq -c
+```
+
+**A DISCREPANCY, DISCLOSED RATHER THAN ROUNDED AWAY: 9 `.out` files carry an ARGS line and an ENV line, but only
+8 carry a `PROBE_TENSOR` line.**  The ninth, `cdep1-ISO-s25-4929657`, started at 14:09 and is **0 epochs in**;
+the harness prints `PROBE_TENSOR:` after the first meta-step, so the line has not been emitted yet.  Its ARGS
+line is present and correct.  This is a timing artefact of auditing a batch mid-flight, **not** a provenance
+defect — but the `PROBE_TENSOR` census is therefore **8/9 of the started runs**, and the full census is an open
+obligation with the rest.
+
+**NO MISMATCH WAS FOUND, SO NOTHING WAS CANCELLED.**  No `scancel` was issued by this entry against any prefix,
+and no job this campaign did not submit was touched on either account.  **`alice` (Saber's shared account) was
+not accessed at all.**
+
+**RULE 20 AND THE ENV AUDIT REMAIN OPEN OBLIGATIONS UNTIL 36/36.  NO ACCURACY, `beta`, PER-TENSOR OR TIMING
+NUMBER FROM `cdep1`, `ciso2` OR `cvg1` MAY BE QUOTED BY ANYONE BEFORE THAT.**  `RUN_DONE` count is **0/36**;
+traceback count is **0/36**.
+
+### 191.3 RULE 21 — ALL THREE MARGINS RE-DERIVED BY WALL CLOCK, NOT COPIED
+
+`git log -1 --format=%ct` on the committing host against `sacct -X -o Submit` on `alice2`, epoch seconds
+subtracted here rather than quoted from the tracks:
+
+| track | registration commit | commit epoch (CEST) | earliest `sacct` Submit | margin |
+|---|---|---|---|---|
+| A `cdep1` | `654497f` | 1788954009 = 13:40:09 | 13:44:00 (4929648–53) | **+231 s** |
+| B `ciso2` | `0a60f05` (scorer) | 1788953965 = 13:39:25 | 13:41:57 (4929327–30) | **+152 s** |
+| B `ciso2` | `d593069` (launcher) | 1788954048 = 13:40:48 | 13:41:57 | **+69 s** |
+| C `cvg1` | `77b499d` | 1788953965 = 13:39:25 | 13:46:20 (4929673–74) | **+415 s** |
+
+All positive; every track's stated margin reproduces to the second.  **Every registered artefact is unedited
+since its registration commit** — `git log <reg>..HEAD -- <path>` is **empty** for `cDP1_cdep1_depth_score.py`,
+`cDP1_depth_control.sh`, `test_probe_tensor_blockwise_cdep1.py`, `cIS2_ciso2_horizon_score.py`,
+`cVG1_vggbn_gap_score.py`, `patch_vggbn.py`, `test_vggbn.py` and `cVG1_vggbn_smoke.sh`.  All three scorers are
+sha-identical Mac ↔ `alice2` (`4ba6c888f36e8c51…`, `ab935f682b6bc0e6…`, `ca23c3507b0a6472…`).  `ciso1`'s
+pre-existing `tests/test_probe_tensor_blockwise.py` (`22f6599e8c523963…`) was **last touched at `be15a15`,
+8 Sep** — before this cycle — confirming 188's RULE 16 claim that the successor imports rather than edits it.
+
+**The one disclosed departure is `d593069`**: Track B fixed its own launcher *between* its scorer commit and its
+submission, after the first dry run aborted at guard 4.  Re-checked here — the **registered scorer's sha did not
+move** across that commit, and `git log 0a60f05..HEAD -- analysis/cIS2_ciso2_horizon_score.py` is empty.  RULE 21
+holds on the scorer's original registration.
+
+### 191.4 A CROSS-TRACK FACT NO TRACK COULD SEE, RE-DERIVED FROM THE TWO LIVE MANIFESTS
+
+Both manifests were pulled from `alice2` and **re-composed from their own `sets:` spec strings by an independent
+parser** — the range list expanded, the isolated names mapped back to 1-based indices through the manifest's own
+`TENSOR` table, and the complement recomputed from scratch:
+
+| manifest | arm | isolated (1-based) | sizes | numel | complement exact? | GROUP1 names match? | GROUP0 ∪ GROUP1 = 62? |
+|---|---|---|---|---|---|---|---|
+| `cdep1` | `ISO` | 50, 53, 59 | [59,3] | [11,218,596 · **1,536**] | ✓ | ✓ | ✓ |
+| `cdep1` | `DEPTH` | 47, 48, 56 | [59,3] | [11,218,596 · **1,536**] | ✓ | ✓ | ✓ |
+| `cdep1` | `DEPTH2` | 47, 56 | [60,2] | [11,219,108 · 1,024] | ✓ | ✓ | ✓ |
+| `cdep1` | `ONE` | 50 | [61,1] | [11,219,620 · 512] | ✓ | ✓ | ✓ |
+| `ciso2` | `ISO` | 50, 53, 59 | [59,3] | [11,218,596 · **1,536**] | ✓ | ✓ | — |
+| `ciso2` | `ONE` | 50 | [61,1] | [11,219,620 · 512] | ✓ | ✓ | — |
+
+Both live models are **62 tensors / 11,220,132 parameters**.  `ISO` and `DEPTH` carry **exactly equal** isolated
+numel — the match `ciso1`'s `CTRL` could not make (1,536 vs 384) — confirming `188`'s central design claim from
+the manifest rather than from its prose.
+
+**THE FACT NEITHER TRACK COULD STATE, BECAUSE EACH SAW ONLY ITS OWN BATCH:**
+
+```
+cdep1 ISO spec  == ciso2 ISO spec   ->  True   (byte-identical)
+cdep1 ONE spec  == ciso2 ONE spec   ->  True   (byte-identical)
+```
+
+and both equal the string `ciso1` ran at `185`/`187`.  **`cdep1` runs `ISO` at seeds {24,25,26} for 100 epochs;
+`ciso2` runs the identical partition at seeds {31,32,33} for 250 epochs and reads its own **free, in-run,
+paired** 100-epoch control at epochs 95–99.**  So when these land the campaign will hold **three independent
+batch-level replications** of the `187` rescue — `ciso1`, `cdep1`-`ISO`, `ciso2`-`ISO`@100 — at **nine distinct
+seeds**, none spliced, every contrast within its own batch.  **This is a consequence worth naming in advance in
+both directions:**
+
+* If all three reproduce `D_ISO ≥ SUPPORT_BAR` (+25.0 pp), the `187` rescue is replicated across batches, which
+  is the unit of replication the campaign has established (F(62,85)=5.47 between batches; F(11,1976)=0.152 across
+  seeds).  That is the **strongest** provenance any result in this campaign has ever had.
+* If **either** fails, its own registered gate fires — `cdep1` stamps `UNRESOLVED-NO-POSITIVE-CONTROL` and
+  **refuses to read any `DEPTH` contrast**; `ciso2` stamps `DIFFERS-FROM-CISO1` (explicitly non-gating and
+  between-batch).  **A discordance between them is then itself the finding**, and it would put the batch-as-unit
+  claim under test rather than the isolation claim.  Nobody may report the concordant case as expected and the
+  discordant case as noise.
+
+### 191.5 SEEDS — FRESH, BUT **`cvg1` AND `ciso2` SHARE {31,32,33}**, AND THAT IS RECORDED HERE
+
+Re-derived on the 2,761-row corpus: the maximum `seed` anywhere is **23**; seeds 24, 25, 26, 31, 32 and 33 carry
+**0 rows each**.  Both tracks' freshness claims are correct.
+
+**But they are not disjoint from each other.**  Track A verified its {24,25,26} against `ciso2`'s {31,32,33} and
+correctly reported disjointness.  **Track C's `cvg1` also uses {31,32,33}** (`cvg1-k01-s31`, `cvg1-kL-s31`, …),
+which no track stated, because each checked only the corpus and the one concurrent batch it knew about.
+
+**This is not a defect and nothing needs changing.**  The two batches run different architectures
+(`VGG11_bn_c100`, 26 tensors / 9,274,532 params vs `ResNet18_c100`, 62 / 11,220,132), different prefixes, and
+every comparison in both is **within batch** — no row can collide on `(run, job_id)` and no contrast crosses
+them.  It is recorded because **a future agent reading "seeds 31–33 are fresh" in `190` would be wrong**: after
+these two batches land, `{31,32,33}` will carry rows under **two** prefixes on **two** networks.  The next free
+seed triple is **{34,35,36}**.
+
+### 191.6 WHAT H-ISOLATE's VERDICT WILL TURN ON WHEN THESE LAND
+
+H-ISOLATE stands at `187`'s `UNRESOLVED-PARTIAL`: isolating the three carrier BN scales recovered the **entire**
+scalar→layerwise gap (+46.9307 pp = +62.10 SE), the layer-2 homologues recovered nothing (−0.0633 pp), and the
+design could separate neither **identity from depth** nor the rescue from the **horizon**.  These three batches
+attack three different joints, and **each has its own registered refusal branch** — none of them is obliged to
+return a verdict.
+
+**(1) `cdep1` decides what the rescue is ABOUT.**  Primary `DELTA_ID = plateau5(ISO) − plateau5(DEPTH)`, bounded
+in neither direction.  `IDENTITY-OPERATIVE` (`D_DEPTH ≤ +5.0` **and** `DELTA_ID ≥ +25.0`) → a size-, numel-,
+width- and depth-matched **carrier-free** set does **not** rescue, and the rescue is about *which tensors*.
+`DEPTH-OPERATIVE` (`D_DEPTH ≥ +25.0` and `|DELTA_ID| ≤ 1.511364`) → the rescue is about **depth or partition
+shape**, and H-ISOLATE as a *tensor-identity* claim is finished.  `BOTH-OPERATIVE` and
+`UNRESOLVED-PARTIAL-RESCUE` are **registered as results, not failures**.  **The binding limit is `188.3`'s and it
+is architectural, not fixable:** on `ciso1`'s own scalar records the carriers rank 1-2-3 of 62 by mean |L| while
+**every** 512-parameter `layer4` non-carrier sits below the median, isolated-set totals ×348 (best possible
+carrier-free triple still ×225).  **`IDENTITY-OPERATIVE` will therefore mean "not any three *matched* `layer4`
+BN parameters" and will NOT separate identity from dynamical magnitude.**  Nothing on this architecture can.
+
+**(2) `ciso2` decides whether the rescue is a REGIME or a DELAY.**  Primary `RHO = D_ISO@250 / D_ISO@100`, both
+in batch.  `187.5`/`187.7` measured `ISO`'s 59-group still descending at −0.026…−0.036 nats/record at the
+horizon and pinning within 2–4 more epochs; `190.2` added that `ISO`'s *isolated* group has been pinned since
+epoch 22.4–23.6, so **when the 59-group pins, every tensor sits on exp(−15) and the whole network freezes**.
+`RESCUE-COLLAPSES` (`D_ISO@250 ≤ 5.0`) → the +46.9 pp is a **≈68-epoch delay of the scalar collapse**, and every
+accuracy sentence H-ISOLATE licenses is horizon-bound.  `RESCUE-SURVIVES` (`≥ 0.80 × D_ISO@100` **and**
+`≥ 25.0`) → a change of regime, and the 0.80 threshold is corpus-anchored, not round: 37.5446 pp exceeds the best
+rescue **any** m=2 partition of this cell has produced (k49, +32.5547).  `UNRESOLVED-NOT-PINNED` is registered as
+**informative**: if 750 further records do not close a 0.055–0.615 nat gap, the descent decelerates near the
+floor and `ISO-59-NEITHER` is a permanent state rather than `187.7`'s mid-flight cut.
+
+**(3) `cvg1` decides whether the phenomenon H-ISOLATE explains EXISTS off ResNet.**  `D = plateau5(layerwise) −
+plateau5(scalar)`.  `GAP-ABSENT` (|D| ≤ 2.0) → the scalar→layerwise gap, and *a fortiori* the three-BN-scale
+result, is architecture-specific as far as anything measured can tell; H-ISOLATE becomes a statement **about
+ResNet**.  `GAP-REPLICATES` (D ≥ +10.0) → the gap has external validity and the carrier question becomes
+well-posed on a second family, answerable from **this batch's own `PROBE_TENSOR` records** with no extra batch.
+`HARNESS-UNSOUND` (max arm mean < 15.00 pp) → no architecture claim of any kind.  **Neither reading may be taken
+as a mechanism result while VGG's tuning is unbracketed (RULE 11 — mistuning can only *suppress* a gap), and the
+family confound is declared: VGG differs from ResNet in depth, channel schedule and downsampling as well as in
+residual structure.**
+
+**THE JOINT READINGS, REGISTERED NOW SO NEITHER CAN BE PRESENTED AS A DISCOVERY LATER:**
+
+* `IDENTITY-OPERATIVE` **×** `RESCUE-COLLAPSES` → identity selects *which* tensors postpone the collapse, and
+  nothing prevents it.  The strongest entitled sentence is then about **timing**, not about a regime.
+* `DEPTH-OPERATIVE` **×** `RESCUE-SURVIVES` → the result is about partition shape at depth, `187`'s carrier
+  framing is wrong, and the three named tensors were a coincidence of where the deepest 512-wide BN scales sit.
+* **Any** `cdep1` branch **×** `GAP-ABSENT` → everything H-ISOLATE says is scoped to ResNet, and `189.2`'s
+  structural reading (carriers = *exactly* the 512-wide BN scales feeding a residual addition; non-carriers =
+  *exactly* the mid-branch `bn1` scales; 3/2, no exceptions) becomes the **leading candidate and still not an
+  established one**, because the clean one-variable object — `PlainNet18`, ResNet-18 with `out += shortcut(x)`
+  deleted — has been **priced (~1 h build, ~9 GPU-h) and deliberately not built**.
+* `UNRESOLVED-NO-POSITIVE-CONTROL` in `cdep1` **×** `DIFFERS-FROM-CISO1` in `ciso2` → the `187` rescue did not
+  reproduce at fresh seeds in either batch, no contrast in either is readable, and the campaign's problem is
+  **replication**, not mechanism.
+
+### 191.7 THE LEDGER — **SEVENTEEN REGISTERED, FIFTEEN DEAD, TWO LIVE, NONE PENDING**
+
+Unchanged from `186`/`187`.  Checked, not assumed: **none of `188`, `189` or `190` registers an eighteenth
+candidate.**  `cdep1` is a **control on H-ISOLATE** (188 says so in terms); `ciso2` is a **horizon test of
+H-ISOLATE** at a byte-identical partition; `cvg1` tests the **external validity of the scalar→layerwise gap**,
+which is the campaign's headline phenomenon and not a mechanism hypothesis.  The two live accounts remain
+`crn1`'s composition (one clean pair) and **H-ISOLATE at `UNRESOLVED-PARTIAL`**.  H-DOMINATE **as named** stays
+dead (`184`/`186`/`187.11`); nothing in this cycle revives it.
+
+### 191.8 DOES TRACK C CHANGE THE SCOPE CAVEAT EVERY FINDING CARRIES?  **NOT YET — AND THE HONEST ANSWER IS THREE-PART.**
+
+The caveat is that every result in this campaign is measured on ResNet.  Re-derived here on the live CSV: of
+**2,761 rows across eleven `network` values**, **zero** fail `^[Rr]es[Nn]et`.  The corpus is **100 % ResNet**.
+
+1. **It is NOT changed by this cycle.**  `cvg1` has **0 of 6 jobs started**, 0 `RUN_DONE`, and no number is
+   quotable.  Until it lands and is scored through its documented one-argument invocation, **every finding still
+   carries the ResNet caveat verbatim, unweakened.**  A patch that adds an architecture is not evidence about
+   one.
+2. **What Track C changed *now* is that the caveat became MEASURABLE and SHARPER.**  Measurable: `cvg1` is the
+   first non-ResNet batch this campaign has ever submitted, and `189.1` established *why* one was cheap — the
+   harness is architecture-agnostic (`HF.init_meta` is driven entirely by `named_parameters()`; `train.py`
+   touches the network through one `build_network` call; neither `argsline_guard.py` nor `_lib_guards.sh`
+   carries a tensor-count assumption), so the caveat was never an infrastructure limit and cannot be excused as
+   one again.  Sharper: `189.2`'s re-derivation replaces *"we only ran ResNet"* with a **named structural
+   hypothesis** — the carriers are exactly the residual-fed 512-wide BN scales — which is falsifiable rather
+   than merely conceded.
+3. **What Track C will NOT buy, at any outcome.**  `189` declares the confound before any result: VGG is not a
+   one-variable ablation of ResNet.  **A `GAP-ABSENT` will not license *"residuals cause the gap"*, and a
+   `GAP-REPLICATES` will not license *"residuals are irrelevant"*.**  The one-variable object is `PlainNet18`
+   and it was **priced and refused** this cycle.  So the widest sentence `cvg1` can ever buy is *"the
+   scalar→layerwise gap does / does not appear on a second architecture family"* — a scope statement, not a
+   mechanism one.  Also re-derived here in support of `189.10`: `ResNet18_gn`, the nearest prior art, holds
+   **17 rows, CIFAR-10, `chunk777`/`nodewise` only, with no `scalar` and no `layerwise` arm** — so
+   **BN→GroupNorm has never been tested at the scalar-vs-layerwise contrast either**, and it does not overlap
+   `cvg1`.
+
+### 191.9 `c98_reproduce.py`, THE CORPUS, AND COST
+
+`python3 analysis/c98_reproduce.py` → **exit 1**, reported as-is, **author scope, deliberately not fixed**.
+**10 checks fail, the same 10 as at `187`**, and the derived side of each is unchanged because nothing was
+ingested: rows **2,761** (paper 2,177) · admissible **2,319** (1,735) · wallclock-carrying **2,746** (2,162) ·
+GPU-h **2,914.4** (1,642) · best ResNet-18/C10 arm 93.328 (93.317) · deficit 1.7964 (1.807) · partition-family
+admissible 440 (431) · …with meta = Lion 428 (419) · count-matched rows outside `rp1` 244 (241) · …of which
+admissible 244 (241).  628 `chk()` sites, 411 distinct quantity numerals, **41.9 %** coverage.  **This cycle
+introduced no new failing check.**
+
+**Corpus 2,761 rows**, re-counted here; **zero rows carry a `cdep1-`, `ciso2-`, `cvg1-` or `vggsmoke-` prefix**.
+Nothing was scored and nothing was ingested by any track or by this entry — correctly, since no batch had landed
+inside its own run.  Disclosed and verified: `190.10`'s housekeeping refresh of the deployed
+`alice2:…/results/all_runs.csv` is real — all three deployed trees now read **2,762 lines = 2,761 data rows**,
+matching committed `HEAD`, with the stale 2,740-row copy preserved at `…all_runs.csv.bak_2740_pre_ciso2`.
+No row was added, changed or removed anywhere.
+
+**COST.**  Committed across the three tracks: `cdep1` 18 jobs ≈ **15.6** GPU-h (mean-based planning figure;
+median-based 13.1, worst case 28.5) · `ciso2` 12 jobs ≈ **21.3** · `cvg1` 6 jobs ≈ **9.0** (corrected upward
+from the launcher comment's ≤5 in `189.8`) = **≈ 45.9 GPU-h planned**, walltime-bounded at 54 + 60 + 18 = **132**.
+Consumed at the audit: `sacct ElapsedRaw` totals **3.373 GPU-h** (`cdep1` only) plus **0.071 h** for Track C's
+`vggsmoke-` infrastructure smoke, which is under a never-ingested prefix.  **A JUDGEMENT CALL WORTH FLAGGING TO
+THE OPERATOR: each track individually honoured the "~30 GPU-h per batch" instruction, but the *account* total is
+≈ 46 GPU-h across three concurrent batches, and no track was in a position to see the sum.**  Nothing is
+over-committed — `cdep1` and `cvg1` both include `gpu-short`, whose QOS is an independent 12-GPU pool on a
+superset of the long partitions' nodes, and `ciso2` is excluded from it by arithmetic (a 2080ti at the
+corpus-worst 70.8 s/epoch needs 4.92 h against `gpu-short`'s 4:00:00 `MaxTime`) — but a fourth concurrent batch
+should not be launched on `alice2` before these drain.
+
+### 191.10 `docs/STATUS.md` WAS ONE TRACK'S FRAGMENT AND IS NOW COHERENT — BY ADDITION, NOT OVERWRITE
+
+Only Track A wrote to `STATUS.md` (`6f90afe`).  Its header therefore read *"cycle 148, Track A"*, *"Authority …
+now 188"* and closed *"Next free number 189"* — all **true when written and stale within twenty minutes**, once
+`189` and `190` landed.  Tracks B and C wrote `CORRECTIONS` entries and no dashboard block, so the dashboard
+under-reported the cycle by 24 jobs and two entries.
+
+**Fixed by ADDING a cycle-148 reconciliation block above Track A's and by amending the three stale header
+clauses in place with the superseded wording preserved in brackets — Track A's block itself was not edited, not
+reordered and not deleted.**  Authority line now reads **191**; the corpus, `c98` and RULE 16 riders were
+extended with this entry's re-derivations rather than replaced.
+
+### 191.11 THE STANDING CONSTRAINTS, DISCHARGED
+
+`alice` **not accessed at all**; everything on `alice2` (`s5014158`), read-only apart from running the unedited
+guard.  **Nothing was submitted and nothing was cancelled by this entry; zero GPU spent.**  `paper/` untouched —
+`git status --porcelain -- paper/` empty.  **`plateau5` is primary** wherever a level is discussed; the CSV
+`plateau` column and `best_test` are read nowhere here.  No registered scorer was run against its own batch and
+**no batch was scored or ingested**.  No nested `claude -p`.  `git add` restricted to `docs/CORRECTIONS.md` and
+`docs/STATUS.md`; the three tracks' untracked run artefacts were left alone.  Every number above was re-derived
+from `git`, `sacct`, the live `.out` files, the two live manifests or the CSV — **nothing was quoted from the
+cycle briefing or from `188`/`189`/`190`'s prose.**  Next free number: **192**.
