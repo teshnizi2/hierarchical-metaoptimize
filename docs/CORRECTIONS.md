@@ -23046,3 +23046,345 @@ change this entry); a cycle-147 block is added above the cycle-146 reconciliatio
 `argsline_guard.py` run unedited at their committed sha256.  **plateau5 primary** throughout; the CSV `plateau`
 column read nowhere; `best_test` used nowhere.  No nested `claude -p`.  `git add` restricted to
 `docs/CORRECTIONS.md`, `docs/STATUS.md` and `results/all_runs.csv`.  Next free number: **188**.
+
+## 188. `cdep1` REGISTERED AND LAUNCHED — **THE IDENTITY-vs-DEPTH CONTROL `187.4` NAMED AS THE BATCH'S BINDING LIMITATION. 18 JOBS, ONE SUBMISSION, ≈13–16 GPU-h. RULE 21 MARGIN +231 s.**  THE ARM IS MATCHED TO `ISO` ON GROUP SIZES, ISOLATED NUMEL (**1,536, EXACTLY**), PARAMETER WIDTH AND NETWORK DEPTH, AND CONTAINS **NO CARRIER** — THE MATCH `ciso1`'s `CTRL` COULD NOT MAKE.  **A NEW AND BINDING SCOPE LIMIT IS ESTABLISHED HERE, BEFORE ANY RESULT: THE ARM CANNOT BE MATCHED ON *DYNAMICAL MAGNITUDE*, AND NO CHOICE OF MEMBERS CAN FIX IT** — on `ciso1`'s own scalar records the carriers' isolated mean-|L| mass exceeds the best admissible carrier-free triple's by **×225**, so this design separates identity from **depth**, and does **not** separate identity from **magnitude**.  **NOTHING HAS LANDED, BEEN SCORED OR BEEN INGESTED; THE CORPUS STANDS AT 2,761 ROWS AND NO `cdep1` NUMBER IS QUOTABLE.**
+
+### 188.1 THE BRIEFING'S CLAIMS, CHECKED AGAINST THE LIVE MODEL — ALL CORRECT, NONE INHERITED
+
+`187.4` asks that index 48 be verified on the live model and that the spec string be re-derived rather than
+inherited, because that string was **wrong as first written** and corrected in place.  Both were done, on
+`build_network("ResNet18_c100")` under the live venv, and the launcher's **guard 4h** re-runs the whole check at
+submit time and aborts on any disagreement:
+
+| 1-based | name | numel | class | role |
+|---|---|---|---|---|
+| 47 | `layer4.0.bn1.weight` | 512 | BN **scale** | non-carrier — `DEPTH`, `DEPTH2` |
+| **48** | **`layer4.0.bn1.bias`** | **512** | **BN *bias*** | non-carrier — `DEPTH` |
+| 50 | `layer4.0.bn2.weight` | 512 | BN scale | **CARRIER** |
+| 51 | `layer4.0.bn2.bias` | 512 | BN bias | affine partner of a carrier |
+| 53 | `layer4.0.shortcut.1.weight` | 512 | BN scale | **CARRIER** |
+| 54 | `layer4.0.shortcut.1.bias` | 512 | BN bias | affine partner of a carrier |
+| 56 | `layer4.1.bn1.weight` | 512 | BN **scale** | non-carrier — `DEPTH`, `DEPTH2` |
+| 57 | `layer4.1.bn1.bias` | 512 | BN bias | non-carrier |
+| 59 | `layer4.1.bn2.weight` | 512 | BN scale | **CARRIER** |
+| 60 | `layer4.1.bn2.bias` | 512 | BN bias | affine partner of a carrier |
+
+**What index 48 actually is, stated plainly: a BatchNorm *shift*, not a *scale*.**  `187`'s architectural fact
+re-derives exactly — `layer4` holds exactly **five** BN scales (47, 50, 53, 56, 59) and every 512-wide BN scale
+in the whole model is one of them (layer1 64, layer2 128, layer3 256 wide).  Three are the carriers.  **A
+three-element set that is class-matched (BN scale), depth-matched (`layer4`), numel-matched (1,536) and
+carrier-free therefore does not exist on this model.**  What that costs the match: `DEPTH` is matched on group
+sizes, isolated numel, per-tensor width, depth and normalisation-layer membership, and **unmatched on parameter
+class in one of its three members**.  That is why `DEPTH2` is in the batch — it isolates {47, 56}, the *only*
+two non-carrier `layer4` BN scales, and is class-pure at the cost of the count/numel match.  The two arms
+together make "the bias member ruined it" a testable proposition **in batch** instead of a caveat in prose.
+
+**The third member was chosen by a rule fixed before the arm was:** among the five 512-parameter `layer4`
+non-carriers that are not 47 or 56, exclude 51 / 54 / 60 because they are the affine bias partners of the three
+carriers (no carrier's own partner in the isolated group); that leaves {48, 57}, the partners of the two
+non-carrier scales, indistinguishable on every measured quantity.  **48** is taken — it completes 47's affine
+pair and it is the index `187.4` put on record, so the arm is neither inflated nor deflated by a late choice.
+**57 was equally admissible and is not needed.**
+
+**The spec strings, re-derived from the live 62-tensor manifest, not copied:**
+
+```
+DEPTH   isolates {47,48,56};  complement {1..46} ∪ {49..55} ∪ {57..62} = 46+7+6 = 59
+        sets:1-46,49-55,57-62/layer4.0.bn1.weight,layer4.0.bn1.bias,layer4.1.bn1.weight   [59,3] / 1,536
+DEPTH2  isolates {47,56};     complement {1..46} ∪ {48..55} ∪ {57..62} = 46+8+6 = 60
+        sets:1-46,48-55,57-62/layer4.0.bn1.weight,layer4.1.bn1.weight                     [60,2] / 1,024
+```
+
+Both agree with `187.4`'s corrected strings, but they were derived independently and guard 4h recomputes each
+coarse group **as the complement of the isolated set on the live model** and fails if the range list is not
+exactly it.  The launcher printed, per arm, `GROUP0 == the complement of [...] re-derived from the live model`.
+
+### 188.2 THE ARMS, AND WHY THERE ARE SIX AND NOT TWO
+
+`cdep1` = **6 arms × 3 seeds {24, 25, 26} = 18 jobs, ONE submission**, standard cell (CIFAR-100 /
+`ResNet18_c100` / SGDm+Lion / ms 1e-3 / alpha0 1e-6 / 100 ep / batch 100 / `AUGMENT=1` /
+`BETA_CLIP=-15:-2.3026` / `PROBE=100` / `PROBE_TENSOR=1` on every arm).
+
+| arm | spec | sizes | isolated numel | role |
+|---|---|---|---|---|
+| `k01` | `scalar` | [62] | — | floor anchor, **in batch** |
+| `k62` | `layerwise` | 62×[1] | — | ceiling anchor, **in batch** |
+| `ISO` | `…/50,53,59` | [59,3] | 1,536 | **the positive control, RE-RUN in batch at fresh seeds** |
+| `DEPTH` | `…/47,48,56` | [59,3] | **1,536** | **the arm** |
+| `DEPTH2` | `…/47,56` | [60,2] | 1,024 | class-pure variant |
+| `ONE` | `…/50` | [61,1] | 512 | kills the content-free rival (188.4) |
+
+**`ISO` is re-run, not spliced, and that decision is priced.**  BATCH is this campaign's unit of replication
+(F(62,85) = 5.47) and SEED is null (F(11,1976) = 0.152), so reading `DEPTH` against `ciso1`'s `ISO` would put
+the whole contrast on the campaign's largest variance component.  Every contrast in `cdep1` is **within batch**.
+Cost of doing it correctly: 3 jobs, ≈ 2.2 GPU-h.  The cross-batch comparison is retained only as a
+**descriptive** stamp (`ISO-REPLICATES` / `ISO-SHIFTED`, |in-batch `ISO` − 70.2113| against 4·`SIGMA_W`), and it
+gates nothing.
+
+**Seeds are fresh, globally.**  The corpus's maximum seed anywhere is **23**; `ZERO` rows on **any** network
+carry 24, 25 or 26 (guard 2c, and a scorer `--selftest` check that reads the whole corpus, not just
+`ResNet18_c100`).  `ciso1` used {21,22,23}, `ctd1` {18,19,20}, `cru1`/`crn1` {15,16,17}.
+
+### 188.3 WHAT THIS DESIGN CONTROLS FOR — AND THE ONE THING IT **CANNOT**, ESTABLISHED BEFORE ANY RESULT
+
+**Controlled:** group count (m=2), coarse-group size (59), isolated-group size (3), isolated parameter count
+(1,536 — *exactly* equal to `ISO`, verified on the live model), per-tensor width (512 each), network depth
+(every isolated tensor in `layer4`), normalisation-layer membership, batch, cell, horizon and seeds.
+
+**NOT controlled, and architecturally uncontrollable — this is new, and it binds every sentence that will be
+written about the outcome.**  Measured on `ciso1`'s own `k01` records (1,500 determinate / 945 pinned, pooled
+over its three seeds), mean |L_i| = |0.9 m_i + 0.1 z_i| on pinned records:
+
+| idx | name | mean \|L\| | rank of 62 |
+|---|---|---|---|
+| 59 | `layer4.1.bn2.weight` | 3.1880e-01 | **1** |
+| 50 | `layer4.0.bn2.weight` | 2.8115e-01 | **2** |
+| 53 | `layer4.0.shortcut.1.weight` | 1.8325e-01 | **3** |
+| 56 | `layer4.1.bn1.weight` | 1.2896e-03 | 33 |
+| 60 | `layer4.1.bn2.bias` | 1.2328e-03 | 35 |
+| 51 / 54 | `layer4.0.bn2.bias` / `layer4.0.shortcut.1.bias` | 1.0358e-03 | 36 / 37 |
+| 47 | `layer4.0.bn1.weight` | 9.5915e-04 | 38 |
+| 57 | `layer4.1.bn1.bias` | 1.8755e-06 | 60 |
+| **48** | **`layer4.0.bn1.bias`** | **1.7344e-06** | **62 — last of 62** |
+
+Median tensor 1.9395e-03.  **Every** 512-parameter `layer4` non-carrier sits between 1.73e-06 and 1.29e-03 —
+below the median — while the carriers are ranks 1-2-3.  Isolated-set totals: `ISO` **7.8321e-01**, `DEPTH`
+**2.2504e-03** (ratio **×348**), and the *best possible* carrier-free triple {47, 56, 60} reaches only
+**3.4815e-03** (ratio **×225**).  **No choice of members closes the gap to within two orders of magnitude.**
+
+**Consequence, registered in the scorer's `FINAL` block so it is printed with every verdict:** an
+`IDENTITY-OPERATIVE` reading means *"not any three matched `layer4` 512-parameter BN parameters"* — it does
+**not** separate tensor *identity* from term *magnitude*, and no batch on this architecture can, because on this
+trajectory the only large-|L| 512-parameter `layer4` tensors **are** the three carriers.  Anyone quoting
+`cdep1` must carry that sentence.  It is a strictly stronger disclosure than `187.4`'s, which named only the
+identity/depth/numel confound.
+
+*(Note, recorded because it is a free consequence: 48 contributes **0.08 %** of `DEPTH`'s isolated |L| mass —
+`DEPTH` 2.2504e-03 against `DEPTH2` 2.2487e-03.  So the sign account predicts `DEPTH` and `DEPTH2` will be
+**indistinguishable**; `|DELTA_BIAS| ≤ READ_BAR` is stamped `BIAS-NULL`, and a difference larger than that means
+something outside the sign account is operating.  Registered now so it cannot be discovered later.)*
+
+### 188.4 THE PRE-REGISTRATION — TWO LIVE ACCOUNTS, THE PRIMARY STATISTIC, AND `164.6`'s DEFECT DESIGNED OUT
+
+**The noise floor, RE-DERIVED at registration on the 2,761-row corpus with `cdep1-` excluded from every reader
+(the `165.4` pattern — invariant under this batch's own ingest).  Nothing is copied from `ciso1`.**  cR1's
+estimator, pooled within-(batch × granularity) SD of `plateau5` over m=2 arms in this cell at 100 epochs:
+
+```
+SIGMA_NARROW  (^\[\d+,\d+\]$ matcher)          0.925518  df 60  30 cells   90 members
+SIGMA_WIDE    (matcher extended to sets: m=2)  0.863472  df 84  42 cells  126 members
+SIGMA_W = max                                  0.925518
+SE_ARM_DIFF = SIGMA_W·√(2/3)                   0.755682
+```
+
+**`SIGMA_WIDE` HAS DRIFTED, `SIGMA_NARROW` HAS NOT** — 0.889041 → **0.863472** with `ciso1`'s five `sets:` cells
+ingested, while the narrow estimator is unchanged because `ciso1` added no `[a,b]`-granularity rows.  The max is
+the narrow one either way, which is **why** `cdep1`'s pp bars are deliberately identical to `ciso1`'s: the two
+batches are then directly commensurable.  This was **verified, not assumed** — `sigma_w` drifted after
+registration twice before (`156`, `159`), and the scorer's `--selftest` re-derives both estimators and FAILs on
+any disagreement with the frozen literals.
+
+**Bars.**  `SUPPORT_BAR` +25.0 pp = **33.08 SE** (77 % of the largest m=2 rescue this cell has produced,
+k49 − floor = 55.468838 − 22.914057 = +32.5548); `REFUTE_BAR` +5.0 pp = **6.62 SE** (below the ladder's worst
+partial state, k50 − floor = +7.4229); `READ_BAR` = 2 SE = **1.511364 pp**; `IDENTITY_BAR` = `SUPPORT_BAR`
+applied to the primary; `DEAD_BAR` 5.00 pp on a within-arm seed range in `k01`, `ISO` or `DEPTH`.  Anchor bands,
+re-derived at score time with `cdep1` excluded: `k01` ∈ 22.914057 ± 4·0.570874 = **[20.6306, 25.1976]** (n 35,
+12 cells); `k62` ∈ 69.443586 ± 4·0.512042 = **[67.3954, 71.4918]** (n 29, 10 cells).
+
+**THE PRIMARY STATISTIC IS `DELTA_ID` = plateau5(`ISO`) − plateau5(`DEPTH`), NOT `D_DEPTH`.**  This is
+`164.6`'s lesson applied rather than recited.  Under `IDENTITY-OPERATIVE`, `D_DEPTH` is predicted at **0.00** —
+*on* the floor — and an arm predicted at a saturation boundary cannot disagree with the account that predicts
+it.  `DELTA_ID` is a difference of two arms and is bounded in **neither** direction: **+47.30 pp = +62.59 SE**
+under `IDENTITY-OPERATIVE`, **0.00** under `DEPTH-OPERATIVE`, and free to land anywhere including negative.
+
+**Predicted levels and floor margins, per arm per LIVE account** (predicted in-batch floor 22.914057, the
+corpus's 35 same-cell `scalar` rows over 12 batches, `cdep1` excluded):
+
+| arm | IDENTITY-OPERATIVE | DEPTH-OPERATIVE | worst margin over the floor |
+|---|---|---|---|
+| `k01` | 22.9141 | 22.9141 | — it **is** the floor |
+| `k62` | 69.4436 | 69.4436 | **+46.5295 = +61.57 SE** |
+| `ISO` | 70.2113 | 70.2113 | **+47.2972 = +62.59 SE** |
+| `ONE` | 64.7500 | 64.7500 | **+41.8359 = +55.36 SE** |
+| `DEPTH` | **22.9141 — AT THE FLOOR** | 70.2113 | **0.00 under IDENTITY-OPERATIVE** |
+| `DEPTH2` | **22.9141 — AT THE FLOOR** | 70.2113 | **0.00 under IDENTITY-OPERATIVE** |
+| — | `DELTA_ID` **+47.2972 = +62.59 SE** | `DELTA_ID` **0.0000** | the primary, unbounded both ways |
+
+**Two arms ARE predicted at the floor under a live account, and that is stated rather than hidden.**  It is
+unavoidable: the predicted level of a null control *is* the null level, and `ciso1`'s `CTRL` was registered the
+same way.  What `164.6` forbids is treating a floored arm's *agreement* with a point prediction as evidence.
+Four things are registered in advance so that cannot happen:
+
+1. **The primary read is not floor-bounded** — see `DELTA_ID` above.  `--selftest` FAILs if `DELTA_ID`'s
+   predicted separation is under 30 SE, and if `k62`, `ISO` or `ONE` clears the floor by under 10 SE under
+   **every** account.
+2. **A floored `DEPTH` entitles a BOUND, never a magnitude.**  The scorer stamps `DEPTH-FLOOR-SATURATED` and
+   prints, in the run itself, that what may be written is *"`D_DEPTH` ≤ 5.0 pp"* and *"`DELTA_ID` ≥ 25.0 pp"*,
+   and that the point value as an effect size, any residual against 22.9141 read as agreement, and the phrase
+   *"`DEPTH` floored exactly as predicted"* may **not**.
+3. **The saturation band is registered from the corpus NOW**, so none is chosen after seeing the result: the 35
+   same-cell `scalar` rows plus every m=2 cell whose mean is at or below floor + `REFUTE_BAR` = 27.914057 (42
+   further rows over 14 cells) run **[21.0940, 27.9520]**, width **6.8580 pp = 9.08 SE**.  Any level inside it
+   is unrejectable against the floor at the 2-SE bar.  `--selftest` re-derives the band and FAILs on drift.
+4. **The content-free rival is NAMED and made testable IN BATCH.**  **H-BROKEN** = *"any two-group partition
+   other than the exact `ISO` set floors, for reasons having nothing to do with which tensors are isolated."*
+   A floored `DEPTH` is consistent with `IDENTITY-OPERATIVE` **and** with H-BROKEN; `cpr1`'s headline died at
+   `164.6` because exactly this rival was never registered.  **`ONE` is in the batch to kill it**: a *different*
+   isolated set at a *different* size ([61,1], 512 params) that rescued by +41.4693 pp in `ciso1`.  If `ONE`
+   rescues here and `DEPTH` floors, H-BROKEN is dead in batch and the null is about *which tensors*.  Gate [H]
+   stamps `H-BROKEN-DEAD` / `H-BROKEN-ALIVE` and, on `ALIVE`, prints the instruction not to read `DEPTH` as an
+   identity result.  Cost of that insurance: 3 jobs, ≈ 2.2 GPU-h, and without it the **modal** predicted outcome
+   is unreadable.
+
+**The mechanism premise, measured on `ciso1`'s records BEFORE this batch's scorer was committed** — `187.6`
+established that the operative statistic is the sign of the remainder sum, **not** domination, so that is the
+statistic used.  Share of records on which removing S flips the remainder's sign (1,500 determinate / 945
+pinned, pooled):
+
+| S removed | flip (determinate) | flip (pinned) | dominates (pinned) |
+|---|---|---|---|
+| {50, 53, 59} — `ISO` | 0.8260 | **1.0000** | 0.9714 |
+| {50} — `ONE` | 0.8000 | **1.0000** | 0.0000 |
+| {47, 48, 56} — **`DEPTH`** | **0.0000** | **0.0000** | 0.0000 |
+| {47, 56} — **`DEPTH2`** | **0.0000** | **0.0000** | 0.0000 |
+| {20, 23, 29} — `ciso1`'s `CTRL` | 0.0000 | 0.0000 | 0.0000 |
+
+So the sign account predicts `DEPTH` and `DEPTH2` **null, ex ante**.  `--selftest` re-derives all four shares
+from `ciso1`'s own probe records and FAILs on any drift; the score run re-derives the in-batch versions on
+`cdep1`'s **own** `k01` and stamps `PREMISE-REPLICATES` only when the carriers flip on ≥ 0.90 of pinned records
+**and** `DEPTH`'s set flips on ≤ 0.10.  **This is a prediction, not a demonstration**: it is measured on the
+*collapsed scalar* trajectory and says what the shared group's vote would have been, not what a run with a
+different partition does.
+
+**THE BRANCH MAP, first match wins.**  Gates `UNRESOLVED-MANIFEST-MISMATCH` → `UNRESOLVED-PROVENANCE` →
+`UNRESOLVED-DIVERGED` → `UNRESOLVED-NO-POSITIVE-CONTROL` (`D_ISO` < `SUPPORT_BAR`: the `ciso1` rescue did not
+reproduce at fresh seeds, so **no `DEPTH` contrast is readable and the batch says so instead of reading one**),
+then:
+
+* **`DEPTH-OPERATIVE`** — `D_DEPTH` ≥ +25.0 and |`DELTA_ID`| ≤ 1.511364.  Isolating three matched carrier-free
+  `layer4` 512-parameter BN parameters rescues just as well: the `ciso1` result is about depth or partition
+  shape, **not** about which tensors.
+* **`IDENTITY-OPERATIVE`** — `D_DEPTH` ≤ +5.0 and `DELTA_ID` ≥ +25.0.  A size-, numel- and depth-matched
+  carrier-free set does not rescue.  **Subject to 188.3's magnitude caveat, which the `FINAL` block prints.**
+* **`BOTH-OPERATIVE`** — `D_DEPTH` ≥ +25.0 and `DELTA_ID` > 1.511364.  `DEPTH` rescues but by measurably less
+  than `ISO`.  **A RESULT, NOT A FAILURE.**
+* **`UNRESOLVED-PARTIAL-RESCUE`** — +5.0 < `D_DEPTH` < +25.0.  **REGISTERED MEANING: BOTH MATTER** — depth buys
+  a partial escape from the collapse and identity buys the rest.  **ALSO NOT A FAILURE**; the scorer prints the
+  fraction of the in-batch gap recovered, `D_DEPTH` / `D_ISO`.  The middle is a substantive outcome and is
+  named as one here, in advance, so it cannot later be reported as a null result.
+* **`UNRESOLVED-PARTIAL`** — anything else.
+
+Stamps, never the branch: `DEPTH-FLOOR-SATURATED` | `DEPTH-ABOVE-BAND`; `DEPTH2-{RESCUES,PARTIAL,FLOOR}`;
+`BIAS-NULL` | `BIAS-MATTERS`; `H-BROKEN-{DEAD,ALIVE}`; `ISO-REPLICATES` | `ISO-SHIFTED`; the `187.7` beta
+readings re-measured at fresh seeds (`ISO-59-…`, `ISO-3-…`, `DEPTH-59-…`, `DEPTH-3-…`, `DEPTH2-60-…`,
+`DEPTH2-2-…`, `ONE-61-…`, each `FREE` | `PINS` | `NEITHER`); `PREMISE-{REPLICATES,NOT-REPLICATED}`;
+`ONE-{RESCUES,PARTIAL,FLOOR}`; `FLOOR-NOT-INGESTED`.
+
+### 188.5 RULE 21, RULE 20, RULE 16, THE ENV AUDIT AND THE INERTNESS PROOF
+
+**RULE 21 — the scorer, the launcher and the successor inertness test were committed BEFORE any `cdep1` run
+existed, and the margin is stated by wall clock.**  Commit **`654497f`** at **2026-09-09T13:40:09+02:00**
+(epoch 1788954009); earliest `sacct` Submit over all 18 jobs **2026-09-09T13:44:00** (epoch 1788954240).
+**MARGIN +231 s.**  Registered shas: `analysis/cDP1_cdep1_depth_score.py`
+`4ba6c888f36e8c512ac64e791774df112ae8556453452dea74225f80be1e0dd6`; `bin/cDP1_depth_control.sh`
+`48ae4b2073196958d029287fab933fd0fbd803e33c2634384df5288d0c6e4cb3`;
+`tests/test_probe_tensor_blockwise_cdep1.py` `1ec724cee58a1690384953b3755c8cea76ffc082421b8f0d1b48b89aad15cf3b`.
+Sha-identical on the Mac and on `alice2`.  `--selftest`: **100 PASS / 0 FAIL / 1 SKIP** on the Mac (the skip is
+the ex-ante premise section, which needs `ciso1`'s probe records) and **110 PASS / 0 FAIL / 0 SKIP** on
+`alice2`, where guard 1c2 **requires** that section to have run and aborts the submission if it was skipped.
+
+**RULE 16 — no registered artefact was edited.**  `git diff -- analysis/ patches/ tests/ bin/` is empty over
+this entry's own commits; the three files above are **additions**, 0 deletions.  The load-bearing case:
+`tests/test_probe_tensor_blockwise.py` is `ciso1`'s registered test and its `SPECS` dict is a literal holding
+*that* batch's three arms.  It is **not edited** (sha `22f6599e8c5239635a3ebeb859c9045c288645ba45fe397b8071765603dff46f`,
+unchanged; the launcher's guard 1b3 aborts if `git status` shows it modified).  The successor **imports** it and
+re-binds `SPECS` at runtime, so every B0–B5 check that runs is the registered test's own code, byte for byte,
+executed against `cdep1`'s four `sets:` strings.  `analysis/argsline_guard.py` `81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`
+unedited and sha-identical on both hosts.
+
+**The inertness proof, on the LIVE source, for THIS batch's four partitions.**  `POST_SHA256
+4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd`; **58 PASS / 0 FAIL / `ALL PASS`** at
+`$WS/runs/cdep1/inertness_blockwise.log`, covering `ISO` [59,3], `DEPTH` [59,3], `DEPTH2` [60,2], `ONE` [61,1]:
+beta bit-identical to unpatched at every step with `PROBE_TENSOR` unset **and** set, records identical modulo
+the appended keys, per-group decomposition exact, applied sign exact, header `type=blockwise`.  Guard 4e refuses
+to submit without an `ALL PASS` log naming all four spec strings at the live sha.  `tests/test_namesets.py`
+N1–N3 re-proved on the live code with the stripped-live `--pre` (the `ciso1` disclosure, unchanged).
+
+**RULE 20 — pre-submit and post-launch, plus a SEPARATE ENV-line audit.**  Every one of the 18 composed lines
+passed `guard_presubmit` twice (design flags, then the three axes) with **0 repeated flags**; the dry run
+printed all 18 and `guard 6: 18 composed command lines, 0 failed`.  `guard_postlaunch` audited the first run's
+**own** `ARGS` line → `1 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH / VERDICT: PASS`.  Batch-consistency,
+with the batch's three declared axes as documented `--vary` arguments on the **unedited** guard:
+
+```
+python3 analysis/argsline_guard.py $WS/runs --name cdep1- --batch-consistency \
+        --vary stepsize-groups --vary seed --vary run-name
+  batch-consistency: every non-axis flag is identical across 6 runs
+  argsline_guard: 6 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+  VERDICT: PASS
+```
+
+**ENV-line audit, separate, because `BETA_CLIP`, `PROBE` and `PROBE_TENSOR` cannot ride the `ARGS` line:**
+`ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default
+SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0` — **exactly one
+line, ×6**, modulo `PROBE_DIR`.  `PROBE_TENSOR` lines: **4 `type=blockwise` / 1 `type=layerwise` / 1
+`type=scalar`** — exactly the seed-24 arm mix (`ISO`, `DEPTH`, `DEPTH2`, `ONE` blockwise; `k62` layerwise; `k01`
+scalar), so the environment reached every arm as designed.
+
+**COVERAGE IS 6 of 18 AT THE TIME OF WRITING — RULE 20 AND THE ENV AUDIT ARE OPEN OBLIGATIONS UNTIL 18/18, AND
+NO ACCURACY, `beta` OR PER-TENSOR NUMBER FROM `cdep1` IS QUOTABLE.**  12 PENDING, 6 RUNNING, **0/18 `RUN_DONE`**,
+0 tracebacks, and `grep -l Traceback` over the 6 `.out` files returns 0.  Jobs **4929648–4929653** (s24), **4929655–4929660** (s25), **4929661–4929666** (s26).
+Partitions `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, `WALL=03:00:00`, composed by
+`slurm_parts_for_wall` with the source-time hook PASSing (10800 s ≤ gpu-short's live 14400 s cap).
+
+### 188.6 COST, AND THE OTHER TWO BATCHES SHARING THIS ACCOUNT
+
+**Priced from `ciso1`, which ran the same cell, horizon and shape** (15 jobs, `sacct` Elapsed 781.28 min =
+**13.02 GPU-h**, median 43.82 min, mean 52.09 min, slowest 95.02 min on a 2080ti node):
+
+* median-based **18 × 43.82 min = 13.1 GPU-h**
+* mean-based **18 × 52.09 min = 15.6 GPU-h**  ← the honest planning figure
+* worst case (every job on a 2080ti) **18 × 95.02 min = 28.5 GPU-h**
+
+All three are inside the ~30 GPU-h ceiling for this track's share.  `WALL=03:00:00` is 1.9× `ciso1`'s slowest run.
+
+**DISCLOSED — `alice2` is shared and TWO other batches were registered in this same working tree during this
+cycle.**  The queue was **empty** when `cdep1`'s design was fixed; by submit time it held **`ciso2`** (12 jobs,
+seeds {31,32,33}, `gpu-l4-24g`, the 200-epoch `ISO` horizon that `187.7` named) and a `vggsmoke` job, from
+commits `0a60f05` / `d593069` and `77b499d`.  **Seed sets are disjoint** ({24,25,26} vs {31,32,33}) and no
+`cdep1` guard, `scancel` line or reader touches any other prefix.  `cdep1` deliberately includes `gpu-short`,
+whose QOS is an independent 12-GPU pool, so the two batches do not compete for the same partition pool.
+`alice` (Saber's shared account) was **not accessed at all**.
+
+**Number collision, handled by `186`'s precedent.**  `cdep1`, `ciso2` and `cvg1` were all registered in the same
+tree in the same cycle and `187.13` left **188** as the next free number.  This entry takes **188**; if another
+track also writes 188, the **later** writer renumbers and a reconciliation entry follows, exactly as `186`
+reconciled `184` and `185`.
+
+### 188.7 WHAT IS **NOT** ESTABLISHED BY THIS ENTRY
+
+* **No `cdep1` result.**  0/18 `RUN_DONE`.  No level, contrast, `beta` occupancy or stamp exists.  The corpus is
+  **2,761 rows**, unchanged; `results/all_runs.csv` was not written.
+* **The identity/depth question is not answered** — the arm that answers it is running, not landed.
+* **`187`'s `UNRESOLVED-PARTIAL` stands unaltered.**  Nothing here revises `ciso1`'s verdict, and nothing here
+  bears on H-DOMINATE, which remains **DEAD as named** (`184`/`186`/`187.11`).
+* **Even a floored `DEPTH` will not separate identity from magnitude** (188.3).  The strongest sentence this
+  batch can license is *"isolating three `layer4` 512-parameter BN parameters matched to the carriers on size,
+  numel, width and depth, but not on |L|, does/does not rescue"*.
+* **Ledger unchanged: seventeen registered, fifteen dead, two live** (`crn1` composition; H-ISOLATE at
+  `UNRESOLVED-PARTIAL`).  `cdep1` does **not** register an eighteenth candidate — it is a **control on an
+  existing one**, and `IDENTITY-OPERATIVE` / `DEPTH-OPERATIVE` are competing readings of H-ISOLATE, not new
+  hypotheses.
+
+### 188.8 THE STANDING CONSTRAINTS, DISCHARGED
+
+**GPU submitted: 18 jobs, one submission, `alice2` only, ≈13–16 GPU-h expected.**  Nothing was cancelled;
+no job this track did not submit was touched; `alice` not accessed.  **`paper/` untouched** —
+`git status --porcelain -- paper/` empty.  **RULE 16**: `git diff -- analysis/ patches/ tests/ bin/` empty;
+three new files, 0 deletions; `argsline_guard.py` and `tests/test_probe_tensor_blockwise.py` unedited at their
+committed shas.  **plateau5 PRIMARY** throughout; the CSV `plateau` column is read nowhere and `best_test`
+nowhere.  **TRAIN is printed beside TEST at every arm and contrast.**  Indices are **1-BASED** everywhere.  The
+partition manifest is measured on the **LIVE model** and written to `$WS/runs/cdep1/PARTITION-MANIFEST.txt` and
+`$WS/runs/cdep1-PARTITION-MANIFEST.txt`; guard 8 proves the scorer's **default** `--manifest` resolution finds
+it, so the documented one-argument invocation cannot be got wrong.  `cdep1-` is in `bin/PROTECTED.txt` on both
+hosts.  No nested `claude -p`.  `git add` restricted to this track's own paths.  Next free number: **189**.
