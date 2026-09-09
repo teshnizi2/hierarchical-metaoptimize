@@ -26193,3 +26193,409 @@ construction, spec composition through the live `HF.py`, the probe-record re-der
 inertness test and four dry runs.
 
 Next free number: **199**.
+
+---
+
+## 199. CYCLE 150 RECONCILIATION — **THREE TRACKS (`196`, `197`, `198`), NO COLLISION, LINEAR HISTORY, AND *NOT ONE* NUMBER IN ANY TRACK'S PROSE DISAGREES WITH ITS OWN SCORER'S OUTPUT.**  RULE 20 **CLOSES AT 36 OF 36** — the cycle's full coverage — WITH A SEPARATE ENV AUDIT RE-RUN BY THIS ENTRY.  THE REGISTERED SCORER `cIS2` WAS **RE-RUN UNEDITED** AND EMITS `UNRESOLVED-NOT-PINNED | ISO-59-NOT-PINNED-AT-250`, **106 PASS / 0 FAIL / 0 SKIP, EXIT 0** — character for character what `196` reported, INCLUDING ITS DISCLOSED SHORT-CIRCUIT.  THE INGEST IS RE-VERIFIED **BOTH HALVES, KEYED `(run, job_id)`**, AND `146.7`'s TRAP IS SHOWN AVOIDED **CONSTRUCTIVELY FROM THE SOURCE**.  TRACK C SUBMITTED **NOTHING**: **0 `cvi1` RECORDS IN `sacct` ALL-TIME**, QUEUE EMPTY, `PROVENANCE.txt` READS `MODE DRY-RUN` WITH NO `SUBMIT_UTC`.  **THE CROSS-TRACK SCIENCE, WHICH NO SINGLE TRACK COULD STATE: (1) ALL THREE LEGS OF H-ISOLATE HAVE NOW REPORTED AND THE POSITION IS STATED IN ONE PLACE — IDENTITY CLOSED, MAGNITUDE ARCHITECTURALLY UNREACHABLE, HORIZON MEASURED-BUT-GATE-NOT-CLEARED.  (2) `191`'s CONCORDANCE TEST IS **COMPLETE AND CONCORDANT ON BOTH HALVES** — but the second half is CONDITIONAL on an inertness I verified myself, and no track named that dependency.  (3) THE CAMPAIGN'S PUBLISHABILITY IS ANSWERED SEPARATELY FOR FOUR CLAIMS, AND ONE OF THEM IS NOT PUBLISHABLE AS ANYONE HAS BEEN WRITING IT.**  **I LEAD WITH A GAP NEITHER TRACK CAUGHT: `ciso2` HAD NO MASTER-TABLE ROW AT ALL** — `197` deliberately excluded it as Track A's, and Track A never wrote it.  CLOSED HERE.  **ZERO GPU SUBMITTED, NOTHING CANCELLED OR REQUEUED, `alice` NOT CONTACTED.  CORPUS 2,797, UNCHANGED BY THIS ENTRY.**  THIS ENTRY TOOK NUMBER **199**; NEXT FREE **200**.
+
+### 199.1 THE GAP I MUST LEAD WITH — `ciso2` WAS INVISIBLE IN THE MASTER TABLE, AND THE REGISTERED CHECKER COULD NOT SEE IT
+
+`197.4` states, correctly and in terms, that `ciso2`'s row is "the concurrent track's to write".  Track A's
+commit `7ee7695` touches **two files** — `docs/CORRECTIONS.md` and `results/all_runs.csv` — and its own entry
+says so.  **Neither track wrote the row.**  The result: the corpus's newest and most expensive batch (12 runs,
+21.65 GPU-h, the campaign's FIRST 250-epoch rows) was in the CSV, in `CORRECTIONS`, and **nowhere in
+`docs/MASTER-TABLE.md`**.
+
+This is a coordination failure, not a data failure, and it is invisible to the registered instrument by
+construction: `c73_mastertable_check.py` checks the header against the table's row count and against the CSV's
+run count and GPU-hours.  It has **no notion of per-batch row coverage**, so it exited 0 on a table missing a
+batch.  I verified that by running it before touching anything: **EXIT 0**, "108 data rows" after my addition
+and 107 before, header consistent in both cases.  The checker is not wrong; it does not check this.
+
+**CLOSED HERE**, additively and in `192`'s section-9 convention: one row appended, the verdict cell carrying the
+registered scorer's **complete emitted token set verbatim** and an in-cell note that the set is complete
+*because the code short-circuits*, so no reader can mistake a two-token row beside its sixteen-token neighbour
+for a truncation.  Header counts moved `33 -> 34` section-9 rows and `107 -> 108` total.  The checker,
+**run unedited at sha `dec9ec68…3af6`**, goes **EXIT 0** on the amended file, and `--selftest` is **6/6**.
+`git diff` over `analysis/`, `bin/` and `tests/` is **EMPTY** for this entry — no registered file was touched.
+
+**REGISTERED LESSON, and it is a cheap one to act on:** when a cycle runs concurrent tracks, "the other track
+will write it" is a claim about a file, and a claim about a file is checkable.  The reconciliation pass is the
+only place that can check it, so it must — a batch that lands must have a row before its cycle closes.
+
+### 199.2 RULE 20 — **RE-RUN BY THIS ENTRY, AND CAMPAIGN COVERAGE CLOSES AT 36 OF 36**
+
+`analysis/argsline_guard.py` was run **UNEDITED**.  Its sha256 on this worktree is
+`81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388`, and I confirmed it is **byte-identical on
+`alice2`** and identical to the value registered at `188.5` / `189.9` / `190` / `194.2` / `195.2` / `196.1`.
+
+Each batch was checked with **its own declared axes as documented `--vary` arguments** — documented arguments
+are not edits (RULE 16):
+
+| batch | invocation | result |
+|---|---|---|
+| `ciso2` (12) | `--batch-consistency --vary seed --vary run-name --vary stepsize-groups --vary save-directory` | **PASS** — "every non-axis flag is identical across 12 runs"; 12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line |
+| `cdep1` (18) | same axes | **PASS** — identical across 18 runs; 18 clean, 0, 0 |
+| `cvg1` (6) | same axes | **PASS** — identical across 6 runs; 6 clean, 0, 0 |
+
+**CAMPAIGN COVERAGE FOR CYCLE 148's BATCHES: 36 OF 36.**  `195.2` left this at 28/36 with `ciso2` at 4/12
+PARTIAL because only four of its jobs had finished; `196.1` closed it at 36/36; **this entry re-derives that
+independently and agrees.**  No `ciso2` number in this entry was read before that check completed.
+
+### 199.3 THE **SEPARATE** ENV AUDIT — MY OWN PARSER, NOT THE GUARD'S
+
+`BETA_CLIP`, `PROBE` and `PROBE_TENSOR` are environment variables and **cannot ride the ARGS line**, so the guard
+above cannot see them.  I wrote an independent auditor outside the repo that reads the `ENV:` line and the
+`PROBE_TENSOR:` banner straight from each raw `.out`.  Results, **all three batches**:
+
+* **Exactly ONE distinct ENV line per batch, modulo `PROBE_DIR`** — `x12`, `x18`, `x6` respectively, every one
+  reading `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default
+  SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 PROBE_DIR=<x> EB_RHO=na EB_LOG=0`.
+  Raw (with `PROBE_DIR`) the lines are 12 / 18 / 6 distinct, i.e. one per run, as they must be.
+* **`PROBE_TENSOR` census, exactly as registered:** `ciso2` blockwise x6 / scalar x3 / layerwise x3 at
+  `tensors=62`; `cdep1` blockwise x12 / scalar x3 / layerwise x3 at `tensors=62`; `cvg1` scalar x3 /
+  layerwise x3 at **`tensors=26`**.
+* **`SCHED=none` on all 36.**  This matters for `199.6` and is recorded here rather than asserted there.
+* **Completion:** 36/36 carry `RUN_DONE`, **0 tracebacks**, and the epoch-line census is exactly
+  `250 x 12` (`ciso2`), `100 x 18` (`cdep1`), `100 x 6` (`cvg1`).
+
+**PROVENANCE OF THE FILES I READ.**  Before any of the above I hashed all 36 `.out` files in the local
+`runs_alice2/` mirror and compared them to `sha256sum` over the same 36 files in `/home/s5014158/metaopt/runs`
+on `alice2`: **all 36 byte-identical.**  So every number below is read from the record, not from a copy of it.
+This also re-confirms `197.8`'s repair from the outside — `ls runs/ | grep -E '^(cdep1|cvg1|ciso)'` is **empty**,
+the misfiled duplicates are gone from the ingest root, and `runs_alice2/` holds each file exactly once.
+
+### 199.4 THE REGISTERED SCORER, **RE-RUN UNEDITED** — AND IT AGREES WITH `196` CHARACTER FOR CHARACTER
+
+`analysis/cIS2_ciso2_horizon_score.py`, sha256
+`ab935f682b6bc0e6715b387c431e3bdc0559acb05e9bc39347f164449e563d98` on this worktree **and on `alice2`**,
+matching the value `196.2` registered.  Run on the cluster host through its **documented one-argument
+invocation** (`--manifest` and `--csv` optional and defaulted, the `164.2` pattern):
+
+```
+python3 analysis/cIS2_ciso2_horizon_score.py /home/s5014158/metaopt/runs
+```
+
+**EXIT 0.**  173 lines of output.  Final two lines, verbatim:
+
+```
+GATES: 106 PASS  0 FAIL  0 SKIP
+FINAL: UNRESOLVED-NOT-PINNED | ISO-59-NOT-PINNED-AT-250
+```
+
+That is `196`'s reported token and gate census, exactly.  **AND THE SHORT-CIRCUIT `196` DISCLOSED IS REAL AND I
+VERIFIED IT DIRECTLY**, because it governs how every other sentence about this batch must be quoted:
+`grep -niE "rho|D_ISO|RESCUE|FROZEN-AT-PIN|FLOOR-HOLDS|REPLICATES"` over the scorer's own 173 lines returns
+**exactly one hit — the title on line 2**.  The registered code prints **no `RHO`, no `D_ISO`, no rescue branch
+and no stamp**.  `196.6` says this in terms and labels every stamp it reports as its own counterfactual
+arithmetic.  **That disclosure is accurate, and it is the single most important thing about `196`:** a track
+that quietly reported `FROZEN-AT-PIN` or `FLOOR-HOLDS` as scorer output would have been fabricating, and this
+one did not.
+
+**PROSE vs TOKEN ACROSS ALL THREE TRACKS: ZERO DISAGREEMENT.**  `197`'s two rows carry `IDENTITY-OPERATIVE`
+and `GAP-REPLICATES` verbatim and I re-ran `c73` unedited (EXIT 0 before my edit at 107 rows, EXIT 0 after at
+108).  `198` registers a scorer against runs that do not exist, so it has no token to disagree with.
+
+### 199.5 THE NUMBERS, RE-DERIVED BY A PARSER SHARING NO CODE WITH ANY SCORER
+
+Written outside the repo, reading raw `.out` only, `plateau5` = mean TEST over the last 5 epoch lines of the
+window (95-99 for `@100`, 245-249 for `@250`).  **Every headline figure in `196` reproduces.**
+
+```
+arm       TRAIN@100  TEST@100    TRAIN@250  TEST@250
+k01        23.1413    23.0640      23.2533    23.1573
+k62        98.8413    69.0813      99.9260    70.3667
+ISO        94.3260    69.9093      94.5627    69.8967
+ONE        83.6573    64.7960      84.5540    64.9440
+
+D_ISO@100 = +46.8453   D_ISO@250 = +46.7393   RHO = 0.997737
+  per-seed paired RHO:  s31 0.997855   s32 0.998962   s33 0.996407
+D_CEIL@100 +46.0173  @250 +47.2093   D_ISO/D_CEIL  1.0180 -> 0.9900
+k01 drift @100->@250  +0.0933 pp  (per seed +0.0720 / +0.1020 / +0.1060) = +0.12 SE
+k62_train - ISO_train  +4.5153 -> +5.3633   (change +0.8480 pp)
+pooled within-arm SD @250 = 0.409934 (df 8), 2.26x SMALLER than SIGMA_W 0.925518
+```
+
+The scorer's own `[C]` block prints the same eight arm means to four decimals, so this is **three independent
+code paths** (`aggregate.py`'s parse, the registered scorer, my parser) landing on one answer.
+
+**`196`'s siblings also reproduce**, from the same parser: `cdep1` `DELTA_ID` **+46.5233**, `D_ISO` **+46.6920**,
+`D_DEPTH` **+0.1687** (0.361 % of `D_ISO`), `D_DEPTH2` **+0.0960** (0.206 %), `D_ONE` **+41.4747**; `cvg1`
+`k01` **35.0173**, `kL` **66.2860**, `D`(TEST) **+31.2687**, `D`(TRAIN) **+64.1587**.
+
+**TWO MICRO-CORRECTIONS TO `196`, BOTH IMMATERIAL, BOTH RECORDED BECAUSE A SILENT ONE IS WORSE:**
+
+1. **`196.5` transposes two seeds.**  It reports `k62`'s step-size-to-floor ratios as
+   "85.7x / 114.8x / 131.0x" in seed order s31/s32/s33.  Measured from the probe records: **s31 = 114.77x,
+   s32 = 85.70x, s33 = 130.97x.**  The **multiset is identical** and the claim it supports — that `k62` runs
+   ~100x above the floor while `ISO` runs at ~1.15x — is untouched.  The per-seed assignment is wrong and
+   should not be quoted per seed.
+2. **`196.5`'s `ISO` s31 tail figures are off by ~0.003.**  It reports occupancy at `<= -14.95` of
+   0.9391 / 0.9295 / 0.9167 and step/floor 1.10x / 1.19x / 1.13x; I measure **0.9361 / 0.9297 / 0.9169** and
+   **1.12x / 1.19x / 1.13x** over the last quarter of 1,250 records.  A tail-window boundary convention,
+   sub-0.3 %, no claim affected.
+
+Everything else in `196.5` I reproduce **exactly**: `ISO` first touch at record **511 / 515 / 497**, departures
+after first touch **149 / 129 / 141**, mean `beta` when off the clamp **-14.982 / -14.9725 / -14.9778**,
+`k62` never touching on 3/3, `k01` pinning at record **186 / 185 / 185** with **zero** departures, and `ISO`
+occupancy at `<= -14.50` **1.0000 on 3/3**.
+
+### 199.6 THE INGEST — **BOTH HALVES, KEYED `(run, job_id)`, AND `146.7` EXCLUDED CONSTRUCTIVELY**
+
+**`146.7` FIRST, FROM THE SOURCE RATHER THAN FROM PROSE.**  `analysis/aggregate.py` contains **exactly one
+writer**: line 227, `csv.DictWriter(sys.stdout, fieldnames=FIELDS, extrasaction="ignore")`.  There is **no
+file opened for writing anywhere in the module** — the only `open()` is line 148, `open(path, errors="replace")`,
+a read.  **Therefore, constructively:** redirecting `aggregate.py` to a log file cannot modify
+`results/all_runs.csv`, a subsequent "0 rows changed" diff against the untouched corpus passes **VACUOUSLY**,
+and redirecting to `results/all_runs.csv` is the **only** way the corpus can move.  `196.8` followed the
+recipe; this is the proof that the recipe is the right one, not an assertion that it was followed.
+
+**HALF ONE — WHAT THE COMMIT DID.**  Comparing `7ee7695^:results/all_runs.csv` against
+`7ee7695:results/all_runs.csv`, keyed `(run, job_id)`:
+
+```
+fields identical: True (38 fields)
+before  2785 rows / 2785 distinct keys      after  2797 rows / 2797 distinct keys
+ADDED 12   REMOVED 0   MULTIPLICITY CHANGES 0
+added runs: ciso2-{ISO,ONE,k01,k62}-s{31,32,33}  -- all 12, and nothing else
+PRE-EXISTING ROWS: field-level changes across all 38 fields = 0
+superseded on all 12 added rows = 0
+```
+
+**Both halves verified: `added == 12 == the expected count`, and `changed == 0` on pre-existing rows.**
+
+**HALF TWO — CAN I *REPRODUCE* IT?**  Yes, and byte-identically.  I ran the recipe myself into a scratch file
+(never into the corpus): `python3 analysis/aggregate.py ../runs ../runs_alice2 > <scratch>.csv` then
+`python3 analysis/args_repair.py --csv <scratch>.csv --apply` (36 rows updated, 2,761 untouched — the
+dup-group repair, as designed).  **`sha256` of my reproduction equals `sha256` of the committed
+`results/all_runs.csv`: `38259b99bc798af9734ac9c8…`.**  Keyed comparison: 0 added, 0 removed, 0 multiplicity
+changes, 0 field changes.  This is a stronger statement than `196.8` made: the ingest is not merely correct,
+it is **deterministic and re-derivable from the mirror as it now stands** — which incidentally proves
+`197.8`'s quarantine was complete, since an incomplete one would have produced 2,821 rows here.
+
+`git status --porcelain` was clean before and after; the corpus was never written by this entry.
+
+### 199.7 TRACK C SUBMITTED **NOTHING** — FOUR INDEPENDENT WITNESSES, AND ITS DESIGN RE-COMPOSES
+
+1. **`sacct`, all time:** `sacct -u s5014158 --starttime=2020-01-01 … | grep -ic cvi1` returns **0**.  Not
+   "0 running" — **zero records ever**.
+2. **The queue is empty:** `squeue -u s5014158` returns the header and nothing else.
+3. **The job-ID ceiling:** the three highest job IDs on the account are **4929676 / 4929677 / 4929678**, all
+   `cvg1-kL-s3*` / `cvg1-k01-s33`, submitted `2026-09-09T13:46:21`.  Nothing was submitted after `cvg1`.
+4. **The batch's own provenance says so:** `$WS/runs/cvi1/PROVENANCE.txt` reads **`MODE DRY-RUN`** and carries
+   **no `SUBMIT_UTC`**.  `$WS/runs/cvi1/` holds exactly three files — the manifest, the provenance and the
+   inertness log — and **no `.out`, no probe directory, no `SCORE-` file**.
+
+**RULE 21 IS SATISFIED, TRIVIALLY AND CHECKABLY.**  `analysis/cVI1_vggiso_identity_score.py` is committed at
+`980499c` (`2026-09-10T00:31:25+02:00`) at sha256
+`86a2b80ffd1ea8907544bfc9d79fa0db3f7772c34fd7d70f1f98aa8fc17ea96a`, and **no `cvi1` run exists anywhere**, so
+the scorer precedes its data by an unbounded margin.
+
+**THE SPEC STRINGS RE-COMPOSE AGAINST THE LIVE MANIFEST.**  Read from
+`$WS/runs/cvi1/PARTITION-MANIFEST.txt`, generated on the cluster from the live model:
+
+* `NUM_PARAM_TENSORS 26`, `TOTAL_PARAMS 9274532`, `NETWORK VGG11_bn_c100`.
+* The four 512-wide 1-D `*.weight` tensors are at 1-based **14 / 17 / 20 / 23** = `bn5` / `bn6` / `bn7` /
+  `bn8.weight`, each `numel` 512.  **No `TENSOR` line's name contains `shortcut`.**
+* `ISO`: `sets:1-22,24-26/bn8.weight` -> `M 2  SIZES 25,1  PARAMS 9274020,512`, `ISOLATED ISO 23`, group 1 =
+  `bn8.weight`.
+* `CTL`: `sets:1-19,21-26/bn7.weight` -> `M 2  SIZES 25,1  PARAMS 9274020,512`, `ISOLATED CTL 20`, group 1 =
+  `bn7.weight`.
+* `SYMDIFF ISO CTL bn7.weight,bn8.weight` — **the twin is EXACT**: the two arms differ in exactly two tensor
+  memberships and in nothing else.  Arithmetic checks: `9274020 + 512 = 9274532`.
+* All four spec strings appear **twice each** — once in `analysis/cVI1_vggiso_identity_score.py`, once in
+  `bin/cVI1_vgg_isolate.sh` — and the two occurrences are byte-identical.
+
+**THE SEEDS ARE GENUINELY FRESH AGAINST THE *WHOLE* CORPUS.**  Re-derived over all 2,797 rows: the seeds
+present anywhere are `{0…26, 31, 32, 33}`.  **`41`, `42`, `43` appear zero times**, and `sum(run.startswith
+("cvi1"))` is **0**.
+
+**THE LAUNCHER CANNOT SUBMIT BY ACCIDENT.**  `bin/cVI1_vgg_isolate.sh` defaults to `SUBMIT=0`; the only path
+that sets `SUBMIT=1` is the explicit `--submit` flag; anything else exits 2 on the usage line; and a guard
+failure is fatal for `--submit` while a dry run prints the composition and submits nothing.  `SEEDS="41 42 43"`
+and `EPOCHS=100` are read straight from the file.
+
+### 199.8 **H-ISOLATE ACROSS ALL THREE LEGS, IN ONE PLACE** — WHAT NO SINGLE TRACK COULD STATE
+
+All three legs have now reported.  The position, stated once:
+
+| leg | status | the number that decides it | what it does NOT settle |
+|---|---|---|---|
+| **IDENTITY** (is it *those* tensors, or any matched triple at that depth?) | **CLOSED** — `cdep1`, CORRECTIONS 193, registered token `IDENTITY-OPERATIVE` | `DELTA_ID` = plateau5(`ISO`) - plateau5(`DEPTH`) = **+46.5233 pp = +61.56 SE**.  A carrier-FREE triple matched on group sizes `[59,3]`, isolated numel **1,536 exactly**, width, stage and BN membership recovers **0.36 %** of the gap (`D_DEPTH` +0.1687 pp = +0.22 SE); class-pure `DEPTH2` 0.21 %; `DELTA_BIAS` +0.0727 (`BIAS-NULL`) | that the operative variable is tensor identity **rather than term magnitude** — see the next row |
+| **MAGNITUDE** (is it those tensors, or simply the three biggest terms?) | **ARCHITECTURALLY UNREACHABLE on `ResNet18_c100`** — `188.3`, registered BEFORE `cdep1` ran, re-measured on `cdep1`'s own `k01` | the carriers rank **1 / 2 / 3 of 62** by mean `abs(L_i)`; every 512-parameter `layer4` non-carrier sits **below the median**; isolated-set totals run **x308**, and the best admissible carrier-free triple is still **x225** short | **everything.**  This is not a result; it is a statement about what this network can be *asked*.  No batch on `ResNet18_c100` can separate identity from magnitude by set-matching |
+| **HORIZON** (is the rescue a delay of the scalar collapse?) | **MEASURED; REGISTERED GATE NOT CLEARED** — `ciso2`, CORRECTIONS 196, token `UNRESOLVED-NOT-PINNED \| ISO-59-NOT-PINNED-AT-250`, registered at `190.7` **IN ADVANCE** as INFORMATIVE, not a failure | under the gate: **`RHO` = 0.997737**, `D_ISO`@250 = **+46.7393 pp = +61.85 SE**, three seeds, in batch, against the batch's own paired in-run control.  `RESCUE-COLLAPSES` needed `<= 5.0` and missed by **41.7 pp** | whether the 59-group is "free".  The registered instrument scores **exact-equality dwell**, not step-size magnitude, and `199.5` measures the consequence |
+
+**THE LEDGER DOES NOT MOVE: SEVENTEEN REGISTERED, FIFTEEN DEAD, TWO LIVE, NONE PENDING.**  Checked, not
+assumed: **none of `196`, `197` or `198` registers an eighteenth candidate.**  `ciso2` is a *horizon test* of an
+existing candidate at a byte-identical partition; `197` is a bookkeeping pass; `cvi1` is a *scope test* of an
+existing candidate and, being unlaunched, is not a result at all.  The two live accounts remain `crn1`'s
+composition (one clean pair) and **H-ISOLATE**.  H-DOMINATE *as named* stays dead (`184` / `186` / `187.11`).
+
+**H-ISOLATE STAYS LIVE, AND BOTH HALVES OF THAT ARE EARNED.**  It does not **die**: `RESCUE-COLLAPSES` was
+genuinely reachable by the data — `ISO` had 46.9 pp of room to fall and fell **0.1** — so the account was
+tested and survived rather than being untestable.  It does not **graduate**: its registered horizon gate did
+not clear, and a gate whose defect I have now measured is still a gate that fired honestly.
+
+**DOES `187`'s `UNRESOLVED-PARTIAL` CHANGE?  NO — IT STAYS FROZEN, AND THE POSITION IS STATED AROUND IT.**
+Three reasons, and the first is decisive on its own:
+
+1. **The token belongs to `ciso1`'s run, and BATCH is the unit of replication** (F(62,85) = 5.47 for batch vs
+   F(11,1976) = 0.152 for seed).  `ciso2` is a different batch.  Splicing its result into `ciso1`'s verdict is
+   the exact splice the campaign's own variance decomposition forbids.
+2. **A scorer's token is frozen once its data exist.**  `187` scored what `187` ran.  Revising it now would be
+   editing a verdict after the fact, which is the failure mode RULE 16 exists to prevent — the same reason
+   `cIS2` is frozen rather than patched.
+3. **Nothing has cleared a freedom gate anyway.**  `187` returned `UNRESOLVED-PARTIAL` because its registered
+   freedom bar failed on its terminal-value half at 100 epochs; `ciso2`'s registered pinning gate failed at
+   250 epochs.  **The freedom question has now failed a registered gate at BOTH horizons.**  There is no token
+   anywhere in the corpus saying the 59-group is free, and none saying it is pinned.
+
+**THE POSITION, WHICH IS WHAT A READER ACTUALLY NEEDS:** isolating three 512-parameter `layer4` BatchNorm
+scales — 1,536 of 11,220,132 parameters, 0.014 % — moves the arm from the scalar floor to the layerwise
+ceiling; a control matched on depth, class, width and numel does not; and the effect is **flat to +/-0.046 pp
+over 150 further epochs** while a genuinely pinned arm at the same cell drifts +0.0933.  What remains open is
+not *whether* the isolation does this but *why*: magnitude is not separable on this network, and the "freedom"
+story the two registered gates were built to test has failed both times, in one case on an instrument now
+known to measure the wrong quantity.
+
+### 199.9 `191`'s TWO PROMISED REPLICATIONS — **BOTH HAVE RUN, BOTH ARE CONCORDANT**, AND ONE CARRIES A DEPENDENCY NO TRACK NAMED
+
+`191` promised **two** independent re-measurements of the `187` rescue at byte-identical spec strings and
+disjoint seeds.  Both have now landed.  **BATCH-AS-UNIT-OF-REPLICATION HAS TWO CONCORDANT TESTS, NOT ONE.**
+
+**SPEC-STRING IDENTITY VERIFIED BY ME, FROM THE RAW `.out` ARGS LINES**, not inherited:
+
+```
+ciso1-ISO-s21 : sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+ciso2-ISO-s31 : sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+ciso1-ONE-s21 : sets:1-49,51-62/layer4.0.bn2.weight
+ciso2-ONE-s31 : sets:1-49,51-62/layer4.0.bn2.weight
+```
+
+| test | batches | seeds | statistic | shift |
+|---|---|---|---|---|
+| **HALF 1** (`cdep1`, 193 / 195.6) | `ciso1` -> `cdep1` | {21,22,23} -> {24,25,26} | `ONE` contrast `D_ONE` | +41.4693 -> **+41.4747** = **+0.0053 pp** |
+| | | | `ISO` arm level | 70.2113 -> 70.0440 = **-0.1673 pp** |
+| **HALF 2** (`ciso2`, 196) | `ciso1` -> `ciso2` @100 | {21,22,23} -> {31,32,33} | `ISO` contrast `D_ISO` | +46.9307 -> **+46.8453** = **-0.0854 pp = -0.11 SE** |
+
+Three disjoint seed blocks, byte-identical partitions, and every shift **inside a fifth of a percentage
+point** against a 2-SE read bar of 1.5114.  **CONCORDANT ON BOTH HALVES.**  Registered BETWEEN-BATCH and
+**NON-GATING** — no `ciso1` arm enters any `ciso2` or `cdep1` contrast, and none did here.
+
+**THE DEPENDENCY, WHICH NO TRACK STATED AND WHICH I VERIFIED MYSELF.**  Half 2 is read **in-run**, from epochs
+95-99 of 250-epoch runs.  That is a valid 100-epoch reading **only if nothing in the training loop depends on
+`num_epochs`** — otherwise it is a different experiment wearing the same label.  `196` asserts a "guard 4h"
+proved this; I did not take that on trust and checked the **live** `train.py` at
+`/home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10/train.py`
+(sha256 `3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7`):
+
+* `num_epochs` / `num-epochs` occurs on **exactly two lines** — line 42, the `argparse` declaration, and line
+  135, `for epoch in range(args.num_epochs)`.  It is a **loop bound and nothing else**.
+* A grep for `lr_scheduler|scheduler|cosineanneal|steplr|onecycle|lambdalr|warmup|total_steps|T_max` returns
+  **nothing at all**, and all 36 ENV lines read `SCHED=none` (`199.3`).
+
+**So the in-run control is genuine and Half 2 stands — but it is the ONLY replication in this campaign whose
+validity rests on a source-code property rather than on a re-run.**  That dependency should travel with the
+claim.  If a scheduler is ever added to `train.py`, Half 2 dies retroactively and Half 1 does not.
+
+**WHAT A DISCORDANCE WOULD HAVE MEANT, stated because it is what makes the test a test.**  A shift larger than
+the read bar, at byte-identical partitions and disjoint seeds, would **not** have invalidated any registered
+contrast — every one of them is within batch by construction, which is precisely the discipline that protects
+them.  What it would have destroyed is the campaign's ability to carry **any** number across a batch boundary:
+`PREMISE-REPLICATES`, `ISO-REPLICATES`, `REPLICATES-CISO1`, every "re-derived from the corpus" figure in
+`docs/MASTER-TABLE.md`, and the cross-batch prose in the bottom line would all have become unquotable, and the
+corpus would have collapsed to 100-odd mutually incomparable islands.  Both halves came back inside 0.2 pp.
+**The corpus is quotable across batches.  That is the result, and it was not free.**
+
+### 199.10 WHAT THE CAMPAIGN CAN HONESTLY CLAIM IN A PAPER — **FOUR ANSWERS, AND ONE OF THEM IS NO**
+
+Asked separately, as instructed, and bluntly.
+
+**(1) THE DENOMINATOR — PUBLISHABLE AS-IS.  IT IS THE STRONGEST THING THE CAMPAIGN OWNS.**
+MetaOptimize does not beat a properly tuned non-meta baseline.  On the headline CIFAR-100 cell,
+`GAP_in` = **+5.699 pp = +18.80 SE** in ONE batch of 24 runs, and **every rung** of the tuned SGDm+cosine `lr`
+ladder beats the meta cell (smallest margin +3.480 pp).  On CIFAR-10 the deficit is **-1.807 pp** on the
+PRIMARY `plateau5` and flat at 1.8-2.0 pp across config-matched 100 / 300 / 600-epoch cells, so the
+long-horizon defence is closed as a clean negative.  The honest counterweight is stated and survives: against
+the **fixed-step** baseline the parent paper actually used, MetaOptimize **wins** by +1.551 pp (t +12.2).
+Nothing in cycle 150 touches any of this.  **The one thing a referee will find:** fairness flaw 3 — the parent
+paper's own **`AUGMENT=0`** setup — has been OPEN since cycle 13, and the only `AUGMENT=0` runs in the corpus
+(`PP-*`) were submitted against a standing rule, carry no probe directory, and may not be pooled.  That is a
+cheap batch that 150 cycles have not run, and it is the last fairness objection with any teeth.
+
+**(2) THE GRANULARITY GAP — PUBLISHABLE, WITH ONE QUALIFIER THAT MUST TRAVEL WITH IT, AND CYCLE 150
+STRENGTHENED IT.**  `cvg1` (194) put the scalar->layerwise gap **off ResNet** for the first time:
+**+31.2687 pp = +65.42 SE** on `VGG11_bn_c100`, a plain BN conv stack with **no residual addition anywhere**,
+TRAIN agreeing at +64.1587, all gates clean.  The corpus is no longer 100 % ResNet.  Two constraints:
+`VGG11_bn` is **non-RESIDUAL, not non-BatchNorm** — nothing here speaks to a network without BatchNorm; and
+the **accuracy-reversal framing is dead** — `hz9` showed that with each arm at its own optimal `ms` the
+epoch-10-to-40 trend runs the other way, so no granularity sentence may be written without the
+"**at a shared `ms=1e-3`**" qualifier.  `198` declines to run a RULE 11 ladder on VGG on the argument that
+mistuning can only **suppress** a gap, never manufacture one, which makes +31.2687 a valid **lower bound**.
+**I have checked that argument and it is sound**, so the refusal is correct and the claim is a bound, not an
+estimate — write it that way.
+
+**(3) THE ISOLATION — *NOT* PUBLISHABLE AS ANYONE HAS BEEN WRITING IT.  THIS IS THE BLUNT ONE.**
+The measurement is real and large: three tensors, 0.014 % of the parameters, carry the arm from floor to
+ceiling; identity is now excluded from depth (`cdep1`); it holds at 2.5x horizon with `RHO` = 0.998 (`ciso2`).
+But **three limits bind it simultaneously, and each alone is enough to sink a mechanism claim**: the
+**magnitude** confound is *architecturally unreachable* on `ResNet18_c100`, so "those tensors" cannot be
+separated from "the three largest terms"; the line is **100 % ResNet** and VGG's own probe records nominate a
+carrier set of **cardinality ONE** (`bn8.weight`), so the **tensor list does not transfer even in
+cardinality**; and the registered **freedom** gate has now failed at **both** 100 and 250 epochs.
+**What IS publishable, and it is a genuine result:** *a 512-parameter subset of a step-size partition
+determines whether the optimiser reaches the layerwise ceiling or the scalar floor, and controls matched on
+depth, normalisation-layer class, width and isolated numel do not reproduce it.*  **What is NOT publishable:**
+"these three BatchNorm scales are the mechanism", or any sentence pairing the VGG gap replication with the
+ResNet isolation.  `197.8` marks those two as claims that must never travel together, and that marking is
+correct and load-bearing.  `cvi1` (`198`) attacks exactly the scope leg and is the right next batch — but it
+is **registered, not run**, and until it lands the paragraph above is the ceiling.
+
+**(4) THE CUT-POSITION RESULT — PUBLISHABLE, AND UNTOUCHED BY THIS CYCLE.**
+`cpk1` localised the granularity effect to a **single step, `k* = 49`**, and it was replicated at a
+**772-epoch converged budget on fresh seeds** (`cpk2` / `cpk3`).  Group **COUNT** and size-**BALANCE** were
+both independently disqualified as the operative variable (`cbl1`, `in489g2` — the second by a mirror control
+a submitting agent added beyond its brief).  This is the cleanest localisation the campaign owns and it does
+**not** depend on the isolation line at all.  Its only limit is the same ResNet scope caveat, which `cvi1`
+does **not** address — `cvi1` tests the isolation off ResNet, not the cut position.  **A cut-position
+replication on VGG has never been registered and would be cheap.**
+
+**THE ONE-SENTENCE VERSION.**  The paper the corpus currently supports is a **negative result with a sharp
+localisation attached**: MetaOptimize loses to a tuned baseline by a margin that is large, replicated and
+horizon-stable; the granularity of its step-size partition matters enormously and now demonstrably off ResNet;
+and the effect localises to a single cut and a tiny parameter subset — **whose mechanism the campaign has
+measured thoroughly and cannot yet name.**
+
+### 199.11 STANDING CONSTRAINTS, DISCHARGED ONE BY ONE
+
+* **RULE 16 — no registered file edited.**  `git diff` over `analysis/`, `bin/`, `tests/` and `patches/` is
+  **EMPTY** for this entry: zero modifications, zero deletions, **zero additions**.  Every parser I wrote lives
+  outside the repo, in the session scratchpad and in `/tmp` on `alice2`.  `argsline_guard.py` and
+  `c73_mastertable_check.py` were run unedited at their registered sha256s; `cIS2` is frozen and was run
+  unedited; `cVI1` was not run at all (it has no data).
+* **RULE 20 before any number.**  `199.2` and `199.3` precede `199.5` in this file and preceded it in
+  execution.  **36 of 36.**
+* **`plateau5` PRIMARY, from the raw `.out`.**  The CSV `plateau` column and `best_test` are read **nowhere**
+  in this entry.  **TRAIN reported beside TEST at every arm** (`199.5`).
+* **BATCH is the unit of replication.**  Every contrast in `199.5` and `199.8` is within batch.  The two
+  cross-batch numbers in `199.9` are explicitly labelled BETWEEN-BATCH and NON-GATING.
+* **Attacked my own result.**  `199.1` leads with a defect neither track caught **and which my own re-run of
+  the registered checker could not detect**; `199.5` corrects `196` twice, in my own favour neither time;
+  `199.9` names a dependency that `196` asserted and I verified against live source.
+* **Nothing quoted, everything re-derived.**  Three code paths agree on the arm means; the spec strings, the
+  manifest arithmetic, the seed freshness, the `sacct` census and the `train.py` inertness were all read from
+  the record.
+* **`paper/` untouched:** `git status --porcelain -- paper/` is **empty**.  `paper/paper.tex` and
+  `paper/DRAFT-v4.md` were not opened.
+* **`analysis/c98_reproduce.py` exit code, reported AS-IS: `1`.**  Expected, inherited, author scope.  **NOT
+  fixed.**  Its own tail explains the scope: 628 `chk()` assertion sites, 411 distinct quantity-numerals,
+  41.9 % coverage, "asserts the numbers that carry a claim, not every numeral the draft prints".
+* **No nested `claude -p`.**  **`alice` NOT CONTACTED** — every remote command in this entry ran on `alice2`
+  (`s5014158`) and was read-only apart from writing my own parser to `/tmp` there.  **Nothing submitted,
+  nothing cancelled, nothing requeued.**
+* **Numbering coordinated.**  I re-read the file immediately before writing and **took 199**, the next free
+  number after `198`.  Nobody's entry was renumbered.
+
+**COST OF THIS ENTRY: ZERO GPU-HOURS.**
+
+Next free number: **200**.
