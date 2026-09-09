@@ -23388,3 +23388,257 @@ partition manifest is measured on the **LIVE model** and written to `$WS/runs/cd
 `$WS/runs/cdep1-PARTITION-MANIFEST.txt`; guard 8 proves the scorer's **default** `--manifest` resolution finds
 it, so the documented one-argument invocation cannot be got wrong.  `cdep1-` is in `bin/PROTECTED.txt` on both
 hosts.  No nested `claude -p`.  `git add` restricted to this track's own paths.  Next free number: **189**.
+
+---
+
+## 189. TRACK C — **THE HARNESS IS ARCHITECTURE-AGNOSTIC; A NEW ARCHITECTURE COSTS ONE NAME AND ONE CLASS.**  `PATCH_VGGBN` ADDS `VGG11_bn` / `VGG11_bn_c100`, A PLAIN BATCHNORM CONV STACK WITH **NO RESIDUAL ADDITION**, PROVED ADDITIVE **BYTE FOR BYTE**; `cvg1` — THE CAMPAIGN'S **FIRST NON-ResNet BATCH** — IS REGISTERED AND LAUNCHED (6 jobs, ONE submission, RULE 21 margin **+415 s**).  **RE-DERIVED HERE: `187`'s THREE CARRIERS ARE *EXACTLY* THE 512-WIDE BN SCALES THAT FEED A RESIDUAL ADDITION, AND THE TWO NON-CARRIERS ARE *EXACTLY* THE TWO MID-BRANCH `bn1` SCALES — 3/2, NO EXCEPTIONS.**  **NOTHING LANDED; corpus 2,761 unchanged; NO `cvg1` NUMBER IS QUOTABLE.**
+
+### 189.1 THE SCOPING ANSWER — WHAT A NEW ARCHITECTURE ACTUALLY COSTS
+
+The task asked for an honest scoping first, and the scoping overturned its own premise.  Read on the live
+tree (`$WS/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10`):
+
+* **`train.py` (173 lines)** touches the network through **exactly one call**, `build_network(args.NN_name,
+  args.device)` at line 124.  There is no architecture logic anywhere else in it.
+* **`Optimizers/HF.py` (1,093 lines)** contains **no architecture logic at all**.  `init_meta` is driven
+  entirely by `[(name, p.data.size()) for name, p in net.named_parameters()]`; every granularity —
+  `scalar`, `layerwise`, `nodewise`, `nodewise1d`, `weightwise`, `chunk<K>`, `permnode<S>`, `[a,b,…]`,
+  `sets:<g>/<g>` — is derived from that list.  A grep for `resnet|ResNet|layer4|shortcut|62` over `HF.py`
+  returns **two** substantive hits, both in `polish_the_stepsize_groups`: the literal strings
+  `resnet18_blocks` → `[3,12,15,15,15,2]` and `resnet50_blocks` → `[3,30,39,57,30,2]`.  Both are reachable
+  only by passing those exact strings, and on a model whose tensor count differs they raise the file's own
+  `0/0` — loudly, which is correct.
+* **`load_data.py`** is dataset-only.  **`analysis/argsline_guard.py`** and **`bin/_lib_guards.sh`** contain
+  **no** tensor-count assumption (grep for `62` over both: zero hits).
+* The `62`-literals live only in *batch-specific scorers* (`cIS1`, `cTD1`, `cL1`, …), which RULE 16 forbids
+  editing anyway and which a new batch does not use.
+
+**So the briefing's worry list — "whether anything is hard-coded to ResNet structure (block counts, shortcut
+naming, the 62-tensor assumption in any scorer or guard), and what the `sets:` grammar needs" — resolves to
+*nothing needs changing*.**  `build_network.py` is a name dispatch; the whole cost is one `if` and one class.
+That is **hours, not days**, so under the task's own rule the deliverable is a build, not a refusal.
+
+### 189.2 WHY VGG — THE STRUCTURAL FACT THAT PICKS THE ARCHITECTURE, RE-DERIVED FROM THE LIVE MODEL
+
+Built `ResNet18_c100` on the live tree and listed `named_parameters()`: **62 tensors, 11,220,132 parameters**.
+The 512-wide 1-D `*.weight` tensors — *every* 512-wide BatchNorm scale in the model — are at 1-based
+**47, 50, 53, 56, 59**, confirming `187`.  Set that against the live `BasicBlock.forward`:
+
+```
+out = F.relu(self.bn1(self.conv1(x)))
+out = self.bn2(self.conv2(out))
+out += self.shortcut(x)
+out = F.relu(out)
+```
+
+| idx | name | `187` verdict | position |
+|----|------|------|------|
+| 47 | `layer4.0.bn1.weight` | **not** a carrier | mid-branch, behind a ReLU |
+| 50 | `layer4.0.bn2.weight` | **CARRIER** | summand of block 0's add |
+| 53 | `layer4.0.shortcut.1.weight` | **CARRIER** | the *other* summand of block 0's add |
+| 56 | `layer4.1.bn1.weight` | **not** a carrier | mid-branch, behind a ReLU |
+| 59 | `layer4.1.bn2.weight` | **CARRIER** | summand of block 1's add |
+
+**The three carriers are exactly the 512-wide BN scales whose output is a summand of a residual addition;
+the two non-carriers are exactly the two that are not.  The split is 3/2 and it is perfect.**  This is a
+re-derivation from the live manifest plus the live source, not a quotation of any prose.
+
+It is recorded as a **hypothesis about the carrier set, not a result.**  Nothing in the corpus has ever
+manipulated residual structure, so *"the carriers are the BN scales that feed a residual add"* and *"the
+carriers are the deepest, widest BN scales"* are, **on a ResNet, the same measurement seen twice** — on a
+ResNet the deepest BN scales all feed adds.  A net with **no** residual addition separates them, and that is
+what selects the architecture.
+
+**The alternatives, and why each was rejected.**  A plain CNN with **no normalisation** removes BatchNorm and
+residuals at once and risks a training failure that floors both arms (forbidden).  An **MLP** removes
+convolutions, BatchNorm and residuals at once, so the finding is not even *statable* on it — no BN scales
+exist to isolate.  A **small ViT** keeps residual additions and swaps in LayerNorm: interesting, but it does
+not test the residual reading, it is the largest build, and a from-scratch ViT at 100 epochs has
+unpredictable arm levels.  **`VGG11_bn` keeps convolutions, keeps BatchNorm and keeps a 512-wide deepest
+stage — so the finding stays statable and falsifiable — and has no residual addition.**
+
+**THE DECLARED CONFOUND, WRITTEN BEFORE ANY RUN EXISTED.  THIS IS *NOT* A ONE-VARIABLE ABLATION.**  VGG11_bn
+differs from ResNet18 in depth, channel schedule and downsampling as well as in the residual connection.  It
+is a *different family that happens to lack residual additions*.  A null does **not** license "residuals
+cause the gap"; a positive does **not** license "residuals are irrelevant".  The clean one-variable object —
+ResNet18 with `out += self.shortcut(x)` deleted — is **deliberately not built**, and is priced in 189.7.
+
+### 189.3 `PATCH_VGGBN` AND ITS ADDITIVITY PROOF
+
+`patches/patch_vggbn.py` patches **`build_network.py` only**; `HF.py`, `train.py`, `load_data.py` and
+`build_optimizer.py` are untouched, and guard 4b2 asserts `PATCH_VGGBN` appears nowhere in `HF.py`.  Two
+**pure insertions**: REGION A, two `if network_name == …` returns after the `ResNet18_tin` dispatch; REGION B,
+`VGG_CFG11` / `_vgg_make` / `class VGG_bn`, appended at end of file.  **No existing line is edited.**
+
+`tests/test_vggbn.py` proves that rather than asserting it — **68 checks, ALL PASS on the live tree**:
+
+* **V0f** deletes the two inserted regions by their own markers and reproduces the pre-patch file **byte for
+  byte**: `stripped 11806 bytes, pre 11806 bytes`.
+* **V1** builds **all eleven** corpus `network` values plus `M1`, `M2`, `ResNet18_soft`, `ResNet152` and two
+  deliberate typos on **both** sides and compares `named_parameters()` **name and shape, elementwise, in
+  order** (the list `init_meta` consumes *positionally*) plus total parameter count — or an identical
+  exception type.  `resnet18` (lowercase, a legacy corpus label) raises `ZeroDivisionError` on both sides.
+* **V1b** compares **initial weights bitwise** under a fixed seed for `ResNet18` and `ResNet18_c100`, so an
+  inserted RNG draw could not hide.
+* **V2–V6** pin the new model: **26 tensors, 9,274,532 parameters**, `class == index mod 3` at **every** index
+  1..24 (reproducing ResNet18's triple structure), 17 one-D tensors, **four 512-wide BN scales at
+  14/17/20/23**, no `+=` and no `shortcut` anywhere (with a **non-vacuity** check that `BasicBlock.forward`
+  *does* contain `+=`), every granularity composing through the **live** `HF.py`, `resnet18_blocks` and
+  `[49,13]` **raising** on 26 tensors, and finite gradients on every tensor.
+
+**This matters beyond my own batch:** a concurrent batch (`cdep1`, `ciso2`) is running ResNet arms against the
+same live tree.  V1/V1b are what license patching it underneath them.
+
+**Two arithmetic errors of mine, caught by the test and corrected before commit and before any run:** I first
+wrote "18 one-D tensors" (it is **17** — 8 `bn.weight` + 8 `bn.bias` + `linear.bias`) and "9,229,002
+parameters" for the 10-class head (it is **9,228,362**).  Both were docstring/test constants; the load-bearing
+figures (26 tensors, 9,274,532) were right.  Disclosed here rather than silently fixed.
+
+### 189.4 `cvg1` — REGISTERED, THEN LAUNCHED
+
+`analysis/cVG1_vggbn_gap_score.py` sha256 `ca23c3507b0a64727c2851972f886c6c7b8d0a2dbf8064f07911d3577989a908`,
+identical in the worktree and in the copy staged on `alice2`.  Committed at `77b499d`, **2026-09-09T13:39:25
++02:00** (`git %ct` 1788953965); earliest `sacct` Submit **2026-09-09T13:46:20+02:00**.  **RULE 21 margin
++415 s.**  Second witness: `PROVENANCE.txt` `SUBMIT_UTC 2026-09-09T11:46:20Z`.
+
+Design: **2 arms × 3 seeds = 6 jobs, ONE submission.**  `k01` = `scalar` (m=1, in-batch floor anchor), `kL` =
+`layerwise` (m=26, in-batch ceiling anchor); `VGG11_bn_c100` / CIFAR-100, 100 epochs, batch 100, seeds
+{31,32,33}, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, ms `1e-3`, `alpha0` `1e-6`, `PROBE=100`, `PROBE_TENSOR=1`.
+
+**Only two arms, on purpose.**  This batch measures *levels* on an architecture whose levels have never been
+measured; registering isolation arms would mean predicting arm levels on an unmeasured net, which the standing
+floor prohibition forbids.  `PROBE_TENSOR=1` rides along at ~zero GPU cost so the follow-on isolation can
+nominate VGG's candidate carriers from **this** batch's per-tensor records — exactly as `ctd1`'s records fed
+`ciso1` — with no extra batch.
+
+**Every premise re-derived by `--selftest` (26 checks, 0 failures), `cvg1-` excluded from every reader** so
+each is invariant under this batch's own ingest: corpus 2,761 rows; **eleven** `network` values; **zero**
+rows failing `^[Rr]es[Nn]et`; `VGG11_bn_c100` absent from the corpus; `SIGMA_NARROW` 0.585420 (df 71, 11
+cells, 82 members); and the six corpus scalar→layerwise gaps — ResNet18_c100/CIFAR100 **+40.371**,
+ResNet18_tin **+40.975**, ResNet10 **+19.585**, ResNet18 **+5.412**, ResNet34 **+3.139**, ResNet50 **+1.285**.
+
+### 189.5 A DISCLOSED DEPARTURE FROM THE `SIGMA_W = max(NARROW, WIDE)` PRECEDENT
+
+The precedent (`149`, `156`, `159`, `187`) takes the max of a narrow and a wide pooled estimator.  Re-derived
+here, that rule would pick **`SIGMA_WIDE` = 2.971730** (df 384, 105 cells).  **It is not used, and this is the
+disclosure.**  **98.92 % of `SIGMA_WIDE`'s total sum of squares — 3354.568 of 3391.173 — comes from a *single*
+cell:** ResNet18 / `scalar`, n=4, within-cell SD **33.439**, a **bimodal** cell in which some seeds escape the
+floor and some do not.  The next two contributors are 0.33 % and 0.22 %; the median of the 105 per-cell SDs is
+0.168297.  `SIGMA_WIDE` therefore estimates **bimodality, not seed noise**, and adopting it would set a 2.97 pp
+floor and make every bar below it vacuously easy.
+
+So `SIGMA_PRIOR := SIGMA_NARROW = 0.585420` — the cell family this contrast actually lives in — and bimodality
+is handled **separately and explicitly** by a `DIVERGED` gate on within-arm seed range.  Further, because
+VGG's seed noise has **never been measured**, the scorer does not trust the corpus alone:
+`SIGMA_USED = max(SIGMA_PRIOR, SIGMA_INBATCH)` with `SIGMA_INBATCH` pooled from `cvg1`'s own 6 runs (df 4),
+computed at score time.  `SE_ARM_DIFF = SIGMA_USED × sqrt(2/3)`; at the prior alone that is **0.477993 pp**.
+
+### 189.6 BARS, GATES AND THE FLOOR/CEILING PROOF — ALL FROZEN BEFORE LAUNCH
+
+`D = plateau5(kL) − plateau5(k01)`, both in-batch 3-seed means; `plateau5` = mean **test** accuracy over
+epochs 95–99 from the runs' own `.out`; **TRAIN printed beside TEST at every arm**; the CSV `plateau` column
+read nowhere.
+
+* **`GAP_BAR` = +10.0 pp = 20.92 SE_prior → `GAP-REPLICATES`.**  The CIFAR-10 corpus rows are
+  **ceiling-compressed** (both arms high-80s/low-90s; D from +1.285 to +19.585) — which is precisely why
+  `cvg1` runs CIFAR-100.  On the two **uncompressed** tasks the gap is +40.371 and +40.975; `GAP_BAR` is a
+  **quarter** of the smaller, and `--selftest` asserts that relation rather than trusting the literal.
+* **`NULL_BAR` = +2.0 pp = 4.18 SE_prior → `GAP-ABSENT`**; between them `GAP-PARTIAL`; `D ≤ −2.0`
+  `GAP-REVERSED`.  **`DIVERGED_BAR` = 5.0 pp** on within-arm seed range.
+* **Gates:** `G-SOUND` (6/6 `RUN_DONE`, 100 epoch lines, no traceback), **`G-FLOOR` (max arm mean ≥ 15.00 pp
+  against a 1.00 pp chance floor — under it the batch is a statement about the *harness*, stamps
+  `HARNESS-UNSOUND`, and licenses **no** gap claim)**, `G-CEIL` (≤ 90.00), `G-DIVERGE`, `G-STRUCT` (26
+  tensors / 9,274,532 params / ≥3 512-wide BN scales / no `shortcut` in any name, read from the batch's own
+  manifest), `G-ENV`.  A failed gate **suspends** the branch; it is not an adverse result.
+* **NO ARM IS PREDICTED AT OR NEAR THE FLOOR OR THE CEILING UNDER EITHER REGISTERED ACCOUNT.**  Under
+  *architecture-general*: `k01` ~20–25, `kL` ~55–70; margins over chance ≥ 19 pp and ≥ 54 pp, neither near
+  100.  Under *residual-specific*: both arms at a common L in 45–68, margin ≥ 44 pp.  The only route to a
+  floored batch is total training failure, which is exactly `G-FLOOR`'s job.
+
+### 189.7 WHAT THE FIRST NON-ResNet RESULT WILL DECIDE — REGISTERED IN ADVANCE
+
+* **`GAP-REPLICATES`** → the scalar→layerwise gap is **not a ResNet artefact**.  The campaign's central
+  phenomenon has external validity across architecture *families*; the scope objection is answered **for the
+  gap**, and the three-BN-scale isolation becomes a well-posed question on a second family — asked by the
+  follow-on, nominating carriers from this batch's `PROBE_TENSOR` records.  It also makes the
+  residual-specific account hard to hold in its strong form: this net has **no** residual-fed BN scales at
+  all, so whatever carries the gap there is something else, and ResNet's carrier set would be one
+  architecture's way of expressing a general mechanism.
+* **`GAP-ABSENT`** → the gap, and *a fortiori* the three-BN-scale result, is **architecture-specific** as far
+  as anything measured can tell — a real, publishable scope limit on the campaign's headline.  It **promotes**
+  the residual reading to leading candidate **without establishing it**: confound (i) family-not-variable and
+  confound (ii) RULE 11 mistuning (no argmax is located on VGG here, and mistuning can only *suppress* a gap)
+  are both live.  Registered next step: the **tuning bracket**, not a claim.
+* **`GAP-PARTIAL`** → present but attenuated; family and tuning unseparated; tuning bracket first.
+* **`GAP-REVERSED`** → unexpected under both accounts; report and stop.
+* **`HARNESS-UNSOUND`** → no architecture claim of any kind.
+
+**Priced follow-ons, named now so they are not invented later.**  (a) **`PlainNet18`** — ResNet18 with
+`out += self.shortcut(x)` deleted: the *clean one-variable* residual ablation, ~30 lines, 53 tensors, ~1 h of
+work plus ~9 GPU-h for a matched 2-arm batch; it is what would let a residual claim be made at all.  (b) the
+**VGG isolation batch** — isolate `{bn5,bn6,bn7,bn8}.weight` (indices 14/17/20/23) against the complement,
+`sets:1-13,15-16,18-19,21-22,24-26/bn5.weight,bn6.weight,bn7.weight,bn8.weight`, sizes `[22,4]`, already
+composed and asserted by `test_vggbn.py` V4 — **conditional on `GAP-REPLICATES`**.  (c) the **ViT/LayerNorm**
+arm, the largest build, unpriced until (a) and (b) report.
+
+### 189.8 AN INFRASTRUCTURE SMOKE, AND WHAT IT DOES **NOT** SAY
+
+Before spending the batch I ran **one** 3-epoch job under the prefix `vggsmoke-` — **not** `cvg1-`, never to
+be ingested, contributing no number to any contrast (the `gn1smoke` precedent).  Job 4929325, `COMPLETED`,
+elapsed 00:04:17 on an RTX 2080 Ti.  It establishes: the harness runs end-to-end on GPU with
+`VGG11_bn_c100`; `RUN_DONE`; the ENV line carries `AUGMENT=1 BETA_CLIP=-15:-2.3026 PROBE=100`; and
+`PROBE_TENSOR: on every=100 type=layerwise tensors=26` — the exact line `cVG1`'s regex requires, and one that
+its `--selftest` proves it would **reject** at `tensors=62`.
+
+Its accuracies were **1.01 / 1.04 / 1.02 %** — chance on CIFAR-100.  **That is not evidence of anything about
+`G-FLOOR`, and it must not be read as such.**  Checked against a ResNet reference (`ciso1-k62-s21`, a run that
+*ends* at 68.21 % test): epochs 0–3 read **1.03 / 1.01 / 1.02 / 1.11 %**, and it does not reach 3 % until
+epoch 10 or 32 % until epoch 20.  With `alpha0` = 1e-6, beta starts at log(1e-6) = −13.8155 and Lion moves it
+by at most 1e-3 per step, so ≥11,500 steps ≈ **23 epochs** are needed merely to reach the clip — **chance at
+epoch 3 is the expected behaviour of this harness for every architecture.**
+
+**A cost correction.**  `bin/cVG1_vggbn_smoke.sh`'s comment budgets "≤ 5 GPU-hours", reasoning that VGG is
+cheaper in FLOPs.  Measured, VGG runs at ~50 s/epoch against ResNet18_c100's ~48 s (`ciso1-k62-s21`: 81 min
+for 100 epochs), so **6 × ~1.5 h ≈ 9 GPU-hours** is the honest figure, bounded by `WALL 03:00:00 × 6 = 18
+GPU-h`.  The stated *bound* was right and `WALL` retains ~2× margin over the ~90-min expectation; the point
+estimate was optimistic.  Corrected here rather than by editing a committed, registered launcher.
+
+### 189.9 STATUS, AND THE ONE THING NOT YET DONE
+
+**6/6 jobs accepted by Slurm**, ids 4929673–4929678, all `PENDING (Priority)` behind the concurrent tracks'
+24 pending jobs; expected completion ~7–8 h.  **`cvg1-` appended to `bin/PROTECTED.txt`.**
+
+**RULE 20 post-launch is `UNVERIFIED` — not passed, not failed.**  `guard_postlaunch` found no `cvg1` `.out`
+inside its window because nothing had started, and none exists yet.  The pre-submission RULE 20 check passed
+on all 6 composed lines (`guard 6: 6 composed command lines, 0 failed`), and the dry run printed every line
+with no repeated flag.  **The outstanding audit, to be run once any `cvg1` job has started:**
+
+```
+export METAOPT_WS=/home/s5014158/metaopt
+python3 analysis/argsline_guard.py $METAOPT_WS/runs --name cvg1- --batch-consistency \
+        --vary stepsize-groups --vary seed --vary run-name
+grep -h '^ENV:' $METAOPT_WS/runs/cvg1-*.out | sed 's/ PROBE_DIR=[^ ]*//' | sort | uniq -c   # ONE line, ×6
+grep -h '^PROBE_TENSOR:' $METAOPT_WS/runs/cvg1-*.out | sed 's/ dir=.*//' | sort | uniq -c   # scalar ×3, layerwise ×3
+```
+
+Score **only** at 6/6 `RUN_DONE`, through the documented one-argument invocation, unedited:
+`python3 analysis/cVG1_vggbn_gap_score.py $METAOPT_WS/runs`.
+
+### 189.10 A BRIEFING CORRECTION
+
+The cycle-147/148 briefing states the corpus architectures as "ResNet18 1854, ResNet18_c100 518, ResNet34 141,
+ResNet10 110, ResNet50 67, resnet18 26" — **six** values, 2,716 rows.  There are **eleven**, 2,761 rows: it
+omits `ResNet18_gn` 17, `ResNet10_c100` 9, `ResNet18_tin` 9, `ResNet34_c100` 9, `ResNet101` 1 = **45 rows**.
+The six counts it *does* give are each exact, and its **headline claim — all 2,761 rows are ResNet — is
+TRUE**, re-derived here (zero rows fail `^[Rr]es[Nn]et`).  Only the enumeration was short.  Noted because
+`ResNet18_gn` is the nearest prior art to this track: it varies the *normaliser* (BN→GroupNorm) within
+ResNet — but its 17 rows are **CIFAR-10 `chunk777`/`nodewise` only, with no `scalar` and no `layerwise` arm**,
+so **BN→GN has never been tested at the scalar-vs-layerwise contrast**, and it does not overlap `cvg1`.
+
+**ZERO GPU spent on analysis this entry; `cvg1` itself is budgeted at ~9 GPU-h (bound 18).**  `paper/`
+untouched — `git status --porcelain -- paper/` empty.  **RULE 16**: `git diff` over `analysis/ patches/
+tests/ bin/` for this entry is **additions only** — four new files, plus one appended line in
+`bin/PROTECTED.txt`; no pre-existing scorer and no `analysis/argsline_guard.py` was edited.  **plateau5
+primary** throughout; the CSV `plateau` column read nowhere; `best_test` used nowhere.  No nested `claude -p`.
+`git add` restricted to this track's own paths — a concurrent batch's untracked `cdep1`/`ciso2` files were
+left untouched.  Next free number: **190**.
