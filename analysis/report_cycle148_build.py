@@ -45,19 +45,19 @@ def chart_cutpos():
     p.append(f'<text transform="translate(16,{(y0+y1)/2:.1f}) rotate(-90)" class="axtitle ax-c">plateau5  (%)</text>')
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Test accuracy against cut position">' + "".join(p) + '</svg>'
 
-# ============ CHART 2 : isolation ============
+# ============ CHART 2 : isolation, cdep1's six arms ============
 def chart_iso():
     rows = [
-        ("layerwise",            "m = 62 &#183; every tensor free",        69.0273, 98.9733, "hi"),
-        ("ISO",                  "[59,3] &#183; 3 carriers &#183; 1,536 p", 70.2113, 94.2800, "win"),
-        ("ONE",                  "[61,1] &#183; tensor 50 &#183; 512 p",    64.7500, 83.5500, "win"),
-        ("CTRL",                 "[59,3] &#183; layer-2 twins &#183; 1,536 p", 23.2173, 23.1867, "null"),
-        ("scalar",               "m = 1 &#183; one step size",              23.2807, 23.1767, "lo"),
+        ("ISO",    "[59,3] &#183; the 3 carriers &#183; 1,536 p",      70.0440, 94.1640, "win"),
+        ("k62",    "m = 62 &#183; every tensor free",                  69.1560, 98.8947, "hi"),
+        ("ONE",    "[61,1] &#183; tensor 50 alone &#183; 512 p",       64.8267, 83.4640, "win"),
+        ("DEPTH",  "[59,3] &#183; matched, no carrier &#183; 1,536 p", 23.5207, 23.5353, "null"),
+        ("DEPTH2", "[60,2] &#183; class-pure &#183; 1,024 p",          23.4480, 23.4913, "null"),
+        ("k01",    "m = 1 &#183; one step size",                       23.3520, 23.4707, "lo"),
     ]
-    W,H = 760, 300; L,R,T,B = 178, 66, 26, 40
+    W,H = 760, 340; L,R,T,B = 196, 66, 26, 42
     x0,x1 = L, W-R
-    vmax = 100.0
-    X = lambda v: lin(v,0,vmax,x0,x1)
+    X = lambda v: lin(v,0,100.0,x0,x1)
     band = (H-T-B)/len(rows)
     p=[]
     for v in range(0,101,20):
@@ -72,8 +72,8 @@ def chart_iso():
         p.append(f'<rect x="{x0:.1f}" y="{yc+3:.1f}" width="{max(X(te)-x0,1):.1f}" height="{h}" rx="1.5" class="bar bar-{kind}"/>')
         p.append(f'<text x="{X(te)+8:.1f}" y="{yc+12.5:.1f}" class="val">{fmt(te,2)}</text>')
         p.append(f'<text x="{X(tr)+8:.1f}" y="{yc-3.5:.1f}" class="val val-dim">{fmt(tr,2)}</text>')
-    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-6:.1f}" class="axtitle ax-c">accuracy (%) &#8212; upper bar train, lower bar plateau5 test &#183; 3 seeds each, one batch</text>')
-    return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Isolation arms">' + "".join(p) + '</svg>'
+    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-6:.1f}" class="axtitle ax-c">accuracy (%) &#183; upper bar train, lower bar plateau5 test &#183; cdep1, 3 seeds per arm, one batch</text>')
+    return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="The cdep1 isolation arms">' + "".join(p) + '</svg>'
 
 # ============ CHART 3 : denominator ============
 def chart_denom():
@@ -179,8 +179,40 @@ def chart_layer4():
     p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-8:.1f}" class="axtitle ax-c">mean |L&#7522;| on pinned records &#183; log scale &#183; the term the Lion sign consumes</text>')
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Layer-4 BatchNorm scales by meta-gradient magnitude and residual role">' + "".join(p) + '</svg>'
 
+
+# ============ CHART 6 : the gap on two architecture families ============
+def chart_arch():
+    fams = [
+        ("ResNet-18",  "62 tensors &#183; 11.22 M params &#183; residual adds",  23.3520, 69.1560, 45.804, "cdep1 &#183; 60.6 SE"),
+        ("VGG11-bn",   "26 tensors &#183; 9.27 M params &#183; no residual add",  35.0173, 66.2860, 31.269, "cvg1 &#183; 65.4 SE"),
+    ]
+    W,H = 760, 260; L,R,T,B = 172, 128, 30, 46
+    x0,x1 = L, W-R; y0,y1 = T, H-B
+    X = lambda v: lin(v,0,100,x0,x1)
+    band = (y1-y0)/len(fams)
+    p=[]
+    for v in range(0,101,20):
+        p.append(f'<line x1="{X(v):.1f}" y1="{y0-8:.1f}" x2="{X(v):.1f}" y2="{y1:.1f}" class="grid"/>')
+        p.append(f'<text x="{X(v):.1f}" y="{y1+18:.1f}" class="ax ax-c">{v}</text>')
+    for i,(name,sub,sc,la,d,note) in enumerate(fams):
+        yc = y0 + band*i + band/2
+        p.append(f'<text x="{L-16:.1f}" y="{yc-2:.1f}" class="rowname ax-r">{name}</text>')
+        p.append(f'<text x="{L-16:.1f}" y="{yc+13:.1f}" class="rowsub ax-r">{sub}</text>')
+        p.append(f'<rect x="{X(sc):.1f}" y="{yc-9:.1f}" width="{max(X(la)-X(sc),1):.1f}" height="18" rx="2" class="gapband"/>')
+        for v,cls in ((sc,'bar-lo'),(la,'bar-hi')):
+            p.append(f'<rect x="{X(v)-2.5:.1f}" y="{yc-13:.1f}" width="5" height="26" rx="1" class="bar {cls}"/>')
+        p.append(f'<text x="{X(sc):.1f}" y="{yc-19:.1f}" class="rowsub ax-c">scalar {fmt(sc,1)}</text>')
+        p.append(f'<text x="{X(la):.1f}" y="{yc-19:.1f}" class="rowsub ax-c">layerwise {fmt(la,1)}</text>')
+        p.append(f'<text x="{x1+12:.1f}" y="{yc+1:.1f}" class="note">+{fmt(d,2)} pp</text>')
+        p.append(f'<text x="{x1+12:.1f}" y="{yc+16:.1f}" class="rowsub">{note}</text>')
+    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-8:.1f}" class="axtitle ax-c">plateau5 (%) &#183; CIFAR-100, 100 epochs &#183; each gap measured within its own batch</text>')
+    return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="The granularity gap on ResNet and VGG">' + "".join(p) + '</svg>'
+
+
 # ---------- content tables ----------
 HOLDS = [
+ ("It is those tensors, not that depth","Isolating three <code>layer4</code> BatchNorm parameters matched to the carriers on group sizes, isolated numel (1,536 <em>exactly</em>), width, stage and normalisation-layer membership &#8212; but containing no carrier &#8212; recovers <strong>0.36 %</strong> of the gap. <code>&#916;_ID = +46.52 pp = +61.56 SE</code>. Every seed clears the bar alone.","cdep1","18 runs, 6 arms, fresh seeds {24,25,26}","188, 193"),
+ ("The gap is not a ResNet artefact","On <code>VGG11_bn_c100</code> &#8212; a plain BatchNorm conv stack with <em>no residual addition anywhere</em> &#8212; scalar&#8594;layerwise is <strong>+31.27 pp = +65.42 SE</strong>. The corpus is no longer 100 % ResNet.","cvg1","6 runs, first non-ResNet batch in the campaign","189, 194"),
  ("Cut position beats group count","At m = 2, <em>where</em> the 62 tensors are split moves test accuracy by 25.07 pp; adding groups does not. Argmax <code>k* = 49</code>.","cpk1 / cpk2 / cpk3","39+18+21 runs, 3 fresh-seed batches, 100 &amp; 772 ep","158, 161"),
  ("The cut-position peak survives the horizon","Re-run at 772 epochs on fresh seeds {3,4,5} and again on {6,7,8}: the argmax does not move. The forecast predicted three rank swaps; zero occurred.","cpk2 / cpk3","772 ep &#183; converged budget","156, 158, 161"),
  ("The gap survives tuning (RULE 11)","Each arm at its <em>own</em> optimal meta step size, the scalar&#8594;layerwise gap goes 47.46 &#8594; 35.29 pp. Ratio 0.7436. It is not a distance-from-optimum artefact.","cru1","60 runs, 10 rungs &#215; 2 granularities","174"),
@@ -207,13 +239,11 @@ CAND = [
  ("14","the reduction &#8212; <code>crn1</code>","LIVE","<code>COMPOSITION-OPERATIVE</code> on one clean pair; the null is excluded on all three","169, 173"),
  ("15","H-DISAGREE","DEAD","argmax at k = 1, &#961; = &#8722;0.05","179"),
  ("16","H-DOMINATE","DEAD","dead as named; element statistic does not exist on disk","181, 184, 186"),
- ("17","H-ISOLATE &#8212; <code>ciso1</code>","LIVE","<code>UNRESOLVED-PARTIAL</code>; two arms in flight to close it","185, 187"),
+ ("17","H-ISOLATE &#8212; <code>ciso1</code> / <code>cdep1</code>","LIVE","Supported on the identity-vs-depth leg (<code>IDENTITY-OPERATIVE</code>). Magnitude leg architecturally unreachable; horizon leg in flight.","185, 187, 193"),
 ]
 
 RUNNING = [
- ("cdep1","<strong>18 jobs</strong> &#183; 6 arms &#215; seeds {24,25,26} &#183; 100 ep. Isolates {47, 48, 56} at [59,3] &#8212; matched to ISO on group size, isolated numel (1,536 <em>exactly</em>), tensor width and depth, with no carrier. Plus DEPTH2, the class-pure two-tensor variant.","Identity vs depth. Primary is <code>&#916;_ID = ISO &#8722; DEPTH</code>, bounded in neither direction &#8212; not <code>D_DEPTH</code>, which is predicted <em>on</em> the floor and so could not disagree with the account predicting it.","188"),
- ("ciso2","<strong>12 jobs</strong> &#183; 4 arms &#215; seeds {31,32,33} &#183; <strong>250 ep</strong>, horizon derived from the measured descent, not chosen round. Spec strings byte-identical to <code>ciso1</code>&#8217;s. The 100-epoch control is read in-run and paired.","Whether the rescue is a regime or a ~68-epoch delay. <code>RHO = D_ISO@250 / D_ISO@100</code>. Survival bar 0.80 is corpus-anchored: it exceeds the best rescue <em>any</em> two-group partition of this cell has produced.","190"),
- ("cvg1","<strong>6 jobs</strong> &#183; scalar vs layerwise on <code>VGG11_bn_c100</code> &#183; 100 ep. <strong>The campaign&#8217;s first non-ResNet batch</strong> &#8212; 26 tensors, 9,274,532 params, BatchNorm kept, residual additions gone.","Whether the scalar&#8594;layerwise gap exists off ResNet at all. <code>GAP-REPLICATES</code> answers the scope objection for the gap; <code>GAP-ABSENT</code> is a real, publishable scope limit on the headline.","189"),
+ ("ciso2","<strong>12 jobs</strong> &#183; 4 arms &#215; seeds {31,32,33} &#183; <strong>250 epochs</strong>, horizon derived from the measured descent slope. Spec strings byte-identical to <code>ciso1</code>&#8217;s; the 100-epoch control is read in-run and paired.","Whether the rescue is a regime or a ~68-epoch delay. Also carries the second, stronger half of the replication test at a longer horizon.","190"),
 ]
 
 def tr_holds():
@@ -252,17 +282,19 @@ def tr_running():
 CORPUS = [("CIFAR-10","2,190","ResNet-10 / 18 / 34 / 50 / 101"),
           ("CIFAR-100","536","ResNet-18_c100, ResNet-34_c100, ResNet-10_c100"),
           ("ImageNet-489","26","ResNet-18"),
-          ("Tiny-ImageNet","9","ResNet-18_tin")]
+          ("Tiny-ImageNet","9","ResNet-18_tin"),
+          ("CIFAR-100 &#183; VGG","6","<strong>VGG11_bn_c100</strong> &#8212; no residual additions")]
 
 def tr_corpus():
     return "".join(f'<tr><td class="t-claim">{a}</td><td class="c-num c-mono">{b}</td><td class="t-detail">{c}</td></tr>'
                    for a,b,c in CORPUS)
 
 HOUSE = [
- ("Account GPU budget is ~45.9 h across three concurrent batches","Each batch honoured its own ~30 h ceiling; no track could see the sum. Nothing is over-committed &#8212; two of the three can use <code>gpu-short</code>, an independent QOS pool &#8212; but a fourth batch should not launch on <code>alice2</code> before these drain.","warn"),
- ("RULE 20 coverage is 9 of 36","<code>cdep1</code> passes 9/9 on the unedited guard with a clean ENV audit. <code>ciso2</code> and <code>cvg1</code> have started no jobs, so the guard has nothing to read &#8212; <em>unverified</em>, not failed. No number from any of the three may be quoted before 36/36.","warn"),
+ ("Only <code>ciso2</code> is still spending","<code>cdep1</code> cost 16.25 GPU-h and <code>cvg1</code> 4.29. A fourth batch still should not launch until <code>ciso2</code> drains.","warn"),
+ ("RULE 20 coverage is 28 of 36","<code>cdep1</code> 18/18 and <code>cvg1</code> 6/6 both PASS at full coverage with clean ENV audits &#8212; their numbers became quotable only at that point. <code>ciso2</code> sits at 4/12: <em>unverified</em> on the rest, not failed. No <code>ciso2</code> number is quoted anywhere.","warn"),
+ ("<code>docs/MASTER-TABLE.md</code> went stale inside its own cycle","Brought current at entry 192 &#8212; 74 &#8594; 105 rows, header re-derived twice, bottom line rewritten onto the CIFAR-100 denominator. Then two batches ingested behind it. It now needs <code>cdep1</code> and <code>cvg1</code> rows. Reported rather than half-patched from a reconciliation entry.","warn"),
  ("Seeds {31,32,33} are used twice","<code>ciso2</code> and <code>cvg1</code> both reserved them. Both freshness claims were correct against the corpus; neither track could see the other. Different architectures, different prefixes, every contrast in batch &#8212; not a defect, but next free triple is {34,35,36}.","warn"),
- ("<code>docs/MASTER-TABLE.md</code> is 14 cycles behind","Compiled at 2,537 runs / cycle 129. Everything since &#8212; <code>cdn1</code>, <code>cru1</code>, <code>crn1</code>, <code>ctd1</code>, <code>ciso1</code> &#8212; lives only in <code>CORRECTIONS</code> 144&#8211;187.","warn"),
+ 
  ("<code>paper/paper.tex</code> predates this week entirely","5,173 lines, untouched since 2026-09-03. None of the isolation, denominator or RULE 11 work is in it.","warn"),
  ("<code>analysis/c98_reproduce.py</code> exits 1","Ten stale-numeral failures, inherited, author scope. Deliberately not fixed &#8212; fixing it would edit registered scorers.","warn"),
  ("Zero failed runs this week","Every submitted job in cycles 141&#8211;148 completed. No arm was lost to a harness fault; 0 tracebacks across the 36 in flight.","ok"),
@@ -494,20 +526,20 @@ footer {{
   <p class="eyebrow">
     <span>Hierarchical MetaOptimize</span><span class="dot">/</span>
     <span>ALICE &#183; Leiden</span><span class="dot">/</span>
-    <span>cycles 1&#8211;148</span><span class="dot">/</span>
-    <span>CORRECTIONS 191</span>
+    <span>cycles 1&#8211;149</span><span class="dot">/</span>
+    <span>CORRECTIONS 195</span>
   </p>
-  <h1>What 2,761 runs actually established</h1>
-  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Seven results hold.</strong> Nine died, including the one the project was named for. The strongest surviving finding is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap. Three batches are in flight to decide what that fact is about.</p>
+  <h1>What 2,785 runs actually established</h1>
+  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Nine results hold.</strong> Nine died, including the one the project was named for. The strongest is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap &#8212; and that it is those specific tensors, not merely three tensors at that depth. The gap now also reproduces on an architecture with no residual connections at all.</p>
 </header>
 
 <div class="rail">
-  <div class="stat"><span class="n">2,761</span><span class="k">runs</span></div>
-  <div class="stat"><span class="n">2,914</span><span class="k">GPU-hours</span></div>
-  <div class="stat"><span class="n">191</span><span class="k">corrections</span></div>
-  <div class="stat"><span class="n" style="color:var(--ok)">7</span><span class="k">results hold</span></div>
+  <div class="stat"><span class="n">2,785</span><span class="k">runs</span></div>
+  <div class="stat"><span class="n">2,935</span><span class="k">GPU-hours</span></div>
+  <div class="stat"><span class="n">195</span><span class="k">corrections</span></div>
+  <div class="stat"><span class="n" style="color:var(--ok)">9</span><span class="k">results hold</span></div>
   <div class="stat"><span class="n" style="color:var(--bad)">9</span><span class="k">results dead</span></div>
-  <div class="stat"><span class="n" style="color:var(--accent)">36</span><span class="k">jobs in flight</span></div>
+  <div class="stat"><span class="n" style="color:var(--accent)">12</span><span class="k">jobs in flight</span></div>
 </div>
 
 <section>
@@ -524,7 +556,7 @@ footer {{
 
 <section>
   <div class="sechead"><h2>Results that hold</h2><span class="seckey">each measured within one batch</span></div>
-  <p class="deck">Batch is the unit of replication in this campaign &#8212; F(62,85) = 5.47, p = 6.9e-13 &#8212; while seed is null, F(11,1976) = 0.152. Every comparison below is in-batch. Primary metric is <code>plateau5</code>, the mean of the last five test epochs.</p>
+  <p class="deck">Batch is the unit of replication in this campaign &#8212; F(62,85) = 5.47, p = 6.9e-13 &#8212; while seed is null, F(11,1976) = 0.152. Every comparison below is in-batch. Primary metric is <code>plateau5</code>, the mean of the last five test epochs. That claim was itself tested this week and held: the same intervention re-run in a fresh batch at disjoint seeds reproduced its contrast to five thousandths of a point.</p>
   <div class="tscroll"><table>
     <thead><tr><th></th><th>Finding</th><th>Evidence</th><th>Entry</th></tr></thead>
     <tbody>{tr_holds()}</tbody>
@@ -542,16 +574,20 @@ footer {{
 </section>
 
 <section>
-  <div class="sechead"><h2>1,536 parameters carry the gap</h2><span class="seckey">figure 2 &#183; CORRECTIONS 185, 187</span></div>
-  <p class="deck">A probe on the scalar trajectory found three <code>layer4</code> BatchNorm scales &#8212; <code>layer4.0.bn2.weight</code>, <code>layer4.0.shortcut.1.weight</code>, <code>layer4.1.bn2.weight</code>, 0.014 % of the model &#8212; carrying the Lion sign against the other 59 tensors on 944 of 944 pinned records. <code>ciso1</code> tested that causally: move exactly those three into their own step-size group and nothing else.</p>
+  <div class="sechead"><h2>1,536 parameters carry the gap</h2><span class="seckey">figure 2 &#183; CORRECTIONS 185, 187, 193</span></div>
+  <p class="deck">A probe on the scalar trajectory found three <code>layer4</code> BatchNorm scales &#8212; <code>layer4.0.bn2.weight</code>, <code>layer4.0.shortcut.1.weight</code>, <code>layer4.1.bn2.weight</code>, 0.014 % of the model &#8212; carrying the Lion sign against the other 59 tensors on 944 of 944 pinned records. <code>ciso1</code> tested that causally, and <code>cdep1</code> then asked whether it was those tensors or merely three tensors that deep. Both arms below are from <code>cdep1</code>, at seeds no earlier batch used.</p>
   <div class="figkey"><span><i class="k-tr"></i>train</span><span><i class="k-a"></i>test &#8212; layerwise ceiling</span><span><i class="k-b"></i>test &#8212; at the scalar floor</span></div>
   <figure>
     {chart_iso()}
-    <figcaption><b>ISO reaches the layerwise ceiling by freeing 1,536 of 11,220,132 parameters</b> &#8212; +46.93 pp over scalar, +62.10 SE, statistically indistinguishable from full layerwise (+1.18 pp = 1.57 SE). Their layer-2 structural homologues, isolated at identical group sizes, recover <b>nothing</b> (&#8722;0.06 pp). One tensor alone recovers +41.47 pp. ISO also reaches that ceiling with <b>4.6 pp less train accuracy</b> than layerwise &#8212; unexplained, and being measured now.</figcaption>
+    <figcaption><b>DEPTH is matched to ISO on group sizes, isolated numel, width, stage and layer type, and differs only in <em>which</em> <code>layer4</code> BatchNorm parameters are freed. It recovers 0.36 % of the gap.</b> Its class-pure variant recovers 0.21 %, so &#8220;the BatchNorm bias member spoiled the match&#8221; is dead in batch too (<code>&#916;_BIAS = +0.07 pp = +0.10 SE</code>). One tensor alone still rescues +41.47 pp, which kills the rival account that <em>any</em> partition other than ISO simply floors. ISO reaches the ceiling with <b>4.7 pp less train accuracy</b> &#8212; the signature replicates at fresh seeds and is still unexplained.</figcaption>
   </figure>
   <div class="callout">
-    <h3>What this does <em>not</em> yet establish.</h3>
-    <p>ISO and CTRL differ in tensor identity <em>and</em> network depth <em>and</em> isolated parameter count at once, so the design cannot say which is operative &#8212; ResNet-18 has exactly five 512-wide BatchNorm scales and all five are in <code>layer4</code>, so a depth-matched, size-matched, carrier-free control had to be built separately. That arm is running. The verdict stands at <code>UNRESOLVED-PARTIAL</code> until it lands.</p>
+    <h3>What this establishes, and what it still cannot.</h3>
+    <p>Depth is <strong>not</strong> the operative variable &#8212; that leg of the confound is closed. But the carriers are also ranks 1, 2 and 3 of 62 by meta-gradient magnitude, and the best carrier-free triple that exists on this network still carries <b>308&#215; less</b> mass. So <code>IDENTITY-OPERATIVE</code> means &#8220;not <em>any</em> three matched <code>layer4</code> BatchNorm parameters&#8221; &#8212; it does not separate tensor identity from term magnitude, and no batch on this architecture can. The horizon leg is still open; <code>ciso2</code> carries it.</p>
+  </div>
+  <div class="callout pos">
+    <h3>And it replicated.</h3>
+    <p><code>ISO</code> and <code>ONE</code> ran here with spec strings byte-identical to <code>ciso1</code>&#8217;s at disjoint seeds. The contrasts reproduce: <code>D_ISO</code> +46.93 &#8594; +46.69, <code>D_ONE</code> +41.4693 &#8594; +41.4747 &#8212; five thousandths of a point. First direct test of this campaign&#8217;s claim that batch, not seed, is the unit of replication, and it passed.</p>
   </div>
 </section>
 
@@ -589,6 +625,19 @@ footer {{
 </section>
 
 <section>
+  <div class="sechead"><h2>Off ResNet for the first time</h2><span class="seckey">figure 6 &#183; CORRECTIONS 189, 194</span></div>
+  <p class="deck">Until this week every one of the campaign&#8217;s runs was a ResNet. That was the objection every finding shared. <code>VGG11_bn_c100</code> keeps convolutions and keeps BatchNorm, and has no residual addition anywhere &#8212; which matters because on a ResNet &#8220;feeds a residual add&#8221; and &#8220;is the deepest, widest BatchNorm scale&#8221; are the same measurement seen twice.</p>
+  <figure>
+    {chart_arch()}
+    <figcaption><b>The gap survives the change of family at +31.27 pp = +65.42 SE.</b> The harness gate was checked before any architecture claim: the top arm clears chance by 65.29 pp, so this is a statement about VGG and not about the harness. Because meta step size was not tuned on VGG, +31.27 pp is a <b>lower bound</b>, not an estimate.</figcaption>
+  </figure>
+  <div class="callout">
+    <h3>The scope caveat lifts for the gap. It does not lift for the isolation.</h3>
+    <p>Two different claims, and they must not travel together. No isolation arm ran on VGG. And the probe records say the carrier set there has cardinality <strong>one</strong> &#8212; <code>bn8.weight</code>, 512 parameters, 0.0055 % of the model, carrying 0.58 of the meta-gradient mass and flipping the remainder sign on 1.0000 of pinned records, while the other three 512-wide BatchNorm scales flip <em>nothing</em>. What transfers is the <em>shape</em> of the mechanism &#8212; a small BatchNorm set carrying the vote, the large convolutions opposing it &#8212; not the set. That refutes the four-tensor arm registered in advance for VGG, before it was run.</p>
+  </div>
+</section>
+
+<section>
   <div class="sechead"><h2>Results that died</h2><span class="seckey">refuted, withdrawn or superseded</span></div>
   <p class="deck">Recording these is the point of the ledger. Roughly a dozen of my own claims were corrected in place this week, including three index-convention errors and one mass prediction that came out backwards.</p>
   <div class="tscroll"><table>
@@ -616,20 +665,20 @@ footer {{
 
 <section>
   <div class="sechead"><h2>Corpus</h2><span class="seckey">results/all_runs.csv</span></div>
-  <p class="deck">Every one of the 2,761 rows is ResNet &#8212; eleven <code>network</code> values, zero exceptions. That is the campaign&#8217;s single largest scope limit and the objection every tensor-level finding shares: &#8220;three <code>layer4</code> BatchNorm scales&#8221; is a claim about one architecture&#8217;s parameter list until it is shown elsewhere.</p>
+  <p class="deck">Until this week all 2,761 rows were ResNet. Six are now not &#8212; twelve <code>network</code> values, and the non-ResNet rows are exactly <code>cvg1</code>&#8217;s. The caveat is lifted for the gap and still stands, verbatim, on every tensor-level finding.</p>
   <div class="tscroll"><table>
     <thead><tr><th>Dataset</th><th>Runs</th><th>Architectures</th></tr></thead>
     <tbody>{tr_corpus()}</tbody>
   </table></div>
   <div class="callout pos">
-    <h3>It was never an infrastructure limit &#8212; and now it cannot be excused as one.</h3>
-    <p>Scoping the port found the harness is architecture-agnostic: <code>train.py</code> touches the network through one <code>build_network</code> call, <code>HF.py</code> derives every granularity from <code>named_parameters()</code> and holds no architecture logic, and neither the args guard nor the launcher library carries a tensor-count assumption. A new architecture costs one <code>if</code> and one class. <code>VGG11_bn_c100</code> is built, proved additive byte-for-byte, backward-compatible across all eleven existing network values, and launched. The caveat still stands on every finding until <code>cvg1</code> lands &#8212; but it is now measurable rather than structural.</p>
+    <h3>It was never an infrastructure limit &#8212; and it is no longer a limit at all for the gap.</h3>
+    <p>Scoping the port found the harness is architecture-agnostic: <code>train.py</code> touches the network through one <code>build_network</code> call, <code>HF.py</code> derives every granularity from <code>named_parameters()</code> and holds no architecture logic, and neither the args guard nor the launcher library carries a tensor-count assumption. A new architecture costs one <code>if</code> and one class. <code>VGG11_bn_c100</code> was built, proved additive byte-for-byte, verified backward-compatible across all eleven existing network values, launched and landed &#8212; in one cycle.</p>
   </div>
 </section>
 
 <section>
   <div class="sechead"><h2>Publication placement</h2><span class="seckey">assessed against the four-lens rubric</span></div>
-  <p class="deck">An honest read, not an encouraging one. The gap between these two columns is the mechanism &#8212; a confirmed causal account plus one non-ResNet architecture is roughly what moves the middle number.</p>
+  <p class="deck">An honest read, not an encouraging one. The middle number moved this week, but not to where it needs to be: <code>VGG11_bn</code> is non-<em>residual</em>, not non-<em>BatchNorm</em>, so the normalisation question the isolation result turns on is still untested.</p>
   <div class="venues">
     <div class="venue">
       <div class="vn">TMLR</div>
@@ -639,9 +688,9 @@ footer {{
     </div>
     <div class="venue">
       <div class="vn">ICML &#8212; cut-position paper</div>
-      <div class="vp" style="color:var(--warn)">10&#8211;15&#8202;%</div>
-      <div class="meter"><i style="width:13%;background:var(--warn)"></i></div>
-      <div class="vd">Rises to <strong>25&#8211;30&#8202;%</strong> with a confirmed mechanism <em>and</em> a non-BatchNorm architecture. Both are in flight.</div>
+      <div class="vp" style="color:var(--warn)">15&#8211;20&#8202;%</div>
+      <div class="meter"><i style="width:18%;background:var(--warn)"></i></div>
+      <div class="vd">Two of the three things that move this landed today: cross-family evidence for the gap, and the identity leg of the mechanism. Still missing &#8212; a normalisation family that is not BatchNorm, and any isolation result off ResNet.</div>
     </div>
     <div class="venue">
       <div class="vn">ICML &#8212; current manuscript</div>
@@ -661,7 +710,7 @@ footer {{
 </section>
 
 <footer>
-  Compiled from <code>results/all_runs.csv</code> at 2,761 rows and <code>docs/CORRECTIONS.md</code> at entry 191. HEAD <code>712ff65</code>.<br>
+  Compiled from <code>results/all_runs.csv</code> at 2,785 rows and <code>docs/CORRECTIONS.md</code> at entry 195.<br>
   Primary metric <code>plateau5</code>; the CSV <code>plateau</code> column is barred as primary and <code>best_test</code> is not a plateau.<br>
   Tensor indices are 1-based. Every comparison in-batch. Numbers re-derived for this report, not copied from prose.
 </footer>
