@@ -26599,3 +26599,161 @@ measured thoroughly and cannot yet name.**
 **COST OF THIS ENTRY: ZERO GPU-HOURS.**
 
 Next free number: **200**.
+
+---
+
+## 200. TRACK A1 — **`cvi1` IS LAUNCHED: ONE SUBMISSION, 12 JOBS, `4936668`–`4936679`, ALL ACCEPTED BY SLURM, 0 REJECTED, LAUNCHER EXIT 0.**  THE OPERATOR AUTHORISED IT; `bash bin/cVI1_vgg_isolate.sh --submit` WAS RUN **ONCE**, ON `alice2` (`s5014158`), AT 06:48:17Z.  **RULE 21 BY WALL CLOCK: SCORER COMMIT `980499c` `%ct` 1788993085 → EARLIEST `sacct` SUBMIT 1789022909 = A MARGIN OF 29,824 s (8 h 17 m 04 s).**  **POST-LAUNCH RULE 20 AT 2 OF 12 STARTED: BOTH PASS ON ARGS, ENV AND PROBE_TENSOR, UNDER THE UNEDITED GUARD AND AN INDEPENDENT PARSER; THE OTHER 10 (PENDING, Priority) ARE UNVERIFIED, NOT FAILED.**  **I LEAD WITH A STAGING GAP THE BRIEFING AND `198.8` BOTH UNDERSTATED: THE `alice2` MIRROR LACKED *FIVE* FILES THE LAUNCHER HARD-REQUIRES, NOT THREE, AND ITS CORPUS COPY WAS 36 ROWS STALE.**  **NOTHING WAS SCORED, NO EPOCH LINE WAS READ, NOTHING WAS CANCELLED, `alice` NOT CONTACTED.  CORPUS 2,797, UNCHANGED BY THIS ENTRY.**  THIS ENTRY TOOK NUMBER **200**; NEXT FREE **201**.
+
+### 200.1 THE CORRECTION FIRST: THE MIRROR NEEDED MORE THAN THE THREE NAMED FILES
+
+The briefing, like `198.8`, said the mirror at `$HOME/metaopt/hierarchical-metaoptimize` lacked the scorer, the
+launcher and `tests/test_vggbn.py`.  **That was true but incomplete.**  I hashed all 16 files the launcher and
+the post-launch/ingest path read, on both sides, before touching anything.  The mirror was **missing**:
+
+| file | read by | missing on mirror |
+|---|---|---|
+| `analysis/cVI1_vggiso_identity_score.py` | guard 1a/1c/4c'/8 | yes (named) |
+| `bin/cVI1_vgg_isolate.sh` | — | yes (named) |
+| `tests/test_vggbn.py` | guard 1a/1d3 | yes (named) |
+| `patches/patch_vggbn.py` | **guard 1a** | **yes — NOT named** |
+| `tests/test_probe_tensor_blockwise_cvi1.py` | **guard 1a** | **yes — NOT named** |
+| `analysis/args_repair.py` | the ingest (not the launch) | **yes — NOT named** |
+
+and two present files were **stale**: `results/all_runs.csv` at **2,762 lines** against the committed **2,798**
+(guards 0/2/2c and the scorer's `--selftest` fresh-seed check read it), and `bin/PROTECTED.txt` lacking
+`cvg1-` and `cdep1-`.  Staging only the three named files would have **aborted `--submit` at guard 1a** (fatal
+for `--submit`), and the fresh-seed guard would have run against a corpus missing 36 rows.  `198`'s clean dry
+run did not see this because it ran from the scratch stage `$HOME/cvi1_stage`, which **does** carry all of them.
+Nothing was harmed; the launcher's guards would have caught it.  It is recorded so the next staging does not
+repeat it.
+
+**What I staged.**  The six missing files plus the two stale ones, `scp -p` from the **committed** Mac tree at
+`5d31aea` (working tree clean).  The two overwritten mirror files were **backed up first**, not destroyed:
+`results/all_runs.csv.pre_cvi1_stage_2761` and `bin/PROTECTED.txt.pre_cvi1_stage`.  **After staging, all 16
+sha256 are identical Mac == mirror** (`diff` of the two hash lists is empty).  The scorer is
+**`86a2b80ffd1ea8907544bfc9d79fa0db3f7772c34fd7d70f1f98aa8fc17ea96a`** on both sides, = the registered sha;
+the launcher `4a37df9e…b8a5`; `argsline_guard.py` `81cea8b5…5388`, untouched.
+
+### 200.2 PRE-FLIGHT, ON THE LIVE CLUSTER TREE, BEFORE THE SUBMIT
+
+* **`tests/test_vggbn.py`** (documented `--pre build_network.py.pre_vggbn --post build_network.py --hf HF.py
+  --csv results/all_runs.csv`): **exit 0, 69 PASS lines, 0 FAIL, `ALL PASS`.**
+* **Scorer `--selftest`** (`--runsdir $WS/runs --csv results/all_runs.csv`): **exit 0, 58 PASS / 0 FAIL /
+  0 SKIP.**  The nomination section **ran** (`bn8.weight (idx 23) is RANK 1 by mean|L| mass`; `REMOVING bn8
+  ALONE flips the remainder…`), and its own fresh-seed check passed.
+* **Fresh seeds, three independent ways:** 0 of 2,797 corpus rows carry seed 41/42/43 (my own `csv.DictReader`
+  on the Mac); 0 `.out` under `$WS/runs` match `-s4[123]`; 0 `alice2` `sacct` job names end `s41|s42|s43`
+  since 2025-01-01.  `alice` was not queried (it is read-only and the corpus already carries its runs).
+* **THE OCCUPANCY / DWELL-TIME DEFECT OF `196` IS NOT IN `cvi1`'s PATH — VERIFIED, NOT QUOTED.**  I read
+  `score()` end to end.  Its gates are **G-STRUCT, G-SOUND, G-ENV, G-FLOOR, G-CEIL, G-DIVERGE** and nothing
+  else; **G-FLOOR is an ACCURACY floor** (max arm mean ≥ 15 pp, chance 1 pp), not a clamp floor.  The branch
+  map reads only `D_ISO`, `DELTA_ID` and `D_CTL`, all in pp of `plateau5`.  The strings `occup`, `dwell`,
+  `PIN_OCC` occur **nowhere** in the file, and `-15` occurs only inside the `BETA_CLIP` string `CLIP` and in
+  comments.  No step-size-magnitude or pin-time quantity enters any gate or branch.
+* **DRY RUN** on the live mirror, after staging: **0 `!!!` lines, 0 `GUARD FAIL`**; guards 0, 1c, 1c2, 1c3,
+  1d, 1d2, 1d3a, 1d3, 2, 2b, 2c, 3, 4a, 4b, 4c, 4e, 4c', 4, 4d, 4f, 4g, 5, 5a, 5b, `guard_parts_for_wall`, 8 all
+  printed passing (guard 1b prints its documented NOTE: the mirror is not a git checkout; RULE 21 is proved
+  below by wall clock).  **12 composed lines.**  My own mechanical check of those 12 lines (a separate Python
+  parse, not the launcher's pre-check): **no repeated flag** in any line; **12 distinct (arm, seed) cells, each
+  exactly once**; seeds **{41, 42, 43}**; each `--stepsize-groups` **byte-identical** to the scorer's `SPEC`
+  table read by `ast.literal_eval` (`scalar`, `layerwise`, `sets:1-22,24-26/bn8.weight`,
+  `sets:1-19,21-26/bn7.weight`); `--time=03:00:00`; `gpu-short` in `--partition`; `--export` exactly
+  `ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=…/probe_<run>`;
+  and after masking the per-run axes all 12 lines collapse to **one** template.
+* **A launcher quirk, disclosed:** `--dry-run` **exits 1 even when clean.**  Its last statement is
+  `[ "$FAIL" = 1 ] && { …; exit 2; }`, which evaluates false when `FAIL=0` and so becomes the script's exit
+  status.  It is not a guard failure; the log carries no `GUARD FAIL`.  The `--submit` branch does not end on
+  that line and exited 0.  **Not edited** (RULE 16 spirit; it is a registered launcher).
+
+### 200.3 THE SUBMISSION
+
+`nohup bash bin/cVI1_vgg_isolate.sh --submit` on `alice2`, queue **empty** immediately before (0 rows), 0
+`cvi1-*.out` on disk.  The launcher re-ran every guard (0 `!!!` lines in its log), printed **`12 jobs (ACCEPTED
+BY SLURM); 0 rejected`**, appended `cvi1-` to the mirror's `bin/PROTECTED.txt`, and **exited 0**.
+`$WS/runs/cvi1/PROVENANCE.txt` now reads **`MODE SUBMIT`, `SUBMIT_UTC 2026-09-10T06:48:28Z`**, HF sha
+`4732b74a…0cecd`, build_network sha `c7998883…ba77d` — **the same live shas `198`'s dry run recorded**.
+
+| job | run | Submit (sacct, epoch s) |
+|---|---|---|
+| 4936668 | cvi1-k01-s41 | 1789022909 |
+| 4936669 | cvi1-kL-s41 | 1789022909 |
+| 4936670 | cvi1-ISO-s41 | 1789022909 |
+| 4936671 | cvi1-CTL-s41 | 1789022909 |
+| 4936672 | cvi1-k01-s42 | 1789022909 |
+| 4936673 | cvi1-kL-s42 | 1789022909 |
+| 4936674 | cvi1-ISO-s42 | 1789022909 |
+| 4936675 | cvi1-CTL-s42 | 1789022909 |
+| 4936676 | cvi1-k01-s43 | 1789022909 |
+| 4936677 | cvi1-kL-s43 | 1789022909 |
+| 4936678 | cvi1-ISO-s43 | 1789022910 |
+| 4936679 | cvi1-CTL-s43 | 1789022910 |
+
+All 12 on `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, `--time=03:00:00`.  **Expected ~7–13 GPU-h; hard
+bound 12 × 3 h = 36 GPU-h.**
+
+### 200.4 RULE 21, BY WALL CLOCK
+
+* scorer commit: `git log -1 --format=%ct -- analysis/cVI1_vggiso_identity_score.py` → **`980499c`,
+  1788993085 = 2026-09-09T22:31:25Z** (`%cI` 00:31:25+02:00).
+* earliest Submit: `SLURM_TIME_FORMAT=%s sacct -X -o JobID,Submit` over the 12 ids → **4936668, 1789022909 =
+  2026-09-10T06:48:29Z** (`sacct`'s default display is the cluster's CEST, 08:48:29).
+* **margin = 1789022909 − 1788993085 = 29,824 s = 8 h 17 m 04 s.**  The scorer on the cluster at submit time
+  hashed to the committed sha (guard 1c printed it in the submit log).
+
+### 200.5 POST-LAUNCH RULE 20, AT THE COVERAGE THAT EXISTS
+
+Audited at **2026-09-10T06:53:31Z**: **2 of 12 started** (`4936668` cvi1-k01-s41 on node874, `4936669`
+cvi1-kL-s41 on node873); **10 PENDING (Priority)**, no `.out` yet; **0 tracebacks**.
+
+* **guard 7 (the launcher's own `guard_postlaunch`):** PASS against cvi1-k01-s41's own `ARGS:` line.
+* **`analysis/argsline_guard.py`, UNEDITED** (sha `81cea8b5…5388`), with the batch's declared axes as
+  documented `--vary` arguments: `--name cvi1- --batch-consistency --vary seed --vary run-name --vary
+  stepsize-groups --vary save-directory --strict` → **`2 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0
+  without an ARGS line`, `VERDICT: PASS`, exit 0.**
+* **SEPARATE ENV-LINE AUDIT** (BETA_CLIP and PROBE ride the runner's `ENV:` line): **ONE distinct line, ×2**,
+  carrying `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … SCHED=none … PROBE=100`.
+* **`PROBE_TENSOR:` lines** (PROBE_TENSOR rides the patch's own line): `type=scalar` ×1 (k01), `type=layerwise`
+  ×1 (kL), both `every=100 tensors=26 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` — the arm-correct
+  types.  The blockwise ×6 half of the expected `scalar ×3, layerwise ×3, blockwise ×6` is **UNVERIFIED**: no
+  ISO or CTL run has started.
+* **AN INDEPENDENT PARSER SHARING NO CODE WITH THE GUARD** (registered values typed in from the launcher's
+  literals, not imported): each started run's `ARGS:` token list is **equal, element for element**, to the
+  registered composed payload for its (arm, seed); no repeated flag; ENV keys as registered; PROBE_TENSOR
+  type correct for the arm → **2/2 ok, 0 mismatch, exit 0.**  The two parsers agree.
+
+**No started run's ARGS or ENV line differs from the registered one, so nothing was cancelled.**  **COVERAGE
+2/12; the other 10 are UNVERIFIED, NOT FAILED.**
+
+**No number from `cvi1` is read or quoted in this entry.**  No `Epoch` line was parsed for a value, the scorer
+was **not** run in scoring mode, and nothing was ingested.  Full-coverage RULE 20 and the ENV/PROBE_TENSOR
+audit are **owed at 12/12**, before the documented one-argument invocation
+`python3 analysis/cVI1_vggiso_identity_score.py $METAOPT_WS/runs`, unedited.
+
+### 200.6 WHAT THIS ENTRY DOES NOT LICENSE
+
+* **Nothing about the science.**  It records a launch.  `198.9`'s five unconditional non-licences stand
+  unchanged; in particular `cvi1` cannot separate identity from magnitude on either architecture, and
+  **the VGG gap replication and the ResNet isolation still must not travel together** (`199`).
+* **Not "12/12 verified".**  RULE 20 has run on the started runs only; the rest are UNVERIFIED.
+* **Not a clean staging record for `198.8`.**  `198.8`'s "exact command the operator would run" was
+  correct, but the staging instruction above it was incomplete (`200.1`).
+
+### 200.7 DISCIPLINE AND COST
+
+* **RULE 16:** `git diff HEAD --numstat -- analysis/ bin/ tests/ patches/` is **one line, `1 0
+  bin/PROTECTED.txt`** — the `cvi1-` protection the launcher appended on the cluster, mirrored so the two copies
+  agree (sha `ef231243…4778` both sides).  **`analysis/` untouched; `argsline_guard.py` not edited; no
+  registered file edited.**  My independent launch-audit parser lives in the session scratchpad and at
+  `/tmp/s5014158_cvi1_launch_audit.py` on `alice2`, **not** in the repo.
+* **`paper/` untouched** (`git status --porcelain -- paper/` empty).
+* **`analysis/c98_reproduce.py` exit code, AS-IS: `1`.**  Expected, inherited, author scope.  Not fixed.
+* **`alice` NOT CONTACTED.**  Every remote command ran on `alice2`.  **Nothing cancelled.**  No nested
+  `claude -p`.
+* **Left on `alice2`, disclosed:** the two `.pre_cvi1_stage*` backups (200.1); `$HOME/cvi1_stage` (198's
+  scratch stage, still deletable); `$WS/runs/cvi1/submit_A1.log` (the launcher's full submit log);
+  `/tmp/s5014158_{vggbn,selftest,cvi1_dryrun}_A1.log`.
+* **Numbering:** pulled immediately before writing; **took 200**, the next free number after `199`.  Nobody's
+  entry was renumbered.
+* **COST: 12 GPU jobs submitted, hard bound 36 GPU-h;** everything else in this entry was CPU on a login node.
+
+Next free number: **201**.
