@@ -27883,3 +27883,87 @@ on VGG, which is a scope limit on `199.10(4)`.
 * **COST OF THIS ENTRY: ZERO GPU-HOURS.**  Cycle 151's total GPU spend is `cvi1`'s **6.8011 GPU-h**.
 
 Next free number: **205**.
+
+## 205. TRACK K1 — **`cvk1` WAS *NOT* LAUNCHED.  THE REGISTERED LAUNCHER REFUSES ON THE LIVE TREE: GUARDS 1c AND 1d3 FAIL, AND BOTH FAILURES ARE CAUSED BY `cvi1`'s INGEST (`b9e836e`, CORPUS 2,797 → 2,809), WHICH CHANGED THE CORPUS THAT TWO REGISTERED CHECKS WERE PINNED TO.**  THE SCORING-PATH SMOKE TEST OF THE **UNEDITED** SCORER **PASSES**: `score()` REACHES A `FINAL:` LINE ON SYNTHETIC HARNESS-FORMAT RUNS AND FINDS ITS MANIFEST BY DEFAULT, SO THE `cdn1` FAILURE MODE (`171`) DOES NOT RECUR AND NO SUCCESSOR SCORER WAS NEEDED FOR THE I/O PATH.  **ZERO GPU SUBMITTED; NO JOB IDS; 0 `cvk1` IN `squeue` OR `sacct` (since 2026-09-01).  NOTHING CANCELLED.  `alice` NOT CONTACTED.  CORPUS 2,809, UNCHANGED.**  THIS ENTRY TOOK NUMBER **205**; NEXT FREE **206**.
+
+### 205.1 BRIEFING CORRECTIONS, LEADING
+
+* **(a) The launcher's name.** It is `bin/cVK1_vgg_cut_ladder.sh` (sha `3468dbe9…8ad0`, committed `5741218`), not `bin/cVK1_vgg_cutpos.sh`.
+* **(b) Measured fact (1).** Guard 1a lists **four** files: the scorer, `patches/patch_vggbn.py`, `tests/test_vggbn.py` and `tests/test_probe_tensor.py`. The launcher also sources `bin/_lib_guards.sh`, which locates `analysis/argsline_guard.py`, and it reads `results/all_runs.csv`. Of all these plus the launcher itself, the mirror lacked exactly **two**: the scorer and the launcher. Everything else already sha-matched the Mac.
+* **(c) Measured fact (3), confirmed and refined.** `interp()` is reached only through `model_predictions()`, and that runs only in the selftest (line 1163), so **`score()` never calls it**. With ≥ 2 points the variables are always bound. The A1 and A2 abscissae are parameter shares, not k values, so the brief's reason ("k values are unique") covers only A4. They are distinct anyway: the minimum gap is 1.393e-2 for A1 and A2 and 2.0 for A4, so no division by zero.
+* **(d) Measured fact (2), confirmed.** `score(` appears only at line 749 (the definition) and line 1249 (`main`); line 453 is a comment.
+* **(e) Entry `201`'s results do not hold on the live tree.** Its "selftest 115/0/0 on alice2" and "`test_vggbn.py` 69 PASS lines" were true at 09:14 on the 2,797-row corpus. Neither is true now (205.3).
+
+### 205.2 STAGING — FROM THE COMMITTED MAC TREE (`git show HEAD:`), sha256 IDENTICAL ON BOTH SIDES
+
+| file | sha256 | mirror before |
+|---|---|---|
+| `analysis/cVK1_vggcut_score.py` | `c8d46b66…d578` | absent (staged) |
+| `bin/cVK1_vgg_cut_ladder.sh` | `3468dbe9…8ad0` | absent (staged) |
+| `patches/patch_vggbn.py` | `333e62a5…b9d5b` | present, matches |
+| `tests/test_vggbn.py` | `c908b769…62c6` | present, matches |
+| `tests/test_probe_tensor.py` | `586d60c2…37eb` | present, matches |
+| `bin/_lib_guards.sh` | `c45e1b73…8a56` | present, matches |
+| `analysis/argsline_guard.py` | `81cea8b5…5388` | present, matches |
+| `results/all_runs.csv` | `50c7f9c8…4f36` (2,810 lines) | present, matches |
+
+Nothing was overwritten, so there was nothing to back up (the pre-copy check found neither file).
+
+### 205.3 STEP 2 ON THE LIVE TREE — AND THE ATTRIBUTION
+
+Environment: Python 3.10.4 with `envs/mo`. The arguments are the launcher's own.
+
+| check | live corpus (2,809) | `5741218`'s corpus (2,797), in `$HOME/cvk1_diag`, **not** the mirror |
+|---|---|---|
+| scorer `--selftest` | **113 PASS / 1 FAIL / 0 SKIP, exit 1** | 115 / 0 / 0, exit 0 |
+| `tests/test_vggbn.py` | **68 PASS lines, 1 failure (V1), exit 1** | 69 PASS lines, 0 FAIL, exit 0 |
+| `tests/test_probe_tensor.py --structural-only` | 8 PASS / 0 FAIL, exit 0 | — |
+
+* **Selftest failure.** The check is `SIGMA_VGG re-derived (frozen 0.400658)`. The live value is **0.363888**, with df 10 over 2 cells and 12 members: `cvg1` 3 scalar + 3 layerwise, and `cvi1` 3 scalar + 3 layerwise. Against the old corpus the two selftest outputs differ **only** in `cvi1` effects: the row count, the moved-levels NOTE, seeds 41–43, and SIGMA_VGG. This check is an equality pin. The bars use `SIGMA_USED = max(SIGMA_PRIOR 0.586232, live values, in-batch)`, and `SIGMA_PRIOR = SIGMA_NARROW`, which re-derives unchanged at 0.586232. So a **lower** live SIGMA_VGG cannot narrow any bar.
+* **`test_vggbn.py` failure.** The check is `V1 'VGG11_bn_c100' raises identically`: pre-patch raises `ZeroDivisionError`, post-patch builds `VGG_bn`. V1's corpus-architecture list went from 11 to **12** entries. The new one is `VGG11_bn_c100`, which comes from `cvi1`'s 12 rows, because V1 excludes only `cvg1-`. `VGG11_bn_c100` is the very architecture the patch *adds*, so pre-patch and post-patch differ by design. The test was written before `cvi1` existed.
+* **Why I did not override.** Neither failure says anything wrong about `cvk1`'s harness. **But both are registered guards, and the launcher has no override flag.** Editing the launcher, the test or the scorer is forbidden by RULE 16. Staging a stale CSV so the guards pass would defeat the guards rather than pass them. The brief's successor path covers a smoke-test crash only; a step-2 failure means **submit nothing**. Registering successors changes the files the operator authorized, so that decision belongs to the operator (205.6).
+
+### 205.4 STEP 3 — SCORING-PATH SMOKE TEST, UNEDITED SCORER
+
+* **Generator.** `analysis/cVK1_smoke_gen.py` (sha `b5b283b0…fa8d`, added by this entry). Every number it writes is invented. It copies the harness structure from `jobs/run_cifar.sh` lines 18–24 and from a real `cpk1` `PROBE=0` `.out`: the NODE, `ARGS:` and `ENV:` lines (`PROBE=0 PROBE_DIR=none`), the GPU line, warnings, Epoch lines 0–99, `<n>  minutes` and `RUN_DONE`. Files are named `<jobname>-<jobid>.out`.
+* **Test directory.** `$HOME/cvk1_smoke/full`, outside `$WS/runs`: 27 runs plus one resubmitted duplicate with a higher job id. The manifest is copied as `cvk1/PARTITION-MANIFEST.txt` and is the live guard-4 manifest (sha `001bfb60…b66d`), byte-identical to the one the step-4 dry run regenerated.
+* **Documented command** `python3 analysis/cVK1_vggcut_score.py $HOME/cvk1_smoke/full`: **exit 0**, 55 gate PASS, 0 FAIL, no traceback, a `FINAL:` line printed, manifest resolved with no `--manifest`, and the higher job id kept for the duplicate.
+* **Partial run.** With `k21-s57` dropped: `FINAL: INCOMPLETE -- … k21 2/3 …`, **exit 2**, as designed.
+* **What it licenses:** the `score()` I/O path runs on harness-format files. **What it does not license:** anything about real ENV content or real data, and no number from it is quotable.
+
+### 205.5 STEP 4 — THE REGISTERED DRY RUN ON THE LIVE TREE
+
+* **Result:** exit **2**, with `!!! GUARD FAIL` on **1c** and **1d3 only**. The launcher prints "`--submit WOULD ABORT HERE`".
+* **Guards that pass:** 0, 1c2 (all three data-bearing sections ran), 1c3, 1d, 1d2, 2, 2b, 2b2, 2c, 2d, 3, 4a, 4c, 4c′, 4, 4b, 4g, 5, 5b, `guard_parts_for_wall` (10,800 s against gpu-short's live cap of 14,400 s) and 8.
+* **Composed lines:** 27, with 0 failing the RULE 20 pre-check. My independent audit of those 27 lines found:
+  * 0 lines with a repeated flag;
+  * each of the 9 spec strings exactly 3 times, all single-quoted;
+  * seeds 55, 56 and 57 exactly 9 times each;
+  * one partition string, `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, one `--time=03:00:00` and one `--export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=0`;
+  * 27 distinct run names.
+* **Provenance:** `PROVENANCE.txt` reads `MODE DRY-RUN`, `STAMP_UTC 2026-09-10T10:00:48Z`, with no `SUBMIT_UTC`.
+
+### 205.6 STEPS 5–7, AND WHAT THE OPERATOR CAN DO
+
+**Steps 5 and 6 were not reached**: no submission, no job ids, and no RULE 20/21 measurement exists. `cvk1`'s RULE 21 premise remains intact, since 0 runs exist. **The one clean path** needs a new operator authorization, because it changes the files that were authorized. It means registering successors whose only differences are these:
+
+1. `analysis/cVK2_vggcut_score.py`: the SIGMA_VGG selftest pin replaced by a check on what the bars actually use, plus a selftest section that drives `score()` over synthetic runs (as `cAU1`'s section E does).
+2. A successor to `tests/test_vggbn.py` that excludes the patch's own architecture (or every post-registration VGG batch) from V1.
+3. A successor launcher pointing at both.
+
+RULE 21 would then be measured from the successor's commit. **Not recommended:** any CSV substitution.
+
+**Heads-up for Track U1, read-only:** the `cAU1` selftest on the Mac against the live 2,809-row corpus gives **39 PASS / 0 FAIL / 1 SKIP, exit 0**, identical to `202`'s Mac result. On this evidence the `cvi1` ingest does not break it; the cluster re-run is U1's to do.
+
+### 205.7 DISCIPLINE
+
+* **Files:** RULE 16 holds — no registered file was edited. The one addition under `analysis/` is `cVK1_smoke_gen.py`, and `argsline_guard.py` is untouched. `paper/` is untouched. `bin/PROTECTED.txt` is unchanged, because the `cvk1-` line is appended only on `--submit`.
+* **Commands and ownership:** `analysis/c98_reproduce.py` exit code, **as-is: `1`**. No nested `claude -p` was used. `git add` was restricted to my two paths.
+* **Left on `alice2`, disclosed:**
+  * the two staged files in the mirror (committed content);
+  * `$WS/runs/cvk1/{PARTITION-MANIFEST.txt,PROVENANCE.txt}` and `$WS/runs/cvk1-PARTITION-MANIFEST.txt`, regenerated by the dry run; the manifest is byte-identical to `201`'s;
+  * `$HOME/cvk1_smoke/` (synthetic), `$HOME/cvk1_diag/` (a copy of the old CSV plus logs), `$HOME/cvk1_smoke_gen.py` and `$HOME/cvk1_{selftest,vggbn,pt,dryrun}_k1.log`. All are deletable and none is under `$WS/runs`.
+* **Numbering:** I pulled immediately before writing and took **205**.
+* **Cost of this entry:** zero GPU-hours.
+
+Next free number: **206**.
