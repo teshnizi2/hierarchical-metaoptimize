@@ -26757,3 +26757,238 @@ audit are **owed at 12/12**, before the documented one-argument invocation
 * **COST: 12 GPU jobs submitted, hard bound 36 GPU-h;** everything else in this entry was CPU on a login node.
 
 Next free number: **201**.
+
+---
+
+## 201. TRACK C — **`cvk1`, THE CUT-POSITION LADDER ON VGG, IS REGISTERED AND LAUNCH-READY. *NOTHING WAS SUBMITTED.***  THE RESNET PREMISE **HOLDS** — `k* = 49` IS the last cut before the first carrier (tensor 50) in all five curves on disk, and the curve's drops sit at the carriers — **BUT IT IS CONFOUNDED, AND NO ENTRY HAS SAID SO: 49 IS ALSO THE EXACT PARAMETER-BALANCE ARGMIN OVER ALL k**, the pre-registered rival that *won* at `146.2`.  On ResNet the two accounts name the same cut; **on VGG they name 22 and 18.**  So the prediction **`k* = 22`** is registered against a rival that predicts 16, a depth-fraction account that predicts 20/21, and NO-PEAK.  27 JOBS, 9 ARMS × SEEDS {55,56,57}, 100 EPOCHS, **~15.8 GPU-h EXPECTED, HARD BOUND 81.**  PRIMARY = **THE ARGMAX LOCATION**, categorical over a grid on which 22 is interior; every grid position is a reachable verdict.  **THE BRIEF'S FLOOR RULE ("every arm clears the floor under every account") CANNOT BE MET BY ANY DESIGN THAT SEPARATES PEAK-AT-22 FROM NO-PEAK — shown below, and honoured in `164.6`'s own form instead.**  SCORER `--selftest` **115 PASS / 0 FAIL / 0 SKIP on the Mac AND on `alice2`**; DRY RUN **0 GUARD FAILURES, 27 COMPOSED LINES, EXIT 0**.  **ZERO GPU SUBMITTED.  0 `cvk1` JOBS IN `squeue` OR `sacct`.  `alice` NOT CONTACTED.  CORPUS 2,797, UNCHANGED.**  THIS ENTRY TOOK NUMBER **201**; NEXT FREE **202**.
+
+### 201.1 TWO THINGS TO LEAD WITH
+
+**(a) A BRIEFING CORRECTION.**  *"the −18.3 pp drop three tensors past the peak"* joins two different
+measurements.  Re-derived from the raw `.out` by a parser sharing no code with any scorer: **−18.2707** is
+`cpk3`'s **one-tensor** step `49 → 50` at **772** epochs; the **three-tensor** step `49 → 52` is `cpk1`'s
+**−17.1053** at **100** epochs.  The drop sits **one** tensor past the peak — at the first carrier itself.
+
+**(b) THE CONFOUND.**  On `ResNet18_c100`, `argmin_k |share(1..k) − 0.5|` over **all** `k = 1..61` is
+**`k = 49`** (share **0.562834**; `k = 50` is 0.562880, 4.6e-5 further).  `cpk1`'s P5 registered parameter
+balance as the rival *because* it predicted a different grid point from the stage account, and it hit 49
+exactly.  **The carrier-cut reading and the balance reading are the same measurement on ResNet**; `cpk2`
+and `cpk3` replicated the argmax but could not separate them.  VGG can: its balance argmin is **18**
+(share 0.485479; 16 and 17 within 1.1e-4).  That, not scope alone, is what this batch is for.
+
+### 201.2 THE RESNET PREMISE, RE-DERIVED FROM THE RECORD (78 raw `.out` + `cdep1`'s live-model manifest)
+
+| curve | argmax (m=2 arms) | level | one-tensor `49→50` (TEST / TRAIN) |
+|---|---|---|---|
+| `cpk1` @100 | **49** | 55.4473 | not on grid; `49→52` −17.1053 / −20.1120 |
+| `cpk2` @100 | **49** | 55.4880 | −25.5127 / −30.5373 |
+| `cpk2` @772 | **49** | 56.4127 | −20.4993 / −21.6327 |
+| `cpk3` @100 | **49** | 55.2120 | −24.4593 / −29.0273 |
+| `cpk3` @772 | **49** | 56.0453 | −18.2707 / −18.4107 |
+
+Carriers by name on the manifest: **50** `layer4.0.bn2.weight`, **53** `layer4.0.shortcut.1.weight`, **59**
+`layer4.1.bn2.weight`, each numel 512.  **`min(carriers) − 1 = 49 = k*`: the premise holds.**  The shape
+sits where the carriers are: `cpk1` `52→55` (carrier 53 + 2) **−14.9700**; `55→60` (carrier 59 + 4)
+**+1.3467**, invisible because both arms are already floored (23.37, 24.72 vs `k01` 22.72).  The one drop
+**not** at a carrier is `46→47` (non-carrier `layer4.0.bn1.weight`), **−2.5773 @100 / −2.7220 @772** —
+7–9× smaller.  TRAIN agrees in sign on every step.
+
+**The alias (`161.7c(ii)`, `189` V2–V6), re-derived:** class == index mod 3 at every index **1..61** on
+ResNet and **1..24** on VGG; each net breaks it only at its last tensor (`linear.bias`, 62 / 26).  Carriers
+are BN scales (≡ 2), so *"the last cut before the first carrier"* is **always** a conv|BN-scale junction
+(≡ 1): 49, and 22.  **What that does to the prediction:** (i) PEAK-AT-22 cannot separate `bn8.weight`'s
+**identity** from the **class** of the junction it closes — no prefix cut can; only a name-list swap can
+(`cpr1`'s design).  Stamped unconditionally.  (ii) A pure class account names **no** location — 13, 16, 19
+and 22 are structurally identical junctions — so it needs a selection rule, and the ladder **can** separate
+selection rules.  (iii) A peak at 20 or 21 (≡ 2, 0) breaks parity itself, whatever the carrier.  (iv) The
+window 19..23 is **consecutive** and reproduces `cpk3`'s class sequence 46..50 exactly (conv, scale, shift,
+conv, carrier-scale); its four steps print beside their ResNet analogues **as a sign census only**.
+
+**What `cvg1`'s probe records say, and do not say.**  On 962 pinned scalar records over 3 seeds, the prefix
+sum `Σ_{i≤k} L_i` is negative on **1.0000** of records for **every** `k` in 4..22 and on **0.0000** at 23 and
+24.  The sign boundary sits exactly at **22|23** — support for the cliff half of the account — **but the map
+is flat over 4..22 and names no peak.**  A sign-based peak locator already died on ResNet (`179`).  The
+peak half of the prediction rests on ResNet's rising left flank (`cpk1`: every step 17→49 positive), not on
+VGG's records.
+
+### 201.3 THE DESIGN — ONE SUBMISSION, 27 JOBS
+
+`VGG11_bn_c100` / CIFAR-100 / SGDm + Lion / ms 1e-3 / alpha0 1e-6 / batch 100 / 100 epochs / `AUGMENT=1` /
+`BETA_CLIP=-15:-2.3026` / **`PROBE=0`** (the ENV of `cpk1`/`cpk2`/`cpk3`, the ladder being replicated) /
+seeds **{55,56,57}** — from the pre-assigned block; **zero** corpus rows and **zero** `.out` files under
+`$WS/runs` carry them (launcher guards 2c and 2d).
+
+| arm | spec | why | live composition (guard 4) |
+|---|---|---|---|
+| `k01` / `kL` | `scalar` / `layerwise` | in-batch anchors | scalar `()` / layerwise `(26,)` |
+| `k13` | `[13,13]` | left edge (sparse) | tail `conv5.weight` \| head `bn5.weight` |
+| `k16` | `[16,10]` | **A2's peak** (balance + parity) | `conv6.weight` \| `bn6.weight` |
+| `k19` | `[19,7]` | the previous junction | `conv7.weight` \| `bn7.weight` |
+| `k20` | `[20,6]` | after a **non-carrier** scale | `bn7.weight` \| `bn7.bias` |
+| `k21` | `[21,5]` | **A4's peak** (26·49/62 = 20.55) | `bn7.bias` \| `conv8.weight` |
+| **`k22`** | **`[22,4]`** | **THE PREDICTION** | **`conv8.weight` \| `bn8.weight`**, group 2 = 52,324 params |
+| `k23` | `[23,3]` | right flank: carrier in the big group | `bn8.weight` \| `bn8.bias` |
+
+Every sweep arm composes through the **live** `HF.polish_the_stepsize_groups` to the contiguous prefix
+`[k, 26−k]` and routes through `init_meta` to a 2-coordinate blockwise beta without rednorm.  **Why not
+cheaper:** drop `k23` and 22 is the grid's edge, where a peak and a monotone rise are one measurement; drop
+`k13` and 16 is an edge; drop `k21` and "22" cannot be told from 21.  `k20` is the one arm the argmax does
+not strictly need; it costs 3 jobs and is VGG's only measured non-carrier BN-scale step in the matched window.
+
+### 201.4 THE ACCOUNTS, THE PRIMARY AND THE BRANCH MAP (frozen in the scorer)
+
+**A1 CARRIER-CUT → 22.  A2 PARAM-BALANCE → 18, i.e. 16 on this grid.  A4 DEPTH-FRACTION → 20/21.  A5
+NO-PEAK.**  (`cpk1`'s stage-boundary P1, 18 on `VGG_CFG11` — live `[64,M,128,M,256,256,M,512,512,M,512,512,M]`
+— was refuted at `146.2` and is not re-registered.)
+
+**PRIMARY:** `k_hat = argmax` of 3-seed in-batch `plateau5` over the seven cuts; `PEAK_SET` = arms within
+`PEAK_BAR = 2 SE` of it.  Bars at the frozen prior (`SE_PRIOR` 0.478656 pp): `PEAK_BAR` **0.957 pp**,
+`FLOOR_BAR` **0.957 pp**, `FLAT_BAR = max(0.10·D_GAP, 4 SE)` = **3.127 pp = 6.53 SE** at `cvg1`'s gap,
+`GAP_MIN` 10.0 pp, `DIVERGED_BAR` 5.0 pp.  Noise floor re-derived with `cvk1-` excluded from every reader:
+`SIGMA_VGG` **0.400658** (df 4), `SIGMA_NARROW` **0.586232** (df 77), identical to `198.5`; `SIGMA_USED` is
+the max with the live and in-batch values at score time, so `cvi1`'s VGG anchors landing first can only
+**widen** the bars.
+
+**Branch map, first match wins:** gates (`HARNESS-UNSOUND`, `UNRESOLVED-DIVERGED`, `UNRESOLVED-NO-GAP`)
+→ **`ALL-CUTS-FLOORED`** (no two-group cut recovers anything; A1, A2, A4 all refuted; levels are bounds)
+→ **`NO-PEAK-FLAT`** (range < `FLAT_BAR`: cut position is **not a localising variable on VGG** — a scope
+limit on `199.10(4)`) → `UNRESOLVED-TIE-WITH-22` / `PEAK-ELSEWHERE-TIE` → **`PEAK-AT-22`** (A1 supported;
+A2 and A4 refuted by the same inequality) → at 23: **`NO-PEAK-INCREASING`** if no adjacent step falls by
+more than `PEAK_BAR` (moving the **only** carrier into the big group does not hurt — A1 refuted at its
+core), else `PEAK-AT-RIGHT-EDGE-23` → at 13: `NO-PEAK-DECREASING` / `PEAK-AT-LEFT-EDGE-13` →
+**`PEAK-ELSEWHERE-k`**, each with a registered meaning: **16** — A2 wins, and ResNet's 49 was the balance
+point that happened to sit before a carrier, so the carrier-cut reading of the campaign's cleanest
+localisation dies; **19** — parity holds, the carrier rule misses by one junction; **20** — parity itself
+broken; **21** — `conv8` belongs with the carrier, and the conv-step sign (+9.0020 at `48→49` on ResNet)
+does not transfer; A4 survives at 20/21.  The FINAL line carries the branch, `CARRIER-CUT-SUPPORTED |
+-UNRESOLVED | -REFUTED | -NOT-TESTED`, the favoured rival, and stamps.  **Secondary, bounded in neither
+direction and branching on nothing:** `D22-16 = M(22) − M(16)`, which A1 predicts positive and A2 negative.
+
+### 201.5 THE FLOOR — WHY THE BRIEF'S RULE IS UNSATISFIABLE HERE, AND WHAT IS ENFORCED INSTEAD
+
+The floor is `164.6`'s: **this batch's own `k01`**, not chance.  "At or near" = within **3.0 pp**, the width
+of the only saturation band this campaign has measured (`164.6`: 3.004 pp).  Predicted levels, from models
+mapping each VGG cut onto `cpk1`'s raw curve (re-derived by the selftest from the `.out` files, not typed):
+
+| account | k13 | k16 | k19 | k20 | k21 | k22 | k23 | peak, margin over `k01` | AT/NEAR floor |
+|---|---|---|---|---|---|---|---|---|---|
+| A1 | 47.76 | 54.40 | 60.64 | 58.93 | 59.00 | **66.16** | 36.35 | k22, **+31.15** | {k23} |
+| A2 | 47.76 | **60.49** | 48.28 | 48.28 | 48.28 | 36.16 | 36.16 | k16, **+25.47** | {k22, k23} |
+| A4 | 41.87 | 43.95 | 48.36 | 52.55 | **52.71** | 43.88 | 35.96 | k21 (tied 20), **+17.69** | {k23} |
+| A5 | representative INC / DEC / FLAT profiles | | | | | | | +15.6 to +25.0 | {} |
+
+**The literal rule cannot be met.**  22's right flank is `k ∈ {23,24,25}`, every one of which puts VGG's
+**only** nominated carrier in the big group — which A1 itself predicts collapses.  Remove the flank and 22
+is the grid's edge, where PEAK and a monotone rise coincide: **a primary bounded in one direction, which is
+the worse violation.**  So the rule is enforced in the form `164.6` states it, and the selftest checks each
+clause on every account: **F1** every account's peak arm is predicted ≥ 15 pp above `k01` (worst: A4,
++17.69 = 37.0 SE), so every account can **fail** through the arm carrying its claim; **F2** no account's
+floored arm is its own peak; **F3** the primary is an argmax, a floored arm can be the argmax only if all
+are floored (`ALL-CUTS-FLOORED`, which no account predicts), and a floored arm enters a verdict **only by
+sign and bound** — the scorer prints `CLIFF-IS-A-BOUND` when `k23` floors; **F4** `k23`'s floor binds it
+**downward** only, and every claim it can refute is refuted by it landing **high**.  Highest prediction
+anywhere: 66.16 pp, 33.8 below the ceiling.
+
+**AN OBSERVATION ON `198`, NOT A DEFECT IN `cvi1`'s BRANCH LOGIC.**  `198.6`'s floor gate measures margins
+from **chance** ("~35 pp, 34 pp clear of chance").  Under `164.6`'s floor — the in-batch `k01` — `cvi1`'s
+`CTL` is predicted **at** the floor under `IDENTITY-OPERATIVE` (~35 = `k01`).  That does not break
+`cvi1`: `IDENTITY-OPERATIVE` is a threshold on `DELTA_ID`, and `CTL` failing to rescue **is** the claim.
+But "34 pp clear of chance" must not be quoted as "no arm at the `164.6` floor".  **And, as the brief asked,
+verified independently:** the registered `cVI1` scorer (sha `86a2b80f…a96a`, unchanged) contains **no**
+occupancy / dwell-time / `PIN_OCC_MIN` / exact `−15` test; `196`'s defect is not in `cvi1`'s path.
+
+### 201.6 WHAT WAS BUILT, AND TWO SELF-CORRECTIONS MADE BEFORE COMMIT
+
+| file | sha256 |
+|---|---|
+| `analysis/cVK1_vggcut_score.py` | `c8d46b665037644bc96f31f7a5c4c6b285276ec9f078a68bf9dc8ab25358d578` |
+| `bin/cVK1_vgg_cut_ladder.sh` | `3468dbe92a98b08418a86231d6834655b2c8851bf8295cd625c3fae2ebe98ad0` |
+
+**Additions only**: no existing scorer, test, launcher or `analysis/argsline_guard.py` was edited.  The
+selftest re-derives the design, the ResNet premise (all five argmaxes, all four `49→50` steps, the three
+`cpk1` steps, the four window analogues, the confound, the alias), the VGG arithmetic (group-1 counts, A2's
+argmin, A4's point, the alias), the prefix-sign map, the corpus noise floor and seed freshness, the floor
+table F1–F4 for six account profiles, and drives the **same `decide()` the scoring path calls** over a
+spike at every grid position and seven shaped curves — **each account's own predicted curve scores as that
+account's own branch.**  **115 PASS / 0 FAIL / 0 SKIP**, byte-identical output on both hosts; on `alice2`
+the launcher's guard 1c2 requires the ResNet, prefix-sign and model-re-derivation sections to have **run**,
+not skipped.
+
+**Self-correction 1 (the selftest was wrong, not the design).**  The first run had **2 FAIL**: I had
+expected a spike at an **edge** over a flat curve to score `PEAK-AT-EDGE`.  Flat-then-up never falls, so it
+is monotone and `decide()` correctly returns `NO-PEAK-INCREASING` / `-DECREASING`.  The expectation was
+fixed and the check now also asserts `k_hat == k` at every position.  No branch rule changed.
+**Self-correction 2 (the launcher's exit status).**  The first clean dry run exited **1**: its last
+statement was `[ "$FAIL" = 1 ] && …`, which returns 1 when nothing failed.  An explicit `exit 0` was added;
+the re-run exits **0** with identical guard output.  **`bin/cVI1_vgg_isolate.sh` ends with the same
+construct** and so exits 1 on a clean dry run too.  It is registered and was **not** edited.
+
+### 201.7 THE DRY RUN AND THE COMMAND THE OPERATOR WOULD RUN
+
+Staged to `$HOME/cvk1_stage` on `alice2` (the mirror is not a git checkout).  **0 GUARD FAIL, exit 0:**
+selftest 115/0/0 at the sha above; `tests/test_vggbn.py` **PASSES on the live tree, 69 PASS lines**;
+`PATCH_PROBE_TENSOR` structural inertness R0 passes; guards 2/2b/2b2/2c/2d find no `cvk1` row, `.out` or
+queued job and no use of seeds 55–57 anywhere; guard 4 builds the live model (26 tensors, 9,274,532
+parameters, tensor 23 = `bn8.weight`) and composes all nine arms; guard 4c′ finds all nine spec strings
+byte-identical in launcher and scorer; `guard_parts_for_wall` **PASS** — `WALL 03:00:00` fits gpu-short's
+4:00:00, so gpu-short is **added** by the library's composer; guard 8 finds the manifest with no
+`--manifest`.  Live `HF.py` sha `4732b74a…0cecd`, `build_network.py` sha `c7998883…a77d`.  One composed
+line, verbatim (the spec is single-quoted because `[22,4]` is a bash glob — the `cK1` precedent):
+
+```
+sbatch --job-name=cvk1-k22-s55 --partition=gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g --gres=gpu:1 \
+  --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,\
+SCHED=none,PROBE=0 /home/s5014158/metaopt/jobs/run_cifar.sh --optimizer HF --alg-base SGDm \
+  --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 \
+  --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name VGG11_bn_c100 --batch-size 100 \
+  --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 \
+  --stepsize-groups '[22,4]' --seed 55 --save-directory /home/s5014158/metaopt/runs/cvk1 --run-name cvk1-k22-s55
+```
+
+**THE COMMAND, IF AND WHEN THE OPERATOR AUTHORISES IT** (after staging the two files into the `alice2`
+mirror):
+
+```
+export METAOPT_WS=/home/s5014158/metaopt
+bash bin/cVK1_vgg_cut_ladder.sh --dry-run     # read the 27 lines
+bash bin/cVK1_vgg_cut_ladder.sh --submit      # the ONLY submitting form
+python3 analysis/cVK1_vggcut_score.py $METAOPT_WS/runs    # at 27/27 RUN_DONE, unedited
+```
+
+RULE 21 is satisfied by the commit carrying this entry, which precedes any `cvk1` job; the launching agent
+records the margin in seconds against the earliest `sacct` Submit.  **Ordering note:** `cvk1` does not
+depend on `cvi1` to be scorable, but its interpretation does — a `NO-RESCUE-VGG` from `cvi1` would weaken
+A1's premise.  Launching after `cvi1` lands costs nothing, and the 12-GPU gpu-short pool is `cvi1`'s now.
+
+**COST:** 27 jobs × 100 epochs.  `cvg1`-mixed-pool ~35 min/job → **15.8 GPU-h**; `cvg1`-worst 63 min →
+**28.4**; corpus-worst 70.8 s/epoch → **53.1**; **hard bound `WALL` × 27 = 81 GPU-h.**
+
+### 201.8 WHAT `cvk1` WILL NOT LICENSE, WRITTEN BEFORE ANY RUN EXISTS
+
+* **Not identity versus junction class** (the alias), and **not identity versus magnitude** — `bn8`
+  holds 0.5783 of the mean|L| mass against `bn7`'s 0.0021 (`198.9`).
+* **Not the isolation line.**  PEAK-AT-22 is a cut-position fact and may not travel with the ResNet
+  isolation (`197.8`, `199.10(3)`); `cvi1`'s verdict is between-batch and enters no `cvk1` contrast.
+* **Not any horizon but 100 epochs** (`156`'s rescoping: ResNet's `k*` needed 772 epochs to be a converged
+  object), **not any ms but 1e-3**, **nothing about residual connections**, **nothing about group count**
+  (every sweep arm is m = 2, `160`).
+* **Not "position beats balance" in general.**  PEAK-AT-22 would refute balance **as the locator of this
+  argmax on VGG**; `146.4` already showed balance cannot produce the *shape*.
+
+### 201.9 DISCIPLINE
+
+**ZERO GPU SUBMITTED.**  `squeue` 0 `cvk1` jobs, `sacct` 0 `cvk1` records since 2026-09-01, 0
+`cvk1-*.out`; `PROVENANCE.txt` reads **`MODE DRY-RUN`** with no `SUBMIT_UTC`.  **`alice` NOT CONTACTED**;
+every remote command ran on `alice2`, read-only apart from the stage and the pre-flight files below.
+**Nothing cancelled.**  **CORPUS 2,797, UNCHANGED** — no aggregate, no ingest, no number from any batch
+read before full coverage (this entry scores nothing).  `plateau5` is primary throughout; the CSV `plateau`
+column and `best_test` are read nowhere; TRAIN is printed beside TEST at every arm.  **RULE 16:** two new
+files, zero modifications under `analysis/ bin/ tests/ patches/`.  **`paper/` untouched.**
+**`analysis/c98_reproduce.py` exit code, AS-IS: `1`** (expected, author scope, not fixed).  No nested
+`claude -p`.  `git add` restricted to my three paths; other tracks' untracked files were left alone.
+**Left on `alice2`, disclosed:** `$WS/runs/cvk1/PARTITION-MANIFEST.txt` (3,620 bytes),
+`$WS/runs/cvk1/PROVENANCE.txt`, `$WS/runs/cvk1-PARTITION-MANIFEST.txt` — pre-flight, not runs, regenerated
+at submit — and `$HOME/cvk1_stage` (deletable).  **Numbering:** pulled immediately before writing; took
+**201**, the next free after `200`.  **COST OF THIS ENTRY: ZERO GPU-HOURS.**
+
+Next free number: **202**.
