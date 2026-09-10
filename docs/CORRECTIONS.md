@@ -26992,3 +26992,227 @@ at submit — and `$HOME/cvk1_stage` (deletable).  **Numbering:** pulled immedia
 **201**, the next free after `200`.  **COST OF THIS ENTRY: ZERO GPU-HOURS.**
 
 Next free number: **202**.
+
+## 202. TRACK B — **THE `AUGMENT=0` FAIRNESS OBJECTION.  `199.10(1)` MISDESCRIBES WHAT IS OPEN: FLAW 3 *AS REGISTERED* WAS RUN THREE TIMES, AND THE HALF THAT IS GENUINELY OPEN WAS *DECLINED*, NOT NEGLECTED.  THAT HALF — METHOD vs A TUNED BASELINE, UNAUGMENTED — IS NOW REGISTERED AS `cau1`: 27 JOBS, ONE SUBMISSION, SEEDS {50,51,52}, ~14.4 GPU-h EXPECTED, HARD BOUND 81.  *NOTHING WAS SUBMITTED.***  SCORER `analysis/cAU1_unaug_denominator_score.py` COMMITTED `736677d` (2026-09-10T09:13:26+02:00, `%ct` 1789024406) WITH `--selftest` **40 PASS / 0 FAIL / 0 SKIP** ON `alice2` (Python 3.10.4) AND 39/0/1 ON THE MAC (the one SKIP needs raw `ub9` `.out`, which only `alice2` holds); LAUNCHER `bin/cAU1_unaug_denominator.sh` COMMITTED `7aa0213`, `SUBMIT=0` BY DEFAULT, DRY RUN **0 GUARD FAILURES, 27 COMPOSED LINES, 27/27 PROVED AGAINST THE SCORER'S OWN `expected_args()`/`expected_env()`**.  **0 `cau1` RECORDS IN `sacct` ALL-TIME, 0 QUEUED, 0 `.out` ON DISK.  ZERO GPU.  `alice` NOT CONTACTED.  CORPUS 2,797, UNCHANGED.**  THIS ENTRY TOOK NUMBER **202** (written first as 201; Track C committed its own 201 first, so MINE was renumbered and theirs left untouched); NEXT FREE **203**.
+
+### 202.1 THE CORRECTION FIRST — FOUR THINGS `199.10(1)` AND MASTER-TABLE ROW 19 SAY THAT THE RECORD DOES NOT
+
+`199.10(1)`: *"fairness flaw 3 — the parent paper's own `AUGMENT=0` setup — has been OPEN since cycle 13, and the
+only `AUGMENT=0` runs in the corpus (`PP-*`) were submitted against a standing rule, carry no probe directory, and
+may not be pooled.  That is a cheap batch that 150 cycles have not run."*  MASTER-TABLE row 19 carries the same
+text.  Re-derived from the corpus and the git history, not from either:
+
+| `199.10(1)` / row 19 says | the record says |
+|---|---|
+| the only `AUGMENT=0` runs are `PP-*` | **27** `augment=0` rows in **three** batches — `pp_*` 9 (jobs 4683697-705), `PP_*` 9 (4700548-556), `ub9-*` 9 — **every one MetaOptimize (AdamW+Adam, α₀ 1e-6, η 1e-3)**.  `ub9` HAS a probe directory (`runs/ub9/probe_*`, 10,000 records each), a saved script (`bin/c88_ub9_widebox.sh`) and a registered scorer (`c88_scorers.py`, 119.10), and was scored at `149.5`. |
+| flaw 3 has been open since cycle 13 | flaw 3 **as registered** in CORRECTIONS 10 is *"paper config (AdamW base + Adam meta, alpha0=1e-6, eta=1e-3, gamma=1), AUGMENT=0, scalar vs 6-block vs layerwise, n=3"* — a **granularity** contrast.  `pp_*` and `PP_*` are that line **executed, twice**, and `ub9` executed it a third time with the box released.  CLOSEOUT item 5a closed it (blk6 over scalar +0.522 pp, t 2.52) and `148.8[5]` discharged its guard caveat. |
+| a cheap batch 150 cycles have not run | the **method-vs-baseline** version was **explicitly DECLINED**: CLOSEOUT item 5b, *"NOT-WORTH-COMPUTE — Re-measures the dead method claim. ~33 jobs for a corpse."*  Declined, not overlooked. |
+| `PP-*` was submitted against a standing rule | see `202.3` — the rule is unnamed in `28.2`, the only candidate predates flaw 3 by eight hours, and `PP_*` is flaw 3's own prescription. |
+
+**What IS genuinely open is exactly one thing: the METHOD against a TUNED non-meta baseline, unaugmented.**  The
+corpus holds **zero** non-meta rows recorded `augment=0`; the only non-meta optimiser ever run without augmentation
+is `gate0_adamw_s1` (job 4650663, AdamW at the parent's own lr = 1e-5, **n = 1**, `augment='?'`, `plateau5`
+**58.426**), which is the parent's fixed-step setting, not a tuned baseline.  So the objection has teeth, and **the
+reason it has teeth is precisely the reason 5b gave for declining it**: 5b called the method claim dead, and that
+dead claim is now the **denominator** — the campaign's strongest publishable result.  "It might be alive in the
+parent's setting" is the objection itself, so 5b's rationale is circular against it.  `is_open`: **YES**, on the
+method half only.
+
+**`ub9`'s bearing on the open half: NONE.**  It has no non-meta arm.  It closes the granularity half and it
+supplies two things to `cau1`: the byte-exact spec for `cau1`'s paper-config arm (so a between-batch concordance
+readout is free), and the curve evidence in `202.5` that decides the primary.
+
+### 202.2 THE BRIEFING, CHECKED
+
+Right: the `28.2` / `28.1` distinction is real; `149.5`'s `ub9` numbers re-derive (scalar **72.422**, blk6
+**74.7967**, layerwise **73.9907**, n = 3 each, `.out`-derived `plateau5`); the open question is the method one.
+Incomplete: it did not know CLOSEOUT 5b had **declined** this batch, which is the fact the design must answer.
+Also verified as asked: the `cVI1` scorer has **no occupancy or dwell-time gate** in `score()`.  Its one
+`n_at_lo == n_beta` test (line 574) sits inside `rederive_nomination()`, the `--selftest` step that re-derives the
+carrier nomination — a record filter, never a verdict gate.  `196`'s defect is not in `cvi1`'s scoring path.
+
+### 202.3 WHICH "STANDING RULE" `PP-*` BROKE
+
+`28.2` does not name one.  The only rule-shaped text in the record that forbids `AUGMENT=0` is the operations
+gotcha *"**Always** `--export=ALL,AUGMENT=1` — without augmentation ResNet-18 memorises CIFAR-10 in epoch 1 and the
+comparison is meaningless"*, committed in `CONTINUE-HERE.md` at `d70a22c` (**2026-08-19 15:37:13**).  CORRECTIONS 10
+— which *prescribes* `AUGMENT=0` runs for flaw 3 — was committed at `fb1a563` (**2026-08-19 23:48:34**), **8 h 11 m
+later**, and its own "Standing rule" is a **reporting** rule (*"never report a comparison until budget, search
+budget, and setup are all matched — or until each mismatch is stated in the same breath"*), not a ban.  So `PP_*`
+broke an operations default that flaw 3 had already overridden for exactly this configuration.  **The breach that
+actually cost `PP_*` its evidential standing is `28.1`**: no saved submit script (a grep of `bin/*.sh` names no
+`pp_*` or `PP_*` run), which CORRECTIONS 29 turned into the rule *"a batch with no `bin/c<NN>_*.sh` submit script is
+not readable as evidence about the intervention it was supposed to test."*  A third rule-shaped text also bears:
+PLAN.md's ruling on B7 calls unaugmented runs *"void for science but valid for verification"*.  `cau1` is a
+verification of a published claim in the parent's own setting, not a mechanism experiment, and it is scoped that
+way (`202.10`).
+
+### 202.4 THE DESIGN — `cau1`, ONE SUBMISSION, 27 JOBS
+
+ResNet18 / CIFAR-10 (the dataset of the parent's Fig. 1, *"Learning curves for selected (base, meta) combinations in
+CIFAR10"*, arXiv:2402.02342v6 §7.1) / batch 100 / 100 epochs / **`AUGMENT=0` on every arm** / seeds **{50, 51, 52}**
+(53 and 54 held in reserve).  Every arm is a byte copy of an existing, cited configuration:
+
+| arm | jobs | what it is | copied from, and what differs |
+|---|---|---|---|
+| `lr{0005,001,002,005,01,02,04}` | 21 | plain SGD + momentum 0.9 + wd 5e-4 + cosine to zero, `COS_TOTAL=50000`, `COS_WARMUP=1000`, lr ∈ {0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.4} | `cdn1` arm A (175) — the **denominator's baseline family**.  Differs only in dataset/net, `AUGMENT` and the rung.  The ladder extends `cdn1`'s {0.01..0.3} **on both sides**: 0.4 because an unaugmented optimum may move up; 0.005 because the record's only CIFAR-10 cosine ladder puts its AUC argmax at its bottom rung (`202.5` B2). |
+| `m6` | 3 | **the parent's own config**: AdamW + Adam, α₀ 1e-6, η 1e-3, γ 1, `resnet18_blocks`, `BETA_CLIP=-60:6.0`, `PROBE=5` | `ub9-b6` (`c88`): **zero** ARGS or ENV differences beyond seed / names / directories.  `-60:6.0` is the nearest the harness gets to the parent's *no* box while still measuring the walls; `ub9-b6` touched neither on 0/3 seeds (149.4). |
+| `m6t` | 3 | **the CIFAR-10 denominator's own meta cell**: the same at α₀ 3e-4, canonical box `-15:-2.3026` | `i3b-3e4` (`c45`): ARGS identical; ENV differs in `AUGMENT` and `PROBE=5` (inert, FINDINGS 74.2).  It exists because at `AUGMENT=1` α₀ 3e-4 sits **+1.7266 pp** over the parent's 1e-6 (93.3173 vs 91.5907), so a deficit against 1e-6 alone could be blamed on an untuned α₀.  **The method gets the better of its two cells.** |
+
+`SGD_WD` / `SGD_MOM` are **not echoed** by `run_cifar.sh`, so a value leaking in through `--export=ALL` would change
+the baseline invisibly.  The launcher reports any such variable, then **unsets every variable the runner echoes**
+before composing; the defaults are pinned by `build_optimizer.py`'s sha256 (`25a899b3…`, `cdn1`'s pin).  **That
+`AUGMENT=0` really disables augmentation is proved on the live source, not assumed:** `load_data.py` (sha256
+`b52b58a3…`, pinned) applies `RandomCrop`/`RandomHorizontalFlip` to CIFAR-10 **only** under `AUGMENT == "1"`;
+otherwise the train transform **is** the test transform (launcher guard 3b2).
+
+### 202.5 THE PRIMARY IS AN ENDPOINT — DECIDED FROM THE RECORD, AGAINST CORRECTIONS 10's PRESCRIPTION
+
+`GAP_END = plateau5(S*) − plateau5(M*)` — `S*` the ladder rung with the best 3-seed mean, `M*` the better of
+{`m6`, `m6t`}, both **within batch**, from the runs' own `.out`; positive = the tuned baseline wins.
+
+CORRECTIONS 10 wrote *"their evidence is Fig. 1 learning curves, so the comparison must be on convergence, not the
+endpoint."*  That sentence was about the **parent's** claim (MetaOptimize vs a fixed step).  `cau1` tests the
+**denominator**, whose statistic is `plateau5`, and three measurements — each re-derived by the scorer's `--selftest`
+— rule a curve statistic out as the **primary**:
+
+* **B1 — at `AUGMENT=0` the method's curve IS its endpoint.**  On all 9 `ub9` runs `|AUC − plateau5| ≤ 0.699 pp`;
+  from the raw `.out` (B1', run on `alice2`) TRAIN reaches 99 % by epoch **5–6** and TEST is within 5 % of its plateau
+  by epoch **2**.  A curve statistic would therefore move almost entirely through the **baseline's** curve shape.
+* **B2 — on a cosine ladder, AUC and `plateau5` pick different rungs.**  On `bl-sgd` (the only CIFAR-10 cosine
+  ladder, `AUGMENT=1`) AUC falls **monotonically** with lr — **90.10 > 89.52 > 86.21 > 77.60** — so its argmax is the
+  **bottom edge**, while `plateau5` peaks **interior** at lr = 0.1.  An AUC primary cannot meet the interior-optimum
+  requirement by construction, and what it measures is the anneal's high-lr phase, which MASTER-TABLE row 15
+  already names as the source of the gap.
+* **B3 — TRAIN is at its ceiling at `AUGMENT=0`.**  `ub9` `final_train` ∈ **[99.81, 100.00]**.  A TRAIN endpoint is
+  bounded and barred as a primary; TRAIN is reported as AUC and epoch-to-99 % instead.
+
+**The parent's evidence type is kept, as the registered SECONDARY**: `GAP_AUC = AUC(S^auc) − AUC(M^auc)`, AUC =
+mean TEST accuracy over all 100 epochs, read against the rung that is best **on AUC** — the fairest curve reading —
+with its own bars and branches.  That is where a reversal in the method's favour is most reachable (`202.6`).
+
+### 202.6 BARS, BRANCH MAP, FLOOR GATE
+
+**Noise floor**, re-derived at registration with `cau1-` excluded from every reader.  Pooled within-cell SD, where
+a cell is the 15 design columns **plus the batch prefix**, over usable ResNet18/CIFAR-10/100-epoch rows:
+`plateau5` — `AUGMENT=0` MetaOptimize **0.446775** (df 18, 9 cells), non-meta SGD+cosine **0.120142** (df 16);
+AUC — **0.385791** / **0.162216**.  Prior = the larger of each pair; at scoring, `SIGMA_USED = max(prior, the batch's
+own pooled SD)`, stamped.  **SE = 0.364790 pp** (3 v 3); every branch boundary is **2 SE = 0.7296 pp**.
+
+**Branch map, first match wins:** `INCOMPLETE` → `GATED-ENV` / `GATED-ARGS` (`AUGMENT=0` checked on **every**
+run) → `GATED-METHOD-AT-FLOOR` → `GATED-BASELINE-AT-FLOOR` → **`DEFICIT-HOLDS`** (`≥ +2 SE`; `+ LOWER-BOUND` when
+the ladder argmax is at an edge, since the baseline can only improve) → **`DEFICIT-CLOSES`** (`|Z| < 2`, ladder
+interior: the method **ties** a tuned baseline in its own setting — "does not beat" survives, "loses" does not) →
+`UNRESOLVED-TIE-LADDER-EDGE` → **`REVERSES-AT-PAPER-CONFIG`** (`≤ −2 SE`, interior, **and** `m6` alone also clears
+−2 SE: the denominator is an augmentation artefact and the method **wins** in its own setting) →
+**`REVERSES-AT-TUNED-ALPHA0-ONLY`** → `UNRESOLVED-REVERSAL-LADDER-EDGE` (no reversal is claimed against a baseline
+whose optimum was not located).  The CURVE token takes the same bars and **never moves the primary**.  **Both
+reversal branches are reached** by `--selftest` cases E3 and E4 driving the real `score()`, as are all the others
+(E1–E14).
+
+**Floor gate (164.6).**  Chance on CIFAR-10 is 10 %.  Under either account — **D** (the deficit is a property of
+the method) or **A** (it is an augmentation artefact) — `m6` is predicted at **74.797** (its own spec, `ub9-b6`),
+`m6t` in **[72, 80]** (the lowest `AUGMENT=0` meta cell in the corpus is `ub9-sc` at 72.422), and every ladder rung at
+**≥ 55** — an **argument, not a measurement**: the only non-meta optimiser ever run unaugmented here, at steps ~3
+orders of magnitude smaller than any rung, reached 58.426.  **The lowest level any account predicts for any arm is
+55 pp = 45 pp = 123 SE above chance**; the primary is bounded in neither direction.  **Selection**, worst case
+(cells truly equal): choosing `S*` pushes `GAP_END` toward DEFICIT by ≤ **0.349 pp**, choosing `M*` toward REVERSAL
+by ≤ **0.146 pp**; both under the 2 SE bar, printed, not branched on.
+
+### 202.7 REGISTRATION — RULE 21 AND RULE 16
+
+| file | commit | committed (CEST) | `%ct` | sha256 | lines |
+|---|---|---|---|---|---|
+| `analysis/cAU1_unaug_denominator_score.py` | `736677d` | 2026-09-10T09:13:26+02:00 | 1789024406 | `ddcdb98a27fb75a3306be53b708ace2a078a62e0de1ac27eaf8adc9e2be9a2d0` | 1133 |
+| `bin/cAU1_unaug_denominator.sh` | `7aa0213` | 2026-09-10T09:13:45+02:00 | 1789024425 | `44d22122a5d83a74f0b1ea2a798c6989ff9204175ce33979add19ad8a9ece05f` | 451 |
+
+**No `cau1` run exists**, so the RULE 21 margin is not yet defined; when the batch is submitted it is `earliest sacct
+Submit − 1789024406`, and it is positive for any submission from now on.  The scorer was committed **alone**, before
+the launcher.  The files that ran the selftests and the dry run are **byte-identical** to the committed ones (sha256
+checked on both hosts).  **RULE 16:** `git diff --numstat fc27855 HEAD -- analysis/ bin/` returns exactly
+`1133 0 analysis/cAU1_unaug_denominator_score.py` and `451 0 bin/cAU1_unaug_denominator.sh` — additions only.
+`argsline_guard.py` and `_lib_guards.sh` were **not** edited.  Three untracked files in the working tree belong to
+other tracks (`analysis/cVK1_vggcut_score.py`, `bin/cVK1_vgg_cut_ladder.sh`, `analysis/cvi1_attack_indep.py`) and
+were **not** added.
+
+**Disclosure the scorer's header carries:** every per-seed value of `ub9`, `pp`, `PP`, `i3b` and `bl-sgd` was seen
+during design, because those rows **are** the premises.  No `cau1` value existed or exists.
+
+### 202.8 THE DRY RUN, AND AN ATTACK ON IT THAT SHARES NO CODE WITH IT
+
+Run on `alice2` from a scratch stage (`/home/s5014158/metaopt/stage_cau1`, holding the scorer, the launcher,
+`_lib_guards.sh`, `argsline_guard.py` and a byte-copy of the corpus; **since removed**), `METAOPT_WS` exported.
+**Exit 0; 0 guard failures; 27 composed lines; `argsline_guard.py --cmdline` 27/27 PASS.**  Guard 6b imports the
+scorer, reads the runner's **own** ENV-echo defaults out of `run_cifar.sh`, and proves that every composed line
+yields the ARGS **and** the ENV line the scorer's G1/G2 will demand — `AUGMENT=0` on all 27.  The dry run writes
+**nothing** under `$WS/runs` (provenance goes to `/tmp`; only `--submit` creates `runs/cau1/`).  Guard 1c2
+**requires** the selftest's raw-`.out` justification (B1') to have run on the host, not been skipped.
+
+**Attack:** a separate parser (session scratchpad, imports nothing from the repo) diffed each of the 27 composed
+lines against the **actual** `ub9-b6-s0` and `i3b-3e4-s2` ARGS/ENV lines read from their `.out` files and against
+`cdn1`'s arm-A composition.  `m6`: **zero** differences.  `m6t`: ARGS identical; ENV differs in `AUGMENT` (0 vs 1),
+`PROBE` (5 vs 0), and in stating `HIER=none` / `SCHED=none` explicitly where `i3b` left them to the runner's
+identical default.  `lr*`: differs from `cdn1` in dataset/net, `AUGMENT` and the rung only.  **Every "byte copy"
+claim in `202.4` holds.**
+
+### 202.9 PRICE
+
+From the corpus's own `wallclock_min` on 100-epoch rows of the same harness: SGD+cosine median **29 min** (worst 67,
+node851), MetaOptimize median **41–43 min** (worst 93, node851).  **Expected 21 × 29 + 6 × 42 min = 14.4 GPU-h**;
+worst observed per family **32.8**; corpus-worst 70.8 s/epoch **53.1**; **HARD BOUND = `WALL` 03:00:00 × 27 =
+81 GPU-h.**  `WALL` fits `gpu-short`'s 4:00:00 MaxTime (read live by `sinfo`), so the composer adds `gpu-short`
+and all 27 can run at once.  At dry-run time the account had **10 pending / 2 running** (`cvi1`).
+
+**THE LAUNCH COMMAND, NOT RUN:** on `alice2`, from a checkout at `7aa0213` or later —
+`export METAOPT_WS=/home/s5014158/metaopt && bash bin/cAU1_unaug_denominator.sh --submit`.  Per `200.1`, the
+checkout must carry `analysis/cAU1_unaug_denominator_score.py`, `bin/cAU1_unaug_denominator.sh`,
+`bin/_lib_guards.sh`, `analysis/argsline_guard.py` and `results/all_runs.csv`, and the raw `ub9` `.out` must be
+readable under `$WS/runs` (guard 1c2).  **This track was told to register only, and submitted nothing.**
+
+### 202.10 WHAT `cau1` WILL NOT LICENSE, WRITTEN BEFORE ANY RUN EXISTS (stamped by the scorer unconditionally)
+
+One baseline family (SGDm + cosine) — not AdamW-cosine, not constant-lr.  **The counterweight** (*"against the
+fixed-step baseline the parent used, MetaOptimize wins, +1.551"*) is **not** re-measured unaugmented.  α₀ gets two
+cells, not a ladder.  CIFAR-10 / ResNet18 only — the CIFAR-100 `GAP_in` +5.699 stays an `AUGMENT=1` number.  At
+`AUGMENT=0` TRAIN is at its ceiling, so the endpoint compares the **generalisation of interpolating solutions**;
+that is the regime the parent chose, and it is stated beside every number.  The comparison with the augmented
+CIFAR-10 deficit (+1.8071, itself cross-batch) is **printed and never a token**.  **Any branch landing licenses a
+sentence about the denominator in the parent's own setting and nothing about granularity.**
+
+### 202.11 THREE MISSTEPS OF MY OWN, CAUGHT BEFORE THE COMMIT AND DISCLOSED
+
+1. My first `AUGMENT=0` noise floor keyed cells by the 15 design columns alone, which **merges `pp_*` and `PP_*`
+   into one cross-batch cell** (0.4148, df 21, 6 cells).  A cross-batch offset is not seed noise; keyed by batch it
+   is **0.446775, df 18, 9 cells**, which is what is frozen.
+2. A between-batch SD for the cross-batch comparison came out at **4.04 pp over 79 cells** — and is **contaminated**
+   exactly as `149.6`'s floor was: its top contributors are `i3a` vs `i3c` (which differ in `COS_TOTAL`, a column
+   the cell key does not carry) and `gate0b` vs `gate0c` (`augment='?'`).  It measures configuration heterogeneity,
+   not batch noise.  **It was not frozen into any bar**; that is why the augmented comparison is a printout, not a
+   token.
+3. The scorer's header first said the selection bias *"favours a reversal"*.  It is the other way round: the
+   seven-rung max inflates the baseline, the two-arm max inflates the method, and the former is the larger push.
+   Fixed before the first commit; `--selftest` section C now states both numbers.
+
+### 202.12 STANDING CONSTRAINTS, DISCHARGED
+
+* **Nothing submitted, nothing cancelled.**  `sacct -u s5014158 -S 2026-01-01` holds **0** `cau1` records;
+  `squeue` **0**; `runs/` **0** `cau1` files (2026-09-10T07:14:06Z).  The scratch stage and its `/tmp` logs on
+  `alice2` were removed.
+* **Seed block verified fresh against the WHOLE record:** 0 corpus rows and 0 `.out` files under
+  `/home/s5014158/metaopt/runs` carry a seed in 50–54.
+* **RULE 20:** no run exists, so there is nothing to audit; the post-launch commands, with the declared `--vary`
+  axes per family (`cau1-lr` varies `alpha0`; `cau1-m6-` and `cau1-m6t-` vary only seed / run-name /
+  save-directory), and the separate ENV audit (`--envaudit`, checked against the scorer's own `expected_env()`) are
+  printed by the launcher.  **No `cau1` number may be read before 27/27.**
+* **Corpus 2,797, unchanged; nothing ingested.**  `paper/` untouched (`git status --porcelain -- paper/` empty).
+  `analysis/c98_reproduce.py` exit code **AS-IS: `1`** (inherited, author scope, not fixed).  No nested
+  `claude -p`.  **`alice` NOT CONTACTED.**
+* **Numbering — A COLLISION, RESOLVED IN THE OTHER TRACK'S FAVOUR.**  I pulled, read `Next free number: **201**`,
+  took 201 and wrote this entry.  Track C, writing concurrently in the same working tree, **committed its own 201**
+  (`cvk1`, `5741218`) before I committed mine.  The rule is to take a number and never renumber anyone else's, so
+  **this entry is renumbered to 202 and placed below Track C's 201, whose text is left byte-identical** (`git diff`
+  against `5741218` is insertions only).  Every internal cross-reference here now reads `202.x`.  No seed
+  collision: `cvk1` holds 55-57, `cau1` holds 50-52.
+* **COST: ZERO GPU-HOURS.**
+
+Next free number: **203**.
