@@ -244,9 +244,47 @@ def chart_horizon():
     return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="The horizon test from 100 to 250 epochs">' + "".join(p) + '</svg>'
 
 
+
+# ============ CHART 8 : recovered fraction of the gap, two families ============
+def chart_recovery():
+    rows = [
+        ("ResNet-18", "ISO",   "3 carriers &#183; [59,3] &#183; 1,536 p",    1.0194, "win"),
+        ("ResNet-18", "DEPTH", "matched, no carrier &#183; [59,3]",          0.0037, "null"),
+        ("VGG11-bn",  "ISO",   "bn8.weight &#183; [25,1] &#183; 512 p",      1.0178, "win"),
+        ("VGG11-bn",  "CTL",   "bn7.weight, exact twin &#183; [25,1]",       -0.0007, "null"),
+    ]
+    W,H = 760, 300; L,R,T,B = 250, 70, 34, 48
+    x0,x1 = L, W-R
+    lo,hi = -0.15, 1.15
+    X = lambda v: lin(v,lo,hi,x0,x1)
+    band = (H-T-B)/len(rows)
+    p=[]
+    for v in (0,0.25,0.5,0.75,1.0):
+        cls = "ref-hi" if v==1.0 else ("ref-lo" if v==0 else "grid")
+        p.append(f'<line x1="{X(v):.1f}" y1="{T-12:.1f}" x2="{X(v):.1f}" y2="{H-B:.1f}" class="{cls}"/>')
+        p.append(f'<text x="{X(v):.1f}" y="{H-B+18:.1f}" class="ax ax-c">{v:g}</text>')
+    p.append(f'<text x="{X(1.0):.1f}" y="{T-17:.1f}" class="rowsub ax-c">the whole gap</text>')
+    p.append(f'<text x="{X(0):.1f}" y="{T-17:.1f}" class="rowsub ax-c">none of it</text>')
+    for i,(fam,arm,sub,v,kind) in enumerate(rows):
+        yc = T + band*i + band/2
+        if i in (0,2):
+            p.append(f'<text x="18" y="{yc+band/2+4:.1f}" class="rowname" style="font-size:12px;fill:var(--muted)">{fam}</text>')
+        if i == 2:
+            p.append(f'<line x1="12" y1="{T+band*2:.1f}" x2="{W-12:.1f}" y2="{T+band*2:.1f}" class="grid"/>')
+        p.append(f'<text x="{L-16:.1f}" y="{yc-2:.1f}" class="rowname ax-r">{arm}</text>')
+        p.append(f'<text x="{L-16:.1f}" y="{yc+13:.1f}" class="rowsub ax-r">{sub}</text>')
+        a,b = sorted((X(0),X(v)))
+        p.append(f'<rect x="{a:.1f}" y="{yc-8:.1f}" width="{max(b-a,2):.1f}" height="16" rx="1.5" class="bar bar-{kind}"/>')
+        lab = f"{v:+.3f}".replace("-","&#8722;")
+        p.append(f'<text x="{max(X(v),X(0))+9:.1f}" y="{yc+4.5:.1f}" class="val">{lab}</text>')
+    p.append(f'<text x="{(x0+x1)/2:.1f}" y="{H-8:.1f}" class="axtitle ax-c">fraction of the in-batch scalar&#8594;layerwise gap recovered &#183; CIFAR-100, 100 epochs &#183; cdep1 and cvi1</text>')
+    return f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Recovered fraction of the gap on two families">' + "".join(p) + '</svg>'
+
+
 # ---------- content tables ----------
 HOLDS = [
  ("It is those tensors, not that depth","Isolating three <code>layer4</code> BatchNorm parameters matched to the carriers on group sizes, isolated numel (1,536 <em>exactly</em>), width, stage and normalisation-layer membership &#8212; but containing no carrier &#8212; recovers <strong>0.36 %</strong> of the gap. <code>&#916;_ID = +46.52 pp = +61.56 SE</code>. Every seed clears the bar alone.","cdep1","18 runs, 6 arms, fresh seeds {24,25,26}","188, 193"),
+ ("The isolation exists off ResNet","On VGG11_bn &#8212; no residual additions &#8212; giving <code>bn8.weight</code> alone its own step size recovers <strong>1.018</strong> of the in-batch gap. Its exact twin <code>bn7.weight</code>, same numel, width and class, one layer shallower, recovers <strong>&#8722;0.001</strong>. <code>&#916;_ID = +31.30 pp = +65.40 SE</code>. The tensor was nominated from the probe records <em>before</em> the intervention ran.","cvi1","12 runs, fresh seeds {41,42,43}","198, 203"),
  ("The rescue is not a delay","At 250 epochs &#8212; 2.5&#215; the horizon &#8212; <code>RHO = D_ISO@250 / D_ISO@100 = 0.9977</code>. ISO freezes on schedule around epoch 102 and then holds 69.9 % for 148 further epochs while the floor holds 23.1 %. The registered &#8220;it is only a delay&#8221; account needed &#8804;5 pp and missed by 41.7.","ciso2","12 runs, 250 ep, in-run paired control","190, 196"),
  ("Batch is the unit of replication","Tested directly and twice. The same intervention re-run in two fresh batches at disjoint seeds reproduced its contrasts: <code>D_ONE</code> +41.4693&#8594;+41.4747, <code>D_ISO</code> +46.9307&#8594;+46.8453. Against a 2-SE read bar of 1.51 pp.","cdep1 / ciso2","3 disjoint seed blocks, byte-identical partitions","191, 193, 196"),
  ("The gap is not a ResNet artefact","On <code>VGG11_bn_c100</code> &#8212; a plain BatchNorm conv stack with <em>no residual addition anywhere</em> &#8212; scalar&#8594;layerwise is <strong>+31.27 pp = +65.42 SE</strong>. The corpus is no longer 100 % ResNet.","cvg1","6 runs, first non-ResNet batch in the campaign","189, 194"),
@@ -276,11 +314,12 @@ CAND = [
  ("14","the reduction &#8212; <code>crn1</code>","LIVE","<code>COMPOSITION-OPERATIVE</code> on one clean pair; the null is excluded on all three","169, 173"),
  ("15","H-DISAGREE","DEAD","argmax at k = 1, &#961; = &#8722;0.05","179"),
  ("16","H-DOMINATE","DEAD","dead as named; element statistic does not exist on disk","181, 184, 186"),
- ("17","H-ISOLATE &#8212; <code>ciso1</code> &#183; <code>cdep1</code> &#183; <code>ciso2</code>","LIVE","All three legs have reported. Identity: closed. Magnitude: architecturally unreachable. Horizon: measured, registered gate not cleared. Does not die &#8212; the collapse account was reachable and was refuted. Does not graduate.","185, 187, 193, 196"),
+ ("17","H-ISOLATE &#8212; <code>ciso1</code> &#183; <code>cdep1</code> &#183; <code>ciso2</code>","LIVE","All three ResNet legs reported; now also <code>IDENTITY-OPERATIVE-VGG</code> on a second family. Magnitude unreachable on both nets. Does not graduate: it identifies, it does not explain.","185&#8211;203"),
 ]
 
 RUNNING = [
- ("cvi1","<strong>Registered, launch-ready, not submitted.</strong> 12 jobs &#183; ~13 GPU-h &#183; 4 arms &#215; fresh seeds {41,42,43} on <code>VGG11_bn_c100</code>. Isolates <code>bn8.weight</code> at [25,1] against <code>bn7.weight</code> as an <em>exact</em> twin &#8212; the two arms differ in precisely two tensor memberships and nothing else.","The scope leg: the first isolation intervention off ResNet. VGG has four 512-wide BN scales &#8212; one nominated carrier and three matched non-carriers &#8212; so the control is one-for-one. ResNet-18 has only two, which is why <code>cdep1</code> needed a set matched on totals.","198"),
+ ("cvk1","<strong>27 jobs</strong> &#183; ~16 GPU-h &#183; a cut-position ladder <code>[k, 26&#8722;k]</code> on VGG11_bn, dense around the predictions, seeds 55&#8211;57.","Whether cut position and isolation are <em>one</em> result. The carrier account predicts <code>k* = 22</code>, the last cut before <code>bn8</code>. Parameter balance &#8212; which also names 49 on ResNet &#8212; predicts 16&#8211;18. Depth fraction predicts 20&#8211;21. A flat curve means cut position does not localise on VGG at all.","201"),
+ ("cau1","<strong>27 jobs</strong> &#183; ~14 GPU-h &#183; ResNet-18 / CIFAR-10 at <code>AUGMENT=0</code>: a seven-rung tuned SGD ladder against the parent paper&#8217;s own config and the method&#8217;s best CIFAR-10 cell, seeds 50&#8211;52.","Whether the denominator &#8212; the strongest result &#8212; holds in the parent paper&#8217;s own unaugmented setting. The design lets the deficit reverse: that is the only outcome that would damage the headline, and it must be reachable.","202"),
 ]
 
 def tr_holds():
@@ -327,9 +366,10 @@ def tr_corpus():
                    for a,b,c in CORPUS)
 
 HOUSE = [
- ("Queue empty, ~42 GPU-h spent this week","<code>cdep1</code> 16.25 h, <code>ciso2</code> 21.65 h, <code>cvg1</code> 4.29 h. Nothing running; <code>cvi1</code> is registered and waiting.","ok"),
+ ("Queue empty, ~49 GPU-h spent this week","<code>cdep1</code> 16.25 h, <code>ciso2</code> 21.65 h, <code>cvg1</code> 4.29 h, <code>cvi1</code> 6.80 h &#8212; below its own 7&#8211;13 h estimate.","ok"),
  ("The freedom gate measures the wrong thing","<code>PIN_OCC_MIN</code> scores dwell time at exactly &#8722;15.000 rather than step-size magnitude, so it bucketed ISO with the free arm despite a hundredfold difference in step size. Registered before the data existed and fired honestly; the defect is measured and disclosed, and the scorer is frozen. A successor must fix it by registration.","warn"),
- ("The <code>AUGMENT=0</code> fairness objection is still open","The parent paper&#8217;s own setup. Open since cycle 13; the only runs at that setting were submitted against a standing rule and cannot be pooled. The last fairness objection with teeth, and a cheap batch.","warn"),
+ ("Last cycle&#8217;s account of the <code>AUGMENT=0</code> objection was wrong","It said the only unaugmented runs broke a standing rule. In fact 27 unaugmented rows exist across three batches, the rule they broke was a missing submit script, and the granularity half of the objection was closed long ago. Only the method-vs-baseline half is open. Corrected in place, superseded wording preserved.","warn"),
+ ("The nomination&#8217;s &#8220;1.0000&#8221; is Lion&#8217;s direction","The sign flip is exact on the momentum-smoothed term Lion actually consumes. On the raw meta-gradient it is 0.97&#8211;0.98 on VGG and 0.82&#8211;0.85 on ResNet. Quote it with that.","warn"),
  ("RULE 20 closed at 36 of 36","All three cycle-148 batches PASS at full coverage on the unedited guard, with clean separate ENV audits. All 36 <code>.out</code> files verified byte-identical between the cluster and the local mirror before any number was read.","ok"),
  ("<code>docs/MASTER-TABLE.md</code> is current","74 &#8594; 108 rows across two passes; the registered checker goes exit 1 &#8594; exit 0 unedited. Its bottom line now carries the CIFAR-100 denominator, the off-ResNet gap replication, and an explicit marking that the gap and the isolation must never travel together.","ok"),
  
@@ -568,18 +608,18 @@ footer {{
   <p class="eyebrow">
     <span>Hierarchical MetaOptimize</span><span class="dot">/</span>
     <span>ALICE &#183; Leiden</span><span class="dot">/</span>
-    <span>cycles 1&#8211;150</span><span class="dot">/</span>
-    <span>CORRECTIONS 199</span>
+    <span>cycles 1&#8211;151</span><span class="dot">/</span>
+    <span>CORRECTIONS 204</span>
   </p>
-  <h1>What 2,797 runs actually established</h1>
-  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Eleven results hold.</strong> Nine died, including the one the project was named for. The strongest is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap &#8212; and that it is those specific tensors, not merely three tensors at that depth. The gap now also reproduces on an architecture with no residual connections at all, and the rescue survives 2.5&#215; the horizon losing one tenth of one percent. What the campaign still cannot do is <em>name</em> the mechanism &#8212; and this report says plainly which sentences that rules out.</p>
+  <h1>What 2,809 runs actually established</h1>
+  <p class="standfirst">Step-size granularity in MetaOptimize, audited end to end. <strong>Twelve results hold.</strong> Nine died, including the one the project was named for. The strongest is that <strong>1,536 of 11.2 million parameters</strong> carry the entire scalar-to-layerwise accuracy gap &#8212; and that it is those specific tensors, not merely three tensors at that depth. The gap now also reproduces on an architecture with no residual connections at all, and the rescue survives 2.5&#215; the horizon losing one tenth of one percent. And as of today the isolation works on a second architecture too, picked out in advance from the probe records. What the campaign still cannot do is <em>name</em> the mechanism &#8212; and this report says plainly which sentences that rules out.</p>
 </header>
 
 <div class="rail">
-  <div class="stat"><span class="n">2,797</span><span class="k">runs</span></div>
-  <div class="stat"><span class="n">2,956</span><span class="k">GPU-hours</span></div>
-  <div class="stat"><span class="n">199</span><span class="k">corrections</span></div>
-  <div class="stat"><span class="n" style="color:var(--ok)">11</span><span class="k">results hold</span></div>
+  <div class="stat"><span class="n">2,809</span><span class="k">runs</span></div>
+  <div class="stat"><span class="n">2,963</span><span class="k">GPU-hours</span></div>
+  <div class="stat"><span class="n">204</span><span class="k">corrections</span></div>
+  <div class="stat"><span class="n" style="color:var(--ok)">12</span><span class="k">results hold</span></div>
   <div class="stat"><span class="n" style="color:var(--bad)">9</span><span class="k">results dead</span></div>
   <div class="stat"><span class="n" style="color:var(--accent)">0</span><span class="k">jobs in flight</span></div>
 </div>
@@ -693,6 +733,19 @@ footer {{
 </section>
 
 <section>
+  <div class="sechead"><h2>The isolation, on a second architecture</h2><span class="seckey">figure 8 &#183; CORRECTIONS 198, 203, 204</span></div>
+  <p class="deck">The previous section lifted the ResNet caveat for the <em>gap</em> and explicitly not for the <em>isolation</em>. <code>cvi1</code> is the test of the isolation. VGG11_bn has four 512-wide BatchNorm scales; the scalar arm&#8217;s probe records nominated exactly one of them as the carrier, so the control could be an exact twin &#8212; something ResNet-18, with only two non-carrier scales against three carriers, could never offer.</p>
+  <figure>
+    {chart_recovery()}
+    <figcaption><b>Same pattern, two families, nominated in advance.</b> On both networks the probe-nominated set recovers the whole gap and a matched set recovers none of it. The nomination statistic &#8212; which tensor&#8217;s removal flips the sign of the remaining meta-gradient &#8212; picked <code>bn8</code> from <code>cvg1</code>&#8217;s records, and the premise replicated inside <code>cvi1</code> itself at fresh seeds (flip 1.0000 on 320/320/320 pinned records; <code>bn7</code> 0.0000). The controls sit at the floor, so their values are floor readings, not measurements of precision: the evidence is the asymmetry between the two arms.</figcaption>
+  </figure>
+  <div class="callout">
+    <h3>What transfers, and what hardens into a limit.</h3>
+    <p><strong>Scope lifts</strong> &#8212; the isolation now exists on a non-residual family. <strong>The tensor list does not transfer</strong>: three carriers on ResNet, one on VGG; what carries over is the rule that nominates them. <strong>Magnitude hardens on both nets</strong>: <code>bn8</code> carries 255&#215; the meta-gradient mass of <code>bn7</code>, and a pure magnitude account predicts this outcome exactly as well. <strong>Horizon is unmeasured on VGG</strong> &#8212; ISO&#8217;s coarse group was still ~1.5 nats above the clamp at epoch 99 and descending.</p>
+  </div>
+</section>
+
+<section>
   <div class="sechead"><h2>Results that died</h2><span class="seckey">refuted, withdrawn or superseded</span></div>
   <p class="deck">Recording these is the point of the ledger. Roughly a dozen of my own claims were corrected in place this week, including three index-convention errors and one mass prediction that came out backwards.</p>
   <div class="tscroll"><table>
@@ -712,7 +765,7 @@ footer {{
 
 <section>
   <div class="sechead"><h2>Next, awaiting your go-ahead</h2><span class="seckey">CORRECTIONS 198 &#183; nothing submitted</span></div>
-  <p class="deck">The queue is empty for the first time in a week. Four candidates were ranked; this one won because it is the only one that moves the only leg still open. Second place &#8212; deleting ResNet&#8217;s residual add for a true one-variable ablation &#8212; turned out to be mispriced: three shortcuts carry nine real parameters, so removing the addition alone would orphan them.</p>
+  <p class="deck">Both registered, dry-run clean, scorers committed, <strong>nothing submitted</strong>. Queue empty. Together about 30 GPU-h expected.</p>
   <div class="tscroll"><table>
     <thead><tr><th>Batch</th><th>What it is</th><th>What it decides</th><th>Entry</th></tr></thead>
     <tbody>{tr_running()}</tbody>
@@ -734,33 +787,33 @@ footer {{
 
 <section>
   <div class="sechead"><h2>What can actually be written</h2><span class="seckey">CORRECTIONS 199 &#183; asked of each result separately</span></div>
-  <p class="deck">Four claims, judged one at a time against what the corpus can defend. One of them is a no.</p>
+  <p class="deck">Four claims, judged one at a time against what the corpus can defend. Last cycle one of them was a no; <code>cvi1</code> upgraded it.</p>
   <div class="tscroll"><table>
     <thead><tr><th></th><th>Claim</th><th>Qualifier that must travel with it</th></tr></thead>
     <tbody>
       <tr><td class="c-st"><span class="pill pill-ok">as-is</span></td>
         <td><div class="t-claim">The denominator</div><div class="t-detail">MetaOptimize does not beat a tuned non-meta baseline. CIFAR-100: <code>+5.699 pp = +18.80 SE</code> in one batch, every rung of the SGD ladder beating the meta cell. CIFAR-10: &#8722;1.807 pp on plateau5, flat across 100/300/600 epochs. <strong>The strongest thing the campaign owns.</strong></div></td>
-        <td class="t-detail">It <em>does</em> beat the fixed-step baseline the parent paper used, +1.551 pp, t = +12.2 &#8212; state that. One fairness objection still has teeth: the parent paper&#8217;s own <code>AUGMENT=0</code> setup has never been run cleanly. Cheap, and 150 cycles have not run it.</td></tr>
+        <td class="t-detail">It <em>does</em> beat the fixed-step baseline the parent paper used, +1.551 pp, t = +12.2 &#8212; state that. One fairness objection still has teeth: a method-vs-tuned-baseline comparison in the parent paper&#8217;s own unaugmented setup. The granularity half of that was run three times; the baseline half was declined at closeout as not worth compute, and that reasoning turns out to be circular. <code>cau1</code> is registered to close it.</td></tr>
       <tr><td class="c-st"><span class="pill pill-ok">as-is</span></td>
         <td><div class="t-claim">Cut position</div><div class="t-detail">The granularity effect localises to a single step, <code>k* = 49</code>, replicated at a converged 772-epoch budget on fresh seeds. Group count and size balance both independently disqualified. The cleanest localisation the campaign owns &#8212; and it does not depend on the isolation line at all.</div></td>
-        <td class="t-detail">Still ResNet-only. A cut-position replication on VGG has never been registered and would be cheap.</td></tr>
+        <td class="t-detail">Still ResNet-only, and it has a confound nobody had written down: on ResNet, <code>k = 49</code> is <em>both</em> the last cut before the first carrier <em>and</em> the parameter-balance optimum. <code>cvk1</code> is registered to separate them on VGG.</td></tr>
       <tr><td class="c-st"><span class="pill pill-warn">with care</span></td>
         <td><div class="t-claim">The granularity gap</div><div class="t-detail">Now demonstrably off ResNet: <code>+31.27 pp = +65.42 SE</code> on a non-residual BatchNorm conv stack, train agreeing at +64.16.</div></td>
         <td class="t-detail">Non-<em>residual</em>, not non-<em>BatchNorm</em>. And no granularity sentence may be written without the &#8220;at a shared <code>ms</code> = 1e-3&#8221; qualifier &#8212; tuning each arm at its own optimum reverses the early-epoch trend. The VGG figure is a <strong>lower bound</strong>, not an estimate.</td></tr>
-      <tr><td class="c-st"><span class="pill pill-bad">not as written</span></td>
-        <td><div class="t-claim">The isolation</div><div class="t-detail">Three limits bind it at once, and <em>each alone</em> sinks a mechanism claim: magnitude is architecturally unreachable on ResNet-18, so &#8220;those tensors&#8221; cannot be separated from &#8220;the three largest terms&#8221;; the line is 100 % ResNet and VGG&#8217;s carrier set has cardinality <em>one</em>; and the registered freedom gate has now failed at both 100 and 250 epochs.</div></td>
-        <td class="t-detail"><strong>Writable:</strong> &#8220;a 512-parameter subset of a step-size partition determines whether the optimiser reaches the layerwise ceiling or the scalar floor, and controls matched on depth, layer class, width and isolated numel do not reproduce it.&#8221; <strong>Not writable:</strong> &#8220;these three BatchNorm scales are the mechanism&#8221; &#8212; or any sentence pairing the VGG gap with the ResNet isolation.</td></tr>
+      <tr><td class="c-st"><span class="pill pill-warn">identification, not mechanism</span></td>
+        <td><div class="t-claim">The isolation</div><div class="t-detail"><em>Upgraded this cycle</em> from &#8220;not publishable as written&#8221;. Now a two-architecture identification result. Writable, verbatim: &#8220;On two BatchNorm convolutional networks trained on CIFAR-100 at a shared meta step size of 10&#8315;&#179; &#8212; ResNet18 and the non-residual VGG11_bn &#8212; giving its own step-size group to the tensor set nominated from the scalar arm&#8217;s pinned meta-update records recovers the entire in-batch scalar-to-layerwise gap at 100 epochs (1.019 and 1.018 of it), whereas isolating the same number of BatchNorm parameters of the same width and layer type at the same or adjacent depth recovers none of it; the nominated sets differ between the two networks, and on both they are also the largest contributors to the meta-update, so the result identifies <em>which</em> parameters decide the outcome, not <em>why</em>.&#8221;</div></td>
+        <td class="t-detail">BatchNorm networks only. One dataset, one shared meta step size, so both rescues are lower bounds. VGG measured at 100 epochs only. The controls&#8217; &#8220;none&#8221; is a floor reading. <strong>Still not writable:</strong> &#8220;these BatchNorm scales are the mechanism&#8221;.</td></tr>
     </tbody>
   </table></div>
   <div class="callout">
     <h3>One sentence.</h3>
-    <p>The paper this corpus supports is <strong>a negative result with a sharp localisation attached</strong>: MetaOptimize loses to a tuned baseline by a margin that is large, replicated and horizon-stable; the granularity of its step-size partition matters enormously, now demonstrably off ResNet; and the effect localises to a single cut and a tiny parameter subset whose mechanism the campaign has measured thoroughly and <em>cannot yet name</em>.</p>
+    <p>The paper this corpus supports is <strong>a negative result with a sharp localisation attached</strong>: MetaOptimize loses to a tuned baseline by a margin that is large, replicated and horizon-stable; the granularity of its step-size partition matters enormously, on two architecture families; and the effect localises to a single cut and to a tiny parameter subset that can be <em>predicted</em> from the meta-update records on both families &#8212; whose mechanism the campaign has measured thoroughly and <em>cannot yet name</em>.</p>
   </div>
 </section>
 
 <section>
   <div class="sechead"><h2>Publication placement</h2><span class="seckey">assessed against the four-lens rubric</span></div>
-  <p class="deck">An honest read, not an encouraging one. The middle number moved this week, but not to where it needs to be: <code>VGG11_bn</code> is non-<em>residual</em>, not non-<em>BatchNorm</em>, so the normalisation question the isolation result turns on is still untested.</p>
+  <p class="deck">An honest read, not an encouraging one. The middle number moved this week, but not to where it needs to be: <code>VGG11_bn</code> is non-<em>residual</em>, not non-<em>BatchNorm</em>, so the normalisation question the isolation result turns on is still untested &#8212; on both families now, rather than one.</p>
   <div class="venues">
     <div class="venue">
       <div class="vn">TMLR</div>
@@ -770,9 +823,9 @@ footer {{
     </div>
     <div class="venue">
       <div class="vn">ICML &#8212; cut-position paper</div>
-      <div class="vp" style="color:var(--warn)">15&#8211;20&#8202;%</div>
-      <div class="meter"><i style="width:18%;background:var(--warn)"></i></div>
-      <div class="vd">Identity and horizon legs both closed this week, and the gap went cross-family. Still missing, and this is what caps it: any isolation result off ResNet (<code>cvi1</code> is registered), and a normalisation family that is not BatchNorm.</div>
+      <div class="vp" style="color:var(--warn)">20&#8211;25&#8202;%</div>
+      <div class="meter"><i style="width:23%;background:var(--warn)"></i></div>
+      <div class="vd">The isolation is now cross-family and was <em>predicted</em> before it was run &#8212; the move a referee rewards. What still caps it: no normalisation family other than BatchNorm, and a mechanism that identifies without explaining. If <code>cvk1</code> peaks at 22, cut position and isolation merge into one story.</div>
     </div>
     <div class="venue">
       <div class="vn">ICML &#8212; current manuscript</div>
@@ -792,7 +845,7 @@ footer {{
 </section>
 
 <footer>
-  Compiled from <code>results/all_runs.csv</code> at 2,797 rows and <code>docs/CORRECTIONS.md</code> at entry 199. The corpus now owns its first 250-epoch rows.<br>
+  Compiled from <code>results/all_runs.csv</code> at 2,809 rows and <code>docs/CORRECTIONS.md</code> at entry 204.<br>
   Primary metric <code>plateau5</code>; the CSV <code>plateau</code> column is barred as primary and <code>best_test</code> is not a plateau.<br>
   Tensor indices are 1-based. Every comparison in-batch. Numbers re-derived for this report, not copied from prose.
 </footer>
