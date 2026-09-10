@@ -28249,3 +28249,316 @@ Either way the launcher successor is mechanical: `bin/cVK1_vgg_cut_ladder.sh` wi
 * **Numbering.**  I fetched immediately before writing: origin's last entry was 206, so I took **207**.
 
 Next free number: **208**.
+
+## 208. TRACK R — **`cvk1`'s BARS ARE FROZEN (O2, 207.6).  REGISTERED AND COMMITTED BEFORE ANY cvk1 RUN EXISTS: `analysis/cVK2_vggcut_score.py` AND `bin/cVK2_vgg_cut_ladder.sh` (commit `5629b17`).**
+
+**THE ACCEPTANCE TEST PASSES.**  The test uses the SAME 27 synthetic runs, 207's near-bar set, byte-identical to 207's files.
+* **cVK2's `score()` emits ONE FINAL line, `PEAK-AT-22 | CARRIER-CUT-SUPPORTED`, against six corpora:**
+  * the 2,797-row corpus;
+  * the 2,809-row corpus;
+  * the cau1-simulated corpus;
+  * the REAL cau1 corpus (the other workflow's uncommitted working-tree ingest, read as a copy);
+  * both of 207's stress corpora.
+* **On the two stress corpora the frozen cVK1 flips to `UNRESOLVED-TIE-WITH-22`.**
+* **On every real corpus, cVK2's σ EQUALS cVK1's EXACTLY** (|Δ| = 0.000e+00).  A floor-only reading of O2 would differ by 1.062e-7.
+
+**THE DIFF IS WHAT THE OPERATOR AUTHORIZED.**
+* **The scorer.**  The non-comment diff against cVK1 is exactly:
+  * (a) the two live σ terms become two pinned literals, through `compose_sigma()`;
+  * (b) the selftest's live pins become NOTEs, plus an O2 block;
+  * (c) section E, which drives the real `score()`.
+* **AST check.**  100 of cVK1's 102 top-level AST nodes are identical.  Inside `score()`, only the 3 σ statements differ.
+* **The launcher.**  Its only non-comment change is the three-path repoint, proved by reverse substitution.
+
+**THE TESTS PASS ON BOTH HOSTS.**
+* **Selftest:** Mac 110/0/2, alice2 139/0/0.
+* **`tests/test_vggbn2.py`:** 68/0 on the Mac AND on alice2, on every corpus.  This closes 207.1(f).
+* **Dry run on alice2:** exit 0, 0 guard failures.  I read all 27 lines in full.  They are byte-identical to the 27 lines of the frozen cVK1 launcher, which still refuses (exit 2, guards 1c and 1d3).
+* **Seeds 55–57 are fresh** in the corpus, in `.out` files and in `sacct`.
+
+**ZERO GPU SUBMITTED.**
+* 0 `cvk1` jobs in `squeue`, 0 in `sacct` all-time, 0 `cvk1-*.out`.
+* `alice` NOT CONTACTED.
+* cau1's files, jobs and ingest were untouched.
+* COMMITTED CORPUS: 2,809 rows, unchanged by me.
+
+THIS ENTRY TOOK NUMBER **208**; NEXT FREE **209**.
+
+### 208.1 BRIEFING CORRECTIONS, LEADING
+
+* **(a) "Registration values" can be read two ways.  Both readings are inert.**
+  * 207.6 says pin the live terms "to their REGISTRATION values".  The brief's 1(a) says pin them to the values "RE-DERIVED NOW".
+  * `SIGMA_VGG_live` was 0.400657792 at cVK1's registration (5741218, 2,797 rows).  Today (2,809 rows) it is 0.3638879864.  I followed 1(a) literally.
+  * Neither value can enter a bar: they lose the max to the frozen floor 0.586232 by 0.1856 and by 0.2223.
+  * `SIGMA_NARROW_live` is 0.5862321062215915 on both corpora, so its two readings coincide.
+* **(b) The stress template.**
+  * 207's `mk_stress.py` copies a `cvi1-` scalar row.  Section E instead takes the first usable VGG std-cell scalar row, which is `cvg1-k01-s31`.
+  * The two rows share one 15-key cell: in either case the 3 invented rows land there and give `SIGMA_VGG_live` 0.905461 / 1.548110.
+  * The acceptance script (208.4) uses 207's recipe verbatim.
+* **(c) 207.1(f) is closed.**
+  * The Mac has `torch` 2.12.0 in `~/.venvs/tiger`.
+  * I copied the three live files read-only from alice2 and verified their sha256: `build_network.py` `c7998883`, `.pre_vggbn` `86b5e2df`, `Optimizers/HF.py` `4732b74a`.
+  * `tests/test_vggbn2.py` therefore ran on BOTH hosts.  The ROG node timed out on ssh again; it was not needed.
+* **(d) cau1 had not been COMMITTED while I worked.  Its ingest was in progress in the SAME working tree.**
+  * Origin stayed at 2,810 lines (`50c7f9c8…`) throughout.  alice2 held 27 `cau1-*.out` files and, by the end, an empty queue.
+  * At 13:42:45Z the shared working tree carried the other workflow's UNSTAGED `results/all_runs.csv`: +27 `cau1-` rows, 2,837 lines, sha `465b81cc…`.  The rows are ResNet18 / CIFAR10 / augment 0, seeds 50/51/52 ×9.
+  * I copied it to my scratchpad and ran against the copy: the acceptance test, cVK2's selftest and `test_vggbn2.py` (208.4, 208.5).  I did not stage, commit, edit or re-derive that ingest.
+  * On it, the frozen `pooled_sigma()` gives NARROW 0.5862321062215915 (df 77) and VGG 0.3638879864280581 (df 10), identical to 16 digits.  cau1's rows fail both filters (`network`, `augment`), so they cannot move either term.
+  * Under O2, no ingest can move a bar at all.  The cau1-simulated corpus of 207 (`43d56b2a…`) was scored as well.
+* **(e) The launcher's "nothing else".**
+  * Besides `SC`, `TESTV` and guard 1b's porcelain list, five non-comment lines name the repointed files, and I repointed them too: guard 1d3's two messages, the DOCUMENTED-INVOCATION echo, the SCORE-IT-WITH echo and the submitting-form echo.
+  * Left alone, they would tell the operator to score with the frozen cVK1.  Each is the same three-string substitution (208.6).
+* **(f) Two strings in cVK2 still say `cVK1`**: the `--selftest` banner and the argparse description.  I left them for diff-minimality and disclosed them in the header.  No guard reads either.
+* **(g) Another track committed into the shared working tree while I worked.**
+  * The commit is `4f95ce5`, "Track A, live-term census: `analysis/cLV1_live_term_census.py`".  My `5629b17` sits on top of it.
+  * `git diff --cached` held my three paths only.  I did not read or touch cLV1.
+
+### 208.2 FILES — SHA256, MAC == alice2 MIRROR
+
+| file | status | sha256 |
+|---|---|---|
+| `analysis/cVK2_vggcut_score.py` | NEW, registered (`5629b17`) | `aca0cdc314734ed9e8fc611ba42f774e7f76a40294df33de4883c59cd7047338` |
+| `bin/cVK2_vgg_cut_ladder.sh` | NEW, registered (`5629b17`) | `4183f85eb8e468720f452e98404efda1e7d3379a68b9b8bb9416f40dad21573e` |
+| `analysis/cVK2_invariance_check.py` | NEW, the acceptance test (`5629b17`) | `90c1a7a606abefa86adf02608b329ab8fc31e0faa90b7567eba390a312ef64d7` |
+| `tests/test_vggbn2.py` | registered at 207, unchanged | `4b1f06ea…a33a` |
+| `analysis/cVK1_vggcut_score.py` | FROZEN, untouched | `c8d46b66…d578` |
+| `bin/cVK1_vgg_cut_ladder.sh` | FROZEN, untouched | `3468dbe9…8ad0` |
+| `bin/_lib_guards.sh` / `analysis/argsline_guard.py` | untouched | `c45e1b73…` / `81cea8b5…` |
+
+* **Staging.**  The first two files and `tests/test_vggbn2.py` were staged into the alice2 mirror (`$HOME/metaopt/hierarchical-metaoptimize`).  The sha256 is identical on both sides.
+* **The same bytes everywhere.**  The bytes that ran on both hosts are the bytes committed.  The alice2 dry run's guard 1c printed the scorer sha `aca0cdc3…`.
+
+### 208.3 THE DIFF IS EXACTLY (a)+(b)+(c) — AND NOTHING THAT MOVES A BAR, BRANCH OR READER
+
+**AST, top level.**  cVK1 has 102 top-level nodes; **100 are AST-identical in cVK2**.  Only `score` and `selftest` differ, and none was removed.
+* **Unchanged: every node that sets a threshold, SE multiplier, branch, arm, seed, spec string, primary or reader.**  All of these are among the 100:
+  * design constants: PREFIX NET DSET EPOCHS BATCH SEEDS CLIP MST A0 AUG PROBE GRID KSTAR_PRED SPEC ARMS;
+  * thresholds and multipliers: PEAK_SE FLOOR_SE FLAT_FRAC FLAT_MIN_SE GAP_MIN DIVERGED_BAR FLOOR_MIN CEIL_MAX;
+  * σ constants and cell key: SIGMA_PRIOR SIGMA_VGG SIGMA_NARROW SE_PRIOR CELLKEYS;
+  * regexes: EPTR_RE OUT_RE;
+  * branch and token functions: `decide` `carrier_token` `rival_token`;
+  * readers: `read_corpus` `usable` `std_cell` `pooled_sigma` `parse_out` `plateau` `read_runs` `read_manifest` `resolve_manifest`;
+  * CVG1_* and `main`.
+* **New nodes:**
+  * 4 imports;
+  * `SIGMA_NARROW_PIN`, `SIGMA_VGG_PIN` and `compose_sigma`;
+  * the section E helpers `_E_ENV _E_LV _E_CH _e_tensors _e_manifest_text _e_write _e_build _e_stress_csv _e_minimal_csv _e_score`.
+
+**Inside `score()`, by statement AST.**  75 of cVK1's 79 top-level statements are identical and in the same order.  The 3 changed statements are all in the σ hunk:
+* the FLOOR banner string;
+* `cands = [...]` plus `if rows: <live terms>`, now `which, sigma_used, cands = compose_sigma(sigma_in)`;
+* `which, sigma_used = max(cands, …)`, now a disclosure `try:` that prints the live terms as a NOTE and assigns nothing a bar reads.
+
+`se = sigma_used*sqrt(2/3)` and everything after it are identical.  The FINAL-stamp line is AST-identical too.  The stamp reads `SIGMA-NARROW-PINNED` only because the candidate's NAME changed.
+
+**Text.**  With comment-only lines stripped from both files (`grep -v '^[[:space:]]*#'`), the diff removes 19 lines and adds 272, in 12 hunks:
+
+| hunk (cVK1 → cVK2) | part | what |
+|---|---|---|
+| `4a5`, `5a7,8`, `10a14` | (b)(c) | `import contextlib, inspect, io, tempfile` |
+| `91a96,97` | (a) | `SIGMA_NARROW_PIN = 0.5862321062215915`, `SIGMA_VGG_PIN = 0.3638879864280581` |
+| `285a292,301` | (a) | `compose_sigma(sigma_in)`: max over [floor, in-batch, NARROW pin, VGG pin], in cVK1's candidate order, so ties resolve as before |
+| `565c581`, `569,577c585`, `580c588,594` | (a) | the σ hunk of `score()` (above); the 11 removed lines are exactly cVK1's live-term block |
+| `679a694,826` | (c) | section E helpers |
+| `696a844,868` | (b) | selftest block "O2 — THE BARS ARE FROZEN": the literals, the < 1.1e-7 margin, `compose_sigma` taking ONE argument (no corpus), and SIGMA_USED == max(floor, in-batch, 2 pins) ≥ floor over 9 in-batch values |
+| `910,917c1082,1084` | (b) | the live-corpus pin loop (8 lines, including the `SIGMA_VGG` pin that FAILED on 2,809) becomes 3 NOTE lines |
+| `934a1102,1187` | (c) | selftest section E |
+
+**One behavioural change, disclosed.**  With NO corpus (CSV missing), cVK1 fell back to max(floor, in-batch) = 0.586232.  cVK2 uses 0.5862321062, which is 1.06e-7 higher.
+
+### 208.4 THE ACCEPTANCE TEST — cVK1 FLIPS, cVK2 DOES NOT
+
+**Command**, run on the Mac:
+
+```
+python3 analysis/cVK2_invariance_check.py <work> <2,809> <2,797> <cau1-sim> [<real cau1>]
+```
+
+It ran twice: with 5 corpora, exit 0, and with the real-cau1 copy added (6 corpora), **exit 0**.
+
+**How it is built.**
+* **The runs.**  The script regenerates 207's runs from the FROZEN `analysis/cVK1_smoke_gen.py`, with one asserted substitution: `"k22": 64.0 → 61.2`.  The 27 `.out` files and the manifest are **byte-identical** (`diff -r`) to 207's `runs_near`.
+* **The stress corpora.**  These are built from the 2,809-row corpus by 207's `mk_stress.py` recipe.
+* **The scorers.**  Both are imported by path and run unedited.
+* **σ.**  Each scorer's σ is computed by its own composition and printed at full precision.
+
+| corpus | cVK1 σ_USED | cVK1 PEAK_SET → FINAL | cVK2 σ_USED | cVK2 PEAK_SET → FINAL |
+|---|---|---|---|---|
+| 2,809 (HEAD, `50c7f9c8`) | 0.5862321062216 | [22] → `PEAK-AT-22 \| CARRIER-CUT-SUPPORTED` (SIGMA-NARROW-LIVE) | 0.5862321062216 | [22] → `PEAK-AT-22 \| CARRIER-CUT-SUPPORTED` (SIGMA-NARROW-PINNED) |
+| 2,797 (`5741218`, `38259b99`) | 0.5862321062216 | [22] → `PEAK-AT-22` | 0.5862321062216 | [22] → `PEAK-AT-22` |
+| 2,836 cau1-sim (`43d56b2a`) | 0.5862321062216 | [22] → `PEAK-AT-22` | 0.5862321062216 | [22] → `PEAK-AT-22` |
+| 2,836 REAL cau1, uncommitted working tree (`465b81cc`) | 0.5862321062216 | [22] → `PEAK-AT-22` | 0.5862321062216 | [22] → `PEAK-AT-22` |
+| 2,809 + 3 VGG 35.0/35.5/38.5 | **0.9054609252638** | **[19, 22] → `UNRESOLVED-TIE-WITH-22 \| CARRIER-CUT-UNRESOLVED`** | 0.5862321062216 | [22] → `PEAK-AT-22` |
+| 2,809 + 3 VGG 35.0/35.0/41.0 | **1.5481104004449** | **[19, 21, 22] → `UNRESOLVED-TIE-WITH-22`**, `CLIFF-IS-A-BOUND` | 0.5862321062216 | [22] → `PEAK-AT-22`, `CLIFF-POINT` |
+
+**What the script checked:**
+1. cVK2 emits ONE FINAL line across all corpora (5, then 6): **PASS**.
+2. cVK1's FINAL moves on **2 of 2** stress corpora, so the test is not vacuous: **PASS**.
+3. The largest |σ cVK2 − σ cVK1| on the non-stress corpora is **0.000e+00**, below 1.1e-7: **PASS**.
+
+A floor-only composition (O2 read as "drop them") would give 0.5862320000000; the NARROW pin sits **1.062e-07** above it.  The in-batch σ is 0.3610679632.
+
+**Independent parser.**  `scratchpad/cvk2r/indep_attack.py` imports neither scorer.  It splits the raw `.out` text on `Test Accuracy:` and recomputes everything by hand.
+* It reads 27 files and gets an in-batch σ of **0.3610679632**.
+* The argmax is k22 at **61.3613**, the runner-up k19 at **60.0747**: a margin of **1.2867** pp.
+* PEAK_BAR and PEAK_SET under each σ:
+
+  | σ | PEAK_BAR | PEAK_SET |
+  |---|---|---|
+  | 0.586232 | 0.9573 | [22] |
+  | 0.905461 | 1.4786 | [19, 22] |
+  | 1.548110 | 2.5281 | [19, 21, 22] |
+
+It agrees digit for digit with both scorers and with 207.3.
+
+**Section E of the selftest, on every host.**
+* **The near-bar runs.**  E1 builds the same kind of runs with deterministic levels: k22 61.2, k19 60.0, margin 1.20.
+* **The corpora.**  It scores them against up to 5 corpora:
+  * the corpus given;
+  * NO corpus;
+  * the given corpus + 3 VGG rows 35.0/35.5/38.5;
+  * the given corpus + 3 VGG rows 35.0/35.0/41.0;
+  * a corpus of ONLY 3 invented VGG rows (live VGG term 3.464102).
+* **Each stress corpus is checked first.**  It must LIFT the live VGG term above the floor ("STRESS IS REAL").  A NOTE records that a live composition would score it `UNRESOLVED-TIE-WITH-22`.
+* **The result.**  The WHOLE `score()` output, minus the one disclosure NOTE line, is **byte-identical across all 5**.
+* **The other paths of the real `score()`**, cases E2–E11:
+
+| case | result |
+|---|---|
+| E2 one run missing | `INCOMPLETE`, rc 2 |
+| E3 a truncated later resubmission shadows a complete run | `INCOMPLETE`, rc 2 |
+| E4 a complete later resubmission | same FINAL, rc 0 |
+| E5 AUGMENT=0 on one ENV line | `GATES-2-FAIL`, rc 1 |
+| E6 one seed 6 pp off its arm | `UNRESOLVED-DIVERGED`, rc 1 |
+| E7 | `NO-PEAK-FLAT` |
+| E8 | `TIE-19-22` |
+| E9 in-batch σ 1.5 | `SIGMA-INBATCH`, `TIE-19-21-22` |
+| E10 | `ALL-CUTS-FLOORED` |
+| E11 | `PEAK-ELSEWHERE-16 \| PARAM-BALANCE-FAVOURED` |
+
+**E0, the manifest.**  Section E composes its manifest from VGG11's cfg.  It is **byte-identical** to the live manifest that the launcher's guard 4 wrote (`001bfb60…`).  I checked this on the Mac against 207's copy, and on alice2 against `$WS/runs/cvk1/`.
+
+### 208.5 SELFTEST AND `tests/test_vggbn2.py` — MAC AND alice2
+
+| host | corpus | cVK2 `--selftest` PASS / FAIL / SKIP | `test_vggbn2.py` | frozen `test_vggbn.py` (control) |
+|---|---|---|---|---|
+| Mac (torch 2.12.0) | 2,809 HEAD | 110 / 0 / 2, exit 0 | **68 / 0**, V1 11 | 68 / **1** (V1 `VGG11_bn_c100`), exit 1 |
+| Mac | 2,797 | 111 / 0 / 2, exit 0 | **68 / 0**, V1 11 | 68 / 0, V1 11 |
+| Mac | 2,836 cau1-sim | 110 / 0 / 2, exit 0 | **68 / 0** | 68 / 1, exit 1 |
+| Mac | 2,836 REAL cau1 (working-tree copy) | 110 / 0 / 2, exit 0 | **68 / 0** | — |
+| Mac | 2,809 + 3 VGG (stress) | 110 / 0 / 2, exit 0 | **68 / 0** | 68 / 1, exit 1 |
+| alice2 live tree (py 3.10.4, `envs/mo`) | mirror live CSV (= 2,809) | **139 / 0 / 0**, exit 0 | **68 / 0** (69 PASS lines) | — |
+| alice2 | 2,797 | **140 / 0 / 0** | **68 / 0** | — |
+| alice2 | 2,809 | **139 / 0 / 0** | **68 / 0** | — |
+| alice2 | 2,836 cau1-sim | **139 / 0 / 0** | **68 / 0** | — |
+
+* **The Mac's 2 SKIPs** are the ResNet-premise and prefix-sign sections.  They need the raw cpk / cvg1 files, which only the cluster has.  The launcher's guard 1c2 REQUIRES them, and they RAN on alice2.
+* **2,797 has one extra PASS**: "THIS CELL's levels re-derive".  On 2,809, cvi1's anchors moved those levels, so it is a NOTE, as in cVK1.
+* **All six guard grep targets are present** in alice2's live-CSV selftest log: 1c2 ×4, 1c3 and E0.
+* **The O2 NOTEs on the live corpus:** `SIGMA_VGG live 0.3638879864 vs PINNED 0.3638879864 (drift +0.000e+00)`, and likewise NARROW.
+* **No live pin remains.**  The frozen cVK1's selftest on 2,809 was 74/1/3 on the Mac (207.7).  cVK2 has no live pin, so no ingest can make it fail.
+
+### 208.6 THE SUCCESSOR LAUNCHER — THE DIFF, THE DRY RUN, THE SEEDS
+
+**Diff.**  I stripped the comment-only lines from both launchers.  I then REVERSED the three substitutions in cVK2's non-comment lines:
+* `cVK2_vggcut_score → cVK1_vggcut_score`;
+* `cVK2_vgg_cut_ladder → cVK1_vgg_cut_ladder`;
+* `tests/test_vggbn2.py → tests/test_vggbn.py`.
+
+The result is **byte-identical** to cVK1's non-comment lines.  So nothing else changed.
+
+The forward diff is 8 lines:
+* `SC=`;
+* `TESTV=`;
+* guard 1b's porcelain list;
+* guard 1d3's two messages;
+* the DOCUMENTED-INVOCATION, SCORE-IT-WITH and submitting-form echoes.
+
+**Unchanged:**
+* the arms, seeds {55,56,57} and spec strings;
+* `WALL=03:00:00` and `slurm_parts_for_wall`;
+* `--export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=0`;
+* `NJOBS=27`, the job names `cvk1-*`, `SAVE=$WS/runs/cvk1`;
+* the PROTECTED prefix `cvk1-`.
+
+`bash -n` passes.
+
+**Dry run on alice2's live tree**, 13:34:47Z → 13:39:40Z, from the mirror: `bash bin/cVK2_vgg_cut_ladder.sh`, **exit 0, 0 guard failures.**
+
+| guard | result |
+|---|---|
+| 0 | CSV 2,810 lines |
+| 1b | NOTE: no git on the mirror, so RULE 21 is proved on the committing host (208.7) |
+| 1c | selftest **139 checks, 0 failures, 0 skipped**; scorer sha `aca0cdc3…` |
+| 1c2 | ResNet premise, prefix-sign and floor-table models all RAN |
+| 1c3 | fresh-seed check passed |
+| 1d / 1d2 | PATCH_VGGBN in `build_network.py`, not in `HF.py` |
+| **1d3** | **`tests/test_vggbn2.py` PASSES on the LIVE tree (69 PASS lines)** |
+| 2 / 2b / 2b2 / 2c / 2d | no cvk1 collision, `.out` or queued job; ZERO corpus rows and ZERO `.out` with seed 55–57 |
+| 3 | cifar-100-python staged |
+| 4a | PROBE_TENSOR inert |
+| 4c / 4c′ | 7 specs agree with the grid; 9 spec strings byte-identical between launcher and scorer |
+| 4 | live VGG11_bn_c100: 26 tensors, 9,274,532 parameters, tensor 23 = `bn8.weight` (512); 7 cuts + 2 anchors verified; the manifest was rewritten with the same bytes `001bfb60…` |
+| 4g | HF `4732b74a`, build_network `c7998883` |
+| 5 / 5b / 5c | 2,000 GB free, 0 pending; PARTS `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` consistent with 03:00:00 |
+| 8 | the default manifest resolution finds `$WS/runs/cvk1/PARTITION-MANIFEST.txt` |
+| 6 | **27 composed lines, 0 failed the RULE 20 pre-check**; "DRY RUN, NOTHING SUBMITTED" |
+
+**I read all 27 lines in full**; they are in `scratchpad/cvk2r/logs/lines_cVK2.txt`, sha `ff346d39…`.
+* **Independent audit.**  A parser (`shlex`, not `argsline_guard.py`) finds 27 lines and 27 distinct (arm, seed) pairs, 9 arms × 3 seeds, with 0 bad lines.  For every line it checks:
+  * no repeated flag;
+  * `--run-name` equals the job name;
+  * `--seed` is in {55,56,57} and matches the name;
+  * `--stepsize-groups` is the SPEC string, single-quoted;
+  * VGG11_bn_c100 / CIFAR100 / 100 epochs / batch 100 / ms 1e-3 / α0 1e-6 / γ 1;
+  * SGDm + Lion, wd-meta 0;
+  * `--time 03:00:00`;
+  * the partition list, the `--export` string and the save directory.
+* **Control.**  In the same session and on the same tree, the FROZEN `bin/cVK1_vgg_cut_ladder.sh` composes **27 lines that are byte-identical** (`cmp`) to cVK2's.  It still refuses, exit 2, on exactly the two failures 205 and 207 attributed:
+  * guard 1c: `FAIL SIGMA_VGG re-derived (frozen 0.400658)   0.363888`;
+  * guard 1d3: `tests/test_vggbn.py FAILED`.
+
+**Seeds 55–57 are fresh.**  I checked on alice2, read only:
+* 0 of the 2,809 committed corpus rows, and 0 of the 2,836 rows in the real-cau1 working tree;
+* 0 non-cvk1 `.out` files under `$WS/runs` carrying `--seed 55|56|57`;
+* 0 `sacct` job names ending `-s55/-s56/-s57` since 2025-01-01.
+
+cau1's 27 `.out` files carry `--seed 50/51/52`, 9 files each.
+
+### 208.7 RULE 21 AND WHAT IS NOW LAUNCH-READY
+
+* **RULE 21, by wall clock.**  `5629b17` was committed at **2026-09-10T13:41:48Z** and pushed.  At **13:41:53Z** alice2 showed:
+  * **0 cvk1 jobs in `squeue`**;
+  * **0 in `sacct` all-time**;
+  * **0 `cvk1-*.out`**.
+
+  Any cvk1 job submitted from now on has a positive margin, measured from its first `sacct` Submit.  Every bar is now a frozen literal or cvk1's own in-batch σ, so RULE 21 holds for every bar, not only for the floor (compare 207.6 O1).
+* **The launch form (the operator's call):** `bash bin/cVK2_vgg_cut_ladder.sh --submit`.  At 27/27 RUN_DONE the batch is scored with `python3 analysis/cVK2_vggcut_score.py $WS/runs`.  Before any number, RULE 20 applies: `argsline_guard.py --batch-consistency --vary seed --vary run-name --vary stepsize-groups`, plus a separate ENV audit.
+* **Not changed:** cvk1's design, prediction and alias stamp, and every scope limit of 201/207.  O2 changes only what a future ingest can do.
+
+### 208.8 DISCIPLINE
+
+* **Files.**
+  * RULE 16: no registered file was edited.
+  * `git diff` over `analysis/ tests/ bin/` shows **three added files**, 2,149 insertions, zero modified lines.
+  * `argsline_guard.py`, `bin/PROTECTED.txt` (nothing was submitted) and `paper/` are untouched.
+  * `git add` named my paths only.
+  * Not mine, and not touched:
+    * the untracked `analysis/cau1_attack_indep.py` and the unstaged `results/all_runs.csv` belong to cau1's workflow;
+    * `4f95ce5` belongs to Track A.
+* **Commands.**
+  * `analysis/c98_reproduce.py` exit code, **as-is: `1`**.
+  * No nested `claude -p`.
+* **Isolation.**
+  * `alice` was not contacted.
+  * I did not touch cau1's jobs, `.out` files or ingest.  I read its queue, its file count, its seeds, and a COPY of its uncommitted CSV.
+  * Nothing was submitted or cancelled.  Zero GPU-hours.
+* **Left on alice2, disclosed** (all deletable, none under `$WS/runs`):
+  * `$HOME/cvk2_r2/` (logs);
+  * `$HOME/cvk2_remote_tests.sh` and `$HOME/cvk2_remote_dry.sh`;
+  * in the mirror, the three staged successor files.
+
+  The two dry runs rewrote `$WS/runs/cvk1/PARTITION-MANIFEST.txt` and `cvk1-PARTITION-MANIFEST.txt` with the same bytes (`001bfb60…`), and rewrote `PROVENANCE.txt` with STAMP 13:40:43Z.  Every earlier cvk1 dry run did the same.
+* **Numbering.**  I fetched immediately before writing: origin's last entry was 207, so I took **208**.
+
+Next free number: **209**.
