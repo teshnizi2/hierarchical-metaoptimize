@@ -27216,3 +27216,303 @@ sentence about the denominator in the parent's own setting and nothing about gra
 * **COST: ZERO GPU-HOURS.**
 
 Next free number: **203**.
+
+---
+
+## 203. TRACK A2 — **`cvi1` LANDS 12/12 AND THE CAMPAIGN HAS ITS FIRST ISOLATION RESULT OFF ResNet: `IDENTITY-OPERATIVE-VGG`, `GATES-CLEAN`.**  THE REGISTERED SCORER, RUN **UNEDITED** WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION, PRINTS **35 PASS / 0 FAIL / 0 SKIP, EXIT 0**.  **PRIMARY `DELTA_ID` = plateau5(`ISO`) − plateau5(`CTL`) = 66.8507 − 35.5473 = +31.3033 pp = +65.40 SE.**  Isolating `bn8.weight` alone (512 parameters, 0.0055 % of the model) recovers **1.0178** of the in-batch scalar→layerwise gap.  Its exact twin `bn7.weight` (same numel, width and class, adjacent depth, byte-identical group sizes `[25,1]`) recovers **−0.0007**: `D_CTL` = **−0.0200 pp = −0.04 SE**.  **RULE 20 IS AT FULL 12/12, PASS, WITH A SEPARATE ENV AUDIT, BEFORE ANY NUMBER WAS READ.**  An independent parser, calibrated first on `cvg1`, reproduces every number **digit for digit**.  **The nomination premise REPLICATES IN BATCH** on `cvi1`'s own scalar-arm records.  **I LEAD WITH WHAT THE REGISTERED SCORER DOES NOT SEE: at epoch 99 `ISO`'s 25-tensor complement group has NOT pinned, but it is still descending at −0.13 to −0.15 nats per epoch and extrapolates to the clamp at epoch ~109–113.  The rescue is measured at the registered 100-epoch horizon and at NO other.**  **CORPUS 2,797 → 2,809 (+12, exactly `cvi1`; 0 pre-existing rows changed in any of 38 fields).**  ZERO new GPU jobs; `cvi1`'s own spend is **6.80 GPU-h** (`sacct`).  THIS ENTRY TOOK NUMBER **203**; NEXT FREE **204**.
+
+### 203.1 CORRECTIONS TO THE BRIEFING, FIRST
+
+* **Numbering.**  The briefing said "highest number 199, next free 200".  Track A1 took **200** (launch), Track C **201**
+  (`cvk1`) and Track B **202** (`cau1`) before this entry was written.  I pulled immediately before writing and
+  **took 203**.  Nobody's entry was renumbered.
+* **"Do the anchors reproduce cvg1's in-batch levels within their registered bands?"**  **No such bands are
+  registered.**  `cVI1_vggiso_identity_score.py` defines no per-anchor tolerance for `k01` or `kL`.  Its only
+  registered anchor comparison is the stamp `GAP-REPLICATES-CVG1` / `GAP-DIFFERS-FROM-CVG1`, at |`D_GAP` − 31.2687|
+  ≤ 5.0 pp, which is **explicitly BETWEEN-BATCH and NON-GATING** (scorer lines 833–834; `198.6`).  The harness gates
+  that ARE registered are G-STRUCT, G-SOUND, G-ENV, G-FLOOR, G-CEIL and G-DIVERGE (§203.5).  §203.6 reports the
+  anchor comparison descriptively and invents no band.
+* **"0.5784 of the mean|L| mass".**  The registered scorer's frozen `NOM_SHARE["bn8.weight"]` is **0.5783**, and my
+  independent parser, run over `cvg1`'s committed probe records, also gives **0.5783**.  `194.5`'s table and the
+  master table's `cvg1` row print **0.5784**.  This is a 1e-4 rounding/averaging difference, inside the scorer's
+  `NOM_TOL` of 5e-3, and it is not load-bearing.  It is recorded so the digit stops propagating.
+* **Cost.**  `198` expected "~7–13 GPU-h".  Measured: **6.8011 GPU-h** by `sacct` `ElapsedRaw` (24,484 s summed over
+  12 jobs) and **6.6500 h** by the CSV's own `wallclock_min` (399 min).  That is below the expected range and far
+  inside the 36 GPU-h bound.  Per-job wall time was 22.5–57.3 min, against `cvg1`'s 19–63.
+
+### 203.2 THE WAIT, AND COVERAGE
+
+A bounded wait with a 14:30Z deadline polled `sacct` and the `.out` files.  All 12 jobs went
+`COMPLETED`, `ExitCode 0:0`.  The first Submit was 1789022909 (06:48:29Z) and the last End was 1789029986
+(08:46:26Z, `4936675` cvi1-CTL-s42), so the batch took **1 h 58 m** of wall clock.  **Coverage 12/12**, verified
+three ways: 12 × 100 `Epoch` lines, 12 × `RUN_DONE`, 0 `Traceback`.  **No `Epoch` line was parsed for a value
+before §203.3 passed.**  During the wait I read only line COUNTS and config lines (`PROBE_TENSOR:` type,
+`block_sizes.json` arity), never an accuracy.
+
+### 203.3 RULE 20 AT FULL 12/12, PLUS THE SEPARATE ENV AUDIT
+
+* **`analysis/argsline_guard.py`, UNEDITED** (sha `81cea8b5…5388`, identical on the Mac and the mirror), run with the
+  batch's declared axes as documented `--vary` arguments, exactly as the launcher prints them:
+  `--name cvi1- --batch-consistency --vary seed --vary run-name --vary stepsize-groups --vary save-directory
+  --strict` → **`12 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line`**, "every non-axis flag
+  is identical across 12 runs", **`VERDICT: PASS`, exit 0.**
+* **SEPARATE ENV / PROBE_TENSOR AUDIT** (BETA_CLIP, PROBE and PROBE_TENSOR are env vars the guard cannot see), in a
+  script of my own with the registered values typed in from the launcher's `--export` string:
+  * **12/12 ok**, 12 distinct (arm, seed) cells, and **ONE distinct ENV line** with PROBE_DIR masked:
+    `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … SCHED=none … PROBE=100`.
+  * Every PROBE_DIR ends in `/runs/cvi1/probe_<run>`.
+  * Every `PROBE_TENSOR:` line matches `every=100 type=<T> tensors=26 meta_alg=Lion momentum_param=0.99
+    Lion_beta2=0.9` with the arm-correct type: **scalar ×3, layerwise ×3, blockwise ×6.**
+  * The six blockwise lines that `200.5` left UNVERIFIED are now verified.
+  * **ENV-AUDIT VERDICT: PASS, exit 0.**
+* **Arity, from each run's own `block_sizes.json`** (written by the live model, not by any scorer):
+  * `ISO` ×3 and `CTL` ×3: `blockwise`, `n_b = [9274020, 512]`.
+  * `k01` ×3: `scalar`, `[9274532]`.
+  * `kL` ×3: `layerwise`, 26 groups summing to 9,274,532.
+  * The manifest's `SYMDIFF ISO CTL bn7.weight,bn8.weight` confirms the two partitions differ in exactly two
+    tensor memberships.
+* **Integrity:** all 12 `.out`, the manifest and the 12 `probe.jsonl` (25 files) are **sha256-identical** between
+  `alice2` and the Mac mirror `../runs_alice2`.
+
+### 203.4 RULE 21, RE-DERIVED BY WALL CLOCK
+
+`git log -1 --format=%ct -- analysis/cVI1_vggiso_identity_score.py` → **`980499c`, 1788993085** (the ONLY commit that
+has ever touched the file, so it is unedited since registration).  The earliest `sacct` Submit is **1789022909**.
+**Margin 29,824 s = 8 h 17 m 04 s**, identical to `200.4`.  The scorer that ran is sha
+**`86a2b80ffd1ea8907544bfc9d79fa0db3f7772c34fd7d70f1f98aa8fc17ea96a`** on both hosts, which is the registered sha.
+
+### 203.5 THE REGISTERED SCORER, UNEDITED
+
+`python3 analysis/cVI1_vggiso_identity_score.py $METAOPT_WS/runs` on `alice2` (venv `Python/3.10.4` + `envs/mo`),
+documented one-argument form, with the manifest and CSV defaulted.  It ran BEFORE the ingest, and its readers exclude
+`cvi1-` in any case.  **Exit 0.  35 PASS / 0 FAIL / 0 SKIP:** G-STRUCT 11, G-SOUND 12, G-ENV 6, G-FLOOR 1,
+G-CEIL 1, G-DIVERGE 4.  Log `/tmp/s5014158_cvi1_score_A2.log` on `alice2`, sha `fb96b74e…76c5`.
+
+```
+FINAL: IDENTITY-OPERATIVE-VGG | GATES-CLEAN | MAGNITUDE-NOT-SEPARATED | NOT-A-ONE-VARIABLE-ABLATION |
+       CARDINALITY-ONE-vs-THREE | MISTUNING-NOT-EXCLUDED | SIGMA-NARROW-LIVE | TRAIN-AGREES | ISO-TRACKS-KL |
+       CTL-AT-FLOOR | GAP-REPLICATES-CVG1
+```
+
+| arm | spec | s41 | s42 | s43 | **TEST plateau5** | range | TRAIN5 |
+|---|---|---|---|---|---|---|---|
+| `k01` | `scalar` | 35.5420 | 35.3340 | 35.8260 | **35.5673** | 0.4920 | 35.5640 |
+| `kL` | `layerwise` | 66.2480 | 66.1060 | 66.5560 | **66.3033** | 0.4500 | 99.3367 |
+| `ISO` | `sets:1-22,24-26/bn8.weight` | 67.1820 | 66.4580 | 66.9120 | **66.8507** | 0.7240 | 95.9733 |
+| `CTL` | `sets:1-19,21-26/bn7.weight` | 35.5660 | 35.2880 | 35.7880 | **35.5473** | 0.5000 | 35.4893 |
+
+**Noise floor.**  `SIGMA_INBATCH` = **0.278633** (df 8).  `SIGMA_USED` = **0.586232**, which is
+`SIGMA_NARROW_live` and equals the frozen prior; the registered max rule chose it.  `SE_ARM_DIFF` = **0.478657**.
+The in-batch SD is 2.1× smaller, so every SE below understates significance rather than overstating it.
+
+| contrast | TEST pp | SE | TRAIN pp |
+|---|---|---|---|
+| **`DELTA_ID` = ISO − CTL (PRIMARY)** | **+31.3033** | **+65.40** | +60.4840 |
+| `D_ISO` = ISO − k01 | +31.2833 | +65.36 | +60.4093 |
+| `D_CTL` = CTL − k01 | −0.0200 | −0.04 | −0.0747 |
+| `D_GAP` = kL − k01 | +30.7360 | +64.21 | +63.7727 |
+| ISO − kL (stamp `ISO-TRACKS-KL`) | +0.5473 | +1.14 | −3.3633 |
+
+`RECOVERY` = 1.0178 and `RECOVERY_CTL` = −0.0007; both are descriptive and nothing branches on them.  **Branch path:**
+G-FLOOR passes; no arm diverges; `D_ISO` 31.28 ≥ `RESCUE_BAR` 10.0; `DELTA_ID` 31.30 ≥ `IDENTITY_BAR` 15.0 →
+**`IDENTITY-OPERATIVE-VGG`**.  `DELTA_ID` clears `IDENTITY_BAR` by **+16.3 pp**.  The result does not sit near any
+bar.
+
+### 203.6 HARNESS AND ANCHOR GATES, CHECKED BEFORE ANY CONTRAST WAS READ
+
+* **The registered harness gates all pass.**
+  * G-STRUCT: 26 tensors and 9,274,532 parameters; the four 512-wide BN scales at 14/17/20/23; `bn8`@23 and
+    `bn7`@20 with numel 512; no `shortcut` parameter; both arms compose to `[25,1]` / `[9274020, 512]`.
+  * G-SOUND 12/12.  G-ENV 6/6.
+  * G-FLOOR: the max arm mean is 66.85, which is 65.85 pp over chance.  G-CEIL: 66.85 ≤ 90.
+  * G-DIVERGE: every seed range is ≤ 0.724.
+* **The floor gate (`164.6`) held as registered.**  The lowest arm is `CTL` at 35.5473, 34.5 pp clear of chance.
+  `198.6` predicted "~35" for any collapsed arm.  **No arm sits at a bound, and the primary is bounded in neither
+  direction.**
+* **The in-batch anchors do what anchors are for.**  `k01` collapses: it pins at epoch 36.0 on all three seeds and
+  its accuracy is flat from epoch ~30.  `kL` does not collapse.  The in-batch gap is +30.7360 pp, so there is a
+  collapse for `ISO` to rescue and a ceiling for it to reach.
+* **Anchor levels against `cvg1`** (BETWEEN-BATCH, descriptive, no registered band — see §203.1):
+
+  | anchor | `cvi1` | `cvg1` | difference | SE |
+  |---|---|---|---|---|
+  | `k01` | 35.5673 | 35.0173 | +0.5500 pp | +1.15 |
+  | `kL` | 66.3033 | 66.2860 | +0.0173 pp | +0.04 |
+  | `D_GAP` | +30.7360 | +31.2687 | −0.5327 pp | — |
+
+  The last row is inside the registered ±5.0 stamp, so the stamp is `GAP-REPLICATES-CVG1`.  **The VGG gap has now
+  been measured in two batches at disjoint seeds, and the two measurements agree to half a point.**  The contrasts
+  are readable.
+
+### 203.7 THE ATTACK — AN INDEPENDENT PARSER, THE BETA TRAJECTORIES, AND THE PREMISE ON THIS BATCH'S OWN RECORDS
+
+**The parser** is `analysis/cvi1_attack_indep.py`, a pure addition to `analysis/`.  It imports nothing from the
+scorer, and every regex, reader and statistic in it is written afresh.  It reads only the raw `.out` files, the
+manifest and the runs' own probe JSON, never the CSV.  **It was calibrated before it was trusted:** with
+`--prefix cvg1` it re-derives `194`'s numbers exactly:
+
+* `k01` 35.0173, `kL` 66.2860, `D` +31.2687, TRAIN `D` +64.1587, `SIGMA_INBATCH` 0.400658;
+* pin epochs 35.8 / 36.0 / 35.8 and pinned records 321 / 320 / 321;
+* the `kL` terminal pinned set `{2,5,8,9,11,14,17,20,21,23,24,25}`;
+* `bn8` share 0.5783 with flip 1.0000, and flip 0.0000 for `{20}`, `{14}`, `{17}`, `{14,17,20}`, `{22}` and `{25}`.
+
+**On `cvi1` it agrees with the registered scorer digit for digit:**
+
+* all 12 per-run plateau5 values and TRAIN5 values, and the four arm means;
+* `SIGMA_INBATCH` 0.278633;
+* every contrast, in pp and in SE;
+* the branch, which it reaches from bars applied by its own code: `IDENTITY-OPERATIVE-VGG`.
+
+A third code path, `aggregate.py`'s parse, gives CSV `plateau5` equal to the raw `.out` value on all 12 new rows
+(max |diff| **0**).  **Three independent code paths, one answer.**
+
+**BETA TRAJECTORIES** (epoch = step/500; pinned := β ≤ −15 + 1e-3):
+
+| arm | group | peak β (epoch) | first pin epoch | pinned records /500 | terminal β |
+|---|---|---|---|---|---|
+| `k01` | the single β | −5.48 / −5.49 / −5.47 (16.8) | **36.0 / 36.0 / 36.0** | 320 / 320 / 320 | −15.00 |
+| `CTL` | complement (25 tensors) | −5.51 / −5.48 / −5.47 (16.6–16.8) | **35.8 / 36.0 / 36.0** | 321 / 320 / 320 | −15.00 |
+| `CTL` | isolated `bn7` | −7.13 / −6.96 / −7.16 (13.4–13.8) | 29.4 / 30.0 / 29.4 | 353 / 350 / 353 | −15.00 |
+| `ISO` | complement (25 tensors) | −5.21 / −5.22 / −5.19 (17.2–17.4) | **NEVER in 100 epochs** | **0 / 0 / 0** | **−13.48 / −13.26 / −13.53** |
+| `ISO` | isolated `bn8` | −9.41 / −9.51 / −9.47 (8.6–8.8) | **20.2 / 19.8 / 20.0** | 399 / 401 / 400 | −15.00 |
+
+* **The mechanism.**  Take `bn8` out of the shared group and the other 25 tensors stop being driven to the clamp.
+  `bn8` itself pins **earlier** than the scalar β does, at epoch ~20 against ~36.  `CTL`'s complement trajectory is
+  **indistinguishable from `k01`'s**, to the second decimal at every tenth epoch (e20 −7.08, e30 −12.08, e40
+  −15.00).  Removing `bn7` changes nothing.
+* **Integrated step size.**  Σ exp(β₀) over the probe records is 0.2303–0.2306 for `ISO`'s complement against
+  0.0838–0.0868 for `CTL`'s and `k01`'s, a factor of ≈ 2.7.  This is the same shape as `ciso1`/`cdep1` on ResNet.
+* **`kL`**: 12 of 26 groups are pinned at the end on every seed, and `bn8` (23) and `bn7` (20) are pinned on all
+  three.  s41 and s43 reproduce `cvg1`'s pinned set exactly.  **s42 differs by one swap (index 9 is free and 15 is
+  pinned).**  That is descriptive and not gating.
+
+**THE HORIZON, WHICH THE REGISTERED SCORER DOES NOT EXAMINE.**  `ISO`'s complement is **still descending at the
+horizon**.  Its least-squares slope over the last 20 epochs is **−0.133 / −0.127 / −0.153 nats per epoch**, and over
+the last 10 it is −0.152 / −0.117 / −0.146.  Its β at every tenth epoch is e40 −8.0, e60 −9.1, e80 −10.9, e90 −12.2
+and e99 −13.4, so the descent **accelerates** late.  Linear extrapolation from the last 20 epochs puts the clamp at
+**epoch ~111 / 113 / 109**.  Once it pins, every group in `ISO` sits on exp(−15) and the network freezes.  The ResNet
+analogue was measured: `ciso2` (`196`) froze on schedule at epoch 99.4–103.0 and then held 69.9 % for ~148 epochs,
+with `RHO` 0.997737, and freezing at a good point was shown to be a different event from collapsing to the floor.
+The VGG trajectory points the same way: `ISO`'s TEST accuracy is flat at 66.7–66.9 from epoch 70, and TRAIN reaches
+95.97 by epoch 99, while β falls from −9.9 to −13.4.  **But that is an inference from ResNet, not a measurement on
+VGG.  No `cvi1` run passes epoch 99.**
+
+**THE CARRIER NOMINATION ON `cvi1`'s OWN SCALAR-ARM PINNED RECORDS** (320 / 320 / 320 of 500 pinned at seeds
+41/42/43).  `n_at_lo == n_beta` gives the same 320 / 320 / 320, so the two pin definitions agree.
+
+| rank | idx | tensor | numel | share, mean over 41/42/43 | per seed | frac `L>0` |
+|---|---|---|---|---|---|---|
+| 1 | **23** | **`bn8.weight`** | 512 | **0.5857** | 0.5882 / 0.5877 / 0.5813 | **1.0000** |
+| 2 | 22 | `conv8.weight` | 2,359,296 | 0.1142 | | 0.0000 |
+| 11 | 20 | `bn7.weight` | 512 | 0.0023 | | 1.0000 |
+| 19 | 14 | `bn5.weight` | 512 | 0.0000 | | 0.0000 |
+| 20 | 17 | `bn6.weight` | 512 | 0.0000 | | 0.0000 |
+
+* `Σ L_i > 0` (β DOWN) on **1.0000** of pinned records, all three seeds.
+* |`L_23`| dominates the remainder on **1.0000**.
+* Removing **`{23}`** flips the remainder's sign on **1.0000 / 1.0000 / 1.0000**.
+* Removing `{20}`, `{14}`, `{17}`, `{14,17,20}`, `{22}` or `{25}` flips it on **0.0000**.
+
+**The premise replicates in batch, at fresh seeds, to four decimals on the operative statistic.**  So in this batch
+the tensor whose removal flips the remainder's sign (`bn8`, flip 1.0000) rescues when isolated, and the matched tensor
+whose removal flips nothing (`bn7`, flip 0.0000) does not.  **`194.5`'s nomination is CONFIRMED BY INTERVENTION off
+ResNet.**  That settles `NO-RESCUE-VGG`'s question, "does the record statistic predict intervention off ResNet?", in
+the positive, at this cell.
+
+### 203.8 WHAT THIS DECIDES, PLAINLY
+
+**`bn8` rescues and `bn7` does not.**  The isolation phenomenon exists off ResNet: on a plain BatchNorm conv stack with
+no residual addition, lifting ONE 512-parameter BN scale out of the shared step-size group recovers the entire in-batch
+scalar→layerwise gap, and the exact twin that ResNet could not supply recovers none of it.  **`195.8`/`197`/`199`'s
+isolation caveat is lifted FOR THE IDENTITY CLAIM, and for nothing else, exactly as `198.6` registered.**  What
+generalises across the two families is the **mechanism**: isolating the tensor whose removal flips the remainder sign
+frees the complement from the clamp.  So does the **nomination method**: the record statistic picked the right tensor
+on a second architecture before the intervention ran.
+
+### 203.9 WHAT IT DOES NOT LICENSE
+
+* **The tensor LIST does not transfer.**  VGG's carrier set has cardinality **1** (`bn8.weight`); ResNet18's has
+  **3** (`layer4.1.bn2`, `layer4.0.bn2`, `layer4.0.shortcut.1` scales).  "The same tensors carry it on both nets" is
+  false as stated.  Only "the tensor(s) that flip the remainder sign" transfers.
+* **Identity is NOT separated from MAGNITUDE, on either net.**  In this batch's own records `bn8` carries **0.5857**
+  of the mean-absolute-`L_i` mass and `bn7` **0.0023**, a ratio of ~255×; `bn5` and `bn6` carry ~0.  No carrier-free
+  512-wide VGG BN scale can be magnitude-matched to `bn8`.  `IDENTITY-OPERATIVE-VGG` means **"not ANY matched BN scale
+  of the same numel, width, class and adjacent depth"**.  It does **not** mean "identity rather than magnitude", and
+  a pure magnitude account predicts this batch's outcome equally well.  (`188.3`'s ResNet bound is the analogue.)
+* **VGG11_bn is still a BatchNorm network.**  Non-RESIDUAL is not non-BatchNorm.  Nothing here speaks to networks
+  without BN scales.
+* **Nothing about residual connections.**  VGG11_bn differs from ResNet18 in depth, channel schedule and downsampling
+  as well as in the residual add (`189.2`, `194.6`).  PlainNet18 is still not built.
+* **No horizon beyond 100 epochs.**  `ISO`'s complement is ~1.5 nats above the clamp and descending (§203.7).  The
+  ResNet `ciso2` precedent says freezing is not collapse; **on VGG that is unmeasured.**
+* **Not "isolation beats layerwise".**  `ISO` − `kL` = +0.5473 pp is +1.14 SE at the registered SE, inside noise, and
+  the stamp is `ISO-TRACKS-KL`.  `ISO` also memorises less: TRAIN 95.97 against 99.34, a −3.36 pp difference.
+  Descriptive only.
+* **RULE 11 mistuning is untested on VGG**, so `D_ISO` is a lower bound.  One cell, one dataset: ms 1e-3,
+  `alpha0` 1e-6, `AUGMENT=1`, CIFAR-100.
+* **`199`'s rule still binds in its original form.**  The VGG gap replication must not be paired with the **ResNet**
+  three-tensor isolation as if one replicated the other.  What exists now is a VGG isolation of VGG's own carrier.
+  Re-grading `199`'s claimability table (the ISOLATION row) is a reconciliation's job, and this entry does not do it.
+* **The `cvg1` anchor comparison is between-batch.**  It enters no contrast.
+
+### 203.10 THE INGEST, IN THE DOCUMENTED ORDER, WITH BOTH HALVES OF THE CHECK
+
+The 12 `.out` files, the manifest and the `cvi1/` artefact tree were rsynced into `../runs_alice2`, their correct
+home, and sha256-verified (§203.3).  **`../runs` (the `alice` mirror) holds 0 `cvi1` files**, so `196.8`'s misfiled-copy
+defect cannot recur.  `146.7`'s trap was avoided **constructively**: the corpus file's sha moved from `38259b99…741c`
+to `50c7f9c8…4f36`.
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv     # "2809 runs aggregated", exit 0
+  # WARNING: 3 duplicated run-name(s) [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply                                          # "APPLIED: 36 rows updated", exit 0
+```
+
+**BOTH HALVES, KEYED `(run, job_id)`, FIELD BY FIELD**, from a pre-ingest snapshot that was `cmp`-identical to HEAD's
+corpus:
+
+```
+before rows 2797 keys 2797 | after rows 2809 keys 2809 | fieldnames identical (38)
+ADDED 12 (all cvi1-, exactly the 12 (run, job_id) of 4936668-4936679)   REMOVED 0   MULTIPLICITY CHANGES 0
+PRE-EXISTING ROWS CHANGED (any of 38 fields): 0   (106,286 field-cells compared)
+```
+
+The 12 new rows each carry a single value of:
+
+* `network VGG11_bn_c100`, `dataset CIFAR100`, `augment 1`, `beta_clip -15:-2.3026`;
+* `epochs_requested` and `epochs_done` 100, `meta_stepsize 1e-3`, `alpha0 1e-6`, `batch_size 100`;
+* `complete 1`, `window_ok 1`, `superseded 0`, `collapsed 0`;
+* seeds {41, 42, 43}.
+
+`args_repair`'s 36 updates are the standing `dup_group` restoration `194.7` and `196.8` recorded, and they touch no
+pre-existing value; the field-by-field count above is taken after it ran.  **CORPUS 2,797 → 2,809.**  Its `.bak` is
+git-ignored and not committed.
+
+### 203.11 THE MASTER TABLE
+
+The ingest broke `c73`, as every ingest does.  Run unedited, `analysis/c73_mastertable_check.py` exited 1 on "header
+says 2797 runs; the CSV has 2809" and "header says 2956.4 GPU-hours; the CSV gives 2963.0".  **Both numbers were
+re-derived first by a hand-rolled splitter that uses no `csv` module**: 2,809 rows; 2,794 carry `wallclock_min` and
+15 do not; 2963.0 GPU-h.  The header now carries them, with the cycle-150 figures kept as `[SUPERSEDED …]`.
+Section-9 rows went 34 → 35 and total rows 108 → 109.  One row was added for `cvi1`, carrying the scorer's token
+**verbatim**, and the bottom line's point (3) took a bracketed **[AMENDED …]** note.  The cycle-150 wording is kept
+verbatim beneath it; nothing was deleted.  `c73` is re-run unedited after the edit (result recorded in the commit
+message).  **No other track's row was touched.**
+
+### 203.12 DISCIPLINE AND COST
+
+* **RULE 16.**  The registered scorer was run unedited at its registered sha.  `argsline_guard.py`, `aggregate.py`,
+  `args_repair.py` and `c73_mastertable_check.py` were run unedited.  `git diff` over `analysis/` is **additions only**:
+  one new file, `analysis/cvi1_attack_indep.py`.
+* **plateau5 is PRIMARY**, from the raw `.out`.  The CSV `plateau` column and `best_test` are read nowhere.  TRAIN is
+  beside TEST at every arm.  Every contrast is WITHIN `cvi1`.
+* **`paper/` untouched.**  **`analysis/c98_reproduce.py` exit code, AS-IS: `1`** (inherited, author scope, not fixed).
+  No nested `claude -p`.  `git add` covered this track's own paths only.
+* **`alice` NOT CONTACTED.**  Every remote command ran on `alice2`.  **Nothing submitted, cancelled or requeued.**
+* **Left on `alice2`, disclosed:** `/tmp/s5014158_cvi1_{score,env_audit,attack_indep}_A2.*`.  The mirror's
+  `results/all_runs.csv` is brought to the committed 2,809-row corpus after this commit, with the prior copy backed up
+  as `results/all_runs.csv.pre_cvi1_ingest_2797`.
+* **Numbering:** pulled immediately before writing; **took 203**, the next free number after Track B's 202.
+* **COST OF THIS ENTRY: ZERO GPU-HOURS.**  `cvi1`'s own spend is **6.8011 GPU-h** (`sacct`), 12/12 `COMPLETED`.
+
+Next free number: **204**.
