@@ -27967,3 +27967,107 @@ RULE 21 would then be measured from the successor's commit. **Not recommended:**
 * **Cost of this entry:** zero GPU-hours.
 
 Next free number: **206**.
+
+---
+
+## 206. TRACK U1 — **`cau1` LAUNCHED: ONE SUBMISSION, 27 JOBS ACCEPTED, 0 REJECTED (job ids 4945786–4945795 and 4945832–4945848).**  THE REGISTERED LAUNCHER `bin/cAU1_unaug_denominator.sh` (sha `44d22122…`) RAN **UNEDITED** WITH `--submit` ON `alice2`; EVERY GUARD PASSED ON THE LIVE TREE.  **RULE 21 MARGIN +10,728 s** (earliest `sacct` Submit 2026-09-10T12:12:14 CEST = 1789035134, scorer `%ct` 1789024406).  **MEASURED FACT (4) WAS SETTLED BEFORE SUBMISSION: NO PER-RUN AFTER-THE-FACT WITNESS OF `SGD_WD` / `SGD_MOM` EXISTS ANYWHERE IN THE HARNESS OR IN SLURM; A BATCH-LEVEL CHAIN OF PRE-EXISTING MECHANISMS DOES CLOSE THE GAP, AND IT IS STRICTLY STRONGER THAN THE STANDARD EVERY EARLIER SGD ARM WAS HELD TO.**  Scoring-path smoke test of the unedited scorer PASSES; no successor registered.  RULE 20 at 2/27 coverage: 0 violations, UNVERIFIED (not FAILED).  **No number from `cau1` exists or was read.  `alice` NOT CONTACTED; `cvk1`'s files and state untouched; nothing cancelled.  CORPUS 2,809, UNCHANGED.**  THIS ENTRY TOOK NUMBER **206**; NEXT FREE **207**.
+
+### 206.1 BRIEFING CORRECTIONS, LEADING
+
+* **Numbering.** The briefing said next free **205**; Track K1 had already taken 205 (`a8b5ded`).  I pulled immediately before writing and took **206**.
+* **Guard 1a lists ONE file** — the scorer.  The launcher's full dependency set, read from its own text, is the scorer, the launcher itself, `bin/_lib_guards.sh` (which locates `analysis/argsline_guard.py`), `results/all_runs.csv`, `bin/PROTECTED.txt` (appended on `--submit`), plus four LIVE cluster files it pins by sha256 (`run_cifar.sh` is read, `build_optimizer.py` and `load_data.py` are pinned, `HF.py` is stamped).  Of the repo files the mirror lacked exactly **two** (scorer, launcher); the other four already sha-matched.
+* **"The launcher reportedly unsets echoed variables"** — confirmed from its text: it records `SGD_WD`/`SGD_MOM` if present, then unsets them together with 19 runner-echoed names **before** composition.  It runs `module load` and the venv `activate` **after** the unset; a fresh-shell test (206.3) shows neither re-introduces any `SGD_*`.
+
+### 206.2 STAGING (STEP 1) — FROM THE COMMITTED MAC TREE (`git show HEAD:`), sha256 IDENTICAL ON BOTH SIDES
+
+| file | sha256 | mirror before |
+|---|---|---|
+| `analysis/cAU1_unaug_denominator_score.py` | `ddcdb98a27fb…9a2d0` | absent (staged) |
+| `bin/cAU1_unaug_denominator.sh` | `44d22122a5d8…ce05f` | absent (staged) |
+| `bin/_lib_guards.sh` | `c45e1b73…8a56` | present, matches |
+| `analysis/argsline_guard.py` | `81cea8b5…5388` | present, matches |
+| `results/all_runs.csv` | `50c7f9c8…4f36` (2,810 lines = 2,809 rows + header) | present, matches |
+| `bin/PROTECTED.txt` | `ef231243…4778` before; `29d9d8b8…e9a3` after the launcher appended `cau1-` | present, matches; the Mac copy gets the same one-line append in this commit and sha-matches again |
+
+Live pins, read on `alice2`: `build_optimizer.py` `25a899b3…ec2` (= cdn1's pin), `load_data.py` `b52b58a3…c46` (= pin), `train.py` `3fea309e…abb7`, `HF.py` `4732b74a…cecd`, `run_cifar.sh` `a0d0a1b9…f3a`.  Nothing was overwritten.
+
+### 206.3 MEASURED FACT (4) — HOW `SGD_WD` / `SGD_MOM` ARE VERIFIABLE AFTER THE FACT, SETTLED BEFORE STEP 5
+
+**No per-run witness exists.**  (a) `run_cifar.sh`'s ENV line (line 20) does not carry them.  (b) Slurm does not store job environments on ALICE: `AccountingStoreFlags = job_comment` only, so `sacct --env-vars` (which needs `job_env`) returns nothing.  (c) `train.py`'s TensorBoard `hyperparameters` text is `vars(args)` — CLI flags only.  (d) `train.py` saves no checkpoint or optimizer `state_dict` (no `torch.save`), so `param_groups` are never written.
+
+**A batch-level chain of PRE-EXISTING mechanisms closes it:**
+1. **Submitting shell → `sbatch`.**  Launcher guard 0 records the two names' state into `runs/cau1/PROVENANCE.txt` and unsets them unconditionally; `--export=ALL` exports that post-unset environment.  The file on disk reads **`SHELL_LEAK none`**, `MODE SUBMIT`, `SUBMIT_UTC 2026-09-10T10:12:13Z`.  This is a persistent, after-the-fact record written at submission.
+2. **`sbatch` → job start, audited on the live site config.**  `job_submit.lua` (`/etc/slurm`, identical copy under `/trinity/shared/etc/slurm`) checks time limits and GPU/partition consistency and **never touches `job_desc.environment`**.  The TaskProlog (`/trinity/shared/etc/slurm/00-prolog-prejob`) exports only `TMPDIR`, `SCRATCH` and `OMP_NUM_THREADS`.
+3. **Batch script → `python`.**  `BASH_ENV` (Lmod's `init/bash`), the `Python/3.10.4-GCCcore-11.3.0` module (only `EBROOT*`/`EBVERSION*`/`EBDEVEL*`/`EBEXTSLIST*` `setenv`s plus dependency loads) and `envs/mo/bin/activate` (`PATH`, `PYTHONHOME`, `PS1`, `VIRTUAL_ENV`) contain no `SGD_`.  **Measured:** a `env -i` non-interactive bash with `BASH_ENV` set, running the runner's lines 14–15, has **no** `SGD_*` variable.  Neither do `~/.bashrc`, `~/.bash_profile`, `~/.profile`, `/etc/profile*` or `/etc/bashrc`.
+4. **Defaults.**  `build_optimizer.py` at sha `25a899b3…`, checked by guard 3c at submission and stamped in `PROVENANCE.txt`, reads `SGD_WD` with default **5e-4** and `SGD_MOM` with default **0.9** (guard 3c2).
+
+**Decision:** the gap is closed **at batch level**, and I submitted.  This is **not** a per-run witness.  It is strictly stronger than what `cdn1` (175) and `bl-sgd` had: both relied on the sha pin alone, with no unset and no leak record, and the CIFAR-100 and CIFAR-10 denominators rest on those arms.  **Residual, stated:** `build_optimizer.py` could change between submission and some job's start, and nothing per-run would show it.  **At ingest, re-check its sha256 and mtime against the pin.**
+
+**Supplementary runtime witness, post-launch.**  I read `/proc/<pid>/environ` of the two running `python -u train.py` processes over ssh into the jobs' own nodes (the session is adopted into the job; read-only, and no job step was created).
+* **Positive control:** `AUGMENT=0`, `COS_TOTAL=50000`, `COS_WARMUP=1000`, `PROBE=0` and the correct `SLURM_JOB_NAME` appear.
+* **Result:** **`SGD_count=0`** for `cau1-lr0005-s50` (4945786, node887) and `cau1-lr001-s50` (4945787, node870).
+* **Coverage:** 2/27 only.  Files are at `alice2:$HOME/cau1_envwitness/`.
+* **My own misstep, disclosed:** the first probe used a regex that could not match `COS_*`/`SGD_*` names, and it also matched my own adopted probe shell.  Its separate `grep -c '^SGD_'` = 0 was valid.  I redid it restricted to `python` processes whose cmdline carries the run name, with the positive control.
+
+### 206.4 `AUGMENT=0` REALLY DISABLES AUGMENTATION ON THE LIVE TREE
+
+* **Source:** in the live `load_data.py` (sha `b52b58a3…`, = pin), the `CIFAR10` branch builds `RandomCrop(32, padding=4)` + `RandomHorizontalFlip()` **only** under `os.environ.get("AUGMENT", "0") == "1"`; otherwise `train_transform = test_transform` (ToTensor + Normalize).  Guard 3b2 prints `True`.
+* **Default:** the runner's own default is also `AUGMENT=0`.
+* **Records of both started runs:** the NODE header, the ENV line and the runtime environment all read `AUGMENT=0`.
+
+### 206.5 STEPS 2–4 ON THE LIVE TREE
+
+| step | result |
+|---|---|
+| 2. scorer `--selftest --runsdir $WS/runs --csv results/all_runs.csv` (the launcher's own arguments; the only test suite its guards invoke) | **40 PASS / 0 FAIL / 0 SKIP, exit 0**, Python 3.10.4.  B1' ran on the 9 raw `ub9` `.out`; seed 50–54 fresh (0 rows) |
+| 3. smoke test, **unedited** scorer, documented one-argument command | **PASS.**  `analysis/cAU1_smoke_gen.py` (new, shares no code with the scorer; format copied from `run_cifar.sh` and real `ub9-b6-s0` / `cdn1-lr001-s0` `.out` and `ub9` probe files; every number invented) wrote 27 runs + a truncated higher-jobid resubmit + a `cvk1-` distractor + 6 probe dirs to `$HOME/cau1_smoke/full`, outside `$WS/runs`.  Result: **exit 0, a `FINAL:` line, no traceback**, 27/27 complete, G1/G2 PASS, the complete file beat the shadow, and the distractor was ignored.  With `m6-s51` dropped: `FINAL: INCOMPLETE`, **exit 1**.  No successor needed.  The smoke token is not quotable. |
+| 4. `--dry-run` | **exit 0, 0 guard failures, 27 lines, 0 RULE 20 pre-check failures**, and nothing written under `$WS/runs`.  Independent audit (my own parser): 0 repeated flags in either half; 27 distinct names; seeds 50/51/52 × 9; alpha0 each rung × 3; one `--partition` `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, one `--time=03:00:00` (10,800 s ≤ gpu-short's live 14,400 s); exports exactly 3 distinct strings by family (`lr`: `AUGMENT=0,COS_TOTAL=50000,COS_WARMUP=1000,HIER=none,SCHED=none,PROBE=0`; `m6`/`m6t`: `AUGMENT=0,BETA_CLIP=<box>,HIER=none,SCHED=none,PROBE=5` + the per-run `PROBE_DIR`); no `SGD_` in any export; every ARGS/export byte-equal to the smoke inputs. |
+
+### 206.6 STEP 5 — THE SUBMISSION
+
+`export METAOPT_WS=/home/s5014158/metaopt && bash bin/cAU1_unaug_denominator.sh --submit`, run once, detached, from the mirror, log `alice2:$HOME/cau1_submit_u1.log`.  Result: `---- 27 jobs (ACCEPTED BY SLURM); 0 rejected ----` and `cau1-` appended to `bin/PROTECTED.txt`.  The launcher's guard 7 (`guard_postlaunch`) audited `cau1-lr001-s50-4945787.out` and printed **PASS**.  `sacct` holds exactly **27** `cau1-` records.
+
+| seed | lr0005 | lr001 | lr002 | lr005 | lr01 | lr02 | lr04 | m6 | m6t |
+|---|---|---|---|---|---|---|---|---|---|
+| 50 | 4945786 | 4945787 | 4945788 | 4945789 | 4945790 | 4945791 | 4945792 | 4945793 | 4945794 |
+| 51 | 4945795 | 4945832 | 4945833 | 4945834 | 4945835 | 4945836 | 4945837 | 4945838 | 4945839 |
+| 52 | 4945840 | 4945841 | 4945842 | 4945843 | 4945844 | 4945845 | 4945846 | 4945847 | 4945848 |
+
+At 10:14:44Z: 2 RUNNING (4945786 node887, 4945787 node870), 25 PENDING.
+
+### 206.7 STEP 6 — RULE 21 AND RULE 20
+
+* **RULE 21, by wall clock.**  Scorer `736677d`: `%ct` **1789024406** (09:13:26 CEST).  Launcher `7aa0213`: `%ct` 1789024425.  Earliest `sacct` Submit: **2026-09-10T12:12:14 CEST = 1789035134** (host TZ Europe/Amsterdam, CEST +0200).  **Margin +10,728 s** from the scorer and +10,709 s from the launcher.  The scorer that ran is sha-identical to the committed one.
+* **RULE 20, ARGS, at 2/27.**  `argsline_guard.py --name cau1-lr --batch-consistency --strict --vary seed --vary run-name --vary save-directory --vary alpha0` returns **2 clean, VERDICT PASS**.  `cau1-m6-` and `cau1-m6t-` have no files yet.
+* **RULE 20, the separate ENV audit.**  `bash bin/cAU1_unaug_denominator.sh --envaudit` reads **2/27, 0 violations, `UNVERIFIED (2/27 present)`**.  One distinct `lr` ENV line, `AUGMENT=0 … COS_TOTAL=50000 COS_WARMUP=1000 … PROBE=0 … EB_RHO=na EB_LOG=0`.
+* **Verdict so far:** both started runs' raw ARGS lines are the registered ones, so nothing was cancelled.  **Full-coverage RULE 20 (27/27, all three families) and the ENV audit remain owed before ANY `cau1` number is read.**
+
+### 206.8 WHAT THIS ENTRY DOES NOT LICENSE, AND WHAT IS OWED
+
+* **No numbers.**  No `cau1` number exists or was read.  Numbers from the smoke test are invented.
+* **`SGD_WD` / `SGD_MOM` are witnessed per run only for 2/27.**  For the batch, the 206.3 chain carries it, and the `build_optimizer.py` sha + mtime re-check at ingest is part of that chain.
+* **Owed, in this order:**
+  1. RULE 20 at 27/27, with the launcher's printed per-family `--vary` axes, plus `--envaudit` PASS.
+  2. Ingest: `aggregate.py` to STDOUT redirected **into** `results/all_runs.csv` (146.7), then `args_repair.py --apply`.  Verify added == 27 AND changed == 0, keyed `(run, job_id)`.
+  3. Score with `python3 analysis/cAU1_unaug_denominator_score.py $METAOPT_WS/runs`, unedited.
+  4. An independent parser.
+
+### 206.9 DISCIPLINE
+
+* **Files.**
+  * RULE 16: no registered file was edited.  `git diff --numstat` over `analysis/` shows one addition (`cAU1_smoke_gen.py`) and no deletions.  `argsline_guard.py` is untouched.
+  * `git add` covered my three paths only: `docs/CORRECTIONS.md`, `analysis/cAU1_smoke_gen.py`, and `bin/PROTECTED.txt` (+1 line, `cau1-`).
+  * `paper/` is untouched.  `analysis/c98_reproduce.py` exit code, **as-is: `1`**.  No nested `claude -p`.
+* **Isolation.**
+  * `alice` was not contacted.
+  * `cvk1`'s files, staging, scratch and state were not touched.
+  * The only jobs submitted are these 27; nothing was cancelled.
+* **Left on `alice2`, disclosed** (all deletable):
+  * the two staged files;
+  * `runs/cau1/PROVENANCE.txt` and the 6 probe dirs, created by `--submit`;
+  * `$HOME/cau1_smoke/` (synthetic), `$HOME/cau1_smoke_gen.py`, `$HOME/cau1_envwitness/`;
+  * `$HOME/cau1_{selftest,dryrun,submit}_u1.log` and `$HOME/cau1_sacct_u1.txt`;
+  * `/tmp/cau1_*` from the launcher's own guards.
+* **Cost.**  Expected ~14.4 GPU-h (202.9); hard bound 81 GPU-h.
+
+Next free number: **207**.
