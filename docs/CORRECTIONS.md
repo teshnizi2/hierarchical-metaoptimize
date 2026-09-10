@@ -28071,3 +28071,181 @@ At 10:14:44Z: 2 RUNNING (4945786 node887, 4945787 node870), 25 PENDING.
 * **Cost.**  Expected ~14.4 GPU-h (202.9); hard bound 81 GPU-h.
 
 Next free number: **207**.
+
+---
+
+## 207. TRACK R — **`cvk1`'s SUCCESSORS: ONE REGISTERED, TWO *NOT* REGISTERED, BY THE BRIEF'S OWN STOP RULE.  THE BARS OF THE REGISTERED SCORER ARE *NOT* A FROZEN LITERAL: `score()` BUILDS EVERY BAR FROM `max(SIGMA_PRIOR 0.586232, SIGMA_INBATCH, SIGMA_NARROW_live, SIGMA_VGG_live)`, AND TWO OF THOSE FOUR TERMS ARE READ FROM THE LIVE CORPUS AT SCORE TIME.**  The literal that fails the selftest, `SIGMA_VGG = 0.400658`, **feeds no bar at all**.  **On the SAME 27 synthetic runs, the UNEDITED `score()` prints `PEAK-AT-22 | CARRIER-CUT-SUPPORTED` against the 2,797-row, the 2,809-row and a cau1-added corpus, and `UNRESOLVED-TIE-WITH-22 | CARRIER-CUT-UNRESOLVED` once 3 invented VGG std-cell rows are added: the verdict moves with an ingest.**  Widening is not conservative at the verdict level: on one curve it carries `CARRIER-CUT-SUPPORTED` through `UNRESOLVED` to `NO-PEAK-FLAT | CARRIER-CUT-REFUTED | POSITION-NOT-LOCALISING`.  **Today's bars are ALREADY live: `SIGMA_NARROW_live` beats the literal by 1.06e-7, and the FINAL line stamps `SIGMA-NARROW-LIVE`.**  The brief said: "STOP and report it rather than choosing a fix."  **So `analysis/cVK2_vggcut_score.py` and the successor launcher are NOT written; the operator picks the fix (207.6).**  **REGISTERED: `tests/test_vggbn2.py`** (sha `4b1f06ea…a33a`), V1 excluding the patch's own architectures BY ARCHITECTURE.  It passes **68 / 0** on alice2's live tree against the 2,797-row, 2,809-row and cau1-simulated corpora; the frozen original, on the same host as a control, passes on 2,797 and fails V1 on the other two.  **ZERO GPU SUBMITTED.  0 `cvk1` IN `squeue`, 0 `cvk1-*.out`.  `alice` NOT CONTACTED.  cau1's files, jobs and ingest untouched.  CORPUS 2,809, UNCHANGED.**  THIS ENTRY TOOK NUMBER **207**; NEXT FREE **208**.
+
+### 207.1 BRIEFING CORRECTIONS, LEADING
+
+* **(a) The brief's dichotomy does not hold as posed.**  The bars are neither a pure frozen literal nor purely live.
+  * `cVK1_vggcut_score.py` lines 851–865: `cands = [SIGMA_PRIOR_frozen, SIGMA_INBATCH]`, plus `SIGMA_NARROW_live` and `SIGMA_VGG_live` whenever the corpus is readable.  `SIGMA_USED = max(cands)` and `se = SIGMA_USED*sqrt(2/3)`.
+  * `decide()` then derives `PEAK_BAR = 2 se`, `FLOOR_BAR = 2 se` and `FLAT_BAR = max(0.10*D_GAP, 4 se)` (lines 458–460), and line 921 uses `FLOOR_SE*se` for the cliff stamp.
+  * So every bar is a frozen floor combined with two terms read from the live corpus at score time.  The live component is exactly what the brief names as the STOP case.
+* **(b) The pinned literal is inert.**  `SIGMA_VGG = 0.400658` enters only `SIGMA_PRIOR := SIGMA_NARROW  # = max(SIGMA_VGG, SIGMA_NARROW)` (line 357), where it loses the max.  The failing selftest check (lines 1197–1204) pins a number that no bar reads.
+* **(c) "Monotone-conservative" is true of the BARS and false of the VERDICTS.**  The header (lines 158–160) and 205.3 ("a lower live SIGMA_VGG cannot narrow any bar") are right that the bars can only widen.  Widening is not verdict-conservative, and widening can move the verdict *toward* A1 as well as away from it (207.3).
+* **(d) The bars are already live today.**  `SIGMA_NARROW_live` = **0.586232106222** on all three corpora.  That is **1.062e-07 above** the literal 0.586232, so `max()` picks the live term: the FINAL line stamps `SIGMA-NARROW-LIVE`, not `SIGMA-PRIOR-FROZEN`.  Numerically negligible, structurally live.
+* **(e) The launcher's name is confirmed.**  It is `bin/cVK1_vgg_cut_ladder.sh`, sha `3468dbe9…8ad0`, as 205.1(a) says.
+* **(f) "Run on the Mac AND alice2" could not be met for the test suite.**  The Mac has no `torch` and no `build_network.py` (neither does the repo), and the ROG offload node timed out on ssh.  `tests/test_vggbn2.py` therefore ran on alice2's live tree only, as `201` and `205` also did.  The corpus-reader half of the claim (which networks V1 sees) was re-derived on the Mac independently (207.5).
+
+### 207.2 THE FREEZE — SHA256, MAC AND THE alice2 MIRROR
+
+The mirror is `$HOME/metaopt/hierarchical-metaoptimize` (not a git checkout).  No byte of these files was touched; they are identical on both sides:
+
+| frozen file | sha256 |
+|---|---|
+| `analysis/cVK1_vggcut_score.py` | `c8d46b665037644bc96f31f7a5c4c6b285276ec9f078a68bf9dc8ab25358d578` |
+| `tests/test_vggbn.py` | `c908b769b1d76def907bb5a795055974efd6da47739c84722624e7c34f4b62c6` |
+| `bin/cVK1_vgg_cut_ladder.sh` | `3468dbe92a98b08418a86231d6834655b2c8851bf8295cd625c3fae2ebe98ad0` |
+| mirror `results/all_runs.csv` (2,810 lines) | `50c7f9c8…4f36` = HEAD's |
+
+Live code on alice2, read only:
+
+| file | sha256 prefix |
+|---|---|
+| `build_network.py` | `c7998883` |
+| `build_network.py.pre_vggbn` | `86b5e2df` |
+| `Optimizers/HF.py` | `4732b74a` |
+
+### 207.3 THE FINDING, MEASURED — THE BARS MOVE WITH AN INGEST, AND SO DOES THE VERDICT
+
+**Which ingests can move the live terms.**  Only rows that pass all three filters:
+* `usable()`: `superseded 0`, `collapsed 0`, `complete 1`, non-empty `plateau5`;
+* `std_cell()`: scalar or layerwise, 100 epochs requested, `AUGMENT=1`, clamp `-15:-2.3026`, ms `1e-3`, α0 `1e-6`, batch 100;
+* network ResNet18_c100 on CIFAR100, **or** network VGG11_bn_c100.
+
+The rows must also sit in a 15-key cell holding at least 2 members, and `cvk1-` is excluded.  **cau1 (ResNet18 / CIFAR-10 / AUGMENT=0) cannot move either term.**  Verified: `SIGMA_NARROW_live` and `SIGMA_VGG_live` are identical to 12 digits on the 2,809-row and cau1-simulated corpora.
+
+**The live terms on each corpus**, computed by the frozen scorer's own `pooled_sigma()`:
+
+| corpus | `SIGMA_NARROW_live` | `SIGMA_VGG_live` | `SIGMA_USED` (synthetic batch, in-batch 0.361068) |
+|---|---|---|---|
+| 2,797 (`5741218`, sha `38259b99…`) | 0.586232106 (df 77) | 0.400657792 (df 4) | 0.586232 = NARROW_live |
+| 2,809 (HEAD, sha `50c7f9c8…`) | 0.586232106 (df 77) | 0.363887986 (df 10) | 0.586232 = NARROW_live |
+| 2,836 = 2,809 + 27 simulated cau1 rows (sha `43d56b2a…`) | 0.586232106 | 0.363887986 | 0.586232 = NARROW_live |
+
+**The frozen `score()` on the same 27 synthetic runs, where only the corpus changes.**
+* The runs are `analysis/cVK1_smoke_gen.py` with the invented k22 level set to 61.2, over the live manifest `001bfb60…`.
+* In batch, k22 leads k19 by **1.2867 pp**.
+* The stress rows are prefixed `zstress-`, INVENTED, and live in one cell.
+
+| corpus | `SIGMA_USED` | PEAK_BAR | PEAK_SET | FINAL (branch, carrier token) |
+|---|---|---|---|---|
+| 2,797 / 2,809 / cau1-sim | 0.586232 | 0.9573 | [22] | `PEAK-AT-22 \| CARRIER-CUT-SUPPORTED` |
+| 2,809 + 3 VGG rows 35.0/35.5/38.5 | 0.905461 (VGG_live) | 1.4786 | [19, 22] | `UNRESOLVED-TIE-WITH-22 \| CARRIER-CUT-UNRESOLVED` |
+| 2,809 + 3 VGG rows 35.0/35.0/41.0 | 1.548110 (VGG_live) | 2.5281 | [19, 21, 22] | `UNRESOLVED-TIE-WITH-22 \| CARRIER-CUT-UNRESOLVED`, and `CLIFF-POINT` → `CLIFF-IS-A-BOUND` |
+
+All three rows exit 0 with gates clean.  A 6-pp outlier seed sits under `DIVERGED_BAR` (5.0 pp is a *within-arm* gate on cvk1's own seeds, not on corpus cells), so nothing in the scorer would flag such an ingest.
+
+**Wider bars are not verdict-conservative.**  I ran the frozen `decide()` over σ, on invented curves:
+* **Curve F2** (k13..k23 = 57.5, 58.0, 58.8, 58.6, 58.7, 60.0, 56.0):
+  * `PEAK-AT-22 | CARRIER-CUT-SUPPORTED` at σ 0.586;
+  * `UNRESOLVED-TIE-WITH-22` from σ 0.736 (ties grow to {19,20,21,22} by 0.861);
+  * **`NO-PEAK-FLAT | CARRIER-CUT-REFUTED | POSITION-NOT-LOCALISING` from σ 1.226** (analytic 1.2247, where 4 SE overtakes the 4.0-pp range).
+  * So a widening moves the verdict from support, through unresolved, to an *assertive* refutation, which the header grades "publishable-as-is".
+* **The selftest's own "rise with a sawtooth to 23":**
+  * `PEAK-AT-RIGHT-EDGE-23 | CARRIER-CUT-REFUTED` at σ 0.586;
+  * `UNRESOLVED-TIE-WITH-22` from σ 1.837 (analytic).
+  * So widening can also move the verdict *toward* A1.
+* The NO-PEAK-INCREASING / -DECREASING `mono` tests (`s >= -PEAK_BAR`) likewise loosen as the bars widen.
+
+**What this does NOT show.**  No cvk1 number exists, and every level above is invented.  The exposure is real only if an ingest at one of those two cells lands before cvk1 is scored.  At time of writing the only batch in flight is cau1, which cannot.  Whether to accept that exposure is the operator's call (207.6); it is not a defect that the scorer hid.  Header lines 158–160 disclosed the live term at registration and judged it conservative; this entry shows that judgement holds for the bars and fails for the verdict.
+
+### 207.4 WHAT WAS NOT REGISTERED, AND WHY
+
+* **`analysis/cVK2_vggcut_score.py` — not written.**  The brief made this contingency explicit: if the bars are computed from the live corpus at score time, "STOP and report it rather than choosing a fix".
+  * Any cVK2 would have to either *keep* the live term, re-registering the exposure with a selftest that blesses it, or *remove* it, which changes a bar.  Both are fixes, and the brief reserved that choice.
+  * Its part (b), section E driving the real `score()` over synthetic runs, lives in the same file, so it is not registered either.
+  * For the record, the unedited `score()` reaches FINAL on synthetic harness-format runs: exit 0 in 205.4, and exit 0 again here on the near-bar set against all five corpora.  So the cdn1 I/O gap (`171`) does not recur; it simply is not yet closed *inside* a file.
+* **The successor launcher — not written.**  Its only content is "point guards 1c/1c2/1c3/4c′/8 and 1d3 at the two successors", and one of those two does not exist.  Writing it now would register a launcher bound to an unregistered scorer.
+* **RULE 21** is therefore *not* started: no successor scorer commit exists to measure from.  cvk1's premise still holds, with 0 runs anywhere.
+
+### 207.5 REGISTERED: `tests/test_vggbn2.py` — THE DIFF AND THE INVARIANCE PROOF
+
+sha256 `4b1f06ea7effdf14f7c54fdf03d668980fd2d5441f5c8ee66762bc369b12a33a`.  The same bytes ran on alice2 and were committed.
+
+**The non-comment diff against the frozen `tests/test_vggbn.py`**, comment-only lines stripped from both:
+
+```
+177a178,179
+>             if v in NEW_NETS:
+>                 continue                      # the patch's OWN architectures, BY ARCHITECTURE
+180,181c182,183
+<         print("\nV1  corpus `network` column (cvg1- excluded): %d distinct: %s"
+<               % (len(seen), ", ".join(seen)))
+---
+>         print("\nV1  corpus `network` column (cvg1- excluded; the patch's own %s excluded"
+>               " BY ARCHITECTURE): %d distinct: %s" % ("/".join(NEW_NETS), len(seen), ", ".join(seen)))
+```
+
+That is the whole of it.
+* Beyond that, the full diff adds a 16-line `#` header above the unchanged module docstring.
+* The exclusion is keyed on `NEW_NETS` (`VGG11_bn`, `VGG11_bn_c100`), the file's own pre-existing constant: by architecture, not by batch prefix.
+* The `cvg1-` prefix exclusion is kept.  It is now redundant, since every cvg1 row is `VGG11_bn_c100`, re-derived on all three corpora.
+* V0, V1b, V2, V3, V4, V5, V6, the EXTRA_NETS tail, the fallback list, the exit codes and the `ALL PASS` line are byte-identical.
+* The excluded names stay covered post-patch by V2 (build + full manifest), V4, V5 and V6.
+* It was produced by exact string replacement with a `count == 1` assertion, and it parses.
+
+**Invariance, on alice2's live tree** (`envs/mo`, Python 3.10.4; `--pre build_network.py.pre_vggbn --post build_network.py --hf Optimizers/HF.py`; corpora staged to `$HOME/cvk2_r/corpora`, sha-verified):
+
+| corpus | frozen `test_vggbn.py` (control) | successor `test_vggbn2.py` |
+|---|---|---|
+| 2,797 (`38259b99…`) | exit 0, 68 PASS / 0 FAIL, V1 lists 11 | **exit 0, 68 / 0**, V1 lists 11 |
+| 2,809 (`50c7f9c8…`) | **exit 1**, 68 / **1**: `V1 'VGG11_bn_c100' raises identically  ZeroDivisionError / VGG_bn(` | **exit 0, 68 / 0**, V1 lists 11 |
+| 2,836 cau1-sim (`43d56b2a…`) | **exit 1**, same single failure | **exit 0, 68 / 0**, V1 lists 11 |
+| mirror's live `results/all_runs.csv` | — | **exit 0, 68 / 0** |
+
+The launcher counts `grep -c PASS`, which includes the `ALL PASS` line, so 68 checks read as "69 PASS lines" (`201`'s figure).
+
+**Mac, independent re-derivation of V1's list** (no torch needed), with the frozen rule and then the successor rule:
+* 2,797: 11 and 11;
+* 2,809: 12 and 11;
+* cau1-sim: 12 and 11.
+
+The ONLY name the successor drops is `VGG11_bn_c100`, whose rows in the corpus come from `cvg1` and `cvi1`.  cau1's `ResNet18` was already on the list, so the cau1 ingest cannot change V1 under either file.
+
+**The simulated cau1 corpus.**
+* It is HEAD's 2,809 rows plus 27 rows built from cau1's *registered design constants* only: `ResNet18`, `CIFAR10`, `augment 0`, 7 SGD ladder rungs + `m6`/`m6t`, seeds 50–52, job ids from 4945786.
+* Every accuracy is INVENTED.  No cau1 `.out` or row was read.
+* cau1 had **not** ingested when this entry was written: origin's corpus was 2,810 lines at the last fetch, and alice2's queue held 3 `cau1-` jobs.
+
+### 207.6 WHAT THE OPERATOR MUST DECIDE (not decided here)
+
+Both options below keep every threshold, SE multiplier, branch, arm, seed, spec string, primary and reader.  They differ only in the σ that enters `se`.
+
+* **O1 KEEP the registered composition.**
+  * cVK2's `score()` is byte-identical in its bar path.
+  * The selftest drops the `SIGMA_VGG == live` pin and asserts instead:
+    * the literal floor `SIGMA_PRIOR == 0.586232`;
+    * that `SIGMA_USED` is the max over {floor, in-batch, NARROW_live, VGG_live} and never below the floor;
+    * the live values printed as NOTE, never pinned.
+  * Plus section E.
+  * *Cost:* an ingest at those two cells before scoring can move the verdict (207.3).  RULE 21 holds for the floor only.
+* **O2 FREEZE the bars.**
+  * `SIGMA_USED = max(SIGMA_PRIOR, SIGMA_INBATCH)`: the two live terms are dropped, or equivalently pinned to their registration values.
+  * *This changes how a bar is computed, which the brief forbade without authorization.*
+  * On today's corpus the bars differ from O1 by **< 1.1e-7 in σ**, and not at all when in-batch dominates.  O2 differs only in what a future ingest can do.
+  * RULE 21 holds for every bar.
+* (Scoring against a pinned corpus snapshot would be a *reader* change and a CSV substitution; 205.6 recommends against it, so it is not offered.)
+
+Either way the launcher successor is mechanical: `bin/cVK1_vgg_cut_ladder.sh` with `SC`, `TESTV` and the guard 1b/1c/4c′/8 paths repointed, everything else byte-identical.  `tests/test_vggbn2.py` is ready for it.
+
+### 207.7 DISCIPLINE
+
+* **Files.**
+  * RULE 16: no registered file was edited.  `git diff` over `analysis/ tests/ bin/` is **one added file** (`tests/test_vggbn2.py`), zero modified lines.
+  * `argsline_guard.py` is untouched, and so is `bin/PROTECTED.txt` (no submission).
+  * `git add` covered my two paths only.  The untracked `analysis/cau1_attack_indep.py` belongs to the cau1 workflow and was left alone.
+  * `paper/` is untouched.
+* **Commands.**
+  * `analysis/c98_reproduce.py` exit code, **as-is: `1`**.
+  * No nested `claude -p`.
+  * The frozen scorer's `--selftest` on the Mac (runsdir sections SKIP there): 2,797 → **76 PASS / 0 FAIL / 3 SKIP, exit 0**; 2,809 → **74 / 1 / 3, exit 1**, the one FAIL being the `SIGMA_VGG` pin.  This reproduces 205.3's attribution on a second host.
+* **Isolation.**
+  * `alice` was not contacted.
+  * cau1's jobs, `.out` files, staging and ingest were not touched: its queue and file count were read, nothing else.
+  * Nothing was submitted or cancelled.  Zero GPU-hours.
+* **Left on `alice2`, disclosed** (all deletable, none under `$WS/runs`): `$HOME/cvk2_r/`, holding copies of both test files, the three corpora, and 7 logs.  Nothing was written to the mirror.
+* **Numbering.**  I fetched immediately before writing: origin's last entry was 206, so I took **207**.
+
+Next free number: **208**.
