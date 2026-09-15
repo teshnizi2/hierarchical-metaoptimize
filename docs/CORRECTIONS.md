@@ -29270,3 +29270,138 @@ The alice2 stage has no git repo, so guard 1b requires the operator to declare t
 - sha256: `analysis/cPL1_plainnet_residual_score.py` `c6718ed991590899…14cc2839`; `bin/cPL1_plainnet_residual.sh` `4dd7d45235972186…36980eab7`; `bin/cPL1_stage_harness.sh` `cd23fb8f64eee954…b126663f`; `patches/patch_plainnet.py` `433cc2155a6fd07c…3fba2ff8`; `tests/test_plainnet.py` `15e8c49cb4a775d6…9302dc5c9`; `tests/test_probe_tensor_blockwise_cpl1.py` `61e4bf3c7394332c…cd47a952`.
 
 **Files (6, new; the launcher's guard 1b NEWF list).** `analysis/cPL1_plainnet_residual_score.py`, `bin/cPL1_plainnet_residual.sh`, `bin/cPL1_stage_harness.sh`, `patches/patch_plainnet.py`, `tests/test_plainnet.py`, `tests/test_probe_tensor_blockwise_cpl1.py`. Outside the repo, on alice2 (new files only): `$WS/harness_cpl1/`, `$WS/jobs/run_cifar_cpl1.sh`, `~/stage_cpl1/`, `~/stage_cpl1_harness/`.
+
+## 216. TRACK L (launch) — **ALL FOUR BATCHES REGISTERED AT 212–215 ARE LAUNCHED, IN THE ORDER `cgn1`, `cpl1`, `cvh1`, `cuc1`: ONE SUBMISSION EACH, THE REGISTERED LAUNCHER UNEDITED WITH ITS OWN `--submit`, 63 JOBS ACCEPTED, 0 REJECTED.**  `cgn1` 6 (5014610–5014615), `cpl1` 15 (5014618–5014632), `cvh1` 12 (5014634–5014645), `cuc1` 30 (5014668–5014697).  **RULE 21 MARGINS, BY WALL CLOCK: +1,983 s / +1,892 s / +2,072 s / +2,704 s.**  **RULE 20 AT CURRENT COVERAGE (two passes, last 20:58Z): 0 VIOLATIONS ANYWHERE.  `cgn1` PASS AT 6/6 AND `cpl1` PASS AT 15/15 (ARGS AND ENV); `cvh1` 0/12 AND `cuc1` 0/30 ARE UNVERIFIED (NO JOB STARTED YET), NOT FAILED.  NOTHING CANCELLED.**  The `cuc1` `SGD_*` witness poller was started 1 s after the first `cuc1` job appeared in the queue.  **No number from any of the four batches was read or quoted.  `alice` NOT CONTACTED.  NO JOB THIS TRACK DID NOT SUBMIT WAS TOUCHED.  NOT PUSHED.**  THIS ENTRY TOOK NUMBER **216**; NEXT FREE **217**.
+
+### 216.1 Authorization and scope
+
+- The operator authorized launching exactly the four batches registered at 212–215, and nothing else. Nothing else was submitted.
+- Account `alice2` (s5014158) only. `alice` (Saber's shared account) was not contacted. Queue before the first submission: 0 jobs; `sacct` all-time: 0 `cgn1|cpl1|cvh1|cuc1` jobs; 0 such `.out` files.
+
+### 216.2 Staging: each launcher ran from its verified `~/stage_<prefix>/`, sha256 = the committed Mac tree
+
+- The alice2 mirror (`$HOME/metaopt/hierarchical-metaoptimize`) holds none of the four batches' files; the four stage directories built and dry-run by Tracks R1–R4 do. A launcher's `REPO` is its own `dirname/..`, so each ran from its stage directory (no git repo there; guard 1b printed its documented NOTE).
+- **Before any submission**, every file each launcher's guard 1a lists was hashed on alice2 and compared with `git show HEAD:<path> | shasum -a 256` on the Mac (HEAD `d69b23a`). **All match; nothing was copied and nothing was overwritten.**
+
+| stage dir | repo files compared (guard 1a set, CSV included) | result |
+|---|---|---|
+| `~/stage_cgn1` | 9 (+ `bin/PROTECTED.txt`) | all sha256-equal to HEAD |
+| `~/stage_cpl1` | 15 (+ `bin/PROTECTED.txt`); the runner `$WS/jobs/run_cifar_cpl1.sh` is cluster-only (`eb17bcca9b1c92fa…`) | all sha256-equal to HEAD |
+| `~/stage_cvh1` | 14 (+ `bin/PROTECTED.txt`) | all sha256-equal to HEAD |
+| `~/stage_cuc1` | 8 (`bin/PROTECTED.txt` included) | all sha256-equal to HEAD |
+
+- Pins re-read by the guards at launch: live `build_network.py` `c7998883…` (= both isolated trees' pinned pre; V-b3/V-b4: no patch marker in the live file), `HF.py` `4732b74a…`, `train.py` `3fea309e…`, `run_cifar.sh` `a0d0a1b9…`, `load_data.py` `b52b58a3…` (cuc1 guard 3b), `build_optimizer.py` `25a899b3…` (cuc1 guard 3c; mtime `2026-08-20 14:01:19.092968862 +0200`, guard 3c3). Isolated trees: `harness_cgn1` `build_network.py` `9f6e4ec9…c892` (= H-PROV pin); `harness_cpl1` `e65e6773…a18b`. Both runners differ from `run_cifar.sh` in exactly the `cd` line (V-d).
+- `cpl1` was launched with the operator-declared `CPL1_REGISTERED_COMMIT=ea51295d8056103947686ff9aef5c2f98c52c349` (guard 1b; it is also written to `runs/cpl1/PROVENANCE.txt`).
+
+### 216.3 The four launches (all times UTC; `sacct` Submit is CEST)
+
+Each batch: the stage-harness check where one exists, then a `--dry-run` immediately before the submission with every composed line read, then ONE `--submit`.
+
+| batch | pre-checks on alice2 | dry run | lines read | submission | accepted / rejected | guard 7 (launcher's own post-launch RULE 20) |
+|---|---|---|---|---|---|---|
+| `cgn1` | `bin/cGN1_stage_harness.sh` **VERIFIED** (V-a…V-d); selftest 62/0; `test_resnet_gn_c100` 51/0 on the cgn1 tree; `test_vggbn2` 68 PASS on the live tree (NOTE 4c2) | 20:24:13Z, exit 0, 0 guard failures | 6 | Submit 22:25:03 | **6 / 0** | **PASS** on `cgn1-k01-s60-5014610.out` |
+| `cpl1` | `bin/cPL1_stage_harness.sh` **VERIFIED** (V-a…V-e; `test_plainnet` 77 PASS); selftest 82/0/0 incl. O2 on this host's real corpus; 53 tensors / 11,046,308 params, 0 fx add ops, partitions [51,2] [51,2] [52,1] | 20:25:18Z, exit 0, 0 guard failures | 15 | Submit 22:26:32–34 | **15 / 0** | **PASS** on `cpl1-ONE-s69-5014622.out` |
+| `cvh1` | selftest 82/0/0 (premise, calibration, synthetic, O2 sections ran); `test_vggbn2` PASS on the LIVE tree (guard 1d3); guard 4e accepted cvi1's blockwise-inertness log (same live HF sha); 4h/4h2/4h3 in-run-control proofs PASS | 20:27:04Z, exit 0, 0 guard failures | 12 | Submit 22:28:11 | **12 / 0** | UNVERIFIED (no job started within 600 s) |
+| `cuc1` | selftest 79/0/0, B′ and B″ ran, 0 SKIP; guard 6b: every line = the scorer's `expected_args()` / `expected_env()` | 20:28:33Z read in full; **re-run at 20:39Z** (ended 20:39:19Z) because ~10 min had passed; its 30 lines are **byte-identical** (`cmp`) to the ones read | 30 | Submit 22:39:48–50 | **30 / 0** | UNVERIFIED (no job started within 600 s) |
+
+What the reading checked, line by line: one `sbatch` per (arm, seed), every flag exactly once, the registered spec strings, seeds, network, epochs, runner, walltime and exports.
+- `cgn1`: k01 `scalar` / kL `layerwise` × {60, 61, 62}; ResNet18_gn_c100, runner `run_cifar_cgn1.sh`, WALL 03:00:00.
+- `cpl1`: k01 / kL / ISO `sets:1-43,45-49,51-53/layer4.0.bn2.weight,layer4.1.bn2.weight` / CTL `sets:1-40,42-46,48-53/layer4.0.bn1.weight,layer4.1.bn1.weight` / ONE `sets:1-43,45-53/layer4.0.bn2.weight` × {69, 70, 71}; PlainNet18_c100, runner `run_cifar_cpl1.sh`, WALL 03:00:00. Guard 1e printed its NOTE (no `.pre_vggbn` in the isolated tree, so the VGG cross-check does not run there; informative only).
+- `cvh1`: k01 / kL / ISO `sets:1-22,24-26/bn8.weight` / CTL `sets:1-19,21-26/bn7.weight` × {63, 64, 65}; VGG11_bn_c100, `--num-epochs 328`, live runner, WALL 07:00:00, partitions `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` (gpu-short dropped by arithmetic).
+- All three HF batches export `AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1` plus the run's own `PROBE_DIR`, with SGDm 0.99/0.1 + Lion 0.99/0.9/0, ms 1e-3, alpha0 1e-6, batch 100, `--max-time 999:00:00`.
+- `cuc1`: SGD rungs `--alpha0 {0.05,0.1,0.2,0.4,0.8}` exporting `AUGMENT=0,COS_TOTAL=50000,COS_WARMUP=1000,HIER=none,SCHED=none,PROBE=0`; meta cells (ms, alpha0) = (1e-4,1e-3) REF, (3e-4,1e-3) CENTER, (1e-3,1e-3), (3e-4,1e-4), (3e-4,1e-2), chunk771, exporting `AUGMENT=0,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=5` plus `PROBE_DIR`; × {66, 67, 68}; ResNet18_c100, WALL 03:30:00. No line exports `SGD_*` or `PROBE5*`; guard 0 found neither set (`SHELL_LEAK none`).
+
+**Job ids.**
+
+| batch | ids |
+|---|---|
+| `cgn1` | k01-s60 5014610, kL-s60 5014611, k01-s61 5014612, kL-s61 5014613, k01-s62 5014614, kL-s62 5014615 |
+| `cpl1` | s69: k01 5014618, kL 5014619, ISO 5014620, CTL 5014621, ONE 5014622; s70: 5014623–5014627; s71: 5014628–5014632 (same arm order) |
+| `cvh1` | s63: k01 5014634, kL 5014635, ISO 5014636, CTL 5014637; s64: 5014638–5014641; s65: 5014642–5014645 (same arm order) |
+| `cuc1` | s66: lr005 5014668, lr01 5014669, lr02 5014670, lr04 5014671, lr08 5014672, m1e4a1e3 5014673, m3e4a1e3 5014674, m1e3a1e3 5014675, m3e4a1e4 5014676, m3e4a1e2 5014677; s67: 5014678–5014687; s68: 5014688–5014697 (same arm order) |
+
+`sacct` holds exactly 6 / 15 / 12 / 30 records for the four prefixes.
+
+### 216.4 `cuc1`'s runtime `SGD_*` witness poller (214.7)
+
+- Started **2026-09-15T20:39:49Z**, 1 s after the first `cuc1` job appeared in `squeue` and while the launcher was still submitting, from `~/stage_cuc1`, with the loop text documented in 214.7 and in the poller's header: `while squeue -h -u s5014158 -o %j | grep -q "^cuc1-"; do bash bin/cUC1_envwitness_poll.sh; sleep 240; done`, log `~/cuc1_envwitness_poll.log`, output `~/cuc1_envwitness/`.
+- **One deviation, disclosed:** it was detached with `setsid nohup … &` rather than a bare `nohup … &`, as a precaution so that it outlives the ssh session (216.8.1). The loop, the directory and the log path are the documented ones.
+- Running as PID 630076 on `nodelogin04` (the login node `ssh alice2` resolved to for every step here). At 20:53Z it had ticked 4 times with 0 witness files; this is expected, because every `cuc1` job was still PENDING and the poller only reads RUNNING jobs. It exits by itself once no `cuc1-` job is queued.
+- Owed at 30/30: `bash bin/cUC1_unaug_c100_denominator.sh --witness`, plus the `build_optimizer.py` sha256 + mtime re-check against `runs/cuc1/PROVENANCE.txt`. If `nodelogin04` reboots or the loop dies, witness coverage stops; restart it with the same command from `~/stage_cuc1`.
+
+### 216.5 RULE 21, by wall clock
+
+| batch | scorer | commit | `%ct` | earliest `sacct` Submit (CEST) | epoch | margin |
+|---|---|---|---|---|---|---|
+| `cgn1` | `analysis/cGN1_gn_gap_score.py` | `e90ac8a` | 1789501920 | 2026-09-15T22:25:03 | 1789503903 | **+1,983 s** |
+| `cpl1` | `analysis/cPL1_plainnet_residual_score.py` | `ea51295` | 1789502100 | 2026-09-15T22:26:32 | 1789503992 | **+1,892 s** |
+| `cvh1` | `analysis/cVH1_vgghorizon_score.py` | `4c1aa60` | 1789502019 | 2026-09-15T22:28:11 | 1789504091 | **+2,072 s** |
+| `cuc1` | `analysis/cUC1_unaug_c100_score.py` | `acaf8f3` | 1789502084 | 2026-09-15T22:39:48 | 1789504788 | **+2,704 s** |
+
+- Each launcher was committed in the same commit as its scorer (identical `%ct`). Each scorer has exactly one commit in `git log`.
+- alice2: TZ Europe/Amsterdam (CEST, +0200), "System clock synchronized: yes"; the Mac's `date +%s` agreed with alice2's to about 1 s (1789504760 vs 1789504759).
+- The scorer that each launcher selftested is sha256-identical to the committed one (guard 1a/1c vs `git show HEAD:`).
+
+### 216.6 RULE 20 at current coverage (pass 1 20:53:02–20:53:07Z; pass 2 20:58:03–20:58:07Z)
+
+- **Method** (three independent halves, all read-only):
+  - (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`), from each batch's stage directory, with each launcher's documented `--batch-consistency` axes plus `--strict`. For `cuc1`: the `lr` family, each of the 5 cells, and the whole `m` family.
+  - (b) The same unedited tool per run, `--expect` on every design flag: the arm's registered spec (taken from the file name), the seed, `run-name` and `save-directory`, plus the flag count (20 for HF runs; 10 for `cuc1` SGD rungs).
+  - (c) The SEPARATE ENV audit. For `cgn1`/`cpl1`/`cvh1`, a read-only script that reads ONLY the `NODE=`, `ENV:` and `PROBE_TENSOR:` lines. It checks all 15 runner ENV keys against the registered values, the run's own `PROBE_DIR`, the NODE header's job name, id and `AUGMENT`, and the PROBE_TENSOR type, tensor count and dir. For `cuc1`, the launcher's own `--envaudit` (against the scorer's `expected_env()`) and `--witness`.
+
+| batch | started (ARGS present) | ARGS: batch-consistency | ARGS: per-run `--expect` | ENV audit | verdict |
+|---|---|---|---|---|---|
+| `cgn1` | 6/6 (both passes) | PASS (6 clean) | 6 checked, 0 violations | 1 distinct ENV line ×6; PROBE_TENSOR scalar ×3, layerwise ×3, tensors=62 | **PASS at 6/6** |
+| `cpl1` | 14/15 (pass 1); **15/15 (pass 2)** | PASS (14, then 15 clean) | 14, then 15 checked, 0 violations | pass 2: 1 distinct ENV line ×15; PROBE_TENSOR blockwise ×9, layerwise ×3, scalar ×3, tensors=53 | **PASS at 15/15** (pass 2) |
+| `cvh1` | 0/12 | no ARGS line yet | — | 0/12 | **UNVERIFIED (0/12)** |
+| `cuc1` | 0/30 | no ARGS line yet (all 7 documented commands) | — | `--envaudit` 0/30, `--witness` 0/30 | **UNVERIFIED (0/30)** |
+
+- The registered ENV line, verbatim with `PROBE_DIR` stripped: `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`.
+- **No started run's ARGS or ENV line differs from the registered one, so nothing was cancelled.**
+- Full-coverage RULE 20 is **done** for `cgn1` (6/6) and `cpl1` (15/15, pass 2): every run's ARGS, ENV and PROBE_TENSOR lines are written at start and are all the registered ones. It remains owed for `cvh1` (12/12) and `cuc1` (30/30), including `cuc1`'s ENV half and witness, before ANY number from those batches is read.
+
+### 216.7 Queue state and ETA (22:53 CEST)
+
+- **Queue.** `cgn1` 6 RUNNING (gpu-short: 4 on node851, 2 on node884). `cpl1` 14 RUNNING (6 gpu-short, 8 gpu-mig-40g) + 1 PENDING (Priority). `cvh1` 12 PENDING (Priority). `cuc1` 30 PENDING (QOSMaxGRESPerUser). `squeue --start` gives no estimate (N/A).
+- **At 22:57 CEST `cpl1-kL-s69` (5014619) COMPLETED, exit 0:0, Elapsed 29:31 on node887 (L4).** A count-only check of its `.out` (no line content read): 1 `RUN_DONE`, 0 Traceback/Error/nan lines, 100 per-epoch lines. `cpl1-ONE-s71` then started, so `cpl1` is 14 RUNNING + 1 COMPLETED, and 0 pending.
+- **Per-user GPU caps** (`sacctmgr`, read-only): qos-short-gpu 12, qos-gpu-l4 8, qos-gpu-mig 8, qos-gpu-a100 2. So at most 30 of this account's jobs run at once across the four partitions. gpu-short (12) and gpu-mig (8) are at the cap now.
+- **ETA. UNSURE**; queue contention can move all of it later.
+  - `cgn1`: done ≈ 23:10–00:15 CEST (node851 is the 2080 Ti node where the parent network took ~1.5 h); hard bound 01:25.
+  - `cpl1`: 1 COMPLETED (29:31 on an L4); 14 running, the last to start (`ONE-s71`, ~22:57) done ≈ 23:30–00:35.
+  - `cvh1`: 1.0–3.1 h per run once started (328 epochs at 11.4–33.6 s/epoch). Its start depends on the 7-day pool, which `cpl1` and `cuc1` also use. Plausibly done ≈ 01:00–05:00 CEST on 2026-09-16.
+  - `cuc1`: 30 jobs of 29 min (SGD median) to 51–118 min (chunk771), in 2–3 waves under the caps. Plausibly done ≈ 03:00–08:00 CEST on 2026-09-16.
+- **GPU-h.** Expected 4.5 + 11 + 17.8 + 20.0 ≈ 53 GPU-h. Hard bounds (WALL × jobs) 18 + 45 + 84 + 105 = 252 GPU-h.
+
+### 216.8 Incidents and deviations, disclosed
+
+1. **My first two attempts at `cgn1`'s stage check + dry run never ran a launcher.** My own wrapper (`~/l216_run.sh`) started with `set -u` and then sourced `/etc/profile`, which aborts under `set -u` (measured in isolation: rc 127). Both attempts exited before writing a log; nothing was written and nothing submitted. Fixed by relaxing `set -u` around the environment setup. From then on every launcher step (and the poller) was detached with `setsid nohup`. Whether a bare `nohup` child survives the ssh session on alice2 was not isolated.
+2. **`cuc1`'s dry run was run twice** (216.3). The second run is the one immediately before the submission; its composed lines are byte-identical to the first's, which were read in full.
+3. **The launchers' guard 7 was UNVERIFIED for `cvh1` and `cuc1`**: every job was still PENDING after 600 s. This is expected, and 216.6 carries it.
+4. **`bin/PROTECTED.txt`.** Each launcher appended its own prefix to its stage directory's copy (each now 38 lines). The mirror's copy (`$HOME/metaopt/hierarchical-metaoptimize/bin/PROTECTED.txt`) was backed up to `PROTECTED.txt.bak_l216` (`9e07c6ee…` = HEAD's bytes) and received the same four lines, `cgn1- cpl1- cvh1- cuc1-`, as the Mac copy in this commit. Mac and mirror are now sha256 `9263797fe4ba1d4a…8911e946`.
+
+### 216.9 What this entry does not license, and what is owed
+
+- **No number.** No epoch, accuracy or loss line of any of the 63 runs was read. The audits read only `ARGS:`, `ENV:`, `NODE=` and `PROBE_TENSOR:` lines, and `argsline_guard.py` reads only the head of each file.
+- **Owed, per batch, in this order:**
+  1. RULE 20 at full coverage, ARGS and ENV, with the axes above (**done** for `cgn1` 6/6 and `cpl1` 15/15, 216.6; owed for `cvh1` and `cuc1`). For `cuc1`, also `--witness` at 30/30 and the `build_optimizer.py` sha + mtime re-check.
+  2. Ingest (146.7), verifying added == N AND changed == 0.
+  3. Score with the documented one-argument invocation, unedited. The launchers printed the stage-directory paths, which are sha256-identical to HEAD:
+     - `python3 analysis/cGN1_gn_gap_score.py $WS/runs`
+     - `python3 analysis/cPL1_plainnet_residual_score.py $WS/runs`
+     - `python3 analysis/cVH1_vgghorizon_score.py $WS/runs`
+     - `python3 analysis/cUC1_unaug_c100_score.py $WS/runs`
+
+### 216.10 Discipline
+
+- **Files in this commit:** `docs/CORRECTIONS.md` (this entry) and `bin/PROTECTED.txt` (+4 lines). `git add` named exactly those two paths.
+- **Untouched:** every registered file, `analysis/argsline_guard.py`, the live harness (build_network `c7998883`, HF `4732b74a`, train `3fea309e`, load_data `b52b58a3`, run_cifar `a0d0a1b9`, all re-read at launch) and `paper/`. No nested `claude -p`.
+- **Left on alice2 (all deletable):**
+  - `~/l216_run.sh` (`644bd206…`), `~/l216_envaudit.py` (`4892aaac…`), `~/l216_rule20.sh` (`ffcea90a…`), `~/launch216_remote_sha.sh`
+  - `~/l216_logs/` (every stage, dry-run, submit and audit log of this entry)
+  - `~/cuc1_envwitness_poll.log`, `~/cuc1_envwitness/`
+  - the mirror's `PROTECTED.txt.bak_l216`
+  - what `--submit` itself writes: `runs/<prefix>/PROVENANCE.txt`, the manifests and the probe dirs
+  - `/tmp/<prefix>_*` guard temporaries
+- **`alice` NOT CONTACTED. NOTHING CANCELLED. NOT PUSHED.**
+
+Next free number: **217**.
