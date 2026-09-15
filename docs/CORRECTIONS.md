@@ -28562,3 +28562,285 @@ cau1's 27 `.out` files carry `--seed 50/51/52`, 9 files each.
 * **Numbering.**  I fetched immediately before writing: origin's last entry was 207, so I took **208**.
 
 Next free number: **209**.
+
+---
+
+## 209. TRACK L1 — **`cau1` LANDS 27/27: `DEFICIT-HOLDS`, ON CIFAR-10 / ResNet18 ONLY.**  THE REGISTERED SCORER `analysis/cAU1_unaug_denominator_score.py` (sha `ddcdb98a…9a2d0`), RUN **UNEDITED** ON `alice2` WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION, EXITS 0.  **PRIMARY `GAP_END` = plateau5(`S*` = `lr02`) − plateau5(`M*` = `m6t`) = 89.6153 − 85.9980 = +3.6173 pp = +9.92 SE.**  The ladder's argmax is INTERIOR (`lr=0.2`).  The parent's own config (`m6`, α₀ 1e-6) sits at **74.4993**, 15.1160 pp (+41.44 SE) below the best rung.  **RULE 20 AT FULL 27/27 (ARGS per family, the launcher's ENV audit, an independent ENV/ARGS audit, and the runtime `SGD_*` witness on 27/27) PASSED BEFORE ANY NUMBER WAS READ.  RULE 21 MARGIN +10,728 s.**  **I LEAD WITH THE ONE PLACE THE UNEDITED SCORER AND CODEX's SAVED OUTPUT DISAGREE: THE `FINAL:` LINE IS IDENTICAL CHARACTER FOR CHARACTER, BUT ONE DESCRIPTIVE DIGIT DIFFERS (`lr005` TRAIN AUC 97.105 here, 97.106 in Codex's file), AND THE CAUSE IS THE INTERPRETER'S FLOAT `sum()`, NOT THE DATA.**  A stale partial landing left by an earlier agent was saved and cleared before anything else (209.2).  **CORPUS 2,809 → 2,863 together with `cvk1` (210.6).  ZERO GPU SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **209**; NEXT FREE **210**.
+
+### 209.1 BRIEFING CORRECTIONS, LEADING
+
+* **Who launched `cau1`.**  Track U1 launched it at `206` (27 jobs, 2026-09-10T10:12:13Z, alice2 `s5014158`), not Codex.  Codex **scored** it on 2026-09-14.  The user authorization Codex cites, and its receipt, concern **`cvk1`** (210.1).  Codex committed nothing to this repo.
+* **Codex's "independent" `cau1` audit is not a second code path.**  `work/cau1_independent_score.txt` is **byte-identical** to what `analysis/cau1_attack_indep.py` prints.  That is the untracked parser written by the earlier agent (Track U2), run with `--witness` and both `--ref` files.  So one independent parser exists for `cau1`, not two.  It is verified here by calibration (209.5), not assumed.
+* **"MT019" matches no string in the repo** (`grep -rn`).  I read it as MASTER-TABLE line 19, the FAIR row, whose verdict is OPEN.  209.6 treats that row.
+* **`206.3`'s stated residual is closed.**  The residual was that `build_optimizer.py` could change between submission and a job's start.  The live `…/cifar10/Optimizers/build_optimizer.py` has sha **`25a899b3…c7ec2` (= the pin)** and **mtime 2026-08-20 14:01:19 CEST**, 20 days before submission.  It has not been written since, so every job ran the pinned `SGD_WD` 5e-4 / `SGD_MOM` 0.9 defaults.
+* **A registered prediction MISSED, in the method's favour.**  `202.6`'s floor gate put `m6t` in **[72, 80]**.  It measured **85.9980**.  The other two held: `m6` was predicted at 74.797 and measured 74.4993; every rung was predicted ≥ 55 and the lowest is 85.3847.  The floor gate is not a branch, so no token moves.
+
+### 209.2 THE STALE PARTIAL LANDING — SAVED, THEN RESTORED TO HEAD
+
+The working tree carried an unfinished `cau1` landing from an agent that died on a session limit:
+* ` M results/all_runs.csv` — +27 `cau1-` rows, 2,836 data rows, sha `465b81cc…` (the copy `208.1(d)` read).
+* ` M docs/MASTER-TABLE.md` — header "2,836 runs / 2976.5", **citing "CORRECTIONS 208" for `cau1`, which is wrong**: 208 is `cvk1`'s bar freeze.  It also placed the `cau1` row in section 1, not in section 9 with the registered token.
+* `?? analysis/cau1_attack_indep.py`.
+
+All of it, plus the full `git diff`, was saved first to the session scratchpad
+`/private/tmp/claude-501/-Users-teshnizi-Saber-Optimization/7abb0c79-bcc7-424b-856d-f4a9fed472c1/scratchpad/stale_cau1_partial/`.  The saved files and their sha256 are `dirty.diff` `3cc43253…`, `MASTER-TABLE.dirty.md` `cee46326…`, `all_runs.dirty.csv` `465b81cc…` and `cau1_attack_indep.py` `9bc2160f…`.  The two tracked files were then `git checkout`-ed to HEAD, where the corpus sha is `50c7f9c8…`, 2,809 rows.  Everything below was redone from that state.  **The parser was verified (209.5) and is committed UNCHANGED** (sha `9bc2160f…`).
+
+### 209.3 RULE 21 AND RULE 20 AT 27/27, BEFORE ANY NUMBER
+
+* **Completion.**  `sacct`: **27/27 `COMPLETED`, `ExitCode 0:0`**, job ids 4945786–4945795 and 4945832–4945848, all on `gpu-short`.  First Submit 12:12:14 CEST; last End 15:32:25 CEST (4945847).
+* **RULE 21.**  Scorer commit `736677d`, `%ct` **1789024406**.  It is the ONLY commit that has touched the file.  The earliest `sacct` Submit is 2026-09-10T12:12:14 CEST = **1789035134**.  **Margin +10,728 s (2 h 58 m 48 s)**; from the launcher (`7aa0213`, 1789024425) it is +10,709 s.  The scorer sha is identical on the Mac and the alice2 mirror, and equals the `SCORER_SHA256` in `runs/cau1/PROVENANCE.txt`.
+* **RULE 20, ARGS** — `analysis/argsline_guard.py` **UNEDITED** (sha `81cea8b5…`), run on alice2 (Python 3.10.4, `envs/mo`) with the launcher's printed per-family axes as documented `--vary` arguments:
+
+  | invocation | result |
+  |---|---|
+  | `--name cau1-lr --batch-consistency --strict --vary seed --vary run-name --vary save-directory --vary alpha0` | **21 clean**, 0 mismatch, 0 without ARGS, `VERDICT: PASS`, exit 0 |
+  | `--name cau1-m6- --batch-consistency --strict --vary seed --vary run-name --vary save-directory` | **3 clean**, `VERDICT: PASS`, exit 0 |
+  | `--name cau1-m6t- --batch-consistency --strict --vary seed --vary run-name --vary save-directory` | **3 clean**, `VERDICT: PASS`, exit 0 |
+
+  Two ARGS lines, quoted verbatim:
+  `ARGS: --optimizer SGD --dataset CIFAR10 --NN-name ResNet18 --batch-size 100 --max-time 999:00:00 --num-epochs 100 --alpha0 0.1 --seed 50 --save-directory /home/s5014158/metaopt/runs/cau1 --run-name cau1-lr01-s50`
+  `ARGS: --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR10 --NN-name ResNet18 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups resnet18_blocks --seed 50 --save-directory /home/s5014158/metaopt/runs/cau1 --run-name cau1-m6-s50`
+* **RULE 20, the SEPARATE ENV audit**, done two ways:
+  1. `bash bin/cAU1_unaug_denominator.sh --envaudit`, the launcher's own mode, checked against the scorer's `expected_env()`.  Result: **27/27 read, 0 violations, `ENV AUDIT VERDICT: PASS`**, one distinct ENV line per family.
+  2. `analysis/cau1_cvk1_env_audit.py`, new here.  It shares no code with any scorer, launcher or guard, and reads only NODE/ARGS/ENV header lines, never an `Epoch` line.  Every ENV key is checked exactly: `lr` family `AUGMENT=0 BETA_CLIP=none COS_TOTAL=50000 COS_WARMUP=1000 PROBE=0 …`, `m6` `BETA_CLIP=-60:6.0 PROBE=5`, `m6t` `BETA_CLIP=-15:-2.3026 PROBE=5`.  So is every non-axis ARGS flag, and the NODE header's `AUGMENT=0`.  No `SGD_*` appears on any ENV line.  **0 violations.**
+* **`SGD_WD` / `SGD_MOM`, which the runner does not echo.**  Beyond `206.3`'s batch-level chain (`SHELL_LEAK none` in `PROVENANCE.txt`; the pin re-checked in 209.1), a **runtime `/proc/<pid>/environ` witness now exists on 27/27**.  It is in `alice2:~/cau1_envwitness/`, written by Track U2's read-only poller `~/cau1_envwitness_poll_u2.sh` while each job ran.  My audit reads it:
+  * **coverage 27/27, `SGD_count=0` on 27, positive control on 27** — `AUGMENT=0`, the matching `SLURM_JOB_ID` and `SLURM_JOB_NAME`, and the family-correct `COS_*` or `PROBE`/`BETA_CLIP`;
+  * the Mac copy `../runs_alice2/cau1/envwitness_u2/` is **sha256-identical file by file (27/27)**.
+
+  **What this still is not:** a witness of the value `build_optimizer.py` READ.  It shows that no `SGD_*` variable existed in the process, so the pinned defaults applied.
+* **Integrity.**  All 27 `.out` files in `../runs_alice2` are **sha256-identical** to alice2's.  The earlier agent had rsynced them; I re-verified them, alongside `cvk1`'s 27 (54/54).
+
+### 209.4 THE REGISTERED SCORER, UNEDITED — AND THE ONE CHARACTER THAT DIFFERS FROM CODEX
+
+`python3 analysis/cAU1_unaug_denominator_score.py $METAOPT_WS/runs` on alice2 (`module load Python/3.10.4-GCCcore-11.3.0`, `envs/mo`, `METAOPT_WS=/home/s5014158/metaopt`): **exit 0, 0 tracebacks**, G0 27/27 complete, G1 PASS, G2 PASS.  Log `alice2:~/l1_logs/score_cau1.log`, sha `96f35cb4…`.
+
+```
+FINAL: DEFICIT-HOLDS | LADDER:INTERIOR | M*=m6t | SIGMA-PRIOR-DOMINATES | CURVE-DEFICIT | TRAIN-AT-CEILING | ONE-BASELINE-FAMILY | COUNTERWEIGHT-NOT-TESTED | ALPHA0-TWO-CELLS | CIFAR10-ONLY
+```
+
+* **Against Codex's `work/cau1_registered_score.txt`.**  The `FINAL:` line is **identical character for character**.  The whole output differs in **exactly one line, one character**: the `lr005` row's TRAIN-AUC column prints **97.105** here and **97.106** in Codex's file.
+* **Cause, measured.**  The same scorer on the Mac (Python 3.14.5, same 27 `.out`) reproduces Codex's file **byte for byte**.  The three per-run TRAIN AUCs of `lr005` come out differently on the two interpreters:
+
+  | host | per-run TRAIN AUCs | arm mean | `%.3f` |
+  |---|---|---|---|
+  | alice2, Python 3.10.4 | 97.07149999999997, 97.11149999999999, 97.13349999999998 | 97.10549999999999 | 97.105 |
+  | Mac, Python 3.14.5 | 97.0715, 97.11149999999999, 97.1335 | 97.1055 | 97.106 |
+
+  Python 3.12 changed the built-in float `sum()` to compensated summation, and this arm mean sits on a rounding half.  It is a descriptive TRAIN column, and nothing branches on it.  **The registered host's output (alice2, 3.10.4, the venv every launcher guard uses) is the record.**
+* **Invariance to this ingest.**  On the Mac the unedited scorer's whole output is **identical** against the 2,809-row HEAD corpus and the new 2,863-row corpus (`cau1-` is excluded from its prior readers, and `cvk1` rows are VGG/CIFAR-100).
+
+### 209.5 THE NUMBERS, TEST BESIDE TRAIN, AND THE INDEPENDENT PARSER
+
+As printed by the registered scorer on alice2.  plateau5 = mean TEST over epochs 95–99, from the runs' own `.out`; every contrast is WITHIN `cau1`.
+
+| arm | what | TEST plateau5 (sd) | TEST AUC | TRAIN plateau5 | TRAIN AUC | ep TRAIN ≥ 99 % |
+|---|---|---|---|---|---|---|
+| `lr0005` | SGDm+cos lr 0.005 | 85.385 (0.213) | 84.014 | 100.000 | 98.349 | 11,10,11 |
+| `lr001` | lr 0.01 | 87.085 (0.380) | 85.649 | 100.000 | 98.358 | 13,13,13 |
+| `lr002` | lr 0.02 | 88.409 (0.344) | 85.498 | 100.000 | 97.959 | 16,17,16 |
+| `lr005` | lr 0.05 | 88.799 (0.239) | 84.366 | 100.000 | 97.105 | 49,44,47 |
+| `lr01` | lr 0.1 | 89.489 (0.242) | 82.990 | 100.000 | 95.277 | 63,62,64 |
+| **`lr02`** | lr 0.2, **`S*`** | **89.615** (0.223) | 80.695 | 100.000 | 91.715 | 73,73,72 |
+| `lr04` | lr 0.4 | 88.667 (0.280) | 75.111 | 100.000 | 86.055 | 82,82,81 |
+| `m6` | parent's config, α₀ 1e-6, box −60:6.0 | **74.499** (0.713) | 74.087 | 99.995 | 98.801 | 5,5,6 |
+| **`m6t`** | α₀ 3e-4, box −15:−2.3026, **`M*`** | **85.998** (0.429) | 84.805 | 99.997 | 98.363 | 15,11,13 |
+
+* **σ.**  Prior 0.4468 (df 18) > in-batch 0.3717 (df 18), so `SIGMA-PRIOR-DOMINATES`; SE 0.3648 pp, bar ±2 SE = 0.7296 pp.
+* **Primary.**  `GAP_END` **+3.6173 pp = +9.92 SE** → `DEFICIT-HOLDS`.  Against `m6`: +15.1160 pp = +41.44 SE.
+* **Secondary (the parent's evidence type).**  `GAP_AUC` = AUC(best-AUC rung `lr001`, 85.6494, interior) − AUC(`m6t`, 84.8046) = **+0.8448 pp = +2.68 SE_AUC** → `CURVE-DEFICIT`.  **Read at `S*` instead, the AUC gap is −4.1099 pp (−13.05 SE_AUC).**  The endpoint-best rung pays for its endpoint with its early curve.  Only 2 of 7 rungs beat `m6t` on AUC.
+* **TRAIN** is at its ceiling on every arm (99.995–100.000), so the endpoint compares the generalisation of interpolating solutions.  `m6` interpolates by epoch 5–6; `S*` does so only at epoch 72–73.
+* **Descriptive, never tokens.**  `m6` vs `ub9-b6` at the identical spec (between-batch) is 74.4993 vs 74.7967 = −0.2974 pp (−0.82 SE).  `m6t` vs `i3b-3e4` (`AUGMENT=1`, cross-setting) is −7.3193 pp.  `GAP_END` vs the augmented CIFAR-10 deficit (+1.8071, itself cross-batch) differs by +1.8102 pp.  Box occupancy: 0 floor and 0 ceiling records on all 6 meta runs.
+
+**The independent parser, `analysis/cau1_attack_indep.py`.**  It imports nothing from the scorer and reads raw `.out` by string splitting.  It was **calibrated first**: `--calib ub9-b6` on `../runs_alice2` gives plateau5 75.3220 / 74.5080 / 74.5600, mean **74.7967**, against the published 74.7967 (diff −0.0000).  Run with `--witness ../runs_alice2/cau1/envwitness_u2 --ref-m6 ../runs_alice2/ub9-b6-s0-4796072.out --ref-m6t ../runs/i3b-3e4-s0-4700627.out`, it exits 0 and reproduces every arm mean, σ, SE, `GAP_END`, `GAP_AUC` and both branches digit for digit.  Its independent robustness lenses, which are non-gating:
+* seed sets **DISJOINT** — min `S*` 89.3800 > max `M*` 86.4140 — with Welch t 12.97;
+* leave-one-seed-out (9 combinations) `GAP_END` ∈ [+3.2930, +3.9430];
+* worst-case max-of-7 selection removed: +3.2685 = +8.96 SE;
+* 6 of 7 rungs beat `M*` by ≥ 2 SE — `lr0005` does not, at −0.6133 pp = −1.68 SE.
+
+Its output file is byte-identical to Codex's `cau1_independent_score.txt` (209.1).  A third path, `aggregate.py`, wrote the CSV rows (210.6).
+
+### 209.6 WHAT IT LICENSES, AND WHAT IT DOES NOT
+
+**Licensed.**  One sentence about the DENOMINATOR in the parent paper's own unaugmented setting, on **CIFAR-10 / ResNet18 at 100 epochs**:
+
+> At `AUGMENT=0`, a tuned SGD+momentum+cosine `lr` ladder beats the better of MetaOptimize's two α₀ cells by 3.62 pp (+9.92 SE) on plateau5, and beats the parent's own configuration by 15.12 pp.
+
+The augmentation-artefact account (`202.6` account A) is refuted **at this cell**.  "Does not beat a tuned baseline" and "loses to it" both survive unaugmented, on CIFAR-10.
+
+**Not licensed** (`202.10`, stamped by the scorer):
+* **CIFAR-100.**  `cdn1`'s `GAP_in` +5.699 stays an `AUGMENT=1` number.
+* **Any baseline family but SGDm+cosine.**
+* **Meta-side tuning.**  α₀ got two cells, not a ladder, and the meta-stepsize is fixed at 1e-3.
+* **The fixed-step counterweight** (+1.551 for the method) was not re-measured unaugmented.
+* **Nothing about granularity.**
+* **A curve result.**  The curve secondary is weaker than the endpoint and reverses at `S*`.  A sentence built on the curve must quote −4.11 beside +0.84.
+
+**MASTER-TABLE row 19 (the FAIR row, "MT019") STAYS OPEN.**  The method-vs-tuned-baseline half at `AUGMENT=0` is now measured, on CIFAR-10 only.  It remains open for **unaugmented CIFAR-100** and for **meta-side tuning**.  The row takes a bracketed amendment and keeps its verdict (210.7).
+
+### 209.7 COST
+
+`sacct` ElapsedRaw 49,534 s over 27 one-GPU jobs = **13.7594 GPU-h**.  The CSV's own `wallclock_min` gives 808 min = 13.4667 h.  The expectation was ~14.4 (202.9) with a hard bound of 81.  This entry spent zero GPU-hours.
+
+Next free number: **210**.
+
+---
+
+## 210. TRACK L1 — **`cvk1` LANDS 27/27: `UNRESOLVED-TIE-WITH-22 | CARRIER-CUT-UNRESOLVED | TIE-16-19-22`.  IT WAS LAUNCHED BY CODEX — ANOTHER AI THE USER RAN, OUTSIDE THIS REPO — WITH THE REGISTERED SUCCESSOR LAUNCHER `bin/cVK2_vgg_cut_ladder.sh`, UNEDITED; THIS IS THE REPO's FIRST RECORD OF THAT LAUNCH.**  THE REGISTERED SCORER `analysis/cVK2_vggcut_score.py` (sha `aca0cdc3…7338`, bars FROZEN by O2 at `208`), RUN **UNEDITED** ON `alice2`, EXITS 0.  **ITS WHOLE OUTPUT IS BYTE-IDENTICAL TO CODEX's `work/cvk2_registered_score.txt`.**  **PRIMARY: argmax `k_hat` = 19 (68.6933); `PEAK_SET` = {16, 19, 22} at `PEAK_BAR` 0.9573 pp.**  **SAID PLAINLY:** (1) the peak set is the conv→BN-scale junctions among the cuts at k ≥ 16, which is the class alias; (2) the 22→23 cliff (moving `bn8.weight`) is −33.14 pp, but k23 is FLOORED, so the cliff is a BOUND; (3) the carrier-cut (22) and balance (16) predictions are **NOT separated** (`D22-16` −0.2227 pp = −0.47 SE).  **I LEAD WITH TWO CORRECTIONS TO THE BRIEFING's WORDING (210.4): the grid holds a FOURTH junction cut, k13, which is NOT in the peak set; and k21 misses the peak set by 0.0180 pp.**  **RULE 20 AT FULL 27/27 WITH A SEPARATE ENV AUDIT, PASS, BEFORE ANY NUMBER.  RULE 21 MARGIN +350,172 s.**  **CORPUS 2,809 → 2,863 (+27 `cau1`, +27 `cvk1`; added 54, changed 0, removed 0).  ZERO GPU SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **210**; NEXT FREE **211**.
+
+### 210.1 WHO LAUNCHED IT, AND ON WHAT AUTHORITY
+
+* **Launcher.**  Codex worked from `/Users/teshnizi/Documents/Codex/2026-09-14/continue-the-alice-metaoptimize-investigation-in/work/` and **committed nothing** to this repo.  It ran `bash bin/cVK2_vgg_cut_ladder.sh --submit` once on **alice2 (`s5014158`)** at **2026-09-14T14:58:00Z**.  The launcher is registered at `5629b17` (sha `4183f85e…573e`); the mirror copy that ran is sha-identical.
+* **The authority it cites**, quoted from its receipt `work/cvk2_prelaunch_receipt.json` (checked_at 2026-09-14T14:57:33Z): **"then complete it if you need to finish a test put them on alice to finish first."**  The same receipt records:
+  * the five immutable hashes, which match the registered files: the scorer `aca0cdc3…`, the launcher `4183f85e…`, `tests/test_vggbn2.py` `4b1f06ea…`, `bin/_lib_guards.sh` `c45e1b73…` and `argsline_guard.py` `81cea8b5…`;
+  * dry-run exit 0, and selftest 139/0/0.
+
+  The user's words say "alice"; the jobs went to **alice2**, the account that is ours, and the shared `alice` account holds none of them by the receipt.  I record the authority as cited.  I did not see the user's conversation with Codex beyond this receipt.  **Whether that instruction covered `cvk1` is the operator's to confirm, not this entry's.**  `208.7` had left the launch as "the operator's call".
+* **The submit log**, `work/cvk2_submit_20260914.log`:
+  * guard 1c: selftest **139 checks, 0 failures, 0 skipped**, scorer sha `aca0cdc3…`;
+  * guard 1d3: `tests/test_vggbn2.py` PASSES on the LIVE tree (69 PASS lines);
+  * `---- 27 jobs (ACCEPTED BY SLURM); 0 rejected ----`;
+  * guard 7: RULE 20 post-launch check PASSED.
+
+  The launcher appended `cvk1-` to the mirror's `bin/PROTECTED.txt` on `--submit`.  The Mac copy takes the same one-line append in this commit and now sha-matches the mirror (`9e07c6ee…`).
+* **Completion.**  `sacct`: **27/27 `COMPLETED`, `ExitCode 0:0`**, job ids **5004252–5004278**.  Submit 16:58:00–16:58:02 CEST.  The jobs ran on `gpu-short` / `gpu-l4-24g` / `gpu-mig-40g` / `gpu-a100-80g`, one GPU each.  Last End 18:00:35 CEST (5004252).  `runs/cvk1/PROVENANCE.txt` reads `MODE SUBMIT`, `SUBMIT_UTC 2026-09-14T14:58:00Z`.
+
+### 210.2 RULE 21 AND RULE 20 AT 27/27, BEFORE ANY NUMBER
+
+* **RULE 21.**  The scorer and launcher were both committed at `5629b17`, `%ct` **1789047708** (2026-09-10T13:41:48Z).  That is the ONLY commit touching either file.  The earliest `sacct` Submit is 2026-09-14T16:58:00 CEST = **1789397880** (5004252 `cvk1-k01-s55`).  **Margin +350,172 s (4 d 01 h 16 m 12 s).**  Under O2 every bar is a frozen literal or `cvk1`'s own in-batch σ, so the margin covers every bar (`208.7`).
+* **RULE 20, ARGS.**  `argsline_guard.py` UNEDITED, in the launcher's printed form `--name cvk1- --batch-consistency --vary seed --vary run-name --vary stepsize-groups`, returns **27 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line, `VERDICT: PASS`, exit 0**.  The same with `--strict` also passes, 27 clean.  One ARGS line, quoted verbatim:
+  `ARGS: --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name VGG11_bn_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups [13,13] --seed 55 --save-directory /home/s5014158/metaopt/runs/cvk1 --run-name cvk1-k13-s55`
+* **RULE 20, the SEPARATE ENV audit.**
+  * **The launcher's documented form**, `grep -h '^ENV:' $WS/runs/cvk1-*.out | sort | uniq -c`, gives **ONE line ×27**: `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=0 PROBE_DIR=none EB_RHO=na EB_LOG=0`.  No `cvk1` file carries a `PROBE_TENSOR:` line.
+  * **`analysis/cau1_cvk1_env_audit.py`** checks every ENV key exactly and every ARGS flag exactly, against the values typed from 201 and 208.6.  The arm's `--stepsize-groups` must equal `[k,26−k]`; `scalar` and `layerwise` are the anchors.  The seed, run name and save directory must match, and the NODE header must carry `AUGMENT=1`.  **27/27, 0 violations.**
+* **Integrity.**  The 27 `.out` files were rsynced to `../runs_alice2` and are **sha256-identical** (54/54 with `cau1`).  The manifest `runs/cvk1/PARTITION-MANIFEST.txt` is `001bfb60…b66d` on both hosts, the manifest `208.6` registered.
+
+### 210.3 THE REGISTERED SCORER, UNEDITED
+
+`python3 analysis/cVK2_vggcut_score.py $METAOPT_WS/runs` on alice2 (3.10.4, `envs/mo`), documented one-argument form, manifest found by default: **exit 0, 0 tracebacks**.  Gates: G-STRUCT 11/11, G-SOUND 27/27, G-ENV 5/5, G-FLOOR, G-CEIL, G-DIVERGE 9/9 and G-GAP all PASS.  Log `alice2:~/l1_logs/score_cvk1.log`, sha `b23bf21d…`.
+
+```
+FINAL: UNRESOLVED-TIE-WITH-22 | CARRIER-CUT-UNRESOLVED | TIE-16-19-22 | GATES-CLEAN | ALIAS-CLASS-IS-INDEX-MOD-3 | MAGNITUDE-NOT-SEPARATED | HORIZON-100-ONLY | SHARED-MS-1E-3 | NOT-A-ONE-VARIABLE-ABLATION | SIGMA-NARROW-PINNED | TRAIN-ARGMAX-DISAGREES(22) | D22-16-TIED | CLIFF-IS-A-BOUND | GAP-REPLICATES-CVG1
+```
+
+* **Against Codex.**  The whole output is **byte-identical** to `work/cvk2_registered_score.txt` (`cmp`), so Codex also ran it on alice2: the manifest path it prints is alice2's.
+* **On the Mac** (Python 3.14.5, `../runs_alice2`) the output is identical except for that manifest-path line.
+* **O2 works as registered.**  On the Mac the whole output is identical against the 2,809-row and the 2,863-row corpora.  The ingest cannot move a bar, and did not.
+
+### 210.4 THE NUMBERS, AND THE THREE THINGS SAID PLAINLY
+
+| k | spec | tensor k → k+1 at the cut | TEST plateau5 (sd) | TRAIN | below argmax |
+|---|---|---|---|---|---|
+| `k01` | scalar (anchor) | — | 35.4480 (0.278) | 35.4473 | — |
+| `kL` | layerwise (anchor) | — | 66.2760 (0.210) | 99.3500 | — |
+| 13 | `[13,13]` | `conv5.weight` → **`bn5.weight`** (junction) | 61.9987 (0.265) | 77.6553 | 6.6947 pp = 13.99 SE |
+| **16** | `[16,10]` | `conv6.weight` → **`bn6.weight`** (junction) | **68.2760** (0.181) | 90.3820 | 0.4173 pp = 0.87 SE |
+| **19** | `[19,7]` | `conv7.weight` → **`bn7.weight`** (junction) | **68.6933** (0.225) | 82.7313 | argmax |
+| 20 | `[20,6]` | `bn7.weight` → `bn7.bias` | 67.3247 (0.367) | 80.9980 | 1.3687 pp = 2.86 SE |
+| 21 | `[21,5]` | `bn7.bias` → `conv8.weight` | 67.7180 (0.288) | 81.5707 | 0.9753 pp = 2.04 SE |
+| **22** | `[22,4]` | `conv8.weight` → **`bn8.weight`** (junction; the carrier) | **68.0533** (0.301) | 98.7887 | 0.6400 pp = 1.34 SE |
+| 23 | `[23,3]` | `bn8.weight` → `bn8.bias` | 34.9120 (0.232) | 34.9753 | floored |
+
+* **σ.**  `SIGMA_USED` 0.586232, the NARROW pin (O2).  In-batch 0.266142 (df 18).  `SE_ARM_DIFF` 0.478657.  `PEAK_BAR` = `FLOOR_BAR` = 0.9573 pp.  `FLAT_BAR` 3.0828 pp.
+* **Primary.**  Sweep range 33.7813 pp.  The argmax is **19**; the runner-up is 16, with margin 0.4173 pp = 0.87 SE; `PEAK_SET` **[16, 19, 22]**.
+* **Anchors.**  `D_GAP` = `kL` − `k01` = +30.8280 pp (+64.41 SE).  Between-batch it agrees with `cvg1`'s +31.2687 and `cvi1`'s +30.7360 (`GAP-REPLICATES-CVG1`).
+* **TRAIN.**  The TRAIN argmax is **22** (98.7887; 16 is at 90.38, 19 at 82.73), so `TRAIN-ARGMAX-DISAGREES(22)`.  Descriptive only.
+
+**(1) The peak set is the class alias.**  In VGG11_bn's `named_parameters()` order (the manifest), tensor 3j+1 is `conv(j+1).weight`, tensor 3j+2 is its BN scale and tensor 3j+3 is its BN bias.  So a cut k falls on a conv→BN-scale junction **iff k ≡ 1 (mod 3)**.
+* **The peak set {16, 19, 22} is exactly the junction cuts among the grid's k ≥ 16.**  Every non-junction cut — 20 (`bn7.weight|bn7.bias`), 21 (`bn7.bias|conv8.weight`), 23 (`bn8.weight|bn8.bias`) — is outside it.
+* This is the alias the scorer stamps (`ALIAS-CLASS-IS-INDEX-MOD-3`, 201.8).  The batch cannot tell "a boundary just before a BN scale" from "every third index", so **no junction-CLASS claim is licensed**.
+* **Correction to the briefing's "exactly the three junctions in the window".**  That is true for the window k ∈ [16, 23], but **not for the grid**.  The grid holds a **fourth** junction cut, **k13** (`conv5|bn5`, the first 512-channel conv), and it is **NOT** in the peak set: it sits 6.6947 pp = 13.99 SE below the argmax.  "Every junction cut peaks" is false on this batch.
+* **One exclusion is decided at the margin.**  **k21 misses `PEAK_BAR` by 0.0180 pp (0.04 SE).**  k20 misses it by 0.4114 pp.  The "junction-only" shape of the peak set therefore rests, at 21, on a hair.  It is stated with the result, not after it.
+
+**(2) The cliff is a BOUND.**  The step 22→23 moves **`bn8.weight`** (the carrier, 512 parameters) into the large group.  TEST falls **−33.1413 pp (−69.24 SE)** and TRAIN **−63.8133 pp**.  But **k23 is FLOORED**: it lands at the scalar-collapse level, 34.9120 against `k01`'s 35.4480, which is −0.5360 pp = −1.12 SE.  So −33.14 is a **lower bound on what the carrier's placement is worth, not an effect size** (`CLIFF-IS-A-BOUND`).  The class-matched window beside `cpk3`'s ResNet steps, a SIGN CENSUS ONLY, reads:
+
+| VGG step | tensor moved | TEST pp (SE) | ResNet step | tensor moved | TEST pp |
+|---|---|---|---|---|---|
+| 19→20 | `bn7.weight` | −1.3687 (−2.86) | 46→47 | `layer4.0.bn1.weight` | −2.5773 |
+| 20→21 | `bn7.bias` | +0.3933 (+0.82) | 47→48 | `layer4.0.bn1.bias` | +0.1087 |
+| 21→22 | `conv8.weight` | +0.3353 (+0.70) | 48→49 | `layer4.0.conv2.weight` | +9.0020 |
+| 22→23 | `bn8.weight` | −33.1413 (−69.24) | 49→50 | `layer4.0.bn2.weight` | −24.4593 |
+
+Every sign agrees.  The conv step's size does not transfer: +0.34 pp on VGG against +9.00 pp on ResNet.
+
+**(3) Carrier-cut and balance are NOT separated.**
+* A1 CARRIER-CUT predicts **22**, and A2 PARAM-BALANCE predicts **16** (18 off-grid, 201.4).  Both are in the tie, so the branch is `UNRESOLVED-TIE-WITH-22` with `CARRIER-CUT-UNRESOLVED`.
+* The registered secondary `D22-16` = M(22) − M(16) = **−0.2227 pp = −0.47 SE** — A1 predicts +, A2 predicts − — is tied (`D22-16-TIED`).
+* The argmax sits at 19, which 201.4 names "parity holds, the carrier rule misses by one junction", but it sits inside a tie, so **no `PEAK-ELSEWHERE-19` reading is available**.
+* A4 DEPTH-FRACTION (20/21) is below the argmax by more than the bar at both cuts, though at 21 only by the 0.018 pp margin above.  No token names A4.
+* **Consequence for `204`.**  `204` said only `cvk1` could turn the ResNet `k*=49` ↔ carrier link from a prediction into evidence.  **It did not.**  The link stays a PREDICTION, still confounded with balance, now on both architectures.
+* **What the batch does show** is a PLATEAU in TEST across junction cuts 16–22, all within 0.64 pp, and a floor-level collapse the moment `bn8.weight` leaves the small group.  That is a cut-position fact on VGG at 100 epochs, not a single-peaked localisation at the last cut before the carrier.
+
+**Independent parsers — two, sharing no code with each other or the scorer.**
+1. Codex's `work/cvk2_verification/reduce_independent.py`, saved result `cvk2_independent_score.txt`, 897 checks.
+2. `analysis/cvk1_attack_indep.py`, new here.  It reads raw `Epoch` lines by string splitting and applies the 201/208 bars in its own code.
+
+Both reproduce every arm mean and SD, σ in-batch 0.266142, SE 0.478657, `PEAK_BAR` 0.9573, argmax 19, `PEAK_SET` [16, 19, 22], `D22-16` −0.2227 (−0.47 SE), CLIFF +33.1413 (+69.24 SE) and the TRAIN argmax 22, **digit for digit**.
+
+### 210.5 WHAT IT LICENSES, AND WHAT IT DOES NOT
+
+**Licensed.**  On `VGG11_bn_c100` / CIFAR-100 at 100 epochs, ms 1e-3, α₀ 1e-6, `AUGMENT=1`, two-group contiguous cuts:
+* every junction cut in k ∈ [16, 22] recovers the whole scalar→layerwise gap (all three at or above `kL`'s 66.28; descriptive capture 1.0649 / 1.0784 / 1.0577);
+* the non-junction cuts 20 and 21 also exceed `kL` but sit 1.3687 and 0.9753 pp below the argmax;
+* moving `bn8.weight` out of the small group collapses the run to the scalar floor.
+
+**Not licensed.**  These are 201.8's limits, unconditional:
+* carrier identity vs junction class (the alias above);
+* identity vs magnitude (`bn8` 0.5783 of mean|L|, `bn7` 0.0021);
+* anything on the isolation line (`cvi1` enters no `cvk1` contrast);
+* any horizon but 100 epochs;
+* any ms but 1e-3;
+* residual connections;
+* group count (every sweep arm is m = 2);
+* "position beats balance" in general;
+* **"the peak sits at the carrier cut"**, which is the prediction this batch registered and did not confirm.
+
+### 210.6 THE INGEST, BOTH BATCHES, IN THE DOCUMENTED ORDER, WITH BOTH HALVES
+
+The corpus snapshot was `cmp`-identical to HEAD's (`50c7f9c8…`, 2,809 rows) before the ingest.  The `.out` files were in `../runs_alice2` and sha-verified (209.3, 210.2).  `../runs`, the `alice` mirror, holds 0 `cau1`/`cvk1` files.  `146.7`'s trap was avoided constructively: the corpus sha moved from `50c7f9c8…` to **`870c4003…4a3a`**.
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # "# 2863 runs aggregated", exit 0
+  # WARNING: 3 duplicated run-name(s) [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply                                        # "APPLIED: 36 rows updated", exit 0
+```
+
+**Both halves, keyed `(run, job_id)`, field by field**, by a comparator of my own (`csv.DictReader`, 38 fields):
+
+```
+before rows 2809 keys 2809 | after rows 2863 keys 2863 | fieldnames identical: True (38)
+ADDED 54  {'cau1': 27, 'cvk1': 27}   REMOVED 0   MULTIPLICITY CHANGES 0
+PRE-EXISTING ROWS CHANGED (any of 38 fields): 0   (106742 field-cells compared)
+  cau1: 27 rows, job_id 4945786..4945848, seeds 50/51/52, ResNet18, CIFAR10, augment 0, epochs_done 100, complete 1
+  cvk1: 27 rows, job_id 5004252..5004278, seeds 55/56/57, VGG11_bn_c100, CIFAR100, augment 1, epochs_done 100, complete 1
+```
+
+`args_repair`'s 36 updates are the standing `dup_group` restoration that `194.7`, `196.8` and `203.10` recorded.  The field-by-field count is taken after it ran.  Its `.bak` is git-ignored and not committed.  **CORPUS 2,809 → 2,863.**  The alice2 mirror's `results/all_runs.csv` was brought to the same bytes (`870c4003…`), with the prior copy kept as `results/all_runs.csv.pre_l1_ingest_2809` (`50c7f9c8…`).
+
+### 210.7 THE MASTER TABLE
+
+* **The header was re-derived first**, by a hand-rolled RFC4180 splitter with no `csv` module and no code shared with the checker: **2,863 rows**, 2,848 with `wallclock_min` and 15 without, **2991.5500 → 2991.6 GPU-h**.  The rise of 28.5333 h equals `cau1`'s 13.4667 plus `cvk1`'s 15.0667, each re-summed over its own 27 rows.
+* **What changed in the file:**
+  * the header carries the new figures, with the `cvi1`-era 2,809 / 2963.0 and the 2,794 kept as `[SUPERSEDED …]`;
+  * section-9 rows went 35 → **37**, and total rows 109 → **111**;
+  * two rows were added in 192's section-9 convention, **each carrying its registered scorer's token verbatim**;
+  * the bottom line took a bracketed **[AMENDED …]** note for `cau1`, with the cycle-150 wording kept beneath it;
+  * row 19 (FAIR) took a bracketed amendment, and its verdict **stays OPEN**.
+* **Deleted:** nothing.  **Other tracks' rows:** none touched.
+* `analysis/c73_mastertable_check.py` was run UNEDITED after the edit; the result is in the commit message.
+
+### 210.8 DISCIPLINE (209 AND 210)
+
+* **RULE 16.**
+  * Both registered scorers ran unedited at their registered shas.  So did `argsline_guard.py`, `aggregate.py`, `args_repair.py`, `c73_mastertable_check.py` and `bin/cAU1_unaug_denominator.sh --envaudit`.
+  * `git diff` over `analysis/` is **additions only**, three new files: `analysis/cau1_attack_indep.py` (the earlier agent's, verified, unchanged), `analysis/cvk1_attack_indep.py` and `analysis/cau1_cvk1_env_audit.py`.
+  * `argsline_guard.py` is untouched.
+* **Evidence handling.**  plateau5 is PRIMARY, from the raw `.out`, with TRAIN beside TEST at every arm.  The batch is the unit of replication, and every contrast is within batch.  Codex's outputs were read as evidence to check, and every quoted number above was re-derived on the registered host.
+* **Hosts and scope.**
+  * `paper/` is untouched.  `analysis/c98_reproduce.py` exits **`1`**, as-is.  No nested `claude -p` was used.
+  * **`alice` was NOT CONTACTED**, and every remote command ran on alice2.  **No job was submitted, cancelled or requeued.**
+* **Git.**  `git add` named this track's paths only: `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md`, `results/all_runs.csv`, `bin/PROTECTED.txt` and the three `analysis/` files.  **Committed LOCALLY; NOT PUSHED.**  The GitHub repo is public, and publishing is the operator's decision.
+* **Left on alice2, disclosed, all deletable:** `~/l1_env_audit.py`, `~/l1_round.py` and `~/l1_logs/` (the five RULE 20 logs, both ENV audits, both scorer logs), plus the mirror's `results/all_runs.csv.pre_l1_ingest_2809`.
+* **Numbering.**  I fetched before writing; origin's last entry was 208.  I took **209** and **210**.
+* **Cost of these entries:** zero GPU-hours.  The batches' own spend is `cau1` 13.7594 and `cvk1` 15.3086 GPU-h (`sacct`).
+
+Next free number: **211**.
