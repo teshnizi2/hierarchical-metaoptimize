@@ -29094,3 +29094,86 @@ Stamps on branches 6–9 (never move the branch): RHO:<x>; COMPLEMENT-PINNED|NEI
 - sha256: `analysis/cVH1_vgghorizon_score.py` `c9e0f17cd4294fdc…9270339e`; `analysis/cVH1_smoke_gen.py` `9b9e573f68f988d6…714cbb366`; `bin/cVH1_vgg_horizon.sh` `4e7dfa73eb405747…b2034206`.
 
 **Files (3, new).** `analysis/cVH1_vgghorizon_score.py`, `analysis/cVH1_smoke_gen.py`, `bin/cVH1_vgg_horizon.sh`. Every other file in the launcher's guard 1a list is already committed. Outside the repo, on alice2: `~/stage_cvh1/`.
+
+## 214. TRACK R3 — **`cuc1` REGISTERED AND DRY-RUN: IS THE CIFAR-100 DENOMINATOR AN AUGMENTATION ARTEFACT, OR UNDER-TUNING OF THE METHOD?  ResNet18_c100 / CIFAR-100 / `AUGMENT=0` ON EVERY ARM / 100 EPOCHS / SEEDS {66, 67, 68}: A 5-RUNG SGD+COSINE LADDER AGAINST A 5-CELL PLUS-SHAPED META GRID, IN BATCH; 30 JOBS, ≈20.0 GPU-h EXPECTED.**  Every bar is a frozen literal (O2).  **NOTHING SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **214**; NEXT FREE **215**.
+
+### 214.1 Question
+
+In the parent paper's own unaugmented setting (AUGMENT=0) on ResNet18_c100 / CIFAR-100, a tuned SGD+momentum+cosine lr ladder is compared IN BATCH against MetaOptimize given a 5-cell meta-stepsize × alpha0 grid around the corpus-best CIFAR-100 cell. This closes MASTER-TABLE row 19's two remaining open counts: (1) CIFAR-100 unaugmented, where cdn1's +5.699 pp is an AUGMENT=1 number; (2) meta-side tuning, where cau1 gave the method two alpha0 cells and one meta-stepsize.
+
+### 214.2 Design
+
+ResNet18_c100 / CIFAR-100 / batch 100 / 100 epochs / AUGMENT=0 on EVERY arm / seeds {66, 67, 68}. ONE submission, 30 jobs = 10 arms × 3 seeds.
+- **Baseline, 15 jobs:** `cuc1-lr{005,01,02,04,08}`. Plain SGD, momentum 0.9, wd 5e-4, cosine to zero, COS_TOTAL=50000, COS_WARMUP=1000 (cdn1 arm A's and cau1's recipe). Ladder {0.05, 0.1, 0.2, 0.4, 0.8}, factor 2, centred on 0.2: cdn1's AUGMENT=1 CIFAR-100 argmax is 0.1 and cau1's AUGMENT=0 CIFAR-10 argmax moved UP from 0.1 to 0.2, so an unaugmented optimum anywhere in 0.1–0.4 is an INTERIOR rung.
+- **Method, 15 jobs:** `cuc1-m<ms>a<a0>` on cdn1-m's spec (= gm2-ch, the corpus-best CIFAR-100 cell family): SGDm base (momentum 0.99, wd 0.1); Lion meta (momentum 0.99, beta2 0.9, wd 0); gamma 1; chunk771 (14,595 groups); BETA_CLIP -15:-2.3026; PROBE=5. It differs from cdn1-m only in AUGMENT (1 → 0), the grid values, and dropping cdn1-m's UNECHOED instrument exports PROBE5=1 and PROBE5_WRITE_EVERY=500; every exported variable is now echoed by the runner.
+- **The grid is a PLUS around CENTER `m3e4a1e3`** (ms 3e-4, alpha0 1e-3): REF = `m1e4a1e3` (ms 1e-4, alpha0 1e-3), the corpus-best cell spec, as the ms-LOW neighbour; ms-HIGH `m1e3a1e3`; alpha0-LOW `m3e4a1e4`; alpha0-HIGH `m3e4a1e2`.
+- **Why centred above the corpus-best ms (re-derived, not assumed):**
+  - The live HF.py Lion meta update (line 1059) is beta −= ms·sign(·) with wd_meta 0, so beta travels at most ms × 50,000 nats per run.
+  - cdn1-m's own probes (3 seeds, AUGMENT=1) show REF IS travel-limited: beta_max rides the full rate (within 0.003 at step 20,000) until step ~27–30k, then settles near −4.0; beta_min falls at 98.9–99.6% of the maximum for all 50,000 steps; the box was touched on 0 records.
+  - Across 14 AUGMENT=1 SGDm+Lion canonical-box cells, the 11 that can reach beta = −4.0 within 60% of training all sit ≥ 69.37 pp; the 3 that cannot sit ≤ 53.59 pp (layerwise ms 1e-4 a0 1e-6 = 10.96, ms 3e-5 = 53.59, ms 1e-5 = 32.32).
+  - So the under-tuning directions are UP on both axes; the DOWN neighbours of REF are travel-stuck cliffs that would be predicted at the collapse floor (164.6). Every cuc1 cell reaches −4.0 within 58.2% (REF), 19.4%, 5.8%, 34.7% and 4.0% of training.
+- **PRIMARY:** GAP_END = plateau5(S*) − plateau5(M*). S* = best of the 5 rungs; M* = best of the 5 cells that train (mean > 25 pp, no seed ≤ 5). plateau5 = mean TEST over epochs 95–99 from each run's own .out. It stays an ENDPOINT, as cau1 decided, re-derived for CIFAR-100: DECAY = PEAK5 − plateau5 on raw .out is ≤ 0.298 pp on all 9 cau1 arms (TRAIN 99.99–100); ≤ 0.169 on C100 ≥ 60 pp cells; ≤ 0.049 on cdn1 SGD; the only AUGMENT=0 decay > 0.3 is ub9's scalar cell (1.151), a granularity cuc1 does not run. CIFAR-100 AUGMENT=0: NO DATA, UNSURE.
+- **The memorisation hazard is registered, not argued away:** a PEAK secondary (the early-stopping reading) on its own frozen bar; a per-arm DECAY disclosure beside TRAIN plateau5, TRAIN-at-peak, TRAIN AUC and epoch-to-99%; an ENDPOINT-PEAK-AGREE/DISAGREE stamp on the FINAL line.
+- **Secondaries (never move the primary):** CURVE = GAP_AUC (the parent's evidence type); PEAK; TUNING = plateau5(M*) − plateau5(REF).
+- **SGD_WD / SGD_MOM (not echoed)** use cau1's 206/209 mechanism: guard 0 reports and unsets them, recording SHELL_LEAK in PROVENANCE; `build_optimizer.py`'s sha pin `25a899b3…` plus its mtime is stamped for the ingest re-check; a read-only /proc environ poller (`bin/cUC1_envwitness_poll.sh`) plus a launcher `--witness` audit at 30/30.
+- **Traded to stay near ~20 GPU-h, each stamped on the FINAL line:** the parent's own config (AdamW+Adam blk6, alpha0 1e-6) on CIFAR-100, 3 jobs, ~2.6 GPU-h (PAPER-CONFIG-NOT-TESTED); the fixed-step counterweight (COUNTERWEIGHT-NOT-TESTED); a full 3×3 grid, +12 jobs, ~10 GPU-h; cdn1's sixth rung. Also ONE-GRANULARITY-CHUNK771, ONE-BASELINE-FAMILY, CIFAR100-RESNET18-ONLY.
+- **Cost:** expected 20.0 GPU-h, worst observed 46.3 (15 × 67 + 15 × 118 min), hard bound 105 (WALL × 30).
+
+### 214.3 Frozen bars (O2)
+
+Every bar is a LITERAL. `score()` reads the runs directory and nothing else. In-batch sigma enters only max(frozen prior, in-batch). Nothing from `results/all_runs.csv` enters any bar.
+
+**Pools**: pooled within-cell SD, cell = 15 design columns + batch prefix, usable rows, `cuc1-` excluded. Four families, each restricted to a FROZEN PREFIX SET so a later ingest of another batch cannot move them (the CORRECTIONS 205 failure): C100_META (18 prefixes; ResNet18_c100 100-ep meta cells with mean ≥ 60), C100_SGD (cdn1), AUG0_META (PP, cau1, pp, ub9), AUG0_SGD (cau1). Each is computed from the CSV and, on the same rows, from alice2's raw .out.
+
+| family | source | plateau5 | auc | peak5 |
+|---|---|---|---|---|
+| C100_META | csv | 0.368050 df 77 | 0.284735 df 77 | — |
+| C100_SGD | csv | 0.229665 df 12 | 0.219281 df 12 | — |
+| AUG0_META | csv | 0.475579 df 22 | 0.411988 df 22 | — |
+| AUG0_SGD | csv | 0.280836 df 14 | 0.265644 df 14 | — |
+| C100_META | raw (100 of 119 rows) | 0.379102 df 65 | 0.298335 | 0.358839 |
+| C100_SGD | raw (18/18) | 0.229665 | 0.219248 | 0.228973 |
+| AUG0_META | raw (15 of 33) | 0.572475 df 10 | 0.484410 | 0.439700 |
+| AUG0_SGD | raw (21/21) | 0.280836 | 0.265543 | 0.271805 |
+
+PRIOR = the max of its statistic's pools: SIGMA_P5_PRIOR 0.572475 (SE 0.467424 pp; every boundary at 2 SE = 0.934848 pp); SIGMA_AUC_PRIOR 0.484410; SIGMA_PEAK_PRIOR 0.439700. Raw plateau5 equals CSV plateau5 to 1.4e-14 on every found row.
+
+**The selftest asserts O2 (section F)** on a near-bar synthetic landing (GAP 1.2 pp, just over the frozen bar): (1) `score()` opened 30 files and NO .csv while handed the real corpus path; (2) the whole stdout is BYTE-IDENTICAL across no corpus, the real 2,863-row corpus, a missing path, and the real corpus + 18 invented rows (3 `cuc1-` rows at the batch's cells, 6 foreign CIFAR-100 AUGMENT=0 rows at wild values, 9 rows injected inside three frozen pool prefixes); (3) NOT VACUOUS: on the stressed corpus a live CIFAR-100 AUGMENT=0 pool is 40.000, and max(prior, live) would put the gap at 0.04 SE (DEFICIT-CLOSES) while the frozen scorer says DEFICIT-HOLDS. Launcher guard 1c4 requires section F to pass. Section A re-derives every CSV pool on its frozen prefix set to 1e-6 with equal df; section B' re-derives every raw pool on alice2 and SKIPs (never FAILs) on a host whose raw file set differs. Live, prefix-unrestricted values are printed as NOTE lines only.
+
+### 214.4 Branches (first match wins, all in batch)
+
+INCOMPLETE (not 30/30 complete .out) → GATED-ENV / GATED-ARGS (AUGMENT=0 checked on every ENV line AND NODE header; no repeated or undeclared flag) → GATED-METHOD-AT-FLOOR (no meta cell trains: printed as a BOUND, never a deficit, per 164.6) → GATED-BASELINE-AT-FLOOR → DEFICIT-HOLDS (GAP_END ≥ +2 SE and the method grid is not resolvably open: M* is CENTER or beats it by < 2 SE) → DEFICIT-HOLDS-METHOD-EDGE (≥ +2 SE, but an edge cell beats CENTER by ≥ 2 SE, or CENTER is dead; under-tuning then NOT excluded in that direction) → (both DEFICIT tokens take `| LOWER-BOUND` at a ladder edge) → DEFICIT-CLOSES (|z| < 2, ladder interior: the tuned method TIES a tuned baseline unaugmented) → UNRESOLVED-TIE-LADDER-EDGE → REVERSES-AT-REF-CELL (z ≤ −2, ladder interior, and REF alone clears −2 SE) → REVERSES-AT-TUNED-CELL-ONLY → UNRESOLVED-REVERSAL-LADDER-EDGE.
+
+Mandatory stamps: LADDER:INTERIOR/EDGE-LOW/EDGE-HIGH; METHOD:BRACKETED / FLAT-TOP-<dir> / EDGE-<dir> / CENTER-DEAD; S*=, M*=; SIGMA-PRIOR/INBATCH-DOMINATES; TUNING-GAIN-RESOLVED/UNRESOLVED/REF-IS-BEST/REF-DEAD; CURVE-* and PEAK-* (same bands on their own frozen bars, with edge variants); ENDPOINT-PEAK-AGREE/DISAGREE; TRAIN-AT-CEILING; BARS-FROZEN, plus the scope stamps.
+
+REVERSES IS REACHABLE: synthetic cases E7 (REVERSES-AT-REF-CELL) and E8 (REVERSES-AT-TUNED-CELL-ONLY) drive the REAL `score()`. Section C shows the predicted envelopes admit a reversal down to −12.37 pp and a deficit up to +30.82 pp. All 20 E-cases pass, including INCOMPLETE on a dropped run and GATED-ENV via both the ENV line and the NODE header (the track's returned text was cut off after this point in the consolidation brief; the scorer file is authoritative).
+
+### 214.5 Tests, freshness, dry run
+
+| check | result |
+|---|---|
+| scorer `--selftest`, alice2 (Python 3.10.4) | 79 pass / 0 fail / 0 skip |
+| scorer `--selftest`, Mac (Python 3.14.5) | 76 / 0 / 1 (the skipped section needs the cdn1-m probes, which exist only on alice2) |
+| smoke test, unedited scorer, one-argument form | full: exit 0 with a FINAL line; one run dropped: `FINAL: INCOMPLETE`, exit 1 |
+| registered dry run on alice2 (`~/stage_cuc1`) | exit 0, 0 guard failures, 30 command lines |
+| independent audit of the 30 lines | PASS |
+| seeds 66–68 | fresh in corpus, `.out` files, sacct and queue |
+
+### 214.6 UNSURE
+
+- No CIFAR-100 AUGMENT=0 row exists anywhere, so every level prediction is an extrapolation. cau1's m6t prediction missed by +6 pp in the method's favour.
+- The alpha0 1e-2 cell has no analog in the corpus.
+- lr 0.8 may diverge.
+
+### 214.7 Launch (operator, on alice2, from a checkout of this commit)
+
+`bash bin/cUC1_unaug_c100_denominator.sh --submit`, then start the SGD_* witness poller straight away, as the poller's header documents:
+`nohup bash -c 'while squeue -h -u s5014158 -o %j | grep -q "^cuc1-"; do bash bin/cUC1_envwitness_poll.sh; sleep 240; done' > ~/cuc1_envwitness_poll.log 2>&1 &`
+At 30/30, before any number is read: `bash bin/cUC1_unaug_c100_denominator.sh --witness` (and `--envaudit`).
+
+### 214.8 Consolidation check (before this commit, on the Mac)
+
+- Scorer `--selftest --runsdir ../runs_alice2 --csv results/all_runs.csv`: **76 checks / 0 failures / 1 skipped, exit 0** (SKIP: B'' cdn1-m probe.jsonl not reachable under `../runs_alice2`); the two one-argument smoke lines PASS (full batch → exit 0, `FINAL: DEFICIT-HOLDS | LADDER:INTERIOR | METHOD:BRACKETED | …`; one run dropped → exit 1, `FINAL: INCOMPLETE`).
+- sha256: `analysis/cUC1_unaug_c100_score.py` `9c2f752d38f80fa4…8cba6b2a`; `analysis/cUC1_smoke_gen.py` `ee4e77ada08489a0…142536e0`; `bin/cUC1_unaug_c100_denominator.sh` `23d2720257f5a9da…284b2000`; `bin/cUC1_envwitness_poll.sh` `5d67f422fabafeca…e91379d`.
+
+**Files (4, new).** `analysis/cUC1_unaug_c100_score.py`, `analysis/cUC1_smoke_gen.py`, `bin/cUC1_unaug_c100_denominator.sh`, `bin/cUC1_envwitness_poll.sh`. Outside the repo, on alice2: `~/stage_cuc1/`.
