@@ -29007,3 +29007,90 @@ Other stamps: SIGMA-PRIOR-FROZEN / SIGMA-INBATCH-DOMINATES, TRAIN-AGREES / DISAG
 - sha256: `analysis/cGN1_gn_gap_score.py` `aaf17b626774208b…c74b9347`; `bin/cGN1_gn_gap.sh` `6bfe07cd3f8ff72c…8771c8`; `bin/cGN1_stage_harness.sh` `256e8fcf754d8067…c92f38`; `patches/patch_resnet_gn_c100.py` `c922097439cc009c…b32e46e`; `tests/test_resnet_gn_c100.py` `8ed6896c5ba2278a…ca4712a5c`.
 
 **Files (5, new).** `analysis/cGN1_gn_gap_score.py`, `bin/cGN1_gn_gap.sh`, `bin/cGN1_stage_harness.sh`, `patches/patch_resnet_gn_c100.py`, `tests/test_resnet_gn_c100.py`. Outside the repo, on alice2 (new files only): `$WS/harness_cgn1/`, `$WS/jobs/run_cifar_cgn1.sh`, `~/stage_cgn1/`.
+
+## 213. TRACK R2 — **`cvh1` REGISTERED AND DRY-RUN: DOES THE VGG ISOLATION RESCUE SURVIVE A LONG HORIZON?  THE `ciso2` ANALOGUE ON `VGG11_bn_c100` / CIFAR-100: 4 ARMS (k01, kL, ISO, CTL) × SEEDS {63, 64, 65} = 12 JOBS, TO E = 328 EPOCHS, PROBE=100 AND PROBE_TENSOR=1.  `ciso2`'s `PIN_OCC_MIN` DEFECT IS REMOVED BY REGISTRATION.**  Every bar is a frozen literal (O2).  No patch; the live harness was not modified.  **NOTHING SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **213**; NEXT FREE **214**.
+
+### 213.1 Question
+
+cvi1 found that isolating `bn8.weight` alone recovers the whole in-batch scalar→layerwise gap at 100 epochs (D_ISO +31.2833 pp). Does that rescue survive a long horizon, in particular the freezing of the network when ISO's 25-tensor complement reaches the step-size floor? At epoch 99 it was ~1.5 nats above the clamp and still descending.
+
+### 213.2 Design
+
+- 12 jobs, ONE submission, 328 epochs, PROBE=100, PROBE_TENSOR=1 on every arm; standard cell (SGDm+Lion, ms 1e-3, alpha0 1e-6, batch 100, AUGMENT=1, BETA_CLIP -15:-2.3026, SCHED=none).
+- **Arms**, spec strings byte-identical to cvi1's (checked against cVI1's registered SPEC table AND all 12 of cvi1's ARGS lines, guard 4c''):
+  - k01 `scalar` (in-batch floor)
+  - kL `layerwise` (in-batch ceiling)
+  - ISO `sets:1-22,24-26/bn8.weight` [25,1]
+  - CTL `sets:1-19,21-26/bn7.weight` [25,1]
+- **Seeds {63, 64, 65}:** 0 corpus rows, 0 sacct job names ever, 0 .out files on those seeds; 0 cvh1 jobs in sacct all-time; queue empty.
+- **Horizon, derived not chosen:** E = ceil(114.7865 + 213.0) = 328.
+  - PIN_BOUND 114.7865 is the latest pin epoch over 6 extrapolations of cvi1's ISO complement (1,500 ISO probe records; 3 seeds × last-50 and last-100 OLS). ISO complement terminal −13.480375 / −13.260286 / −13.526394. OLS slopes last-50 −0.0304401 / −0.0235310 / −0.0292064, last-100 −0.0267193 / −0.0254405 / −0.0307080 nats/record. Extrapolated clamp epochs 109.98 / 114.79 / 110.09 (last-50) and 111.37 / 113.68 / 109.60 (last-100).
+  - The method bounded the arm MAXIMUM on both ciso2 arms it was tried on (ISO ≤ 104.7 vs measured 103.0; ONE ≤ 182.1 vs 151.0).
+  - W_MAX = 213.0 is the longest post-pin window ever measured (ciso2 k01, first touch 37.0, run to 250); ciso2 ISO 150.6, ONE 114.2, ciso1 CTRL 63.2, cvi1 k01 64.0, cvg1 k01 64.2. No batch longer than 100 epochs other than ciso2 has probe records (982 probe dirs searched), so no longer window is measurable. The r ≤ 2 pin definition gives 324.
+  - META_STEPS 164,000; 1,640 probe records per run.
+- **100-epoch control read IN-RUN (epochs 95–99).** Horizon-keyed code proved absent on the live code: train.py mentions num_epochs only at lines 42 (argparse) and 135 (loop bound). HF.py's PATCH_SCHED with SCHED=none returns exactly 1.0 at every counter up to 1e7 (T = SCHED_TOTAL = 0; `sched_total_effective` is referenced at HF.py:483 and defined nowhere), proved functionally by guard 4h2. Guard 4h3 refuses if SCHED_*/COS_*/LAM/ETA_RATIO/EB_* are set in the submitting shell (`--export=ALL`).
+- **PRIMARY:** RHO = D_ISO@328 / D_ISO@100, with D_ISO = plateau5(ISO) − plateau5(k01), all from the runs' own .out, all in batch. TRAIN beside TEST everywhere; CSV plateau and best_test read nowhere.
+- **PIN GATE, after the primary, as a stamp** (cannot suppress the verdict): per seed, the median over the last quarter of r = α/α_floor = exp(β+15); PINNED ≤ 2.0, FREE ≥ 10.0, NEITHER otherwise; arm class = class of ≥ 2/3 seeds. On ciso2's ISO it gives PINNED (medians 1.0010 / 1.0025 / 1.0010) where PIN_OCC_MIN failed (dwell 0.34–0.43).
+- **Scheduling.** WALL 07:00:00 (76.8 s/epoch = 2.03× VGG's worst-ever 37.8, 2.29× the 7-day pool's worst 33.6). PARTS gpu-l4-24g,gpu-mig-40g,gpu-a100-80g from `slurm_parts_for_wall`; gpu-short is dropped by arithmetic (25,200 s > 14,400 s live cap).
+- **Cost.** Expected 17.8 GPU-h, 36.7 at the 7-day pool's worst rate, hard bound 84.
+
+### 213.3 Manifest (live VGG11_bn_c100; guard 4 on alice2, live build_network.py `c7998883`, HF.py `4732b74a`)
+
+26 parameter tensors, 9,274,532 parameters, no `shortcut` parameter. 1-based: 1 conv1.weight 1728 | 2 bn1.weight 64 | 3 bn1.bias 64 | 4 conv2.weight 73728 | 5 bn2.weight 128 | 6 bn2.bias 128 | 7 conv3.weight 294912 | 8 bn3.weight 256 | 9 bn3.bias 256 | 10 conv4.weight 589824 | 11 bn4.weight 256 | 12 bn4.bias 256 | 13 conv5.weight 1179648 | 14 bn5.weight 512 | 15 bn5.bias 512 | 16 conv6.weight 2359296 | 17 bn6.weight 512 | 18 bn6.bias 512 | 19 conv7.weight 2359296 | 20 bn7.weight 512 | 21 bn7.bias 512 | 22 conv8.weight 2359296 | 23 bn8.weight 512 | 24 bn8.bias 512 | 25 linear.weight 51200 | 26 linear.bias 100.
+- 512-wide BN scales: 14 bn5.weight, 17 bn6.weight, 20 bn7.weight, 23 bn8.weight.
+- k01 → init_meta scalar, beta shape (); kL → beta (26,); both without rednorm.
+- ISO → m=2, sizes [25,1], params [9274020,512], GROUP1 = bn8.weight (23); init_meta blockwise, beta (2,), no rednorm. CTL → m=2, sizes [25,1], params [9274020,512], GROUP1 = bn7.weight (20); same routing. SYMDIFF ISO CTL = bn7.weight, bn8.weight.
+- Written by the dry run to `$WS/runs/cvh1/PARTITION-MANIFEST.txt` and `$WS/runs/cvh1-PARTITION-MANIFEST.txt` (2,505 bytes); the scorer's default resolution finds it (guard 8).
+
+### 213.4 Frozen bars (O2)
+
+All literals in `analysis/cVH1_vgghorizon_score.py`; `score()` reads the CSV ONLY for a descriptive row-count NOTE. Noise floor re-derived at registration with `cvh1-` excluded (2,863 rows, sha `870c400319f4…4a3a`), then frozen:
+- VGG_SL_100 0.317817 (df 16) | VGG_ALL_100 0.290870 (df 30) | NARROW_SL_100 0.586232 (df 77) | R250 0.409934 (df 8) | R772 0.813024 (df 30) | R100_M2_NARROW 0.925518 (df 60).
+- SIGMA_FROZEN = max = 0.925518; SE_FROZEN 0.755682; READ_BAR_FROZEN 1.511365. The only in-batch term: SIGMA_USED = max(SIGMA_FROZEN, SIGMA_INBATCH of this batch's own seeds, df 16).
+- Bars: D100_MIN 10.0 pp | REFUTE_BAR 5.0 pp (6.62 SE) | SUPPORT_BAR 15.0 pp (19.85 SE) | SURVIVE_FRAC 0.80 | ATTEN_MILD 0.50 | DEAD_BAR 5.0 pp seed range | IDENTITY_BAR 15.0 (stamp) | anchors k01 35.3442 ± 3.702072, kL 66.2884 ± 3.702072 (VGG corpus means, n 9 each; half-width 4 × SIGMA_FROZEN) | pin gate PIN_RATIO_MAX 2.0, FREE_RATIO_MIN 10.0, TAIL_FRAC 0.25 | decomposition tol 1e-4 relative to the group's L1 mass, fail max 1%.
+- **O2 asserted by the selftest:** FINAL identical on near_bar, survive_chatter and collapse across 5 corpora (one-arg default, given, stress A, stress B, none). Stress corpora add 3 invented VGG std-cell scalar rows plus 12 invented cvh1-* rows at cvh1's own cells. Non-vacuity: on stress A a live-max sigma would be 4.8768 → READ_BAR 7.9638 > near_bar's +1.60 margin, so a live-reading scorer would have stamped CEIL-TRACKS where this one stamps CEIL-ABOVE. A static check confirms `score()`'s source calls no corpus sigma/band/level function.
+- Selftest corpus checks are HARD at the registration sha and become NOTEs if the corpus moves (bars cannot move), so another track's ingest cannot make this launcher refuse the way cvk1's did at 205.
+- **Decomposition check fixed before registration.** Relative to |ref|, the old error measure failed 27 of 12,000 correct groupings on cvi1's real records. The new one, relative to the group's L1 mass, fails 0 of 12,000 on the registered partition, and 11,988 of 12,000 when the ISO/CTL partitions are swapped.
+
+### 213.5 Floor gate (164.6)
+
+Predicted plateau5 at E = 328 under every registered account (floor = in-batch k01; chance 1.00):
+
+| arm | SURVIVE (freeze, held) | ATTENUATE | COLLAPSE | NEVER-PINS |
+|---|---|---|---|---|
+| k01 | 35.6 [35.0, 36.2] | same | same | same |
+| CTL | 35.6 [35.0, 36.2] | same | same | same |
+| kL | 66.3–69.0 | same | same | same |
+| ISO | 65.8–67.8 | 41–60 | ≤ 40.6 | 66.8–69.0 |
+| RHO | 0.96–1.04 | 0.16–0.80 | ≤ 0.16 | 1.00–1.07 |
+
+- k01 and CTL ARE the floor by construction (margin 0, disclosed), 34.6 pp above chance (cvi1: 35.5673 / 35.5473). Under the account being tested (SURVIVE), ISO sits +31.3 pp = +41.4 SE above the in-batch floor and kL +30.7 pp = +40.6 SE. No TEST level is within 30 pp of 100.
+- RESCUE-COLLAPSES is reachable: ISO has 31 pp to fall. RHO is bounded in NEITHER direction: it exceeds 1 if ISO keeps improving (NEVER-PINS) and goes negative if ISO drops below k01, so a predicted ~1.0 is not a bound.
+- **A ceiling on a stamp.** kL TRAIN is 99.34 at 100 epochs, 0.66 pp from 100. Under the freeze account ciso2's TRAIN-GAP-WIDENS could move at most 0.66 pp < READ_BAR, so it is unreachable by construction and is NOT registered. ISO-TRAIN-* is kept (4.03 pp headroom).
+
+### 213.6 Branches (first match wins)
+
+1. UNRESOLVED-MANIFEST-MISMATCH — no manifest, or the model or any partition is not the frozen one (name AND numel, 1-based; 512-wide BN scales at 14/17/20/23; EPOCHS 328; META_STEPS 164000).
+2. INCOMPLETE — any of the 12 runs missing, without RUN_DONE, with a traceback or with < 328 epoch lines (exit 3; nothing quotable). Tokens MISSING:n NOT-DONE:n MISSING-<arm-seed>.
+3. UNRESOLVED-PROVENANCE — ARGS (parsed flag by flag, incl. `--num-epochs 328` and the arm spec), ENV (AUGMENT=1, BETA_CLIP, SCHED=none, SCHED_TOTAL=none, SCHED_WARMUP=none, …, PROBE=100; one distinct line) or PROBE_TENSOR line not the registered one; a duplicated .out; probe records ≠ 1,640; n_b wrong; decomposition fails > 1%.
+4. UNRESOLVED-ANCHOR — k01 or kL P100 outside its frozen band.
+5. UNRESOLVED-DIVERGED — any arm's seed range > 5.0 pp at 100 or 328.
+6. NO-RESCUE-AT-100 — D_ISO@100 < 10.0 (RHO not interpretable).
+7. RESCUE-COLLAPSES — D_ISO@328 ≤ 5.0.
+8. RESCUE-SURVIVES — RHO ≥ 0.80 AND D_ISO@328 ≥ 15.0.
+9. RESCUE-ATTENUATES (+ ATTENUATE-MILD if RHO ≥ 0.50, else ATTENUATE-SEVERE).
+
+Stamps on branches 6–9 (never move the branch): RHO:<x>; COMPLEMENT-PINNED|NEITHER|FREE (the redesigned gate, after the primary); if PINNED, ISO-PIN-EPOCH, POST-PIN-WINDOW, WINDOW-MEETS-WMAX|WINDOW-SHORT and FROZEN-AT-PIN|DECAYS-AFTER-PIN|IMPROVES-AFTER-PIN, otherwise POST-PIN-UNMEASURED; CEIL-TRACKS|BELOW|ABOVE; KL-STILL-TRAINING|KL-FROZEN; FLOOR-HOLDS|FLOOR-DRIFTS (the null model); CTL-AT-FLOOR-AT-E|CTL-… (the track's returned text for the remaining CTL stamps was cut off in the consolidation brief; the scorer file is authoritative).
+
+### 213.7 Tests and dry run
+
+- Selftest: 72/0/1 on the Mac (the SKIP is the ciso2 calibration, whose records are only on alice2) and 82/0/0 on alice2. It drives the real `score()` through the one-argument invocation on 13 synthetic scenarios; a dropped run gives INCOMPLETE, as does a truncated one.
+- Dry run r3 from `~/stage_cvh1`: exit 0, 0 guard failures. All 12 composed lines read; byte-identical to r2's; each carries every flag exactly once.
+- **Launch** (operator, on alice2, from a checkout of this commit): `bash bin/cVH1_vgg_horizon.sh --submit`. Guard 1d3 requires `tests/test_vggbn2.py` to pass on the LIVE tree; 212's GN patch is deliberately NOT applied live, so this holds.
+
+### 213.8 Consolidation check (before this commit, on the Mac)
+
+- Scorer `--selftest --runsdir ../runs_alice2 --csv results/all_runs.csv`: **72 PASS / 0 FAIL / 1 SKIP, exit 0** (SKIP: no ciso2 probe records under `../runs_alice2/ciso2`), as the track reported.
+- sha256: `analysis/cVH1_vgghorizon_score.py` `c9e0f17cd4294fdc…9270339e`; `analysis/cVH1_smoke_gen.py` `9b9e573f68f988d6…714cbb366`; `bin/cVH1_vgg_horizon.sh` `4e7dfa73eb405747…b2034206`.
+
+**Files (3, new).** `analysis/cVH1_vgghorizon_score.py`, `analysis/cVH1_smoke_gen.py`, `bin/cVH1_vgg_horizon.sh`. Every other file in the launcher's guard 1a list is already committed. Outside the repo, on alice2: `~/stage_cvh1/`.
