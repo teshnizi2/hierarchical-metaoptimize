@@ -28844,3 +28844,73 @@ PRE-EXISTING ROWS CHANGED (any of 38 fields): 0   (106742 field-cells compared)
 * **Cost of these entries:** zero GPU-hours.  The batches' own spend is `cau1` 13.7594 and `cvk1` 15.3086 GPU-h (`sacct`).
 
 Next free number: **211**.
+
+## 211. TRACK T — **MASTER-TABLE BROUGHT CURRENT FOR THE COUNT-MATCHED PARTITION AUDIT: 37 ROWS, SECTION 10, ZERO GPU (cycle 151).**  `analysis/c73_mastertable_check.py`, run UNEDITED, exits 0 before (111 rows) and after (148 rows).  **NOTHING SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **211**; NEXT FREE **212**.
+
+**Before.** `analysis/c73_mastertable_check.py`, run UNEDITED at 5186cb8: 111 rows; 2,863 runs / 2991.6 GPU-h; exit 0. The count-matched partition audit had NO row in the file. It is the campaign's one clearly successful line and the basis of the paper. Across the 25 audit batch names, grep finds `ar1` once, in passing, and nothing else. The research-notebook site therefore linked its "Partition tests" phase to MT098 alone.
+
+**What was added.** Section 10, "Cycles 75–110 — the count-matched partition audit": 37 rows in the section-9 column convention.
+- **Placement.** Appended AFTER section 9, at lines 169–211, not inserted in cycle order. The site keys experiments on MASTER-TABLE line numbers: its export matches MT014 = line 14 and MT098 = line 98. Lines 1–2 and 4–167 are byte-identical to HEAD. Line 3 took two insertions plus 111 -> 148.
+- **Verdict column.** The registered scorer's own token, verbatim, in backticks. Where no registered scorer exists, or the row is a pre-data withdrawal or a zero-GPU analysis, the record's own verdict in quotation marks with its entry number. Neither form joins the six prose families.
+- **Negatives included:**
+  - the refuted size-1 carrier (119.0 K4, M3)
+  - the withdrawn singleton law `sf1` (111.2) and its cross-architecture test, UNTESTABLE (111.1)
+  - the killed fixed-m ladder `sl1` (114.1)
+  - `gf1` withdrawn and `gf2` BLOCKED (119.9–119.10)
+  - direction C dropped (`cc1` C1 `MIXED`)
+  - `ar1` box-VOID under the corrected instrument (117.1)
+  - `gn1` `NO TRANSFER VERDICT IS ISSUED` + `THIS IS NOT A NULL`
+  - `aw1` `UNRESOLVED at n=6`, and its withdrawn "D TRANSFERS" (123.1)
+  - `hz3` "GROWS" withdrawn (123.2) and repaired by `hz3q` to `NOT FLAT -- D DECLINES WITH BUDGET`
+  - the imported count slope DELETED (117.10)
+  - carrier NOT IDENTIFIABLE (124.1)
+  - D not predictable, and the level slope dead (124.2–124.3)
+  - `ml2` and `sm3` VOID on their registered meta axis (125.2)
+  - "identified" withdrawn in favour of "candidate moderator" (128.1)
+- **After.** Checker UNEDITED: 148 rows, exit 0; selftest 6/6.
+
+### 211.1 The batch list in the brief was incomplete
+
+Cycles 75–88 (CORRECTIONS 104–119) hold 13 audit batches, not 12: `tw0` opens the line. Twelve more batches in cycles 89–110 (CORRECTIONS 120–134) are the same audit: `rl3`, `aw1`, `gm2`, `hz3`, `nl1`, `r50`, `ml2`, `sm3`, `bm2`, `sm4`, `rp1`, `hz3q`. They carry 13 of the headline's 20 cells. The audit cannot be recorded from 104–119 alone.
+
+### 211.2 Headline re-derived independently
+
+`analysis/cT211_partition_audit_rederive.py` is NEW. It reads the raw `.out` series, imports nothing from `analysis/`, uses no `csv` module, and applies each run's own ARGS line with last-wins. It parsed 368 runs, each matching the CSV plateau5 to 0.000000. Selftest 18/18; `--check` asserts the 53 numerals printed in section 10, with 0 mismatches.
+- 20 of 20 cells positive; t >= 3.0 in 18 (`ml2` t 2.34, `sm3` t 2.22).
+- SGDm-8 pool +0.5556 ± 0.0448, Q 4.21 on 7 df.
+- Fourteen-cell pool +0.5297 ± 0.0294, Q 102.47 on 13 df, τ 0.2948.
+- `pp1` A = −0.0093 ± 0.1569; `rp1` A = −0.0184 ± 0.0791, paired on run seed.
+- Levels: SGD +1.000, RMSProp +0.720, AdamW +0.189. M6 = +0.531 ± 0.138.
+
+The prose numbers all reproduce. Not re-derived independently: ±0.121 and the null median 9.4. `c98_reproduce.py`, unedited, PASSes both, while exiting 1 on ten stale corpus-count checks.
+
+### 211.3 Disagreements with the prose, stated in section 10
+
+- (a) "The method trails tuned baselines by 1.8–4.2 pp" (MAIN-IDEA-REPORT §5, paper): CIFAR-100's deficit is 5.699 pp (`cdn1`), outside the range. `c98_reproduce.py` now derives the ResNet-18/CIFAR-10 deficit as 1.796, not 1.807 (best MetaOptimize arm 93.328 vs 93.317); stale by an ingest.
+- (b) Six of the twenty cells come from the five batches with no scorer registered before their runs. Two of those batches (`ml2`, `sm3`) are VOID on their registered meta axis.
+- (c) CLOSEOUT §6 and CORRECTIONS 116 still print "ResNet50 is structurally excluded". CORRECTIONS 117 (objection 3) ruled that PREMATURE, and `r50` ran: D +0.881, t 3.37. Flagged here; the shared files are not edited.
+
+### 211.4 NEW FINDING: five launch scripts carry `aw1`'s registration header
+
+The files are `bin/c91_c100_mech.sh` (`gm2`), `bin/c92_norm_ladder.sh` (`nl1`), `bin/c93_resnet50.sh` (`r50`), `bin/c94_meta_ladder.sh` (`ml2`) and `bin/c96_secondmoment.sh` (`sm3`). Once the backticked batch name is stripped, their lines 3–30 are identical to `bin/c90_awbase.sh`'s (same md5). That includes the self-name "c90_awbase.sh", the question "ONE variable changes: SGDm -> AdamW" and the TRANSFERS bands. The five batches with no pre-registered scorer therefore also carry no registration text of their own: their design exists only in their runs' ARGS lines. No file in `docs/` recorded this. Nothing was edited (RULE 16).
+
+### 211.5 The audit's scorers cannot reach their verdicts from the local mirror
+
+`../runs` and `../runs_alice2` hold `neg_counts` caches but no `probe.jsonl`. Run UNEDITED here with only documented arguments:
+- Crash with FileNotFoundError: `tw0`, `at1`, `ck1`, `mm1`, `cx2`, `pp1`, `bn1`, `ar1`, `cc1`, `fa1`, `gc1`, `rp1`.
+- VOID or PENDING: `g3m`, `rl3`, `hz3`, `bm2`, `sm4`.
+- `gn1` prints "THE WHOLE BATCH IS VOID" from 0 probe dirs. That is a sync fault, never a finding (110.1).
+- Only `aw1` (CSV-based) and `hz3q` (`.out`-based) reproduce their registered verdicts locally.
+
+Section 10's tokens are therefore the ones the entries record from the cluster runs. Three tokens, in two rows, are marked in-cell as the scorer's own branch function applied to the re-derived numbers, because CORRECTIONS 116 never quoted them: `g3m` H1 `GENERALISES`, H3 `MECHANISM CONFIRMED ON ResNet34`, and `gc1` `CLOSE-CONFIRMED`. UNSURE whether the cluster printout matched them character for character. This pass ran nothing on the cluster.
+
+### 211.6 Handoff (not done here)
+
+The portal (`research-portal/.../scripts/export_research.py`) hard-codes `expected experiments: 111` and `PHASE_LINKS` (Partition tests = ["MT098"]). The new rows sit at lines 175–211. Linking them is the portal's change to make; the portal was not touched.
+
+### 211.7 Consolidation check (before this commit, on the Mac)
+
+Re-run on the bytes committed here: `cT211_partition_audit_rederive.py --selftest` 18/18, exit 0; `--check` 53 numerals asserted, 0 mismatches, exit 0; `c73_mastertable_check.py` UNEDITED exit 0, "header is consistent with both the table and the CSV OK"; its `--selftest` 6/6.
+- sha256 `analysis/cT211_partition_audit_rederive.py` `b8a8556ecd7903c6…4dc214e32`; `docs/MASTER-TABLE.md` `e6f158ea1020f020…4b380d88`.
+
+**Files.** `docs/MASTER-TABLE.md` (header line 3 and section 10) and `analysis/cT211_partition_audit_rederive.py` (new). Nothing pushed or submitted, and no cluster file was touched.
