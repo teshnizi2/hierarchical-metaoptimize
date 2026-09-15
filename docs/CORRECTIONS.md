@@ -29177,3 +29177,96 @@ At 30/30, before any number is read: `bash bin/cUC1_unaug_c100_denominator.sh --
 - sha256: `analysis/cUC1_unaug_c100_score.py` `9c2f752d38f80fa4…8cba6b2a`; `analysis/cUC1_smoke_gen.py` `ee4e77ada08489a0…142536e0`; `bin/cUC1_unaug_c100_denominator.sh` `23d2720257f5a9da…284b2000`; `bin/cUC1_envwitness_poll.sh` `5d67f422fabafeca…e91379d`.
 
 **Files (4, new).** `analysis/cUC1_unaug_c100_score.py`, `analysis/cUC1_smoke_gen.py`, `bin/cUC1_unaug_c100_denominator.sh`, `bin/cUC1_envwitness_poll.sh`. Outside the repo, on alice2: `~/stage_cuc1/`.
+
+## 215. TRACK R4 — **`cpl1` REGISTERED AND DRY-RUN: THE ONE-VARIABLE RESIDUAL ABLATION VGG COULD NOT BE.  `PlainNet18_c100` = ResNet18_c100 WITH EVERY RESIDUAL ADDITION REMOVED AND THE 3 PROJECTION-SHORTCUT MODULES NOT CONSTRUCTED; 5 ARMS × SEEDS {69, 70, 71} = 15 JOBS, ≈11 GPU-h EXPECTED, HARD BOUND 45.  `tests/test_plainnet.py` P3g PROVES THE ONE-VARIABLE CLAIM FUNCTIONALLY, BITWISE (max|d| 0.000e+00, eval and train).  CROSS-TRACK CONFLICT WITH 212 FOUND AND AVOIDED: `cpl1` RUNS FROM ITS OWN ISOLATED TREE; THE LIVE HARNESS IS BYTE-UNTOUCHED.**  Every bar is a frozen literal (O2).  **NOTHING SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **215**; NEXT FREE **216**.
+
+### 215.1 Question
+
+Once ResNet-18's residual additions are removed, and nothing else, do the ResNet carrier BatchNorm scales that still exist (`layer4.0.bn2.weight`, `layer4.1.bn2.weight`) still carry the scalar→layerwise gap? In particular, does `layer4.0.bn2.weight`, which on ResNet was a summand of block 0's addition, had no conv-free path to the classifier, and alone recovered ~0.91 of the gap (ciso1 0.9065, cdep1 0.9055), still rescue the scalar collapse when it feeds only a convolution? This is the one-variable test of 189.2's account (carriers are exactly the 512-wide BN scales whose output is a summand of a residual addition), which VGG11_bn, a different family, could not provide.
+
+### 215.2 Design
+
+- **Network.** PlainNet18_c100 = ResNet(PlainBlock, [2,2,2,2], num_classes=100); PlainBlock = BasicBlock minus `out += self.shortcut(x)`, shortcut modules NOT constructed (198). 53 tensors, 11,046,308 params (ResNet18_c100: 62 / 11,220,132; the 9 removed tensors are layer{2,3,4}.0.shortcut.{0.weight,1.weight,1.bias}, 173,824 params).
+- **Cell.** The standard CIFAR-100 cell: SGDm base (mom 0.99, wd 0.1), Lion meta (mom 0.99, beta2 0.9, wd 0), ms 1e-3, alpha0 1e-6, batch 100, 100 epochs, AUGMENT=1, BETA_CLIP=-15:-2.3026, PROBE=100, PROBE_TENSOR=1 on every arm.
+- **ONE submission, 15 jobs = 5 arms × seeds {69, 70, 71}.** m=2 arms: big group beta[0], isolated beta[1]; 1-based, re-derived by name and numel on the patched model.
+  - k01 `scalar` (floor anchor, in batch)
+  - kL `layerwise` (ceiling anchor, in batch)
+  - ISO `sets:1-43,45-49,51-53/layer4.0.bn2.weight,layer4.1.bn2.weight`, sizes [51,2], params [11045284,1024], isolates 44, 50
+  - CTL `sets:1-40,42-46,48-53/layer4.0.bn1.weight,layer4.1.bn1.weight`, sizes [51,2], params [11045284,1024], isolates 41, 47. An EXACT twin of ISO (cardinality 2/2, numel 1024/1024, width 512, BN scale, layer4, interleaved depth).
+  - ONE `sets:1-43,45-53/layer4.0.bn2.weight`, sizes [52,1], params [11045796,512], isolates 44. It decomposes ISO.
+- **PRIMARY** DELTA_ID = plateau5(ISO) − plateau5(CTL). **KEY SECONDARY** D_ONE = plateau5(ONE) − plateau5(k01). Secondaries D_ISO, D_CTL, D_GAP = kL − k01, D_HEAD = ISO − ONE; RECOVERY and RECOVERY_ONE are descriptive only. plateau5 = mean TEST of the run's own epochs 95..99 from the raw .out; TRAIN beside TEST; CSV plateau and best_test are read nowhere. Every contrast is in batch; the ResNet twins are printed between-batch and non-gating.
+- The k01 arm's PROBE_TENSOR records feed a descriptive, non-gating nomination readout (mean|L| share; remainder-sign flip for {44}, {50}, {44,50}, {41,47}).
+- **Runs from the ISOLATED tree** `$WS/harness_cpl1/cifar10` via `$WS/jobs/run_cifar_cpl1.sh` (run_cifar.sh with only its cd line changed).
+
+### 215.3 The patch, and the cross-track conflict
+
+- `patches/patch_plainnet.py` is ONE end-of-file append, dispatched by rebinding `build_network`. It was proved additive byte-for-byte and backward compatible on all 12 corpus networks (bitwise init + buffers + RNG state + repr): `tests/test_plainnet.py` 77/0 (Mac scratch; alice2 with `--pre` = the LIVE file; alice2 isolated tree). `tests/test_vggbn2.py` still 68/0 on the patched copy.
+- **DISCOVERED CROSS-TRACK CONFLICT.** cgn1's PATCH_RESNET_GN_C100 (212) inserts mid-file, so the two patches cannot share one tree: whichever lands second breaks the other's byte-identity proof. cpl1 therefore runs from its own isolated tree (`$WS/harness_cpl1` + `jobs/run_cifar_cpl1.sh`, cgn1's convention), built and verified on alice2 (new files only). The LIVE harness is byte-untouched (`c7998883` before and after).
+
+### 215.4 Accounts and predictions
+
+All levels UNSURE: no plain 18-layer net has ever run in the corpus. Anchors: ResNet18_c100 scalar band [21.694, 24.174] (38 rows), layerwise ~69.4; VGG11_bn_c100 scalar ~35.4, layerwise ~66.3. Registered intervals: K01_COLLAPSE 20–36, KL_PRED 55–70, FREE 45–70, ONE_IDENT 48–68.
+- **R-ONLY** (189.2 literally; collapse persists via an unlisted tensor): k01 20–36, kL 55–70, ISO/CTL/ONE 20–36 → NO-RESCUE-PLAIN.
+- **R-NOGAP** (189.2 strong: no summand, no collapse): k01 45–70, kL 55–70, ISO/CTL/ONE 45–70 → GAP-ABSENT-PLAIN.
+- **PATH** (a BN scale carries iff it has a conv-free path to the classifier; unifies ResNet's 3/2 split and VGG bn8/bn7; on PlainNet only idx 50): k01 20–36, kL 55–70, ISO 55–70, CTL 20–36, ONE 20–36 → HEAD-CARRIES-PLAIN.
+- **IDENT** (tensor identity survives the topology change): ISO 55–70, CTL 20–36, ONE 48–68 → CARRIER-SURVIVES-PLAIN.
+- **CLASS** (any deep 512-wide BN scale): ISO, CTL, ONE 55–70 → CLASS-OPERATIVE-PLAIN.
+- **H-BROKEN** (content-free: every m=2 partition floors on PlainNet): identical to R-ONLY on every arm → NO-RESCUE-PLAIN.
+
+Selftest section D asserts each account's midpoint lands in its registered branch, and asserts R-ONLY == H-BROKEN on every arm (declared: NO-RESCUE cannot confirm R-ONLY).
+
+### 215.5 Branches — `decide()`, in order
+
+- HARNESS-UNSOUND (max arm < 15.00): nothing licensed.
+- PLAIN-UNTRAINABLE (kL < 30.00): the plain 18-layer net does not train at this cell; NO sentence about carriers, the gap or 189.2.
+- UNRESOLVED-DIVERGED (any arm seed range > 5.0): no branch.
+- GAP-ABSENT-PLAIN (D_GAP < 10): removing the additions, and nothing else, removes the ResNet-18 gap at this cell (R-NOGAP); the gap on ResNet-18 REQUIRES the additions; VGG's gap is a different family and not contradicted; ISO/CTL/ONE not read.
+- GAP-ATTENUATED-PLAIN (10 ≤ D_GAP < 20): additions contribute to the gap; bars unreachable; no carrier contrast read.
+- NO-RESCUE-PLAIN (no m=2 arm has D ≥ 10): PATH, IDENT, CLASS REFUTED; R-ONLY NOT distinguished from H-BROKEN; NOT support for 189.2 over H-BROKEN; stamps H-BROKEN-NOT-EXCLUDED; next step: nominate from this batch's k01 PROBE_TENSOR records.
+- UNEXPECTED-PATTERN (ISO fails, ONE or CTL rescues): stop.
+- CONTROL-DOMINATES-PLAIN (DELTA_ID ≤ −15): stop.
+- HEAD-CARRIES-PLAIN (DELTA_ID ≥ 15 and D_ONE ≤ 2): ONE-VARIABLE SUPPORT FOR 189.2 for layer4.0.bn2.weight: removing the addition removed the carrier status it had on ResNet; ISO's rescue excludes H-BROKEN in batch; attribution of the rescue to layer4.1.bn2.weight is BY SUBTRACTION (164.7), consistent with PATH.
+- ONE-PARTIAL-PLAIN (DELTA_ID ≥ 15, 2 < D_ONE < 10): 189.2 neither supported nor refuted for that tensor.
+- CARRIER-SURVIVES-PLAIN (DELTA_ID ≥ 15, D_ONE ≥ 10): 189.2's residual account REFUTED as a necessary condition for layer4.0.bn2.weight to carry; identity vs magnitude still not separated.
+- CLASS-OPERATIVE-PLAIN (CTL rescues and |DELTA_ID| ≤ 2): without additions bn2 and bn1 are interchangeable, whereas on ResNet the same-named bn1 pair (cdep1 DEPTH2 23.4480) did not rescue; support for 189.2 in its identity-discriminating role (between-batch, non-gating).
+- IDENTITY-ATTENUATED-PLAIN (otherwise): identity contributes, not decisive; 189.2 neither supported nor refuted.
+
+Unconditional stamps: ONE-VARIABLE-RESIDUAL-ABLATION, THIRD-CARRIER-ABSENT, MAGNITUDE-NOT-SEPARATED, MISTUNING-NOT-EXCLUDED, HORIZON-100-ONLY; plus SIGMA-*, H-BROKEN-EXCLUDED/NOT-EXCLUDED, FLOOR-READINGS-ARE-BOUNDS, DECOMPOSITION-BY-SUBTRACTION, TRAIN-AGREES/DISAGREES, ISO-TRACKS/BELOW/ABOVE-KL, CTL-AT/ABOVE-FLOOR, ONE-AT-FLOOR/PARTIAL/RESCUES. The branch map is proven total (4,000 random means) and every registered branch is reached.
+
+### 215.6 Frozen bars (O2)
+
+All literals in `analysis/cPL1_plainnet_residual_score.py`; `score()` reads NO bar term from the corpus. Noise floor re-derived at registration on the 2,863-row corpus (sha `870c4003…`, HEAD 5186cb8) with `cpl1-` excluded from every reader, then frozen:
+- SIGMA_NARROW 0.5862321062215915 (ResNet18_c100/CIFAR100 scalar+layerwise std cells; df 77, 11 cells, 88 members).
+- SIGMA_R18ALL 0.694442846939599 (same net/cell, every granularity incl. ciso1/cdep1 sets: arms; df 209, 46 cells, 255 members; top cell 12.64% of SS, so not a bimodality estimator).
+- SIGMA_PRIOR = max = 0.694442846939599; SE_PRIOR 0.567010. SIGMA_USED = max(SIGMA_PRIOR, SIGMA_INBATCH) via `compose_sigma(sigma_in)`: ONE argument, no corpus.
+- RESCUE_BAR 10.0 pp (17.64 SE); IDENTITY_BAR 15.0 pp (26.45 SE); NULL_BAR 2.0 pp (3.53 SE); GAP_ABSENT_BAR 10.0; GAP_MIN 20.0; DIVERGED_BAR 5.0; FLOOR_MIN 15.00; KL_MIN 30.00 (G-TRAINS); CEIL_MAX 90.00; CHANCE 1.00.
+- ResNet twins frozen (non-gating): ciso1 k01 23.2807, k62 69.0273, ISO 70.2113, ONE 64.7500; cdep1 k01 23.3520, k62 69.1560, ISO 70.0440, ONE 64.8267, DEPTH2 23.4480; ONE recoveries 0.9065 / 0.9055.
+- **O2 proof in the selftest:** the same synthetic runs give an IDENTICAL FINAL line and identical SIGMA_USED / SE / bars / PRIMARY lines against (a) the real corpus, (b) the real corpus + 10 invented rows at this batch's own PlainNet18_c100 cells and at the ResNet18_c100 std cells the floor was derived from (live R18ALL sigma moved 0.6944 → 4.2966), (c) a minimal invented corpus, (d) no corpus. Launcher guard 1c4 requires that proof to have RUN against the host's real corpus.
+
+### 215.7 Floor gate (164.6)
+
+Chance 1.00 pp, ceiling 100. The lowest level ANY registered account predicts for ANY arm is 20 pp (19.0 pp above chance); the highest is 70 pp (30.0 pp below the ceiling); both asserted in selftest section D.
+- Per account, arms predicted AT the in-batch k01 level vs off-floor m=2 arms: R-ONLY at-k01 ISO, CTL, ONE / off-floor NONE; R-NOGAP no collapse (all free 45–70); PATH at-k01 CTL, ONE / off-floor ISO; IDENT at-k01 CTL / off-floor ISO, ONE; CLASS none at k01 / off-floor all; H-BROKEN identical to R-ONLY.
+- Every account except R-ONLY/H-BROKEN has an off-floor m=2 arm in batch, which kills H-BROKEN in batch (cdep1's ONE role), so a floored ONE/CTL under PATH/IDENT reads as a real null. R-ONLY's prediction is entirely floor-pinned and indistinguishable from H-BROKEN; declared before any run: NO-RESCUE-PLAIN never confirms R-ONLY and stamps H-BROKEN-NOT-EXCLUDED.
+- PRIMARY DELTA_ID = ISO − CTL is a difference of two free accuracies, bounded in neither direction (about ±50 pp). Under R-ONLY/H-BROKEN it sits at the floor-difference (a soft bound), which is why that reading is never quoted as a point agreement (stamp FLOOR-READINGS-ARE-BOUNDS). The bounded ratio D_ISO/D_GAP (ceiling 1 under PATH/IDENT) is descriptive only.
+- Harness gates: G-TRAINS (kL ≥ 30 pp) plus G-FLOOR (the track's returned text was cut off at this point in the consolidation brief; the scorer file is authoritative).
+
+### 215.8 Tests and dry run
+
+- Scorer selftest 82/0/0 (Mac and alice2). It drives the real `score()` on synthetic runs, including the documented one-argument invocation as a subprocess; a dropped run gives `FINAL: INCOMPLETE`, exit 2.
+- `tests/test_plainnet.py` 77/0 (above). P3g: PlainNet18_c100 with ResNet18_c100's own weights loaded equals ResNet18_c100's modules walked with the addition removed, BITWISE (max|d| 0.000e+00, eval and train).
+- Final dry run on alice2: exit 0, 0 guard failures, 15 composed lines read in full.
+- **UNSURE:** trainability of a plain 18-layer net at this cell. No corpus evidence exists; a local MPS/CPU smoke was attempted in a scratch copy and abandoned as infeasible, and produced no number. The registered harness gate is G-TRAINS (kL ≥ 30 pp) plus G-FLOOR.
+
+### 215.9 Launch (operator, on alice2)
+
+The alice2 stage has no git repo, so guard 1b requires the operator to declare the registered commit: `CPL1_REGISTERED_COMMIT=<the hash of the commit that adds this entry> bash bin/cPL1_plainnet_residual.sh --submit`. The hash is recorded in `docs/STATUS.md`'s cycle-151 block. Guard 1a also needs `$RUNNER` (`$WS/jobs/run_cifar_cpl1.sh`), which exists on alice2.
+
+### 215.10 Consolidation check (before this commit, on the Mac)
+
+- Scorer `--selftest --runsdir ../runs_alice2 --csv results/all_runs.csv`: **82 PASS / 0 FAIL / 0 SKIP, exit 0, ALL PASS**, as the track reported.
+- `tests/test_plainnet.py` on a scratch copy of the live build_network.py (`c7998883…`) patched by the committed `patch_plainnet.py` (post sha `e65e67738e454180…`): **77/0, ALL PASS** (torch 2.14.0, CPU).
+- `tests/test_probe_tensor_blockwise_cpl1.py --net PlainNet18_c100` on a scratch harness copy carrying the same patched build_network.py: **45 PASS / 0 FAIL, ALL PASS** (B5: `probe_tensor.json` stepsize_type blockwise, 53 tensors).
+- sha256: `analysis/cPL1_plainnet_residual_score.py` `c6718ed991590899…14cc2839`; `bin/cPL1_plainnet_residual.sh` `4dd7d45235972186…36980eab7`; `bin/cPL1_stage_harness.sh` `cd23fb8f64eee954…b126663f`; `patches/patch_plainnet.py` `433cc2155a6fd07c…3fba2ff8`; `tests/test_plainnet.py` `15e8c49cb4a775d6…9302dc5c9`; `tests/test_probe_tensor_blockwise_cpl1.py` `61e4bf3c7394332c…cd47a952`.
+
+**Files (6, new; the launcher's guard 1b NEWF list).** `analysis/cPL1_plainnet_residual_score.py`, `bin/cPL1_plainnet_residual.sh`, `bin/cPL1_stage_harness.sh`, `patches/patch_plainnet.py`, `tests/test_plainnet.py`, `tests/test_probe_tensor_blockwise_cpl1.py`. Outside the repo, on alice2 (new files only): `$WS/harness_cpl1/`, `$WS/jobs/run_cifar_cpl1.sh`, `~/stage_cpl1/`, `~/stage_cpl1_harness/`.
