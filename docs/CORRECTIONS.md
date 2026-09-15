@@ -28914,3 +28914,96 @@ Re-run on the bytes committed here: `cT211_partition_audit_rederive.py --selftes
 - sha256 `analysis/cT211_partition_audit_rederive.py` `b8a8556ecd7903c6…4dc214e32`; `docs/MASTER-TABLE.md` `e6f158ea1020f020…4b380d88`.
 
 **Files.** `docs/MASTER-TABLE.md` (header line 3 and section 10) and `analysis/cT211_partition_audit_rederive.py` (new). Nothing pushed or submitted, and no cluster file was touched.
+
+## 212. TRACK R1 — **`cgn1` REGISTERED AND DRY-RUN: IS THE SCALAR→LAYERWISE GAP A BATCHNORM PHENOMENON?  `ResNet18_gn_c100` (every `BatchNorm2d(C)` → `GroupNorm(32, C)`) AT THE HEADLINE CELL; 2 ARMS × SEEDS {60, 61, 62} = 6 JOBS, ≈4.5 GPU-h.  THE PATCH IS NOT APPLIED TO THE LIVE HARNESS, BECAUSE THAT BREAKS `tests/test_vggbn2.py` V0f; `cgn1` RUNS FROM AN ISOLATED TREE.**  Every bar is a frozen literal (O2).  **NOTHING SUBMITTED.  `alice` NOT CONTACTED.  NOTHING PUSHED.**  THIS ENTRY TOOK NUMBER **212**; NEXT FREE **213**.
+
+### 212.1 Question and design
+
+- **Question.** Does the scalar→layerwise plateau5 gap exist on ResNet18_c100 with every BatchNorm2d(C) replaced by GroupNorm(32, C)? The parameter list, the step-size partition and the initial point are identical; the network has no batch statistics.
+- **Size.** 6 jobs in ONE submission: 2 arms × seeds {60, 61, 62}, 100 epochs, PROBE=100, PROBE_TENSOR=1.
+- **Arms.** k01 = `scalar` (m = 1, the in-batch floor anchor); kL = `layerwise` (m = 62, the in-batch ceiling anchor).
+- **Cell.** CIFAR100; `--optimizer HF`, SGDm (momentum 0.99, weight decay 0.1) + Lion (0.99 / beta2 0.9, weight decay 0); meta-stepsize 1e-3, alpha0 1e-6, batch 100, gamma 1, `--max-time 999:00:00`.
+- **Environment.** AUGMENT=1, BETA_CLIP=-15:-2.3026, HIER=none, SCHED=none, PROBE=100, PROBE_TENSOR=1, PROBE_DIR=$WS/runs/cgn1/probe_<run>. The scalar arm's per-tensor records can later nominate GroupNorm carriers at no extra GPU cost (the ctd1→ciso1 / cvg1→cvi1 pattern).
+- **Scheduling.** WALL 03:00:00; PARTS = gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g, composed by `slurm_parts_for_wall` and re-checked by `guard_parts_for_wall`.
+- **Runner.** `$WS/jobs/run_cifar_cgn1.sh`, which runs from the isolated tree `$WS/harness_cgn1/cifar10`.
+- **Primary.** D = plateau5(kL) − plateau5(k01); plateau5 = mean TEST over the run's own epochs 95..99 from the raw .out; TRAIN printed beside it. Secondary, descriptive only: D_rel = D / (100 − k01), and D/D_BN, D/D_VGG against frozen reference literals. Every contrast is in batch.
+
+### 212.2 No CIFAR-100 GroupNorm network existed; the patch; why the live tree is untouched
+
+- `build_network('ResNet18_gn_c100')` raises ZeroDivisionError on the live tree. `patches/patch_resnet_gn_c100.py` adds it by inserting ONE dispatch region directly after the `ResNet18_gn` dispatch.
+- **Not applied live.** On a scratch copy with the region inserted, `tests/test_vggbn2.py` gives 67 PASS / 1 FAIL (V0f); the unpatched live tree gives 68/0. After a simulated cgn1 ingest, V1 fails too. That suite is guard 1d3 of the registered VGG launchers, and cvh1 (213) is a VGG track. The patch script refuses the live path unless `CGN1_PATCH_LIVE=1` (an operator decision, which breaks test_vggbn2).
+- **The isolated tree** `$WS/harness_cgn1/cifar10/`: every harness .py file is byte-identical to the live tree except build_network.py (pinned pre + one region); `data/` is a symlink to the live data. `$WS/jobs/run_cifar_cgn1.sh` is identical to run_cifar.sh except for the one `cd` line. The live build_network.py, HF.py, train.py, load_data.py and run_cifar.sh have the same sha256 before and after.
+- **Structure, proven on the built models.** The (name, shape) list is elementwise equal to ResNet18_c100's: 62 tensors, 11,220,132 parameters. At every index 1..60 the class follows index mod 3 (conv / GN scale / GN shift), and every scale and shift there belongs to a GroupNorm. The 512-wide scales are at 47/50/53/56/59 by name. Initial parameters are bitwise equal to ResNet18_c100's under the same seed. What differs: 20 GroupNorm modules instead of 20 BatchNorm2d, and 0 buffers instead of 60.
+
+### 212.3 Accounts and predictions (frozen in the scorer header)
+
+- **(A) NOT-BATCH-STATISTICS.** Sharing one step size across this tensor list, under any per-feature affine normaliser, produces the gap. Predicts k01 18–32 (the BN scalar arm is 22.95), kL 55–70, D +25 to +50.
+- **(B) BATCH-STATISTICS.** The gap needs BatchNorm's batch statistics, or the full per-channel scale invariance BN gives and GN(32) only partly keeps. Predicts k01 ≈ kL ≈ L with L in 50–68, |D| ≤ 2.
+- **(C) ATTENUATED.** GroupNorm keeps part of the mechanism through per-group invariance (16 channels per group in layer4). Predicts k01 32–55, kL 55–70, D +2 to +25.
+- UNSURE: these GroupNorm levels are priors. No GroupNorm CIFAR-100 run exists; the only GroupNorm data is gn1 on CIFAR-10, where GN trailed its BN twin by 2.86 pp.
+
+### 212.4 Floor gate (164.6)
+
+Against chance (1.00 pp), the BN scalar floor band at this cell [21.694, 24.174] (38 rows, cgn1 excluded) and the ceiling (100):
+
+| Account | Arm | Predicted | Margin over band top | Margin to 100 | Status |
+|---|---|---|---|---|---|
+| (A) | k01 | 18–32 | −6.17 to +7.83 | +68 to +82 | the in-batch floor anchor by construction (disclosed) |
+| (A) | kL | 55–70 | +30.83 to +45.83 | +30 to +45 | free |
+| (B) | k01 | 50–68 | +25.83 to +43.83 | +32 to +50 | free |
+| (B) | kL | 50–68 | +25.83 to +43.83 | +32 to +50 | free |
+| (C) | k01 | 32–55 | +7.83 to +30.83 | +45 to +68 | free |
+| (C) | kL | 55–70 | +30.83 to +45.83 | +30 to +45 | free |
+
+D is bounded in neither direction under any account: kL is at least 25 pp above the floor band and at least 30 pp below 100 in every prediction (the selftest asserts this). The only route to a floor-bounded D is kL itself collapsing, which H-TRAINS (mean kL ≥ 40.0) catches as HARNESS-UNSOUND before any branch is read. So GAP-ABSENT can never be issued with k01 below 38 pp.
+
+### 212.5 Frozen bars (O2)
+
+All literals in `analysis/cGN1_gn_gap_score.py`, re-derived at registration on the 2,863-row corpus (sha `870c4003…4a3a`) with `cgn1-` excluded, then frozen.
+- SIGMA_NARROW_PIN 0.5862321062215915 (ResNet18_c100 / CIFAR100 standard cell; df 77, 11 cells, 88 members); SIGMA_GN_PIN 0.2731176486424861 (ResNet18_gn / CIFAR10, gn1: ms 1e-4, alpha0 1e-3; df 14, 2 cells, 16 members); SIGMA_PRIOR = max = 0.5862321062215915; SE_PRIOR 0.4786565 (= SIGMA_PRIOR × sqrt(2/3)).
+- At score time SIGMA_USED = max(SIGMA_PRIOR, SIGMA_INBATCH), SIGMA_INBATCH the pooled within-arm SD of cgn1's own 6 runs (df 4). `compose_sigma()` has no third input.
+- GAP_BAR 10.0 pp (20.89 SE at the prior); NULL_BAR 2.0 pp (4.18 SE); K_SE 3.0; DIVERGED_BAR 5.0 pp; KL_MIN 40.0 pp; CEIL_MAX 90.0 pp; FULLSIZE_FRAC 0.5. Gap bar = max(10.0, 3 × SE_USED); reversal bar = max(2.0, 3 × SE_USED); GAP-ABSENT also requires SE_USED ≤ 1.0.
+- Descriptive references (stamps only, never a bar or branch): BN_D_INBATCH_MEDIAN 46.548667 (9 ResNet18_c100 batches, range 45.746667–46.990); BN_DREL_MEDIAN 0.6045; BN_SCALAR_BAND [21.694, 24.174] (38 rows, mean 22.948632); BN_LAYERWISE_MEAN 69.416625 (32 rows); VGG_D_INBATCH_MEDIAN 30.828 (3 VGG11_bn_c100 batches).
+- **Enforcement.** The selftest pins every literal only on the registration corpus sha; on any other corpus it prints the drift as a NOTE and never fails. The O2 proof: the real `score()` on 15 synthetic batches gives an identical FINAL line and exit code against the real corpus, no corpus, the corpus plus 12 invented standard-cell rows at the ResNet18_gn_c100 and ResNet18_c100 scalar/layerwise cells with extreme values, and a corpus of those 12 invented rows only.
+
+### 212.6 Branches (frozen; first match wins)
+
+1. **INCOMPLETE** (exit 2): any of the 6 runs absent, lacking epochs 0..99, or lacking RUN_DONE.
+2. **HARNESS-UNSOUND** (exit 1), checked first among complete batches: H-ARGS (each run's own ARGS line carries NN-name ResNet18_gn_c100, CIFAR100, the arm's stepsize-groups, its seed, ms 1e-3, alpha0 1e-6, 100 epochs, batch 100, SGDm / Lion / HF and the run-name, no repeated flag); H-ENV (one ENV line with AUGMENT=1, BETA_CLIP=-15:-2.3026, PROBE=100, HIER=none, SCHED=none; each run prints `PROBE_TENSOR ... type=<spec> tensors=62`); H-STRUCT (manifest NETWORK ResNet18_gn_c100, 62 tensors, 11,220,132 parameters, GroupNorm 20 / BatchNorm2d 0, GroupNorm ownership of every scale and shift, 512-wide scales at 47/50/53/56/59); H-PROV (PROVENANCE.txt MODE submit and build_network sha `9f6e4ec9…c892`); H-TRAINS (mean kL ≥ 40); H-CEIL (no arm mean above 90).
+3. **UNRESOLVED-DIVERGED**: a within-arm seed range above 5 pp.
+4. **GAP-REPLICATES**: D ≥ max(10, 3 SE), stamped FULL-SIZE if D ≥ 23.274, ATTENUATED otherwise.
+5. **GAP-REVERSED**: D ≤ −max(2, 3 SE).
+6. **GAP-ABSENT**: |D| ≤ 2 and SE ≤ 1.
+7. **UNRESOLVED-NOISY**: |D| ≤ 2 but SE > 1.
+8. **GAP-PARTIAL**: D > 2.
+9. **UNRESOLVED-SMALL-NEGATIVE**: anything left.
+
+Other stamps: SIGMA-PRIOR-FROZEN / SIGMA-INBATCH-DOMINATES, TRAIN-AGREES / DISAGREES, K01-{BELOW,IN,ABOVE}-BN-FLOOR-BAND, GN32-ALSO-CHANGES-PER-CHANNEL-INVARIANCE, HORIZON-100-ONLY, PROBE-RECORDS-PRESENT / MISSING, and MISTUNING-NOT-EXCLUDED on ABSENT, PARTIAL and NOISY.
+
+### 212.7 Tests, freshness, dry run
+
+- `tests/test_resnet_gn_c100.py`: 51/51 PASS on the cgn1 tree (alice2).
+- Scorer selftest: 62/0 on alice2, through the real `score()` on synthetic .out files. All 15 synthetic cases give an identical FINAL line on the 4 corpora above; a dropped run gives INCOMPLETE; the one-argument subprocess prints the same FINAL line. The launcher's guard 4d checks the synthetic manifest is byte-identical to the one built from the live model. The one-argument scorer on the real runs directory prints `INCOMPLETE 0/6` and exits 2.
+- Freshness: prefix, seeds 60–62 and the ResNet18_gn_c100 network are unused everywhere: 0 in sacct all-time, 0 in squeue, 0 .out files, 0 CSV rows (highest corpus seed is 57).
+- Dry run from `~/stage_cgn1` on alice2: exit 0, no guard failures, 6 composed lines that match the design.
+
+### 212.8 Briefing corrections
+
+- The ResNet18_c100 gap is +40 pp only as a pooled figure. In batch it is +45.75 to +46.99 over 9 batches (median +46.55).
+- The corpus now has 12 network values, including VGG11_bn_c100 with 45 rows.
+
+### 212.9 UNSURE, and before any launch
+
+- UNSURE: the GN level predictions are priors; the layerwise-arm harness gate (KL_MIN = 40 pp) is the track's choice; the cost estimate borrows gn1's CIFAR-10 GN/BN wallclock ratio of about 1.0.
+- If HF.py, train.py or load_data.py change on the live tree before launch, the stage check (V-a) fails; the operator must then delete `$WS/harness_cgn1` and `run_cifar_cgn1.sh` and re-stage (`bin/cGN1_stage_harness.sh`).
+- **Cross-track (from 215).** This patch inserts mid-file, `patch_plainnet.py` appends; the two cannot share one tree without breaking each other's byte-identity proof. Both batches run from their own isolated trees, so neither is affected.
+- **Launch** (operator, on alice2, from a checkout of this commit): `bash bin/cGN1_gn_gap.sh --submit`.
+
+### 212.10 Consolidation check (before this commit, on the Mac)
+
+- Scorer `--selftest --runsdir ../runs_alice2 --csv results/all_runs.csv`: **61 PASS / 0 FAIL / 0 SKIP, exit 0, ALL PASS** (alice2 reported 62/0; the Mac has no live manifest under `../runs_alice2/cgn1`, so E0 is a NOTE here).
+- `tests/test_resnet_gn_c100.py` on a scratch copy of the live build_network.py (sha `c7998883…`, identical to alice2's live file today) patched by the committed `patch_resnet_gn_c100.py`: post sha `9f6e4ec97157311b…1837c892` (= the H-PROV pin), **51/0, ALL PASS** (torch 2.14.0, CPU).
+- alice2, read-only: squeue 0 jobs; 0 `cgn1|cvh1|cuc1|cpl1` jobs in sacct since 2026-09-01; 0 such `.out`; live build_network.py `c7998883…`.
+- sha256: `analysis/cGN1_gn_gap_score.py` `aaf17b626774208b…c74b9347`; `bin/cGN1_gn_gap.sh` `6bfe07cd3f8ff72c…8771c8`; `bin/cGN1_stage_harness.sh` `256e8fcf754d8067…c92f38`; `patches/patch_resnet_gn_c100.py` `c922097439cc009c…b32e46e`; `tests/test_resnet_gn_c100.py` `8ed6896c5ba2278a…ca4712a5c`.
+
+**Files (5, new).** `analysis/cGN1_gn_gap_score.py`, `bin/cGN1_gn_gap.sh`, `bin/cGN1_stage_harness.sh`, `patches/patch_resnet_gn_c100.py`, `tests/test_resnet_gn_c100.py`. Outside the repo, on alice2 (new files only): `$WS/harness_cgn1/`, `$WS/jobs/run_cifar_cgn1.sh`, `~/stage_cgn1/`.
