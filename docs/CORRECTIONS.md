@@ -29405,3 +29405,214 @@ What the reading checked, line by line: one `sbatch` per (arm, seed), every flag
 - **`alice` NOT CONTACTED. NOTHING CANCELLED. NOT PUSHED.**
 
 Next free number: **217**.
+
+## 217. TRACK L2 (land) — **`cgn1` LANDS 6/6: `GAP-REPLICATES | FULL-SIZE`.  ON `ResNet18_gn_c100` — ResNet18_c100 WITH EVERY `BatchNorm2d(C)` REPLACED BY `GroupNorm(32, C)`, THE SAME 62-TENSOR LIST AND A BITWISE-IDENTICAL INITIAL POINT, AND NO BATCH STATISTICS ANYWHERE — `D = plateau5(layerwise) − plateau5(scalar)` = +37.3833 pp = +63.08 SE, TRAIN AGREEING (+44.0300 pp).  THE SCALAR→LAYERWISE GAP DOES NOT NEED BATCH STATISTICS.**  THE REGISTERED SCORER `analysis/cGN1_gn_gap_score.py` (sha `aaf17b62…c74b9347`, bars FROZEN by O2 at `212`), RUN **UNEDITED** ON `alice2` WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION FROM `~/stage_cgn1`, EXITS **0**, EVERY HARNESS GATE CLEAN.  **TWO THINGS BOUND IT AND ARE LED WITH (217.4): (1) the GN scalar collapse is NOT the clamp object BN's is — the scalar `beta` never reaches −15 inside 100 epochs (0 of 500 records on every seed; it ends at −12.30 / −11.78 / −11.55); (2) the layerwise arm is still climbing at +0.29 to +0.34 pp/epoch over epochs 80–99, so plateau5 is a window on a rising curve and D is a 100-EPOCH SNAPSHOT, not a converged gap.**  **GROUPNORM CARRIERS NOMINATED AS A HYPOTHESIS, ZERO GPU, NOTHING SUBMITTED (217.6): the 194.5 statistic is UNAVAILABLE on this batch (0 pinned records); under a DISCLOSED post-peak deviation the top GN scales are exactly ResNet's three carrier positions — 59, 50, 53.**  **RULE 20 AT FULL 6/6, ARGS AND A SEPARATE ENV AUDIT, PASS, BEFORE ANY NUMBER.  RULE 21 MARGIN +1,983 s.**  An independent parser reproduces every number digit for digit.  **CORPUS 2,863 → 2,884 with `cpl1` (added 21, changed 0; the single ingest is recorded at 218.8).  ZERO GPU SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.  NOT PUSHED.**  THIS ENTRY TOOK NUMBER **217**; NEXT FREE **218**.
+
+### 217.1 Completion, RULE 21, RULE 20 — before any number
+
+* **Completion.** `sacct`: **6/6 `COMPLETED`, `ExitCode 0:0`**, job ids 5014610–5014615, all on `gpu-short`. `s60` and `s61` ran BOTH arms on node851 (RTX 2080 Ti; 85–96 min); `s62` ran both on node884 (L4; 41–45 min). So every within-seed pair shares a GPU class; the design did not require it. Last End 00:01:00 CEST on 2026-09-16 (`cgn1-k01-s60`). Spend **7.4889 GPU-h** by `sacct` ElapsedRaw: above 212's ≈4.5 estimate (212.9 flagged it UNSURE, borrowing `gn1`'s CIFAR-10 GN/BN ratio; 4 of 6 runs landed on 2080 Ti), inside the 18 GPU-h hard bound. `runs/cgn1/PROVENANCE.txt`: `MODE submit`, `BUILD_NETWORK_SHA256 9f6e4ec9…c892` (the H-PROV pin; the isolated tree, 216.2).
+* **RULE 21.** 216.5: scorer committed at `e90ac8a`, `%ct` 1789501920; earliest `sacct` Submit 22:25:03 CEST = 1789503903; **margin +1,983 s**. One commit in `git log`; the copy that ran is sha256-identical to it.
+* **RULE 20 at FULL coverage (6/6 `RUN_DONE`, 0 in `squeue`), `~/l217_rule20.sh` pass 2, 22:01:18Z, read-only, BEFORE the scorer ran.**
+  * (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, from `~/stage_cgn1`) with the launcher's documented axes `--name cgn1- --batch-consistency --vary stepsize-groups --vary seed --vary run-name`: **6 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line, `VERDICT: PASS`**; with `--strict`: PASS, 6 clean.
+  * (b) the same tool per run, `--expect` on all 20 design flags (`NN-name ResNet18_gn_c100`, the arm's spec, seed, `run-name`, `save-directory`): **6 checked, 0 violations**.
+  * (c) the SEPARATE ENV audit `~/l216_envaudit.py` (sha `4892aaac…`, unchanged since 216): **ONE distinct ENV line ×6**, the registered one quoted at 218.1, and `PROBE_TENSOR: on every=100 type=scalar|layerwise tensors=62` ×3 each; **6/6, 0 violations, `ENV AUDIT VERDICT cgn1: PASS`**.
+  * Pass 1 (21:36:21Z, while four runs were still training) gave the same at 6/6 ARGS lines; it is not the full-coverage pass and is not relied on.
+* **Integrity.** The 6 `.out` files and the whole `runs/cgn1/` tree (33 files) were rsynced to `../runs_alice2` and are **sha256-identical** to alice2's.
+
+### 217.2 The registered scorer, unedited
+
+`cd ~/stage_cgn1 && python3 analysis/cGN1_gn_gap_score.py $METAOPT_WS/runs` (3.10.4, `envs/mo`, 22:01:44Z): **exit 0**, 0 tracebacks. COMPLETE 6/6; H-ARGS 6/6, H-ENV (one ENV line, AUGMENT=1, BETA_CLIP, PROBE=100, HIER, SCHED, `PROBE_TENSOR` 6/6), H-STRUCT (NETWORK, 62 tensors, 11,220,132 params, `GroupNorm 20 BatchNorm2d 0`, GN ownership of every scale/shift, 512-wide scales at 47/50/53/56/59), H-PROV (MODE submit, POST_SHA), H-TRAINS (kL 51.8173 ≥ 40), H-CEIL — **all PASS**. Log `alice2:~/l217_logs/score_cgn1.log`, sha `f215a694…23d5e634`. The FINAL line, verbatim:
+
+```
+FINAL: GAP-REPLICATES | HARNESS-CLEAN | FULL-SIZE | SIGMA-INBATCH-DOMINATES | TRAIN-AGREES | K01-BELOW-BN-FLOOR-BAND | GN32-ALSO-CHANGES-PER-CHANNEL-INVARIANCE | HORIZON-100-ONLY | PROBE-RECORDS-PRESENT
+```
+
+On the Mac (Python 3.14.5, `../runs_alice2`) the whole output is identical except the two path lines (manifest, provenance).
+
+### 217.3 The numbers (in batch; plateau5 = mean TEST over epochs 95–99 of each run's own `.out`)
+
+| arm | spec | TEST plateau5 (sd, range) | TRAIN | seeds s60 / s61 / s62 (TRAIN) |
+|---|---|---|---|---|
+| `k01` | scalar | 14.4340 (0.2298, 0.4500) | 16.5167 | 14.2360 / 14.3800 / 14.6860 (16.6740 / 16.6000 / 16.2760) |
+| `kL` | layerwise | 51.8173 (1.0005, 1.8880) | 60.5467 | 52.2000 / 50.6820 / 52.5700 (61.4000 / 58.9340 / 61.3060) |
+
+* **σ (O2).** `SIGMA_INBATCH` **0.725870** (df 4) exceeds the frozen prior 0.5862321062, so `SIGMA_USED` is the in-batch term (`SIGMA-INBATCH-DOMINATES`): the only way 212 lets the bars widen. `SE_ARM_DIFF` 0.592670; gap bar max(10.0, 3 × 0.592670 = 1.778) = **10.0 pp**.
+* **Primary.** `D` = 51.8173 − 14.4340 = **+37.3833 pp = +63.08 SE**; `D(TRAIN)` **+44.0300 pp** (`TRAIN-AGREES`). `D` ≥ 0.5 × 46.548667 = 23.2743 → **`FULL-SIZE`**. No seed range is near the 5.0 divergence bar (kL 1.888).
+* **Descriptive only, between-batch, frozen references:** `D_rel` = D/(100 − k01) = 0.4369 (BN in-batch median 0.6045); D/D_BN = 0.8031; D/D_VGG = 1.2126.
+* **The accounts (212.3), scored against their own registered intervals.** **(B) BATCH-STATISTICS is REFUTED**: it predicted |D| ≤ 2; D is +37.38. **(C) ATTENUATED** predicted D in (+2, +25) and `k01` in (32, 55): both miss. **(A) NOT-BATCH-STATISTICS** predicted D in [+25, +50]: **hit**; but both of (A)'s LEVEL predictions miss LOW — `k01` 14.4340 against 18–32, `kL` 51.8173 against 55–70. The branch is (A)'s; the levels are nobody's.
+
+### 217.4 Two things that bound the result, led with
+
+**(1) The GN scalar collapse is not the clamp object BN's is.** On ResNet18_c100 the scalar `beta` pins at the −15 clamp at epoch ~36.8 (`190.2`); on PlainNet18_c100 at 36.2–36.4 (218.4). On `ResNet18_gn_c100`, from the runs' own `probe.jsonl` (500 records per run): the scalar `beta` starts at −13.815, rises to a peak of **−5.670 / −5.770 / −5.842 at step 8,200 / 8,100 / 8,100 (epoch ≈16.2–16.4)**, then descends to **−12.300 / −11.782 / −11.554 at epoch 100 — 0 of 500 records at the clamp on every seed.** `k01`'s TEST is still creeping up (12.3 at epoch 30 → 14.5 at epoch 99; OLS slope over epochs 80–99 +0.0035 / +0.0219 / +0.0231 pp/epoch). So `K01-BELOW-BN-FLOOR-BAND` is a LOWER level reached by a scalar `beta` that has **not** collapsed to the clamp. Whether it pins later is not measured. **The GN scalar arm fails at this cell, but not by the BN mechanism's terminal state, and nothing here says the two failures are the same object.**
+
+**(2) The layerwise arm is not converged; D is a snapshot.** `kL`'s TEST OLS slope over epochs 80–99 is **+0.2911 / +0.3354 / +0.2900 pp/epoch** (TRAIN +0.39 to +0.40); its arm mean runs 46.0 at epoch 80, 50.1 at 90, 53.4 at 99. Its epoch-to-epoch TEST jitter is **1.5–3.0 pp** (BN-free and noisy: PlainNet's `kL` shows 0.45–0.69, 218.6). plateau5 here is a 5-epoch mean on a rising, noisy curve — which is why the in-batch σ overtook the prior. `kL` also reaches only 60.55 TRAIN, where BN ResNet18_c100's layerwise arm memorises (~97–99): **the GN net is under-trained at 100 epochs at this cell.** With `k01` near-flat and `kL` rising, a longer horizon would plausibly widen D; **that is not measured**, and `HORIZON-100-ONLY` carries it. **+37.38 pp is a 100-epoch number, not an estimate of the GN gap at convergence.**
+
+Also descriptive: at the last record, 7 of `kL`'s 62 groups sit at the clamp (s60: tensors 44 `layer3.1.bn2.weight`, 47, 50, 53, 56, 59 — all five 512-wide GN scales — and 61 `linear.weight`); some `kL` group first touches the clamp at epoch 2.4–2.8; max `kL` `beta` −3.8 to −3.9.
+
+### 217.5 The attack — an independent parser
+
+`analysis/cgn1_cpl1_attack_indep.py cgn1 ../runs_alice2` (new; shared with 218; imports nothing from any scorer, no regex, re-types 212's bars and branch order): **every per-run plateau5 and TRAIN5, both arm means / sd / ranges, σ in-batch 0.725870, SE 0.592670, D +37.3833 (+63.08 SE), D(TRAIN) +44.0300, D_rel 0.4369, and the branch `GAP-REPLICATES (FULL-SIZE)` — digit for digit. 0 violations.** Its own header checks (20 flags, none repeated, every design value; 15 ENV keys + own `PROBE_DIR`; NODE job/id/`AUGMENT=1`; `PROBE_TENSOR` type/62/every 100) pass on 6/6. Manifest: 62 tensors, 11,220,132 params, `NORM GroupNorm 20 BatchNorm2d 0` (and 9 `shortcut` names, as ResNet-18 has). Probe arity from the runs' own `block_sizes.json`: `k01` `scalar`, m = 1, `n_b` [11220132]; `kL` `layerwise`, m = 62 summing to 11,220,132; 500 records per run, every `len(z_tensor)` 62. **Three parsers agree on every run's plateau5**: the scorer, this parser, and `aggregate.py`'s CSV `plateau5` (218.8).
+
+### 217.6 The GroupNorm carrier nomination — A HYPOTHESIS FOR A FUTURE BATCH, NOT A RESULT.  ZERO GPU.  NOTHING SUBMITTED.
+
+The gap replicated, so the follow-on 212.1 and the scorer's licence text name was done from this batch's own `k01` `PROBE_TENSOR` records with `analysis/cgn1_nominate_gn_carriers.py` (new; the cvg1/194.5 method re-implemented: `L_i = 0.9·m_i + 0.1·z_i`, share of Σ mean|L_i|, fraction `L_i > 0`, and 187's remainder-sign flip).
+
+* **FIRST, THE 194.5 STATISTIC IS UNAVAILABLE ON THIS BATCH.** 194.5 ranks the scalar arm's PINNED records. `cgn1` has **zero** (217.4(1)); `pinned` mode selects 0/500 on every seed and exits 3. Nothing below is the 194.5 statistic.
+* **THE DEVIATION, DISCLOSED.** `postpeak` mode ranks every record after the scalar `beta`'s own maximum — the descending, collapse phase: 417 / 418 / 418 records.
+
+| rank | idx | name | numel | share of Σ mean&#124;L_i&#124; | frac `L>0` | `kL` rank | `kL`/`k01` mean&#124;L&#124; |
+|---|---|---|---|---|---|---|---|
+| 1 | **59** | **`layer4.1.bn2.weight`** | 512 | **0.1978** | **1.000** | 27 | 0.0221 |
+| 2 | **50** | **`layer4.0.bn2.weight`** | 512 | **0.1665** | **1.000** | 24 | 0.0289 |
+| 3 | 61 | `linear.weight` | 51,200 | 0.1236 | 0.000 | 1 | 1.583 |
+| 4 | **53** | **`layer4.0.shortcut.1.weight`** | 512 | **0.1014** | **1.000** | 23 | 0.0502 |
+| 34 | 56 | `layer4.1.bn1.weight` | 512 | 0.0004 | 1.000 | 37 | — |
+| 38 | 47 | `layer4.0.bn1.weight` | 512 | 0.0003 | 1.000 | 36 | — |
+
+* **The operative statistic on the same post-peak records (mean over seeds).** The total votes `beta` DOWN on only **0.5754** of them (0.5899 / 0.5742 / 0.5622; 194.5's pinned BN records were 1.0000). Removing **{50, 53, 59}** flips the remainder's sign on **0.5746** — essentially every DOWN record — and each alone on 0.556–0.571. Removing the numel-, width-, class- and stage-matched **{47, 56}** flips **0.0152**. Removing `{61}` `linear.weight` flips **0.4246**, which equals the UP share: `linear.weight` carries every UP vote, and the three GN scales every DOWN vote.
+* **Under layerwise dynamics** the three scales' mean |L| falls ×20–×45 (ranks 23/24/27 of 62) — the trajectory-specific signature 184 reported for ResNet's BN carriers.
+* **NOMINATED, AS A HYPOTHESIS: the GN carrier set is {50 `layer4.0.bn2.weight`, 53 `layer4.0.shortcut.1.weight`, 59 `layer4.1.bn2.weight`} — the same three indices, names and positions as ResNet18_c100's BN carriers (187), with {47, 56} as the matched non-carrier pair.** The intervention that would test it is the `ciso1`/`cdep1` design transferred to `ResNet18_gn_c100`. That design is NOT composed, priced or registered here, and nothing was submitted.
+* **What the nomination does NOT license.** It is an observation on records — exactly the kind 184→187 showed can survive and still carry the wrong mechanism. It uses a record set 194.5 did not use, chosen because the registered one is empty. Magnitude is not separated: the three hold 0.4657 of the mass together and {47, 56} almost none. And it says nothing about whether the GN scalar arm fails BECAUSE of these tensors, since the GN failure has not reached BN's terminal state (217.4(1)).
+
+### 217.7 What this licenses, and what it does not
+
+**Licensed (the registered text, 212.6).** The scalar→layerwise gap does NOT need batch statistics: at this cell it exists — full-size by the registered stamp — on a network with none, the same tensor list and the same initial point. Account (B) in its batch-statistics form is refuted.
+
+**Not licensed.**
+* **That GN's carriers are ResNet's 50/53/59.** That is the hypothesis of 217.6, from a non-registered record set.
+* **Anything about other normalisers** (LayerNorm, no normalisation), or about **per-channel invariance**. GN(32) also changes it (`GN32-ALSO-CHANGES-PER-CHANNEL-INVARIANCE`); the GN(C) arm 212.6 names for splitting the two was not run.
+* **"The same mechanism as BatchNorm's."** The GN scalar `beta` never reaches the clamp (217.4(1)).
+* **The SIZE of the GN gap.** 100 epochs, `kL` still rising at ~0.3 pp/epoch (217.4(2)). The D/D_BN = 0.80 and D/D_VGG = 1.21 ratios are between-batch and descriptive, and are not an "attenuation" claim.
+* **RULE 11.** No argmax over granularity or meta step located on GN; one cell (ms 1e-3, α₀ 1e-6). Mistuning can only suppress a gap, so it cannot manufacture this one; +37.38 is a lower bound on the achievable 100-epoch gap at this cell, not an estimate of it.
+* **Generalisation.** Both arms are under-fitted here (`kL` TRAIN 60.55): this is an optimisation gap, like its BN comparators.
+* **Any between-batch contrast.** The BN references are frozen literals printed as stamps. The batch is the unit of replication.
+
+## 218. TRACK L2 (land) — **`cpl1` LANDS 15/15: `HEAD-CARRIES-PLAIN`.  ON `PlainNet18_c100` — ResNet18_c100 WITH EVERY RESIDUAL ADDITION REMOVED AND NOTHING ELSE — THE SURVIVING EX-CARRIER PAIR {`layer4.0.bn2.weight`, `layer4.1.bn2.weight`} RESCUES THE SCALAR COLLAPSE, ITS EXACT bn1 TWIN DOES NOT, AND `layer4.0.bn2.weight` ALONE — WHICH RECOVERED ~0.91 OF THE GAP ON ResNet — RECOVERS −0.0018.**  THE REGISTERED SCORER `analysis/cPL1_plainnet_residual_score.py` (sha `c6718ed9…14cc2839`, bars FROZEN by O2 at `215`), RUN **UNEDITED** ON `alice2` WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION FROM `~/stage_cpl1`, EXITS **0**, ALL GATES CLEAN.  **PRIMARY `DELTA_ID` = ISO − CTL = +55.8460 pp = +98.49 SE; KEY SECONDARY `D_ONE` = ONE − k01 = −0.1027 pp = −0.18 SE; `D_GAP` = +57.1933 pp.**  **WHAT THE BRANCH SAYS ABOUT `189.2`, EXACTLY: ONE-VARIABLE SUPPORT FOR IT FOR `layer4.0.bn2.weight` ONLY (that tensor's carrier status on ResNet needed the addition it fed) — AND, READ AGAINST 215.4's OWN ACCOUNT TABLE, 189.2's LITERAL "CARRIERS ARE EXACTLY THE SUMMAND SCALES" FORM (`R-ONLY`, and `R-NOGAP`) MISSED ITS REGISTERED BRANCH: A RESCUE EXISTS ON A NET WITH NO ADDITION ANYWHERE, AND BY SUBTRACTION IT RIDES ON A TENSOR THAT IS A SUMMAND OF NOTHING.  THE OBSERVED LOCATIONS ARE `PATH`'s PREDICTION.**  **TWO THINGS THE BRIEFING DID NOT ANTICIPATE, LED WITH (218.4): the scalar arm floors at 11.7867 pp, BELOW every collapse account's registered 20–36 band; and ISO's rescue is a DELAY, not a prevention — its complement group pins at the −15 clamp at epoch 60–62 (k01's pins at 36), so ISO's 67.5427 is a level FROZEN before epoch 100.**  **RULE 20 AT FULL 15/15, ARGS AND A SEPARATE ENV AUDIT, PASS, BEFORE ANY NUMBER.  RULE 21 MARGIN +1,892 s.**  An independent parser reproduces every number digit for digit.  **CORPUS 2,863 → 2,884 (+6 `cgn1`, +15 `cpl1`; added 21, changed 0, removed 0).  ZERO GPU SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.  NOT PUSHED.**  THIS ENTRY TOOK NUMBER **218**; NEXT FREE **219**.
+
+### 218.1 Completion, RULE 21, RULE 20 — before any number
+
+* **Completion.** `sacct`: **15/15 `COMPLETED`, `ExitCode 0:0`**, job ids 5014618–5014632 (216.3), on `gpu-short` (7) and `gpu-mig-40g` (8). Last End 23:36:03 CEST (`cpl1-ONE-s71`, 5014632, which started last at 22:56). Spend **9.9503 GPU-h** by `sacct` ElapsedRaw (215 expected ≈11, hard bound 45). `runs/cpl1/PROVENANCE.txt`: `MODE SUBMIT`, `REGISTERED_COMMIT ea51295d…`, `SCORER_SHA256 c6718ed9…`, `BUILD_NETWORK_SHA256 e65e6773…a18b` (the isolated tree, 216.2).
+* **RULE 21.** 216.5: scorer committed at `ea51295`, `%ct` 1789502100; earliest `sacct` Submit 22:26:32 CEST = 1789503992; **margin +1,892 s**. The scorer has one commit in `git log`, and the copy that ran is sha256-identical to it.
+* **RULE 20 at FULL coverage (15/15 `RUN_DONE`, 0 in `squeue`), `~/l217_rule20.sh`, 21:36:21Z, read-only, BEFORE the scorer ran.**
+  * (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, from `~/stage_cpl1`) with the launcher's documented axes `--name cpl1- --batch-consistency --vary seed --vary run-name --vary stepsize-groups --vary save-directory`: **15 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line, `VERDICT: PASS`**; the same with `--strict`: PASS, 15 clean.
+  * (b) the same tool per run, `--expect` on all 20 design flags (the arm's registered spec from the file name, seed, `run-name`, `save-directory`): **15 checked, 0 violations**, every run 20 flags.
+  * (c) the SEPARATE ENV audit `~/l216_envaudit.py` (216's, sha `4892aaac…`, unchanged; reads only `NODE=`, `ENV:`, `PROBE_TENSOR:`): **ONE distinct ENV line ×15** — `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0` (+ each run's own `PROBE_DIR`) — and `PROBE_TENSOR` type blockwise ×9 / layerwise ×3 / scalar ×3, `tensors=53`; **coverage 15/15, 0 violations, `ENV AUDIT VERDICT cpl1: PASS`**.
+* **Integrity.** The 15 `.out` files and the whole `runs/cpl1/` tree (78 files: manifest, provenance, probe dirs) were rsynced to `../runs_alice2` and are **sha256-identical** to alice2's.
+
+### 218.2 The registered scorer, unedited
+
+`cd ~/stage_cpl1 && python3 analysis/cPL1_plainnet_residual_score.py $METAOPT_WS/runs` (3.10.4, `envs/mo`, 21:36:50Z): **exit 0**, 0 tracebacks, every gate PASS (G-STRUCT 9/9, G-SOUND 15/15, G-ARGS 15/15, G-ENV, G-FLOOR, G-TRAINS, G-CEIL, G-DIVERGE 5/5). Log `alice2:~/l217_logs/score_cpl1.log`, sha `1a97e0b7…918bd8016`. The FINAL line, verbatim:
+
+```
+FINAL: HEAD-CARRIES-PLAIN | GATES-CLEAN | ONE-VARIABLE-RESIDUAL-ABLATION | THIRD-CARRIER-ABSENT | MAGNITUDE-NOT-SEPARATED | MISTUNING-NOT-EXCLUDED | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | H-BROKEN-EXCLUDED | FLOOR-READINGS-ARE-BOUNDS | DECOMPOSITION-BY-SUBTRACTION | TRAIN-AGREES | ISO-TRACKS-KL | CTL-AT-FLOOR | ONE-AT-FLOOR
+```
+
+On the Mac (Python 3.14.5, `../runs_alice2`) the whole output is identical except the manifest-path line (`diff`: one line).
+
+### 218.3 The numbers (in batch; plateau5 = mean TEST over epochs 95–99 of each run's own `.out`)
+
+| arm | spec | TEST plateau5 (sd, range) | TRAIN | seeds s69 / s70 / s71 |
+|---|---|---|---|---|
+| `k01` | scalar (floor anchor) | 11.7867 (0.135, 0.256) | 11.7973 | 11.7360 / 11.9400 / 11.6840 |
+| `kL` | layerwise (ceiling anchor) | 68.9800 (0.012, 0.022) | 97.6493 | 68.9740 / 68.9720 / 68.9940 |
+| **ISO** | {44 `layer4.0.bn2.weight`, 50 `layer4.1.bn2.weight`} [51,2] | **67.5427** (0.220, 0.428) | 82.3633 | 67.7280 / 67.6000 / 67.3000 |
+| CTL | {41 `layer4.0.bn1.weight`, 47 `layer4.1.bn1.weight`} [51,2] | 11.6967 (0.320, 0.598) | 11.7120 | 11.4640 / 12.0620 / 11.5640 |
+| **ONE** | {44 `layer4.0.bn2.weight`} [52,1] | **11.6840** (0.277, 0.524) | 11.7907 | 11.4740 / 11.9980 / 11.5800 |
+
+* **σ (O2).** `SIGMA_INBATCH` 0.221845 (df 10) is below the frozen prior, so `SIGMA_USED` = 0.694443 (`SIGMA-PRIOR-FROZEN`); `SE_ARM_DIFF` 0.567010.
+* **Contrasts (TEST; TRAIN beside).** PRIMARY `DELTA_ID` **+55.8460 pp = +98.49 SE** (TRAIN +70.6513). KEY `D_ONE` **−0.1027 pp = −0.18 SE** (TRAIN −0.0067). `D_ISO` +55.7560 (+98.33 SE); `D_CTL` −0.0900 (−0.16 SE); `D_HEAD` = ISO − ONE +55.8587 (+98.51 SE); `D_GAP` +57.1933 (+100.87 SE; TRAIN +85.8520). Descriptive: `RECOVERY` 0.9749, `RECOVERY_ONE` −0.0018 (ResNet twins' ONE 0.9065 / 0.9055, between-batch, non-gating).
+* **Branch arithmetic.** `D_GAP` ≥ 20 → carrier branches readable; ISO rescues (≥ 10), CTL and ONE do not; `DELTA_ID` ≥ 15 and `D_ONE` ≤ 2 → **`HEAD-CARRIES-PLAIN`**. Nothing sits near a bar: the nearest margin is `D_ONE`'s, 2.10 pp under the +2.0 null bar (−0.1027 against +2.0).
+
+### 218.4 Two things the briefing did not anticipate, led with because they bound the result
+
+**(1) The scalar floor is lower than any account registered.** `k01` = **11.7867 pp**. Every collapse account in 215.4 (R-ONLY, PATH, IDENT, CLASS, H-BROKEN) registered `k01` in **20–36**; the ResNet18_c100 scalar band is [21.694, 24.174]. The level prediction MISSED for every account. It moves no branch (every bar is a difference of in-batch arms), but it is a registered prediction that failed and is said here. The collapse is mechanically the same object as ResNet's: the single `beta` reaches the −15 clamp at epoch **36.2 / 36.4 / 36.4** and stays there (ResNet18_c100: epoch 36.8, `190.2`); PlainNet simply stood at ~11 % TEST when it froze (its TEST is 11.3 at epoch 20, against `kL`'s 23.8).
+
+**(2) ISO's rescue is a DELAY of the complement's collapse, not a prevention, and ISO's level is FROZEN.** From the runs' own `probe.jsonl` (500 records each; `analysis/cgn1_cpl1_attack_indep.py`):
+
+| arm | complement group `beta[0]`: at clamp continuously from epoch | isolated group `beta[1]`: at clamp from epoch |
+|---|---|---|
+| `k01` (one group) | 36.2 / 36.4 / 36.4 | — |
+| ISO | **62.4 / 62.0 / 60.0** (peak −4.906 / −4.836 / −4.810) | 23.4 / 23.0 / 21.8 |
+| CTL | 36.2 / 36.4 / 36.6 | 34.4 / 34.8 / 35.2 |
+| ONE | 36.2 / 36.4 / 36.4 (**= `k01`'s, to the record**) | 44.2 / 44.2 / 44.2 |
+
+* Isolating the pair keeps the 11,045,284-parameter complement free for ~25 epochs longer, and then it pins anyway. ISO's TEST reaches 67.3 by epoch 50 and is flat at 67.5 from the complement's pin onward (OLS slope over epochs 80–99: −0.0017 / +0.0017 / −0.0065 pp/epoch), while `kL` (no group at the clamp except 10 of 53 by the end, max `beta` −5.0 to −6.0) keeps climbing to 69.2. ISO's TRAIN is **82.3633 against `kL`'s 97.6493 (−15.29 pp)**: `ISO-TRACKS-KL` holds on TEST (−1.4373 pp) and **not on TRAIN**.
+* So ISO's 67.5427 is **the level reached before the complement's collapse**, and `RECOVERY` 0.9749 is a 100-epoch number that a longer horizon would lower: every ISO `beta` is at the clamp from epoch ~62. This is the PlainNet analogue of `cvi1`'s VGG complement, which was still descending at 100 epochs and extrapolated to the clamp at epoch ~109–113 (203); here the pin happens inside the budget. `HORIZON-100-ONLY` carries it.
+* ONE's complement collapses **on `k01`'s exact schedule**: isolating `layer4.0.bn2.weight` alone changed nothing about the collapse. That is the mechanism behind `D_ONE` −0.1027.
+
+### 218.5 What the branch says about `189.2`, exactly
+
+* **The registered licence (215.5), verbatim in substance:** the surviving-carrier PAIR rescues, its matched twin does not, and its member that fed an addition on ResNet (`layer4.0.bn2.weight`) does NOT rescue alone, although the identically-named ONE arm recovered ~0.91 of the gap on ResNet. **ONE-VARIABLE SUPPORT FOR 189.2 FOR THAT TENSOR: removing the addition removed its carrier status.** ISO's rescue (off-floor, in batch) **kills H-BROKEN in batch**, so ONE's null is a real null, not a content-free floor. That the rescue rides on `layer4.1.bn2.weight` is **BY SUBTRACTION** (50 alone was not isolated; single-tensor additivity was refuted at 164.7). **Consistent with PATH.**
+* **Read against 215.4's own account → branch table** (registered before any run): the observed locations — `k01` collapsed, `kL` free, ISO free, CTL and ONE at `k01` — are **PATH's** prediction on every arm. **R-ONLY** (189.2 literally: a scale carries iff it is a summand of a residual add) registered `NO-RESCUE-PLAIN` with ISO at `k01`; ISO sits **+55.7560 pp** above `k01`. **R-NOGAP** registered `GAP-ABSENT-PLAIN`; `D_GAP` is +57.1933. **IDENT** (ONE rescues) and **CLASS** (CTL rescues) also missed. So **189.2 as a characterisation of WHICH tensors carry does not survive**: on a network with no addition anywhere a carrier-shaped rescue exists, and by subtraction it rides on a tensor that is a summand of nothing. What survives of 189.2 is its **necessity half for `layer4.0.bn2.weight` only**.
+* **Descriptive corroboration, non-gating (the 184/194.5 statistic, the scorer's own readout, reproduced independently):** on the `k01` arm's 955 pinned records, `layer4.1.bn2.weight` (idx 50) holds **0.6201** of the mean-|L| mass (then `linear.weight` 0.1231, `layer4.1.conv2.weight` 0.0748); removing {50} flips the remainder's sign on **1.0000** of pinned records, removing {44} on **0.0000**, {41,47} on 0.0000. This agrees with the subtraction, and it is an observation on records, of the kind 184→187 showed can carry the wrong mechanism.
+
+### 218.6 The attack — an independent parser
+
+`analysis/cgn1_cpl1_attack_indep.py cpl1 ../runs_alice2` (new here; imports nothing from any scorer, no regex, reads raw `Epoch` lines by string splitting, re-types the 215 bars and branch order): **every per-run plateau5 and TRAIN5, every arm mean / sd / range, σ in-batch 0.221845, SE 0.567010, all six contrasts, `RECOVERY` 0.9749 / −0.0018, the nomination shares and flips, and the branch `HEAD-CARRIES-PLAIN` — digit for digit. 0 violations.** It also re-checks every header line itself (20 flags, no repeat, every design value; 15 ENV keys + own `PROBE_DIR`; NODE job name/id/`AUGMENT=1`; `PROBE_TENSOR` type/53/every 100), the manifest (53 tensors, 11,046,308 params, no `shortcut` name), and each run's probe arity from `block_sizes.json`: `k01` m=1, `kL` m=53, ISO/CTL `[11045284, 1024]`, ONE `[11045796, 512]`, every `len(z_tensor)` 53, 500 records per run. **Three parsers agree on every run's plateau5:** the scorer, this parser, and `aggregate.py`'s CSV `plateau5` (218.8).
+
+### 218.7 What this does NOT license
+
+* **"`layer4.1.bn2.weight` is a carrier on PlainNet"** as a measured fact: it is by subtraction. 50 alone was never isolated.
+* **Identity vs magnitude** (188.3 / 194.6): 50 carries 0.6201 of the pinned mass and 44 almost none; nothing here separates them.
+* **Anything about `layer4.0.shortcut.1.weight`**, the third ResNet carrier: it does not exist on PlainNet.
+* **PATH as confirmed.** PATH is the registered account whose branch occurred. Its `k01` level missed (218.4(1)), and this batch cannot separate it from an unregistered account predicting the same locations.
+* **"Residual additions are irrelevant to the gap."** `D_GAP` +57.19 on PlainNet against ~+46 on ResNet is between-batch and enters no contrast.
+* **Any horizon but 100 epochs.** ISO is frozen from epoch ~62 (218.4(2)).
+* **RULE 11.** No argmax located on PlainNet18_c100; one cell (ms 1e-3, α₀ 1e-6).
+* **Point agreement for a floored arm.** CTL and ONE sit within 0.11 pp of `k01`; those readings are BOUNDS (`FLOOR-READINGS-ARE-BOUNDS`), and the null is a location claim, not a size.
+* **The ResNet twins** (ciso1/cdep1) are printed between-batch and non-gating; the batch is the unit of replication.
+
+### 218.8 The ingest — BOTH batches, ONCE, in the documented order, with both halves
+
+The pre-ingest corpus was `cmp`-identical to HEAD's (`870c4003…4a3a`, 2,863 rows) and was snapshotted before anything ran. The 21 `.out` files were in `../runs_alice2`, sha256-verified (217.1, 218.1); `../runs`, the `alice` mirror, holds 0 `cgn1`/`cpl1` files. `146.7`'s trap was avoided constructively: `aggregate.py` was redirected INTO the corpus, and the corpus sha moved from `870c4003…` to **`e0de4c85…f6a7`**.
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # "# 2884 runs aggregated", exit 0
+  # WARNING: 3 duplicated run-name(s) [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply                                        # "APPLIED: 36 rows updated"
+```
+
+**Both halves, keyed `(run, job_id)`, field by field**, by a comparator of my own (`csv.DictReader`, 38 fields), after `args_repair`:
+
+```
+before rows 2863 keys 2863 | after rows 2884 keys 2884 | fieldnames identical: True (38)
+ADDED 21 {'cgn1': 6, 'cpl1': 15}   REMOVED 0   MULTIPLICITY CHANGES 0
+PRE-EXISTING ROWS CHANGED: 0 field-cells differ (108794 compared), rows 0
+  cgn1: 6 rows, job_id 5014610..5014615, seeds 60/61/62, ResNet18_gn_c100, CIFAR100, augment 1, epochs_done 100, complete 1, window_ok 1, superseded 0, collapsed 0
+  cpl1: 15 rows, job_id 5014618..5014632, seeds 69/70/71, PlainNet18_c100, CIFAR100, augment 1, epochs_done 100, complete 1, window_ok 1, superseded 0, collapsed 0
+```
+
+* **All 21 CSV `plateau5` values equal the raw-`.out` re-derivation** to the printed digit (e.g. `cgn1-k01-s60` 14.236, `cpl1-ISO-s69` 67.728). Three parsers agree: the registered scorers, the attack parser and `aggregate.py`.
+* `args_repair`'s 36 updates are the standing `dup_group` restoration (`194.7`, `196.8`, `203.10`, `210.6`). Its `.bak` is git-ignored and not committed. **CORPUS 2,863 → 2,884.**
+* **O2, demonstrated.** Both scorers ran against the pre-ingest corpus (their stage copies, `870c4003…`). Re-run on the Mac against the post-ingest corpus: `cPL1`'s whole output is **byte-identical**; `cGN1`'s differs in exactly one line, its descriptive `corpus: 2863 rows` → `2878 rows, cgn1- excluded` (the 15 `cpl1` rows). No bar, σ, branch or stamp moved.
+* **Mirror.** The alice2 mirror's `results/all_runs.csv` was brought to the same bytes (`e0de4c85…`), with the prior copy kept as `results/all_runs.csv.pre_l217_ingest_2863` (`870c4003…`).
+
+### 218.9 The MASTER TABLE
+
+* **The header was re-derived first**, by a hand-rolled RFC4180 splitter with no `csv` module and no code shared with the checker: **2,884 rows, 2,869 with `wallclock_min` and 15 without, 3008.8000 → 3008.8 GPU-h.** The rise of 17.25 h equals `cgn1`'s 7.4333 plus `cpl1`'s 9.8167, each re-summed over its own rows.
+* **The two new rows are APPENDED as the file's last two lines (212, 213)**, under the section-10 table heading, in section 9's convention, each carrying its registered scorer's FINAL tokens verbatim, joined with ` + `. They sit there, not in section 9, because the research-notebook site keys experiment ids on line numbers: **every existing line 1–211 other than the header (line 3) is byte-identical**, checked line by line after the write.
+* **The header, edited in place (line 3 only):** 2,884 / 3008.8, with 2,863 / 2991.6 kept as `[SUPERSEDED …]`; 2,869 wallclock rows, with 2,848 kept as superseded; and the rows total 148 → **150**, with one clause saying where the two rows are and why.
+* **Counted twice.** `analysis/c73_mastertable_check.py`, run **UNEDITED** (`dec9ec68…`): **exit 0**, "150 data rows, 7 columns each", "CSV: 2884 runs / 3008.8 GPU-hours", "header is consistent with both the table and the CSV OK". An independent row walker (no shared code) counts 150 rows (section 9 37; the section-10 table 39 = 37 + 2) and sections 1–8's families 33 / 26 / 8 / 3 / 2 / 2, the header's figures.
+* **Deliberately NOT edited, and owed.** The bottom-line paragraph (line 7) still says of `VGG11_bn` that "nothing here says anything about a network without BatchNorm", and still describes the isolation line as ResNet-only. After `cgn1` (the GAP exists without BatchNorm) and `cpl1` (an isolation arm on a residual-free ResNet topology), both sentences are stale by scope. This pass was limited to the header counts and the two appended rows, so the amendment is the operator's call and is flagged here.
+* **Deleted:** nothing. **Other tracks' rows:** none touched.
+
+### 218.10 Discipline (217 and 218), and what was disclosed
+
+* **RULE 16.**
+  * Both registered scorers ran UNEDITED at their registered shas, from the stage trees their launchers ran from, with the documented one-argument invocation. So did `argsline_guard.py` (`81cea8b5…`), `aggregate.py` (`35c035e1…`), `args_repair.py` (`e6d8918d…`) and `c73_mastertable_check.py` (`dec9ec68…`).
+  * `git diff` over `analysis/` is **additions only**: `analysis/cgn1_cpl1_attack_indep.py` and `analysis/cgn1_nominate_gn_carriers.py`, both new.
+* **Deviations, disclosed.**
+  1. The attack parser was extended twice after its first cpl1 pass: the per-group `beta` pin timeline, then the tail slope. Both are additions, prompted by what the first pass showed (both ISO groups at the clamp; `cgn1` `kL` still rising). No number the first pass printed changed.
+  2. The nomination script's `postpeak` mode was added after the registered `pinned` record set came back empty on `cgn1`. It is labelled as a deviation in the script's output and at 217.6.
+  3. RULE 20 pass 1 (21:36:21Z) ran while four `cgn1` runs were still training. For `cgn1` only pass 2 (22:01:18Z, 6/6) is the full-coverage pass; for `cpl1` pass 1 already was (15/15), and pass 2 repeated it.
+  4. One local foreground wait was refused by the harness (exit 1, no output). The waits that were used ran on alice2 under `timeout 570`, read-only.
+* **Evidence handling.** plateau5 is PRIMARY, from the raw `.out`; the CSV `plateau` column and `best_test` are read nowhere; TRAIN is beside TEST at every arm; every contrast is within batch; the batch is the unit of replication.
+* **Hosts and scope.**
+  * Every remote command ran on alice2 (`s5014158`). **`alice` was NOT contacted.**
+  * **No job was submitted, cancelled or requeued.** The account's other batches (`cvh1` 12, `cuc1` 30) were left alone, and no number of theirs was read; the `cuc1` witness poller (216.4) was not touched.
+  * `paper/` is untouched. `analysis/c98_reproduce.py` exits **`1`**, as-is: 10 stale corpus-count checks (rows 2,884 vs the paper's 2,177, and similar). Neither batch enters any checked number. No nested `claude -p`.
+* **Git.** `git add` named explicit paths only: `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md`, `results/all_runs.csv`, `analysis/cgn1_cpl1_attack_indep.py`, `analysis/cgn1_nominate_gn_carriers.py`. **Committed LOCALLY; NOT PUSHED.** The GitHub repo is public, and publishing is the operator's decision.
+* **Left on alice2, all deletable:** `~/l217_rule20.sh`, `~/l217_score.sh`, `~/l217_logs/` (`rule20_pass1.log`, `rule20_pass2.log`, `score_cgn1.log`, `score_cpl1.log`), and the mirror's `results/all_runs.csv.pre_l217_ingest_2863`.
+* **Cost of these entries:** zero GPU-hours. The batches' own spend by `sacct` is `cgn1` 7.4889 and `cpl1` 9.9503 GPU-h.
+
+Next free number: **219**.
