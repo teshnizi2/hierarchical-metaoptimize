@@ -29615,4 +29615,222 @@ PRE-EXISTING ROWS CHANGED: 0 field-cells differ (108794 compared), rows 0
 * **Left on alice2, all deletable:** `~/l217_rule20.sh`, `~/l217_score.sh`, `~/l217_logs/` (`rule20_pass1.log`, `rule20_pass2.log`, `score_cgn1.log`, `score_cpl1.log`), and the mirror's `results/all_runs.csv.pre_l217_ingest_2863`.
 * **Cost of these entries:** zero GPU-hours. The batches' own spend by `sacct` is `cgn1` 7.4889 and `cpl1` 9.9503 GPU-h.
 
-Next free number: **219**.
+## 219. TRACK L3 (land) — **`cvh1` LANDS 12/12: `RESCUE-SURVIVES`.  ON `VGG11_bn_c100` / CIFAR-100 AT A **328-EPOCH** HORIZON, THE VGG ISOLATION RESCUE DOES NOT DECAY: `RHO` = D_ISO@328 / D_ISO@100 = **1.0001** (+32.0093 pp / +32.0053 pp, both IN BATCH, the 100-epoch control read FROM THE SAME RUNS).**  THE REGISTERED SCORER `analysis/cVH1_vgghorizon_score.py` (sha `c9e0f17c…`, bars FROZEN by O2 at `213`), RUN **UNEDITED** ON `alice2` WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION FROM `~/stage_cvh1`, EXITS **0**: **105 PASS, 0 FAIL, 0 SKIP.**  **THE RE-REGISTERED FREEDOM GATE WORKED, AND THAT WAS THE POINT OF RE-REGISTERING IT (219.5):** ISO's 25-tensor complement is `COMPLEMENT-PINNED` on all three seeds by step-size MAGNITUDE (MED_R 1.0010 / 1.0020 / 1.0020, MAX_R 1.197 / 1.273 / 1.234), while `cIS2`'s superseded exact-clamp-dwell rule (`PIN_OCC_MIN` ≥ 0.50) scores **0.4195 / 0.3780 / 0.3610** and would have called the arm NOT PINNED — exactly the `196.5` defect — and the gate now sits **AFTER** the primary as a stamp, so neither form can void a measured `RHO` the way `ciso2` lost 0.9977 to it.  **WHAT "SURVIVES" MEANS HERE, LED WITH (219.4): A LEVEL FROZEN AT THE PIN, NOT CONTINUED LEARNING.**  The complement pins (r ≤ 2) at epoch **104.8 / 106.4 / 107.8**, the post-pin window is **220.2 epochs** (≥ `W_MAX` 213.0), and ISO's TEST over epochs 113–117 is **67.3433** against **67.4113** at 328 — a drift of **+0.0680 pp = +0.09 SE**, inside `READ_BAR`.  `RULE 20` AT FULL **12/12**, ARGS **AND** A SEPARATE ENV AUDIT, **PASS, BEFORE ANY NUMBER WAS READ**.  `RULE 21` MARGIN **+2,072 s**.  An independent parser (`analysis/cvh1_cuc1_attack_indep.py`, new, no regex, nothing imported) reproduces every number digit for digit and re-grades the branch map to the same branch.  **CORPUS 2,884 → 2,926 with `cuc1` (added 42, changed 0, removed 0; the single ingest is recorded at 220.8).  ZERO GPU SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **219**; NEXT FREE **220**.
+
+### 219.1 Completion, RULE 21, RULE 20 — before any number
+
+* **Completion.** 12/12 `.out` files, each with `RUN_DONE`, no traceback, **328 contiguous `Epoch` lines**, one `.out` per (arm, seed), no run outside the registered 12, and 0 `cvh1-` jobs in `squeue` (checked 09:28 CEST, 16 Sep). Nodes: node865/866/868/869/883/884. `sacct` `COMPLETED` on all 12.
+* **RULE 21, by wall clock.** `analysis/cVH1_vgghorizon_score.py` has **one** commit, `4c1aa60`, `%ct` **1789502019** (2026-09-15 21:53:39 +0200). Earliest `sacct` Submit for the batch: **2026-09-15T22:28:11 CEST** = 1789504091. **Margin +2,072 s**, confirming `216.5`. The copy that ran (`~/stage_cvh1/analysis/cVH1_vgghorizon_score.py`) is sha256-identical to HEAD's.
+* **RULE 20 at FULL coverage, `~/l219_rule20.sh` + `~/l219_rule20b.sh`, read-only, BEFORE the scorer ran.**
+  * (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, from `~/stage_cvh1`) with the launcher's own documented axes **plus `--strict`**: `--name cvh1- --batch-consistency --strict --vary seed --vary run-name --vary stepsize-groups --vary save-directory` → **12 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line, `VERDICT: PASS`, exit 0**; "batch-consistency: every non-axis flag is identical across 12 runs".
+  * (b) the same tool with `--expect` on all 15 non-axis design flags (`NN-name VGG11_bn_c100`, `dataset CIFAR100`, `num-epochs 328`, `optimizer HF`, `alg-base SGDm`, `alg-meta Lion`, `meta-stepsize 1e-3`, `alpha0 1e-6`, `batch-size 100`, `gamma 1`, `momentum-param-base 0.99`, `weight-decay-base 0.1`, `momentum-param-meta 0.99`, `Lion-beta2-meta 0.9`, `weight-decay-meta 0`): **12 clean, 0 violations, `VERDICT: PASS`, exit 0**. Every run carries **20 flags, none repeated**.
+  * (c) the per-arm spec strings from the runs' own ARGS lines are **byte-identical to `cvi1`'s**, 3 seeds each: `k01` `scalar`, `kL` `layerwise`, ISO `sets:1-22,24-26/bn8.weight`, CTL `sets:1-19,21-26/bn7.weight`. **So this is the same intervention at a longer horizon**, as `213` designed.
+  * (d) **the separate ENV-line audit** (the launcher's own commands, `BETA_CLIP`/`PROBE` ride the runner's ENV line, `PROBE_TENSOR` rides the patch's own): **ONE distinct ENV line × 12** (`PROBE_DIR` stripped) — `AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0` — exactly one ENV line per file; and `PROBE_TENSOR: on every=100 … tensors=26` with **scalar ×3, layerwise ×3, blockwise ×6**, the arity the four arms require.
+* **Integrity.** The 12 `.out` files and the whole `runs/cvh1/` tree (62 files: manifest, provenance, 12 probe dirs) were rsynced to `../runs_alice2` and are **sha256-identical** to alice2's (part of the 181-file verification at 220.8). `../runs`, the `alice` mirror, holds **0** `cvh1` files.
+
+### 219.2 The registered scorer, unedited
+
+`python3 analysis/cVH1_vgghorizon_score.py /home/s5014158/metaopt/runs`, from `~/stage_cvh1`, venv `module load Python/3.10.4-GCCcore-11.3.0` then `/home/s5014158/metaopt/envs/mo/bin/activate`, `METAOPT_WS=/home/s5014158/metaopt`. **Exit 0. GATES: 105 PASS 0 FAIL 0 SKIP.** The FINAL line, verbatim:
+
+```
+FINAL: RESCUE-SURVIVES | RHO:1.0001 | COMPLEMENT-PINNED | ISO-PIN-EPOCH:106.3 | POST-PIN-WINDOW:220.2 | WINDOW-MEETS-WMAX | FROZEN-AT-PIN | CEIL-TRACKS | KL-STILL-TRAINING | FLOOR-HOLDS | CTL-AT-FLOOR-AT-E | IDENTITY-HOLDS-AT-E | ISO-TRAIN-FROZEN | SIGMA-FROZEN-DOMINATES | REPLICATES-CVI1 | MAGNITUDE-NOT-SEPARATED | NOT-A-ONE-VARIABLE-ABLATION
+```
+
+Manifest gate G1 (26 TENSOR lines, every tensor matching the frozen NAME **and** NUMEL at its 1-based index, total **9,274,532** parameters, the four 512-wide BN scales at 14/17/20/23 = bn5/bn6/bn7/bn8, no name containing `shortcut`, ISO isolating exactly tensor 23 with group sizes (25, 1) and parameter counts (9 274 020, 512), CTL exactly tensor 20 with the same shape, both re-composing from the registered SPEC, `EPOCHS 328`, `CLIP_C -15:-2.3026`, `META_STEPS 164000`) is clean. G0 provenance is clean on all 12: **1,640 probe records each** and the group sums of `z_tensor`/`m_tensor` reproduce `z_agg`/`mom_pre` on **39,360 of 39,360** checks, worst residual 8.633e-07.
+
+### 219.3 The numbers (in batch; plateau5 = mean TEST over the 5 epochs ending at the horizon, from each run's own `.out`)
+
+| arm | TEST @100 (seeds) | TEST @328 (seeds) | TRAIN @100 | TRAIN @328 |
+|---|---|---|---|---|
+| `k01` scalar (floor) | **35.3627** (35.510 / 35.492 / 35.086) | **35.4020** (35.552 / 35.478 / 35.176) | 35.5227 | 35.6293 |
+| `kL` layerwise (ceiling) | **66.1867** (66.322 / 66.188 / 66.050) | **66.9140** (66.944 / 66.676 / 67.122) | 99.2493 | 99.8767 |
+| **ISO** `sets:1-22,24-26/bn8.weight` | **67.3680** (67.244 / 67.194 / 67.666) | **67.4113** (67.310 / 67.218 / 67.706) | 95.8907 | 96.1573 |
+| CTL `sets:1-19,21-26/bn7.weight` | **35.2393** (35.432 / 35.386 / 34.900) | **35.3087** (35.528 / 35.434 / 34.964) | 35.4553 | 35.5400 |
+
+* **σ.** `SIGMA_FROZEN` **0.925518** (the `213` literal) dominates the in-batch **0.244624** (df 16, this batch's own seeds) → `SE_USED` **0.755682**, `READ_BAR` **1.511365**. `SIGMA-FROZEN-DOMINATES`.
+* **PRIMARY.** `D_ISO` = plateau5(ISO) − plateau5(`k01`): **@100 +32.0053 pp = +42.35 SE**, **@328 +32.0093 pp = +42.36 SE** → **`RHO` = 1.0001**. Per seed, paired: 63 → 31.7340 / 31.7580, ρ 1.0008; 64 → 31.7020 / 31.7400, ρ 1.0012; 65 → 32.5800 / 32.5300, ρ 0.9985. `SURVIVE` needs ρ ≥ 0.80 **and** D@328 ≥ 15.0; `COLLAPSE` needs D@328 ≤ 5.0. **Branch decided by the primary alone.**
+* **Anchors, inside their frozen bands.** `k01` @100 35.3627 ∈ [31.6421, 39.0463]; `kL` @100 66.1867 ∈ [62.5863, 69.9905]. Seed ranges ≤ `DEAD_BAR` 5.0 everywhere (max **0.5640**, CTL @328).
+* **Stamps** (none moves the branch): ISO − `kL` @328 **+0.4973 pp (+0.66 SE)** → `CEIL-TRACKS`; the batch's **NULL MODEL** `k01` @328 − @100 **+0.0393 pp (+0.05 SE)** → `FLOOR-HOLDS`; CTL − `k01` @328 **−0.0933 pp** → `CTL-AT-FLOOR-AT-E`; `DELTA_ID` = ISO − CTL @328 **+32.1027 pp (+42.48 SE)** [@100 +32.1287] → `IDENTITY-HOLDS-AT-E`; ISO TRAIN @328 − @100 **+0.2667 pp** → `ISO-TRAIN-FROZEN`; `kL` groups FREE (MED_R ≥ 10) **12 / 13 / 13 of 26** → `KL-STILL-TRAINING`.
+* **Between-batch, NON-GATING.** `D_ISO@100` here **32.0053** against `cvi1`'s **31.2833**: **+0.7220 pp = +0.96 SE** → `REPLICATES-CVI1`.
+* **Every registered point prediction landed IN.** ρ predicted [0.96, 1.04] → 1.0001; `k01` @328 [35.0, 36.2] → 35.4020; CTL @328 [35.0, 36.2] → 35.3087; `kL` @328 [66.0, 69.0] → 66.9140; ISO @328 [65.8, 67.8] → 67.4113; ISO complement pin (r ≤ 2) ≤ 108.9 → 104.8–107.8, and the exact-clamp bound ≤ 114.8 → 109.2–111.8. **The `190` extrapolation method bounded the measured pin for a third time.**
+
+### 219.4 What "survives" means here, led with, because it bounds the result
+
+1. **It is a FREEZE, not continued learning.** ISO's complement (the 25-tensor group) reaches within 2× of the step-size floor at epoch **104.8 / 106.4 / 107.8** and stays there; from epoch 113 onward ISO's TEST moves **+0.0680 pp** to the end of 328 — well inside `READ_BAR` 1.511. `ISO-TRAIN-FROZEN` says the same on TRAIN (+0.2667 pp over 228 epochs). So the correct sentence is **"the rescue's level, once reached, does not decay over a 220-epoch post-pin window"**, not "isolation keeps learning".
+2. **ρ ≈ 1 is not a bound.** `213`'s own floor-gate table predicts ρ 1.00–1.07 under the NEVER-PINS account, so ρ slightly above 1 is consistent with two different stories; what discriminates them is the pin state, which came back PINNED. `RESCUE-COLLAPSES` was reachable by the data — ISO had 31 pp to fall — and it did not.
+3. **ISO and `kL` are not ordered by this batch.** +0.4973 pp apart at 328, inside `READ_BAR`. `CEIL-TRACKS` means "ISO reaches the layerwise ceiling", not "isolation beats layerwise". On TRAIN they are 3.72 pp apart in `kL`'s favour (99.88 vs 96.16), which is the freeze showing.
+4. **`kL` is still training at 328** (12–13 of its 26 groups FREE on every seed), so the ceiling arm has not converged either; the comparison is between one frozen arm and one still-moving arm.
+
+### 219.5 The re-registered freedom gate, GRADED — this was the point of `213`
+
+`ciso2` put a pin gate BEFORE its primary and lost a measured `RHO` 0.9977 to `UNRESOLVED-NOT-PINNED`, because `PIN_OCC_MIN` measured the fraction of records at **exactly** β = −15.000. `213` replaced the statistic and moved the gate. Both forms, computed here on the same trajectories:
+
+| ISO complement | MED_R (last quarter) | MAX_R | terminal β | first r ≤ 2 | first exact touch | exact-clamp dwell |
+|---|---|---|---|---|---|---|
+| s63 | 1.0010 | 1.197 | −14.9070 | ep 106.4 | ep 111.4 | 0.4195 |
+| s64 | 1.0020 | 1.273 | −14.9960 | ep 107.8 | ep 111.8 | 0.3780 |
+| s65 | 1.0020 | 1.234 | −14.8890 | ep 104.8 | ep 109.2 | 0.3610 |
+
+* **New form: PINNED on 3/3.** Every seed's step size sits within **1.27×** of the floor over the whole last quarter — a group that is, for any practical purpose, not moving.
+* **Old form: NOT PINNED on 3/3** (0.4195 / 0.3780 / 0.3610, all below 0.50). The scorer prints this comparison itself: "NOTE cIS2's PIN_OCC_MIN (exact-clamp dwell >= 0.50) would call 0/3 seeds pinned; it is NOT used".
+* **So the redesign behaves as intended**, on an arm that reproduces the defect it was written to remove, and **it is a stamp, not a gate** — the branch came from `RHO` alone. This is graded, not asserted: the independent parser recomputes both forms from the raw `probe.jsonl` and gets the same six numbers.
+* **Calibration honesty.** The thresholds (PINNED ≤ 2.0, FREE ≥ 10.0) were frozen at `213` against every record set that existed, whose largest PINNED median was 1.0555 and smallest FREE median 25.85. This batch's ISO complement (1.0010–1.0020) sits inside the calibrated PINNED cluster, not in the gap, so the gate is **not** being read at its threshold. `k01` and both isolated singletons sit at MED_R 1.0000 exactly.
+
+### 219.6 The attack — an independent parser
+
+`python3 analysis/cvh1_cuc1_attack_indep.py cvh1 ../runs_alice2` (new; shared with 220; imports nothing from either registered scorer, **no regular expressions anywhere**, parses `Epoch` / `ARGS` / `ENV` / `NODE` / `PROBE_TENSOR` lines by string splitting, re-types `213`'s bars and branch order by hand): **every per-run plateau5 and TRAIN5 at both horizons, all four arm means / sd / seed ranges, σ in-batch 0.244624, SE 0.755682, `READ_BAR` 1.511365 re-derived from the frozen σ, `D_ISO` +32.0053 / +32.0093, `RHO` 1.0001, all three paired per-seed ρ, all six stamps, `DELTA_ID` +32.1027, the `cvi1` delta +0.7220, both pin-gate forms, the pin epochs, the 220.2-epoch window and the +0.0680 post-pin drift — digit for digit, and the branch map re-implemented from the prose returns `RESCUE-SURVIVES`. 0 violations.** Its own header checks pass on 12/12 (20 flags none repeated; 14 ENV keys + own `PROBE_DIR`; ONE distinct ENV line; `NODE` job name/id/`AUGMENT=1`; `PROBE_TENSOR` type/26/every 100), as do the probe checks (1,640 records each, `n_b` arity 1 / 26 / 2 / 2, ISO and CTL `n_b` = [9274020, 512], every arity summing to 9,274,532). **Three parsers agree on every run's plateau5**: the registered scorer, this parser, and `aggregate.py`'s CSV `plateau5` column (220.8).
+
+### 219.7 What this licenses, and what it does not
+
+**Licensed.** One sentence, at one cell: *on `VGG11_bn_c100` / CIFAR-100, the isolation rescue measured at 100 epochs by `cvi1` is still there at 328 epochs, unattenuated (ρ 1.0001), with the isolated tensor's complement frozen at the step-size floor from epoch ~106 and the rescue's level flat for the 220 epochs after that.* It closes `cvi1`'s **`HORIZON-100-ONLY`** bound for this arm, and it does so with the 100-epoch control read **from the same runs**, so the two horizons share seeds, nodes, harness and initial point.
+
+**NOT licensed.**
+* **Another architecture.** `VGG11_bn_c100` only. The `ciso2` analogue on ResNet is a *different* batch (ρ 0.9977 at 250 epochs) and the two are not pooled here.
+* **Another tensor, or the tensor LIST.** ISO isolates `bn8.weight` (512 parameters) alone. VGG's nominated carrier set has cardinality **1** against ResNet's **3**; nothing here transfers the list.
+* **IDENTITY vs MAGNITUDE.** `MAGNITUDE-NOT-SEPARATED` and `NOT-A-ONE-VARIABLE-ABLATION` are stamped unconditionally: ISO changes both *which* tensor is isolated and the step-size magnitude its group can reach.
+* **Any horizon beyond 328 epochs**, and no statement that either arm has converged. `kL` is still training; ISO is frozen. A longer batch could still move `kL` and thus `CEIL-TRACKS`.
+* **`AUGMENT=0`, another meta-optimiser, another meta-stepsize, or the paper configuration.** `cvh1` ran `AUGMENT=1`, `HF` + `SGDm`/`Lion`, ms 1e-3, α₀ 1e-6.
+* **Any ordering of ISO against `kL`** (219.4, item 3), and `RULE 11`.
+* **Cost.** 12 jobs, **17.3167 GPU-h** re-summed over the batch's own 12 `wallclock_min` values (`sacct` Elapsed 17.4414), against the registered 17.8 h pool-mean estimate and an 84 h hard bound.
+
+## 220. TRACK L3 (land) — **`cuc1` LANDS 30/30: `DEFICIT-HOLDS`.  ON UNAUGMENTED CIFAR-100 (`ResNet18_c100`, `AUGMENT=0` ON EVERY ONE OF THE 30 RUNS), A TUNED PLAIN SGD+MOMENTUM+COSINE `lr` LADDER PEAKS **INTERIOR** AT `lr = 0.4` WITH **65.0573 pp** AND BEATS THE BEST OF FIVE META CELLS (`m1e3a1e3`, **52.8793**) BY `GAP_END` = **+12.1780 pp = +26.05 SE**.**  THE REGISTERED SCORER `analysis/cUC1_unaug_c100_score.py` (sha `9c2f752d…`, bars FROZEN by O2 at `214`), RUN **UNEDITED** ON `alice2` WITH ITS DOCUMENTED ONE-ARGUMENT INVOCATION FROM `~/stage_cuc1`, EXITS **0**.  **THE LADDER'S ARGMAX IS INTERIOR (62.658 / 63.097 / 64.774 / **65.057** / 59.848), SO THE TOKEN DOES NOT TAKE `| LOWER-BOUND` AND THE GAP IS NOT MERELY A BOUND.**  **`214`'s DISCLOSED ADVERSE SENSITIVITY MODEL — under which every meta cell floors at 4–15 pp and the batch would have returned `GATED-METHOD-AT-FLOOR`, ~20 GPU-h with no answer — DID NOT HAPPEN: FOUR OF FIVE CELLS TRAIN (47.06–52.88 pp) AND ONLY THE α₀-HIGH CELL FLOORS (14.195, `DOES NOT TRAIN`).  THE BATCH HAS AN ANSWER.**  **THE UNAUGMENTED CIFAR-100 DEFICIT IS THE LARGEST THE CAMPAIGN HAS MEASURED: +12.178 pp here against +5.699 pp augmented on the same network (`cdn1`) and +3.617 pp unaugmented on CIFAR-10 (`cau1`).**  `RULE 20` AT FULL **30/30**, PER FAMILY **AND** PER CELL, PLUS THE SEPARATE ENV AUDIT, THE **30/30 `SGD_*` RUNTIME WITNESS**, AND A `build_optimizer.py` **sha256 AND mtime** RE-CHECK AGAINST `runs/cuc1/PROVENANCE.txt` — ALL PASS, BEFORE ANY NUMBER.  `RULE 21` MARGIN **+2,704 s**.  An independent parser reproduces every number digit for digit.  **CORPUS 2,884 → 2,926 (+12 `cvh1`, +30 `cuc1`; added 42, changed 0, removed 0).  MASTER-TABLE row 19's two remaining counts ARE CLOSED.  ZERO GPU SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **220**; NEXT FREE **221**.
+
+### 220.1 Completion, RULE 21, RULE 20 at full coverage, and the two registered obligations
+
+* **Completion.** 30/30 `.out` files, each `RUN_DONE`, no traceback, **100 contiguous `Epoch` lines**, one `.out` per (arm, seed), no run outside the registered 30, 0 `cuc1-` jobs in `squeue`. `sacct` `COMPLETED` on all 30.
+* **RULE 21.** `analysis/cUC1_unaug_c100_score.py` has **one** commit, `acaf8f3`, `%ct` **1789502084** (2026-09-15 21:54:44 +0200); earliest `sacct` Submit **2026-09-15T22:39:48 CEST** = 1789504788. **Margin +2,704 s**, confirming `216.5`. The copy that ran is sha256-identical to HEAD's.
+* **RULE 20, ARGS, at FULL 30/30, the launcher's own per-family and per-cell commands, `argsline_guard.py` UNEDITED (`81cea8b5…`, from `~/stage_cuc1`), all with `--strict`:**
+  * `--name cuc1-lr --batch-consistency --strict --vary seed --vary run-name --vary save-directory --vary alpha0` → **15 clean, 0 mismatches, `VERDICT: PASS`, exit 0**; every SGD rung carries exactly **10 flags**, none repeated, and **no** `--alg-base` / `--alg-meta` / `--meta-stepsize` / `--stepsize-groups`.
+  * each of the five cells alone (`m1e4a1e3`, `m3e4a1e3`, `m1e3a1e3`, `m3e4a1e4`, `m3e4a1e2`) → **3 clean, PASS, exit 0** each; every meta run carries exactly **20 flags**, none repeated.
+  * `--name cuc1-m --batch-consistency --strict --vary seed --vary run-name --vary save-directory --vary alpha0 --vary meta-stepsize` → **15 clean, PASS, exit 0**, "every non-axis flag is identical across 15 runs".
+  * with `--expect` added on the non-axis design flags (`NN-name ResNet18_c100`, `dataset CIFAR100`, `num-epochs 100`, `batch-size 100`; `optimizer SGD` on the ladder, `optimizer HF` / `alg-base SGDm` / `alg-meta Lion` / `stepsize-groups chunk771` on the grid): **PASS on both families, 0 violations**.
+  * **the grid read off the runs' own ARGS lines**, 3 seeds each: `m1e4a1e3` ms 1e-4 α₀ 1e-3; `m3e4a1e3` ms 3e-4 α₀ 1e-3 (CENTER); `m1e3a1e3` ms 1e-3 α₀ 1e-3; `m3e4a1e4` ms 3e-4 α₀ 1e-4; `m3e4a1e2` ms 3e-4 α₀ 1e-2. **The ladder read off ARGS**: α₀ 0.05 / 0.1 / 0.2 / 0.4 / 0.8, 3 seeds each.
+* **The SEPARATE ENV audit — the launcher's registered `--envaudit`, run from `~/stage_cuc1`: `30/30 runs read, 0 violations`, `ENV AUDIT VERDICT: PASS`, exit 0.** One distinct ENV line per family: the ladder `AUGMENT=0 BETA_CLIP=none … COS_TOTAL=50000 COS_WARMUP=1000 … PROBE=0`, every meta cell `AUGMENT=0 BETA_CLIP=-15:-2.3026 … COS_TOTAL=default COS_WARMUP=default … PROBE=5`. **`AUGMENT=0` appears in the ENV line and in the `NODE=` header of every single one of the 30 runs** — the independent parser checks both, separately.
+* **The registered `SGD_*` runtime witness — `--witness`: `coverage 30/30, SGD_count=0 and positive control on 30`, `WITNESS VERDICT: PASS`, exit 0.** The read-only poller of `216.4` (`~/cuc1_envwitness/`) captured every job's `/proc/<pid>/environ` while it ran; no job carried `SGD_WD` or `SGD_MOM`, and the positive control fired on all 30, so the **defaults in the source were what ran**. **Coverage is honest and complete: 30 of 30, not a sample.**
+* **`build_optimizer.py`, sha256 AND mtime, re-checked at ingest time (`206.3`, and the `206`/`209` witness chain).** Live file `…/MetaOptimize/cifar10/Optimizers/build_optimizer.py`: sha256 **`25a899b3745e9d66fbf630795a1202c6075e2067daffa077e4a54c28e54c7ec2`**, mtime **`2026-08-20 14:01:19.092968862 +0200`**. `runs/cuc1/PROVENANCE.txt` records `BUILD_OPTIMIZER_SHA256 25a899b3…c7ec2` and `BUILD_OPTIMIZER_MTIME 2026-08-20 14:01:19.092968862 +0200`. **Both match, to the nanosecond.** The `SGD_optimizer` path reads `SGD_WD` default **5e-4** and `SGD_MOM` default **0.9** and `nesterov=False`, so with `SGD_count=0` the baseline is the registered plain-SGD recipe. `PROVENANCE.txt` also pins `SHELL_LEAK none`, `AUGMENT 0`, `GRAN chunk771`, `EPOCHS 100`, `SEEDS 66 67 68`, and the ladder/grid tables as launched.
+* **Integrity.** The 30 `.out` files and the whole `runs/cuc1/` tree (77 files) are in `../runs_alice2`, **sha256-identical** to alice2's. `../runs` holds **0** `cuc1` files.
+
+### 220.2 The registered scorer, unedited
+
+`python3 analysis/cUC1_unaug_c100_score.py /home/s5014158/metaopt/runs`, from `~/stage_cuc1`, same venv. **Exit 0.** G0 completeness 30/30, **G1 ENV PASS (0 violations)**, **G2 ARGS PASS (0 violations)**. The FINAL line, verbatim:
+
+```
+FINAL: DEFICIT-HOLDS | LADDER:INTERIOR | METHOD:FLAT-TOP-MS-HIGH | S*=lr04 | M*=m1e3a1e3 | SIGMA-PRIOR-DOMINATES | TUNING-GAIN-RESOLVED | CURVE-DEFICIT-LOWER-BOUND | PEAK-DEFICIT | ENDPOINT-PEAK-AGREE | TRAIN-AT-CEILING | BARS-FROZEN | ONE-BASELINE-FAMILY | ONE-GRANULARITY-CHUNK771 | PAPER-CONFIG-NOT-TESTED | COUNTERWEIGHT-NOT-TESTED | CIFAR100-RESNET18-ONLY
+```
+
+### 220.3 The numbers (all IN batch; plateau5 = mean TEST over epochs 95–99 of each run's own `.out`)
+
+| arm | ms | α₀ / lr | TEST plateau5 (sd) | PEAK5 @ep | TEST AUC | TRAIN p5 | TRAIN AUC | ep(TRAIN ≥ 99) |
+|---|---|---|---|---|---|---|---|---|
+| `lr005` | — | 0.05 | 62.658 (0.296) | 62.931 @57.3 | 56.670 | 99.981 | 92.964 | 31,40,32 |
+| `lr01` | — | 0.1 | 63.097 (0.419) | 63.333 @72.0 | 54.149 | 99.979 | 88.673 | 57,61,55 |
+| `lr02` | — | 0.2 | 64.774 (0.384) | 65.139 @75.7 | 52.488 | 99.979 | 79.765 | 70,72,70 |
+| **`lr04` = S\*** | — | **0.4** | **65.057** (0.241) | 65.327 @84.0 | 47.350 | 99.980 | 67.503 | 80,80,80 |
+| `lr08` | — | 0.8 | 59.848 (0.214) | 59.948 @91.0 | 36.532 | 99.975 | 52.813 | 90,90,89 |
+| `m1e4a1e3` = REF | 1e-4 | 1e-3 | 48.457 (0.137) | 52.751 @53.7 | 43.779 | 99.965 | 77.649 | 48,51,51 |
+| `m3e4a1e3` = CENTER | 3e-4 | 1e-3 | 52.749 (0.105) | 56.219 @46.3 | 48.306 | 99.973 | 84.588 | 30,30,31 |
+| **`m1e3a1e3` = M\*** | **1e-3** | 1e-3 | **52.879** (1.050) | 53.703 @36.3 | 49.699 | 99.976 | 90.426 | 19,18,19 |
+| `m3e4a1e4` | 3e-4 | 1e-4 | 47.057 (1.063) | 48.838 @56.3 | 38.115 | 99.961 | 73.553 | 41,40,40 |
+| `m3e4a1e2` | 3e-4 | 1e-2 | **14.195** (0.764) `DOES NOT TRAIN` | 19.349 @4.7 | 15.205 | 15.852 | 16.118 | —,—,— |
+
+* **σ.** The frozen plateau5 prior **0.572475** dominates the in-batch **0.5555** (df 18, non-training arms excluded) → **SE 0.4674 pp**, 2 SE bar **0.9348 pp**. `SIGMA-PRIOR-DOMINATES`, `BARS-FROZEN`. (AUC prior 0.484410 → SE_AUC 0.3955; PEAK prior 0.439700 → SE_PEAK 0.3590; both dominate their in-batch values.)
+* **TRAINS-AT-ALL.** 9 of 10 arms train; `m3e4a1e2` (α₀-HIGH) does not (mean 14.195, min seed 13.374, TRAIN 15.85) and is excluded from M\* by the registered rule.
+* **THE LADDER IS INTERIOR.** 62.658 < 63.097 < 64.774 < **65.057** > 59.848: the argmax is the **fourth of five rungs**, and the fall to the top rung is **5.209 pp = 11.14 SE**. **The baseline's `lr` optimum is bracketed on both sides**, so the token does **not** take `| LOWER-BOUND` — the deficit is a measurement, not a floor.
+* **PRIMARY.** `GAP_END` = plateau5(S\*) − plateau5(M\*) = 65.0573 − 52.8793 = **+12.1780 pp = +26.05 SE**. Against every trained cell: REF +16.6000 (+35.51 SE), CENTER +12.3087 (+26.33 SE), M\* +12.1780 (+26.05 SE), α₀-LOW +18.0000 (+38.51 SE). **Every rung of the ladder beats every meta cell**; the smallest such margin is `lr08` − M\* = +6.969 pp.
+* **Selection bias, disclosed by the scorer.** S\* and M\* are both max-of-5, worst-case bias ≈ **0.384 pp each**, **in opposite directions on `GAP_END`**, so they cancel in expectation; even taking both adversely the gap is +11.41 pp = 24.4 SE.
+* **The other readings agree in sign.** `PEAK` peak5(`lr04`) − peak5(`m3e4a1e3`) = **+9.1087 pp = +25.37 SE_PEAK** → `PEAK-DEFICIT`, `ENDPOINT-PEAK-AGREE`. `CURVE` auc(`lr005`) − auc(M\*) = **+6.9710 pp = +17.62 SE_CURVE**, but at S\* the AUC comparison goes the other way (**−2.3489**), which is why the token is `CURVE-DEFICIT-LOWER-BOUND` and not a clean win: **on the parent's own evidence type the best-endpoint rung loses on AUC**, exactly as `cau1` found on CIFAR-10. `DECAY` (peak5 − plateau5) S\* +0.270, M\* +0.824.
+* **TUNING.** plateau5(M\*) − plateau5(REF) = **+4.4220 pp = +9.46 SE** → `TUNING-GAIN-RESOLVED`: **the corpus-best augmented cell spec is genuinely mistuned here**, and the gap above is already measured against the *better*, retuned cell.
+* **TRAIN.** Every training arm is at the TRAIN ceiling (plateau5 ≥ 99.96) → `TRAIN-AT-CEILING`, so TRAIN is read as AUC and epoch-to-99 %, **never as an endpoint**; TRAIN-AUC gap S\* − M\* = **−22.9231 pp** (the method reaches interpolation far sooner: epoch 18–19 against 80).
+* **β trajectories** (each cell's own `probe.jsonl`, 10,000 records per run, `n_b` arity 62 = `chunk771`, non-gating): **exactly one cell never reaches the −15 clamp** — REF `m1e4a1e3`, ending β_min −11.8589 to −11.8649 against its travel bound −11.908; every other cell spends time at −15, and only `m1e3a1e3` and `m3e4a1e2` also touch the upper clamp. **The method's best cell is the one whose step sizes are hard against the floor**, which is why `METHOD:FLAT-TOP-MS-HIGH` rather than a bracketed optimum.
+
+### 220.4 `214`'s adverse sensitivity model did NOT fire — said plainly, because it was registered to be said either way
+
+`214` disclosed, as a sensitivity model and not an account, that `cau1`'s PARENT config lost error at ratio 3.03 rather than 2.10, and that applied to CIFAR-100 this predicts the meta cells at **4–15 pp — i.e. at the floor**, a landing that is `GATED-METHOD-AT-FLOOR` by construction and can never be read as a deficit. The brief asked that, if that is what happened, it be said plainly and not dressed up.
+
+**It is not what happened.** Four of the five cells train, at **47.06 / 48.46 / 52.75 / 52.88 pp**, all far above `TRAINS_MIN` 25.0 and above the model's 4–15 pp window; only `m3e4a1e2` (α₀ 1e-2, the α₀-HIGH corner) floors, at 14.195. So the grid is not at the floor, `GATED-METHOD-AT-FLOOR` did not fire, **and the ~20 GPU-h bought an answer.** The one cell that *did* floor is the one the model would have hit least — the high-α₀ corner — so the model was wrong in level, not merely in margin. That is recorded here as a registered prediction that **missed in the method's favour on four cells and in nobody's favour on the fifth**, alongside `209.1`'s note that `cau1`'s own `m6t` prediction also missed in the method's favour.
+
+### 220.5 MASTER-TABLE row 19's two remaining counts
+
+Row 19's question — does the denominator hold in the parent's own unaugmented setting — had two open counts after `cau1`: **CIFAR-100** (`cau1` was CIFAR-10 only) and **meta-side tuning beyond two α₀ cells**. `cuc1` closes both: CIFAR-100 at `AUGMENT=0` with a 5-rung interior ladder against a **5-cell ms × α₀ grid**, all in one batch. What row 19 still does **not** have, and `cuc1` stamps unconditionally: `ONE-BASELINE-FAMILY`, `ONE-GRANULARITY-CHUNK771`, `PAPER-CONFIG-NOT-TESTED`, `COUNTERWEIGHT-NOT-TESTED`.
+
+### 220.6 The attack — an independent parser
+
+`python3 analysis/cvh1_cuc1_attack_indep.py cuc1 ../runs_alice2` (the same new file as 219.6; no regex, nothing imported, `214`'s bars and branch map re-typed by hand): **every per-arm plateau5 / peak5 / peak epoch / TEST AUC / TRAIN plateau5 / TRAIN-at-peak / TRAIN AUC / epoch-to-99 %, every sd and seed range, σ in-batch 0.5555, SE 0.4674, the TRAINS-AT-ALL verdict on all ten arms, the ladder shape and its INTERIOR argmax, the grid, M\* and its +0.1307 pp = +0.28 SE rise over the CENTER, `METHOD:FLAT-TOP-MS-HIGH`, `GAP_END` +12.1780 = +26.05 SE and all four per-cell gaps, TUNING +4.4220, CURVE +6.9710, PEAK +9.1087, the TRAIN-AUC gap −22.9231, and the per-run β clamp counts — digit for digit, and the branch map re-implemented from the prose returns `DEFICIT-HOLDS`. 0 violations.** It re-checks every header line itself (no repeated flag; **10** flags on every SGD rung and **20** on every meta cell; the family's full ENV key set; `AUGMENT=0` in the ENV line **and** the `NODE=` header on all 30) and each meta run's `n_b` arity (62).
+
+**Why `DEFICIT-HOLDS` and not `DEFICIT-HOLDS-METHOD-EDGE`, graded against the registered map.** M\* **is** an edge cell of the plus (ms-HIGH), which is what the `-METHOD-EDGE` branch is for — but `214` conditions that branch on the edge cell beating the CENTER by **≥ 2 SE**, and it beats it by **+0.1307 pp = +0.28 SE**. So the method's top is *flat*, not resolvably open, and the registered first-match rule gives plain `DEFICIT-HOLDS` with the `METHOD:FLAT-TOP-MS-HIGH` stamp. The independent parser reaches the same branch through the same two tests. **What that costs the reading is stated at 220.7: under-tuning in the ms-HIGH direction is bounded by the flat top, not excluded.**
+
+### 220.7 What this licenses, and what it does not
+
+**Licensed.** One sentence: *on `ResNet18_c100` / CIFAR-100 with `AUGMENT=0`, a tuned plain SGD+momentum+cosine `lr` ladder — argmax interior at `lr = 0.4` — beats the best of a 5-cell MetaOptimize ms × α₀ grid by +12.178 pp = +26.05 SE at the endpoint, and by +9.109 pp = +25.37 SE at the early-stopping peak, all within one batch.* Read with `cdn1` (+5.699 pp, `AUGMENT=1`, same network) and `cau1` (+3.617 pp, `AUGMENT=0`, CIFAR-10), **removing augmentation does not rescue the method on CIFAR-100; it widens the deficit** — but that three-way comparison is **between batches** and is printed for orientation only (the scorer prints it under "CROSS-SETTING (printed, never a token)").
+
+**NOT licensed.**
+* **Granularity.** `chunk771` only. A different `stepsize-groups` could move M\*, and the campaign's own granularity line says granularity matters.
+* **The paper configuration.** α₀ 1e-6 — the parent's own — is **not on this grid** (`PAPER-CONFIG-NOT-TESTED`). `214`'s sensitivity model says that cell might floor; that is a prediction, not a measurement, and `cuc1` did not test it.
+* **"The method needs augmentation."** No weight-decay or regularisation counterweight was swept on the method side (`COUNTERWEIGHT-NOT-TESTED`), so the mechanism behind the widening is untouched.
+* **Meta-side tuning as exhausted.** M\* sits at an **edge** of the plus; its rise over the CENTER is inside noise, so ms-HIGH under-tuning is **bounded by a flat top, not excluded**. A wider grid could raise M\* — by at most what that flat top allows on this evidence, which is not zero.
+* **Another baseline family** (`ONE-BASELINE-FAMILY`): AdamW, or SGD without cosine, is not here.
+* **Any horizon but 100 epochs**, and no convergence claim. Every training arm is at the TRAIN ceiling, so the endpoint compares the generalisation of interpolating solutions — the regime the parent chose, and the reason TRAIN carries no verdict here.
+* **The AUC reading as a clean win.** `CURVE-DEFICIT-LOWER-BOUND`: at the endpoint-best rung the AUC comparison **reverses** (−2.3489 pp). Anyone quoting the parent's evidence type must quote that too.
+* **`CIFAR100-RESNET18-ONLY`**, and `RULE 11`.
+* **Cost.** 30 jobs, **22.9500 GPU-h** re-summed over the batch's own 30 `wallclock_min` values (`sacct` Elapsed 23.2664), against the registered ~20 h estimate.
+
+### 220.8 The ingest — BOTH batches, ONCE, in the documented order, with both halves
+
+The pre-ingest corpus was `cmp`-identical to HEAD's (**`e0de4c85…f6a7`, 2,884 rows**) and was snapshotted before anything ran. The **42** `.out` files and **both** artefact trees were rsynced to `../runs_alice2` and verified: **all 181 files (42 `.out` + `runs/cvh1` 62 + `runs/cuc1` 77) are sha256-identical to alice2's, 0 differences.** `../runs`, the `alice` mirror, holds 0 `cvh1`/`cuc1` files. `146.7`'s trap was avoided constructively — `aggregate.py` was redirected INTO the corpus:
+
+```
+python3 analysis/aggregate.py ../runs ../runs_alice2 > results/all_runs.csv   # "# 2926 runs aggregated", exit 0
+  # WARNING: 3 duplicated run-name(s) [a0-blk6-1e4_s0, a0-layer-1e4_s0, a0-scal-1e4_s0 -- standing]
+python3 analysis/args_repair.py --apply                                        # "APPLIED: 36 rows updated"
+```
+
+Corpus sha `e0de4c85…f6a7` → **`3223028d03b17c58d5451d9a9ce5ce64dfa35fff04cfba0b3044101ba4568e58`**.
+
+**Both halves, keyed `(run, job_id)`, field by field**, by a comparator of my own (`csv.DictReader`, 38 fields), after `args_repair`:
+
+```
+before rows 2884 keys 2884 | after rows 2926 keys 2926 | fieldnames identical: True (38)
+ADDED 42 {'cvh1': 12, 'cuc1': 30}   REMOVED 0   MULTIPLICITY CHANGES 0
+PRE-EXISTING ROWS CHANGED: 0 field-cells differ (109592 compared), rows 0
+  cvh1: 12 rows, job_id 5014634..5014645, seeds 63/64/65, VGG11_bn_c100, CIFAR100, augment 1, epochs_done 328, complete 1, window_ok 1, superseded 0, collapsed 0
+  cuc1: 30 rows, job_id 5014668..5014697, seeds 66/67/68, ResNet18_c100, CIFAR100, augment 0, epochs_done 100, complete 1, window_ok 1, superseded 0, collapsed 0
+```
+
+* **All 42 CSV `plateau5` values equal the raw-`.out` re-derivation**, worst discrepancy **1.421e-14 pp** over the 42 rows (e.g. `cvh1-ISO-s63` 67.310, `cuc1-lr04-s66` 65.310, `cuc1-m1e3a1e3-s66` 52.030). Three parsers agree: the registered scorers, the attack parser, and `aggregate.py`.
+* `args_repair`'s 36 updates are the standing `dup_group` restoration (`194.7`, `196.8`, `203.10`, `210.6`, `218.8`). Its `.bak` is git-ignored and not committed. **CORPUS 2,884 → 2,926.**
+* **O2, demonstrated.** Both scorers ran on alice2 against the **pre-ingest** corpus (their stage copies, `870c4003…`, 2,863 rows, 0 named `cvh1-`/`cuc1-`). Re-run on the Mac against the **post-ingest** corpus (2,926 rows, sha `3223028d…`): `cVH1`'s output differs in exactly **three descriptive lines** — the `runsdir` path, the manifest-resolution path, and `corpus 2863 rows (sha 870c4003…), 0 named cvh1-*` → `2926 rows (sha 3223028d…), 12 named cvh1-*`. **No bar, σ, branch or stamp moved; the FINAL line is byte-identical.** `cUC1`'s output differs in **exactly one digit**: `m3e4a1e4`'s descriptive TEST AUC prints **38.115** on alice2 and **38.114** on the Mac. The underlying value is **exactly 38.1145** — a `%.3f` rounding tie whose last bit differs between x86-64 and arm64 float accumulation. It is an AUC of an arm that is neither S\* nor M\*, it gates nothing, and it moves no token: `cUC1`'s FINAL line is byte-identical. **Disclosed rather than smoothed over.** The independent parser, run on the Mac, also prints 38.114, which is what a platform tie looks like and not a parser disagreement.
+* **Mirror.** The alice2 mirror (`/home/s5014158/metaopt/hierarchical-metaoptimize`) had `results/all_runs.csv` at `e0de4c85…`; it was brought to the same bytes (`3223028d…`, 2,926 rows) with the prior copy kept as **`results/all_runs.csv.pre_l219_ingest_2884`** (`e0de4c85…`).
+
+### 220.9 The MASTER TABLE
+
+* **The header was re-derived first**, independently of the checker: **2,926 rows, 2,911 with `wallclock_min` and 15 without, 3049.1 GPU-h.** The rise of 40.27 h equals `cvh1`'s **17.3167** plus `cuc1`'s **22.9500**, each re-summed over its own rows.
+* **The two new rows are APPENDED as the file's last two lines (214, 215)**, under the section-10 table heading, in section 9's convention, each carrying its registered scorer's FINAL tokens verbatim, joined with ` + `. They sit there because the research-notebook site keys experiment ids on line numbers: **every existing line other than the two amended in place (3 and 5) is byte-identical**, checked line by line after the write.
+* **The header, edited in place (line 3):** 2,926 / 3049.1, with 2,884 / 3008.8 kept as `[SUPERSEDED …]`; 2,911 wallclock rows, with 2,869 kept as superseded; appended rows 2 → **4** (entries 217, 218, 219, 220) and the rows total 150 → **152**.
+* **THE BOTTOM LINE WAS AMENDED IN PLACE (line 5) — the debt `218.9` flagged and left owed.** Two of its sentences had gone stale by scope, and each now carries an `[AMENDED … [SUPERSEDED: …]]` bracket in the file's own convention, with the superseded wording preserved verbatim:
+  1. *"`VGG11_bn` is non-RESIDUAL, not non-BatchNorm: nothing here says anything about a network without BatchNorm."* — still true of `cvg1` alone, **false as a statement about the campaign** since `cgn1` (`217`): on `ResNet18_gn_c100`, no batch statistics anywhere, `D` = **+37.3833 pp = +63.08 SE**, TRAIN +44.0300. The amendment carries `cgn1`'s own two bounds (the GN scalar arm never reaches the −15 clamp in 100 epochs; the GN layerwise arm is still rising 0.29–0.34 pp/epoch) and the `GroupNorm(32, ·)` per-channel-invariance caveat, so the lift is **"the gap does not need batch statistics"** and **not** "normalisation-free".
+  2. *"The three-BN-scale isolation remains 100 % ResNet."* — the **three-tensor set** is still ResNet-only, and the amendment says so; what changed is that isolation arms now exist on **two non-ResNet-topology networks**: `cpl1` (`218`, `PlainNet18_c100`, `DELTA_ID` +55.8460 pp = +98.49 SE, `D_ONE` −0.1027 pp) and `cvi1`/`cvh1` on VGG. The amendment also **retires `cvi1`'s `HORIZON-100-ONLY` bound** with `cvh1`'s ρ 1.0001 at 328 epochs and the measured pin at 104.8–107.8 (inside `cvi1`'s own extrapolated 109–113), preserving the superseded wording.
+  3. A third bracket records that **`cuc1` closes the CIFAR-100 count** that `209`'s `cau1` amendment explicitly left open ("It says nothing about CIFAR-100"), with `GAP_END` +12.1780 pp and the `AUGMENT=1` → `AUGMENT=0` widening on one network, flagged as **between-batch**.
+* **Counted twice.** `analysis/c73_mastertable_check.py`, run **UNEDITED** (`dec9ec68…`): **exit 0**, "152 data rows", "CSV: 2926 runs / 3049.1 GPU-hours", header consistent with both the table and the CSV. An independent row walker (no shared code) counts 152 rows (section 9 37; the section-10 table 41 = 37 + 4) and sections 1–8's families 33 / 26 / 8 / 3 / 2 / 2, the header's figures.
+* **Deleted:** nothing. **Other tracks' rows:** none touched.
+
+### 220.10 Discipline (219 and 220), and what was disclosed
+
+* **RULE 16.**
+  * Both registered scorers ran **UNEDITED** at their registered shas, from the stage trees their launchers ran from (`~/stage_cvh1`, `~/stage_cuc1`), with the documented **one-argument** invocation. So did `argsline_guard.py` (`81cea8b5…`), both launchers' `--envaudit` / `--witness` modes (`23d27202…`), `aggregate.py` (`35c035e1…`), `args_repair.py` (`e6d8918d…`) and `c73_mastertable_check.py` (`dec9ec68…`). **Every file used from either stage tree was re-verified sha256-identical to HEAD before it ran.**
+  * `git diff` over `analysis/` is **additions only**: `analysis/cvh1_cuc1_attack_indep.py`, new.
+* **Deviations, disclosed.**
+  1. My first `--expect` invocation of `argsline_guard.py` on `cvh1` used flag names that do not exist in this harness (`--model`, `--hierarchical`) and exited **1** on twelve DESIGN MISMATCHes. That was **my** error in an invocation I invented, not a defect in the batch: the launcher's own documented axes had already passed at exit 0 immediately before it, and the corrected `--expect` run (real flag names, all 15 non-axis design flags) passes at exit 0. Both are in `~/l219_logs/`.
+  2. The attack parser's standard-error convention was wrong on its first pass (σ/√3/√2 instead of σ·√(2/3)) and was caught by its own re-derivation check against the frozen `READ_BAR`, which it reported as a VIOLATION. Fixed; no measured quantity changed, and the check that caught it is still in the file.
+  3. Two labels in the attack parser's β section were corrected after the first pass for accuracy, not for value: its clamp column is a **sum over records** of `n_at_lo`/`n_at_hi`, a different statistic from the scorer's per-record tally, and it is now labelled as such; and a sentence that said "the two cells that never reach the clamp" said "two" where the data say **one**.
+  4. One local `rsync` exceeded the harness's 120 s foreground limit and completed in the background (exit 0); its result was verified by the 181-file sha256 comparison, not by the rsync's own report.
+  5. The `cuc1` witness poller of `216.4` had already exited (its `while squeue` guard); `--witness` read the files it had left in `~/cuc1_envwitness/`. Coverage is 30/30, so nothing was lost, but the poller was **not** restarted and its log was **not** re-read.
+* **Evidence handling.** plateau5 is PRIMARY, from the raw `.out`; the CSV `plateau` column and `best_test` are read nowhere (the CSV `plateau5` column is read only as a third-parser cross-check at 220.8); TRAIN is beside TEST at every arm and every horizon; every contrast is within batch; the batch is the unit of replication.
+* **Hosts and scope.**
+  * Every remote command ran on **alice2** (`s5014158`). **`alice` was NOT contacted** — not read, not queried, not written.
+  * **No job was submitted, cancelled or requeued. `squeue -u s5014158` was empty throughout.**
+  * `paper/` is untouched. `analysis/c98_reproduce.py` exits **`1`**, as-is: **10 CHECK(S) FAILED**, the same ten as at `218.10` and no new one. Four are the corpus-count family (rows **2,926** against the paper's 2,177; admissible 2,484 vs 1,735; wallclock rows 2,911 vs 2,162; GPU-h 3,049 vs 1,642), two are the standing CIFAR-10 pair (93.328 vs 93.317; deficit 1.796 vs 1.807), and four are partition-family counts. **CORRECTION TO THE CLAIM `218.10` MADE ABOUT ITS OWN BATCHES: `cuc1` DOES enter four checked numerals.** Run against the pre-ingest corpus and again against the post-ingest one, the failing SET is identical, but `admissible runs in the partition families` moves **440 → 455**, `...with meta = Lion` **428 → 443**, and `count-matched-family rows outside rp1` (and its admissible twin) **244 → 259** — **+15 each, exactly `cuc1`'s 15 `HF`/Lion meta runs**. `cvh1`'s 12 enter none of them. All four already disagreed with the paper before this ingest and still do, in the same direction; no check flipped from pass to fail. **No nested `claude -p`.**
+* **Git.** `git add` named explicit paths only: `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md`, `results/all_runs.csv`, `analysis/cvh1_cuc1_attack_indep.py`. **Committed AND PUSHED to `origin/master`**, as the operator directed for this landing.
+* **Left on alice2, all deletable:** `~/l219_rule20.sh`, `~/l219_rule20b.sh`, `~/l219_logs/` (`rule20.log`, `rule20b.log`, `score_cvh1.log`, `score_cuc1.log`), and the mirror's `results/all_runs.csv.pre_l219_ingest_2884`.
+* **Cost of these entries:** zero GPU-hours. The batches' own spend by `sacct` Elapsed is `cvh1` **17.4414** and `cuc1` **23.2664** GPU-h (40.71 h together).
+
+Next free number: **221**.
