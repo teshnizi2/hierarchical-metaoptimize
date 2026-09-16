@@ -1,0 +1,203 @@
+[0] manifest: 53 tensors, 11046308 params; idx50 layer4.1.bn2.weight; idx47 layer4.1.bn1.weight; 3634 bytes sha d78c0322be41109c
+    PROVENANCE MODE submit HF 3f2b98e1 BUILD e65e6773 RUNNER d389e8a5 TRAIN 3fea309e SCORER 8bbd07b18ec61fa0
+    scorer file sha256 8bbd07b18ec61fa01fa9c0e29b45f2235586be2c2e1874057f5c692fd5365e35 == PROVENANCE SCORER_SHA256: True
+    corpus: csv sha a8bd1136a1431d7c rows 3019, exclusion tsv sha aeb82070350bfd6d keys 33 -> 2986 rows (cvt5- dropped)
+
+[1] completeness and harness gates, re-derived (witnesses built from K and the manifest's names)
+  OK   k01   s93 job 5021645  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   HEAD  s93 job 5021646  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K13   s93 job 5021647  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K33   s93 job 5021649  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   k01   s94 job 5021650  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   HEAD  s94 job 5021651  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K13   s94 job 5021652  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K33   s94 job 5021653  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   k01   s95 job 5021654  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   HEAD  s95 job 5021655  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K13   s95 job 5021656  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  OK   K33   s95 job 5021657  epochs 300 (0..299, dup 0)  RUN_DONE True  tb 0  ARGS 20 flags, wrong - rep -  ENV True  PT True  VOTE_W True
+  G-STRUCT manifest sha d78c0322… == 238.3's d78c0322…, EPOCHS/CTRL_EPOCHS/META_STEPS, ARMSPEC/VOTEW/WITNESS rebuilt: True
+  G-PROV MODE / build_network / HF / RUNNER / TRAIN prefixes from 238.10, SCORER == file: True
+  scorer log: 50 PASS lines, 0 FAIL lines
+
+[2] levels: plateau5 TEST @100 (epochs 95..99) and @300 (295..299), TRAIN beside
+  k01   TEST @100 11.6280 (sd 0.5538, range 1.1040)  @300 11.6700 (sd 0.4577, range 0.9140)   TRAIN @100 11.6593  @300 11.6680
+        seeds @100: s93 11.0500 (train 11.3280), s94 12.1540 (train 12.0680), s95 11.6800 (train 11.5820)
+        seeds @300: s93 11.1980 (train 11.3500), s94 12.1120 (train 12.0780), s95 11.7000 (train 11.5760)
+        TEST OLS slope pp/ep, epochs 80-99: -0.0009/0.0026/0.0018;  epochs 280-299: 0.0051/0.0018/0.0009
+  HEAD  TEST @100 64.2087 (sd 0.2648, range 0.4880)  @300 64.3147 (sd 0.1712, range 0.3420)   TRAIN @100 78.5700  @300 78.8673
+        seeds @100: s93 64.0240 (train 77.7320), s94 64.0900 (train 78.8020), s95 64.5120 (train 79.1760)
+        seeds @300: s93 64.1480 (train 78.0040), s94 64.3060 (train 79.1140), s95 64.4900 (train 79.4840)
+        TEST OLS slope pp/ep, epochs 80-99: 0.0027/-0.0046/0.0082;  epochs 280-299: 0.0034/0.0029/0.0032
+  K13   TEST @100 52.6613 (sd 0.7982, range 1.4040)  @300 53.0807 (sd 0.7731, range 1.3880)   TRAIN @100 62.5647  @300 64.1493
+        seeds @100: s93 51.7400 (train 62.0580), s94 53.1000 (train 62.9660), s95 53.1440 (train 62.6700)
+        seeds @300: s93 52.1900 (train 63.5660), s94 53.5780 (train 64.5220), s95 53.4740 (train 64.3600)
+        TEST OLS slope pp/ep, epochs 80-99: 0.0265/0.0344/0.0268;  epochs 280-299: 0.0048/-0.0043/-0.0045
+  K33   TEST @100 36.9447 (sd 0.9158, range 1.7660)  @300 37.1347 (sd 0.9406, range 1.7540)   TRAIN @100 38.1553  @300 38.4260
+        seeds @100: s93 36.2020 (train 37.2900), s94 37.9680 (train 39.4020), s95 36.6640 (train 37.7740)
+        seeds @300: s93 36.4540 (train 37.5000), s94 38.2080 (train 39.6840), s95 36.7420 (train 38.0940)
+        TEST OLS slope pp/ep, epochs 80-99: -0.0015/0.0065/0.0070;  epochs 280-299: 0.0070/0.0025/-0.0028
+  G-FLOOR max arm mean @100 64.2087 >= 15.0: True;  G-CEIL max over both horizons 64.3147 <= 90.0: True
+
+[3] G-BITE re-derived (math.fsum), and THE APPLIED STEP: on every interior record where a group's beta moved,
+    step sign == -sign(b2*mom_pre + (1-b2)*z_agg) [weighted]; where weighted and UNWEIGHTED directions disagree,
+    which one the step followed
+  OK   k01   s93 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.76e-07 m 7.48e-07 | informative 0 unweighted-match 0 | moved interior 181 follow-weighted 181 | DISAGREE 0: weighted 0 unweighted 0
+  OK   HEAD  s93 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.78e-07 m 8.84e-07 | informative 0 unweighted-match 0 | moved interior 554 follow-weighted 554 | DISAGREE 0: weighted 0 unweighted 0
+  OK   K13   s93 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.98e-07 m 9.49e-07 | informative 1410 unweighted-match 0 | moved interior 1578 follow-weighted 1578 | DISAGREE 705: weighted 705 unweighted 0
+  OK   K33   s93 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.77e-07 m 8.26e-07 | informative 1412 unweighted-match 0 | moved interior 309 follow-weighted 309 | DISAGREE 90: weighted 90 unweighted 0
+  OK   k01   s94 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.97e-07 m 6.56e-07 | informative 0 unweighted-match 0 | moved interior 182 follow-weighted 182 | DISAGREE 0: weighted 0 unweighted 0
+  OK   HEAD  s94 recs 1500 steps 0..149900 True meta True bad 0 | worst z 2.06e-07 m 8.26e-07 | informative 0 unweighted-match 0 | moved interior 540 follow-weighted 540 | DISAGREE 0: weighted 0 unweighted 0
+  OK   K13   s94 recs 1500 steps 0..149900 True meta True bad 0 | worst z 2.09e-07 m 7.66e-07 | informative 1409 unweighted-match 0 | moved interior 1571 follow-weighted 1571 | DISAGREE 723: weighted 723 unweighted 0
+  OK   K33   s94 recs 1500 steps 0..149900 True meta True bad 0 | worst z 2.34e-07 m 5.48e-07 | informative 1414 unweighted-match 0 | moved interior 1242 follow-weighted 1242 | DISAGREE 563: weighted 563 unweighted 0
+  OK   k01   s95 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.96e-07 m 6.95e-07 | informative 0 unweighted-match 0 | moved interior 182 follow-weighted 182 | DISAGREE 0: weighted 0 unweighted 0
+  OK   HEAD  s95 recs 1500 steps 0..149900 True meta True bad 0 | worst z 2.92e-07 m 6.18e-07 | informative 0 unweighted-match 0 | moved interior 626 follow-weighted 626 | DISAGREE 0: weighted 0 unweighted 0
+  OK   K13   s95 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.67e-07 m 6.79e-07 | informative 1409 unweighted-match 0 | moved interior 1557 follow-weighted 1557 | DISAGREE 721: weighted 721 unweighted 0
+  OK   K33   s95 recs 1500 steps 0..149900 True meta True bad 0 | worst z 1.83e-07 m 7.89e-07 | informative 1412 unweighted-match 0 | moved interior 302 follow-weighted 302 | DISAGREE 88: weighted 88 unweighted 0
+
+[4] sigma and contrasts (within batch; @100 and @300 in run)
+  SIGMA_PRIOR_frozen   0.847518
+  SIGMA_INBATCH        0.668392
+  SIGMA_USED           0.847518  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.691996  = SIGMA_USED * sqrt(2/3)  (df_inbatch 16)
+  READ_BAR             1.383991  = 2 SE (stamp-level comparisons only)
+  KEY      D_HEAD@100 = +52.5807 pp = +75.98 SE (TRAIN +66.9107)   D_HEAD@300 = +52.6447 pp = +76.08 SE (TRAIN +67.1993)
+  PREMISE  @100: HEAD - K13 +11.5473 | K13 - K33 +15.7167 | HEAD - K33 +27.2640  (cvt2: +12.0693 / +16.7560 / +28.8253)
+  PRIMARY  (a) G13@300 = K13 - K33 = +15.9460 pp = +23.04 SE (TRAIN +25.7233)   [@100 +15.7167]
+  PRIMARY  (a) DROP13 = K13@300 - K13@100 = +0.4193 pp = +0.61 SE (TRAIN +1.5847);  HEAD@300 - K13@300 +11.2340
+  PRIMARY  (b) RHO = D_HEAD@300 / D_HEAD@100 = 1.0012   (SURVIVE needs RHO >= 0.80 AND D_HEAD@300 >= 15.0; COLLAPSE <= 5.0)
+           seed 93 paired (descriptive): D_HEAD +52.9740 -> +52.9500 rho 0.9995 | K13 +51.7400 -> +52.1900 (drop +0.4500) | K13 - K33 @300 +15.7360
+           seed 94 paired (descriptive): D_HEAD +51.9360 -> +52.1940 rho 1.0050 | K13 +53.1000 -> +53.5780 (drop +0.4780) | K13 - K33 @300 +15.3700
+           seed 95 paired (descriptive): D_HEAD +52.8320 -> +52.7900 rho 0.9992 | K13 +53.1440 -> +53.4740 (drop +0.3300) | K13 - K33 @300 +16.7320
+  KEY      K33@300 - K33@100 +0.1900 | HEAD@300 - HEAD@100 +0.1060 | k01@300 - k01@100 +0.0420
+  bars: GAP_MIN 20.0 | SHAPE_GAP 15.0 | MATCH 5.0 pp (7.23 SE) | REFUTE 5.0 | SUPPORT 15.0 | SURVIVE 0.80 | NULL 2.0
+  (registration header literal READ_BAR_PRIOR 1.383992 vs computed 2*SIGMA_PRIOR*sqrt(2/3) = 1.383991084: a 6th-decimal rounding of the header text only; the scorer computes it)
+
+[5] divergence, global gates, branches (238.6, re-typed)
+  diverged @100 none  @300 none  global gate none
+  (a) K-DEPENDENT-EQUILIBRIUM   TRAIN K-DEPENDENT-EQUILIBRIUM
+  (b) RESCUE-SURVIVES   RHO 1.0012   TRAIN RESCUE-SURVIVES RHO 1.0043
+
+[6] the pin gate: r = exp(beta[0]+15); median r over the last quarter of records; PINNED <= 2, FREE >= 10;
+    first r<=2; exact clamp = every later record within 1e-3 of -15; post-100 = records at epoch >= 100
+  k01   s93 group0 median r 1.0000 -> PINNED   first r<=2 34.8  exact-clamp from 36.2  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  k01   s94 group0 median r 1.0000 -> PINNED   first r<=2 35.0  exact-clamp from 36.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  k01   s95 group0 median r 1.0000 -> PINNED   first r<=2 35.0  exact-clamp from 36.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  HEAD  s93 group0 median r 1.0000 -> PINNED   first r<=2 63.8  exact-clamp from 299.8  max r after ep 100 1.0747  off-exact records after ep 100 208  terminal -15.0000
+  HEAD  s94 group0 median r 1.0000 -> PINNED   first r<=2 62.2  exact-clamp from never  max r after ep 100 1.0429  off-exact records after ep 100 211  terminal -14.9900
+  HEAD  s95 group0 median r 1.0000 -> PINNED   first r<=2 64.0  exact-clamp from 299.8  max r after ep 100 1.0964  off-exact records after ep 100 286  terminal -15.0000
+  K13   s93 group0 median r 1.5146 -> PINNED   first r<=2 161.4  exact-clamp from never  max r after ep 100 16.1535  off-exact records after ep 100 974  terminal -14.6609
+  K13   s94 group0 median r 1.6196 -> PINNED   first r<=2 159.2  exact-clamp from never  max r after ep 100 17.7108  off-exact records after ep 100 976  terminal -14.0496
+  K13   s95 group0 median r 1.2239 -> PINNED   first r<=2 160.2  exact-clamp from never  max r after ep 100 20.4551  off-exact records after ep 100 961  terminal -14.7999
+  K33   s93 group0 median r 1.0000 -> PINNED   first r<=2 37.2  exact-clamp from 38.6  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  K33   s94 group0 median r 1.0151 -> PINNED   first r<=2 69.4  exact-clamp from never  max r after ep 100 1.2325  off-exact records after ep 100 762  terminal -14.9520
+  K33   s95 group0 median r 1.0000 -> PINNED   first r<=2 37.0  exact-clamp from 38.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  K13: latest pin 161.4 -> post-pin level epochs 167..171 = 52.9813; @300 - that = +0.0993 vs READ_BAR 1.383991
+  HEAD: latest pin 64.0 -> post-pin level epochs 69..73 = 64.1773; @300 - that = +0.1373 vs READ_BAR 1.383991
+  (c) K33-HOLDS-PINNED   K33 classes ['PINNED', 'PINNED', 'PINNED'], max r after epoch 100 ['1.0000', '1.2325', '1.0000'], off-exact records after epoch 100 [0, 762, 0]
+
+  REBUILT FINAL: K-DEPENDENT-EQUILIBRIUM | RESCUE-SURVIVES | K33-HOLDS-PINNED | HARNESS-CLEAN | PATCH-BITES | ONE-NETWORK-PLAINNET | HORIZON-300 | NO-TIME-GATE | ONE-CELL-ONLY | SIGMA-PRIOR-FROZEN | RHO:1.0012 | TRAIN-AGREES-A | TRAIN-AGREES-B | K13-LEVEL-HOLDS | HEAD-LEVEL-HOLDS | K33-LEVEL-HOLDS | K13-COMPLEMENT-PINNED | K13-PIN-EPOCH:160.3 | K13-POST-PIN-WINDOW:138.6 | K13-WINDOW-MEETS-W100 | K13-PIN-INSIDE-BOUND | K13-FROZEN-AT-PIN | HEAD-COMPLEMENT-PINNED | HEAD-PIN-EPOCH:63.3 | HEAD-POST-PIN-WINDOW:236.0 | HEAD-WINDOW-MEETS-W100 | HEAD-FROZEN-AT-PIN | K33-COMPLEMENT-PINNED | K33-MAXR-POST100:1.2325 | K33-EXACT-CLAMP-CONTINUOUS | K01-PINNED | FLOOR-HOLDS
+  == the scorer's FINAL line, byte for byte: True (32 tokens)
+
+[7] the scorer's between-batch line and descriptive readout, rebuilt
+  cvt5 {93,94,95} @100: k01 11.6280  HEAD 64.2087  K13 52.6613  K33 36.9447
+  k01   29:11.61(11.66)  49:11.64(11.62)  99:11.59(11.62)  149:11.64(11.64)  199:11.69(11.68)  249:11.65(11.70)  299:11.65(11.68)
+  HEAD  29:45.62(45.95)  49:63.82(76.46)  99:64.23(78.59)  149:64.27(78.67)  199:64.16(78.73)  249:64.31(78.82)  299:64.35(78.81)
+  K13   29:41.89(43.12)  49:49.78(56.06)  99:52.67(62.60)  149:52.92(63.68)  199:52.94(63.73)  249:53.04(64.17)  299:53.00(64.21)
+  K33   29:35.93(36.59)  49:36.75(38.05)  99:37.00(38.24)  149:36.99(38.14)  199:37.04(38.27)  249:37.13(38.38)  299:37.16(38.50)
+  k01   50:-15.000  100:-15.000  150:-15.000  200:-15.000  250:-15.000  299:-15.000
+  HEAD  50:-9.915  100:-15.000  150:-14.997  200:-15.000  250:-15.000  299:-15.000  g1 pinned-from 23.2/22.2/22.0
+  K13   50:-9.971  100:-12.168  150:-13.817  200:-14.953  250:-14.631  299:-14.538  g1 pinned-from 23.2/22.2/22.0
+  K33   50:-14.009  100:-14.982  150:-14.999  200:-14.999  250:-15.000  299:-15.000  g1 pinned-from 23.2/22.2/22.0
+  K13 s93 0-50:0.412  50-100:0.592  100-150:0.492  150-200:0.504  200-250:0.516  250-300:0.468
+  K13 s94 0-50:0.444  50-100:0.532  100-150:0.532  150-200:0.532  200-250:0.488  250-300:0.508
+  K13 s95 0-50:0.412  50-100:0.556  100-150:0.520  150-200:0.564  200-250:0.536  250-300:0.512
+
+[8] every bar margin (pp; SE at SE_USED 0.691996)
+  margin k01@100 under K01_MAX 20                                         +8.3720 pp =  +12.10 SE
+  margin D_HEAD@100 over GAP_MIN 20                                      +32.5807 pp =  +47.08 SE
+  margin PREMISE HEAD-K33@100 over SHAPE_GAP 15                          +12.2640 pp =  +17.72 SE
+  margin PREMISE HEAD-K13@100 over MATCH 5                                +6.5473 pp =   +9.46 SE
+  margin PREMISE K13-K33@100 over MATCH 5                                +10.7167 pp =  +15.49 SE
+  margin G13@300 over MATCH 5 (GRADED-WAS-A-DELAY edge)                  +10.9460 pp =  +15.82 SE
+  margin K13@300 - HEAD@300 under MATCH 5 (K13-ABOVE-HEAD edge)          +16.2340 pp =  +23.46 SE
+  margin DROP13 under +5 (K13-RECOVERS edge)                              +4.5807 pp =   +6.62 SE
+  margin DROP13 over -5 (GRADED-PARTLY-A-DELAY edge)                      +5.4193 pp =   +7.83 SE
+  margin D_HEAD@300 over REFUTE 5                                        +47.6447 pp =  +68.85 SE
+  margin D_HEAD@300 over SUPPORT 15                                      +37.6447 pp =  +54.40 SE
+  margin K33@300-K33@100 under +5 (K33-REOPENS by level)                  +4.8100 pp =   +6.95 SE
+  margin K33@300-K33@100 over -5                                          +5.1900 pp =   +7.50 SE
+  margin worst seed range @100 under DIVERGED 5                           +3.2340 pp =   +4.67 SE
+  margin worst seed range @300 under DIVERGED 5                           +3.2460 pp =   +4.69 SE
+  margin DROP13 inside READ_BAR (K13-LEVEL-HOLDS)                         +0.9647 pp =   +1.39 SE
+  margin HEAD@300-HEAD@100 inside READ_BAR                                +1.2780 pp =   +1.85 SE
+  margin K33@300-K33@100 inside READ_BAR                                  +1.1940 pp =   +1.73 SE
+  margin k01@300-k01@100 inside READ_BAR (FLOOR-HOLDS)                    +1.3420 pp =   +1.94 SE
+  margin K13 @300 - post-pin level inside READ_BAR (FROZEN-AT-PIN)        +1.2847 pp =   +1.86 SE
+  margin HEAD @300 - post-pin level inside READ_BAR (FROZEN-AT-PIN)       +1.2467 pp =   +1.80 SE
+  RHO 1.0012 over SURVIVE 0.80 by 0.2012; ATTEN_MILD 0.50 by 0.5012
+  K13 latest pin 161.4 under PIN_BOUND 223.5 by 62.1; post-pin window 138.6 over W_POST 64.2 by 74.4
+  K33 max r after 100 = 1.2325 under PIN 2 by 0.7675; median r per seed 1.0000 / 1.0151 / 1.0000 (PIN 2)
+  K13 median r per seed 1.5146 / 1.6196 / 1.2239 under PIN 2 by 0.4854 / 0.3804 / 0.7761
+
+[9] DESCRIPTIVE ONLY -- cannot move any gate, branch or stamp
+  [9a] arm-mean TEST / TRAIN at single epochs 99 / 149 / 199 / 249 / 299 and as 5-epoch windows ending there
+   k01   epoch  99:11.59/11.62  149:11.64/11.64  199:11.69/11.68  249:11.65/11.70  299:11.65/11.68
+   k01   window 95-99:11.6280/11.6593  145-149:11.6747/11.6267  195-199:11.6447/11.6680  245-249:11.6313/11.6707  295-299:11.6700/11.6680
+   HEAD  epoch  99:64.23/78.59  149:64.27/78.67  199:64.16/78.73  249:64.31/78.82  299:64.35/78.81
+   HEAD  window 95-99:64.2087/78.5700  145-149:64.2407/78.5740  195-199:64.2220/78.6993  245-249:64.2220/78.8587  295-299:64.3147/78.8673
+   K13   epoch  99:52.67/62.60  149:52.92/63.68  199:52.94/63.73  249:53.04/64.17  299:53.00/64.21
+   K13   window 95-99:52.6613/62.5647  145-149:52.9687/63.6167  195-199:53.0447/63.7967  245-249:53.0513/63.9947  295-299:53.0807/64.1493
+   K33   epoch  99:37.00/38.24  149:36.99/38.14  199:37.04/38.27  249:37.13/38.38  299:37.16/38.50
+   K33   window 95-99:36.9447/38.1553  145-149:36.9567/38.1947  195-199:37.0247/38.2807  245-249:37.0953/38.3213  295-299:37.1347/38.4260
+  [9b] per-seed TEST window (TRAIN) at 95-99 / 145-149 / 195-199 / 245-249 / 295-299
+   k01   s93 11.050(11.328)  11.138(11.352)  11.162(11.366)  11.202(11.368)  11.198(11.350)
+   k01   s94 12.154(12.068)  12.178(12.004)  12.134(12.058)  12.066(12.058)  12.112(12.078)
+   k01   s95 11.680(11.582)  11.708(11.524)  11.638(11.580)  11.626(11.586)  11.700(11.576)
+   HEAD  s93 64.024(77.732)  64.018(77.742)  63.978(77.784)  64.034(77.952)  64.148(78.004)
+   HEAD  s94 64.090(78.802)  64.226(78.910)  64.228(78.966)  64.234(79.138)  64.306(79.114)
+   HEAD  s95 64.512(79.176)  64.478(79.070)  64.460(79.348)  64.398(79.486)  64.490(79.484)
+   K13   s93 51.740(62.058)  52.112(63.064)  52.110(63.236)  52.110(63.420)  52.190(63.566)
+   K13   s94 53.100(62.966)  53.384(64.024)  53.650(64.218)  53.538(64.478)  53.578(64.522)
+   K13   s95 53.144(62.670)  53.410(63.762)  53.374(63.936)  53.506(64.086)  53.474(64.360)
+   K33   s93 36.202(37.290)  36.312(37.400)  36.362(37.398)  36.338(37.420)  36.454(37.500)
+   K33   s94 37.968(39.402)  37.942(39.440)  38.068(39.546)  38.204(39.648)  38.208(39.684)
+   K33   s95 36.664(37.774)  36.616(37.744)  36.644(37.898)  36.744(37.896)  36.742(38.094)
+  [9c] did the TEST level keep rising after epoch 100?  per-seed OLS slope pp/epoch over 100-149 / 150-199 / 200-249 / 250-299; arm-mean settle epoch = first epoch after which the arm-mean TEST stays within 0.5 pp of @300
+   k01   -0.0006/+0.0016/+0.0009/+0.0002  +0.0010/+0.0008/+0.0004/-0.0001  +0.0007/+0.0001/-0.0008/+0.0002 | TEST settle 21, TRAIN settle 21 | TEST 100-window->300-window +0.0420, 150->300 -0.0047, 200->300 +0.0253
+   HEAD  +0.0006/-0.0014/+0.0002/+0.0007  +0.0012/+0.0012/-0.0015/-0.0009  +0.0016/+0.0018/-0.0009/-0.0007 | TEST settle 51, TRAIN settle 88 | TEST 100-window->300-window +0.1060, 150->300 +0.0740, 200->300 +0.0927
+   K13   +0.0102/+0.0022/-0.0000/+0.0022  +0.0057/+0.0018/+0.0003/+0.0020  +0.0085/+0.0012/+0.0005/-0.0007 | TEST settle 105, TRAIN settle 160 | TEST 100-window->300-window +0.4193, 150->300 +0.1120, 200->300 +0.0360
+   K33   +0.0007/+0.0023/+0.0007/-0.0005  +0.0015/+0.0030/+0.0021/+0.0014  +0.0013/-0.0005/+0.0010/-0.0002 | TEST settle 42, TRAIN settle 85 | TEST 100-window->300-window +0.1900, 150->300 +0.1780, 200->300 +0.1100
+  [9d] complement (group 0) beta and r = exp(beta+15) at epochs 100 / 150 / 200 / 250 and the last record (299.8), per seed
+   k01   s93 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   k01   s94 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   k01   s95 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   HEAD  s93 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   HEAD  s94 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-14.990(r 1.01)
+   HEAD  s95 100:-15.000(r 1.00)  150:-14.991(r 1.01)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   K13   s93 100:-12.270(r 15.33)  150:-13.666(r 3.79)  200:-14.859(r 1.15)  250:-14.630(r 1.45)  299.8:-14.661(r 1.40)
+   K13   s94 100:-12.126(r 17.71)  150:-14.049(r 2.59)  200:-14.999(r 1.00)  250:-14.570(r 1.54)  299.8:-14.050(r 2.59)
+   K13   s95 100:-12.108(r 18.03)  150:-13.734(r 3.54)  200:-15.000(r 1.00)  250:-14.692(r 1.36)  299.8:-14.800(r 1.22)
+   K33   s93 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+   K33   s94 100:-14.947(r 1.05)  150:-14.997(r 1.00)  200:-14.998(r 1.00)  250:-15.000(r 1.00)  299.8:-14.952(r 1.05)
+   K33   s95 100:-15.000(r 1.00)  150:-15.000(r 1.00)  200:-15.000(r 1.00)  250:-15.000(r 1.00)  299.8:-15.000(r 1.00)
+  [9e] pin epochs by the magnitude gate (first r<=2), and the complement AFTER that epoch: records above r 2, max r, fraction of records at the exact clamp; r by 50-epoch window (mean r / fraction r > 2)
+   k01   s93 first r<=2 34.8 | after: 1326 records, 0 above r 2, max r 1.988 at ep 34.8, at exact clamp 0.995 | 0-50:1226.15/0.70  50-100:1.00/0.00  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   k01   s94 first r<=2 35.0 | after: 1325 records, 0 above r 2, max r 1.922 at ep 35.0, at exact clamp 0.995 | 0-50:1263.53/0.70  50-100:1.00/0.00  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   k01   s95 first r<=2 35.0 | after: 1325 records, 0 above r 2, max r 1.850 at ep 35.0, at exact clamp 0.995 | 0-50:1244.81/0.70  50-100:1.00/0.00  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   HEAD  s93 first r<=2 63.8 | after: 1181 records, 0 above r 2, max r 1.984 at ep 63.8, at exact clamp 0.787 | 0-50:3426.52/1.00  50-100:12.03/0.28  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   HEAD  s94 first r<=2 62.2 | after: 1189 records, 0 above r 2, max r 1.861 at ep 62.2, at exact clamp 0.791 | 0-50:3428.90/1.00  50-100:10.73/0.24  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   HEAD  s95 first r<=2 64.0 | after: 1180 records, 0 above r 2, max r 1.876 at ep 64.0, at exact clamp 0.709 | 0-50:3415.98/1.00  50-100:10.79/0.28  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   K13   s93 first r<=2 161.4 | after: 693 records, 74 above r 2, max r 2.744 at ep 282.6, at exact clamp 0.038 | 0-50:2484.52/1.00  50-100:64.12/1.00  100-150:7.59/1.00  150-200:1.64/0.23  200-250:1.22/0.00  250-300:1.78/0.30
+   K13   s94 first r<=2 159.2 | after: 704 records, 104 above r 2, max r 2.644 at ep 293.4, at exact clamp 0.034 | 0-50:2486.49/1.00  50-100:62.50/1.00  100-150:8.11/1.00  150-200:1.46/0.18  200-250:1.18/0.00  250-300:1.90/0.42
+   K13   s95 first r<=2 160.2 | after: 699 records, 5 above r 2, max r 2.191 at ep 181.6, at exact clamp 0.056 | 0-50:2489.04/1.00  50-100:57.23/1.00  100-150:9.26/1.00  150-200:1.66/0.22  200-250:1.21/0.00  250-300:1.25/0.00
+   K33   s93 first r<=2 37.2 | after: 1314 records, 0 above r 2, max r 1.930 at ep 37.2, at exact clamp 0.995 | 0-50:2200.28/0.74  50-100:1.00/0.00  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+   K33   s94 first r<=2 69.4 | after: 1153 records, 0 above r 2, max r 1.980 at ep 69.4, at exact clamp 0.249 | 0-50:2079.33/1.00  50-100:3.91/0.39  100-150:1.03/0.00  150-200:1.04/0.00  200-250:1.03/0.00  250-300:1.03/0.00
+   K33   s95 first r<=2 37.0 | after: 1315 records, 0 above r 2, max r 1.980 at ep 37.0, at exact clamp 0.995 | 0-50:2124.41/0.74  50-100:1.00/0.00  100-150:1.00/0.00  150-200:1.00/0.00  200-250:1.00/0.00  250-300:1.00/0.00
+  [9f] isolated beta[1] (idx 50) on the blockwise arms: exact-clamp from, max r after epoch 100
+   HEAD  s93 from 23.2 max r 1.0000 | s94 from 22.2 max r 1.0000 | s95 from 22.0 max r 1.0000
+   K13   s93 from 23.2 max r 1.0000 | s94 from 22.2 max r 1.0000 | s95 from 22.0 max r 1.0000
+   K33   s93 from 23.2 max r 1.0000 | s94 from 22.2 max r 1.0000 | s95 from 22.0 max r 1.0000
+
+AGREEMENT with the scorer's printed lines: 115 matched, 0 missing
+VIOLATIONS 0

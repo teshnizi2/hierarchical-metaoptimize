@@ -1,0 +1,204 @@
+==============================================================================
+ cvt5 -- PLAINNET AT 300 EPOCHS: IS GRADED A DELAY, AND DOES HEAD SURVIVE ITS OWN PIN?
+ PlainNet18_c100 / CIFAR100   300 epochs (in-run control at 100)   seeds 93,94,95   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   k01   scalar                                 VOTE_W=(unset)
+   HEAD  sets:1-49,51-53/layer4.1.bn2.weight    VOTE_W=(unset)
+   K13   sets:1-49,51-53/layer4.1.bn2.weight    VOTE_W=layer4.1.bn1.weight:13
+   K33   sets:1-49,51-53/layer4.1.bn2.weight    VOTE_W=layer4.1.bn1.weight:33
+ PRIMARY (a): K13@300 vs K33@300 and vs K13@100.   PRIMARY (b): RHO = D_HEAD@300 / D_HEAD@100.   (c) K33 at 300.
+          plateau5 = mean TEST over epochs 95..99 and 295..299 of each run's own .out.
+ BARS ARE FROZEN LITERALS (O2); the corpus cannot move them.  The pin gate runs AFTER the primaries.
+==============================================================================
+corpus: 2986 rows after corpus_exclusions.filter_rows, cvt5- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  12 runs, epochs 0..299, RUN_DONE, no traceback
+  OK   cvt5-k01-s93  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-HEAD-s93  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K13-s93  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K33-s93  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-k01-s94  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-HEAD-s94  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K13-s94  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K33-s94  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-k01-s95  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-HEAD-s95  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K13-s95  300 epoch lines, RUN_DONE=True, traceback=False
+  OK   cvt5-K33-s95  300 epoch lines, RUN_DONE=True, traceback=False
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s93
+  PASS G-ARGS HEAD-s93
+  PASS G-ARGS K13-s93
+  PASS G-ARGS K33-s93
+  PASS G-ARGS k01-s94
+  PASS G-ARGS HEAD-s94
+  PASS G-ARGS K13-s94
+  PASS G-ARGS K33-s94
+  PASS G-ARGS k01-s95
+  PASS G-ARGS HEAD-s95
+  PASS G-ARGS K13-s95
+  PASS G-ARGS K33-s95
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is cvt1's (== cvt2's), byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=53`   12 runs
+
+G-VOTEW   every run printed exactly ONE VOTE_W line, == its arm's registered witness
+  PASS G-VOTEW k01-s93
+  PASS G-VOTEW HEAD-s93
+  PASS G-VOTEW K13-s93
+  PASS G-VOTEW K33-s93
+  PASS G-VOTEW k01-s94
+  PASS G-VOTEW HEAD-s94
+  PASS G-VOTEW K13-s94
+  PASS G-VOTEW K33-s94
+  PASS G-VOTEW k01-s95
+  PASS G-VOTEW HEAD-s95
+  PASS G-VOTEW K13-s95
+  PASS G-VOTEW K33-s95
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cvt5/PARTITION-MANIFEST.txt (<runsdir>/cvt5/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text() (53 tensors, EPOCHS 300, CTRL_EPOCHS 100, the VOTE_W table)   3634 vs 3634 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cvt5/PROVENANCE.txt (<runsdir>/cvt5/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV build_network.py sha256 == POST_SHA e65e67738e45...   e65e67738e454180
+  PASS G-PROV HF.py sha256 == HF_POST_SHA 3f2b98e1a279... (cvt1's PATCH_VOTEWEIGHT tree)   3f2b98e1a279cecc
+  PASS G-PROV RUNNER_SHA256 == run_cifar_cvt1.sh d389e8a5f3d8...   d389e8a5f3d85ce7
+  PASS G-PROV TRAIN_SHA256 == the train.py guard 4h proved (3fea309e1726...)   3fea309e172609c1
+  PASS G-PROV SCORER_SHA256 == this scorer's sha256 8bbd07b18ec6...   8bbd07b18ec61fa0
+
+LEVELS    plateau5 (TEST) and TRAIN at 100 and 300, IN BATCH, IN RUN; tail slopes are descriptive
+  k01   TEST @100 11.6280 (sd 0.5538, range 1.1040)  @300 11.6700 (sd 0.4577, range 0.9140)   TRAIN @100 11.6593  @300 11.6680
+        seeds @100: s93 11.0500 (train 11.3280), s94 12.1540 (train 12.0680), s95 11.6800 (train 11.5820)
+        seeds @300: s93 11.1980 (train 11.3500), s94 12.1120 (train 12.0780), s95 11.7000 (train 11.5760)
+        TEST OLS slope pp/ep, epochs 80-99: -0.0009/0.0026/0.0018;  epochs 280-299: 0.0051/0.0018/0.0009
+  HEAD  TEST @100 64.2087 (sd 0.2648, range 0.4880)  @300 64.3147 (sd 0.1712, range 0.3420)   TRAIN @100 78.5700  @300 78.8673
+        seeds @100: s93 64.0240 (train 77.7320), s94 64.0900 (train 78.8020), s95 64.5120 (train 79.1760)
+        seeds @300: s93 64.1480 (train 78.0040), s94 64.3060 (train 79.1140), s95 64.4900 (train 79.4840)
+        TEST OLS slope pp/ep, epochs 80-99: 0.0027/-0.0046/0.0082;  epochs 280-299: 0.0034/0.0029/0.0032
+  K13   TEST @100 52.6613 (sd 0.7982, range 1.4040)  @300 53.0807 (sd 0.7731, range 1.3880)   TRAIN @100 62.5647  @300 64.1493
+        seeds @100: s93 51.7400 (train 62.0580), s94 53.1000 (train 62.9660), s95 53.1440 (train 62.6700)
+        seeds @300: s93 52.1900 (train 63.5660), s94 53.5780 (train 64.5220), s95 53.4740 (train 64.3600)
+        TEST OLS slope pp/ep, epochs 80-99: 0.0265/0.0344/0.0268;  epochs 280-299: 0.0048/-0.0043/-0.0045
+  K33   TEST @100 36.9447 (sd 0.9158, range 1.7660)  @300 37.1347 (sd 0.9406, range 1.7540)   TRAIN @100 38.1553  @300 38.4260
+        seeds @100: s93 36.2020 (train 37.2900), s94 37.9680 (train 39.4020), s95 36.6640 (train 37.7740)
+        seeds @300: s93 36.4540 (train 37.5000), s94 38.2080 (train 39.6840), s95 36.7420 (train 38.0940)
+        TEST OLS slope pp/ep, epochs 80-99: -0.0015/0.0065/0.0070;  epochs 280-299: 0.0070/0.0025/-0.0028
+
+G-FLOOR / G-CEIL (max arm mean at 100)
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 64.2087
+  PASS G-CEIL max arm mean (either horizon) <= 90.00 pp
+
+G-BITE    the registered weight reached the complement's sum -- read from the runs' OWN probe records
+  per record, per group: z_agg == sum_i w_i z_tensor_i and mom_pre == sum_i w_i m_tensor_i (rel 1e-04);
+  K13 / K33: >= 50 records where weighted and unweighted sums differ by > 1e-02, the unweighted matching none.
+  Controls (k01, HEAD): weights 1 everywhere.  1500 records per run.
+  PASS G-BITE k01   s93  records 1500  bad 0  worst z 1.8e-07 m 7.5e-07  informative 0  unweighted-match 0
+  PASS G-BITE HEAD  s93  records 1500  bad 0  worst z 1.8e-07 m 8.8e-07  informative 0  unweighted-match 0
+  PASS G-BITE K13   s93  records 1500  bad 0  worst z 2.0e-07 m 9.5e-07  informative 1410  unweighted-match 0
+  PASS G-BITE K33   s93  records 1500  bad 0  worst z 1.8e-07 m 8.3e-07  informative 1412  unweighted-match 0
+  PASS G-BITE k01   s94  records 1500  bad 0  worst z 2.0e-07 m 6.6e-07  informative 0  unweighted-match 0
+  PASS G-BITE HEAD  s94  records 1500  bad 0  worst z 2.1e-07 m 8.3e-07  informative 0  unweighted-match 0
+  PASS G-BITE K13   s94  records 1500  bad 0  worst z 2.1e-07 m 7.7e-07  informative 1409  unweighted-match 0
+  PASS G-BITE K33   s94  records 1500  bad 0  worst z 2.3e-07 m 5.5e-07  informative 1414  unweighted-match 0
+  PASS G-BITE k01   s95  records 1500  bad 0  worst z 2.0e-07 m 6.9e-07  informative 0  unweighted-match 0
+  PASS G-BITE HEAD  s95  records 1500  bad 0  worst z 2.9e-07 m 6.2e-07  informative 0  unweighted-match 0
+  PASS G-BITE K13   s95  records 1500  bad 0  worst z 1.7e-07 m 6.8e-07  informative 1409  unweighted-match 0
+  PASS G-BITE K33   s95  records 1500  bad 0  worst z 1.8e-07 m 7.9e-07  informative 1412  unweighted-match 0
+
+SIGMA     O2: max(frozen floor, in-batch over arm x horizon) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.847518
+  SIGMA_INBATCH        0.668392
+  SIGMA_USED           0.847518  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.691996  = SIGMA_USED * sqrt(2/3)  (df_inbatch 16)
+  READ_BAR             1.383991  = 2 SE (stamp-level comparisons only)
+
+CONTRASTS (every one WITHIN batch; @100 and @300 IN RUN; TRAIN beside TEST)
+  KEY      D_HEAD@100 = +52.5807 pp = +75.98 SE (TRAIN +66.9107)   D_HEAD@300 = +52.6447 pp = +76.08 SE (TRAIN +67.1993)
+  PREMISE  @100: HEAD - K13 +11.5473 | K13 - K33 +15.7167 | HEAD - K33 +27.2640  (cvt2: +12.0693 / +16.7560 / +28.8253)
+  PRIMARY  (a) G13@300 = K13 - K33 = +15.9460 pp = +23.04 SE (TRAIN +25.7233)   [@100 +15.7167]
+  PRIMARY  (a) DROP13 = K13@300 - K13@100 = +0.4193 pp = +0.61 SE (TRAIN +1.5847);  HEAD@300 - K13@300 +11.2340
+  PRIMARY  (b) RHO = D_HEAD@300 / D_HEAD@100 = 1.0012   (SURVIVE needs RHO >= 0.80 AND D_HEAD@300 >= 15.0; COLLAPSE <= 5.0)
+           seed 93 paired (descriptive): D_HEAD +52.9740 -> +52.9500 rho 0.9995 | K13 +51.7400 -> +52.1900 (drop +0.4500) | K13 - K33 @300 +15.7360
+           seed 94 paired (descriptive): D_HEAD +51.9360 -> +52.1940 rho 1.0050 | K13 +53.1000 -> +53.5780 (drop +0.4780) | K13 - K33 @300 +15.3700
+           seed 95 paired (descriptive): D_HEAD +52.8320 -> +52.7900 rho 0.9992 | K13 +53.1440 -> +53.4740 (drop +0.3300) | K13 - K33 @300 +16.7320
+  KEY      K33@300 - K33@100 +0.1900 | HEAD@300 - HEAD@100 +0.1060 | k01@300 - k01@100 +0.0420
+  bars: GAP_MIN 20.0 | SHAPE_GAP 15.0 | MATCH 5.0 pp (7.23 SE) | REFUTE 5.0 | SUPPORT 15.0 | SURVIVE 0.80 | NULL 2.0
+
+G-DIVERGE (branch conditions, not harness gates)
+  PASS every arm's seed range @100 <= 5.0 pp
+  PASS every arm's seed range @300 <= 5.0 pp
+
+BRANCHES (decided by the level primaries alone, BEFORE any pin statistic is read)
+  (a) K-DEPENDENT-EQUILIBRIUM   (TRAIN, same map: K-DEPENDENT-EQUILIBRIUM)
+  (b) RESCUE-SURVIVES   RHO 1.0012   (TRAIN, same map: RESCUE-SURVIVES, RHO 1.0043)
+
+PIN GATE  step-size MAGNITUDE over the last quarter of records, r = exp(beta + 15) (cvh1's form; stamps only)
+  k01   s93 group0 median r 1.0000 -> PINNED   first r<=2 34.8  exact-clamp from 36.2  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  k01   s94 group0 median r 1.0000 -> PINNED   first r<=2 35.0  exact-clamp from 36.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  k01   s95 group0 median r 1.0000 -> PINNED   first r<=2 35.0  exact-clamp from 36.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  HEAD  s93 group0 median r 1.0000 -> PINNED   first r<=2 63.8  exact-clamp from 299.8  max r after ep 100 1.0747  off-exact records after ep 100 208  terminal -15.0000
+  HEAD  s94 group0 median r 1.0000 -> PINNED   first r<=2 62.2  exact-clamp from never  max r after ep 100 1.0429  off-exact records after ep 100 211  terminal -14.9900
+  HEAD  s95 group0 median r 1.0000 -> PINNED   first r<=2 64.0  exact-clamp from 299.8  max r after ep 100 1.0964  off-exact records after ep 100 286  terminal -15.0000
+  K13   s93 group0 median r 1.5146 -> PINNED   first r<=2 161.4  exact-clamp from never  max r after ep 100 16.1535  off-exact records after ep 100 974  terminal -14.6609
+  K13   s94 group0 median r 1.6196 -> PINNED   first r<=2 159.2  exact-clamp from never  max r after ep 100 17.7108  off-exact records after ep 100 976  terminal -14.0496
+  K13   s95 group0 median r 1.2239 -> PINNED   first r<=2 160.2  exact-clamp from never  max r after ep 100 20.4551  off-exact records after ep 100 961  terminal -14.7999
+  K33   s93 group0 median r 1.0000 -> PINNED   first r<=2 37.2  exact-clamp from 38.6  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  K33   s94 group0 median r 1.0151 -> PINNED   first r<=2 69.4  exact-clamp from never  max r after ep 100 1.2325  off-exact records after ep 100 762  terminal -14.9520
+  K33   s95 group0 median r 1.0000 -> PINNED   first r<=2 37.0  exact-clamp from 38.4  max r after ep 100 1.0000  off-exact records after ep 100 0  terminal -15.0000
+  (c) K33-HOLDS-PINNED   K33 classes ['PINNED', 'PINNED', 'PINNED'], max r after epoch 100 ['1.0000', '1.2325', '1.0000'], off-exact records after epoch 100 [0, 762, 0]
+
+==============================================================================
+FINAL: K-DEPENDENT-EQUILIBRIUM | RESCUE-SURVIVES | K33-HOLDS-PINNED | HARNESS-CLEAN | PATCH-BITES | ONE-NETWORK-PLAINNET | HORIZON-300 | NO-TIME-GATE | ONE-CELL-ONLY | SIGMA-PRIOR-FROZEN | RHO:1.0012 | TRAIN-AGREES-A | TRAIN-AGREES-B | K13-LEVEL-HOLDS | HEAD-LEVEL-HOLDS | K33-LEVEL-HOLDS | K13-COMPLEMENT-PINNED | K13-PIN-EPOCH:160.3 | K13-POST-PIN-WINDOW:138.6 | K13-WINDOW-MEETS-W100 | K13-PIN-INSIDE-BOUND | K13-FROZEN-AT-PIN | HEAD-COMPLEMENT-PINNED | HEAD-PIN-EPOCH:63.3 | HEAD-POST-PIN-WINDOW:236.0 | HEAD-WINDOW-MEETS-W100 | HEAD-FROZEN-AT-PIN | K33-COMPLEMENT-PINNED | K33-MAXR-POST100:1.2325 | K33-EXACT-CLAMP-CONTINUOUS | K01-PINNED | FLOOR-HOLDS
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt5 bar or contrast):
+  cvt2 {87,88,89} @100: k01 11.4767  HEAD 64.4187  K13 52.3493  K33 35.5933
+  cvt5 {93,94,95} @100: k01 11.6280  HEAD 64.2087  K13 52.6613  K33 36.9447
+
+DESCRIPTIVE, NON-GATING -- arm-mean TEST (TRAIN) from the raw .out
+  k01   29:11.61(11.66)  49:11.64(11.62)  99:11.59(11.62)  149:11.64(11.64)  199:11.69(11.68)  249:11.65(11.70)  299:11.65(11.68)
+  HEAD  29:45.62(45.95)  49:63.82(76.46)  99:64.23(78.59)  149:64.27(78.67)  199:64.16(78.73)  249:64.31(78.82)  299:64.35(78.81)
+  K13   29:41.89(43.12)  49:49.78(56.06)  99:52.67(62.60)  149:52.92(63.68)  199:52.94(63.73)  249:53.04(64.17)  299:53.00(64.21)
+  K33   29:35.93(36.59)  49:36.75(38.05)  99:37.00(38.24)  149:36.99(38.14)  199:37.04(38.27)  249:37.13(38.38)  299:37.16(38.50)
+
+DESCRIPTIVE, NON-GATING -- arm-mean group-0 beta at epochs 50/100/150/200/250/299, and group-1 (idx 50) pinned-from
+  k01   50:-15.000  100:-15.000  150:-15.000  200:-15.000  250:-15.000  299:-15.000
+  HEAD  50:-9.915  100:-15.000  150:-14.997  200:-15.000  250:-15.000  299:-15.000  g1 pinned-from 23.2/22.2/22.0
+  K13   50:-9.971  100:-12.168  150:-13.817  200:-14.953  250:-14.631  299:-14.538  g1 pinned-from 23.2/22.2/22.0
+  K33   50:-14.009  100:-14.982  150:-14.999  200:-14.999  250:-15.000  299:-15.000  g1 pinned-from 23.2/22.2/22.0
+
+DESCRIPTIVE, NON-GATING -- K13's complement Lion direction DOWN fraction (b2*mom_pre + (1-b2)*z_agg > 0) by 50-epoch window
+  K13 s93 0-50:0.412  50-100:0.592  100-150:0.492  150-200:0.504  200-250:0.516  250-300:0.468
+  K13 s94 0-50:0.444  50-100:0.532  100-150:0.532  150-200:0.532  200-250:0.488  250-300:0.508
+  K13 s95 0-50:0.412  50-100:0.556  100-150:0.520  150-200:0.564  200-250:0.536  250-300:0.512
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  (a) K-DEPENDENT EQUILIBRIUM (of the LEVEL).  At 300 epochs K13 is still more than 5 pp above K33's plateau
+  and has not fallen by more than 5 pp from its in-run 100-epoch level: GRADED is NOT a delay at this
+  horizon; the partial level is K-dependent.  WHAT 'EQUILIBRIUM' MEANS DEPENDS ON THE PIN STAMP:
+  K13-COMPLEMENT-PINNED (+ K13-FROZEN-AT-PIN) = the level held through the complement's own collapse, so the
+  level is not a step-size equilibrium -- it was set before the pin (as 231.4(1) found on GN);
+  UNRESOLVED-NOT-PINNED = the complement's step size also never collapsed in 300 epochs, the stronger
+  'vote equilibrium' reading (still descriptive: no record-level equilibrium test is registered).
+  NOT licensed: persistence past 300 epochs; a decay slower than 5 pp per 200 epochs; any other K.
+  (b) HEAD's PlainNet rescue PERSISTS to 300 epochs (RHO >= 0.80, D_HEAD@300 >= 15 pp), with the 100-epoch
+  control read from the same runs.  With HEAD-COMPLEMENT-PINNED + HEAD-FROZEN-AT-PIN it is cvh1's / cgn3's
+  sentence on PlainNet: the rescue's level survives its own complement's freeze (by magnitude at ~64 epochs,
+  the exact clamp at ~96-100), a regime, not a delayed collapse -- the fourth network.
+  NOT licensed: persistence past 300; a decay slower than READ_BAR over the post-pin window; the ceiling (no kL).
+  (c) THE STRICTER READING RESOLVES AS PINNED.  Over epochs 100-300 K33's complement stays inside the magnitude pin
+  (r <= 2 on every record of every seed; PINNED by the gate) and its level moves by less than 5 pp: the
+  exact-clamp departures 236 saw are excursions within r <= 2 (as HEAD's own complement shows after its pin),
+  not a re-opening.  NOT licensed: that exact-clamp dwell means anything for the level.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about ResNet18_c100 (BN or GN) or VGG11_bn_c100: one network, one cell.
+  * Any K other than 13 and 33 at long horizon; K152 / K691 / K2000 were not re-run.
+  * Anything past 300 epochs; dose vs onset (no time gate); any between-batch contrast.
+  * Point agreement for any floor-band reading (FLOOR-READINGS-ARE-BOUNDS).
