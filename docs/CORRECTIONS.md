@@ -30577,6 +30577,51 @@ A patch that never bit, bit on a control arm, bit with the wrong weight, or left
 * **RULE 21.** The scorer is committed and pushed in this commit, before any `cvt1` run exists (0 `.out`, 0 `sacct`, 0 CSV rows, 0 in `squeue` at guard 2). The margin is proved by wall clock at 227.10.
 * **Hosts.** `alice` NOT contacted. No job this track did not submit was touched; `cgn3`'s 12 jobs were only listed by `squeue`. No nested `claude -p`.
 
+### 227.10 LAUNCH — `cvt1` SUBMITTED ON alice2: ONE submission, the registered launcher UNEDITED with its own `--submit`, 15 accepted / 0 rejected; RULE 21 margin **+57 s**; RULE 20 PASS at available coverage 11/15 (ARGS and ENV, including every `VOTE_W` witness line); nothing cancelled. No number from the batch was read.
+
+* **Stage == registered commit.** After `921ad38` was pushed (`origin/master` == `921ad38da9a5…`), the 15 files the launcher reads or registers were compared with `git show HEAD:<path> | shasum -a 256` (`~/head_cvt1.sha`) on `~/stage_cvt1`. All 15 are sha256-equal, including all 8 new files, `argsline_guard.py`, `_lib_guards.sh` and the CSV. The 16th, the stage's `bin/PROTECTED.txt`, predated `cgn3`'s line and was replaced by HEAD's bytes before submission; no registered file is involved.
+* **Submission.** `CVT1_REGISTERED_COMMIT=921ad38da9a5240bdefad504c77aa96aeb73b1af bash bin/cVT1_voteweight.sh --submit`, started 10:59:00Z, exit 0. Log `~/l227_logs/submit_cvt1.log` (`8f37a02c…`).
+  * Every guard passed again at submit time: selftest 134/0/0, both inertness logs at their shas, the stage verify, the byte-identical manifest, guard 4c'.
+  * `guard 6`: 15 lines, 0 RULE 20 / VOTE_W pre-check failures. **15 ACCEPTED, 0 rejected.**
+  * **guard 7 PASS** against `cvt1-DOSE-s78`'s own ARGS line.
+* **Job ids** (arm order k01, HEAD, MUTE, DOSE, INJECT per seed): s78 5019104–5019108; s79 5019109–5019113; s80 5019114–5019118.
+* **`PROVENANCE.txt`** (written only by `--submit`): `MODE submit`, `BUILD_NETWORK_SHA256 e65e6773…`, `HF_SHA256 3f2b98e1…`, `SCORER_SHA256 21789734…`, `REGISTERED_COMMIT 921ad38…`. These are exactly what `G-PROV` checks. The live `HF.py` (`4732b74a…`) and `build_network.py` (`c7998883…`) are recorded beside them.
+* **RULE 21, by wall clock.** Scorer `analysis/cVT1_voteweight_score.py`, one commit (`921ad38`), `%ct` **1789556321**. The earliest `sacct` Submit is 2026-09-16T12:59:38 CEST = **1789556378**. **Margin +57 s** (positive). alice2 reports "System clock synchronized: yes", and alice2's and the Mac's `date +%s` agreed to the second (1789556399). The margin is small because push, stage verification and submission ran back to back (as 223.4).
+* **RULE 20 at available coverage** (`~/l227_rule20.sh`, `72598a5d…`, a copy of 223's `l221_rule20.sh` with the batch table swapped; the separate ENV audit `~/l227_envaudit.py`, `40beb176…`, a copy of `l221_envaudit.py` that also requires each run's `VOTE_W` line to equal its arm's registered witness). It reads only `ARGS:`, `NODE=`, `ENV:`, `PROBE_TENSOR:` and `VOTE_W` lines. `analysis/argsline_guard.py` was run **UNEDITED** (`81cea8b5…`).
+
+| pass (UTC) | started (ARGS present) | ARGS batch-consistency (`--strict`, vary stepsize-groups/seed/run-name) | per-run `--expect` (20 flags) | ENV audit | `VOTE_W` witness lines | verdict |
+|---|---|---|---|---|---|---|
+| 1, 11:00:29 (`rule20_pass1.log`, `39595eb6…`) | 8/15 | PASS, 8 clean | 8 checked, 0 violations | 1 distinct ENV line ×8; PROBE_TENSOR scalar ×5, blockwise ×3, tensors=53; every PROBE_DIR the run's own | off ×4, MUTE ×2, DOSE ×1, INJECT ×1, each byte-equal | **PASS at 8/15** |
+| 2, 11:12:36 (`rule20_pass2.log`, `0a50137f…`) | 11/15 | PASS, 11 clean | 11 checked, 0 violations | 1 distinct ×11; scalar ×7, blockwise ×4 | off ×5, MUTE ×2, DOSE ×2, INJECT ×2 | **PASS at 11/15** (UNVERIFIED for the 4 not yet started, NOT failed) |
+
+* The ENV line, verbatim with `PROBE_DIR` stripped, is `cpl2`'s: `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`.
+* **No started run differs from the registration, so nothing was cancelled.** Full 15/15 RULE 20 is **owed** before any number is read: `bash ~/l227_rule20.sh`.
+
+### 227.11 Queue, ETA, cost, owed, and the live harness after launch
+
+* **Queue at 11:12Z.** 12 `cvt1` RUNNING on `gpu-short` (L4 / MIG / A100 nodes 869, 870, 876, 881, 887), 3 PENDING. The 12-GPU `gpu-short` per-user cap is full; `cgn3`'s 12 jobs hold `gpu-mig-40g` and `gpu-l4-24g`.
+* **ETA (UNSURE).** At `cpl2`'s 29–45 min per run, the first 12 finish ≈ 11:45–12:00Z and the last 3 ≈ 12:30–13:00Z (14:30–15:00 CEST).
+* **GPU-h.** ≈9.7 expected; hard bound 45; plus the registration's ≈0.06 (227.7).
+* **Owed, in order:**
+  1. RULE 20 at FULL 15/15.
+  2. `python3 analysis/cVT1_voteweight_score.py $WS/runs` from `~/stage_cvt1`, **unedited**. `G-BITE` reads `runs/cvt1/probe_cvt1-*`, which must not be moved before scoring.
+  3. An independent parser, including an independent re-read of the weighted decomposition.
+  4. Ingest (146.7: added == 15, changed == 0), marking MUTE/DOSE/INJECT rows (227.7 caveat).
+  5. MASTER-TABLE rows appended only when the batch lands.
+* **The live shared harness is unchanged.** `~/l227_logs/live_hashes_after.txt` is byte-identical (`cmp`) to `live_hashes_before.txt` (both `b30962af…`, 37 files: the live cifar10 tree, `run_cifar.sh`, `run_cifar_cpl1.sh` and the whole `harness_cpl1` tree).
+* **`bin/PROTECTED.txt`** +`cvt1-` (Mac and alice2 mirror; mirror backup `PROTECTED.txt.bak_l227`; both now sha256 `834b3c13…`).
+* **Left on alice2, all deletable:**
+  * `~/stage_cvt1/`, `~/head_cvt1.sha`, `~/l227_rule20.sh`, `~/l227_envaudit.py`;
+  * `~/l227_logs/`: stage, test_voteweight_1/_2 (a killed partial re-run)/run_vw_test.sh, the two `cvt1inert` outs, derivations, dryrun_1/_2, submit, rule20_pass1/_2, live_hashes_before/_after;
+  * `runs/cvt1/PROVENANCE.dryrun.txt`, `/tmp/cvt1_*` guard temporaries.
+* **Discipline (launch).**
+  * Account `alice2` only; `alice` NOT contacted.
+  * No job this track did not submit was touched (`cgn3` only listed).
+  * Nothing cancelled; no `.out` accuracy line read.
+  * `git add` named `docs/CORRECTIONS.md` and `bin/PROTECTED.txt` only. Committed and PUSHED.
+
+Next free number (pre-assigned block): `cvt1` 227 (this), `cgn3` 228, bookkeeping 229.
+
 ## 228. TRACK A2 — **`cgn3` REGISTERED, DRY-RUN AND LAUNCHED: IS THE GROUPNORM RESCUE A RESCUE OR A DELAYED COLLAPSE?  THE `cvh1` / `ciso2` ANALOGUE ON `ResNet18_gn_c100` AT `cgn2`'s CELL: 4 ARMS (k01, kL, ISO {50,53,59}, ONE {50}) × SEEDS {81, 82, 83} = 12 JOBS, TO E = 430 EPOCHS, PROBE=100 AND PROBE_TENSOR=1, SPEC STRINGS BYTE-IDENTICAL TO `cgn2`'s.  E IS DERIVED FROM `cgn2`'s MEASURED DESCENT, AND THE DERIVATION IS DISCLOSED AS THE EARLY END OF A MODEL RANGE THAT SPANS A FACTOR > 2 WITHIN THE LINEAR FAMILY ALONE (228.2).  PRIMARY `RHO` = D_ISO@430 / D_ISO@100 WITH THE 100-EPOCH CONTROL READ IN-RUN; `cvh1`'s STEP-SIZE-MAGNITUDE PIN GATE SITS AFTER IT AS A STAMP; `UNRESOLVED-NOT-PINNED` IS REGISTERED AS INFORMATIVE.  ≈38.5 GPU-h EXPECTED, HARD BOUND 84.**  Every bar is a frozen literal (O2).  No patch; `cgn3` runs from `cgn1`'s verified isolated tree; the live harness hashes are pinned before and re-read after.  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **228** (pre-assigned); `cvt1` holds 227, bookkeeping 229.
 
 ### 228.1 Question
