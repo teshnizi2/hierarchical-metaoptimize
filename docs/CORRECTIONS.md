@@ -30551,3 +30551,53 @@ The stamps are listed in the scorer header. The unconditional ones are `MAGNITUD
 * `bin/cGN3_gn_horizon.sh` (`1d68d813ba8976b6…d55664dc109b0`)
 
 **Reused unedited:** `bin/cGN1_stage_harness.sh`, `tests/test_resnet_gn_c100.py`, `tests/test_probe_tensor.py`, `tests/test_probe_tensor_blockwise*.py`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`, `analysis/cGN2_gn_isolation_score.py` (read for SPEC, never edited).
+
+### 228.9 The launch — ONE submission, 12 jobs accepted, 0 rejected
+
+* **Authorisation and scope.** The operator's brief directed this track to register AND launch `cgn3` on `alice2` (`s5014158`). Nothing else was submitted. `alice` was not contacted. No job this track did not submit was touched; `cvt1inert` (5019078) belongs to the concurrent `cvt1` track and was left alone.
+* **Staging.** `~/stage_cgn3` holds the committed tree. Before the submission, the three registration files, `results/all_runs.csv`, `cGN2_gn_isolation_score.py`, `_lib_guards.sh`, `argsline_guard.py` and `cGN1_stage_harness.sh` were hashed on alice2 and compared against `git show a58740e:<path>` on the Mac: **all sha256-equal**.
+* **Dry run 2**, immediately before the submission (log `~/l228_logs/dryrun_2.log`): exit 0, 0 guard failures. Guard 1b accepted the operator-declared `CGN3_REGISTERED_COMMIT=a58740e3e6c7a368271de515695a86e0951efabc`. Selftest 110/0/0. **Its 12 composed lines are byte-identical (`diff`) to dry run 1's, which were read line by line (228.7).**
+* **Submission.** `CGN3_REGISTERED_COMMIT=a58740e3… bash bin/cGN3_gn_horizon.sh --submit`, from `~/stage_cgn3`, detached with `setsid nohup`, started 10:47:02Z; log `~/l228_logs/submit.log`. Output: "guard 6: 12 composed command lines, 0 failed the RULE 20 pre-check"; "12 jobs (ACCEPTED BY SLURM); 0 rejected"; "guard 10: live harness + runner hashes UNCHANGED across this launcher run". **`runs/cgn3/PROVENANCE.txt`** records `MODE submit`, `REGISTERED_COMMIT a58740e3…`, `SCORER_SHA256 5101e6da…`.
+
+| seed | k01 | kL | ISO | ONE |
+|---|---|---|---|---|
+| 81 | 5019065 | 5019066 | 5019067 | 5019068 |
+| 82 | 5019069 | 5019070 | 5019071 | 5019072 |
+| 83 | 5019073 | 5019074 | 5019075 | **5019077** |
+
+(5019076 belongs to another cluster user.) All 12 were RUNNING by 12:52:35 CEST: s81 and s82 on `gpu-mig-40g` (node865/866/868/869), s83 on `gpu-l4-24g` (node881/882).
+* **Guard 7** (the launcher's own post-launch RULE 20) PASSED on `cgn3-ISO-s81-5019067.out`'s own ARGS line (`argsline_guard: 1 clean … VERDICT: PASS`).
+
+### 228.10 RULE 21, by wall clock
+
+* The scorer, generator and launcher have exactly one commit: `a58740e`, `%ct` **1789555547**, pushed to `origin/master` before the submission.
+* The earliest `sacct` Submit is **2026-09-16T12:47:48 CEST = 1789555668**. **Margin +121 s.**
+* alice2 reports "System clock synchronized: yes"; its `date +%s` agreed with the Mac's.
+
+### 228.11 RULE 20 at available coverage — 12/12 started, ARGS AND a separate ENV audit, PASS
+
+`~/l228_rule20.sh` (sha `bfb99bdd…`) and `~/l228_envaudit.py` (`b7b0db1d…`) are copies of 223's `l221_*` with the `cgn3` batch table added (diffs read). Both are read-only, and no accuracy line was read.
+
+* **Pass 1**, 10:49:23Z, 9/12 started: ARGS PASS (9 clean, 0 violations); ENV 1 distinct line ×9, 0 violations, `UNVERIFIED (9/12)`.
+* **Pass 2**, 10:53:10Z, **12/12** started; log `~/l228_logs/rule20_pass2.log`, sha `22e73274…`:
+  * (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, from `~/stage_cgn3`), `--name cgn3- --batch-consistency --strict --vary stepsize-groups --vary seed --vary run-name`: **12 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line, VERDICT: PASS**.
+  * (b) the same tool per run, `--expect` on every design flag: `NN-name ResNet18_gn_c100`, `num-epochs 430`, the arm's registered spec from the file name, seed, `run-name` and `save-directory`, 20 flags each. **12 checked, 0 violations.**
+  * (c) the SEPARATE ENV audit: **ONE distinct ENV line ×12**, `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0` (+ each run's own `PROBE_DIR`). `PROBE_TENSOR` is blockwise ×6, layerwise ×3, scalar ×3, `tensors=62`. **Coverage 12/12, 0 violations, `ENV AUDIT VERDICT cgn3: PASS`.**
+* **Nothing was cancelled.** The post-completion full-coverage pass is still owed before the scorer runs.
+
+### 228.12 Cost, ETA, and what is owed
+
+* **Cost.** ≈**38.5 GPU-h expected**, and more than that if the slower L4 rate dominates, since the three s83 runs landed on L4. Hard bound 84 GPU-h. No GPU was spent by the registration itself.
+* **ETA (UNSURE).** 430 epochs at 40:28–48:39 per 100 epochs ≈ 2.9–3.5 h per run, so all 12 should finish ≈ **15:45–16:25 CEST**. The latest possible end (the 7 h wall) is 19:52 CEST.
+* **Owed, in this order, before any number is quoted:**
+  1. RULE 20 at full coverage after completion (12/12 `RUN_DONE`, 0 in `squeue`): ARGS and ENV, with `~/l228_rule20.sh`.
+  2. The rsync of the `.out` files and `runs/cgn3/` to `../runs_alice2`, sha256-verified.
+  3. `python3 analysis/cGN3_gn_horizon_score.py $WS/runs` from `~/stage_cgn3`, **unedited**.
+  4. An independent parser.
+  5. Ingest (146.7: added == 12, changed == 0).
+  6. MASTER-TABLE rows appended only when the batch lands.
+* **Files in this addendum:** `docs/CORRECTIONS.md` and `bin/PROTECTED.txt` (+`cgn3-`). The alice2 mirror's copy got the same line (backup `PROTECTED.txt.bak_l228`); Mac and mirror are both sha256 `f042a408…`.
+* **Left on alice2, all deletable:** `~/stage_cgn3/`, `~/l228_logs/` (selftest_1, dryrun_1, dryrun_2, submit, rule20_pass1, rule20_pass2), `~/l228_rule20.sh`, `~/l228_envaudit.py`, `runs/cgn3/PROVENANCE.dryrun.txt`, and `/tmp/cgn3_*` guard temporaries.
+* **Untouched:** the live harness (re-read by guard 10), `argsline_guard.py`, every registered file, and `paper/`. No nested `claude -p`.
+
+Next free number after the pre-assigned block: **230**.
