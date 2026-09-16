@@ -923,3 +923,12 @@ Before registering any batch, tick every line:
 * [ ] Rows from a longer horizon (e.g. `cgn3`'s 430-epoch `ResNet18_gn_c100` rows) are separated
       from 100-epoch cells by `epochs_requested` (the existing readers filter on it), not by
       exclusion — check the new reader's filter or cell key includes it.
+
+**`--check` covers `BETA_HOLD` and completeness (CORRECTIONS 239).** A listed row's witness is
+compared with the run's own line of the kind the witness names — `VOTE_W` or `BETA_HOLD`, from the
+`KINDS` table in `corpus_exclusions.py` (a new intervention kind is one line there) — and every
+unlisted run of a listed batch must print that kind's `off` line. With `--runs`, every `.out` found is
+also scanned: a run that is a row of `all_runs.csv` and prints an ON `VOTE_W` or `BETA_HOLD` line must be
+listed, with a witness of that kind (ON runs not yet ingested are counted, not required). Only logs
+under `--runs` are read, so sync the batch's `.out` files to `../runs_alice2` before running it on the
+Mac. `load` / `is_excluded` / `filter_rows` are unchanged.

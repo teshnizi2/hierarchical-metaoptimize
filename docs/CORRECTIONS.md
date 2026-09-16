@@ -32226,3 +32226,45 @@ Group 0 (the complement, or `k01`'s shared step size); r = exp(beta + 15); PINNE
 * **Discipline (launch).** Account `alice2` only; **`alice` NOT contacted.** No job this track did not submit was touched; the queue held no other job of the account at submission. No accuracy line read. `git add` names `docs/CORRECTIONS.md` and `bin/PROTECTED.txt` only. **Left on alice2, all deletable:** `~/stage_cvt5/`, `~/head_cvt5.sha`, `~/l238_rule20.sh`, `~/l238_envaudit.py`, `~/l238_logs/` (derivations, dryrun_1, submit, rule20_pass1), `runs/cvt5/PROVENANCE.dryrun.txt`, `/tmp/cvt5_*` guard temporaries.
 
 Next free number (pre-assigned block): `cvt4` 237, `cvt5` 238 (this).
+
+## 239. TRACK B (code bug, ZERO GPU) — **`corpus_exclusions.py --check` NOW VERIFIES `BETA_HOLD` WITNESSES AND CHECKS COMPLETENESS; `load` / `keys` / `is_excluded` / `filter_rows` UNCHANGED, AND EVERY SCORER THAT IMPORTS THE MODULE PRINTS BYTE-IDENTICAL OUTPUT BEFORE AND AFTER.**  Closes the gap owed by 237.7 / 237.9 / 237.13(4).  No registered scorer, launcher, TSV row, CSV row or `paper/` file edited.  **`alice` NOT CONTACTED; alice2 not contacted either.**  THIS ENTRY TOOK NUMBER **239**; NEXT FREE **240**.
+
+### 239.1 The gap
+
+`--check` compared a listed run's `VOTE_W` lines with its listed witness and required every unlisted run of a listed batch to print `VOTE_W: off`. `cvt4`'s 12 held runs print `VOTE_W: off` plus a `BETA_HOLD: on ...` line and must be listed with that `BETA_HOLD` line as witness (237.7), so the check would FAIL a correct landing. It also could not see an ON run missing from the list: it read only batches that already had a listed row, and only their `VOTE_W` lines.
+
+### 239.2 What changed (`analysis/corpus_exclusions.py`, `5d7694ad…` → `9ede7453…`; only the `--check` path and its docstring)
+
+* **A `KINDS` table** — `("VOTE_W", "VOTE_W: off")`, `("BETA_HOLD", "BETA_HOLD: off")`. A row's kind is the entry its `witness` starts with (`<prefix>:`); a witness naming no kind FAILS. A future kind is one line.
+* **Witness check, generalised.** A listed run's lines of its kind must equal `[witness]`; an unlisted run of a listed batch must print exactly the `off` line of every kind that batch's rows use. Line extraction is the old `startswith(prefix)` (the same rule `cVT4_betahold_score.py` uses, lines 511–512). The per-run messages and the summary line are unchanged for a VOTE_W-only list.
+* **Completeness, new.** With `--runs`, every `.out` found is scanned. A run that is a row of `all_runs.csv` (by `(run, job_id)` from `<run>-<job_id>.out`) and prints an ON line (any line of a kind other than its `off` line) must be listed, with a witness of that kind. ON runs **not yet in the CSV are counted, not required**: listing them would fail the existing present-exactly-once check, and a running batch or an inertness job must not block another batch's landing. One new stdout line reports the counts.
+* **Unavailable logs: unchanged.** Without `--runs` no log is read. With `--runs`, only logs under those dirs are seen (a listed `.out` that is absent still FAILs `found N of M`). The `cvt4` / `cvt5` `.out` files are on alice2 only today, so at landing they must be synced to `../runs_alice2` before running the check on the Mac.
+
+### 239.3 Tests (`tests/test_corpus_exclusions_check.py`, NEW, `40feb903…`, stdlib; synthetic TSV, CSV and `.out` in a temp copy of the repo layout, the real module run as a subprocess)
+
+C1 BETA_HOLD row passes; C2 mismatched BETA_HOLD witness fails and quotes the log's line; C3 VOTE_W row passes with the old summary line byte for byte, and a VOTE_W mismatch fails with the old message; C4 an ON corpus run missing from the TSV fails (a: BETA_HOLD batch with no listed row; b: one held run left out of a listed batch; c: VOTE_W run of an unlisted batch); C5 `off` / witness-less runs not required; C6 ON runs not in the CSV not required, and counted; C7 a listed run printing an ON line of another kind fails; C8 an unregistered kind fails; C9 no `--runs` reads no log. **Before the edit: 9 FAIL / 6 PASS, exit 1** (the 6 passes are the regression guards C3 ×3 and C9, plus C2's exit code and C7, which the old code also failed for the wrong reason). **After: 15 PASS / 0 FAIL, exit 0.**
+
+**Real-data control (Mac, `../runs ../runs_alice2`, the live CSV, the TSV with all 15 `cvt2` rows removed):** the old module exits **0** (`VERDICT: PASS`, the gap); the new one exits **1** with 15 `is a CSV row printing an ON VOTE_W line but is NOT listed` lines.
+
+### 239.4 Invariance (Mac, `/opt/homebrew/bin/python3` 3.14.5, `../runs_alice2`, as 237.8 / 238.7; `PYTHONDONTWRITEBYTECODE=1`; recorded before the edit, re-run after)
+
+| output | before | after |
+|---|---|---|
+| `load()` (33 rows) / `keys()` / `is_excluded` over 3,019 rows (33 true) | `2c42bd7b…` / `9d22e80d…` / `abeab719…` | identical |
+| `filter_rows(csv.DictReader(all_runs.csv))` (3,019 → 2,986) | `c0507e32…` | identical |
+| `inspect.getsource` of `load` / `keys` / `is_excluded` / `filter_rows` / `_pooled` | `3e71c514…` / `6ff4844d…` / `6f39c8a7…` / `d89c64d6…` / `99b52fe8…` | identical |
+| `cVT2_injectladder_score.py --selftest --runsdir ../runs_alice2` | `e9b64541…`, exit 1 | identical, exit 1 |
+| `cVT3_downcoalition_score.py --selftest …` | `eec5493b…`, exit 1 | identical, exit 1 |
+| `cVT4_betahold_score.py --selftest …` | `1a2372dd…`, 164 / 0, exit 0 | identical, exit 0 |
+| `cVT5_plainhorizon_score.py --selftest …` | `48b5032f…`, 175 / 0, exit 0 | identical, exit 0 |
+| `cvt3_registration_derivations.py` / `cvt4_registration_derivations.py ../runs_alice2` | `0483427f…` / `063107b2…`, exit 0 | identical |
+| `corpus_exclusions.py --check` (no `--runs`) | `523e8c97…`, exit 0 | identical |
+| `corpus_exclusions.py --check --runs ../runs ../runs_alice2` | `94fa4c7f…`, exit 0 | `996d2f54…`, exit 0: **one added line** `completeness (VOTE_W / BETA_HOLD): 33 .out files print an ON line; 33 are CSV rows, every one listed with its kind: True; 0 not in the CSV …`; every other line identical |
+
+The whole stdout of each selftest is byte-identical, so no scorer output changed. **The cVT2 and cVT3 selftests exited 1 BEFORE this edit** (5 and 3 FAILs). Those are registration-time premises that went stale when the batches landed (236): "no cvt2 row in the CSV", "CORPUS-EXCLUSIONS.tsv lists no cvt2 row yet", "PlainNet18_c100 appears ONLY in cpl1/cpl2/cvt1 rows", and the like. They are not caused by this entry and were not touched. Only cVT2–cVT5 (and the two derivation scripts) import `corpus_exclusions`; `cVT1`, `cPL2` and `cGN*` do not (grep). No launcher pins the module's sha; `bin/cVT{2..5}_*.sh` guard 1b needs only that it be committed and clean, so this commit satisfies it. `results/CORPUS-EXCLUSIONS.tsv` (`aeb82070…`) and `results/all_runs.csv` (`a8bd1136…`) are untouched.
+
+### 239.5 Discipline
+
+`git add` names `analysis/corpus_exclusions.py`, `tests/test_corpus_exclusions_check.py`, `docs/OPERATIONS.md` (§36 gains one paragraph) and `docs/CORRECTIONS.md` only. No GPU, no Slurm, no remote command. Running `cvt4` / `cvt5` not looked at. Cost: zero GPU-hours.
+
+Next free number: **240**.
