@@ -31198,6 +31198,195 @@ PRE-EXISTING ROWS CHANGED: 0 field-cells differ (112898 compared), rows 0
 
 Next free number: **232**.
 
+## 232. TRACK A — **`cvt3` REGISTERED AND DRY-RUN: DOES SILENCING THE WHOLE DOWN COALITION RESCUE WITHOUT AN OWN STEP SIZE?  230.4(2) LEFT THIS OPEN: cvt1's MUTE FAILED, BUT ON ITS RECORDS THE DOWN VOTE MOVED TO OTHER BN SCALES.  ON `PlainNet18_c100` AT cvt1's CELL, FROM cvt1's UNCHANGED TREE, NO NEW HARNESS CODE: 5 ARMS × SEEDS {84, 85, 86} = 15 JOBS, 100 EPOCHS — k01; HEAD (byte-identical, positive control); MUTE50 (cvt1's MUTE, replicated); MUTEDOWN (50 + THE DOWN COALITION, 21 WEIGHTS AT 0, ONE SHARED STEP SIZE); MUTECTL (50 + A COUNT- AND CLASS-MATCHED NON-DOWN SET, 21 WEIGHTS AT 0).  BOTH SETS ARE FIXED BY RULES WRITTEN HERE AND COMPUTED MECHANICALLY FROM cvt1 MUTE's 960 POST-EPOCH-36 RECORDS: RULE C (DOWN ON ≥ 0.90 OF RECORDS, RANKED BY VOTE SHARE, CUMULATIVE CUT 1.00) → 20 TENSORS (15 BN SCALES + 5 CONVS, 0.8280 OF THE MASS); RULE K (DOWN ON ≤ 0.50, SAME MODULE CLASS, NEAREST NUMEL) → 20 TENSORS (15 BN BIASES OF THE SAME MODULES + 5 SMALLER CONVS, 0.0276 OF THE MASS — MATCHED ON COUNT AND CLASS, NOT ON MASS; A MASS-MATCHED NON-DOWN SET DOES NOT EXIST ON THIS NET).  PRIMARY `P_COAL` = MUTEDOWN − MUTECTL, UNBOUNDED.  FIVE ACCOUNTS WITH EVERY ARM's PREDICTED LEVEL — COALITION, COALITION-PARTIAL, OWN-STEP-NECESSARY, NONSPECIFIC — PLUS THE NEW FAILURE MODE `UP-RUNAWAY` (NO DOWN VOTE LEFT → beta RUNS TO THE CLAMP CEILING OR BLOWS UP; NOT A RESCUE AT ANY LEVEL), DETECTED FROM EACH RUN's OWN beta TRAJECTORY BY `G-RUNAWAY` AND STAMPED BEFORE ANY BRANCH IS READ; THE BROKEN-PATCH NULL IS SEPARATED BY `G-BITE` AND A NEW SET-LEVEL HALF `G-BITE-SET`.  EVERY BRANCH STATES WHAT IT DOES TO 230's HEADLINE.  THE NOISE FLOOR IS READ THROUGH `corpus_exclusions.filter_rows` (OPERATIONS 36): SIGMA_PLAIN 0.4628 FILTERED vs 7.8955 NAIVE; THE PRIOR IS 0.694443.  THE EXACT VOTE_W STRINGS ARE PROVED INERT (WEIGHT 1, BITWISE) AND BITING (WEIGHT 0, INCLUDING THE SET LEVEL) ON A REAL 300-STEP GPU RUN: 38 PASS / 0 FAIL.  SCORER SELFTEST 141 / 0 / 0 ON THE MAC AND ON alice2; DRY RUN EXIT 0, 0 GUARD FAILURES, 15 LINES READ.  ≈10.4 GPU-h EXPECTED, HARD BOUND 30.**  Every bar is a frozen literal (O2).  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **232** (pre-assigned); `cvt2` holds 233, bookkeeping 234.
+
+### 232.1 Question
+
+cvt1 (230) returned `STEP-SIZE-NEEDED-VOTE-SUFFICES`. Its half (a) reads: **the rescue needs `layer4.1.bn2.weight` (idx 50) on its own step size** — silencing 50's term while it shares the step size (MUTE) left the arm at `k01` (10.99 vs 11.95).
+
+230.4(2) bounded that: on MUTE's own records the DOWN vote did not disappear, it **moved**. From epoch 36 every record votes the shared beta DOWN, carried by 47 (0.20–0.29 of the mass), 44, 41, 38 — every one DOWN on 1.00 of records. So MUTE may have failed only because the rest of the DOWN coalition re-carried the collapse. If so, "the own step size is needed" is an artefact of silencing one voter.
+
+`cvt3` silences the whole coalition, and a matched control, while every tensor keeps the ONE shared step size.
+
+### 232.2 Design
+
+* **Cell.** cvt1's exactly: CIFAR-100, `PlainNet18_c100` (53 tensors, 11,046,308 params), SGDm (0.99, wd 0.1) + Lion meta (0.99, b2 0.9, wd 0), ms 1e-3, alpha0 1e-6, 100 ep, batch 100, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, `PROBE=100`, `PROBE_TENSOR=1`. The exports are cvt1's byte for byte, plus each arm's `VOTE_W`.
+* **No new harness code.** The tree is `$WS/harness_cvt1/cifar10` (HF.py `3f2b98e1…`, build_network `e65e6773…`), the runner `$WS/jobs/run_cifar_cvt1.sh` (`d389e8a5…`), both unchanged; `bin/cVT1_stage_harness.sh` (verify mode, unedited) re-verifies them at every launcher pass. `PATCH_VOTEWEIGHT` already parses multi-item `name:w/name:w`; only the strings are new.
+* **ONE submission, 15 jobs = 5 arms × seeds {84, 85, 86}** (pre-assigned; zero corpus rows and zero `.out` ARGS lines carry them; 0 `cvt3-` jobs in `sacct`).
+
+| arm | `--stepsize-groups` | `VOTE_W` | what it does |
+|---|---|---|---|
+| k01 | `scalar` | unset | the floor anchor |
+| HEAD | `sets:1-49,51-53/layer4.1.bn2.weight` | unset | positive control, byte-identical to cvt1's and cpl2's HEAD (selftest B reads both scorers) |
+| **MUTE50** | `scalar` | `layer4.1.bn2.weight:0` | cvt1's MUTE, replicated (string and witness byte-identical) |
+| **MUTEDOWN** | `scalar` | {50} ∪ C, 21 names `:0` | silences 50 AND the DOWN coalition; every tensor shares one step size |
+| **MUTECTL** | `scalar` | {50} ∪ K, 21 names `:0` | silences 50 AND a count/class-matched NON-DOWN set |
+
+* **PRIMARY** `P_COAL` = MUTEDOWN − MUTECTL (in batch; plateau5 from each run's own `.out`; TRAIN beside it). **KEY** `D_DOWN` = MUTEDOWN − k01, `D_CTL` = MUTECTL − k01, `D_HEAD` = HEAD − k01, `D_MUTE50` = MUTE50 − k01, `G_DOWN` = HEAD − MUTEDOWN.
+* **Arm names carry no hyphen** (`MUTE50`, `MUTEDOWN`, `MUTECTL`), so every `-`-splitting reader (RULE 20 script, ENV audit, `corpus_exclusions --check`, the landing parser) parses them.
+
+### 232.3 The two sets — rules written here, computed mechanically (`analysis/cvt3_registration_derivations.py`, NEW)
+
+**The rules** (also in the derivation's docstring and printed by it; the scorer carries the output as literals and its selftest re-runs the rules on the host's cvt1 records and requires equality):
+
+* **Records.** cvt1 MUTE (`VOTE_W=layer4.1.bn2.weight:0`), seeds 78/79/80, every probe record with epoch ≥ 36.0 (after `k01`'s pin at 36.2–36.6 and MUTE's own at 40.2–40.6): 320 per seed, **960 pooled**.
+* **Vote.** L_i = w_i (b2·m_i + (1−b2)·z_i), with MUTE's weights (w_50 = 0). Lion moves beta by −ms·sign(Σ L_i), so a tensor votes **DOWN** on a record iff L_i > 0. share_i = |L_i| / Σ_j |L_j| per record.
+* **RULE C (the DOWN coalition).** Eligible iff i ≠ 50 and DOWN on ≥ **0.90** of the 960 pooled records. Ranked by pooled mean share, descending (ties: lower index). **Cumulative mass cut 1.00: every eligible tensor is kept.** Why not 0.90 or 0.95: MUTE failed because the voters that were LEFT re-carried the vote; a cut would rebuild that trap by design. (A 0.90 cut would keep 12 of 20, a 0.95 cut 15 — printed, descriptive.)
+* **RULE K (the NON-DOWN control).** Pool: i ≠ 50, not in C, DOWN on ≤ **0.50** of records. For each member c of C in rank order, the unused pool tensor of the **same module class** (manifest column 4) minimising |ln(numel_c / numel_i)|; ties → smallest |i − c|, then the lower index. If any member finds no candidate, the rule fails loudly.
+* **VOTE_W strings** list items in ascending index, `<name>:0` joined by `/`; the patch prints its witness items in the same order.
+
+**The result** (output sha on alice2 `72f15ed1…`; on the Mac one line differs, see 232.9):
+
+| rank | C (DOWN share, DOWN frac) | ↔ | K (share, DOWN frac) | numel C / K |
+|---|---|---|---|---|
+| 1 | 47 `layer4.1.bn1.weight` (0.2467, 1.000) | | 48 `layer4.1.bn1.bias` (0.0003, 0.000) | 512 / 512 |
+| 2 | 44 `layer4.0.bn2.weight` (0.1154, 1.000) | | 45 `layer4.0.bn2.bias` (0.0001, 0.000) | 512 / 512 |
+| 3 | 41 `layer4.0.bn1.weight` (0.0753, 1.000) | | 42 `layer4.0.bn1.bias` (0.00002, 0.040) | 512 / 512 |
+| 4–12 | 38, 35, 32, 29, 26, 23, 20, 17, 14 (BN scales, 0.0588 → 0.0162, all 1.000) | | 39, 36, 33, 30, 27, 24, 21, 18, 15 (their own modules' biases, ≤ 0.00006, 0.22–0.41) | equal |
+| 13 | 40 `layer4.0.conv1.weight` (0.0153, 1.000) | | 19 `layer2.0.conv2.weight` (0.0056, 0.419) | ×8 |
+| 14 | 46 `layer4.1.conv1.weight` (0.0135, 1.000) | | 13 `layer1.1.conv2.weight` (0.0048, 0.465) | ×64 |
+| 15 | 43 `layer4.0.conv2.weight` (0.0132, 1.000) | | 10 `layer1.1.conv1.weight` (0.0050, 0.316) | ×64 |
+| 16 | 11 `layer1.1.bn1.weight` (0.0120, 0.998) | | 12 `layer1.1.bn1.bias` | equal |
+| 17 | 37 `layer3.1.conv2.weight` (0.0095, 1.000) | | 7 `layer1.0.conv2.weight` (0.0053, 0.191) | ×16 |
+| 18 | 8 `layer1.0.bn2.weight` (0.0085, 0.975) | | 9 `layer1.0.bn2.bias` | equal |
+| 19 | 5 `layer1.0.bn1.weight` (0.0054, 0.954) | | 6 `layer1.0.bn1.bias` | equal |
+| 20 | 49 `layer4.1.conv2.weight` (0.0043, 1.000) | | 4 `layer1.0.conv1.weight` (0.0061, 0.096) | ×64 |
+
+* **COALITION C** (rank order) = 47 44 41 38 35 32 29 26 23 20 17 14 40 46 43 11 37 8 5 49: 15 BatchNorm2d + 5 Conv2d, **0.827994** of the mean |L| mass. **CONTROL K** (pair order) = 48 45 42 39 36 33 30 27 24 21 18 15 19 13 10 12 7 9 6 4: 15 BatchNorm2d + 5 Conv2d, **0.027615** of the mass.
+* **Near the eligibility bar, NOT eligible:** 2 `bn1.weight` 0.8417, 34 `layer3.1.conv1.weight` 0.8396. Neither C nor pool (0.50 < DOWN < 0.90): 2, 16, 22, 25, 28, 31, 34 — these stay in every arm's sum.
+* **What K is and is not (disclosed, not hidden).** Every BN pair is (scale, bias) of ONE module, numel-equal (15/15). The conv pairs are ×8–×64 smaller (C's convs 8,847,360 params vs K's 294,912): every conv with ≥ 294,912 params votes DOWN on ≥ 0.70 of records, so none is in the pool. **K holds 1/30 of C's mass, and every non-C tensor together holds only 0.172: a mass-matched NON-DOWN control does not exist on this net.** K controls for "silencing 20 more tensors of these classes (with 50)", not for "removing the same amount of vote".
+* **The same rule on MUTE's decline records (epochs 17–36) instead**, descriptive: 14 tensors, all inside C (C adds 5, 14, 40, 43, 46, 49). No tensor the decline rule picks is missing from C.
+
+**Record-level prior (S5; descriptive, NON-GATING; a counterfactual on cvt1's trajectories, NOT a prediction of cvt3's).** Fraction of group-0 records that would vote UP (Σ L < 0) with {50} ∪ C, and with {50} ∪ K, silenced:
+
+| cvt1 records | epochs 0–17 (as run: UP on all) | 17–36 | 36–100 |
+|---|---|---|---|
+| `k01` s78/79/80 | UP-if-C 0.96–1.00; UP-if-K 1.00 | UP-if-C 1.000; UP-if-K 1.000 | UP-if-C 1.000; UP-if-K 1.000 |
+| MUTE s78/79/80 | UP-if-C 0.96–1.00 | UP-if-C 0.853 / 0.253 / 0.832; UP-if-K 0.17 / 0.14 / 0.17 | UP-if-C **1.000 / 0.163 / 1.000**; UP-if-K 0.000 |
+| HEAD (complement) | UP-if-C 0.96–1.00 | UP-if-C 0.54–0.58; UP-if-K 0.84–0.90 | UP-if-C **1.000**; UP-if-K 0.09–0.12 |
+
+* Two readings, both UNSURE. (i) On `k01`'s and HEAD's trajectories, silencing C leaves an UP-voting sum on every post-17 record, with nothing left to brake it: **UP-RUNAWAY is a live outcome, not a formality.** (ii) On MUTE s79 the mixed convs (28, 31, 34, 16, 22, 25 — DOWN on 1.00 of that seed's records, not eligible pooled) keep the sum DOWN on 0.84 of post-36 records: the coalition as ruled may be re-carried on some seeds. On every cvt1 arm the silence of K alone changes the post-36 sign of MUTE's sum on 0 records.
+* **No time gate.** Every weight is 0 from step 0; the sets were chosen on post-epoch-36 records. Dose and onset stay confounded exactly as in cvt1 (230.4(1)). In epochs 0–17 silencing C leaves the as-run UP vote UP on 0.96–1.00 of records, so the early rise is not predicted to change sign; nothing more is claimed.
+
+### 232.4 Accounts and the floor table (164.6) — every arm, every account (UNSURE)
+
+Anchors (cvt1, between batch, non-gating): k01 11.9493, HEAD 64.7940, MUTE 10.9860. Intervals: K01_PL 8–16, FREE_PL 56–72, PART_PL 20–50.
+
+| account | k01 | HEAD | MUTE50 | MUTEDOWN | MUTECTL | `P_COAL` | branch |
+|---|---|---|---|---|---|---|---|
+| **COALITION** | 8–16 | 56–72 | 8–16 | **56–72** | 8–16 | +40…+64 | `COALITION` |
+| **COALITION-PARTIAL** | 8–16 | 56–72 | 8–16 | 20–50 | 8–16 | +4…+42 | `COALITION-PARTIAL` |
+| **OWN-STEP-NECESSARY** | 8–16 | 56–72 | 8–16 | **8–16** | 8–16 | −8…+8 | `OWN-STEP-NECESSARY` |
+| **NONSPECIFIC** | 8–16 | 56–72 | 8–16 | 56–72 | **56–72** | −16…+16 | `NONSPECIFIC` |
+| **UP-RUNAWAY** | 8–16 | 56–72 | 8–16 | **not predicted (1–100)** | 8–16 | not predicted | `UP-RUNAWAY`, from `G-RUNAWAY` |
+| BROKEN-PATCH (null) | = OWN-STEP-NECESSARY on every arm | | | | | | reaches NO branch: `PATCH-NOT-VERIFIED` |
+
+* **Asserted in selftest D.** The lowest level any level-account predicts for any arm is 8 pp, 7.0 pp above chance. `P_COAL`'s predicted interval sits ≥ 25 pp inside ±99 under every account (primary unbounded). HEAD is predicted ≥ 40 pp off `k01` under every account. Every account's midpoint lands in its registered branch. `UP-RUNAWAY` is returned at MUTEDOWN = 1, 12, 35, 64 and 90 alike — never read as a rescue.
+* **OWN-STEP-NECESSARY and BROKEN-PATCH predict identically: declared.** `G-BITE` / `G-BITE-SET` separate them; every other level-account differs from the null on MUTEDOWN or MUTECTL.
+* **Floor readings are bounds.** Arms predicted at `k01` sit on the clamp-frozen level; such readings are locations (`FLOOR-READINGS-ARE-BOUNDS`).
+
+### 232.5 Gates, branches, and what each does to 230's headline — `decide()`, first match wins; frozen bars
+
+**Harness gates (→ `HARNESS-UNSOUND`, rc 1).** `G-ARGS` (every run's own single ARGS line: its spec, net, cell, 15 fixed HF flags, seed, run-name); `G-ENV` (one distinct ENV line == cvt1's/cpl2's; one `PROBE_TENSOR: on every=100 type=<arm's> tensors=53`); **`G-VOTEW`** (exactly one `VOTE_W` line == the arm's witness; MUTEDOWN's is 1,086 characters, MUTECTL's 1,054); `G-STRUCT` (manifest byte-identical to the scorer's, 6,626 bytes, with `COALITION_RANKED` / `CONTROL_PAIRED` lines); `G-PROV` (MODE submit; build_network `e65e6773…`; HF `3f2b98e1…`; **RUNNER `d389e8a5…`**; SCORER == the file); `G-FLOOR`/`G-CEIL` (max arm mean in 15–90).
+
+**`G-BITE` + `G-BITE-SET` (→ `PATCH-NOT-VERIFIED`, rc 1; before any level).** From `runs/cvt3/probe_cvt3-<arm>-s<seed>/probe.jsonl`: 500 parseable records; on every FINITE record z_agg == Σ w_i z_tensor_i and mom_pre == Σ w_i m_tensor_i (rel 1e-4 of Σ|term|); intervened runs ≥ 50 records where weighted and unweighted sums differ by > 1e-2, the unweighted matching none. **NEW, `G-BITE-SET`** (MUTEDOWN, MUTECTL): ≥ 50 records where the registered set and the **50-only** set differ by > 1e-2, the 50-only sum matching none; and the OTHER arm's set matches no record. A patch that bit only on its first item, a swapped set, or a weight on a control arm cannot reach a level. On cvt1's own records the set difference exceeds 1e-2 on 373–499 of 500 records per run for C and K alike, so the half is informative. Individual BN-bias items (≤ 1e-4 of Σ|z| each) are below float32 resolution one by one: the bite is proved at the SET level, and the witness proves every item was parsed. **Non-finite records are counted, not failed** — a blow-up is `G-RUNAWAY`'s evidence, not a patch failure.
+
+**`G-RUNAWAY` (stamped BEFORE any branch; feeds `decide()` as per-arm seed counts).** From each run's own probe `beta[0]`: a record is at the ceiling iff beta[0] ≥ −2.3026 − 0.01 (the clamp's upper end; `HF.step` clamps after every meta update); **a seed runs away iff ≥ 0.10 of its epoch-≥-17 records are at the ceiling, or any record carries a non-finite beta[0]** (only a large step size can blow up the net); **an arm runs away iff ≥ 2 of 3 seeds do.** `DRIFT` (stamp only): beta[0] ≥ −4.0 on ≥ 0.10 of those records on ≥ 2 seeds. Premise, re-checked by the selftest on the host's cvt1 records: **all 15 cvt1 runs: 0 runaway, 0 drift, maximum beta[0] −4.342** (MUTE s79).
+
+**Branches** (after `INCOMPLETE` / `HARNESS-UNSOUND` / `PATCH-NOT-VERIFIED`):
+
+| order | condition | branch | what it does to 230's half (a), "the rescue needs 50 on its own step size" |
+|---|---|---|---|
+| 1 | MUTEDOWN runs away on ≥ 2 seeds | **`UP-RUNAWAY`** | **Neither strengthened nor rescinded; it stands, untested by this design.** Silencing every consistent DOWN voter removes the brake: the coalition is what holds the shared step size down, but the intervention replaced the collapse by a different failure, so it cannot say whether the silence rescues. MUTEDOWN's level is printed, never quoted as a rescue. |
+| 2 | exactly 1 seed | `UNRESOLVED-RUNAWAY-SPLIT` | none (bimodal, reported not averaged) |
+| 3 | any OTHER arm runs away on ≥ 1 seed | `CONTROL-RUNAWAY` | none (unregistered; stop) |
+| 4–6 | seed range > 5 / k01 > 20 / D_HEAD < 20 | `UNRESOLVED-DIVERGED` / `SCALAR-NOT-COLLAPSED` / `POSITIVE-CONTROL-FAILED` | none |
+| 7 | D_MUTE50 ≥ 10 | `MUTE50-RESCUES` | **put IN QUESTION** by a between-batch disagreement (cvt1's MUTE did not replicate), not rescinded; stop |
+| 8 | D_DOWN < −2 without a runaway | `MUTEDOWN-BELOW-K01` | none (unregistered; stop) |
+| 9 | D_CTL ≥ 10 and P_COAL ≥ 10 | `COALITION-OVER-NONSPECIFIC` | **rescinded as worded**; a coalition-specific part sits on a nonspecific one |
+| 10 | D_CTL ≥ 10 otherwise | **`NONSPECIFIC`** | **rescinded as worded** (a vote intervention with no own step size rescued), but NOT attributable to the coalition; mechanism UNSURE |
+| 11 | 2 < D_CTL < 10 | `CONTROL-WEAK` | neither |
+| 12 | D_CTL ≤ 2, D_DOWN ≥ 10, HEAD − MUTEDOWN ≤ 5 | **`COALITION`** | **RESCOPED**: the own step size is NOT needed once the whole DOWN coalition is silent; 230(a) holds only against a vote removal that leaves other DOWN voters in the sum |
+| 13 | D_CTL ≤ 2, D_DOWN ≥ 10, HEAD − MUTEDOWN > 5 | **`COALITION-PARTIAL`** | **WEAKENED**: vote removal carries part of the rescue |
+| 14 | D_CTL ≤ 2, D_DOWN ≤ 2 | **`OWN-STEP-NECESSARY`** | **STRENGTHENED**: survives 230.4(2)'s re-carriage objection at the coalition level. Not licensed: that no other silenced set rescues (~0.17 of the mass still votes) or why |
+| 15 | D_CTL ≤ 2, 2 < D_DOWN < 10 | `DOWN-WEAK` | neither |
+
+* **Frozen bars (O2).** GAP_MIN 20.0, K01_MAX 20.0, RESCUE 10.0 (17.64 SE), NULL 2.0 (3.53 SE), MATCH 5.0 (8.82 SE), DIVERGED 5.0, FLOOR_MIN 15.0, CEIL_MAX 90.0; G-BITE: BITE_TOL 1e-4, INFORM 1e-2, MIN_INFORMATIVE 50, N_RECORDS 500; G-RUNAWAY: ceiling −2.3026, tolerance 0.01, from epoch 17, fraction 0.10, ≥ 2 seeds; DRIFT −4.0.
+* **Stamps.** Always: `HARNESS-CLEAN`, `PATCH-BITES`, `SETS-FROM-CVT1-MUTE`, `CTL-COUNT-CLASS-NOT-MASS`, `NO-TIME-GATE`, `ONE-NETWORK-PLAINNET`, `HORIZON-100-ONLY`, `SIGMA-PRIOR-FROZEN`/`-INBATCH`. Conditional: `RUNAWAY-<arm>-<n>of3`, `NONFINITE-<arm>`, `DRIFT-MUTEDOWN`, `POSITIVE-CONTROL-REPRODUCES`, `MUTE50-AT-K01`/`-WEAK`, `DOWN-ABOVE-HEAD`, `CTL-BELOW-K01`, `FLOOR-READINGS-ARE-BOUNDS`, `TRAIN-AGREES`/`-DISAGREES`.
+* **After FINAL, descriptive and unable to move it:** per-arm beta trajectories and pin epochs; on MUTE50 / MUTEDOWN / MUTECTL records from epoch 36, the sum's DOWN fraction and the top six UNSILENCED voters (who re-carries, if anyone).
+
+### 232.6 The noise floor — through `corpus_exclusions.filter_rows` (OPERATIONS 36)
+
+Re-derived on the 2,983-row corpus (`1aa245d6…`), exclusion list `31105e32…` (9 rows dropped → 2,974), 227.6's definitions (15-key cells; complete, unsuperseded, standard cell; `epochs_requested` = 100 keeps `cgn3`'s 430-epoch rows out):
+
+| | FILTERED (registered) | NAIVE (the trap) |
+|---|---|---|
+| `SIGMA_R18ALL` | **0.694442846939599** (df 209, 46 cells) | 0.694442846939599 (df 209) |
+| `SIGMA_PLAIN` | **0.46281639069317043** (df 29, 7 cells: cpl1 + cpl2 + cvt1 k01/HEAD) | 7.89550749447568 (df 38) |
+
+* `SIGMA_PRIOR` = max(filtered pair) = **0.694442846939599**; `SE_PRIOR` 0.567010. The filter does not move the prior here (ResNet dominates), but the PlainNet term it guards is ×17.
+* **The scorer reads the corpus ONLY through `filter_rows`** (`read_corpus()` calls it by default); **selftest C shows each frozen literal IS the filtered value** on the registration corpus (to 1e-12) and that the naive PlainNet floor is 7.8955 (×17), not the literal. `corpus_exclusions.py --check`: exit 0, VERDICT PASS on the Mac.
+* **Ingest caveat, registered now.** MUTE50/MUTEDOWN/MUTECTL rows will carry `k01`'s 15 cell keys. Their 9 rows go into `results/CORPUS-EXCLUSIONS.tsv` in the SAME commit as the ingest, with the witness line verbatim; `corpus_exclusions --check` then proves every unlisted `cvt3` `.out` prints `VOTE_W: off`.
+
+### 232.7 Inertness and bite of the EXACT strings, on a real run (BEFORE launch)
+
+`tests/test_voteweight_realrun_cvt3.py` (NEW) **imports cvt1's registered `tests/test_voteweight_realrun.py` unedited** (`4320aaf2…`) and reuses its child (train.py's own `parse_args`, `build_network`, `build_optimizer`, `load_data`; CIFAR-100, AUGMENT=1, BETA_CLIP, PROBE every 10, PROBE_TENSOR=1; cudnn deterministic; one process per variant), `run_variant`, `same` and `chk`. The strings and witness lines are read from the scorer, so test and scorer cannot disagree. Job `cvt3inert` **5021013**, node851 (RTX 2080 Ti), 6 min 33 s, 300 steps per variant, seed 84; unpatched tree `harness_cpl1` read-only.
+
+| check | result |
+|---|---|
+| RR0 unpatched vs itself: beta every step, loss, probe.jsonl bytes, every final parameter and buffer | identical (`2f875d20…`) |
+| RR1 OFF (unset; empty, printing `VOTE_W: off`) == unpatched | bitwise, 4/4 each |
+| **RR2 IDENTITY on the exact 21-name lists** (MUTEDOWN's and MUTECTL's names at `:1`) == unpatched; witness prints all 21 items at w=1.0 | **bitwise, 4/4 each + witness** |
+| **RR3 BITE, exact strings**: one `VOTE_W` line == the scorer's WITNESS (1 / 21 / 21 items); z_agg == Σ w z_tensor AND mom_pre == Σ w m_tensor at every record | worst rel 3.4e-07 / 1.7e-07 / 2.1e-07 |
+| RR3 z_agg differs from the unpatched run | 30 of 30 records, all three |
+| **RR3 SET-level**: MUTEDOWN / MUTECTL differ from the 50-only sum on 29 of 30 records, match it on none, match the other set on none | PASS both |
+
+**38 PASS / 0 FAIL, `REALRUN_RC 0`.** Log `alice2:~/l232_logs/cvt3inert-5021013.out`, installed as `runs/cvt3/inertness_voteweight_realrun_cvt3.log` (**`508dc8a9…`**), headed by the driver, registered-test and **scorer** shas; launcher guard 4f2 requires all three to equal the current files, so the log cannot outlive a scorer edit. Unlike cvt1's 300-step proof (227.4), the intervened arms' final weights here DIFFER from the control's (`af8e118b…` / `615576e7…` / `f21c18f9…` vs `2f875d20…`): the weights moved beta within 300 steps, so non-vacuity reaches the parameters, not only z. cvt1's CPU (`fcaa80ff…`, 88/0) and real-run (`6fc87fb1…`, 37/0) logs on the same tree are re-required by guards 4e/4f.
+
+### 232.8 Tests and dry run
+
+* **Scorer selftest** `python3 analysis/cVT3_downcoalition_score.py --selftest --runsdir <runs>`: **141 PASS / 0 FAIL / 0 SKIP** on the Mac (Python 3.14, `../runs_alice2`, 57 s) and on alice2 via guard 1c (3.10.4). It covers:
+  * **A** design: |C| = |K| = 20, disjoint, no 50; class-matched pairs; each BN pair (scale, bias) of one module; VOTEW / WITNESS / WEIGHTS agree by name; MUTE50 == cvt1's MUTE byte for byte; `decide()` reads no probe record; G-BITE → G-RUNAWAY → contrasts → branch in that order.
+  * **B** the sets **re-derived on the host's cvt1 records** by the derivation module (rule constants equal; C in rank order, K in pair order, both strings and witnesses byte-identical; MASS_C/MASS_K); **G-RUNAWAY on all 15 cvt1 runs: 0 runaway, 0 drift, max −4.342**; cvt1's manifest `248f4686…`.
+  * **C** the floor through `filter_rows` (232.6); PlainNet only in cpl1/cpl2/cvt1; 0 rows with seeds 84–86.
+  * **D** the floor table (232.4).
+  * **E the real `score()` on 42 synthetic batches with synthetic probe records**: every one of the 18 registered outcomes is reached by E or the sweep; `UP-RUNAWAY` at a HIGH level (60) and as a NaN blow-up at chance (rc 0, `NONFINITE-MUTEDOWN`, not a patch failure); a one-seed runaway → `UNRESOLVED-RUNAWAY-SPLIT`; a control runaway; drift without the ceiling → stamped, not branched; near-bar MATCH / NULL / RESCUE; 12 harness breaks (every arm tiny; MUTEDOWN printing MUTECTL's or MUTE50's witness, HEAD printing an on-line, no VOTE_W line, provenance with the unpatched HF / another runner / dry-run / another scorer, a manifest naming another net, AUGMENT=0, a wrong spec); **7 bite breaks** (every intervened arm unweighted at the null's levels; **a 50-only partial patch on MUTEDOWN**; **MUTECTL carrying MUTEDOWN's set**; `k01` carrying a weight; a garbled file; a missing probe dir; a 400-record file); a dropped run → INCOMPLETE (exit 2); a truncated higher-jid resubmission does not shadow.
+  * **O2 invariance** for COALITION, OWN-STEP-NECESSARY and UP-RUNAWAY across four corpora, with 11 invented rows at PlainNet `scalar` (where k01, MUTE50, MUTEDOWN and MUTECTL all sit), at HEAD's string and at the ResNet cells; non-vacuity: the FILTERED PlainNet corpus sigma moves and FINAL does not.
+  * The one-argument subprocess (exit 0; dropped run exit 2); a 6,000-draw totality sweep including runaway counts; every substantive branch's licence names 230's headline; RULE 21 premise (no `cvt3-*.out`, no `cvt3-` row).
+* **Dry run** (alice2, `~/stage_cvt3`, `METAOPT_WS=/home/s5014158/metaopt`): **pass 1 (`~/l232_logs/dryrun_cvt3_1.log`, `61fb3d97…`, 147 lines): exit 0, 0 guard failures, every line read.**
+  * guard 1c–1c9: selftest 141/0/0; O2 against this host's corpus; the invocation; fresh seeds; HEAD byte-identical to cvt1's and cpl2's; **both sets re-derived from cvt1's records on alice2**; no runaway false positive on cvt1; **the frozen floor is the filtered value**; partial-patch and swapped-set cases.
+  * guard 1d: the derivation reproduces both sets (output `72f15ed1…`). guard 2–2f: no `cvt3` row, `.out`, `sacct` or `squeue` entry; 0 rows / 0 ARGS lines with seed 84–86; PlainNet only under cpl1/cpl2/cvt1.
+  * guard 4a: `bin/cVT1_stage_harness.sh` (unedited) **VERIFIED** cvt1's tree (V-a…V-f, test_plainnet 78 PASS, test_voteweight V0 9 PASS). guards 3–3e: data visible, build_network / HF / pre-voteweight / live HF / runner shas pinned; the live HF carries no marker.
+  * guards 4b/4e/4f/4f2: PATCH_PROBE_TENSOR R0; cvt1's two inertness logs; **cvt3's real-run log on THIS scorer**.
+  * guard 4c': launcher literals == the scorer's (imported, not regexed) and the stage script's shas.
+  * **guard 4 on the LIVE 53-tensor model** from cvt1's tree: the names equal the scorer's; C and K by name, class and numel; for each arm `HF.init_meta` under its own `VOTE_W` gives `_vw_items` == {50} / {50} ∪ C / {50} ∪ K exactly, the registered witness (1,086 / 1,054 chars), scalar beta (HEAD [52,1]); Lion sign, both guarded returns, raw `z_tensor`, BETA_CLIP handling; **guard 4d: the live manifest is byte-identical to the scorer's (6,626 bytes, `0030e4a4…`).**
+  * guards 4g, 5, 8, 9: provenance (dry-run file `51445410…`); partitions `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g` at WALL 02:00:00; 1,997 GB free; 0 pending; default manifest resolution; the runner `cd`s into the tree the guards tested.
+  * **guard 6: 15 composed lines, 0 RULE 20 / VOTE_W pre-check failures** (each intervened line carries exactly ONE `VOTE_W=` equal to its own string; k01/HEAD none). The 15 lines are 5 templates × 3 seeds differing only in the seed tokens.
+* **Cost.** ≈ **10.4 GPU-h** expected (cvt1 sacct 10.3783 / 15); **hard bound 30** (WALL 2 h × 15; cvt1's longest run 47:16). Registration spend: the `cvt3inert` job, 393 s = **0.11 GPU-h**.
+
+### 232.9 Deviations and limits, disclosed
+
+* **One printed digit differs between hosts.** The derivation prints `SIGMA_PLAIN` via `repr`: 0.46281639069317043 on the Mac (Python 3.14) and 0.4628163906931704 on alice2 (3.10.4) — `sum()` of floats became compensated in 3.12, so the last ulp differs. Every other line is identical. The scorer's check is to 1e-12, and the prior (`SIGMA_R18ALL`) is identical on both.
+* **The stage holds more than this registration.** `~/stage_cvt3` was rsync'd from the shared working copy, which also held Track B's untracked `cvt2` files (not staged by this track into any guard, not committed here). The launcher and scorer read none of them; at launch the 13 files guard 1b names are compared with `git show HEAD:<path>`.
+* **K is not mass-matched** and **the silence has no time gate** (232.3). **One eligibility bar (0.90), one cut (1.00), one record window (epoch ≥ 36)** — which coalition members are necessary is not tested.
+* **The live shared harness is untouched.** `~/l232_hashes.sh` (read-only) wrote `~/l232_logs/live_hashes_before.txt` (47 lines, `de9a8f04…`: the live cifar10 tree, cvt1's and cpl1's trees, `run_cifar.sh`, `run_cifar_cvt1.sh`, `run_cifar_cpl1.sh`, cvt1's STAGE-MANIFEST); it is re-taken after launch.
+
+### 232.10 Files
+
+**New (5):** `analysis/cVT3_downcoalition_score.py` (`04cc16b4…`), `bin/cVT3_downcoalition.sh` (`7c0bdf6a…`), `analysis/cvt3_registration_derivations.py` (`475460d7…`), `tests/test_voteweight_realrun_cvt3.py` (`7f96445f…`), `bin/cVT3_realrun_inertness.sbatch` (`71df3382…`).
+
+**Reused unedited:** `analysis/corpus_exclusions.py` (`5d7694ad…`), `results/CORPUS-EXCLUSIONS.tsv` (`31105e32…`), `tests/test_voteweight_realrun.py`, `tests/test_voteweight.py`, `tests/test_probe_tensor.py`, `tests/test_plainnet.py`, `patches/patch_voteweight.py`, `patches/patch_plainnet.py`, `bin/cVT1_stage_harness.sh`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`; read for byte-identity: `analysis/cVT1_voteweight_score.py`, `analysis/cPL2_plainnet_head_score.py`.
+
+**On alice2 (new only):** `~/stage_cvt3/`, `~/l232_logs/` (derivations, cvt3inert out, dryrun, live hashes), `~/l232_hashes.sh`, `~/l232_rule20.sh` (`1f859369…`, a copy of `l227_rule20.sh` with the batch table swapped), `~/l232_envaudit.py` (`e1bbd825…`, a copy of `l227_envaudit.py` with cvt3's table and three witness lines), `$WS/runs/cvt3/` (manifest, dry-run provenance, the real-run log), `$WS/runs/cvt3-PARTITION-MANIFEST.txt`. **cvt1's tree, runner and runs are read, never written.**
+
+### 232.11 Discipline (registration)
+
+* **RULE 16.** No registered file, `argsline_guard.py`, `paper/` or MASTER-TABLE line was edited; `git diff` is additions only. The unpatched tree `harness_cpl1` and cvt1's tree were used read-only (`PYTHONDONTWRITEBYTECODE=1`).
+* **RULE 21.** The scorer is committed and pushed in this commit, before any `cvt3` run exists (guard 2: 0 `.out`, 0 `sacct`, 0 CSV rows, 0 in `squeue`). The margin is proved by wall clock at launch.
+* **Hosts.** `alice` NOT contacted. No job this track did not submit was touched. No nested `claude -p`.
+
+Next free number (pre-assigned block): `cvt3` 232 (this), `cvt2` 233, bookkeeping 234.
+
 ## 233. TRACK B — **`cvt2` REGISTERED AND DRY-RUN: AN INJECT DOSE LADDER ON `PlainNet18_c100` — IS `cvt1`'s COMPLEMENT COLLAPSE A THRESHOLD OR GRADED IN THE TWIN's WEIGHT K, AND WAS THE 0.34 RESIDUE DOSE?  7 ARMS × SEEDS {87, 88, 89} = 21 JOBS, 100 EPOCHS, `cvt1`'s CELL AND `cvt1`'s ISOLATED TREE UNCHANGED (NO NEW HARNESS CODE): k01, HEAD (K = 1), AND HEAD's GROUPING WITH `layer4.1.bn1.weight` (idx 47) × K IN THE COMPLEMENT AT K = 13, 33, 152, 691 (`cvt1`'s INJECT, BYTE FOR BYTE), 2000.  THE K VALUES ARE DERIVED FROM `cvt1`'s OWN PROBE RECORDS AND THE DERIVATION CHANGES THE BRIEF's LADDER (233.3): LION READS ONLY THE SIGN OF THE COMPLEMENT's SUM, AND ON INJECT's COLLAPSED RECORDS THE OTHER 51 TERMS VOTE UP ON EVERY RECORD, SO THE TWIN HOLDS THE COLLAPSE ONLY ABOVE K_SUSTAIN = 84–118; THE BRIEF's 152 AND 258 (AND THEIR SHARE-BASED RE-DERIVATIONS 117 / 213) ALL SIT ABOVE IT, WHERE EVERY K IS PREDICTED TO BE THE SAME RUN.  258 IS DROPPED; 13 AND 33 (THE INITIATE-BUT-NOT-SUSTAIN INTERVAL [5, 84.4] IN THREE LOG PARTS) ARE ADDED.  PRIMARY SHAPE (K13 / K33 / K152 AT-HEAD / BETWEEN / AT-PLATEAU OF K691) AND PRIMARY TOP = K691 − K2000.  DOSE AND ONSET ARE CONFOUNDED (NO TIME GATE) AND THE DERIVATION SHOWS ONSET IS NEARLY FIXED BY THE TWIN's OWN SIGN (~EPOCH 16 AT EVERY K): DISCLOSED, AND THE PER-ARM DOM EPOCH IS REPORTED BESIDE DOSE.  NO ARM IS PREDICTED AT THE FLOOR UNDER ANY OF SIX ACCOUNTS; THE BRIEF's "K2000 AT k01's LEVEL" IS NOT REGISTERED AS A POINT PREDICTION.  THE NOISE FLOOR IS READ THROUGH `corpus_exclusions.filter_rows` (OPERATIONS §36).  INERTNESS AND BITE RE-PROVED FOR THE EXACT FIVE STRINGS ON A REAL GPU RUN: 46 / 0.  ≈14.5 GPU-h EXPECTED, HARD BOUND 63.**  Every bar is a frozen literal (O2).  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **233** (pre-assigned); `cvt3` holds 232, bookkeeping 234.
 
 ### 233.1 Question (from 227 + 230)
