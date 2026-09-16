@@ -897,3 +897,29 @@ boundary — with 11.17M coordinates, one always does. So `max|dbeta|` between t
 
 **Rule: any test asserting two configurations are IDENTICAL must run on CPU and must first assert
 that a config equals itself.** A test that cannot fail cannot pass.
+
+## 36. Registration checklist — any noise floor or corpus sigma must call `corpus_exclusions.filter_rows` FIRST (CORRECTIONS 231)
+
+Some corpus rows are interventions whose design the ARGS line cannot carry (the first: `cvt1`'s 9
+MUTE / DOSE / INJECT runs, which carry `k01`'s or HEAD's CSV cell key). They are listed, keyed
+`(run, job_id)`, in `results/CORPUS-EXCLUSIONS.tsv` (CORRECTIONS 230.8). Nothing drops them
+automatically: `aggregate.py` is registered and unedited, and until 231 no file in `analysis/`
+imported the helper. The trap is live — `cPL2_plainnet_head_score.py --selftest` reads SIGMA_PLAIN
+on the current corpus as 8.68 against 0.41 with the 9 rows dropped (a NOTE there, feeding no bar).
+
+Before registering any batch, tick every line:
+
+* [ ] Every noise-floor, corpus-sigma, anchor-band or cell-pooling derivation in the new scorer or
+      its selftest reads the corpus through
+      `rows = corpus_exclusions.filter_rows(csv.DictReader(open("results/all_runs.csv")))`
+      (`analysis/corpus_exclusions.py`, stdlib only) BEFORE grouping by cell.
+* [ ] The registration entry says so in one sentence and quotes the floor with and without the
+      filter when they differ.
+* [ ] `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` exits 0 on the
+      corpus the floor was derived from.
+* [ ] If the new batch itself has arms the ARGS line cannot distinguish (an env-var patch, a vote
+      weight, a runtime intervention), its rows are appended to `CORPUS-EXCLUSIONS.tsv` in the SAME
+      commit as its ingest, with the witness line verbatim.
+* [ ] Rows from a longer horizon (e.g. `cgn3`'s 430-epoch `ResNet18_gn_c100` rows) are separated
+      from 100-epoch cells by `epochs_requested` (the existing readers filter on it), not by
+      exclusion — check the new reader's filter or cell key includes it.
