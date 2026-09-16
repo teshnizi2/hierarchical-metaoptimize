@@ -30082,3 +30082,77 @@ Next free number: **223**.
 * **`alice` NOT CONTACTED. NOTHING CANCELLED.** Committed and PUSHED, as the operator directed.
 
 Next free number: **224**.
+
+## 224. TRACK B (code bugs, ZERO GPU) — **`c98_reproduce.py` HAS EXITED 1 FOR MANY CYCLES ON 10 STALE CORPUS-COUNT CHECKS; A REGISTERED SUCCESSOR `analysis/c98b_reproduce.py` RUNS c98's OWN CODE UNMODIFIED, KEEPS ALL 618 SCIENCE ASSERTIONS BYTE-IDENTICAL, MOVES 18 WHOLE-CORPUS SITES (SELECTED BY RULE, NOT BY "FAILS TODAY") INTO A DRIFT REPORT, AND EXITS 0.  c98 STILL EXITS 1 WITH THE SAME 10 FAILS; THE PAPER'S NUMERALS REMAIN STALE AND CLOSING THAT IS THE AUTHOR'S CALL.  SAFETY SWEEP OF `analysis/` (pyright 1.1.409 + two AST passes, `analysis/c224_safety_sweep.py`): 752 unbound/None findings triaged — 1 REACHABLE BUG IN A NON-REGISTERED HELPER FIXED WITH A TEST (`probe5_window.reduce_dir` crashed on a scalar-arm or n_records<2 probe dir); 3 REGISTERED FILES CARRY REACHABLE CRASHES (REPORTED, NOT EDITED); 49 REGISTERED SCORERS' SELFTESTS NEVER DRIVE score() (the cdn1 mode), 16 ONLY PARTIALLY.**  No registered file, `argsline_guard.py`, `paper/` or MASTER-TABLE edited.  No GPU, nothing submitted, `alice` NOT CONTACTED.  THIS ENTRY TOOK NUMBER **224**; NEXT FREE **225**.
+
+### 224.1 c98 as it stands (registered, NOT edited)
+
+* `python3 analysis/c98_reproduce.py` on the 2,926-row corpus (sha256 `3223028d…`): **exit 1**, 636 assertion sites, **10 CHECK(S) FAILED**, all of them whole-corpus numerals:
+  rows 2926 vs 2177; admissible 2484 vs 1735; wallclock rows 2911 vs 2162; GPU-hours 3049 vs 1642; best ResNet-18/C10 MetaOptimize arm 93.328 vs 93.317; deficit 1.796 vs 1.807; partition-family admissible 455 vs 431; ...Lion 443 vs 419; count-matched rows outside rp1 259 vs 241; ...admissible 259 vs 241.
+* **Evidence these are ingest drift, not regressions:** the same unedited c98 run with `--csv` on `git show cf00461:results/all_runs.csv` (its last commit; 2,177 rows) prints **ALL 636 CHECKS PASS, exit 0.** The best-arm move is the ingest of `eb1-a06` (absent from the 2,177-row corpus; 93.368/93.466/93.150).
+
+### 224.2 `analysis/c98b_reproduce.py` (new; sha256 `1bd675ea…`)
+
+* **Mechanism.** Imports `c98_reproduce` and calls its `main()`, sections and `chk()` unmodified; only wraps `chk` to know the current section. A DRIFT site's FAIL is removed from `FAILS` after c98's `chk` appended it and is printed as `DRIFT` with a `[DRIFT]` tag. c98's `ASSERTED` list is untouched, so its §3.4 census check (628/411/982/41.9) is unchanged and still passes.
+* **The drift rule.** A site is DRIFT iff its derived value is an aggregate over the whole corpus that no batch prefix bounds. Applied to all 636 sites it selects exactly the 18 sites of three sections, 8 of which PASS today:
+
+| section | sites | kind |
+|---|---|---|
+| [1] corpus | rows, admissible, wallclock rows, GPU-hours, distinct nodes, rows failing window_ok, rows failing complete, rows with no plateau5 | append-only counts |
+| [8] competitiveness | best R18/C10 MO arm, tuned SGD baseline, its se, deficit | corpus-wide maxima |
+| [15] metacensus | partition-family admissible, ...Lion, ...RMSProp, distinct metas, count-matched outside rp1, ...admissible | append-only counts |
+
+* **Still gated (not silenced).** G1: an append-only count below the paper's value (data loss) fails. G2: deficit <= 0 (abstract (ii) reversed) fails. A declared drift key not matched exactly once exits 2 (declaration stale).
+* **Enumeration proof.** `diff` of c98's and c98b's stdout on the same corpus differs ONLY on the 18 drift lines (status token + tag), the footer, and the appended drift report; every one of the 618 science lines is byte-identical. `tests/test_c98b_reproduce.py` asserts this mechanically (T1), plus: a perturbed Table 2 paper value makes c98b exit 1 (T2, science 43/44); drift alone exits 0 (T3); G1 fires on a 1,000-row truncated corpus (T4); G2 fires (T5); a stale declaration exits 2 (T6). **ALL PASS.**
+* **Run:** `python3 analysis/c98b_reproduce.py` → `ALL 618 SCIENCE CHECKS PASS (636 assertion sites = 618 science + 18 drift)`, `c98b VERDICT: science 618/618 PASS | drift 18 site(s), 10 differ (not gated) | guards fired 0 | declaration OK`, **exit 0**. Drift report prints expected vs live vs delta for all 18.
+* **THE PAPER'S NUMERALS (2177, 1735, 2162, 1642, 93.317, 1.807, 431, 419, 241, 241) REMAIN STALE.** c98b does not make them right; it stops them masking science regressions. Refreshing `paper/` is the author's call. c98 itself is unchanged and still exits 1; `c98_release.py` still calls c98.
+
+### 224.3 Safety sweep — tools and counts
+
+* **Tools.** pyright 1.1.409 (`pyright --outputjson analysis`, 181 files). ruff, mypy, pyflakes are NOT installed. Own AST passes in `analysis/c224_safety_sweep.py` (new, read-only): (1) enclosing-function context of every finding; (2) selftest→score() call-closure reachability.
+* **Scope.** The six unbound/None rules: 752 findings pre-fix (748 post-fix). Every non-selftest finding group was READ BY HAND; verdicts live as data in the tool's `OVERRIDES`.
+* **Registered = every c*-prefixed file** (instruments and landed-record evidence), plus `probe5_floor.py` and `test_fence_mask.py`, which CORRECTIONS names as registered. Report only for those.
+
+| | ARTEFACT | LATENT | REACHABLE | FIXED |
+|---|---|---|---|---|
+| registered (686 post-fix) | 586 | 61 | **39** | – |
+| non-registered (62 post-fix) | 55 | 7 | 0 | **4 sites pre-fix** |
+
+ARTEFACT = pyright cannot see the guard: 282 registered + 46 non-registered sites are inside selftests on fixed synthetic fixtures; the rest are dict-literal value unions (`o["rec_lo"]` always a float), None-checks/INCOMPLETE/VOID gates upstream, short-circuits, loop invariants (all 20 "possibly unbound" are bound on every reaching path). LATENT = reachable only if a fixed on-disk artefact or sibling module is absent/malformed.
+
+### 224.4 REACHABLE, registered — REPORTED ONLY, for a future successor
+
+* **`c53_score.py`** 201–227, 401–428: `c52_boxfree.agg()` returns `(None, 0)` when a rung has no probe dir; B0/N0 subscript it → TypeError instead of a gate FAIL.
+* **`c72_hz9_score.py`** 147, 150, 171: `pl()` is None for a missing or <100-epoch `.out`; H0 prints INCOMPLETE and CONTINUES, H0.5 does None − float (h1()'s `mean()` too); `sem()` None for an arm with <2 readable runs. A dropped run crashes rather than yielding INCOMPLETE.
+* **`cLV1_live_term_census.py`** 561: `indep_seed_levels()` returns None when one `.out` is missing; the sum iterates None.
+* LATENT (registered): `c53_budget_window` 190; `c60_exception_mechanism` 785–802, 954–956, 1091–1096; `c63_span_reconcile` 433–434; `c69_c100_armset` 112–113, 184–188; `c70_composition_audit` 604–607; `c74_bf9` 382, `c75_tw0` 461, `c75_frozen_free` 75 (the flagged None is guarded, but the adjacent `["steady .5-1"]` is a KeyError when that window is skipped, T<16 records); `cG16_eb` 712; `cLV1` 812–819; `cVH1_vgghorizon` 950–986; `cvg1_attack_rederive` 101–102; `probe5_floor` 189.
+
+### 224.5 FIXED — `analysis/probe5_window.py` (non-registered helper; the ONLY edited existing file)
+
+* **Bug.** `reduce_dir()` subscripted `recompute_rho()`'s result unchecked. It is None whenever the corrected floor is non-finite: n_tot < 2 (`parse_dirname` accepts the rung token `scal`, and `decompose()` returns a dict for n_tot = 1) or `n_records < 2` in `neg_counts.json`. One such dir under a root crashed `probe5_window.py`, `probe5_time_ladder.reduce_arm()` and `neff_instrument.reduce_root()` with `TypeError: 'NoneType' object is not subscriptable`.
+* **Fix (+5 lines, additions only):** skip that window, exactly as the function already skips a None `decompose()`. The registered `probe5_floor.profile` already guards the same case (`if not c: continue`).
+* **Test first:** `tests/test_probe5_window_degenerate.py` failed 3/4 before the fix (P1 scalar dir, P2 n_records<2, P4 `main()` traceback) and passes 4/4 after. P3 proves that on four healthy rungs (w/node/lay/blk6) the output is identical to the verbatim pre-fix body. Existing selftests unchanged before/after: probe5_window 41/41, probe5_time_ladder 32/32, neff_instrument 23/23 (probe5_floor 15/15, idea3_robustness 37/37, idea3_threearm 45/45).
+* Other non-registered findings: agchk, agree_legacy, identity_gate, idea3_*, neff_instrument, probe5_time_ladder are ARTEFACT (neff_instrument and probe5_time_ladder inherit the fix). probe5_window 135/187/220–224/395/422 are LATENT import fallbacks (twochannel/corr_range absent from analysis/), not fixed.
+
+### 224.6 Registered scorers whose selftest never drives score() (AST pass, `--scorepath`)
+
+* **NEVER (49)** — the selftest's call closure does not reach `score()` (or the entry's scoring driver), no subprocess of itself: c53, c54, c71_bd7_bo7, c72_bf8, c72_hz9, c81_cc1, c83_gen, c87_an0, c87_hz3, c87_rl3, c97_bm2, c97_sm4, c99_hz3q, cA1_g4, cA2_g3, cA3_lsm1, cDP1_cdep1_depth, cG16_eb, cG1_tl, cH1_hb1, cI1_in489g1, cI2_in489g2, cIS1_ciso1_isolate, cIS2_ciso2_horizon, cJ1_cbl1, cK1_cpk1, cL1_cts1, cM1_cts2, cN1_box_row24, cN2_box_row24, cO1_cfr1, cO1_cts3, cO2_cfr2, cP1_scl1, cQ1_row24_falloff, cR1_cpk2, cS2_cpk3, cT1_tin, cTD1_tensor_dominate, cTD2_tensor_dominate, cU1_alpha0_granularity, cV1_cpr1, cVG1_vggbn_gap, cVI1_vggiso_identity, cVK1_vggcut, cW1_cpg1, cX1_crn1, cY1_cru1, cdn1_denominator.
+* **PARTIAL (16)** — no single `score()`; the selftest reaches sub-scorers but not `main()`'s inline scoring: c74_bf9, c74_wm9, c75_at1, c75_ck1, c75_tw0, c76_cx2, c76_mm1, c77_pp1, c78_bn1, c79_ar1, c82_fa1, c83_gc1, c84_gn1, c97_rp1, cHD1_hdisagree, cHE1_hdominate_element.
+* **DRIVES (9):** cAU1, cGN1, cGN2, cPL1, cPL2, cUC1, cVH1, cVK2, cdn2.
+* **Validation of the pass:** it classifies cdn1 NEVER and its successor cdn2 DRIVES (the known 171 history), and cVK1 NEVER / cVK2 DRIVES.
+
+### 224.7 Registered selftests on today's Mac tree (run, not edited)
+
+* 109 c*.py files take `--selftest`; **65 exit 0, 44 exit non-zero.**
+* Every non-zero one read falls in one of two classes, neither a code defect:
+  1. Registration-time corpus assertions that drift by design: RULE 21 "no <prefix> row yet" after the batch landed, frozen literals re-derived from the grown CSV, corpus row counts. cms1 prints it explicitly: "a FAIL here after a later ingest is a CENSUS CHANGE, not a defect".
+  2. Probe mirrors absent on the Mac: c55, c65, c67, c72_bf8, c73_bf8_ceiling (the last raises IndexError on the empty arm list).
+* This is the c98 problem at scorer scale; a successor pattern like 224.2 would be needed to make those selftests gate again. NOT done here.
+
+### 224.8 Discipline
+
+* **`git diff -- analysis/`** is additions only: new `c98b_reproduce.py` and `c224_safety_sweep.py`, and +5 lines in `probe5_window.py` (the one deliberately fixed non-registered helper). New tests: `tests/test_c98b_reproduce.py`, `tests/test_probe5_window_degenerate.py`.
+* **Untouched:** `analysis/c98_reproduce.py` (sha256 `78d6bc6a…`), `analysis/argsline_guard.py` (`81cea8b5…`), every c* file, `paper/`, `docs/MASTER-TABLE.md`, `results/all_runs.csv` (2,926 rows, `3223028d…`).
+* ZERO GPU; no cluster command; `alice` NOT CONTACTED.
+
+Next free number: **225**.
