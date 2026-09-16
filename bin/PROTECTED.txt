@@ -39,3 +39,5 @@ cgn1-
 cpl1-
 cvh1-
 cuc1-
+cgn2-
+cpl2-

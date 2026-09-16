@@ -29992,3 +29992,93 @@ Level anchors, frozen from `cpl1` (non-gating): k01 11.7867, kL 68.9800, ISO 67.
 * **RULE 16:** no registered file, no `argsline_guard.py`, no `paper/` file was edited; `git diff` is additions only (6 new files + this entry). **RULE 21:** both scorers are committed in this commit, before any `cgn2`/`cpl2` run exists (0 `.out`, 0 `sacct`, 0 CSV rows, 0 in `squeue`); the launch entry will prove the margin by wall clock. **Launch** is in the next entry, from these exact bytes, with `CGN2_REGISTERED_COMMIT` / `CPL2_REGISTERED_COMMIT` = this commit. `alice` NOT contacted. No nested `claude -p`.
 
 Next free number: **223**.
+
+## 223. TRACK L4 (launch) — **`cgn2` AND `cpl2` LAUNCHED ON alice2, IN THAT ORDER: ONE SUBMISSION EACH, THE REGISTERED LAUNCHER UNEDITED WITH ITS OWN `--submit`, FROM ITS sha-VERIFIED `~/stage_<prefix>`, 30 JOBS ACCEPTED, 0 REJECTED.  `cgn2` 5018235–5018237, 5018240–5018251; `cpl2` 5018256–5018270.  RULE 21 MARGINS, BY WALL CLOCK: +53 s AND +96 s (positive; the registration commit `ad29705` was pushed before either submission).  RULE 20 AT AVAILABLE COVERAGE (two passes): `cgn2` PASS AT 15/15, ARGS AND A SEPARATE ENV AUDIT; `cpl2` 0/15 UNVERIFIED (ALL PENDING, `QOSMaxGRESPerUser`/Priority), NOT FAILED.  NOTHING CANCELLED.**  **No number from either batch was read.  `alice` NOT CONTACTED.  No job this track did not submit was touched.**  THIS ENTRY TOOK NUMBER **223**; NEXT FREE **224**.
+
+### 223.1 Authorization and scope
+
+* The operator directed that both follow-ups be launched ("move forward and keep testing the open items"), one submission each. Nothing else was submitted.
+* Account `alice2` (`s5014158`) only. Before the first submission: 0 jobs in `squeue`, and 0 `cgn2-`/`cpl2-` jobs in `sacct`, `.out` files or CSV rows.
+
+### 223.2 Staging — the stages ARE the registered commit
+
+* `~/stage_cgn2` and `~/stage_cpl2` were built from the Mac tree before registration (`bin/`, `tests/`, `patches/`, `analysis/*.py`, `results/all_runs.csv`). No git repo there, so guard 1b's operator-declared commit was used.
+* **After committing `ad29705` and before either submission,** every file each launcher's guard 1a lists (plus the BN/PlainNet scorers the selftests read, and `bin/PROTECTED.txt`) was hashed on alice2 and compared with `git show HEAD:<path> | shasum -a 256`. Result: **`cgn2` 14/14, `cpl2` 13/13 sha256-equal; nothing copied, nothing overwritten.**
+* Cluster-only pins re-read by the guards at launch:
+  * `harness_cgn1` `build_network.py` `9f6e4ec9…c892`; `harness_cpl1` `e65e6773…a18b`.
+  * HF.py `4732b74a…` in both trees (= live).
+  * Runners `run_cifar_cgn1.sh` `c98e1a56…`, `run_cifar_cpl1.sh` `eb17bcca…`.
+  * The live `build_network.py` is still `c7998883…`, untouched: V-b3/V-b4 of both stage scripts.
+
+### 223.3 The two launches (times UTC; `sacct` Submit is CEST)
+
+| batch | dry run immediately before | lines | submission | accepted / rejected | launcher guard 7 |
+|---|---|---|---|---|---|
+| `cgn2` | 08:23:27–08:23:37Z, exit 0, 0 guard failures; its 15 lines **byte-identical (`cmp`)** to the 15 read in full at 221.6 | 15 | `CGN2_REGISTERED_COMMIT=ad297058… bash bin/cGN2_gn_isolation.sh --submit`, started 08:23:43Z; Submit 10:23:51–52 CEST | **15 / 0** | **PASS** against a run's own ARGS line |
+| `cpl2` | 08:23:59–08:24:14Z, exit 0, 0 guard failures; lines **byte-identical** to those read at 222.6 | 15 | `CPL2_REGISTERED_COMMIT=ad297058… bash bin/cPL2_plainnet_head.sh --submit`, started 08:24:20Z; Submit 10:24:34–35 CEST | **15 / 0** | UNVERIFIED (no job started within 600 s) |
+
+* Every guard of both launchers passed at submit time. **Job ids:**
+  * `cgn2` (arm order k01, kL, ISO, CTL, ONE per seed): s72 5018235, 5018236, 5018237, 5018240, 5018241; s73 5018242–5018246; s74 5018247–5018251. 5018238–5018239 are not this account's jobs.
+  * `cpl2` (k01, kL, ISO, HEAD, TWIN): s75 5018256–5018260; s76 5018261–5018265; s77 5018266–5018270.
+* **`PROVENANCE.txt`** (written only by `--submit`), for both: `MODE submit`, `REGISTERED_COMMIT ad297058c00631ab449ad55a3299c9645d67fb2c`, `SCORER_SHA256` = the registered scorer (`cdf6643e…` / `66c3adab…`), `BUILD_NETWORK_SHA256` = the tree pin. This is exactly what each scorer's G-PROV gate will check.
+
+### 223.4 RULE 21, by wall clock
+
+| batch | scorer | commit | `%ct` | earliest `sacct` Submit (CEST) | epoch | margin |
+|---|---|---|---|---|---|---|
+| `cgn2` | `analysis/cGN2_gn_isolation_score.py` | `ad29705` | 1789546978 | 2026-09-16T10:23:51 | 1789547031 | **+53 s** |
+| `cpl2` | `analysis/cPL2_plainnet_head_score.py` | `ad29705` | 1789546978 | 2026-09-16T10:24:34 | 1789547074 | **+96 s** |
+
+* Each scorer has exactly one commit in `git log`, and the copy that ran is sha256-identical to it (223.2). The commit was on `origin/master` before the first submission.
+* alice2: TZ Europe/Amsterdam, "System clock synchronized: yes". Mac `date +%s` and alice2's agreed to the second (1789547082 on both).
+* **Disclosed:** the margins are small (53 s / 96 s against 216's ~2,000 s) because the registration commit, the stage verification, the dry runs and the submissions were run back to back. RULE 21 requires a positive margin, and both are positive.
+
+### 223.5 RULE 20 at available coverage (pass 1 08:25:27Z; pass 2 08:35:18Z)
+
+* **Method** (read-only; `~/l221_rule20.sh`, a copy of 216's `l216_rule20.sh` with the batch tables swapped, sha `ba1a37c8…`):
+  * (a) `analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, from each stage), `--batch-consistency --strict`, axes `--vary stepsize-groups --vary seed --vary run-name`.
+  * (b) The same tool per run, `--expect` on every design flag, with the arm's registered spec (from the file name), seed, `save-directory` and `run-name`, and the flag count (20).
+  * (c) The SEPARATE ENV audit `~/l221_envaudit.py` (a copy of 216's `l216_envaudit.py` with the `cgn2`/`cpl2` table; sha `977d614d…`). It reads ONLY `NODE=`, `ENV:` and `PROBE_TENSOR:` lines, and checks all 15 runner ENV keys, the run's own `PROBE_DIR`, the NODE header's job name, id and AUGMENT, and the PROBE_TENSOR type, tensor count and dir.
+
+| batch | started (ARGS present) | ARGS: batch-consistency | ARGS: per-run `--expect` | ENV audit | verdict |
+|---|---|---|---|---|---|
+| `cgn2` | **15/15** (both passes) | PASS, 15 clean | 15 checked, 0 violations | ONE distinct ENV line ×15; PROBE_TENSOR blockwise ×9, layerwise ×3, scalar ×3, `tensors=62` | **PASS at 15/15** |
+| `cpl2` | 0/15 (15 PENDING) | no candidate file | — | 0/15 | **UNVERIFIED (0/15)** |
+
+* The ENV line, verbatim with `PROBE_DIR` stripped: `ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0`.
+* **No started run differs from the registration, so nothing was cancelled.** Full-coverage RULE 20 is **done for `cgn2`**: ARGS, ENV and PROBE_TENSOR lines are written at start, and all 15 are the registered ones. It is **owed for `cpl2`** at 15/15 before any `cpl2` number is read: `bash ~/l221_rule20.sh`.
+* Logs: `~/l221_logs/rule20_pass1.log` (`e423c169…`), `rule20_pass2.log` (`ce2a609e…`), `submit_cgn2.log` (`d832f30c…`), `submit_cpl2.log` (`f2060981…`).
+
+### 223.6 Queue state, ETA and cost
+
+* **At 08:35Z:**
+  * `cgn2` 15 RUNNING: 12 on `gpu-short` (7 on L4 nodes 881/882/887, 5 on MIG nodes 865–867) and 3 on `gpu-mig-40g` (867/868). None is on a 2080 Ti, the class that made `cgn1` slow.
+  * `cpl2` 15 PENDING (`QOSMaxGRESPerUser` ×14, Priority ×1). The per-user caps (gpu-short 12, gpu-mig 8, gpu-l4 8, a100 2) are held by `cgn2`. `squeue --start` gives 18:25–22:34 CEST, a worst-case estimate.
+* **ETA, UNSURE.**
+  * `cgn2` ≈ 45–90 min per run on L4/MIG, so done ≈ 11:15–12:00 CEST.
+  * `cpl2` starts as `cgn2` frees slots; at ≈30–45 min per run (cpl1: 29:31 on an L4), done ≈ 12:30–14:00 CEST if it gets slots when `cgn2` ends.
+* **GPU-h.** Expected ≈18.7 (`cgn2`; plausibly lower on L4/MIG) + ≈10.0 (`cpl2`) ≈ **28.7**, inside the ~35 envelope. Hard bound (WALL × jobs) 45 + 45 = 90.
+
+### 223.7 Owed, per batch, in order
+
+1. RULE 20 at FULL coverage (**done `cgn2`**; owed `cpl2`).
+2. Ingest (146.7): added == 15 per batch AND changed == 0.
+3. Score with the documented one-argument invocation, UNEDITED, from the stage directory:
+   * `cd ~/stage_cgn2 && python3 analysis/cGN2_gn_isolation_score.py $METAOPT_WS/runs`
+   * `cd ~/stage_cpl2 && python3 analysis/cPL2_plainnet_head_score.py $METAOPT_WS/runs`
+4. MASTER-TABLE rows APPENDED at the very end of the file ONLY when each lands (not now).
+
+### 223.8 Discipline
+
+* **Files in this commit:** `docs/CORRECTIONS.md` (this entry) and `bin/PROTECTED.txt` (+2 lines, `cgn2-`, `cpl2-`). `git add` named exactly those two paths.
+  * The launchers appended the same two prefixes to their stage copies.
+  * The alice2 mirror's `bin/PROTECTED.txt` was backed up to `PROTECTED.txt.bak_l223` (`9263797f…` = the previous HEAD bytes) and received the same two lines. Mac and mirror are now sha256 `f89208ee…77eac17`.
+* **Untouched:** every registered file (including `ad29705`'s six), `analysis/argsline_guard.py`, both isolated trees, the live harness, `paper/`. No nested `claude -p`.
+* **Left on alice2 (all deletable):**
+  * `~/derive_c221.py` (the registration-time re-derivation of 221.2/222.2), `~/mk221.py`, `~/l221_bw.sh`, `~/l221_rule20.sh`, `~/l221_envaudit.py`, `~/head_cgn2.sha`, `~/head_cpl2.sha`, `~/l221_logs/`.
+  * `/tmp/cgn2_bw_l221`, `/tmp/cpl2_bw_l221` and the guards' `/tmp/<prefix>_*` temporaries.
+  * The mirror's `PROTECTED.txt.bak_l223`.
+  * What the launchers wrote: `runs/<prefix>/{PARTITION-MANIFEST.txt, PROVENANCE.txt, PROVENANCE.dryrun.txt, inertness log, probe dirs}`, `runs/<prefix>-PARTITION-MANIFEST.txt`, `runs/<prefix>-PROVENANCE.txt`.
+* **`alice` NOT CONTACTED. NOTHING CANCELLED.** Committed and PUSHED, as the operator directed.
+
+Next free number: **224**.
