@@ -1,0 +1,226 @@
+[0] manifest: 53 tensors, 11046308 params; idx50 layer4.1.bn2.weight; 4508 bytes, sha256 b2f2208954230b55…
+    REPLAY line, six WITNESS lines == the witnesses built here, sha prefix b2f22089, 4508 bytes: True
+    PROVENANCE MODE submit  BUILD e65e6773…  HF 84b345ad…  RUNNER c801fc85…  SCORER 1304144a… == scorer file: True
+
+[1] completeness and header lines (BETA_HOLD witnesses built from mode / P / b0 / ms)
+  OK   k01        s90 job 5021700  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HEAD       s90 job 5021701  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDLOW    s90 job 5021702  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDSHARED s90 job 5021703  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHIGH   s90 job 5021704  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHEAD   s90 job 5021705  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   k01        s91 job 5021706  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HEAD       s91 job 5021707  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDLOW    s91 job 5021708  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDSHARED s91 job 5021709  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHIGH   s91 job 5021710  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHEAD   s91 job 5021711  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   k01        s92 job 5021712  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HEAD       s92 job 5021713  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDLOW    s92 job 5021714  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDSHARED s92 job 5021715  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHIGH   s92 job 5021716  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+  OK   HOLDHEAD   s92 job 5021717  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True
+
+[2] levels (plateau5 = mean TEST epochs 95..99; TRAIN5 beside)
+  k01        TEST 11.6947 (sd 0.4359, range 0.8700)  TRAIN 11.5080  seeds 11.6620 / 12.1460 / 11.2760  train 11.4960 / 12.0660 / 10.9620  slope80-99 -0.002 / +0.000 / +0.006
+  HEAD       TEST 64.7347 (sd 0.3370, range 0.6560)  TRAIN 79.9907  seeds 64.3620 / 64.8240 / 65.0180  train 79.4580 / 79.9080 / 80.6060  slope80-99 -0.004 / -0.001 / -0.009
+  HOLDLOW    TEST 65.4607 (sd 0.4413, range 0.8240)  TRAIN 81.5100  seeds 65.2780 / 65.9640 / 65.1400  train 81.4960 / 82.4800 / 80.5540  slope80-99 +0.003 / -0.003 / -0.001
+  HOLDSHARED TEST 11.3940 (sd 0.5909, range 1.1760)  TRAIN 11.2820  seeds 10.7720 / 11.9480 / 11.4620  train 10.5620 / 12.0620 / 11.2220  slope80-99 +0.001 / -0.003 / -0.001
+  HOLDHIGH   TEST 11.1267 (sd 0.6632, range 1.2180)  TRAIN 11.1187  seeds 10.3660 / 11.5840 / 11.4300  train 10.3080 / 11.6800 / 11.3680  slope80-99 -0.002 / -0.004 / -0.003
+  HOLDHEAD   TEST 64.6660 (sd 0.0556, range 0.1000)  TRAIN 79.2493  seeds 64.6300 / 64.7300 / 64.6380  train 78.9120 / 79.8080 / 79.0280  slope80-99 +0.009 / +0.001 / +0.005
+
+[3] sigma and contrasts (within batch)
+  SIGMA_INBATCH 0.463780 (df 12)  SIGMA_PRIOR 0.694443  -> used 0.694443 (SIGMA_PRIOR_frozen)  SE 0.567010
+  PRIMARY  P_HIGH         = HEAD       - HOLDHIGH   TEST  +53.6080 pp =   +94.55 SE   TRAIN  +68.8720   per seed +53.9960 / +53.2400 / +53.5880
+  PRIMARY  P_COUP         = HOLDHIGH   - HOLDSHARED TEST   -0.2673 pp =    -0.47 SE   TRAIN   -0.1633   per seed -0.4060 / -0.3640 / -0.0320
+  PRIMARY  P_LOW          = HOLDLOW    - HEAD       TEST   +0.7260 pp =    +1.28 SE   TRAIN   +1.5193   per seed +0.9160 / +1.1400 / +0.1220
+  KEY      D_HEAD         = HEAD       - k01        TEST  +53.0400 pp =   +93.54 SE   TRAIN  +68.4827   per seed +52.7000 / +52.6780 / +53.7420
+  KEY      P_CTL          = HEAD       - HOLDHEAD   TEST   +0.0687 pp =    +0.12 SE   TRAIN   +0.7413   per seed -0.2680 / +0.0940 / +0.3800
+  KEY      D_HOLDLOW      = HOLDLOW    - k01        TEST  +53.7660 pp =   +94.82 SE   TRAIN  +70.0020   per seed +53.6160 / +53.8180 / +53.8640
+  KEY      D_HOLDSHARED   = HOLDSHARED - k01        TEST   -0.3007 pp =    -0.53 SE   TRAIN   -0.2260   per seed -0.8900 / -0.1980 / +0.1860
+  KEY      D_HOLDHIGH     = HOLDHIGH   - k01        TEST   -0.5680 pp =    -1.00 SE   TRAIN   -0.3893   per seed -1.2960 / -0.5620 / +0.1540
+  KEY      D_HOLDHEAD     = HOLDHEAD   - k01        TEST  +52.9713 pp =   +93.42 SE   TRAIN  +67.7413   per seed +52.9680 / +52.5840 / +53.3620
+
+[4] G-BITE re-derived from the raw probe records (237.6 (a)-(e)), the vote-out decomposition, non-vacuity
+  PASS k01        s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 2.4e-07
+  PASS HEAD       s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 1.9e-07
+  PASS HOLDLOW    s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 52 bh_active 5098 | vote-out decomposition worst rel 1.6e-07
+  PASS HOLDSHARED s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 42 bh_active 4409 | vote-out decomposition worst rel 2.7e-07
+  PASS HOLDHIGH   s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 43 bh_active 10027 | vote-out decomposition worst rel 1.7e-07
+  PASS HOLDHEAD   s90 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 1 bh_active 4827 | vote-out decomposition worst rel 2.2e-07
+  PASS k01        s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 1.5e-07
+  PASS HEAD       s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 2.3e-07
+  PASS HOLDLOW    s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 48 bh_active 4778 | vote-out decomposition worst rel 1.8e-07
+  PASS HOLDSHARED s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 47 bh_active 4725 | vote-out decomposition worst rel 2.1e-07
+  PASS HOLDHIGH   s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 47 bh_active 10207 | vote-out decomposition worst rel 2.1e-07
+  PASS HOLDHEAD   s91 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 3 bh_active 4946 | vote-out decomposition worst rel 2.0e-07
+  PASS k01        s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 1.7e-07
+  PASS HEAD       s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 0 bh_active None | vote-out decomposition worst rel 1.7e-07
+  PASS HOLDLOW    s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 45 bh_active 4462 | vote-out decomposition worst rel 2.1e-07
+  PASS HOLDSHARED s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 52 bh_active 5015 | vote-out decomposition worst rel 1.3e-07
+  PASS HOLDHIGH   s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 51 bh_active 10402 | vote-out decomposition worst rel 3.8e-07
+  PASS HOLDHEAD   s92 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | bh-audit 0 bh-on-control 0 active 7 bh_active 5133 | vote-out decomposition worst rel 2.2e-07
+  NON-VACUITY cross-read: records (of 500) on which group 1 FAILS each held mode's schedule (either half); max |error|
+  run        as HOLDLOW              as HOLDSHARED           as HOLDHIGH             as HOLDHEAD           
+  HEAD       s90 114  max   6.1475        378  max   8.8967        200  max   8.7345        113  max   0.0419      
+  HEAD       s91 107  max   5.8314        374  max   8.9197        200  max   9.3504        112  max   0.5782      
+  HEAD       s92 101  max   5.5002        395  max   9.1547        200  max   9.9965        112  max   1.2225      
+  HOLDLOW    s90   0  max   0.0000        392  max  10.1266        201  max  10.5855        113  max   6.1855      
+  HOLDLOW    s91   0  max   0.0000        398  max  10.0846        201  max  10.5855        113  max   6.1855      
+  HOLDLOW    s92   0  max   0.0000        371  max  10.1266        201  max  10.5855        113  max   6.1855      
+  HOLDSHARED s90 202  max  10.5146          0  max   0.0000        201  max   0.0903        201  max   8.8642      
+  HOLDSHARED s91 202  max  10.4826          0  max   0.0000        201  max   0.1339        201  max   8.8882      
+  HOLDSHARED s92 201  max  10.5236          0  max   0.0000        200  max   0.0619        200  max   8.8082      
+  HOLDHIGH   s90 201  max  10.5855        201  max   0.0644          0  max   0.0000        150  max   8.7740      
+  HOLDHIGH   s91 201  max  10.5855        201  max   0.1604          0  max   0.0000        150  max   8.7740      
+  HOLDHIGH   s92 201  max  10.5855        201  max   0.0799          0  max   0.0000        150  max   8.7740      
+  HOLDHEAD   s90 113  max   6.1855        362  max   8.8417        150  max   8.7740          0  max   0.0000      
+  HOLDHEAD   s91 113  max   6.1855        389  max   8.8467        150  max   8.7740          0  max   0.0000      
+  HOLDHEAD   s92 113  max   6.1855        379  max   8.7777        150  max   8.7740          0  max   0.0000      
+  every run FAILS every held mode but its own on >= 1 record: True; every held run passes its own on all: True
+
+[5] branch, states, stamps (237.6, re-typed; first match wins)
+  states: HOLDLOW AT-HEAD  HOLDSHARED AT-K01  HOLDHIGH AT-K01  HOLDHEAD AT-HEAD
+  FINAL: OWN-STEP-MAGNITUDE | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | REPLAY-MAX-RATE-TRIANGLE | SHARED-IS-MUTE-ARITHMETIC | ONE-NETWORK-PLAINNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDLOW-AT-HEAD | HOLDSHARED-AT-K01 | HOLDHIGH-AT-K01 | HOLDHEAD-AT-HEAD | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+    margin D_HEAD over GAP_MIN                               +33.0400 pp = +58.27 SE
+    margin k01 under K01_MAX                                  +8.3053 pp = +14.65 SE
+    margin worst seed range under DIVERGED (HOLDHIGH)         +3.7820 pp = +6.67 SE
+    margin HOLDLOW: L - (HEAD - MATCH)   (>= 0 is AT-HEAD)    +5.7260 pp = +10.10 SE
+    margin HOLDLOW: (k01 + NULL) - L     (>= 0 is AT-K01)    -51.7660 pp = -91.30 SE
+    margin HOLDSHARED: L - (HEAD - MATCH)   (>= 0 is AT-HEAD)  -48.3407 pp = -85.26 SE
+    margin HOLDSHARED: (k01 + NULL) - L     (>= 0 is AT-K01)   +2.3007 pp = +4.06 SE
+    margin HOLDHIGH: L - (HEAD - MATCH)   (>= 0 is AT-HEAD)  -48.6080 pp = -85.73 SE
+    margin HOLDHIGH: (k01 + NULL) - L     (>= 0 is AT-K01)    +2.5680 pp = +4.53 SE
+    margin HOLDHEAD: L - (HEAD - MATCH)   (>= 0 is AT-HEAD)   +4.9313 pp = +8.70 SE
+    margin HOLDHEAD: (k01 + NULL) - L     (>= 0 is AT-K01)   -50.9713 pp = -89.89 SE
+  per-seed readings against the in-batch k01 mean + NULL and HEAD mean - MATCH (descriptive; the branch reads arm means):
+    HOLDLOW    s90 65.2780 AT-HEAD / s91 65.9640 AT-HEAD / s92 65.1400 AT-HEAD
+    HOLDSHARED s90 10.7720 AT-K01 / s91 11.9480 AT-K01 / s92 11.4620 AT-K01
+    HOLDHIGH   s90 10.3660 AT-K01 / s91 11.5840 AT-K01 / s92 11.4300 AT-K01
+    HOLDHEAD   s90 64.6300 AT-HEAD / s91 64.7300 AT-HEAD / s92 64.6380 AT-HEAD
+  scorer log FINAL == this FINAL (whole string): True
+  branch token equal: True;  stamp lists equal as lists: True (scorer 16 tokens, here 16)
+
+[6] the scorer's descriptive readouts, re-derived (beta peak / pin (<= -15+1e-4 for good) / mean r epochs 15-30)
+  k01        s90  beta peak -5.384 @17.0 pin 36.4 r 3375  bh_active -
+  k01        s91  beta peak -5.414 @16.8 pin 36.2 r 3257  bh_active -
+  k01        s92  beta peak -5.422 @16.8 pin 36.2 r 3205  bh_active -
+  HEAD       s90  cmpl peak -4.854 @18.0 pin 99.6 r 8548 | b50 peak -8.853 @10.0 pin 22.8 r 7  bh_active -
+  HEAD       s91  cmpl peak -4.892 @18.0 pin 97.8 r 8550 | b50 peak -9.169 @9.4 pin 21.4 r 4  bh_active -
+  HEAD       s92  cmpl peak -4.920 @17.8 pin 99.6 r 8436 | b50 peak -9.501 @8.8 pin 20.2 r 2  bh_active -
+  HOLDLOW    s90  cmpl peak -4.874 @18.0 pin never r 8412 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 5098
+  HOLDLOW    s91  cmpl peak -4.916 @17.8 pin 99.6 r 8346 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 4778
+  HOLDLOW    s92  cmpl peak -4.874 @18.0 pin 99.6 r 8614 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 4462
+  HOLDSHARED s90  cmpl peak -4.486 @18.8 pin 40.4 r 10173 | b50 peak -4.486 @18.8 pin 40.4 r 10173  bh_active 4409
+  HOLDSHARED s91  cmpl peak -4.518 @18.8 pin 40.4 r 10117 | b50 peak -4.518 @18.8 pin 40.4 r 10117  bh_active 4725
+  HOLDSHARED s92  cmpl peak -4.476 @18.8 pin 40.2 r 10033 | b50 peak -4.476 @18.8 pin 40.2 r 10033  bh_active 5015
+  HOLDHIGH   s90  cmpl peak -4.448 @18.8 pin 40.4 r 10103 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10027
+  HOLDHIGH   s91  cmpl peak -4.354 @19.0 pin 40.4 r 10935 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10207
+  HOLDHIGH   s92  cmpl peak -4.494 @18.8 pin 40.4 r 10157 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10402
+  HOLDHEAD   s90  cmpl peak -4.868 @18.0 pin 99.6 r 8661 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 4827
+  HOLDHEAD   s91  cmpl peak -4.916 @17.8 pin 99.0 r 8560 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 4946
+  HOLDHEAD   s92  cmpl peak -4.874 @18.0 pin 97.8 r 8663 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 5133
+
+[7] LINE-BY-LINE AGREEMENT with the scorer log (each re-built line looked up verbatim)
+  COMPLETE      18 lines found verbatim, 0 not found
+  G-ARGS        18 lines found verbatim, 0 not found
+  G-ENV          4 lines found verbatim, 0 not found
+  G-VOTEW       18 lines found verbatim, 0 not found
+  G-HOLDW       18 lines found verbatim, 0 not found
+  G-STRUCT       1 lines found verbatim, 0 not found
+  G-PROV         5 lines found verbatim, 0 not found
+  LEVELS        12 lines found verbatim, 0 not found
+  G-FLOOR        1 lines found verbatim, 0 not found
+  G-CEIL         1 lines found verbatim, 0 not found
+  G-BITE        18 lines found verbatim, 0 not found
+  SIGMA          4 lines found verbatim, 0 not found
+  CONTRASTS     10 lines found verbatim, 0 not found
+  G-DIVERGE      1 lines found verbatim, 0 not found
+  BETWEEN        1 lines found verbatim, 0 not found
+  DESCRIPTIVE   24 lines found verbatim, 0 not found
+  total 154 re-built lines, 154 found; FAIL lines in the scorer log: 0
+
+====================================================================================================
+DESCRIPTIVE, NOT REGISTERED -- nothing below can move a level, contrast, gate, branch or stamp above
+====================================================================================================
+
+[D1] APPLIED beta after the update that ends each epoch (probe record at step 500e; the value the next update uses), MEDIAN seed per arm (by plateau5): k01 s90  HEAD s91  HOLDLOW s90  HOLDSHARED s92  HOLDHIGH s92  HOLDHEAD s92
+     c = complement (group 0), 50 = layer4.1.bn2.weight (group 1); k01 has one shared beta (50 rides it)
+  ep  k01             HEAD            HOLDLOW         HOLDSHARED      HOLDHIGH        HOLDHEAD       
+      shared          c / 50          c / 50          c / 50          c / 50          c / 50         
+   0  -13.815         -13.815/-13.815 -13.815/-15.000 -13.815/-13.815 -13.815/-13.815 -13.815/-13.815
+   2  -12.826         -12.816/-12.814 -12.826/-15.000 -12.818/-12.818 -12.818/-12.815 -12.818/-12.815
+   4  -11.826         -11.816/-11.814 -11.826/-15.000 -11.818/-11.818 -11.818/-11.815 -11.818/-11.815
+   6  -10.825         -10.815/-10.813 -10.825/-15.000 -10.817/-10.817 -10.817/-10.815 -10.817/-10.815
+   8   -9.825          -9.815/ -9.813  -9.825/-15.000  -9.817/ -9.817  -9.817/ -9.815  -9.817/ -9.815
+  10   -8.824          -8.814/ -9.319  -8.824/-15.000  -8.816/ -8.816  -8.816/ -8.815  -8.816/ -8.815
+  12   -7.824          -7.814/-10.309  -7.824/-15.000  -7.816/ -7.816  -7.816/ -7.815  -7.816/ -9.735
+  14   -6.824          -6.814/-11.309  -6.824/-15.000  -6.816/ -6.816  -6.816/ -6.815  -6.816/-10.735
+  16   -5.824          -5.814/-12.310  -5.824/-15.000  -5.816/ -5.816  -5.816/ -5.815  -5.816/-11.735
+  18   -5.884          -4.892/-13.310  -4.874/-15.000  -4.816/ -4.816  -4.816/ -4.815  -4.874/-12.735
+  20   -6.884          -5.890/-14.311  -5.858/-15.000  -4.968/ -4.968  -4.900/ -4.961  -5.846/-13.735
+  22   -7.884          -6.192/-15.000  -6.252/-15.000  -5.926/ -5.926  -5.886/ -5.961  -6.128/-14.735
+  24   -8.885          -6.290/-15.000  -6.430/-15.000  -6.926/ -6.926  -6.886/ -6.961  -6.384/-15.000
+  26   -9.885          -6.510/-15.000  -6.474/-15.000  -7.926/ -7.926  -7.886/ -7.961  -6.510/-15.000
+  28  -10.885          -6.594/-15.000  -6.606/-15.000  -8.927/ -8.927  -8.887/ -8.961  -6.578/-15.000
+  30  -11.886          -6.862/-15.000  -6.926/-15.000  -9.927/ -9.927  -9.887/ -9.961  -6.916/-15.000
+  32  -12.886          -7.008/-15.000  -7.116/-15.000 -10.927/-10.927 -10.887/-10.961  -7.050/-15.000
+  34  -13.887          -7.170/-15.000  -7.110/-15.000 -11.928/-11.928 -11.888/-11.961  -7.132/-15.000
+  36  -14.887          -7.322/-15.000  -7.454/-15.000 -12.928/-12.928 -12.888/-12.961  -7.424/-15.000
+  38  -15.000          -7.554/-15.000  -7.538/-15.000 -13.929/-13.929 -13.889/-13.961  -7.630/-15.000
+  40  -15.000          -7.804/-15.000  -7.808/-15.000 -14.929/-14.929 -14.889/-14.961  -7.942/-15.000
+  mean r = exp(beta+15) over epochs [15,30), arm mean of the three seeds (complement / 50):
+    k01        shared    3279.0
+    HEAD       complement    8511.5   50       4.3
+    HOLDLOW    complement    8457.2   50       1.0
+    HOLDSHARED complement   10107.6   50   10107.6
+    HOLDHIGH   complement   10398.5   50   10063.8
+    HOLDHEAD   complement    8628.4   50       6.4
+  complement beta, arm mean at epochs 18 / 20 / 25 / 30 / 35 / 40 / 50 / 60 / 80 / 99.8:
+    k01        -5.94 / -6.94 / -9.44 / -11.94 / -14.44 / -15.00 / -15.00 / -15.00 / -15.00 / -15.00
+    HEAD       -4.90 / -5.87 / -6.45 / -6.87 / -7.27 / -7.81 / -9.43 / -12.43 / -15.00 / -15.00
+    HOLDLOW    -4.92 / -5.87 / -6.45 / -6.89 / -7.35 / -7.83 / -9.34 / -12.14 / -14.99 / -15.00
+    HOLDSHARED -4.82 / -4.98 / -7.38 / -9.88 / -12.38 / -14.88 / -15.00 / -15.00 / -15.00 / -15.00
+    HOLDHIGH   -4.82 / -4.89 / -7.36 / -9.86 / -12.36 / -14.86 / -15.00 / -15.00 / -15.00 / -15.00
+    HOLDHEAD   -4.89 / -5.85 / -6.45 / -6.92 / -7.37 / -7.87 / -9.70 / -12.96 / -15.00 / -15.00
+
+[D2] TEST (TRAIN) after 15 / 30 / 50 / 100 completed epochs (Epoch lines 14 / 29 / 49 / 99): arm mean, then per seed
+  k01        5.48 (4.91)  11.54 (11.48)  11.64 (11.52)  11.68 (11.50)   | s90 5.89/11.57/11.70/11.73  s91 5.28/11.97/12.03/12.08  s92 5.26/11.09/11.18/11.23
+  HEAD       5.66 (4.97)  44.72 (45.27)  64.00 (76.69)  64.73 (79.95)   | s90 5.81/44.27/63.45/64.30  s91 5.95/45.55/63.94/64.89  s92 5.22/44.35/64.61/64.99
+  HOLDLOW    5.96 (5.10)  45.93 (46.16)  64.34 (77.58)  65.47 (81.47)   | s90 5.92/45.19/64.21/65.44  s91 6.33/46.29/64.48/65.91  s92 5.64/46.30/64.34/65.06
+  HOLDSHARED 5.48 (4.89)  11.40 (11.25)  11.38 (11.24)  11.42 (11.24)   | s90 5.88/10.70/10.71/10.75  s91 5.41/11.96/11.96/11.94  s92 5.14/11.55/11.46/11.56
+  HOLDHIGH   5.42 (4.94)  11.22 (11.10)  11.11 (11.10)  11.11 (11.07)   | s90 5.62/10.37/10.36/10.31  s91 5.34/11.75/11.55/11.53  s92 5.31/11.54/11.43/11.48
+  HOLDHEAD   5.65 (4.95)  45.02 (45.67)  63.97 (76.82)  64.55 (79.20)   | s90 6.06/43.83/63.99/64.60  s91 5.26/45.96/64.27/64.56  s92 5.64/45.27/63.65/64.49
+
+[D3] when the level is set.  settle = first epoch line after which TEST stays within 0.5 pp of plateau5; share = TEST / plateau5 at Epoch lines 14 / 19 / 24 / 29
+  k01        arm-mean settle 21  per seed 21/21/21  share 0.47 / 0.93 / 0.99 / 0.99
+  HEAD       arm-mean settle 50  per seed 50/52/49  share 0.09 / 0.31 / 0.51 / 0.69
+  HOLDLOW    arm-mean settle 52  per seed 53/53/50  share 0.09 / 0.32 / 0.50 / 0.70
+  HOLDSHARED arm-mean settle 22  per seed 22/22/22  share 0.48 / 0.88 / 0.99 / 1.00
+  HOLDHIGH   arm-mean settle 21  per seed 21/21/23  share 0.49 / 0.85 / 1.00 / 1.01
+  HOLDHEAD   arm-mean settle 50  per seed 50/51/50  share 0.09 / 0.31 / 0.51 / 0.70
+  HEAD - HOLDHIGH   arm-mean TEST gap by Epoch line 10..30: 10:-0.0 12:+0.1 14:+0.2 16:+2.1 18:+7.2 20:+12.5 22:+16.6 24:+22.1 26:+27.6 28:+31.5 30:+34.1 ; first line after which it stays > 2 pp: 16
+  HOLDHIGH   complement beta minus HEAD's (arm means) at epochs 10..40: 10:-0.00 12:-0.00 14:-0.00 16:-0.00 18:+0.08 20:+0.98 22:+0.41 24:-0.47 26:-1.32 28:-2.22 30:-2.99 32:-3.82 34:-4.66 36:-5.50 38:-6.28 40:-7.05 ; first epoch |diff| > 0.1: 19
+  HEAD - HOLDSHARED arm-mean TEST gap by Epoch line 10..30: 10:+0.1 12:+0.1 14:+0.2 16:+1.9 18:+6.7 20:+12.4 22:+16.5 24:+21.9 26:+27.3 28:+31.2 30:+33.9 ; first line after which it stays > 2 pp: 17
+  HOLDSHARED complement beta minus HEAD's (arm means) at epochs 10..40: 10:+0.00 12:+0.00 14:+0.00 16:+0.00 18:+0.08 20:+0.89 22:+0.39 24:-0.49 26:-1.34 28:-2.24 30:-3.01 32:-3.84 34:-4.68 36:-5.52 38:-6.30 40:-7.07 ; first epoch |diff| > 0.1: 19
+  tensor 50's beta, HOLDHIGH minus HEAD (arm means) at epochs 2..20: 2:-0.00 4:-0.00 6:-0.00 8:-0.00 10:+0.56 12:+2.50 14:+4.50 16:+6.51 18:+8.51 20:+9.36
+
+[D4] HOLDSHARED's live complement and HOLDHIGH's live complement against MUTE's measured shared trajectory (between batch: cvt1 MUTE s78-80, cvt3 MUTE50 s84-86; orientation only) and the replay v_9428
+  cvt1 MUTE s78              peak -4.410 @19.0  pin 40.4   r15-30  10618.4   max|beta - v_9428| all 0.104, epochs 0-40 0.104
+  cvt1 MUTE s79              peak -4.342 @19.0  pin 40.6   r15-30  11185.5   max|beta - v_9428| all 0.212, epochs 0-40 0.212
+  cvt1 MUTE s80              peak -4.430 @18.8  pin 40.2   r15-30  10225.0   max|beta - v_9428| all 0.042, epochs 0-40 0.042
+  cvt3 MUTE50 s84            peak -4.364 @19.0  pin 40.4   r15-30  10573.1   max|beta - v_9428| all 0.104, epochs 0-40 0.104
+  cvt3 MUTE50 s85            peak -4.444 @18.8  pin 40.2   r15-30  10151.9   max|beta - v_9428| all 0.030, epochs 0-40 0.030
+  cvt3 MUTE50 s86            peak -4.306 @19.2  pin 40.6   r15-30  11520.9   max|beta - v_9428| all 0.254, epochs 0-40 0.254
+  cvt4 HOLDSHARED s90 cmpl   peak -4.486 @18.8  pin 40.4   r15-30  10173.2   max|beta - v_9428| all 0.090, epochs 0-40 0.090
+  cvt4 HOLDSHARED s91 cmpl   peak -4.518 @18.8  pin 40.4   r15-30  10116.6   max|beta - v_9428| all 0.132, epochs 0-40 0.132
+  cvt4 HOLDSHARED s92 cmpl   peak -4.476 @18.8  pin 40.2   r15-30  10033.0   max|beta - v_9428| all 0.062, epochs 0-40 0.062
+  cvt4 HOLDHIGH s90 cmpl     peak -4.448 @18.8  pin 40.4   r15-30  10103.2   max|beta - v_9428| all 0.064, epochs 0-40 0.064
+  cvt4 HOLDHIGH s91 cmpl     peak -4.354 @19.0  pin 40.4   r15-30  10935.1   max|beta - v_9428| all 0.160, epochs 0-40 0.160
+  cvt4 HOLDHIGH s92 cmpl     peak -4.494 @18.8  pin 40.4   r15-30  10157.2   max|beta - v_9428| all 0.080, epochs 0-40 0.080
+  cvt4 HEAD s90 cmpl         peak -4.854 @18.0  pin 99.6   r15-30   8548.5   max|beta - v_9428| all 7.208, epochs 0-40 7.164
+  cvt4 HEAD s91 cmpl         peak -4.892 @18.0  pin 97.8   r15-30   8550.3   max|beta - v_9428| all 7.156, epochs 0-40 7.156
+  cvt4 HEAD s92 cmpl         peak -4.920 @17.8  pin 99.6   r15-30   8435.7   max|beta - v_9428| all 7.254, epochs 0-40 7.134
+
+VIOLATIONS 0

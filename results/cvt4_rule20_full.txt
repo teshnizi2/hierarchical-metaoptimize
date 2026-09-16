@@ -1,0 +1,21 @@
+RULE20 run utc=2026-09-16T21:38:03Z host=nodelogin04.alice.leidenuniv.nl
+===================== cvt4
+  .out files: 18   with ARGS: 18   squeue: 
+  BATCH-CONSISTENCY --name cvt4- --vary stepsize-groups --vary seed --vary run-name -> rc=0  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (cvt4): 18 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x18  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x15  PROBE_TENSOR: on every=100 type=blockwise tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x3  PROBE_TENSOR: on every=100 type=scalar tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x18  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x6  BETA_HOLD: off
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=floor value=-15.0
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=shared source=0 sourcesize=52
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=5041 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-8.774510749816894
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=9428 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-4.387510749816894
+    coverage 18/18 runs with an .out, 0 violations
+  ENV AUDIT VERDICT cvt4: PASS
+RULE20 end utc=2026-09-16T21:38:04Z

@@ -1,0 +1,229 @@
+==============================================================================
+ cvt4 -- IS TENSOR 50's OWN LARGE STEP SIZE THE LEVER?  (PlainNet18_c100, PATCH_BETAHOLD)
+ PlainNet18_c100 / CIFAR100   100 epochs   seeds 90,91,92   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   k01        scalar                                 BETA_HOLD (unset)
+   HEAD       sets:1-49,51-53/layer4.1.bn2.weight    BETA_HOLD (unset)
+   HOLDLOW    sets:1-49,51-53/layer4.1.bn2.weight    BETA_HOLD layer4.1.bn2.weight:floor
+   HOLDSHARED sets:1-49,51-53/layer4.1.bn2.weight    BETA_HOLD layer4.1.bn2.weight:shared
+   HOLDHIGH   sets:1-49,51-53/layer4.1.bn2.weight    BETA_HOLD layer4.1.bn2.weight:tri:9428
+   HOLDHEAD   sets:1-49,51-53/layer4.1.bn2.weight    BETA_HOLD layer4.1.bn2.weight:tri:5041
+ CO-PRIMARY: P_HIGH = HEAD - HOLDHIGH; P_COUP = HOLDHIGH - HOLDSHARED; P_LOW = HOLDLOW - HEAD.
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 2986 rows after corpus_exclusions.filter_rows, cvt4- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  18 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cvt4-k01-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.6620 (train 11.4960)
+  OK   cvt4-HEAD-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.3620 (train 79.4580)
+  OK   cvt4-HOLDLOW-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.2780 (train 81.4960)
+  OK   cvt4-HOLDSHARED-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 10.7720 (train 10.5620)
+  OK   cvt4-HOLDHIGH-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 10.3660 (train 10.3080)
+  OK   cvt4-HOLDHEAD-s90  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.6300 (train 78.9120)
+  OK   cvt4-k01-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 12.1460 (train 12.0660)
+  OK   cvt4-HEAD-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.8240 (train 79.9080)
+  OK   cvt4-HOLDLOW-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.9640 (train 82.4800)
+  OK   cvt4-HOLDSHARED-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.9480 (train 12.0620)
+  OK   cvt4-HOLDHIGH-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.5840 (train 11.6800)
+  OK   cvt4-HOLDHEAD-s91  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.7300 (train 79.8080)
+  OK   cvt4-k01-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.2760 (train 10.9620)
+  OK   cvt4-HEAD-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.0180 (train 80.6060)
+  OK   cvt4-HOLDLOW-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.1400 (train 80.5540)
+  OK   cvt4-HOLDSHARED-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.4620 (train 11.2220)
+  OK   cvt4-HOLDHIGH-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 11.4300 (train 11.3680)
+  OK   cvt4-HOLDHEAD-s92  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.6380 (train 79.0280)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s90
+  PASS G-ARGS HEAD-s90
+  PASS G-ARGS HOLDLOW-s90
+  PASS G-ARGS HOLDSHARED-s90
+  PASS G-ARGS HOLDHIGH-s90
+  PASS G-ARGS HOLDHEAD-s90
+  PASS G-ARGS k01-s91
+  PASS G-ARGS HEAD-s91
+  PASS G-ARGS HOLDLOW-s91
+  PASS G-ARGS HOLDSHARED-s91
+  PASS G-ARGS HOLDHIGH-s91
+  PASS G-ARGS HOLDHEAD-s91
+  PASS G-ARGS k01-s92
+  PASS G-ARGS HEAD-s92
+  PASS G-ARGS HOLDLOW-s92
+  PASS G-ARGS HOLDSHARED-s92
+  PASS G-ARGS HOLDHIGH-s92
+  PASS G-ARGS HOLDHEAD-s92
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is cvt1's / cpl2's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=53`   18 runs
+
+G-VOTEW / G-HOLDW   exactly ONE `VOTE_W: off` line and ONE BETA_HOLD line == the arm's witness, per run
+  PASS G-VOTEW k01-s90
+  PASS G-HOLDW k01-s90
+  PASS G-VOTEW HEAD-s90
+  PASS G-HOLDW HEAD-s90
+  PASS G-VOTEW HOLDLOW-s90
+  PASS G-HOLDW HOLDLOW-s90
+  PASS G-VOTEW HOLDSHARED-s90
+  PASS G-HOLDW HOLDSHARED-s90
+  PASS G-VOTEW HOLDHIGH-s90
+  PASS G-HOLDW HOLDHIGH-s90
+  PASS G-VOTEW HOLDHEAD-s90
+  PASS G-HOLDW HOLDHEAD-s90
+  PASS G-VOTEW k01-s91
+  PASS G-HOLDW k01-s91
+  PASS G-VOTEW HEAD-s91
+  PASS G-HOLDW HEAD-s91
+  PASS G-VOTEW HOLDLOW-s91
+  PASS G-HOLDW HOLDLOW-s91
+  PASS G-VOTEW HOLDSHARED-s91
+  PASS G-HOLDW HOLDSHARED-s91
+  PASS G-VOTEW HOLDHIGH-s91
+  PASS G-HOLDW HOLDHIGH-s91
+  PASS G-VOTEW HOLDHEAD-s91
+  PASS G-HOLDW HOLDHEAD-s91
+  PASS G-VOTEW k01-s92
+  PASS G-HOLDW k01-s92
+  PASS G-VOTEW HEAD-s92
+  PASS G-HOLDW HEAD-s92
+  PASS G-VOTEW HOLDLOW-s92
+  PASS G-HOLDW HOLDLOW-s92
+  PASS G-VOTEW HOLDSHARED-s92
+  PASS G-HOLDW HOLDSHARED-s92
+  PASS G-VOTEW HOLDHIGH-s92
+  PASS G-HOLDW HOLDHIGH-s92
+  PASS G-VOTEW HOLDHEAD-s92
+  PASS G-HOLDW HOLDHEAD-s92
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cvt4/PARTITION-MANIFEST.txt (<runsdir>/cvt4/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text() (53 tensors, HEAD [52,1], the hold table)   4508 vs 4508 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cvt4/PROVENANCE.txt (<runsdir>/cvt4/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV build_network.py sha256 == POST_SHA e65e67738e45...   e65e67738e454180
+  PASS G-PROV HF.py sha256 == HF_POST_SHA 84b345adf6df... (cvt4's PATCH_BETAHOLD tree)   84b345adf6df8024
+  PASS G-PROV RUNNER_SHA256 == cvt4's runner c801fc85115f...   c801fc85115f124d
+  PASS G-PROV SCORER_SHA256 == this scorer's sha256 1304144ad1a1...   1304144ad1a19ae8
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01        TEST 11.6947  sd 0.4359  range 0.8700   TRAIN 11.5080   tail slope -0.002/0.000/0.006 pp/ep
+             seeds: s90 11.6620 (train 11.4960), s91 12.1460 (train 12.0660), s92 11.2760 (train 10.9620)
+  HEAD       TEST 64.7347  sd 0.3370  range 0.6560   TRAIN 79.9907   tail slope -0.004/-0.001/-0.009 pp/ep
+             seeds: s90 64.3620 (train 79.4580), s91 64.8240 (train 79.9080), s92 65.0180 (train 80.6060)
+  HOLDLOW    TEST 65.4607  sd 0.4413  range 0.8240   TRAIN 81.5100   tail slope 0.003/-0.003/-0.001 pp/ep
+             seeds: s90 65.2780 (train 81.4960), s91 65.9640 (train 82.4800), s92 65.1400 (train 80.5540)
+  HOLDSHARED TEST 11.3940  sd 0.5909  range 1.1760   TRAIN 11.2820   tail slope 0.001/-0.003/-0.001 pp/ep
+             seeds: s90 10.7720 (train 10.5620), s91 11.9480 (train 12.0620), s92 11.4620 (train 11.2220)
+  HOLDHIGH   TEST 11.1267  sd 0.6632  range 1.2180   TRAIN 11.1187   tail slope -0.002/-0.004/-0.003 pp/ep
+             seeds: s90 10.3660 (train 10.3080), s91 11.5840 (train 11.6800), s92 11.4300 (train 11.3680)
+  HOLDHEAD   TEST 64.6660  sd 0.0556  range 0.1000   TRAIN 79.2493   tail slope 0.009/0.001/0.005 pp/ep
+             seeds: s90 64.6300 (train 78.9120), s91 64.7300 (train 79.8080), s92 64.6380 (train 79.0280)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 65.4607
+  PASS G-CEIL max arm mean <= 90.00 pp   max 65.4607
+
+G-BITE    the registered hold reached 50's beta at every record, and touched nothing else
+  (a) 500 records; (b) every UNHELD group's beta == Lion recomputed from its own beta_pre/mom_pre/z_agg (tol 1e-05);
+  (c) held group 1: beta == hold(step+2) and beta_pre == hold(step+1); (d) the patch's bh_* record audits;
+  (e) k01 / HEAD carry no bh_* key.  Non-finite records are counted and stamped, not failed.
+  PASS G-BITE k01        s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HEAD       s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HOLDLOW    s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 52  bh_active 5098
+  PASS G-BITE HOLDSHARED s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 42  bh_active 4409
+  PASS G-BITE HOLDHIGH   s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 43  bh_active 10027
+  PASS G-BITE HOLDHEAD   s90  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 1  bh_active 4827
+  PASS G-BITE k01        s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HEAD       s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HOLDLOW    s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 48  bh_active 4778
+  PASS G-BITE HOLDSHARED s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 47  bh_active 4725
+  PASS G-BITE HOLDHIGH   s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 47  bh_active 10207
+  PASS G-BITE HOLDHEAD   s91  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 3  bh_active 4946
+  PASS G-BITE k01        s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HEAD       s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 0  bh_active None
+  PASS G-BITE HOLDLOW    s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 45  bh_active 4462
+  PASS G-BITE HOLDSHARED s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 52  bh_active 5015
+  PASS G-BITE HOLDHIGH   s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 51  bh_active 10402
+  PASS G-BITE HOLDHEAD   s92  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  bh-audit 0  bh-on-control 0  active records 7  bh_active 5133
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.694443
+  SIGMA_INBATCH        0.463780
+  SIGMA_USED           0.694443  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.567010  = SIGMA_USED * sqrt(2/3)  (df_inbatch 12)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_HIGH   = HEAD - HOLDHIGH       = +53.6080 pp = +94.55 SE   (TRAIN +68.8720)
+  PRIMARY  P_COUP   = HOLDHIGH - HOLDSHARED = -0.2673 pp = -0.47 SE   (TRAIN -0.1633)
+  PRIMARY  P_LOW    = HOLDLOW - HEAD        = +0.7260 pp = +1.28 SE   (TRAIN +1.5193)
+  KEY      D_HEAD   = HEAD - k01            = +53.0400 pp = +93.54 SE   (TRAIN +68.4827)  [positive control]
+  KEY      P_CTL    = HEAD - HOLDHEAD       = +0.0687 pp = +0.12 SE   (TRAIN +0.7413)  [hold control]
+  KEY      D_HOLDLOW    = HOLDLOW    - k01  = +53.7660 pp = +94.82 SE   (TRAIN +70.0020)   HEAD - HOLDLOW    = -0.7260
+  KEY      D_HOLDSHARED = HOLDSHARED - k01  = -0.3007 pp = -0.53 SE   (TRAIN -0.2260)   HEAD - HOLDSHARED = +53.3407
+  KEY      D_HOLDHIGH   = HOLDHIGH   - k01  = -0.5680 pp = -1.00 SE   (TRAIN -0.3893)   HEAD - HOLDHIGH   = +53.6080
+  KEY      D_HOLDHEAD   = HOLDHEAD   - k01  = +52.9713 pp = +93.42 SE   (TRAIN +67.7413)   HEAD - HOLDHEAD   = +0.0687
+  bars: GAP_MIN 20.0 (35.27 SE) | MATCH 5.0 pp (8.82 SE) | NULL 2.0 pp (3.53 SE) | RESCUE 10.0 pp (17.64 SE)
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: OWN-STEP-MAGNITUDE | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | REPLAY-MAX-RATE-TRIANGLE | SHARED-IS-MUTE-ARITHMETIC | ONE-NETWORK-PLAINNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDLOW-AT-HEAD | HOLDSHARED-AT-K01 | HOLDHIGH-AT-K01 | HOLDHEAD-AT-HEAD | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt4 bar or contrast):
+  cvt1: k01 11.9493  HEAD 64.7940  MUTE 10.9860
+  cvt3: k01 11.5720  HEAD 64.5960  MUTE50 11.2947
+  cvt2: k01 11.4767  HEAD 64.4187
+  cvt4 {90,91,92}: k01 11.6947  HEAD 64.7347  HOLDLOW 65.4607  HOLDSHARED 11.3940  HOLDHIGH 11.1267  HOLDHEAD 64.6660
+
+DESCRIPTIVE, NON-GATING -- beta trajectories from the runs' own probe.jsonl; r = exp(beta + 15), epochs 15-30
+  k01        s90  beta peak -5.384 @17.0 pin 36.4 r 3375  bh_active -
+  k01        s91  beta peak -5.414 @16.8 pin 36.2 r 3257  bh_active -
+  k01        s92  beta peak -5.422 @16.8 pin 36.2 r 3205  bh_active -
+  HEAD       s90  cmpl peak -4.854 @18.0 pin 99.6 r 8548 | b50 peak -8.853 @10.0 pin 22.8 r 7  bh_active -
+  HEAD       s91  cmpl peak -4.892 @18.0 pin 97.8 r 8550 | b50 peak -9.169 @9.4 pin 21.4 r 4  bh_active -
+  HEAD       s92  cmpl peak -4.920 @17.8 pin 99.6 r 8436 | b50 peak -9.501 @8.8 pin 20.2 r 2  bh_active -
+  HOLDLOW    s90  cmpl peak -4.874 @18.0 pin never r 8412 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 5098
+  HOLDLOW    s91  cmpl peak -4.916 @17.8 pin 99.6 r 8346 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 4778
+  HOLDLOW    s92  cmpl peak -4.874 @18.0 pin 99.6 r 8614 | b50 peak -15.000 @0.0 pin 0.0 r 1  bh_active 4462
+  HOLDSHARED s90  cmpl peak -4.486 @18.8 pin 40.4 r 10173 | b50 peak -4.486 @18.8 pin 40.4 r 10173  bh_active 4409
+  HOLDSHARED s91  cmpl peak -4.518 @18.8 pin 40.4 r 10117 | b50 peak -4.518 @18.8 pin 40.4 r 10117  bh_active 4725
+  HOLDSHARED s92  cmpl peak -4.476 @18.8 pin 40.2 r 10033 | b50 peak -4.476 @18.8 pin 40.2 r 10033  bh_active 5015
+  HOLDHIGH   s90  cmpl peak -4.448 @18.8 pin 40.4 r 10103 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10027
+  HOLDHIGH   s91  cmpl peak -4.354 @19.0 pin 40.4 r 10935 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10207
+  HOLDHIGH   s92  cmpl peak -4.494 @18.8 pin 40.4 r 10157 | b50 peak -4.415 @18.8 pin 40.2 r 10064  bh_active 10402
+  HOLDHEAD   s90  cmpl peak -4.868 @18.0 pin 99.6 r 8661 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 4827
+  HOLDHEAD   s91  cmpl peak -4.916 @17.8 pin 99.0 r 8560 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 4946
+  HOLDHEAD   s92  cmpl peak -4.874 @18.0 pin 97.8 r 8663 | b50 peak -8.815 @10.0 pin 22.6 r 6  bh_active 5133
+
+DESCRIPTIVE, NON-GATING -- arm-mean TEST (TRAIN) at epochs 9 / 19 / 29 / 39 / 49 / 99, from the raw .out
+  k01        2.1 (1.9) / 10.9 (10.4) / 11.5 (11.5) / 11.7 (11.5) / 11.6 (11.5) / 11.7 (11.5)
+  HEAD       2.1 (1.9) / 20.1 (17.7) / 44.7 (45.3) / 58.5 (64.2) / 64.0 (76.7) / 64.7 (80.0)
+  HOLDLOW    2.0 (1.9) / 20.7 (18.2) / 45.9 (46.2) / 59.2 (64.9) / 64.3 (77.6) / 65.5 (81.5)
+  HOLDSHARED 2.1 (1.9) / 10.0 (9.1) / 11.4 (11.2) / 11.5 (11.3) / 11.4 (11.2) / 11.4 (11.2)
+  HOLDHIGH   2.1 (1.9) / 9.4 (9.1) / 11.2 (11.1) / 11.1 (11.1) / 11.1 (11.1) / 11.1 (11.1)
+  HOLDHEAD   2.1 (1.9) / 19.9 (17.6) / 45.0 (45.7) / 59.1 (64.6) / 64.0 (76.8) / 64.5 (79.2)
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  THE OWN-STEP-MAGNITUDE ACCOUNT.  With 50's vote OUT of the complement's sum and the complement's step size
+  free, handing 50 the step size MUTE's shared beta had (an exogenous max-rate replay, peak -4.39 at epoch
+  18.9, clamp at 40.1) stalls the arm at k01, as HOLDSHARED (= MUTE) does; freezing 50 at the floor keeps
+  HEAD's level; the replay of HEAD's own 50-trajectory keeps HEAD's level.  EFFECT ON 236.7's descriptive reading ("50's OWN large step size stalls the scalar arm"):
+  CONFIRMED BY INTERVENTION on PlainNet18_c100 at this cell -- 50's own large step size is sufficient to
+  stall, and 50 on a small step size is sufficient to keep the rescue, with its vote out either way.  230's
+  half (a) sharpens to 'the rescue needs 50 on a SMALL step size'.  Not licensed: which window of the
+  trajectory matters (the replay is > 100 x the floor from epoch ~6.8 to ~30.9; no time gate); a dose curve (one large
+  trajectory); why a large step size on this BatchNorm scale stalls the network; any other tensor, network
+  or horizon.  HOLDHIGH / HOLDSHARED readings at k01 are LOCATIONS (FLOOR-READINGS-ARE-BOUNDS).
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about ResNet18_c100 (BN or GN) or VGG11_bn_c100: one network, one cell, one held tensor.
+  * WHEN a large step size acts: every hold runs from init to the end; the replays are one fixed shape each.
+  * A dose curve: one large trajectory (MUTE's), one small (HEAD's), and the floor.
+  * That HOLDSHARED and MUTE are the same RUN: they are the same equations on different float paths (237.3).
+  * Any point agreement for an arm at the k01 level: such readings are BOUNDS (164.6).
+  * Anything beyond 100 epochs.
