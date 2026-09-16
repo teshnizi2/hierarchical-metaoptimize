@@ -30390,3 +30390,164 @@ PRE-EXISTING ROWS CHANGED: 0 field-cells differ (111188 compared), rows 0
 * **Cost of these entries:** zero GPU-hours. The batches' own spend by `sacct`: `cgn2` 11.1997, `cpl2` 9.7356 GPU-h.
 
 Next free number: **227**.
+
+## 228. TRACK A2 — **`cgn3` REGISTERED, DRY-RUN AND LAUNCHED: IS THE GROUPNORM RESCUE A RESCUE OR A DELAYED COLLAPSE?  THE `cvh1` / `ciso2` ANALOGUE ON `ResNet18_gn_c100` AT `cgn2`'s CELL: 4 ARMS (k01, kL, ISO {50,53,59}, ONE {50}) × SEEDS {81, 82, 83} = 12 JOBS, TO E = 430 EPOCHS, PROBE=100 AND PROBE_TENSOR=1, SPEC STRINGS BYTE-IDENTICAL TO `cgn2`'s.  E IS DERIVED FROM `cgn2`'s MEASURED DESCENT, AND THE DERIVATION IS DISCLOSED AS THE EARLY END OF A MODEL RANGE THAT SPANS A FACTOR > 2 WITHIN THE LINEAR FAMILY ALONE (228.2).  PRIMARY `RHO` = D_ISO@430 / D_ISO@100 WITH THE 100-EPOCH CONTROL READ IN-RUN; `cvh1`'s STEP-SIZE-MAGNITUDE PIN GATE SITS AFTER IT AS A STAMP; `UNRESOLVED-NOT-PINNED` IS REGISTERED AS INFORMATIVE.  ≈38.5 GPU-h EXPECTED, HARD BOUND 84.**  Every bar is a frozen literal (O2).  No patch; `cgn3` runs from `cgn1`'s verified isolated tree; the live harness hashes are pinned before and re-read after.  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **228** (pre-assigned); `cvt1` holds 227, bookkeeping 229.
+
+### 228.1 Question
+
+`cgn2` (225) lifted the GN scalar arm from 14.0940 to 55.7147 pp by isolating {50 `layer4.0.bn2.weight`, 53 `layer4.0.shortcut.1.weight`, 59 `layer4.1.bn2.weight`}, and 50 alone reached 40.2853 (0.6579 of the gap). Its one binding caveat (225.4(1)): at 100 epochs no complement had pinned and every arm was still climbing. ISO's complement `beta` ended at −8.941 / −8.800 / −8.903, still falling. On PlainNet (`cpl1`, 218.4(2)) the ISO rescue was a DELAY whose level froze when the complement pinned. **Is the GN rescue a rescue, or a delayed collapse that 100 epochs cannot see? And what happens to ONE's partial rescue?**
+
+### 228.2 The horizon, derived from `cgn2`'s own 1,500 ISO probe records (re-derived by the selftest on alice2 and the Mac)
+
+* **Tail-linear, the 190 method** (cVH1's `extrapolate()`, last 50 / last 100 records):
+  * ISO complement terminal −8.940540 / −8.800484 / −8.902525; slopes −0.0050150 / −0.0048443 / −0.0057570 (last 50) and −0.0056757 / −0.0046762 / −0.0057979 (last 100) nats per record.
+  * To the exact clamp: 341.6515 / 355.9504 / 311.8266 and 313.5222 / **365.1491** / 310.3325.
+  * To r ≤ 2 (β = −15 + ln 2): 314.0088 / 327.3334 / 287.7466 and 289.0972 / **335.5036** / 286.4224.
+* **The descent is not linear, and the non-linearity is not a simple deceleration.** Window slopes of ISO's complement, nats per epoch, over epochs 20–40 / 40–60 / 60–80 / 80–100: s72 −0.069 −0.015 −0.010 −0.028; s73 −0.075 −0.016 −0.007 −0.023; s74 −0.075 −0.020 −0.013 −0.029. It slowed, then sped up. `k01` and CTL instead decelerate steadily.
+* **The r ≤ 2 pin epoch of ISO's complement under four model families (the uncertainty):**
+
+| model | fit window | predicted r ≤ 2 pin epoch (3 seeds) |
+|---|---|---|
+| tail-linear | last 50 / 100 records | **286.4 – 335.5** |
+| linear | last 250 / 350 records (ep 50/30–100) | 386.8 – 460.4 |
+| β = a + c·√t | epochs ≥ 30 | 816 – 902 |
+| β = a + c·ln t | epochs ≥ 30 | 13,592 – 18,966 |
+
+* **Holdout** (fit on epochs 30–80, predict the mean β over records 475–499): error linear −0.03…+0.10 nats, √t +0.06…+0.20, ln t +0.15…+0.28. Every family predicts a slower descent than occurred, and linear is the least wrong on ISO. On `k01` and CTL the same holdout favours ln t. **So the pin epoch is uncertain by more than a factor of 2 even within the linear family.** A GN complement that never pins inside the horizon is a live possibility, which is why it is registered as a finding and not as a void.
+* **E.** `PIN_BOUND` 365.1491 and `PIN_BOUND_R2` 335.5036 (the latest tail-linear extrapolations). `W_POST` = **64.2**, the longest post-pin window measurable in a 100-epoch batch (`cvg1` k01; `ciso1` CTRL 63.2, `cvi1` k01 64.0). E = ceil(max(365.1491 + 64.2, 335.5036 + 64.2)) = ceil(429.3491) = **430**.
+  * **Why not `W_MAX` 213.0 (`ciso2` k01) or `cvh1`'s 220.2?** They give E = 579 = 51.9 GPU-h, outside the ~40 GPU-h envelope.
+  * **What the shorter window costs, disclosed.** Every precedent froze at the pin (`cpl1`; `ciso2` ISO; `cvh1` +0.068 pp over 220 epochs). So 64 post-pin epochs can stamp FROZEN / DECAYS / IMPROVES-AFTER-PIN at `READ_BAR`. They cannot exclude a decay slower than `READ_BAR` per 64 epochs.
+  * **What each account leaves at E.** Tail-linear: ≥ 64.8 post-pin epochs to the exact clamp, ≥ 94.5 to r ≤ 2. Long-window linear: the complement may end NEITHER. √t or ln t: it ends FREE. Each outcome is stamped, and none moves the primary.
+* **Price.** `cgn2`'s `sacct`: 11.1997 GPU-h over 1,500 run-epochs = 0.0074665 GPU-h per run-epoch. The 7 L4 and 8 A100-MIG runs sit on the same node set as the 7-day partitions, at 40:28–48:39 per 100 epochs.
+
+| E | basis | GPU-h (12 runs) |
+|---|---|---|
+| 400 | round | 35.84 |
+| **430** | **registered** | **38.53** |
+| 525 | long-window-linear pin + `W_POST` | 47.04 |
+| 550 | r ≤ 2 bound + `W_MAX_R2` | 49.28 |
+| 579 | exact bound + `W_MAX` | 51.88 |
+
+* **Wall, checked rather than assumed.** 430 epochs at `cgn2`'s worst measured rate (48:39 per 100 epochs = 29.19 s/epoch) take **3.49 h**. `WALL` 07:00:00 = 58.6 s/epoch = **2.01×** that worst rate, with no checkpointing. 7 h exceeds `gpu-short`'s live 4:00:00, so `_lib_guards.sh`'s `slurm_parts_for_wall` drops `gpu-short` (and its 2080 Ti nodes, 85–96 min per 100 epochs in `cgn1`) by arithmetic: PARTS = `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`. **Hard bound 12 × 7 h = 84 GPU-h.**
+
+### 228.3 Design
+
+* **Arms**, spec strings byte-identical to `cgn2`'s. The selftest reads cGN2's `SPEC` table; launcher guard 4c'' checks the table AND `--stepsize-groups` on `cgn2`'s own 12 ARGS lines for these four arms.
+  * `k01` `scalar`: in-batch floor.
+  * `kL` `layerwise`: in-batch ceiling.
+  * ISO `sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight`: [59,3], [11218596,1536].
+  * ONE `sets:1-49,51-62/layer4.0.bn2.weight`: [61,1], [11219620,512].
+* **No CTL arm.** `DELTA_ID` is not re-measured at E (stamp `NO-IN-BATCH-CTL`).
+* **Standard cell:** SGDm 0.99 / wd 0.1, Lion 0.99 / 0.9 / 0, ms 1e-3, α₀ 1e-6, batch 100, AUGMENT=1, BETA_CLIP −15:−2.3026, SCHED=none, 430 epochs = 215,000 meta-steps = 2,150 probe records.
+* **Seeds {81, 82, 83}:** 0 corpus rows, 0 `.out` ARGS lines, 0 `sacct` job names ending in -s81/-s82/-s83, 0 `cgn3-` jobs ever.
+* **Harness.** `$WS/harness_cgn1/cifar10`, reused unedited. `bin/cGN1_stage_harness.sh` VERIFIES V-a…V-d. `build_network.py` is `9f6e4ec9…c892` (= `cgn1`/`cgn2`'s POST_SHA). The tree's HF.py, train.py and load_data.py are byte-identical to the live ones. The runner is `run_cifar_cgn1.sh` (`c98e1a56…`), which differs from `run_cifar.sh` in exactly its `cd` line. **No patch: nothing added to either tree.**
+  * Live harness pinned by guard 3e before and re-read by guard 10 after: build_network `c7998883…`, HF `4732b74a…`, train `3fea309e…`, load_data `b52b58a3…`, run_cifar `a0d0a1b9…`.
+  * Blockwise PROBE_TENSOR inertness for ISO and ONE on this HF sha and this build_network sha: `cgn2`'s log `runs/cgn2/inertness_blockwise_gn.log` (44 PASS / 0 FAIL; the same specs, byte for byte), accepted by guard 4e.
+* **The 100-epoch control is in-run, proved on the live code.**
+  * Guard 4h, on BOTH the tree's and the live train.py: `num_epochs` occurs only at line 42 (argparse) and line 135 (`for epoch in range(args.num_epochs)`). There is no lr_scheduler, total_steps, warmup or environ read; `--max-time 999:00:00` keeps line 168's time break from firing.
+  * Guard 4h2, on the tree's HF.py: `_sched_factor()` under SCHED=none with SCHED_TOTAL unset returns exactly 1.0 at 12 counters up to 1e7, including 215,000. `sched_total_effective` is not defined on HF.
+  * Guard 4h3: no schedule variable is set in the submitting shell.
+* **PRIMARY.** `RHO` = D_ISO@430 / D_ISO@100, with D_ISO = plateau5(ISO) − plateau5(k01), all from the runs' own `.out` (epochs 95–99 and 425–429). TRAIN is beside TEST everywhere, and the same branch map on TRAIN numbers is stamped `TRAIN-AGREES` or `TRAIN-DISAGREES`. `RHO` is bounded in neither direction: above 1 if ISO keeps climbing, below 0 if ISO drops under k01.
+* **KEY SECONDARY, ONE (stamps only):**
+  * `RHO-ONE` under the same map and bars: `ONE-SURVIVES`, `-ATTENUATES`, `-COLLAPSES` or `-NO-RESCUE-AT-100`.
+  * ONE's share of the gap at E against at 100, bar 0.10: `ONE-SHARE-RISES`, `-HOLDS` or `-FALLS`.
+  * `ONE-COMPLEMENT-PINNED`, `-NEITHER` or `-FREE`.
+  * `HEAD3-WIDENS`, `-HOLDS` or `-NARROWS` on (ISO − ONE)@E − (ISO − ONE)@100.
+* **PIN GATE, after the primary, as a stamp — `cvh1`'s corrected magnitude form, never `ciso2`'s exact-clamp dwell.** Per seed, MED_R = the median of r = exp(β + 15) over the last quarter of the records. MED_R ≤ 2.0 is PINNED, ≥ 10.0 is FREE, otherwise NEITHER; the arm class is the class held by ≥ 2 of 3 seeds.
+  * **If PINNED:** `ISO-PIN-EPOCH`, `POST-PIN-WINDOW`, `WINDOW-MEETS-W100` or `WINDOW-SHORT`, `PIN-INSIDE-BOUND` or `PIN-AFTER-BOUND` (grading the extrapolation), and `FROZEN-AT-PIN` / `DECAYS-AFTER-PIN` / `IMPROVES-AFTER-PIN`.
+  * **Otherwise:** `COMPLEMENT-NEITHER` or `COMPLEMENT-FREE`, plus **`UNRESOLVED-NOT-PINNED` (INFORMATIVE: a GN complement that never pins in 430 epochs is itself a finding)** and `POST-PIN-UNMEASURED`.
+  * **Calibration** (frozen; re-derived on alice2 110/0/0): `cvh1` ISO 1.0010 / 1.0020 / 1.0020 and `ciso2` ISO 1.0010 / 1.0025 / 1.0010 are PINNED; `ciso2` ONE ≤ 1.0555 is PINNED; `cgn2` ISO@100 643.95 / 610.09 / 602.81, ONE 571.1 / 581.5 / 586.2 and k01 61.11 / 40.96 / 40.23 are FREE; `cvi1` ISO ≥ 25.85 and `ciso2` k62 ≥ 69.3 are FREE. Both thresholds sit strictly inside the calibration gap.
+
+### 228.4 Frozen bars and noise floor (O2)
+
+* **Noise floor.** Re-derived at registration on the 2,956-row corpus (sha `5c82c06c…27a1b9`, HEAD `64e4f47`) with `cgn3-` excluded, then frozen:
+
+| variant | SD | df | definition |
+|---|---|---|---|
+| **GN_CELL_100** | **0.953197** | 16 | ResNet18_gn_c100, 15-column cell; pools `cgn1`+`cgn2`, so it carries between-batch variance |
+| GN_BATCH_100 | 0.747783 | 14 | ResNet18_gn_c100, batch × granularity cell |
+| R18ALL_100 | 0.694443 | 209 | ResNet18_c100, every granularity |
+| R250 | 0.409934 | 8 | ResNet18_c100, 250 epochs |
+| R772 | 0.813024 | 30 | ResNet18_c100, 772 epochs |
+| R100_M2_NARROW | 0.925518 | 60 | ResNet18_c100, m=2 [a,b], 100 epochs |
+| VGG_328 | 0.249310 | 8 | VGG11_bn_c100, 328 epochs |
+
+  * `SIGMA_FROZEN` = max = **0.953197**; `SE_FROZEN` 0.778282; `READ_BAR_FROZEN` 1.556564.
+  * `SIGMA_USED` = max(`SIGMA_FROZEN`, this batch's in-batch σ, df 16).
+  * No corpus row owns a GN run beyond 100 epochs; that extrapolation is disclosed.
+* **Bars.** D100_MIN 10.0 | REFUTE_BAR 5.0 (6.42 SE) | SUPPORT_BAR 15.0 (19.27 SE) | SURVIVE_FRAC 0.80 (`ciso2`/`cvh1`, carried) | ATTEN_MILD 0.50 | DEAD_BAR 5.0 | ONE_SHARE_BAR 0.10 | anchors k01 14.2640 ± 3.812788 and kL 52.8610 ± 3.812788 (GN corpus means, n 6 each, half-width 4 × `SIGMA_FROZEN`) | pin gate 2.0 / 10.0 / last quarter.
+* **O2, proved by the selftest.** FINAL and the SE_USED line are identical on `near_bar`, `survive_freeze` and `collapse` across 5 corpora: the one-argument default, the corpus given explicitly, stress A, stress B, and none. Stress A and B add 3 invented GN std-cell rows plus 12 invented `cgn3-*` rows at `cgn3`'s own cells.
+  * **Non-vacuity.** On stress A a live-max σ would be 4.5034, giving `READ_BAR` 7.3541. That exceeds `near_bar`'s +1.65 margin, so a live-reading scorer would have stamped CEIL-TRACKS where this one stamps CEIL-ABOVE.
+  * A static check confirms that `score()` calls no corpus σ, band or level function.
+
+### 228.5 Floor gate (164.6) — predicted level at E = 430 under every account (floor = in-batch k01; chance 1.00; all UNSURE)
+
+| arm | **FREEZE-HOLDS** (tested: pins, level held) | NEVER-PINS | ATTENUATE | COLLAPSE (delayed collapse) |
+|---|---|---|---|---|
+| k01 | 14–22 | 14–22 | 14–22 | 14–22 |
+| kL | 55–72 | 55–72 | 55–72 | 55–72 |
+| ISO | 57–72 | 60–78 | 22–55 | 14–27 |
+| ONE | 42–68 | 45–72 | 20–50 | 14–27 |
+| RHO | 0.90–1.40 → SURVIVES | 1.00–1.60 → SURVIVES | 0.20–0.79 → ATTENUATES | −0.20…0.12 → COLLAPSES |
+
+* **Margins.** k01 is the floor by construction, and that is disclosed. Under the account being tested only k01 sits at the floor, with kL, ISO and ONE ≥ 20 pp above its band. No arm is predicted within 13 pp of chance or within 22 pp of the TEST ceiling.
+* **Reachability.** RESCUE-COLLAPSES is reachable: ISO has ~41 pp to fall. RHO is predicted-reachable above 1 and below 0. Each account's midpoint lands in its registered branch (asserted in the selftest).
+* **FREEZE-HOLDS and NEVER-PINS give the same branch.** The pin stamp separates them. Under NEVER-PINS the sentence is weaker: "survives 430 epochs of a complement that never froze".
+
+### 228.6 Branches (first match wins)
+
+1. `UNRESOLVED-MANIFEST-MISMATCH` (rc 1): the manifest is not byte-identical to `synthetic_manifest_text()` (62 tensors by name, numel and owner; GN 20 / BN 0; the four arms).
+2. `INCOMPLETE` (rc 2): any of the 12 runs missing, not RUN_DONE, with a traceback, or with fewer than 430 epoch lines.
+3. `UNRESOLVED-PROVENANCE` (rc 1): any of the following.
+   * ARGS, ENV or PROBE_TENSOR not the registered line.
+   * A duplicate `.out`.
+   * Records ≠ 2,150, or wrong `n_b`.
+   * Decomposition failing on more than 1 %.
+   * PROVENANCE not MODE submit, not the `cgn1`-tree POST_SHA, or not this scorer's sha.
+4. `UNRESOLVED-ANCHOR`.
+5. `UNRESOLVED-DIVERGED`.
+6. `NO-RESCUE-AT-100` (D_ISO@100 < 10).
+7. `RESCUE-COLLAPSES` (D_ISO@430 ≤ 5).
+8. `RESCUE-SURVIVES` (RHO ≥ 0.80 and D_ISO@430 ≥ 15).
+9. `RESCUE-ATTENUATES` (`ATTENUATE-MILD` / `-SEVERE`).
+
+The stamps are listed in the scorer header. The unconditional ones are `MAGNITUDE-NOT-SEPARATED`, `NO-IN-BATCH-CTL`, `GN32-ALSO-CHANGES-PER-CHANNEL-INVARIANCE` and `ONE-CELL-ONLY`.
+
+### 228.7 Tests and dry run
+
+* **Scorer selftest.** `--selftest --runsdir <runs> --csv results/all_runs.csv`: **110 PASS / 0 FAIL / 0 SKIP on alice2** (3.10.4, `envs/mo`). On the Mac, against `../runs_alice2`, 108 / 0 / 2 (the SKIPs are the `ciso2` calibration, whose records are only on alice2).
+  * **[S0]** the frozen arithmetic, the E derivation, the cost, and the wall ratio.
+  * **[S0b]** the floor gate.
+  * **[S1]** the σ variants and anchors re-derive exactly at the registration corpus sha, and seeds 81–83 are unused.
+  * **[S2]** the specs compose; they and the 62-tensor list are byte-identical to cGN2's.
+  * **[S3]** the `cgn2` premise re-derives:
+    * terminals, slopes, every tail and long-window extrapolation, PIN_BOUND and PIN_BOUND_R2;
+    * the median r values;
+    * plateau5 and TRAIN at 100 for all four arms, and D_ISO 41.6207 / D_ONE 26.1913;
+    * the group-sum decomposition on `cgn2`'s real ISO and ONE records, with a swapped-partition negative control that fails.
+  * **[S4]** the `cvh1` and `ciso2` calibration.
+  * **[S5]** the REAL `score()`, run by the documented one-argument invocation on 16 synthetic scenarios, reaches every registered branch:
+    * survive_freeze, survive_pinned, survive_free, survive_neither;
+    * collapse (with DECAYS-AFTER-PIN), attenuate, no_rescue;
+    * one_fades, near_bar, anchor, diverged;
+    * a DROPPED run (→ INCOMPLETE, rc 2), a truncated run, badspec, badprov, nomanifest.
+  * **[S6]** O2. **[S7]** the RULE 21 premise.
+* **Dry run 1** (alice2, `~/stage_cgn3`, files sha256-identical to this commit; log `~/l228_logs/dryrun_1.log`): **exit 0, 0 guard failures, 12 composed lines, every line read.**
+  * **What the guards covered:**
+    * 1a files; 1c/1c2 the selftest with its 15 required lines;
+    * 2–2f the RULE 21 premise;
+    * 4a stage VERIFIED; 3–3e the tree and live pins;
+    * 4c GN suite 52/0; 4b/4b2 structural inertness; 4e blockwise log;
+    * 4c'/4c'' literals and cgn2 identity; 4h/4h2/4h3 the in-run control;
+    * 4 the live manifest, byte-identical (3,510 bytes, sha `0866ac0f…`), with the Lion sign, the unnormalised blockwise sum and capture placement;
+    * 4g provenance; 5/5a/5c partitions (gpu-short excluded); 8 default manifest resolution;
+    * 9/9b the runner `cd` and the one-line runner diff; 10 live hashes unchanged.
+  * **What each line carried:** `ResNet18_gn_c100`, `--num-epochs 430`, the four registered strings, seeds 81/82/83, runner `run_cifar_cgn1.sh`, `--time=07:00:00`, partitions `gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, and exports `AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1` plus the run's own `PROBE_DIR`. No flag was repeated.
+
+### 228.8 Files (3, new)
+
+* `analysis/cGN3_gn_horizon_score.py` (sha `5101e6da006b6783…1867fec`)
+* `analysis/cGN3_smoke_gen.py` (`727124451608974a…c1bf8a08d`)
+* `bin/cGN3_gn_horizon.sh` (`1d68d813ba8976b6…d55664dc109b0`)
+
+**Reused unedited:** `bin/cGN1_stage_harness.sh`, `tests/test_resnet_gn_c100.py`, `tests/test_probe_tensor.py`, `tests/test_probe_tensor_blockwise*.py`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`, `analysis/cGN2_gn_isolation_score.py` (read for SPEC, never edited).
