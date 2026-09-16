@@ -1,0 +1,13 @@
+(b) K13 complement DOWN fraction, DOWN iff pt_b2*mom_pre[0][0] + (1-pt_b2)*z_agg[0][0] > 0, windows [lo,lo+50) epochs
+    sign convention check (records where beta moved, off both clamps): DOWN-by-c == beta fell on 4369, not on 0
+    s93  0-50:103/250=0.412  50-100:148/250=0.592  100-150:123/250=0.492  150-200:126/250=0.504  200-250:129/250=0.516  250-300:117/250=0.468
+    s94  0-50:111/250=0.444  50-100:133/250=0.532  100-150:133/250=0.532  150-200:133/250=0.532  200-250:122/250=0.488  250-300:127/250=0.508
+    s95  0-50:103/250=0.412  50-100:139/250=0.556  100-150:130/250=0.520  150-200:141/250=0.564  200-250:134/250=0.536  250-300:128/250=0.512
+    pooled 0-50:317/750=0.423  50-100:420/750=0.560  100-150:386/750=0.515  150-200:400/750=0.533  200-250:385/750=0.513  250-300:372/750=0.496
+    RANGE per seed, the 12 windows from epoch 100: min 0.468  max 0.564
+    RANGE seeds pooled, the 4 windows from epoch 100: min 0.496  max 0.533
+
+(c) K13 s94 complement r = exp(beta[0]+15) after its first record with r <= 2
+    first r <= 2 at epoch 159.2
+    max r 2.6443 (beta -14.027607); records with exactly this beta: 283.2, 293.2, 293.4
+    records whose r prints as 2.644: 283.2 (beta -14.027607), 293.2 (beta -14.027607), 293.4 (beta -14.027607)

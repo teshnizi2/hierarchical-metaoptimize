@@ -7,6 +7,12 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,761 ro
 **`c98_reproduce.py` EXITS 1** — reported as-is, **author scope, deliberately not fixed**. **10 checks fail, the SAME 10 as before this ingest**: only the derived counts move — rows 2,680 → **2,740** (paper 2,177), admissible 2,238 → **2,298**, wallclock-carrying 2,665 → **2,725**, GPU-h 2,857.30 → **2,896.5**. **This ingest introduced no new failing check.** 628 `chk()` sites, 411 distinct quantity numerals, 41.9% coverage. *[cycle-144 counts; re-run at 186 on 2,746 rows: exit 1, the SAME 10 checks — rows 2,746, admissible 2,304, wallclock-carrying 2,731, GPU-h 2,902; no new failing check.]* *[187, post-`ciso1` ingest on 2,761 rows: exit 1, the SAME 10 checks — rows 2,761, admissible 2,319, wallclock-carrying 2,746, GPU-h 2,914.4; zero `FAIL` lines inside the run; no new failing check. Reported as-is, author scope, not fixed.]* *[191, cycle-148 reconciliation, nothing ingested: exit **1**, the **SAME 10** checks, and the derived side of every one is UNCHANGED from 187 — rows 2,761, admissible 2,319, wallclock-carrying 2,746, GPU-h 2,914.4. **This cycle introduced no new failing check.** Reported as-is, author scope, not fixed.]*
 **RULE 16: `git diff -- analysis/` EMPTY** — no registered scorer or guard edited. `cY1_cru1_score.py` `sha256 0de0604ca5995335…` and `argsline_guard.py` `sha256 81cea8b586e124a6…` unchanged on Mac and `alice2`. *[cycle 144; over cycle 145 `git diff --numstat eb51d27..HEAD -- analysis/` is three NEW files, 0 deletions — 183.3.]* *[186: `git diff 9ef4ac3..d7e11a5 -- analysis/ patches/ tests/ bin/` = 5 NEW files, 2,076 insertions, 0 deletions; `cTD2` `c3122e1f…`, `cIS1` `f9310405…`, `argsline_guard.py` `81cea8b5…` sha-identical Mac ↔ `alice2`.]* *[187: `git diff -- analysis/ patches/ tests/ bin/` EMPTY over `64a55b6..HEAD`; `cIS1` `f931040533…` identical in the worktree, at `HEAD`, at its registration commit `be15a15e4` and on `alice2`; `argsline_guard.py` `81cea8b586…` unedited. Both run through their documented invocations.]* *[191: `git diff --numstat d39d147..HEAD -- analysis/ patches/ tests/ bin/` = **10 files, 5,873 insertions, 0 deletions** — additions only across all three tracks; `analysis/argsline_guard.py` `81cea8b586e124a6…` **last touched at `617b6c8`, 2026-09-02**, byte-identical on the Mac and at four deployed trees on `alice2`; `tests/test_probe_tensor_blockwise.py` `22f6599e8c523963…` last touched at `be15a15`, 8 Sep — before this cycle; all three new scorers unedited since their registration commits and sha-identical Mac ↔ `alice2`.]*
 
+## CYCLE 152 (FIX TRACK) — **CORRECTIONS 244. ZERO GPU; NOTHING SUBMITTED; `alice` NOT CONTACTED.**
+
+- `jobs/run_cifar_cvt4.sh` archived from alice2 (sha `c801fc85…` = 237's runner); `cvt5_attack_indep.txt` reproduces only against the pre-ingest corpus at `a544921` (invocation at 244.2).
+- K13's DOWN fraction from epoch 100, re-derived from the raw probes: 0.468–0.564 per seed (`results/c244_cvt5_k13_readouts.txt`); s94's r 2.644 at 283.2, 293.2 and 293.4 (241.4(2), 241.6, 241.7 amended in place).
+- Verifier wording fixes checked against 240/241 and MASTER-TABLE rows 222–223: `cvt4` fixes 2–3 (sufficiency; `P_COUP` a floor location) and `cvt5` fixes 4–5 (lead with the bound; equilibrium of the LEVEL) applied in place, in brackets, also on line 5; `c73` exit 0, no line moved. Four doubled blank lines in this file removed.
+
 ## CYCLE 152 (LANDING) — **CORRECTIONS 240 (`cvt4`) + 241 (`cvt5` and the ingest of both). BOTH BATCHES LANDED; NOTHING RUNNING; `alice2` QUEUE EMPTY; `alice` NOT CONTACTED. CORPUS 3,049.** *(The header lines above are stale since cycle 148; authority is `docs/CORRECTIONS.md`, now 241.)*
 
 | # | batch | runs | verdict (registered FINAL, first tokens) | what bounds it | GPU-h (`sacct`) |
@@ -448,7 +454,6 @@ Two more measured facts, same probe: an **EQUAL VOTE PER TENSOR** reproduces the
 
 **SCOPE:** 100 epochs; `m = 1` and cut positions 49/50 only; nothing about `layerwise`/`nodewise`/`weightwise`/`chunk*`/`permnode*` (inert by construction); **no claim that either weighting is a better optimizer** — the chain rule gives the unnormalised sum, so `tn:` is deliberately the wrong gradient and is a mechanism probe; no test of `152.12` rival (c); **RULE 11 open** (single shared `ms = 1e-3`).
 
-
 ## CYCLE 141 — **VERIFICATION PASS (a fourth agent, NOT a fourth batch).** CORRECTIONS **170**. ZERO GPU, ZERO JOBS SUBMITTED, ZERO CANCELLED, NOTHING INGESTED
 
 **RULE 20 + THE SEPARATE ENV AUDIT, AT THE COVERAGE THAT EXISTS.** Through the **UNEDITED, PRE-EXISTING** `analysis/argsline_guard.py` (`81cea8b5…b04e5388`, byte-identical at `HEAD` and in all three `alice2` checkouts, last touched **2 Sep**), `METAOPT_WS` exported first.
@@ -488,7 +493,6 @@ Bar **re-derived at write time**, four ways, the three in-flight prefixes exclud
 **`c98_reproduce.py` → EXIT 1**, 8 checks failed, all the known stale-draft drift (rows 2638 vs 2177, GPU-h 2827.38 vs 1642, deficit 1.7964 vs 1.807, …). **AUTHOR SCOPE, DELIBERATELY NOT FIXED.**
 
 **QUEUE:** 7 `cdn1` RUNNING (17/24 `COMPLETED`), 8 `cru1` RUNNING + 52 PENDING, 18 `crn1` PENDING, all pending on `QOSMaxGRESPerUser`. **≈ 76.4 GPU-h committed this cycle over 102 jobs (17 + 45 + 14.4 — corrected from an earlier ≈81 slip, `170.6`); 19.86 GPU-h elapsed already consumed; this pass cost 0.**
-
 
 ## CYCLE 140 — **`cpg1` LANDS, SCORED and INGESTED.** CORRECTIONS **166**
 
@@ -827,7 +831,6 @@ Registered **before first execution**, run **UNEDITED**, sha256 `45b95380…0c6a
 
 **This cycle LANDED, SCORED and INGESTED `cpk2` — the cut-position ladder at 772 epochs on FRESH seeds {3,4,5}.** CORRECTIONS **158**. **`FINAL: k*-UNMOVED | CONVERGED`.** The argmax at `E = 772` is **`k49` 56.4127 pp**, runner-up `k47` 45.8987 — **margin 10.5140 pp = 14.04 SE**, bar 1.4979; **every arm converged** at `E`. The in-batch 100-epoch control reproduces `cpk1`'s peak on seeds that batch never used (**`k49` by 10.4073 pp = 13.90 SE**), so the un-moved argmax is attributable to the **budget**, not the seed draw. **THE PRE-REGISTERED BRANCH IS CONFIRMED AND ITS CURVE MODEL IS REFUTED:** the forecast predicted **three rank swaps** with `k52` rising to runner-up; **zero** occurred, and `k52` misses by **−8.2225 pp** where every other arm is within 1.6. **No MASTER-TABLE verdict moves. No FINDINGS entry moves.**
 
-
 | # | deliverable | outcome |
 |---|---|---|
 | 1 | `cpk2` — the argmax at a converged budget | **LANDED 18/18, SCORED, INGESTED.** `k*-UNMOVED` **and** `CONVERGED`, both on the registered rule |
@@ -1001,7 +1004,6 @@ Scorer `analysis/cO2_cfr2_score.py` run **UNEDITED**, sha256 `1e4f531a…d2a3b3b
 | `nodewise` | 0.7532 ± 0.1701 | **0.7532 ± 0.1687** | 0.0000 |
 
 `sigma_w` 0.1967 (df 216) → **0.1951 (df 222)**; the `ms=3e-4` cells go **n=5 → 8** for both arms; the corpus clamped gap at that rung **3.1820 → 3.2250** and the share-of-decade **93.12% → 94.68%**. **No conclusion moves** — Test A still 3 of 4 AGREE with `nodewise` still DISAGREEing by −1.8398, Test B still resolved at 2 SE, and **B-ALT is completely unchanged** (4.4219 / 0.9144 / 1.6749 / 0.1993) because it touches only cells `cfr2` does not populate. Row 24's printed numerals are **re-stamped and dated**. **This is FINDINGS 58.8(a)'s corpus-growth fragility — the one that broke `nodewise` at 154 — biting `scalar` and `layerwise`, harmlessly, and it will bite again on the next ingest into this stratum.**
-
 
 ## Row 24 — the numerals RE-DERIVED (CORRECTIONS 154, `cQ1`)
 
