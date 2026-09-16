@@ -30391,6 +30391,192 @@ PRE-EXISTING ROWS CHANGED: 0 field-cells differ (111188 compared), rows 0
 
 Next free number: **227**.
 
+## 227. TRACK A1 — **`cvt1` REGISTERED AND DRY-RUN: SEPARATE IDENTITY FROM MAGNITUDE BY INTERVENING ON THE VOTE.  ON `PlainNet18_c100` AT `cpl1`/`cpl2`'s CELL, A NEW ADDITIVE, OPT-IN, ENVIRONMENT-CONTROLLED PATCH (`PATCH_VOTEWEIGHT`, `VOTE_W=<name>:<w>`) MULTIPLIES ONE TENSOR'S TERM INSIDE THE UNNORMALISED SHARED META-GRADIENT SUM, BEFORE THE SIGN.  5 ARMS × SEEDS {78, 79, 80} = 15 JOBS, 100 EPOCHS, PROBE=100 AND PROBE_TENSOR=1: k01, HEAD (`cpl2`'s, byte-identical: the positive control), MUTE (scalar grouping, `layer4.1.bn2.weight`'s term × 0), DOSE (× 0.1), INJECT (HEAD's grouping, the twin `layer4.1.bn1.weight`'s term × 691 IN THE COMPLEMENT).  THE INJECTION FACTOR IS A FIXED K = 691, NOT A PER-STEP MATCH TO THE LIVE TERM, BECAUSE ON `cpl2`'s OWN HEAD RECORDS THE LIVE TERM OF 50 COLLAPSES TO 0.12–0.21 × THE TWIN'S ONCE 50's OWN STEP SIZE PINS (EPOCH 22): A LIVE MATCH WOULD SHRINK THE TWIN'S VOTE FOR 78 % OF TRAINING (227.3).  THE PATCH IS PROVED INERT BEFORE LAUNCH: DELETING ITS FOUR REGIONS REPRODUCES THE PRE-PATCH HF.py BYTE FOR BYTE; OFF AND AT IDENTITY IT REPRODUCES THE UNPATCHED TREE'S beta, LOSS, probe.jsonl AND EVERY FINAL PARAMETER AND BUFFER BITWISE OVER 300 REAL CIFAR-100 STEPS ON A GPU (37/37), AND 88/88 ON CPU.  A BROKEN-PATCH NULL IS REGISTERED; IT PREDICTS THE OWN-STEP-SIZE ACCOUNT'S LEVELS EXACTLY AND IS SEPARATED FROM IT BY A GATE (`G-BITE`) THAT READS THE WEIGHTS OFF EVERY RUN'S OWN PROBE RECORDS.  ≈9.7 GPU-h EXPECTED, HARD BOUND 45.**  Every bar is a frozen literal (O2).  The live shared harness is unchanged (hashes before and after).  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **227** (pre-assigned); `cgn3` holds 228, bookkeeping 229.
+
+### 227.1 Question
+
+On four networks, isolating a small set of normalisation scales recovers the scalar→layerwise gap, and a matched set does not. On every one the carriers also dominate the scalar arm's summed meta-gradient, and no carrier-free set comes within ×225 (ResNet BN), ×19 (GN) or ×691 (PlainNet, the twin). So set-matching cannot separate **identity** from **magnitude**.
+
+The mechanism (184–187) makes the confound concrete. The scalar meta-update is `beta ← beta − ms·sign(b2·mom + (1−b2)·z)` with `z = Σ_i <h_i, g_i>`, an UNNORMALISED SUM. On PlainNet, removing idx 50 (`layer4.1.bn2.weight`) from `k01`'s pinned records flips that sign on 1.0000 of records. Isolation does two things at once: it **removes 50's vote** from the shared sum, and it **gives 50 its own step size**.
+
+`cvt1` intervenes on the vote itself. **(a)** Is the rescue the removal of the vote, or the own step size? (MUTE vs HEAD.) **(b)** If it is the vote, is it the vote's SIZE or its OWNER? (INJECT: a carrier-sized vote cast by a different tensor.)
+
+### 227.2 Design
+
+* **Cell.** `cpl1`/`cpl2`'s exactly: CIFAR-100, `PlainNet18_c100` (53 tensors, 11,046,308 params), SGDm (0.99, wd 0.1) + Lion meta (0.99, b2 0.9, wd 0), ms 1e-3, alpha0 1e-6, 100 ep, batch 100, `AUGMENT=1`, `BETA_CLIP=-15:-2.3026`, `PROBE=100`, `PROBE_TENSOR=1`. The ENV line is `cpl2`'s byte for byte.
+* **Isolated tree.** `$WS/harness_cvt1/cifar10`, built by `bin/cVT1_stage_harness.sh --stage` (the `cgn1`/`cpl1` pattern):
+  * every live harness `.py` copied byte-identical, except two files;
+  * `build_network.py` = live pre (`c7998883…`) + `PATCH_PLAINNET` = `cpl1`'s POST_SHA `e65e6773…a18b`, bit for bit;
+  * `Optimizers/HF.py` = live `HF.py` (`4732b74a…`, kept as `HF.py.pre_voteweight`) + `PATCH_VOTEWEIGHT` = `3f2b98e1…fa4e52`;
+  * `data` is a symlink to the live data; `STAGE-MANIFEST.txt` `60238c10…`.
+* **Runner.** `$WS/jobs/run_cifar_cvt1.sh` (`d389e8a5…`) differs from `jobs/run_cifar.sh` in exactly its `cd` line (V-d).
+* **ONE submission, 15 jobs = 5 arms × seeds {78, 79, 80}** (pre-assigned; zero corpus rows and zero `.out` ARGS lines carry them).
+
+| arm | `--stepsize-groups` | `VOTE_W` | sizes | what it does |
+|---|---|---|---|---|
+| k01 | `scalar` | unset | m=1 | the floor anchor |
+| HEAD | `sets:1-49,51-53/layer4.1.bn2.weight` | unset | [52,1] | `cpl2`'s HEAD, **byte-identical** (selftest B reads `cPL2`'s SPEC): the positive control |
+| **MUTE** | `scalar` | `layer4.1.bn2.weight:0` | m=1 | 50 **keeps** the shared step size; its term's weight is 0, so it no longer votes |
+| **DOSE** | `scalar` | `layer4.1.bn2.weight:0.1` | m=1 | as MUTE, weight 0.1 |
+| **INJECT** | HEAD's string | `layer4.1.bn1.weight:691` | [52,1] | HEAD's grouping, and the twin (idx 47) votes ×691 **inside the complement** |
+
+* **Re-derivation by name (guard 4, alice2).** On the live 53-tensor model, each arm's `HF.init_meta` was constructed with its own `VOTE_W`. Every arm matched the registration:
+  * idx 50 = `layer4.1.bn2.weight`, idx 47 = `layer4.1.bn1.weight`, both numel 512, BatchNorm2d;
+  * HEAD/INJECT compose to [52,1], params [11045796, 512], GROUP1 `layer4.1.bn2.weight`;
+  * `_vw_items` = {50: 0.0} / {50: 0.1} / {47: 691.0}, `_vw_on` False on k01 and HEAD;
+  * each arm prints exactly its registered witness line.
+
+  The manifest (3,704 bytes, `248f4686…`) is **byte-identical** to the scorer's `synthetic_manifest_text()`.
+* **CO-PRIMARY STATISTICS** (in batch; plateau5 from each run's own `.out`; TRAIN beside TEST):
+  * `P_VOTE` = HEAD − MUTE (vote removal vs own step size);
+  * `P_INJECT` = HEAD − INJECT (does a carrier-sized vote re-collapse?).
+  * Key secondaries: `D_HEAD` = HEAD − k01 (positive control), `D_MUTE`, `D_DOSE`, `D_INJ`. `DOSE_FRAC` = `D_DOSE`/`D_MUTE` is descriptive only.
+
+### 227.3 Two decisions, taken from `cpl2`'s landed records (`analysis/cvt1_registration_derivations.py`, new; output `a81d8d57…`, byte-identical on the Mac and on alice2)
+
+`L_i = b2·m_i + (1−b2)·z_i` per tensor.
+
+**(1) INJECT uses a FIXED K = 691, not a per-step match to the live term.**
+* **K itself.** On `cpl2` `k01`'s 956 pinned records, the mean-|L| ratio 50/47 is 641.02 / 696.23 / 742.95 per seed, pooled **690.7113 → 691** (226.4(3)'s ×691; the scorer's selftest re-derives it on alice2: "690.7113 -> 691").
+* **K matches the carrier in every phase, not only when pinned.** The per-record median |L_50|/|L_47| is 704.5 (epochs 0–5), 691.0 (5–17), 742.6 (17–36, the decline), 696.4 (36–100). The fixed ×691 is within 8 % of the carrier's typical per-step size in every phase. The known worry, that ×691 is only a pinned-record average, is therefore measured, not assumed. What K cannot do is match the carrier **record by record**: in epochs 5–17 the ratio spans 158–20,400 (q10–q90). Disclosed.
+* **A per-step match to 50's live term is broken by the isolation INJECT keeps.** On `cpl2`'s HEAD records, 50's own `beta` pins at the clamp at epoch 22–23. From then on the LIVE |z_50|/|z_47| is 0.148 / 0.213 / 0.163 (epochs 22–50) and 0.115 / 0.158 / 0.120 (epochs 50–100). "Match 50's live term" would **shrink** the twin's vote ×5–9 for 78 % of training. Counterfactually, on HEAD's epoch 50–100 records, that down-weighting flips the complement's Lion sign on 0.920 / 0.808 / 0.848 of records, almost all DOWN → UP. It would test the opposite of an injection.
+* **Linearity and determinism.** Weighting z also weights the tensor's momentum by exactly K (momentum is linear in z); a per-step ratio is not linear in the momentum. One literal, no runtime state.
+* **Sign.** The twin's own sign is preserved (w > 0). On `k01`, sign(z_47) = sign(z_50) on 0.996 of records in epochs 17–36 and 1.000 after. It is 0.960 in epochs 0–5 and 0.550 in 5–17, where 50 holds ~1.5 % of the mass and decides no record's sign.
+* **Prior evidence, descriptive and non-gating.** On HEAD's UP-voting complement records in epochs 18–100, the smallest twin factor that turns the vote DOWN (K*) has median 1.0–1.2 and max 93.6; K = 691 exceeds K* on every such record. In epochs 0–18, K* is 5,700–10,400 (median) and ≤ 691 on only 8–22 % of records. So INJECT is predicted to push the complement down from about epoch 18, as 50 does in `k01`. This is a record-level counterfactual on HEAD's trajectory, not a prediction of INJECT's trajectory. It is also why the IDENTITY account below has a low prior: it must hold against a ×691 vote where ×1.2 already flips the record. That is stated, not hidden.
+
+**(2) DOSE = 0.1 (the operator's value) is a threshold test, not a graded one.** On `k01`'s records from epoch 17 where removing 50 flips the shared sign, the critical weight w* (below which 50's weighted term no longer flips it) is:
+
+| seed | q01 | q10 | median | q90 | max |
+|---|---|---|---|---|---|
+| s75 | 0.509 | 0.563 | 0.599 | 0.633 | 0.939 |
+| s76 | 0.518 | 0.584 | 0.625 | 0.666 | 0.956 |
+| s77 | 0.571 | 0.596 | 0.631 | 0.666 | 0.994 |
+
+A 0.1 weight sits below w* on every record. So under a sign-threshold vote account DOSE is predicted **at MUTE's level**, not partial. A partial DOSE means the threshold moved along the intervened trajectory (graded). DOSE at `k01` contradicts the threshold account. A dose near w* ≈ 0.6 would be the graded probe; it was not substituted for the operator's arm, and is noted here as the natural follow-up.
+
+### 227.4 The patch and its inertness (proved BEFORE launch)
+
+**`patches/patch_voteweight.py`** (`3c8a559d…`) makes four insertions and edits no existing line:
+1. A guarded early return at the top of `block_product`'s `scalar` branch.
+2. The same at the top of its `blockwise` branch.
+3. One `self._vw_init(net_param_names_and_size)` call after `init_meta`'s last line.
+4. Three new methods (`_vw_parse`, `_vw_init`, `_vw_block_product`) before `check_required_attributes`.
+
+How it behaves:
+* **OFF.** `VOTE_W` unset or empty → `_vw_on` False → the original branches run byte-unchanged (PATCH_REDNORM's guard included).
+* **ON.** The same per-tensor terms are computed in the same order and summed by the same left-to-right python `sum`, with `terms[i] *= w_i`.
+* **Loud grammar.** Unknown or repeated names, signs, exponents, `inf`/`nan`, empty items, commas, layerwise/nodewise specs, a named tensor alone in its group, and any `tn:` spec all raise.
+* **Witness line.** Every construction prints `VOTE_W: off` or `VOTE_W: on type=… items=<idx>:<name>:w=<w>:group=<k>:groupsize=<n>`. It must, because the runner's ENV line cannot carry `VOTE_W`.
+* **Probe records are untouched.** `PROBE_TENSOR`'s `z_tensor` stays the RAW per-tensor term; its `z_agg` is the harness's weighted z. That is what makes the intervention auditable afterwards (227.6).
+
+| proof | where | result |
+|---|---|---|
+| **Structure** (`tests/test_voteweight.py` V0): the four regions appear as registered; **deleting them reproduces `HF.py.pre_voteweight` BYTE FOR BYTE**; exactly three new methods; every pre-existing method present in order | stage V-f, guard 4a | 9 / 0 |
+| **CPU, live PlainNet, synthetic batches** (V1–V6, the registered `test_probe_tensor` `run_one`, imported unedited): OFF (unset and empty) and IDENTITY (weight 1 / 1.0, one and two items, scalar and HEAD) give beta at every step AND probe.jsonl bytes identical to the unpatched file, on `scalar`, HEAD, `layerwise`, `cpl1`'s ISO and `cpl2`'s TWIN. Intervened arms: z_agg == Σ w_i z_tensor_i (worst rel 2.5e-07) and mom_pre == Σ w_i m_tensor_i at every record; the unweighted sum matches on none of the informative records; the applied sign is right on every unclamped coordinate. `block_product` equals an independent float64 weighted sum, and at weight 1 equals the ORIGINAL branch **bitwise**. All 14 malformed forms raise. Witness literals == the scorer's | `$WS/runs/cvt1/inertness_voteweight.log` (`fcaa80ff…`), headed by the HF and build_network shas | **88 / 0, ALL PASS** |
+| **GPU, REAL run** (`tests/test_voteweight_realrun.py`, job `cvt1inert` 5019078, node881 L4, 3 min 05 s): each variant in its own process, importing its own tree, with cudnn deterministic. The unpatched tree is `harness_cpl1` (HF.py == this tree's `HF.py.pre_voteweight`, build_network identical), used read-only with `PYTHONDONTWRITEBYTECODE=1`. The path is train.py's own `parse_args`, `build_network`, `build_optimizer`, `load_data` (CIFAR-100, AUGMENT=1, seed 78), 300 steps, PROBE every 10, PROBE_TENSOR=1. **RR0** unpatched vs itself: beta, loss, probe.jsonl and the sha256 of every parameter and buffer identical (the bitwise claim is testable on this node). **RR1** OFF (unset, empty; k01 and HEAD) and **RR2** IDENTITY (k01 `layer4.1.bn2.weight:1`, HEAD `layer4.1.bn1.weight:1`) == unpatched on all four. **RR3** MUTE / DOSE / INJECT print the registered witness; z_agg == Σ w_i z_tensor_i at every record (worst rel 1.4e-07 / 1.4e-07 / 1.7e-07); z_agg differs from the unpatched run on 30 of 30 records | `$WS/runs/cvt1/inertness_voteweight_realrun.log` (`6fc87fb1…`) | **37 / 0, ALL PASS, REALRUN_RC 0** |
+
+* **Limit of the real-run proof, disclosed.** In 300 steps no intervened arm flips a meta-gradient sign (every arm's beta is still rising from alpha0), so the intervened arms' beta and final weights also equal the control's (all weights `eedeb03b…`). The non-vacuity of RR3 is at the level of z (30/30 records differ, and are the registered weighted sums), not beta. The bitwise claims RR1/RR2 are exactly what inertness requires.
+* **Two first attempts failed, both in the TESTS, and were fixed before any result was read.**
+  1. `test_voteweight_1.log` (`24342098…`): 85 PASS, 1 FAIL. The test's own non-vacuity count required ≥ 25 % of records to be informative for INJECT; on random data only 5 of 60 were. All 5 were correctly non-matching. The count was relaxed to ≥ 5, and the whole test re-ran to 88/0.
+  2. Job 5019057 (31 s): every child failed at `import train`. The harness's `train.py` executes `writer.close()` at module level outside its `__main__` guard. The driver now lifts train.py's own `parse_args` out of its source by AST and executes it unchanged; the sha of the file that passed is `4320aaf2…`.
+* **The live shared harness is unchanged.** Before staging, the sha256 of every file under the live cifar10 tree (data excluded), `run_cifar.sh`, `run_cifar_cpl1.sh` and the whole `harness_cpl1` tree was written to `~/l227_logs/live_hashes_before.txt` (37 files, `b30962af…`). The same listing is re-taken after the launch (227.11). Stage V-b3/V-h3/V-h4 and guard 3d confirm that the live `build_network.py` and `HF.py` are the pinned pre bytes and carry no `PATCH_VOTEWEIGHT`.
+
+### 227.5 Accounts and the floor table (164.6) — every arm, every account (UNSURE)
+
+Anchors (`cpl2`, between batch, non-gating): k01 11.8120, HEAD 64.1767, kL 68.9380. Intervals: K01_PL 8–16, FREE_PL 56–72, PART_PL 20–50, COLLAPSE_PL 8–30.
+
+| account | k01 | HEAD | MUTE | DOSE | INJECT | `P_VOTE` | `P_INJECT` | branch (+ DOSE stamp) |
+|---|---|---|---|---|---|---|---|---|
+| **VOTE-MAGNITUDE** (threshold) | 8–16 | 56–72 | 56–72 | 56–72 | 8–30 | −16…+16 | +26…+64 | `VOTE-MAGNITUDE` (+`DOSE-AT-MUTE`) |
+| **VOTE-MAGNITUDE-GRADED** | 8–16 | 56–72 | 56–72 | 20–50 | 8–30 | −16…+16 | +26…+64 | `VOTE-MAGNITUDE` (+`DOSE-PARTIAL`) |
+| **IDENTITY-BEYOND-VOTE** | 8–16 | 56–72 | 56–72 | 56–72 | 56–72 | −16…+16 | −16…+16 | `IDENTITY-BEYOND-VOTE` |
+| **OWN-STEP-SIZE** | 8–16 | 56–72 | 8–16 | 8–16 | 56–72 | +40…+64 | −16…+16 | `OWN-STEP-SIZE` |
+| **STEP-AND-VOTE** | 8–16 | 56–72 | 8–16 | 8–16 | 8–30 | +40…+64 | +26…+64 | `STEP-SIZE-NEEDED-VOTE-SUFFICES` |
+| **BROKEN-PATCH (null)** | = OWN-STEP-SIZE on every arm | | | | | | | reaches NO branch: `PATCH-NOT-VERIFIED` (227.6) |
+
+* **Margins, asserted in selftest D.** The lowest level any account predicts for any arm is 8 pp, 7.0 pp above chance (`cpl2`'s k01 11.81). Both primaries' predicted intervals sit ≥ 25 pp inside ±99 under every account, so neither is bounded in either direction. HEAD is predicted ≥ 40 pp off k01 under every account. Every account's midpoint lands in its registered branch, and in its registered DOSE stamp.
+* **OWN-STEP-SIZE and BROKEN-PATCH predict identically on every arm: declared.** Levels cannot separate them. `G-BITE` does: a patch that never reached the sum fails it before any branch is read. Every other account differs from the null by level on MUTE or INJECT.
+* **Where readings are bounds.** Arms predicted at k01 sit on the clamp-frozen level (PlainNet's scalar pins at epoch ~36). Such readings are locations (`FLOOR-READINGS-ARE-BOUNDS`).
+
+### 227.6 Gates, branches and what each licenses — `decide()`, first match wins; frozen bars
+
+**Harness gates (→ `HARNESS-UNSOUND`, rc 1).**
+* `G-ARGS`: each run's own single ARGS line has its arm's registered spec, net, cell, seed and run-name.
+* `G-ENV`: one distinct ENV line, equal to `cpl2`'s; one `PROBE_TENSOR: on every=100 type=<arm's> tensors=53` per run.
+* **`G-VOTEW`**: exactly one `VOTE_W` line per run, byte-equal to the arm's witness (off ×6; the three on-lines ×3).
+* `G-STRUCT`: the manifest byte-identical to the scorer's text.
+* `G-PROV`: MODE submit; `BUILD_NETWORK_SHA256` == POST_SHA; **`HF_SHA256` == `3f2b98e1…`**; `SCORER_SHA256` == the scorer.
+* `G-FLOOR`/`G-CEIL`: max arm mean between 15 and 90.
+
+**`G-BITE` (→ `PATCH-NOT-VERIFIED`, rc 1; runs BEFORE any branch).** For every run, from `runs/cvt1/probe_cvt1-<arm>-s<seed>/probe.jsonl`:
+* exactly 500 parseable records;
+* at every record, z_agg == Σ_i w_i z_tensor_i and mom_pre == Σ_i w_i m_tensor_i per group, to relative 1e-4 of Σ|term|, with w = the arm's registered weights (all 1 on k01 and HEAD);
+* on each intervened run, ≥ 50 "informative" records (where the weighted and unweighted sums differ by > 1e-2 relative), on **none** of which the unweighted sum matches.
+
+A patch that never bit, bit on a control arm, bit with the wrong weight, or left a probe missing, short or garbled cannot reach a level reading. Registered licence: **no statement about identity or magnitude**.
+
+**Branches.** First `UNRESOLVED-DIVERGED` (a seed range > 5), then `SCALAR-NOT-COLLAPSED` (k01 > 20), then `POSITIVE-CONTROL-FAILED` (`D_HEAD` < 20), then `INJECT-ABOVE-HEAD` (INJECT − HEAD > 5; unregistered, stop). After that:
+
+| MUTE | INJECT | branch | licenses |
+|---|---|---|---|
+| **at HEAD** (`D_MUTE` ≥ 10 and `P_VOTE` ≤ 5) | `P_INJECT` ≥ 10 | **`VOTE-MAGNITUDE`** | On PlainNet the scalar collapse is carried by the **magnitude** of one term inside the unnormalised sum, not by which tensor casts it and not by that tensor lacking its own step size. **The first intervention in the campaign that separates magnitude from identity.** Not licensed: ResNet (BN/GN) or VGG; > 100 epochs; that ×691 is minimal (one K); record-level identity of the injected term; a dose-response curve (one dose). |
+| at HEAD | \|`P_INJECT`\| ≤ 5 | **`IDENTITY-BEYOND-VOTE`** | Removing 50's vote suffices; a carrier-sized vote from another tensor does NOT collapse. 50's vote matters because it is 50's (its direction along the trajectory, its coupling to the head), not by size alone. Not licensed: which property of 50; any other network; that no K collapses. |
+| at HEAD | 5 < `P_INJECT` < 10 | `VOTE-MAGNITUDE-ATTENUATED` | Magnitude matters; a borrowed vote is weaker than 50's own. |
+| partial (`D_MUTE` ≥ 10, `P_VOTE` > 5) | any (stamped) | `VOTE-REMOVAL-PARTIAL` | Vote removal carries part of the rescue, the own step size the rest; no single-mechanism sentence. |
+| **at k01** (`D_MUTE` ≤ 2) | \|`P_INJECT`\| ≤ 5 | **`OWN-STEP-SIZE`** | The rescue needs 50 on its own step size; its vote in the shared sum is not what collapses the scalar. The broken-patch null is excluded **only** because `G-BITE` passed. MUTE/DOSE readings are locations. Not licensed: that 50's vote is irrelevant in general. |
+| at k01 | `P_INJECT` ≥ 10 | `STEP-SIZE-NEEDED-VOTE-SUFFICES` | A loud vote suffices to collapse; removing it does not suffice to rescue while 50 shares the step size. Both act. |
+| at k01 | 5 < `P_INJECT` < 10 | `OWN-STEP-SIZE-ATTENUATED` | Own step size carries the rescue; vote magnitude acts partially. |
+| 2 < `D_MUTE` < 10 | — | `MUTE-WEAK` | Nothing clean. |
+
+* **Frozen bars (O2).** GAP_MIN 20.0, K01_MAX 20.0, RESCUE 10.0 (17.64 SE), NULL 2.0 (3.53 SE), **MATCH 5.0** (8.82 SE; 7.8 % of `cpl2`'s HEAD), **COLLAPSE 10.0** (17.64 SE), DIVERGED 5.0, FLOOR_MIN 15.0, CEIL_MAX 90.0; G-BITE: BITE_TOL 1e-4, INFORM 1e-2, MIN_INFORMATIVE 50, N_RECORDS 500.
+* **Noise floor.** Re-derived on the 2,956-row corpus (`5c82c06c…`) with `cvt1-` excluded:
+  * `SIGMA_R18ALL` 0.694442846939599 (df 209);
+  * `SIGMA_PLAIN` 0.39545713778624325 (`cpl1` + `cpl2`, df 23, 7 cells);
+  * `SIGMA_PRIOR` = max = **0.694442846939599**; `SE_PRIOR` 0.567010.
+* **Stamps.** Always present: `HARNESS-CLEAN`, `PATCH-BITES`, `K-FIXED-691`, `ONE-NETWORK-PLAINNET`, `HORIZON-100-ONLY`, `SIGMA-PRIOR-FROZEN`/`-INBATCH`. Conditional: `POSITIVE-CONTROL-REPRODUCES`; `DOSE-AT-MUTE`/`-PARTIAL`/`-AT-K01`; `INJECT-AT-K01`/`-PARTIAL`/`-AT-HEAD`; `MUTE-TRACKS`/`BELOW`/`ABOVE-HEAD`; `FLOOR-READINGS-ARE-BOUNDS`; `TRAIN-AGREES`/`-DISAGREES` (both primaries).
+* **After FINAL, descriptive and unable to move it:** per-arm pin epochs; on `k01`'s pinned records the in-batch 50/47 ratio and the removal flip fraction; on MUTE's records from epoch 17 the fraction whose sign "adding 50 back" would flip.
+
+### 227.7 Tests and dry run
+
+* **Scorer selftest.** The Mac's 132 PASS / 0 FAIL / 0 SKIP lacks two host-only checks (the live manifest and K's re-derivation from `runs/cpl2`); alice2 via guard 1c ran **134 / 0 / 0**. What it covers:
+  * The real `score()` on 37 synthetic batches, **with 7,500 synthetic probe records**: every branch; near-bar cases on MATCH, COLLAPSE and NULL; 12 harness breaks, including MUTE printing `VOTE_W: off`, HEAD printing an on-line, no VOTE_W line (unpatched tree), and a DOSE witness at w=0.2.
+  * **5 G-BITE breaks.** MUTE's z is the unweighted sum *at OWN-STEP-SIZE's levels* (the broken-patch null → `PATCH-NOT-VERIFIED`, rc 1, no branch), k01's z carries a weight, a garbled DOSE file, a missing INJECT probe dir, a 400-record HEAD file.
+  * A dropped run → INCOMPLETE (exit 2); a truncated higher-jid resubmission does not shadow.
+  * O2 invariance for VOTE-MAGNITUDE and OWN-STEP-SIZE across four corpora, with 11 invented rows at PlainNet `scalar` (where k01, MUTE and DOSE all sit), at HEAD's string, and at the ResNet cells. Non-vacuity: the PlainNet corpus sigma moves 0.3955 → 19.7092 and FINAL does not.
+  * The one-argument subprocess; a 4,000-draw totality sweep.
+  * Corpus premises: both sigmas and all five `cpl2` references re-derive exactly; `PlainNet18_c100` appears only in `cpl1`/`cpl2`; seeds 78–80 are unused.
+* **Dry run** (alice2, `~/stage_cvt1`). Pass 1 (`dryrun_cvt1_1.log`, exit 2) failed ONE guard: guard 4c''s regex read a one-line dict in the tests as a multi-line block. The regex was fixed in the uncommitted launcher. **Pass 2 (`dryrun_cvt1_2.log`, `16a78cdd…`): exit 0, 0 guard failures, 15 composed lines, byte-identical (`cmp`) to pass 1's, every line read.**
+  * The lines: runner `run_cifar_cvt1.sh`, `PlainNet18_c100`, seeds 78/79/80, WALL 03:00:00, partitions `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, the exports of `cpl2` plus `VOTE_W=layer4.1.bn2.weight:0` / `:0.1` / `layer4.1.bn1.weight:691` on exactly MUTE / DOSE / INJECT (the per-line VOTE_W count check passed), and the two spec strings.
+  * Guard 4f re-checked the mechanism on the live source:
+    * Lion subtracts `ms·sign(b2·mom + (1−b2)·z)`;
+    * `block_product` keeps both original reductions plus exactly two guarded returns;
+    * `_pt_capture`'s `z_tensor` is the raw term;
+    * the order is `block_product < capture < base_update < meta_update`.
+* **Cost.** ≈9.7 GPU-h expected (`cpl2` sacct 9.7356 / 15), hard bound 45. The registration itself spent ≈0.06 GPU-h (the two `cvt1inert` jobs, 31 s + 3 min 05 s on an L4).
+* **Ingest caveat for the landing track, registered now.** `results/all_runs.csv` has no `VOTE_W` column. MUTE and DOSE rows will share `k01`'s 15 cell keys (`granularity scalar`), and INJECT rows will share HEAD's. Every later corpus-sigma or cell reader must exclude `cvt1-MUTE/DOSE/INJECT`, or the ingest must mark them. O2 keeps this scorer immune (selftest C notes it).
+
+### 227.8 Files
+
+**New (8):**
+* `analysis/cVT1_voteweight_score.py` (`21789734…cf717cb`)
+* `bin/cVT1_voteweight.sh` (`b88e10c9…32706b7`)
+* `bin/cVT1_stage_harness.sh` (`531effc3…ef4dd1`)
+* `bin/cVT1_realrun_inertness.sbatch` (`350927bb…df6388`)
+* `patches/patch_voteweight.py` (`3c8a559d…2eca94d`)
+* `tests/test_voteweight.py` (`b1ed95cf…724ade`)
+* `tests/test_voteweight_realrun.py` (`4320aaf2…2d51`)
+* `analysis/cvt1_registration_derivations.py` (`fbbeea83…6c72e`)
+
+**Reused unedited:** `patches/patch_plainnet.py`, `tests/test_plainnet.py`, `tests/test_probe_tensor.py`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`, `analysis/cPL2_plainnet_head_score.py` (read for the byte-identity checks).
+
+**On alice2 (new only):** `$WS/harness_cvt1/`, `$WS/jobs/run_cifar_cvt1.sh`, `$WS/runs/cvt1/` (manifest, `PROVENANCE.dryrun.txt`, the two inertness logs), `$WS/runs/cvt1-PARTITION-MANIFEST.txt`, `~/stage_cvt1/`, `~/l227_logs/`.
+
+### 227.9 Discipline (registration)
+
+* **RULE 16.** No registered file, `argsline_guard.py`, `paper/` or MASTER-TABLE line was edited; `git diff` is additions only. The unpatched tree `harness_cpl1` was used read-only (no bytecode written).
+* **RULE 21.** The scorer is committed and pushed in this commit, before any `cvt1` run exists (0 `.out`, 0 `sacct`, 0 CSV rows, 0 in `squeue` at guard 2). The margin is proved by wall clock at 227.10.
+* **Hosts.** `alice` NOT contacted. No job this track did not submit was touched; `cgn3`'s 12 jobs were only listed by `squeue`. No nested `claude -p`.
+
 ## 228. TRACK A2 — **`cgn3` REGISTERED, DRY-RUN AND LAUNCHED: IS THE GROUPNORM RESCUE A RESCUE OR A DELAYED COLLAPSE?  THE `cvh1` / `ciso2` ANALOGUE ON `ResNet18_gn_c100` AT `cgn2`'s CELL: 4 ARMS (k01, kL, ISO {50,53,59}, ONE {50}) × SEEDS {81, 82, 83} = 12 JOBS, TO E = 430 EPOCHS, PROBE=100 AND PROBE_TENSOR=1, SPEC STRINGS BYTE-IDENTICAL TO `cgn2`'s.  E IS DERIVED FROM `cgn2`'s MEASURED DESCENT, AND THE DERIVATION IS DISCLOSED AS THE EARLY END OF A MODEL RANGE THAT SPANS A FACTOR > 2 WITHIN THE LINEAR FAMILY ALONE (228.2).  PRIMARY `RHO` = D_ISO@430 / D_ISO@100 WITH THE 100-EPOCH CONTROL READ IN-RUN; `cvh1`'s STEP-SIZE-MAGNITUDE PIN GATE SITS AFTER IT AS A STAMP; `UNRESOLVED-NOT-PINNED` IS REGISTERED AS INFORMATIVE.  ≈38.5 GPU-h EXPECTED, HARD BOUND 84.**  Every bar is a frozen literal (O2).  No patch; `cgn3` runs from `cgn1`'s verified isolated tree; the live harness hashes are pinned before and re-read after.  **`alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **228** (pre-assigned); `cvt1` holds 227, bookkeeping 229.
 
 ### 228.1 Question
