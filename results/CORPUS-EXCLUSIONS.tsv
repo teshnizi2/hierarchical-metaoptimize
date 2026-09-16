@@ -1,0 +1,30 @@
+# results/CORPUS-EXCLUSIONS.tsv -- rows of results/all_runs.csv that are NOT what their CSV cell key says they are.
+# Created at CORRECTIONS 230 (cycle 152).  Machine-readable; read it with analysis/corpus_exclusions.py.
+#
+# WHY: results/all_runs.csv has no column for a harness INTERVENTION that the ARGS line cannot carry.
+# `cvt1` (CORRECTIONS 227) ran PATCH_VOTEWEIGHT with VOTE_W=<tensor>:<w>, which reweights one tensor's term
+# inside the shared meta-gradient sum.  VOTE_W rides only the run's own `VOTE_W:` witness line, so
+# aggregate.py (unedited) writes MUTE and DOSE rows with k01's cell key (granularity `scalar`) and INJECT
+# rows with HEAD's cell key.  They are NOT plain scalar / plain HEAD measurements.
+#
+# RULE FOR EVERY CORPUS READER THAT POOLS BY CELL (noise floors, cell means, anchors, O2 re-derivations):
+# drop every row whose (run, job_id) is listed here BEFORE grouping.  analysis/corpus_exclusions.py
+# provides load() / is_excluded(row) / filter_rows(rows), and `--check` verifies this file against the CSV
+# and the raw .out witness lines.  A new intervention batch whose design the ARGS line cannot carry
+# appends its rows here in the same commit as its ingest.
+#
+# The plain arms of the same batch (cvt1-k01-*, cvt1-HEAD-*) print `VOTE_W: off` and are NOT listed:
+# they are ordinary measurements of their cells.
+#
+# columns: run, job_id, batch, arm, looks_like (the plain arm whose cell key the row carries), intervention,
+#          witness (the run's own VOTE_W line, verbatim), registered_at, reason
+run	job_id	batch	arm	looks_like	intervention	witness	registered_at	reason
+cvt1-MUTE-s78	5019106	cvt1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-MUTE-s79	5019111	cvt1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-MUTE-s80	5019116	cvt1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-DOSE-s78	5019107	cvt1	DOSE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0.1	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.1:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-DOSE-s79	5019112	cvt1	DOSE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0.1	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.1:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-DOSE-s80	5019117	cvt1	DOSE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0.1	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.1:group=0:groupsize=53	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-INJECT-s78	5019108	cvt1	INJECT	HEAD (granularity sets:1-49,51-53/layer4.1.bn2.weight)	VOTE_W=layer4.1.bn1.weight:691	VOTE_W: on type=blockwise items=47:layer4.1.bn1.weight:w=691.0:group=0:groupsize=52	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-INJECT-s79	5019113	cvt1	INJECT	HEAD (granularity sets:1-49,51-53/layer4.1.bn2.weight)	VOTE_W=layer4.1.bn1.weight:691	VOTE_W: on type=blockwise items=47:layer4.1.bn1.weight:w=691.0:group=0:groupsize=52	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
+cvt1-INJECT-s80	5019118	cvt1	INJECT	HEAD (granularity sets:1-49,51-53/layer4.1.bn2.weight)	VOTE_W=layer4.1.bn1.weight:691	VOTE_W: on type=blockwise items=47:layer4.1.bn1.weight:w=691.0:group=0:groupsize=52	CORRECTIONS 227	vote-weight intervention not carried by any CSV column
