@@ -29834,3 +29834,161 @@ PRE-EXISTING ROWS CHANGED: 0 field-cells differ (109592 compared), rows 0
 * **Cost of these entries:** zero GPU-hours. The batches' own spend by `sacct` Elapsed is `cvh1` **17.4414** and `cuc1` **23.2664** GPU-h (40.71 h together).
 
 Next free number: **221**.
+
+## 221. TRACK R5 — **`cgn2` REGISTERED AND DRY-RUN: DOES THE ISOLATION TRANSFER OFF BATCHNORM?  `cgn1` (217) showed only that the GAP does.  `ResNet18_gn_c100` AT `cgn1`'s CELL, 5 ARMS (k01, kL, ISO, CTL, ONE) × SEEDS {72, 73, 74} = 15 JOBS, 100 EPOCHS, PROBE=100 AND PROBE_TENSOR=1 ON EVERY ARM; ≈18.7 GPU-h EXPECTED, HARD BOUND 45.  THE THREE m=2 SPEC STRINGS ARE BYTE-IDENTICAL TO THE BATCHNORM BATCHES' (`ciso1` ISO / ONE, `cdep1` DEPTH) AND WERE RE-DERIVED ON THE LIVE GN MODEL BY NAME AND NUMEL.  NO GATE, BRANCH OR FINAL-LINE STAMP READS A PINNED RECORD: `cgn1`'s GN SCALAR NEVER PINNED.  100 EPOCHS CHOSEN AND PRICED AGAINST 150/200.**  Every bar is a frozen literal (O2).  No patch; `cgn2` runs from `cgn1`'s verified isolated tree; the live harness is untouched.  **NOTHING SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **221**; NEXT FREE **222**.
+
+### 221.1 Question
+
+`cgn1` measured the scalar→layerwise GAP on a network with no batch statistics (+37.3833 pp). The isolation result is a different claim: on `ResNet18_c100` (BatchNorm), putting {50 `layer4.0.bn2.weight`, 53 `layer4.0.shortcut.1.weight`, 59 `layer4.1.bn2.weight`} in their own step-size group recovers the whole gap (`ciso1` 70.2113, `cdep1` 70.0440). The matched carrier-free triple {47, 48, 56} recovers none (`cdep1` DEPTH 23.5207 against k01 23.3520). 50 alone recovers ~0.91 (`ciso1` 64.7500, `cdep1` 64.8267). 217.6 nominated the same three GN tensors as a HYPOTHESIS, from a record set that was not the registered one. **Does the isolation transfer to GroupNorm, and does 50 alone still rescue?**
+
+### 221.2 Design
+
+* **Network and cell.** `cgn1`'s exactly: `ResNet18_gn_c100` from `$WS/harness_cgn1/cifar10` (`build_network.py` sha `9f6e4ec9…c892` = `cgn1`'s H-PROV pin), runner `$WS/jobs/run_cifar_cgn1.sh`. SGDm base (mom 0.99, wd 0.1), Lion meta (0.99 / 0.9 / 0), ms 1e-3, α₀ 1e-6, batch 100, 100 epochs, AUGMENT=1, BETA_CLIP −15:−2.3026. Nothing was staged: `bin/cGN1_stage_harness.sh` (unedited) VERIFIES the tree (V-a…V-d), and `tests/test_resnet_gn_c100.py` passes on it (52/0).
+* **ONE submission, 15 jobs = 5 arms × seeds {72, 73, 74}** (seeds unused anywhere: 0 CSV rows, 0 `.out` ARGS lines, 0 `sacct`). m=2 arms: big group `beta[0]`, isolated group `beta[1]`.
+
+| arm | spec (byte-identical to) | sizes | params | isolates (1-based, GN model) |
+|---|---|---|---|---|
+| k01 | `scalar` | m=1 | 11,220,132 | — |
+| kL | `layerwise` | m=62 | — | — |
+| ISO | `sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight` (`ciso1`/`cdep1` ISO) | [59,3] | [11218596,1536] | 50, 53, 59 |
+| CTL | `sets:1-46,49-55,57-62/layer4.0.bn1.weight,layer4.0.bn1.bias,layer4.1.bn1.weight` (`cdep1` DEPTH) | [59,3] | [11218596,1536] | 47, 48, 56 |
+| ONE | `sets:1-49,51-62/layer4.0.bn2.weight` (`ciso1`/`cdep1` ONE) | [61,1] | [11219620,512] | 50 |
+
+* **Re-derivation (187.4).** On alice2, the live GN model's `(name, shape)` list is ELEMENTWISE EQUAL to `ResNet18_c100`'s (62 tensors, GroupNorm 20 / BatchNorm2d 0, num_groups 32). `HF.polish_the_stepsize_groups` composes each string to the sizes, params and names above, and `init_meta` routes each to a 2-coordinate blockwise beta. Guard 4 prints the manifest per arm with names, numel and owner class, and guard 4d proves it BYTE-IDENTICAL to the scorer's `synthetic_manifest_text()` (3,728 bytes, sha `5a36d081…`). The scorer's selftest reads the two BN scorers' `SPEC` dicts and asserts byte equality for all three strings.
+* **CTL is matched on numel, not class.** 48 is a GN shift (`layer4.0.bn1.bias`), exactly as in `cdep1`. CTL contains 217.6's matched pair {47, 56}. Stamped `CTL-MATCHED-ON-NUMEL-NOT-CLASS`.
+* **PRIMARY** `DELTA_ID` = plateau5(ISO) − plateau5(CTL). **KEY SECONDARY** `D_ONE` = ONE − k01. Secondaries (all in batch): `D_ISO`, `D_CTL`, `D_GAP` = kL − k01, `D_HEAD3` = ISO − ONE. `RECOVERY` and `RECOVERY_ONE` are descriptive. plateau5 = mean TEST over epochs 95–99 from the raw `.out`, with TRAIN beside it; the CSV `plateau` and `best_test` are read nowhere.
+
+### 221.3 What `cgn1`'s disclosed limits do to this design (registered)
+
+1. **The GN scalar never reaches the clamp** (0 of 500 records at −15 on every `cgn1` seed).
+   * "At the floor" is defined as **at the in-batch k01 LEVEL** (within `NULL_BAR` 2.0 pp of this batch's scalar arm), never "pinned". The k01 level is still creeping (`cgn1` OLS +0.0035…+0.0231 pp/epoch), so it is a level, not an absorbing state. Stamped `K01-IS-A-LEVEL-NOT-A-CLAMP`, unconditional.
+   * **No gate, no branch and no FINAL-line stamp requires or reads a pinned record.** The selftest asserts that `decide()` reads no probe record and no pin state, and that the probe readout runs only after the FINAL line is composed. A garbled probe file leaves FINAL and the exit code unchanged (tested).
+   * Every account is stated as LEVELS, not clamp states (221.4).
+   * The only probe readouts are DESCRIPTIVE, printed after FINAL: each arm's beta trajectory (last value, peak, clamp fraction, "pinned-from-epoch" or "never"), and 217.6's post-peak nomination re-run on this batch's k01 records, labelled as the deviation it is. **Validation of that readout:** run on `cgn1`'s real records it reproduces 217.4/217.6 (peak −5.670/−5.770/−5.842 at epoch 16.2–16.4, last −12.300/−11.782/−11.554, "never", DOWN fraction 0.5899/0.5742/0.5622, top shares 59/50/61/53). Stamped `NOMINATION-WAS-POST-PEAK-NOT-PINNED`.
+2. **The horizon: 100 epochs, CHOSEN, with the reasons and the price registered.**
+   * The primary is a within-batch difference between two [59,3] arms at the same horizon. Its bars (RESCUE 10, IDENTITY 15 pp) are 0.27 and 0.40 of `cgn1`'s +37.38 gap and ~17 and ~25 SE. A still-rising kL moves the ceiling, not the sign or location of ISO − CTL.
+   * **Price** (`cgn1` sacct: 7.4889 GPU-h / 6 runs = 1.248 GPU-h per 100-epoch GN run, 4 of 6 on 2080 Ti): 100 ep ≈ **18.7**, 150 ep ≈ 28.1, 200 ep ≈ 37.4 GPU-h for this batch. With `cpl2` (≈10.0) the pair is ≈28.7 / ≈38 / ≈47 GPU-h, so only 100 epochs fits the operator's ~35 GPU-h envelope.
+   * **What 100 epochs cannot say.** Whether a GN rescue is a DELAY: `cpl1`'s ISO complement pinned at epoch 60–62 and its level froze, but no GN pin is expected inside 100 epochs, so a GN delay would be invisible here. Nor can it give the converged size of anything. Stamped `HORIZON-100-ONLY` and `RESCUE-PERSISTENCE-NOT-TESTED`. Each arm's TEST OLS slope over epochs 80–99 is printed as a descriptive readout.
+
+### 221.4 Accounts and the floor table (164.6) — every arm, every account
+
+Level anchors, frozen from `cgn1` (between-batch, non-gating): k01 14.4340, kL 51.8173. Intervals: K01_GN 10–20, KL_GN 45–62, FREE_GN 40–62. All levels UNSURE. Chance 1.00, ceiling 100.
+
+| account | k01 | kL | ISO | CTL | ONE | `DELTA_ID` predicted | branch |
+|---|---|---|---|---|---|---|---|
+| **T-IDENT** (the BN isolation transfers whole) | 10–20 anchor | 45–62 | 40–62 off k01 ≥20 | 10–20 at k01 | 40–62 off k01 ≥20 | +20…+52 | `IDENTITY-TRANSFERS-GN` |
+| **T-SET** (the triple carries; 50 alone does not, the PlainNet pattern) | 10–20 | 45–62 | 40–62 | 10–20 | 10–20 | +20…+52 | `IDENTITY-TRANSFERS-ONE-NULL-GN` |
+| **CLASS** (any layer4 GN triple lifts the slow, non-clamp GN collapse) | 10–20 | 45–62 | 40–62 | 40–62 | 40–62 | −22…+22 | `CLASS-OPERATIVE-GN` |
+| **DIFFUSE** (not carried by a small set) | 10–20 | 45–62 | 10–20 | 10–20 | 10–20 | −10…+10 | `NO-RESCUE-GN` |
+| **H-BROKEN** (content-free: m=2 partitions fail on GN) | = DIFFUSE on every arm | | | | | | `NO-RESCUE-GN` |
+
+* **Margins, asserted in selftest D.** The lowest level any account predicts for any arm is 10 pp, **9.0 pp above chance**. The highest is 62, 38 pp below the ceiling. Under every account `DELTA_ID`'s predicted interval sits ≥ 47 pp inside both hard bounds (±99), so the primary is bounded in neither direction. Every account predicts `D_GAP` ≥ 25 (GAP_MIN + 5). Each account's midpoint lands in its registered branch.
+* **The floor readings, declared.** k01 is the in-batch floor ANCHOR by construction. Every "at-k01" arm is a control or a null prediction: a LOCATION, never quoted as a point (`FLOOR-READINGS-ARE-BOUNDS`). T-IDENT, T-SET and CLASS each put an m=2 arm ≥ 20 pp off k01, which kills H-BROKEN in batch. **DIFFUSE and H-BROKEN predict identically, so `NO-RESCUE-GN` never confirms DIFFUSE** (stamp `H-BROKEN-NOT-EXCLUDED`). Under those two accounts `DELTA_ID` sits at a soft bound: the difference of two arms at a moving k01 level.
+
+### 221.5 Branches — `decide()`, first match wins; frozen bars
+
+`INCOMPLETE` (any run missing, short, without RUN_DONE or with a traceback; exit 2) → `HARNESS-UNSOUND` (G-ARGS 15/15, G-ENV, G-STRUCT, G-PROV, max arm < 15 or > 90; exit 1) → `GN-UNTRAINABLE` (kL < 30) → `UNRESOLVED-DIVERGED` (an arm's seed range > 5) → `GAP-NOT-REPRODUCED-GN` (`D_GAP` < 20) → `NO-RESCUE-GN` → `UNEXPECTED-PATTERN` (ISO does not rescue, CTL or ONE does) → `CONTROL-DOMINATES-GN` (`DELTA_ID` ≤ −15) → with `DELTA_ID` ≥ 15: `IDENTITY-TRANSFERS-GN` (`D_ONE` ≥ 10), `IDENTITY-TRANSFERS-ONE-NULL-GN` (`D_ONE` ≤ 2), otherwise `IDENTITY-TRANSFERS-ONE-PARTIAL-GN` → `CLASS-OPERATIVE-GN` (CTL rescues and |`DELTA_ID`| ≤ 2) → `IDENTITY-ATTENUATED-GN`.
+
+* **Frozen bars (O2).** RESCUE 10.0, IDENTITY 15.0, NULL 2.0, GAP_MIN 20.0, DIVERGED 5.0, FLOOR_MIN 15.0, KL_MIN 30.0, CEIL_MAX 90.0.
+* **Noise floor.** Re-derived on the 2,926-row corpus (sha `3223028d…`, HEAD `7254ed4`) with `cgn2-` excluded, then frozen:
+  * `SIGMA_R18ALL` **0.694442846939599** (ResNet18_c100, every granularity, df 209).
+  * `SIGMA_GNC100` **0.725869593430298** (`cgn1`'s own 6 runs, df 4).
+  * `SIGMA_PRIOR` = max = **0.725869593430298**; `SE_PRIOR` 0.592670. `SIGMA_USED` = `compose_sigma(sigma_in)` = max(prior, in-batch): one argument, no corpus.
+* **Licences (the scorer's `LICENSE` table).** `NO-RESCUE-GN` refutes T-IDENT, T-SET and CLASS and does not support 217.6. `IDENTITY-TRANSFERS-GN` licenses "the carrier set, not only the gap, does not need batch statistics" and supports 217.6 by intervention. `IDENTITY-TRANSFERS-ONE-NULL-GN` licenses the set but not the single-tensor decomposition (`DECOMPOSITION-BY-SUBTRACTION`). `CLASS-OPERATIVE-GN` means the BN identity result does NOT transfer.
+* **Unconditional stamps.** `K01-IS-A-LEVEL-NOT-A-CLAMP`, `NOMINATION-WAS-POST-PEAK-NOT-PINNED`, `CTL-MATCHED-ON-NUMEL-NOT-CLASS`, `MAGNITUDE-NOT-SEPARATED`, `MISTUNING-NOT-EXCLUDED`, `HORIZON-100-ONLY`, `RESCUE-PERSISTENCE-NOT-TESTED`, `GN32-ALSO-CHANGES-PER-CHANNEL-INVARIANCE`.
+
+### 221.6 Tests and dry run
+
+* **Scorer selftest** (`--selftest --runsdir <runs> --csv results/all_runs.csv`): **104 PASS / 0 FAIL / 0 SKIP**, on the Mac (Python 3.14) and on alice2 (3.10.4, `envs/mo`).
+  * It drives the REAL `score()` on 24 synthetic batches: every registered branch, near-bar cases, 7 harness breaks (AUGMENT=0, spec ≠ arm, BN net named, BN manifest, provenance = live tree / dry-run / wrong scorer sha), a DROPPED run → `FINAL: INCOMPLETE` with exit 2, and a truncated higher-jid resubmission that does not shadow.
+  * **O2:** two cases give identical FINAL and SIGMA/SE/bars/PRIMARY lines against the real corpus, the real corpus + 14 INVENTED rows (at `ResNet18_gn_c100` scalar, layerwise and all three `sets:` strings, and at the ResNet18_c100 cells), a corpus of invented rows only, and no corpus. Non-vacuity: the invented rows move the live GN corpus sigma by more than 5×.
+  * The documented one-argument invocation is run as a subprocess (exit 0; exit 2 on a dropped run). A 4,000-draw sweep shows the branch map is total. RULE 21 premise: 0 `cgn2-*.out`, 0 CSV rows.
+* **`tests/test_probe_tensor_blockwise_cgn2.py`** (new successor; the registered test is imported, not edited, with `SPECS` re-bound and the documented `--net ResNet18_gn_c100`). On alice2 against the cgn1 tree (`--pre` = the live `HF.py.pre_probe_tensor`; the tree's HF.py is sha-identical to the live one, `4732b74a…`): **44 PASS / 0 FAIL, ALL PASS**, `SCORER_SPECS_AGREE`. Log `$WS/runs/cgn2/inertness_blockwise_gn.log` (`9c35b812…`).
+* **Dry run** (alice2, from `~/stage_cgn2`, whose six new files are sha256-identical to the Mac tree; log `~/l221_logs/dryrun_cgn2_1.log`): **exit 0, 0 guard failures, 15 composed lines, every line read.**
+  * The guards: 1c selftest with its O2, invocation, fresh-seed and byte-identity sub-checks; 2 RULE 21 premise; 4a stage VERIFIED; 3b/3c tree pins; 4c GN suite 52/0; 4b/4b2 PROBE_TENSOR structural inertness; 4e the blockwise log; 4c′ literals agree across launcher, scorer and stage script; 4 live manifest; 4f the Lion sign, the unnormalised blockwise product and capture placement; 8 default manifest resolution; 9 runner `cd` == the tested tree.
+  * The lines: `ResNet18_gn_c100`, the three registered strings, seeds 72/73/74, runner `run_cifar_cgn1.sh`, WALL 03:00:00, partitions `gpu-short,gpu-l4-24g,gpu-mig-40g,gpu-a100-80g`, exports `AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1` plus the run's own `PROBE_DIR`.
+* **Cost.** ≈18.7 GPU-h expected (L4-only ≈10.8, 2080 Ti-only ≈24); hard bound WALL × 15 = 45 GPU-h.
+* **UNSURE.** Every level in 221.4. And whether blockwise dynamics on GN differ enough from BN that 100 epochs misreads a delayed collapse as a rescue: registered as untestable here.
+
+### 221.7 Files (3, new; guard 1b's NEWF list)
+
+`analysis/cGN2_gn_isolation_score.py` (sha `cdf6643e09ba2806…3df0f9`), `bin/cGN2_gn_isolation.sh` (`3210180f7b3a9dec…0ee256d`), `tests/test_probe_tensor_blockwise_cgn2.py` (`b1ceffa5207bc4d6…627d15586`). **Reused unedited:** `bin/cGN1_stage_harness.sh`, `tests/test_resnet_gn_c100.py`, `tests/test_probe_tensor_blockwise.py`, `tests/test_probe_tensor.py`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`. **On alice2 (new only):** `~/stage_cgn2/`, `$WS/runs/cgn2/` (inertness log, dry-run manifest, `PROVENANCE.dryrun.txt`), `$WS/runs/cgn2-PARTITION-MANIFEST.txt`, `~/l221_logs/`.
+
+## 222. TRACK R6 — **`cpl2` REGISTERED AND DRY-RUN: TURN `cpl1`'s SUBTRACTION INTO A MEASUREMENT.  ON `PlainNet18_c100` (53 TENSORS; EVERY INDEX RE-DERIVED BY NAME — NOT ResNet's), ISOLATE `layer4.1.bn2.weight` ALONE (HEAD, idx 50) AND ITS MATCHED TWIN `layer4.1.bn1.weight` ALONE (TWIN, idx 47), WITH `cpl1`'s TWO-TENSOR ISO AS THE IN-BATCH POSITIVE CONTROL, PLUS k01 AND kL.  5 ARMS × SEEDS {75, 76, 77} = 15 JOBS, 100 EPOCHS; ≈10.0 GPU-h EXPECTED, HARD BOUND 45.  A NULL AND A FULL RESCUE ARE BOTH REGISTERED WITH THEIR MEANINGS BEFORE ANY RUN.**  Every bar is a frozen literal (O2).  No patch; `cpl2` runs from `cpl1`'s verified isolated tree.  **NOTHING SUBMITTED BY THIS ENTRY.  `alice` NOT CONTACTED.**  THIS ENTRY TOOK NUMBER **222**; NEXT FREE **223**.
+
+### 222.1 Question
+
+`cpl1` (218) returned `HEAD-CARRIES-PLAIN`. The pair {44 `layer4.0.bn2.weight`, 50 `layer4.1.bn2.weight`} rescued (67.5427 against k01 11.7867), and 44 alone did not (`D_ONE` −0.1027). The rescue was attributed to 50 **by subtraction**, and 50 was never isolated alone. 164.7 refuted single-tensor additivity on ResNet, so the subtraction is an inference. **Does `layer4.1.bn2.weight` alone rescue the PlainNet scalar collapse?**
+
+### 222.2 Design
+
+* **Network and cell.** `cpl1`'s exactly: `PlainNet18_c100` from `$WS/harness_cpl1/cifar10` (`build_network.py` sha `e65e6773…a18b` = `cpl1`'s), runner `$WS/jobs/run_cifar_cpl1.sh`, with the same cell as 221.2. `bin/cPL1_stage_harness.sh` (unedited) VERIFIES the tree, V-a…V-e, where V-e re-runs `tests/test_plainnet.py`: 78 PASS against the current corpus (77 at 215, whose extra check depends on the corpus), 0 FAIL.
+* **ONE submission, 15 jobs = 5 arms × seeds {75, 76, 77}** (unused anywhere).
+
+| arm | spec | sizes | params | isolates (1-based, **PlainNet**) |
+|---|---|---|---|---|
+| k01 | `scalar` | m=1 | 11,046,308 | — |
+| kL | `layerwise` | m=53 | — | — |
+| ISO | `sets:1-43,45-49,51-53/layer4.0.bn2.weight,layer4.1.bn2.weight` (**byte-identical to `cpl1`'s ISO**: the positive control) | [51,2] | [11045284,1024] | 44, 50 |
+| **HEAD** | `sets:1-49,51-53/layer4.1.bn2.weight` | [52,1] | [11045796,512] | **50** |
+| TWIN | `sets:1-46,48-53/layer4.1.bn1.weight` | [52,1] | [11045796,512] | 47 |
+
+* **Re-derivation (187.4).** On alice2, `HF.polish_the_stepsize_groups` on the live PlainNet model composes each string to the rows above. `layer4.1.bn2.weight` is idx **59** on ResNet and **50** on PlainNet; the selftest asserts it. Guard 4 prints the manifest per arm with names, numel and owner. It also checks: PlainNet == the parent minus exactly the 9 shortcut tensors; 0 fx add ops (parent 8); 17 BatchNorm2d; `resnet18_blocks` / `resnet50_blocks` raise. Guard 4d proves the manifest BYTE-IDENTICAL to `synthetic_manifest_text()` (3,430 bytes, `873b4124…`).
+* **HEAD and TWIN are an exact twin.** One 512-numel BN scale each, same block `layer4.1`, bn2 against bn1, group sizes [52,1]. 47 is `cpl1`'s CTL member in that block. HEAD is the last BN scale before the classifier: the conv-free-to-head position PATH named, and VGG's bn8 position.
+* **PRIMARY** `DELTA_HEAD` = plateau5(HEAD) − plateau5(TWIN). **KEY SECONDARY** `D_HEAD` = HEAD − k01. Secondaries: `D_ISO` (the positive control), `D_TWIN`, `D_GAP`, and `D_PAIR` = ISO − HEAD (what adding 44 to HEAD's group adds). `RECOVERY_HEAD` = `D_HEAD`/`D_ISO` is descriptive only.
+
+### 222.3 What a null means versus a full rescue (registered before any run)
+
+* **FULL RESCUE — `HEAD-CARRIES-ALONE-PLAIN`** (`DELTA_HEAD` ≥ 15 and `D_PAIR` ≤ `PAIR_BAR` 5.0). `cpl1`'s `DECOMPOSITION-BY-SUBTRACTION` becomes a MEASUREMENT. On a network with no residual addition, the rescue rides on the one BN scale with no conv between it and the classifier (PATH's location), and 44 is dispensable. Kills H-SINGLETON in batch. Not licensed: identity vs magnitude; anything about ResNet's carriers; any horizon beyond 100 epochs.
+* **NULL — `PAIR-REQUIRED-PLAIN`** (neither singleton reaches `RESCUE_BAR` and `D_HEAD` ≤ 2, with ISO rescuing in batch). **The rescue needs BOTH scales lifted out of the shared step size TOGETHER.** Neither ex-carrier rescues alone (44 in `cpl1`, 50 here), so **`cpl1`'s attribution of the rescue to `layer4.1.bn2.weight` is WITHDRAWN as a single-tensor claim**, and the pair is the unit (non-additive, cf. 164.7). **What it cannot exclude:** H-SINGLETON, under which every [52,1] singleton isolation fails on PlainNet for content-free reasons (the only singleton ever run there, `cpl1`'s ONE, floored). Stamped `SINGLETON-BROKEN-NOT-EXCLUDED`. So the null says that isolating 50 alone does not rescue, not that 50 is unimportant.
+* **PARTIAL.** `HEAD-PARTIAL-PLAIN` (2 < `D_HEAD` < 10, neither singleton rescues): 50 contributes and the pair is strongly super-additive. `HEAD-CARRIES-MOST-PLAIN` (`DELTA_HEAD` ≥ 15 but `D_PAIR` > 5): the location is confirmed, but "the whole rescue" is not, because 44 adds a joint increment.
+* **No reading at all** if the positive control fails (`POSITIVE-CONTROL-FAILED-PLAIN`: `D_ISO` < 10). With no in-batch rescue to decompose, neither a null nor a rescue is licensed.
+
+### 222.4 Accounts and the floor table (164.6)
+
+Level anchors, frozen from `cpl1` (non-gating): k01 11.7867, kL 68.9800, ISO 67.5427. Intervals: K01_PL 8–16, KL_PL 60–72, FREE_PL 58–72, MOST_PL 30–52. All levels UNSURE. Chance 1.00. **On PlainNet, unlike GN, the scalar beta DOES pin (epoch ~36, `cpl1`),** so "at-k01" is a clamp-frozen level here. Nothing gates on pins in this batch either.
+
+| account | k01 | kL | ISO | HEAD | TWIN | `DELTA_HEAD` predicted | branch |
+|---|---|---|---|---|---|---|---|
+| **SUBTRACT** (`cpl1`'s subtraction literally right) | 8–16 anchor | 60–72 | 58–72 | 58–72 | 8–16 | +42…+64 | `HEAD-CARRIES-ALONE-PLAIN` |
+| **JOINT** (50 carries most; 44 adds jointly) | 8–16 | 60–72 | 58–72 | 30–52 | 8–16 | +14…+44 | `HEAD-CARRIES-MOST-PLAIN` |
+| **PAIR** (needs both scales together) | 8–16 | 60–72 | 58–72 | 8–16 | 8–16 | −8…+8 | `PAIR-REQUIRED-PLAIN` |
+| **CLASS1** (any layer4.1 BN scale alone) | 8–16 | 60–72 | 58–72 | 58–72 | 58–72 | −14…+14 | `CLASS-OPERATIVE-PLAIN` |
+| **H-SINGLETON** (singleton isolation broken) | = PAIR on every arm | | | | | | `PAIR-REQUIRED-PLAIN` |
+
+* **Margins, asserted in selftest D.** The lowest level any account predicts for any arm is 8 pp, **7.0 pp above chance** (`cpl1`'s k01 was 11.79). The highest is 72, 28 pp below the ceiling. `DELTA_HEAD`'s predicted interval is ≥ 35 pp inside ±99 under every account, so it is bounded in neither direction. The positive control ISO is predicted ≥ 42 pp off k01 under every account, which kills pair-level H-BROKEN in batch. SUBTRACT, JOINT and CLASS1 each put a singleton arm ≥ 14 pp off k01, which kills H-SINGLETON in batch. **PAIR and H-SINGLETON predict identically: declared.** Under them the primary sits at the floor difference (a soft bound; `FLOOR-READINGS-ARE-BOUNDS`). Midpoints land in the registered branches.
+
+### 222.5 Branches — `decide()`, first match wins; frozen bars
+
+`INCOMPLETE` → `HARNESS-UNSOUND` (same gate set as 221.5, against PlainNet's manifest and `cpl1`'s POST_SHA) → `PLAIN-UNTRAINABLE` (kL < 30) → `UNRESOLVED-DIVERGED` → `GAP-NOT-REPRODUCED-PLAIN` (`D_GAP` < 20) → `POSITIVE-CONTROL-FAILED-PLAIN` (`D_ISO` < 10) → neither singleton rescues: `PAIR-REQUIRED-PLAIN` (`D_HEAD` ≤ 2) or `HEAD-PARTIAL-PLAIN` → `UNEXPECTED-PATTERN` (TWIN rescues, HEAD does not) → `CONTROL-DOMINATES-PLAIN` (`DELTA_HEAD` ≤ −15) → `DELTA_HEAD` ≥ 15: `HEAD-CARRIES-ALONE-PLAIN` (`D_PAIR` ≤ 5) or `HEAD-CARRIES-MOST-PLAIN` → `CLASS-OPERATIVE-PLAIN` (TWIN rescues and |`DELTA_HEAD`| ≤ 2) → `IDENTITY-ATTENUATED-PLAIN`.
+
+* **Frozen bars (O2).** RESCUE 10.0, IDENTITY 15.0, NULL 2.0, **PAIR 5.0** (8.82 SE at the prior; 7.4 % of `cpl1`'s ISO level), GAP_MIN 20.0, DIVERGED 5.0, FLOOR_MIN 15.0, KL_MIN 30.0, CEIL_MAX 90.0.
+* **Noise floor.** Re-derived on the same 2,926-row corpus with `cpl2-` excluded:
+  * `SIGMA_R18ALL` 0.694442846939599 (df 209).
+  * `SIGMA_PLAIN` 0.22184499092835014 (`cpl1`'s 15 runs, df 10).
+  * `SIGMA_PRIOR` = max = **0.694442846939599**; `SE_PRIOR` 0.567010.
+* **Stamps.** Unconditional: `SINGLE-TENSOR-DECOMPOSITION-OF-cpl1`, `THIRD-CARRIER-ABSENT`, `MAGNITUDE-NOT-SEPARATED`, `MISTUNING-NOT-EXCLUDED`, `HORIZON-100-ONLY`. Conditional: `POSITIVE-CONTROL-REPRODUCES`/`-FAILED`, `SINGLETON-BROKEN-EXCLUDED`/`-NOT-EXCLUDED`, `FLOOR-READINGS-ARE-BOUNDS`, `TRAIN-AGREES`/`-DISAGREES`, `HEAD-TRACKS`/`BELOW`/`ABOVE-ISO`, `TWIN-AT`/`ABOVE-K01`, `ISO-TRACKS`/`BELOW`/`ABOVE-KL`.
+* **Horizon.** 100 epochs, as `cpl1`. ISO's level froze when its complement pinned at epoch 60–62, so a longer run re-measures a frozen level. A HEAD rescue that pins earlier freezes lower, which `D_PAIR` reads. Per-arm pin epochs are printed after FINAL as a descriptive readout. **Validation:** run on `cpl1`'s real records, the readout reproduces 218.4 (k01 36.2/36.4/36.4; ISO complement 62.4/62.0/60.0, isolated 23.4/23.0/21.8; ONE isolated 44.2) and 218.5 (pinned records 319+318+318 = 955; idx-50 share 0.6100/0.6294/0.6209; removing {50} flips 1.0000, {44} 0.0000).
+
+### 222.6 Tests and dry run
+
+* **Scorer selftest: 110 PASS / 0 FAIL / 0 SKIP**, on the Mac and on alice2.
+  * Real `score()` on 26 synthetic batches: every branch, near-bar cases for PAIR_BAR / NULL / RESCUE, 7 harness breaks, a dropped run → INCOMPLETE (exit 2), and a shadowing resubmission.
+  * O2 invariance for two cases across four corpora, with 14 invented rows at PlainNet's scalar, layerwise, ISO, HEAD and TWIN cells and at the ResNet cells; non-vacuity > 5×.
+  * The one-argument subprocess; a 4,000-draw totality sweep.
+  * Corpus premises: ISO byte-identical to `cpl1`'s ISO; neither singleton string has ever run; `PlainNet18_c100` only in `cpl1`'s rows; both sigmas and all five `cpl1` references re-derive exactly.
+* **`tests/test_probe_tensor_blockwise_cpl2.py`** (new successor, same mechanism). On alice2 against the cpl1 tree: **44 PASS / 0 FAIL, ALL PASS**, `SCORER_SPECS_AGREE`. Log `$WS/runs/cpl2/inertness_blockwise_plainnet_cpl2.log` (`d322077c…`).
+* **Dry run** (alice2, `~/stage_cpl2`, the six new files sha256-identical to the Mac tree; log `~/l221_logs/dryrun_cpl2_1.log`): **exit 0, 0 guard failures, 15 composed lines, every line read.**
+  * The lines: `PlainNet18_c100`, the three registered strings, seeds 75/76/77, runner `run_cifar_cpl1.sh`, WALL 03:00:00, the same partitions and exports as `cgn2`.
+* **Cost.** ≈10.0 GPU-h expected (`cpl1` sacct 9.9503 / 15 runs); hard bound 45.
+* **The pair together.** ≈**28.7 GPU-h expected**, inside the operator's ~35 GPU-h envelope; hard bound 90.
+
+### 222.7 Files (3, new)
+
+`analysis/cPL2_plainnet_head_score.py` (sha `66c3adabf55c5555…1c27335b`), `bin/cPL2_plainnet_head.sh` (`7f91c16785b7a24c…51cf208c0`), `tests/test_probe_tensor_blockwise_cpl2.py` (`7ed2ff8e2750a45c…3aa2186`). **Reused unedited:** `bin/cPL1_stage_harness.sh`, `tests/test_plainnet.py`, `patches/patch_plainnet.py`, `tests/test_probe_tensor_blockwise.py`, `tests/test_probe_tensor.py`, `bin/_lib_guards.sh`, `analysis/argsline_guard.py`. **On alice2 (new only):** `~/stage_cpl2/`, `$WS/runs/cpl2/`, `$WS/runs/cpl2-PARTITION-MANIFEST.txt`.
+
+### 221–222 Discipline
+
+* **RULE 16:** no registered file, no `argsline_guard.py`, no `paper/` file was edited; `git diff` is additions only (6 new files + this entry). **RULE 21:** both scorers are committed in this commit, before any `cgn2`/`cpl2` run exists (0 `.out`, 0 `sacct`, 0 CSV rows, 0 in `squeue`); the launch entry will prove the margin by wall clock. **Launch** is in the next entry, from these exact bytes, with `CGN2_REGISTERED_COMMIT` / `CPL2_REGISTERED_COMMIT` = this commit. `alice` NOT contacted. No nested `claude -p`.
+
+Next free number: **223**.
