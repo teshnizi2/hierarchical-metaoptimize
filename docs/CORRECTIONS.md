@@ -30832,3 +30832,58 @@ The stamps are listed in the scorer header. The unconditional ones are `MAGNITUD
 * **Untouched:** the live harness (re-read by guard 10), `argsline_guard.py`, every registered file, and `paper/`. No nested `claude -p`.
 
 Next free number after the pre-assigned block: **230**.
+
+## 229. TRACK B (bookkeeping, ZERO GPU) — **MASTER-TABLE ROW 19 (THE FAIR ROW) MOVES `OPEN` → `CONFIRMED, RESCOPED 229`: `cau1` (209, CIFAR-10, +3.6173 pp) AND `cuc1` (220, CIFAR-100, +12.1780 pp, 5-CELL META GRID) CLOSED ITS TWO REMAINING COUNTS; THE THREE SCOPE LIMITS THAT STILL BIND (ONE BASELINE FAMILY; THE PAPER'S α₀ 1e-6 UNTESTED ON CIFAR-100; ONE GRANULARITY PER BATCH) ARE WRITTEN INTO THE ROW AND TRAVEL WITH THE VERDICT.  FOUR MORE ROWS (MT162, MT163, MT166, MT213) TAKE BRACKETED IN-PLACE AMENDMENTS WHERE A REGISTERED RESULT NOW CONTRADICTS OR RESCOPES THEIR WORDING; EVERY SUPERSEDED WORD IS KEPT VERBATIM.  THE HEADER TALLY MOVES CONFIRMED 33 → 34, OPEN 8 → 7, SUPERSEDED FIGURES KEPT.  NO LINE MOVED (217 LINES BEFORE AND AFTER; 6 LINES EDITED IN PLACE).  THE THREE ISOLATED RUNNERS `jobs/run_cifar_{cgn1,cpl1,cvt1}.sh` ARE ARCHIVED FROM alice2, sha256-IDENTICAL.  `c73` UNEDITED: EXIT 0.**  No GPU, nothing submitted or cancelled, `alice` NOT CONTACTED, `paper/` untouched.  THIS ENTRY TOOK NUMBER **229** (pre-assigned); NEXT FREE **230**.
+
+### 229.1 Row 19 — the verdict word, chosen from the table's own vocabulary
+
+Row 19 asks *"Was the method-vs-baseline comparison FAIR (matched budget, matched search budget, the paper's own setup)?"*  Flaws 1 and 2 closed at 30/44.  Flaw 3's METHOD-vs-TUNED-BASELINE half at `AUGMENT=0` was left open by `209` on two counts, CIFAR-100 and meta-side tuning beyond two α₀ cells; `220.5` records that `cuc1` closes both.  The row's verdict cell nevertheless still read `**OPEN**`.
+
+**Why `CONFIRMED, RESCOPED` and not plain `CONFIRMED` or a held `OPEN`.**  The six families the header counts are CONFIRMED / REFUTED / OPEN / WITHDRAWN / DEAD / UNINTERPRETABLE, and the file already carries `CONFIRMED, RESCOPED c73` for a verdict that stands only under a narrowed wording.  That is this case: every *registered* fairness objection has now been measured and the deficit held on each (`DEFICIT-HOLDS` on both unaugmented batches, the CIFAR-100 ladder argmax INTERIOR), so holding `OPEN` would contradict `220.5`; but three limits are stamped unconditionally by the batches' own scorers and bound what "fair" may mean:
+1. **One baseline family** — SGD+momentum+cosine only (`ONE-BASELINE-FAMILY` on `cau1` and `cuc1`).
+2. **The paper's own α₀ 1e-6 is untested on CIFAR-100** (`PAPER-CONFIG-NOT-TESTED`); it is measured on CIFAR-10 only (`cau1` `m6`, +15.1160 pp behind).
+3. **One granularity per batch** (`chunk771` on CIFAR-100, `resnet18_blocks` on CIFAR-10), so meta-side tuning is BOUNDED, not exhausted — `cuc1`'s M\* sits at the ms-HIGH edge of its plus-grid with a +0.28 SE rise over the centre.
+
+Also carried into the row: no method-side counterweight, ResNet18 only, 100 epochs only, and the AUC reading reverses at S\* on both datasets.
+
+**Edit, in place on line 19:** the verdict cell reads `**CONFIRMED, RESCOPED 229** (superseded verdict token kept verbatim: OPEN. …)`, following `192`'s `CLOSED-OUT 115` precedent; the so-what cell is prefixed with an `[AMENDED at cycle 152, CORRECTIONS 229 …]` bracket stating the licence and the limits above, after which the `209` amendment and the cycle-150 wording follow verbatim; the ref cell gains `; closed by 220, verdict moved at 229`.  Every number in the bracket was read off the `cau1` and `cuc1` rows (lines 166 and 215) and entries 209/220, not typed from the brief.
+
+**Header (line 3), in place:** `CONFIRMED 34 **[SUPERSEDED: 33]**`, `OPEN 7 **[SUPERSEDED: 8]**`, and `Of the 34 CONFIRMED **[SUPERSEDED: 33]**, … and one is CONFIRMED, RESCOPED 229 (line 19, the FAIR row …)`.  The superseded brackets are placed so that `c73`'s `NAME N` tally regex does not read them as claims (`SUPERSEDED:` is followed by a colon).
+
+### 229.2 Rows MT162, MT163, MT166, MT213 — each read, each amended only where a registered result contradicts it
+
+| row (line) | batch | wording that a registered result now contradicts or rescopes | by | action |
+|---|---|---|---|---|
+| MT162 | `cdep1` | "ResNet-only." as the scope of the identity-over-matched-set pattern | `cvi1` 203 (VGG, +31.3033), `cgn2` 225 (GN, +41.5167), `cpl2` 226 (PlainNet, +52.1367) | **AMENDED**: rescoped to this batch's DEPTH control; LIST non-transfer, 'DEPTH excluded is ResNet-BN only', and magnitude unreachable on every network (×225 / ×19.1 at 225.6 / ×691 at 226.4) stated; `cvt1` (227) noted as registered, not landed |
+| MT163 | `cvg1` | "no isolation arm has run on VGG"; the `bn8.weight` nomination "a HYPOTHESIS for a future batch, not a result" | `cvi1` 203 (`IDENTITY-OPERATIVE-VGG`), `cvh1` 219 (`RHO` 1.0001 at 328 ep) | **AMENDED**: both clauses overtaken; LIST and magnitude warnings and "non-RESIDUAL, NOT non-BatchNorm" kept as binding |
+| MT166 | `cau1` | "NOT licensed: CIFAR-100 …" and "the FAIR row above STAYS OPEN on both" | `cuc1` 220; row 19 at 229.1 | **AMENDED**: answered by a LATER batch, not by `cau1`; what this row licenses is unchanged (two α₀ cells at one meta-stepsize, CIFAR-10) |
+| MT213 | `cpl1` | "by subtraction it rides on `layer4.1.bn2.weight`"; "NOT licensed: `layer4.1.bn2.weight` as a measured carrier (never isolated alone)" | `cpl2` 226 (`HEAD-CARRIES-ALONE-PLAIN`, `DELTA_HEAD` +52.1367 = +91.95 SE) | **AMENDED**: superseded; 'alone' is bar-relative (ISO − HEAD +3.5940 = +6.34 SE inside the 5.0 bar), HEAD's rescue is a delay (pin 98.2 / 98.8), identity vs magnitude and PATH still not licensed |
+
+In all four the amendment is APPENDED to the so-what cell as a bold `[AMENDED at cycle 152, CORRECTIONS 229: …]` bracket and the original cell text is untouched — verified mechanically: for each changed row, every pre-edit cell's text is a substring of the post-edit cell (row 19's verdict cell excepted, where the superseded token `OPEN` is quoted inside the new cell).  **No verdict-column token on these four rows changed** (they carry registered scorer tokens verbatim, which are never rewritten).  `DECOMPOSITION-BY-SUBTRACTION` in MT213's token column stays, as the scorer emitted it.  **Checked and left:** none of the four was left unamended; no other row was edited.
+
+### 229.3 Archived runner scripts — the path the site's source export reads
+
+The research-portal exporter (`scripts/export_sources.py`) walks `CODE_ROOTS = ('analysis', 'bin', 'jobs', 'patches', 'tests', 'imagenet489')` for every `.py`/`.sh` and resolves cited `jobs/…sh` paths against that set.  `bin/cGN1_*`, `bin/cGN2_*`, `bin/cGN3_*`, `bin/cPL1_*`, `bin/cPL2_*` and `patches/patch_plainnet.py` cite `jobs/run_cifar_cgn1.sh` / `jobs/run_cifar_cpl1.sh`, and none existed in the repo.  They are archived at exactly those repo paths, alongside the existing `jobs/run_cifar.sh` and `jobs/run_cifar_alice2.sh`:
+
+| repo path | sha256 (Mac copy = alice2 `$WS/jobs/`) | cluster mtime | used by |
+|---|---|---|---|
+| `jobs/run_cifar_cgn1.sh` | `c98e1a568da8c815d7fb55757f81542390ccee4cecf96b2b4f0f8dbfd315c53b` | Sep 15 20:47 | `cgn1`, `cgn2`, `cgn3` (228 pins this sha) |
+| `jobs/run_cifar_cpl1.sh` | `eb17bcca9b1c92fa17d9be5a024d9045e6bb830e66b753e339e018f728beaa73` | Sep 15 21:32 | `cpl1`, `cpl2` |
+| `jobs/run_cifar_cvt1.sh` | `d389e8a5f3d85ce7dd4b7640fbcfa2d9075f36eb79c90fe2a7c21727d77c97c3` | Sep 16 12:36 | `cvt1` |
+
+Copied with `scp` from alice2 and `sha256sum` re-read on the cluster after the copy: 3/3 identical.  On alice2 each differs from the live `run_cifar.sh` (`a0d0a1b9…`) in exactly its `cd` line (`diff`, one hunk `16c16`).  **`cgn3` created no runner** — its launcher runs `$WS/jobs/run_cifar_cgn1.sh` (guard 9b) — so there is no fourth file.  **Disclosed, not fixed:** the repo's own `jobs/run_cifar.sh` (`00fa7ff0…`, Aug 19) is NOT the live alice2 runner (`a0d0a1b9…`, Sep 3); the exporter labels it a "shared training runner snapshot".  Refreshing it is a separate decision and was not taken here.
+
+### 229.4 Counted twice; no line moved
+
+* `analysis/c73_mastertable_check.py`, **UNEDITED** (sha `dec9ec68…` before and after): **exit 0**, "154 data rows, 7 columns each", "CSV: 2956 runs / 3069.7 GPU-hours", families CONFIRMED 30 + 4 annotated = 34, REFUTED 26, OPEN 7, WITHDRAWN 3, DEAD 2, UNINTERPRETABLE 2, "header is consistent with both the table and the CSV OK".
+* **Independent count** (a character-scanning splitter that honours `\|`, no regex): 154 rows; CONFIRMED 34, REFUTED 26, OPEN 7, WITHDRAWN 3, DEAD 2, UNINTERPRETABLE 2.
+* **Line discipline:** `docs/MASTER-TABLE.md` has **217 lines before and after**; a line-by-line comparison against the pre-edit snapshot finds exactly **6 changed lines — 3, 19, 162, 163, 166, 213** — each with 7 cells before and after; `git diff -U0` shows only `@@ -N +N @@` / `@@ -162,2 +162,2 @@` in-place hunks.  Line 3 was additionally checked by reversing the inserted strings, which restores the pre-edit line byte for byte.  File sha `4cfaa96e…` → `c2fe5c47…`.
+* **Corpus untouched:** `results/all_runs.csv` 2,956 rows, sha `5c82c06c…`.
+
+### 229.5 Discipline
+
+* ZERO GPU.  No job submitted, cancelled or requeued; the only alice2 commands were read-only (`ls`, `sha256sum`, `diff`, `cat`) plus the three `scp` reads.  **`alice` NOT CONTACTED.**  `cvt1` and `cgn3` jobs not touched.
+* Not edited: any registered file, `argsline_guard.py`, `c73_mastertable_check.py`, `paper/`, the CSV.  No nested `claude -p`.
+* Git: explicit paths only — `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md`, `jobs/run_cifar_cgn1.sh`, `jobs/run_cifar_cpl1.sh`, `jobs/run_cifar_cvt1.sh`.  Pulled before writing.
+
+Next free number: **230**.
