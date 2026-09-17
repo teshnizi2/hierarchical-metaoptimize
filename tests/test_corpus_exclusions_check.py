@@ -23,6 +23,22 @@ subprocess.  The module resolves its TSV and CSV from its own location, so nothi
   C8  a witness that names no registered intervention kind fails.
   C9  without --runs no log is read: no witness or completeness line, exit 0 (the existing behaviour).
 
+ADDED AT CORRECTIONS 245 -- `cvt7`'s GROUP_HOLD (243) and `cvt6`'s COMP_HOLD (242), whose forced arms print TWO ON
+lines (BETA_HOLD and COMP_HOLD) while a TSV row carries ONE witness:
+  C10 a listed GROUP_HOLD row passes (cvt7-style: every run prints `VOTE_W: off` and `BETA_HOLD: off`).
+  C11 a mismatched GROUP_HOLD witness fails, and the failure quotes the run's own GROUP_HOLD line.
+  C12 cvt6-style runs with BETA_HOLD + COMP_HOLD ON pass when listed ONCE, by their BETA_HOLD line (242.7's plan) --
+      and also when listed by their COMP_HOLD line instead (any one ON line may be the witness).
+  C13 the same runs FAIL when the other ON line is wrong: (a) a replay sha that is not the registered one; (b) the
+      other arm's complement path; (c) the COMP_HOLD line missing (`COMP_HOLD: off`); (d) an arm whose registration
+      has ONE ON kind printing a second ON line; (e) listed by COMP_HOLD, the BETA_HOLD line wrong.
+  C14 an ON GROUP_HOLD corpus run absent from the TSV fails: (a) a batch with no listed row; (b) one held run left out.
+  C15 `off` runs are not required: unlisted runs printing `GROUP_HOLD: off` / `COMP_HOLD: off` pass; an unlisted run of
+      a listed two-kind batch that prints no `COMP_HOLD: off` line fails, as 239's rule does for a listed kind.
+  C16 prefix collisions: no KINDS prefix is a prefix of another (the necessary and sufficient condition for a
+      `startswith` reader to select one line for two kinds); every patch prints exactly `<PREFIX>: off` / `<PREFIX>:
+      on ...`; the module's MULTI_KIND lines == the registered cvt6 scorer's WITNESS_BH / WITNESS_CH, byte for byte.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -44,6 +60,20 @@ BH_TRI = ("BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.we
 BH_TRI_5041 = ("BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=5041 "
                "b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-8.772510749816895")
 BH_FLOOR = "BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=floor value=-15.0"
+# CORRECTIONS 245: the registered lines of patches/patch_grouphold.py (243.4) and patches/patch_comphold.py (242.4);
+# C16 checks each against the registered scorer's own table.
+GH_NAMES = "names=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight"
+GH_TRI = ("GROUP_HOLD: on type=blockwise group=1 groupsize=3 " + GH_NAMES + " mode=tri P=8609 b0=-13.815510749816895 "
+          "ms=0.001 lo=-15.0 hi=-2.3026 peak=-5.2065107498168945")
+GH_TRI_ISO = ("GROUP_HOLD: on type=blockwise group=1 groupsize=3 " + GH_NAMES + " mode=tri P=5153 b0=-13.815510749816895 "
+              "ms=0.001 lo=-15.0 hi=-2.3026 peak=-8.662510749816894")
+GH_FLOOR = "GROUP_HOLD: on type=blockwise group=1 groupsize=3 " + GH_NAMES + " mode=floor value=-15.0"
+CH_REC = ("COMP_HOLD: on type=blockwise group=0 groupsize=52 mode=rec id=cvt6_headpath "
+          "sha256=74be71fa524ad0122d1408e01dd2b633b004b2e27228393fe6e593f494358a5d knots=500 n0=2 n1=49902 "
+          "b0=-13.815510749816895 lo=-15.0 hi=-2.3026 vmax=-4.852388381958008 vlast=-15.0")
+CH_TRI = ("COMP_HOLD: on type=blockwise group=0 groupsize=52 mode=tri P=9428 b0=-13.815510749816895 ms=0.001 lo=-15.0 "
+          "hi=-2.3026 peak=-4.387510749816894")
+CH_REC_OTHER_SHA = CH_REC.replace("sha256=74be71fa", "sha256=00000000")
 
 
 def chk(cond, label, extra=""):
@@ -123,6 +153,36 @@ def vw_batch():
     listed = [VMUTE + (VW_MUTE,)]
     corpus = [VK01, VMUTE]
     logs = {VK01: ["VOTE_W: off"], VMUTE: [VW_MUTE]}
+    return listed, corpus, logs
+
+
+G_K01, G_ISO = ("cvt7-k01-s99", "5000041"), ("cvt7-ISO-s99", "5000042")
+G_HIGH, G_LOW = ("cvt7-HOLDHIGH-s99", "5000043"), ("cvt7-HOLDLOW-s99", "5000044")
+C_K01, C_LOW = ("cvt6-k01-s96", "5000051"), ("cvt6-HOLDLOW-s96", "5000052")
+C_HHP, C_LMP, C_LHP = ("cvt6-HIGHHEADPATH-s96", "5000053"), ("cvt6-LOWMUTEPATH-s96", "5000054"), \
+    ("cvt6-LOWHEADPATH-s96", "5000055")
+
+
+def gh_batch():
+    """cvt7-style (243): every run prints VOTE_W: off and BETA_HOLD: off; the held run is listed by GROUP_HOLD."""
+    listed = [G_HIGH + (GH_TRI,)]
+    corpus = [G_K01, G_ISO, G_HIGH]
+    logs = {G_K01: ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off"],
+            G_ISO: ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off"],
+            G_HIGH: ["VOTE_W: off", "BETA_HOLD: off", GH_TRI]}
+    return listed, corpus, logs
+
+
+def ch_batch(by="BETA_HOLD"):
+    """cvt6-style (242): HOLDLOW one ON kind; the three forced arms two (BETA_HOLD + COMP_HOLD), listed ONCE."""
+    logs = {C_K01: ["VOTE_W: off", "BETA_HOLD: off", "COMP_HOLD: off"],
+            C_LOW: ["VOTE_W: off", BH_FLOOR, "COMP_HOLD: off"],
+            C_HHP: ["VOTE_W: off", BH_TRI, CH_REC],
+            C_LMP: ["VOTE_W: off", BH_FLOOR, CH_TRI],
+            C_LHP: ["VOTE_W: off", BH_FLOOR, CH_REC]}
+    pick = 1 if by == "BETA_HOLD" else 2
+    listed = [C_LOW + (BH_FLOOR,)] + [k + (logs[k][pick],) for k in (C_HHP, C_LMP, C_LHP)]
+    corpus = [C_K01, C_LOW, C_HHP, C_LMP, C_LHP]
     return listed, corpus, logs
 
 
@@ -222,6 +282,120 @@ def main():
     rc, out = run_check(listed, corpus, logs, with_runs=False)
     chk(rc == 0 and "VERDICT: PASS" in out and "raw .out witness" not in out and "completeness" not in out,
         "C9 no --runs -> exit 0, no witness or completeness line", "rc=%d %s" % (rc, show(out)))
+
+    # ---- CORRECTIONS 245 ------------------------------------------------------------------------------------
+    print("C10 a GROUP_HOLD-witnessed row passes")
+    rc, out = run_check(*gh_batch())
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C10 listed GROUP_HOLD run + unlisted `GROUP_HOLD: off` runs (cvt7-style) -> exit 0 PASS", "rc=%d %s" % (rc, show(out)))
+    chk(any(ln.startswith("  raw .out witness: 1 listed runs carry their listed line; 2 unlisted runs")
+            and ln.endswith("print `GROUP_HOLD: off`") for ln in out.splitlines()),
+        "C10 the witness line names the off line the unlisted runs print", repr([l for l in out.splitlines() if "raw" in l]))
+
+    print("C11 a mismatched GROUP_HOLD witness fails")
+    listed, corpus, logs = gh_batch()
+    logs[G_HIGH] = ["VOTE_W: off", "BETA_HOLD: off", GH_TRI_ISO]
+    rc, out = run_check(listed, corpus, logs)
+    chk(rc == 1 and "VERDICT: FAIL" in out, "C11 the log prints P=5153, the list says P=8609 -> exit 1 FAIL", "rc=%d" % rc)
+    chk(any("cvt7-HOLDHIGH-s99-5000043.out" in f and "P=5153" in f for f in fails(out)),
+        "C11 the FAIL line names the run and quotes its own GROUP_HOLD line", show(out))
+
+    print("C12 two-kind runs (BETA_HOLD + COMP_HOLD ON) listed ONCE pass")
+    rc, out = run_check(*ch_batch("BETA_HOLD"))
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C12 HOLDLOW + the three forced arms listed by their BETA_HOLD line (242.7's plan) -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any(ln.startswith("  two-kind runs") and " 3 listed runs " in ln and ln.endswith(": True")
+            for ln in out.splitlines()),
+        "C12 the two-kind line counts the 3 forced runs, verified", repr([l for l in out.splitlines() if "two-kind" in l]))
+    chk(any(ln.startswith("  raw .out witness: 4 listed runs carry their listed line; 1 unlisted runs")
+            and ln.endswith("print `BETA_HOLD: off` / `COMP_HOLD: off`") for ln in out.splitlines()),
+        "C12 the unlisted cvt6 run is held to both off lines", repr([l for l in out.splitlines() if "raw" in l]))
+    rc, out = run_check(*ch_batch("COMP_HOLD"))
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C12 the forced arms listed by their COMP_HOLD line instead -> exit 0 PASS", "rc=%d %s" % (rc, show(out)))
+
+    print("C13 a two-kind run whose OTHER ON line is wrong fails")
+    for tag, key, lines, by, want in [
+            ("a", C_HHP, ["VOTE_W: off", BH_TRI, CH_REC_OTHER_SHA], "BETA_HOLD", "COMP_HOLD"),
+            ("b", C_LMP, ["VOTE_W: off", BH_FLOOR, CH_REC], "BETA_HOLD", "COMP_HOLD"),
+            ("c", C_LHP, ["VOTE_W: off", BH_FLOOR, "COMP_HOLD: off"], "BETA_HOLD", "COMP_HOLD"),
+            ("d", C_LOW, ["VOTE_W: off", BH_FLOOR, CH_TRI], "BETA_HOLD", "COMP_HOLD"),
+            ("e", C_LHP, ["VOTE_W: off", BH_TRI, CH_REC], "COMP_HOLD", "BETA_HOLD")]:
+        listed, corpus, logs = ch_batch(by)
+        logs[key] = lines
+        rc, out = run_check(listed, corpus, logs)
+        name = "%s-%s.out" % key
+        chk(rc == 1 and any(name in f and want in f for f in fails(out)),
+            "C13%s %s prints a wrong %s line (listed by %s) -> exit 1, named" % (tag, key[0], want, by), show(out))
+
+    print("C14 an ON GROUP_HOLD corpus run absent from the TSV fails")
+    listed, corpus, logs = gh_batch()
+    rc, out = run_check([], corpus, logs)
+    chk(rc == 1 and any("cvt7-HOLDHIGH-s99-5000043.out" in f and "GROUP_HOLD" in f for f in fails(out)),
+        "C14a GROUP_HOLD run of a batch with NO listed row -> exit 1, named", "rc=%d %s" % (rc, show(out)))
+    listed, corpus, logs = gh_batch()
+    corpus += [G_LOW]
+    logs[G_LOW] = ["VOTE_W: off", "BETA_HOLD: off", GH_FLOOR]
+    rc, out = run_check(listed, corpus, logs)
+    chk(rc == 1 and any("cvt7-HOLDLOW-s99-5000044.out" in f for f in fails(out)),
+        "C14b one held run left out of a listed GROUP_HOLD batch -> exit 1, named", "rc=%d %s" % (rc, show(out)))
+
+    print("C15 `off` runs of the new kinds are not required")
+    extra = ([], [("cvt7-k01-s100", "5000061"), ("cvt6-HEAD-s97", "5000062")],
+             {("cvt7-k01-s100", "5000061"): ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off"],
+              ("cvt6-HEAD-s97", "5000062"): ["VOTE_W: off", "BETA_HOLD: off", "COMP_HOLD: off"]})
+    rc, out = run_check(*merge(gh_batch(), ch_batch(), extra))
+    chk(rc == 0 and "VERDICT: PASS" in out, "C15 unlisted GROUP_HOLD / COMP_HOLD off runs -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    listed, corpus, logs = ch_batch()
+    logs[C_K01] = ["VOTE_W: off", "BETA_HOLD: off"]
+    rc, out = run_check(listed, corpus, logs)
+    chk(rc == 1 and "FAIL cvt6-k01-s96-5000051.out is NOT listed but its witness is []" in fails(out),
+        "C15 an unlisted run of a two-kind batch with no `COMP_HOLD: off` line -> exit 1, named", show(out))
+
+    print("C16 prefix collisions, the patches' line forms, and MULTI_KIND against the registered scorer")
+    import re
+    sys.path.insert(0, os.path.join(REPO, "analysis"))
+    import corpus_exclusions as CE
+    kinds = [k for k, _off in CE.KINDS]
+    chk(CE.KINDS[:2] == [("VOTE_W", "VOTE_W: off"), ("BETA_HOLD", "BETA_HOLD: off")]
+        and ("GROUP_HOLD", "GROUP_HOLD: off") in CE.KINDS and ("COMP_HOLD", "COMP_HOLD: off") in CE.KINDS
+        and len(CE.KINDS) == 4, "C16 KINDS = 239's two entries unchanged + GROUP_HOLD + COMP_HOLD", repr(CE.KINDS))
+    chk(all(not a.startswith(b) for a in kinds for b in kinds if a != b),
+        "C16 no KINDS prefix is a prefix of another (so no line starts with two of them)", repr(kinds))
+    patches = {"VOTE_W": "patch_voteweight.py", "BETA_HOLD": "patch_betahold.py", "GROUP_HOLD": "patch_grouphold.py",
+               "COMP_HOLD": "patch_comphold.py"}
+    for k, fn in sorted(patches.items()):
+        src = open(os.path.join(REPO, "patches", fn)).read()
+        lits = re.findall(r"'((?:%s): [^']*)'" % "|".join(sorted(patches)), src)
+        chk(("%s: off" % k) in lits and any(l.startswith("%s: on type=" % k) for l in lits)
+            and all(l.startswith(k + ": ") for l in lits),
+            "C16 %s prints only `%s: off` / `%s: on type=...` lines" % (fn, k, k), repr(sorted(set(lits))))
+    tmp = tempfile.mkdtemp(prefix="ce_prefix_test_")
+    try:
+        p = os.path.join(tmp, "x.out")
+        four = [VW_MUTE, BH_TRI, GH_TRI, CH_REC, "VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off", "COMP_HOLD: off"]
+        open(p, "w").write("\n".join(four) + "\n")
+        got = CE.witness_lines(p)
+        chk(all(got[k] == [ln for ln in four if ln.split(":")[0] == k] for k in kinds),
+            "C16 witness_lines (the startswith reader) puts each of 8 lines under its own kind only", repr(got)[:300])
+    finally:
+        shutil.rmtree(tmp)
+    try:
+        import cVT6_complementpath_score as S6
+        mk = getattr(CE, "MULTI_KIND", None)
+        want = dict((("cvt6", a), {"BETA_HOLD": S6.WITNESS_BH[a], "COMP_HOLD": S6.WITNESS_CH[a]}) for a in S6.FORCED)
+        chk(mk == want, "C16 MULTI_KIND == cvt6's FORCED arms x the registered scorer's WITNESS_BH / WITNESS_CH",
+            repr(mk)[:200])
+        chk((S6.WITNESS_CH["HIGHHEADPATH"], S6.WITNESS_CH["LOWMUTEPATH"], S6.WITNESS_BH["HIGHHEADPATH"],
+             S6.WITNESS_BH["LOWHEADPATH"]) == (CH_REC, CH_TRI, BH_TRI, BH_FLOOR),
+            "C16 this test's cvt6 fixtures are the registered scorer's lines")
+        import cVT7_grouphold_score as S7
+        chk((S7.WITNESS_GH["HOLDHIGH"], S7.WITNESS_GH["HOLDISO"], S7.WITNESS_GH["HOLDLOW"]) == (GH_TRI, GH_TRI_ISO, GH_FLOOR),
+            "C16 this test's cvt7 fixtures are the registered scorer's lines")
+    except Exception as ex:  # a scorer that does not import is a FAIL here, not an error
+        chk(False, "C16 the registered cvt6 / cvt7 scorers import", "%s: %s" % (type(ex).__name__, ex))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)

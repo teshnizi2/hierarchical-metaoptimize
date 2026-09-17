@@ -932,3 +932,6 @@ also scanned: a run that is a row of `all_runs.csv` and prints an ON `VOTE_W` or
 listed, with a witness of that kind (ON runs not yet ingested are counted, not required). Only logs
 under `--runs` are read, so sync the batch's `.out` files to `../runs_alice2` before running it on the
 Mac. `load` / `is_excluded` / `filter_rows` are unchanged.
+**CORRECTIONS 245:** `GROUP_HOLD` and `COMP_HOLD` are kinds too, and a run printing ON lines of two kinds (`cvt6`'s
+forced arms) is listed ONCE, by either line, while `--check` holds both lines to the registered ones in `MULTI_KIND` —
+a future two-kind batch needs its entry there, and no KINDS prefix may be a prefix of another.

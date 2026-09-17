@@ -33010,3 +33010,50 @@ Four places had two consecutive blank lines (pre-edit lines 450–451, 491–492
 * **Cost: zero GPU-hours.**
 
 Next free number: **245** (242 and 243 are pre-assigned to `cvt6` and `cvt7`).
+
+## 245. TRACK C (code gap, ZERO GPU) — **`corpus_exclusions.py --check` NOW KNOWS `GROUP_HOLD` (`cvt7`) AND `COMP_HOLD` (`cvt6`), AND HOLDS BOTH ON LINES OF `cvt6`'s THREE FORCED ARMS TO THEIR REGISTERED LINES WHILE EACH RUN IS LISTED ONCE; `load` / `keys` / `is_excluded` / `filter_rows` UNCHANGED, THE TSV UNCHANGED, AND EVERY SCORER SELFTEST AND DERIVATION THAT IMPORTS THE MODULE PRINTS BYTE-IDENTICAL OUTPUT BEFORE AND AFTER.**  Closes the checker items owed by 242.7 / 242.9 / 242.13(4) and 243.7(ii) / 243.9 / 243.13(4).  No registered scorer, launcher, TSV row, CSV row or `paper/` file edited.  **`alice` NOT CONTACTED; alice2 read only (two `grep`s of the witness-prefix lines of the 36 `cvt6` / `cvt7` `.out` files; no accuracy line read).**  THIS ENTRY TOOK NUMBER **245**; NEXT FREE **246**.
+
+### 245.1 The gap
+
+`KINDS` held `VOTE_W` and `BETA_HOLD`.  (a) A `cvt7` row, witnessed by its `GROUP_HOLD:` line (243.7), names no kind and FAILs a correct landing, and an unlisted GROUP_HOLD-ON corpus run is invisible to completeness.  (b) `cvt6`'s forced arms print `BETA_HOLD: on …` AND `COMP_HOLD: on …`; 242.7 lists each once, by its BETA_HOLD line, and 239's module never reads a `COMP_HOLD` line — so a run with the wrong replay sha passes (real-line control, 245.4: exit 0).
+
+### 245.2 The rule for two-kind runs, and why (`analysis/corpus_exclusions.py`, `9ede7453…` → `81c12d2a…`; the `--check` path, KINDS and its docstring only)
+
+* **No second-witness column.** `load()` requires every row's arity to equal the header's, so a tenth column means editing all 51 rows and changing `load()`'s output — both frozen here.  A second row per run would break the duplicate-key check and make the row count differ from the run count.
+* **Rule.** A run is listed ONCE, by ANY one of its ON lines; being listed satisfies completeness.  A listed run whose `(batch, arm)` — read from its run name — is in the new `MULTI_KIND` table must print EXACTLY the registered line of every kind registered there, so the line the row does not carry is verified, and a wrong, missing or `off` second line FAILs.  Any other listed run printing an ON line of a kind its witness does not name FAILs, as in 239.  A listed two-kind batch also holds its unlisted runs to that kind's `off` line.
+* **`MULTI_KIND`** = `cvt6` HIGHHEADPATH / LOWMUTEPATH / LOWHEADPATH × {`BETA_HOLD`, `COMP_HOLD`}, re-typed from `cVT6_complementpath_score.py`'s `WITNESS_BH` / `WITNESS_CH` (not imported, as 227.6's sigmas); test C16 pins it to the scorer's tables byte for byte.  **The landing appends exactly the rows 242.7 and 243.7 planned** (15 `cvt6` rows by BETA_HOLD witness, 9 `cvt7` rows by GROUP_HOLD witness); a forced arm may equally be listed by its COMP_HOLD line.
+* **Limits.** As in 239, a single-kind row's witness is compared with the run's own log, not with the registration (that is the scorer's `G-HOLDW` / `G-GHOLD` and RULE 20); only two-kind runs are compared with registered lines.  A future two-kind batch needs its own `MULTI_KIND` entry.
+
+### 245.3 Prefix collisions — proof
+
+Every registered reader selects witness lines with `ln.startswith(<prefix>)` (`witness_lines` here; the `cvt4` / `cvt6` / `cvt7` scorers' parsers).  A line selected for two prefixes A ≠ B starts with both, so one of A, B is a prefix of the other.  `VOTE_W`, `BETA_HOLD`, `GROUP_HOLD`, `COMP_HOLD` begin with V, B, G, C: none is a prefix of another, so no line is read as two kinds (and `kind_of`'s `<prefix>:` match is unambiguous for the same reason).  Each patch prints only `<PREFIX>: off` / `<PREFIX>: on type=…` literals (C16 parses the four patch sources); `check()` now FAILs if a future KINDS entry breaks the property, and prints it.  Real logs: every line starting with one of the prefixes begins `<PREFIX>: ` — 81 `VOTE_W` and 18 `BETA_HOLD` lines in the Mac's 3,117 `.out` files; 36 `VOTE_W`, 36 `BETA_HOLD`, 21 `COMP_HOLD` and 15 `GROUP_HOLD` in the 36 `cvt6` / `cvt7` `.out` files on alice2, where no other line contains any of the four.
+
+### 245.4 Tests (`tests/test_corpus_exclusions_check.py`, `40feb903…` → `6b2c771a…`, +C10–C16, 27 checks)
+
+C10 a GROUP_HOLD row passes; C11 a mismatched GROUP_HOLD witness fails and quotes the log's line; C12 `cvt6`-style runs with BETA_HOLD + COMP_HOLD ON pass when listed once by BETA_HOLD, and when listed by COMP_HOLD; C13 they FAIL when the other line is wrong (a: another replay sha; b: the other path; c: `COMP_HOLD: off`; d: HOLDLOW printing a COMP_HOLD on-line; e: listed by COMP_HOLD, the BETA_HOLD line wrong); C14 an ON GROUP_HOLD corpus run missing from the TSV fails (whole batch; one run); C15 `GROUP_HOLD: off` / `COMP_HOLD: off` runs are not required, and an unlisted run of a two-kind batch without its `COMP_HOLD: off` line fails; C16 the prefix proof, the patches' line forms, `witness_lines` on one line of each kind, and `MULTI_KIND` and the fixtures against the registered `cvt6` / `cvt7` scorers.  **Against 239's module: 26 PASS / 16 FAIL, exit 1** (the 11 new passes: C16's 8 guards, C11's exit code, C12's BETA_HOLD-listed pass — the gap itself — and C13e, which the old module fails for the wrong reason: it rejects any COMP_HOLD witness).  **After: 42 PASS / 0 FAIL, exit 0.**  One assertion (C15, the wording of the missing-`off` message) was corrected to 239's existing message after the first green run; it still fails against 239's module.
+
+**Real-line control** (a scratch script, not committed): the 36 runs' real witness lines, the 24 planned rows and 36 key-only CSV rows in a temp copy of the layout, with `../runs ../runs_alice2`.  New module: **PASS, completeness 75 / 75, 9 two-kind runs verified**; a wrong replay sha on `cvt6-HIGHHEADPATH-s97` → FAIL, named (**239's module: exit 0**, `cvt6` rows alone); `cvt6-LOWMUTEPATH-s98` printing `COMP_HOLD: off` → FAIL; the `cvt7-HOLDISO-s101` row dropped → FAIL.  On the `cvt7` rows 239's module FAILs 9× "names no registered intervention kind".
+
+### 245.5 Invariance (Mac, `/opt/homebrew/bin/python3` 3.14.5, `../runs_alice2`, `PYTHONDONTWRITEBYTECODE=1`, as 239.4; recorded twice before the edit — identical — and once after)
+
+| output | before | after |
+|---|---|---|
+| `load()` (51 rows) / `keys()` / `is_excluded` over 3,049 rows (51 true) | `1c1cc1fe…` / `a98b1e1f…` / `3db83c1d…` | identical |
+| `filter_rows(csv.DictReader(all_runs.csv))` (3,049 → 2,998) | `c9e188e8…` | identical |
+| `inspect.getsource` of `load` / `keys` / `is_excluded` / `filter_rows` / `_pooled` | `3e71c514…` / `6ff4844d…` / `6f39c8a7…` / `d89c64d6…` / `99b52fe8…` (= 239.4's) | identical |
+| `cVT2` / `cVT3` / `cVT4` / `cVT5` `--selftest --runsdir ../runs_alice2` | `d7bf48f3…` / `df2f9834…` / `9fa895a4…` / `ec672e4a…`, each exit 1 | identical |
+| `cVT6_complementpath_score.py` / `cVT7_grouphold_score.py --selftest …` | `b1f6b76c…` 180 / 0 / `788556ed…` 156 / 0, exit 0 | identical |
+| `cvt3` / `cvt4` / `cvt6_registration_derivations.py ../runs_alice2` | `e3adea64…` / `0f60b57e…` / `3a99bc48…`, exit 0 | identical |
+| `cvt7_registration_derivations.py ../runs_alice2` | `e5889376…`, exit 1 (`ciso2`'s probe records are not on the Mac, 243.8) | identical |
+| `corpus_exclusions.py --check` (no `--runs`) | `297bf712…`, exit 0 | identical |
+| `corpus_exclusions.py --check --runs ../runs ../runs_alice2` | `d04f8b88…`, exit 0 | `7ce5a33c…`, exit 0: **two added lines**, `kinds scanned (CORRECTIONS 245): VOTE_W / BETA_HOLD / GROUP_HOLD / COMP_HOLD; no prefix is a prefix of another …: True` and `two-kind runs (CORRECTIONS 245): 0 listed runs …: True`; every other line identical |
+
+* **No scorer output changed**: each selftest's and derivation's whole stdout and stderr are byte-identical, exit codes equal.  The importers are exactly `cVT2`–`cVT7`'s scorers and the `cvt3` / `cvt4` / `cvt6` / `cvt7` derivations (grep; `cvt5_attack_indep.py` only names the module in a string).  No launcher pins the module's sha; the `cvt6` / `cvt7` scorers pin only the TSV's (`f8455571…`, untouched, as is `all_runs.csv` `c2d1164d…`).
+* **The completeness line is unchanged on this corpus because its label now names the kinds in use** (a listed witness's kind, or an ON line found) — `VOTE_W / BETA_HOLD` here; all four scanned kinds are on the added line.  On a synthetic single-kind TSV the label is shorter than 239's.
+* **`cVT2`–`cVT5` selftests exit 1 before and after**: their RULE 21 premises ("no cvt4-*.out under ../runs_alice2", "no cvt4- row in the CSV", …) went stale when the batches landed (239.4 disclosed the same for `cVT2` / `cVT3`).  Not caused here, not touched.
+
+### 245.6 Discipline
+
+`git add` names `analysis/corpus_exclusions.py`, `tests/test_corpus_exclusions_check.py`, `docs/OPERATIONS.md` (§36 gains one sentence) and `docs/CORRECTIONS.md` only.  No GPU, no Slurm.  alice2: two read-only `ssh` `grep`s of witness-prefix lines (the 245.3 scan and the 245.4 control's input).  Running `cvt6` / `cvt7` jobs not touched.  Cost: zero GPU-hours.
+
+Next free number: **246**.
