@@ -1,0 +1,214 @@
+==============================================================================
+ cvt7 -- DOES 'THE CARRIER NEEDS A SMALL STEP SIZE' TRANSFER TO ResNet18_c100?  (PATCH_GROUPHOLD)
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 99,100,101   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   k01       scalar     GROUP_HOLD (unset)
+   ISO       ISO's      GROUP_HOLD (unset)
+   HOLDLOW   ISO's      GROUP_HOLD layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight:floor
+   HOLDHIGH  ISO's      GROUP_HOLD layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight:tri:8609
+   HOLDISO   ISO's      GROUP_HOLD layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight:tri:5153
+ CO-PRIMARY: P_HIGH = ISO - HOLDHIGH; P_LOW = HOLDLOW - ISO.
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 2998 rows after corpus_exclusions.filter_rows, cvt7- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  15 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cvt7-k01-s99  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.2540 (train 22.5840)
+  OK   cvt7-ISO-s99  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.9400 (train 94.1540)
+  OK   cvt7-HOLDLOW-s99  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.1400 (train 94.9240)
+  OK   cvt7-HOLDHIGH-s99  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 50.2300 (train 54.7080)
+  OK   cvt7-HOLDISO-s99  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.3580 (train 94.2020)
+  OK   cvt7-k01-s100  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.3340 (train 23.1880)
+  OK   cvt7-ISO-s100  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.7320 (train 94.5660)
+  OK   cvt7-HOLDLOW-s100  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.6200 (train 95.0800)
+  OK   cvt7-HOLDHIGH-s100  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 50.4240 (train 55.2140)
+  OK   cvt7-HOLDISO-s100  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.6980 (train 94.6980)
+  OK   cvt7-k01-s101  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.2700 (train 23.5700)
+  OK   cvt7-ISO-s101  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.4520 (train 94.7220)
+  OK   cvt7-HOLDLOW-s101  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.1340 (train 95.1360)
+  OK   cvt7-HOLDHIGH-s101  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 50.0280 (train 54.6080)
+  OK   cvt7-HOLDISO-s101  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.1180 (train 94.5120)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s99
+  PASS G-ARGS ISO-s99
+  PASS G-ARGS HOLDLOW-s99
+  PASS G-ARGS HOLDHIGH-s99
+  PASS G-ARGS HOLDISO-s99
+  PASS G-ARGS k01-s100
+  PASS G-ARGS ISO-s100
+  PASS G-ARGS HOLDLOW-s100
+  PASS G-ARGS HOLDHIGH-s100
+  PASS G-ARGS HOLDISO-s100
+  PASS G-ARGS k01-s101
+  PASS G-ARGS ISO-s101
+  PASS G-ARGS HOLDLOW-s101
+  PASS G-ARGS HOLDHIGH-s101
+  PASS G-ARGS HOLDISO-s101
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is ciso1's / cdep1's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=62`   15 runs
+
+G-VOTEW / G-BHOLD / G-GHOLD   exactly ONE `VOTE_W: off`, ONE `BETA_HOLD: off` and ONE GROUP_HOLD line == the arm's witness, per run
+  PASS G-VOTEW k01-s99
+  PASS G-BHOLD k01-s99
+  PASS G-GHOLD k01-s99
+  PASS G-VOTEW ISO-s99
+  PASS G-BHOLD ISO-s99
+  PASS G-GHOLD ISO-s99
+  PASS G-VOTEW HOLDLOW-s99
+  PASS G-BHOLD HOLDLOW-s99
+  PASS G-GHOLD HOLDLOW-s99
+  PASS G-VOTEW HOLDHIGH-s99
+  PASS G-BHOLD HOLDHIGH-s99
+  PASS G-GHOLD HOLDHIGH-s99
+  PASS G-VOTEW HOLDISO-s99
+  PASS G-BHOLD HOLDISO-s99
+  PASS G-GHOLD HOLDISO-s99
+  PASS G-VOTEW k01-s100
+  PASS G-BHOLD k01-s100
+  PASS G-GHOLD k01-s100
+  PASS G-VOTEW ISO-s100
+  PASS G-BHOLD ISO-s100
+  PASS G-GHOLD ISO-s100
+  PASS G-VOTEW HOLDLOW-s100
+  PASS G-BHOLD HOLDLOW-s100
+  PASS G-GHOLD HOLDLOW-s100
+  PASS G-VOTEW HOLDHIGH-s100
+  PASS G-BHOLD HOLDHIGH-s100
+  PASS G-GHOLD HOLDHIGH-s100
+  PASS G-VOTEW HOLDISO-s100
+  PASS G-BHOLD HOLDISO-s100
+  PASS G-GHOLD HOLDISO-s100
+  PASS G-VOTEW k01-s101
+  PASS G-BHOLD k01-s101
+  PASS G-GHOLD k01-s101
+  PASS G-VOTEW ISO-s101
+  PASS G-BHOLD ISO-s101
+  PASS G-GHOLD ISO-s101
+  PASS G-VOTEW HOLDLOW-s101
+  PASS G-BHOLD HOLDLOW-s101
+  PASS G-GHOLD HOLDLOW-s101
+  PASS G-VOTEW HOLDHIGH-s101
+  PASS G-BHOLD HOLDHIGH-s101
+  PASS G-GHOLD HOLDHIGH-s101
+  PASS G-VOTEW HOLDISO-s101
+  PASS G-BHOLD HOLDISO-s101
+  PASS G-GHOLD HOLDISO-s101
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: ../runs_alice2/cvt7/PARTITION-MANIFEST.txt (<runsdir>/cvt7/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text() (62 tensors, ISO [59,3], the hold table)   5085 vs 5085 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: ../runs_alice2/cvt7/PROVENANCE.txt (<runsdir>/cvt7/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV build_network.py sha256 == the LIVE one c79988833c43...   c79988833c4399a0
+  PASS G-PROV HF.py sha256 == HF_POST_SHA 2396f2be8102... (cvt7's PATCH_GROUPHOLD tree)   2396f2be8102724c
+  PASS G-PROV RUNNER_SHA256 == cvt7's runner 805267e4cbcc...   805267e4cbcc6417
+  PASS G-PROV SCORER_SHA256 == this scorer's sha256 942d1a50d22f...   942d1a50d22fcbf2
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01       TEST 22.9527  sd 0.6059  range 1.0800   TRAIN 23.1140   tail slope 0.010/0.010/0.003 pp/ep
+            seeds: s99 22.2540 (train 22.5840), s100 23.3340 (train 23.1880), s101 23.2700 (train 23.5700)
+  ISO       TEST 70.0413  sd 0.3705  range 0.7200   TRAIN 94.4807   tail slope -0.006/-0.008/0.001 pp/ep
+            seeds: s99 69.9400 (train 94.1540), s100 69.7320 (train 94.5660), s101 70.4520 (train 94.7220)
+  HOLDLOW   TEST 70.2980  sd 0.2789  range 0.4860   TRAIN 95.0467   tail slope 0.003/-0.005/-0.004 pp/ep
+            seeds: s99 70.1400 (train 94.9240), s100 70.6200 (train 95.0800), s101 70.1340 (train 95.1360)
+  HOLDHIGH  TEST 50.2273  sd 0.1980  range 0.3960   TRAIN 54.8433   tail slope -0.001/0.004/-0.002 pp/ep
+            seeds: s99 50.2300 (train 54.7080), s100 50.4240 (train 55.2140), s101 50.0280 (train 54.6080)
+  HOLDISO   TEST 70.0580  sd 0.3341  range 0.6600   TRAIN 94.4707   tail slope -0.001/-0.005/0.003 pp/ep
+            seeds: s99 70.3580 (train 94.2020), s100 69.6980 (train 94.6980), s101 70.1180 (train 94.5120)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 70.2980
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.2980
+
+G-BITE    the registered hold reached the carrier group's beta at every record, and touched nothing else
+  (a) 500 records; (b) every UNHELD group's beta == Lion recomputed from its own beta_pre/mom_pre/z_agg (tol 1e-05);
+  (c) held group 1: beta == hold(step+2) and beta_pre == hold(step+1); (d) the patch's gh_* record audits;
+  (e) k01 / ISO carry no gh_* key; no run carries a bh_* key.  Non-finite records are counted and stamped, not failed.
+  PASS G-BITE k01       s99  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE ISO       s99  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE HOLDLOW   s99  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 51  gh_active 5083
+  PASS G-BITE HOLDHIGH  s99  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 36  gh_active 9080
+  PASS G-BITE HOLDISO   s99  records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 1  gh_active 4918
+  PASS G-BITE k01       s100 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE ISO       s100 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE HOLDLOW   s100 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 53  gh_active 5274
+  PASS G-BITE HOLDHIGH  s100 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 34  gh_active 8971
+  PASS G-BITE HOLDISO   s100 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 1  gh_active 4927
+  PASS G-BITE k01       s101 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE ISO       s101 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active None
+  PASS G-BITE HOLDLOW   s101 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 52  gh_active 5162
+  PASS G-BITE HOLDHIGH  s101 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 35  gh_active 9030
+  PASS G-BITE HOLDISO   s101 records 500  bad 0  nonfinite 0  lion-mismatch 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  gh-on-control 0  bh-keys 0  active records 0  gh_active 4878
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.694443
+  SIGMA_INBATCH        0.382886
+  SIGMA_USED           0.694443  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.567010  = SIGMA_USED * sqrt(2/3)  (df_inbatch 10)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_HIGH   = ISO - HOLDHIGH        = +19.8140 pp = +34.94 SE   (TRAIN +39.6373)
+  PRIMARY  P_LOW    = HOLDLOW - ISO         = +0.2567 pp = +0.45 SE   (TRAIN +0.5660)
+  KEY      D_ISO    = ISO - k01             = +47.0887 pp = +83.05 SE   (TRAIN +71.3667)  [positive control]
+  KEY      P_CTL    = ISO - HOLDISO         = -0.0167 pp = -0.03 SE   (TRAIN +0.0100)  [hold control]
+  KEY      D_HOLDLOW   = HOLDLOW   - k01  = +47.3453 pp = +83.50 SE   (TRAIN +71.9327)   ISO - HOLDLOW   = -0.2567
+  KEY      D_HOLDHIGH  = HOLDHIGH  - k01  = +27.2747 pp = +48.10 SE   (TRAIN +31.7293)   ISO - HOLDHIGH  = +19.8140
+  KEY      D_HOLDISO   = HOLDISO   - k01  = +47.1053 pp = +83.08 SE   (TRAIN +71.3567)   ISO - HOLDISO   = -0.0167
+  bars: GAP_MIN 20.0 (35.27 SE) | MATCH 5.0 pp (8.82 SE) | NULL 2.0 pp (3.53 SE) | RESCUE 10.0 pp (17.64 SE)
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: TRANSFERS-GRADED | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | REPLAY-MAX-RATE-TRIANGLE | HIGH-IS-K01-TRAJECTORY | CARRIER-GROUP-OF-3 | ONE-NETWORK-RESNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDLOW-AT-ISO | HOLDHIGH-BETWEEN | HOLDISO-AT-ISO | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt7 bar or contrast):
+  ciso1: k01 23.2807  ISO 70.2113
+  cdep1: k01 23.3520  ISO 70.0440
+  cvt7 {99,100,101}: k01 22.9527  ISO 70.0413  HOLDLOW 70.2980  HOLDHIGH 50.2273  HOLDISO 70.0580
+
+DESCRIPTIVE, NON-GATING -- beta trajectories from the runs' own probe.jsonl; r = exp(beta + 15), epochs 15-30
+  k01       s99  beta peak -5.212 @17.2 pin 37.0 r 4081 last -15.000  gh_active -
+  k01       s100 beta peak -5.220 @17.2 pin 37.0 r 4074 last -15.000  gh_active -
+  k01       s101 beta peak -5.212 @17.2 pin 37.0 r 4186 last -15.000  gh_active -
+  ISO       s99  cmpl peak -5.016 @17.6 pin never r 8227 last -14.999 | carr peak -8.774 @10.2 pin 22.8 r 7 last -15.000  gh_active -
+  ISO       s100 cmpl peak -4.994 @17.8 pin never r 8075 last -14.457 | carr peak -8.620 @10.6 pin 23.4 r 10 last -15.000  gh_active -
+  ISO       s101 cmpl peak -5.012 @17.6 pin never r 8189 last -14.905 | carr peak -8.704 @10.4 pin 23.0 r 8 last -15.000  gh_active -
+  HOLDLOW   s99  cmpl peak -5.000 @17.8 pin never r 8111 last -14.998 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5083
+  HOLDLOW   s100 cmpl peak -4.920 @17.8 pin never r 8081 last -14.519 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5274
+  HOLDLOW   s101 cmpl peak -5.012 @17.6 pin never r 8091 last -14.997 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5162
+  HOLDHIGH  s99  cmpl peak -4.612 @18.4 pin 99.2 r 10365 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 9080
+  HOLDHIGH  s100 cmpl peak -4.602 @18.6 pin 99.8 r 10349 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 8971
+  HOLDHIGH  s101 cmpl peak -4.546 @18.6 pin 99.8 r 10474 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 9030
+  HOLDISO   s99  cmpl peak -5.024 @17.6 pin never r 8249 last -14.999 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4918
+  HOLDISO   s100 cmpl peak -4.946 @17.8 pin never r 8089 last -14.211 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4927
+  HOLDISO   s101 cmpl peak -5.012 @17.6 pin never r 8245 last -14.968 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4878
+
+DESCRIPTIVE, NON-GATING -- arm-mean TEST (TRAIN) at epochs 9 / 19 / 29 / 39 / 49 / 99, from the raw .out
+  k01       2.9 (2.2) / 19.0 (18.5) / 22.9 (23.0) / 22.9 (23.0) / 23.0 (23.0) / 22.9 (23.1)
+  ISO       2.8 (2.3) / 28.3 (27.0) / 54.6 (56.9) / 63.8 (72.1) / 67.9 (82.3) / 70.1 (94.4)
+  HOLDLOW   2.9 (2.3) / 28.2 (27.7) / 54.7 (57.1) / 64.0 (72.3) / 67.7 (82.3) / 70.3 (95.0)
+  HOLDHIGH  2.8 (2.3) / 20.0 (18.5) / 42.4 (43.0) / 49.5 (53.2) / 50.3 (54.7) / 50.2 (54.9)
+  HOLDISO   2.8 (2.3) / 28.8 (27.1) / 54.6 (57.1) / 63.8 (72.2) / 67.8 (82.3) / 70.1 (94.5)
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  Handing the carrier group k01's step size lowers the rescued arm by more than 5 pp but keeps it more than
+  2 pp above k01, while HOLDLOW and HOLDISO keep ISO's level.  EFFECT ON 240's PlainNet sentence ("the rescue needs the carrier on a SMALL step size"): PARTLY
+  TRANSFERS -- on ResNet the carriers' large step size carries part of the stall, not all of it (on PlainNet it
+  carried all of it).  No single-mechanism sentence for ResNet; no dose curve.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about ResNet18_gn_c100, VGG11_bn_c100 or another cell: one network, one cell, one held group.
+  * Any single carrier: the three are held together as ISO's group.
+  * WHEN a large step size acts: every hold runs from init to the end; the replays are one fixed shape each.
+  * A dose curve: one large trajectory (k01's), one small (ISO's own), and the floor.
+  * Whether the stall is direct or through the complement's path (cvt6's question, on PlainNet).
+  * Any point agreement for an arm at the k01 level: such readings are BOUNDS (164.6).
+  * Anything beyond 100 epochs.

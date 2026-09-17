@@ -1,0 +1,22 @@
+RULE20 run utc=2026-09-17T01:32:03Z host=nodelogin04.alice.leidenuniv.nl
+===================== cvt7
+  .out files: 15   with ARGS: 15   squeue: 
+  BATCH-CONSISTENCY --name cvt7- --vary stepsize-groups --vary seed --vary run-name -> rc=0  argsline_guard: 15 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (cvt7): 15 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x15  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x12  PROBE_TENSOR: on every=100 type=blockwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x3  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x15  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x15  BETA_HOLD: off
+    GROUP_HOLD witness lines (exact match to the arm's registered line):
+      x6  GROUP_HOLD: off
+      x3  GROUP_HOLD: on type=blockwise group=1 groupsize=3 names=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight mode=floor value=-15.0
+      x3  GROUP_HOLD: on type=blockwise group=1 groupsize=3 names=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight mode=tri P=5153 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-8.662510749816894
+      x3  GROUP_HOLD: on type=blockwise group=1 groupsize=3 names=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight mode=tri P=8609 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-5.2065107498168945
+    coverage 15/15 runs with an .out, 0 violations
+  ENV AUDIT VERDICT cvt7: PASS
+RULE20 end utc=2026-09-17T01:32:03Z

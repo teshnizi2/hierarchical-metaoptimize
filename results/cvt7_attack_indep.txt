@@ -1,0 +1,227 @@
+[0] corpus disclosure (the ONE corpus-dependent line; no bar reads it)
+    all_runs.csv sha256 c2d1164d46cedde8  rows 3049;  CORPUS-EXCLUSIONS.tsv sha256 f8455571b0f1e1ce  rows 51 keys 51  ->  2998 rows (cvt7- dropped)
+    manifest: 62 tensors, 11220132 params; carriers 50:layer4.0.bn2.weight,53:layer4.0.shortcut.1.weight,59:layer4.1.bn2.weight; 5085 bytes, sha256 6734d0ffc6986fcb...
+    ISO spec -> sizes [59, 3], group 1 = [50, 53, 59]; CARRIERS / REPLAY / 5 GROUPHOLD / 5 WITNESS lines == built here; sha prefix 6734d0ff, 5085 bytes: True
+    PROVENANCE MODE submit  BUILD c7998883...  HF 2396f2be...  RUNNER 805267e4...  SCORER 942d1a50... == scorer file: True
+
+[1] completeness and header lines (GROUP_HOLD witnesses built from mode / P / b0 / ms)
+  OK   k01       s99  job 5022489  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   ISO       s99  job 5022490  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDLOW   s99  job 5022491  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDHIGH  s99  job 5022492  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDISO   s99  job 5022493  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   k01       s100 job 5022494  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   ISO       s100 job 5022495  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDLOW   s100 job 5022496  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDHIGH  s100 job 5022497  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDISO   s100 job 5022498  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   k01       s101 job 5022499  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   ISO       s101 job 5022500  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDLOW   s101 job 5022501  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDHIGH  s101 job 5022502  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+  OK   HOLDISO   s101 job 5022503  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  GROUP_HOLD True
+
+[2] levels (plateau5 = mean TEST epochs 95..99; TRAIN5 beside)
+  k01       TEST 22.9527 (sd 0.6059, range 1.0800)  TRAIN 23.1140  seeds 22.2540 / 23.3340 / 23.2700  train 22.5840 / 23.1880 / 23.5700  slope80-99 +0.010 / +0.010 / +0.003
+  ISO       TEST 70.0413 (sd 0.3705, range 0.7200)  TRAIN 94.4807  seeds 69.9400 / 69.7320 / 70.4520  train 94.1540 / 94.5660 / 94.7220  slope80-99 -0.006 / -0.008 / +0.001
+  HOLDLOW   TEST 70.2980 (sd 0.2789, range 0.4860)  TRAIN 95.0467  seeds 70.1400 / 70.6200 / 70.1340  train 94.9240 / 95.0800 / 95.1360  slope80-99 +0.003 / -0.005 / -0.004
+  HOLDHIGH  TEST 50.2273 (sd 0.1980, range 0.3960)  TRAIN 54.8433  seeds 50.2300 / 50.4240 / 50.0280  train 54.7080 / 55.2140 / 54.6080  slope80-99 -0.001 / +0.004 / -0.002
+  HOLDISO   TEST 70.0580 (sd 0.3341, range 0.6600)  TRAIN 94.4707  seeds 70.3580 / 69.6980 / 70.1180  train 94.2020 / 94.6980 / 94.5120  slope80-99 -0.001 / -0.005 / +0.003
+
+[3] sigma and contrasts (within batch)
+  SIGMA_INBATCH 0.382886 (df 10)  SIGMA_PRIOR 0.694443  -> used 0.694443 (SIGMA_PRIOR_frozen)  SE 0.567010
+  PRIMARY  P_HIGH      = ISO       - HOLDHIGH  TEST  +19.8140 pp =   +34.94 SE   TRAIN  +39.6373   per seed +19.7100 / +19.3080 / +20.4240
+  PRIMARY  P_LOW       = HOLDLOW   - ISO       TEST   +0.2567 pp =    +0.45 SE   TRAIN   +0.5660   per seed +0.2000 / +0.8880 / -0.3180
+  KEY      D_ISO       = ISO       - k01       TEST  +47.0887 pp =   +83.05 SE   TRAIN  +71.3667   per seed +47.6860 / +46.3980 / +47.1820
+  KEY      P_CTL       = ISO       - HOLDISO   TEST   -0.0167 pp =    -0.03 SE   TRAIN   +0.0100   per seed -0.4180 / +0.0340 / +0.3340
+  KEY      D_HOLDLOW   = HOLDLOW   - k01       TEST  +47.3453 pp =   +83.50 SE   TRAIN  +71.9327   per seed +47.8860 / +47.2860 / +46.8640
+  KEY      D_HOLDHIGH  = HOLDHIGH  - k01       TEST  +27.2747 pp =   +48.10 SE   TRAIN  +31.7293   per seed +27.9760 / +27.0900 / +26.7580
+  KEY      D_HOLDISO   = HOLDISO   - k01       TEST  +47.1053 pp =   +83.08 SE   TRAIN  +71.3567   per seed +48.1040 / +46.3640 / +46.8480
+
+[4] G-BITE re-derived from the raw probe records (243.6 (a)-(e)), the vote-out decomposition, non-vacuity
+  PASS k01       s99  meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 2.0e-07
+  PASS ISO       s99  meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 2.1e-07
+  PASS HOLDLOW   s99  meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 51 gh_active 5083 | vote-out decomposition worst rel 1.5e-07
+  PASS HOLDHIGH  s99  meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 36 gh_active 9080 | vote-out decomposition worst rel 1.9e-07
+  PASS HOLDISO   s99  meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 1 gh_active 4918 | vote-out decomposition worst rel 2.3e-07
+  PASS k01       s100 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 2.0e-07
+  PASS ISO       s100 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 1.8e-07
+  PASS HOLDLOW   s100 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 53 gh_active 5274 | vote-out decomposition worst rel 1.7e-07
+  PASS HOLDHIGH  s100 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 34 gh_active 8971 | vote-out decomposition worst rel 2.3e-07
+  PASS HOLDISO   s100 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 1 gh_active 4927 | vote-out decomposition worst rel 2.6e-07
+  PASS k01       s101 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 1.9e-07
+  PASS ISO       s101 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active None | vote-out decomposition worst rel 1.7e-07
+  PASS HOLDLOW   s101 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 52 gh_active 5162 | vote-out decomposition worst rel 1.4e-07
+  PASS HOLDHIGH  s101 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 35 gh_active 9030 | vote-out decomposition worst rel 1.9e-07
+  PASS HOLDISO   s101 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | sched 0/0 worst 0.0e+00 | gh-audit 0 gh-on-control 0 bh-keys 0 active 0 gh_active 4878 | vote-out decomposition worst rel 1.8e-07
+  NON-VACUITY cross-read: records (of 500) on which group 1 FAILS each held mode's schedule (either half); max |error|
+  run           as HOLDLOW              as HOLDHIGH             as HOLDISO            
+  ISO       s99  114  max   6.2265        184  max   7.0745        114  max   0.1625      
+  ISO       s100 117  max   6.3806        184  max   6.7124        116  max   0.2021      
+  ISO       s101 115  max   6.2966        184  max   6.9064        114  max   0.0080      
+  HOLDLOW   s99    0  max   0.0000        185  max   9.7855        115  max   6.2905      
+  HOLDLOW   s100   0  max   0.0000        185  max   9.7855        115  max   6.2905      
+  HOLDLOW   s101   0  max   0.0000        185  max   9.7855        115  max   6.2905      
+  HOLDHIGH  s99  185  max   9.7855          0  max   0.0000        133  max   6.9120      
+  HOLDHIGH  s100 185  max   9.7855          0  max   0.0000        133  max   6.9120      
+  HOLDHIGH  s101 185  max   9.7855          0  max   0.0000        133  max   6.9120      
+  HOLDISO   s99  115  max   6.2905        133  max   6.9120          0  max   0.0000      
+  HOLDISO   s100 115  max   6.2905        133  max   6.9120          0  max   0.0000      
+  HOLDISO   s101 115  max   6.2905        133  max   6.9120          0  max   0.0000      
+  every run FAILS every held mode but its own on >= 1 record: True (fewest failing records 114); every held run passes its own on all: True
+
+[5] branch, states, stamps (243.6, re-typed; first match wins)
+  states: HOLDLOW AT-ISO  HOLDHIGH BETWEEN  HOLDISO AT-ISO
+  FINAL: TRANSFERS-GRADED | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | REPLAY-MAX-RATE-TRIANGLE | HIGH-IS-K01-TRAJECTORY | CARRIER-GROUP-OF-3 | ONE-NETWORK-RESNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDLOW-AT-ISO | HOLDHIGH-BETWEEN | HOLDISO-AT-ISO | TRAIN-AGREES
+  AT-ISO bar (ISO - 5) = 65.0413;  AT-K01 bar (k01 + 2) = 24.9527
+    margin D_ISO over GAP_MIN                                +27.0887 pp = +47.77 SE
+    margin k01 under K01_MAX                                  +7.0473 pp = +12.43 SE
+    margin worst seed range under DIVERGED (k01)              +3.9200 pp = +6.91 SE
+    margin HOLDLOW: L - (ISO - MATCH)    (>= 0 is AT-ISO)     +5.2567 pp = +9.27 SE
+    margin HOLDLOW: (k01 + NULL) - L     (>= 0 is AT-K01)    -45.3453 pp = -79.97 SE
+    margin HOLDHIGH: L - (ISO - MATCH)    (>= 0 is AT-ISO)   -14.8140 pp = -26.13 SE
+    margin HOLDHIGH: (k01 + NULL) - L     (>= 0 is AT-K01)   -25.2747 pp = -44.58 SE
+    margin HOLDISO: L - (ISO - MATCH)    (>= 0 is AT-ISO)     +5.0167 pp = +8.85 SE
+    margin HOLDISO: (k01 + NULL) - L     (>= 0 is AT-K01)    -45.1053 pp = -79.55 SE
+  per-seed readings against the in-batch bars (descriptive; the branch reads arm means):
+    HOLDLOW   s99 70.1400 AT-ISO / s100 70.6200 AT-ISO / s101 70.1340 AT-ISO
+    HOLDHIGH  s99 50.2300 BETWEEN / s100 50.4240 BETWEEN / s101 50.0280 BETWEEN
+    HOLDISO   s99 70.3580 AT-ISO / s100 69.6980 AT-ISO / s101 70.1180 AT-ISO
+  per-seed paired P_HIGH (ISO - HOLDHIGH, same seed) +19.7100 / +19.3080 / +20.4240; per-seed P_LOW +0.2000 / +0.8880 / -0.3180
+  registered accounts (243.5) -- misses of each arm's predicted band (0 = inside):
+    TRANSFERS          k01 0.00  ISO 0.00  HOLDLOW 0.00  HOLDHIGH 22.23  HOLDISO 0.00  P_HIGH 14.19
+    TRANSFERS-GRADED   k01 0.00  ISO 0.00  HOLDLOW 0.00  HOLDHIGH 0.00  HOLDISO 0.00  P_HIGH 0.00
+    DOES-NOT-TRANSFER  k01 0.00  ISO 0.00  HOLDLOW 0.00  HOLDHIGH 11.77  HOLDISO 0.00  P_HIGH 3.81
+    LOW-STALLS         k01 0.00  ISO 0.00  HOLDLOW 42.30  HOLDHIGH 22.23  HOLDISO 0.00  P_HIGH 14.19
+    ANY-HOLD-BREAKS    k01 0.00  ISO 0.00  HOLDLOW 42.30  HOLDHIGH 22.23  HOLDISO 42.06  P_HIGH 14.19
+  scorer log FINAL == this FINAL (whole string): True
+  branch token equal: True;  token lists equal: True (scorer 15 tokens, here 15)
+
+[6] the scorer's descriptive readouts, re-derived (beta peak / pin (<= -15+1e-4 for good) / mean r epochs 15-30 / last)
+  k01       s99  beta peak -5.212 @17.2 pin 37.0 r 4081 last -15.000  gh_active -
+  k01       s100 beta peak -5.220 @17.2 pin 37.0 r 4074 last -15.000  gh_active -
+  k01       s101 beta peak -5.212 @17.2 pin 37.0 r 4186 last -15.000  gh_active -
+  ISO       s99  cmpl peak -5.016 @17.6 pin never r 8227 last -14.999 | carr peak -8.774 @10.2 pin 22.8 r 7 last -15.000  gh_active -
+  ISO       s100 cmpl peak -4.994 @17.8 pin never r 8075 last -14.457 | carr peak -8.620 @10.6 pin 23.4 r 10 last -15.000  gh_active -
+  ISO       s101 cmpl peak -5.012 @17.6 pin never r 8189 last -14.905 | carr peak -8.704 @10.4 pin 23.0 r 8 last -15.000  gh_active -
+  HOLDLOW   s99  cmpl peak -5.000 @17.8 pin never r 8111 last -14.998 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5083
+  HOLDLOW   s100 cmpl peak -4.920 @17.8 pin never r 8081 last -14.519 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5274
+  HOLDLOW   s101 cmpl peak -5.012 @17.6 pin never r 8091 last -14.997 | carr peak -15.000 @0.0 pin 0.0 r 1 last -15.000  gh_active 5162
+  HOLDHIGH  s99  cmpl peak -4.612 @18.4 pin 99.2 r 10365 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 9080
+  HOLDHIGH  s100 cmpl peak -4.602 @18.6 pin 99.8 r 10349 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 8971
+  HOLDHIGH  s101 cmpl peak -4.546 @18.6 pin 99.8 r 10474 last -15.000 | carr peak -5.215 @17.2 pin 37.0 r 4026 last -15.000  gh_active 9030
+  HOLDISO   s99  cmpl peak -5.024 @17.6 pin never r 8249 last -14.999 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4918
+  HOLDISO   s100 cmpl peak -4.946 @17.8 pin never r 8089 last -14.211 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4927
+  HOLDISO   s101 cmpl peak -5.012 @17.6 pin never r 8245 last -14.968 | carr peak -8.711 @10.4 pin 23.0 r 8 last -15.000  gh_active 4878
+
+[7] LINE-BY-LINE AGREEMENT with the scorer log (each re-built line looked up verbatim)
+  HEADER        10 lines found verbatim, 0 not found
+  CORPUS         1 lines found verbatim, 0 not found
+  COMPLETE      16 lines found verbatim, 0 not found
+  G-ARGS        15 lines found verbatim, 0 not found
+  G-ENV          4 lines found verbatim, 0 not found
+  G-VOTEW       15 lines found verbatim, 0 not found
+  G-BHOLD       15 lines found verbatim, 0 not found
+  G-GHOLD       15 lines found verbatim, 0 not found
+  G-STRUCT       2 lines found verbatim, 0 not found
+  G-PROV         6 lines found verbatim, 0 not found
+  LEVELS        10 lines found verbatim, 0 not found
+  G-FLOOR        1 lines found verbatim, 0 not found
+  G-CEIL         1 lines found verbatim, 0 not found
+  G-BITE        16 lines found verbatim, 0 not found
+  SIGMA          4 lines found verbatim, 0 not found
+  CONTRASTS      8 lines found verbatim, 0 not found
+  G-DIVERGE      1 lines found verbatim, 0 not found
+  FINAL          1 lines found verbatim, 0 not found
+  BETWEEN        4 lines found verbatim, 0 not found
+  DESCRIPTIVE   20 lines found verbatim, 0 not found
+  total 165 re-built lines, 165 found; FAIL lines in the scorer log: 0
+  scorer log: 214 lines; 168 are re-built lines; not re-built: 18 blank, 0 '=' rules, 15 unindented section titles, 13 indented prose lines (the G-BITE clause legend, the registered licence and not-licensed text)
+    not re-built, carries a digit: "  (c) held group 1: beta == hold(step+2) and beta_pre == hold(step+1); (d) the patch's gh_* record audits;"
+    not re-built, carries a digit: '  (e) k01 / ISO carry no gh_* key; no run carries a bh_* key.  Non-finite records are counted and stamped, not failed.'
+
+====================================================================================================
+DESCRIPTIVE, NOT REGISTERED -- nothing below can move a level, contrast, gate, branch or stamp above
+====================================================================================================
+
+[D1] APPLIED beta after the update that ends each epoch (probe record at step 500e; the value the next update uses); c = complement (group 0), g = carrier group (group 1); k01 has one shared beta
+  MEDIAN seed per arm (by plateau5): k01 s101  ISO s99  HOLDLOW s99  HOLDHIGH s99  HOLDISO s101
+  arm       epoch 10           epoch 17           epoch 20           epoch 30           epoch 40         
+  k01       -8.81              -5.31              -6.53              -11.53             -15.00           
+  ISO       c -8.81 / g -8.81  c -5.31 / g -12.17  c -5.84 / g -13.67  c -7.02 / g -15.00  c -7.91 / g -15.00
+  HOLDLOW   c -8.81 / g -15.00  c -5.31 / g -15.00  c -5.88 / g -15.00  c -7.03 / g -15.00  c -7.82 / g -15.00
+  HOLDHIGH  c -8.81 / g -8.81  c -5.31 / g -5.31  c -5.37 / g -6.60  c -7.25 / g -11.60  c -9.87 / g -15.00
+  HOLDISO   c -8.81 / g -8.81  c -5.31 / g -12.01  c -5.82 / g -13.51  c -7.11 / g -15.00  c -7.86 / g -15.00
+  arm mean of the three seeds:
+  k01       -8.81              -5.31              -6.56              -11.56             -15.00           
+  ISO       c -8.81 / g -8.81  c -5.31 / g -12.00  c -5.87 / g -13.50  c -7.03 / g -15.00  c -7.88 / g -15.00
+  HOLDLOW   c -8.81 / g -15.00  c -5.31 / g -15.00  c -5.86 / g -15.00  c -7.03 / g -15.00  c -7.88 / g -15.00
+  HOLDHIGH  c -8.81 / g -8.81  c -5.31 / g -5.31  c -5.31 / g -6.60  c -7.40 / g -11.60  c -9.81 / g -15.00
+  HOLDISO   c -8.81 / g -8.81  c -5.31 / g -12.01  c -5.85 / g -13.51  c -7.05 / g -15.00  c -7.88 / g -15.00
+  mean r = exp(beta+15) over epochs [15,30), arm mean (complement / carrier group):
+    k01       shared    4113.7
+    ISO       complement    8163.8   carrier group       8.1
+    HOLDLOW   complement    8094.1   carrier group       1.0
+    HOLDHIGH  complement   10395.8   carrier group    4025.7
+    HOLDISO   complement    8194.6   carrier group       7.9
+
+[D2] TEST (TRAIN) after 15 / 30 / 50 / 100 completed epochs (Epoch lines 14 / 29 / 49 / 99): arm mean, then TEST per seed
+  k01       10.48 (9.46)  22.90 (22.99)  22.97 (23.03)  22.94 (23.13)   | s99 10.07/22.33/22.28/22.15  s100 10.92/23.16/23.33/23.41  s101 10.45/23.21/23.31/23.25
+  ISO       10.88 (9.79)  54.60 (56.94)  67.90 (82.28)  70.12 (94.44)   | s99 10.62/54.49/68.01/69.92  s100 11.13/54.02/67.50/69.80  s101 10.88/55.30/68.19/70.63
+  HOLDLOW   11.18 (10.00)  54.72 (57.05)  67.69 (82.32)  70.28 (95.03)   | s99 10.70/54.63/67.00/70.22  s100 11.49/53.88/67.72/70.47  s101 11.34/55.65/68.36/70.16
+  HOLDHIGH  10.54 (9.50)  42.40 (42.98)  50.29 (54.71)  50.22 (54.91)   | s99 9.99/42.06/50.32/50.31  s100 11.00/41.49/50.38/50.22  s101 10.62/43.64/50.16/50.12
+  HOLDISO   11.03 (9.84)  54.59 (57.06)  67.80 (82.30)  70.10 (94.47)   | s99 10.60/54.43/67.67/70.37  s100 11.33/53.80/67.78/69.80  s101 11.15/55.54/67.94/70.14
+
+[D3] when the level is set.  settle = first Epoch line after which the value stays within 0.5 pp of its own plateau5 (TEST) / TRAIN5 (TRAIN); share = arm-mean TEST / plateau5 at Epoch lines 14 / 19 / 24 / 29 / 39
+  k01       TEST settle arm-mean 24 (per seed 24/24/24)  TRAIN settle arm-mean 26  share 0.46 / 0.83 / 0.99 / 1.00 / 1.00
+  ISO       TEST settle arm-mean 59 (per seed 59/63/68)  TRAIN settle arm-mean 77  share 0.16 / 0.40 / 0.63 / 0.78 / 0.91
+  HOLDLOW   TEST settle arm-mean 62 (per seed 66/68/62)  TRAIN settle arm-mean 79  share 0.16 / 0.40 / 0.64 / 0.78 / 0.91
+  HOLDHIGH  TEST settle arm-mean 41 (per seed 40/41/41)  TRAIN settle arm-mean 44  share 0.21 / 0.40 / 0.65 / 0.84 / 0.99
+  HOLDISO   TEST settle arm-mean 61 (per seed 65/60/63)  TRAIN settle arm-mean 77  share 0.16 / 0.41 / 0.63 / 0.78 / 0.91
+
+[D4] the complement's pin by the MAGNITUDE gate (cvh1's form): first record with r = exp(beta+15) <= 2; records at or after it back above r 2; max r after it; median r over the last quarter of records; exact clamp from
+  k01       s99  shared first r<=2 35.6   back above 0    max r after 1.861   median r last quarter    1.000  exact clamp from 37.0
+  k01       s100 shared first r<=2 35.6   back above 0    max r after 1.858   median r last quarter    1.000  exact clamp from 37.0
+  k01       s101 shared first r<=2 35.6   back above 0    max r after 1.945   median r last quarter    1.000  exact clamp from 37.0
+  ISO       s99  cmpl   first r<=2 92.6   back above 3    max r after 2.171   median r last quarter    5.846  exact clamp from never
+  ISO       s100 cmpl   first r<=2 99.4   back above 0    max r after 1.891   median r last quarter    9.855  exact clamp from never
+  ISO       s101 cmpl   first r<=2 96.4   back above 0    max r after 1.945   median r last quarter    8.532  exact clamp from never
+  HOLDLOW   s99  cmpl   first r<=2 94.6   back above 0    max r after 1.884   median r last quarter    6.820  exact clamp from never
+  HOLDLOW   s100 cmpl   first r<=2 99.0   back above 0    max r after 1.933   median r last quarter    8.084  exact clamp from never
+  HOLDLOW   s101 cmpl   first r<=2 96.0   back above 0    max r after 1.832   median r last quarter    9.115  exact clamp from never
+  HOLDHIGH  s99  cmpl   first r<=2 52.8   back above 0    max r after 1.914   median r last quarter    1.000  exact clamp from 99.2
+  HOLDHIGH  s100 cmpl   first r<=2 54.0   back above 0    max r after 1.988   median r last quarter    1.000  exact clamp from 99.8
+  HOLDHIGH  s101 cmpl   first r<=2 52.8   back above 0    max r after 1.976   median r last quarter    1.000  exact clamp from 99.8
+  HOLDISO   s99  cmpl   first r<=2 94.6   back above 0    max r after 1.965   median r last quarter    8.165  exact clamp from never
+  HOLDISO   s100 cmpl   first r<=2 never  back above -    max r after -       median r last quarter   12.013  exact clamp from never
+  HOLDISO   s101 cmpl   first r<=2 95.4   back above 0    max r after 1.992   median r last quarter    8.431  exact clamp from never
+
+[D5] HOLDHIGH's free complement against ISO's complement, HOLDLOW's / HOLDISO's complement and k01's shared beta
+  complement beta, arm mean, at epochs 10 / 14 / 16 / 17 / 18 / 19 / 20 / 22 / 25 / 30 / 40 / 50 / 60 / 70 / 80 / 90 / 99.8:
+    k01 (sh)  -8.81 / -6.81 / -5.81 / -5.31 / -5.56 / -6.06 / -6.56 / -7.56 / -9.06 / -11.56 / -15.00 / -15.00 / -15.00 / -15.00 / -15.00 / -15.00 / -15.00
+    ISO       -8.81 / -6.81 / -5.81 / -5.31 / -5.11 / -5.58 / -5.87 / -6.18 / -6.49 / -7.03 / -7.88 / -8.60 / -9.45 / -10.47 / -11.83 / -13.24 / -14.79
+    HOLDLOW   -8.81 / -6.81 / -5.81 / -5.31 / -5.09 / -5.54 / -5.86 / -6.20 / -6.49 / -7.03 / -7.88 / -8.54 / -9.31 / -10.36 / -11.62 / -13.30 / -14.84
+    HOLDHIGH  -8.81 / -6.81 / -5.81 / -5.31 / -4.81 / -4.81 / -5.31 / -5.72 / -6.45 / -7.40 / -9.81 / -13.16 / -15.00 / -15.00 / -15.00 / -15.00 / -15.00
+    HOLDISO   -8.81 / -6.81 / -5.81 / -5.31 / -5.10 / -5.48 / -5.85 / -6.05 / -6.49 / -7.05 / -7.88 / -8.63 / -9.46 / -10.55 / -11.77 / -13.14 / -14.73
+  HOLDHIGH  complement peak -4.612 / -4.602 / -4.546 @ 18.4 / 18.6 / 18.6; ISO's -5.016 / -4.994 / -5.012 @ 17.6 / 17.8 / 17.6
+  HOLDLOW   complement peak -5.000 / -4.920 / -5.012 @ 17.8 / 17.8 / 17.6; ISO's -5.016 / -4.994 / -5.012 @ 17.6 / 17.8 / 17.6
+  HOLDISO   complement peak -5.024 / -4.946 / -5.012 @ 17.6 / 17.8 / 17.6; ISO's -5.016 / -4.994 / -5.012 @ 17.6 / 17.8 / 17.6
+  HOLDHIGH  complement max|beta[0] - v_8609|: s99 all 6.016 / ep0-40 6.016; s100 all 6.152 / ep0-40 6.152; s101 all 5.950 / ep0-40 5.950
+  k01       shared max|beta[0] - v_8609|: s99 all 0.022 / ep0-40 0.022; s100 all 0.020 / ep0-40 0.020; s101 all 0.066 / ep0-40 0.066
+  ISO       complement max|beta[0] - v_8609|: s99 all 7.458 / ep0-40 7.458; s100 all 7.450 / ep0-40 7.450; s101 all 7.426 / ep0-40 7.426
+  ISO - HOLDHIGH arm-mean TEST gap by Epoch line 10..40: 10:-0.05 12:+0.09 14:+0.34 16:+2.06 18:+9.33 20:+8.98 22:+10.34 24:+11.34 26:+11.36 28:+11.85 30:+12.16 32:+12.57 34:+12.63 36:+13.35 38:+14.39 40:+14.98
+    first Epoch line after which the gap stays > 2 pp: 16 (line n = after n+1 epochs); per seed first line > 2 pp: 17 / 16 / 16
+  HOLDHIGH complement beta minus ISO's (arm means) at epochs 10..40: 10:+0.00 12:+0.00 14:+0.00 16:+0.00 18:+0.30 20:+0.57 22:+0.46 24:+0.12 26:-0.04 28:-0.28 30:-0.36 32:-0.59 34:-0.86 36:-1.17 38:-1.56 40:-1.93 ; first epoch |diff| > 0.1: 18
+    per seed (same seed number, different runs) first record |cmpl diff| > 0.1 at epoch: 17.8 / 18.0 / 17.8
+  HOLDHIGH carrier-group beta minus ISO's (arm means) at epochs 2..24: 2:-0.00 4:-0.00 6:-0.00 8:-0.00 10:-0.00 12:+1.68 14:+3.68 16:+5.68 18:+6.90 20:+6.90 22:+6.90 24:+6.40
+  HOLDHIGH - k01 arm-mean TEST by Epoch line 10..40: 10:+0.04 12:-0.03 14:+0.06 16:-0.04 18:-1.90 20:+2.92 22:+5.92 24:+10.19 26:+14.36 28:+18.22 30:+20.81 32:+23.11 34:+25.04 36:+25.80 38:+26.23 40:+26.61
+
+[D6] orientation only, between batch (PlainNet18_c100, cvt4 s90-92; not this batch's statistic): the same magnitude gate on cvt4 HEAD's and HOLDHIGH's complement
+  cvt4 HEAD      s90 cmpl peak -4.854 @18.0 r15-30   8548.5  first r<=2 65.2   back above 0    exact clamp from 99.6
+  cvt4 HEAD      s91 cmpl peak -4.892 @18.0 r15-30   8550.3  first r<=2 65.0   back above 0    exact clamp from 97.8
+  cvt4 HEAD      s92 cmpl peak -4.920 @17.8 r15-30   8435.7  first r<=2 66.0   back above 0    exact clamp from 99.6
+  cvt4 HOLDHIGH  s90 cmpl peak -4.448 @18.8 r15-30  10103.2  first r<=2 39.0   back above 0    exact clamp from 40.4
+  cvt4 HOLDHIGH  s91 cmpl peak -4.354 @19.0 r15-30  10935.1  first r<=2 39.2   back above 0    exact clamp from 40.4
+  cvt4 HOLDHIGH  s92 cmpl peak -4.494 @18.8 r15-30  10157.2  first r<=2 39.0   back above 0    exact clamp from 40.4
+
+VIOLATIONS 0
