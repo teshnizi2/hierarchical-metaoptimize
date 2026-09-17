@@ -33795,3 +33795,56 @@ python3 analysis/cvt6_attack_indep.py ../runs_alice2 analysis/cVT6_complementpat
 * **Cost: zero GPU-hours.**
 
 Next free number: **251** (248 and 249 are pre-assigned to `cvt8` and `cvt9`).
+
+## 251. TRACK C (code gap, ZERO GPU) — **`corpus_exclusions.py --check` NOW KNOWS `REST_HOLD` (`cvt8`) AND `WINDOW_HOLD` (`cvt9`), AND HOLDS `cvt8`'s THREE FORCED ARMS (GROUP_HOLD + REST_HOLD) AND `cvt9`'s SIX HELD ARMS (BETA_HOLD + COMP_HOLD; EARLY / LATE ALSO WINDOW_HOLD, THREE KINDS) TO THEIR REGISTERED LINES WHILE EACH RUN IS LISTED ONCE; `load` / `keys` / `is_excluded` / `filter_rows` UNCHANGED, THE TSV UNCHANGED, EVERY SCORER SELFTEST AND DERIVATION THAT IMPORTS THE MODULE BYTE-IDENTICAL; `--check --runs` GAINS TWO LINES.  ALSO `jobs/run_cifar_cvt9.sh` 100644 → 100755 (CONTENT UNCHANGED) AND `cvt9`'s G-BITE WINDOW RESOLUTION RECORDED.**  Closes the checker items owed by 248.7 / 248.13(4) and 249.7 / 249.13(3).  No registered scorer, launcher, TSV row, CSV row or `paper/` file edited.  **`alice` NOT CONTACTED; alice2 read only (251.7; no accuracy line read).**  THIS ENTRY TOOK NUMBER **251**; NEXT FREE **252**.
+
+### 251.1 The gap
+
+`KINDS` held `VOTE_W` / `BETA_HOLD` / `GROUP_HOLD` / `COMP_HOLD`.  (a) 245's module never reads a `REST_HOLD` line: a `cvt8` forced arm listed by its GROUP_HOLD line (248.7) passes with a wrong replay sha or `REST_HOLD: off` (real-log control, 251.4: exit 0), and the unlisted `k01` / ISO runs' `REST_HOLD: off` lines go unchecked.  (b) `cvt9`'s held runs listed by BETA_HOLD (249.7) FAIL 18× ("prints an ON COMP_HOLD line but is listed with a BETA_HOLD witness"), and no `WINDOW_HOLD` line is read: 245's output is byte-identical with EARLY's window swapped for LATE's or deleted.
+
+### 251.2 What changed (`analysis/corpus_exclusions.py`, `81c12d2a…` → `df119ebb…`; KINDS, MULTI_KIND, two print lines, docstring, comments)
+
+* **`KINDS`** + `("REST_HOLD", "REST_HOLD: off")`, `("WINDOW_HOLD", "WINDOW_HOLD: off")`, appended after 245's four (whose order sets the printed lines).
+* **`MULTI_KIND`** + 9 entries in a `MULTI_KIND.update({…})` after 245's dict, which is unchanged: `cvt8` HIGHISOPATH / BIGISOPATH / LOWISOPATH × {GROUP_HOLD `tri:8609` / `tri:9428` / floor, REST_HOLD `rec:cvt8_isopath` `08ab25f3…`}; `cvt9` LOWHEADPATH / HIGHHEADPATH / MIDDOSE / RESDOSE × {BETA_HOLD floor / `tri:9428` / `tri:7235` / `tri:8609`, COMP_HOLD `rec:cvt6_headpath`}; EARLY / LATE × {BETA_HOLD `tri:9428`, COMP_HOLD rec, WINDOW_HOLD `n0=0 n1=9429` / `n0=9429 n1=end`}.  Re-typed (not imported) from `cVT8_doseroute_score.py` `WITNESS_GH` / `WITNESS_RH` over FORCED and `cVT9_dosewindow_score.py` `WITNESS_BH` / `WITNESS_CH` / `WITNESS_WH` over FORCED (= HELD); C23 pins them.  `cvt8`'s HOLDHIGH / HOLDBIG (one ON kind) and every `k01` / ISO are not entries.
+* **N kinds: no generalisation was needed.** 245's `check()` already reads an entry kind by kind (`for kd in KINDS: if kd in des`) in the witness, completeness and off-line paths; only the label "two-kind" says two.  That line is kept byte for byte, and a new line counts the listed multi-kind runs by the number of kinds registered (C19 and the real-log control exercise three).
+* **Two added `--check --runs` lines.** 245's `kinds scanned` line now names `KINDS[:4]`, so it is unchanged; `kinds scanned (CORRECTIONS 251): also REST_HOLD / WINDOW_HOLD, 6 in all; …: True` follows it, and `multi-kind runs (CORRECTIONS 251): … 2 kinds N, 3 kinds M` follows the two-kind line.
+* **Limits (as 245.2).** A listed run is not required to print the `off` line of a kind it does not register (`cvt8` HOLDHIGH with no REST_HOLD line; a `cvt9` two-kind arm with no `WINDOW_HOLD: off`); an ON line there still FAILs (C18d, C20d).  **The landing appends exactly 248.7's 15 `cvt8` rows (GROUP_HOLD witness) and 249.7's 18 `cvt9` rows (BETA_HOLD witness)**; any one ON line of a registered arm may equally be its witness.
+
+### 251.3 Prefix collisions — proof
+
+As 245.3: a line selected by `startswith` for two prefixes A ≠ B starts with both, so one is a prefix of the other; the six first letters V, B, G, C, R, W differ, so none is.  `check()` still FAILs on a collision and the new line prints the test over all six.  `patch_resthold.py` and `patch_windowhold.py` print only `<PREFIX>: off` / `<PREFIX>: on type=…` literals (C23).  Real logs: the 42 `cvt8` / `cvt9` `.out` files on alice2 hold 168 lines containing any of the six prefixes, all 168 beginning `<PREFIX>: ` (VOTE_W 42, BETA_HOLD 42, GROUP_HOLD 21, COMP_HOLD 21, REST_HOLD 21, WINDOW_HOLD 21), and every run's line of each kind equals its arm's line in the scorers' tables (42 / 42).  None of the Mac's 3,153 `.out` files contains `REST_HOLD` or `WINDOW_HOLD`.
+
+### 251.4 Tests (`tests/test_corpus_exclusions_check.py`, `6b2c771a…` → `479939e6…`, +C17–C23)
+
+C17 `cvt8` two-kind runs pass listed by GROUP_HOLD (248.7) or by REST_HOLD, and `k01` / ISO are held to both `off` lines; C18 a wrong REST_HOLD line FAILs with the expected message (another sha; `REST_HOLD: off`; no line; HOLDHIGH printing one; listed by REST_HOLD with the GROUP_HOLD line wrong); C19 `cvt9` runs pass listed by BETA_HOLD (249.7), EARLY / LATE also by WINDOW_HOLD or COMP_HOLD, counted as 4 two-kind + 2 three-kind; C20 a wrong or missing WINDOW_HOLD line FAILs (LATE's window on EARLY; `WINDOW_HOLD: off`; no line; MIDDOSE printing one; listed by WINDOW_HOLD with COMP_HOLD wrong); C21 an unlisted ON corpus run of each new kind FAILs completeness (whole batch; one run; a run whose only ON line is the new kind); C22 `off` runs are not required, and an unlisted run of a listed `cvt8` / `cvt9` batch with no `REST_HOLD: off` / `WINDOW_HOLD: off` FAILs; C23 KINDS, the prefix proof, the patch line forms, `witness_lines` on 12 lines, MULTI_KIND's `cvt8` / `cvt9` entries == the scorers' tables and == the arms whose registered witnesses are ON in ≥ 2 kinds, 245's line unchanged.  **Against 245's module: 48 PASS / 36 FAIL, exit 1** (C1–C16 42 / 42; the 6 new passes are C17's GROUP_HOLD-listed pass — the gap itself — and five guards: two patch forms, 245's line, two fixture pins).  **After: 84 PASS / 0 FAIL, exit 0.**
+
+**Two edits to 245's tests, disclosed.** (i) C1–C9's synthetic batches were named `cvt9` / `cvt8` at 239; both are registered batches now, and a listed run of that name pulls in the new MULTI_KIND `off`-line rule, so the fixtures are renamed `syn9` / `syn8` with no assertion changed (renamed file on 245's module: 42 / 0).  (ii) C16's `len(KINDS) == 4` and `MULTI_KIND == cvt6's` became `KINDS[:4]` == 245's four in order and MULTI_KIND's `cvt6` entries == `cvt6`'s (C23 checks the rest).  245's unedited test file against the new module: 35 / 7, all seven from (i) and (ii).
+
+**Real-log control** (scratch, not committed): the 42 runs' real witness lines, the 33 planned rows and 42 key-only CSV rows in a temp copy of the layout, `--runs ../runs ../runs_alice2 <tmp>`.  New module: **PASS, 108 listed, completeness 108 / 108, 36 multi-kind runs verified (2 kinds 30, 3 kinds 6)**.  Each FAILs, named: a wrong replay sha on `cvt8-HIGHISOPATH-s102`; `REST_HOLD: off` on `cvt8-LOWISOPATH-s103`; LATE's window on `cvt9-EARLY-s106`; LATE's cut moved to 9450 on `cvt9-LATE-s107`; no WINDOW_HOLD line on `cvt9-EARLY-s105`; the `cvt8-LOWISOPATH-s104` or `cvt9-LATE-s107` row dropped (completeness names REST_HOLD / WINDOW_HOLD).  **245's module:** with the `cvt8` rows alone it exits **0** on both REST_HOLD corruptions; with the `cvt9` rows alone it FAILs 18× on COMP_HOLD, and its whole output is byte-identical with EARLY's window swapped or deleted.
+
+### 251.5 Invariance (Mac, `/opt/homebrew/bin/python3` 3.14.5, `../runs_alice2`, `PYTHONDONTWRITEBYTECODE=1`, as 245.5; recorded twice before the edit — identical — and once after)
+
+| output (sha256 of stdout; stderr empty throughout) | before | after |
+|---|---|---|
+| `load()` (75 rows) / `keys()` / `is_excluded` over 3,085 rows (75 true) / `filter_rows` (3,085 → 3,010), sha256 of `repr` | `dad2dcf2…` / `905e3b21…` / `b65d94e4…` / `6e0b169a…` | identical |
+| `inspect.getsource` of `load` / `keys` / `is_excluded` / `filter_rows` / `_pooled` | `3e71c514…` / `6ff4844d…` / `6f39c8a7…` / `d89c64d6…` / `99b52fe8…` (= 239.4's) | identical |
+| `cVT2` / `cVT3` / `cVT4` / `cVT5` `--selftest --runsdir ../runs_alice2` | `26b61497…` / `04854a75…` / `999bfd42…` / `5a7a3b81…`, each exit 1 | identical |
+| `cVT6` / `cVT7` `--selftest …` | `7b56ad90…` / `f95bcf43…`, each exit 1 | identical |
+| `cVT8` / `cVT9` `--selftest …` | `2af0bf37…` 229 / 0 / `2f7eaa5a…` 193 / 0, exit 0 | identical |
+| `cvt3` / `cvt4` / `cvt6` / `cvt7` / `cvt8` / `cvt9` `_registration_derivations.py ../runs_alice2` | `5a3a4b3c…` / `fd52c62e…` / `3ecef313…` / `e96a5f35…` / `47e164dc…` / `85e60992…`, each exit 0 | identical |
+| `corpus_exclusions.py --check` (no `--runs`) | `437e16dc…`, exit 0 | identical |
+| `corpus_exclusions.py --check --runs ../runs ../runs_alice2` | `bc5c2526…`, exit 0 | `080f66d2…`, exit 0: **two added lines** (251.2), `… also REST_HOLD / WINDOW_HOLD, 6 in all; …: True` and `multi-kind runs …: 2 kinds 9, 3 kinds 0`; with them removed the output is byte-identical |
+
+* **The importers are exactly `cVT2`–`cVT9`'s scorers and the `cvt3` / `cvt4` / `cvt6`–`cvt9` derivations** (grep; the `cvt5`–`cvt7` independent parsers do not import it).  `cvt8_registration_derivations.py` reads `KINDS` for its E4 eligibility test; its output is unchanged because no eligible run prints a REST_HOLD or WINDOW_HOLD line.  No launcher or scorer pins the module's sha (grep for `81c12d2a`).
+* **`cVT6` / `cVT7` selftests exit 1 before and after**: their RULE 21 premises ("no cvt6-*.out under ../runs_alice2", "no cvt6- row in the CSV") went stale at landing, as 245.5 disclosed for `cVT2`–`cVT5`.  Not caused here, not touched.  `cvt7`'s derivation exits 0 now (245.5 recorded 1).
+
+### 251.6 Two items from the `cvt8` / `cvt9` launch verifier
+
+* **(a) `cvt9`'s G-BITE locates the window boundary only to the probe grid.** Any cut in updates 9403–9501 passes (tested at 9450).  The exact 9429 rests on the `WINDOW_HOLD` witness line (RULE 20, and now `--check`, which FAILs a 9450 cut, 251.4) and on the CPU schedule test (249.4).  This entry records the verifier's finding and does not re-derive it.
+* **(b) `jobs/run_cifar_cvt9.sh` was committed with mode 100644**, while `cvt6`–`cvt8`'s runners are 100755.  Fixed with `git update-index --chmod=+x` (and `chmod +x` in the working copy).  The blob `de51d8a5…` and the sha256 `0fe45b1d…` (= 249.12's `RUNNER_SHA256`) are unchanged.  No scorer or launcher reads the mode (grep), and the `cVT9` selftest re-run after the change is byte-identical.
+
+### 251.7 Discipline
+
+`git add` names `analysis/corpus_exclusions.py`, `tests/test_corpus_exclusions_check.py`, `jobs/run_cifar_cvt9.sh` (mode only), `docs/OPERATIONS.md` (§36 gains one sentence) and `docs/CORRECTIONS.md` only.  No GPU, no Slurm, no job touched.  alice2, read only: one `ls` of `$WS/runs/cvt8*` / `cvt9*`; one `grep` of the six witness prefixes over the 42 `.out` files (the control's input); one pass of counts (prefix lines, and `RUN_DONE` lines in the `cvt8` logs: 8 of 21).  No accuracy line was read.  `alice` NOT contacted.  Cost: zero GPU-hours.
+
+Next free number: **252**.

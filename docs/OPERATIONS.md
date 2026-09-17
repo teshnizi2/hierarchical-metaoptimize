@@ -935,3 +935,5 @@ Mac. `load` / `is_excluded` / `filter_rows` are unchanged.
 **CORRECTIONS 245:** `GROUP_HOLD` and `COMP_HOLD` are kinds too, and a run printing ON lines of two kinds (`cvt6`'s
 forced arms) is listed ONCE, by either line, while `--check` holds both lines to the registered ones in `MULTI_KIND` —
 a future two-kind batch needs its entry there, and no KINDS prefix may be a prefix of another.
+**CORRECTIONS 251:** `REST_HOLD` (`cvt8`) and `WINDOW_HOLD` (`cvt9`) are kinds too, and a `MULTI_KIND` entry may register
+any number of kinds (`cvt9`'s EARLY / LATE register three), each held to its registered line.
