@@ -232,3 +232,85 @@ never ablates and never justifies. That is the gap our count-matched contrast fi
 | **Adafactor** | `min_dim_size_to_factor` is a threshold below which it does **not** factor, falling back to full per-coordinate second moments | memory, again the opposite direction |
 
 **No method in the survey imposes a minimum group size on step sizes.** Two impose a maximum.
+
+---
+
+# 2026-09-17 — The BatchNorm-carrier line (mechanism rows 212–227): prior-art sweep, verified
+
+*Added at CORRECTIONS 254; the sections above are unchanged. Two sweeps (normalisation / effective-LR angle, ~35
+screened; meta-learned step size / granularity angle, ~32 screened) plus a verification pass that checked every arXiv id
+against its abstract page (36/36 exist with the stated titles and authors) and every venue against arXiv
+Comments/Journal-ref, official proceedings, OpenReview or the ACM DL. No PDF was read. Items that could not be checked are
+marked UNVERIFIED or dropped. Discussion prep: `docs/LIMITS-PREP.md`.*
+
+## The finding being positioned
+
+A scalar (one shared) MetaOptimize step size collapses at the CIFAR-100 cells because the shared Lion meta-update's vote
+is dominated by a few last-block normalisation-scale tensors (`ctd1`); isolating them rescues (`ciso1`), a matched
+non-carrier BN set does not (`cdep1`); replicated on VGG11_bn, GroupNorm ResNet18 and residual-free PlainNet18; hold
+interventions (`cvt4`–`cvt9`) show a large held carrier trajectory is sufficient to stall, graded in dose.
+
+## Verified papers
+
+| paper | id / URL | venue | relation | establishes |
+|---|---|---|---|---|
+| Arora, Li, Lyu — Theoretical Analysis of Auto Rate-Tuning by Batch Normalization | arXiv:1812.03981; openreview.net/forum?id=rkxQ-nA9FX | ICLR 2019 (forum read; decision page not read) | EXPLAINS-PART | only scale-variant params (gamma/beta, last layer) need a tuned LR; scale-invariant weights converge at any LR (verified in ar5iv body) |
+| You, Gitman, Ginsburg — Large Batch Training of Convolutional Networks (LARS) | arXiv:1708.03888 | arXiv | EXPLAINS-PART / ADJACENT | ‖w‖/‖g‖ per layer 5.76 (conv1) vs 1345 (fc6) in AlexNet-BN (ar5iv Table 2); a global LR is limited by a few layers |
+| Davis, Frank — Revisiting Batch Norm Initialization | arXiv:2110.13989; github.com/osu-cvl/revisiting-bn-init | ECCV 2022 (official README) | ALREADY-SHOWN (partial) | gamma init ≈ 0.1 and gamma LR ÷ 100 help (LR detail in README, not abstract) |
+| Zhou, Wang, Luo, Feng, Li, Zhang — How Does BN Increase Collapsed Neural Network Filters? | arXiv:2001.11216 | UNVERIFIED | CANDIDATE MECHANISM (untested) | BN+ReLU filter collapse, probability ∝ lr², ∝ 1/gamma²; worse with large/adaptive LR |
+| Kosson, Messmer, Jaggi — Rotational Equilibrium | arXiv:2305.17212 | ICML 2024 | EXPLAINS-PART | with WD under AdamW/Lion/SGDm, per-layer angular updates equilibrate |
+| Lobacheva, Kodryan, Chirkova, Malinin, Vetrov — On the Periodic Behavior of NN Training with BN and WD | arXiv:2106.15739 | NeurIPS 2021 | ADJACENT; live alternative for the 250–430-epoch rescue decay | BN + WD periodic destabilisation |
+| Li, Arora — An Exponential Learning Rate Schedule for Deep Learning | arXiv:1910.07454 | ICLR 2020 (openreview.net/forum?id=rJg8TeSFDH) | ADJACENT | exp LR ≡ standard schedules under BN + WD + momentum |
+| van Laarhoven — L2 Regularization versus Batch and Weight Normalization | arXiv:1706.05350 | arXiv | ADJACENT | L2 on pre-norm weights only changes effective LR |
+| Hoffer, Banner, Golan, Soudry — Norm matters | arXiv:1803.01814 | NeurIPS 2018 (arXiv journal-ref) | ADJACENT | norm / WD / LR coupling |
+| Heo, Chun, Oh, Han, Yun, Kim, Uh, Ha — AdamP | arXiv:2006.08217 | ICLR 2021 | ADJACENT | momentum inflates scale-invariant norms, shrinking effective step |
+| Mehmeti-Göpel, Wand — On the Weight Dynamics of Deep Normalized Networks | arXiv:2306.00700 | UNVERIFIED | ADJACENT | ELR gaps between layers hurt trainability past a critical LR |
+| Kim, Choi, Jang, Lee, Jeong, Kim — Guidelines for the Regularization of Gammas in BN for Deep Residual Networks | arXiv:2205.07260; doi.org/10.1145/3643860 | ACM TIST 15(3), 2024 | ADJACENT (only lead for ResNet 3-vs-1) | gamma handling depends on position in the residual block (L2, not step size) |
+| Mueller, Vlaar, Rolnick, Hein — Normalization Layers Are All That SAM Needs | arXiv:2306.04226 | NeurIPS 2023 | ADJACENT (design precedent for ISO vs CTL) | perturbing only norm-affine params beats all; matched sparse sets do not |
+| Frankle, Schwab, Morcos — Training BatchNorm and Only BatchNorm | arXiv:2003.00152 | ICLR 2021 | ADJACENT | BN-affine-only training reaches 82% on CIFAR-10 |
+| Fei, Dai, Li, Zou, Xiong — MimicNorm | arXiv:2010.09278 | UNVERIFIED | ADJACENT | the last BN layer provides autotuned learning rates (dataset details UNVERIFIED) |
+| Jie, Gao, Vasnev, Tran — Adaptive Hierarchical Hyper-gradient Descent (CAM-HD) | arXiv:2008.07277 | journal not re-checked | ADJACENT | multi-level hypergradient LRs (FFN, LeNet-5, ResNet-18/34); no visible scalar collapse or dominance |
+| Shea, Schmidt — Why Line Search when you can Plane Search? | arXiv:2406.17954 | arXiv | ADJACENT | per-layer step sizes help on some datasets, hurt on others; one layer's rate runs away (§4.5, HTML) |
+| Cutkosky, Defazio, Mehta — Mechanic: A Learning Rate Tuner | arXiv:2306.00144 | NeurIPS 2023 | ADJACENT | scalar learned LR scale; per-layer named as open question; no layer/BN dominance reported |
+| Ivgi, Hinder, Carmon — DoG is SGD's Best Friend | arXiv:2302.12022 | ICML 2023 | ADJACENT | per-layer L-DoG beats global DoG |
+| Hägele, Hernández-Cano, Kosson, Jaggi — Improving NN Training by Decoupling the Magnitude and Direction of Weight Vectors | arXiv:2606.25971 | arXiv | ADJACENT | magnitude gains on their own LR, by design |
+| Amid, Anil, Fifty, Warmuth — Step-size Adaptation Using Exponentiated Gradient Updates | arXiv:2202.00145 | not checked | ADJACENT | global scale + per-coordinate gains, multiplicative updates |
+| Baydin, Cornish, Martinez Rubio, Schmidt, Wood — Online Learning Rate Adaptation with Hypergradient Descent | arXiv:1703.04782 | ICLR 2018 | ADJACENT | scalar hypergradient LR works on VGG/CIFAR-10 in its setting |
+| Chu, Gao, Ye, Udell — Provable and Practical Online LR Adaptation with Hypergradient Descent | arXiv:2502.11229 | not checked | ADJACENT | HDM instability analysis (convex) |
+| Chen, Wang, Ba — Differentiable Self-Adaptive Learning Rate | arXiv:2210.10290 | not checked | ADJACENT | hypergradient LR instability |
+| Metz, Maheswaranathan, Nixon, Freeman, Sohl-Dickstein — Understanding and correcting pathologies in the training of learned optimizers | arXiv:1810.10180 | ICML 2019 (PMLR 97) | ADJACENT | truncated meta-gradients biased / exploding |
+| Kovaleva, Kulshreshtha, Rogers, Rumshisky — BERT Busters | arXiv:2105.06990 | not checked | ADJACENT (structural) | outlier dimensions ARE LayerNorm scaling factors and biases; about pruning fragility, not step sizes |
+| Yu, Wang, Shan, Reed, Wan — The Super Weight in LLMs; Sun, Chen, Kolter, Liu — Massive Activations in LLMs | arXiv:2411.07191; arXiv:2402.17762 | not checked | ADJACENT | a handful of parameters/activations carry disproportionate control (inference) |
+
+Parent paper (arXiv:2402.02342), checked in the local text: no "batch norm" string anywhere; §7.3 ImageNet reports
+blockwise no better than scalar; Appendix Table 4 includes a scalar (SGDm, Lion) row (momentum parsed as 0.9, column
+alignment UNSURE).
+
+**Dropped as unverified:** Nado et al. (arXiv:2102.06356) "LAMB diverges on all params incl. BN"; "TF LARS excludes BN
+from layer adaptation by default" (both exclusion lists default to None; BN/bias is only an example — cite as commonly
+configured); Bjorck et al. (arXiv:1806.02375) last-layer-BN claim; Semantic Scholar's 6 MetaOptimize citers.
+
+## Novelty assessment
+
+**Already known — cite, do not claim.**
+1. BN gamma benefits from its own, smaller LR (Davis & Frank). "Separate group for gamma helps" is not new as a practice.
+2. Scale-variant tensors (gamma/beta, last layer) are where LR sensitivity lives in normalised nets (Arora–Li–Lyu); so it
+   is predictable that carriers are norm scales, not conv kernels.
+3. One global LR can be limited by a few layers with different scale (LARS); per-layer beats global in several step-size
+   methods (L-DoG, CAM-HD), and finer is not always better (Shea & Schmidt; parent §7.3).
+4. A tiny norm-affine subset can control an optimiser-level effect where a matched sparse set cannot (SAM-ON).
+5. A large LR on BN parameters can collapse filters (Zhou et al.) — candidate mechanism for the dose result, untested.
+6. BN + WD produces periodic destabilisations (Lobacheva et al.); WD is 0.1 on the base in every campaign run and is
+   applied to gamma (`patches/HF_patched.py` 592–598), so this is a live alternative, not background.
+
+**Looks new (nothing found pre-empts it).**
+(a) A meta-learned SHARED step size whose meta-update vote is shown, by per-tensor attribution, to be dominated by a few
+identified last-block normalisation-scale tensors. (b) Rescue by isolating only those tensors, with a matched non-carrier
+control that does not rescue, replicated across BN, GN and residual-free nets. (c) Hold interventions dissociating dose
+and route, with a graded dose effect. arXiv searches combining hypergradient / meta-learned LR with normalisation or
+per-layer dominance returned 0 hits; Mechanic names per-layer as future work; MetaOptimize never mentions BN.
+
+**Framing.** A referee will say "of course the gammas — the only scale-variant parameters". The answer is `cdep1` (other
+gammas do not rescue) and last-block specificity. If carrier gammas are shown to go to ~0 under the large held dose
+(Zhou et al.), novelty narrows to carrier selection and the vote. If S1/N4 (LIMITS-PREP §5.1) show the collapse needs
+momentum 0.99 or coupled WD on norm scales, the finding must be stated as a mechanism under that configuration.

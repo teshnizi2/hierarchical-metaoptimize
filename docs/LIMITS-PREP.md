@@ -1,0 +1,360 @@
+# LIMITS-PREP — scoping the BatchNorm-carrier finding for the discussion with Dr Salehkaleybar
+
+*Written 2026-09-17 (CORRECTIONS 254). Preparation notes, NOT paper text. Read-only work: nothing registered,
+submitted or launched, zero GPU, no dataset or PDF downloaded, no licence accepted, `alice` not contacted, `paper/`
+untouched. plateau5 is the only metric used. Cell means come from `results/all_runs.csv` after
+`analysis/corpus_exclusions.filter_rows` (the 108 intervention runs are never pooled). Every citation below was
+checked against an arXiv abstract page, ar5iv/arXiv HTML, an official proceedings page or the official repo; anything
+that could not be checked is marked UNVERIFIED or left out.*
+
+## 0. The finding being scoped (one paragraph)
+
+MetaOptimize with ONE shared step size (`k01`, scalar) collapses at the campaign's CIFAR-100 cells (ResNet18_c100
+22.96 vs layerwise 69.42; PlainNet18_c100 11.81 vs 68.96). The shared Lion meta-update's vote is dominated by a few
+last-block normalisation SCALE tensors (`ctd1`). Giving those carriers their own step-size group rescues the gap
+(`ciso1`, +46.9 pp); a matched non-carrier BN set does not (`cdep1`). The rescue replicates on VGG11_bn (bn8 alone),
+GroupNorm ResNet18 and residual-free PlainNet18, and lasts 250–430 epochs. The hold interventions (`cvt4`, `cvt6`–`cvt9`)
+show that a LARGE held step-size trajectory on the carriers is SUFFICIENT to stall to the scalar level (PlainNet: one
+tensor; ResNet: three tensors at PlainNet's dose), a small one keeps the rescue, the complement's early collapse adds a
+separate partial loss, and the damage is graded in dose and spread across the rise and fall of the trajectory.
+
+## 1. The three limits at a glance
+
+| | Limit, one sentence | Corpus says | Prior art says | Can a MUST-tier batch move it? |
+|---|---|---|---|---|
+| **L1** | One training setting per network, CIFAR only (ImageNet-1k impossible here, `docs/DATASETS.md`). | Collapse: 17/58 paired cells (R50). Mechanism evidence: 8/58 cells, ALL at one hyper-parameter point. CIFAR-10 at the same hyper-parameters does NOT collapse. | Small-scale scope is normal for this literature. The parent itself ran scalar (SGDm, Lion) successfully on ImageNet. | Partly: S1 (momentum 0.9, WD 0, norm-WD 0), S2 (meta step 3e-4), S3 (CIFAR-10 dominance). |
+| **L2** | The interventions show SUFFICIENCY at that setting, not NECESSITY and not other settings. | Every hold, ISO and CTL arm sits at meta step 1e-3, alpha0 1e-6, SGDm 0.99 / wd 0.1 + Lion, CIFAR-100. | No paper establishes necessity for any per-group LR either; the claim is not weaker than the field norm. | Yes, at one cell: N1 (shadow-vote necessity), N3 (merge inside layerwise), N4 (weight-decay route). |
+| **L3** | On ResNet, `cvt8` resolved the dose (`DOSE-FULL`) but the held set still differs (3 carriers vs PlainNet's 1 tensor); the route is partial at `k01`'s dose. | `cvt8`: HOLDBIG 19.38 and BIGISOPATH 19.42 (both below `k01` 23.06); HIGHISOPATH 58.19 (`ROUTE-PARTIAL`). | Only lead: Kim et al. (position-dependent gamma roles, under L2 not step size). | Yes: R1 (one tensor vs three at PlainNet's dose, 8 arms, no new code). |
+
+---
+
+## 2. L1 — narrow scope
+
+### 2.1 The limit
+
+The carrier account is supported at exactly one hyper-parameter point, on four networks from one trunk family, CIFAR-100
+only.
+
+### 2.2 What the corpus already shows (read-only census, re-derived independently; both derivations agree exactly)
+
+Gates: 3,127 rows → 3,019 after `filter_rows` → 2,577 admissible (window_ok, complete, plateau5) → 2,363 MetaOptimize
+rows (214 fixed-step baselines set aside). Rows sharing a `dup_group` are averaged before n is counted. A cell is every
+config field except granularity and seed (CSV columns plus momentum / WD / Lion beta2 / schedule read from `.out`
+ARGS/ENV). MERGED view (441 rows without a local `.out` filled from launchers) = 58 paired cells; STRICT = 71. Same
+qualitative picture in both.
+
+**Collapse definition (primary): R50** = scalar plateau5 ≤ 0.50 × the reference arm (layerwise if present, else the
+best finer arm). Near-chance is not usable (ResNet18_c100 scalar ≈ 23% ≫ 1%).
+
+| definition | MERGED (of 58) | STRICT (of 71) |
+|---|---|---|
+| R50 vs ref | **17** | 21 |
+| R75 vs ref | 21 | 25 |
+| R90 vs ref | 25 | 29 |
+| R50 vs best finer | 18 | 22 |
+| D ≥ 10 pp | 24 | 28 |
+
+**Collapse cells (CIFAR-100 and harder; SGDm(0.99, wd 0.1) + Lion, gamma 1, clip −15:−2.3026, aug 1, bs 100)**
+
+| cell | meta step | alpha0 | ep | scalar (n) | ref (n) | ratio | R50 | carrier/ISO evidence |
+|---|---|---|---|---|---|---|---|---|
+| PlainNet18_c100 | 1e-3 | 1e-6 | 100 | 11.81 (24) | 68.96 (6) | 0.171 | Y | yes |
+| PlainNet18_c100 | 1e-3 | 1e-6 | 300 | 11.67 (3) | ISO 64.31 (3) | 0.181 | Y | yes |
+| ResNet10_c100 | 1e-3 | 1e-3 | 100 | 12.97 (3) | 68.52 (3) | 0.189 | Y | none |
+| ResNet18_c100 | 3e-3 | 1e-3 / 1e-6 | 100 | 16.35 / 16.81 | 69.86 / 69.61 | 0.234 / 0.241 | Y | none |
+| **ResNet18_c100 (mechanism cell)** | 1e-3 | 1e-6 | 100 | 22.96 (44) | 69.42 (32) | 0.331 | Y | **yes** |
+| ResNet18_c100 | 1e-3 | 1e-3 | 100 | 22.49 (8) | 69.66 (11) | 0.323 | Y | none |
+| ResNet18_c100 | 1e-3 | 1e-6 | 250 | 23.16 (3) | 70.37 (3) | 0.329 | Y | yes |
+| ResNet18_c100 | 1e-3 | 1e-6 | 772 | 23.27 (6) | 56.24 (9, no layerwise) | 0.414 | Y | none |
+| ResNet18_c100 | 3e-4 | 1e-3 / 1e-6 | 100 | 29.78 / 28.63 | 70.19 / 68.29 | 0.424 / 0.419 | Y | none |
+| ResNet18_c100 | 1e-4 | 1e-3 | 100 | 35.79 | 71.08 | 0.504 | N (D +35.3) | none |
+| ResNet18_gn_c100 | 1e-3 | 1e-6 | 100 / 430 | 14.26 / 14.84 | 52.86 / 66.39 | 0.270 / 0.224 | Y | yes |
+| ResNet34_c100 | 1e-3 | 1e-3 | 100 | 30.86 (3) | 68.12 (3) | 0.453 | Y | none |
+| VGG11_bn_c100 | 1e-3 | 1e-6 | 100 / 328 | 35.34 / 35.40 | 66.29 / 66.91 | 0.533 / 0.529 | N (R75 Y) | yes |
+| ResNet18_tin (Tiny-ImageNet) | 1e-3 | 1e-6 | 100 | 9.86 (3) | 50.83 (3) | 0.194 | Y | none |
+| resnet18, ImageNet-489 subset (NOT ImageNet) | 1e-3 | 1e-6 | 84, bs 256 | 1.00 (5) | 49.21 (5) | 0.020 | Y | none |
+
+Not interpretable (both arms stuck / ref unhealthy): ResNet18_c100 meta 1e-4 alpha0 1e-6 (10.55 vs 10.96); meta 3e-5
+and 1e-5 at alpha0 1e-3 (ratio 0.54, 0.77 with an unhealthy layerwise arm).
+
+**Non-collapse cells (the core L1 evidence)**
+
+| cell | pairing | ratio | note |
+|---|---|---|---|
+| ResNet18 / CIFAR-10, 13 cells incl. the exact mechanism hyper-parameters (C13: 87.91 n15 vs 90.92 n26) | SGDm(0.99) + Lion | 0.962–1.001 | changing CIFAR-100 → CIFAR-10 (and the head 100 → 10) removes the collapse |
+| ResNet34, ResNet50 / CIFAR-10 | SGDm + Lion | 0.987–1.015 | |
+| ResNet18 / CIFAR-10 | AdamW + Adam (6 cells), AdamW + Lion, Lion + Lion | 0.979–1.017 | |
+| ResNet10 / CIFAR-10 | SGDm + Lion | 0.77–0.78 | partial (D ≈ +20 pp) |
+| ResNet18 / CIFAR-10, alpha0 1e-6 | SGDm + Adam | 0.468 (clip none), 0.783 (clip on) | **seed-bimodal**: 3 of 7 scalar seeds at 18–21%, the rest 87–88%; no carrier evidence |
+
+**Coverage (58 MERGED cells)**
+
+| axis | values seen | varied at the collapse setting? |
+|---|---|---|
+| dataset | CIFAR-10 36 (1 R50), CIFAR-100 20 (14), Tiny-ImageNet 1 (1), IN-489 1 (1) | — |
+| base optimiser | SGDm 48, AdamW 9 (all CIFAR-10), Lion 1 (CIFAR-10) | **no** (SGDm only) |
+| meta optimiser | Lion 46, Adam 12 (all CIFAR-10) | **no** (Lion only) |
+| SGDm momentum | 0.99 everywhere; the parent's 0.9 never used | **never varied anywhere** |
+| base weight decay | 0.1 in every one of 2,973 ARGS lines carrying the flag | **never varied anywhere** |
+| meta weight decay, gamma, hier, schedule | 0, 1, none, default | never varied |
+| augmentation, beta clip, batch size | varied only on CIFAR-10 | **no** |
+| meta step size | 1e-5 … 3e-3 (cru1) | yes, no carrier runs there |
+| alpha0 | 1e-6, 1e-3 (C43 ratio 0.323) | yes, no carrier runs there |
+| epochs | 100 plus 250/300/328/430/772 | yes (collapse persists) |
+
+**How narrow, plainly.** The collapse is a CIFAR-100(-and-harder) × SGDm(0.99, wd 0.1) + Lion phenomenon (plus one
+bimodal CIFAR-10 SGDm+Adam cell). It is graded in depth (ResNet10_c100 0.19, 18 0.33, 34 0.45) and in meta step size
+(0.24 at 3e-3 → 0.50 at 1e-4), each from single batches of n = 3. The carrier account rests on 8/58 cells at one point:
+CIFAR-100, SGDm(0.99, wd 0.1) + Lion(0.99, 0.9, wd 0), meta step 1e-3, alpha0 1e-6, gamma 1, clip −15:−2.3026, aug 1,
+bs 100. Dataset is confounded with collapse (CIFAR-10 at identical hyper-parameters: no collapse; head width changes too).
+
+### 2.3 Relation to the parent paper's configuration (`docs/PAPER-CONFIG.md`; local text of arXiv 2402.02342)
+
+* CIFAR-10 Table 2: ResNet-18, bs 100, pairings (AdamW, Adam), (Lion, Lion), (RMSprop, Adam), (SGDm, Adam); SGDm row
+  rho 0.9, kappa 0.1, alpha0 1e-6, eta 1e-3, gamma 1. No augmentation or beta clip stated; epochs UNSURE.
+* **Correction to the census draft:** SGDm + Lion IS a parent pairing. Appendix Table 4 (ImageNet) has an (SGDm, Lion)
+  scalar row, parsed as rho 0.9, kappa 0.1, alpha0 1e-5, eta 1e-3, gamma 1 (column alignment UNSURE), and §7.3 /
+  Appendix D name MetaOptimize (SGDm, Lion) among the best on ImageNet.
+* The mechanism cell therefore differs from the parent's use of this pairing in **SGDm momentum (0.99 vs 0.9)**, alpha0
+  (1e-6 vs 1e-5), dataset (CIFAR-100 vs ImageNet), augmentation and the beta clip. It matches on WD 0.1, meta step 1e-3,
+  gamma 1, bs 100.
+* Consequence: our IN-489 scalar sits at 1.00 while the parent reports scalar (SGDm 0.9, Lion) working on full
+  ImageNet. The obvious untested confounder is momentum 0.99. "Collapse needs momentum 0.99" is untested, not refuted.
+* Parent §7.3 (quoted from local text): blockwise showed no improvement over scalar on ImageNet. That is the one scope
+  counterweight a professor may raise.
+
+### 2.4 What else is feasible without new data or licences (read-only feasibility check on alice2)
+
+| option | status | new code | GPU-h / 100-ep run |
+|---|---|---|---|
+| CIFAR-100 at other settings (momentum 0.9, WD 0, base/meta optimiser, meta step, alpha0, bs) | available now | none (CLI flags) | 0.66–0.82 |
+| carrier contrast at ResNet10_c100 / ResNet34_c100 / ResNet18_gn_c100 | available now | small; probe hard-codes 62 tensors (needs generalising for ResNet10/34) | 0.35–1.1 |
+| Tiny-ImageNet-200, ResNet18_tin | on disk, verified, no terms page | none for ResNet18_tin | 1.2–1.6 (>4 h at 300 ep: 7-day partitions) |
+| CIFAR-100 upsampled to 64 px | available | small | ≈1.2–1.6 (UNSURE) |
+| MNIST M1/M2 (no-norm control) | needs staging; licence not checked | none after staging | <0.3 (UNSURE) |
+| SVHN / STL-10 / CINIC-10 | usage terms or licence → **Reza decides** | moderate | — |
+| ImageNet32/64 | image-net.org terms → **Reza's own login only** | moderate | ≈25× CIFAR (UNSURE) |
+| TinyStories (llama2.c) | CDLA-Sharing-1.0, ~7.6 GB, tokenizer licence UNSURE | large | unmeasured |
+| ImageNet-1k | **impossible on this cluster** (not re-litigated) | — | — |
+
+Compute on alice2 alone: L4/MIG/A100 ≈ 0.66–0.77 GPU-h per ResNet18_c100 100-epoch run, 2080 Ti ≈ 2×; `cvt8`/`cvt9`
+batch means 0.79–0.82. Peak running concurrency 20–26 (14–17 Sep); good day ≈ 150–190 GPU-h. QOS caps
+(≈42 GPUs theoretical) were read once and not re-checked.
+
+---
+
+## 3. L2 — sufficiency, not necessity
+
+### 3.1 The limit
+
+Holding the carriers' step size shows what is SUFFICIENT to stall or rescue at one cell; nothing shows the large carrier
+step is NECESSARY, and nothing speaks to other settings.
+
+### 3.2 What the corpus shows
+
+| batch | network | reading (registered, as sufficiency at this cell) |
+|---|---|---|
+| `ciso1` / `cdep1` | ResNet18_c100 | ISO rescues (+46.9 pp); matched CTL {47, 48, 56} does not |
+| `cvt4` (240) | PlainNet18_c100 | large held step on idx 50 stalls; small keeps rescue |
+| `cvt6` (246) | PlainNet18_c100 | large step stalls with complement forced onto a recorded path; early complement collapse adds a partial loss |
+| `cvt7` (247) | ResNet18_c100 | `k01`'s own trajectory replayed on the three carriers: partial loss (HOLDHIGH ≈ 50) |
+| `cvt8` (252) | ResNet18_c100 | `DOSE-FULL+ROUTE-PARTIAL+BIGROUTE-DIRECT` (HOLDBIG 19.38, HIGHISOPATH 58.19, ISO 70.26, `k01` 23.06) |
+| `cvt9` (253) | PlainNet18_c100 | `DOSE-GRADED \| WINDOW-GRADED` (HIGHHEADPATH 11.21, MIDDOSE 55.86, RESDOSE 21.84, EARLY 18.37, LATE 27.71) |
+
+Two facts that change how L2 is argued (both read in the repo, not assumptions):
+
+* **Weight decay is 0.1 on the base in every run, and it acts on BN gamma.** `patches/HF_patched.py` lines 592–598:
+  `delta = a*(m + wd*w)` and `h = gamma*(1-wd*a)*h - delta`, applied to every tensor, no normalisation exclusion. A large
+  carrier step is therefore also strong shrinkage of that gamma (1% per step at the α = 0.1 ceiling), and WD enters the
+  meta trace `h`. An earlier prior-art draft assumed WD 0; that was wrong.
+* `PROBE_TENSOR` does not log weight norms (`z_tensor`, `m_tensor`, `z_agg`, `mom_pre`, `beta_pre`, `pt_mp`, `pt_b2`),
+  so "do the carrier gammas go to zero?" cannot be read from existing probe records.
+
+### 3.3 Prior art (verified only) — what is known, what looks new
+
+| paper | id / URL | venue (verified) | relation | what it establishes |
+|---|---|---|---|---|
+| Arora, Li, Lyu, *Theoretical Analysis of Auto Rate-Tuning by Batch Normalization* | arXiv:1812.03981; openreview.net/forum?id=rkxQ-nA9FX | ICLR 2019 (forum read; decision page not read) | EXPLAINS-PART | scale-invariant weights converge at any LR; only scale-variant params (gamma/beta, last layer) need a tuned LR (ar5iv body) — predicts WHICH class of tensor carries |
+| You, Gitman, Ginsburg, *Large Batch Training of Convolutional Networks* (LARS) | arXiv:1708.03888 | arXiv | EXPLAINS-PART / ADJACENT | per-layer ‖w‖/‖g‖ spans 5.76 → 1345 in AlexNet-BN; one global LR limited by a few layers |
+| Zhou, Wang, Luo, Feng, Li, Zhang, *How Does BN Increase Collapsed Neural Network Filters?* | arXiv:2001.11216 | UNVERIFIED | **CANDIDATE MECHANISM (untested here)** | BN+ReLU filter collapse, probability ∝ lr² and ∝ 1/gamma², worse with large/adaptive LR |
+| Davis, Frank, *Revisiting Batch Norm Initialization* | arXiv:2110.13989; github.com/osu-cvl/revisiting-bn-init | ECCV 2022 (repo README) | ALREADY-SHOWN (partial) | gamma init ≈ 0.1 and gamma LR ÷ 100 give significant gains (LR detail in README only) |
+| Kosson, Messmer, Jaggi, *Rotational Equilibrium* | arXiv:2305.17212 | ICML 2024 | EXPLAINS-PART | under AdamW/Lion/SGDm **with WD**, per-layer angular updates equilibrate; shared LR gives unequal effective rates until then |
+| Lobacheva, Kodryan, Chirkova, Malinin, Vetrov, *Periodic Behavior … BN and WD* | arXiv:2106.15739 | NeurIPS 2021 | ADJACENT, **live alternative** | BN + WD periodic destabilisation — a candidate for the rescue lasting only 250–430 epochs (WD is 0.1 here) |
+| Li, Arora, *An Exponential Learning Rate Schedule for Deep Learning* | arXiv:1910.07454 | ICLR 2020 | ADJACENT | exp LR ≡ standard schedules under BN + WD + momentum (preconditions hold here) |
+| Mehmeti-Göpel, Wand, *On the Weight Dynamics of Deep Normalized Networks* | arXiv:2306.00700 | UNVERIFIED | ADJACENT | effective-LR gaps between layers hurt trainability beyond a critical LR (scale-invariant weights) |
+| Mueller, Vlaar, Rolnick, Hein, *Normalization Layers Are All That SAM Needs* | arXiv:2306.04226 | NeurIPS 2023 | ADJACENT (design precedent) | perturbing only norm-affine params (~0.1%) beats all; matched sparse sets do not — same shape as ISO vs CTL |
+| Frankle, Schwab, Morcos, *Training BatchNorm and Only BatchNorm* | arXiv:2003.00152 | ICLR 2021 | ADJACENT | BN-affine-only training reaches 82% on CIFAR-10; BN gates features off |
+| van Laarhoven, *L2 Regularization versus Batch and Weight Normalization* | arXiv:1706.05350 | arXiv | ADJACENT | L2 on pre-norm weights only changes the effective LR |
+| Hoffer, Banner, Golan, Soudry, *Norm matters* | arXiv:1803.01814 | NeurIPS 2018 (arXiv journal-ref) | ADJACENT | norm / WD / LR coupling in normalised nets |
+| Heo et al., *AdamP* | arXiv:2006.08217 | ICLR 2021 | ADJACENT | momentum inflates scale-invariant weight norms, shrinking their effective step |
+
+**Known — cite, do not claim:** gamma benefits from its own smaller LR (Davis & Frank); scale-variant tensors are where
+LR sensitivity lives (Arora–Li–Lyu); one global LR can be held back by a few layers (LARS); a tiny norm-affine subset can
+control an optimiser-level effect where a matched subset cannot (SAM-ON); large LR on BN params can collapse filters
+(Zhou et al., candidate); BN + WD produces periodic instabilities (Lobacheva et al.).
+
+**Looks new (nothing found pre-empts it; ~70 papers screened across two sweeps):** (a) a meta-learned SHARED step size
+whose meta-update vote is shown, by per-tensor attribution, to be dominated by a few identified last-block
+normalisation-scale tensors; (b) the carrier-specific rescue beaten by a matched non-carrier control, replicated across
+BN, GN and residual-free nets; (c) hold interventions dissociating dose and route, with a graded dose effect. Searches
+combining hypergradient / meta-learned LR with normalisation returned 0 arXiv hits.
+
+**Expected referee line:** "of course BN gammas — they are the only scale-variant parameters" (Arora–Li–Lyu). Answer:
+`cdep1` (other gammas do not rescue) and last-block specificity. Note the GN replication is also scale-invariant, so it
+supports rather than weakens that argument.
+
+**Necessity:** none of these papers establishes necessity for any per-group LR, so L2 is not weaker than the field norm.
+
+---
+
+## 4. L3 — the ResNet open part
+
+### 4.1 The limit
+
+At PlainNet's dose ResNet stalls (`DOSE-FULL`), but the held set is three carriers together (`layer4.0.bn2.weight`,
+`layer4.0.shortcut.1.weight`, `layer4.1.bn2.weight`), not one tensor as on PlainNet; at `k01`'s own dose the route is
+partial (HIGHISOPATH 58.19, 3.56 pp above the `ROUTE-DIRECT` bar).
+
+### 4.2 What the corpus shows
+
+`cdep1`'s ONE arm ({`layer4.0.bn2.weight`} alone, free) 64.83 — one tensor largely rescues on ResNet. `cgn2`/`cgn3`: ONE
+partial on GN. No ResNet arm has held ONE tensor at PlainNet's dose. `GROUP_HOLD` accepts a one-member group (patch
+validation read locally), so this needs no new code.
+
+### 4.3 Prior art
+
+Only lead: Kim, Choi, Jang, Lee, Jeong, Kim, *Guidelines for the Regularization of Gammas in Batch Normalization for Deep
+Residual Networks*, arXiv:2205.07260, ACM TIST 15(3) 2024, DOI 10.1145/3643860 — ADJACENT: gamma's role depends on its
+position in the residual block (for L2, not step size). No paper explains 3-vs-1.
+
+---
+
+## 5. Ranked experiment program (NOT registered, NOTHING launched; each batch needs its own registration and Reza's go-ahead)
+
+Conventions: 3 seeds/arm (SE ≈ 0.6 pp; effects of interest ≥ 9 pp); 0.82 GPU-h per ResNet18_c100 / PlainNet18_c100 /
+CIFAR-10 run, 1.5 for ResNet18_tin; 100 epochs; every batch carries its own `k01` and reference; within-batch contrasts
+only; "≈" judged against a pre-registered ±5 pp margin; `PROBE_TENSOR=1` on every `k01` arm.
+
+### 5.0 Zero-GPU checks first (day 0)
+
+| id | check | effect |
+|---|---|---|
+| Z1 | `ls` alice2 for cvt4/6/8/9 and ctd1 checkpoints; if present read carrier gamma norms and fraction \|gamma\| < 1e-3 (touches run artefacts — needs Reza's OK) | answers Zhou et al. with no runs; else add read-only `PATCH_WNORM` |
+| Z2 | grep cru1/cvh1/cgn*/CIFAR-10 `k01` `.out` for `PROBE_TENSOR: on`; run `analysis/cTD1_tensor_dominate_score.py` unedited | free dominance readings; cancels S3 if CIFAR-10 records exist |
+| Z3 | put WD-on-gamma and the Σα / WD-shrink table into discussion notes | pre-empts "any BN scale on that much step stalls" |
+| Z4 | settle parent Table 4 (SGDm, Lion) column alignment | fixes the "parent config" S1 cites |
+| Z5 | dry-parse every `sets:` / `GROUP_HOLD` string in the target trees | avoids a lost night |
+
+### 5.1 MUST-HAVE before the discussion — 106 runs, ≈87 GPU-h raw (≈109 with 25% overhead, +≈2 registration)
+
+| id | limit | question | arms × seeds | runs | GPU-h | new code | licensed sentence (if …) | not licensed |
+|---|---|---|---|---|---|---|---|---|
+| **S1a** | L1 | Does the collapse, and the ISO rescue, need SGDm momentum 0.99 or base WD? ResNet18_c100 mechanism cell | base {k01, kL}; `--momentum-param-base 0.9` {k01, kL, ISO}; `--weight-decay-base 0` {k01, kL, ISO} | 24 | 19.7 | none | persists: "the collapse does not require momentum 0.99 / base WD" (+ISO: "and isolating the carriers still rescues"); vanishes: "the collapse requires X" (momentum 0.9 would also explain the parent's ImageNet result) | specificity without CTL; other nets/datasets; interactions; WD0 cannot separate weight vs meta-trace route |
+| **S1b** | L1 | Does it need WD on normalisation scales only? | k01, kL with `WD_SCALE=normscale:0` | 6 | 4.9 | PATCH_WDMASK (40–80 lines, bitwise inert at s=1) | vanishes: "needs coupled WD on norm scales", which common practice avoids — narrows novelty | decoupled WD |
+| **S2** | L1 | Same carriers nominated, ISO rescues, CTL not, at meta step 3e-4 (ratio 0.42)? | k01+probe, ISO, CTL | 9 | 7.4 | none | nominated {50,53,59} and ISO≫CTL: "the carrier rescue holds at a second meta step size" | other datasets; necessity |
+| **S3** | L1/L2 | Do carriers dominate the vote on CIFAR-10, where nothing collapses? | k01+probe | 3 | 2.5 | none | dominate: "dominance is not sufficient for collapse"; not: "dominance co-occurs with collapse" | causation (dataset and head co-vary) |
+| **N3** | L2 | Inside healthy layerwise, does merging the 3 carriers into one group with a fixed neighbour set collapse, while merging `cdep1`'s {47,48,56} does not? | kL, kL-MERGE-CARRIERS, kL-MERGE-CDEP1 | 9 | 7.4 | none (`sets:`) | "keeping the carriers off a shared vote is necessary for healthy layerwise at this cell" (or not) | all groupings / cells |
+| **R1** | L3 | One tensor vs three at PlainNet's dose on ResNet | k01; ISO; HOLDBIG3 `tri:9428`; ONE50 {layer4.0.bn2} free / BIG; ONE59 {layer4.1.bn2} free / BIG; ISO-SPLIT ({53,59} free, {50} BIG) | 24 | 19.7 | none | ONE-BIG ≈ k01: "one isolated carrier on the large dose suffices on ResNet too"; both BETWEEN: "held set differs by network" | why nets differ; dose functional form; closed-loop route |
+| **N1** | L2 | Is a large carrier step NECESSARY for the stall, with its shared-step vote intact? PlainNet, cvt1 cell | k01; SHADOW-INERT (1 seed, must equal k01 bitwise); SHADOW-LOW; NAIVE-LOW; MUTE (`VOTE_W=50:0`); HEAD | 16 | 13.1 | PATCH_SHADOWVOTE (60–100 lines, list-capable) | SHADOW-LOW ≈ HEAD: "large applied step necessary, vote dominance alone not sufficient" (token e.g. `APPLIED-STEP-NECESSARY`); ≈ k01: "vote route sufficient"; BETWEEN: "both routes" | ResNet; other doses/horizons; unmodified MetaOptimize (shadow is counterfactual) |
+| **N4** | L2 | Is the held step's damage a coupled-WD effect? PlainNet, cvt9 tree | k01, k01-carrierWD0, HIGHHEADPATH, HIGHHEADPATH-carrierWD0, LOWHEADPATH-carrierWD0 | 15 | 12.3 | PATCH_WDMASK (compatible with BETA_HOLD) | HIGH-WD0 ≈ LOW: "damage goes through WD on the carrier scale" (novelty narrows); ≈ HIGH: "gradient-step route" | ResNet; filter-collapse path (needs Z1/WNORM) |
+| | | | **total** | **106** | **87.0** | | | |
+
+### 5.2 SHOULD-HAVE — 72 runs, ≈65 GPU-h (gated on S1 / N1)
+
+| id | limit | question | runs | GPU-h | code | gate |
+|---|---|---|---|---|---|---|
+| T1 | L1 | Tiny-ImageNet ResNet18_tin k01+probe / ISO / CTL (nomination check) | 9 | 13.5 | merge tin patch into probe tree | S1a keeps collapse; 7-day partitions beyond 100 ep |
+| S4 | L1 | CTL where ISO rescued at momentum 0.9 / WD0 | 6 | 4.9 | none | after S1a |
+| S5 | L1 | alpha0 1e-3 carrier contrast (C43, 0.323) | 9 | 7.4 | none | after S2 |
+| S6 | L1/L2 | SGDm + Adam meta on CIFAR-100 (does it need the Lion sign vote?) k01×5, kL, ISO | 11 | 9.0 | none | independent |
+| N2 | L2/L3 | N1 on the three ResNet carriers | 13 | 10.7 | SHADOWVOTE lists | N1 clean |
+| G1 | L2 | large carrier trajectory inside healthy layerwise, PlainNet | 9 | 7.4 | none | independent |
+| R3 | L2/L3 | hold transfer to GN (BN-only Zhou alternative) | 9 | 7.4 | merge GROUPHOLD into cgn1 tree | after Z1/WNORM |
+| S1c | L1 | beta clip removed, k01 / kL | 6 | 4.9 | none (ENV) | independent |
+
+### 5.3 NICE-TO-HAVE — 83 runs, ≈69 GPU-h
+
+ResNet dose ladder + window on ISO group (21 runs, 17.3); necessity at a second setting (6–9, ≈7); ResNet10_c100 and
+ResNet34_c100 two-stage carrier tests (9 + 12 runs, 4.5 + 13.2; probe generalisation); AdamW pairings on CIFAR-100 (18,
+14.8); meta 3e-3 ISO (6, 4.9); CIFAR-10 ISO beside S3 (3, 2.5); ResNet shortcut singleton ONE53 (6, 4.9).
+
+### 5.4 NOT recommended
+
+| item | reason |
+|---|---|
+| augmentation off | overfit-dominated plateau5; parent does not state augmentation |
+| TWINBIG | Σα / WD-shrink table already answers the generic version |
+| ResNet50_c100 | ≈22.5 GPU-h, new name + probe generalisation; weakest value per GPU-h |
+| longer horizons before S1/N4 | Lobacheva's BN+WD alternative must be read first |
+| "finer beats scalar" at new cells as a claim | not new (parent §7; Shea & Schmidt arXiv:2406.17954; Ivgi et al. arXiv:2302.12022) |
+| another "gamma wants a smaller LR" test | Davis & Frank already show it |
+| MNIST MLP | no norm tensors; needs staging |
+| SVHN / STL-10 / CINIC-10 / ImageNet32/64 | licence/terms decisions are Reza's |
+| ImageNet-1k | impossible on this cluster |
+| TinyStories | large new code, cost unmeasured |
+
+### 5.5 Calendar (alice2, ≈40 jobs/night, each night separately registered)
+
+| day | daytime | night |
+|---|---|---|
+| 0 | Z1–Z5; register night 1; start SHADOWVOTE, WDMASK, WNORM | S1a + S2 + S3 = 36 |
+| 1 | patch inertness tests (each needs a go-ahead); read night 1 | R1 + N3 = 33 (+S1b if WDMASK passes) |
+| 2 | review SHADOWVOTE; read night 2; decide S1-gated SHOULD items | N1 + N4 (+S1b) = 31–37 |
+| 3 | analysis, discussion notes | spare / reruns |
+| **4–5** | **discussion possible** | SHOULD: T1 + S4 + S5 + S6 = 35 |
+| 6–7 | | N2 + G1 + R3 + S1c = 37 |
+| 8–10 | | NICE, 2–3 nights |
+
+MUST alone ≈ 1 week to discussion-ready. Full program 261 jobs, ≈221 GPU-h raw (≈276 with overhead), 7–8 compute
+nights, 2.5–3 weeks wall clock. Pacing is patches, their proofs and registrations, not GPU-h.
+
+---
+
+## 6. Reviewer critique after the MUST tier
+
+* **L1.** Still CIFAR-100 only; every scope axis on ResNet18 only; axes one at a time; the momentum-0.9 arm keeps alpha0
+  1e-6 (not the parent's exact Table 4 row); CIFAR-10 contrast co-varies dataset and head; all runs 100 epochs while the
+  rescue decays by 250–430. Expected line: "one dataset family, one network per axis, one horizon."
+* **L2.** N1's necessity is one PlainNet cell, one floor dose, with a counterfactual shadow vote a reviewer will call an
+  algorithm intervention. N3 covers one merge. No ResNet necessity until N2. 3 seeds with ±5 pp margins do not support
+  BETWEEN readings well.
+* **L3.** R1 settles how many tensors are held, not why ResNet and PlainNet differ, nor the closed-loop route at `k01`'s
+  dose.
+* **Single biggest remaining weakness.** Every carrier claim sits at one configuration that departs from both the parent
+  and common practice — SGDm momentum 0.99 (parent 0.9), coupled L2 weight decay 0.1 applied to normalisation scales,
+  and a hard beta clip — while the parent reports scalar (SGDm, Lion) working on ImageNet. A reviewer can call the
+  collapse a configuration pathology. S1 and N4 aim directly at this; if momentum 0.9 or norm-WD 0 removes the collapse,
+  the finding narrows to a mechanism under that configuration and must be stated so.
+* **Wasted by prior art?** Nothing in MUST, provided ISO is framed as mechanism evidence (vote dominance, CTL
+  specificity, step/vote dissociation), not as "gamma needs its own LR".
+
+## 7. Questions for the professor
+
+1. Is a finding stated as "at this configuration (SGDm 0.99, coupled WD 0.1 on norm scales, beta clip, CIFAR-100)"
+   acceptable, or must S1 (momentum 0.9, WD 0, norm-WD 0) come back before the carrier account is discussed further?
+2. If momentum 0.9 removes the collapse, is the paper still the mechanism, or does it become a note on a configuration
+   pitfall?
+3. Is necessity (N1's shadow-vote design, a modified algorithm) worth the patch, or is sufficiency plus the matched
+   control (`cdep1`, N3) enough for the claim he wants?
+4. Which widening of L1 does he value most: a second hyper-parameter axis (S2/S5), a second dataset that needs no
+   licence (Tiny-ImageNet, T1), or a second pairing (S6 Adam meta)?
+5. Any datasets with terms (SVHN non-commercial, CINIC-10 licence, ImageNet32/64 via image-net.org) he wants accepted —
+   by Reza, never by an agent?
+6. How should the parent's §7.3 ImageNet result (blockwise no better than scalar; scalar SGDm+Lion works) be positioned
+   against our IN-489 scalar at 1.00?
+7. Does the Zhou et al. filter-collapse candidate (lr²/gamma²) need to be ruled in or out (Z1 checkpoints) before the
+   discussion?
+
+## 8. Housekeeping and provenance
+
+* Census scripts and outputs (scratch, not committed): `…/scratchpad/limits_prep/census/scalar_collapse_census.py`,
+  `census_merged.txt`, `census_strict.txt`, `cells_*.tsv/json`; independent re-derivation `…/scratchpad/verify/census4.py`,
+  `merged4.txt`, `strict4.txt`. Re-derivation trap: `ml2` ARGS lines carry duplicate `--alg-meta` flags (CORRECTIONS
+  125.2); argparse last-wins gives 58 cells.
+* WebFetch auto-saved three unreadable PDFs (arXiv 2102.06356, 2008.07277, 1708.03888) under
+  `~/.claude/projects/-Users-teshnizi-Saber-Optimization/7abb0c79-bcc7-424b-856d-f4a9fed472c1/tool-results/`. Not
+  requested; nothing was read from them. Reza decides whether to delete.
+* Claims deliberately NOT carried forward (unverified): Nado et al. (arXiv:2102.06356) "LAMB diverges when applied to all
+  params"; "TF LARS excludes BN by default" (defaults are None; BN/bias given only as an example); Bjorck et al.
+  (arXiv:1806.02375) last-layer-BN claim; MimicNorm's (arXiv:2010.09278) dataset list; Semantic Scholar's list of 6
+  MetaOptimize citers.
