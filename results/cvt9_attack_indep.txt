@@ -1,0 +1,301 @@
+[0] manifest: 53 tensors, 11046308 params; idx50 layer4.1.bn2.weight (512); 7720 bytes, sha256 995e4b937ae36ba5...; == the manifest rebuilt here from the architecture, the registration tables and the replay file, byte for byte: True; sha prefix / bytes as 249.8: True
+    <runsdir>/cvt9-PARTITION-MANIFEST.txt == <runsdir>/cvt9/PARTITION-MANIFEST.txt: True
+    replay file: id cvt6_headpath sha256 74be71fa524ad012... knots 500 n0 2 n1 49902 spacing [100] vmax -4.852388381958008 vlast -15.0 -> as 242.3(2) / 249.3: True
+    PROVENANCE MODE submit  BUILD e65e6773...  HF 816e3357...  RUNNER 0fe45b1d...  REPLAY 74be71fa... == file: True  SCORER 5c53a40d... == scorer file: True == 249.10: True
+    corpus (DISCLOSURE line only): csv sha 355c0977b2a6f87b rows 3085, exclusion tsv sha d0b955cbfce5c485 keys 75 -> 3010 rows (cvt9- dropped)
+    corpus files are the registration corpus (249.7 355c0977... / d0b955cb...), i.e. commit 45eac02 = 8af7ee2's: True
+
+[1] completeness and header lines (witnesses built from mode / P / b0 / ms / window / the replay file)
+  OK   k01          s105 job 5024025  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LOWHEADPATH  s105 job 5024026  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   HIGHHEADPATH s105 job 5024027  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   MIDDOSE      s105 job 5024028  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   RESDOSE      s105 job 5024029  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   EARLY        s105 job 5024030  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LATE         s105 job 5024031  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   k01          s106 job 5024032  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LOWHEADPATH  s106 job 5024033  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   HIGHHEADPATH s106 job 5024034  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   MIDDOSE      s106 job 5024035  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   RESDOSE      s106 job 5024036  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   EARLY        s106 job 5024037  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LATE         s106 job 5024038  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   k01          s107 job 5024039  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LOWHEADPATH  s107 job 5024040  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   HIGHHEADPATH s107 job 5024041  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   MIDDOSE      s107 job 5024042  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   RESDOSE      s107 job 5024043  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   EARLY        s107 job 5024044  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+  OK   LATE         s107 job 5024045  epochs 100  RUN_DONE True  tb 0  ARGS wrong - rep -  ENV True  PT True  VOTE_W True  BETA_HOLD True  COMP_HOLD True  WINDOW_HOLD True
+
+[2] levels (plateau5 = mean TEST epochs 95..99; TRAIN5 beside)
+  k01          TEST 12.1347 (sd 0.7446, range 1.4060)  TRAIN 12.0467  seeds 12.4180 / 11.2900 / 12.6960  train 12.2140 / 11.3760 / 12.5500  slope80-99 -0.003 / -0.007 / -0.005
+  LOWHEADPATH  TEST 65.2080 (sd 0.0572, range 0.1020)  TRAIN 80.5640  seeds 65.2380 / 65.2440 / 65.1420  train 80.4760 / 80.4460 / 80.7700  slope80-99 -0.004 / +0.006 / -0.001
+  HIGHHEADPATH TEST 11.2107 (sd 0.5390, range 1.0580)  TRAIN 11.3287  seeds 11.6800 / 10.6220 / 11.3300  train 11.9640 / 10.6920 / 11.3300  slope80-99 -0.000 / +0.006 / -0.002
+  MIDDOSE      TEST 55.8553 (sd 0.2840, range 0.5620)  TRAIN 65.6027  seeds 55.8080 / 55.5980 / 56.1600  train 65.6800 / 65.3420 / 65.7860  slope80-99 +0.003 / +0.000 / +0.002
+  RESDOSE      TEST 21.8387 (sd 0.9383, range 1.8160)  TRAIN 23.0253  seeds 22.1120 / 20.7940 / 22.6100  train 23.2640 / 21.7900 / 24.0220  slope80-99 +0.002 / -0.004 / +0.001
+  EARLY        TEST 18.3713 (sd 0.9787, range 1.9480)  TRAIN 18.9513  seeds 19.2900 / 17.3420 / 18.4820  train 19.8900 / 17.9460 / 19.0180  slope80-99 -0.003 / -0.006 / +0.001
+  LATE         TEST 27.7140 (sd 1.0680, range 2.0320)  TRAIN 29.4173  seeds 27.3340 / 26.8880 / 28.9200  train 29.1740 / 28.6420 / 30.4360  slope80-99 +0.002 / -0.008 / +0.000
+
+[3] G-BITE re-derived from the raw probe records (249.6 (a)-(e)); non-vacuity cross-read; window resolution
+  PASS k01          s105 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 0/0/0 last None/None/None
+  PASS LOWHEADPATH  s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 54/267/0 last 5315/27105/None
+  PASS HIGHHEADPATH s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 41/253/0 last 9877/25822/None
+  PASS MIDDOSE      s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 19/352/0 last 7361/36163/None
+  PASS RESDOSE      s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 33/253/0 last 8943/25822/None
+  PASS EARLY        s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 41/253/106 last 16981/25822/10613
+  PASS LATE         s105 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 54/248/95 last 12946/25223/9428
+  PASS k01          s106 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 0/0/0 last None/None/None
+  PASS LOWHEADPATH  s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 52/268/0 last 5090/27431/None
+  PASS HIGHHEADPATH s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 45/253/0 last 10027/25822/None
+  PASS MIDDOSE      s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 23/338/0 last 7500/34649/None
+  PASS RESDOSE      s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 36/253/0 last 9084/25822/None
+  PASS EARLY        s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 45/253/106 last 17125/25822/10613
+  PASS LATE         s106 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 52/247/95 last 12946/25223/9428
+  PASS k01          s107 meta True recs 500 lion-mism 0 ties 0 worst 4.0e-07 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 0/0/0 last None/None/None
+  PASS LOWHEADPATH  s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 54/257/0 last 5391/25989/None
+  PASS HIGHHEADPATH s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 41/253/0 last 9849/25822/None
+  PASS MIDDOSE      s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 19/307/0 last 7330/32176/None
+  PASS RESDOSE      s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 33/253/0 last 8914/25822/None
+  PASS EARLY        s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 41/253/106 last 16941/25822/10613
+  PASS LATE         s107 meta True recs 500 lion-mism 0 ties 0 worst 0.0e+00 | 50 0/0 worst 0.0e+00 | C 0/0 worst 0.0e+00 | audits bh 0 ch 0 wh 0 keys 0 | active 55/247/95 last 12946/25236/9428
+  NON-VACUITY cross-read: records (of 500) on which 50 (group 1) FAILS each OTHER held arm's schedule (beta or beta_pre); min over seeds, and the max |error|
+  LOWHEADPATH  as LOWH own 0:True  HIGH 201 (max 10.585)  MIDD 157 (max 8.385)  RESD 185 (max 9.785)  EARL 95 (max 10.585)  LATE 106 (max 10.540)
+  HIGHHEADPATH as LOWH 201 (max 10.585)  HIGH own 0:True  MIDD 128 (max 4.386)  RESD 114 (max 1.638)  EARL 106 (max 10.540)  LATE 95 (max 10.585)
+  MIDDOSE      as LOWH 157 (max 8.385)  HIGH 128 (max 4.386)  MIDD own 0:True  RESD 112 (max 2.748)  EARL 84 (max 6.154)  LATE 201 (max 8.385)
+  RESDOSE      as LOWH 185 (max 9.785)  HIGH 114 (max 1.638)  MIDD 112 (max 2.748)  RESD own 0:True  EARL 98 (max 8.902)  LATE 201 (max 9.785)
+  EARLY        as LOWH 95 (max 10.585)  HIGH 106 (max 10.540)  MIDD 84 (max 6.154)  RESD 98 (max 8.902)  EARL own 0:True  LATE 201 (max 10.585)
+  LATE         as LOWH 106 (max 10.540)  HIGH 95 (max 10.585)  MIDD 201 (max 8.385)  RESD 201 (max 9.785)  EARL 201 (max 10.585)  LATE own 0:True
+  every held run passes its own 50 schedule on all 500 records and fails every other held arm's on >= 1: True
+  window resolution, EARLY: of cuts 9000..10000 on 50's records 8800..10200, clause (c) passes cuts 9403..9501 (99, contiguous True); the registered 9429 among them: True
+  window resolution, LATE: of cuts 9000..10000 on 50's records 8800..10200, clause (c) passes cuts 9403..9501 (99, contiguous True); the registered 9429 among them: True
+
+[4] sigma, onset and contrasts (within batch)
+  SIGMA_INBATCH 0.747163 (df 14)  SIGMA_PRIOR 0.688153  -> used 0.747163 (SIGMA_INBATCH)  SE 0.610056
+  ONSET = LATE's arm-mean TEST at Epoch line 17: 11.9000 (seeds 11.830 / 11.480 / 12.390); LOWHEADPATH at line 17: 12.2300 (seeds 12.830 / 10.990 / 12.870)
+  PRIMARY P_MID    = LOWHEADPATH - MIDDOSE     TEST   +9.3527 pp =   +15.33 SE   TRAIN  +14.9613   per seed +9.4300 / +9.6460 / +8.9820
+  PRIMARY P_RES    = LOWHEADPATH - RESDOSE     TEST  +43.3693 pp =   +71.09 SE   TRAIN  +57.5387   per seed +43.1260 / +44.4500 / +42.5320
+  PRIMARY P_EARLY  = LOWHEADPATH - EARLY       TEST  +46.8367 pp =   +76.77 SE   TRAIN  +61.6127   per seed +45.9480 / +47.9020 / +46.6600
+  PRIMARY P_LATE   = LOWHEADPATH - LATE        TEST  +37.4940 pp =   +61.46 SE   TRAIN  +51.1467   per seed +37.9040 / +38.3560 / +36.2220
+  PRIMARY P_WIN    = LATE        - EARLY       TEST   +9.3427 pp =   +15.31 SE   TRAIN  +10.4660   per seed +8.0440 / +9.5460 / +10.4380
+  KEY D_CTL +53.0733 pp (+87.00 SE; TRAIN +68.5173)  R_HIGH +53.9973 pp (+88.51 SE; TRAIN +69.2353; per seed +53.5580 / +54.6220 / +53.8120)  ADD +30.3333
+
+[5] branch, states, stamps (249.6, re-typed; first match wins)
+  dose states: HIGHHEADPATH AT-K01  MIDDOSE BETWEEN  RESDOSE BETWEEN;  window states: EARLY PARTIAL  LATE PARTIAL
+  FINAL: DOSE-GRADED | WINDOW-GRADED | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | COMPLEMENT-ON-HEADPATH | FORCED-ARMS-OPEN-LOOP | DOSE-IS-TRIANGLE-FAMILY | WINDOW-CUT-AT-PEAK | ONE-WINDOW-PAIR | ONE-NETWORK-PLAINNET | HORIZON-100-ONLY | SIGMA-INBATCH | POSITIVE-CONTROL-REPRODUCES | HIGHHEADPATH-AT-K01 | MIDDOSE-BETWEEN | RESDOSE-BETWEEN | EARLY-PARTIAL | LATE-PARTIAL | LATE-ONSET:11.90 | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+    margin D_CTL over GAP_MIN                                          +33.0733 pp = +54.21 SE
+    margin k01 under K01_MAX                                            +7.8653 pp = +12.89 SE
+    margin worst seed range under DIVERGED (LATE)                       +2.9680 pp = +4.87 SE
+    margin RESDOSE - MIDDOSE under the NONMONOTONE bar (5)             +39.0167 pp = +63.96 SE
+    margin LATE stall bar under AT-CTL (ONSET-UNRESOLVED if < 0)       +43.3080 pp = +70.99 SE
+    margin LOWHEADPATH: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)    +5.0000 pp = +8.20 SE
+    margin LOWHEADPATH: (k01 + NULL) - L    (>= 0 is AT-K01)           -51.0733 pp = -83.72 SE
+    margin HIGHHEADPATH: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)  -48.9973 pp = -80.32 SE
+    margin HIGHHEADPATH: (k01 + NULL) - L    (>= 0 is AT-K01)           +2.9240 pp = +4.79 SE
+    margin MIDDOSE: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)        -4.3527 pp = -7.13 SE
+    margin MIDDOSE: (k01 + NULL) - L    (>= 0 is AT-K01)               -41.7207 pp = -68.39 SE
+    margin RESDOSE: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)       -38.3693 pp = -62.89 SE
+    margin RESDOSE: (k01 + NULL) - L    (>= 0 is AT-K01)                -7.7040 pp = -12.63 SE
+    margin EARLY: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)         -41.8367 pp = -68.58 SE
+    margin EARLY: (k01 + NULL) - L    (>= 0 is AT-K01)                  -4.2367 pp = -6.94 SE
+    margin LATE: L - (CTL - MATCH)   (>= 0 is AT-CTL/RESCUED)          -32.4940 pp = -53.26 SE
+    margin LATE: (k01 + NULL) - L    (>= 0 is AT-K01)                  -13.5793 pp = -22.26 SE
+    margin LATE: stallbar(LATE) - L  (>= 0 is STALLED)                 -10.8140 pp = -17.73 SE
+  bars in this batch: AT-CTL iff L >= 60.2080; AT-K01 iff L <= 14.1347; STALLED(LATE) iff L <= 16.9000 = max(k01 + 2, onset + 5)
+  per-seed readings against the in-batch bars (descriptive; the branch reads arm means):
+    LOWHEADPATH  s105 65.2380 AT-CTL / s106 65.2440 AT-CTL / s107 65.1420 AT-CTL
+    HIGHHEADPATH s105 11.6800 AT-K01 / s106 10.6220 AT-K01 / s107 11.3300 AT-K01
+    MIDDOSE      s105 55.8080 BETWEEN / s106 55.5980 BETWEEN / s107 56.1600 BETWEEN
+    RESDOSE      s105 22.1120 BETWEEN / s106 20.7940 BETWEEN / s107 22.6100 BETWEEN
+    EARLY        s105 19.2900 PARTIAL / s106 17.3420 PARTIAL / s107 18.4820 PARTIAL
+    LATE         s105 27.3340 PARTIAL / s106 26.8880 PARTIAL / s107 28.9200 PARTIAL
+  registered accounts (249.5), predicted bands (k01 K01, CTL FREE, HIGHHEADPATH K01 in every account):
+    DOSE-ALL-STALL         MIDDOSE miss 39.86  RESDOSE miss 5.84
+    DOSE-THRESHOLD         MIDDOSE miss 0.14  RESDOSE miss 5.84
+    DOSE-ONLY-HIGH-STALLS  MIDDOSE miss 0.14  RESDOSE miss 34.16
+    DOSE-GRADED            MIDDOSE miss 5.86  RESDOSE hit
+    DOSE-NONMONOTONE       MIDDOSE miss 39.86  RESDOSE miss 34.16
+    EARLY-WINDOW           EARLY miss 2.37  LATE miss 28.29
+    LATE-WINDOW            EARLY miss 37.63  LATE miss 10.71
+    BOTH-WINDOWS           EARLY miss 2.37  LATE miss 10.71
+    NEITHER-WINDOW         EARLY miss 37.63  LATE miss 28.29
+    WINDOW-GRADED          EARLY miss 1.63  LATE hit
+    anchors: k01 hit  CTL hit  HIGHHEADPATH hit
+  scorer log FINAL == this FINAL (whole string): True
+  token lists equal: True (scorer 22 tokens, here 22)
+
+[6] the scorer's between-batch literals (re-derived from the raw .out) and descriptive readouts
+  cvt6: k01 12.0700  LOWHEADPATH 65.0207  HIGHHEADPATH 11.4933  HEAD 64.9000   (plateau5 from cvt6's raw .out, 3 seeds each)
+  cvt4: HOLDHEAD(tri:5041) 64.6660  HOLDHIGH(tri:9428) 11.1267   (plateau5 from cvt4's raw .out, 3 seeds each)
+  cvt7 (ResNet, carrier group): HOLDHIGH(tri:8609) 50.2273  ISO 70.0413  k01 22.9527   (plateau5 from cvt7's raw .out, 3 seeds each)
+  k01          s105  beta peak -5.424 @17.0  r(5-18.9) 3523  r(18.9-41) 508  bh_active - ch_active - wh_active -
+  k01          s106  beta peak -5.352 @17.0  r(5-18.9) 3700  r(18.9-41) 572  bh_active - ch_active - wh_active -
+  k01          s107  beta peak -5.346 @17.0  r(5-18.9) 3667  r(18.9-41) 550  bh_active - ch_active - wh_active -
+  LOWHEADPATH  s105  b50 peak -15.000 @0.0  r(5-18.9) 1  r(18.9-41) 1  bh_active 5315 ch_active 27105 wh_active -
+  LOWHEADPATH  s106  b50 peak -15.000 @0.0  r(5-18.9) 1  r(18.9-41) 1  bh_active 5090 ch_active 27431 wh_active -
+  LOWHEADPATH  s107  b50 peak -15.000 @0.0  r(5-18.9) 1  r(18.9-41) 1  bh_active 5391 ch_active 25989 wh_active -
+  HIGHHEADPATH s105  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 3609  bh_active 9877 ch_active 25822 wh_active -
+  HIGHHEADPATH s106  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 3609  bh_active 10027 ch_active 25822 wh_active -
+  HIGHHEADPATH s107  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 3609  bh_active 9849 ch_active 25822 wh_active -
+  MIDDOSE      s105  b50 peak -6.615 @14.4  r(5-18.9) 1219  r(18.9-41) 45  bh_active 7361 ch_active 36163 wh_active -
+  MIDDOSE      s106  b50 peak -6.615 @14.4  r(5-18.9) 1219  r(18.9-41) 45  bh_active 7500 ch_active 34649 wh_active -
+  MIDDOSE      s107  b50 peak -6.615 @14.4  r(5-18.9) 1219  r(18.9-41) 45  bh_active 7330 ch_active 32176 wh_active -
+  RESDOSE      s105  b50 peak -5.215 @17.2  r(5-18.9) 4014  r(18.9-41) 702  bh_active 8943 ch_active 25822 wh_active -
+  RESDOSE      s106  b50 peak -5.215 @17.2  r(5-18.9) 4014  r(18.9-41) 702  bh_active 9084 ch_active 25822 wh_active -
+  RESDOSE      s107  b50 peak -5.215 @17.2  r(5-18.9) 4014  r(18.9-41) 702  bh_active 8914 ch_active 25822 wh_active -
+  EARLY        s105  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 1  bh_active 16981 ch_active 25822 wh_active 10613
+  EARLY        s106  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 1  bh_active 17125 ch_active 25822 wh_active 10613
+  EARLY        s107  b50 peak -4.415 @18.8  r(5-18.9) 5933  r(18.9-41) 1  bh_active 16941 ch_active 25822 wh_active 10613
+  LATE         s105  b50 peak -4.461 @19.0  r(5-18.9) 1  r(18.9-41) 3609  bh_active 12946 ch_active 25223 wh_active 9428
+  LATE         s106  b50 peak -4.461 @19.0  r(5-18.9) 1  r(18.9-41) 3609  bh_active 12946 ch_active 25223 wh_active 9428
+  LATE         s107  b50 peak -4.461 @19.0  r(5-18.9) 1  r(18.9-41) 3609  bh_active 12946 ch_active 25236 wh_active 9428
+  first epoch line from which arm-mean TEST LOWHEADPATH - HIGHHEADPATH stays > 2 pp: 16
+  first epoch line from which arm-mean TEST LOWHEADPATH - MIDDOSE stays > 2 pp: 18
+  first epoch line from which arm-mean TEST LOWHEADPATH - RESDOSE stays > 2 pp: 16
+  first epoch line from which arm-mean TEST LOWHEADPATH - EARLY stays > 2 pp: 16
+  first epoch line from which arm-mean TEST LOWHEADPATH - LATE stays > 2 pp: 20
+
+[7] LINE-BY-LINE AGREEMENT with the scorer log (each re-built line looked up verbatim)
+  HEADER        11 lines found verbatim, 0 not found
+  CORPUS         1 lines found verbatim, 0 not found
+  COMPLETE      22 lines found verbatim, 0 not found
+  G-ARGS        21 lines found verbatim, 0 not found
+  G-ENV          4 lines found verbatim, 0 not found
+  G-VOTEW       21 lines found verbatim, 0 not found
+  G-HOLDW       21 lines found verbatim, 0 not found
+  G-CHOLDW      21 lines found verbatim, 0 not found
+  G-WHOLDW      21 lines found verbatim, 0 not found
+  G-STRUCT       1 lines found verbatim, 0 not found
+  G-PROV         6 lines found verbatim, 0 not found
+  HOSTPATH       2 lines found verbatim, 0 not found
+  G-REPLAY       1 lines found verbatim, 0 not found
+  LEVELS        14 lines found verbatim, 0 not found
+  G-FLOOR        1 lines found verbatim, 0 not found
+  G-CEIL         1 lines found verbatim, 0 not found
+  G-BITE        24 lines found verbatim, 0 not found
+  SIGMA          4 lines found verbatim, 0 not found
+  ONSET          1 lines found verbatim, 0 not found
+  CONTRASTS     16 lines found verbatim, 0 not found
+  G-DIVERGE      1 lines found verbatim, 0 not found
+  BETWEEN        4 lines found verbatim, 0 not found
+  DESCRIPTIVE   35 lines found verbatim, 0 not found
+  total 252 re-built lines (+ 2 host-path lines by suffix, + FINAL), 252 found; FAIL lines in the scorer log: 0
+  scorer log: 306 lines, 20 blank, 31 non-blank not re-built here (banners, section titles, the registered licence text):
+    | ==============================================================================
+    | ==============================================================================
+    | G-ARGS    every run's OWN ARGS line says what its file name registers
+    | G-ENV     the environment rode the ENV line on every run
+    | G-VOTEW / G-HOLDW / G-CHOLDW / G-WHOLDW   one line of each kind per run == the arm's registered witness
+    | G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+    | G-PROV    PROVENANCE.txt
+    | G-REPLAY  the replay file this scorer reads
+    | LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+    | G-FLOOR / G-CEIL
+    | G-BITE    the registered holds reached the step sizes at every record, and touched nothing else
+    | SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+    | CONTRASTS (every one WITHIN batch)
+    | G-DIVERGE (a branch condition, not a harness gate)
+    | ==============================================================================
+    | ==============================================================================
+    | BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt9 bar or contrast):
+    | WHAT THIS DECIDES -- as registered, before any run existed:
+    |   At least one rung sits between k01 and the control (states stamped), monotone within 5 pp: the damage grows
+    |   with the peak step size across the triangle family rather than switching at one rung.  EFFECT ON 240's OWN-STEP-MAGN
+    |   the stall is GRADED in dose at this cell; read P_MID and P_RES.  CROSS-CHECK: RESDOSE's state is the PlainNet
+    |   level of cvt7's ResNet trajectory.  Not licensed: a functional form; any other network.
+    |   At least one window arm is PARTIAL (states stamped): each half carries part, or one half partly.  EFFECT ON
+    |   240's OWN-STEP-MAGNITUDE and 246's GRADED (HIGHHEADPATH-AT-K01): PARTLY LOCATED -- read P_EARLY, P_LATE and P_WIN; n
+    | WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+    |   * Anything about ResNet18_c100, VGG or any other tensor: one network, one cell, one held tensor (idx 50).
+    |   * A window finer than the one cut at the peak (update 9429); which sub-window of a half acts.
+    |   * A dose curve beyond the four triangle rungs (5041 between batch, 7235, 8609, 9428); the family moves peak,
+    |     fall onset and duration together.
+    |   * That the forced (open-loop) complement stands for a free one; necessity of anything; point agreement at k01.
+    |   * Anything beyond 100 epochs.
+
+====================================================================================================
+DESCRIPTIVE, NOT REGISTERED -- nothing below can move a level, contrast, gate, branch or stamp above
+====================================================================================================
+
+[D1] TEST (TRAIN) after 15 / 17 / 19 / 30 / 50 / 100 completed epochs (Epoch lines 14 / 16 / 18 / 29 / 49 / 99): arm mean, then TEST per seed
+  k01          5.68 (4.96)  8.33 (7.73)  10.64 (10.32)  12.11 (11.95)  12.16 (12.01)  12.09 (12.00)
+               s105 6.26/8.78/10.96/12.38/12.38/12.42  s106 5.32/7.21/9.97/11.05/11.37/11.23  s107 5.45/9.01/11.00/12.90/12.73/12.63
+  LOWHEADPATH  6.28 (5.26)  10.49 (9.41)  15.94 (14.22)  46.29 (46.66)  64.57 (77.94)  65.28 (80.51)
+               s105 6.90/10.92/15.95/46.10/64.91/65.32  s106 5.98/9.33/15.87/45.73/64.31/65.36  s107 5.95/11.22/15.99/47.03/64.50/65.16
+  HIGHHEADPATH 5.50 (5.01)  8.37 (7.79)  10.60 (9.89)  11.16 (11.24)  11.25 (11.33)  11.20 (11.32)
+               s105 6.13/8.95/11.09/11.29/11.74/11.69  s106 5.22/7.04/9.67/10.68/10.52/10.60  s107 5.15/9.12/11.05/11.52/11.49/11.30
+  MIDDOSE      5.72 (5.05)  8.85 (8.27)  13.33 (12.54)  37.94 (37.78)  55.21 (63.58)  55.87 (65.58)
+               s105 6.43/9.73/13.34/38.33/55.13/55.86  s106 5.42/7.35/12.52/37.31/55.05/55.60  s107 5.32/9.48/14.14/38.17/55.45/56.16
+  RESDOSE      5.47 (4.97)  8.35 (7.68)  10.61 (10.06)  16.93 (16.59)  21.69 (22.75)  21.85 (23.04)
+               s105 6.02/9.06/11.09/17.23/21.93/22.14  s106 5.21/7.10/9.82/16.19/20.68/20.80  s107 5.18/8.89/10.93/17.37/22.47/22.60
+  EARLY        5.56 (4.96)  8.16 (7.82)  10.50 (9.93)  14.62 (14.31)  18.33 (18.77)  18.35 (18.96)
+               s105 6.12/8.97/10.80/15.40/19.42/19.35  s106 5.18/6.69/9.50/13.36/17.31/17.26  s107 5.38/8.82/11.21/15.09/18.25/18.45
+  LATE         6.33 (5.22)  10.24 (9.31)  16.01 (14.37)  23.00 (22.90)  27.51 (29.07)  27.72 (29.47)
+               s105 7.15/10.91/15.67/23.02/27.12/27.29  s106 6.12/8.71/15.89/22.56/26.90/26.90  s107 5.73/11.09/16.46/23.42/28.52/28.98
+
+[D2] 50's APPLIED beta (group 1; k01: the one shared beta) at epochs 10 / 17 / 18.86 / 20 / 30 / 40.
+     RECORD BOUNDARY: probe record k has step s = 100k and carries beta after update s+1, i.e. the value applied at
+     update n = s+2 (checked above in G-BITE).  Epoch e ends at update 500e, so 'at epoch e' = record k = 5e (n = 500e+2).
+     18.86 is not on the 100-step record grid: the cut n_E = 9429 falls between record 94 (s 9400, n 9402, epoch 18.8)
+     and record 95 (s 9500, n 9502, epoch 19.0); both are shown, with the schedule at n = 9428 / 9429.
+  arm (seed)                        10         17       18.8       19.0         20         30         40   sched n=9428 / 9429
+  k01 s105                     -8.8265    -5.4243    -6.3223    -6.4223    -6.9222   -11.9237   -15.0000
+  k01 s106                     -8.8205    -5.3524    -6.2023    -6.3023    -6.8022   -11.8037   -15.0000
+  k01 s107                     -8.8125    -5.3464    -6.2423    -6.3423    -6.8422   -11.8437   -15.0000
+  LOWHEADPATH (x3, 0 diff)    -15.0000   -15.0000   -15.0000   -15.0000   -15.0000   -15.0000   -15.0000    -15.0000 /  -15.0000
+  HIGHHEADPATH (x3, 0 diff)    -8.8145    -5.3145    -4.4145    -4.4605    -4.9605    -9.9605   -14.9605     -4.3885 /   -4.3875
+  MIDDOSE (x3, 0 diff)         -8.8145    -7.8465    -8.7465    -8.8465    -9.3465   -14.3465   -15.0000     -8.7725 /   -8.7735
+  RESDOSE (x3, 0 diff)         -8.8145    -5.3145    -5.9985    -6.0985    -6.5985   -11.5985   -15.0000     -6.0245 /   -6.0255
+  EARLY (x3, 0 diff)           -8.8145    -5.3145    -4.4145   -15.0000   -15.0000   -15.0000   -15.0000     -4.3885 /  -15.0000
+  LATE (x3, 0 diff)           -15.0000   -15.0000   -15.0000    -4.4605    -4.9605    -9.9605   -14.9605    -15.0000 /   -4.3875
+  HEADPATH (group 0)           -8.8235    -5.3234    -5.2374    -5.3374    -5.8073    -6.8762    -7.8582
+  r, HIGHHEADPATH 50               486      16083      39557      37778      22914        154          1
+
+[D3] the Epoch line from which TEST stays MORE than 2 pp BELOW LOWHEADPATH (to line 99; line n = after n+1 epochs)
+     arm mean = (arm-mean LOWHEADPATH curve) - (arm-mean held curve); per seed = same-seed LOWHEADPATH - arm; then TRAIN (arm mean)
+  HIGHHEADPATH arm mean 16   per seed s105 / s106 / s107 17 / 16 / 16   TRAIN 17   gap at lines 14..22: 14:+0.78 15:+0.99 16:+2.12 17:+2.80 18:+5.33 19:+9.13 20:+12.77 21:+15.34 22:+18.41
+  MIDDOSE      arm mean 18   per seed s105 / s106 / s107 18 / 18 / 19   TRAIN 19   gap at lines 14..22: 14:+0.55 15:+0.88 16:+1.64 17:+1.15 18:+2.60 19:+3.34 20:+5.09 21:+5.17 22:+5.76
+  RESDOSE      arm mean 16   per seed s105 / s106 / s107 17 / 16 / 16   TRAIN 17   gap at lines 14..22: 14:+0.81 15:+1.22 16:+2.14 17:+2.88 18:+5.32 19:+8.42 20:+11.09 21:+14.04 22:+16.08
+  EARLY        arm mean 16   per seed s105 / s106 / s107 17 / 16 / 16   TRAIN 17   gap at lines 14..22: 14:+0.72 15:+0.98 16:+2.33 17:+2.93 18:+5.43 19:+9.30 20:+12.54 21:+14.97 22:+17.56
+  LATE         arm mean 20   per seed s105 / s106 / s107 20 / 20 / 20   TRAIN 20   gap at lines 14..22: 14:-0.06 15:-0.02 16:+0.25 17:+0.33 18:-0.07 19:+1.01 20:+4.30 21:+6.62 22:+9.18
+
+[D4] SETTLE LINE = the first Epoch line from which the curve stays within 0.5 pp of its own plateau5 through line 99
+     (arm mean: the arm-mean curve against the arm-mean plateau5; per seed: each run against its own; TRAIN likewise
+     against TRAIN5).  Line n = after n+1 epochs.
+  k01          TEST settle 21 (per seed 20 / 20 / 22)   TRAIN settle 21
+  LOWHEADPATH  TEST settle 50 (per seed 49 / 51 / 51)   TRAIN settle 57
+  HIGHHEADPATH TEST settle 19 (per seed 32 / 40 / 28)   TRAIN settle 21
+  MIDDOSE      TEST settle 51 (per seed 50 / 51 / 51)   TRAIN settle 55
+  RESDOSE      TEST settle 43 (per seed 43 / 46 / 42)   TRAIN settle 47
+  EARLY        TEST settle 45 (per seed 43 / 45 / 44)   TRAIN settle 46
+  LATE         TEST settle 44 (per seed 45 / 43 / 47)   TRAIN settle 48
+
+[D5] DOSE-RESPONSE over the triangle family (complement on HEADPATH in every arm).  peak = the schedule's own
+     maximum b0 + ms*P (log step size; LOWHEADPATH is the floor, -15); r_peak = exp(peak + 15); integrated
+     step size = sum over updates n = 1..50,000 of (exp(v(n) + 15) - 1), in units of the floor step; clamp epoch =
+     first update from which v stays at -15, / 500.  Levels are plateau5 arm means (TEST, TRAIN) and seeds.
+     'kept' = (L - HIGHHEADPATH) / (LOWHEADPATH - HIGHHEADPATH), as the scorer's kept fraction.
+  LOWHEADPATH  floor     peak -15.0000  r_peak        1  peak epoch      -  integrated 0.0000e+00  clamp epoch      - | TEST 65.2080  TRAIN 80.5640  kept 1.000  seeds 65.2380 / 65.2440 / 65.1420
+  MIDDOSE      tri:7235  peak  -6.5805  r_peak     4535  peak epoch  14.47  integrated 9.0493e+06  clamp epoch  31.31 | TEST 55.8553  TRAIN 65.6027  kept 0.827  seeds 55.8080 / 55.5980 / 56.1600
+  RESDOSE      tri:8609  peak  -5.2065  r_peak    17917  peak epoch  17.22  integrated 3.5811e+07  clamp epoch  36.81 | TEST 21.8387  TRAIN 23.0253  kept 0.197  seeds 22.1120 / 20.7940 / 22.6100
+  HIGHHEADPATH tri:9428  peak  -4.3875  r_peak    40639  peak epoch  18.86  integrated 8.1254e+07  clamp epoch  40.08 | TEST 11.2107  TRAIN 11.3287  kept 0.000  seeds 11.6800 / 10.6220 / 11.3300
+  EARLY        tri:9428  peak  -4.3875  r_peak    40639  peak epoch  18.86  integrated 4.0606e+07  clamp epoch  18.86 | TEST 18.3713  TRAIN 18.9513  kept 0.133  seeds 19.2900 / 17.3420 / 18.4820
+  LATE         tri:9428  peak  -4.3875  r_peak    40639  peak epoch  18.86  integrated 4.0648e+07  clamp epoch  40.08 | TEST 27.7140  TRAIN 29.4173  kept 0.306  seeds 27.3340 / 26.8880 / 28.9200
+  successive drops per log unit of peak: floor->MID 9.35 pp over 8.4195; MID->RES 34.02 pp over 1.3740; RES->HIGH 10.63 pp over 0.8190
+  per seed, monotone LOWHEADPATH > MIDDOSE > RESDOSE > HIGHHEADPATH: True / True / True
+
+[D6] the window halves
+  integrated (r - 1): EARLY 4.06062e+07  LATE 4.06479e+07  LATE/EARLY 1.00103  EARLY+LATE == HIGHHEADPATH (8.12542e+07): True; pointwise partition of tri:9428 at every update 0..50,001: True
+  LATE vs LOWHEADPATH (same schedules before update 9429):
+    s105 identical (train, test) on 0 of lines 0..17, first differing line 0, max |TEST diff| 0..17 1.000, complement beta identical on records 0..93: True
+    s106 identical (train, test) on 5 of lines 0..17, first differing line 1, max |TEST diff| 0..17 0.620, complement beta identical on records 0..93: True
+    s107 identical (train, test) on 1 of lines 0..17, first differing line 0, max |TEST diff| 0..17 0.480, complement beta identical on records 0..93: True
+  EARLY vs HIGHHEADPATH (same schedules before update 9429):
+    s105 identical (train, test) on 1 of lines 0..17, first differing line 0, max |TEST diff| 0..17 0.270, complement beta identical on records 0..93: True
+    s106 identical (train, test) on 3 of lines 0..17, first differing line 0, max |TEST diff| 0..17 0.350, complement beta identical on records 0..93: True
+    s107 identical (train, test) on 2 of lines 0..17, first differing line 0, max |TEST diff| 0..17 0.470, complement beta identical on records 0..93: True
+  LATE's onset gap: LOWHEADPATH - LATE arm-mean TEST at lines 16 / 17 / 18 / 19 / 20: +0.25 / +0.33 / -0.07 / +1.01 / +4.30
+  EARLY - HIGHHEADPATH arm-mean TEST at lines 17 / 18 / 19 / 20 / 29 / 49 / 99: -0.13 / -0.10 / -0.17 / +0.23 / +3.45 / +7.08 / +7.16
+  ADD = P_EARLY + P_LATE - R_HIGH +30.3333 pp: the two halves' losses (46.8367 + 37.4940 = 84.3307) exceed the whole's (53.9973)
+
+VIOLATIONS 0

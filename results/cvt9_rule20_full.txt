@@ -1,0 +1,28 @@
+RULE20 run utc=2026-09-17T06:19:51Z host=nodelogin04.alice.leidenuniv.nl
+===================== cvt9
+  .out files: 21   with ARGS: 21   squeue: 
+  BATCH-CONSISTENCY --name cvt9- --vary stepsize-groups --vary seed --vary run-name -> rc=0  argsline_guard: 21 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (cvt9): 21 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x21  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x18  PROBE_TENSOR: on every=100 type=blockwise tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x3  PROBE_TENSOR: on every=100 type=scalar tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x21  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x3  BETA_HOLD: off
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=floor value=-15.0
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=7235 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-6.580510749816894
+      x3  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=8609 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-5.2065107498168945
+      x9  BETA_HOLD: on type=blockwise group=1 groupsize=1 name=layer4.1.bn2.weight mode=tri P=9428 b0=-13.815510749816895 ms=0.001 lo=-15.0 hi=-2.3026 peak=-4.387510749816894
+    COMP_HOLD witness lines (exact match to the arm's registered line):
+      x3  COMP_HOLD: off
+      x18  COMP_HOLD: on type=blockwise group=0 groupsize=52 mode=rec id=cvt6_headpath sha256=74be71fa524ad0122d1408e01dd2b633b004b2e27228393fe6e593f494358a5d knots=500 n0=2 n1=49902 b0=-13.815510749816895 lo=-15.0 hi=-2.3026 vmax=-4.852388381958008 vlast=-15.0
+    WINDOW_HOLD witness lines (exact match to the arm's registered line):
+      x15  WINDOW_HOLD: off
+      x3  WINDOW_HOLD: on type=blockwise group=1 name=layer4.1.bn2.weight base=tri P=9428 n0=0 n1=9429 outside=floor value=-15.0
+      x3  WINDOW_HOLD: on type=blockwise group=1 name=layer4.1.bn2.weight base=tri P=9428 n0=9429 n1=end outside=floor value=-15.0
+    coverage 21/21 runs with an .out, 0 violations
+  ENV AUDIT VERDICT cvt9: PASS
+RULE20 end utc=2026-09-17T06:19:51Z
