@@ -84,6 +84,31 @@ last-wins semantics.  The kinds are `ARGS_MOMENTUM_BASE` / `ARGS_WD_BASE`; a TSV
   C28 cell mixing: two UNLISTED ingested runs of the SAME 15-key cell carrying different `--momentum-param-base`
       values fail (the pooling the list exists to prevent), and the same pair passes once one is listed.
 
+ADDED AT CORRECTIONS 269 -- `cwd1` / `cwd2`'s DECAY_MASK (260 / 261) and `csv1`'s SHADOW_VOTE (262), two new
+ENVIRONMENT switches whose `<PREFIX>: on ...` line no CSV column carries.  `cwd2`'s HIGHWD0 / LOWWD0 print THREE ON
+lines (BETA_HOLD + COMP_HOLD + DECAY_MASK) and its HIGHHEADPATH two, so they are MULTI_KIND rows; `cwd1`'s masked arms
+and `csv1`'s three switch arms print ONE:
+  C29 a cwd1-style DECAY_MASK batch passes: k01 unlisted at `DECAY_MASK: off`, the 2 masked arms listed by their
+      DECAY_MASK line, and the completeness line names the kind.
+  C30 DECAY_MASK corruptions fail, each named: (a) a listed masked run printing `DECAY_MASK: off` (the mask never bit
+      -- cwd1's BROKEN-MASK null, caught in the corpus layer); (b) a listed row whose witness is not the run's line;
+      (c) one masked run dropped from the list; (d) a whole masked batch with no listed row; (e) an unlisted run of a
+      listed DECAY_MASK batch that prints no `DECAY_MASK: off` line; `off` runs of an unlisted batch stay unlisted.
+  C31 cwd2-style multi-kind runs listed ONCE pass, by their DECAY_MASK, BETA_HOLD or COMP_HOLD line, with the
+      multi-kind line counting two 3-kind runs; and fail when another registered line is wrong: (a) HIGHWD0 printing
+      `DECAY_MASK: off`; (b) LOWWD0 printing HIGHWD0's BETA_HOLD; (c) k01WD0 (one ON kind) printing a BETA_HOLD
+      on-line; (d) HIGHHEADPATH (no mask) printing a DECAY_MASK on-line.
+  C32 a csv1-style SHADOW_VOTE batch passes (INERT / SHADOWLOW / NAIVELOW listed by their SHADOW_VOTE line, MUTE by
+      its VOTE_W line, k01 / HEAD unlisted at the off lines), and corruptions fail: (a) SHADOWLOW printing NAIVELOW's
+      witness; (b) NAIVELOW printing `SHADOW_VOTE: off`; (c) INERT dropped from the list; (d) an unlisted run with no
+      `SHADOW_VOTE: off` line; (e) MUTE, listed by VOTE_W, also printing a SHADOW_VOTE on-line.
+  C33 KINDS = 251's six unchanged + DECAY_MASK + SHADOW_VOTE; the eight first letters differ (V B G C R W D S), so no
+      prefix is a prefix of another and none collides with the ARGS reader; patch_decaymask.py / patch_shadowvote.py
+      print only `<PREFIX>: off` / `<PREFIX>: on <field>=...`; witness_lines on one on and one off line of each of the
+      eight kinds; MULTI_KIND's cwd2 entries == the registered cwd_design tables (and the cwd1 / cwd2 / csv1 arms whose
+      registered witnesses are ON in 2+ kinds are exactly those entries, so cwd1 and csv1 register none); 245's and
+      251's `kinds scanned` lines are unchanged byte for byte and ONE new line names the two added kinds.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -343,6 +368,78 @@ def cmo_batch():
         elif wd != "0.1":
             listed.append(key + (W_WD,))
     return listed, corpus, logs, args, cells
+
+
+# ---- CORRECTIONS 269: cwd1 / cwd2 (DECAY_MASK) and csv1 (SHADOW_VOTE) fixtures -------------------------------
+# The registered lines of patches/patch_decaymask.py (260.7 / 261.7) and patches/patch_shadowvote.py (262.7), re-typed;
+# C33 checks each against the registered tables (analysis/cwd_design.py, imported UNEDITED by both cWD scorers, and the
+# registered cSV1 scorer).  The keys below are the REAL run names and job ids of the three batches, so the synthetic
+# cases have the shape the landing tracks will append.
+DM_NS_IDX = "2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59"
+DM_NS_NAMES = ("bn1.weight,layer1.0.bn1.weight,layer1.0.bn2.weight,layer1.1.bn1.weight,layer1.1.bn2.weight,"
+               "layer2.0.bn1.weight,layer2.0.bn2.weight,layer2.0.shortcut.1.weight,layer2.1.bn1.weight,"
+               "layer2.1.bn2.weight,layer3.0.bn1.weight,layer3.0.bn2.weight,layer3.0.shortcut.1.weight,"
+               "layer3.1.bn1.weight,layer3.1.bn2.weight,layer4.0.bn1.weight,layer4.0.bn2.weight,"
+               "layer4.0.shortcut.1.weight,layer4.1.bn1.weight,layer4.1.bn2.weight")
+DM_NORMSCALE = ("DECAY_MASK: on base=SGDm wd=0.1 spec=normscale masked=20 of=62 numel=4800 idx=" + DM_NS_IDX
+                + " names=" + DM_NS_NAMES)
+DM_CARRIER = ("DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.1.bn2.weight masked=1 of=53 numel=512 idx=50 "
+              "names=layer4.1.bn2.weight")
+DM_WRONG = DM_NORMSCALE.replace("masked=20", "masked=19")      # a corrupted witness: one scale short
+SV_INERT = ("SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=shared floor=na "
+            "items=50:layer4.1.bn2.weight:numel=512")
+SV_SHADOWLOW = ("SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 "
+                "items=50:layer4.1.bn2.weight:numel=512")
+SV_NAIVELOW = ("SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 "
+               "items=50:layer4.1.bn2.weight:numel=512")
+
+D1_K01, D1_NWD, D1_LNWD = ("cwd1-k01-s128", "5045342"), ("cwd1-k01NWD-s128", "5045343"), ("cwd1-kLNWD-s128", "5045344")
+D1_NWD2, D1_LNWD2 = ("cwd1-k01NWD-s129", "5045346"), ("cwd1-kLNWD-s129", "5045347")
+D2_K01, D2_WD0 = ("cwd2-k01-s132", "5045380"), ("cwd2-k01WD0-s132", "5045381")
+D2_HHP, D2_HWD, D2_LWD = ("cwd2-HIGHHEADPATH-s132", "5045382"), ("cwd2-HIGHWD0-s132", "5045383"), \
+    ("cwd2-LOWWD0-s132", "5045384")
+S1_K01, S1_HEAD, S1_MUTE = ("csv1-k01-s136", "5045359"), ("csv1-HEAD-s136", "5045364"), ("csv1-MUTE-s136", "5045363")
+S1_IN, S1_SL, S1_NL = ("csv1-INERT-s136", "5045360"), ("csv1-SHADOWLOW-s136", "5045361"), \
+    ("csv1-NAIVELOW-s136", "5045362")
+CWD1_OFF = ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off", "REST_HOLD: off"]   # cvt8 lineage (260)
+
+
+def dm_batch():
+    """cwd1-style (260): k01 unlisted at `DECAY_MASK: off`; the masked arms listed by their DECAY_MASK line."""
+    logs = {D1_K01: CWD1_OFF + ["DECAY_MASK: off"]}
+    for k in (D1_NWD, D1_LNWD, D1_NWD2, D1_LNWD2):
+        logs[k] = CWD1_OFF + [DM_NORMSCALE]
+    listed = [k + (DM_NORMSCALE,) for k in (D1_NWD, D1_LNWD, D1_NWD2, D1_LNWD2)]
+    corpus = [D1_K01, D1_NWD, D1_LNWD, D1_NWD2, D1_LNWD2]
+    return listed, corpus, logs
+
+
+def dm2_batch(by="DECAY_MASK"):
+    """cwd2-style (261): k01WD0 ONE ON kind; HIGHHEADPATH two (BETA_HOLD + COMP_HOLD); HIGHWD0 / LOWWD0 THREE."""
+    logs = {D2_K01: ["VOTE_W: off", "BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off", "DECAY_MASK: off"],
+            D2_WD0: ["VOTE_W: off", "BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off", DM_CARRIER],
+            D2_HHP: ["VOTE_W: off", BH_TRI, CH_REC, "WINDOW_HOLD: off", "DECAY_MASK: off"],
+            D2_HWD: ["VOTE_W: off", BH_TRI, CH_REC, "WINDOW_HOLD: off", DM_CARRIER],
+            D2_LWD: ["VOTE_W: off", BH_FLOOR, CH_REC, "WINDOW_HOLD: off", DM_CARRIER]}
+    pick = {"BETA_HOLD": 1, "COMP_HOLD": 2, "DECAY_MASK": 4}[by]
+    listed = ([D2_WD0 + (DM_CARRIER,), D2_HHP + (logs[D2_HHP][1 if by == "DECAY_MASK" else pick],)]
+              + [k + (logs[k][pick],) for k in (D2_HWD, D2_LWD)])
+    corpus = [D2_K01, D2_WD0, D2_HHP, D2_HWD, D2_LWD]
+    return listed, corpus, logs
+
+
+def sv_batch():
+    """csv1-style (262): three SHADOW_VOTE arms with ONE ON kind, MUTE with VOTE_W, k01 / HEAD at every off line."""
+    off3 = ["BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off"]                 # cvt9 lineage (262)
+    logs = {S1_K01: ["VOTE_W: off"] + off3 + ["SHADOW_VOTE: off"],
+            S1_HEAD: ["VOTE_W: off"] + off3 + ["SHADOW_VOTE: off"],
+            S1_MUTE: [VW_MUTE] + off3 + ["SHADOW_VOTE: off"],
+            S1_IN: ["VOTE_W: off"] + off3 + [SV_INERT],
+            S1_SL: ["VOTE_W: off"] + off3 + [SV_SHADOWLOW],
+            S1_NL: ["VOTE_W: off"] + off3 + [SV_NAIVELOW]}
+    listed = [S1_MUTE + (VW_MUTE,), S1_IN + (SV_INERT,), S1_SL + (SV_SHADOWLOW,), S1_NL + (SV_NAIVELOW,)]
+    corpus = [S1_K01, S1_HEAD, S1_MUTE, S1_IN, S1_SL, S1_NL]
+    return listed, corpus, logs
 
 
 def line_of(out, head):
@@ -663,9 +760,11 @@ def main():
             % (key[0].split("-")[0], "REST_HOLD" if tag == "R" else "WINDOW_HOLD"), show(out))
 
     print("C23 the new KINDS, the prefix proof, the patches' line forms, and MULTI_KIND against the cvt8 / cvt9 scorers")
-    chk(CE.KINDS[4:] == [("REST_HOLD", "REST_HOLD: off"), ("WINDOW_HOLD", "WINDOW_HOLD: off")] and len(CE.KINDS) == 6,
-        "C23 KINDS = 245's four + REST_HOLD + WINDOW_HOLD, appended", repr(CE.KINDS))
-    kinds = [k for k, _off in CE.KINDS]
+    # CORRECTIONS 269: was `CE.KINDS[4:] == [...] and len(CE.KINDS) == 6`; KINDS now also holds DECAY_MASK and
+    # SHADOW_VOTE (C33 owns the total and the two added entries).  251's claim is unchanged over entries 5 and 6.
+    chk(CE.KINDS[4:6] == [("REST_HOLD", "REST_HOLD: off"), ("WINDOW_HOLD", "WINDOW_HOLD: off")],
+        "C23 KINDS = 245's four + REST_HOLD + WINDOW_HOLD, appended", repr(CE.KINDS[:6]))
+    kinds = [k for k, _off in CE.KINDS[:6]]   # CORRECTIONS 269: 251's six, not every kind
     chk(len(kinds) == 6 and len(set(k[0] for k in kinds)) == len(kinds)
         and all(not a.startswith(b) for a in kinds for b in kinds if a != b),
         "C23 the six first letters differ (%s), so no prefix is a prefix of another" % " ".join(k[0] for k in kinds))
@@ -683,7 +782,10 @@ def main():
         twelve = [VW_MUTE, BH_TRI, GH_TRI, CH_REC, RH_REC, WH_EARLY] + ["%s: off" % k for k in SIX]
         open(p, "w").write("\n".join(twelve) + "\n")
         got = CE.witness_lines(p)
-        chk(sorted(got) == sorted(SIX) and all(got[k] == [ln for ln in twelve if ln.split(":")[0] == k] for k in SIX),
+        # CORRECTIONS 269: was `sorted(got) == sorted(SIX)`; witness_lines now also returns the two added kinds' keys,
+        # empty on these twelve lines -- so the kinds that COLLECT a line are still exactly 251's six.
+        chk(sorted(k for k in got if got[k]) == sorted(SIX)
+            and all(got[k] == [ln for ln in twelve if ln.split(":")[0] == k] for k in SIX),
             "C23 witness_lines puts each of 12 lines (one on, one off per kind) under its own kind only", repr(got)[:300])
     finally:
         shutil.rmtree(tmp)
@@ -751,8 +853,11 @@ def main():
         chk([tuple(e) for e in CE2.ARGS_KINDS] == [("ARGS_MOMENTUM_BASE", "momentum-param-base", "0.99"),
                                                    ("ARGS_WD_BASE", "weight-decay-base", "0.1")],
             "C24 ARGS_KINDS = the two cmo1 factors with the standard-cell values 0.99 / 0.1", repr(CE2.ARGS_KINDS))
+        # CORRECTIONS 269: was `len(set(names)) == 8`; two line kinds were added, so the count is `len(names)` (C33
+        # pins it at 10).  263's claim -- no name a prefix of another, across both readers -- is unchanged.
         names = [k for k, _o in CE2.KINDS] + [k for k, _f, _s in CE2.ARGS_KINDS]
-        chk(len(set(names)) == 8 and not [(a, b) for a in names for b in names if a != b and a.startswith(b)],
+        chk(len(set(names)) == len(names) and len(names) >= 8
+            and not [(a, b) for a in names for b in names if a != b and a.startswith(b)],
             "C24 no name of the 6 line kinds + 2 ARGS kinds is a prefix of another", repr(names))
         chk(not [k for k, _o in CE2.KINDS if "ARGS:".startswith(k) or k.startswith("ARGS")],
             "C24 `ARGS:` starts with no line-kind prefix, so witness_lines never collects an ARGS line")
@@ -836,6 +941,176 @@ def main():
     rc, out = run_check(listed + [twin + (W_MOM,)], corpus, logs, args=args, cells=cells)
     chk(rc == 0 and "VERDICT: PASS" in out, "C28 the same pair passes once the 0.9 run is listed",
         "rc=%d %s" % (rc, show(out)))
+
+    # ---- CORRECTIONS 269 ------------------------------------------------------------------------------------
+    print("C29 a cwd1-style DECAY_MASK batch passes")
+    rc, out = run_check(*dm_batch())
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C29 4 masked runs listed by their DECAY_MASK line, k01 unlisted at `DECAY_MASK: off` -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("DECAY_MASK" in ln and "every one listed with its kind: True" in ln
+            for ln in line_of(out, "  completeness")),
+        "C29 the completeness line names DECAY_MASK and is True", repr(line_of(out, "  completeness")))
+
+    print("C30 DECAY_MASK corruptions fail, each named")
+    for tag, key, line, msg in [("a", D1_NWD, "DECAY_MASK: off", "witness"),
+                                ("b", D1_LNWD, DM_WRONG, "witness")]:
+        listed, corpus, logs = dm_batch()
+        logs[key] = CWD1_OFF + [line]
+        rc, out = run_check(listed, corpus, logs)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C30%s %s prints %r but is listed with its registered line -> exit 1, named"
+            % (tag, key[0], line[:40]), show(out))
+    listed, corpus, logs = dm_batch()
+    rc, out = run_check([r for r in listed if r[:2] != D1_LNWD], corpus, logs)
+    chk(rc == 1 and any(("%s-%s.out" % D1_LNWD) in f and "NOT listed" in f for f in fails(out)),
+        "C30c one masked run dropped from the list -> exit 1, named", show(out))
+    listed, corpus, logs = dm_batch()
+    rc, out = run_check([], corpus, logs)
+    chk(rc == 1 and len([f for f in fails(out) if "printing an ON DECAY_MASK line but is NOT listed" in f]) == 4,
+        "C30d a masked batch with NO listed row -> exit 1, all four named", show(out))
+    listed, corpus, logs = dm_batch()
+    logs[D1_K01] = CWD1_OFF                                   # the k01 run prints no DECAY_MASK line at all
+    rc, out = run_check(listed, corpus, logs)
+    chk(rc == 1 and any(("%s-%s.out" % D1_K01) in f and "NOT listed but its witness is" in f for f in fails(out)),
+        "C30e an unlisted run of a listed DECAY_MASK batch with no `DECAY_MASK: off` line -> exit 1, named", show(out))
+    off_only = {("cwd9-k01-s1", "5000901"): CWD1_OFF + ["DECAY_MASK: off"]}
+    rc, out = run_check(*merge(dm_batch(), ([], [("cwd9-k01-s1", "5000901")], off_only)))
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C30f an unlisted batch whose runs print `DECAY_MASK: off` stays unlisted -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+
+    print("C31 cwd2-style multi-kind runs (BETA_HOLD + COMP_HOLD + DECAY_MASK) listed ONCE pass")
+    for by in ("DECAY_MASK", "BETA_HOLD", "COMP_HOLD"):
+        rc, out = run_check(*dm2_batch(by))
+        chk(rc == 0 and "VERDICT: PASS" in out,
+            "C31 the three held / masked arms listed by their %s line -> exit 0 PASS" % by, "rc=%d %s" % (rc, show(out)))
+    rc, out = run_check(*dm2_batch())
+    chk(any("3 kinds 2" in ln for ln in line_of(out, "  multi-kind runs")),
+        "C31 the multi-kind line counts the two 3-kind runs (HIGHWD0 / LOWWD0)", repr(line_of(out, "  multi-kind runs")))
+    for tag, key, lines, msg in [
+            ("a", D2_HWD, ["VOTE_W: off", BH_TRI, CH_REC, "WINDOW_HOLD: off", "DECAY_MASK: off"], "MULTI_KIND"),
+            ("b", D2_LWD, ["VOTE_W: off", BH_TRI, CH_REC, "WINDOW_HOLD: off", DM_CARRIER], "MULTI_KIND"),
+            ("c", D2_WD0, ["VOTE_W: off", BH_TRI, "COMP_HOLD: off", "WINDOW_HOLD: off", DM_CARRIER], "BETA_HOLD"),
+            ("d", D2_HHP, ["VOTE_W: off", BH_TRI, CH_REC, "WINDOW_HOLD: off", DM_CARRIER], "DECAY_MASK")]:
+        listed, corpus, logs = dm2_batch()
+        logs[key] = lines
+        rc, out = run_check(listed, corpus, logs)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C31%s %s prints a wrong registered line -> exit 1, named with %s" % (tag, key[0], msg), show(out))
+
+    print("C32 a csv1-style SHADOW_VOTE batch passes")
+    rc, out = run_check(*sv_batch())
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C32 INERT / SHADOWLOW / NAIVELOW listed by SHADOW_VOTE, MUTE by VOTE_W, k01 / HEAD unlisted -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("SHADOW_VOTE" in ln and "every one listed with its kind: True" in ln for ln in line_of(out, "  completeness")),
+        "C32 the completeness line names SHADOW_VOTE and is True", repr(line_of(out, "  completeness")))
+    for tag, key, lines, msg in [
+            ("a", S1_SL, ["VOTE_W: off"] + ["BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off"] + [SV_NAIVELOW],
+             "witness"),
+            ("b", S1_NL, ["VOTE_W: off"] + ["BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off"] + ["SHADOW_VOTE: off"],
+             "witness"),
+            ("e", S1_MUTE, [VW_MUTE] + ["BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off"] + [SV_INERT],
+             "SHADOW_VOTE")]:
+        listed, corpus, logs = sv_batch()
+        logs[key] = lines
+        rc, out = run_check(listed, corpus, logs)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C32%s %s prints a wrong SHADOW_VOTE line -> exit 1, named" % (tag, key[0]), show(out))
+    listed, corpus, logs = sv_batch()
+    rc, out = run_check([r for r in listed if r[:2] != S1_IN], corpus, logs)
+    chk(rc == 1 and any(("%s-%s.out" % S1_IN) in f and "NOT listed" in f for f in fails(out)),
+        "C32c INERT dropped from the list -> exit 1, named", show(out))
+    listed, corpus, logs = sv_batch()
+    logs[S1_HEAD] = ["VOTE_W: off", "BETA_HOLD: off", "COMP_HOLD: off", "WINDOW_HOLD: off"]
+    rc, out = run_check(listed, corpus, logs)
+    chk(rc == 1 and any(("%s-%s.out" % S1_HEAD) in f and "NOT listed but its witness is" in f for f in fails(out)),
+        "C32d an unlisted run of the listed batch with no `SHADOW_VOTE: off` line -> exit 1, named", show(out))
+
+    print("C33 the new KINDS, the prefix proof, the patches' line forms, and MULTI_KIND against the cwd / csv tables")
+    chk(CE.KINDS[6:] == [("DECAY_MASK", "DECAY_MASK: off"), ("SHADOW_VOTE", "SHADOW_VOTE: off")] and len(CE.KINDS) == 8,
+        "C33 KINDS = 251's six + DECAY_MASK + SHADOW_VOTE, appended", repr(CE.KINDS[6:]))
+    kinds8 = [k for k, _off in CE.KINDS]
+    chk(len(kinds8) == 8 and len(set(k[0] for k in kinds8)) == 8
+        and all(not a.startswith(b) for a in kinds8 for b in kinds8 if a != b),
+        "C33 the eight first letters differ (%s), so no prefix is a prefix of another" % " ".join(k[0] for k in kinds8))
+    names10 = kinds8 + [k for k, _f, _s in CE.ARGS_KINDS]
+    chk(not [(a, b) for a in names10 for b in names10 if a != b and a.startswith(b)]
+        and not [k for k in kinds8 if "ARGS:".startswith(k) or k.startswith("ARGS")]
+        and CE.kind_of(DM_NORMSCALE) == "DECAY_MASK" and CE.kind_of(SV_INERT) == "SHADOW_VOTE"
+        and CE.kind_of("DECAY_MASK: off") == "DECAY_MASK",
+        "C33 no name of the 8 line kinds + 2 ARGS kinds is a prefix of another, and neither reader takes the other's line",
+        repr(names10))
+    EIGHT = ["VOTE_W", "BETA_HOLD", "GROUP_HOLD", "COMP_HOLD", "REST_HOLD", "WINDOW_HOLD", "DECAY_MASK",
+             "SHADOW_VOTE"]  # literal, not read from the module
+    eight = "|".join(sorted(EIGHT))
+    for k, fn, on in (("DECAY_MASK", "patch_decaymask.py", "DECAY_MASK: on base="),
+                      ("SHADOW_VOTE", "patch_shadowvote.py", "SHADOW_VOTE: on type=")):
+        src = open(os.path.join(REPO, "patches", fn)).read()
+        lits = re.findall(r"'((?:%s): [^']*)'" % eight, src)
+        chk(("%s: off" % k) in lits and any(l.startswith(on) for l in lits) and all(l.startswith(k + ": ") for l in lits),
+            "C33 %s prints only `%s: off` / `%s ...` lines" % (fn, k, on), repr(sorted(set(lits)))[:300])
+    tmp = tempfile.mkdtemp(prefix="ce_prefix_test_")
+    try:
+        p = os.path.join(tmp, "x.out")
+        sixteen = ([VW_MUTE, BH_TRI, GH_TRI, CH_REC, RH_REC, WH_EARLY, DM_NORMSCALE, SV_SHADOWLOW]
+                   + ["%s: off" % k for k in EIGHT])
+        open(p, "w").write("\n".join(sixteen) + "\n")
+        got = CE.witness_lines(p)
+        chk(sorted(got) == sorted(EIGHT) and all(got[k] == [ln for ln in sixteen if ln.split(":")[0] == k] for k in EIGHT),
+            "C33 witness_lines puts each of 16 lines (one on, one off per kind) under its own kind only", repr(sorted(got)))
+    finally:
+        shutil.rmtree(tmp)
+    rc, out = run_check(*merge(rh_batch(), wh_batch(), dm_batch(), dm2_batch(), sv_batch()))
+    chk(("  kinds scanned (CORRECTIONS 245): VOTE_W / BETA_HOLD / GROUP_HOLD / COMP_HOLD; no prefix is a prefix of another, "
+         "so no line is read as two kinds: True") in out.splitlines(),
+        "C33 245's `kinds scanned` line is unchanged, byte for byte", repr(line_of(out, "  kinds scanned")))
+    chk(("  kinds scanned (CORRECTIONS 251): also REST_HOLD / WINDOW_HOLD, 6 in all; no prefix of the 6 is a prefix of "
+         "another: True") in out.splitlines(),
+        "C33 251's `kinds scanned` line is unchanged, byte for byte", repr(line_of(out, "  kinds scanned")))
+    chk(any("DECAY_MASK / SHADOW_VOTE" in ln and "8 in all" in ln and ln.endswith(": True")
+            for ln in line_of(out, "  kinds scanned (CORRECTIONS 269)")),
+        "C33 ONE new line names the two added kinds, no prefix collision", repr(line_of(out, "  kinds scanned")))
+    chk(len(line_of(out, "  kinds scanned")) == 3, "C33 exactly three `kinds scanned` lines",
+        repr(line_of(out, "  kinds scanned")))
+    try:
+        mk = getattr(CE, "MULTI_KIND", None) or {}
+        import cwd_design as DW              # the frozen tables both registered cWD scorers import UNEDITED
+        import cSV1_shadowvote_score as SSV  # the registered csv1 scorer
+        offs = set(off for _k, off in CE.KINDS)
+        on1 = dict((a, dict((k, w) for k, w in [("DECAY_MASK", DW.CWD1.WITNESS_DM[a])] + list(zip(DW.CWD1.OFF_KINDS,
+                                                                                                 DW.CWD1.OFF_LINES))
+                            if w not in offs)) for a in DW.CWD1.ARMS)
+        on2 = dict((a, dict((k, w) for k, w in (("VOTE_W", DW.CWD2.WITNESS_VW), ("BETA_HOLD", DW.CWD2.WITNESS_BH[a]),
+                                                ("COMP_HOLD", DW.CWD2.WITNESS_CH[a]),
+                                                ("WINDOW_HOLD", DW.CWD2.WITNESS_WH[a]),
+                                                ("DECAY_MASK", DW.CWD2.WITNESS_DM[a])) if w not in offs))
+                   for a in DW.CWD2.ARMS)
+        onS = dict((a, dict((k, w) for k, w in ([("VOTE_W", SSV.WITNESS_VW[a]), ("SHADOW_VOTE", SSV.WITNESS_SV[a])]
+                                                + list(zip(("BETA_HOLD", "COMP_HOLD", "WINDOW_HOLD"), SSV.WITNESS_OFF)))
+                            if w not in offs)) for a in SSV.ARMS)
+        want2 = dict((("cwd2", a), d) for a, d in on2.items() if len(d) > 1)
+        chk(dict((k, v) for k, v in mk.items() if k[0] == "cwd2") == want2 and len(want2) == 3,
+            "C33 MULTI_KIND's cwd2 entries == cwd_design's WITNESS_BH / WITNESS_CH / WITNESS_DM for its 2+-kind arms",
+            repr(sorted(want2)))
+        chk(not [k for k in mk if k[0] in ("cwd1", "csv1")]
+            and not [a for a, d in on1.items() if len(d) > 1] and not [a for a, d in onS.items() if len(d) > 1],
+            "C33 no cwd1 / csv1 arm turns on two kinds, and MULTI_KIND registers none for them",
+            repr((sorted((a, sorted(d)) for a, d in on1.items()), sorted((a, sorted(d)) for a, d in onS.items()))))
+        chk((DW.CWD1.WITNESS_DM["k01NWD"], DW.CWD1.WITNESS_DM["kLNWD"], DW.CWD1.WITNESS_DM["k01"],
+             DW.CWD2.WITNESS_DM["HIGHWD0"], DW.CWD2.WITNESS_DM["LOWWD0"], DW.CWD2.WITNESS_DM["k01WD0"])
+            == (DM_NORMSCALE, DM_NORMSCALE, "DECAY_MASK: off", DM_CARRIER, DM_CARRIER, DM_CARRIER),
+            "C33 this test's DECAY_MASK fixtures are the registered cwd_design lines")
+        chk((SSV.WITNESS_SV["INERT"], SSV.WITNESS_SV["SHADOWLOW"], SSV.WITNESS_SV["NAIVELOW"], SSV.WITNESS_SV["k01"],
+             SSV.WITNESS_VW["MUTE"]) == (SV_INERT, SV_SHADOWLOW, SV_NAIVELOW, "SHADOW_VOTE: off", VW_MUTE),
+            "C33 this test's SHADOW_VOTE fixtures are the registered cSV1 scorer's lines")
+        chk((DW.CWD2.WITNESS_BH["HIGHWD0"], DW.CWD2.WITNESS_BH["LOWWD0"], DW.CWD2.WITNESS_CH["HIGHHEADPATH"])
+            == (BH_TRI, BH_FLOOR, CH_REC),
+            "C33 cwd2's hold lines are cvt9's, byte for byte (261.5: taken from the registered cvt9 scorer)")
+    except Exception as ex:  # a table that does not import is a FAIL here, not an error
+        chk(False, "C33 cwd_design and the registered cSV1 scorer import and MULTI_KIND holds cwd2's arms",
+            "%s: %s" % (type(ex).__name__, ex))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)
