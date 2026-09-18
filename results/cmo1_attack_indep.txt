@@ -1,0 +1,126 @@
+====================================================================================================
+cmo1_attack_indep -- independent re-derivation of CORRECTIONS 255 (cmo1).  No repo import, no regex.
+====================================================================================================
+
+[0] PROVENANCE, SCORER, MANIFEST, CORPUS
+  ok  PROVENANCE MODE == submit
+  ok  PROVENANCE BUILD_NETWORK_SHA256 == c79988833c4399a0
+  ok  PROVENANCE HF_SHA256 == 4732b74aa3a10508
+  ok  PROVENANCE TRAIN_SHA256 == 3fea309e172609c1
+  ok  PROVENANCE RUNNER_SHA256 == a0d0a1b904e64ea5
+  ok  PROVENANCE SCORER_SHA256 == 2548ee1b562aa06a
+  ok  the scorer given on the command line is the REGISTERED one (sha256 2548ee1b562aa06a...)
+  ok  PARTITION-MANIFEST.txt rebuilt byte for byte from the ResNet18_c100 architecture   4554 bytes, 62 tensors, 11220132 params, ISO groups [59, 3]
+  ok  ISO = 59 + 3 tensors, 11218596 + 1536 params, carriers layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+  corpus files: all_runs.csv sha256 1801245410857d8a... (3127 data rows); CORPUS-EXCLUSIONS.tsv sha256 ff9533348f9f2f0d... (108 listed)
+  corpus commit 1cb52f7 (the cvt8 / cvt9 ingest), unchanged through 8e341e4; 3019 rows survive the filter
+
+[1] COMPLETENESS AND PER-RUN WITNESSES (raw .out only)
+  ok  exactly one .out per arm and seed   27 files
+  ok  all 27 runs complete (100 epoch lines, RUN_DONE, no traceback)
+  ok  every run's ARGS line equals the registered expected_args(arm, seed), flag by flag   27/27
+  ok  one distinct ENV line across 27 runs == ciso1's, byte for byte (PROBE_DIR stripped)
+  ok  every run printed exactly one ENV line whose PROBE_DIR is its own
+  ok  every run printed ONE PROBE_TENSOR line of its own arm's type (scalar/layerwise/blockwise 9/9/9)
+  ok  no run printed a VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/DECAY_MASK/SHADOW_VOTE line
+
+[2] LEVELS -- plateau5 from the RAW .out (mean TEST over epochs 95..99); TRAIN beside it
+  k01    TEST  22.7887  sd 0.3351  range 0.6520   TRAIN  22.9547   seeds 23.0700 22.8780 22.4180
+  kL     TEST  69.0507  sd 0.4371  range 0.7620   TRAIN  98.9273   seeds 68.5460 69.3080 69.2980
+  ISO    TEST  70.4227  sd 0.4623  range 0.8300   TRAIN  94.1887   seeds 69.8900 70.7200 70.6580
+  M9k01  TEST  24.5833  sd 0.3687  range 0.7340   TRAIN  24.7087   seeds 24.9300 24.6240 24.1960
+  M9kL   TEST  69.3913  sd 0.5527  range 1.0280   TRAIN  98.9007   seeds 68.7600 69.7880 69.6260
+  M9ISO  TEST  70.9047  sd 0.3525  range 0.6740   TRAIN  94.9467   seeds 70.5080 71.0240 71.1820
+  W0k01  TEST  71.5600  sd 0.2381  range 0.4720   TRAIN  99.5353   seeds 71.3060 71.7780 71.5960
+  W0kL   TEST  68.1700  sd 0.6303  range 1.1720   TRAIN  99.2033   seeds 67.4500 68.4380 68.6220
+  W0ISO  TEST  71.4620  sd 0.2687  range 0.4760   TRAIN  99.4753   seeds 71.7720 71.3180 71.2960
+  ok  floor / ceiling   max arm mean 71.5600
+
+[3] FLAG WITNESS -- each run's OWN TensorBoard table, TFRecord frames with masked CRC-32C verified
+  ok  all 27 runs: one events file, every registered key once-valued and equal to the registration
+  ok  TFRecord framing: 129654 frames read, masked CRC-32C of length and payload verified   0 bad
+  M9 arms read 0.9 and W0 arms read 0.0 from their own events file; anchors read 0.99 / 0.1
+
+[4] SIGMA AND CONTRASTS (every contrast WITHIN batch)
+  PRIMARY  G_M9   =  +44.8080 pp =  +80.56 SE   (TRAIN +74.1920)
+  PRIMARY  R_M9   =  +46.3213 pp =  +83.28 SE   (TRAIN +70.2380)
+  PRIMARY  L_M9   =   +1.7947 pp =   +3.23 SE   (TRAIN +1.7540)
+  PRIMARY  G_W0   =   -3.3900 pp =   -6.09 SE   (TRAIN -0.3320)
+  PRIMARY  R_W0   =   -0.0980 pp =   -0.18 SE   (TRAIN -0.0600)
+  PRIMARY  L_W0   =  +48.7713 pp =  +87.69 SE   (TRAIN +76.5807)
+
+[5] BRANCH AND STAMPS (the map re-typed from 255.4; first match wins)
+  M9: k01 24.5833  kL 69.3913  ISO 70.9047 -> COLLAPSE-PERSISTS / ISO-RESCUES   (gap 44.8080, k01/kL 0.3543, ISO-kL 1.5133)
+  W0: k01 71.5600  kL 68.1700  ISO 71.4620 -> COLLAPSE-IS-CONFIG / ISO-UNREADABLE   (gap -3.3900, k01/kL 1.0497, ISO-kL 3.2920)
+  rebuilt FINAL: FINAL: M9:COLLAPSE-PERSISTS/ISO-RESCUES+W0:COLLAPSE-IS-CONFIG/ISO-UNREADABLE | HARNESS-CLEAN | FLAGS-WITNESSED | LIVE-HARNESS | ONE-VALUE-PER-FACTOR | ONE-FACTOR-AT-A-TIME | ISO-IS-CISO1-CARRIERS | NO-CTL-AT-NEW-CONFIGS | ONE-NETWORK-RESNET | HORIZON-100-ONLY | ALPHA0-1E-6 | SIGMA-PRIOR-FROZEN | ANCHOR-REPRODUCES | M9-K01-AT-ANCHOR | W0-K01-LIFTED | W0-ISO-AT-REF | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+
+[6] DESCRIPTIVE CARRIER SHARE (probe records; share of sum_t |z_tensor| per tensor, mean over seeds)
+  k01    carriers 50/53/59 = 0.152 / 0.101 / 0.172 (sum 0.425); top tensor layer4.1.bn2.weight 0.172
+  M9k01  carriers 50/53/59 = 0.151 / 0.100 / 0.171 (sum 0.422); top tensor layer4.1.bn2.weight 0.171
+  W0k01  carriers 50/53/59 = 0.003 / 0.001 / 0.012 (sum 0.016); top tensor linear.weight 0.158
+
+[7] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG
+  ok  every one of the 213 scorer lines rebuilt independently and matched (2 host-path lines by suffix)   0 mismatched
+  ok  FINAL identical, token by token
+
+[D1] DESCRIPTIVE / UNSURE -- the ARGS witness per arm (for the corpus-exclusion stage, 255.7)
+     definition: the tokens of the run's own argparse line; identical on all 3 seeds of the arm.
+     k01    ARGS --momentum-param-base 0.99 --weight-decay-base 0.1 --stepsize-groups scalar
+     kL     ARGS --momentum-param-base 0.99 --weight-decay-base 0.1 --stepsize-groups layerwise
+     ISO    ARGS --momentum-param-base 0.99 --weight-decay-base 0.1 --stepsize-groups ISO(sets:1-49,51-52,54-58,60-62/3 carriers)
+     M9k01  ARGS --momentum-param-base 0.9  --weight-decay-base 0.1 --stepsize-groups scalar
+     M9kL   ARGS --momentum-param-base 0.9  --weight-decay-base 0.1 --stepsize-groups layerwise
+     M9ISO  ARGS --momentum-param-base 0.9  --weight-decay-base 0.1 --stepsize-groups ISO(sets:1-49,51-52,54-58,60-62/3 carriers)
+     W0k01  ARGS --momentum-param-base 0.99 --weight-decay-base 0   --stepsize-groups scalar
+     W0kL   ARGS --momentum-param-base 0.99 --weight-decay-base 0   --stepsize-groups layerwise
+     W0ISO  ARGS --momentum-param-base 0.99 --weight-decay-base 0   --stepsize-groups ISO(sets:1-49,51-52,54-58,60-62/3 carriers)
+     rows whose ARGS carries a NON-DEFAULT base momentum or base WD (the exclusion stage owes these):
+       cmo1-M9k01-s108 job 5025986   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9k01-s109 job 5025995   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9k01-s110 job 5026004   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9kL-s108 job 5025987   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9kL-s109 job 5025996   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9kL-s110 job 5026005   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9ISO-s108 job 5025988   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9ISO-s109 job 5025997   witness: ARGS --momentum-param-base 0.9
+       cmo1-M9ISO-s110 job 5026006   witness: ARGS --momentum-param-base 0.9
+       cmo1-W0k01-s108 job 5025989   witness: ARGS --weight-decay-base 0
+       cmo1-W0k01-s109 job 5025998   witness: ARGS --weight-decay-base 0
+       cmo1-W0k01-s110 job 5026007   witness: ARGS --weight-decay-base 0
+       cmo1-W0kL-s108 job 5025990   witness: ARGS --weight-decay-base 0
+       cmo1-W0kL-s109 job 5025999   witness: ARGS --weight-decay-base 0
+       cmo1-W0kL-s110 job 5026008   witness: ARGS --weight-decay-base 0
+       cmo1-W0ISO-s108 job 5025991   witness: ARGS --weight-decay-base 0
+       cmo1-W0ISO-s109 job 5026000   witness: ARGS --weight-decay-base 0
+       cmo1-W0ISO-s110 job 5026009   witness: ARGS --weight-decay-base 0
+     18 rows (9 M9 + 9 W0); the 9 anchor rows are plain 0.99 / 0.1 and pool normally.
+
+[D2] DESCRIPTIVE / UNSURE -- does k01 still collapse, does ISO still rescue (same numbers, in words)
+     M9: k01 24.5833 vs its own kL 69.3913 -> gap 44.8080 pp, ratio 0.3543 (collapse bars: gap >= 20 AND ratio <= 0.50)
+        ISO 70.9047; ISO - kL = +1.5133 (rescue bar: within 5 pp of kL); ISO - k01 = +46.3213
+     W0: k01 71.5600 vs its own kL 68.1700 -> gap -3.3900 pp, ratio 1.0497 (collapse bars: gap >= 20 AND ratio <= 0.50)
+        ISO 71.4620; ISO - kL = +3.2920 (rescue bar: within 5 pp of kL); ISO - k01 = -0.0980
+     anchor in the same batch: k01 22.7887, kL 69.0507, ISO 70.4227 (gap 46.2620, ratio 0.3300)
+
+[D3] DESCRIPTIVE / UNSURE -- carrier nomination from the probe records (500 records per run, all steps)
+     k01    ciso1's trio share 0.425; top5 layer4.1.bn2.weight 0.172, layer4.0.bn2.weight 0.152, layer4.0.shortcut.1.weight 0.101, linear.weight 0.074, conv1.weight 0.051
+     M9k01  ciso1's trio share 0.422; top5 layer4.1.bn2.weight 0.171, layer4.0.bn2.weight 0.151, layer4.0.shortcut.1.weight 0.100, linear.weight 0.075, conv1.weight 0.045
+     W0k01  ciso1's trio share 0.016; top5 linear.weight 0.158, conv1.weight 0.103, layer4.1.conv2.weight 0.036, layer4.0.conv2.weight 0.035, layer1.0.conv1.weight 0.035
+     UNSURE: a share readout is not a nomination test; no control arm at M9 / W0 (S4 is SHOULD-tier).
+
+[D4] DESCRIPTIVE / UNSURE -- TEST (TRAIN) at epochs 9 / 19 / 49 / 99, arm mean over the 3 seeds
+     record boundary: the run's own `Epoch <n>` lines, 0-indexed; the final epoch line is printed twice by
+     the harness and is read once (dict by epoch); seeds are the batch's own 108/109/110, no split.
+     k01    e9    3.17 (  2.60)  e19  19.27 ( 18.68)  e49  22.81 ( 22.88)  e99  22.77 ( 22.95)
+     kL     e9    3.17 (  2.57)  e19  29.53 ( 27.43)  e49  66.93 ( 84.17)  e99  69.19 ( 99.05)
+     ISO    e9    3.14 (  2.59)  e19  28.75 ( 26.93)  e49  67.90 ( 82.64)  e99  70.33 ( 94.24)
+     M9k01  e9    3.16 (  2.61)  e19  19.75 ( 19.58)  e49  24.67 ( 24.65)  e99  24.68 ( 24.68)
+     M9kL   e9    3.13 (  2.61)  e19  28.77 ( 28.79)  e49  66.05 ( 84.71)  e99  69.11 ( 98.98)
+     M9ISO  e9    3.15 (  2.62)  e19  27.83 ( 28.44)  e49  68.38 ( 84.16)  e99  70.87 ( 95.03)
+     W0k01  e9    3.19 (  2.58)  e19  28.23 ( 26.09)  e49  66.26 ( 85.34)  e99  71.80 ( 99.61)
+     W0kL   e9    3.16 (  2.58)  e19  29.20 ( 27.04)  e49  65.23 ( 89.75)  e99  68.25 ( 99.21)
+     W0ISO  e9    3.15 (  2.59)  e19  28.62 ( 26.16)  e49  65.86 ( 85.78)  e99  71.75 ( 99.52)
+
+====================================================================================================
+VIOLATIONS 0
+====================================================================================================

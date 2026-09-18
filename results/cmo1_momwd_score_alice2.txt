@@ -1,0 +1,213 @@
+==============================================================================
+ cmo1 -- ResNet18_c100: does the scalar collapse and the carrier rescue survive momentum 0.9 / weight decay 0?
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 108,109,110   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1  LIVE harness
+   k01    scalar    momentum-param-base 0.99  weight-decay-base 0.1
+   kL     layerwise momentum-param-base 0.99  weight-decay-base 0.1
+   ISO    ISO       momentum-param-base 0.99  weight-decay-base 0.1
+   M9k01  scalar    momentum-param-base 0.9   weight-decay-base 0.1
+   M9kL   layerwise momentum-param-base 0.9   weight-decay-base 0.1
+   M9ISO  ISO       momentum-param-base 0.9   weight-decay-base 0.1
+   W0k01  scalar    momentum-param-base 0.99  weight-decay-base 0
+   W0kL   layerwise momentum-param-base 0.99  weight-decay-base 0
+   W0ISO  ISO       momentum-param-base 0.99  weight-decay-base 0
+ CO-PRIMARY (X in M9, W0): G_X = XkL - Xk01; R_X = XISO - Xk01; L_X = Xk01 - k01.
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3019 rows after corpus_exclusions.filter_rows, cmo1- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  27 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cmo1-k01-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.0700 (train 23.2120)
+  OK   cmo1-kL-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.5460 (train 98.9340)
+  OK   cmo1-ISO-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.8900 (train 94.5280)
+  OK   cmo1-M9k01-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 24.9300 (train 24.9500)
+  OK   cmo1-M9kL-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.7600 (train 98.8320)
+  OK   cmo1-M9ISO-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.5080 (train 95.2900)
+  OK   cmo1-W0k01-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.3060 (train 99.4740)
+  OK   cmo1-W0kL-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.4500 (train 99.1160)
+  OK   cmo1-W0ISO-s108  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.7720 (train 99.5360)
+  OK   cmo1-k01-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.8780 (train 23.0600)
+  OK   cmo1-kL-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.3080 (train 98.9680)
+  OK   cmo1-ISO-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.7200 (train 93.8300)
+  OK   cmo1-M9k01-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 24.6240 (train 24.8360)
+  OK   cmo1-M9kL-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.7880 (train 98.9600)
+  OK   cmo1-M9ISO-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.0240 (train 94.6340)
+  OK   cmo1-W0k01-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.7780 (train 99.6040)
+  OK   cmo1-W0kL-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.4380 (train 99.2560)
+  OK   cmo1-W0ISO-s109  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.3180 (train 99.3680)
+  OK   cmo1-k01-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.4180 (train 22.5920)
+  OK   cmo1-kL-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.2980 (train 98.8800)
+  OK   cmo1-ISO-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.6580 (train 94.2080)
+  OK   cmo1-M9k01-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 24.1960 (train 24.3400)
+  OK   cmo1-M9kL-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.6260 (train 98.9100)
+  OK   cmo1-M9ISO-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.1820 (train 94.9160)
+  OK   cmo1-W0k01-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.5960 (train 99.5280)
+  OK   cmo1-W0kL-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.6220 (train 99.2380)
+  OK   cmo1-W0ISO-s110  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.2960 (train 99.5220)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers (momentum and WD included)
+  PASS G-ARGS k01-s108
+  PASS G-ARGS kL-s108
+  PASS G-ARGS ISO-s108
+  PASS G-ARGS M9k01-s108
+  PASS G-ARGS M9kL-s108
+  PASS G-ARGS M9ISO-s108
+  PASS G-ARGS W0k01-s108
+  PASS G-ARGS W0kL-s108
+  PASS G-ARGS W0ISO-s108
+  PASS G-ARGS k01-s109
+  PASS G-ARGS kL-s109
+  PASS G-ARGS ISO-s109
+  PASS G-ARGS M9k01-s109
+  PASS G-ARGS M9kL-s109
+  PASS G-ARGS M9ISO-s109
+  PASS G-ARGS W0k01-s109
+  PASS G-ARGS W0kL-s109
+  PASS G-ARGS W0ISO-s109
+  PASS G-ARGS k01-s110
+  PASS G-ARGS kL-s110
+  PASS G-ARGS ISO-s110
+  PASS G-ARGS M9k01-s110
+  PASS G-ARGS M9kL-s110
+  PASS G-ARGS M9ISO-s110
+  PASS G-ARGS W0k01-s110
+  PASS G-ARGS W0kL-s110
+  PASS G-ARGS W0ISO-s110
+
+G-ENV     the environment rode the ENV line on every run; PROBE_TENSOR on; NO intervention switch line
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is ciso1's / cdep1's / cvt8's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=62`   27 runs
+  PASS G-NOSWITCH no run printed a VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/DECAY_MASK/SHADOW_VOTE line (the LIVE harness prints none)
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cmo1/PARTITION-MANIFEST.txt (<runsdir>/cmo1/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text() (62 tensors, ISO [59,3], base flags)   4554 vs 4554 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cmo1/PROVENANCE.txt (<runsdir>/cmo1/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV BUILD_NETWORK_SHA256 == the LIVE c79988833c43...   c79988833c4399a0
+  PASS G-PROV HF_SHA256 == the LIVE 4732b74aa3a1...   4732b74aa3a10508
+  PASS G-PROV TRAIN_SHA256 == the LIVE 3fea309e1726...   3fea309e172609c1
+  PASS G-PROV RUNNER_SHA256 == the LIVE a0d0a1b904e6...   a0d0a1b904e64ea5
+  PASS G-PROV SCORER_SHA256 == this scorer's sha256 2548ee1b562a...   2548ee1b562aa06a
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01    TEST 22.7887  sd 0.3351  range 0.6520   TRAIN 22.9547   tail slope 0.005/-0.001/-0.004 pp/ep
+         seeds: s108 23.0700 (train 23.2120), s109 22.8780 (train 23.0600), s110 22.4180 (train 22.5920)
+  kL     TEST 69.0507  sd 0.4371  range 0.7620   TRAIN 98.9273   tail slope 0.021/0.010/0.028 pp/ep
+         seeds: s108 68.5460 (train 98.9340), s109 69.3080 (train 98.9680), s110 69.2980 (train 98.8800)
+  ISO    TEST 70.4227  sd 0.4623  range 0.8300   TRAIN 94.1887   tail slope -0.004/-0.005/0.011 pp/ep
+         seeds: s108 69.8900 (train 94.5280), s109 70.7200 (train 93.8300), s110 70.6580 (train 94.2080)
+  M9k01  TEST 24.5833  sd 0.3687  range 0.7340   TRAIN 24.7087   tail slope 0.002/-0.000/0.002 pp/ep
+         seeds: s108 24.9300 (train 24.9500), s109 24.6240 (train 24.8360), s110 24.1960 (train 24.3400)
+  M9kL   TEST 69.3913  sd 0.5527  range 1.0280   TRAIN 98.9007   tail slope 0.051/0.038/0.068 pp/ep
+         seeds: s108 68.7600 (train 98.8320), s109 69.7880 (train 98.9600), s110 69.6260 (train 98.9100)
+  M9ISO  TEST 70.9047  sd 0.3525  range 0.6740   TRAIN 94.9467   tail slope 0.003/0.006/0.003 pp/ep
+         seeds: s108 70.5080 (train 95.2900), s109 71.0240 (train 94.6340), s110 71.1820 (train 94.9160)
+  W0k01  TEST 71.5600  sd 0.2381  range 0.4720   TRAIN 99.5353   tail slope 0.044/0.068/0.056 pp/ep
+         seeds: s108 71.3060 (train 99.4740), s109 71.7780 (train 99.6040), s110 71.5960 (train 99.5280)
+  W0kL   TEST 68.1700  sd 0.6303  range 1.1720   TRAIN 99.2033   tail slope 0.025/0.011/0.020 pp/ep
+         seeds: s108 67.4500 (train 99.1160), s109 68.4380 (train 99.2560), s110 68.6220 (train 99.2380)
+  W0ISO  TEST 71.4620  sd 0.2687  range 0.4760   TRAIN 99.4753   tail slope 0.074/0.009/0.042 pp/ep
+         seeds: s108 71.7720 (train 99.5360), s109 71.3180 (train 99.3680), s110 71.2960 (train 99.5220)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 71.5600
+  PASS G-CEIL max arm mean <= 90.00 pp   max 71.5600
+
+G-TBARGS  the run's OWN TensorBoard hyper-parameter table (written by train.py from vars(args)) carries the
+          registered base momentum, base WD and every other registered key, once-valued, on every run
+  PASS G-TBARGS k01    s108 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS kL     s108 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS ISO    s108 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9k01  s108 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9kL   s108 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9ISO  s108 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0k01  s108 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0kL   s108 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0ISO  s108 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS k01    s109 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS kL     s109 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS ISO    s109 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9k01  s109 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9kL   s109 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9ISO  s109 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0k01  s109 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0kL   s109 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0ISO  s109 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS k01    s110 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS kL     s110 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS ISO    s110 momentum_param_base=0.99 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9k01  s110 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9kL   s110 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS M9ISO  s110 momentum_param_base=0.9 weight_decay_base=0.1  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0k01  s110 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0kL   s110 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+  PASS G-TBARGS W0ISO  s110 momentum_param_base=0.99 weight_decay_base=0.0  1 events file(s); every registered key once-valued and right
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.681198
+  SIGMA_INBATCH        0.422804
+  SIGMA_USED           0.681198  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.556196  = SIGMA_USED * sqrt(2/3)  (df_inbatch 18)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  G_M9   = M9kL   - M9k01  = +44.8080 pp = +80.56 SE   (TRAIN +74.1920)
+  PRIMARY  R_M9   = M9ISO  - M9k01  = +46.3213 pp = +83.28 SE   (TRAIN +70.2380)
+  PRIMARY  L_M9   = M9k01  - k01    = +1.7947 pp = +3.23 SE   (TRAIN +1.7540)
+  PRIMARY  G_W0   = W0kL   - W0k01  = -3.3900 pp = -6.09 SE   (TRAIN -0.3320)
+  PRIMARY  R_W0   = W0ISO  - W0k01  = -0.0980 pp = -0.18 SE   (TRAIN -0.0600)
+  PRIMARY  L_W0   = W0k01  - k01    = +48.7713 pp = +87.69 SE   (TRAIN +76.5807)
+  KEY      G_A    = kL     - k01    = +46.2620 pp = +83.18 SE   (TRAIN +75.9727)
+  KEY      R_A    = ISO    - k01    = +47.6340 pp = +85.64 SE   (TRAIN +71.2340)
+  KEY      DL_M9  = M9kL   - kL     = +0.3407 pp = +0.61 SE   (TRAIN -0.0267)
+  KEY      DI_M9  = M9ISO  - ISO    = +0.4820 pp = +0.87 SE   (TRAIN +0.7580)
+  KEY      DL_W0  = W0kL   - kL     = -0.8807 pp = -1.58 SE   (TRAIN +0.2760)
+  KEY      DI_W0  = W0ISO  - ISO    = +1.0393 pp = +1.87 SE   (TRAIN +5.2867)
+  KEY      IG_M9 = G_M9 - G_A = -1.4540 pp;  IR_M9 = R_M9 - R_A = -1.3127 pp;  ratio Xk01/XkL = 0.3543 (anchor 0.3300)
+  KEY      IG_W0 = G_W0 - G_A = -49.6520 pp;  IR_W0 = R_W0 - R_A = -47.7320 pp;  ratio Xk01/XkL = 1.0497 (anchor 0.3300)
+  bars: GAP_MIN 20.0 (35.96 SE) | MATCH 5.0 pp (8.99 SE) | RESCUE 10.0 pp (17.98 SE) | NULL 2.0 pp | REF_MIN 45.0 | R50 0.50 | K01_MAX 30.0
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: M9:COLLAPSE-PERSISTS/ISO-RESCUES+W0:COLLAPSE-IS-CONFIG/ISO-UNREADABLE | HARNESS-CLEAN | FLAGS-WITNESSED | LIVE-HARNESS | ONE-VALUE-PER-FACTOR | ONE-FACTOR-AT-A-TIME | ISO-IS-CISO1-CARRIERS | NO-CTL-AT-NEW-CONFIGS | ONE-NETWORK-RESNET | HORIZON-100-ONLY | ALPHA0-1E-6 | SIGMA-PRIOR-FROZEN | ANCHOR-REPRODUCES | M9-K01-AT-ANCHOR | W0-K01-LIFTED | W0-ISO-AT-REF | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cmo1 bar or contrast):
+  cvt8: k01 23.0600  ISO 70.2600
+  ciso1: k01 23.2807  ISO 70.2113
+  cdep1: k01 23.3520  ISO 70.0440
+  corpus (254 census): k01 22.9600  kL 69.4200
+  cmo1 {108,109,110}: k01 22.7887  kL 69.0507  ISO 70.4227  M9k01 24.5833  M9kL 69.3913  M9ISO 70.9047  W0k01 71.5600  W0kL 68.1700  W0ISO 71.4620
+
+DESCRIPTIVE (NON-GATING, after FINAL): share of sum_t |z_tensor| per tensor on the scalar arms, mean over seeds
+  k01    (3 seeds) carriers 50:0.152 53:0.101 59:0.172   top5 59:layer4.1.bn2.weight:0.172 50:layer4.0.bn2.weight:0.152 53:layer4.0.shortcut.1.weight:0.101 61:linear.weight:0.074 1:conv1.weight:0.051
+  M9k01  (3 seeds) carriers 50:0.151 53:0.100 59:0.171   top5 59:layer4.1.bn2.weight:0.171 50:layer4.0.bn2.weight:0.151 53:layer4.0.shortcut.1.weight:0.100 61:linear.weight:0.075 1:conv1.weight:0.045
+  W0k01  (3 seeds) carriers 50:0.003 53:0.001 59:0.012   top5 61:linear.weight:0.158 1:conv1.weight:0.103 58:layer4.1.conv2.weight:0.036 49:layer4.0.conv2.weight:0.035 4:layer1.0.conv1.weight:0.035
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  M9:COLLAPSE-PERSISTS: with SGDm momentum 0.9 (the parent's value; EMA form, so the averaging window shrinks 100 -> 10 steps while the step scale is unchanged), the scalar arm still sits at <= half its own layerwise reference and >= 20 pp below
+    it.  Licensed: 'at this cell the scalar collapse does not require SGDm momentum 0.99'.  Not licensed: the size of the gap at the
+    parent's full configuration (alpha0 1e-6 here, not 1e-5; CIFAR-100, not ImageNet); other networks; interactions.
+    M9 ISO-RESCUES: isolating ciso1's three carriers lifts the scalar arm to within 5 pp of layerwise with SGDm momentum 0.9 (the parent's value; EMA form, so the averaging window shrinks 100 -> 10 steps while the step scale is unchanged).
+    Licensed: 'and isolating the carriers still rescues'.  Not licensed: specificity (no matched control at M9; the
+    CTL arm is SHOULD-tier S4); that the SAME tensors dominate the vote at M9 (descriptive probe readout only).
+  W0:COLLAPSE-IS-CONFIG: with base weight decay 0 (removed from every tensor, the BN gammas included, AND from the meta trace h; the two routes are not separated), the scalar arm recovers to within 5 pp of its own layerwise reference.
+    Licensed: 'at this cell the scalar collapse requires coupled base weight decay'; the carrier account is then a mechanism OF THAT
+    CONFIGURATION and must be stated so (LIMITS-PREP section 6).  Not licensed: which route (WD on the weights (gammas) vs WD in the meta trace);
+    that the carriers play no role at W0 (ISO is unreadable without a gap).
+    W0 ISO-UNREADABLE: no gap (or no healthy reference) to rescue; ISO's level is stamped, not read.
+  EFFECT ON LIMITS-PREP L1 (every carrier claim sits at SGDm 0.99 / coupled WD 0.1): as the two halves say, ONE value per factor, one factor at a time, at ciso1's cell only
+  (ResNet18_c100, CIFAR-100, Lion meta, meta step 1e-3, alpha0 1e-6, clip, 100 epochs).  Readings at k01 are LOCATIONS.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Any other network, dataset, horizon, meta optimiser, meta step, alpha0 or clip (RULE 11).
+  * The parent's exact configuration: momentum 0.9 here keeps alpha0 1e-6 (parent Table 4 row: 1e-5, alignment UNSURE).
+  * An interaction (momentum 0.9 AND WD 0 together was not run) or a dose curve (one value per factor).
+  * Carrier SPECIFICITY at M9 / W0 (no matched control there) or that ciso1's tensors are still the top voters there.
+  * For W0, which route: WD on the gammas vs WD inside the meta trace (both removed together).
+  * Point agreement for an arm at the k01 level: such readings are LOCATIONS (164.6).
