@@ -937,3 +937,10 @@ forced arms) is listed ONCE, by either line, while `--check` holds both lines to
 a future two-kind batch needs its entry there, and no KINDS prefix may be a prefix of another.
 **CORRECTIONS 251:** `REST_HOLD` (`cvt8`) and `WINDOW_HOLD` (`cvt9`) are kinds too, and a `MULTI_KIND` entry may register
 any number of kinds (`cvt9`'s EARLY / LATE register three), each held to its registered line.
+**CORRECTIONS 263:** a batch may deviate from the standard cell in a CLI FLAG alone (`cmo1`'s `--momentum-param-base 0.9`,
+`--weight-decay-base 0`), which no CSV column carries and no patch line announces.  Those rows are listed with an ARGS
+witness `<KIND>: <flag>=<value>` (`ARGS_KINDS` in `corpus_exclusions.py`: `ARGS_MOMENTUM_BASE`, `ARGS_WD_BASE`), verified
+against the run's OWN `ARGS:` line read with argparse last-wins semantics.  `--check --runs` then requires every INGESTED
+standard-cell run whose ARGS deviates to be listed, holds the unlisted runs of a listed batch to the standard values, and
+FAILs if one 15-key cell would pool unlisted rows carrying different values.  Outside the standard cell (`_pooled`'s
+filter) older batches ran momentum 0.9 as their own standard, so those rows are counted, not required.

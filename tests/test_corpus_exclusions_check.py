@@ -61,6 +61,29 @@ lines (GROUP_HOLD + REST_HOLD); cvt9's four path / dose arms print two (BETA_HOL
       registered scorers' witness tables (and the arms whose registered witnesses are ON in 2+ kinds are exactly those
       entries); 245's `kinds scanned` line is unchanged byte for byte and a new line names the two added kinds.
 
+ADDED AT CORRECTIONS 263 -- the ARGS-VALUE witness kinds for `cmo1` (255), whose M9* / W0* arms deviate from the
+standard cell ONLY in CLI flags (`--momentum-param-base 0.9`, `--weight-decay-base 0`).  There is no `<KIND>: on`
+line to read: the witness is the run's OWN `ARGS:` line, the prefix every run prints, read with argparse
+last-wins semantics.  The kinds are `ARGS_MOMENTUM_BASE` / `ARGS_WD_BASE`; a TSV row's witness is
+`<KIND>: <flag>=<value>`:
+  C24 the parser and the registry: the module's re-typed ARGS reader == `analysis/argsline_guard.py`'s (RULE 20's
+      registered parser, imported HERE only) on 9 real and synthetic ARGS lines, repeated flags and `--flag=value`
+      included; ARGS_KINDS holds the two kinds with standards 0.99 / 0.1; PREFIX PROOF: no name of the 6 line kinds
+      + 2 ARGS kinds is a prefix of another, `ARGS:` starts with no line-kind prefix, no kind name starts with
+      `ARGS:`, and no ARGS-kind witness is itself an `ARGS:` line (so no kind can be misread).
+  C25 a cmo1-style batch passes: 3 anchor arms unlisted at 0.99 / 0.1, 3 M9 arms listed by their
+      ARGS_MOMENTUM_BASE witness and 3 W0 arms by their ARGS_WD_BASE witness -> exit 0, the three added lines
+      reporting 6 listed, 6 deviating CSV rows in the standard cell, 0 cells mixing.
+  C26 corruptions fail, each named: (a) an M9 row dropped from the list (a standard-cell CSV row whose ARGS
+      deviates, unlisted); (b) a listed M9 run whose ARGS line says 0.99 (the flag never arrived); (c) a listed M9
+      run whose ARGS says 0.8 (value != the listed witness); (d) a run deviating on BOTH flags listed by one;
+      (e) a deviating, unlisted .out of the listed batch that is not yet a CSV row (the batch rule).
+  C27 scope: an ingested run OUTSIDE the standard cell (300 epochs) whose ARGS carries 0.9 is counted DESCRIPTIVELY,
+      not required to be listed; an absent flag is the standard (argparse default); a log with no ARGS line is
+      counted, not failed.
+  C28 cell mixing: two UNLISTED ingested runs of the SAME 15-key cell carrying different `--momentum-param-base`
+      values fail (the pooling the list exists to prevent), and the same pair passes once one is listed.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -135,8 +158,27 @@ def row(run, job, witness):
     return [vals[c] for c in tsv_header()]
 
 
-def run_check(listed, corpus, logs, with_runs=True):
-    """listed: [(run, job, witness)]; corpus: [(run, job)]; logs: {(run, job): [lines]} -> (rc, stdout)."""
+# CORRECTIONS 263: the CSV the fixture writes now carries the 15 cell-key columns at their standard-cell values, so
+# the ARGS-value block can ask whether a deviating row sits in the standard cell (and which rows share a cell).  The
+# defaults reproduce 239's / 245's / 251's behaviour exactly: `plateau5` stays empty, so the noise-floor lines are
+# unchanged, and `args=` defaults to 239's ARGS line, which carries neither factor flag.
+CSV_COLS = ["run", "job_id", "network", "dataset", "granularity", "base", "meta", "meta_stepsize", "alpha0", "gamma",
+            "augment", "beta_clip", "batch_size", "epochs_requested", "hier", "lam", "eta_ratio",
+            "superseded", "collapsed", "complete", "plateau5"]
+CSV_STD = {"network": "PlainNet18_c100", "dataset": "CIFAR100", "granularity": "scalar", "base": "SGDm",
+           "meta": "Lion", "meta_stepsize": "1e-3", "alpha0": "1e-6", "gamma": "1", "augment": "1",
+           "beta_clip": "-15:-2.3026", "batch_size": "100", "epochs_requested": "100", "hier": "", "lam": "",
+           "eta_ratio": "", "superseded": "0", "collapsed": "0", "complete": "1", "plateau5": ""}
+DEFAULT_ARGS = "--network PlainNet18_c100 --seed 90"
+
+
+def run_check(listed, corpus, logs, with_runs=True, args=None, cells=None):
+    """listed: [(run, job, witness)]; corpus: [(run, job)]; logs: {(run, job): [lines]} -> (rc, stdout).
+
+    args:  {(run, job): "<ARGS payload>"}  -- the run's own ARGS line (default: 239's, no factor flag).
+    cells: {(run, job): {column: value}}   -- CSV cell-key overrides (default: the standard cell)."""
+    args = args or {}
+    cells = cells or {}
     tmp = tempfile.mkdtemp(prefix="ce_check_test_")
     try:
         os.makedirs(os.path.join(tmp, "analysis"))
@@ -147,14 +189,17 @@ def run_check(listed, corpus, logs, with_runs=True):
             for r in listed:
                 f.write("\t".join(row(*r)) + "\n")
         with open(os.path.join(tmp, "results", "all_runs.csv"), "w") as f:
-            f.write("run,job_id,network,superseded,collapsed,complete,plateau5\n")
+            f.write(",".join(CSV_COLS) + "\n")
             for run, job in corpus:
-                f.write("%s,%s,PlainNet18_c100,0,0,1,\n" % (run, job))
+                v = dict(CSV_STD, run=run, job_id=job)
+                v.update(cells.get((run, job), {}))
+                f.write(",".join(v[c] for c in CSV_COLS) + "\n")
         for (run, job), lines in logs.items():
             d = os.path.join(tmp, "runs", run.split("-")[0])
             os.makedirs(d, exist_ok=True)
             with open(os.path.join(d, "%s-%s.out" % (run, job)), "w") as f:
-                f.write("ARGS: --network PlainNet18_c100 --seed 90\nNODE=synthetic\n")
+                al = args.get((run, job), DEFAULT_ARGS)
+                f.write(("ARGS: %s\n" % al if al is not None else "") + "NODE=synthetic\n")
                 for ln in lines:
                     f.write(ln + "\n")
                 f.write("epoch 1 train 1.0 test 1.0\nRUN_DONE\n")
@@ -264,6 +309,40 @@ def wh_batch(by="BETA_HOLD"):
     listed = [k + (logs[k][1],) for k in (W_LHP, W_HHP, W_MID, W_RES)] + [k + (logs[k][pick],) for k in (W_EARLY, W_LATE)]
     corpus = [W_K01, W_LHP, W_HHP, W_MID, W_RES, W_EARLY, W_LATE]
     return listed, corpus, logs
+
+
+# ---- CORRECTIONS 263: cmo1-style ARGS-value fixtures --------------------------------------------------------
+# The payload is `cmo1`'s real ARGS line (255.10; read on alice2 from cmo1-k01-s108-5025983.out and its twins),
+# with the two factor flags and the grouping substituted.
+CMO_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base %s --weight-decay-base %s --alg-meta Lion "
+            "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 "
+            "--NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 "
+            "--alpha0 1e-6 --num-epochs 100 --stepsize-groups %s --seed 108 "
+            "--save-directory /home/s5014158/metaopt/runs/cmo1 --run-name %s")
+ISO_SETS = "sets:1-49,51-52,54-58,60-62/layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight"
+W_MOM = "ARGS_MOMENTUM_BASE: momentum-param-base=0.9"
+W_WD = "ARGS_WD_BASE: weight-decay-base=0"
+CMO_ARMS = [("k01", "scalar", "0.99", "0.1"), ("kL", "layerwise", "0.99", "0.1"), ("ISO", ISO_SETS, "0.99", "0.1"),
+            ("M9k01", "scalar", "0.9", "0.1"), ("M9kL", "layerwise", "0.9", "0.1"), ("M9ISO", ISO_SETS, "0.9", "0.1"),
+            ("W0k01", "scalar", "0.99", "0"), ("W0kL", "layerwise", "0.99", "0"), ("W0ISO", ISO_SETS, "0.99", "0")]
+CMO = dict((arm, ("cmo1-%s-s108" % arm, "502598%d" % (3 + i))) for i, (arm, _g, _m, _w) in enumerate(CMO_ARMS))
+
+
+def cmo_batch():
+    """cmo1-style (255): 3 anchor arms at 0.99 / 0.1 and 6 arms deviating in ONE CLI flag, listed by that value."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for arm, grouping, mom, wd in CMO_ARMS:
+        key = CMO[arm]
+        corpus.append(key)
+        logs[key] = ["VOTE_W: off", "BETA_HOLD: off"]
+        args[key] = CMO_ARGS % (mom, wd, grouping, key[0])
+        cells[key] = {"network": "ResNet18_c100",
+                      "granularity": {"scalar": "scalar", "layerwise": "layerwise"}.get(grouping, "blockwise")}
+        if mom != "0.99":
+            listed.append(key + (W_MOM,))
+        elif wd != "0.1":
+            listed.append(key + (W_WD,))
+    return listed, corpus, logs, args, cells
 
 
 def line_of(out, head):
@@ -650,6 +729,113 @@ def main():
     except Exception as ex:  # a scorer that does not import is a FAIL here, not an error
         chk(False, "C23 the registered cvt8 / cvt9 scorers import and MULTI_KIND holds their arms",
             "%s: %s" % (type(ex).__name__, ex))
+
+    # ---- CORRECTIONS 263 ------------------------------------------------------------------------------------
+    print("C24 the ARGS reader, the registry and the prefix proof")
+    try:
+        sys.path.insert(0, os.path.join(REPO, "analysis"))
+        import corpus_exclusions as CE2
+        import argsline_guard as AG  # RULE 20's registered parser: imported HERE, never by the module
+        lines = [DEFAULT_ARGS,
+                 CMO_ARGS % ("0.9", "0.1", "scalar", "cmo1-M9k01-s108"),
+                 CMO_ARGS % ("0.99", "0", ISO_SETS, "cmo1-W0ISO-s110"),
+                 "--momentum-param-base 0.99 --momentum-param-base 0.9",          # argparse: the LAST wins
+                 "--momentum-param-base=0.9 --weight-decay-base=0",               # --flag=value
+                 "--alg-base SGDm --Lion-beta2-base -1 --beta-clip -15:-2.3026",  # negative values are values
+                 "--weight-decay-base 0.1 --run-name a b c",
+                 "", "--wait --stepsize-groups scalar"]
+        same = [dict(AG.effective(AG.parse_flags(AG.tokenize(l)))) == dict(CE2._args_effective(CE2._args_tokens(l)))
+                for l in lines]
+        chk(all(same), "C24 the module's re-typed ARGS reader == argsline_guard's on %d lines" % len(lines),
+            repr([l for l, s in zip(lines, same) if not s])[:200])
+        chk([tuple(e) for e in CE2.ARGS_KINDS] == [("ARGS_MOMENTUM_BASE", "momentum-param-base", "0.99"),
+                                                   ("ARGS_WD_BASE", "weight-decay-base", "0.1")],
+            "C24 ARGS_KINDS = the two cmo1 factors with the standard-cell values 0.99 / 0.1", repr(CE2.ARGS_KINDS))
+        names = [k for k, _o in CE2.KINDS] + [k for k, _f, _s in CE2.ARGS_KINDS]
+        chk(len(set(names)) == 8 and not [(a, b) for a in names for b in names if a != b and a.startswith(b)],
+            "C24 no name of the 6 line kinds + 2 ARGS kinds is a prefix of another", repr(names))
+        chk(not [k for k, _o in CE2.KINDS if "ARGS:".startswith(k) or k.startswith("ARGS")],
+            "C24 `ARGS:` starts with no line-kind prefix, so witness_lines never collects an ARGS line")
+        chk(all(AG.ARGS_RE.match(CE2.args_witness(k, "0.9")) is None for k, _f, _s in CE2.ARGS_KINDS)
+            and CE2.kind_of(W_MOM) == "ARGS_MOMENTUM_BASE" and CE2.kind_of(W_WD) == "ARGS_WD_BASE"
+            and CE2.kind_of(BH_TRI) == "BETA_HOLD" and CE2.kind_of("ARGS: --momentum-param-base 0.9") is None,
+            "C24 no ARGS-kind witness is itself an `ARGS:` line, and kind_of reads each witness as ONE kind",
+            repr([CE2.args_witness(k, "0.9") for k, _f, _s in CE2.ARGS_KINDS]))
+        chk(CE2.args_witness("ARGS_MOMENTUM_BASE", "0.9") == W_MOM and CE2.args_witness("ARGS_WD_BASE", "0") == W_WD,
+            "C24 the witness form is `<KIND>: <flag>=<value>`, the value verbatim from the ARGS line")
+    except Exception as ex:
+        chk(False, "C24 the module and argsline_guard import and expose the ARGS reader", "%s: %s" % (type(ex).__name__, ex))
+
+    print("C25 a cmo1-style batch passes")
+    listed, corpus, logs, args, cells = cmo_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C25 3 anchor arms unlisted + 3 M9 and 3 W0 arms listed by their ARGS value -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("6 listed runs carry their listed ARGS value" in ln for ln in line_of(out, "  ARGS witness")),
+        "C25 the added line counts the 6 listed ARGS rows", repr(line_of(out, "  ARGS witness")))
+    chk(any("6 deviate" in ln and "6 are CSV rows in the standard cell, every one listed: True" in ln
+            for ln in line_of(out, "  ARGS witness")),
+        "C25 completeness: the 6 deviating standard-cell CSV rows are all listed", repr(line_of(out, "  ARGS witness")))
+    chk(any(ln.endswith(": True") for ln in line_of(out, "  ARGS cell mixing")),
+        "C25 no cell pools two different (momentum, weight decay) values", repr(line_of(out, "  ARGS cell mixing")))
+    chk(len(line_of(out, "  ARGS")) == 3, "C25 the block adds exactly three lines", repr(line_of(out, "  ARGS")))
+
+    print("C26 corruptions fail, each named")
+    listed, corpus, logs, args, cells = cmo_batch()
+    rc, out = run_check([r for r in listed if r[:2] != CMO["M9kL"]], corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("cmo1-M9kL-s108-5025987.out" in f and "NOT listed" in f for f in fails(out)),
+        "C26a an M9 row dropped from the list -> exit 1, named", show(out))
+    for tag, arm, mom, wd, msg in [("b", "M9k01", "0.99", "0.1", "but its own ARGS line does not deviate"),
+                                   ("c", "M9ISO", "0.8", "0.1", "ARGS witness"),
+                                   ("d", "W0kL", "0.9", "0", "but is listed with a")]:
+        listed, corpus, logs, args, cells = cmo_batch()
+        key = CMO[arm]
+        args[key] = CMO_ARGS % (mom, wd, "scalar", key[0])
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C26%s %s runs at momentum %s / wd %s -> exit 1, named" % (tag, arm, mom, wd), show(out))
+    listed, corpus, logs, args, cells = cmo_batch()
+    extra = ("cmo1-M9k01-s109", "5025995")
+    logs[extra] = ["VOTE_W: off"]
+    args[extra] = CMO_ARGS % ("0.9", "0.1", "scalar", extra[0])
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("cmo1-M9k01-s109-5025995.out" in f and "unlisted run of a listed batch" in f for f in fails(out)),
+        "C26e a deviating unlisted .out of the listed batch, not yet a CSV row -> exit 1, named", show(out))
+
+    print("C27 scope: outside the standard cell, absent flags, no ARGS line")
+    listed, corpus, logs, args, cells = cmo_batch()
+    out300 = ("c300-ly-s7", "5000301")
+    corpus.append(out300)
+    logs[out300] = ["VOTE_W: off"]
+    args[out300] = CMO_ARGS % ("0.9", "0.1", "layerwise", out300[0])
+    cells[out300] = {"network": "ResNet18_c100", "granularity": "layerwise", "epochs_requested": "300"}
+    noargs = ("c300-ly-s8", "5000302")
+    corpus.append(noargs)
+    logs[noargs] = ["VOTE_W: off"]
+    args[noargs] = None
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C27 a 300-epoch ingested run at momentum 0.9 is NOT required to be listed -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("1 deviating CSV row" in ln or "1 deviating CSV rows" in ln for ln in line_of(out, "  ARGS witness")),
+        "C27 it is counted DESCRIPTIVELY on the added line", repr(line_of(out, "  ARGS witness")))
+    chk(any("(1 without one)" in ln for ln in line_of(out, "  ARGS witness")),
+        "C27 the log with no ARGS line is counted, not failed", repr(line_of(out, "  ARGS witness")))
+
+    print("C28 two unlisted ingested runs of ONE cell with different momentum fail")
+    listed, corpus, logs, args, cells = cmo_batch()
+    twin = ("cmo1-k01-s109", "5025992")
+    corpus.append(twin)
+    logs[twin] = ["VOTE_W: off"]
+    args[twin] = CMO_ARGS % ("0.9", "0.1", "scalar", twin[0])
+    cells[twin] = {"network": "ResNet18_c100", "granularity": "scalar"}
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("cmo1-k01-s109" in f for f in fails(out)),
+        "C28 an unlisted 0.9 run in the scalar cell of unlisted 0.99 runs -> exit 1, named", show(out))
+    rc, out = run_check(listed + [twin + (W_MOM,)], corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out, "C28 the same pair passes once the 0.9 run is listed",
+        "rc=%d %s" % (rc, show(out)))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)
