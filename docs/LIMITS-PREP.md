@@ -26,6 +26,33 @@ separate partial loss, and the damage is graded in dose and spread across the ri
 | **L2** | The interventions show SUFFICIENCY at that setting, not NECESSITY and not other settings. | Every hold, ISO and CTL arm sits at meta step 1e-3, alpha0 1e-6, SGDm 0.99 / wd 0.1 + Lion, CIFAR-100. | No paper establishes necessity for any per-group LR either; the claim is not weaker than the field norm. | Yes, at one cell: N1 (shadow-vote necessity), N3 (merge inside layerwise), N4 (weight-decay route). |
 | **L3** | On ResNet, `cvt8` resolved the dose (`DOSE-FULL`) but the held set still differs (3 carriers vs PlainNet's 1 tensor); the route is partial at `k01`'s dose. | `cvt8`: HOLDBIG 19.38 and BIGISOPATH 19.42 (both below `k01` 23.06); HIGHISOPATH 58.19 (`ROUTE-PARTIAL`). | Only lead: Kim et al. (position-dependent gamma roles, under L2 not step size). | Yes: R1 (one tensor vs three at PlainNet's dose, 8 arms, no new code). |
 
+### 1.1 RESULTS SO FAR — the first four MUST-tier batches, landed 18 Sep 2026 (CORRECTIONS 264, 265, 266)
+
+*Added after the tier was approved and run. Registered verdicts only; the authority is `docs/CORRECTIONS.md`,
+and each sentence below is licensed at ONE cell only. Corpus is now 3,181 rows (the four batches ingested once,
++54 rows, 0 changed, commit `77c6de9`).*
+
+| id | batch | registered verdict | what it does to the limit |
+|---|---|---|---|
+| **S1a** | `cmo1`, 27 runs (264) | `M9:COLLAPSE-PERSISTS/ISO-RESCUES` + `W0:COLLAPSE-IS-CONFIG/ISO-UNREADABLE` | **L1 widens on momentum, NARROWS on weight decay.** At SGDm momentum 0.9 the collapse persists (`M9k01` 24.58 vs `M9kL` 69.39, ratio 0.354) and the carrier isolation still rescues (`M9ISO` 70.90). At base weight decay 0 the collapse is GONE — `W0k01` 71.56 is the BEST arm in the batch, +3.39 pp ABOVE its own layerwise arm and +48.77 pp above the anchor `k01`, so there is no gap and ISO is unreadable. **Coupled base weight decay is NECESSARY for the collapse at this cell; momentum 0.99 is not.** §6's conditional has fired: the carrier account must now be written as conditional on coupled weight decay. |
+| **S2** | `cst1`, 9 runs (265) | `UNRESOLVED-DECOMPOSITION` — a GATE, no branch | **L1 UNMOVED.** The registered scorer stopped on a tolerance defect (an absolute 1e-3 bar on a quotient whose float32 noise is 1.59e-03 at ms 3e-4), not a harness failure — the harness's update is bit-exact on 6,876 of 6,876 unclamped coordinates. The runs are sound and RULE-20-clean; a FROZEN SUCCESSOR SCORER must be registered before any of it is read. Zero GPU to finish. |
+| **S3** | `cct1`, 6 runs (265) | `NOT-COLLAPSED+CARRIERS-DO-NOT-DOMINATE` | **L1 answered on the CIFAR-10 axis, as an ASSOCIATION.** On CIFAR-10 nothing collapses (ratio 0.964) and there the three carriers are still the largest single terms — top-3 on 69 % of records, tensor 59 the argmax on 83 % — but never decisive: `DOM_C` is 0 on all 1,500 records against 0.81 at the collapsing CIFAR-100 cell. **Dominance co-occurs with collapse across these two cells.** Dataset and head width co-vary, so it is not causation. |
+| **N3** | `cmg1`, 12 runs (266) | `NO-MERGE-HARMS` | **L2 moves, narrowly and at a near bar.** Keeping the three carriers out of ONE shared group with the rest of `layer4` is NOT necessary for the layerwise level, within ±5 pp — but `D_CAR` = +4.115 pp is only 0.885 pp inside that 5 pp margin and is +8.54 SE from zero in all four seeds, so the honest gloss is **"this merge costs ~4 pp, just under the bar"**, a BOUND, not "costs nothing". The control {47,48,56} is count- and width-matched but NOT role-matched (two weights and a bias, against three weights). |
+| **R1 / L3** | `cvt10`, not landed | — | **L3 UNMOVED.** |
+
+**Net effect on §6's "single biggest remaining weakness".** Half answered, half confirmed: **momentum 0.99 is
+exonerated, coupled weight decay is not — it is a precondition of the collapse at this cell.** What `cmo1` cannot
+say is WHICH weight-decay route acts, because `--weight-decay-base 0` removes decay from every tensor AND from the
+meta trace in one flag. **That is exactly what S1b (`cwd1`, `WD_SCALE=normscale:0`) separates, which is why it is now
+the highest-value GPU item in the remaining tier** (ranked in full at CORRECTIONS 266.11: 1 the frozen `cst1`
+successor at zero GPU, 2 `cwd1`, 3 `csv1` for carrier necessity, 4 `cwd2`, 5 `cvt10`, 6 the newly live S4 CTL-at-M9
+arm without which M9's `ISO-RESCUES` can never become a specificity statement).
+
+**Question 2 of §7 is now live and should be put to the professor in this form:** momentum 0.9 does NOT remove the
+collapse, but base weight decay 0 DOES. Is the paper still the mechanism, stated as conditional on coupled weight
+decay, or does it become a note on a configuration pitfall?
+
+
 ---
 
 ## 2. L1 — narrow scope
