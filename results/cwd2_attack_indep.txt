@@ -1,0 +1,59 @@
+==============================================================================
+ cwd2_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED cwd2 SCORER'S OUTPUT
+ CORRECTIONS 261.  No repo module imported, no regular expression, every literal re-typed.
+==============================================================================
+
+[1] WHAT WAS REBUILT FROM SCRATCH, BEFORE THE LOG WAS OPENED
+  PASS PlainNet18_c100 rebuilt from the architecture   53 tensors, 11046308 params
+  PASS idx 50 (1-based) is the carrier   layer4.1.bn2.weight BatchNorm2d numel 512
+  PASS DECAY_MASK resolves to exactly one tensor, 0-based index 49   masked numel 512
+  PASS HEAD's grouping rebuilt from the spec string   group sizes [52, 1]
+  PASS the frozen manifest rebuilt   sha256 6adc44b5da24df15
+  PASS the replay file verified by sha and re-read   knots 500 n0 2 n1 49902
+  PASS B0 re-derived through float32   -13.815510749816895
+  PASS the tri schedule's peak re-derived   peak -4.387510749816894
+
+[1b] COULD THE DECAY_MASK HALF OF G-BITE HAVE FAILED?  every run's records read BOTH ways
+     (k = the arm's registered number of masked tensors, and k = the other value): exactly one may pass.
+      k01          s132  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      k01WD0       s132  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      HIGHHEADPATH s132  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      HIGHWD0      s132  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      LOWWD0       s132  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      k01          s133  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      k01WD0       s133  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      HIGHHEADPATH s133  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      HIGHWD0      s133  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      LOWWD0       s133  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      k01          s134  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      k01WD0       s134  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      HIGHHEADPATH s134  as-registered(k=0) PASS   cross-read(k=1) FAIL
+      HIGHWD0      s134  as-registered(k=1) PASS   cross-read(k=0) FAIL
+      LOWWD0       s134  as-registered(k=1) PASS   cross-read(k=0) FAIL
+  PASS every run passes its own DECAY_MASK audit and FAILS the other arm-kind's   15 runs, 15 cross-reads refused
+
+[2] THE NUMBERS, RE-DERIVED FROM THE RAW RECORDS ONLY
+  k01          TEST 12.0673  TRAIN 12.0153  seeds 12.1200 / 12.7760 / 11.3060
+  k01WD0       TEST 65.7500  TRAIN 81.6667  seeds 65.6460 / 65.8400 / 65.7640
+  HIGHHEADPATH TEST 10.7127  TRAIN 10.9613  seeds 10.7240 / 10.3720 / 11.0420
+  HIGHWD0      TEST 65.6260  TRAIN 81.1280  seeds 66.1340 / 65.5460 / 65.1980
+  LOWWD0       TEST 65.0007  TRAIN 80.4720  seeds 65.2680 / 65.2300 / 64.5040
+  SIGMA_INBATCH 0.463331   SE_ARM_DIFF 0.556196
+  P_WD    +54.9133 pp = +98.73 SE   (TRAIN +70.1667)
+  P_LEFT  -0.6253 pp = -1.12 SE   (TRAIN -0.6560)
+  P_SC    +53.6827 pp = +96.52 SE   (TRAIN +69.6513)
+  D_CTL   +52.9333 pp   R_HIGH  +54.2880 pp   F_WD 1.012
+  branch  WD-ROUTE | SCALAR-NEEDS-CARRIER-WD
+
+[3] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG
+  PASS the rebuild has the scorer log's line count   248 rebuilt vs 248 in the log
+  lines in the scorer log            248
+  rebuilt and matched VERBATIM       245
+  matched host-independently          3   (2 path disclosures by suffix; 1 corpus count re-filtered here)
+  MISMATCHES                          0
+
+[4] THE FINAL LINE
+  PASS the FINAL line is rebuilt token by token
+  FINAL: WD-ROUTE | SCALAR-NEEDS-CARRIER-WD | HARNESS-CLEAN | PATCH-BITES | HOLDS-FROM-INIT | COMPLEMENT-ON-HEADPATH | HELD-ARMS-OPEN-LOOP | MASK-ONE-TENSOR-IDX50 | K01WD0-BOTH-ROUTES-CHANGED | ONE-NETWORK-PLAINNET | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+
+VIOLATIONS 0
