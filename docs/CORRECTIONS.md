@@ -35474,3 +35474,211 @@ Checked through `gh api` ONLY. **No site page and no Vercel URL was opened, and 
 **ZERO GPU submitted.** `alice` NOT contacted. No file downloaded, no `.pdf` fetched, no dataset licence accepted, no site or Vercel URL opened, no nested `claude -p`. **RULE 16 honoured:** no registered scorer, no launcher, no `analysis/argsline_guard.py`, no `analysis/corpus_exclusions.py`, no `results/*.csv` or `results/*.tsv`, and nothing under `paper/` was edited — the only changes are `docs/CORRECTIONS.md` (this entry) and one bracketed in-place amendment in `docs/STATUS.md`, staged **by path**. All alice2 work was read-only or a re-run of an existing unedited audit script on the login node with no GPU. Nothing here is registered, and no number of any in-flight batch was read.
 
 Next free number: **268**.
+
+## 268. TRACK B (frozen successor registered, then scored — ZERO GPU) — **[LED WITH THE BOUND: (1) `cst1`'s FIRST WORD IS `NOMINATION-PARTIAL`, NOT `NOMINATED` — SO THE BATCH **MAY NOT SAY THE SAME THREE CARRIERS ARE NOMINATED AT ms 3e-4**, AND THE HEADLINE SENTENCE *"the carrier rescue holds at a second meta step size"* (which belongs to `NOMINATED+ISO-RESCUES+CTL-NULL`) **WAS NOT REACHED**.  THE WORD IS BAR-SENSITIVE IN RECORD COUNTS: `DOM_C` **0.4727 = 709 of 1,500 records** against a 0.50 bar of **750** — **MISSES BY 41 RECORDS**; `TOP3_C` **0.4960 = 744 of 1,500** — **MISSES BY SIX RECORDS** (exactly 248/500 in every seed, i.e. two records per seed; per-seed `DOM_C` 235 / 237 / 237 of 500 against 250, i.e. 15 / 13 / 13).  IT CLEARS THE `NOT-NOMINATED` BAR (150 RECORDS) BY **559 RECORDS**, so "partial" is a genuine middle, not a near-miss on both sides.  (2) THE TWO LEVEL WORDS ARE NOT NEAR ANY BAR: `D_ISO` **+41.1567 pp** clears the 20.0 bar by **21.1567 pp (38.04 SE)**; `D_CTL` **+0.1807 pp** sits **4.8193 pp (8.66 SE)** inside the 5.0 bar; `k01` **28.5173** is **5.4827 pp** under `K01_MAX` 34.0.  (3) EVERY `*-NULL` WORD IS A **LOCATION**, NOT A MECHANISM (`FLOOR-READINGS-ARE-BOUNDS`, 164.6): the licensed contrast is ISO ≫ CTL (`P` **+40.9760 pp, +73.67 SE**), NEVER why CTL sits where it sits.  (4) ONE CELL, ONE NETWORK, ONE alpha0, ONE HORIZON, THREE SEEDS, NO LAYERWISE ARM IN BATCH.  (5) THE SUCCESSOR'S BARS ARE THE **LITERALS COPIED FROM 256.5** AND ARE PROVED SO MECHANICALLY (268.3) — 27 scalar literals, 17 maps and licence tables, all 29 branches and all 29 licence strings, `manifest_text()`, `args_line()` on all 9 runs, `nom_word()` / `arm_word()` on their bar grids and `decide()` on 4,000 random points, **0 differences** against the REGISTERED predecessor.  **NOT ONE BAR WAS RE-TUNED, AND NONE WAS CHOSEN WITH 0.4727 / 0.4960 IN VIEW.**]**  `analysis/cST2_carriervote_score.py` (`8300f757…`) IS REGISTERED AS THE **FROZEN SUCCESSOR** OF `analysis/cST1_carrier_contrast_score.py` (`05546791…`, UNEDITED, STILL FROZEN — RULE 16), COMMITTED AND PUSHED AS **`9581897`** **BEFORE** IT WAS RUN ON A SINGLE `cst1` RECORD (margin **+14 s** against the push on the Mac, **+35 s** on alice2).  ITS **ONE** CHANGE IS THE `G-DECOMP` SIGN TOLERANCE — from an ABSOLUTE `1e-3` to `1e-3 + 4·ulp32(beta)/ms`, DERIVED AT 268.2 — AND NOTHING ELSE MOVES.  `cst1` (CIFAR-100 / `ResNet18_c100`, ms 3e-4, seeds {112,113,114}) NOW READS **`FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL`** (exit 0, IDENTICAL on alice2 and the Mac but for the one runsdir line).  THE TWO-SCORER DIFF IS **104 OF THE PREDECESSOR'S 115 LINES BYTE-IDENTICAL AND IN ORDER**; the 11 that differ are the scorer's own identity line, the nine `G-DECOMP` lines and the `FINAL` gate line — exactly the allowed set.  AT `cct1`'s ms 1e-3 (CORRECTIONS 257, where the predecessor's sibling PASSED) **THE OLD AND THE NEW BAR AGREE, 0 AND 0 REJECTIONS OF 85,912 COORDINATES**.  SELFTEST **99 PASS / 0 FAIL** on the Mac AND on alice2, the two outputs **byte-identical**, against the predecessor's 70 at registration.  A NEW INDEPENDENT PARSER (no repo import, ulp32 re-derived from the float32 BIT PATTERN rather than `frexp`) REPORTS **VIOLATIONS 0** and REBUILDS THE SUCCESSOR'S **66 POST-GATE LINES, FINAL INCLUDED, BYTE FOR BYTE** — the diff is empty — with a body sha IDENTICAL on both hosts.  **NO MASTER-TABLE ROW IS WRITTEN HERE (268.11).  ZERO GPU SUBMITTED; NO SLURM JOB; `alice` NOT CONTACTED; alice2 READ-ONLY plus unedited scripts on the LOGIN NODE.**  THIS ENTRY TAKES NUMBER **268**, WHICH 267 DECLARED FREE.
+
+### 268.1 The defect, and its arithmetic
+
+The frozen core `analysis/cCV0_carrier_vote_core.py` (`0754ca84…`) tests, on every UNCLAMPED coordinate `k` of a run's own partition,
+
+```
+    | -(beta - beta_pre)/ms  -  sign(b2·mom_pre[k] + (1-b2)·z_agg[k]) |  <=  1e-3
+```
+
+— **an ABSOLUTE bar on a QUOTIENT**, and a run fails `G-DECOMP` when more than 1 % of its unclamped coordinates exceed it.  The harness posts `beta` as **float32**: `beta_post = fl32(beta_pre − fl32(ms)·s)`.  Under round-to-nearest the residual of that one rounding is at most `0.5·ulp32(beta_post)`, and dividing by `ms` **inflates it as `ms` shrinks**.  Under `BETA_CLIP -15:-2.3026` every unclamped `|beta|` lies in `(2.3026, 15) ⊂ [2, 16)`, so `ulp32(beta) <= 2^-20 = 9.5367431640625e-07` (the `[8,16)` binade), and the bound is `0.5·9.5367431640625e-07/ms`:
+
+| ms | `0.5·ulp32/ms` | vs the frozen 1e-3 bar |
+|---|---|---|
+| 1e-4 | 4.768e-03 | **FAILS** |
+| **3e-4** (`cst1`) | **1.5894572e-03** | **FAILS — larger than the bar itself** |
+| 4e-4 | 1.192e-03 | **FAILS** |
+| 4.7e-4 | 1.015e-03 | **FAILS** |
+| **4.76837158203125e-04** | **1.000e-03** | **the CROSSOVER** |
+| 5e-4 | 9.537e-04 | passes |
+| 7e-4 | 6.812e-04 | passes |
+| 9e-4 | 5.298e-04 | passes |
+| **1e-3** (`cct1`) | **4.7683716e-04** | passes, **52 % under** |
+| 3e-3 | 1.589e-04 | passes |
+| 1e-2 | 4.768e-05 | passes |
+
+So at `cst1`'s ms 3e-4 **no correct harness can meet the bar**, and at `cct1`'s ms 1e-3 the same code passes with a factor-2.1 margin — which is exactly what the two batches did (265.2).  This entry re-measured both with a stdlib-only cross-check that imports no repo module (`analysis/cst2_tol_crosscheck.py`, `07c2dcac…`), over **every** landed run of **both** batches:
+
+| batch | ms | unclamped coordinates | bit-exact `float32` reconstructions | rejected by the OLD absolute bar | rejected by the NEW ms-aware bar | worst `|q − sign|` | round-to-nearest bound |
+|---|---|---|---|---|---|---|---|
+| `cst1` | 3e-4 | **6,876** | **6,876 / 6,876** | **5,394 (78.4 %)** | **0** | 1.3580e-03 | 1.5895e-03 |
+| `cct1` | 1e-3 | **85,912** | **85,912 / 85,912** | **0** | **0** | 4.0436e-04 | 4.7684e-04 |
+| both | — | **92,788** | **92,788 / 92,788** | 5,394 | 0 | — | — |
+
+The per-run OLD-bar counts reproduce 265.2's table exactly (`k01` 382 / 382 / 380 of 500; ISO 608 / 596 / 620 of 800 / 785 / 810; CTL 809 / 809 / 808 of 995 / 992 / 994 — sum 5,394), and the 92,788 / 92,788 figure reproduces the verifier's widened count at 265.3 to the unit.  **The defect is in the check, not in the harness**, and the fix must leave `cct1`'s reading untouched — which it does, 0 against 0.
+
+### 268.2 The ONE change — the tolerance, derived
+
+Let `s = sign(b2·mom_pre[k] + (1-b2)·z_agg[k]) ∈ {−1, 0, +1}` and let the check recompute `q = −(beta_post − beta_pre)/ms` in float64 (the subtraction of two float32 values is EXACT in float64, so it contributes nothing).  Write `beta_post = beta_pre − fl32(ms)·s + d` with `|d| <= 0.5·ulp32(beta_post)`.  Then `q = s·fl32(ms)/ms − d/ms`, so
+
+```
+    |q − s|  <=  |fl32(ms) − ms|/ms  +  0.5·ulp32(beta_post)/ms
+             <=  2^-24               +  0.5·ulp32(beta_post)/ms
+              =  5.9605e-08          +  0.5·ulp32(beta_post)/ms.
+```
+
+The first term is the float32 REPRESENTATION error of the step size (measured here: `4.750e-08` at ms 3e-4, inside `2^-24`); the second is the float32 QUANTISATION of `beta` and is the one that scales as `1/ms`.  **REGISTERED BAR:**
+
+```
+    TOL(beta, ms) = SIGN_ABS_BAR + SIGN_ULP_K · ulp32(beta) / ms
+    SIGN_ABS_BAR = 1e-3    the PREDECESSOR'S OWN LITERAL, KEPT: it absorbs the 2^-24 term with 1.7e4 x of margin
+    SIGN_ULP_K   = 4.0     the factor CORRECTIONS 265.3 prescribed when it specified this successor;
+                           8x the 0.5·ulp round-to-nearest bound
+```
+
+`ulp32(beta)` is the **per-coordinate** spacing (tighter than the `2^-20` worst case), evaluated at the LARGER of `|beta_pre|` and `|beta_post|` so that a binade crossing is handled conservatively.  Three properties, all selftested at `[T]` and re-derived independently by the parser:
+
+* **Correct at any meta step size.**  `TOL >= 0.5·ulp32/ms + 2^-24` for every `ms > 0` by construction, so a bit-exact harness passes at every `ms`.  At ms 3e-4, `TOL = 1.3716e-02`, i.e. **8.63×** the theoretical bound.
+* **It still discriminates.**  A MISSING or zero applied step gives `|q − s| = 1`; a FLIPPED sign gives `2`.  `TOL < 1` whenever `4·ulp32/ms < 1 − 1e-3`, i.e. **`ms > 4·9.5367431640625e-07/0.999 = 3.8184e-06`** — **26× below the smallest meta step this campaign has ever used (1e-4)**, and 73× below 1 at ms 3e-4.  The core's `SIGN_FAIL_MAX` 1-%-of-coordinates rule is UNCHANGED, and the selftest pins it (5 faults of 500 pass, 6 fail).
+* **The crossover, stated explicitly.**  The predecessor's absolute bar would have been exactly right at `ms = 0.5·ulp32/1e-3 = `**`4.76837158203125e-04`** — safe at or above it, unmeetable below it.  This is the forward bound 265.3 corrected, re-derived here from scratch rather than quoted.
+
+**The core is NOT edited.**  `G-CORE` still pins `cCV0` at `0754ca84…`; the successor defines its own `decomposition()` / `decomposition_ok()` locally, re-using the core's `TOL_Z`, `TOL_M`, `DECOMP_FAIL_MAX` and `SIGN_FAIL_MAX` literals by reference so none of them can drift.
+
+### 268.3 THE PROOF THAT NO BAR MOVED — mechanical, against the REGISTERED predecessor
+
+Selftest section **`[A2]`** imports `cST1_carrier_contrast_score` and FIRST pins its file sha to `05546791…`, so the comparison is against the registered text and not against an edited copy.  Then, **11 checks, 0 differences**:
+
+| what is compared | result |
+|---|---|
+| 27 scalar literals / bars — `DOM_HI` 0.50, `DOM_LO` 0.10, `TOP3_BAR` 0.50, `RESCUE_BAR` 20.0, `NULL_BAR` 5.0, `K01_MAX` 34.0, `DIVERGED_BAR` 5.0, `LEVEL_MIN` 5.0, `LEVEL_MAX` 90.0, `CHANCE`, `SIGMA_PRIOR` 0.6811983409351905, `SE_PRIOR`, `REG_CORPUS_SHA`, `REG_CORPUS_ROWS`, `CALIB_SCALAR_DOM`, `CALIB_SCALAR_POOLED`, `BATCH`, `NET`, `DSET`, `MST`, `MS`, `A0`, `SEEDS`, `UNUSED_SEEDS`, `ARMS`, `N_RUNS`, `CORE_SHA` | **identical** |
+| 17 maps / word lists / licence tables — `SPEC`, `PT_TYPE`, `N_COORDS`, `ISOLATED`, `ANCHOR`, `ACCOUNTS`, `EXPECTED_BRANCH`, `NULL_ACCOUNT`, `NOM_WORDS`, `ISO_WORDS`, `CTL_WORDS`, `NOM_SENT`, `ISO_SENT`, `CTL_SENT`, `HEADLINE`, `NOT_LICENSED`, `ARGS_FMT` | **identical** |
+| all 29 branches AND all 29 `licence()` strings | **byte-identical** |
+| `manifest_text()` (3,107 bytes) | **byte-identical** |
+| `args_line()` on all 9 (arm, seed) | **identical** |
+| `nom_word()` on a 50-point bar grid; `arm_word()` on a 20-point grid | **identical** |
+| `decide()` on 4,000 random (levels, ranges, `DOM_C`, `TOP3_C`) points | **0 disagreements** |
+| `score()` source: the predecessor calls `core.decomposition()`, the successor its own | **the one change, located** |
+| the core's frozen sign bar IS the absolute `1e-3` this successor replaces | **confirmed** |
+
+**Two mechanically forced adaptations, disclosed in the successor's own header and neither of which moves a bar or a word:**
+
+1. **`G-PROV` checks `SCORER_SHA256` against the frozen literal `05546791…`** instead of self-hashing.  `runs/cst1/PROVENANCE.txt` was written at SUBMISSION and names the scorer registered THEN; a successor cannot be in a file that predates it.  The **checked value and the printed line are byte-identical** to the predecessor's, which arrives at the same string by hashing itself — the two-scorer diff (268.5) confirms that line is one of the 104 identical ones.
+2. **The selftest's corpus-freshness block** (selftest only; it gates nothing) asserts the original pre-launch freshness when the corpus sha is the registration one, and otherwise reads the POST-266.9-ingest corpus as a LANDED batch: exactly **9 `cst1-` rows at seeds 112 / 113 / 114, three each, seed 115 still fresh**.  The predecessor's selftest, run unedited on today's corpus, FAILS those two checks (**67 PASS / 2 FAIL**) purely because `cst1` has since been ingested — a fact about the calendar, not about the scorer.
+
+### 268.4 REGISTRATION BEFORE READING — RULE 21's spirit, by wall clock
+
+* Registration commit **`9581897`** `%ct` **1789769231** (2026-09-19T00:07:11+02:00); `git push` to `origin/master` returned by the Mac's `date +%s` = **1789769233**.
+* The FIRST run of `cST2` on any `cst1` record completed at **1789769247** on the Mac (**+14 s against the push**) and at **1789769268** on alice2 (**+35 s**).  **No `cst1` branch word, licence or vote statistic was read, printed or computed by this session before the push.**  The only record-reading done before it was the selftest's PREMISE block, which reads the 18 landed **ms 1e-3** probe runs (`ctd1` / `ciso1` / `cdep1`) that 256.3 calibrated on — never `cst1`.
+* **alice2 stage.** `~/stage_cst2` is a `git clone` checked out at `9581897`, `git status` **clean**, and the four decisive files carry their registered shas on the stage: `cST2_carriervote_score.py` `8300f757…`, `cst2_tol_crosscheck.py` `07c2dcac…`, `cST1_carrier_contrast_score.py` `05546791…`, `cCV0_carrier_vote_core.py` `0754ca84…`.  The scorer was run there UNEDITED against `/home/s5014158/metaopt/runs`, the batch's own run directory.  A second stage `~/stage_cst2b` at `3ac3554` was used for the independent parser.
+* **The predecessor still reproduces its own landing output.**  Re-run UNEDITED on both hosts here, `cST1`'s stdout is **byte-identical to `results/cst1_carriercontrast_score_{mac,alice2}.txt` as committed at 265** — so the two-scorer diff below is a difference between SCORERS, not between runs of the same scorer.
+
+### 268.5 THE TWO-SCORER DIFF — what changed, and nothing else
+
+Both scorers, UNEDITED, on the same nine runs, same host, same corpus.  `cST1`: **115 lines, exit 1**.  `cST2`: **169 lines, exit 0**.  **104 of `cST1`'s 115 lines appear in `cST2` byte-identical and in order.**  The 11 that do not are exactly the allowed set:
+
+| # | lines | what |
+|---|---|---|
+| 1 | the scorer's own identity + runsdir line | `cST1 -- …` → `cST2 -- … (FROZEN SUCCESSOR of cST1; ms-aware G-DECOMP)` |
+| 9 | the nine `G-DECOMP` ledger lines | `FAIL … sign 382/500 …` → `PASS … sign 0/500 … | worst|q-s| 1.358e-03 bar 1.372e-02`.  **Every other field on those lines — `shape 0 z 0 m 0`, the two worst relative residuals, `clamped`, `shared` — is unchanged**; only the verdict word, the sign numerator and an appended tolerance diagnostic differ |
+| 1 | `FINAL` | `UNRESOLVED-DECOMPOSITION | G-DECOMP k01-s112` → the branch line at 268.7 |
+
+`cST2` ADDS two lines under the `[G-DECOMP]` header (the tolerance rule and the crossover, printed so the bar is auditable from the stdout alone) and **53 lines the predecessor never reached** — `[NOMINATION]`, `[LEVELS]`, `[DESCRIPTIVE]`, `BRANCH`, `LICENCE`, `NOT LICENSED`.  Every gate before `G-DECOMP` — `G-COMPLETE` ×18, `G-CORE`, `G-PROV` ×8, `G-STRUCT`, and `G-ARGS` / `G-ENV` / `G-PT` / `G-FOREIGN` / `G-HEADER` / `G-RECORDS` / `G-SPEC` on all nine runs — prints **identically** in both.  Committed verbatim as `results/cst1_cst2_scorer_diff.txt` (`827fee6b…`).
+
+**At `cct1`'s meta step the two rules agree** (268.1): 0 rejections of 85,912 coordinates under either bar, worst residual 4.0436e-04 against a 4.7684e-04 bound.  `cct1`'s own registered scorer `cCT1_c10_dominance_score.py` (`9bedffa8…`) is untouched and its 265 verdict is unaffected.
+
+### 268.6 The selftest — 99 PASS / 0 FAIL on both hosts, byte-identical output
+
+`python3 analysis/cST2_carriervote_score.py --selftest --runsdir …`, Mac (3.14.5, `../runs_alice2`) and alice2 (3.9.25, `/home/s5014158/metaopt/runs`), **exit 0 both**, and the two stdouts are **byte-identical** (`ea8a4858…`).  Against the predecessor's 70 at 256.8:
+
+| section | checks | what |
+|---|---|---|
+| `[A]` | 13 | design, literals, bar ordering, the ISO / CTL strings imported from `cIS1` / `cDP1`, 29 licences, `decide()` reads no record, the 20-flag ARGS line |
+| `[A2]` | 11 | **NEW** — the no-bar-moved proof of 268.3 |
+| `[T]` | 10 | **NEW** — the tolerance arithmetic: `ulp32` per binade, the `2^-20` ceiling under `BETA_CLIP`, the 1.589e-03 bound at 3e-4, the 4.768e-04 bound at 1e-3, the crossover, a worked 11-point `ms` table, the `2^-24` term, the `< 1` discrimination margin and the 3.8184e-06 floor, `sign_tol()` symmetry |
+| `[B]` | 3 | the nomination PREMISE on the 18 landed ms 1e-3 runs: `NOMINATED` / `NOT-NOMINATED`, pooled `DOM_C` 0.80689 against the registered 0.8069 |
+| `[C]` | 4 | the noise floor through `corpus_exclusions.filter_rows`, naive > filtered (8.5522 vs 0.6632 on today's corpus), `SIGMA_PRIOR` frozen on a moved corpus, the post-ingest corpus read as a landed batch |
+| `[D]` | 9 | the 6 accounts land in 6 different branches; the BROKEN-SPEC null's branch; the floor table |
+| `[E]` | 38 | **the REAL `score()`** on synthetic batches: the 6 accounts, an other-trio batch, `NOMINATION-PARTIAL`, `CTL-PARTIAL`, near-bar pairs on `D_ISO` (20.02 / 19.98), `D_CTL` (4.98 / 5.02), `DOM_C` (0.502 / 0.498, 0.100 / 0.104) and `k01` (33.9 / 34.1), a diverged seed, a **dropped run → `INCOMPLETE` rc 2**, no `RUN_DONE`, 499 records, a truncated resubmission that must not shadow, ARGS / ENV / PT-type / `GROUP_HOLD` / `SHADOW_VOTE` / CIFAR-10 header / four provenance mutations / a changed manifest → `HARNESS-UNSOUND`, the BROKEN-SPEC null on ISO and on CTL → `SPEC-NOT-APPLIED`, a broken capture → `UNRESOLVED-DECOMPOSITION` |
+| `[E4]` | 8 | **NEW** — the defect and its fix on float32-quantised betas the LIVE harness would post: the old bar rejects a BIT-EXACT harness at ms 3e-4 while the new one accepts every coordinate (worst 1.358e-03, the same value the real batch shows); at ms 1e-3 BOTH bars pass the same records; a FLIPPED step on 400/500 and a MISSING step on 100/500 are still caught; the 1 % rule is unchanged (5/500 pass, 6/500 fail); and the two full-batch cases `float32-quantised → scored` and `float32-quantised + flipped → UNRESOLVED-DECOMPOSITION` |
+| `[E2]` | 1 | **O2 invariance** — 11 invented corpus rows at `cst1`'s own cell move the filtered sigma 0.66 → 7.14 and `FINAL` is identical on the corpus, the injected corpus and NO corpus |
+| `[E3]` | 2 | the one-argument subprocess: exit 0; a dropped run exit 2 |
+
+### 268.7 THE VERDICT
+
+```
+FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0.4727 |
+TOP3_C=0.4960 | PINNED-FRAC=0.0000 | HARNESS-CLEAN | SPEC-APPLIED | DECOMPOSITION-OK | ONE-CELL-MS-3E-4 |
+ALPHA0-1E-6-ONLY | HORIZON-100-ONLY | ONE-NETWORK-RESNET18_C100 | CTL-HAS-A-BIAS-MEMBER |
+NO-LAYERWISE-IN-BATCH | NOMINATION-FROM-K01-RECORDS-ONLY | SIGMA-PRIOR-FROZEN
+```
+
+exit 0, IDENTICAL on alice2 and the Mac but for the runsdir line.  Every gate PASSES: `G-COMPLETE` 9/9 (`RUN_DONE`, epochs 0…99, 500 records each), `G-CORE`, `G-PROV` (MODE submit; HF `4732b74a…`, `build_network c7998883…`, `train.py 3fea309e…`, runner `a0d0a1b9…`, core `0754ca84…`, scorer `05546791…`), `G-STRUCT` (manifest byte-identical, 3,107 bytes), `G-ARGS` / `G-ENV` / `G-PT` / `G-FOREIGN` / `G-HEADER` / `G-RECORDS` on all nine, `G-SPEC` (1 / 2 / 2 coordinates — the BROKEN-SPEC null excluded), and now **`G-DECOMP` 0 failing coordinates of 6,876**.
+
+**Levels** (plateau5 = mean TEST over epochs 95…99 of each raw `.out`; the CSV `plateau` column never read), unchanged from the descriptive numbers 265.4 recorded — they are the same runs:
+
+| arm | per-seed TEST | mean | range | TRAIN mean |
+|---|---|---|---|---|
+| `k01` | 28.524 / 28.062 / 28.966 | **28.5173** | 0.904 | 29.0813 |
+| ISO | 69.226 / 70.084 / 69.712 | **69.6740** | 0.858 | 91.4427 |
+| CTL | 28.616 / 28.346 / 29.132 | **28.6980** | 0.786 | 29.1520 |
+
+`D_ISO` **+41.1567 pp (+74.00 SE)**, `D_CTL` **+0.1807 pp (+0.32 SE)**, `P` = ISO − CTL **+40.9760 pp (+73.67 SE)**; in-batch sigma 0.4278 (df 6) against the frozen `SIGMA_PRIOR` 0.6811983409351905 (`SE_PRIOR` 0.556196).  TRAIN gives the same two words, so `TRAIN-AGREES`.  **Vote statistics, pooled over `k01`'s 1,500 records:** `DOM_C` **0.4727**, `TOP3_C` **0.4960**, `DOM_TOP3` 0.7747, `SHARE_C` median 0.4180, `R_T` 0.4937 (DIS 740), `CAR_EQ` 0.9581, `DOWN` 1.0000, `PINNED-FRAC` 0.0000, modal top-3 {50,53,59} ×744, argmax 59 ×804; `DOM_C` by decile **0.00 0.00 0.00 0.00 0.00 0.73 1.00 1.00 1.00 1.00**.
+
+### 268.8 BAR MARGINS AS RECORD COUNTS — the nomination word is the bar-sensitive one
+
+| quantity | measured | as records of 1,500 | the bar, as records | margin |
+|---|---|---|---|---|
+| `DOM_C` vs the `NOMINATED` bar 0.50 | 0.4727 | **709** | **750** | **MISSES BY 41 RECORDS** |
+| `TOP3_C` vs the `NOMINATED` bar 0.50 | 0.4960 | **744** | **750** | **MISSES BY 6 RECORDS** |
+| `DOM_C` vs the `NOT-NOMINATED` bar 0.10 | 0.4727 | 709 | 150 | **CLEARS IT BY 559 RECORDS** |
+| `D_ISO` vs `RESCUE_BAR` 20.0 | +41.1567 pp | — | — | clears by **21.1567 pp = 38.04 SE** |
+| `D_CTL` vs `NULL_BAR` 5.0 | +0.1807 pp | — | — | **4.8193 pp = 8.66 SE** inside |
+| `k01` vs `K01_MAX` 34.0 | 28.5173 | — | — | **5.4827 pp** under |
+| every arm's seed range vs `DIVERGED_BAR` 5.0 | 0.904 / 0.858 / 0.786 | — | — | at least **4.096 pp** inside |
+
+**Per seed**, so the pooled miss is not one seed's doing: `DOM_C` **235 / 237 / 237 of 500** against a 250-record bar (**15 / 13 / 13 records short**); `TOP3_C` is **exactly 248 / 500 in every seed** (**2 records short each**).  **`NOMINATION-PARTIAL` therefore sits 41 records below `NOMINATED` and 559 above `NOT-NOMINATED`.  A referee who moved the `DOM_C` bar from 0.50 to 0.4727 would flip the first word; the bars are the 256.5 literals and were not moved (268.3).**  The two LEVEL words are not bar-sensitive at all.
+
+### 268.9 WHAT THIS LICENSES, AND WHAT IT DOES NOT
+
+**The licence the scorer printed, verbatim:**
+
+> *"at ms 3e-4 C fixes the shared vote on between 10 % and 50 % of k01's records (or is not the top three on half of them): a partial nomination, no identity sentence; isolating C recovers >= 20 pp over k01 (sufficiency of isolating C, at this cell); the matched non-carrier set stays within 5 pp of k01 (a floor LOCATION)."*
+
+**`NOT LICENSED` by `cst1`, the scorer's printed line verbatim:**
+
+> *"other datasets / networks / alpha0 / horizons; necessity of anything; why CTL sits where it sits; the 3e-4 collapse's time course relative to 1e-3's; a scalar-vs-layerwise gap measured in batch"*
+
+In plain words, **and with the bound first**: at a SECOND meta step size (3e-4, one variable off the mechanism cell), **isolating the three carriers still rescues — +41.16 pp over the scalar arm, 74 SE, while the count-matched non-carrier triple moves +0.18 pp** — so the ISOLATION result transfers.  **But the VOTE-DOMINANCE nomination does NOT reproduce at 3e-4**: `DOM_C` falls from 0.8069 at ms 1e-3 (the 18-run registration calibration) to 0.4727, 41 records under its bar, and `TOP3_C` 6 records under its own.  **The batch therefore may NOT write *"the same three carriers are nominated at a second meta step size"*, and may NOT write the `NOMINATED+ISO-RESCUES+CTL-NULL` headline *"THE CARRIER RESCUE HOLDS AT A SECOND META STEP SIZE"* — that branch was not reached.**  What it may write is: **the rescue transfers; the nomination is only partial there; the two are not locked together at this cell.**
+
+Three further bounds, all registered:
+
+* **`FLOOR-READINGS-ARE-BOUNDS` (164.6).**  `CTL-NULL` reads CTL AT `k01`'s own level — a LOCATION.  "The arm died" (H-FLOOR) predicts it equally.  The licensed contrast is **ISO ≫ CTL**, never why CTL sits at the floor.
+* **`NOMINATION-FROM-K01-RECORDS-ONLY`.**  The nomination is computed from `k01`'s 1,500 records alone, as registered.  CTL's pooled statistics are numerically almost identical to `k01`'s (`DOM_C` 0.4733) — expected, not a defect (265.7(3)), and gating nothing.
+* **The `DOM_C` TIME COURSE is DESCRIPTIVE and explicitly NOT LICENSED.**  The decile profile (0.00 ×5, then 0.73, then 1.00 ×4) says the pooled 0.4727 is a phase-onset artefact rather than a level, with onset near step 27,000 against ~9,500 at ms 1e-3.  **That reading is exactly what `NOT LICENSED` forbids quoting** (*"the 3e-4 collapse's time course relative to 1e-3's"*), and it is recorded here as UNSURE only.  A batch designed to test it would have to register that comparison in advance.
+
+### 268.10 The independent parser
+
+`analysis/cst2_attack_indep.py` (`fb32e456…`, NEW, stdlib only) imports **no** repo module — not `cCV0_carrier_vote_core`, not `cST1`, not `cST2`, not `cst2_tol_crosscheck`, not `corpus_exclusions` — and never reads the scorers' output.  It rebuilds the 62 tensors and their numels from the `ResNet18_c100` architecture itself and checks them against every run's `probe_tensor.json` (11,220,132 params); rebuilds `PARTITION-MANIFEST.txt` byte for byte (3,107 bytes) with its own parse of the `sets:` grammar (ISO and CTL both → [59, 3], both isolating 1,536 = 3 × 512 — count-matched); re-derives PROVENANCE against the 256.10 literals **and records that PROVENANCE names the PREDECESSOR, as a file written at submission must**; re-derives every run line, the decomposition counts under BOTH bars, every vote statistic, the levels and TRAIN from the RAW `.out`, the beta trajectories, and the corpus sigma and anchors through the exclusions TSV.
+
+**It re-derives `ulp32` by a DIFFERENT route from the scorer** — incrementing the float32 bit pattern with `struct` rather than `math.frexp` — and checks the two against each other at 13 points across the whole `BETA_CLIP` band, so the tolerance is evidence rather than a shared assumption.
+
+**Corpus used:** `results/all_runs.csv` `1801245410857d8a9e66a68e6ec633ccf6cf9e92d0efcec8cf3d7e2077b94b0a` (3,127 rows) and `results/CORPUS-EXCLUSIONS.tsv` `ff9533348f9f2f0db04c66e7f6cbe8f191cd05bc59cb1c7dc359976db7cbe191`, **materialised with `git show 1cb52f7:results/…` on BOTH hosts** — the corpus `cst1` was registered against, as 265.5 requires now that the 266.9 ingest has moved the live corpus to 3,181 rows.  Re-derived from it: `SIGMA_R18ALL` 0.6811983409351905 (df 221, 46 cells), the naive 7.155901812067415 for contrast, and the three gating-adjacent anchors to 5e-5.
+
+**Results.**  **VIOLATIONS 0** on both hosts.  Its REPLICA block is **byte-identical to the successor's own 66 post-gate lines** — the `[G-DECOMP]` header, the two tolerance lines, the nine `PASS` lines, `[NOMINATION]`, `[LEVELS]`, `[DESCRIPTIVE]`, `BRANCH`, `LICENCE`, `NOT LICENSED` and `FINAL` — **the diff is empty**.  Body sha (excluding the two trailing `HOSTPATH` lines) **`f4d679d757025c0c8cafcbc1fb2ebd234417072c74c659ef0c69e1f24dcc2368` on alice2 (3.9.25) AND on the Mac (3.14.5)**.
+
+### 268.11 WHAT IS OWED AT LANDING — and what is NOT
+
+* **INGEST: NOTHING IS OWED.**  `cst1`'s nine rows were ingested once already, at **266.9** (corpus 3,127 → 3,181, +54 rows, 0 changed).  The successor's selftest `[C]` re-verified it on today's corpus rather than assuming it: **exactly 9 `cst1-` rows, seeds 112 / 113 / 114 with three each, and seed 115 still absent**.  The successor reads no accuracy number from the corpus and its `FINAL` is corpus-invariant (`[E2]`), so nothing about the verdict depends on this.
+* **EXCLUSION ROWS: NOTHING IS OWED.**  256.7 registered none (the three arms separate on the CSV `granularity` column alone; `PROBE_TENSOR` is proved inert on this HF sha), and 266.9 verified none on the landed runs.  The successor changes no run, no witness kind and no corpus row.  `results/CORPUS-EXCLUSIONS.tsv` was NOT touched.
+* **A `docs/MASTER-TABLE.md` ROW IS OWED, AND THIS ENTRY DOES NOT WRITE IT.**  Row **229** currently carries `UNRESOLVED-DECOMPOSITION` + *"a GATE, not a branch.  The batch has NO verdict and NO licence"*.  **The landing stage owes its supersession**, in the file's own convention (appended or amended so that no existing line moves), carrying: the branch `NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL`; the printed licence and `NOT LICENSED` lines verbatim; the record-count margins of 268.8 (41 and 6 of 1,500; 559 above the lower bar); `D_ISO` / `D_CTL` / `P` with their SE; the successor's sha `8300f757…` and registration commit `9581897`; the fact that the bars are the 256.5 literals, proved by `[A2]`; and a pointer to 265.3 for why the predecessor's `UNRESOLVED-DECOMPOSITION` stands as a correct record of a defective check.  **The header count (3,181 / 3304.0) does NOT change** — no row is added to the corpus by this entry.
+* **266.11's ranked item 1 is CLOSED.**  It asked for exactly this, at ZERO GPU, and named the two constraints this entry honoured: the bars stay the 256.5 literals, and they must not be written with 0.4727 / 0.4960 steering them.
+* **STALE STATEMENTS TO FIX AT LANDING, named not edited here:** `docs/STATUS.md` line 15 (the cycle-154 table row for 265) and its judgement line 25 item 1, and `docs/LIMITS-PREP.md` §1.1's "RESULTS SO FAR" block, all of which still say `cst1` has no verdict.  `docs/LIMITS-PREP.md` §6 L1's S2 leg is now answered — **half**: the isolation rescue transfers to a second meta step size, the vote-dominance nomination does not.
+
+### 268.12 Discipline, files, cost
+
+* **RULE 16 held.**  `analysis/cST1_carrier_contrast_score.py`, `analysis/cCT1_c10_dominance_score.py`, `analysis/cCV0_carrier_vote_core.py`, `analysis/argsline_guard.py`, `analysis/corpus_exclusions.py`, every launcher and everything under `paper/` were **NOT edited**.  The predecessor stays FROZEN and its `UNRESOLVED-DECOMPOSITION` stands as the correct output of a defective check; the successor is a NEW file, registered before it was read.
+* **RULE 21's spirit held** (268.4): commit `9581897` pushed at 1789769233, first read at 1789769247.
+* **ZERO GPU.  No `sbatch`, no `srun`, no job of any kind.**  `alice` (Saber's shared account) **NOT contacted**.  All alice2 work is read-only or an unedited script on the **login node**: two `git clone`s, `git show` of the registration corpus, and CPU-only Python.  No file downloaded, no `.pdf` fetched, no site or Vercel URL opened, no nested `claude -p`.
+* **Files**, all under `/Users/teshnizi/Saber Optimization/alice-backup/hierarchical-metaoptimize`, staged **by path** (never `-A`):
+  * NEW, commit **`9581897`** (the registration): `analysis/cST2_carriervote_score.py` (`8300f75786279566c5ef8a6931fddb1d9bf8abd5f3d99c980e8dee51fcf69122`), `analysis/cst2_tol_crosscheck.py` (`07c2dcace1db427214682dcc4a0616b08ef9a5dd4da98db16c76de59ec756277`).
+  * NEW, commit **`3ac3554`**: `analysis/cst2_attack_indep.py` (`fb32e4567d7f78a9e7a080ac4e6c765b8fe3ce079929e8562ac6c0652358ef74`).
+  * NEW, this commit: `results/cst2_carriervote_score_mac.txt` (`1b17de80…`), `results/cst2_carriervote_score_alice2.txt` (`934e17af…`), `results/cst2_carriervote_selftest_mac.txt` and `results/cst2_carriervote_selftest_alice2.txt` (both `ea8a4858…` — byte-identical), `results/cst2_tol_crosscheck_mac.txt` (`45b3db7f…`), `results/cst2_tol_crosscheck_alice2.txt` (`b8497188…`), `results/cst2_attack_indep_mac.txt` (`d7a67bd2…`), `results/cst2_attack_indep_alice2.txt` (`03d30732…`), `results/cst1_cst2_scorer_diff.txt` (`827fee6b…`), and `docs/CORRECTIONS.md` (this entry).
+  * NOT touched: `docs/MASTER-TABLE.md`, `docs/STATUS.md`, `docs/LIMITS-PREP.md`, `results/all_runs.csv`, `results/CORPUS-EXCLUSIONS.tsv`, `paper/`, every registered scorer, launcher and core.
+* **Cost: 0 GPU-h by this entry.**  `cst1`'s own 8.85 GPU-h were spent at 256.10 / 265.1 and are unchanged; the successor makes them readable.
+* **UNSURE, recorded.**  (1) `SIGN_ULP_K = 4.0` is the factor CORRECTIONS 265.3 prescribed, not one derived from an optimality argument; any `K >= 1` is sound by 268.2's bound, and `K = 4` was chosen because it was already in the record BEFORE `cst1`'s statistics were read.  (2) The tolerance is derived for a SINGLE round-to-nearest in the beta update; a future harness that computed the update in two or more float32 operations would need a larger `K`, which is why the bar is stated as a formula with `K` visible rather than as a number.  (3) This entry could not independently confirm that no other stage pushed to `origin/master` between `9581897` and the runs; `git fetch` reported the branch up to date before each commit, and `origin/master == local` was re-checked after the push.
+
+Next free number: **269**.

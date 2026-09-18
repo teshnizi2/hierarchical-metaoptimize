@@ -1,0 +1,150 @@
+==============================================================================================================
+cst2_tol_crosscheck -- the OLD (absolute 1e-3) and the NEW (1e-3 + 4*ulp32/ms) G-DECOMP sign bar,
+applied to every landed run of `cst1` (ms 3e-4) and `cct1` (ms 1e-3).  No repo module imported.
+==============================================================================================================
+
+[ARITHMETIC] the bound, the crossover, and a worked table of 0.5*ulp32/ms
+  BETA_CLIP -15:-2.3026 keeps every unclamped |beta| inside [2, 16), so ulp32(beta) <= 2^-20 = 9.5367431640625000e-07
+  round-to-nearest bound on |q - sign|:  0.5*ulp32(beta)/ms  +  |float32(ms) - ms|/ms  <=  0.5*ulp32/ms + 2^-24
+  2^-24 = 5.960464e-08 (the float32(ms) term), absorbed by the 1e-3 floor both bars keep
+    ms 0.0001        0.5*ulp/ms 4.7684e-03  vs OLD bar 1.000e-03 -> FAILS     NEW bar 3.9147e-02 -> discriminates
+    ms 0.0003        0.5*ulp/ms 1.5895e-03  vs OLD bar 1.000e-03 -> FAILS     NEW bar 1.3716e-02 -> discriminates
+    ms 0.0004        0.5*ulp/ms 1.1921e-03  vs OLD bar 1.000e-03 -> FAILS     NEW bar 1.0537e-02 -> discriminates
+    ms 0.00047       0.5*ulp/ms 1.0145e-03  vs OLD bar 1.000e-03 -> FAILS     NEW bar 9.1164e-03 -> discriminates
+    ms 0.000476837   0.5*ulp/ms 1.0000e-03  vs OLD bar 1.000e-03 -> passes    NEW bar 9.0000e-03 -> discriminates
+    ms 0.00048       0.5*ulp/ms 9.9341e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 8.9473e-03 -> discriminates
+    ms 0.0005        0.5*ulp/ms 9.5367e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 8.6294e-03 -> discriminates
+    ms 0.0007        0.5*ulp/ms 6.8120e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 6.4496e-03 -> discriminates
+    ms 0.0009        0.5*ulp/ms 5.2982e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 5.2386e-03 -> discriminates
+    ms 0.001         0.5*ulp/ms 4.7684e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 4.8147e-03 -> discriminates
+    ms 0.003         0.5*ulp/ms 1.5895e-04  vs OLD bar 1.000e-03 -> passes    NEW bar 2.2716e-03 -> discriminates
+    ms 0.01          0.5*ulp/ms 4.7684e-05  vs OLD bar 1.000e-03 -> passes    NEW bar 1.3815e-03 -> discriminates
+  CROSSOVER: the OLD absolute bar is exactly right at ms = 0.5*ulp32/1e-3 = 4.76837158203125e-04
+  OK   the crossover is 4.76837158203125e-04
+  OK   at ms 3e-4 the bound 1.589e-03 EXCEEDS the old 1e-3 bar   1.589457e-03
+  OK   at ms 1e-3 the bound 4.768e-04 is 52 % UNDER the old 1e-3 bar   4.768372e-04
+  OK   the new bar at ms 3e-4 is still far below 1 (a missing step) and 2 (a flipped sign)   1.371566e-02
+
+[cst1] ResNet18_c100, 62 tensors, 11220132 params, ms 0.0003  (the batch whose registered scorer stopped at G-DECOMP)
+  OK   cst1 k01-s112: 500 records at steps 0..49,900
+  OK   cst1 k01-s112: 1 coordinate(s), the registered partition
+  k01-s112   probe.jsonl d0ee3233cd739dc0b8c56f6f86cd568924562bf3897358f20cf50aa4902ae6b7
+             unclamped   500  clamped    0 | OLD bar fails   382 ( 76.40 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   500/500  
+  OK   cst1 k01-s112: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 k01-s112: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 k01-s112: the OLD bar gates this run (> 1 % of unclamped coordinates)   382/500
+  OK   cst1 k01-s113: 500 records at steps 0..49,900
+  OK   cst1 k01-s113: 1 coordinate(s), the registered partition
+  k01-s113   probe.jsonl ed366dcd332945529fdaeb39a087051ef16591fe9de639ac703f2bcbb18281cd
+             unclamped   500  clamped    0 | OLD bar fails   382 ( 76.40 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   500/500  
+  OK   cst1 k01-s113: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 k01-s113: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 k01-s113: the OLD bar gates this run (> 1 % of unclamped coordinates)   382/500
+  OK   cst1 k01-s114: 500 records at steps 0..49,900
+  OK   cst1 k01-s114: 1 coordinate(s), the registered partition
+  k01-s114   probe.jsonl 76c0f7a4f1795ca3ab96fa4e76ef79269141cfcf54e733ae62f45f37b572fbf6
+             unclamped   500  clamped    0 | OLD bar fails   380 ( 76.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   500/500  
+  OK   cst1 k01-s114: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 k01-s114: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 k01-s114: the OLD bar gates this run (> 1 % of unclamped coordinates)   380/500
+  OK   cst1 ISO-s112: 500 records at steps 0..49,900
+  OK   cst1 ISO-s112: 2 coordinate(s), the registered partition
+  ISO-s112   probe.jsonl 76f6badc51d8292fee60d1d53a0843c4ce66086b967fcc6dae5c46ebfe9cde56
+             unclamped   800  clamped  200 | OLD bar fails   608 ( 76.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   800/800  
+  OK   cst1 ISO-s112: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 ISO-s112: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 ISO-s112: the OLD bar gates this run (> 1 % of unclamped coordinates)   608/800
+  OK   cst1 ISO-s113: 500 records at steps 0..49,900
+  OK   cst1 ISO-s113: 2 coordinate(s), the registered partition
+  ISO-s113   probe.jsonl 5cd4f5d818d94118ac03dea5dee33e4b598abe408cecbf6acd47ef789fbb6fda
+             unclamped   785  clamped  215 | OLD bar fails   596 ( 75.92 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   785/785  
+  OK   cst1 ISO-s113: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 ISO-s113: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 ISO-s113: the OLD bar gates this run (> 1 % of unclamped coordinates)   596/785
+  OK   cst1 ISO-s114: 500 records at steps 0..49,900
+  OK   cst1 ISO-s114: 2 coordinate(s), the registered partition
+  ISO-s114   probe.jsonl 302efad799fdc4c38e26efd5d442f1100f77349fccc47c4e585e043d6c4d60c1
+             unclamped   810  clamped  190 | OLD bar fails   620 ( 76.54 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   810/810  
+  OK   cst1 ISO-s114: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 ISO-s114: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 ISO-s114: the OLD bar gates this run (> 1 % of unclamped coordinates)   620/810
+  OK   cst1 CTL-s112: 500 records at steps 0..49,900
+  OK   cst1 CTL-s112: 2 coordinate(s), the registered partition
+  CTL-s112   probe.jsonl 90c4c66f48a60c4fca1802f02a5cfbaee9d3a54a9957e24f68b6a41ca6bcc96e
+             unclamped   995  clamped    5 | OLD bar fails   809 ( 81.31 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   995/995  
+  OK   cst1 CTL-s112: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 CTL-s112: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 CTL-s112: the OLD bar gates this run (> 1 % of unclamped coordinates)   809/995
+  OK   cst1 CTL-s113: 500 records at steps 0..49,900
+  OK   cst1 CTL-s113: 2 coordinate(s), the registered partition
+  CTL-s113   probe.jsonl 2f0bef0f90c06a32489c6fe49509c330c45d1926c57d52fb86d9ff5639a092ae
+             unclamped   992  clamped    8 | OLD bar fails   809 ( 81.55 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   992/992  
+  OK   cst1 CTL-s113: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 CTL-s113: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 CTL-s113: the OLD bar gates this run (> 1 % of unclamped coordinates)   809/992
+  OK   cst1 CTL-s114: 500 records at steps 0..49,900
+  OK   cst1 CTL-s114: 2 coordinate(s), the registered partition
+  CTL-s114   probe.jsonl 2ce249b0bea4f83a797a3da3285144da21cce5c553ea92dd508573574df96560
+             unclamped   994  clamped    6 | OLD bar fails   808 ( 81.29 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 1.3580e-03  widest NEW bar 1.3716e-02 | bit-exact float32   994/994  
+  OK   cst1 CTL-s114: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cst1 CTL-s114: 0 coordinates exceed the NEW ms-aware bar
+  OK   cst1 CTL-s114: the OLD bar gates this run (> 1 % of unclamped coordinates)   808/994
+  TOTAL cst1: unclamped 6876, clamped 624 | OLD fails 5394, NEW fails 0 | bit-exact 6876/6876 | worst|q-s| 1.3580e-03
+
+[cct1] ResNet18, 62 tensors, 11173962 params, ms 0.001  (the batch whose sibling scorer PASSED the same code)
+  OK   cct1 k01-s116: 500 records at steps 0..49,900
+  OK   cct1 k01-s116: 1 coordinate(s), the registered partition
+  k01-s116   probe.jsonl 0f3c945346c028461a9fb196b9d821b6380366496de2112763485a4f719c6c41
+             unclamped   500  clamped    0 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32   500/500  
+  OK   cct1 k01-s116: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 k01-s116: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 k01-s116: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  OK   cct1 k01-s117: 500 records at steps 0..49,900
+  OK   cct1 k01-s117: 1 coordinate(s), the registered partition
+  k01-s117   probe.jsonl df010520f1985f99051d6df5421ed12e62e22a24a3bc5b2622085768ebd3720f
+             unclamped   500  clamped    0 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32   500/500  
+  OK   cct1 k01-s117: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 k01-s117: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 k01-s117: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  OK   cct1 k01-s118: 500 records at steps 0..49,900
+  OK   cct1 k01-s118: 1 coordinate(s), the registered partition
+  k01-s118   probe.jsonl af29d12e61d5bb7b545a3a0093e2cc673383596e206ac6178c36c871614e93d1
+             unclamped   500  clamped    0 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32   500/500  
+  OK   cct1 k01-s118: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 k01-s118: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 k01-s118: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  OK   cct1 kL-s116: 500 records at steps 0..49,900
+  OK   cct1 kL-s116: 62 coordinate(s), the registered partition
+  kL-s116    probe.jsonl 2f4437ca1acb0fef134c2ce66a6815ba717665ad6b7000aeef97f8c360356d1f
+             unclamped 28204  clamped 2796 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32 28204/28204
+  OK   cct1 kL-s116: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 kL-s116: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 kL-s116: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  OK   cct1 kL-s117: 500 records at steps 0..49,900
+  OK   cct1 kL-s117: 62 coordinate(s), the registered partition
+  kL-s117    probe.jsonl 3ab813e094339886f6b0c6ab6e82f12d89a2c64bc6dea4825dbf53f519da6f94
+             unclamped 28104  clamped 2896 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32 28104/28104
+  OK   cct1 kL-s117: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 kL-s117: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 kL-s117: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  OK   cct1 kL-s118: 500 records at steps 0..49,900
+  OK   cct1 kL-s118: 62 coordinate(s), the registered partition
+  kL-s118    probe.jsonl 907b00199ab31a8cc38a1dd6a5410defe453acb236e937067b623f5c00b7fa53
+             unclamped 28104  clamped 2896 | OLD bar fails     0 (  0.00 %)  NEW bar fails     0 (  0.00 %) | worst|q-s| 4.0436e-04  widest NEW bar 4.8147e-03 | bit-exact float32 28104/28104
+  OK   cct1 kL-s118: EVERY unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   cct1 kL-s118: 0 coordinates exceed the NEW ms-aware bar
+  OK   cct1 kL-s118: the OLD bar ALSO passes -- the two rules agree at ms 1e-3
+  TOTAL cct1: unclamped 85912, clamped 8588 | OLD fails 0, NEW fails 0 | bit-exact 85912/85912 | worst|q-s| 4.0436e-04
+
+[VERDICT OF THE CROSS-CHECK]
+  cst1 (ms 3e-4): the OLD bar rejects 5394 of 6876 bit-exact unclamped coordinates; the NEW bar rejects 0.
+  cct1 (ms 1e-3): the OLD bar rejects 0 of 85912; the NEW bar rejects 0 -- THE TWO RULES AGREE.
+  bit-exact float32 reconstructions over BOTH batches: 92788 of 92788 unclamped coordinates.
+  worst |q - sign(L)|: cst1 1.3580e-03 (bound 0.5*ulp/ms = 1.5895e-03), cct1 4.0436e-04 (bound 4.7684e-04).
+  OK   both batches' worst residual is inside the round-to-nearest bound: the whole residual is quantisation
+  OK   the harness applied EXACTLY the registered update on every unclamped coordinate of both batches
+  OK   the successor's bar changes cst1's gate and changes NOTHING at cct1's meta step
+
+==============================================================================================================
+VIOLATIONS 0
+HOSTPATH runsdir  /home/s5014158/metaopt/runs

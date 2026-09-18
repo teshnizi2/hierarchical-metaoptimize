@@ -1,0 +1,125 @@
+====================================================================================================
+cST2 SELFTEST  (frozen successor of cST1; the ONLY change is the G-DECOMP sign tolerance)
+====================================================================================================
+
+[A] design, literals, bars, branches
+  PASS the imported core is the registered core   0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  PASS 9 runs; seeds 112-114 used, 115 unused
+  PASS ISO and CTL strings byte-identical to cdep1's registered ISO and DEPTH (cDP1 imported)
+  PASS ISO string byte-identical to ciso1's registered ISO (cIS1 imported)   sets:1-49,51-52,54-58,60-62/layer4.0.bn2
+  PASS ISO parses to [59, 3], isolated 50, 53, 59
+  PASS CTL parses to [59, 3], isolated 47, 48, 56, no carrier
+  PASS isolated numels matched 3 x 512
+  PASS bar ordering; K01_MAX below R50 of the corpus layerwise level, above k01 + 4 sigma
+  PASS nomination bars sit >= 0.25 below the collapse calibration and >= 0.10 above layerwise (0.000)
+  PASS 29 branches, every one has a licence
+  PASS decide() reads no record
+  PASS SE_PRIOR = SIGMA_PRIOR * sqrt(2/3) = 0.556196
+  PASS the registered ARGS line has 20 flags, none repeated
+
+[A2] NO BAR MOVED: every literal, word, sentence and map compared to the REGISTERED predecessor
+  PASS the predecessor on disk IS the registered scorer (sha 05546791...) -- the comparison below is against the REGISTERED text   05546791a0d9269a3f410fe0364f7afed97f711dd3f29186f28bce42973588a3
+  PASS all 27 scalar literals / bars identical to cST1 (DOM_HI, DOM_LO, TOP3_BAR, RESCUE_BAR, NULL_BAR, K01_MAX, DIVERGED_BAR, LEVEL_MIN/MAX, SIGMA_PRIOR, ...)   differ: []
+  PASS all 17 maps / word lists / licence sentences identical to cST1   differ: []
+  PASS the 29 branches AND all 29 licence strings are byte-identical to cST1's
+  PASS manifest_text() byte-identical (3107 bytes)
+  PASS args_line() identical on all 9 (arm, seed)
+  PASS nom_word() identical on the 50-point bar grid
+  PASS arm_word() identical on the 20-point bar grid
+  PASS decide() agrees with cST1's on 4,000 random (levels, ranges, DOM_C, TOP3_C) points   0 disagreements
+  PASS cST1's score() calls core.decomposition(); cST2's calls its OWN ms-aware decomposition()
+  PASS the core's frozen sign bar is the absolute 1e-3 this successor replaces (the core is NOT edited)
+
+[T] the tolerance, derived (the ONE change)
+  PASS ulp32() is the float32 spacing per binade (2^-20 on [8,16), 2^-21 on [4,8), 2^-22 on [2,4))
+  PASS BETA_CLIP -15:-2.3026 keeps |beta| < 16, so ulp32(beta) <= 2^-20 = 9.5367431640625e-07
+  PASS at ms 3e-4 the round-to-nearest bound 0.5*ulp/ms is 1.589e-03 -- LARGER than cST1's absolute 1e-3 bar, so no correct harness can pass it
+  PASS at ms 1e-3 the same bound is 4.768e-04, 52 % under the 1e-3 bar -- which is why cct1's sibling passed
+  PASS the crossover where cST1's bar would have been exactly right: ms = 0.5*ulp/1e-3 = 4.76837158203125e-04
+  PASS the crossover partitions a worked ms table: 1e-4 / 3e-4 / 4e-4 / 4.7e-4 fail it, 4.8e-4 ... 1e-2 pass
+  PASS the float32(ms) representation term 2^-24 = 5.96e-08 is absorbed by the retained 1e-3 floor (>1.6e4 x)
+  PASS at ms 3e-4 the new bar is 1.3716e-02: >8x the theoretical bound, yet still far below 1 (a zero step) and 2 (a flipped sign)
+  PASS the new bar still detects a missing step for every ms > 3.8184e-06 -- 26x below the smallest meta step this campaign has used (1e-4)
+  PASS sign_tol() is symmetric and takes the LARGER |beta| of the pair (a binade crossing is conservative)
+
+[B] the nomination premise on LANDED records (ms 1e-3), with the core this scorer runs
+  PASS PREMISE sc: 9 landed runs read NOMINATED   DOM_C 0.8069 TOP3_C 0.8238
+  PASS PREMISE lay: 9 landed runs read NOT-NOMINATED   DOM_C 0.0000 TOP3_C 0.0000
+  PASS PREMISE the pooled scalar DOM_C == the registered 0.8069   0.80689
+
+[C] the noise floor through filter_rows; the corpus at registration vs after the 266.9 ingest
+  NOTE the corpus moved since registration (sha 306d41063dd6..., 3181 rows): filtered sigma now 0.6631657745078832 (df 239); SIGMA_PRIOR stays frozen (O2)
+  PASS on a MOVED corpus SIGMA_PRIOR stays the frozen registration literal (O2)
+  PASS post-ingest corpus: exactly 9 cst1- rows at seeds 112/113/114 (3 each) and seed 115 still fresh   9 rows, seeds ['112', '113', '114']
+  PASS the NAIVE sigma exceeds the filtered one (the trap is live)   8.5522 vs 0.6632
+  PASS corpus_exclusions.filter_rows() actually removes rows (3181 -> 3055)
+
+[D] accounts and the floor table
+  PASS account SAME-MECHANISM's midpoint lands in NOMINATED+ISO-RESCUES+CTL-NULL   NOMINATED+ISO-RESCUES+CTL-NULL
+  PASS account ISOLATION-GENERIC's midpoint lands in NOMINATED+ISO-RESCUES+CTL-RESCUES   NOMINATED+ISO-RESCUES+CTL-RESCUES
+  PASS account NOMINATED-INSUFFICIENT's midpoint lands in NOMINATED+ISO-PARTIAL+CTL-NULL   NOMINATED+ISO-PARTIAL+CTL-NULL
+  PASS account OTHER-CARRIERS's midpoint lands in NOT-NOMINATED+ISO-NO-RESCUE+CTL-NULL   NOT-NOMINATED+ISO-NO-RESCUE+CTL-NULL
+  PASS account ROLE-NOT-VOTE's midpoint lands in NOT-NOMINATED+ISO-RESCUES+CTL-NULL   NOT-NOMINATED+ISO-RESCUES+CTL-NULL
+  PASS account NO-COLLAPSE-HERE's midpoint lands in SCALAR-NOT-COLLAPSED   SCALAR-NOT-COLLAPSED
+  PASS the 6 accounts land in 6 different branches
+  PASS the BROKEN-SPEC null predicts NOMINATED+ISO-NO-RESCUE+CTL-NULL, a branch no non-null account owns; only G-SPEC separates it
+  PASS lowest predicted level 22 pp is >= 20 pp above chance
+
+[E] the REAL score() on synthetic batches
+  PASS E SAME-MECHANISM                                             -> NOMINATED+ISO-RESCUES+CTL-NULL | (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E ISOLATION-GENERIC                                          -> NOMINATED+ISO-RESCUES+CTL-RESCUES (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-RESCUES | TRAIN-AGREES | DOM_C=0.8000 | TOP3_C=0.8000 | P rc 0
+  PASS E NOMINATED-INSUFFICIENT                                     -> NOMINATED+ISO-PARTIAL+CTL-NULL (rc 0)   got FINAL: NOMINATED+ISO-PARTIAL+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E OTHER-CARRIERS (not nominated)                             -> NOT-NOMINATED+ISO-NO-RESCUE+CTL-NULL (rc 0)   got FINAL: NOT-NOMINATED+ISO-NO-RESCUE+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | D rc 0
+  PASS E ROLE-NOT-VOTE                                              -> NOT-NOMINATED+ISO-RESCUES+CTL-NULL (rc 0)   got FINAL: NOT-NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM rc 0
+  PASS E other-trio dominates, C not                                -> NOT-NOMINATED+ISO-RESCUES (rc 0)   got FINAL: NOT-NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM rc 0
+  PASS E NOMINATION-PARTIAL                                         -> NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL (rc 0)   got FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES  rc 0
+  PASS E CTL-PARTIAL                                                -> NOMINATED+ISO-RESCUES+CTL-PARTIAL (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-PARTIAL | TRAIN-AGREES | DOM_C=0.8000 | TOP3_C=0.8000 | P rc 0
+  PASS E NO-COLLAPSE-HERE                                           -> SCALAR-NOT-COLLAPSED (rc 0)   got FINAL: SCALAR-NOT-COLLAPSED | UNBRANCHED-NOMINATED | DOM_C=0.8000 | TOP3_C=0.8000 | PINNED rc 0
+  PASS E near bar: D_ISO 20.02 rescues                              -> NOMINATED+ISO-RESCUES (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E near bar: D_ISO 19.98 partial                              -> NOMINATED+ISO-PARTIAL (rc 0)   got FINAL: NOMINATED+ISO-PARTIAL+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E near bar: D_CTL 4.98 null                                  -> NOMINATED+ISO-RESCUES+CTL-NULL (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E near bar: D_CTL 5.02 partial                               -> NOMINATED+ISO-RESCUES+CTL-PARTIAL (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-PARTIAL | TRAIN-AGREES | DOM_C=0.8000 | TOP3_C=0.8000 | P rc 0
+  PASS E near bar: DOM_C 0.502 nominated                            -> NOMINATED+ (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E near bar: DOM_C 0.498 partial                              -> NOMINATION-PARTIAL+ (rc 0)   got FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES  rc 0
+  PASS E near bar: DOM_C 0.100 not nominated                        -> NOT-NOMINATED+ (rc 0)   got FINAL: NOT-NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM rc 0
+  PASS E near bar: DOM_C 0.104 partial                              -> NOMINATION-PARTIAL+ (rc 0)   got FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES  rc 0
+  PASS E near bar: k01 33.9 collapsed                               -> NOMINATED+ (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E near bar: k01 34.1 not collapsed                           -> SCALAR-NOT-COLLAPSED (rc 0)   got FINAL: SCALAR-NOT-COLLAPSED | UNBRANCHED-NOMINATED | DOM_C=0.8000 | TOP3_C=0.8000 | PINNED rc 0
+  PASS E diverged seed (ISO s113 -6)                                -> UNRESOLVED-DIVERGED (rc 0)   got FINAL: UNRESOLVED-DIVERGED | DOM_C=0.8000 | TOP3_C=0.8000 | PINNED-FRAC=0.0000 | HARNESS-C rc 0
+  PASS E dropped run -> INCOMPLETE                                  -> INCOMPLETE (rc 2)   got FINAL: INCOMPLETE | 8/9 complete rc 2
+  PASS E no RUN_DONE -> INCOMPLETE                                  -> INCOMPLETE (rc 2)   got FINAL: INCOMPLETE | 8/9 complete rc 2
+  PASS E 499 records -> INCOMPLETE                                  -> INCOMPLETE (rc 2)   got FINAL: INCOMPLETE | 9/9 complete rc 2
+  PASS E truncated resubmission does not shadow                     -> NOMINATED+ISO-RESCUES+CTL-NULL (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E ARGS: ms 1e-3 on k01-s112                                  -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-ARGS k01-s112: one ARGS line == regi rc 1
+  PASS E ENV: AUGMENT=0                                             -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-ENV CTL-s113: one ENV line == regist rc 1
+  PASS E PT type scalar on ISO                                      -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 2 harness check(s) failed: G-PT ISO-s114: one PROBE_TENSOR line,  rc 1
+  PASS E foreign GROUP_HOLD: off line                               -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-FOREIGN ISO-s112: no intervention-ki rc 1
+  PASS E foreign SHADOW_VOTE line                                   -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-FOREIGN k01-s114: no intervention-ki rc 1
+  PASS E header numels of ResNet18 (CIFAR-10)                       -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-HEADER k01-s112: probe_tensor.json r rc 1
+  PASS E provenance HF of cvt8's tree                               -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-PROV: HF_SHA256 == 4732b74aa3a105088 rc 1
+  PASS E provenance runner of cvt8                                  -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-PROV: RUNNER_SHA256 == a0d0a1b904e64 rc 1
+  PASS E provenance MODE dryrun                                     -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-PROV: MODE == submit rc 1
+  PASS E provenance scorer sha wrong                                -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-PROV: SCORER_SHA256 == 05546791a0d92 rc 1
+  PASS E manifest numel changed                                     -> HARNESS-UNSOUND (rc 1)   got FINAL: HARNESS-UNSOUND | 1 harness check(s) failed: G-STRUCT: PARTITION-MANIFEST.txt byte- rc 1
+  PASS E BROKEN-SPEC: ISO-s113 ran scalar                           -> SPEC-NOT-APPLIED (rc 1)   got FINAL: SPEC-NOT-APPLIED | G-SPEC ISO-s113: every record carries 2 beta / z_agg coordinate( rc 1
+  PASS E BROKEN-SPEC: CTL-s112 ran scalar                           -> SPEC-NOT-APPLIED (rc 1)   got FINAL: SPEC-NOT-APPLIED | G-SPEC CTL-s112: every record carries 2 beta / z_agg coordinate( rc 1
+  PASS E capture broken on k01-s114                                 -> UNRESOLVED-DECOMPOSITION (rc 1)   got FINAL: UNRESOLVED-DECOMPOSITION | G-DECOMP k01-s114 rc 1
+
+[E4] the DEFECT and its fix, on float32-quantised betas the LIVE harness would post
+  PASS the DEFECT reproduces: cST1's absolute bar rejects a BIT-EXACT float32 harness at ms 3e-4   500/500 coordinates over the 1e-3 bar
+  PASS the FIX: cST2's ms-aware bar accepts every one of them, worst |q-s| 1.358e-03 inside the bound 1.589e-03
+  PASS at ms 1e-3 (cct1's cell) the OLD and the NEW bar BOTH pass the same quantised records -- the successor changes nothing where the predecessor was right
+  PASS a FLIPPED applied step on 400 of 500 records is still caught by the new bar (|q-s| = 2)
+  PASS a MISSING applied step on 100 of 500 records is still caught by the new bar (|q-s| = 1)
+  PASS the core's 1 %-of-coordinates rule is UNCHANGED: 5/500 faults pass, 6/500 fail
+  PASS E float32-quantised betas (the real harness) -> scored       -> NOMINATED+ISO-RESCUES+CTL-NULL | (rc 0)   got FINAL: NOMINATED+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0 rc 0
+  PASS E float32-quantised + flipped step on k01-s112..CTL-s114     -> UNRESOLVED-DECOMPOSITION (rc 1)   got FINAL: UNRESOLVED-DECOMPOSITION | G-DECOMP k01-s112 rc 1
+
+[E2] O2 invariance: injected corpus rows at cst1's own cells move the filtered sigma, not FINAL
+  PASS FINAL identical on the corpus, the injected corpus (filtered sigma 7.14) and no corpus
+
+[E3] the one-argument subprocess invocation
+  PASS `cST2_carriervote_score.py <runsdir>` exit 0
+  PASS a dropped run: exit 2, FINAL: INCOMPLETE
+
+SELFTEST PASSES: 99 PASS / 0 FAIL

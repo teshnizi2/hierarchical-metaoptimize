@@ -1,0 +1,290 @@
+====================================================================================================
+cst2_attack_indep -- INDEPENDENT re-derivation of the FROZEN SUCCESSOR's output (no repo import)
+====================================================================================================
+
+[FILES] sha256 of every file read (host-independent)
+  OK   one .out for k01-s112   1
+  k01-s112       job 5026061  out d441af0006c67eb2b79577156aea5c7d893677e40937a23ac3f49430a0bca393
+                             probe.jsonl d0ee3233cd739dc0b8c56f6f86cd568924562bf3897358f20cf50aa4902ae6b7
+  OK   one .out for k01-s113   1
+  k01-s113       job 5026064  out e093e1c061ce44408159e152b3dc64a86ac5aae5cbc18a0d4a312e574f249e3f
+                             probe.jsonl ed366dcd332945529fdaeb39a087051ef16591fe9de639ac703f2bcbb18281cd
+  OK   one .out for k01-s114   1
+  k01-s114       job 5026067  out ef8fc8f04b7cc24db2f2a3079202b9aff985ab390a3c8b70a70c8b244d5764eb
+                             probe.jsonl 76c0f7a4f1795ca3ab96fa4e76ef79269141cfcf54e733ae62f45f37b572fbf6
+  OK   one .out for ISO-s112   1
+  ISO-s112       job 5026062  out 0cdb5b3a7e3085f79dc92733be1f82b7a85dcefa9e09994187dfb226c502ffc6
+                             probe.jsonl 76f6badc51d8292fee60d1d53a0843c4ce66086b967fcc6dae5c46ebfe9cde56
+  OK   one .out for ISO-s113   1
+  ISO-s113       job 5026065  out 2648820030bbae15888459903faf559e03671f441273d1ba83b1a259b22634d2
+                             probe.jsonl 5cd4f5d818d94118ac03dea5dee33e4b598abe408cecbf6acd47ef789fbb6fda
+  OK   one .out for ISO-s114   1
+  ISO-s114       job 5026068  out 1b03906dfd3c3404ab1ef98726b52c73183c2312761ac3b9276e746c74d08984
+                             probe.jsonl 302efad799fdc4c38e26efd5d442f1100f77349fccc47c4e585e043d6c4d60c1
+  OK   one .out for CTL-s112   1
+  CTL-s112       job 5026063  out cf7e498c8fbf3be62e9b4c64b043ebbefb682bce2d9ba84185855d0a6babd0d6
+                             probe.jsonl 90c4c66f48a60c4fca1802f02a5cfbaee9d3a54a9957e24f68b6a41ca6bcc96e
+  OK   one .out for CTL-s113   1
+  CTL-s113       job 5026066  out e4af6b73b90e44b9fce683ce8eabb070ee574647351f19b467faa2628f09e3b2
+                             probe.jsonl 2f0bef0f90c06a32489c6fe49509c330c45d1926c57d52fb86d9ff5639a092ae
+  OK   one .out for CTL-s114   1
+  CTL-s114       job 5026069  out 8105e456e95fc1332f2f06804a8e02dbacfe03cd6e082e96c450fb7ebd14875b
+                             probe.jsonl 2ce249b0bea4f83a797a3da3285144da21cce5c553ea92dd508573574df96560
+  batch          PROVENANCE.txt d22ed35360221a87ffcf5c09b35623fbb7818811469672b4e2b7cc4ee16293b2
+  batch          PARTITION-MANIFEST.txt 89c1818f9cfd121f2a92ae3225e38f3dfe6dd2a8b1f235958fbd0e031aa0e1e0
+  corpus         all_runs.csv 1801245410857d8a9e66a68e6ec633ccf6cf9e92d0efcec8cf3d7e2077b94b0a
+  corpus         CORPUS-EXCLUSIONS.tsv ff9533348f9f2f0db04c66e7f6cbe8f191cd05bc59cb1c7dc359976db7cbe191
+  corpus commit 1cb52f7 -- the corpus `cst1` was REGISTERED against, and the corpus the scorer's frozen
+  SIGMA_PRIOR and ANCHOR literals come from.  The 266.9 ingest moved the live corpus to 3,181 rows,
+  so these two files are materialised with `git show 1cb52f7:results/...` (CORRECTIONS 265.5).
+  OK   all_runs.csv sha == the scorer's REG_CORPUS_SHA
+  OK   CORPUS-EXCLUSIONS.tsv sha == the registered one
+
+[MODEL] names and numels built from the ResNet18_c100 architecture, then checked against each header
+  OK   62 tensors, 11220132 parameters
+  OK   C = {50, 53, 59} are the three carriers by name
+  OK   CTL = {47, 48, 56} is the matched non-carrier layer4 triple (one member is a bias)
+  OK   ISO parses to [59, 3] with the carriers isolated
+  OK   CTL parses to [59, 3] with the control triple isolated
+  OK   ISO and CTL isolate 1,536 parameters each (3 x 512) -- count-matched
+  OK   PARTITION-MANIFEST.txt rebuilt byte for byte (3107 bytes)   3107 on disk
+  OK   manifest length == the registered 3107
+  OK   header numels k01-s112 == the built model
+  OK   header numels k01-s113 == the built model
+  OK   header numels k01-s114 == the built model
+  OK   header numels ISO-s112 == the built model
+  OK   header numels ISO-s113 == the built model
+  OK   header numels ISO-s114 == the built model
+  OK   header numels CTL-s112 == the built model
+  OK   header numels CTL-s113 == the built model
+  OK   header numels CTL-s114 == the built model
+
+[PROVENANCE] runs/cst1/PROVENANCE.txt against the literals CORRECTIONS 256.10 records
+  OK   PROVENANCE MODE   got submit
+  OK   PROVENANCE HF_SHA256   got 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd
+  OK   PROVENANCE BUILD_NETWORK_SHA256   got c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+  OK   PROVENANCE TRAIN_PY_SHA256   got 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7
+  OK   PROVENANCE RUNNER_SHA256   got a0d0a1b904e64ea5a3de8c0649b58454beff0322419c97ea9e6d77481cfd9f3a
+  OK   PROVENANCE CORE_SHA256   got 0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  OK   PROVENANCE SCORER_SHA256   got 05546791a0d9269a3f410fe0364f7afed97f711dd3f29186f28bce42973588a3
+  NOTE PROVENANCE names the PREDECESSOR scorer (05546791...), which is what a file written at SUBMISSION
+  must name.  The successor checks that same literal; its own sha is 8300f75786279566c5ef8a6931fddb1d9bf8abd5f3d99c980e8dee51fcf69122.
+  OK   cST1_carrier_contrast_score.py on disk is the registered file   05546791a0d9269a
+  OK   cST2_carriervote_score.py on disk is the registered file   8300f75786279566
+  OK   cCV0_carrier_vote_core.py on disk is the registered file   0754ca84e44258fb
+
+[RUN LINES] ARGS / ENV / PROBE_TENSOR / foreign / records / coordinate count, from each run's own .out
+  OK   k01-s112: RUN_DONE, epochs 0..99, no traceback
+  OK   k01-s112: ARGS == the registered line
+  OK   k01-s112: ENV == the registered line, PROBE_DIR is the run's own
+  OK   k01-s112: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  OK   k01-s112: no intervention line (the live tree ran)
+  OK   k01-s112: 500 records at steps 0..49,900
+  OK   k01-s112: every record carries 1 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   k01-s113: RUN_DONE, epochs 0..99, no traceback
+  OK   k01-s113: ARGS == the registered line
+  OK   k01-s113: ENV == the registered line, PROBE_DIR is the run's own
+  OK   k01-s113: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  OK   k01-s113: no intervention line (the live tree ran)
+  OK   k01-s113: 500 records at steps 0..49,900
+  OK   k01-s113: every record carries 1 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   k01-s114: RUN_DONE, epochs 0..99, no traceback
+  OK   k01-s114: ARGS == the registered line
+  OK   k01-s114: ENV == the registered line, PROBE_DIR is the run's own
+  OK   k01-s114: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  OK   k01-s114: no intervention line (the live tree ran)
+  OK   k01-s114: 500 records at steps 0..49,900
+  OK   k01-s114: every record carries 1 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   ISO-s112: RUN_DONE, epochs 0..99, no traceback
+  OK   ISO-s112: ARGS == the registered line
+  OK   ISO-s112: ENV == the registered line, PROBE_DIR is the run's own
+  OK   ISO-s112: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   ISO-s112: no intervention line (the live tree ran)
+  OK   ISO-s112: 500 records at steps 0..49,900
+  OK   ISO-s112: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   ISO-s113: RUN_DONE, epochs 0..99, no traceback
+  OK   ISO-s113: ARGS == the registered line
+  OK   ISO-s113: ENV == the registered line, PROBE_DIR is the run's own
+  OK   ISO-s113: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   ISO-s113: no intervention line (the live tree ran)
+  OK   ISO-s113: 500 records at steps 0..49,900
+  OK   ISO-s113: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   ISO-s114: RUN_DONE, epochs 0..99, no traceback
+  OK   ISO-s114: ARGS == the registered line
+  OK   ISO-s114: ENV == the registered line, PROBE_DIR is the run's own
+  OK   ISO-s114: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   ISO-s114: no intervention line (the live tree ran)
+  OK   ISO-s114: 500 records at steps 0..49,900
+  OK   ISO-s114: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   CTL-s112: RUN_DONE, epochs 0..99, no traceback
+  OK   CTL-s112: ARGS == the registered line
+  OK   CTL-s112: ENV == the registered line, PROBE_DIR is the run's own
+  OK   CTL-s112: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   CTL-s112: no intervention line (the live tree ran)
+  OK   CTL-s112: 500 records at steps 0..49,900
+  OK   CTL-s112: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   CTL-s113: RUN_DONE, epochs 0..99, no traceback
+  OK   CTL-s113: ARGS == the registered line
+  OK   CTL-s113: ENV == the registered line, PROBE_DIR is the run's own
+  OK   CTL-s113: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   CTL-s113: no intervention line (the live tree ran)
+  OK   CTL-s113: 500 records at steps 0..49,900
+  OK   CTL-s113: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+  OK   CTL-s114: RUN_DONE, epochs 0..99, no traceback
+  OK   CTL-s114: ARGS == the registered line
+  OK   CTL-s114: ENV == the registered line, PROBE_DIR is the run's own
+  OK   CTL-s114: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  OK   CTL-s114: no intervention line (the live tree ran)
+  OK   CTL-s114: 500 records at steps 0..49,900
+  OK   CTL-s114: every record carries 2 coordinate(s) -- the BROKEN-SPEC null is excluded
+
+[TOLERANCE] the successor's ONE change, re-derived here from the float32 BIT PATTERN (not frexp)
+  OK   the bit-increment ulp32 and the frexp ulp32 agree on the whole BETA_CLIP band (13 points)
+  OK   the widest float32 spacing BETA_CLIP -15:-2.3026 allows is 2^-20 = 9.5367431640625e-07 (the [8,16) binade)
+  OK   |float32(ms) - ms| / ms < 2^-24 = 5.96e-08 at ms 3e-4   4.750e-08
+  OK   the round-to-nearest bound at ms 3e-4 is 1.589457e-03 -- LARGER than the predecessor's absolute 1e-3 bar
+  OK   the crossover is ms = 4.76837158203125e-04; at ms 1e-3 the bound is 4.768372e-04, 52 % under the old bar
+  OK   the successor's bar at ms 3e-4 is 1.371566e-02 -- below 1 (a missing step) and 2 (a flipped sign), so it still discriminates
+
+[G-DECOMP] the successor's counts, and the predecessor's, side by side
+  k01-s112   shape 0 z 0 m 0 (worst 2.0e-07 / 8.1e-07) NEW sign 0/500  OLD sign 382/500  clamped 0 shared 0  bit-exact 500/500
+  OK   k01-s112: counts == the two scorers' own   (0, 0, 0, 0, 500, 0, 0, 382)
+  OK   k01-s112: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   k01-s112: PASSES the successor's G-DECOMP
+  k01-s113   shape 0 z 0 m 0 (worst 2.3e-07 / 8.7e-07) NEW sign 0/500  OLD sign 382/500  clamped 0 shared 0  bit-exact 500/500
+  OK   k01-s113: counts == the two scorers' own   (0, 0, 0, 0, 500, 0, 0, 382)
+  OK   k01-s113: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   k01-s113: PASSES the successor's G-DECOMP
+  k01-s114   shape 0 z 0 m 0 (worst 2.2e-07 / 1.2e-06) NEW sign 0/500  OLD sign 380/500  clamped 0 shared 0  bit-exact 500/500
+  OK   k01-s114: counts == the two scorers' own   (0, 0, 0, 0, 500, 0, 0, 380)
+  OK   k01-s114: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   k01-s114: PASSES the successor's G-DECOMP
+  ISO-s112   shape 0 z 0 m 0 (worst 1.8e-07 / 7.6e-07) NEW sign 0/800  OLD sign 608/800  clamped 200 shared 0  bit-exact 800/800
+  OK   ISO-s112: counts == the two scorers' own   (0, 0, 0, 0, 800, 200, 0, 608)
+  OK   ISO-s112: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   ISO-s112: PASSES the successor's G-DECOMP
+  ISO-s113   shape 0 z 0 m 0 (worst 2.1e-07 / 8.7e-07) NEW sign 0/785  OLD sign 596/785  clamped 215 shared 0  bit-exact 785/785
+  OK   ISO-s113: counts == the two scorers' own   (0, 0, 0, 0, 785, 215, 0, 596)
+  OK   ISO-s113: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   ISO-s113: PASSES the successor's G-DECOMP
+  ISO-s114   shape 0 z 0 m 0 (worst 2.1e-07 / 7.4e-07) NEW sign 0/810  OLD sign 620/810  clamped 190 shared 0  bit-exact 810/810
+  OK   ISO-s114: counts == the two scorers' own   (0, 0, 0, 0, 810, 190, 0, 620)
+  OK   ISO-s114: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   ISO-s114: PASSES the successor's G-DECOMP
+  CTL-s112   shape 0 z 0 m 0 (worst 1.9e-07 / 1.2e-06) NEW sign 0/995  OLD sign 809/995  clamped 5 shared 0  bit-exact 995/995
+  OK   CTL-s112: counts == the two scorers' own   (0, 0, 0, 0, 995, 5, 0, 809)
+  OK   CTL-s112: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   CTL-s112: PASSES the successor's G-DECOMP
+  CTL-s113   shape 0 z 0 m 0 (worst 2.9e-07 / 9.6e-07) NEW sign 0/992  OLD sign 809/992  clamped 8 shared 0  bit-exact 992/992
+  OK   CTL-s113: counts == the two scorers' own   (0, 0, 0, 0, 992, 8, 0, 809)
+  OK   CTL-s113: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   CTL-s113: PASSES the successor's G-DECOMP
+  CTL-s114   shape 0 z 0 m 0 (worst 1.8e-07 / 6.1e-07) NEW sign 0/994  OLD sign 808/994  clamped 6 shared 0  bit-exact 994/994
+  OK   CTL-s114: counts == the two scorers' own   (0, 0, 0, 0, 994, 6, 0, 808)
+  OK   CTL-s114: every unclamped beta == float32(beta_pre - float32(ms)*sign(L))
+  OK   CTL-s114: PASSES the successor's G-DECOMP
+  TOTAL unclamped 6876; bit-exact 6876; rejected by the OLD absolute bar 5394; by the NEW ms-aware bar 0
+  worst |-(beta - beta_pre)/ms - sign(L)| = 1.3580e-03, inside the bound 0.5*ulp32/ms = 1.5895e-03
+  OK   the whole residual is float32 quantisation of beta: the harness applied EXACTLY the registered update
+  OK   no arm's seed range exceeds 5.0 pp and every run is inside [5, 90]   ranges k01 0.904 ISO 0.858 CTL 0.786
+  OK   k01 28.5173 <= K01_MAX 34.0: the collapse gate is not tripped
+
+[BAR MARGINS AS RECORD COUNTS] the nomination word is the bar-sensitive one (CORRECTIONS 265)
+  DOM_C   0.4727 = 709 of 1500 records; the 0.50 bar is 750 records: MISSES BY 41 RECORDS
+  TOP3_C  0.4960 = 744 of 1500 records; the 0.50 bar is 750 records: MISSES BY 6 RECORDS
+  DOM_C   0.4727 = 709 records; the NOT-NOMINATED bar 0.10 is 150 records: CLEARS IT BY 559 RECORDS
+  D_ISO +41.1567 pp clears the 20.0 bar by 21.1567 pp (38.04 SE); D_CTL +0.1807 pp is 4.8193 pp inside the 5.0 bar (8.66 SE); k01 28.5173 is 5.4827 pp under K01_MAX 34.0
+  OK   both nomination bars are missed and the NOT-NOMINATED bar is cleared -> NOMINATION-PARTIAL
+
+[CORPUS] sigma and the anchors, re-derived through the exclusions TSV at commit 1cb52f7
+  rows 3127 -> 3019 after 108 exclusion keys
+  OK   the registration corpus has 3127 rows
+  SIGMA_R18ALL filtered 0.6811983409351905 (df 221, 46 cells)
+  OK   SIGMA_R18ALL == SIGMA_PRIOR (df 221, 46 cells)
+  the same WITHOUT the exclusions (the OPERATIONS 36 trap): 7.155902 (df 245, 46 cells)
+  OK   the naive sigma is larger than the filtered one
+  anchor k01@3e-4 (cru1 n3)          n=3 mean 28.6340
+  OK   anchor k01@3e-4 (cru1 n3) == the registered literal
+  anchor layerwise@3e-4 (cru1 n3)    n=3 mean 68.2927
+  OK   anchor layerwise@3e-4 (cru1 n3) == the registered literal
+  anchor k01@1e-3 (n44)              n=44 mean 22.9562
+  OK   anchor k01@1e-3 (n44) == the registered literal
+  OK   no cst1- row in the REGISTRATION corpus (the pre-launch freshness 256.2 recorded)
+
+====================================================================================================
+REPLICA -- the successor scorer's output from its [G-DECOMP] header to FINAL, rebuilt independently
+====================================================================================================
+[G-DECOMP] per-group sums of the capture vs the harness; applied step vs sign(L)
+  tolerance (THE ONE CHANGE from cST1): |-(beta - beta_pre)/ms - sign(L)| <= 1.0e-03 + 4.0*ulp32(beta)/ms = 1.3716e-02 at ms 0.0003, |beta| < 16
+  cST1 applied an absolute 1.0e-03; the float32 bound 0.5*ulp32/ms is 1.5895e-03 here and exceeds it for ms < 4.768372e-04
+  PASS G-DECOMP k01-s112   shape 0 z 0 m 0 (worst 2.0e-07 / 8.1e-07) sign 0/500 clamped 0 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP k01-s113   shape 0 z 0 m 0 (worst 2.3e-07 / 8.7e-07) sign 0/500 clamped 0 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP k01-s114   shape 0 z 0 m 0 (worst 2.2e-07 / 1.2e-06) sign 0/500 clamped 0 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP ISO-s112   shape 0 z 0 m 0 (worst 1.8e-07 / 7.6e-07) sign 0/800 clamped 200 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP ISO-s113   shape 0 z 0 m 0 (worst 2.1e-07 / 8.7e-07) sign 0/785 clamped 215 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP ISO-s114   shape 0 z 0 m 0 (worst 2.1e-07 / 7.4e-07) sign 0/810 clamped 190 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP CTL-s112   shape 0 z 0 m 0 (worst 1.9e-07 / 1.2e-06) sign 0/995 clamped 5 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP CTL-s113   shape 0 z 0 m 0 (worst 2.9e-07 / 9.6e-07) sign 0/992 clamped 8 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+  PASS G-DECOMP CTL-s114   shape 0 z 0 m 0 (worst 1.8e-07 / 6.1e-07) sign 0/994 clamped 6 shared 0 | worst|q-s| 1.358e-03 bar 1.372e-02
+
+[NOMINATION] k01's records only, pooled over seeds (the registered check)
+  k01-s112               n=500  DOM_C 0.4700  TOP3_C 0.4960  DOM_TOP3 0.7400  SHARE_C(med) 0.4135  R_T 0.4920 (DIS 246)  CAR_EQ 0.9553  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x248, {49,58,61} x200, {49,55,58} x19; argmax 59(layer4.1.bn2.weight) x268, 61(linear.weight) x178, 58(layer4.1.conv2.weight) x54
+                         class share of sum|L| (median): bn_scale 0.488 bn_bias 0.001 conv 0.432 linear 0.100; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.70 1.00 1.00 1.00 1.00
+  k01-s113               n=500  DOM_C 0.4740  TOP3_C 0.4960  DOM_TOP3 0.7900  SHARE_C(med) 0.4303  R_T 0.4970 (DIS 248)  CAR_EQ 0.9556  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x248, {49,58,61} x187, {49,55,58} x31; argmax 59(layer4.1.bn2.weight) x268, 61(linear.weight) x173, 58(layer4.1.conv2.weight) x59
+                         class share of sum|L| (median): bn_scale 0.491 bn_bias 0.001 conv 0.432 linear 0.097; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.74 1.00 1.00 1.00 1.00
+  k01-s114               n=500  DOM_C 0.4740  TOP3_C 0.4960  DOM_TOP3 0.7940  SHARE_C(med) 0.4180  R_T 0.4920 (DIS 246)  CAR_EQ 0.9634  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x248, {49,58,61} x191, {49,55,58} x25; argmax 59(layer4.1.bn2.weight) x268, 61(linear.weight) x176, 58(layer4.1.conv2.weight) x56
+                         class share of sum|L| (median): bn_scale 0.489 bn_bias 0.001 conv 0.311 linear 0.100; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.74 1.00 1.00 1.00 1.00
+  k01 POOLED             n=1500  DOM_C 0.4727  TOP3_C 0.4960  DOM_TOP3 0.7747  SHARE_C(med) 0.4180  R_T 0.4937 (DIS 740)  CAR_EQ 0.9581  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x744, {49,58,61} x578, {49,55,58} x75; argmax 59(layer4.1.bn2.weight) x804, 61(linear.weight) x527, 58(layer4.1.conv2.weight) x169
+                         class share of sum|L| (median): bn_scale 0.491 bn_bias 0.001 conv 0.325 linear 0.099; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.73 1.00 1.00 1.00 1.00
+  calibration at ms 1e-3 (registration): scalar DOM_C 0.784-0.820 pooled 0.8069; layerwise 0.0000
+
+[LEVELS] plateau5 (train5) per run; arm means; contrasts in pp and SE (SE_PRIOR 0.556196)
+  k01  28.524 28.062 28.966  mean 28.5173  range 0.904  | train 29.180 28.470 29.594 mean 29.0813
+  ISO  69.226 70.084 69.712  mean 69.6740  range 0.858  | train 91.242 91.622 91.464 mean 91.4427
+  CTL  28.616 28.346 29.132  mean 28.6980  range 0.786  | train 29.202 28.594 29.660 mean 29.1520
+  D_ISO = ISO - k01    +41.1567 pp =   +74.00 SE
+  D_CTL = CTL - k01     +0.1807 pp =    +0.32 SE
+  P = ISO - CTL        +40.9760 pp =   +73.67 SE
+  in-batch sigma 0.4278 (df 6); SIGMA_PRIOR 0.6812 -> SIGMA-PRIOR-FROZEN
+
+[DESCRIPTIVE, gating nothing] the counterfactual shared vote inside ISO and CTL; beta per group
+  ISO POOLED             n=1500  DOM_C 0.0000  TOP3_C 0.0000  DOM_TOP3 0.3040  SHARE_C(med) 0.0206  R_T 0.4225 (DIS 630)  CAR_EQ 0.0000  DOWN 0.9730  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {49,58,61} x575, {44,47,56} x394, {49,55,58} x206; argmax 44(layer3.1.bn2.weight) x545, 61(linear.weight) x527, 58(layer4.1.conv2.weight) x284, 1(conv1.weight) x107, 38(layer3.0.shortcut.1.weight) x20
+                         class share of sum|L| (median): bn_scale 0.145 bn_bias 0.001 conv 0.533 linear 0.090; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  CTL POOLED             n=1500  DOM_C 0.4733  TOP3_C 0.4960  DOM_TOP3 0.7747  SHARE_C(med) 0.4171  R_T 0.4950 (DIS 742)  CAR_EQ 0.9569  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x744, {49,58,61} x578, {49,55,58} x75; argmax 59(layer4.1.bn2.weight) x804, 61(linear.weight) x527, 58(layer4.1.conv2.weight) x169
+                         class share of sum|L| (median): bn_scale 0.490 bn_bias 0.001 conv 0.326 linear 0.099; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.73 1.00 1.00 1.00 1.00
+  beta k01-s112 g0: peak -6.256 at step 25300; terminal -13.633; share at floor 0.000
+  beta k01-s113 g0: peak -6.254 at step 25200; terminal -13.646; share at floor 0.000
+  beta k01-s114 g0: peak -6.227 at step 25300; terminal -13.588; share at floor 0.000
+  beta ISO-s112 g0: peak -5.772 at step 26800; terminal -9.647; share at floor 0.000
+  beta ISO-s112 g1: peak -9.934 at step 13000; terminal -15.000; share at floor 0.400
+  beta ISO-s113 g0: peak -5.750 at step 26900; terminal -9.887; share at floor 0.000
+  beta ISO-s113 g1: peak -10.164 at step 12300; terminal -15.000; share at floor 0.430
+  beta ISO-s114 g0: peak -5.774 at step 26800; terminal -9.709; share at floor 0.000
+  beta ISO-s114 g1: peak -9.790 at step 13500; terminal -15.000; share at floor 0.380
+  beta CTL-s112 g0: peak -6.262 at step 25200; terminal -13.637; share at floor 0.000
+  beta CTL-s112 g1: peak -6.999 at step 22700; terminal -15.000; share at floor 0.010
+  beta CTL-s113 g0: peak -6.253 at step 25200; terminal -13.646; share at floor 0.000
+  beta CTL-s113 g1: peak -7.043 at step 22600; terminal -15.000; share at floor 0.016
+  beta CTL-s114 g0: peak -6.233 at step 25300; terminal -13.591; share at floor 0.000
+  beta CTL-s114 g1: peak -7.017 at step 22800; terminal -15.000; share at floor 0.012
+  corpus anchors (non-gating, filtered): k01@3e-4 (cru1 n3) 28.6340; layerwise@3e-4 (cru1 n3) 68.2927; ISO@1e-3 (n12) 70.1395; CTL@1e-3 (cdep1 DEPTH n3) 23.5207; k01@1e-3 (n44) 22.9562
+
+BRANCH   NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL
+LICENCE  at ms 3e-4 C fixes the shared vote on between 10 % and 50 % of k01's records (or is not the top three on half of them): a partial nomination, no identity sentence; isolating C recovers >= 20 pp over k01 (sufficiency of isolating C, at this cell); the matched non-carrier set stays within 5 pp of k01 (a floor LOCATION).
+NOT LICENSED  other datasets / networks / alpha0 / horizons; necessity of anything; why CTL sits where it sits; the 3e-4 collapse's time course relative to 1e-3's; a scalar-vs-layerwise gap measured in batch
+
+FINAL: NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES | DOM_C=0.4727 | TOP3_C=0.4960 | PINNED-FRAC=0.0000 | HARNESS-CLEAN | SPEC-APPLIED | DECOMPOSITION-OK | ONE-CELL-MS-3E-4 | ALPHA0-1E-6-ONLY | HORIZON-100-ONLY | ONE-NETWORK-RESNET18_C100 | CTL-HAS-A-BIAS-MEMBER | NO-LAYERWISE-IN-BATCH | NOMINATION-FROM-K01-RECORDS-ONLY | SIGMA-PRIOR-FROZEN
+====================================================================================================
+  OK   FINAL re-derived == the successor scorer's FINAL
+  OK   BRANCH re-derived   NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL
+  OK   this branch has NO headline sentence: the licence is composed word by word
+
+VIOLATIONS 0
+HOSTPATH runsdir  /home/s5014158/metaopt/runs
+HOSTPATH corpus   /home/s5014158/cst2_regcorpus/all_runs.csv
