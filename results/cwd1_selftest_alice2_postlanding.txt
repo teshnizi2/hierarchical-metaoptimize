@@ -1,0 +1,101 @@
+cWD1 --selftest: design and witnesses, G-BITE on REAL landed records (cvt8 k01; cgn1 layerwise) incl. the
+broken-mask null, the noise floor through corpus_exclusions.filter_rows, the account tables, the REAL score() on
+synthetic runs, the O2 invariance proof and the documented one-argument invocation.
+
+A. DESIGN, WITNESSES, ARITHMETIC
+  PASS A cvt9's registered scorer (Lion helper) is the file 249 registered
+  PASS A arms and seeds {128,129,130}
+  PASS A normscale = 20 BatchNorm2d scales, 4,800 parameters, incl. the carriers 50 / 53 / 59; no shift, conv or linear tensor
+  PASS A the DECAY_MASK witnesses
+  PASS A prefix rule (245/251): DECAY_MASK neither prefixes nor is prefixed by any corpus_exclusions KIND   ['VOTE_W', 'BETA_HOLD', 'GROUP_HOLD', 'COMP_HOLD', 'REST_HOLD', 'WINDOW_HOLD']
+  PASS A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = SIGMA_R18ALL
+  PASS A SIGMA_USED == max(frozen floor, in-batch)
+  PASS A O2: score() calls no sigma routine and reads the corpus once (disclosure)
+  PASS A masked counts and group counts
+  PASS A the frozen manifest: 62 tensors, idx 59 = layer4.1.bn2.weight, 3 lines per arm
+  PASS A the ENV line is cvt9's (= cvt8's)
+
+B. G-BITE ON REAL LANDED RECORDS (this host's runs directory)
+  PASS B the 3 landed cvt8 k01 runs PASS G-BITE read as cwd1's k01 (Lion on every record, no hold key, no dm key)   3/3
+  PASS B THE BROKEN-MASK NULL ON REAL RECORDS: the 3 landed cvt8 k01 runs read as k01NWD pass Lion and FAIL the DECAY_MASK audit on every record   3/3
+  PASS B the Lion recompute is exact on 62 groups: 3 landed cgn1 kL (ResNet18_gn_c100, layerwise, 500 records) runs pass   3/3
+  PASS B ... and FAILS when one real record's beta is moved by 0.01
+
+C. THE NOISE FLOOR (OPERATIONS 36) AND FRESHNESS
+  PASS SIGMA_R18ALL: the FROZEN literal 0.6811983409351905 IS the FILTERED value (df 221)
+  PASS the NAIVE (unfiltered) value is the disclosed trap, not the literal
+  PASS ZERO corpus rows carry seed 128, 129 or 130   []
+  PASS ZERO corpus rows carry the cwd1- prefix
+  FAIL G RULE 21 premise: no cwd1-*.out exists under /home/s5014158/metaopt/runs
+
+D. ACCOUNTS -> TOKENS (each account's midpoints through the real decide())
+  PASS D account COLLAPSE-PERSISTS midpoints -> COLLAPSE-PERSISTS   COLLAPSE-PERSISTS
+  PASS D account COLLAPSE-VANISHES midpoints -> COLLAPSE-VANISHES   COLLAPSE-VANISHES
+  PASS D account COLLAPSE-REDUCED midpoints -> COLLAPSE-REDUCED   COLLAPSE-REDUCED
+  PASS D account REFERENCE-FAILED midpoints -> REFERENCE-FAILED   REFERENCE-FAILED
+  PASS D the BROKEN-MASK null's levels reach COLLAPSE-PERSISTS (only G-BITE separates it)
+  PASS D the REDUCED band straddles the R50 line (both stamps reachable)
+  PASS D the K01 / PART / FREE bands are disjoint
+
+E. THE REAL score() ON SYNTHETIC RUNS
+  PASS E base (COLLAPSE-PERSISTS) -> rc 0, COLLAPSE-PERSISTS
+  PASS E base stamps
+  PASS E COLLAPSE-VANISHES -> rc 0, COLLAPSE-VANISHES
+  PASS E COLLAPSE-REDUCED, R50 -> rc 0, COLLAPSE-REDUCED
+  PASS E REDUCED at 32 / 69 stamps R50-UNDER-MASK
+  PASS E COLLAPSE-REDUCED, not R50 -> rc 0, COLLAPSE-REDUCED
+  PASS E REDUCED at 50 / 69 stamps NOT-R50-UNDER-MASK
+  PASS E near bar: k01NWD = kLNWD - 5 + 0.05 -> rc 0, COLLAPSE-VANISHES
+  PASS E near bar: k01NWD = kLNWD - 5 - 0.05 -> rc 0, COLLAPSE-REDUCED
+  PASS E near bar: k01NWD = k01 + 2 - 0.05 -> rc 0, COLLAPSE-PERSISTS
+  PASS E near bar: k01NWD = k01 + 2 + 0.05 -> rc 0, COLLAPSE-REDUCED
+  PASS E k01NWD below k01 -> rc 0, COLLAPSE-PERSISTS
+  PASS E a deeper collapse under the mask is stamped K01NWD-BELOW-K01
+  PASS E diverged arm -> rc 0, UNRESOLVED-DIVERGED
+  PASS E k01 not collapsed -> rc 0, SCALAR-NOT-COLLAPSED
+  PASS E reference failed -> rc 0, REFERENCE-FAILED
+  PASS E floor: every arm under 15 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ENV break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS spec break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK witness off on k01NWD -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK carrier-only on kLNWD -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK on k01 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: a COMP_HOLD line -> rc 1, HARNESS-UNSOUND
+  PASS E harness: manifest break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov HF = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov scorer sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov common sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov runner = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E G-BITE: THE BROKEN-MASK NULL (every masked run's records without dm_* keys) -> rc 1, PATCH-NOT-VERIFIED
+  PASS E the BROKEN-MASK null's LEVELS block is BYTE-IDENTICAL to the base case's (COLLAPSE-PERSISTS): only G-BITE separates them
+  PASS E G-BITE: k01NWD without dm keys -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: kLNWD dm_skipped forged -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: k01NWD dm_n off by one -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: kLNWD dm_masked wrong -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: k01NWD zero dm_wdterm -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: kLNWD dm_norm not a list -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm keys on k01 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: k01 Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: kLNWD Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: a hold key on k01NWD -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: kLNWD records with ONE group -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: short probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: garbled record -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: missing probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E dropped run -> INCOMPLETE -> rc 2, INCOMPLETE
+  PASS E truncated resubmission beside a complete run is ignored -> rc 0, COLLAPSE-PERSISTS
+
+   O2 INVARIANCE: FINAL identical across corpora (bars never read the corpus)
+  PASS O2 PERSISTS  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 VANISHES  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 REDUCED   real+invented minimal-invented no-corpus real real+invented
+  PASS O2 non-vacuity: the invented rows MOVE the filtered ResNet18_c100 sigma (0.6812 -> 5.4850), FINAL does not
+
+   THE DOCUMENTED ONE-ARGUMENT INVOCATION
+  PASS `python3 cWD1_normwd_score.py <runsdir>` exits 0 and prints FINAL
+  PASS ... and on a dropped run exits 2 (INCOMPLETE)
+
+F. TOTALITY: decide() over 6,000 random draws returns a registered token
+  PASS F every draw's token is registered   0 bad
+
+SELFTEST FAIL: 1  ['G RULE 21 premise: no cwd1-*.out exists under /home/s5014158/metaopt/runs']

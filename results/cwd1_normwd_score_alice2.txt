@@ -1,0 +1,178 @@
+==============================================================================
+ cwd1 -- ResNet18_c100: DOES THE SCALAR COLLAPSE NEED COUPLED WEIGHT DECAY ON THE NORMALISATION SCALES?  (PATCH_DECAYMASK)
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 128,129,130   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   k01     scalar     DECAY_MASK (unset)
+   k01NWD  scalar     DECAY_MASK normscale
+   kLNWD   layerwise  DECAY_MASK normscale
+ CO-PRIMARY: P_NWD = k01NWD - k01; G_NWD = kLNWD - k01NWD.  KEY: D_REF = kLNWD - k01.
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3019 rows after corpus_exclusions.filter_rows, cwd1- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  9 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cwd1-k01-s128  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6560 (train 22.5280)
+  OK   cwd1-k01NWD-s128  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 71.0860 (train 97.5660)
+  OK   cwd1-kLNWD-s128  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.6560 (train 99.1100)
+  OK   cwd1-k01-s129  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6280 (train 22.5040)
+  OK   cwd1-k01NWD-s129  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.4860 (train 97.3840)
+  OK   cwd1-kLNWD-s129  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.1080 (train 99.0880)
+  OK   cwd1-k01-s130  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.5700 (train 23.0420)
+  OK   cwd1-k01NWD-s130  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.7560 (train 97.5500)
+  OK   cwd1-kLNWD-s130  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.2620 (train 99.1520)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s128
+  PASS G-ARGS k01NWD-s128
+  PASS G-ARGS kLNWD-s128
+  PASS G-ARGS k01-s129
+  PASS G-ARGS k01NWD-s129
+  PASS G-ARGS kLNWD-s129
+  PASS G-ARGS k01-s130
+  PASS G-ARGS k01NWD-s130
+  PASS G-ARGS kLNWD-s130
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is cvt1's ... cvt9's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=62`   9 runs
+
+G-WITNESS one line of each kind per run == the registered witness (VOTE_W / BETA_HOLD / GROUP_HOLD / REST_HOLD off; DECAY_MASK)
+  PASS G-WITNESS VOTE_W k01-s128
+  PASS G-WITNESS BETA_HOLD k01-s128
+  PASS G-WITNESS GROUP_HOLD k01-s128
+  PASS G-WITNESS REST_HOLD k01-s128
+  PASS G-WITNESS DECAY_MASK k01-s128
+  PASS G-WITNESS k01-s128 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01NWD-s128
+  PASS G-WITNESS BETA_HOLD k01NWD-s128
+  PASS G-WITNESS GROUP_HOLD k01NWD-s128
+  PASS G-WITNESS REST_HOLD k01NWD-s128
+  PASS G-WITNESS DECAY_MASK k01NWD-s128
+  PASS G-WITNESS k01NWD-s128 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W kLNWD-s128
+  PASS G-WITNESS BETA_HOLD kLNWD-s128
+  PASS G-WITNESS GROUP_HOLD kLNWD-s128
+  PASS G-WITNESS REST_HOLD kLNWD-s128
+  PASS G-WITNESS DECAY_MASK kLNWD-s128
+  PASS G-WITNESS kLNWD-s128 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s129
+  PASS G-WITNESS BETA_HOLD k01-s129
+  PASS G-WITNESS GROUP_HOLD k01-s129
+  PASS G-WITNESS REST_HOLD k01-s129
+  PASS G-WITNESS DECAY_MASK k01-s129
+  PASS G-WITNESS k01-s129 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01NWD-s129
+  PASS G-WITNESS BETA_HOLD k01NWD-s129
+  PASS G-WITNESS GROUP_HOLD k01NWD-s129
+  PASS G-WITNESS REST_HOLD k01NWD-s129
+  PASS G-WITNESS DECAY_MASK k01NWD-s129
+  PASS G-WITNESS k01NWD-s129 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W kLNWD-s129
+  PASS G-WITNESS BETA_HOLD kLNWD-s129
+  PASS G-WITNESS GROUP_HOLD kLNWD-s129
+  PASS G-WITNESS REST_HOLD kLNWD-s129
+  PASS G-WITNESS DECAY_MASK kLNWD-s129
+  PASS G-WITNESS kLNWD-s129 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s130
+  PASS G-WITNESS BETA_HOLD k01-s130
+  PASS G-WITNESS GROUP_HOLD k01-s130
+  PASS G-WITNESS REST_HOLD k01-s130
+  PASS G-WITNESS DECAY_MASK k01-s130
+  PASS G-WITNESS k01-s130 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01NWD-s130
+  PASS G-WITNESS BETA_HOLD k01NWD-s130
+  PASS G-WITNESS GROUP_HOLD k01NWD-s130
+  PASS G-WITNESS REST_HOLD k01NWD-s130
+  PASS G-WITNESS DECAY_MASK k01NWD-s130
+  PASS G-WITNESS k01NWD-s130 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W kLNWD-s130
+  PASS G-WITNESS BETA_HOLD kLNWD-s130
+  PASS G-WITNESS GROUP_HOLD kLNWD-s130
+  PASS G-WITNESS REST_HOLD kLNWD-s130
+  PASS G-WITNESS DECAY_MASK kLNWD-s130
+  PASS G-WITNESS kLNWD-s130 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cwd1/PARTITION-MANIFEST.txt (<runsdir>/cwd1/)
+  PASS G-STRUCT byte-identical to cwd_design.manifest_text(CWD1)   5188 vs 5188 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cwd1/PROVENANCE.txt (<runsdir>/cwd1/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == cvt8's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == cwd1's PATCH_DECAYMASK tree   HF_SHA256=94aedc33046afb12
+  PASS G-PROV HF.py.pre_decaymask == cvt8's HF.py   HF_PRE_DECAYMASK_SHA256=5197dc2eecbbcb6f
+  PASS G-PROV runner == run_cifar_cwd1.sh   RUNNER_SHA256=34a8c90ee3a0bee0
+  PASS G-PROV SCORER == this file   SCORER_SHA256=e9f8b72dd704934d
+  PASS G-PROV DESIGN == the cwd_design.py this scorer loaded   DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01     TEST 22.9513  sd 0.5360  range 0.9420   TRAIN 22.6913   tail slope 0.002/-0.002/0.009 pp/ep
+          seeds: s128 22.6560 (train 22.5280), s129 22.6280 (train 22.5040), s130 23.5700 (train 23.0420)
+  k01NWD  TEST 70.7760  sd 0.3005  range 0.6000   TRAIN 97.5000   tail slope 0.028/0.026/0.026 pp/ep
+          seeds: s128 71.0860 (train 97.5660), s129 70.4860 (train 97.3840), s130 70.7560 (train 97.5500)
+  kLNWD   TEST 69.3420  sd 0.2826  range 0.5480   TRAIN 99.1167   tail slope 0.045/0.060/0.001 pp/ep
+          seeds: s128 69.6560 (train 99.1100), s129 69.1080 (train 99.0880), s130 69.2620 (train 99.1520)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 70.7760
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.7760
+
+G-BITE    Lion recomputed on every group of every arm; no hold key; the DECAY_MASK record audit
+  PASS G-BITE k01     s128  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE k01NWD  s128  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.0010585156464669439, 'dm_absmin': 0.9810391664505005, 'dm_small': 0}
+  PASS G-BITE kLNWD   s128  records 500  groups 62  lion-mismatch 0 (ties 40, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.7928935243745717, 'dm_absmin': 0.502387523651123, 'dm_small': 0}
+  PASS G-BITE k01     s129  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE k01NWD  s129  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.0011217240907636344, 'dm_absmin': 0.9844501614570618, 'dm_small': 0}
+  PASS G-BITE kLNWD   s129  records 500  groups 62  lion-mismatch 0 (ties 40, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.7879257608735502, 'dm_absmin': 0.4694478213787079, 'dm_small': 0}
+  PASS G-BITE k01     s130  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE k01NWD  s130  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.0010169746412955153, 'dm_absmin': 0.9835436344146729, 'dm_small': 0}
+  PASS G-BITE kLNWD   s130  records 500  groups 62  lion-mismatch 0 (ties 40, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.7847842331624766, 'dm_absmin': 0.5383468866348267, 'dm_small': 0}
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.681198
+  SIGMA_INBATCH        0.390484
+  SIGMA_USED           0.681198  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.556196  = SIGMA_USED * sqrt(2/3)  (df_inbatch 6)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_NWD  = k01NWD  - k01     = +47.8247 pp = +85.99 SE   (TRAIN +74.8087)   seeds +48.430 / +47.858 / +47.186
+  PRIMARY  G_NWD  = kLNWD   - k01NWD  = -1.4340 pp = -2.58 SE   (TRAIN +1.6167)   seeds -1.430 / -1.378 / -1.494
+  KEY      D_REF  = kLNWD - k01 = +46.3907 pp = +83.41 SE   (TRAIN +76.4253)
+  DESCR    RATIO  = k01NWD / kLNWD = 1.0207  (census R50 collapse iff <= 0.50)
+  DESCR    F_NWD  = P_NWD / D_REF  = 1.0309
+  bars: GAP_MIN 20.0 (35.96 SE) | MATCH 5.0 pp (8.99 SE) | NULL 2.0 pp (3.60 SE) | RESCUE 10.0 pp (17.98 SE)
+  state bars: VANISHES iff k01NWD >= 64.3420 ; PERSISTS iff k01NWD <= 24.9513
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: COLLAPSE-VANISHES | HARNESS-CLEAN | PATCH-BITES | MASK-20-NORM-SCALES | MASK-UPDATE-AND-TRACE | CONV-LINEAR-WD-KEPT | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | NO-WD-ON-REFERENCE-ARM | SIGMA-PRIOR-FROZEN | NOT-R50-UNDER-MASK | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cwd1 bar or contrast):
+  corpus mechanism cell (LIMITS-PREP 2.2): k01 (n44) 22.96  layerwise (n32) 69.42
+  cvt8 (252): k01 23.06  ISO 70.26
+  cwd1 {128,129,130}: k01 22.9513  k01NWD 70.7760  kLNWD 69.3420
+
+DESCRIPTIVE (non-gating) -- PATCH_DECAYMASK's readout on the masked arms: ||w|| of the three ctd1 carriers
+(layer4.0.bn2.weight, layer4.0.shortcut.1.weight, layer4.1.bn2.weight) and the median over the 20 scales; min |w| over the 20; entries |w| < 1e-3; records 0 / 50 / 200 / 499; seed means
+  k01NWD  rec 0: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 50: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 200: carriers 22.8/22.7/22.8 median 16 absmin 0.985 small 0.0 | rec 499: carriers 22.9/22.7/22.9 median 16 absmin 0.983 small 0.0
+  kLNWD   rec 0: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 50: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 200: carriers 29.5/26.4/32.4 median 14.5 absmin 0.619 small 0.0 | rec 499: carriers 38.3/30/48.9 median 13.4 absmin 0.503 small 0.0
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  k01NWD sits within 5 pp of kLNWD: with coupled WD removed from the 20 BatchNorm scales (update AND meta trace),
+  the scalar step size no longer collapses at this cell.  Sentence licensed: 'at this cell the scalar collapse
+  REQUIRES coupled weight decay 0.1 on the normalisation scales' (necessity of that WD, shown by removing it).
+  EFFECT ON the scalar collapse at the mechanism cell (MASTER-TABLE rows 212-227) and the carrier account: NARROWED -- common practice (no weight decay on BN scales, He et al. arXiv:1812.01187)
+  avoids the configuration; the carrier account becomes a mechanism of a WD-on-norm-scale configuration and must be
+  stated so.  Not licensed: which route (weight shrink vs meta trace), which of the 20 scales, decoupled WD, other cells.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about PlainNet / VGG / GroupNorm, other cells, momentum 0.9, or WD on conv / linear weights.
+  * Which of the 20 scales matters (the carriers are masked together with 17 others), or which route (weight
+    shrink vs meta trace).  Decoupled weight decay.  The ISO rescue under the mask (no ISO arm).  Beyond 100 epochs.
+  * A within-batch comparison of kLNWD with an unmasked layerwise arm (none in batch; between-batch only).

@@ -1,0 +1,16 @@
+live model: 62 parameter tensors, 11220132 parameters
+  ok   62 parameter tensors
+  ok   11,220,132 parameters
+  ok   the patch's rule (1-D *.weight) selects the SAME tensors as BatchNorm2d BY MODULE TYPE
+  ok   the mask is 20 tensors   20
+  ok   the mask is 4,800 parameters   4800
+  ok   the ctd1 carrier layer4.0.bn2.weight is inside the mask
+  ok   the ctd1 carrier layer4.0.shortcut.1.weight is inside the mask
+  ok   the ctd1 carrier layer4.1.bn2.weight is inside the mask
+  ok   the 21 other 1-D tensors (20 BatchNorm2d shifts + the linear bias) keep their weight decay   21
+  idx   2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59
+  names bn1.weight,layer1.0.bn1.weight,layer1.0.bn2.weight,layer1.1.bn1.weight,layer1.1.bn2.weight,layer2.0.bn1.weight,layer2.0.bn2.weight,layer2.0.shortcut.1.weight,layer2.1.bn1.weight,layer2.1.bn2.weight,layer3.0.bn1.weight,layer3.0.bn2.weight,layer3.0.shortcut.1.weight,layer3.1.bn1.weight,layer3.1.bn2.weight,layer4.0.bn1.weight,layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn1.weight,layer4.1.bn2.weight
+  ok   the run's own DECAY_MASK witness line == the live model's mask   ['DECAY_MASK: on base=SGDm wd=0.1 spec=normscale masked=20 of=62 numel=4800 idx=2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59 names=bn1.weight,layer1.0.bn1.weight,layer1.0.bn2.weight,layer1
+
+LIVE-MODEL CHECK PASS
+RC=0
