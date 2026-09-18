@@ -1,0 +1,89 @@
+cmg1_attack_indep -- INDEPENDENT re-derivation of CORRECTIONS 259's scorer output
+  corpus commit 1cb52f7  all_runs.csv 180124541085  CORPUS-EXCLUSIONS.tsv ff9533348f9f
+
+[0] the batch's own PARTITION-MANIFEST.txt and PROVENANCE.txt
+  manifest 5268 bytes sha 54dd0241c8b2...  == the registered 5268 / 54dd0241: True
+  manifest: 62 TENSOR lines, total 11220132 params; SET N True C True T True
+  KLS  ARMSPEC / ARMSIZES / ARMPARAMS rebuilt here and found in the manifest: True  (groups 62)
+  MCAR ARMSPEC / ARMSIZES / ARMPARAMS rebuilt here and found in the manifest: True  (groups 51)
+  MCTL ARMSPEC / ARMSIZES / ARMPARAMS rebuilt here and found in the manifest: True  (groups 51)
+  MCAR / MCTL matched: group count 51 == 51, sizes identical True, per-group numel identical True
+  PROVENANCE MODE submit  HF 4732b74a...  build_network c7998883...  runner a0d0a1b9...  scorer bdd212d4...  all as registered: True
+
+[1] completeness and the four audited header lines, per run (ARGS rebuilt from the re-typed design)
+  OK   cmg1-KLS  s124 job 5026021  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCAR s124 job 5026022  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCTL s124 job 5026023  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-KLS  s125 job 5026024  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCAR s125 job 5026025  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCTL s125 job 5026026  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-KLS  s126 job 5026027  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCAR s126 job 5026028  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCTL s126 job 5026029  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-KLS  s127 job 5026030  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCAR s127 job 5026031  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  OK   cmg1-MCTL s127 job 5026032  epochs 100  RUN_DONE True  traceback 0  ARGS True  ENV True  PT True  FOREIGN-none True
+  one save-directory for the batch: True ; 12 runs found: True
+
+[2] levels -- plateau5 = mean TEST of the run's OWN epochs 95..99 from the RAW .out; TRAIN5 beside it
+  KLS   TEST 69.5485  sd 0.2560  range 0.5480   TRAIN 98.9205   seeds s124 69.8800/98.8720, s125 69.3320/99.0060, s126 69.6200/98.9580, s127 69.3620/98.8460
+  MCAR  TEST 65.4335  sd 0.4755  range 1.1440   TRAIN 88.6230   seeds s124 65.3720/88.6220, s125 65.9700/89.4060, s126 65.5660/87.9920, s127 64.8260/88.4720
+  MCTL  TEST 68.4560  sd 0.0607  range 0.1320   TRAIN 95.1845   seeds s124 68.4240/95.0900, s125 68.4920/95.4140, s126 68.5200/95.0960, s127 68.3880/95.1380
+
+[3] sigma and the contrasts (O2: max(frozen prior, in-batch); the corpus is not read for any of this)
+  SIGMA_PRIOR_frozen   0.681198
+  SIGMA_INBATCH        0.313745
+  SIGMA_USED           0.681198  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.481680  = SIGMA_USED * sqrt(2/4)
+  PRIMARY  DELTA_ID = MCTL - MCAR = +3.0225 pp = +6.27 SE   (TRAIN +6.5615)
+  KEY      D_CAR    = KLS - MCAR  = +4.1150 pp = +8.54 SE   (TRAIN +10.2975)
+  KEY      D_CTL    = KLS - MCTL  = +1.0925 pp = +2.27 SE   (TRAIN +3.7360)
+  same-seed DELTA_ID: s124 +3.0520, s125 +2.5220, s126 +2.9540, s127 +3.5620
+  bars: MARGIN 5.0 pp (10.38 SE) | AT-KLS stamp |D| <= 2.0 SE = 0.9634 pp | REF_MIN 64.4166
+  margins to the nearest bar: D_CAR is 0.8850 pp BELOW the 5.0 pp margin (1.84 SE); |DELTA_ID| 1.9775 pp below; D_CTL 3.9075 pp below
+  KLS - REF_MIN = +5.1319 pp; KLS vs the layerwise band 69.4166 +- 2.0080: |dev| 0.1319 pp
+
+[4] G-PARTITION re-derived from the probe records, and a NON-VACUITY cross-read
+  PASS KLS  s124  records 500  bad 0  steps True  meta True
+  PASS MCAR s124  records 500  bad 0  steps True  meta True
+  PASS MCTL s124  records 500  bad 0  steps True  meta True
+  PASS KLS  s125  records 500  bad 0  steps True  meta True
+  PASS MCAR s125  records 500  bad 0  steps True  meta True
+  PASS MCTL s125  records 500  bad 0  steps True  meta True
+  PASS KLS  s126  records 500  bad 0  steps True  meta True
+  PASS MCAR s126  records 500  bad 0  steps True  meta True
+  PASS MCTL s126  records 500  bad 0  steps True  meta True
+  PASS KLS  s127  records 500  bad 0  steps True  meta True
+  PASS MCAR s127  records 500  bad 0  steps True  meta True
+  PASS MCTL s127  records 500  bad 0  steps True  meta True
+  cross-read: every run's records read as each OTHER arm's grouping -- 24 reads, 0 pass (0 expected), min bad 500 of 500 records
+
+[5] branch, stamps and FINAL
+  G-DIVERGE (max seed range 1.1440 pp, bar 5.0): PASS
+  FINAL: NO-MERGE-HARMS | HARNESS-LIVE-UNPATCHED | PARTITION-VERIFIED | ONE-MERGE-SET-N9 | CONTROL-TRIPLE-47-48-56 | REFERENCE-SINGLETON-SETS | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | MAGNITUDE-NOT-SEPARATED | MCAR-NEAR-KLS-BELOW | MCTL-NEAR-KLS-BELOW | KLS-IN-LAYERWISE-BAND | SEEDS-AGREE | MCAR-GSTAR-PINS | MCTL-GSTAR-PINS | TRAIN-AGREES | ACCOUNT-A3-MERGE-HARMLESS
+  accounts: observed levels KLS 69.5485 MCAR 65.4335 MCTL 68.4560; the account whose branch is taken: A3-MERGE-HARMLESS
+
+[6] the DESCRIPTIVE pin readout, re-derived (fraction of records with beta_pre <= -14.999)
+  KLS  s124  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s125  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s126  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s127  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  MCAR s124  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s125  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s126  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s127  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCTL s124  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s125  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s126  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s127  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+
+[7] the corpus DISCLOSURE line, re-derived with a re-typed filter_rows (no bar reads it)
+  corpus commit 1cb52f7: 3127 data rows, 3019 after filter_rows with cmg1- excluded; layerwise at the cell n 32 mean 69.4166
+
+[8] AGREEMENT -- every rebuilt line looked up VERBATIM in the scorer's log
+  110 rebuilt lines, 110 found verbatim, 0 MISSING
+  the log's FINAL line count 1; token-by-token identical to this parser's: True
+  log lines carrying a digit that this parser neither rebuilt nor re-typed: 0
+  path-bearing lines compared by basename only: 3
+
+VIOLATIONS 0

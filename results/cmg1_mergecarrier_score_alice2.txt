@@ -1,0 +1,167 @@
+==============================================================================
+ cmg1 -- ResNet18_c100: IS KEEPING THE CARRIERS APART NECESSARY INSIDE THE LAYERWISE GROUPING?  (N3, 259)
+ ResNet18_c100 / CIFAR100  100 epochs  seeds 124,125,126,127  AUGMENT=1 BETA_CLIP=-15:-2.3026 PROBE=100 PROBE_TENSOR=1  LIVE harness
+   KLS   62 singletons                MCAR  G* = N u {50,53,59}      MCTL  G* = N u {47,48,56}
+ PRIMARY DELTA_ID = MCTL - MCAR; KEY D_CAR = KLS - MCAR, D_CTL = KLS - MCTL.  MARGIN 5.0 pp (frozen, O2).
+==============================================================================
+corpus: 3019 rows after filter_rows (cmg1- excluded); layerwise at the cell n 32 mean 69.4166  (DISCLOSURE ONLY -- no bar, branch or stamp reads it)
+
+COMPLETE  12 runs, epochs 0..99 once each, RUN_DONE, no traceback, finite plateau5
+  OK   cmg1-KLS-s124  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCAR-s124  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCTL-s124  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-KLS-s125  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCAR-s125  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCTL-s125  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-KLS-s126  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCAR-s126  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCTL-s126  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-KLS-s127  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCAR-s127  100 epoch lines, RUN_DONE=True, traceback=False
+  OK   cmg1-MCTL-s127  100 epoch lines, RUN_DONE=True, traceback=False
+
+G-ARGS    every run's OWN ARGS line == the registered line (save-directory any path ending /cmg1)
+  PASS G-ARGS KLS-s124
+  PASS G-ARGS MCAR-s124
+  PASS G-ARGS MCTL-s124
+  PASS G-ARGS KLS-s125
+  PASS G-ARGS MCAR-s125
+  PASS G-ARGS MCTL-s125
+  PASS G-ARGS KLS-s126
+  PASS G-ARGS MCAR-s126
+  PASS G-ARGS MCTL-s126
+  PASS G-ARGS KLS-s127
+  PASS G-ARGS MCAR-s127
+  PASS G-ARGS MCTL-s127
+  PASS G-ARGS one save-directory for the batch   ['/home/s5014158/metaopt/runs/cmg1']
+
+G-ENV     one ENV line per run == the registered one (PROBE_DIR stripped); PROBE_DIR == <save>/probe_<run>
+  PASS G-ENV KLS-s124
+  PASS G-ENV MCAR-s124
+  PASS G-ENV MCTL-s124
+  PASS G-ENV KLS-s125
+  PASS G-ENV MCAR-s125
+  PASS G-ENV MCTL-s125
+  PASS G-ENV KLS-s126
+  PASS G-ENV MCAR-s126
+  PASS G-ENV MCTL-s126
+  PASS G-ENV KLS-s127
+  PASS G-ENV MCAR-s127
+  PASS G-ENV MCTL-s127
+
+G-PT      ONE `PROBE_TENSOR: on every=100 type=blockwise tensors=62 ...` per run; NO foreign intervention line
+  PASS G-PT KLS-s124
+  PASS G-FOREIGN KLS-s124 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCAR-s124
+  PASS G-FOREIGN MCAR-s124 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCTL-s124
+  PASS G-FOREIGN MCTL-s124 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT KLS-s125
+  PASS G-FOREIGN KLS-s125 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCAR-s125
+  PASS G-FOREIGN MCAR-s125 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCTL-s125
+  PASS G-FOREIGN MCTL-s125 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT KLS-s126
+  PASS G-FOREIGN KLS-s126 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCAR-s126
+  PASS G-FOREIGN MCAR-s126 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCTL-s126
+  PASS G-FOREIGN MCTL-s126 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT KLS-s127
+  PASS G-FOREIGN KLS-s127 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCAR-s127
+  PASS G-FOREIGN MCAR-s127 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+  PASS G-PT MCTL-s127
+  PASS G-FOREIGN MCTL-s127 no VOTE_W/BETA_HOLD/GROUP_HOLD/COMP_HOLD/REST_HOLD/WINDOW_HOLD/SHADOW_VOTE/DECAY_MASK line
+
+G-STRUCT  the batch's PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cmg1/PARTITION-MANIFEST.txt (<runsdir>/cmg1/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text()   5268 vs 5268 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cmg1/PROVENANCE.txt (<runsdir>/cmg1/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV HF.py == the LIVE, unpatched 4732b74aa3a1...   4732b74aa3a10508
+  PASS G-PROV build_network.py == LIVE c79988833c43...   c79988833c4399a0
+  PASS G-PROV runner == run_cifar.sh a0d0a1b904e6...   a0d0a1b904e64ea5
+  PASS G-PROV SCORER_SHA256 == this scorer bdd212d41796...   bdd212d417965388
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max run >= 2.0 pp   max 69.8800
+  PASS G-CEIL max run <= 99.0 pp   max 69.8800
+
+G-PARTITION  every record's z_agg / mom_pre / beta_pre decompose into the arm's REGISTERED groups
+  (500 records at steps 0..49900; singleton groups at rel 1e-06, the merged group at rel 1e-02; probe_tensor.json
+   blockwise / 62 tensors / numels; block_sizes.json n_b == the registered per-group numel)
+  PASS G-PARTITION KLS  s124  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCAR s124  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCTL s124  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION KLS  s125  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCAR s125  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCTL s125  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION KLS  s126  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCAR s126  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCTL s126  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION KLS  s127  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCAR s127  records 500  bad 0  steps True  meta True
+  PASS G-PARTITION MCTL s127  records 500  bad 0  steps True  meta True
+
+LEVELS    plateau5 (TEST) and TRAIN5, IN BATCH
+  KLS   TEST 69.5485  sd 0.2560  range 0.5480   TRAIN 98.9205   seeds s124 69.8800/98.8720, s125 69.3320/99.0060, s126 69.6200/98.9580, s127 69.3620/98.8460
+  MCAR  TEST 65.4335  sd 0.4755  range 1.1440   TRAIN 88.6230   seeds s124 65.3720/88.6220, s125 65.9700/89.4060, s126 65.5660/87.9920, s127 64.8260/88.4720
+  MCTL  TEST 68.4560  sd 0.0607  range 0.1320   TRAIN 95.1845   seeds s124 68.4240/95.0900, s125 68.4920/95.4140, s126 68.5200/95.0960, s127 68.3880/95.1380
+
+SIGMA     O2: max(frozen prior, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.681198
+  SIGMA_INBATCH        0.313745
+  SIGMA_USED           0.681198  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.481680  = SIGMA_USED * sqrt(2/4)
+
+CONTRASTS (within batch)
+  PRIMARY  DELTA_ID = MCTL - MCAR = +3.0225 pp = +6.27 SE   (TRAIN +6.5615)
+  KEY      D_CAR    = KLS - MCAR  = +4.1150 pp = +8.54 SE   (TRAIN +10.2975)
+  KEY      D_CTL    = KLS - MCTL  = +1.0925 pp = +2.27 SE   (TRAIN +3.7360)
+  same-seed DELTA_ID: s124 +3.0520, s125 +2.5220, s126 +2.9540, s127 +3.5620
+  bars: MARGIN 5.0 pp (10.38 SE) | AT-KLS stamp |D| <= 2.0 SE = 0.9634 pp | REF_MIN 64.4166
+
+ACCOUNTS (259.5) -- predicted levels; the observed branch is compared with each account's registered branch
+  A1-IDENTITY-AT-SHARED-STEP   KLS 69.4166 MCAR 59.9980 MCTL 68.4166 -> CARRIER-MERGE-HARMS
+  A2-DOWNVOTER-GENERIC         KLS 69.4166 MCAR 59.9980 MCTL 60.9980 -> BOTH-HARM-ALIKE
+  A3-MERGE-HARMLESS            KLS 69.4166 MCAR 68.4166 MCTL 68.4166 -> NO-MERGE-HARMS
+  BROKEN-PARTITION (MCAR/MCTL built as another grouping): levels unconstrained; excluded ONLY by G-PARTITION
+
+G-DIVERGE (branch condition): PASS
+
+==============================================================================
+FINAL: NO-MERGE-HARMS | HARNESS-LIVE-UNPATCHED | PARTITION-VERIFIED | ONE-MERGE-SET-N9 | CONTROL-TRIPLE-47-48-56 | REFERENCE-SINGLETON-SETS | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | MAGNITUDE-NOT-SEPARATED | MCAR-NEAR-KLS-BELOW | MCTL-NEAR-KLS-BELOW | KLS-IN-LAYERWISE-BAND | SEEDS-AGREE | MCAR-GSTAR-PINS | MCTL-GSTAR-PINS | TRAIN-AGREES | ACCOUNT-A3-MERGE-HARMLESS
+==============================================================================
+
+DESCRIPTIVE PROBE READOUT (NOT GATING): fraction of records at the clamp floor (beta_pre <= -14.999)
+  KLS  s124  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s125  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s126  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  KLS  s127  t50 late 1.000; t53 late 1.000; t59 late 1.000; t47 late 1.000; t48 late 0.000; t56 late 1.000; t46 late 0.000; t49 late 0.000; t55 late 0.000; t58 late 0.000
+  MCAR s124  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s125  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s126  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCAR s127  G* early(<10000) 0.000 late(>=40000) 1.000; single t47 late 1.000; single t48 late 0.000; single t56 late 1.000
+  MCTL s124  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s125  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s126  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+  MCTL s127  G* early(<10000) 0.000 late(>=40000) 1.000; single t50 late 1.000; single t53 late 1.000; single t59 late 1.000
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  Neither merge moves plateau5 by >= 5 pp and they differ by < 5 pp.  Licensed: 'at this cell, keeping the carriers
+  out of a shared group with N is NOT necessary for the layerwise level (within +-5 pp)'.  Read WITH the G* pin
+  stamps: if MCAR's G* PINS, N's own step size does not matter here; if it is FREE, the carriers did not capture the
+  merged vote.  It does NOT say separation is never necessary: larger merges ([50,12], scalar) collapse (147, 184).
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Any other merge (another neighbour set, size or position), grouping family, cell, network or horizon.
+  * That the carriers' step size (large or small) is what harms: no step size is manipulated here; the merged group's
+    step size is whatever the shared Lion vote makes it (the G* pin stamps are DESCRIPTIVE).
+  * Identity vs MAGNITUDE (188.3): at a shared step size the carriers' |L| exceeds T's by x100+ (premise S), so a
+    carrier-specific result does not separate which tensors from how large their terms are.
+  * Necessity for the scalar collapse, or sufficiency statements beyond 187 / 193 / 240-253.
+  * A point reading for an arm AT KLS: |D| < 5 pp is a BOUND ('costs < 5 pp'), not 'costs nothing' (164.6).
