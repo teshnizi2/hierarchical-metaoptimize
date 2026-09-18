@@ -1,0 +1,268 @@
+============================================================================================================
+cvt10_attack_indep -- INDEPENDENT re-derivation of CORRECTIONS 258 (no repo import, no regex)
+============================================================================================================
+
+[0] CORPUS DISCLOSURE (the ONE corpus-dependent line), MANIFEST, PROVENANCE, SCORER SHA
+    corpus files: all_runs.csv sha256 1801245410857d8a... (3127 data rows), CORPUS-EXCLUSIONS.tsv sha256 ff9533348f9f2f0d... (108 keys)
+    CORPUS COMMIT: 8e341e4cc98b8b6ef65eff6f8cadb48854885b83  (cvt10's own registration commit; both scored stages carried exactly this corpus)
+    registration corpus identity: CSV True   TSV True
+    rows with a cvt10- run name: 0 (RULE 21 premise: the batch is not in the corpus)
+    manifest: 62 tensors, 11220132 params, 20 BatchNorm modules; carriers 50:layer4.0.bn2.weight,53:layer4.0.shortcut.1.weight,59:layer4.1.bn2.weight; ISO -> [59, 3], ISOSPLIT -> [59, 1, 2];
+              6203 bytes, sha256 156f2000655ed2ff...; RE-BUILT BYTE FOR BYTE FROM THE ARCHITECTURE: True
+    provenance: MODE submit  HF 5197dc2eecbb...  build_network c79988833c43...  runner 1dbe4ff52ecc...  scorer 05f52bb60c28...
+    REGISTERED_COMMIT in PROVENANCE.txt: 8e341e4cc98b8b6ef65eff6f8cadb48854885b83  (== the registration commit: True; the scorer does NOT gate on this field)
+    the scorer given on the command line has sha256 05f52bb60c288673...  (== the registered 05f52bb60c288673...: True)
+
+[1] COMPLETENESS, plateau5 FROM THE RAW .out, AND EVERY WITNESS LINE
+    30 cvt10 .out files; 30 (arm, seed) cells; missing or incomplete: none
+    ARGS: 30 lines, 0 mismatched.  ENV: 1 distinct (PROBE_DIR stripped), == the frozen one: True.
+    PROBE_TENSOR: 0 bad.  GROUP_HOLD: 0 witness mismatches (15 arms carry a witness, 15 carry `off`).
+
+[2] LEVELS -- plateau5 (TEST) and TRAIN5, per arm; tail slope = OLS of TEST on epochs 80..99
+    k01       TEST 22.7540 (sd 0.7079, range 1.4140)   TRAIN 22.8393
+    ISO       TEST 70.1660 (sd 0.0622, range 0.1220)   TRAIN 93.8727
+    HOLDBIG3  TEST 18.7233 (sd 0.3089, range 0.6140)   TRAIN 18.5687
+    ONE50     TEST 64.7967 (sd 0.2793, range 0.5280)   TRAIN 83.0347
+    ONE50BIG  TEST 21.1340 (sd 0.2926, range 0.5660)   TRAIN 21.0520
+    ONE59     TEST 67.7053 (sd 0.1286, range 0.2540)   TRAIN 91.4427
+    ONE59BIG  TEST 21.0973 (sd 0.2469, range 0.4700)   TRAIN 20.9680
+    ONE53     TEST 57.5033 (sd 0.2479, range 0.4480)   TRAIN 67.9607
+    ONE53BIG  TEST 22.2893 (sd 0.6461, range 1.1700)   TRAIN 22.0293
+    ISOSPLIT  TEST 67.0893 (sd 0.5726, range 1.1260)   TRAIN 84.2240
+
+[3] G-BITE -- the hold on group 1 of every held arm, Lion recomputed on every unheld group
+    30 runs re-checked independently: 0 G-BITE failures.  Worst Lion residual over the whole batch 4.04e-07;
+    worst schedule residual on a held group 1 0.00e+00 (tolerance 1e-05).
+    NON-VACUITY (the BROKEN-SINGLETON-HOLD null): the 3 FREE ONE50 runs read as ONE50BIG FAIL the schedule 3/3 -- so G-BITE's PASS is not vacuous.
+
+[4] SIGMA AND THE CONTRASTS
+    SIGMA_PRIOR_frozen 0.681198   SIGMA_INBATCH 0.406001 (df 20)   SIGMA_USED 0.681198 (SIGMA_PRIOR_frozen)   SE_ARM_DIFF 0.556196
+    PRIMARY  P_ONE50  = +43.6627 pp = +78.50 SE   (TRAIN +61.9827)
+    PRIMARY  P_ONE59  = +46.6080 pp = +83.80 SE   (TRAIN +70.4747)
+    PRIMARY  P_ONE53  = +35.2140 pp = +63.31 SE   (TRAIN +45.9313)
+    KEY      D_ISO    = +47.4120 pp = +85.24 SE   (TRAIN +71.0333)
+    KEY      R_HB3    = +51.4427 pp = +92.49 SE   (TRAIN +75.3040)
+    KEY      P_SPLIT  = +3.0767 pp = +5.53 SE   (TRAIN +9.6487)
+    KEY      Q_SPLIT  = +45.9553 pp = +82.62 SE   (TRAIN +63.1720)
+    KEY      E_50     = +2.4107 pp = +4.33 SE   (TRAIN +2.4833)
+    KEY      E_59     = +2.3740 pp = +4.27 SE   (TRAIN +2.3993)
+    KEY      E_53     = +3.5660 pp = +6.41 SE   (TRAIN +3.4607)
+
+[5] BRANCH, STAMPS, FINAL
+    re-derived FINAL: FINAL: ONE-SUFFICES+ONE50-STALLS+ONE59-STALLS+ONE53-STALLS+SPLIT-NO-EFFECT | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | BIG-IS-PLAINNET-DOSE | SINGLETON-GROUPS | NO-FREE-SPLIT-CONTROL | ONE-DOSE-ONLY | ONE-NETWORK-RESNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDBIG3-AT-K01 | ONE50-BETWEEN | ONE50BIG-AT-K01 | ONE59-AT-ISO | ONE59BIG-AT-K01 | ONE53-BETWEEN | ONE53BIG-AT-K01 | ISOSPLIT-AT-ISO | HOLDBIG3-BELOW-K01 | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+    FINAL agrees with the scorer's, string for string (23 tokens).
+    bar margins (pp / SE):
+      ONE50BIG  STALLS bar k01+2 = 24.7540;  ONE50BIG = 21.1340;  margin INSIDE the bar +3.6200 pp (+6.51 SE);  free twin rescue +42.0427 pp (READ_MARGIN 10)
+      ONE59BIG  STALLS bar k01+2 = 24.7540;  ONE59BIG = 21.0973;  margin INSIDE the bar +3.6567 pp (+6.57 SE);  free twin rescue +44.9513 pp (READ_MARGIN 10)
+      ONE53BIG  STALLS bar k01+2 = 24.7540;  ONE53BIG = 22.2893;  margin INSIDE the bar +2.4647 pp (+4.43 SE);  free twin rescue +34.7493 pp (READ_MARGIN 10)
+      ISOSPLIT  NO-EFFECT bar ISO-5 = 65.1660;  ISOSPLIT = 67.0893;  margin INSIDE the bar +1.9233 pp (+3.46 SE)
+      HOLDBIG3  REPLICATE bar k01+2 = 24.7540;  HOLDBIG3 = 18.7233;  margin INSIDE +6.0307 pp (+10.84 SE)
+      k01       K01_MAX 30;  k01 = 22.7540 (7.2460 INSIDE).   ISO-k01 = 47.4120 vs GAP_MIN 20 (27.4120 INSIDE).
+    licence block: 15 lines; opens the 5 words this branch requires: True; CATEGORY (Kim) line present False (KIM-CATEGORY-SPLIT stamped False)
+
+[6] THE DESCRIPTIVE READOUTS, RE-BUILT
+
+[7] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG (each re-built line looked up verbatim)
+    HEADER        15 found verbatim, 0 not found
+    CORPUS         1 found verbatim, 0 not found
+    COMPLETE      31 found verbatim, 0 not found
+    G-ARGS        30 found verbatim, 0 not found
+    G-ENV          4 found verbatim, 0 not found
+    G-VOTEW       30 found verbatim, 0 not found
+    G-BHOLD       30 found verbatim, 0 not found
+    G-RHOLD       30 found verbatim, 0 not found
+    G-CHOLD       30 found verbatim, 0 not found
+    G-GHOLD       30 found verbatim, 0 not found
+    G-STRUCT       1 found verbatim, 0 not found
+    G-PROV         5 found verbatim, 0 not found
+    HOSTPATH       2 found verbatim, 0 not found
+    LEVELS        20 found verbatim, 0 not found
+    G-FLOOR        1 found verbatim, 0 not found
+    G-CEIL         1 found verbatim, 0 not found
+    G-BITE        30 found verbatim, 0 not found
+    SIGMA          4 found verbatim, 0 not found
+    CONTRASTS     20 found verbatim, 0 not found
+    G-DIVERGE      1 found verbatim, 0 not found
+    FINAL          1 found verbatim, 0 not found
+    BETWEEN        4 found verbatim, 0 not found
+    DESC-BETA     30 found verbatim, 0 not found
+    DESC-EPOCH    17 found verbatim, 0 not found
+    total 368 re-built lines, 368 found; FAIL lines anywhere in the scorer log: 0
+    scorer log: 429 lines, 18 blank, 40 non-blank NOT re-built here (banners, section titles and the registered licence prose):
+      | G-ARGS    every run's OWN ARGS line says what its file name registers
+      | G-ENV     the environment rode the ENV line on every run
+      | G-VOTEW / G-BHOLD / G-RHOLD / G-CHOLD / G-WHOLD / G-GHOLD   ONE `VOTE_W: off`, ONE `BETA_HOLD: off`, ONE
+      |           `REST_HOLD: off`, NO COMP_HOLD or WINDOW_HOLD line, ONE GROUP_HOLD line == the arm's registered witness
+      | G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+      | G-PROV    PROVENANCE.txt
+      | LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+      | G-FLOOR / G-CEIL
+      | G-BITE    the registered hold reached beta at every record, and touched nothing else
+      |   (a) 500 records; (b) every UNHELD group == Lion recomputed from its own beta_pre/mom_pre/z_agg (tol 1e-05);
+      |   (c) group 1 of every held arm: beta == tri:9428(step+2), beta_pre == tri:9428(step+1); (d) gh_* records audit;
+      |   (e) no gh_* key on a free arm, no bh_* / ch_* / rh_* / wh_* key anywhere.  Non-finite records are counted, not failed.
+      | SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+      | CONTRASTS (every one WITHIN batch)
+      | G-DIVERGE (a branch condition, not a harness gate)
+      | BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt10 bar or contrast):
+      | DESCRIPTIVE, NON-GATING -- beta from the runs' own probe.jsonl; r = exp(beta + 15) over epochs 15-30 / 30-60; pin = firs
+      | WHAT THIS DECIDES -- as registered, before any run existed:
+      |   ONE-SUFFICES: at least one carrier, isolated ALONE in its own step-size group and held on PlainNet's dose (tri:9428,
+      |   bitwise the schedule that stalled PlainNet and cvt8's HOLDBIG), with every other tensor -- the other two carriers
+      |   included -- sharing one free Lion step size, puts the run at the k01 location.  EFFECT ON 252.8(1)'s remaining confoun
+      |   carrier the held set is NOT needed at this dose; the PlainNet sentence (240 / 246: one tensor on this dose stalls)
+      |   TRANSFERS to ResNet18_c100 at this cell for that single tensor.  Sufficiency, at this cell only.
+      |   ONE50-STALLS -- ONE50BIG, layer4.0.bn2.weight (last BN of the downsampling block's residual branch; Kim et al.'s gamma
+      |   ONE59-STALLS -- ONE59BIG, layer4.1.bn2.weight (last BN of the final block's residual branch; gamma_last), sits at the 
+      |   ONE53-STALLS -- ONE53BIG, layer4.0.shortcut.1.weight (the projection-shortcut BN; Kim et al.'s gamma_down), sits at th
+      |   SPLIT-NO-EFFECT: carrier 50 held on PlainNet's dose, with 53 and 59 isolated free, stays within 5 pp of ISO: with
+      |   the other carriers out of the complement's vote the one-tensor hold does not stall.
+      |   TOGETHER (ONE50-STALLS with SPLIT-NO-EFFECT): 50's hold stalls while 53 and 59 vote in the shared complement and
+      |   does not once they sit in their own free group -- the one-tensor stall needs the remaining carriers' vote in the
+      |   shared step size (the ctd1 vote route), at this dose.  Sufficiency both ways; no free [59,1,2] control.
+      |   EFFECT ON 252.8(1)'s remaining confound (the ResNet stall at PlainNet's dose held THREE carriers together, PlainNet's 
+      |   fixed at tri:9428, every hold from init).  Readings at k01 are LOCATIONS (164.6).
+      | WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+      |   * Any other network, cell, dose or horizon; GroupNorm, VGG, PlainNet (RULE 11).
+      |   * Necessity: every reading is what a hold is SUFFICIENT to do.
+      |   * Why ResNet and PlainNet differ, a dose curve (one dose, tri:9428), or when the step size acts (holds from init).
+      |   * Any pair of carriers held together (not run), or a category law from one tensor per category.
+      |   * ISOSPLIT's cost relative to its own free partition (not run).
+      |   * Point agreement for an arm at the k01 level: such readings are LOCATIONS (164.6).
+
+    HOST-FLOAT TIES (a rendering that differs between left-to-right and exact summation): 1
+      ! epoch-line TEST HOLDBIG3 e18: left-to-right 14.1 vs exact 14.0
+    NOTES: 0
+
+============================================================================================================
+DESCRIPTIVE, NOT REGISTERED -- nothing below can move a level, contrast, gate, branch or stamp above
+============================================================================================================
+
+[D1] TEST (TRAIN) after 15 / 30 / 50 / 100 COMPLETED epochs = Epoch lines 14 / 29 / 49 / 99
+     (the .out prints `Epoch e` AFTER e+1 completed epochs, so `after 15 epochs` is the line `Epoch 14`)
+     arm              after 15 ep         after 30 ep         after 50 ep        after 100 ep
+     k01           10.81 (  9.82)      22.75 ( 22.68)      22.74 ( 22.74)      22.73 ( 22.81)
+                10.28/11.10/11.06   23.40/22.17/22.67   23.49/22.19/22.55   23.45/21.99/22.76
+     ISO           11.16 ( 10.11)      54.92 ( 56.81)      67.99 ( 82.27)      70.12 ( 93.91)
+                10.74/11.24/11.51   54.51/55.47/54.77   67.96/67.97/68.05   70.17/70.14/70.04
+     HOLDBIG3      10.80 (  9.78)      18.73 ( 18.52)      18.77 ( 18.64)      18.71 ( 18.59)
+                10.27/10.97/11.17   18.22/19.38/18.60   18.48/19.19/18.65   18.42/18.98/18.72
+     ONE50         10.98 (  9.92)      42.88 ( 43.09)      60.28 ( 67.89)      64.80 ( 83.16)
+                10.43/11.17/11.33   41.63/44.03/42.99   59.31/60.90/60.63   64.46/65.06/64.87
+     ONE50BIG      10.80 (  9.82)      21.11 ( 21.04)      21.17 ( 20.95)      21.17 ( 20.97)
+                10.21/11.10/11.10   21.54/20.92/20.87   21.49/20.94/21.09   21.52/20.96/21.03
+     ONE59         11.00 (  9.96)      45.07 ( 45.85)      61.44 ( 70.78)      67.67 ( 91.49)
+                10.59/11.19/11.22   44.91/45.78/44.52   61.06/62.53/60.72   67.73/67.68/67.59
+     ONE59BIG      10.72 (  9.76)      20.95 ( 20.87)      21.09 ( 20.89)      21.09 ( 20.91)
+                10.18/10.99/10.98   21.44/20.77/20.63   21.49/20.75/21.03   21.35/20.96/20.95
+     ONE53         10.79 (  9.87)      35.95 ( 36.71)      51.90 ( 55.70)      57.68 ( 68.10)
+                10.15/11.03/11.18   36.36/35.67/35.83   51.78/52.05/51.86   57.76/57.95/57.32
+     ONE53BIG      10.75 (  9.81)      22.23 ( 21.99)      22.20 ( 21.93)      22.23 ( 21.98)
+                10.16/10.92/11.17   22.51/21.63/22.55   22.53/21.48/22.59   22.46/21.51/22.72
+     ISOSPLIT      11.07 ( 10.04)      52.55 ( 54.06)      65.57 ( 77.88)      67.20 ( 84.29)
+                10.50/11.29/11.42   51.84/53.47/52.35   65.50/65.69/65.53   67.40/66.57/67.63
+
+[D2] APPLIED beta at epochs 10 / 17 / 20 / 30 / 40, for the HELD tensor (group 1) and the COMPLEMENT
+     (group 0 -- every tensor not isolated; on k01 the ONE shared beta).
+     RECORD BOUNDARY, stated: probe record k carries step s = 100k and the beta AFTER update s+1, i.e. the
+     value APPLIED at update n = s + 2 (this is what G-BITE checked above).  An epoch is 500 updates, so
+     `at epoch e` is read at record k = 5e, i.e. step 500e, applied update n = 500e + 2.  Epochs 10 / 17 /
+     20 / 30 / 40 are records 50 / 85 / 100 / 150 / 200.  tri:9428 peaks at update 9429 (epoch 18.86) and
+     is back at the -15 floor from update 20041 (epoch 40.08) on -- so the epoch-40 column is still above
+     the floor by construction.
+     arm / group                         ep 10       ep 17       ep 20       ep 30       ep 40
+     k01 g0 complement s120            -8.8125     -5.3124     -6.5103    -11.5116    -15.0000
+     k01 g0 complement s121            -8.8125     -5.3124     -6.4903    -11.4916    -15.0000
+     k01 g0 complement s122            -8.8125     -5.3124     -6.5303    -11.5316    -15.0000
+     ISO g0 complement s120            -8.8125     -5.3124     -5.8983     -7.0142     -7.9702
+     ISO g0 complement s121            -8.8125     -5.3124     -5.8263     -7.0622     -8.0062
+     ISO g0 complement s122            -8.8125     -5.3124     -5.8683     -7.0202     -7.8622
+     ISO g1 free s120                  -8.8125    -12.1378    -13.6384    -15.0000    -15.0000
+     ISO g1 free s121                  -8.8125    -11.8777    -13.3783    -15.0000    -15.0000
+     ISO g1 free s122                  -8.8125    -12.2379    -13.7385    -15.0000    -15.0000
+     HOLDBIG3 g0 complement s120       -8.8125     -5.3124     -4.6544     -9.6548    -14.6569
+     HOLDBIG3 g0 complement s121       -8.8125     -5.3124     -4.7084     -9.7089    -14.7109
+     HOLDBIG3 g0 complement s122       -8.8125     -5.3124     -4.8804     -9.6368    -14.6388
+     HOLDBIG3 g1 HELD (x3 identical)    -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     ONE50 g0 complement s120          -8.8125     -5.3124     -6.1603     -7.0742     -7.8322
+     ONE50 g0 complement s121          -8.8125     -5.3124     -6.1163     -7.0482     -7.7462
+     ONE50 g0 complement s122          -8.8125     -5.3124     -6.0703     -7.1302     -7.8002
+     ONE50 g1 free s120                -8.8125    -11.9898    -13.4904    -15.0000    -15.0000
+     ONE50 g1 free s121                -8.8125    -11.9598    -13.4604    -15.0000    -15.0000
+     ONE50 g1 free s122                -8.8165    -12.2219    -13.7225    -15.0000    -15.0000
+     ONE50BIG g0 complement s120       -8.8125     -5.3124     -6.2023    -11.2035    -15.0000
+     ONE50BIG g0 complement s121       -8.8125     -5.3124     -6.1323    -11.1334    -15.0000
+     ONE50BIG g0 complement s122       -8.8125     -5.3124     -6.1163    -11.1174    -15.0000
+     ONE50BIG g1 HELD (x3 identical)    -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     ONE59 g0 complement s120          -8.8125     -5.3124     -6.1103     -7.1222     -7.8702
+     ONE59 g0 complement s121          -8.8125     -5.3124     -6.0763     -7.0362     -7.7502
+     ONE59 g0 complement s122          -8.8125     -5.3124     -6.1443     -7.0822     -7.7402
+     ONE59 g1 free s120                -9.0306    -12.5300    -14.0306    -15.0000    -15.0000
+     ONE59 g1 free s121                -8.8125    -11.9578    -13.4584    -15.0000    -15.0000
+     ONE59 g1 free s122                -9.1346    -12.6360    -14.1366    -15.0000    -15.0000
+     ONE59BIG g0 complement s120       -8.8125     -5.3124     -6.0663    -11.0674    -15.0000
+     ONE59BIG g0 complement s121       -8.8125     -5.3124     -6.0143    -11.0154    -15.0000
+     ONE59BIG g0 complement s122       -8.8125     -5.3124     -6.0003    -11.0014    -15.0000
+     ONE59BIG g1 HELD (x3 identical)    -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     ONE53 g0 complement s120          -8.8125     -5.3124     -6.1483     -7.1402     -7.8962
+     ONE53 g0 complement s121          -8.8125     -5.3124     -6.1803     -7.1302     -7.8862
+     ONE53 g0 complement s122          -8.8125     -5.3124     -6.1183     -7.1522     -7.8302
+     ONE53 g1 free s120                -8.8125    -11.7057    -13.2063    -15.0000    -15.0000
+     ONE53 g1 free s121                -8.8125    -11.5756    -13.0762    -15.0000    -15.0000
+     ONE53 g1 free s122                -8.8125    -11.5576    -13.0582    -15.0000    -15.0000
+     ONE53BIG g0 complement s120       -8.8125     -5.3124     -6.3623    -11.3635    -15.0000
+     ONE53BIG g0 complement s121       -8.8125     -5.3124     -6.3043    -11.3055    -15.0000
+     ONE53BIG g0 complement s122       -8.8125     -5.3124     -6.2463    -11.2475    -15.0000
+     ONE53BIG g1 HELD (x3 identical)    -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     ISOSPLIT g0 complement s120       -8.8125     -5.3124     -5.5903     -7.1182     -8.3503
+     ISOSPLIT g0 complement s121       -8.8125     -5.3124     -5.4943     -7.1482     -8.2763
+     ISOSPLIT g0 complement s122       -8.8125     -5.3124     -5.6383     -7.0922     -8.1642
+     ISOSPLIT g1 HELD (x3 identical)    -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     ISOSPLIT g2 free s120             -8.8165    -12.2059    -13.7065    -15.0000    -15.0000
+     ISOSPLIT g2 free s121             -8.8125    -11.7977    -13.2983    -15.0000    -15.0000
+     ISOSPLIT g2 free s122             -8.8125    -12.2459    -13.7465    -15.0000    -15.0000
+     tri:9428 schedule                 -8.8145     -5.3145     -4.9605     -9.9605    -14.9605
+     r = exp(beta+15), held                486       16083       22914         154           1
+
+[D3] THE COMPLEMENT'S MAGNITUDE PIN EPOCH (first epoch from which r = exp(beta+15) <= 2 for good,
+     searched from the complement's own peak; `never` = it never settles by epoch 100)
+     arm        complement g0 pin (s120/1/2) complement peak beta     held g1 pin
+     k01        35.6/35.8/35.6           -5.210/-5.190/-5.212     -
+     ISO        91.2/93.4/95.6           -4.914/-5.020/-4.920     21.4/22.0/21.2
+     HOLDBIG3   39.4/39.2/39.4           -4.404/-4.412/-4.426     38.8/38.8/38.8
+     ONE50      never/never/never        -5.040/-5.050/-4.974     21.8/21.8/21.2
+     ONE50BIG   36.4/36.4/36.4           -5.036/-5.012/-5.012     38.8/38.8/38.8
+     ONE59      never/never/never        -5.046/-5.050/-5.030     20.6/21.8/20.4
+     ONE59BIG   36.6/36.6/36.8           -5.000/-4.932/-4.914     38.8/38.8/38.8
+     ONE53      never/never/never        -5.044/-5.050/-5.014     22.4/22.6/22.6
+     ONE53BIG   36.0/36.2/36.2           -5.112/-5.104/-5.052     38.8/38.8/38.8
+     ISOSPLIT   81.6/78.6/85.0           -4.786/-4.798/-4.828     38.8/38.8/38.8
+
+[D4] PER ONE<s>BIG ARM: the Epoch line from which TEST stays MORE than 2 pp BELOW its FREE twin,
+     to line 99.  arm mean = (arm-mean free curve) - (arm-mean held curve); per seed = same-seed free - held.
+     Line n is `after n+1 completed epochs`.
+     ONE50BIG  vs ONE50       arm mean 18       per seed s120/s121/s122 18/18/18             TRAIN 18
+     ONE59BIG  vs ONE59       arm mean 17       per seed s120/s121/s122 17/17/17             TRAIN 18
+     ONE53BIG  vs ONE53       arm mean 19       per seed s120/s121/s122 19/18/22             TRAIN 19
+     HOLDBIG3  vs ISO         arm mean 17       per seed s120/s121/s122 17/17/16             TRAIN 17
+     ISOSPLIT  vs ISO         arm mean 52       per seed s120/s121/s122 54/49/52             TRAIN 18
+
+[D5] THE PROJECTION-SHORTCUT CARRIER 53 AGAINST THE TWO LAST-IN-BRANCH CARRIERS 50 AND 59
+     (Kim et al. arXiv:2205.07260's position categories: 50 and 59 are gamma_last, 53 is gamma_down)
+     carrier          FREE       HELD   P_ONE<s> HELD - k01
+     50            64.7967    21.1340    43.6627    -1.6200
+     59            67.7053    21.0973    46.6080    -1.6567
+     53            57.5033    22.2893    35.2140    -0.4647
+     branch words: ONE50-STALLS / ONE59-STALLS / ONE53-STALLS
+     L_LAST_DOWN = mean(P_ONE50, P_ONE59) - P_ONE53 = +9.9213 pp = +17.84 SE
+     FREE arms: 53 sits -8.7477 pp BELOW mean(ONE50, ONE59) free = 66.2510;  HELD arms: 53 sits +1.1737 pp
+     ABOVE mean(ONE50BIG, ONE59BIG) = 21.1157.  Every one of the three held singletons is INSIDE the STALLS
+     bar (k01 + 2 = 24.7540), so the registered branch word is the SAME for all three and the
+     KIM-CATEGORY-SPLIT stamp does NOT fire: the difference between 53 and {50, 59} is in the FREE
+     rescue level and in L_LAST_DOWN, both DESCRIPTIVE, not in the registered word.
+
+============================================================================================================
+VIOLATIONS: 0
+HOST-FLOAT TIES: 1.  This file's own arithmetic is strictly left-to-right, so its stdout is byte-identical
+on every host; a re-built line is accepted if EITHER summation order renders it.
+============================================================================================================

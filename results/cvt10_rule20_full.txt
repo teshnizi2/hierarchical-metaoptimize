@@ -1,0 +1,53 @@
+cvt10 -- RULE 20 AT FULL COVERAGE (30/30 started), RE-RUN BY THE SCORING TRACK BEFORE ANY NUMBER WAS READ.
+CORRECTIONS 258.11 owed 'the same two audits at 30/30 once the queue has started every run'.
+analysis/argsline_guard.py UNEDITED, sha256 81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388 (RULE 16).
+The registered scorer analysis/cVT10_onevsthree_score.py (sha256 05f52bb60c2886733f90bfc03fd7499877b75f6b9c1f94e4c6db0a7a544ebe7f)
+is IMPORTED READ-ONLY by the witness audit for its own WITNESS_GH / PT_TYPE / PT_RE / ENV_EXPECTED tables; it is not edited.
+
+==============================================================================
+A. THE LAUNCH TRACK'S UNATTENDED WAITER LOG, READ VERBATIM (~/cvt10_rule20_full.log on alice2)
+==============================================================================
+=== RULE 20 FULL COVERAGE ATTEMPT Fri Sep 18 21:35:38 CEST 2026 ; started .out files: 30
+      --save-directory             /home/s5014158/metaopt/runs/cvt10
+      --run-name                   cvt10-k01-s122
+batch-consistency: every non-axis flag is identical across 30 runs
+---------------------------------------------------------------
+argsline_guard: 30 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+witness/ENV/PROBE_TENSOR audit: 30 runs; 0 failures []
+
+==============================================================================
+B. RE-RUN BY THIS TRACK ON alice2, FROM ~/stage_cvt10 (the registered commit 8e341e4), AT 30/30
+==============================================================================
+started .out files: 30
+81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388  analysis/argsline_guard.py
+batch-consistency: every non-axis flag is identical across 30 runs
+---------------------------------------------------------------
+argsline_guard: 30 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+scorer sha256: 05f52bb60c2886733f90bfc03fd7499877b75f6b9c1f94e4c6db0a7a544ebe7f
+witness/ENV/PROBE_TENSOR audit: 30 runs; 0 failures []
+RULE20_WITNESS: PASS
+
+==============================================================================
+C. THE SAME TWO AUDITS ON THE MAC, against the sha-verified mirror alice-backup/runs_alice2 (184/184 files OK)
+==============================================================================
+started .out files: 30
+81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388  analysis/argsline_guard.py
+batch-consistency: every non-axis flag is identical across 30 runs
+---------------------------------------------------------------
+argsline_guard: 30 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+scorer sha256: 05f52bb60c2886733f90bfc03fd7499877b75f6b9c1f94e4c6db0a7a544ebe7f
+witness/ENV/PROBE_TENSOR audit: 30 runs; 0 failures []
+RULE20_WITNESS: PASS
+
+==============================================================================
+VERDICT: RULE 20 PASS AT FULL COVERAGE, 30/30, ON BOTH HOSTS.
+  argsline_guard  30 clean / 0 mismatched / 0 without an ARGS line, every non-axis flag identical across 30.
+  witness audit   30/30 exact: one VOTE_W: off, one BETA_HOLD: off, one REST_HOLD: off, no COMP_HOLD and no
+                  WINDOW_HOLD line, GROUP_HOLD equal to that arm's registered witness (groupsize=1 on ONE50BIG /
+                  ONE59BIG / ONE53BIG / ISOSPLIT, groupsize=3 on HOLDBIG3, group=1, mode=tri P=9428) or
+                  GROUP_HOLD: off on the five free arms; one PROBE_TENSOR line of the arm's own type with
+                  tensors=62; one ENV line byte-identical to ciso1 / cdep1 / cvt8's with PROBE_DIR stripped.
+Only after this did the scoring track run the frozen scorer.

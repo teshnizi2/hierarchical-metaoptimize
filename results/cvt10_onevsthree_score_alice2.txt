@@ -1,0 +1,429 @@
+==============================================================================
+ cvt10 -- ResNet18_c100: ONE carrier vs THREE at PlainNet's dose  (PATCH_GROUPHOLD, cvt8's tree unchanged)
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 120,121,122   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   k01       scalar  sizes 62         GROUP_HOLD (unset)
+   ISO       blockwise sizes 59,3       GROUP_HOLD (unset)
+   HOLDBIG3  blockwise sizes 59,3       GROUP_HOLD layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight:tri:9428
+   ONE50     blockwise sizes 61,1       GROUP_HOLD (unset)
+   ONE50BIG  blockwise sizes 61,1       GROUP_HOLD layer4.0.bn2.weight:tri:9428
+   ONE59     blockwise sizes 61,1       GROUP_HOLD (unset)
+   ONE59BIG  blockwise sizes 61,1       GROUP_HOLD layer4.1.bn2.weight:tri:9428
+   ONE53     blockwise sizes 61,1       GROUP_HOLD (unset)
+   ONE53BIG  blockwise sizes 61,1       GROUP_HOLD layer4.0.shortcut.1.weight:tri:9428
+   ISOSPLIT  blockwise sizes 59,1,2     GROUP_HOLD layer4.0.bn2.weight:tri:9428
+ CO-PRIMARY: P_ONE50 = ONE50 - ONE50BIG; P_ONE59 = ONE59 - ONE59BIG; P_ONE53 = ONE53 - ONE53BIG.
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3019 rows after corpus_exclusions.filter_rows, cvt10- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  30 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cvt10-k01-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.4820 (train 23.1300)
+  OK   cvt10-ISO-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.1520 (train 94.0160)
+  OK   cvt10-HOLDBIG3-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 18.4360 (train 18.3940)
+  OK   cvt10-ONE50-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.4800 (train 83.3880)
+  OK   cvt10-ONE50BIG-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.4600 (train 21.1220)
+  OK   cvt10-ONE59-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.6820 (train 91.3300)
+  OK   cvt10-ONE59BIG-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.3760 (train 21.0500)
+  OK   cvt10-ONE53-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 57.6260 (train 67.7000)
+  OK   cvt10-ONE53BIG-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6060 (train 22.2140)
+  OK   cvt10-ISOSPLIT-s120  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.2100 (train 84.5360)
+  OK   cvt10-k01-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.0680 (train 22.3640)
+  OK   cvt10-ISO-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.2340 (train 93.4240)
+  OK   cvt10-HOLDBIG3-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 19.0500 (train 18.7380)
+  OK   cvt10-ONE50-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.0080 (train 83.1940)
+  OK   cvt10-ONE50BIG-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 20.8940 (train 20.9200)
+  OK   cvt10-ONE59-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.8440 (train 91.2700)
+  OK   cvt10-ONE59BIG-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 20.9060 (train 20.9420)
+  OK   cvt10-ONE53-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 57.6660 (train 68.1460)
+  OK   cvt10-ONE53BIG-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.5460 (train 21.4560)
+  OK   cvt10-ISOSPLIT-s121  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 66.4660 (train 83.0120)
+  OK   cvt10-k01-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.7120 (train 23.0240)
+  OK   cvt10-ISO-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.1120 (train 94.1780)
+  OK   cvt10-HOLDBIG3-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 18.6840 (train 18.5740)
+  OK   cvt10-ONE50-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.9020 (train 82.5220)
+  OK   cvt10-ONE50BIG-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.0480 (train 21.1140)
+  OK   cvt10-ONE59-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.5900 (train 91.7280)
+  OK   cvt10-ONE59BIG-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.0100 (train 20.9120)
+  OK   cvt10-ONE53-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 57.2180 (train 68.0360)
+  OK   cvt10-ONE53BIG-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.7160 (train 22.4180)
+  OK   cvt10-ISOSPLIT-s122  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.5920 (train 85.1240)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s120
+  PASS G-ARGS ISO-s120
+  PASS G-ARGS HOLDBIG3-s120
+  PASS G-ARGS ONE50-s120
+  PASS G-ARGS ONE50BIG-s120
+  PASS G-ARGS ONE59-s120
+  PASS G-ARGS ONE59BIG-s120
+  PASS G-ARGS ONE53-s120
+  PASS G-ARGS ONE53BIG-s120
+  PASS G-ARGS ISOSPLIT-s120
+  PASS G-ARGS k01-s121
+  PASS G-ARGS ISO-s121
+  PASS G-ARGS HOLDBIG3-s121
+  PASS G-ARGS ONE50-s121
+  PASS G-ARGS ONE50BIG-s121
+  PASS G-ARGS ONE59-s121
+  PASS G-ARGS ONE59BIG-s121
+  PASS G-ARGS ONE53-s121
+  PASS G-ARGS ONE53BIG-s121
+  PASS G-ARGS ISOSPLIT-s121
+  PASS G-ARGS k01-s122
+  PASS G-ARGS ISO-s122
+  PASS G-ARGS HOLDBIG3-s122
+  PASS G-ARGS ONE50-s122
+  PASS G-ARGS ONE50BIG-s122
+  PASS G-ARGS ONE59-s122
+  PASS G-ARGS ONE59BIG-s122
+  PASS G-ARGS ONE53-s122
+  PASS G-ARGS ONE53BIG-s122
+  PASS G-ARGS ISOSPLIT-s122
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is ciso1's / cdep1's / cvt8's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=<its arm's> tensors=62`   30 runs
+
+G-VOTEW / G-BHOLD / G-RHOLD / G-CHOLD / G-WHOLD / G-GHOLD   ONE `VOTE_W: off`, ONE `BETA_HOLD: off`, ONE
+          `REST_HOLD: off`, NO COMP_HOLD or WINDOW_HOLD line, ONE GROUP_HOLD line == the arm's registered witness
+  PASS G-VOTEW k01-s120
+  PASS G-BHOLD k01-s120
+  PASS G-RHOLD k01-s120
+  PASS G-CHOLD/G-WHOLD k01-s120
+  PASS G-GHOLD k01-s120
+  PASS G-VOTEW ISO-s120
+  PASS G-BHOLD ISO-s120
+  PASS G-RHOLD ISO-s120
+  PASS G-CHOLD/G-WHOLD ISO-s120
+  PASS G-GHOLD ISO-s120
+  PASS G-VOTEW HOLDBIG3-s120
+  PASS G-BHOLD HOLDBIG3-s120
+  PASS G-RHOLD HOLDBIG3-s120
+  PASS G-CHOLD/G-WHOLD HOLDBIG3-s120
+  PASS G-GHOLD HOLDBIG3-s120
+  PASS G-VOTEW ONE50-s120
+  PASS G-BHOLD ONE50-s120
+  PASS G-RHOLD ONE50-s120
+  PASS G-CHOLD/G-WHOLD ONE50-s120
+  PASS G-GHOLD ONE50-s120
+  PASS G-VOTEW ONE50BIG-s120
+  PASS G-BHOLD ONE50BIG-s120
+  PASS G-RHOLD ONE50BIG-s120
+  PASS G-CHOLD/G-WHOLD ONE50BIG-s120
+  PASS G-GHOLD ONE50BIG-s120
+  PASS G-VOTEW ONE59-s120
+  PASS G-BHOLD ONE59-s120
+  PASS G-RHOLD ONE59-s120
+  PASS G-CHOLD/G-WHOLD ONE59-s120
+  PASS G-GHOLD ONE59-s120
+  PASS G-VOTEW ONE59BIG-s120
+  PASS G-BHOLD ONE59BIG-s120
+  PASS G-RHOLD ONE59BIG-s120
+  PASS G-CHOLD/G-WHOLD ONE59BIG-s120
+  PASS G-GHOLD ONE59BIG-s120
+  PASS G-VOTEW ONE53-s120
+  PASS G-BHOLD ONE53-s120
+  PASS G-RHOLD ONE53-s120
+  PASS G-CHOLD/G-WHOLD ONE53-s120
+  PASS G-GHOLD ONE53-s120
+  PASS G-VOTEW ONE53BIG-s120
+  PASS G-BHOLD ONE53BIG-s120
+  PASS G-RHOLD ONE53BIG-s120
+  PASS G-CHOLD/G-WHOLD ONE53BIG-s120
+  PASS G-GHOLD ONE53BIG-s120
+  PASS G-VOTEW ISOSPLIT-s120
+  PASS G-BHOLD ISOSPLIT-s120
+  PASS G-RHOLD ISOSPLIT-s120
+  PASS G-CHOLD/G-WHOLD ISOSPLIT-s120
+  PASS G-GHOLD ISOSPLIT-s120
+  PASS G-VOTEW k01-s121
+  PASS G-BHOLD k01-s121
+  PASS G-RHOLD k01-s121
+  PASS G-CHOLD/G-WHOLD k01-s121
+  PASS G-GHOLD k01-s121
+  PASS G-VOTEW ISO-s121
+  PASS G-BHOLD ISO-s121
+  PASS G-RHOLD ISO-s121
+  PASS G-CHOLD/G-WHOLD ISO-s121
+  PASS G-GHOLD ISO-s121
+  PASS G-VOTEW HOLDBIG3-s121
+  PASS G-BHOLD HOLDBIG3-s121
+  PASS G-RHOLD HOLDBIG3-s121
+  PASS G-CHOLD/G-WHOLD HOLDBIG3-s121
+  PASS G-GHOLD HOLDBIG3-s121
+  PASS G-VOTEW ONE50-s121
+  PASS G-BHOLD ONE50-s121
+  PASS G-RHOLD ONE50-s121
+  PASS G-CHOLD/G-WHOLD ONE50-s121
+  PASS G-GHOLD ONE50-s121
+  PASS G-VOTEW ONE50BIG-s121
+  PASS G-BHOLD ONE50BIG-s121
+  PASS G-RHOLD ONE50BIG-s121
+  PASS G-CHOLD/G-WHOLD ONE50BIG-s121
+  PASS G-GHOLD ONE50BIG-s121
+  PASS G-VOTEW ONE59-s121
+  PASS G-BHOLD ONE59-s121
+  PASS G-RHOLD ONE59-s121
+  PASS G-CHOLD/G-WHOLD ONE59-s121
+  PASS G-GHOLD ONE59-s121
+  PASS G-VOTEW ONE59BIG-s121
+  PASS G-BHOLD ONE59BIG-s121
+  PASS G-RHOLD ONE59BIG-s121
+  PASS G-CHOLD/G-WHOLD ONE59BIG-s121
+  PASS G-GHOLD ONE59BIG-s121
+  PASS G-VOTEW ONE53-s121
+  PASS G-BHOLD ONE53-s121
+  PASS G-RHOLD ONE53-s121
+  PASS G-CHOLD/G-WHOLD ONE53-s121
+  PASS G-GHOLD ONE53-s121
+  PASS G-VOTEW ONE53BIG-s121
+  PASS G-BHOLD ONE53BIG-s121
+  PASS G-RHOLD ONE53BIG-s121
+  PASS G-CHOLD/G-WHOLD ONE53BIG-s121
+  PASS G-GHOLD ONE53BIG-s121
+  PASS G-VOTEW ISOSPLIT-s121
+  PASS G-BHOLD ISOSPLIT-s121
+  PASS G-RHOLD ISOSPLIT-s121
+  PASS G-CHOLD/G-WHOLD ISOSPLIT-s121
+  PASS G-GHOLD ISOSPLIT-s121
+  PASS G-VOTEW k01-s122
+  PASS G-BHOLD k01-s122
+  PASS G-RHOLD k01-s122
+  PASS G-CHOLD/G-WHOLD k01-s122
+  PASS G-GHOLD k01-s122
+  PASS G-VOTEW ISO-s122
+  PASS G-BHOLD ISO-s122
+  PASS G-RHOLD ISO-s122
+  PASS G-CHOLD/G-WHOLD ISO-s122
+  PASS G-GHOLD ISO-s122
+  PASS G-VOTEW HOLDBIG3-s122
+  PASS G-BHOLD HOLDBIG3-s122
+  PASS G-RHOLD HOLDBIG3-s122
+  PASS G-CHOLD/G-WHOLD HOLDBIG3-s122
+  PASS G-GHOLD HOLDBIG3-s122
+  PASS G-VOTEW ONE50-s122
+  PASS G-BHOLD ONE50-s122
+  PASS G-RHOLD ONE50-s122
+  PASS G-CHOLD/G-WHOLD ONE50-s122
+  PASS G-GHOLD ONE50-s122
+  PASS G-VOTEW ONE50BIG-s122
+  PASS G-BHOLD ONE50BIG-s122
+  PASS G-RHOLD ONE50BIG-s122
+  PASS G-CHOLD/G-WHOLD ONE50BIG-s122
+  PASS G-GHOLD ONE50BIG-s122
+  PASS G-VOTEW ONE59-s122
+  PASS G-BHOLD ONE59-s122
+  PASS G-RHOLD ONE59-s122
+  PASS G-CHOLD/G-WHOLD ONE59-s122
+  PASS G-GHOLD ONE59-s122
+  PASS G-VOTEW ONE59BIG-s122
+  PASS G-BHOLD ONE59BIG-s122
+  PASS G-RHOLD ONE59BIG-s122
+  PASS G-CHOLD/G-WHOLD ONE59BIG-s122
+  PASS G-GHOLD ONE59BIG-s122
+  PASS G-VOTEW ONE53-s122
+  PASS G-BHOLD ONE53-s122
+  PASS G-RHOLD ONE53-s122
+  PASS G-CHOLD/G-WHOLD ONE53-s122
+  PASS G-GHOLD ONE53-s122
+  PASS G-VOTEW ONE53BIG-s122
+  PASS G-BHOLD ONE53BIG-s122
+  PASS G-RHOLD ONE53BIG-s122
+  PASS G-CHOLD/G-WHOLD ONE53BIG-s122
+  PASS G-GHOLD ONE53BIG-s122
+  PASS G-VOTEW ISOSPLIT-s122
+  PASS G-BHOLD ISOSPLIT-s122
+  PASS G-RHOLD ISOSPLIT-s122
+  PASS G-CHOLD/G-WHOLD ISOSPLIT-s122
+  PASS G-GHOLD ISOSPLIT-s122
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cvt10/PARTITION-MANIFEST.txt (<runsdir>/cvt10/)
+  PASS G-STRUCT byte-identical to synthetic_manifest_text() (62 tensors, five partitions, the hold table)   6203 vs 6203 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cvt10/PROVENANCE.txt (<runsdir>/cvt10/)
+  PASS G-PROV MODE submit   submit
+  PASS G-PROV build_network.py == the LIVE one c79988833c43...   c79988833c4399a0
+  PASS G-PROV HF.py == HF_POST_SHA 5197dc2eecbb... (cvt8's tree, unchanged)   5197dc2eecbbcb6f
+  PASS G-PROV RUNNER_SHA256 == cvt8's runner 1dbe4ff52ecc...   1dbe4ff52eccbbb1
+  PASS G-PROV SCORER_SHA256 == this scorer's sha256 05f52bb60c28...   05f52bb60c288673
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01       TEST 22.7540  sd 0.7079  range 1.4140   TRAIN 22.8393   tail slope -0.003/0.001/-0.008 pp/ep
+            seeds: s120 23.4820 (train 23.1300), s121 22.0680 (train 22.3640), s122 22.7120 (train 23.0240)
+  ISO       TEST 70.1660  sd 0.0622  range 0.1220   TRAIN 93.8727   tail slope -0.003/-0.005/0.003 pp/ep
+            seeds: s120 70.1520 (train 94.0160), s121 70.2340 (train 93.4240), s122 70.1120 (train 94.1780)
+  HOLDBIG3  TEST 18.7233  sd 0.3089  range 0.6140   TRAIN 18.5687   tail slope 0.004/-0.004/-0.002 pp/ep
+            seeds: s120 18.4360 (train 18.3940), s121 19.0500 (train 18.7380), s122 18.6840 (train 18.5740)
+  ONE50     TEST 64.7967  sd 0.2793  range 0.5280   TRAIN 83.0347   tail slope 0.005/0.017/0.013 pp/ep
+            seeds: s120 64.4800 (train 83.3880), s121 65.0080 (train 83.1940), s122 64.9020 (train 82.5220)
+  ONE50BIG  TEST 21.1340  sd 0.2926  range 0.5660   TRAIN 21.0520   tail slope 0.000/-0.004/0.001 pp/ep
+            seeds: s120 21.4600 (train 21.1220), s121 20.8940 (train 20.9200), s122 21.0480 (train 21.1140)
+  ONE59     TEST 67.7053  sd 0.1286  range 0.2540   TRAIN 91.4427   tail slope 0.025/-0.003/0.019 pp/ep
+            seeds: s120 67.6820 (train 91.3300), s121 67.8440 (train 91.2700), s122 67.5900 (train 91.7280)
+  ONE59BIG  TEST 21.0973  sd 0.2469  range 0.4700   TRAIN 20.9680   tail slope -0.000/0.002/0.000 pp/ep
+            seeds: s120 21.3760 (train 21.0500), s121 20.9060 (train 20.9420), s122 21.0100 (train 20.9120)
+  ONE53     TEST 57.5033  sd 0.2479  range 0.4480   TRAIN 67.9607   tail slope 0.028/0.034/0.038 pp/ep
+            seeds: s120 57.6260 (train 67.7000), s121 57.6660 (train 68.1460), s122 57.2180 (train 68.0360)
+  ONE53BIG  TEST 22.2893  sd 0.6461  range 1.1700   TRAIN 22.0293   tail slope -0.000/-0.000/0.001 pp/ep
+            seeds: s120 22.6060 (train 22.2140), s121 21.5460 (train 21.4560), s122 22.7160 (train 22.4180)
+  ISOSPLIT  TEST 67.0893  sd 0.5726  range 1.1260   TRAIN 84.2240   tail slope -0.001/-0.008/0.004 pp/ep
+            seeds: s120 67.2100 (train 84.5360), s121 66.4660 (train 83.0120), s122 67.5920 (train 85.1240)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 70.1660
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.1660
+
+G-BITE    the registered hold reached beta at every record, and touched nothing else
+  (a) 500 records; (b) every UNHELD group == Lion recomputed from its own beta_pre/mom_pre/z_agg (tol 1e-05);
+  (c) group 1 of every held arm: beta == tri:9428(step+2), beta_pre == tri:9428(step+1); (d) gh_* records audit;
+  (e) no gh_* key on a free arm, no bh_* / ch_* / rh_* / wh_* key anywhere.  Non-finite records are counted, not failed.
+  PASS G-BITE k01       s120 groups 1 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ISO       s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE HOLDBIG3  s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10016
+  PASS G-BITE ONE50     s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE50BIG  s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9971
+  PASS G-BITE ONE59     s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE59BIG  s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10125
+  PASS G-BITE ONE53     s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE53BIG  s120 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9886
+  PASS G-BITE ISOSPLIT  s120 groups 3 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9976
+  PASS G-BITE k01       s121 groups 1 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ISO       s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE HOLDBIG3  s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9938
+  PASS G-BITE ONE50     s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE50BIG  s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9968
+  PASS G-BITE ONE59     s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE59BIG  s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9961
+  PASS G-BITE ONE53     s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE53BIG  s121 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9854
+  PASS G-BITE ISOSPLIT  s121 groups 3 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9964
+  PASS G-BITE k01       s122 groups 1 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ISO       s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE HOLDBIG3  s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10042
+  PASS G-BITE ONE50     s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE50BIG  s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10040
+  PASS G-BITE ONE59     s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE59BIG  s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10155
+  PASS G-BITE ONE53     s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active None
+  PASS G-BITE ONE53BIG  s122 groups 2 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 9851
+  PASS G-BITE ISOSPLIT  s122 groups 3 records 500  bad 0  nonfinite 0  lion 0 (ties 0, worst 4.0e-07)  sched 0/0 (worst 0.0e+00)  gh-audit 0  keys-wrong 0  gh_active 10040
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.681198
+  SIGMA_INBATCH        0.406001
+  SIGMA_USED           0.681198  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.556196  = SIGMA_USED * sqrt(2/3)  (df_inbatch 20)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_ONE50  = ONE50     - ONE50BIG  = +43.6627 pp = +78.50 SE   (TRAIN +61.9827)
+  PRIMARY  P_ONE59  = ONE59     - ONE59BIG  = +46.6080 pp = +83.80 SE   (TRAIN +70.4747)
+  PRIMARY  P_ONE53  = ONE53     - ONE53BIG  = +35.2140 pp = +63.31 SE   (TRAIN +45.9313)
+  KEY      D_ISO    = ISO       - k01       = +47.4120 pp = +85.24 SE   (TRAIN +71.0333)
+  KEY      R_HB3    = ISO       - HOLDBIG3  = +51.4427 pp = +92.49 SE   (TRAIN +75.3040)
+  KEY      P_SPLIT  = ISO       - ISOSPLIT  = +3.0767 pp = +5.53 SE   (TRAIN +9.6487)
+  KEY      Q_SPLIT  = ISOSPLIT  - ONE50BIG  = +45.9553 pp = +82.62 SE   (TRAIN +63.1720)
+  KEY      E_50     = ONE50BIG  - HOLDBIG3  = +2.4107 pp = +4.33 SE   (TRAIN +2.4833)
+  KEY      E_59     = ONE59BIG  - HOLDBIG3  = +2.3740 pp = +4.27 SE   (TRAIN +2.3993)
+  KEY      E_53     = ONE53BIG  - HOLDBIG3  = +3.5660 pp = +6.41 SE   (TRAIN +3.4607)
+  KEY      D_HOLDBIG3  = HOLDBIG3  - k01 = -4.0307 pp = -7.25 SE   (TRAIN -4.2707)
+  KEY      D_ONE50     = ONE50     - k01 = +42.0427 pp = +75.59 SE   (TRAIN +60.1953)
+  KEY      D_ONE50BIG  = ONE50BIG  - k01 = -1.6200 pp = -2.91 SE   (TRAIN -1.7873)
+  KEY      D_ONE59     = ONE59     - k01 = +44.9513 pp = +80.82 SE   (TRAIN +68.6033)
+  KEY      D_ONE59BIG  = ONE59BIG  - k01 = -1.6567 pp = -2.98 SE   (TRAIN -1.8713)
+  KEY      D_ONE53     = ONE53     - k01 = +34.7493 pp = +62.48 SE   (TRAIN +45.1213)
+  KEY      D_ONE53BIG  = ONE53BIG  - k01 = -0.4647 pp = -0.84 SE   (TRAIN -0.8100)
+  KEY      D_ISOSPLIT  = ISOSPLIT  - k01 = +44.3353 pp = +79.71 SE   (TRAIN +61.3847)
+  DESCRIPTIVE L_LAST_DOWN = mean(P_ONE50, P_ONE59) - P_ONE53 = +9.9213 pp
+  bars: GAP_MIN 20.0 (35.96 SE) | MATCH 5.0 pp (8.99 SE) | NULL 2.0 pp (3.60 SE) | READ_MARGIN 10.0 pp (17.98 SE) | RESCUE 10.0 pp
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: ONE-SUFFICES+ONE50-STALLS+ONE59-STALLS+ONE53-STALLS+SPLIT-NO-EFFECT | HARNESS-CLEAN | PATCH-BITES | HOLD-FROM-INIT | BIG-IS-PLAINNET-DOSE | SINGLETON-GROUPS | NO-FREE-SPLIT-CONTROL | ONE-DOSE-ONLY | ONE-NETWORK-RESNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | HOLDBIG3-AT-K01 | ONE50-BETWEEN | ONE50BIG-AT-K01 | ONE59-AT-ISO | ONE59BIG-AT-K01 | ONE53-BETWEEN | ONE53BIG-AT-K01 | ISOSPLIT-AT-ISO | HOLDBIG3-BELOW-K01 | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cvt10 bar or contrast):
+  cvt8: k01 23.0553  ISO 70.2613  HOLDBIG 19.3780
+  ciso1: k01 23.2807  ISO 70.2113  ONE 64.7500
+  cdep1: k01 23.3520  ISO 70.0440  ONE 64.8267
+  cvt10 {120,121,122}: k01 22.7540  ISO 70.1660  HOLDBIG3 18.7233  ONE50 64.7967  ONE50BIG 21.1340  ONE59 67.7053  ONE59BIG 21.0973  ONE53 57.5033  ONE53BIG 22.2893  ISOSPLIT 67.0893
+
+DESCRIPTIVE, NON-GATING -- beta from the runs' own probe.jsonl; r = exp(beta + 15) over epochs 15-30 / 30-60; pin = first r <= 2 for good; g0 = the complement (the shared step size of every tensor not isolated)
+  k01       s120  g0 peak -5.210 @17.4 pin 35.6 r 4240/3  gh_active -
+  k01       s121  g0 peak -5.190 @17.4 pin 35.8 r 4291/3  gh_active -
+  k01       s122  g0 peak -5.212 @17.2 pin 35.6 r 4191/3  gh_active -
+  ISO       s120  g0 peak -4.914 @17.8 pin 91.2 r 8267/1102 | g1 peak -8.804 @10.2 pin 21.4 r 7/1  gh_active -
+  ISO       s121  g0 peak -5.020 @17.6 pin 93.4 r 8412/1044 | g1 peak -8.618 @10.4 pin 22.0 r 9/1  gh_active -
+  ISO       s122  g0 peak -4.920 @17.8 pin 95.6 r 8214/1120 | g1 peak -8.812 @10.0 pin 21.2 r 6/1  gh_active -
+  HOLDBIG3  s120  g0 peak -4.404 @19.4 pin 39.4 r 11635/15 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 10016
+  HOLDBIG3  s121  g0 peak -4.412 @19.2 pin 39.2 r 11374/14 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9938
+  HOLDBIG3  s122  g0 peak -4.426 @18.8 pin 39.4 r 11122/16 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 10042
+  ONE50     s120  g0 peak -5.040 @17.6 pin never r 7067/1216 | g1 peak -8.720 @10.4 pin 21.8 r 8/1  gh_active -
+  ONE50     s121  g0 peak -5.050 @17.6 pin never r 7200/1174 | g1 peak -8.666 @10.4 pin 21.8 r 8/1  gh_active -
+  ONE50     s122  g0 peak -4.974 @17.8 pin never r 7255/1161 | g1 peak -8.816 @10.0 pin 21.2 r 6/1  gh_active -
+  ONE50BIG  s120  g0 peak -5.036 @17.6 pin 36.4 r 5069/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9971
+  ONE50BIG  s121  g0 peak -5.012 @17.6 pin 36.4 r 5278/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9968
+  ONE50BIG  s122  g0 peak -5.012 @17.6 pin 36.4 r 5325/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 10040
+  ONE59     s120  g0 peak -5.046 @17.6 pin never r 7110/1304 | g1 peak -8.955 @9.8 pin 20.6 r 5/1  gh_active -
+  ONE59     s121  g0 peak -5.050 @17.6 pin never r 7242/1306 | g1 peak -8.660 @10.4 pin 21.8 r 8/1  gh_active -
+  ONE59     s122  g0 peak -5.030 @17.6 pin never r 7141/1324 | g1 peak -9.015 @9.6 pin 20.4 r 4/1  gh_active -
+  ONE59BIG  s120  g0 peak -5.000 @17.8 pin 36.6 r 5469/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 10125
+  ONE59BIG  s121  g0 peak -4.932 @17.8 pin 36.6 r 5646/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9961
+  ONE59BIG  s122  g0 peak -4.914 @17.8 pin 36.8 r 5694/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 10155
+  ONE53     s120  g0 peak -5.044 @17.6 pin never r 6878/1053 | g1 peak -8.550 @10.6 pin 22.4 r 11/1  gh_active -
+  ONE53     s121  g0 peak -5.050 @17.6 pin never r 6968/1055 | g1 peak -8.488 @10.8 pin 22.6 r 12/1  gh_active -
+  ONE53     s122  g0 peak -5.014 @17.6 pin never r 6930/1071 | g1 peak -8.512 @10.8 pin 22.6 r 12/1  gh_active -
+  ONE53BIG  s120  g0 peak -5.112 @17.4 pin 36.0 r 4625/3 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9886
+  ONE53BIG  s121  g0 peak -5.104 @17.6 pin 36.2 r 4781/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9854
+  ONE53BIG  s122  g0 peak -5.052 @17.6 pin 36.2 r 4945/4 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11  gh_active 9851
+  ISOSPLIT  s120  g0 peak -4.786 @18.2 pin 81.6 r 9300/784 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11 | g2 peak -8.816 @10.0 pin 21.4 r 7/1  gh_active 9976
+  ISOSPLIT  s121  g0 peak -4.798 @18.2 pin 78.6 r 9438/716 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11 | g2 peak -8.600 @10.6 pin 22.2 r 10/1  gh_active 9964
+  ISOSPLIT  s122  g0 peak -4.828 @18.0 pin 85.0 r 9113/850 | g1 peak -4.415 @18.8 pin 38.8 r 10064/11 | g2 peak -8.812 @10.0 pin 21.2 r 6/1  gh_active 10040
+
+DESCRIPTIVE, NON-GATING -- arm-mean TEST (TRAIN) at epoch lines 9 / 14 / 16 / 17 / 18 / 19 / 24 / 29 / 39 / 49 / 99
+  k01       2.9 (2.3) / 10.8 (9.8) / 14.0 (13.2) / 15.9 (14.7) / 17.4 (16.5) / 18.7 (18.0) / 22.3 (22.0) / 22.7 (22.7) / 22.8 (22.8) / 22.7 (22.7) / 22.7 (22.8)
+  ISO       2.9 (2.3) / 11.2 (10.1) / 15.7 (14.5) / 19.4 (17.1) / 23.2 (21.6) / 28.2 (26.8) / 44.7 (44.4) / 54.9 (56.8) / 63.9 (72.1) / 68.0 (82.3) / 70.1 (93.9)
+  HOLDBIG3  2.9 (2.3) / 10.8 (9.8) / 13.9 (13.3) / 14.0 (14.5) / 14.1 (14.8) / 14.8 (14.8) / 18.1 (17.6) / 18.7 (18.5) / 18.7 (18.6) / 18.8 (18.6) / 18.7 (18.6)
+  ONE50     2.9 (2.3) / 11.0 (9.9) / 14.8 (13.7) / 16.9 (15.6) / 20.8 (19.0) / 23.7 (22.2) / 33.5 (33.7) / 42.9 (43.1) / 53.5 (58.0) / 60.3 (67.9) / 64.8 (83.2)
+  ONE50BIG  2.9 (2.3) / 10.8 (9.8) / 13.9 (13.2) / 15.2 (14.5) / 17.3 (16.1) / 18.0 (17.5) / 20.8 (20.4) / 21.1 (21.0) / 21.2 (21.0) / 21.2 (20.9) / 21.2 (21.0)
+  ONE59     2.9 (2.3) / 11.0 (10.0) / 14.8 (13.9) / 17.6 (16.0) / 21.4 (19.6) / 24.6 (23.3) / 36.4 (35.6) / 45.1 (45.9) / 55.8 (61.0) / 61.4 (70.8) / 67.7 (91.5)
+  ONE59BIG  2.9 (2.3) / 10.7 (9.8) / 13.7 (13.2) / 14.1 (14.5) / 17.2 (16.1) / 18.2 (17.4) / 20.6 (20.3) / 20.9 (20.9) / 21.1 (20.9) / 21.1 (20.9) / 21.1 (20.9)
+  ONE53     2.9 (2.3) / 10.8 (9.9) / 14.3 (13.5) / 15.5 (15.0) / 19.0 (17.6) / 21.4 (20.4) / 29.4 (29.8) / 36.0 (36.7) / 45.9 (48.3) / 51.9 (55.7) / 57.7 (68.1)
+  ONE53BIG  2.9 (2.3) / 10.8 (9.8) / 13.9 (13.2) / 15.6 (14.6) / 17.2 (16.3) / 18.1 (17.7) / 21.8 (21.3) / 22.2 (22.0) / 22.3 (21.9) / 22.2 (21.9) / 22.2 (22.0)
+  ISOSPLIT  2.9 (2.3) / 11.1 (10.0) / 15.2 (14.1) / 16.7 (16.3) / 21.1 (19.5) / 25.7 (24.4) / 42.5 (41.3) / 52.6 (54.1) / 62.0 (69.2) / 65.6 (77.9) / 67.2 (84.3)
+  first epoch line from which |arm-mean TEST ISO - HOLDBIG3| stays > 2 pp: 17
+  first epoch line from which |arm-mean TEST ONE50 - ONE50BIG| stays > 2 pp: 18
+  first epoch line from which |arm-mean TEST ONE59 - ONE59BIG| stays > 2 pp: 17
+  first epoch line from which |arm-mean TEST ONE53 - ONE53BIG| stays > 2 pp: 19
+  first epoch line from which |arm-mean TEST ISO - ISOSPLIT| stays > 2 pp: 52
+  first epoch line from which |arm-mean TEST ISOSPLIT - ONE50BIG| stays > 2 pp: 18
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  ONE-SUFFICES: at least one carrier, isolated ALONE in its own step-size group and held on PlainNet's dose (tri:9428,
+  bitwise the schedule that stalled PlainNet and cvt8's HOLDBIG), with every other tensor -- the other two carriers
+  included -- sharing one free Lion step size, puts the run at the k01 location.  EFFECT ON 252.8(1)'s remaining confound (the ResNet stall at PlainNet's dose held THREE carriers together, PlainNet's held idx 50 alone): for that
+  carrier the held set is NOT needed at this dose; the PlainNet sentence (240 / 246: one tensor on this dose stalls)
+  TRANSFERS to ResNet18_c100 at this cell for that single tensor.  Sufficiency, at this cell only.
+  ONE50-STALLS -- ONE50BIG, layer4.0.bn2.weight (last BN of the downsampling block's residual branch; Kim et al.'s gamma_last), sits at the k01 location (<= k01 + 2 pp) while its free twin rescues: this ONE tensor on PlainNet's dose is SUFFICIENT to stall.
+  ONE59-STALLS -- ONE59BIG, layer4.1.bn2.weight (last BN of the final block's residual branch; gamma_last), sits at the k01 location (<= k01 + 2 pp) while its free twin rescues: this ONE tensor on PlainNet's dose is SUFFICIENT to stall.
+  ONE53-STALLS -- ONE53BIG, layer4.0.shortcut.1.weight (the projection-shortcut BN; Kim et al.'s gamma_down), sits at the k01 location (<= k01 + 2 pp) while its free twin rescues: this ONE tensor on PlainNet's dose is SUFFICIENT to stall.
+  SPLIT-NO-EFFECT: carrier 50 held on PlainNet's dose, with 53 and 59 isolated free, stays within 5 pp of ISO: with
+  the other carriers out of the complement's vote the one-tensor hold does not stall.
+  TOGETHER (ONE50-STALLS with SPLIT-NO-EFFECT): 50's hold stalls while 53 and 59 vote in the shared complement and
+  does not once they sit in their own free group -- the one-tensor stall needs the remaining carriers' vote in the
+  shared step size (the ctd1 vote route), at this dose.  Sufficiency both ways; no free [59,1,2] control.
+  EFFECT ON 252.8(1)'s remaining confound (the ResNet stall at PlainNet's dose held THREE carriers together, PlainNet's held idx 50 alone): as the words say, at this cell only (ResNet18_c100, ciso1's cell, 100 epochs, the dose
+  fixed at tri:9428, every hold from init).  Readings at k01 are LOCATIONS (164.6).
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Any other network, cell, dose or horizon; GroupNorm, VGG, PlainNet (RULE 11).
+  * Necessity: every reading is what a hold is SUFFICIENT to do.
+  * Why ResNet and PlainNet differ, a dose curve (one dose, tri:9428), or when the step size acts (holds from init).
+  * Any pair of carriers held together (not run), or a category law from one tensor per category.
+  * ISOSPLIT's cost relative to its own free partition (not run).
+  * Point agreement for an arm at the k01 level: such readings are LOCATIONS (164.6).
