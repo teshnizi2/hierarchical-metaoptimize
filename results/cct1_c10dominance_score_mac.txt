@@ -1,0 +1,130 @@
+====================================================================================================
+cCT1 -- `cct1`: carrier vote dominance on CIFAR-10 (no collapse).  runsdir ../runs_alice2
+====================================================================================================
+
+[G-COMPLETE]
+  PASS k01-s116: complete .out
+  PASS k01-s116: >= 500 probe records   500
+  PASS k01-s117: complete .out
+  PASS k01-s117: >= 500 probe records   500
+  PASS k01-s118: complete .out
+  PASS k01-s118: >= 500 probe records   500
+  PASS kL-s116: complete .out
+  PASS kL-s116: >= 500 probe records   500
+  PASS kL-s117: complete .out
+  PASS kL-s117: >= 500 probe records   500
+  PASS kL-s118: complete .out
+  PASS kL-s118: >= 500 probe records   500
+
+[G-CORE / G-PROV / G-STRUCT]
+  PASS G-CORE: core sha256 == registered   0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  PASS G-PROV: PROVENANCE.txt present
+  PASS G-PROV: MODE == submit   got submit
+  PASS G-PROV: HF_SHA256 == 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd   got 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd
+  PASS G-PROV: BUILD_NETWORK_SHA256 == c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d   got c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+  PASS G-PROV: TRAIN_PY_SHA256 == 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7   got 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7
+  PASS G-PROV: RUNNER_SHA256 == a0d0a1b904e64ea5a3de8c0649b58454beff0322419c97ea9e6d77481cfd9f3a   got a0d0a1b904e64ea5a3de8c0649b58454beff0322419c97ea9e6d77481cfd9f3a
+  PASS G-PROV: CORE_SHA256 == 0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6   got 0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  PASS G-PROV: SCORER_SHA256 == 9bedffa80f9940571931c7ab2967e6a3b1329e2e66439764ce4a23d009557bd7   got 9bedffa80f9940571931c7ab2967e6a3b1329e2e66439764ce4a23d009557bd7
+  PASS G-STRUCT: PARTITION-MANIFEST.txt byte-identical (2733 bytes)
+
+[G-ARGS / G-ENV / G-PT / G-FOREIGN / G-HEADER / G-RECORDS]
+  PASS G-ARGS k01-s116
+  PASS G-ENV k01-s116
+  PASS G-PT k01-s116: type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s116
+  PASS G-HEADER k01-s116 (ResNet18 numels)
+  PASS G-RECORDS k01-s116
+  PASS G-ARGS k01-s117
+  PASS G-ENV k01-s117
+  PASS G-PT k01-s117: type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s117
+  PASS G-HEADER k01-s117 (ResNet18 numels)
+  PASS G-RECORDS k01-s117
+  PASS G-ARGS k01-s118
+  PASS G-ENV k01-s118
+  PASS G-PT k01-s118: type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s118
+  PASS G-HEADER k01-s118 (ResNet18 numels)
+  PASS G-RECORDS k01-s118
+  PASS G-ARGS kL-s116
+  PASS G-ENV kL-s116
+  PASS G-PT kL-s116: type=layerwise, dir == PROBE_DIR
+  PASS G-FOREIGN kL-s116
+  PASS G-HEADER kL-s116 (ResNet18 numels)
+  PASS G-RECORDS kL-s116
+  PASS G-ARGS kL-s117
+  PASS G-ENV kL-s117
+  PASS G-PT kL-s117: type=layerwise, dir == PROBE_DIR
+  PASS G-FOREIGN kL-s117
+  PASS G-HEADER kL-s117 (ResNet18 numels)
+  PASS G-RECORDS kL-s117
+  PASS G-ARGS kL-s118
+  PASS G-ENV kL-s118
+  PASS G-PT kL-s118: type=layerwise, dir == PROBE_DIR
+  PASS G-FOREIGN kL-s118
+  PASS G-HEADER kL-s118 (ResNet18 numels)
+  PASS G-RECORDS kL-s118
+
+[G-SPEC]
+  PASS G-SPEC k01-s116: 1 coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC k01-s117: 1 coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC k01-s118: 1 coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC kL-s116: 62 coordinate(s)   beta [62] z_agg [62]
+  PASS G-SPEC kL-s117: 62 coordinate(s)   beta [62] z_agg [62]
+  PASS G-SPEC kL-s118: 62 coordinate(s)   beta [62] z_agg [62]
+
+[G-DECOMP]
+  PASS G-DECOMP k01-s116   shape 0 z 0 m 0 (worst 1.9e-07 / 5.5e-07) sign 0/500 clamped 0 shared 0
+  PASS G-DECOMP k01-s117   shape 0 z 0 m 0 (worst 2.3e-07 / 5.9e-07) sign 0/500 clamped 0 shared 0
+  PASS G-DECOMP k01-s118   shape 0 z 0 m 0 (worst 2.5e-07 / 9.7e-07) sign 0/500 clamped 0 shared 0
+  PASS G-DECOMP kL-s116   shape 0 z 0 m 0 (worst 0.0e+00 / 0.0e+00) sign 0/28204 clamped 2796 shared 0
+  PASS G-DECOMP kL-s117   shape 0 z 0 m 0 (worst 0.0e+00 / 0.0e+00) sign 0/28104 clamped 2896 shared 0
+  PASS G-DECOMP kL-s118   shape 0 z 0 m 0 (worst 0.0e+00 / 0.0e+00) sign 0/28104 clamped 2896 shared 0
+
+[DOMINANCE] k01's records (the registered statistic), and kL's (the companion)
+  k01-s116               n=500  DOM_C 0.0000  TOP3_C 0.6060  DOM_TOP3 0.0820  SHARE_C(med) 0.4239  R_T 0.4900 (DIS 245)  CAR_EQ 0.0000  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x303, {50,59,61} x69, {49,58,61} x46; argmax 59(layer4.1.bn2.weight) x414, 61(linear.weight) x44, 58(layer4.1.conv2.weight) x39, 4(layer1.0.conv1.weight) x2, 49(layer4.0.conv2.weight) x1
+                         class share of sum|L| (median): bn_scale 0.546 bn_bias 0.002 conv 0.384 linear 0.069; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  k01-s117               n=500  DOM_C 0.0000  TOP3_C 0.7400  DOM_TOP3 0.0800  SHARE_C(med) 0.4229  R_T 0.4680 (DIS 234)  CAR_EQ 0.0000  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x370, {49,58,61} x50, {49,50,59} x31; argmax 59(layer4.1.bn2.weight) x414, 61(linear.weight) x46, 58(layer4.1.conv2.weight) x39, 1(conv1.weight) x1
+                         class share of sum|L| (median): bn_scale 0.545 bn_bias 0.002 conv 0.387 linear 0.067; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  k01-s118               n=500  DOM_C 0.0000  TOP3_C 0.7360  DOM_TOP3 0.0760  SHARE_C(med) 0.4217  R_T 0.4729 (DIS 236)  CAR_EQ 0.0000  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x368, {49,58,61} x44, {49,55,58} x35; argmax 59(layer4.1.bn2.weight) x415, 58(layer4.1.conv2.weight) x44, 61(linear.weight) x41
+                         class share of sum|L| (median): bn_scale 0.543 bn_bias 0.002 conv 0.390 linear 0.067; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  kL-s116                n=500  DOM_C 0.0000  TOP3_C 0.0000  DOM_TOP3 0.0880  SHARE_C(med) 0.0026  R_T 0.1214 (DIS 59)  CAR_EQ 0.0000  DOWN 0.2542  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {49,58,61} x47, {49,55,58} x36, {1,4,61} x18; argmax 61(linear.weight) x131, 1(conv1.weight) x85, 4(layer1.0.conv1.weight) x50, 5(layer1.0.bn1.weight) x49, 32(layer3.0.bn1.weight) x48
+                         class share of sum|L| (median): bn_scale 0.237 bn_bias 0.006 conv 0.632 linear 0.089; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  kL-s117                n=500  DOM_C 0.0000  TOP3_C 0.0000  DOM_TOP3 0.0860  SHARE_C(med) 0.0024  R_T 0.1441 (DIS 69)  CAR_EQ 0.0000  DOWN 0.1594  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {49,58,61} x50, {49,55,58} x34, {1,4,61} x13; argmax 61(linear.weight) x99, 1(conv1.weight) x79, 5(layer1.0.bn1.weight) x65, 4(layer1.0.conv1.weight) x49, 58(layer4.1.conv2.weight) x41
+                         class share of sum|L| (median): bn_scale 0.239 bn_bias 0.007 conv 0.643 linear 0.074; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  kL-s118                n=500  DOM_C 0.0000  TOP3_C 0.0000  DOM_TOP3 0.0820  SHARE_C(med) 0.0022  R_T 0.1691 (DIS 82)  CAR_EQ 0.0000  DOWN 0.0732  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {49,58,61} x44, {49,55,58} x35, {1,4,61} x12; argmax 1(conv1.weight) x171, 61(linear.weight) x61, 5(layer1.0.bn1.weight) x61, 4(layer1.0.conv1.weight) x46, 58(layer4.1.conv2.weight) x43
+                         class share of sum|L| (median): bn_scale 0.217 bn_bias 0.006 conv 0.679 linear 0.071; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  k01 POOLED             n=1500  DOM_C 0.0000  TOP3_C 0.6940  DOM_TOP3 0.0793  SHARE_C(med) 0.4228  R_T 0.4770 (DIS 715)  CAR_EQ 0.0000  DOWN 1.0000  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {50,53,59} x1041, {49,58,61} x140, {49,55,58} x100; argmax 59(layer4.1.bn2.weight) x1243, 61(linear.weight) x131, 58(layer4.1.conv2.weight) x122, 4(layer1.0.conv1.weight) x2, 49(layer4.0.conv2.weight) x1
+                         class share of sum|L| (median): bn_scale 0.545 bn_bias 0.002 conv 0.387 linear 0.067; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  kL POOLED              n=1500  DOM_C 0.0000  TOP3_C 0.0000  DOM_TOP3 0.0853  SHARE_C(med) 0.0024  R_T 0.1448 (DIS 210)  CAR_EQ 0.0000  DOWN 0.1524  PINNED 0.0000  DOM_C|pinned n/a
+                         modal top-3 {49,58,61} x141, {49,55,58} x105, {1,4,61} x43; argmax 1(conv1.weight) x335, 61(linear.weight) x291, 5(layer1.0.bn1.weight) x175, 4(layer1.0.conv1.weight) x145, 58(layer4.1.conv2.weight) x123
+                         class share of sum|L| (median): bn_scale 0.228 bn_bias 0.006 conv 0.654 linear 0.077; DOM_C by decile 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+  calibration (CIFAR-100 ms 1e-3, registration): collapsing scalar DOM_C pooled 0.8069; layerwise 0.0000
+
+[LEVELS]
+  k01 87.662 87.188 87.694 mean 87.5147 range 0.506 | train 93.792 93.550 93.528
+  kL  90.792 90.786 90.748 mean 90.7753 range 0.044 | train 99.654 99.636 99.680
+  kL - k01 = +3.2607 pp = +22.22 SE (SE_PRIOR 0.146762); ratio 0.9641
+
+[DESCRIPTIVE, gating nothing] beta trajectories
+  k01-s116: peak -5.366 at step 8600; terminal -10.627; share at floor 0.000
+  k01-s117: peak -5.356 at step 8500; terminal -10.683; share at floor 0.000
+  k01-s118: peak -5.326 at step 8600; terminal -10.671; share at floor 0.000
+  kL-s116 carriers' own beta terminal -15.000 -15.000 -15.000; linear.weight -15.000
+  kL-s117 carriers' own beta terminal -15.000 -15.000 -15.000; linear.weight -15.000
+  kL-s118 carriers' own beta terminal -15.000 -15.000 -15.000; linear.weight -15.000
+  corpus anchors (non-gating, filtered): k01 C10 (n15) 87.9128; kL C10 (n26) 90.9190; k01 C100 1e-3 (n44) 22.9562; layerwise C100 1e-3 (n32) 69.4166
+
+BRANCH   NOT-COLLAPSED+CARRIERS-DO-NOT-DOMINATE
+LICENCE  On CIFAR-10 / ResNet18 at the mechanism hyper-parameters, where scalar does not collapse in batch, the three carriers fix the shared vote on <= 10 % of k01's records, against 0.81 at the collapsing CIFAR-100 cell: CARRIER DOMINANCE CO-OCCURS WITH COLLAPSE across these two cells (association only; dataset and head width co-vary; not causation)
+NOT LICENSED  causation (dataset and head width co-vary); other networks, datasets, meta steps, alpha0 or horizons; that dominance on CIFAR-10 has the CIFAR-100 time course; anything about the ISO rescue
+
+FINAL: NOT-COLLAPSED+CARRIERS-DO-NOT-DOMINATE | RATIO=0.9641 | DOM_C=0.0000 | TOP3_C=0.6940 | KL-DOM_C=0.0000 | KL-CARRIERS-DO-NOT-DOMINATE | DOM_TOP3=0.0793 | R_T=0.4770 | DOWN=1.0000 | PINNED-FRAC=0.0000 | MODAL-TOP3={50,53,59} | ARGMAX=59 | GAP-IN-BATCH=3.2607 | HARNESS-CLEAN | SPEC-APPLIED | DECOMPOSITION-OK | DATASET-AND-HEAD-CO-VARY | ONE-CELL-CIFAR10-MS1E-3 | HORIZON-100-ONLY | ONE-NETWORK-RESNET18 | FLOOR-NOT-APPLICABLE | SIGMA-PRIOR-FROZEN

@@ -1,0 +1,35 @@
+# results/cst1_cct1_rule20_full.txt -- RULE 20 AT FULL COVERAGE for `cst1` (CORRECTIONS 256) and `cct1` (257).
+#
+# Tool: ~/l256_rule20.py on alice2, UNCHANGED since the launch entry wrote it (256.11);
+#       sha256 193c5e85a8814c399ac6e19e67613cd6f4c35c0e731e74a6098d284188832487.
+# It reads ONLY the ARGS / ENV / PROBE_TENSOR / intervention lines of each run's own .out (no Epoch line is
+# parsed), then runs analysis/argsline_guard.py UNEDITED from the stage ~/stage_trackB (git clone at the
+# registered commit 14fb3606e3f9d64087ad9b78ee3fe2e2bf07d1c0; argsline_guard.py sha256
+# 81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388, identical to the repo's HEAD copy)
+# with --batch-consistency --strict --vary stepsize-groups --vary seed --vary run-name.
+#
+# Command (alice2 login node, CPU only):
+#   module load Python/3.10.4-GCCcore-11.3.0 && source /home/s5014158/metaopt/envs/mo/bin/activate
+#   METAOPT_WS=/home/s5014158/metaopt python ~/l256_rule20.py
+# Run 2026-09-18 (UTC), BEFORE any accuracy number of either batch was read.
+# COVERAGE: cst1 9/9 and cct1 6/6 -- FULL.  A FAIL would have stopped the landing.
+cst1-CTL-s112-5026063  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-CTL-s113-5026066  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-CTL-s114-5026069  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-ISO-s112-5026062  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-ISO-s113-5026065  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-ISO-s114-5026068  ARGS True  ENV True  PT True(blockwise)  FOREIGN-none True
+cst1-k01-s112-5026061  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cst1-k01-s113-5026064  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cst1-k01-s114-5026067  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cst1: 9 / 9 started; distinct ENV lines (PROBE_DIR stripped) 1; all expected started: True
+cst1: argsline_guard --batch-consistency --strict rc 0; tail: --------------------------------------------------------------- | argsline_guard: 9 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line | VERDICT: PASS
+cct1-k01-s116-5026078  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cct1-k01-s117-5026080  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cct1-k01-s118-5026082  ARGS True  ENV True  PT True(scalar)  FOREIGN-none True
+cct1-kL-s116-5026079   ARGS True  ENV True  PT True(layerwise)  FOREIGN-none True
+cct1-kL-s117-5026081   ARGS True  ENV True  PT True(layerwise)  FOREIGN-none True
+cct1-kL-s118-5026083   ARGS True  ENV True  PT True(layerwise)  FOREIGN-none True
+cct1: 6 / 6 started; distinct ENV lines (PROBE_DIR stripped) 1; all expected started: True
+cct1: argsline_guard --batch-consistency --strict rc 0; tail: --------------------------------------------------------------- | argsline_guard: 6 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line | VERDICT: PASS
+RULE20 PASS

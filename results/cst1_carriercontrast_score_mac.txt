@@ -1,0 +1,115 @@
+====================================================================================================
+cST1 -- `cst1`: the carrier contrast at meta step 3e-4.  runsdir ../runs_alice2
+====================================================================================================
+
+[G-COMPLETE] every (arm, seed) has a COMPLETE .out and 500 probe records
+  PASS k01-s112: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS k01-s112: >= 500 probe records   500
+  PASS k01-s113: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS k01-s113: >= 500 probe records   500
+  PASS k01-s114: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS k01-s114: >= 500 probe records   500
+  PASS ISO-s112: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS ISO-s112: >= 500 probe records   500
+  PASS ISO-s113: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS ISO-s113: >= 500 probe records   500
+  PASS ISO-s114: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS ISO-s114: >= 500 probe records   500
+  PASS CTL-s112: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS CTL-s112: >= 500 probe records   500
+  PASS CTL-s113: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS CTL-s113: >= 500 probe records   500
+  PASS CTL-s114: complete .out (RUN_DONE, epochs 0..99, finite plateau5)
+  PASS CTL-s114: >= 500 probe records   500
+
+[G-CORE / G-PROV / G-STRUCT] the code and the harness that ran
+  PASS G-CORE: cCV0_carrier_vote_core.py sha256 == registered   0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  PASS G-PROV: <runsdir>/cst1/PROVENANCE.txt present
+  PASS G-PROV: MODE == submit   got submit
+  PASS G-PROV: HF_SHA256 == 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd   got 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd
+  PASS G-PROV: BUILD_NETWORK_SHA256 == c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d   got c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+  PASS G-PROV: TRAIN_PY_SHA256 == 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7   got 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7
+  PASS G-PROV: RUNNER_SHA256 == a0d0a1b904e64ea5a3de8c0649b58454beff0322419c97ea9e6d77481cfd9f3a   got a0d0a1b904e64ea5a3de8c0649b58454beff0322419c97ea9e6d77481cfd9f3a
+  PASS G-PROV: CORE_SHA256 == 0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6   got 0754ca84e44258fbe628d7985cb5268f69272f004e25af531950304ec148c5e6
+  PASS G-PROV: SCORER_SHA256 == 05546791a0d9269a3f410fe0364f7afed97f711dd3f29186f28bce42973588a3   got 05546791a0d9269a3f410fe0364f7afed97f711dd3f29186f28bce42973588a3
+  PASS G-STRUCT: PARTITION-MANIFEST.txt byte-identical to manifest_text() (3107 bytes)
+
+[G-ARGS / G-ENV / G-PT / G-FOREIGN / G-HEADER / G-RECORDS] every run's own lines
+  PASS G-ARGS k01-s112: one ARGS line == registered
+  PASS G-ENV k01-s112: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT k01-s112: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s112: no intervention-kind line (the live tree ran)
+  PASS G-HEADER k01-s112: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS k01-s112: 500 parseable records at steps 0..49,900
+  PASS G-ARGS k01-s113: one ARGS line == registered
+  PASS G-ENV k01-s113: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT k01-s113: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s113: no intervention-kind line (the live tree ran)
+  PASS G-HEADER k01-s113: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS k01-s113: 500 parseable records at steps 0..49,900
+  PASS G-ARGS k01-s114: one ARGS line == registered
+  PASS G-ENV k01-s114: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT k01-s114: one PROBE_TENSOR line, type=scalar, dir == PROBE_DIR
+  PASS G-FOREIGN k01-s114: no intervention-kind line (the live tree ran)
+  PASS G-HEADER k01-s114: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS k01-s114: 500 parseable records at steps 0..49,900
+  PASS G-ARGS ISO-s112: one ARGS line == registered
+  PASS G-ENV ISO-s112: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT ISO-s112: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN ISO-s112: no intervention-kind line (the live tree ran)
+  PASS G-HEADER ISO-s112: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS ISO-s112: 500 parseable records at steps 0..49,900
+  PASS G-ARGS ISO-s113: one ARGS line == registered
+  PASS G-ENV ISO-s113: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT ISO-s113: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN ISO-s113: no intervention-kind line (the live tree ran)
+  PASS G-HEADER ISO-s113: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS ISO-s113: 500 parseable records at steps 0..49,900
+  PASS G-ARGS ISO-s114: one ARGS line == registered
+  PASS G-ENV ISO-s114: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT ISO-s114: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN ISO-s114: no intervention-kind line (the live tree ran)
+  PASS G-HEADER ISO-s114: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS ISO-s114: 500 parseable records at steps 0..49,900
+  PASS G-ARGS CTL-s112: one ARGS line == registered
+  PASS G-ENV CTL-s112: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT CTL-s112: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN CTL-s112: no intervention-kind line (the live tree ran)
+  PASS G-HEADER CTL-s112: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS CTL-s112: 500 parseable records at steps 0..49,900
+  PASS G-ARGS CTL-s113: one ARGS line == registered
+  PASS G-ENV CTL-s113: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT CTL-s113: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN CTL-s113: no intervention-kind line (the live tree ran)
+  PASS G-HEADER CTL-s113: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS CTL-s113: 500 parseable records at steps 0..49,900
+  PASS G-ARGS CTL-s114: one ARGS line == registered
+  PASS G-ENV CTL-s114: one ENV line == registered (modulo PROBE_DIR, which is the run's own)
+  PASS G-PT CTL-s114: one PROBE_TENSOR line, type=blockwise, dir == PROBE_DIR
+  PASS G-FOREIGN CTL-s114: no intervention-kind line (the live tree ran)
+  PASS G-HEADER CTL-s114: probe_tensor.json registered (ResNet18_c100 numels)
+  PASS G-RECORDS CTL-s114: 500 parseable records at steps 0..49,900
+
+[G-SPEC] the partition that RAN, read off the records (the BROKEN-SPEC null's only separator)
+  PASS G-SPEC k01-s112: every record carries 1 beta / z_agg coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC k01-s113: every record carries 1 beta / z_agg coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC k01-s114: every record carries 1 beta / z_agg coordinate(s)   beta [1] z_agg [1]
+  PASS G-SPEC ISO-s112: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+  PASS G-SPEC ISO-s113: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+  PASS G-SPEC ISO-s114: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+  PASS G-SPEC CTL-s112: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+  PASS G-SPEC CTL-s113: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+  PASS G-SPEC CTL-s114: every record carries 2 beta / z_agg coordinate(s)   beta [2] z_agg [2]
+
+[G-DECOMP] per-group sums of the capture vs the harness; applied step vs sign(L)
+  FAIL G-DECOMP k01-s112   shape 0 z 0 m 0 (worst 2.0e-07 / 8.1e-07) sign 382/500 clamped 0 shared 0
+  FAIL G-DECOMP k01-s113   shape 0 z 0 m 0 (worst 2.3e-07 / 8.7e-07) sign 382/500 clamped 0 shared 0
+  FAIL G-DECOMP k01-s114   shape 0 z 0 m 0 (worst 2.2e-07 / 1.2e-06) sign 380/500 clamped 0 shared 0
+  FAIL G-DECOMP ISO-s112   shape 0 z 0 m 0 (worst 1.8e-07 / 7.6e-07) sign 608/800 clamped 200 shared 0
+  FAIL G-DECOMP ISO-s113   shape 0 z 0 m 0 (worst 2.1e-07 / 8.7e-07) sign 596/785 clamped 215 shared 0
+  FAIL G-DECOMP ISO-s114   shape 0 z 0 m 0 (worst 2.1e-07 / 7.4e-07) sign 620/810 clamped 190 shared 0
+  FAIL G-DECOMP CTL-s112   shape 0 z 0 m 0 (worst 1.9e-07 / 1.2e-06) sign 809/995 clamped 5 shared 0
+  FAIL G-DECOMP CTL-s113   shape 0 z 0 m 0 (worst 2.9e-07 / 9.6e-07) sign 809/992 clamped 8 shared 0
+  FAIL G-DECOMP CTL-s114   shape 0 z 0 m 0 (worst 1.8e-07 / 6.1e-07) sign 808/994 clamped 6 shared 0
+
+FINAL: UNRESOLVED-DECOMPOSITION | G-DECOMP k01-s112
