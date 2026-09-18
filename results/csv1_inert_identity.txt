@@ -1,0 +1,14 @@
+INERT-s136 vs k01-s136 -- IS THE ON-PATH AT IDENTITY BITWISE THE UNPATCHED ARM OVER THE LANDED RUN?
+  both runs: seed 136, node851 (RTX 2080 Ti), same tree, same ENV; the ONLY difference registered is
+  SHADOW_VOTE=shadow:shared:layer4.1.bn2.weight, which 262.3 proved BITWISE inert over 300 real steps.
+  records: 500 vs 500
+  sv_* keys present only on INERT: sv_a_applied, sv_a_shared, sv_applied, sv_dapp, sv_dref, sv_dw, sv_ho_norm, sv_hv_norm, sv_idx, sv_n, sv_vote, sv_z_other, sv_z_vote
+  records NOT bitwise equal after deleting the sv_* keys: 500 of 500
+  FIRST divergence: record 0 (step 0); keys that differ: mom_norm, z_agg, z_mean, z_std, z_tensor
+  at record 0: z_tensor differs in 25 of 53 slots; idx 50 among them? False ; z[50] = 0.0 / 0.0
+    max |dz| 1.019e-13 on max |z| 5.220e-09  (relative 1.95e-05)
+  at record 0: m_tensor (the BASE momentum) differs in 0 of 53 slots
+  at record 0: z_agg -1.0702673414186847e-08 / -1.0702504660287104e-08 ; mom_norm 1.0702673496763602e-10 / 1.0702504052099697e-10
+  shared beta: bitwise identical on 402 of 500 records; FIRST differing record 84 (step 8400): -5.424346923828125 vs -5.422347068786621
+  shared beta at record 100 (epoch 20): -6.870242118835449 vs -6.866242408752441 ; max |dbeta| over 500 records 0.007999
+  plateau5: k01-s136 12.4880  INERT-s136 12.7320  gap +0.2440 pp  (registered INERT bar |gap| <= 2.0)

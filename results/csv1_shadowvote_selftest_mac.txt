@@ -1,0 +1,188 @@
+cSV1 --selftest: design and arithmetic, G-BITE on REAL landed records (positives and nulls), the frozen manifest,
+frozen bars (O2), the noise floor through corpus_exclusions.filter_rows, the landed vote-share prior, the floor
+tables, the REAL score() on synthetic runs, the O2 invariance proof and the documented one-argument invocation.
+
+A. ARITHMETIC, REGEX AND DESIGN
+  PASS SE_PRIOR = SIGMA_PRIOR*sqrt(2/3)
+  PASS SIGMA_PRIOR = max(SIGMA_R18ALL, SIGMA_PLAIN)
+  PASS compose_sigma() takes ONE argument -- NO corpus
+  PASS SIGMA_USED == max(frozen floor, in-batch)
+  PASS score() calls no corpus statistic; its single read_corpus() feeds a row-count print only
+  PASS decide() is a function of the in-batch means, one divergence flag, the INERT gap and the share flag only
+  PASS decide() reads NO probe record and no corpus
+  PASS the descriptive probe readout runs AFTER the FINAL line is composed
+  PASS order: G-BITE, then the share flag, then contrasts, then the branch
+  PASS bar ordering GAP_MIN >= 2 RESCUE > MATCH > NULL
+  PASS AT-HEAD and AT-K01 cannot overlap once D_HEAD >= GAP_MIN
+  PASS MATCH >= 5 SE and NULL >= 3 SE at the prior   8.99 / 3.60 SE
+  PASS INERT_BAR is >= 2.5 run-level sigmas (one run vs one run)   2.94 sigma
+  PASS BH_TOL <= 1/50 of one Lion step
+  PASS epoch-line regex
+  PASS run-file regex matches csv1's six arms ONLY
+  PASS PROBE_TENSOR regex: 53 tensors only
+  PASS 18 (arm, seed) runs; every table covers exactly the six arms; MODE the three SHADOW_VOTE arms
+  PASS seeds: LOW arms 136-139; k01 / MUTE / HEAD 136-138; INERT 136, paired with k01-s136
+  PASS every arm but HEAD in the scalar grouping
+  PASS every SHADOW_VOTE / VOTE_W value is ONE token of [A-Za-z0-9_.:/], no comma
+  PASS the SHADOW_VOTE and VOTE_W strings, literal
+  PASS the SHADOW_VOTE witnesses, literal
+  PASS the VOTE_W witnesses (MUTE == cvt1's registered line), literal
+  PASS prefix rule: SHADOW_VOTE is not a prefix of, nor prefixed by, any registered kind (first letter S)
+  PASS b0 = float32(log 1e-6)
+  PASS FLOOR_ALPHA = float32(exp(-15)) = 3.0590231858695915e-07 (np.exp(np.float32(-15)))   3.0590231858695915e-07
+  PASS lion_natural: sign, clamp, tie
+  PASS 500 records; the share window and bars
+  PASS z_agg expectations: MUTE drops 50, HEAD groups it, the rest sum
+  NOTE expected cost 12.1 GPU-h (0.67 per run, cvt6 / cvt9 sacct); 14.9 at 0.83; hard bound = WALL x 18
+
+B. THE FROZEN MANIFEST AND G-BITE ON LANDED RECORDS
+  PASS PlainNet18_c100: 53 tensors, 11046308 parameters
+  PASS idx 50 = layer4.1.bn2.weight (512)
+  PASS HEAD: [52,1], 50 alone in group 1
+  PASS B HEADSPEC, cvt9's HF and runner shas == cVT9's registered literals (the base tree)
+  PASS B MUTE's VOTE_W witness appears in cVT1's registered scorer
+  PASS B G-BITE (Lion, z_agg, no keys) PASSES the 12 landed cvt1 / cvt4 / cvt6 / cvt9 k01 runs as k01   12/12
+  PASS B the 3 landed cvt1 MUTE runs PASS G-BITE as MUTE (z_agg drops 50)   3/3
+  PASS B the 6 landed cvt1 / cvt4 HEAD runs PASS G-BITE as HEAD   6/6
+  PASS B THE BROKEN-PATCH NULL ON REAL RECORDS: every landed k01 run read as INERT / SHADOWLOW / NAIVELOW FAILS   36/36
+  PASS B landed MUTE read as k01 FAILS (z_agg keeps 50) -- the z_agg check has teeth   3/3
+  PASS B the landed k01 vote share re-derived: min per-run median 0.5115 == the derivation's literal; >= DOM_K01_MIN + 0.15   0.536 / 0.537 / 0.540 / 0.516 / 0.518 / 0.511 / 0.535 / 0.541 / 0.543 / 0.541 / 0.525 / 0.563
+  NOTE landed cvt1 MUTE share (raw z_tensor, its term weighted 0 in the sum): 0.619 / 0.559 / 0.658
+  PASS B the LIVE manifest guard 4 wrote is BYTE-IDENTICAL
+
+C. CORPUS PREMISES AND THE NOISE FLOOR, through corpus_exclusions.filter_rows (OPERATIONS 36)
+  PASS analysis/corpus_exclusions.py imports and provides filter_rows
+  NOTE corpus 3127 rows, 3019 after filter_rows, sha 180124541085... -- THE REGISTRATION CORPUS
+       SIGMA_R18ALL  FILTERED 0.681198340935 (df 221)   NAIVE 7.155901812067 (df 245)
+  PASS SIGMA_R18ALL: the FROZEN literal 0.68119834093519049 IS the FILTERED value
+  PASS SIGMA_R18ALL: the NAIVE value is 7.1559, NOT the literal
+       SIGMA_PLAIN   FILTERED 0.459529378821 (df 56)   NAIVE 16.798409387578 (df 134)
+  PASS SIGMA_PLAIN: the FROZEN literal 0.45952937882142003 IS the FILTERED value
+  PASS SIGMA_PLAIN: the NAIVE value is 16.7984, NOT the literal
+  PASS ZERO corpus rows carry seed 136, 137, 138 or 139
+  PASS no csv1- row in the corpus
+  NOTE THE CSV HAS NO SHADOW_VOTE / VOTE_W COLUMN: at ingest INERT, SHADOWLOW, NAIVELOW and MUTE (12 rows) share k01's scalar cell key -- they go into results/CORPUS-EXCLUSIONS.tsv in the SAME commit as the ingest (262)
+
+D. THE FLOOR TABLES (164.6).  Chance 1.00 pp.  Levels UNSURE.
+  PASS APPLIED-STEP-NECESSARY       midpoint lands in APPLIED-STEP-NECESSARY   APPLIED-STEP-NECESSARY
+  PASS APPLIED-STEP-NECESSARY       P_VOTE predicted -16..+16 is >= 25 pp inside +-99
+  PASS APPLIED-STEP-NECESSARY       P_APPLIED predicted +40..+64 is >= 25 pp inside +-99
+  PASS VOTE-ROUTE-SUFFICES          midpoint lands in VOTE-ROUTE-SUFFICES   VOTE-ROUTE-SUFFICES
+  PASS VOTE-ROUTE-SUFFICES          P_VOTE predicted +40..+64 is >= 25 pp inside +-99
+  PASS VOTE-ROUTE-SUFFICES          P_APPLIED predicted -8..+8 is >= 25 pp inside +-99
+  PASS BOTH-ROUTES                  midpoint lands in BOTH-ROUTES   BOTH-ROUTES
+  PASS BOTH-ROUTES                  P_VOTE predicted +6..+52 is >= 25 pp inside +-99
+  PASS BOTH-ROUTES                  P_APPLIED predicted +4..+42 is >= 25 pp inside +-99
+  PASS APPLIED-STEP-NOT-NECESSARY   midpoint lands in APPLIED-STEP-NOT-NECESSARY   APPLIED-STEP-NOT-NECESSARY
+  PASS APPLIED-STEP-NOT-NECESSARY   P_VOTE predicted -8..+8 is >= 25 pp inside +-99
+  PASS APPLIED-STEP-NOT-NECESSARY   P_APPLIED predicted -8..+8 is >= 25 pp inside +-99
+  PASS NAIVE-PARTIAL                midpoint lands in NAIVE-PARTIAL   NAIVE-PARTIAL
+  PASS NAIVE-PARTIAL                P_VOTE predicted -30..+30 is >= 25 pp inside +-99
+  PASS NAIVE-PARTIAL                P_APPLIED predicted +4..+42 is >= 25 pp inside +-99
+  PASS BROKEN-PATCH                 midpoint lands in APPLIED-STEP-NOT-NECESSARY   APPLIED-STEP-NOT-NECESSARY
+  PASS BROKEN-PATCH                 P_VOTE predicted -8..+8 is >= 25 pp inside +-99
+  PASS BROKEN-PATCH                 P_APPLIED predicted -8..+8 is >= 25 pp inside +-99
+  PASS BROKEN-SHADOW                midpoint lands in APPLIED-STEP-NECESSARY   APPLIED-STEP-NECESSARY
+  PASS BROKEN-SHADOW                P_VOTE predicted -16..+16 is >= 25 pp inside +-99
+  PASS BROKEN-SHADOW                P_APPLIED predicted +40..+64 is >= 25 pp inside +-99
+  PASS the LOWEST level any account predicts is >= 7 pp above chance   7.0
+  PASS the two nulls reach a substantive token by level (declared; only G-BITE separates them)
+  PASS HEAD is predicted >= 40 pp off k01
+  PASS the share flag gates the rescue readings only (a stall needs no dominance premise)
+
+E. THE REAL score() ON SYNTHETIC RUNS (invented numbers; evidence of nothing)
+  PASS E NECESSARY                                                              -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E VOTE-ROUTE-SUFFICES                                                    -> VOTE-ROUTE-SUFFICES   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIE
+  PASS E BOTH-ROUTES                                                            -> BOTH-ROUTES   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW-IS
+  PASS E NOT-NECESSARY                                                          -> APPLIED-STEP-NOT-NECESSARY   FINAL: APPLIED-STEP-NOT-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL |
+  PASS E NOT-NECESSARY (SHADOW rescues)                                         -> APPLIED-STEP-NOT-NECESSARY   FINAL: APPLIED-STEP-NOT-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL |
+  PASS E NAIVE-PARTIAL                                                          -> NAIVE-PARTIAL   FINAL: NAIVE-PARTIAL | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW-
+  PASS E NOT DOMINANT (shadow share low, rescue)                                -> SHADOW-VOTE-NOT-DOMINANT   FINAL: SHADOW-VOTE-NOT-DOMINANT | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | A
+  PASS E NOT DOMINANT (between)                                                 -> SHADOW-VOTE-NOT-DOMINANT   FINAL: SHADOW-VOTE-NOT-DOMINANT | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | A
+  PASS E NOT DOMINANT does not gate a stall                                     -> VOTE-ROUTE-SUFFICES   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIE
+  PASS E k01 share under 0.30                                                   -> SHADOW-VOTE-NOT-DOMINANT   FINAL: SHADOW-VOTE-NOT-DOMINANT | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | A
+  PASS E share just at the bar (0.50 x k01 0.55 = 0.275, shadow 0.28)           -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E near-bar MATCH inside (SHADOWLOW)                                      -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E near-bar MATCH outside (SHADOWLOW)                                     -> BOTH-ROUTES   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW-IS
+  PASS E near-bar NULL inside (SHADOWLOW)                                       -> VOTE-ROUTE-SUFFICES   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIE
+  PASS E near-bar NULL outside (SHADOWLOW)                                      -> BOTH-ROUTES   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW-IS
+  PASS E near-bar INERT inside                                                  -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E INERT-DEPARTED                                                         -> INERT-DEPARTED   FINAL: INERT-DEPARTED | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW
+  PASS E CONTROL-FAILED                                                         -> CONTROL-FAILED   FINAL: CONTROL-FAILED | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW
+  PASS E scalar not collapsed                                                   -> SCALAR-NOT-COLLAPSED   FINAL: SCALAR-NOT-COLLAPSED | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLI
+  PASS E diverged                                                               -> UNRESOLVED-DIVERGED   FINAL: UNRESOLVED-DIVERGED | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIE
+  PASS E MUTE rescues (stamped, not branched)                                   -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E harness: every arm tiny                                                -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-FLOOR
+  PASS E harness: AUGMENT=0 on one run                                          -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 2 harness gate(s) failed: G-ENV; G-ENV
+  PASS E harness: ARGS spec != arm                                              -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-ARGS
+  PASS E harness: SHADOWLOW printed NAIVELOW's witness                          -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-SVW
+  PASS E harness: NAIVELOW printed SHADOW_VOTE off                              -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-SVW
+  PASS E harness: no SHADOW_VOTE line (cvt9's tree)                             -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-SVW
+  PASS E harness: INERT printed SHADOWLOW's witness                             -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-SVW
+  PASS E harness: MUTE printed VOTE_W off                                       -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-VOTEW
+  PASS E harness: a VOTE_W on-line on SHADOWLOW                                 -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-VOTEW
+  PASS E harness: a BETA_HOLD on-line                                           -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-HOLDOFF
+  PASS E harness: manifest names another net                                    -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-STRUCT
+  PASS E harness: provenance is cvt9's HF                                       -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-PROV
+  PASS E harness: provenance is cvt9's runner                                   -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-PROV
+  PASS E harness: provenance dry-run                                            -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-PROV
+  PASS E harness: provenance names another scorer                               -> HARNESS-UNSOUND   FINAL: HARNESS-UNSOUND | 1 harness gate(s) failed: G-PROV
+  PASS E BROKEN PATCH: SHADOWLOW / NAIVELOW records carry no sv keys at the NOT -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s137,NAIVELOW-s137
+  PASS E BROKEN APPLIED: SHADOWLOW applied the shared step                      -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s136
+  PASS E BROKEN PHYSICS: NAIVELOW's weights moved at the shared step            -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on NAIVELOW-s139
+  PASS E BROKEN SHADOW: SHADOWLOW's vote trace is the natural one (traces swapp -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s138
+  PASS E BROKEN NATURAL: NAIVELOW's vote trace is the shadow one                -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on NAIVELOW-s137
+  PASS E sv_z_vote != z_tensor[50]                                              -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s137
+  PASS E sv_n off by one                                                        -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on NAIVELOW-s136
+  PASS E sv_idx names 51                                                        -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s139
+  PASS E sv_a_shared != exp(beta_pre)                                           -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on INERT-s136
+  PASS E INERT's two terms differ                                               -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on INERT-s136
+  PASS E k01 carries sv keys                                                    -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on k01-s138
+  PASS E HEAD carries bh keys                                                   -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on HEAD-s137
+  PASS E MUTE's z_agg keeps 50 (VOTE_W never bit)                               -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on MUTE-s137
+  PASS E k01's Lion broken                                                      -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on k01-s136
+  PASS E probe: a SHADOWLOW file garbled                                        -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on SHADOWLOW-s136
+  PASS E probe: a NAIVELOW probe dir missing                                    -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on NAIVELOW-s138
+  PASS E probe: an INERT file short                                             -> PATCH-NOT-VERIFIED   FINAL: PATCH-NOT-VERIFIED | G-BITE failed on INERT-s136
+  PASS E a DROPPED run                                                          -> INCOMPLETE   FINAL: INCOMPLETE | 17/18 | missing SHADOWLOW-s139
+  PASS E a TRUNCATED higher-jid resubmission                                    -> APPLIED-STEP-NECESSARY   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APP
+  PASS E the base case exits 0 with the state stamps and the unconditional stamps   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEAN | PATCH-BITES | SCALAR-GROUPING | SHADOW-IS-COUNTERFACTUAL | APPLIED-LOW-IS-FLOOR-FROM-INIT | ONE-TENSOR-50 | ONE-NETWORK-PLAINNET | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | POSITIVE-CONTROL-REPRODUCES | NAIVELOW-AT-HEAD | SHADOWLOW-AT-HEAD | MUTE-AT-K01 | INERT-GAP:+0.30 | SHARE-K01:0.550 | SHARE-SHADOWLOW:0.500 | SHARE-NAIVELOW:0.001 | SHADOW-VOTE-DOMINANT | PHYS-RECORDS-MIN:210 | FLOOR-READINGS-ARE-BOUNDS | TRAIN-AGREES
+  PASS E a rescuing MUTE is stamped, not branched
+  PASS E the BROKEN-PATCH null at NOT-NECESSARY's levels exits 1, reaching NO branch
+  PASS E the BROKEN-SHADOW null at NECESSARY's levels exits 1, reaching NO branch
+  PASS E exit codes: dropped 2, harness 1
+  PASS E a truncated resubmission does not shadow
+  PASS E G-BITE reads 500 records per run and audits the shadow vote (phys and trace)
+  PASS E the descriptive readout runs (after FINAL)
+
+   O2 INVARIANCE: the SAME synthetic runs against four corpora
+  PASS O2 NECESSARY              real              FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEA
+  PASS O2 NECESSARY              real+invented     FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEA
+  PASS O2 NECESSARY              minimal-invented  FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEA
+  PASS O2 NECESSARY              no-corpus         FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: APPLIED-STEP-NECESSARY | HARNESS-CLEA
+  PASS O2 VOTE-ROUTE-SUFFICES    real              FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN |
+  PASS O2 VOTE-ROUTE-SUFFICES    real+invented     FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN |
+  PASS O2 VOTE-ROUTE-SUFFICES    minimal-invented  FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN |
+  PASS O2 VOTE-ROUTE-SUFFICES    no-corpus         FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: VOTE-ROUTE-SUFFICES | HARNESS-CLEAN |
+  PASS O2 BOTH-ROUTES            real              FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-B
+  PASS O2 BOTH-ROUTES            real+invented     FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-B
+  PASS O2 BOTH-ROUTES            minimal-invented  FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-B
+  PASS O2 BOTH-ROUTES            no-corpus         FINAL and SIGMA/SE/bars/PRIMARY lines IDENTICAL   FINAL: BOTH-ROUTES | HARNESS-CLEAN | PATCH-B
+  PASS O2 non-vacuity: invented rows MOVE the FILTERED PlainNet sigma (0.4595 -> 10.2376); FINAL did not move
+
+   THE DOCUMENTED ONE-ARGUMENT INVOCATION, as a subprocess
+  PASS `python3 cSV1_shadowvote_score.py <runsdir>` exits 0 with the in-process FINAL line   rc 0
+  PASS ... and on a dropped run exits 2 with FINAL: INCOMPLETE   rc 2
+
+F. THE BRANCH MAP IS TOTAL -- 6,000 random in-batch means, gaps and flags
+  PASS every token decide() returns has a registered licence text   10 distinct
+  PASS every registered token is reached by section E or the sweep   missing []
+  PASS every substantive token's licence states what it does to the L2 sufficiency reading
+  PASS every reading token discloses that the shadow vote is counterfactual
+
+G. RULE 21 PREMISE: no csv1 run may exist yet
+  FAIL no csv1-*.out under /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2   18 found
+  PASS no csv1- row in the CSV
+
+FAILURES: 1
+   FAIL no csv1-*.out under /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2

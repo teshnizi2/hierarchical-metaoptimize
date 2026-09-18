@@ -1,0 +1,92 @@
+====================================================================================================
+A. per-arm TEST (TRAIN) AFTER N EPOCHS.  'after N epochs' = the `Epoch N-1` line of the run's own .out
+   (the harness prints Epoch 0..99 for a 100-epoch run), arm mean over the arm's seeds, 2 dp.
+   arm        after  15 ep  after  17 ep  after  19 ep  after  30 ep  after  50 ep  after 100 ep
+   k01         5.73 ( 5.00)   8.52 ( 7.49)  10.70 (10.35)  12.17 (11.90)  12.08 (11.94)  12.14 (11.92)
+   INERT       5.89 ( 4.93)   8.59 ( 8.08)  10.86 (10.76)  12.67 (12.65)  12.75 (12.79)  12.82 (12.53)
+   SHADOWLOW   6.09 ( 5.23)  10.57 ( 9.23)  16.40 (14.74)  27.39 (27.37)  38.09 (40.55)  50.26 (60.23)
+   NAIVELOW    6.29 ( 5.29)  10.20 ( 9.09)  16.63 (14.26)  46.24 (47.34)  64.69 (77.91)  65.17 (80.63)
+   MUTE        5.74 ( 4.95)   8.85 ( 7.79)   8.97 ( 9.57)  11.29 (10.94)  11.27 (11.01)  11.31 (11.01)
+   HEAD        6.08 ( 5.08)  10.21 ( 8.89)  15.98 (13.93)  45.91 (46.55)  64.08 (76.68)  64.48 (78.88)
+
+   per seed, TEST only:
+     k01        s136    5.95    8.17   10.81   12.52   12.44   12.49
+     k01        s137    5.11    8.11   10.53   12.02   11.67   11.77
+     k01        s138    6.12    9.29   10.77   11.98   12.12   12.16
+     INERT      s136    5.89    8.59   10.86   12.67   12.75   12.82
+     SHADOWLOW  s136    6.19   10.79   16.99   28.63   39.04   50.74
+     SHADOWLOW  s137    5.48   10.04   15.53   26.58   37.89   50.60
+     SHADOWLOW  s138    6.46   10.17   16.95   27.61   38.25   49.67
+     SHADOWLOW  s139    6.23   11.27   16.13   26.75   37.17   50.03
+     NAIVELOW   s136    6.36    9.78   16.80   47.02   65.30   66.02
+     NAIVELOW   s137    5.50    9.79   16.68   46.85   64.96   64.86
+     NAIVELOW   s138    6.39   10.33   17.14   45.92   64.33   64.97
+     NAIVELOW   s139    6.90   10.88   15.90   45.18   64.15   64.83
+     MUTE       s136    5.97    8.59    9.20   10.67   10.56   10.68
+     MUTE       s137    5.28    8.67    8.66   11.81   11.67   11.66
+     MUTE       s138    5.97    9.29    9.05   11.40   11.58   11.60
+     HEAD       s136    6.57   10.07   15.91   46.07   63.77   64.46
+     HEAD       s137    5.47   10.02   15.51   46.37   64.16   64.16
+     HEAD       s138    6.19   10.55   16.51   45.30   64.32   64.81
+
+====================================================================================================
+B. idx 50's APPLIED beta and the SHARED beta, at epochs 10 / 17 / 20 / 30 / 40.
+   record index = epoch * 500 / 100.  For the scalar arms the shared beta is beta[0]; idx 50's APPLIED beta is
+   ln(sv_a_applied) on the three SHADOW_VOTE arms and beta[0] itself on k01 / MUTE (no separation exists there).
+   For HEAD the grouping is blockwise [complement, idx50], so shared = beta[0] and idx 50's applied = beta[1].
+   arm        seed  ep10  shared / applied  ep17  shared / applied  ep20  shared / applied  ep30  shared / applied  ep40  shared / applied
+   k01        136    -8.8225 /  -8.8225   -5.3744 /  -5.3744   -6.8702 /  -6.8702  -11.8717 / -11.8717  -15.0000 / -15.0000
+   k01        137    -8.8325 /  -8.8325   -5.3564 /  -5.3564   -6.8542 /  -6.8542  -11.8557 / -11.8557  -15.0000 / -15.0000
+   k01        138    -8.8265 /  -8.8265   -5.3524 /  -5.3524   -6.8102 /  -6.8102  -11.8117 / -11.8117  -15.0000 / -15.0000
+   INERT      136    -8.8225 /  -8.8235   -5.3664 /  -5.3654   -6.8662 /  -6.8652  -11.8677 / -11.8667  -15.0000 / -15.0000
+   SHADOWLOW  136    -8.8225 / -15.0000   -5.3244 / -15.0000   -6.7363 / -15.0000   -8.0862 / -15.0000   -8.4724 / -15.0000
+   SHADOWLOW  137    -8.8285 / -15.0000   -5.3484 / -15.0000   -6.7662 / -15.0000   -7.9822 / -15.0000   -8.4503 / -15.0000
+   SHADOWLOW  138    -8.8285 / -15.0000   -5.3304 / -15.0000   -6.7323 / -15.0000   -8.1642 / -15.0000   -8.4423 / -15.0000
+   SHADOWLOW  139    -8.8225 / -15.0000   -5.3224 / -15.0000   -6.7403 / -15.0000   -8.1482 / -15.0000   -8.4663 / -15.0000
+   NAIVELOW   136    -8.8285 / -15.0000   -5.3284 / -15.0000   -5.8083 / -15.0000   -6.9362 / -15.0000   -7.8822 / -15.0000
+   NAIVELOW   137    -8.8345 / -15.0000   -5.3344 / -15.0000   -5.7743 / -15.0000   -6.8762 / -15.0000   -7.9002 / -15.0000
+   NAIVELOW   138    -8.8285 / -15.0000   -5.3284 / -15.0000   -5.8123 / -15.0000   -6.7942 / -15.0000   -7.8782 / -15.0000
+   NAIVELOW   139    -8.8285 / -15.0000   -5.3284 / -15.0000   -5.8043 / -15.0000   -6.8462 / -15.0000   -7.8682 / -15.0000
+   MUTE       136    -8.8325 /  -8.8325   -5.3324 /  -5.3324   -4.8864 /  -4.8864   -9.8809 /  -9.8809  -14.8829 / -14.8829
+   MUTE       137    -8.8345 /  -8.8345   -5.3344 /  -5.3344   -4.8864 /  -4.8864   -9.8869 /  -9.8869  -14.8889 / -14.8889
+   MUTE       138    -8.8325 /  -8.8325   -5.3324 /  -5.3324   -4.8904 /  -4.8904   -9.8909 /  -9.8909  -14.8929 / -14.8929
+   HEAD       136    -8.8325 /  -8.8125   -5.3324 / -11.9097   -5.8263 / -13.4103   -6.8802 / -15.0000   -7.8462 / -15.0000
+   HEAD       137    -8.8345 /  -8.8125   -5.3344 / -11.7597   -5.7603 / -13.2603   -6.8822 / -15.0000   -8.0202 / -15.0000
+   HEAD       138    -8.8285 /  -8.8125   -5.3284 / -11.8397   -5.8043 / -13.3403   -6.8142 / -15.0000   -7.8642 / -15.0000
+
+====================================================================================================
+C. the first epoch line from which TEST stays > 2 pp above k01, for SHADOWLOW and NAIVELOW.
+   'stays' = true for that line and every later line to 99.  Two references are reported:
+     (i)  per seed vs the k01 ARM MEAN curve; (ii) per seed vs the SAME-SEED k01 run (s139 has no k01 twin);
+     (iii) arm mean vs arm mean (this is the scorer's own descriptive line).
+   SHADOWLOW  s136   vs k01 arm mean: 16   vs same-seed k01: 16
+   SHADOWLOW  s137   vs k01 arm mean: 17   vs same-seed k01: 17
+   SHADOWLOW  s138   vs k01 arm mean: 17   vs same-seed k01: 17
+   SHADOWLOW  s139   vs k01 arm mean: 16   vs same-seed k01: n/a (no k01 at s139)
+   SHADOWLOW  ARM MEAN vs k01 ARM MEAN: 16
+   NAIVELOW   s136   vs k01 arm mean: 17   vs same-seed k01: 17
+   NAIVELOW   s137   vs k01 arm mean: 18   vs same-seed k01: 17
+   NAIVELOW   s138   vs k01 arm mean: 17   vs same-seed k01: 17
+   NAIVELOW   s139   vs k01 arm mean: 16   vs same-seed k01: n/a (no k01 at s139)
+   NAIVELOW   ARM MEAN vs k01 ARM MEAN: 17
+
+====================================================================================================
+D. does SHADOWLOW's SHARED beta trajectory resemble k01's, or HEAD's complement (group-0) trajectory?
+   All three are the group that carries the sum idx 50 votes into (HEAD's group 0 is the 52-tensor complement,
+   from which 50 is excluded).  Compared over all 500 probe records: RMS |diff|, max |diff|, Pearson r,
+   peak value / peak epoch, and the pin epoch (first record from which beta stays <= -14.99).
+   k01 (arm mean)                   peak  -5.3610 @ epoch  17.0   pin 36.4
+   HEAD complement g0 (arm mean)    peak  -4.8384 @ epoch  18.0   pin 87.6
+   NAIVELOW (arm mean)              peak  -4.8504 @ epoch  18.0   pin 94.4
+   SHADOWLOW (arm mean)             peak  -5.3314 @ epoch  17.0   pin never
+
+   SHADOWLOW vs k01                   RMS  5.0214   max |diff|  6.7117   Pearson r +0.48033
+   SHADOWLOW vs HEAD complement g0    RMS  3.7105   max |diff|  5.9386   Pearson r +0.61338
+   SHADOWLOW vs NAIVELOW              RMS  3.6592   max |diff|  5.9402   Pearson r +0.61524
+
+   late-window comparison (records 200..499, i.e. epochs 40..99):
+   SHADOWLOW vs k01                   RMS  5.9794   max |diff|  6.6322   Pearson r +nan
+   SHADOWLOW vs HEAD complement g0    RMS  4.7384   max |diff|  5.9386   Pearson r +0.91302
+   SHADOWLOW vs NAIVELOW              RMS  4.6722   max |diff|  5.9402   Pearson r +0.92101
+
+   mean shared beta over epochs 40..99:  SHADOWLOW  -9.0294   k01 -15.0000   HEAD-g0 -13.2592   NAIVELOW -13.1385

@@ -1,0 +1,77 @@
+csv1 -- RULE 20 AT FULL COVERAGE (18/18 started and COMPLETED), RE-RUN BY THE SCORING TRACK BEFORE ANY NUMBER WAS READ.
+CORRECTIONS 262.11 owed 'the same two audits at 18/18'; CORRECTIONS 267.2 recorded csv1 as HALF-CLOSED and left the
+witness-value half owed by Track F.  This file closes it, on BOTH hosts.
+analysis/argsline_guard.py UNEDITED, sha256 81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388 (RULE 16),
+identical in ~/stage_csv1 on alice2 and in the repo on the Mac.
+DRIVER (new, this track, csv1's own; a copy of ~/l260_rule20.sh 48f4edc6... with the batch table swapped):
+  alice2 ~/l262_rule20.sh     sha256 b0d22af5d37911552de9544300bf81d7e26ce2c385567d420de656a2fb0aacbf  (= bin/cSV1_rule20.sh)
+  alice2 ~/l262_envaudit.py   sha256 9e1f511db28d507bdd6746f563e49e0025473ef194fbb92b1e7e5234a6a6508b  (= analysis/csv1_rule20_envaudit.py)
+The witness literals in the ENV audit are RE-TYPED from the registered scorer analysis/cSV1_shadowvote_score.py
+(f62dbf9e...); that scorer is NOT imported and NOT edited, and argsline_guard.py is NOT edited.
+RULE 20 lesson from CORRECTIONS 267.2 applied: this run fired long after every run had printed its whole witness
+block (all 18 sacct COMPLETED, ExitCode 0:0), so the 34-second race that produced cwd2's withdrawn FAIL cannot occur.
+
+================ alice2 (nodelogin03, login node, read-only) ================
+RULE20 run utc=2026-09-18T22:47:43Z host=nodelogin03.alice.leidenuniv.nl batch=csv1 guard_sha=81cea8b586e124a6
+  .out files: 18   with ARGS: 18   squeue: 
+  BATCH-CONSISTENCY --name csv1- --vary stepsize-groups --vary seed --vary run-name -> rc=0  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (csv1): 18 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x18  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x3  PROBE_TENSOR: on every=100 type=blockwise tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x15  PROBE_TENSOR: on every=100 type=scalar tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x15  VOTE_W: off
+      x3  VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x18  BETA_HOLD: off
+    COMP_HOLD witness lines (exact match to the arm's registered line):
+      x18  COMP_HOLD: off
+    WINDOW_HOLD witness lines (exact match to the arm's registered line):
+      x18  WINDOW_HOLD: off
+    SHADOW_VOTE witness lines (exact match to the arm's registered line):
+      x9  SHADOW_VOTE: off
+      x4  SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512
+      x4  SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512
+      x1  SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=shared floor=na items=50:layer4.1.bn2.weight:numel=512
+    coverage 18/18 runs with an .out, 0 violations
+  ENV AUDIT VERDICT csv1: PASS
+  ENV AUDIT rc=0
+RULE20 end utc=2026-09-18T22:47:44Z
+
+================ the Mac, same guard, same audit, runs_alice2 mirror ================
+RULE20 run utc=2026-09-18T22:48:07Z host=Teshnizis-MacBook-Air.local batch=csv1 guard_sha=81cea8b586e124a6
+  .out files:       18   with ARGS:       18   squeue: 
+  BATCH-CONSISTENCY --name csv1- --vary stepsize-groups --vary seed --vary run-name -> rc=0  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (csv1): 18 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x18  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x3  PROBE_TENSOR: on every=100 type=blockwise tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x15  PROBE_TENSOR: on every=100 type=scalar tensors=53 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x15  VOTE_W: off
+      x3  VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x18  BETA_HOLD: off
+    COMP_HOLD witness lines (exact match to the arm's registered line):
+      x18  COMP_HOLD: off
+    WINDOW_HOLD witness lines (exact match to the arm's registered line):
+      x18  WINDOW_HOLD: off
+    SHADOW_VOTE witness lines (exact match to the arm's registered line):
+      x9  SHADOW_VOTE: off
+      x4  SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512
+      x4  SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512
+      x1  SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=shared floor=na items=50:layer4.1.bn2.weight:numel=512
+    coverage 18/18 runs with an .out, 0 violations
+  ENV AUDIT VERDICT csv1: PASS
+  ENV AUDIT rc=0
+RULE20 end utc=2026-09-18T22:48:09Z
+
+VERDICT: PASS on both hosts.  18/18 ARGS lines clean under --batch-consistency --strict, 0 repeated flags,
+0 design mismatches; per-run --expect 18/18, 0 violations, 20 flags each; ONE distinct ENV line x18; PROBE_TENSOR
+blockwise x3 (HEAD) + scalar x15; VOTE_W off x15 + cvt1's MUTE line x3; BETA_HOLD / COMP_HOLD / WINDOW_HOLD off x18;
+SHADOW_VOTE off x9 (k01, MUTE, HEAD) + natural:floor x4 (NAIVELOW) + shadow:floor x4 (SHADOWLOW) + shadow:shared x1
+(INERT) -- exactly the partition CORRECTIONS 262 registered.  GROUP_HOLD / REST_HOLD / DECAY_MASK print NO line on
+any run (they are not in csv1's lineage), which the audit requires and checks: that is the G-FOREIGN half.

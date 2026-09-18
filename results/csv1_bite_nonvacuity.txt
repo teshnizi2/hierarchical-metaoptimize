@@ -1,0 +1,11 @@
+G-BITE NON-VACUITY, on csv1's OWN landed records (independent implementation):
+  (a) BROKEN-PATCH null -- every csv1 k01 / MUTE / HEAD run read as if it were an ON arm:
+      0 of 27 cross-reads PASS, 27 FAIL
+  (b) the three ON arms read as k01 (the 'patch never bit' reading):
+      0 PASS, 9 FAIL
+  (c) csv1's MUTE runs read as k01 (the 'VOTE_W never bit' reading):
+      0 PASS, 3 FAIL
+  (d) SHADOWLOW read as NAIVELOW and NAIVELOW read as SHADOWLOW (the BROKEN-SHADOW null, traces swapped):
+      0 PASS, 8 FAIL
+  (e) the batch as registered (the positive control):
+      18 PASS, 0 FAIL

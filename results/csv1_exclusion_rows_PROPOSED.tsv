@@ -1,0 +1,29 @@
+# PROPOSED rows for results/CORPUS-EXCLUSIONS.tsv, owed by CORRECTIONS 262.7 at csv1's landing.
+# NOT applied here: this track does NOT edit results/CORPUS-EXCLUSIONS.tsv or analysis/corpus_exclusions.py.
+#
+# STATE OF THE KIND, as of this commit: analysis/corpus_exclusions.py AT HEAD carries NEITHER a DECAY_MASK nor a
+# SHADOW_VOTE entry in KINDS.  A concurrent stage has both in the shared working tree as an UNCOMMITTED edit
+# (its comments date them 'added at 269'), together with a 285-line addition to tests/test_corpus_exclusions_check.py.
+# So the kind is owed until that stage lands; 262.7 asked for the two additions to be made in ONE landing pass, and
+# this file is the csv1 half of it, handed over rather than applied.
+#
+# WHAT IS OWED: the SHADOW_VOTE kind (prefix 'SHADOW_VOTE', off line 'SHADOW_VOTE: off') plus the 12 rows below.
+# No MULTI_KIND entry is needed: every csv1 run turns on AT MOST ONE kind (SHADOW_VOTE xor VOTE_W), which the
+# RULE 20 witness audit verified on all 18 runs (results/csv1_rule20_full.txt).
+# 9 SHADOW_VOTE rows (INERT 1, SHADOWLOW 4, NAIVELOW 4) + 3 VOTE_W rows (MUTE, under cvt1's existing kind).
+# csv1-k01-* (3) and csv1-HEAD-* (3) need NO row: k01 is an ordinary scalar row at a fresh seed block and HEAD's
+# grouping is carried by the CSV's own granularity column (sets:1-49,51-53/layer4.1.bn2.weight).
+# Each witness below was read from the run's OWN .out file; the columns are the TSV's registered nine.
+run	job_id	batch	arm	looks_like	intervention	witness	registered_at	reason
+csv1-INERT-s136	5045360	csv1	INERT	k01 (granularity scalar)	SHADOW_VOTE=shadow:shared:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=shared floor=na items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-SHADOWLOW-s136	5045361	csv1	SHADOWLOW	k01 (granularity scalar)	SHADOW_VOTE=shadow:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-NAIVELOW-s136	5045362	csv1	NAIVELOW	k01 (granularity scalar)	SHADOW_VOTE=natural:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-MUTE-s136	5045363	csv1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 262	vote-weight intervention not carried by any CSV column
+csv1-SHADOWLOW-s137	5045366	csv1	SHADOWLOW	k01 (granularity scalar)	SHADOW_VOTE=shadow:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-NAIVELOW-s137	5045367	csv1	NAIVELOW	k01 (granularity scalar)	SHADOW_VOTE=natural:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-MUTE-s137	5045368	csv1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 262	vote-weight intervention not carried by any CSV column
+csv1-SHADOWLOW-s138	5045371	csv1	SHADOWLOW	k01 (granularity scalar)	SHADOW_VOTE=shadow:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-NAIVELOW-s138	5045372	csv1	NAIVELOW	k01 (granularity scalar)	SHADOW_VOTE=natural:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-MUTE-s138	5045373	csv1	MUTE	k01 (granularity scalar)	VOTE_W=layer4.1.bn2.weight:0	VOTE_W: on type=scalar items=50:layer4.1.bn2.weight:w=0.0:group=0:groupsize=53	CORRECTIONS 262	vote-weight intervention not carried by any CSV column
+csv1-SHADOWLOW-s139	5045375	csv1	SHADOWLOW	k01 (granularity scalar)	SHADOW_VOTE=shadow:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=shadow applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
+csv1-NAIVELOW-s139	5045376	csv1	NAIVELOW	k01 (granularity scalar)	SHADOW_VOTE=natural:floor:layer4.1.bn2.weight	SHADOW_VOTE: on type=scalar base=SGDm vote=natural applied=floor floor=-15.0 items=50:layer4.1.bn2.weight:numel=512	CORRECTIONS 262	shadow-vote intervention not carried by any CSV column
