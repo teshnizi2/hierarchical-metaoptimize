@@ -52,6 +52,42 @@ arm without which M9's `ISO-RESCUES` can never become a specificity statement).
 collapse, but base weight decay 0 DOES. Is the paper still the mechanism, stated as conditional on coupled weight
 decay, or does it become a note on a configuration pitfall?
 
+### 1.1b RESULTS SO FAR, CONTINUED — the remaining five MUST-tier readings, landed 19 Sep 2026 (CORRECTIONS 268, 270, 271, 272, 273)
+
+*Registered verdicts only; the authority is `docs/CORRECTIONS.md`, and each sentence below is licensed at ONE cell only.
+Corpus is now **3,253 rows / 3364.4 GPU-hours** (the four batches ingested once, +72 rows, 0 changed, commit `66a19fb`);
+`results/CORPUS-EXCLUSIONS.tsv` 126 -> 171 rows, `--check` PASS, `c98b` exit 0 with the same verdict as at 266 / 253 / 247.*
+
+| id | batch | registered verdict | what it does to the limit |
+|---|---|---|---|
+| **S2** | `cst1`, 9 runs, read by the FROZEN SUCCESSOR `cST2` (268) | `NOMINATION-PARTIAL+ISO-RESCUES+CTL-NULL` | **L1 HALF-ANSWERED, replacing 1.1's "UNMOVED".** At a second meta step size (3e-4) the ISOLATION RESCUE TRANSFERS -- `D_ISO` **+41.1567 pp = +74.00 SE** while the count-matched non-carrier triple moves **+0.1807 pp** -- but the VOTE-DOMINANCE NOMINATION DOES NOT: `DOM_C` falls from 0.8069 at ms 1e-3 to **0.4727 = 709 of 1,500 records against a 750-record bar, missing by 41**, and `TOP3_C` by **six**. The campaign may write *the rescue transfers, the nomination is only partial there, and the two are not locked together at this cell*; it may NOT write *the same three carriers are nominated at a second meta step size*. Zero GPU: the successor was registered and pushed before it read a single record, with the 256.5 bars proved unmoved. |
+| **S1b** | `cwd1`, 9 runs (271) | `COLLAPSE-VANISHES` | **L1 NARROWS AGAIN, and the WD precondition is LOCALISED.** Removing coupled weight decay from the **20 BatchNorm scales only** -- 4,800 of 11,220,132 parameters, conv and linear weights keeping WD 0.1 -- removes the collapse: `k01NWD` **70.7760** against `k01` 22.9513, `P_NWD` **+47.8247 pp = +85.99 SE**, and the scalar arm sits 1.4340 pp **above** its own masked layerwise reference. That is **98.06 %** of `cmo1`'s whole-network W0 effect. **This is the decomposition 264 could not do.** It still does NOT separate the weight-shrink route from the meta-trace route -- the mask changes both -- and there is no ISO arm. |
+| **N1** | `csv1`, 18 runs (272) | `BOTH-ROUTES` | **L2 CLOSES on carrier necessity, at one cell and on a modified algorithm.** With idx 50's applied step pinned at the clamp floor, its COUNTERFACTUAL shadow vote alone costs **+15.3630 pp** of the 52.3113 pp HEAD-minus-`k01` gap, and an applied step **ABOVE THE CLAMP FLOOR** is necessary for the remaining **+37.7610 pp**. **The registered licence says "a LARGE applied step"; only the floor was tested, so the correct sentence is "above the clamp floor" -- a RULE 16 defect reported and not fixed (272.6 F1).** The shadow vote is counterfactual, so this is an algorithm intervention, exactly as §6 predicted a reviewer would say. |
+| **N4** | `cwd2`, 15 runs (273) | `WD-ROUTE` + `SCALAR-NEEDS-CARRIER-WD` | **L2 MOVES AGAIN, on the cleanest design of the cycle, and L1's precondition reaches a SECOND NETWORK.** In three open-loop held arms the mask can touch only idx 50's weight update, and removing the coupled decay on that ONE tensor removes the whole held-step damage: `P_WD` **+54.9133 pp** against `R_HIGH` +54.2880, **`F_WD` 1.012**, with `HIGHWD0` 0.6253 pp (inside the null bar) from the control. The PlainNet scalar collapse needs the same tensor's decay: `k01WD0` **65.7500** against `k01` 12.0673. **240 / 246 / 253's "own large step size" is REINTERPRETED as acting through the shrinkage it multiplies.** |
+| **R1 / L3** | `cvt10`, 30 runs (270) | `ONE-SUFFICES+ONE50-STALLS+ONE59-STALLS+ONE53-STALLS+SPLIT-NO-EFFECT` | **L3 MOVES, and the counting question CLOSES at this cell.** Each of the three carriers, isolated alone and held on PlainNet's dose, stalls the ResNet run (`P_ONE50` +43.66, `P_ONE59` +46.61, `P_ONE53` +35.21 pp), so 252.8(1)'s held-set confound is gone and 240 / 246's PlainNet sentence transfers to `ResNet18_c100` per carrier. **With the condition:** the same 50-hold does nothing once 53 and 59 are lifted into their own free group (`ISOSPLIT` 67.0893 against ISO 70.1660), so the one-tensor stall **needs the remaining carriers voting in the shared step size**. Still open: why the two networks differ, the closed-loop route at `k01`'s own dose, any PAIR. |
+
+**NET EFFECT, replacing 1.1's "half answered, half confirmed": §6's single biggest remaining weakness is now FULLY
+CONFIRMED on the weight-decay axis, and localised.** Coupled L2 weight decay on normalisation scales is a
+**PRECONDITION of the scalar collapse on BOTH networks and at three grains** -- every tensor plus the meta trace on
+ResNet (`cmo1`, +48.77 pp), the 20 BatchNorm scales on ResNet (`cwd1`, +47.82 pp), ONE BatchNorm scale on PlainNet
+(`cwd2`, +53.68 pp) -- and **the held-step damage runs through the same factor** (`cwd2`, `F_WD` 1.012). Momentum 0.99
+stays exonerated (264). **He et al. (arXiv:1812.01187, "no bias decay") is the standard reference for NOT applying
+weight decay to BatchNorm parameters and biases, so the configuration is one common practice explicitly avoids.**
+
+**WHAT THE CYCLE DOES NOT ESTABLISH, and must be said in the same breath:** the mechanism BY WHICH the decay matters is
+**not measured**. `PATCH_DECAYMASK` records weight norms only on the arms where the decay is OFF, and there the scales
+**grow** (`cwd1` `kLNWD` carriers 22.6 -> up to 48.9; `cwd2` `k01WD0` 22.63 -> 23.31) with zero tiny weights at all
+12,000 masked probe records, while the arms that actually collapse carry no readout at all. Zhou et al.'s
+filter-collapse candidate (arXiv:2001.11216) is **neither confirmed nor excluded**. **Naming the precondition is a
+SCOPE result, not yet a mechanism.**
+
+**Question 2 of §7 is now ANSWERED by the data and needs only the professor's decision on framing:** momentum 0.9 does
+not remove the collapse, weight decay 0 on the normalisation scales does, on both networks and down to a single
+tensor. **The recommendation of CORRECTIONS 273.12 is CONSOLIDATE -- write up now**, with the denominator result and
+the count-matched partition audit keeping the headline and the mechanism line stated as a bounded,
+configuration-conditional failure mode. The claim wording proposed for the paper is at 273.12.
+
+
 
 ---
 

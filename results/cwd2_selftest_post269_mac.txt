@@ -1,0 +1,103 @@
+cWD2 --selftest: design and witnesses, G-BITE on REAL landed cvt9 records (positives and the broken-mask null),
+the noise floor through corpus_exclusions.filter_rows, the account tables, the REAL score() on synthetic runs,
+the O2 invariance proof and the documented one-argument invocation.
+
+A. DESIGN, WITNESSES, ARITHMETIC
+  PASS A cvt9's registered scorer is the file 249 registered (sha 5c53a40dff7f...)
+  PASS A arms, seeds {132,133,134}, CTL LOWWD0
+  PASS A the hold witnesses ARE cvt9's (HIGHWD0 = HIGHHEADPATH's, LOWWD0 = LOWHEADPATH's, k01WD0 none)
+  PASS A the DECAY_MASK witness is idx 50 = layer4.1.bn2.weight, masked=1 numel=512; unmasked arms print `DECAY_MASK: off`
+  FAIL A prefix rule (245/251): DECAY_MASK neither prefixes nor is prefixed by any corpus_exclusions KIND; no KIND starts with D   ['VOTE_W', 'BETA_HOLD', 'GROUP_HOLD', 'COMP_HOLD', 'REST_HOLD', 'WINDOW_HOLD', 'DECAY_MASK', 'SHADOW_VOTE']
+  PASS A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = max(SIGMA_R18ALL, SIGMA_PLAIN)
+  PASS A SIGMA_USED == max(frozen floor, in-batch)
+  PASS A O2: score() calls no sigma routine and reads the corpus once (disclosure)
+  PASS A masked tensor counts per arm
+  PASS A the frozen manifest: 53 tensors, idx 50 = layer4.1.bn2.weight, 5 lines per arm
+  PASS A the ENV line is cvt9's
+
+B. G-BITE ON REAL LANDED cvt9 RECORDS (this host's runs directory)
+  PASS B the 6 landed cvt9 k01 / HIGHHEADPATH runs PASS G-BITE read as cwd2's k01 / HIGHHEADPATH (holds + no dm key)   6/6
+  PASS B THE BROKEN-MASK NULL ON REAL RECORDS: all 9 landed cvt9 k01 / HIGHHEADPATH / LOWHEADPATH runs read as k01WD0 / HIGHWD0 / LOWWD0 PASS cvt9's hold audit and FAIL the DECAY_MASK audit on every record   9/9
+
+C. THE NOISE FLOOR (OPERATIONS 36) AND FRESHNESS
+  NOTE the corpus or exclusion list moved since registration (956f335713bd / 7da3901cc137): the literals stay frozen (O2); filtered now 0.648113 / 0.460632
+  FAIL ZERO corpus rows carry seed 132, 133 or 134   ['cwd2-k01-s132', 'cwd2-k01WD0-s132', 'cwd2-k01WD0-s133']
+  FAIL ZERO corpus rows carry the cwd2- prefix
+  FAIL G RULE 21 premise: no cwd2-*.out exists under ../runs_alice2
+
+D. ACCOUNTS -> TOKENS (each account's midpoints through the real decide())
+  PASS D account (STEP-ROUTE, SCALAR-WITHOUT-CARRIER-WD) midpoints -> STEP-ROUTE | SCALAR-WITHOUT-CARRIER-WD   STEP-ROUTE | SCALAR-WITHOUT-CARRIER-WD
+  PASS D account (STEP-ROUTE, SCALAR-NEEDS-CARRIER-WD) midpoints -> STEP-ROUTE | SCALAR-NEEDS-CARRIER-WD   STEP-ROUTE | SCALAR-NEEDS-CARRIER-WD
+  PASS D account (STEP-ROUTE, SCALAR-PARTIAL) midpoints -> STEP-ROUTE | SCALAR-PARTIAL   STEP-ROUTE | SCALAR-PARTIAL
+  PASS D account (WD-ROUTE, SCALAR-WITHOUT-CARRIER-WD) midpoints -> WD-ROUTE | SCALAR-WITHOUT-CARRIER-WD   WD-ROUTE | SCALAR-WITHOUT-CARRIER-WD
+  PASS D account (WD-ROUTE, SCALAR-NEEDS-CARRIER-WD) midpoints -> WD-ROUTE | SCALAR-NEEDS-CARRIER-WD   WD-ROUTE | SCALAR-NEEDS-CARRIER-WD
+  PASS D account (WD-ROUTE, SCALAR-PARTIAL) midpoints -> WD-ROUTE | SCALAR-PARTIAL   WD-ROUTE | SCALAR-PARTIAL
+  PASS D account (BOTH-ROUTES, SCALAR-WITHOUT-CARRIER-WD) midpoints -> BOTH-ROUTES | SCALAR-WITHOUT-CARRIER-WD   BOTH-ROUTES | SCALAR-WITHOUT-CARRIER-WD
+  PASS D account (BOTH-ROUTES, SCALAR-NEEDS-CARRIER-WD) midpoints -> BOTH-ROUTES | SCALAR-NEEDS-CARRIER-WD   BOTH-ROUTES | SCALAR-NEEDS-CARRIER-WD
+  PASS D account (BOTH-ROUTES, SCALAR-PARTIAL) midpoints -> BOTH-ROUTES | SCALAR-PARTIAL   BOTH-ROUTES | SCALAR-PARTIAL
+  PASS D the BROKEN-MASK null's levels reach STEP-ROUTE | SCALAR-WITHOUT-CARRIER-WD (only G-BITE separates it)
+  PASS D predicted intervals: lowest 8 pp; control >= 40 pp above k01; the three bands disjoint
+
+E. THE REAL score() ON SYNTHETIC RUNS
+  PASS E base (STEP-ROUTE | SCALAR-WITHOUT) -> rc 0, STEP-ROUTE | SCALAR-WITHOUT-CARRIER-WD
+  PASS E base stamps
+  PASS E WD-ROUTE | NEEDS -> rc 0, WD-ROUTE | SCALAR-NEEDS-CARRIER-WD
+  PASS E BOTH-ROUTES | PARTIAL -> rc 0, BOTH-ROUTES | SCALAR-PARTIAL
+  PASS E WD-ROUTE | WITHOUT -> rc 0, WD-ROUTE | SCALAR-WITHOUT-CARRIER-WD
+  PASS E near bar: HIGHWD0 = CTL - 5 + 0.05 -> WD-ROUTE -> rc 0, WD-ROUTE
+  PASS E near bar: HIGHWD0 = CTL - 5 - 0.05 -> BOTH -> rc 0, BOTH-ROUTES
+  PASS E near bar: HIGHWD0 = HIGH + 2 - 0.05 -> STEP -> rc 0, STEP-ROUTE
+  PASS E near bar: HIGHWD0 = HIGH + 2 + 0.05 -> BOTH -> rc 0, BOTH-ROUTES
+  PASS E near bar: k01WD0 = k01 + 2 + 0.05 -> PARTIAL -> rc 0, STEP-ROUTE | SCALAR-PARTIAL
+  PASS E diverged arm -> rc 0, UNRESOLVED-DIVERGED
+  PASS E k01 not collapsed -> rc 0, SCALAR-NOT-COLLAPSED
+  PASS E control failed -> rc 0, CONTROL-FAILED
+  PASS E replicate failed -> rc 0, REPLICATE-FAILED
+  PASS E floor: every arm under 15 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ENV break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS spec break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK witness off on a masked arm -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK witness normscale on HIGHWD0 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK line on an unmasked arm -> rc 1, HARNESS-UNSOUND
+  PASS E harness: BETA_HOLD witness floor on HIGHWD0 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: a GROUP_HOLD line -> rc 1, HARNESS-UNSOUND
+  PASS E harness: manifest break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov HF = cvt9's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov scorer sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov MODE dry-run -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov design sha -> rc 1, HARNESS-UNSOUND
+  PASS E G-BITE: THE BROKEN-MASK NULL (every masked run's records without dm_* keys) -> rc 1, PATCH-NOT-VERIFIED
+  PASS E the BROKEN-MASK null's LEVELS block is BYTE-IDENTICAL to the base case's (STEP-ROUTE | SCALAR-WITHOUT): only G-BITE separates them
+  PASS E G-BITE: BROKEN-MASK null: HIGHWD0 records carry no dm_* key -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: BROKEN-MASK null: every masked arm without dm keys, seed 133 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_skipped forged -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_n off by one -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_masked wrong -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_wdterm zero everywhere -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_norm not a list -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_* keys on unmasked HIGHHEADPATH -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm_* keys on unmasked k01 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: HIGHWD0's 50 on LOWHEADPATH's schedule -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: HIGHWD0's complement unheld -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: k01WD0 Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: a hold key on k01WD0 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: short probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: garbled record -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: missing probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E dropped run -> INCOMPLETE -> rc 2, INCOMPLETE
+  PASS E truncated resubmission beside a complete run is ignored -> rc 0, STEP-ROUTE | SCALAR-WITHOUT-CARRIER-WD
+
+   O2 INVARIANCE: FINAL identical across corpora (bars never read the corpus)
+  PASS O2 STEP+WITHOUT  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 WD+NEEDS      real+invented minimal-invented no-corpus real real+invented
+  PASS O2 BOTH+PARTIAL  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 non-vacuity: the invented rows MOVE the filtered PlainNet sigma (0.4606 -> 9.5481), FINAL does not
+
+   THE DOCUMENTED ONE-ARGUMENT INVOCATION
+  PASS `python3 cWD2_carrierwd_score.py <runsdir>` exits 0 and prints FINAL
+  PASS ... and on a dropped run exits 2 (INCOMPLETE)
+
+F. TOTALITY: decide() over 6,000 random draws returns a registered token
+  PASS F every draw's tokens are registered   0 bad
+
+SELFTEST FAIL: 4  ['A prefix rule (245/251): DECAY_MASK neither prefixes nor is prefixed by any corpus_exclusions KIND; no KIND starts with D', 'ZERO corpus rows carry seed 132, 133 or 134', 'ZERO corpus rows carry the cwd2- prefix', 'G RULE 21 premise: no cwd2-*.out exists under ../runs_alice2']
