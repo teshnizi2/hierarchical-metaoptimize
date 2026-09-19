@@ -1,0 +1,119 @@
+NODE=node887 | JOB=cwd3bite 5047831 | BATCH=cwd3
+EXPORT_PROBE layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+NVIDIA L4, 23034 MiB
+8d08803ae1d826b149144c5b55149ab1155002b45a5da9b595eb1070bf7ef18b  tests/test_decaymask.py
+0c64e50ffaac6a2a483f68f81e1b9634199ef7a2a82545964351cad3cfb396bb  tests/test_decaymask_realrun.py
+17148ee3cf502c919d2fdf5d332b8b04c807d2784805d9f408dbe98b2069556d  tests/test_decaymask_realrun_cwd3.py
+690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722  tests/test_grouphold_realrun.py
+03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195  analysis/cwd_design.py
+f8afdfa24cac6c4e7d34aa9378a0bc6e315a4802ed83d05bd060163787377318  analysis/cwd3_design.py
+cf88e7d25793b73c27e7a3bafcabd68e5499fe9007e803d871f25aaef75b2379  patches/patch_decaymask.py
+94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py.pre_decaymask
+5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9  /home/s5014158/metaopt/harness_cvt8/cifar10/Optimizers/HF.py
+D0 STRUCTURE
+  PASS D0 the pre file carries no PATCH_DECAYMASK / _dm_ name
+  PASS D0 region 1 (the _dm_init call) present once
+  PASS D0 region 2 (the guarded _dm_attach) present once
+  PASS D0 region 3 (the method block) present once
+  PASS D0 region 1 sits IMMEDIATELY before `self.trace_meta = ...` in init_meta
+  PASS D0 region 1 runs AFTER the last hold patch's init call
+  PASS D0 region 2 sits IMMEDIATELY before `self._pt_attach(rec)  # PATCH_PROBE_TENSOR`
+  PASS D0 region 3 sits IMMEDIATELY before check_required_attributes
+  PASS D0 DELETING THE THREE REGIONS REPRODUCES THE PRE HF.py BYTE FOR BYTE   79768 vs 79768 bytes
+  PASS D0 the block defines exactly the four _dm_ methods, in order   ['_dm_init', '_dm_resolve', '_dm_SGDm_base_update', '_dm_attach']
+  PASS D0 every pre-existing method present, in order (51)
+  PASS D0 SGDm_base_update is the registered text in pre and post
+  PASS D0 the copy's unmasked branch is the original lines verbatim; the masked branch drops wd in delta AND in h
+
+ALL PASS
+TEST_DECAYMASK_D0_RC 0
+BATCH cwd3
+DRIVER_SHA256 17148ee3cf502c919d2fdf5d332b8b04c807d2784805d9f408dbe98b2069556d
+REUSED_DRIVER_SHA256 0c64e50ffaac6a2a483f68f81e1b9634199ef7a2a82545964351cad3cfb396bb
+REGISTERED_TEST_SHA256 690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722
+DESIGN_SHA256 f8afdfa24cac6c4e7d34aa9378a0bc6e315a4802ed83d05bd060163787377318
+CWD_DESIGN_SHA256 03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195
+PATCH_SHA256 cf88e7d25793b73c27e7a3bafcabd68e5499fe9007e803d871f25aaef75b2379
+TREE_PRE /home/s5014158/metaopt/harness_cvt8/cifar10 HF 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9 build_network c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+TREE_POST /home/s5014158/metaopt/harness_cwd1/cifar10 HF 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf build_network c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+  PASS --tree-post's HF.py is cwd1's PATCH_DECAYMASK tree, UNCHANGED (94aedc33...)
+  PASS --tree-pre's HF.py is cvt8's and carries no PATCH_DECAYMASK
+  PASS --tree-pre's HF.py is BYTE-IDENTICAL to --tree-post's HF.py.pre_decaymask
+  PASS the two trees' build_network.py are BYTE-IDENTICAL and == the design's BN_SHA
+  PASS the reused driver and cwd_design.py are cwd1's registered files, UNEDITED
+
+steps 300, PROBE every 10, PROBE_TENSOR=1, seed 140, AUGMENT=1, BETA_CLIP -15:-2.3026, net ResNet18_c100, every arm scalar
+
+RR0 DETERMINISM CONTROL (the parent tree, twice)
+  ran pre_k01_a        tree=harness_cvt8 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 2c97a3f86ed1...
+  ran pre_k01_b        tree=harness_cvt8 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 2c97a3f86ed1...
+  PASS RR0 parent k01 vs itself: beta IDENTICAL at every step   300 steps
+  PASS RR0 parent k01 vs itself: per-step loss IDENTICAL
+  PASS RR0 parent k01 vs itself: probe.jsonl BYTE-IDENTICAL   30 records
+  PASS RR0 parent k01 vs itself: every parameter and buffer after the last step BITWISE-IDENTICAL   2c97a3f86ed1f113
+
+RR1 OFF (DECAY_MASK unset / empty on cwd1's tree == the parent tree, bitwise)
+  ran post_k01_unset   tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 2c97a3f86ed1...
+  PASS RR1 k01 DECAY_MASK unset: beta IDENTICAL at every step   300 steps
+  PASS RR1 k01 DECAY_MASK unset: per-step loss IDENTICAL
+  PASS RR1 k01 DECAY_MASK unset: probe.jsonl BYTE-IDENTICAL   30 records
+  PASS RR1 k01 DECAY_MASK unset: every parameter and buffer after the last step BITWISE-IDENTICAL   2c97a3f86ed1f113
+  PASS RR1 k01 DECAY_MASK unset printed `DECAY_MASK: off` and the parent's own witness lines
+  PASS RR1 k01 DECAY_MASK unset: no dm_* key in probe.jsonl
+  ran post_k01_empty   tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 2c97a3f86ed1...
+  PASS RR1 k01 DECAY_MASK empty: beta IDENTICAL at every step   300 steps
+  PASS RR1 k01 DECAY_MASK empty: per-step loss IDENTICAL
+  PASS RR1 k01 DECAY_MASK empty: probe.jsonl BYTE-IDENTICAL   30 records
+  PASS RR1 k01 DECAY_MASK empty: every parameter and buffer after the last step BITWISE-IDENTICAL   2c97a3f86ed1f113
+  PASS RR1 k01 DECAY_MASK empty printed `DECAY_MASK: off` and the parent's own witness lines
+  PASS RR1 k01 DECAY_MASK empty: no dm_* key in probe.jsonl
+
+RR2 THE EXACT MASKED STRINGS ON THE REAL PATH
+  ran post_carwd0      tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights ed58aec293a8...
+  PASS RR2 CARWD0   printed exactly the design's DECAY_MASK witness (k=3, idx 50,53,59)   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked
+  PASS RR2 CARWD0   at every probe record dm_n == step+2, dm_skipped == dm_n*3, dm_masked == 3, dm_wdterm > 0, 3 finite norm(s)   30 records, 0 bad; last {'dm_n': 292, 'dm_skipped': 876, 'dm_wdterm': 5.2383181817874e-06, 'dm_absmin': 1.0}
+  ran post_ctlwd0      tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights ec3db132df49...
+  PASS RR2 CTLWD0   printed exactly the design's DECAY_MASK witness (k=3, idx 47,48,56)   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.0.bn1.bias+layer4.1.bn1.weight masked=3 of=62 
+  PASS RR2 CTLWD0   at every probe record dm_n == step+2, dm_skipped == dm_n*3, dm_masked == 3, dm_wdterm > 0, 3 finite norm(s)   30 records, 0 bad; last {'dm_n': 292, 'dm_skipped': 876, 'dm_wdterm': 4.277068885240955e-06, 'dm_absmin': 1.5824713067713603e-11}
+  ran post_ctl2wd0     tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 7b7bbe58e20f...
+  PASS RR2 CTL2WD0  printed exactly the design's DECAY_MASK witness (k=2, idx 47,56)   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.1.bn1.weight masked=2 of=62 numel=1024 idx=47,
+  PASS RR2 CTL2WD0  at every probe record dm_n == step+2, dm_skipped == dm_n*2, dm_masked == 2, dm_wdterm > 0, 2 finite norm(s)   30 records, 0 bad; last {'dm_n': 292, 'dm_skipped': 584, 'dm_wdterm': 4.277068885240954e-06, 'dm_absmin': 1.0}
+  ran post_nwd         tree=harness_cwd1 spec=scalar GROUP_HOLD=None  300 steps on NVIDIA L4  weights 560fc0e87278...
+  PASS RR2 NWD      printed exactly the design's DECAY_MASK witness (k=20, idx normscale)   DECAY_MASK: on base=SGDm wd=0.1 spec=normscale masked=20 of=62 numel=4800 idx=2,5,8,11,14,17,20,23,26,29,32,35
+  PASS RR2 NWD      at every probe record dm_n == step+2, dm_skipped == dm_n*20, dm_masked == 20, dm_wdterm > 0, 20 finite norm(s)   30 records, 0 bad; last {'dm_n': 292, 'dm_skipped': 5840, 'dm_wdterm': 9.260125770886642e-06, 'dm_absmin': 1.0}
+
+RR3 UPDATE IDENTITY ON THE REAL PATH (the registered verifier around base_update)
+  ran verify_pre_k01         (verifier) tree=harness_cvt8 spec=scalar env={} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0]} bites 0
+  PASS RR3 CONTROL the parent tree (OFF) matches the registered formula with an EMPTY mask at every step, every tensor   {'expect': [0, 0, 0], 'wrong': [0, 0, 0]}
+  ran verify_carwd0          (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0]} bites 900
+  PASS RR3 CARWD0   w', h', m' BITWISE the formula with wd 0 on idx {50,53,59} and 0.1 elsewhere, at every one of 300 steps   {'expect': [0, 0, 0], 'wrong': [900, 900, 0]}; bites at float resolution 900
+  ran verify_ctlwd0          (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn1.weight+layer4.0.bn1.bias+layer4.1.bn1.weight'} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [898, 898, 0]} bites 898
+  PASS RR3 CTLWD0   w', h', m' BITWISE the formula with wd 0 on idx {47,48,56} and 0.1 elsewhere, at every one of 300 steps   {'expect': [0, 0, 0], 'wrong': [898, 898, 0]}; bites at float resolution 898
+  ran verify_ctl2wd0         (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn1.weight+layer4.1.bn1.weight'} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [600, 600, 0]} bites 600
+  PASS RR3 CTL2WD0  w', h', m' BITWISE the formula with wd 0 on idx {47,56} and 0.1 elsewhere, at every one of 300 steps   {'expect': [0, 0, 0], 'wrong': [600, 600, 0]}; bites at float resolution 600
+  ran verify_nwd             (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'normscale'} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [6000, 6000, 0]} bites 6000
+  PASS RR3 NWD      w', h', m' BITWISE the formula with wd 0 on idx {2,5,8,11,14,17,20,23,26,29,32,35,38,...} and 0.1 elsewhere, at every one of 300 steps   {'expect': [0, 0, 0], 'wrong': [6000, 6000, 0]}; bites at float resolution 6000
+
+RR4 SET DISCRIMINATION (test-only alpha0 1e-2: the WD term visible at float resolution)
+  ran verify_big_off         (verifier) tree=harness_cwd1 spec=scalar env={} alpha0=1e-2  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0]} bites 0
+  PASS RR4 the test-only alpha0 1e-2 OFF run matches the EMPTY-mask formula at every step
+  ran verify_big_carwd0      (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'} alpha0=1e-2  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [1798, 1798, 0]} bites 900
+  PASS RR4 CARWD0   matches ITS OWN set {50,53,59}, the WD term bites (bites > 0), the SAME run FAILS CTLWD0's set {47,48,56}, and its weights differ from OFF   stats {'expect': [0, 0, 0], 'wrong': [1798, 1798, 0]} bites 900
+  ran verify_big_ctlwd0      (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn1.weight+layer4.0.bn1.bias+layer4.1.bn1.weight'} alpha0=1e-2  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [1798, 1798, 0]} bites 898
+  PASS RR4 CTLWD0   matches ITS OWN set {47,48,56}, the WD term bites (bites > 0), the SAME run FAILS CARWD0's set {50,53,59}, and its weights differ from OFF   stats {'expect': [0, 0, 0], 'wrong': [1798, 1798, 0]} bites 898
+  ran verify_big_ctl2wd0     (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn1.weight+layer4.1.bn1.weight'} alpha0=1e-2  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [298, 298, 0]} bites 600
+  PASS RR4 CTL2WD0  matches ITS OWN set {47,56}, the WD term bites (bites > 0), the SAME run FAILS CTLWD0's set {47,48,56}, and its weights differ from OFF   stats {'expect': [0, 0, 0], 'wrong': [298, 298, 0]} bites 600
+  ran verify_big_nwd         (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'normscale'} alpha0=1e-2  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [5100, 5100, 0]} bites 6000
+  PASS RR4 NWD      matches ITS OWN set {normscale}, the WD term bites (bites > 0), the SAME run FAILS CARWD0's set {50,53,59}, and its weights differ from OFF   stats {'expect': [0, 0, 0], 'wrong': [5100, 5100, 0]} bites 6000
+
+RR5 LOUDNESS ON cwd1's TREE (CPU, the real HF.init_meta)
+  LOUD misspelt ValueError: PATCH_DECAYMASK: 'layer4.0.shortcut.1.weigth' is not a parameter name of this model
+  LOUD duplicate ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight+layer4.0.bn2.weight' names a tensor twice
+  LOUD empty-token ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight++layer4.1.bn2.weight' has an empty + toke
+  LOUD not-a-name ValueError: PATCH_DECAYMASK: 'layer5.0.bn2.weight' is not a parameter name of this model
+  LOUD bad-char ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight,layer4.1.bn2.weight' has a character outs
+  PASS RR5 a misspelt name, a duplicate, an empty + token, a non-name and a bad character EACH raise ValueError at construction
+
+ALL PASS
+REALRUN_RC 0

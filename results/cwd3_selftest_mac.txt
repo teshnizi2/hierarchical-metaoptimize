@@ -1,0 +1,132 @@
+cWD3 --selftest: design and witnesses, G-BITE on REAL landed cwd1 records incl. BOTH broken-mask nulls, the noise
+floor through corpus_exclusions.filter_rows, the account tables, the REAL score() on synthetic runs, the O2
+invariance proof and the documented one-argument invocation.
+
+A. DESIGN, WITNESSES, ARITHMETIC
+  PASS A cvt9's registered scorer (Lion helper) is the file 249 registered
+  PASS A the REUSED cwd_design.py / cwd_common.py are cwd1's registered files, byte for byte (RULE 16)
+  PASS A arms and seeds {140,141,142}
+  PASS A every arm is scalar
+  PASS A CARWD0   = idx (50, 53, 59), 1536 params, k 3, every tensor a BatchNorm2d parameter
+  PASS A CTLWD0   = idx (47, 48, 56), 1536 params, k 3, every tensor a BatchNorm2d parameter
+  PASS A CTL2WD0  = idx (47, 56), 1024 params, k 2, every tensor a BatchNorm2d parameter
+  PASS A NWD      = idx (2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59), 4800 params, k 20, every tensor a BatchNorm2d parameter
+  PASS A CAR inside normscale; CAR disjoint from CTL and CTL2; CTL2 a proper subset of CTL; CTL has exactly ONE non-scale (the shift 48)
+  PASS A every CAR and CTL tensor is 512 wide and in layer4 (width and depth match)
+  PASS A every 512-wide BN scale is one of 47/50/53/56/59; only TWO are non-carriers, so NO class-pure, count-matched, depth-matched, carrier-free triple exists (188.1) -- which is why CTL2WD0 is in the batch
+  PASS A the DECAY_MASK witnesses (NWD's == cwd1's k01NWD's byte for byte; CARWD0's literal)
+  PASS A prefix rule (245/251) over the LITERAL registration tuple: no other KIND prefixes or is prefixed by DECAY_MASK
+  PASS A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = SIGMA_R18ALL
+  PASS A SIGMA_USED == max(frozen floor, in-batch)
+  PASS A O2: score() calls no sigma routine and reads the corpus once (disclosure); G-HW is read only AFTER every gate
+  PASS A masked counts; one group per arm
+  PASS A the frozen manifest: cwd_design.manifest_text (unedited) + 3 SET lines; CTLWD0's shift is named
+  PASS A the ENV line is cvt9's (= cvt8's = cwd1's)
+  PASS A the tree, the runner and build_network are cwd1's, UNCHANGED
+
+B. G-BITE ON REAL LANDED cwd1 RECORDS (this host's runs directory)
+  PASS B the 3 landed cwd1 k01 runs PASS G-BITE read as cwd3's k01 (Lion, no hold key, no dm key)   3/3
+  PASS B the 3 landed cwd1 k01NWD runs PASS G-BITE read as cwd3's NWD (k = 20 on every record)   3/3
+  PASS B THE BROKEN NAME-LIST-MASK NULL ON REAL RECORDS: the 3 landed cwd1 k01 runs read as CARWD0 pass Lion and FAIL the DECAY_MASK audit on every record   3/3
+  PASS B THE WRONG-SET NULL ON REAL RECORDS: the 3 landed cwd1 k01NWD runs (k = 20) read as CARWD0 (k = 3) FAIL dm_masked on every record   3/3
+  PASS B ... and the Lion recompute FAILS when one real record's beta is moved by 0.01
+
+C. THE NOISE FLOOR (OPERATIONS 36) AND FRESHNESS
+  PASS SIGMA_R18ALL: the FROZEN literal 0.6481128684085689 IS the FILTERED value (df 255)
+  PASS the NAIVE (unfiltered) value is the disclosed trap, not the literal
+  PASS the registration corpus has 3253 rows
+  PASS ZERO corpus rows OUTSIDE cwd3 carry seed 140, 141 or 142   []
+  PASS ZERO corpus rows carry the cwd3- prefix (registration corpus)
+
+D. ACCOUNTS -> TOKENS (each account's midpoints through the real decide())
+  PASS D account CARRIER-DECAY-SUFFICES midpoints -> CARRIER-DECAY-SUFFICES   ('CARRIER-DECAY-SUFFICES', 'CAR-REC+CTL-NULL+CTL2-NULL')
+  PASS D account CARRIER-DECAY-SUFFICES-CLASS-OPEN midpoints -> CARRIER-DECAY-SUFFICES-CLASS-OPEN   ('CARRIER-DECAY-SUFFICES-CLASS-OPEN', 'CAR-REC+CTL-NULL+CTL2-PART')
+  PASS D account ANY-THREE-SCALES midpoints -> ANY-THREE-SCALES   ('ANY-THREE-SCALES', 'CAR-REC+CTL-REC+CTL2-REC')
+  PASS D account SPECIFICITY-PARTIAL midpoints -> SPECIFICITY-PARTIAL   ('SPECIFICITY-PARTIAL', 'CAR-REC+CTL-PART+CTL2-PART')
+  PASS D account CARRIER-DECAY-PARTIAL midpoints -> CARRIER-DECAY-PARTIAL   ('CARRIER-DECAY-PARTIAL', 'CAR-PART+CTL-NULL+CTL2-NULL')
+  PASS D account PARTIAL-BOTH midpoints -> PARTIAL-BOTH   ('PARTIAL-BOTH', 'CAR-PART+CTL-PART+CTL2-PART')
+  PASS D account NEEDS-MORE-THAN-THREE midpoints -> NEEDS-MORE-THAN-THREE   ('NEEDS-MORE-THAN-THREE', 'CAR-NULL+CTL-NULL+CTL2-NULL')
+  PASS D account CONTROL-EXCEEDS midpoints -> CONTROL-EXCEEDS   ('CONTROL-EXCEEDS', 'CAR-NULL+CTL-REC+CTL2-REC')
+  PASS D account REPLICATE-FAILED midpoints -> REPLICATE-FAILED   ('REPLICATE-FAILED', None)
+  PASS D the BROKEN NAME-LIST-MASK null's levels reach NEEDS-MORE-THAN-THREE (only G-BITE / G-WITNESS separate it)
+  PASS D the ALL-MASKS-BROKEN null's levels reach REPLICATE-FAILED (only G-BITE separates it)
+  PASS D the K01 / PART / FREE bands are disjoint
+  PASS D the 9 (CAR, CTL) state cells map onto the 8 registered accounts; every account is reachable
+
+E. THE REAL score() ON SYNTHETIC RUNS
+  PASS E base (CARRIER-DECAY-SUFFICES) -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E base stamps (state word, floor, bite, HW, shift)
+  PASS E CLASS-OPEN (CTL2 partial) -> rc 0, CARRIER-DECAY-SUFFICES-CLASS-OPEN
+  PASS E CLASS-OPEN is stamped CTL2-EXCEEDS-CTL
+  PASS E ANY-THREE-SCALES -> rc 0, ANY-THREE-SCALES
+  PASS E SPECIFICITY-PARTIAL -> rc 0, SPECIFICITY-PARTIAL
+  PASS E CARRIER-DECAY-PARTIAL -> rc 0, CARRIER-DECAY-PARTIAL
+  PASS E PARTIAL-BOTH -> rc 0, PARTIAL-BOTH
+  PASS E NEEDS-MORE-THAN-THREE -> rc 0, NEEDS-MORE-THAN-THREE
+  PASS E CONTROL-EXCEEDS -> rc 0, CONTROL-EXCEEDS
+  PASS E REPLICATE-FAILED -> rc 0, REPLICATE-FAILED
+  PASS E near bar: CAR = NWD - 5 + 0.05 -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E near bar: CAR = NWD - 5 - 0.05 -> rc 0, CARRIER-DECAY-PARTIAL
+  PASS E near bar: CTL = k01 + 2 - 0.05 -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E near bar: CTL = k01 + 2 + 0.05 -> rc 0, SPECIFICITY-PARTIAL
+  PASS E CTL below k01 -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E a deeper collapse under a mask is stamped <arm>-BELOW-K01
+  PASS E NWD far from cwd1 -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E an NWD more than 5 pp from cwd1's k01NWD is stamped (non-gating)
+  PASS E mixed hardware (NON-GATING) -> rc 0, CARRIER-DECAY-SUFFICES |
+  PASS E mixed hardware changes a STAMP only, never the account
+  PASS E diverged arm -> rc 0, UNRESOLVED-DIVERGED
+  PASS E k01 not collapsed -> rc 0, SCALAR-NOT-COLLAPSED
+  PASS E floor: every arm under 15 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ENV break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS spec break (layerwise) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK witness off on CARWD0 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: CARWD0 carries CTL's witness (wrong set) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: CTLWD0 carries CAR's witness (swap) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: NWD carries CAR's witness -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK on k01 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: a COMP_HOLD line -> rc 1, HARNESS-UNSOUND
+  PASS E harness: manifest break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov HF = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov scorer sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov design sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov cwd_design sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov common sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov runner = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov MODE dry-run -> rc 1, HARNESS-UNSOUND
+  PASS E G-BITE: THE BROKEN NAME-LIST-MASK NULL (every name-list arm's records without dm_* keys) -> rc 1, PATCH-NOT-VERIFIED
+  PASS E the BROKEN NAME-LIST-MASK null's LEVELS block is BYTE-IDENTICAL to the NEEDS-MORE-THAN-THREE case's: only G-BITE separates them
+  PASS E G-BITE: CARWD0 without dm keys -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CARWD0 records carry k = 20 (wrong set) -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CTL2WD0 records carry k = 3 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CTLWD0 dm_skipped forged -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: NWD dm_n off by one -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CARWD0 dm_masked wrong -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CTLWD0 zero dm_wdterm -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: NWD dm_norm not a list -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: dm keys on k01 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: k01 Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CARWD0 Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: a hold key on CTLWD0 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: CARWD0 records with 62 groups -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: short probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: garbled record -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE: missing probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E dropped run -> INCOMPLETE -> rc 2, INCOMPLETE
+  PASS E truncated resubmission beside a complete run is ignored -> rc 0, CARRIER-DECAY-SUFFICES |
+
+   O2 INVARIANCE: FINAL identical across corpora (bars never read the corpus)
+  PASS O2 SUFFICES   real+invented minimal-invented no-corpus real real+invented
+  PASS O2 NEEDS-MORE real+invented minimal-invented no-corpus real real+invented
+  PASS O2 ANY-THREE  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 PARTIAL    real+invented minimal-invented no-corpus real real+invented
+  PASS O2 non-vacuity: the invented rows MOVE the filtered ResNet18_c100 sigma (0.6481 -> 5.1141), FINAL does not
+
+   THE DOCUMENTED ONE-ARGUMENT INVOCATION
+  PASS `python3 cWD3_carrierwd_score.py <runsdir>` exits 0 and prints FINAL
+  PASS ... and on a dropped run exits 2 (INCOMPLETE)
+
+F. TOTALITY: decide() over 6,000 random draws returns a registered token
+  PASS F every draw's token is registered   0 bad
+
+SELFTEST PASS
