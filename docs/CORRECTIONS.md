@@ -36271,3 +36271,36 @@ So: **`cwd1` masked 3,000 of 4,500; `cwd2` masked 4,500 of 7,500; BOTH BATCHES m
 **ZERO GPU. No Slurm job submitted, cancelled or queried. `alice` — Saber's shared account — NOT contacted.** No notebook website or Vercel URL opened, nothing downloaded, no `.pdf` fetched. **RULE 16 held**: no registered scorer, launcher, patch, `analysis/argsline_guard.py`, `analysis/corpus_exclusions.py`, `results/*.csv`, `results/*.tsv` or anything under `paper/` was edited. `git add` named `docs/CORRECTIONS.md` and `docs/LIMITS-PREP.md` only, never `-A`. Gates re-run on the committed tree: `analysis/c73_mastertable_check.py` exit 0, `analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` exit 0 VERDICT PASS, `analysis/c98b_reproduce.py` exit 0, same verdict.
 
 Next free number: **275**.
+
+## 276. TRACK B (write-up draft, ZERO GPU) — **[LED WITH WHAT IT IS NOT: this entry records a DRAFT for Reza and Dr Salehkaleybar, `docs/WRITEUP-mechanism.md`. It is NOT paper text, NOT for submission, and NOTHING UNDER `paper/` WAS TOUCHED. It moves NO level, contrast, bar, branch word or stamp; no scorer was run for a verdict and none was edited (RULE 16). Number 275 is RESERVED for Track A's parallel `cwd3` registration and was not yet on `origin/master` when this was written — **Track A must INSERT 275 ABOVE this entry, not append after it, so the file stays in numeric order.**]** The mechanism line is drafted as a **bounded, configuration-conditional secondary contribution** beside the denominator result and the count-matched partition audit, with the claim paragraph proposed at 273.12 **CORRECTED** in four places.
+
+### 276.1 What the draft claims
+
+**Coupled L2 weight decay on normalisation scales is a PRECONDITION of the shared-step-size collapse** on `ResNet18_c100` and `PlainNet18_c100` at the campaign's CIFAR-100 cell, at three grains (every tensor + meta trace, `cmo1` 264; the 20 network-wide BN scales, `cwd1` 271; one BN scale on PlainNet, `cwd2` 273), with the PlainNet held-step damage running through the same factor (`F_WD` 1.012, 273). The carrier account (184, 187, 193, 270, 272, 268) is reported as sufficiency with a count-matched control plus two one-cell necessity statements. **It is stated as a SCOPE result, not a mechanism**: the weight-norm readout exists only on arms where the decay is off, so the collapsing arms carry no measurement (274.1).
+
+### 276.2 The four corrections to 273.12's paragraph (each re-verified against the committed record, not taken from the brief)
+
+* **O1** — "last-block scales … removing the decay from **those scales alone**, 4,800 of 11.2 M on ResNet" conflates the NOMINATION set (3 last-block tensors) with `cwd1`'s MASK set (20 BN scales network-wide, 271.4(1), 271.5). **No ResNet arm removes the decay from the three carriers alone.** The single-tensor sentence is earned on PlainNet only.
+* **O2** — `F_WD` ≈ 1.0 is **PlainNet-only** (`cwd2`, idx 50, one dose, open-loop, complement on a replay).
+* **O3** — "a reader who follows that practice **will not meet** the collapse" → "**did not meet it at any cell tested**".
+* **O4** — the **98.06 %** (`cwd1` `P_NWD` / `cmo1` `L_W0`) is a **cross-batch ratio, orientation only, UNSURE** (271.6 F4), never a decomposition.
+
+**Disclosed:** the brief attributed these four to a "final audit" and to CORRECTIONS 274. **No audit report was found in the repository or the scratchpad at `84e4bcb`, and 274 corrects four descriptive `dm_*` record COUNTS, which is a different list.** Each of O1–O4 was therefore re-verified here against 264 / 271 / 273 and the committed scorer outputs. UNSURE whether this is the audit's own list.
+
+### 276.3 How the numbers were sourced
+
+Every §2 number of the draft was re-read from its committed artefact: `results/cmo1_momwd_score_alice2.txt`, `results/cwd1_normwd_score_alice2.txt`, `results/cwd2_carrierwd_score_alice2.txt`, `results/csv1_shadowvote_score_alice2.txt`, `results/cvt10_onevsthree_score_alice2.txt`, `results/cst2_carriervote_score_alice2.txt`, `results/SCORE-cdep1.txt`, `results/ctd1_tensor_dominate/ATTACK_REPORT.txt`. All agree with the registered values quoted at 264 / 268 / 270–273. One census figure (the mechanism-cell corpus means 22.96 / 69.42) is labelled as census and taken from `LIMITS-PREP` §2.2.
+
+### 276.4 Prior art
+
+Only the seven papers named in the brief are used, all already verified at 254 / 258.1 / 260.1: He et al. arXiv:1812.01187; Arora, Li, Lyu arXiv:1812.03981; Davis & Frank arXiv:2110.13989; Zhou et al. arXiv:2001.11216; Lobacheva et al. arXiv:2106.15739; Kim et al. arXiv:2205.07260; De & Smith arXiv:2002.10444. **Each id was re-resolved on its arXiv ABSTRACT PAGE (HTML) on 2026-09-19, and each title and author list matches**, as does the parent arXiv:2402.02342. (The `arxiv` MCP tool returned "not found" for every id including the parent, so it was treated as broken and not relied on.) **No paper was added.** No PDF fetched, nothing downloaded, no licence accepted.
+
+### 276.5 Open items the draft names (none registered, nothing launched)
+
+The ResNet carrier-only decay mask (Track A, `cwd3`, 275 — the one GPU item the draft recommends before the discussion, because it repairs an over-statement instead of widening a claim); a weight-norm readout on the UNMASKED arms (the only route to a mechanism; a design question for the professor); the owed zero-GPU hardware census for `cvt10` / `csv1` and the launcher-side `G-HW` disclosure; 264.6 W1's parser debt; S4, N2, a dose ladder, a carrier PAIR and a free `ISOSPLIT` control, each costed in the draft's §6.
+
+### 276.6 Discipline
+
+**ZERO GPU. No Slurm job submitted, cancelled or queried. `alice` — Saber's shared account — NOT contacted.** No notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched. **RULE 16 held**: no registered scorer, launcher, patch, `analysis/argsline_guard.py`, `analysis/corpus_exclusions.py`, `results/*.csv`, `results/*.tsv` or anything under `paper/` was edited. `git add` named `docs/WRITEUP-mechanism.md` and `docs/CORRECTIONS.md` only, never `-A`.
+
+Next free number: **277** (275 reserved for Track A).
