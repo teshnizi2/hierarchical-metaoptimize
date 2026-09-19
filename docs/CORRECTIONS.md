@@ -36227,3 +36227,47 @@ The reasoning, stated so it can be argued with:
 * **Cost: 0 GPU-h by this entry.**  The cycle's four batches cost **60.4 GPU-h** by their own `wallclock_min` (`cvt10` 25.4667, `cwd1` 7.5333, `csv1` 15.1833, `cwd2` 12.2167), spent at 258.11 / 260.11 / 261.11 / 262.11, and the census moves 3304.0 → **3364.4**.
 
 Next free number: **274**.
+
+## 274. TRACK L (addendum, ZERO GPU) — **[LED WITH WHAT IT DOES NOT TOUCH: this entry corrects FOUR RECORD COUNTS in the DESCRIPTIVE `dm_*` readout paragraphs of 273 and LIMITS-PREP §1.1b. It moves NO level, NO contrast, NO bar, NO branch word and NO stamp — `dm_*` is written by `PATCH_DECAYMASK` for description only, and 271.7 and 273.7 both carry the header "nothing here can move a token". Every registered verdict of 270–273 stands UNCHANGED, and no scorer, launcher, patch or `paper/` file was edited (RULE 16).]** The counts quoted as MASKED probe records were in fact the batches' WHOLE probe corpora. `dm_*` is present on exactly the arms the mask is ON; the corrected figures SHARPEN 273.10(6) rather than weaken it.
+
+### 274.1 What was measured, and how
+
+Read directly from the per-run `probe.jsonl` records under `../runs_alice2/cwd1/probe_cwd1-*` and `../runs_alice2/cwd2/probe_cwd2-*`, counting the records that carry a `dm_small` key at all:
+
+| batch | arm | mask | probe records | records carrying `dm_*` |
+|---|---|---|---|---|
+| `cwd1` | `k01` | off | 1,500 | **0** |
+| `cwd1` | `k01NWD` | on | 1,500 | 1,500 |
+| `cwd1` | `kLNWD` | on | 1,500 | 1,500 |
+| `cwd2` | `k01` | off | 1,500 | **0** |
+| `cwd2` | `HIGHHEADPATH` | off | 1,500 | **0** |
+| `cwd2` | `k01WD0` | on | 1,500 | 1,500 |
+| `cwd2` | `HIGHWD0` | on | 1,500 | 1,500 |
+| `cwd2` | `LOWWD0` | on | 1,500 | 1,500 |
+
+So: **`cwd1` masked 3,000 of 4,500; `cwd2` masked 4,500 of 7,500; BOTH BATCHES masked 7,500 of 12,000.** The keys written are `dm_n`, `dm_masked`, `dm_skipped`, `dm_wdterm`, `dm_norm`, `dm_absmin`, `dm_small`.
+
+### 274.2 The four corrections
+
+* **(a) 273's headline bound (2)** reads "`dm_small` 0 at all **7,500** records" of `cwd2`. **CORRECTED: 0 at all 4,500 MASKED records.** 7,500 is `cwd2`'s whole probe corpus over its five arms; on the other 3,000 records `dm_small` is **ABSENT**, not 0.
+* **(b) 273.7** reads "the count of |w| < 1e-3 is 0 at every one of the **7,500** probe records", in a sentence scoped to "any masked run". **CORRECTED: 4,500.**
+* **(c) 273.10(6)** reads "`dm_small` is 0 at all **12,000** masked probe records across both batches". **CORRECTED: 7,500 masked** (12,000 is both batches' whole probe corpus).
+* **(d) `docs/LIMITS-PREP.md` §1.1b** carries the same "12,000 masked probe records". **CORRECTED IN PLACE to 7,500**, with the superseded figure bracketed; it is the only one of the four that is amended in the file, because LIMITS-PREP is a working document and CORRECTIONS is append-only.
+
+**Also noted, presentational:** 273.13 names the document it wrote as `docs/LIMITS-PREP.md` **§1.1**; the section actually written was the NEW **§1.1b** (§1.1 was not edited, and the landing's own `+36/−0` diff is the witness that nothing in §1.1 moved).
+
+### 274.3 What does NOT change, and why the corrected numbers are stronger
+
+**Every factual reading survives verbatim**: `dm_small` is **0 on every record that carries it** (7,500 of 7,500 across both batches), min |w| never leaves [0.9994, 1.020] on any masked run (`cwd2` masked minimum re-measured at **0.99941**), and with WD off the scales **grow** (`cwd1` `kLNWD` carriers 22.6 → **38.3 / 30.0 / 48.9**; `k01NWD` 22.6 → 22.9 / 22.7 / 22.9; `cwd2` `k01WD0` idx 50 **22.63 → 23.31**) — all re-derived for this entry and all equal to the figures 271.7 and 273.7 print.
+
+**And the correction makes 273.10(6)'s own point sharper.** The 4,500 `cwd2` records with **no** readout are exactly the three seeds of the two **STALLING** arms, `k01` and `HIGHHEADPATH`; the 1,500 in `cwd1` are `k01`'s. **The arms where the collapse happens are precisely the arms with zero instrumentation** — which is the binding constraint 273.12 rests its CONSOLIDATE judgement on, and it is now stated with the right denominator. Zhou et al. (arXiv:2001.11216) remains **neither confirmed nor excluded**.
+
+### 274.4 Site consequence, OWED not done
+
+`public/data/research.json` in the notebook publishes the same figure once, in **MT235**'s scope cell ("tiny-weight count 0 at all 7,500 records"). **It is NOT corrected here**: this stage is read-only on the site clone and pushes nothing to it. **The next site import OWES MT235 this amendment** (7,500 → 4,500 masked). No other published field carries either count.
+
+### 274.5 Discipline
+
+**ZERO GPU. No Slurm job submitted, cancelled or queried. `alice` — Saber's shared account — NOT contacted.** No notebook website or Vercel URL opened, nothing downloaded, no `.pdf` fetched. **RULE 16 held**: no registered scorer, launcher, patch, `analysis/argsline_guard.py`, `analysis/corpus_exclusions.py`, `results/*.csv`, `results/*.tsv` or anything under `paper/` was edited. `git add` named `docs/CORRECTIONS.md` and `docs/LIMITS-PREP.md` only, never `-A`. Gates re-run on the committed tree: `analysis/c73_mastertable_check.py` exit 0, `analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` exit 0 VERDICT PASS, `analysis/c98b_reproduce.py` exit 0, same verdict.
+
+Next free number: **275**.

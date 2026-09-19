@@ -77,7 +77,10 @@ weight decay to BatchNorm parameters and biases, so the configuration is one com
 **WHAT THE CYCLE DOES NOT ESTABLISH, and must be said in the same breath:** the mechanism BY WHICH the decay matters is
 **not measured**. `PATCH_DECAYMASK` records weight norms only on the arms where the decay is OFF, and there the scales
 **grow** (`cwd1` `kLNWD` carriers 22.6 -> up to 48.9; `cwd2` `k01WD0` 22.63 -> 23.31) with zero tiny weights at all
-12,000 masked probe records, while the arms that actually collapse carry no readout at all. Zhou et al.'s
+**7,500** masked probe records **[CORRECTED at CORRECTIONS 274 from "12,000 masked probe records": 12,000 is the two
+batches' WHOLE probe corpus; the MASKED subset that carries a `dm_*` key at all is 7,500 (cwd1 3,000 of 4,500, cwd2
+4,500 of 7,500). Every reading is unchanged — `dm_small` is 0 on every record that carries it]**, while the arms that
+actually collapse carry no readout at all. Zhou et al.'s
 filter-collapse candidate (arXiv:2001.11216) is **neither confirmed nor excluded**. **Naming the precondition is a
 SCOPE result, not yet a mechanism.**
 
