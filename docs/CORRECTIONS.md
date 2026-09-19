@@ -36627,4 +36627,6 @@ The ten bounds are the headline of this entry and are not repeated in full here.
 * **RULE 16 held.**  No registered scorer, launcher, patch, tree, runner, `analysis/argsline_guard.py`, `analysis/corpus_exclusions.py` or anything under `paper/` was edited.  **One defect reported and NOT fixed (278.6 D1).**  The RULE 20 tools were **copied** to `/home/s5014158/metaopt/scratch/land278-u1/` and run there, never modified; the stage is mine and disposable, and Track A's `~/stage_cwd3*` stages were not touched.
 * **Files.**  The ingest commit `064dff6` wrote `results/all_runs.csv` and `results/CORPUS-EXCLUSIONS.tsv` only.  This entry writes `docs/CORRECTIONS.md`, `docs/WRITEUP-mechanism.md`, `docs/MASTER-TABLE.md` (**row 236** and the header), `docs/LIMITS-PREP.md` §1.1b and `docs/STATUS.md`, and adds `results/cwd3_rule20_land278.txt` — staged by path, **never `-A`**.  Scoring artefacts read, committed at `3a530b9`: `results/cwd3_carrierwd_score_{alice2,mac}.txt`, `results/cwd3_attack_indep_{alice2,mac}.txt`, `results/cwd3_rule20_landing.txt`, `results/cwd3_exclusions_owed.tsv`.
 * **Cost.**  The batch itself: **10.7111 GPU-h** by `sacct` over 15 runs (mean 0.7141), **10.60** by the runs' own `minutes` lines, against 275.3's ≈12.6 expected and the 45 h hard bound.  This entry: **ZERO**.
-* **`docs/CORRECTIONS.md` is in numeric order end-to-end after this append; 278 sits after 277.  Next free number: 279.**
+* **`docs/CORRECTIONS.md` is in numeric order end-to-end after this append; 278 sits after 277.**
+
+Next free number: **279**.
