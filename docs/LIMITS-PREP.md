@@ -55,8 +55,14 @@ decay, or does it become a note on a configuration pitfall?
 ### 1.1b RESULTS SO FAR, CONTINUED — the remaining five MUST-tier readings, landed 19 Sep 2026 (CORRECTIONS 268, 270, 271, 272, 273)
 
 *Registered verdicts only; the authority is `docs/CORRECTIONS.md`, and each sentence below is licensed at ONE cell only.
-Corpus is now **3,253 rows / 3364.4 GPU-hours** (the four batches ingested once, +72 rows, 0 changed, commit `66a19fb`);
-`results/CORPUS-EXCLUSIONS.tsv` 126 -> 171 rows, `--check` PASS, `c98b` exit 0 with the same verdict as at 266 / 253 / 247.*
+Corpus is now **3,268 rows / 3375.0 GPU-hours** (`cwd3` ingested once at CORRECTIONS **278**, +15 rows, 0 changed,
+0 of 123,614 pre-existing field-cells changed, commit `064dff6`); `results/CORPUS-EXCLUSIONS.tsv` 171 -> **183** rows
+(12 `DECAY_MASK` rows, `corpus_exclusions.py` NOT edited), `--check` PASS, `c98b` exit 0 with the same verdict as at
+273 / 266 / 253 / 247. **[SUPERSEDED: 3,253 rows / 3364.4 GPU-hours, the four batches ingested once, +72 rows, 0 changed,
+commit `66a19fb`; exclusions 126 -> 171.]** **DISCLOSED, and it moved again:** the `--check` noise-floor demonstration is
+now `SIGMA_R18ALL` **0.645141 (df 258)** **[SUPERSEDED: 0.648113, df 255]**, `SIGMA_PLAIN` 0.460632 unchanged; **no bar
+reads that line** and every registered floor was frozen at its registration, but the next registration must quote the
+new value.*
 
 | id | batch | registered verdict | what it does to the limit |
 |---|---|---|---|
@@ -66,18 +72,27 @@ Corpus is now **3,253 rows / 3364.4 GPU-hours** (the four batches ingested once,
 | **N4** | `cwd2`, 15 runs (273) | `WD-ROUTE` + `SCALAR-NEEDS-CARRIER-WD` | **L2 MOVES AGAIN, on the cleanest design of the cycle, and L1's precondition reaches a SECOND NETWORK.** In three open-loop held arms the mask can touch only idx 50's weight update, and removing the coupled decay on that ONE tensor removes the whole held-step damage: `P_WD` **+54.9133 pp** against `R_HIGH` +54.2880, **`F_WD` 1.012**, with `HIGHWD0` 0.6253 pp (inside the null bar) from the control. The PlainNet scalar collapse needs the same tensor's decay: `k01WD0` **65.7500** against `k01` 12.0673. **240 / 246 / 253's "own large step size" is REINTERPRETED as acting through the shrinkage it multiplies.** |
 | **R1 / L3** | `cvt10`, 30 runs (270) | `ONE-SUFFICES+ONE50-STALLS+ONE59-STALLS+ONE53-STALLS+SPLIT-NO-EFFECT` | **L3 MOVES, and the counting question CLOSES at this cell.** Each of the three carriers, isolated alone and held on PlainNet's dose, stalls the ResNet run (`P_ONE50` +43.66, `P_ONE59` +46.61, `P_ONE53` +35.21 pp), so 252.8(1)'s held-set confound is gone and 240 / 246's PlainNet sentence transfers to `ResNet18_c100` per carrier. **With the condition:** the same 50-hold does nothing once 53 and 59 are lifted into their own free group (`ISOSPLIT` 67.0893 against ISO 70.1660), so the one-tensor stall **needs the remaining carriers voting in the shared step size**. Still open: why the two networks differ, the closed-loop route at `k01`'s own dose, any PAIR. |
 
+| **S1c** | `cwd3`, 15 runs (**278**) | `CARRIER-DECAY-SUFFICES` + `CAR-REC+CTL-NULL+CTL2-NULL` | **L1's LAST OPEN HALF ON THE WD AXIS CLOSES AT THIS CELL, and it closes with two new confounds attached.** `cwd1` (S1b) masked all **20** BN scales network-wide and therefore could not say *which* tensors carry the precondition. `cwd3` masks the **three `ctd1` carriers ALONE** -- 1,536 of 11,220,132 parameters, in the weight update AND the meta trace -- and the collapse goes: `CARWD0` **70.2640** against `k01` **22.9853**, `P_CAR` **+47.2787 pp = +89.34 SE**, and `CARWD0` lands **INSIDE** `NWD`'s recovery band (+4.5413 pp above the 65.7227 bar; `NWD` **70.7227** replicates `cwd1`'s `k01NWD` 70.7760 in batch). **It is SPECIFIC against both matched non-carrier sets -- `P_SPEC` +47.2627 pp = +89.31 SE -- but that specificity is an ASYMMETRY BETWEEN A MEASURED RESCUE AND TWO BOUNDED FLOORS, not a difference between two magnitudes**: `CTLWD0` (`cdep1`'s DEPTH triple {47,48,56}) and `CTL2WD0` (its class-pure DEPTH2 pair {47,56}) are LOCATIONS at `k01`'s floor -- `P_CTL` +0.0160 pp, `P_CTL2` -0.0520 pp, i.e. below the 2.0 pp `NULL` bar and below **1.0744 / 1.1104 pp at +/-2 SE** (2 SE = 1.058364 pp is the HALF-WIDTH, not the bound), a ratio of **42.6 : 1** at the 2-SE bound. **The other 17 scales' residual is likewise a BOUND: `P_SET` = `NWD` - `CARWD0` = +0.4587 pp = +0.87 SE, <= +1.5171 pp at 2 SE -- AND ITS SIGN IS HORIZON-DEPENDENT** (it crosses zero near epoch 80 and is still moving at 99), so **no share may be read off it and `F_CAR` 0.9904 is DESCRIPTIVE, drifting through 1 across the horizon**. **TWO confounds, both registered and neither excluded: (a) only FIVE 512-wide BN scales exist in `ResNet18_c100`, {47,50,53,56,59}, and THREE are the carriers, so a class-pure carrier-free triple CANNOT exist at that depth (275.1; Kim et al. arXiv:2205.07260); (b) `CTLWD0`'s idx 48 is a BN SHIFT carrying essentially no decay dose, so its EFFECTIVE intervention is TWO scales, not three, and a COUNT/DOSE account fits every number here as well as the carrier account.** ONE cell, ONE network, ONE horizon, every arm SCALAR, one switch changing both routes, three seeds |
+
 **NET EFFECT, replacing 1.1's "half answered, half confirmed": §6's single biggest remaining weakness is now FULLY
 CONFIRMED on the weight-decay axis, and localised.** Coupled L2 weight decay on normalisation scales is a
-**PRECONDITION of the scalar collapse on BOTH networks and at three grains** -- every tensor plus the meta trace on
-ResNet (`cmo1`, +48.77 pp), the 20 BatchNorm scales on ResNet (`cwd1`, +47.82 pp), ONE BatchNorm scale on PlainNet
-(`cwd2`, +53.68 pp) -- and **the held-step damage runs through the same factor** (`cwd2`, `F_WD` 1.012). Momentum 0.99
+**PRECONDITION of the scalar collapse on BOTH networks and at FOUR grains** **[was "three grains" before CORRECTIONS
+278]** -- every tensor plus the meta trace on ResNet (`cmo1`, +48.77 pp), the 20 BatchNorm scales on ResNet (`cwd1`,
++47.82 pp), **the THREE CARRIERS ALONE on ResNet (`cwd3`, +47.2787 pp -- CORRECTIONS 278)**, ONE BatchNorm scale on
+PlainNet (`cwd2`, +53.68 pp) -- and **the held-step damage runs through the same factor** (`cwd2`, `F_WD` 1.012).
+**At the ResNet cell the precondition is now LOCALISED TO THE CARRIERS THEMSELVES, and is specific against two matched
+non-carrier sets -- but as an asymmetry against BOUNDS, and without separating carrier IDENTITY from POSITION CLASS or
+from COUNT/DOSE (CORRECTIONS 278, bounds (4) and (5)).** Momentum 0.99
 stays exonerated (264). **He et al. (arXiv:1812.01187, "no bias decay") is the standard reference for NOT applying
 weight decay to BatchNorm parameters and biases, so the configuration is one common practice explicitly avoids.**
 
 **WHAT THE CYCLE DOES NOT ESTABLISH, and must be said in the same breath:** the mechanism BY WHICH the decay matters is
 **not measured**. `PATCH_DECAYMASK` records weight norms only on the arms where the decay is OFF, and there the scales
 **grow** (`cwd1` `kLNWD` carriers 22.6 -> up to 48.9; `cwd2` `k01WD0` 22.63 -> 23.31) with zero tiny weights at all
-**7,500** masked probe records **[CORRECTED at CORRECTIONS 274 from "12,000 masked probe records": 12,000 is the two
+**7,500** masked probe records **[UNCHANGED by CORRECTIONS 278: `cwd3` adds 6,000 masked records of its own, on all of
+which `dm_wdterm` is positive and `dm_small` is 0 for `CARWD0` / `CTL2WD0` / `NWD`; its `CTLWD0` arm is the one exception
+and it is the SHIFT member, idx 48, whose 512 entries sit below 1e-3 from init -- which is evidence about that control's
+DOSE, not about filter collapse. `cwd3`'s own collapsing arm `k01` again carries NO readout at all.]** **[CORRECTED at CORRECTIONS 274 from "12,000 masked probe records": 12,000 is the two
 batches' WHOLE probe corpus; the MASKED subset that carries a `dm_*` key at all is 7,500 (cwd1 3,000 of 4,500, cwd2
 4,500 of 7,500). Every reading is unchanged — `dm_small` is 0 on every record that carries it]**, while the arms that
 actually collapse carry no readout at all. Zhou et al.'s
@@ -86,9 +101,13 @@ SCOPE result, not yet a mechanism.**
 
 **Question 2 of §7 is now ANSWERED by the data and needs only the professor's decision on framing:** momentum 0.9 does
 not remove the collapse, weight decay 0 on the normalisation scales does, on both networks and down to a single
-tensor. **The recommendation of CORRECTIONS 273.12 is CONSOLIDATE -- write up now**, with the denominator result and
-the count-matched partition audit keeping the headline and the mechanism line stated as a bounded,
-configuration-conditional failure mode. The claim wording proposed for the paper is at 273.12.
+tensor, **and at the ResNet cell the three carriers' own decay suffices (278)**. **The recommendation of CORRECTIONS
+273.12 is CONSOLIDATE -- write up now**, with the denominator result and the count-matched partition audit keeping the
+headline and the mechanism line stated as a bounded, configuration-conditional failure mode. The claim wording proposed
+for the paper is at 273.12, **corrected by the referee pass at 277 and AMENDED for `cwd3` at 278; the current text lives
+in `docs/WRITEUP-mechanism.md` §1, with §1.3 stating exactly what `cwd3` moved and the two new limits (T18, T19) it
+opened.** **`cwd3` CLOSED the write-up's own top-ranked open question O-1; the arm that would separate the count account
+from the identity account -- a TWO-carrier mask {50, 53} -- is now O-12 and is NOT registered and NOT launched.**
 
 
 

@@ -18,6 +18,16 @@ named three FINALs where the committed outputs carry five. **Every number in §�
 artefact named in its row before this revision was written, and RULE 20 for `cwd3` was re-run at full coverage 15/15
 first (277.1).** Still **ZERO GPU**, still nothing under `paper/` read or touched, still RULE 16.*
 
+***AMENDED 2026-09-19 at CORRECTIONS 278**, against `master` at `064dff6`, corpus **3,268 rows / 3375.0 GPU-hours**
+(`results/all_runs.csv` at `064dff6`), `results/CORPUS-EXCLUSIONS.tsv` **183 rows**. **`cwd3` landed**, and it is the
+batch **O-1** asked for: on `ResNet18_c100` at `ciso1`'s cell, removing coupled weight decay from the **three carriers
+alone** removes the scalar collapse, while both matched non-carrier sets stay on the floor. **This retires §0 bound 3,
+T2 and O-1** — the draft's own biggest declared gap — **and adds two new limits in the same breath (T18, T19) plus a new
+open question (O-12)**, because the batch that closes the gap opens a horizon-dependence and a count/dose confound.
+**Nothing in §1's headline moves**: the denominator result and the count-matched partition audit are still the paper, and
+the mechanism line is still a bounded, configuration-conditional secondary contribution. Still **ZERO GPU**, still
+nothing under `paper/` read or touched, still RULE 16 (one new defect **reported and not fixed**, CORRECTIONS 278.6 D1).*
+
 ---
 
 ## 0. Bounds, led with
@@ -31,9 +41,15 @@ composition)*:
 2. **The measured arms are the wrong arms.** `PATCH_DECAYMASK` writes `dm_norm` / `dm_absmin` / `dm_small` **only where
    the mask is on**, so the arms that actually collapse (`cwd1` `k01`; `cwd2` `k01`, `HIGHHEADPATH`) carry **no**
    weight-norm record at all (CORRECTIONS 274.1, per-arm table).
-3. **On ResNet the decay was never removed from the three carriers alone.** `cwd1`'s mask is the **20 BatchNorm scales of
-   the whole network**, `bn1` through `layer4` (271.4(1), 271.5 live-model check). The carriers are three of the twenty.
-   The single-tensor sentence is earned on **PlainNet only** (`cwd2`, idx 50).
+3. **~~On ResNet the decay was never removed from the three carriers alone.~~ RETIRED AT THIS CELL by `cwd3`
+   (CORRECTIONS 278).** *What it said, kept verbatim because it was the draft's biggest declared gap: `cwd1`'s mask is
+   the 20 BatchNorm scales of the whole network, `bn1` through `layer4` (271.4(1), 271.5 live-model check); the carriers
+   are three of the twenty; the single-tensor sentence is earned on PlainNet only (`cwd2`, idx 50).* **What replaced it:**
+   `cwd3` masks the three carriers **alone** on `ResNet18_c100` at `ciso1`'s cell — 1,536 of 11,220,132 parameters —
+   and the collapse goes (`P_CAR` **+47.2787 pp = +89.34 SE**, `CARWD0` **inside** `NWD`'s `REC` band). **The gap is
+   closed at ONE cell, on ONE network, at ONE horizon, with every arm SCALAR and no layerwise arm** — and it is closed
+   with two new confounds attached, at items 10 and 11 below. **The `cwd2` single-tensor sentence is still PlainNet
+   only**, and nothing here separates which ONE of the three carriers matters.
 4. **`F_WD` = 1.012 is PlainNet-only**, one tensor, one dose, one cell, with the complement forced onto a replayed path
    (`COMPLEMENT-ON-HEADPATH`, `HELD-ARMS-OPEN-LOOP`).
 5. **The 98.06 % figure is a CROSS-BATCH ratio and is orientation only** (271.6 F4, UNSURE): different interventions,
@@ -50,6 +66,24 @@ composition)*:
    `layer4.0.bn1.bias`, not three scales; the class-pure pair `DEPTH2` {47, 56} gives the same bound
    (`D_DEPTH2` +0.0960 pp, `DELTA_BIAS` +0.0727 pp = +0.10 SE), so the result does not rest on the shift — **but it does
    not become a magnitude either.**
+9. **`cwd3`'s two controls are FLOOR BOUNDS too, and the numbers that bound them are these** *(added at CORRECTIONS
+   278)*: at ±2 SE on the observed contrasts, **|P_CTL| ≤ 1.0744 pp** and **|P_CTL2| ≤ 1.1104 pp** — and
+   **2 SE = 1.058364 pp is the HALF-WIDTH of the interval, not itself the bound**. Against `P_CAR` +47.2787 pp that is
+   **42.6 : 1** at the 2-SE bound, or **23.6 : 1** against the registered 2.0 pp `NULL` bar. **That ratio is what
+   carries the specificity claim. It is not a measured zero, and "has no effect" may not be written.**
+10. **`P_SET`'s SIGN IS HORIZON-DEPENDENT** *(added at CORRECTIONS 278; see T18)*. `NWD` − `CARWD0` = **+0.4587 pp =
+   +0.87 SE** in the registered window, but read in successive 5-epoch TEST windows it runs −0.9153 (55–59) … −0.1640
+   (75–79), **+0.1573** (80–84) … **+0.4587** (95–99): it **crosses zero near epoch 80 and is still moving at epoch 99**.
+   `CARWD0` has plateaued (+0.0040 pp/ep) while `NWD` still climbs (+0.0276 pp/ep) — a 20-epoch slope difference of
+   **+0.4726 pp, the same size as `P_SET` itself**. **Its sign is not a finding**, and `F_CAR` (0.9904) correspondingly
+   **drifts through 1** across the horizon, which is the cleanest possible proof that it is not a decomposition.
+11. **IDENTITY IS SEPARATED FROM NEITHER POSITION CLASS NOR COUNT/DOSE, and these are TWO DISTINCT confounds**
+   *(added at CORRECTIONS 278; see T19)*. `ResNet18_c100` has exactly **five** 512-wide BN scales — {47, 50, 53, 56, 59}
+   — and **three are the carriers**, so a class-pure, count-matched, **carrier-free triple cannot exist** at that depth
+   (registered at 275.1; re-derived from the architecture three independent ways). On top of that, `CTLWD0`'s idx 48 is a
+   BN **shift** with ‖w‖ 1.3e-10 at init, so its **effective** intervention is **two** genuine scales, not three.
+   Therefore *"exempting ANY three genuine 512-wide `layer4` BN scales suffices, and two does not"* fits every number in
+   `cwd3` **exactly as well** as the carrier account. **A two-carrier arm would separate them and was not run (O-12).**
 
 ---
 
@@ -59,7 +93,10 @@ This is the **corrected** version of the paragraph proposed at CORRECTIONS 273.1
 struck; §1.1 lists them with the evidence. **A hostile referee pass at CORRECTIONS 277 struck four more**: a floor level
 read as a magnitude, an undisclosed BatchNorm shift in the count-matched control, the word "large" for the held step, and
 a condition asserted from one uncontrolled arm. **The paragraph below is the version after all eight strikes**; §1.2 lists
-the referee's four with their evidence.
+the referee's four with their evidence. **It was AMENDED again at CORRECTIONS 278, when `cwd3` landed**: the weakest
+clause in it — *"we have no ResNet arm that removes the decay from the carriers alone"* — is replaced by the measured
+result, **in bounded form and with the two confounds that come with it**; §1.3 states exactly what moved and what did
+not.
 
 > The headline of the paper is unchanged: the **denominator** result — a properly tuned non-meta baseline is not beaten by
 > MetaOptimize, measured most strongly on CIFAR-100 (the campaign's own registered result, `cuc1`: CORRECTIONS **220**,
@@ -82,8 +119,18 @@ the referee's four with their evidence.
 > (`NO-FREE-SPLIT-CONTROL`), and it is the narrowest margin of the cycle — `P_SPLIT` **+3.0767 pp**, only 1.9233 pp =
 > **3.46 SE** inside its 5 pp bar. Removing the coupled decay removes the collapse at
 > every grain we tested: from every tensor and the meta trace on ResNet; from the **twenty** BatchNorm scales of the whole
-> ResNet network (4,800 of 11.2 M parameters — **a network-wide mask, not the three carriers; we have no ResNet arm that
-> removes the decay from the carriers alone**); and from a **single** BatchNorm scale on PlainNet (512 parameters), where
+> ResNet network (4,800 of 11.2 M parameters — a network-wide mask, not the three carriers); **and, on ResNet, from those
+> three carriers ALONE** — 1,536 of 11,220,132 parameters, in the weight update and the meta trace together — **which
+> removes the collapse as fully as the network-wide mask does** (`P_CAR` **+47.2787 pp = +89.34 SE**; the carrier-only arm
+> lands **inside** the network-wide arm's recovery band). **It is specific against both matched non-carrier controls, and
+> that specificity is an asymmetry between a measured rescue and two BOUNDED FLOORS, not a difference between two
+> magnitudes**: `P_SPEC` **+47.2627 pp** against **|P_CTL| ≤ 1.0744 pp** and **|P_CTL2| ≤ 1.1104 pp** at ±2 SE — a ratio of
+> **42.6 : 1** — while the other seventeen scales' residual is likewise **bounded, not measured** (`P_SET` **+0.4587 pp =
+> +0.87 SE**, ≤ +1.52 pp at 2 SE, **and its sign is horizon-dependent**, so no share may be read off it). **Two confounds
+> travel with that sentence and may not be dropped: only five 512-wide BatchNorm scales exist in this network and three of
+> them ARE the carriers, so "these three tensors" is not separated from "this position class" (Kim et al.,
+> arXiv:2205.07260) nor from "any three scales of this width at this depth".** And from a **single** BatchNorm scale on
+> PlainNet (512 parameters), where
 > it also removes the damage of an externally held step **at that same dose** on that same tensor **to within the noise
 > floor** (`F_WD` = 1.012, the excess being `P_LEFT` −0.6253 pp = −1.12 SE, inside the 2.0 pp null bar; **PlainNet
 > only**). We
@@ -123,6 +170,27 @@ locate an audit report under `docs/`, `results/` or the scratchpad at `84e4bcb`;
 corrects four *descriptive `dm_*` record counts*, which is a different list. **Every one of O1–O4 above was therefore
 re-verified by me against the committed record named in its row**, not taken on the brief's authority. **UNSURE** whether
 this is the same list the audit meant.
+
+### 1.3 What `cwd3` changes, and what it does not (CORRECTIONS 278)
+
+**One gap closed, two limits opened, nothing in the headline moved.** Each row re-derived from
+`results/cwd3_carrierwd_score_alice2.txt` and from the runs' own raw `.out`.
+
+| | before `cwd3` | after `cwd3` |
+|---|---|---|
+| **the ResNet carrier-only mask** | **absent.** §0 bound 3, T2 (*"conceded, unreservedly … this is the gap"*) and O-1, the top-ranked open question | **run and landed.** `P_CAR` +47.2787 pp = +89.34 SE, `CARWD0` **inside** `NWD`'s `REC` band (+4.5413 pp above the 65.7227 bar). §0 bound 3 **retired at this cell**, T2 **rewritten**, O-1 **closed** |
+| **specificity of the decay result** | untested on ResNet | `P_SPEC` +47.2627 pp = +89.31 SE against **two** matched non-carrier sets, both at `k01`'s floor (**E20**) — an asymmetry against **bounds**, `\|P_CTL\| ≤ 1.0744`, `\|P_CTL2\| ≤ 1.1104` at 2 SE |
+| **the other 17 scales** | unasked | `P_SET` +0.4587 pp = +0.87 SE, **bounded at ≤ +1.52 pp at 2 SE and NOT distinguishable from zero** — and **its sign is horizon-dependent** (**T18**) |
+| **identity vs position class** | the same bound, registered at 275.1 | **unchanged, and re-derived independently from the architecture**: only five 512-wide BN scales exist, three are carriers (**T19**) |
+| **identity vs count / dose** | not named anywhere | **named, and NOT excluded** (**T19**): `CTLWD0`'s third member is a BN shift with ‖w‖ 1.3e-10, so its effective intervention is **two** scales, not three |
+| **the write-up's headline** | denominator + count-matched partition audit | **unchanged** |
+
+**The sentence §1 is now entitled to, in the scorer's registered words and no wider:** *"the collapse's weight-decay
+precondition is carried by the three carriers' own decay: removing it from those three scales alone removes the collapse,
+and removing it from matched non-carrier last-block normalisation parameters does not."* **Read "matched non-carrier
+last-block normalisation parameters" strictly as the two sets actually run — {47, 48, 56} and {47, 56}. It may not be
+paraphrased as "any matched non-carrier triple", and "does not lift the run off the floor" may not become "has no
+effect".**
 
 ---
 
@@ -179,6 +247,32 @@ indistinguishable from the in-batch control"* — **not** "removes 101.2 %" (273
 **Orientation only, cross-batch, UNSURE** (271.6 F4): `P_NWD` +47.8247 against `L_W0` +48.7713 = **98.06 %**. Different
 interventions, different batches, no shared bar, no shared seed.
 
+### 2.3b The fourth grain — the three carriers ALONE, on ResNet (`cwd3`, CORRECTIONS 278)
+
+`ResNet18_c100` at `ciso1`'s cell, seeds {140, 141, 142}, **every arm SCALAR**, one `DECAY_MASK` name list per arm.
+`SE_ARM_DIFF` **0.529182** here (frozen prior σ 0.648113 over an in-batch 0.408720 — the conservative choice), so this
+row-set does **not** share §2's 0.556196 either; every contrast is **within batch**. Anchors reproduce: `k01` **22.9853**
+against `cwd1`'s 22.9513, `NWD` **70.7227** against `cwd1`'s `k01NWD` 70.7760 (Δ 0.0533 pp, inside `MATCH`).
+
+| # | question | intervention | arms | effect | artefact | CORR |
+|---|---|---|---|---|---|---|
+| **E19** | does the **carriers' own** decay carry the precondition? | `DECAY_MASK` on {50, 53, 59} — **1,536 of 11,220,132 parameters**, update **and** meta trace | `CARWD0` **70.2640** vs `k01` **22.9853** | `P_CAR` **+47.2787 pp = +89.34 SE**; `CARWD0` is `REC`, **+4.5413 pp inside** `NWD`'s recovery band | `results/cwd3_carrierwd_score_alice2.txt` | 278 |
+| **E20** | is it **specific** to them? | vs `cdep1`'s count-, numel-, width- and depth-matched triple {47, 48, 56}, and vs its class-pure pair {47, 56} | `CTLWD0` **23.0013**, `CTL2WD0` **22.9333** | `P_SPEC` **+47.2627 pp = +89.31 SE**; **both controls are FLOOR BOUNDS** — `P_CTL` +0.0160 pp (+0.03 SE), `P_CTL2` −0.0520 pp (−0.10 SE), i.e. `\|effect\|` below the 2.0 pp `NULL` bar and below **1.0744 / 1.1104 pp** at ±2 SE. **Ratio 42.6 : 1 at the 2-SE bound, 23.6 : 1 at the `NULL` bar** | same | 278 |
+| **E21** | how much do the other **17** scales add? | `NWD` (all 20 scales) vs `CARWD0` | `NWD` **70.7227** | `P_SET` **+0.4587 pp = +0.87 SE — A BOUND, NOT A MEASUREMENT**: ≤ +1.5171 pp at 2 SE, inside `MATCH` 5.0. **Its SIGN is horizon-dependent** (T18) | same | 278 |
+
+**The right reading of `F_CAR` = 0.9904**: it is **DESCRIPTIVE**, a ratio of two in-batch differences, and it **drifts
+through 1** across the horizon — 1.0202 (epochs 55–59), 1.0111 (65–69), 1.0035 (75–79), 0.9979 (85–89), 0.9904 (95–99).
+For most of training `CARWD0` sat **above** `NWD` and the ratio **exceeded 1**. **A "fraction carried" that can exceed 1
+is not a decomposition**, and writing "the carriers carry 99 % of the effect" would repeat O4 at a new grain. The honest
+form is E21's bound. `D_SHIFT` = `CTLWD0` − `CTL2WD0` = **+0.0680 pp** is a difference **between two floor readings** and
+is therefore **doubly a bound** — it is not "the BN shift's share".
+
+**Gates, stated because the dangerous null here is a mask that never bit** (275.4's null (i), which would have forged
+exactly the opposite verdict): `G-BITE` PASSES on **all 15 runs** — 500 probe records each, `dm_masked == k` with
+k = 3 / 3 / 2 / 20, `dm_skipped == dm_n × k`, a **positive `dm_wdterm` on 6,000 of 6,000 masked records**, and **no
+`dm_*` key on any of the 1,500 `k01` records**. The **cross-read** is the strongest of them: every run is read as its own
+k **and as every other k in {0, 2, 3, 20}**, and all 15 pass their own while refusing all three others.
+
 ### 2.4 Necessity of the carrier's own applied step (PlainNet18_c100, `cvt1`'s cell)
 
 | # | statement | numbers | artefact | CORR |
@@ -228,8 +322,12 @@ A **conjunction of one-cell results**, and nothing stronger:
    held alone in its own group while the other 61 share one step size (E6). Whether that also requires the other two to
    remain in the shared vote is **INDICATED only** (E7): one arm, no free-split control, the cycle's narrowest margin.
 3. On PlainNet, both the applied step and the vote carry part of the damage (E13, E14).
-4. **Coupled weight decay on normalisation scales is a precondition** of the whole phenomenon, at three grains and on two
-   networks (E8–E10), and the held-step damage runs through the same factor on PlainNet (E11).
+4. **Coupled weight decay on normalisation scales is a precondition** of the whole phenomenon, at **four** grains and on
+   two networks (E8–E10, **E19**), and the held-step damage runs through the same factor on PlainNet (E11). **At the
+   ResNet cell the precondition is carried by the three carriers' own decay** (E19), and that is **specific** against
+   both matched non-carrier sets (E20) — again as an **asymmetry between a measured rescue and two bounded floors**, and
+   again without separating identity from position class or from count/dose (§0 items 9 and 11). **The residual left to
+   the other seventeen scales is a BOUND, not a measurement, and its sign is horizon-dependent** (E21, §0 item 10).
 
 ### 3.2 What is NOT shown — stated in the same breath
 
@@ -308,14 +406,14 @@ In the campaign's register: what a reviewer will say, and what the honest answer
 | # | threat | answer, or concession |
 |---|---|---|
 | T1 | "This is a configuration pathology, not a finding." | **Largely conceded, and it must be written that way.** `LIMITS-PREP` §6 named this as the single biggest weakness and its own conditional has fired on the weight-decay branch. Momentum 0.99 is exonerated (E18); coupled WD on the norm scales is not — it is a **precondition** (E8–E11). The section is therefore a configuration-conditional failure mode, and the practical ceiling is set by the configuration. The correct statement of that ceiling is **"we did not meet the collapse at any cell tested with the decay off"**, never "a reader will not meet it". |
-| T2 | "You never removed the decay from the carriers alone on ResNet." | **Conceded, unreservedly.** `cwd1`'s mask is network-wide (20 scales). This is the gap. It is the one open item that can be closed cheaply, and Track A is registering exactly that batch (§6 O-1). |
+| T2 | "You never removed the decay from the carriers alone on ResNet." | **ANSWERED at CORRECTIONS 278 — this row previously read *"conceded, unreservedly … this is the gap"*, and the batch that closes it has now run.** `cwd3`: `DECAY_MASK` on {50, 53, 59} alone, `ResNet18_c100`, `ciso1`'s cell, 15 runs, every arm SCALAR. `P_CAR` **+47.2787 pp = +89.34 SE** and `CARWD0` lands **inside** the 20-scale arm's recovery band (E19); `P_SPEC` **+47.2627 pp** against both matched controls, each a **bounded floor** (E20). **The honest scope of the answer: ONE cell, ONE network, ONE horizon, ONE WD value, three seeds, no layerwise arm, and the mask still changes the weight update and the meta trace together.** `cwd1`'s network-wide mask is still what E9 is, and the PlainNet single-tensor sentence is still `cwd2`'s. **And closing this gap opened two others — T18 and T19 — which must be quoted whenever this row is.** |
 | T3 | "The mechanism is not measured." | **Conceded.** §3.2. The instrument records ‖w‖ only where the decay is off; the collapsing arms carry nothing. A mechanism needs a **new instrument**, not more cells. |
 | T4 | "Your necessity results are on a modified algorithm." | **Partly conceded.** `csv1`'s shadow vote is counterfactual (`SHADOW-IS-COUNTERFACTUAL`) and the registration says so in every licence token. `cwd2`'s held arms are open-loop with the complement forced onto a replay (`COMPLEMENT-ON-HEADPATH`). The necessity statements that do **not** modify the meta-update are the weight-decay ones: `cmo1` W0 is a plain CLI flag on the unpatched harness (`LIVE-HARNESS`); `cwd1` / `cwd2` `k01WD0` use `PATCH_DECAYMASK`, which changes **which tensors are decayed** — a training-configuration change — and leaves the meta-update closed-loop. |
 | T5 | "One dataset family, one network per axis, one horizon." | **Conceded.** CIFAR-100 (plus one CIFAR-10 association cell, `cct1`, where nothing collapses and dominance is present but never decisive); `ResNet18` or `PlainNet18` per axis; 100 epochs everywhere in this cycle, while the rescue is known to decay by 250–430 epochs elsewhere in the corpus. |
 | T6 | "Three seeds." | **Conceded as a design fact, mitigated by margin.** Every deciding contrast in §2 clears its bar by 30–100 SE. In `cmo1`, `cwd1`, `cwd2`, `csv1`, `cvt10` and `cst2` the bar is the **frozen prior sigma** 0.681198 (`SIGMA-PRIOR-FROZEN` on each FINAL; the conservative choice over that batch's own in-batch sigma, which runs 0.390–0.481), giving `SE_ARM_DIFF` 0.556196. **`cdep1` is the exception and the 276 draft got it wrong: it does NOT use 0.681198.** Its bars are frozen in its own scorer at `SE_ARM_DIFF` **0.755682 pp**, from *"a corpus reader that excludes `cdep1-*` rows"* — a **larger** bar than the frozen prior's, so E4/E5 are if anything under-stated in SE, not over-stated. The exceptions to the 30–100 SE range are named: `P_SPLIT` (1.9233 pp = 3.46 SE inside its bar, E7) and `cmg1`'s `D_CAR` (+4.115 pp, 0.885 pp inside a 5 pp margin — reported elsewhere, not used in §1). |
 | T7 | "Some arms sit **below** the scalar anchor, so 'stalls to the scalar level' is wrong." | **Conceded and already stamped.** `FLOOR-READINGS-ARE-BOUNDS` (164.6) is on the `cmo1`, `cvt10`, `csv1`, `cwd2` and `cst2` FINALs — five, not the three the 276 draft listed, verified by grep over the committed outputs; `HOLDBIG3-BELOW-K01` is explicit. **`cdep1` belongs on this list too and the 276 draft omitted it** (R1): its FINAL carries `DEPTH-FLOOR-SATURATED` and `DEPTH2-FLOOR-SATURATED`, and its scorer cites 164.6 in the same words — DEPTH 23.5207 and DEPTH2 23.4480 are **inside** the registered saturation band [21.0940, 27.9520], so the entitled statements are `D_DEPTH ≤ 5.0 pp` and `D_DEPTH2 ≤ 5.0 pp` and nothing finer. Every such reading is a **location**, a bound, never a point estimate — and that applies to the E4 control exactly as it applies to `cvt10`'s stalled arms. |
 | T8 | "Hardware was not controlled." | **Disclosed, not defended.** `cmo1`, `cwd1` and `cwd2` ran across mixed accelerators (2080 Ti / L4 / A100-MIG), unregistered and ungated. For `cwd2` the arm-centred device estimate is +0.046 / −0.038 / −0.073 pp — inside the noise floor and two to three orders below the 54.9 pp the verdict turns on; the branch string survives every leave-one-seed-out and ±2 pp per device class. **Seed is confounded with device and cannot be separated.** `cvt10` and `csv1` have **no** such census yet (§6 O-3). |
-| T9 | "Your noise floor moved under you." | **Disclosed.** The `--check` demonstration floor moved with the ingest (`SIGMA_R18ALL` 0.663166 df 239 → **0.648113 df 255**; `SIGMA_PLAIN` 0.459529 → 0.460632). **No bar reads that line** — every bar in §2 is a frozen literal set at registration — but any future scorer re-deriving a floor from the corpus must quote the new value. |
+| T9 | "Your noise floor moved under you." | **Disclosed, and it moved again.** The `--check` demonstration floor moved with the 273 ingest (`SIGMA_R18ALL` 0.663166 df 239 → 0.648113 df 255; `SIGMA_PLAIN` 0.459529 → 0.460632) **and again with the `cwd3` ingest at CORRECTIONS 278: `SIGMA_R18ALL` 0.648113 df 255 → **0.645141 df 258**, `SIGMA_PLAIN` **0.460632 unchanged**.** **No bar reads that line** — every bar in §2 is a frozen literal set at registration, and `cwd3`'s own bars use the 0.6481128684085689 frozen at 275 — but any future scorer re-deriving a floor from the corpus now gets **0.645141** and must quote it. |
 | T10 | "Six RULE 16 defects are open." | **Reported, none fixed, none hidden**: 270.6 F1, 271.6 F1 + F2, 272.6 F1 + F2, 273.6 F1 + F2. Exactly one of them touches a **licence sentence** — `cSV1`'s word "large" — and §2.4 states the corrected sentence in its place. |
 | T11 | "The parent reports scalar (SGDm, Lion) working on ImageNet." | **Open, and it is the sharpest external counterweight.** Our IN-489 scalar sits at 1.00. The obvious untested confounder was momentum 0.99 — now exonerated (E18) — which makes coupled WD the live candidate, but we have run nothing on ImageNet and cannot. Parent §7.3 also reports blockwise no better than scalar there. |
 | **T12** | **"Your only control is a bounded floor, and it has a BatchNorm shift in it."** | **Conceded, and now disclosed in §1, E4, E16 and T7 rather than left for a referee to find** (R1, R2). Two separate concessions: (a) the count-matched control's result is a **bound** (`D_DEPTH ≤ 5.0 pp`), not a magnitude — "recovers none of it" is struck; (b) the triple {47, 48, 56} contains **`layer4.0.bn1.bias`, a BatchNorm shift**, so it is count-matched and layer-matched but **not class-pure**. The answer is in the same artefact and costs nothing: `DEPTH2` {47, 56} is class-pure, `D_DEPTH2` +0.0960 pp, `DELTA_BIAS` +0.0727 pp = +0.10 SE (`BIAS-NULL`). The conclusion does not rest on the shift member — **but it also does not become a magnitude by being class-pure**; DEPTH2 is floor-saturated too. `cst2`'s `CTL` is the same triple (`CTL-HAS-A-BIAS-MEMBER`) and has **no** class-pure partner at its cell. |
@@ -324,6 +422,8 @@ In the campaign's register: what a reviewer will say, and what the honest answer
 | **T15** | **"The whole carrier set comes from one instrument, and that instrument is already unstable."** | **Conceded, and it is the weakest joint in the chain.** The three carriers are nominated **only** by `ctd1`'s per-tensor \|L\| attribution on the scalar arm (E3) — one attribution statistic, on one arm, at one cell. There is **no second, independent nomination instrument anywhere in the campaign**: no ablation-based ranking, no gradient-norm ranking, no leave-one-out search. And the instrument is **already known to be fragile off its cell**: at ms 3e-4 the same statistic gives `DOM_C` **0.4727** against a 0.50 bar (misses by 41 records of 1,500) and `TOP3_C` **0.4960** (misses by **six**), against a pooled **0.8069** at ms 1e-3 — E17, branch `NOMINATION-PARTIAL`. So the rescue transfers a decade of meta step size and the nomination does not. **A referee is entitled to say the carrier set is an artefact of one statistic at one meta step size, and the campaign cannot currently refute that.** |
 | **T16** | **"How many contrasts did you look at before these?"** | **Conceded: there is no multiplicity control anywhere in this cycle, and none was ever registered.** Across `cmo1`, `cvt10`, `cwd1`, `csv1`, `cwd2`, `cdep1` and `cst2` this write-up reads **19 numbered evidence rows** (E0–E18), and the underlying scorers print several times that many contrasts (`cvt10` alone prints **18** under `CONTRASTS`, plus a DESCRIPTIVE nineteenth). Every bar is a **frozen literal fixed at registration** and every contrast is **within batch and pre-registered as PRIMARY / CO-PRIMARY / KEY / DESCRIPTIVE before the runs existed** — which is what protects the deciding numbers, and it is a better protection than a post-hoc correction would be. **But no family-wise or false-discovery correction is applied to anything**, so the honest statement is: the 30–100 SE contrasts are unaffected by any plausible correction, and the **two narrow ones — `P_SPLIT` at 3.46 SE inside its bar (E7) and `cmg1`'s `D_CAR` at 1.84 SE inside (T6) — are exactly the ones a multiplicity argument would attack, and neither is load-bearing in §1 any more after R4.** Descriptive readings (`L_LAST_DOWN`, the `dm_*` block, the class shares) carry **no** bar at all and are labelled DESCRIPTIVE. |
 | **T17** | **"Your own draft had an evidence error in it."** | **Disclosed rather than quietly fixed.** The 276 draft asserted *"min \|w\| never leaves [0.9994, 1.020] on any masked run"*. That interval is **`cwd2`'s single masked tensor only**; on `cwd1`, where the readout minimises over all **20** masked scales, it reaches **0.983** (`k01NWD`) and **0.503** (`kLNWD`). Corrected in §3.2 at CORRECTIONS 277. **The conclusion is unchanged** — 0.503 is three orders above the 1e-3 threshold and `dm_small` is 0 on all 7,500 records that carry it, so Zhou et al. remains neither confirmed nor excluded — but the bound as stated was wrong, and it was inherited from 274.3, which generalised 273's correctly-scoped `min \\|w₅₀\| ≥ 0.9994`. **Anyone quoting 274.3's sentence should quote the per-batch figures instead.** |
+| **T18** | **"Your residual is a snapshot of a curve that has not converged."** | **Conceded, and it is the sharpest thing the refute pass of 278 added.** `P_SET` = `NWD` − `CARWD0` is **+0.4587 pp = +0.87 SE** in the registered 95–99 window, but over successive 5-epoch TEST windows it runs **−0.9153** (55–59), −0.7447, −0.5173, −0.5507, −0.1640 (75–79), **+0.1573** (80–84), +0.0973, +0.3800, **+0.4587** (95–99): it **crosses zero near epoch 80 and is still moving at epoch 99**. `CARWD0` has plateaued (mean tail slope **+0.0040** pp/ep) while `NWD` is still climbing (**+0.0276** pp/ep) — over the 20-epoch tail that slope difference is **+0.4726 pp, the same size as `P_SET` itself**. **So `P_SET` is a snapshot of a still-moving difference under `HORIZON-100-ONLY`, not a settled residual, and its SIGN must not be reported as a finding.** `F_CAR` drifts through 1 over the same windows (1.0202 → 0.9904). **`P_CAR`, `P_SPEC`, `P_CTL` and `P_CTL2` are stable across every 5-epoch window from 75 onward** (`P_CAR` 47.1580 / 47.2220 / 47.2787 at 75–79 / 85–89 / 95–99), **so the verdict and both `NULL` states are untouched** — this limits only the residual. |
+| **T19** | **"Your carrier result could just be a count of scales at that depth, and you cannot tell."** | **Conceded, and it is TWO separate confounds, neither excluded.** *(a) Position class, registered at 275.1 before any `cwd3` run and re-derived from the architecture three independent ways here:* `ResNet18_c100` has exactly **five** 512-wide BN scales — **{47, 50, 53, 56, 59}** — and **three of them are the carriers**, so a class-pure, count-matched, depth-matched, **carrier-free triple does not exist** at that depth. In Kim et al.'s taxonomy (arXiv:2205.07260), `CARWD0` vs `CTL2WD0` is **{γ_last, γ_down} vs {γ_others}** at the same depth; the batch cannot tell "these three tensors" from "this position class". *(b) Count / dose, which is NOT the same thing:* `CTLWD0`'s idx 48 is a BatchNorm **shift** whose ‖w‖ is **1.3e-10** at record 0 (`dm_small` **512**, seed-mean absmin **8.76e-15**, only 0.0066 by record 200), so coupled decay on it does essentially nothing and **`CTLWD0`'s effective intervention is two genuine scales, not three**. With (a), **no control in this batch — and none that could exist at that depth — is at once carrier-free, class-pure and count-matched at three**, so the rival account *"exempting ANY three genuine 512-wide `layer4` BN scales suffices, and two does not"* fits **every number in `cwd3` exactly as well** as the carrier account. **A two-carrier arm (e.g. {50, 53}) would separate them and was not run (O-12).** Note also that the `dm` readout matches the controls **per tensor** (‖w‖ ≈ 22.6 each) but **not in total**: decayed scale-mass stands at **3 : 2**. |
 
 ---
 
@@ -335,7 +435,7 @@ O-8 are 273.12's estimates; O-1, O-2, O-9 and O-11 are my own rough guesses at �
 
 | id | question | cost | what an outcome would let the section say |
 |---|---|---|---|
-| **O-1** | **The ResNet carrier-only decay mask** — `DECAY_MASK` on {50, 53, 59} alone, against `cwd1`'s 20-scale mask and against `k01`. This is the batch Track A is registering in parallel as this draft is written (expected id `cwd3`; **nothing of it is in the repository at `84e4bcb`, so everything about it here is UNSURE and must be re-read from CORRECTIONS 275**). | ≈ 5–8 GPU-h (guess, UNSURE) | **If the three alone remove the collapse**: O1 is repaired and §1 may say "the collapse is carried by a few last-block scales **and** removing their decay removes it" on **ResNet as well as PlainNet** — the cleanest sentence the line can have. **If they do not** (and the other 17 scales are needed): the carrier account and the decay account **come apart**, the nomination set and the precondition set are different sets, and that is a more interesting and more honest result than the one 273.12 proposed. **If partial**: a bounded fraction, stated as a fraction, with `cwd1` as the ceiling. **Either way the gap closes.** |
+| **O-1** | ~~**The ResNet carrier-only decay mask**~~ — **CLOSED at CORRECTIONS 278.** The batch ran as `cwd3` (15 runs, seeds {140, 141, 142}, `ResNet18_c100` at `ciso1`'s cell, every arm SCALAR) and **the first branch of this row fired**: the three alone remove the collapse. `P_CAR` **+47.2787 pp = +89.34 SE**, `CARWD0` inside `NWD`'s `REC` band, `P_SPEC` **+47.2627 pp** against two matched controls that both stay on `k01`'s floor (E19–E21, §2.3b). **The row's own prediction is honoured with its own caveat**: §1 may now say *the collapse is carried by a few last-block scales **and** removing their decay removes it* — **at this cell, on this network, at this horizon**, and never as "which one of the three" or as a share. **The second branch did NOT fire**: the nomination set and the precondition set did **not** come apart. | **10.7111 GPU-h actual** (`sacct`; 10.60 by the runs' own `minutes` lines) against the ≈5–8 guessed here and 275.3's ≈12.6 — **the guess in this row was low** | **Done.** What it bought, and what it cost: the gap at §0 bound 3 / T2 is closed, and **T18 and T19 are the price**. |
 | **O-2** | **A weight-norm readout on the arms where the decay is ON** — a read-only patch (`PATCH_WNORM`-style) so the collapsing arms carry ‖w‖, min |w| and a small-weight count. | new patch + inertness proof + ≈ 5 GPU-h | The only item that could turn the scope result into a **mechanism**, and the only way to rule Zhou et al. in or out. **This is a design question for the professor, not a queue item** (273.12). |
 | **O-3** | **GPU-hardware census for `cvt10` and `csv1`**, read from each run's own device line, in the form 264.4(4) / 273.4 used. | **ZERO GPU** | Closes T8 for the two batches carrying the cycle's narrowest margin. **Owed** since 270.4(6) and 272.4(7). |
 | **O-4** | **Pin `--constraint`, or record node/GPU in `PROVENANCE`, and add a `G-HW` disclosure** for any future batch. A launcher change, not a scorer edit. | ZERO | Retires the whole T8 class. Owed since 264.4(4). |
@@ -346,6 +446,7 @@ O-8 are 273.12's estimates; O-1, O-2, O-9 and O-11 are my own rough guesses at �
 | **O-9** | **A PAIR of carriers** on ResNet, and a free `[59,1,2]` control for `ISOSPLIT`. Never run. | ≈ 8 GPU-h | Would make E7's condition ("only while the others vote") a measured statement instead of a single uncontrolled arm. |
 | **O-10** | **Why ResNet and PlainNet differ at all** (three carriers vs one tensor), and the **closed-loop route at `k01`'s own dose** (`cvt8`'s `ROUTE-PARTIAL`, HIGHISOPATH 58.19). | unscoped | Both still open after `cvt10`. Not recommended before the discussion. |
 | **O-11** | **Any further widening of L1 by dataset or network** (Tiny-ImageNet T1, S5, S6). | 20–40 GPU-h | **NOT recommended** (273.12): it buys scope for a claim whose ceiling is set by the configuration, not by the scope. |
+| **O-12** | **A TWO-carrier decay mask on ResNet** — `DECAY_MASK` on {50, 53} alone, in batch with `cwd3`'s `CARWD0` and `k01`. **The arm that would separate the two accounts T19 cannot separate**: "these three tensors" against "any three genuine 512-wide `layer4` BN scales, and two are not enough". *(Added at CORRECTIONS 278. **Nothing is registered and nothing is launched by this file.**)* | ≈ 5 GPU-h (guess, **UNSURE**; `cwd3`'s measured 0.71 GPU-h per run × 6 for two seeds-triples, or ≈2.2 for one triple) | **If two carriers also recover**: the count account survives and the identity claim must narrow to "normalisation scales of this width at this depth". **If two do NOT recover while three do**: the count account is refuted at this cell and the carrier identity claim is materially stronger than it is today. **Either outcome is publishable and either one removes T19(b)**; T19(a), the position class, would still stand. |
 
 ---
 
@@ -380,8 +481,13 @@ answered by the data or is a costed queue item.
 
 ## 8. Provenance and discipline
 
-* Written against `master` `84e4bcb`; corpus `results/all_runs.csv` at `66a19fb`, **3,253 rows / 3364.4 GPU-hours**;
-  `results/CORPUS-EXCLUSIONS.tsv` 171 rows.
+* Written against `master` `84e4bcb`; **revised at 277 against `2ab824c`; amended at CORRECTIONS 278 against `064dff6`,
+  corpus `results/all_runs.csv` at `064dff6`, `3,268` rows / `3375.0` GPU-hours, `results/CORPUS-EXCLUSIONS.tsv` `183`
+  rows** **[SUPERSEDED: corpus at `66a19fb`, 3,253 rows / 3364.4 GPU-hours, exclusions 171 rows]**.
+* **`cwd3`'s rows (E19–E21, §2.3b, §1.3) were re-derived for this file twice**: by the registered scorer
+  `analysis/cWD3_carrierwd_score.py` (`bade3827…`, run UNEDITED, exit 0, 259 lines, identical on both hosts) and by a
+  stdlib-only reader of the raw `.out` files importing no repo module. The window-by-window figures behind **§0 item 10**
+  and **T18** are my own, from the raw `Epoch` lines, and are DESCRIPTIVE.
 * Every number in §2 was re-derived from the committed artefact named in its row. Census figures (E2) are labelled as
   census and come from `LIMITS-PREP` §2.2, which reads `results/all_runs.csv` through
   `analysis/corpus_exclusions.filter_rows` — the 108 intervention runs are never pooled.
@@ -396,5 +502,9 @@ answered by the data or is a costed queue item.
   that index is **broken here and was not relied on**; 2306.04226 was verified on `arxiv.org/abs/2306.04226` itself,
   returning Mueller, Vlaar, Rolnick, Hein, "Normalization Layers Are All That Sharpness-Aware Minimization Needs", v1
   7 Jun 2023 / v2 17 Nov 2023, with the abstract quoted in §4.)*
-* **ZERO GPU. No `sbatch`, no `srun`, no job submitted, cancelled or queried. `alice` — Saber's shared account — NOT
-  contacted.**
+* **ZERO GPU. No `sbatch`, no `srun`, no job submitted or cancelled. `alice` — Saber's shared account — NOT contacted.**
+  *(At CORRECTIONS 278 the amendment's cluster work was read-only on `alice2`: `sacct` / `squeue` polling, `scp`, and the
+  RULE 20 audit on the login node from a scratch stage of its own. **One RULE 16 defect reported and NOT fixed** —
+  `analysis/cWD3_carrierwd_score.py`'s `dm` readout takes `sorted(v)[len(v)//2]`, the upper middle, so it prints
+  "median 16" where the true median of that 20-vector is 13.6569; **DESCRIPTIVE, non-gating, no bar, level, contrast,
+  state, branch or stamp reads it**, CORRECTIONS 278.6 D1.)*
