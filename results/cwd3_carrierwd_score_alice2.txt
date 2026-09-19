@@ -1,0 +1,259 @@
+==============================================================================
+ cwd3 -- ResNet18_c100: IS THE COLLAPSE's WD PRECONDITION CARRIED BY THE THREE CARRIERS' OWN DECAY?  (PATCH_DECAYMASK)
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 140,141,142   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1  every arm scalar
+   k01      DECAY_MASK (unset)
+   CARWD0   DECAY_MASK layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+   CTLWD0   DECAY_MASK layer4.0.bn1.weight+layer4.0.bn1.bias+layer4.1.bn1.weight
+   CTL2WD0  DECAY_MASK layer4.0.bn1.weight+layer4.1.bn1.weight
+   NWD      DECAY_MASK normscale
+ CO-PRIMARY: P_CAR = CARWD0 - k01; P_SPEC = CARWD0 - CTLWD0; P_SET = NWD - CARWD0 (bounded in neither direction).
+ plateau5 = mean TEST over epochs 95..99 of each run's own .out.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3082 rows after corpus_exclusions.filter_rows, cwd3- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  15 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cwd3-k01-s140  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6940 (train 22.5560)
+  OK   cwd3-CARWD0-s140  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.0140 (train 94.1580)
+  OK   cwd3-CTLWD0-s140  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.5080 (train 22.5380)
+  OK   cwd3-CTL2WD0-s140  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6080 (train 22.5820)
+  OK   cwd3-NWD-s140  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.8900 (train 97.5760)
+  OK   cwd3-k01-s141  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.8720 (train 22.9980)
+  OK   cwd3-CARWD0-s141  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.4540 (train 95.4160)
+  OK   cwd3-CTLWD0-s141  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.8420 (train 22.9940)
+  OK   cwd3-CTL2WD0-s141  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.6440 (train 22.9900)
+  OK   cwd3-NWD-s141  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.6760 (train 97.4480)
+  OK   cwd3-k01-s142  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.3900 (train 23.1540)
+  OK   cwd3-CARWD0-s142  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.3240 (train 94.8160)
+  OK   cwd3-CTLWD0-s142  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.6540 (train 23.3680)
+  OK   cwd3-CTL2WD0-s142  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.5480 (train 23.3260)
+  OK   cwd3-NWD-s142  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.6020 (train 97.4160)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s140
+  PASS G-ARGS CARWD0-s140
+  PASS G-ARGS CTLWD0-s140
+  PASS G-ARGS CTL2WD0-s140
+  PASS G-ARGS NWD-s140
+  PASS G-ARGS k01-s141
+  PASS G-ARGS CARWD0-s141
+  PASS G-ARGS CTLWD0-s141
+  PASS G-ARGS CTL2WD0-s141
+  PASS G-ARGS NWD-s141
+  PASS G-ARGS k01-s142
+  PASS G-ARGS CARWD0-s142
+  PASS G-ARGS CTLWD0-s142
+  PASS G-ARGS CTL2WD0-s142
+  PASS G-ARGS NWD-s142
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line, one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is cvt1's ... cvt9's / cwd1's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=scalar tensors=62`   15 runs
+
+G-WITNESS one line of each kind per run == the registered witness (VOTE_W / BETA_HOLD / GROUP_HOLD / REST_HOLD off; DECAY_MASK)
+  PASS G-WITNESS VOTE_W k01-s140
+  PASS G-WITNESS BETA_HOLD k01-s140
+  PASS G-WITNESS GROUP_HOLD k01-s140
+  PASS G-WITNESS REST_HOLD k01-s140
+  PASS G-WITNESS DECAY_MASK k01-s140
+  PASS G-WITNESS k01-s140 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s140
+  PASS G-WITNESS BETA_HOLD CARWD0-s140
+  PASS G-WITNESS GROUP_HOLD CARWD0-s140
+  PASS G-WITNESS REST_HOLD CARWD0-s140
+  PASS G-WITNESS DECAY_MASK CARWD0-s140
+  PASS G-WITNESS CARWD0-s140 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTLWD0-s140
+  PASS G-WITNESS BETA_HOLD CTLWD0-s140
+  PASS G-WITNESS GROUP_HOLD CTLWD0-s140
+  PASS G-WITNESS REST_HOLD CTLWD0-s140
+  PASS G-WITNESS DECAY_MASK CTLWD0-s140
+  PASS G-WITNESS CTLWD0-s140 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s140
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s140
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s140
+  PASS G-WITNESS REST_HOLD CTL2WD0-s140
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s140
+  PASS G-WITNESS CTL2WD0-s140 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W NWD-s140
+  PASS G-WITNESS BETA_HOLD NWD-s140
+  PASS G-WITNESS GROUP_HOLD NWD-s140
+  PASS G-WITNESS REST_HOLD NWD-s140
+  PASS G-WITNESS DECAY_MASK NWD-s140
+  PASS G-WITNESS NWD-s140 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s141
+  PASS G-WITNESS BETA_HOLD k01-s141
+  PASS G-WITNESS GROUP_HOLD k01-s141
+  PASS G-WITNESS REST_HOLD k01-s141
+  PASS G-WITNESS DECAY_MASK k01-s141
+  PASS G-WITNESS k01-s141 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s141
+  PASS G-WITNESS BETA_HOLD CARWD0-s141
+  PASS G-WITNESS GROUP_HOLD CARWD0-s141
+  PASS G-WITNESS REST_HOLD CARWD0-s141
+  PASS G-WITNESS DECAY_MASK CARWD0-s141
+  PASS G-WITNESS CARWD0-s141 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTLWD0-s141
+  PASS G-WITNESS BETA_HOLD CTLWD0-s141
+  PASS G-WITNESS GROUP_HOLD CTLWD0-s141
+  PASS G-WITNESS REST_HOLD CTLWD0-s141
+  PASS G-WITNESS DECAY_MASK CTLWD0-s141
+  PASS G-WITNESS CTLWD0-s141 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s141
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s141
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s141
+  PASS G-WITNESS REST_HOLD CTL2WD0-s141
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s141
+  PASS G-WITNESS CTL2WD0-s141 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W NWD-s141
+  PASS G-WITNESS BETA_HOLD NWD-s141
+  PASS G-WITNESS GROUP_HOLD NWD-s141
+  PASS G-WITNESS REST_HOLD NWD-s141
+  PASS G-WITNESS DECAY_MASK NWD-s141
+  PASS G-WITNESS NWD-s141 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s142
+  PASS G-WITNESS BETA_HOLD k01-s142
+  PASS G-WITNESS GROUP_HOLD k01-s142
+  PASS G-WITNESS REST_HOLD k01-s142
+  PASS G-WITNESS DECAY_MASK k01-s142
+  PASS G-WITNESS k01-s142 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s142
+  PASS G-WITNESS BETA_HOLD CARWD0-s142
+  PASS G-WITNESS GROUP_HOLD CARWD0-s142
+  PASS G-WITNESS REST_HOLD CARWD0-s142
+  PASS G-WITNESS DECAY_MASK CARWD0-s142
+  PASS G-WITNESS CARWD0-s142 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTLWD0-s142
+  PASS G-WITNESS BETA_HOLD CTLWD0-s142
+  PASS G-WITNESS GROUP_HOLD CTLWD0-s142
+  PASS G-WITNESS REST_HOLD CTLWD0-s142
+  PASS G-WITNESS DECAY_MASK CTLWD0-s142
+  PASS G-WITNESS CTLWD0-s142 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s142
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s142
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s142
+  PASS G-WITNESS REST_HOLD CTL2WD0-s142
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s142
+  PASS G-WITNESS CTL2WD0-s142 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W NWD-s142
+  PASS G-WITNESS BETA_HOLD NWD-s142
+  PASS G-WITNESS GROUP_HOLD NWD-s142
+  PASS G-WITNESS REST_HOLD NWD-s142
+  PASS G-WITNESS DECAY_MASK NWD-s142
+  PASS G-WITNESS NWD-s142 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cwd3/PARTITION-MANIFEST.txt (<runsdir>/cwd3/)
+  PASS G-STRUCT byte-identical to cwd3_design.manifest_text(CWD3)   5843 vs 5843 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cwd3/PROVENANCE.txt (<runsdir>/cwd3/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == cvt8's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == cwd1's PATCH_DECAYMASK tree, UNCHANGED   HF_SHA256=94aedc33046afb12
+  PASS G-PROV HF.py.pre_decaymask == cvt8's HF.py   HF_PRE_DECAYMASK_SHA256=5197dc2eecbbcb6f
+  PASS G-PROV runner == run_cifar_cwd1.sh, UNCHANGED   RUNNER_SHA256=34a8c90ee3a0bee0
+  PASS G-PROV SCORER == this file   SCORER_SHA256=bade3827b0261b5d
+  PASS G-PROV DESIGN == the cwd3_design.py this scorer loaded   DESIGN_SHA256=f8afdfa24cac6c4e
+  PASS G-PROV the reused cwd_design.py this scorer loaded   CWD_DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01      TEST 22.9853  sd 0.3616  range 0.6960   TRAIN 22.9027   tail slope -0.004/0.003/-0.001 pp/ep
+           seeds: s140 22.6940 (train 22.5560), s141 22.8720 (train 22.9980), s142 23.3900 (train 23.1540)
+  CARWD0   TEST 70.2640  sd 0.2261  range 0.4400   TRAIN 94.7967   tail slope 0.009/0.002/0.000 pp/ep
+           seeds: s140 70.0140 (train 94.1580), s141 70.4540 (train 95.4160), s142 70.3240 (train 94.8160)
+  CTLWD0   TEST 23.0013  sd 0.5894  range 1.1460   TRAIN 22.9667   tail slope -0.001/0.005/-0.001 pp/ep
+           seeds: s140 22.5080 (train 22.5380), s141 22.8420 (train 22.9940), s142 23.6540 (train 23.3680)
+  CTL2WD0  TEST 22.9333  sd 0.5326  range 0.9400   TRAIN 22.9660   tail slope 0.001/0.009/0.001 pp/ep
+           seeds: s140 22.6080 (train 22.5820), s141 22.6440 (train 22.9900), s142 23.5480 (train 23.3260)
+  NWD      TEST 70.7227  sd 0.1496  range 0.2880   TRAIN 97.4800   tail slope 0.033/0.015/0.035 pp/ep
+           seeds: s140 70.8900 (train 97.5760), s141 70.6760 (train 97.4480), s142 70.6020 (train 97.4160)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 70.7227
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.7227
+
+G-BITE    Lion recomputed on the one group of every arm; no hold key; the DECAY_MASK record audit (k per arm)
+  PASS G-BITE k01      s140  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s140  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 1.4868253718277449e-06, 'dm_absmin': 1.0013412237167358, 'dm_small': 0}
+  PASS G-BITE CTLWD0   s140  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 9.78882597929378e-07, 'dm_absmin': 1.4021403558217571e-06, 'dm_small': 511}
+  PASS G-BITE CTL2WD0  s140  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.788826899172063e-07, 'dm_absmin': 0.9988965392112732, 'dm_small': 0}
+  PASS G-BITE NWD      s140  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.0011792521454954503, 'dm_absmin': 0.9796115159988403, 'dm_small': 0}
+  PASS G-BITE k01      s141  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s141  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 1.3920414765635199e-06, 'dm_absmin': 1.0008375644683838, 'dm_small': 0}
+  PASS G-BITE CTLWD0   s141  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 9.788822942462306e-07, 'dm_absmin': 4.942986606693012e-07, 'dm_small': 511}
+  PASS G-BITE CTL2WD0  s141  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.788821915008925e-07, 'dm_absmin': 0.9989631175994873, 'dm_small': 0}
+  PASS G-BITE NWD      s141  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.001169852233277724, 'dm_absmin': 0.9827311635017395, 'dm_small': 0}
+  PASS G-BITE k01      s142  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s142  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 2.959335587178293e-06, 'dm_absmin': 1.0009257793426514, 'dm_small': 0}
+  PASS G-BITE CTLWD0   s142  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 9.788830744596675e-07, 'dm_absmin': 1.2656497574425885e-06, 'dm_small': 509}
+  PASS G-BITE CTL2WD0  s142  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.788832714025846e-07, 'dm_absmin': 0.9990571737289429, 'dm_small': 0}
+  PASS G-BITE NWD      s142  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=20 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 998040, 'dm_wdterm': 0.0010648565541789428, 'dm_absmin': 0.9803739786148071, 'dm_small': 0}
+
+G-HW      DISCLOSURE ONLY (271.4(5)): the GPU each run's own nvidia-smi line names -- NO gate reads it
+  k01      s140 NVIDIA L4  s141 NVIDIA L4  s142 NVIDIA L4
+  CARWD0   s140 NVIDIA L4  s141 NVIDIA L4  s142 NVIDIA L4
+  CTLWD0   s140 NVIDIA L4  s141 NVIDIA L4  s142 NVIDIA L4
+  CTL2WD0  s140 NVIDIA L4  s141 NVIDIA L4  s142 NVIDIA L4
+  NWD      s140 NVIDIA L4  s141 NVIDIA L4  s142 NVIDIA L4
+  distinct devices: ['NVIDIA L4']
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.648113
+  SIGMA_INBATCH        0.408720
+  SIGMA_USED           0.648113  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.529182  = SIGMA_USED * sqrt(2/3)  (df_inbatch 10)
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_CAR  = CARWD0  - k01     = +47.2787 pp = +89.34 SE   (TRAIN +71.8940)   seeds +47.320 / +47.582 / +46.934
+  PRIMARY  P_SPEC = CARWD0  - CTLWD0  = +47.2627 pp = +89.31 SE   (TRAIN +71.8300)   seeds +47.506 / +47.612 / +46.670
+  PRIMARY  P_SET  = NWD     - CARWD0  = +0.4587 pp = +0.87 SE   (TRAIN +2.6833)   seeds +0.876 / +0.222 / +0.278
+  KEY      P_NWD  = NWD     - k01     = +47.7373 pp = +90.21 SE   (TRAIN +74.5773)   seeds +48.196 / +47.804 / +47.212
+  KEY      P_CTL  = CTLWD0  - k01     = +0.0160 pp = +0.03 SE   (TRAIN +0.0640)   seeds -0.186 / -0.030 / +0.264
+  KEY      P_CTL2 = CTL2WD0 - k01     = -0.0520 pp = -0.10 SE   (TRAIN +0.0633)   seeds -0.086 / -0.228 / +0.158
+  DESCR    F_CAR  = P_CAR / P_NWD = 0.9904
+  DESCR    D_SHIFT = CTLWD0 - CTL2WD0 = +0.0680 pp (the one BN shift in CTLWD0's triple, and the count/numel difference)
+  bars: GAP_MIN 20.0 (37.79 SE) | MATCH 5.0 pp (9.45 SE) | NULL 2.0 pp (3.78 SE) | RESCUE 10.0 pp (18.90 SE)
+  state bars: REC iff arm >= 65.7227 (NWD - 5) ; NULL iff arm <= 24.9853 (k01 + 2)
+  STATE    CARWD0   70.2640 -> REC   (to REC bar +4.5413 pp, to NULL bar +45.2787 pp)
+  STATE    CTLWD0   23.0013 -> NULL   (to REC bar -42.7213 pp, to NULL bar -1.9840 pp)
+  STATE    CTL2WD0  22.9333 -> NULL   (to REC bar -42.7893 pp, to NULL bar -2.0520 pp)
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: CARRIER-DECAY-SUFFICES | CAR-REC+CTL-NULL+CTL2-NULL | HARNESS-CLEAN | PATCH-BITES | MASK-UPDATE-AND-TRACE | CONV-LINEAR-WD-KEPT | ALL-ARMS-SCALAR | RECOVERY-AGAINST-NWD | CTL-HAS-ONE-SHIFT | CTL-DEPTH-MATCHED-NOT-MAGNITUDE | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | FLOOR-READINGS-ARE-BOUNDS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cwd3 bar or contrast):
+  corpus mechanism cell (LIMITS-PREP 2.2): k01 (n44) 22.9600  layerwise (n32) 69.4200
+  cwd1 (271): k01 22.9513  k01NWD 70.7760  kLNWD 69.3420
+  cwd3 {140,141,142}: k01 22.9853  CARWD0 70.2640  CTLWD0 23.0013  CTL2WD0 22.9333  NWD 70.7227
+
+DESCRIPTIVE (non-gating) -- PATCH_DECAYMASK's readout on the masked arms: ||w|| per masked tensor (seed means) and
+min |w|, entries |w| < 1e-3, at records 0 / 50 / 200 / 499.  k01 carries no readout (the mask is off there).
+  CARWD0   rec 0: 22.6/22.6/22.6 absmin 1 small 0.0 | rec 50: 22.6/22.6/22.6 absmin 1 small 0.0 | rec 200: 22.8/22.7/22.8 absmin 1 small 0.0 | rec 499: 22.8/22.7/22.9 absmin 1 small 0.0
+  CTLWD0   rec 0: 22.6/1.3e-10/22.6 absmin 8.76e-15 small 512.0 | rec 50: 22.6/0.000257/22.6 absmin 2.29e-08 small 512.0 | rec 200: 22.6/0.00662/22.6 absmin 1.07e-06 small 510.3 | rec 499: 22.6/0.00662/22.6 absmin 1.05e-06 small 510.3
+  CTL2WD0  rec 0: 22.6/22.6 absmin 1 small 0.0 | rec 50: 22.6/22.6 absmin 1 small 0.0 | rec 200: 22.6/22.6 absmin 0.999 small 0.0 | rec 499: 22.6/22.6 absmin 0.999 small 0.0
+  NWD      rec 0: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 50: carriers 22.6/22.6/22.6 median 16 absmin 1 small 0.0 | rec 200: carriers 22.8/22.7/22.8 median 16 absmin 0.983 small 0.0 | rec 499: carriers 22.9/22.7/22.9 median 16 absmin 0.981 small 0.0
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  CARWD0 sits within 5 pp of NWD while CTLWD0 AND CTL2WD0 sit within 2 pp of k01: removing coupled WD from the
+  three ctd1 carrier BatchNorm scales ALONE (1,536 of 11,220,132 parameters; update AND meta trace) removes the scalar
+  collapse as fully as removing it from all 20 scales, while removing it from cdep1's count-, numel-, width- and
+  depth-matched non-carrier triple {47,48,56} and from the class-pure non-carrier pair {47,56} does not lift the run.
+  SENTENCE LICENSED, at this cell: 'the collapse's weight-decay precondition is carried by the three carriers' own
+  decay: removing it from those three scales alone removes the collapse, and removing it from matched non-carrier
+  last-block normalisation parameters does not.'  EFFECT ON the carrier account of the scalar collapse at the mechanism cell (MASTER-TABLE rows 212-227, cwd1 271): the sentence 271 / 274 could NOT write
+  is EARNED at this cell.  A NULL state is a location at k01's floor (164.6), a BOUND on the effect, not a measured zero.
+  Not licensed: which ONE of the three; identity vs dynamical MAGNITUDE (188: the carriers' vote mass is x225 any
+  admissible control's); Not licensed: which ROUTE acts (weight shrink vs meta trace -- the mask changes both), decoupled WD, other cells.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about PlainNet / VGG / GroupNorm, other cells, momentum 0.9, or WD on conv / linear weights.
+  * Which ROUTE (weight shrink vs meta trace -- one switch changes both), decoupled weight decay, other WD values.
+  * Which ONE of the three carriers (they are masked together); identity vs dynamical magnitude (188.1).
+  * Any statement about the layerwise grouping (no layerwise arm) or beyond 100 epochs.

@@ -1,0 +1,78 @@
+==============================================================================
+ cwd3_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED cwd3 SCORER'S OUTPUT
+ CORRECTIONS 275.  No repo module imported, no regular expression, every literal re-typed.
+==============================================================================
+
+[1] WHAT WAS REBUILT FROM SCRATCH, BEFORE THE LOG WAS OPENED
+  PASS ResNet18_c100 rebuilt from the architecture   62 tensors, 11220132 params
+  PASS the 20 normscale tensors resolved by ndim==1 and name.endswith('.weight')   20 tensors, numel 4800
+  PASS CARWD0's name list resolves to the registered set   idx 50,53,59 numel 1536 k 3
+  PASS CTLWD0's name list resolves to the registered set   idx 47,48,56 numel 1536 k 3
+  PASS CTL2WD0's name list resolves to the registered set   idx 47,56 numel 1024 k 2
+  PASS every 512-wide BN scale in the model is one of {47,50,53,56,59} (188.1 / 275.2: no carrier-free class-pure triple)   512-wide scales (47, 50, 53, 56, 59)
+  PASS CTLWD0's idx 48 is a BatchNorm SHIFT, not a scale (the CTL2WD0 contrast exists for this reason)   layer4.0.bn1.bias
+  PASS alpha0 1e-6 -> beta0 re-derived through float32   -13.815510749816895
+
+[1b] COULD THE DECAY_MASK HALF OF G-BITE HAVE FAILED?  every run's records read as EVERY arm's k
+     (the registered k, and every other k in the batch): exactly one may pass.  This is the gate that
+     separates a name-list mask that never bit (275.4 null (i)) from one that really bit.
+      k01      s140  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s140  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTLWD0   s140  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTL2WD0  s140  as-registered(k=2) PASS   cross-reads that also pass: none
+      NWD      s140  as-registered(k=20) PASS   cross-reads that also pass: none
+      k01      s141  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s141  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTLWD0   s141  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTL2WD0  s141  as-registered(k=2) PASS   cross-reads that also pass: none
+      NWD      s141  as-registered(k=20) PASS   cross-reads that also pass: none
+      k01      s142  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s142  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTLWD0   s142  as-registered(k=3) PASS   cross-reads that also pass: none
+      CTL2WD0  s142  as-registered(k=2) PASS   cross-reads that also pass: none
+      NWD      s142  as-registered(k=20) PASS   cross-reads that also pass: none
+  PASS every run passes its OWN k and FAILS every other arm's k   15 runs, 15 cross-reads refused
+
+[1c] THE WITNESS, RE-DERIVED FROM THE ARCHITECTURE AND MATCHED TO WHAT THE RUN ITSELF PRINTED
+  PASS all 15 runs printed exactly the witness this parser rebuilt from the architecture   15/15
+      k01      DECAY_MASK: off
+      CARWD0   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+      CTLWD0   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.0.bn1.bias+layer4.1.bn1.weight masked=3 of=62 numel=1536 idx=47,48,56 names=layer4.0.bn1.weight,layer4.0.bn1.bias,layer4.1.bn1.weight
+      CTL2WD0  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.1.bn1.weight masked=2 of=62 numel=1024 idx=47,56 names=layer4.0.bn1.weight,layer4.1.bn1.weight
+      NWD      DECAY_MASK: on base=SGDm wd=0.1 spec=normscale masked=20 of=62 numel=4800 idx=2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59 names=bn1.weight,layer1.0.bn1.weight,layer1.0.bn2.weight,layer1.1.bn1.weight,layer1.1.bn2.weight,layer2.0.bn1.weight,layer2.0.bn2.weight,layer2.0.shortcut.1.weight,layer2.1.bn1.weight,layer2.1.bn2.weight,layer3.0.bn1.weight,layer3.0.bn2.weight,layer3.0.shortcut.1.weight,layer3.1.bn1.weight,layer3.1.bn2.weight,layer4.0.bn1.weight,layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn1.weight,layer4.1.bn2.weight
+
+[1d] THE MANIFEST AND THE PROVENANCE, REBUILT
+  PASS the batch's PARTITION-MANIFEST.txt == the manifest rebuilt here, byte for byte   5843 bytes, sha256 68e8946d659f0401
+  PASS every PROVENANCE.txt value equals the literal RE-TYPED here (275.5 / 271.2), scorer sha included   9 keys
+
+[2] THE NUMBERS, RE-DERIVED FROM THE RAW RECORDS ONLY
+  k01      TEST 22.9853  TRAIN 22.9027  seeds 22.6940 / 22.8720 / 23.3900
+  CARWD0   TEST 70.2640  TRAIN 94.7967  seeds 70.0140 / 70.4540 / 70.3240
+  CTLWD0   TEST 23.0013  TRAIN 22.9667  seeds 22.5080 / 22.8420 / 23.6540
+  CTL2WD0  TEST 22.9333  TRAIN 22.9660  seeds 22.6080 / 22.6440 / 23.5480
+  NWD      TEST 70.7227  TRAIN 97.4800  seeds 70.8900 / 70.6760 / 70.6020
+  SIGMA_INBATCH 0.408720   SIGMA_USED SIGMA_PRIOR_frozen   SE_ARM_DIFF 0.529182   df 10
+  P_CAR   +47.2787 pp = +89.34 SE   (TRAIN +71.8940)
+  P_SPEC  +47.2627 pp = +89.31 SE   (TRAIN +71.8300)
+  P_SET   +0.4587 pp = +0.87 SE   (TRAIN +2.6833)
+  P_NWD   +47.7373 pp = +90.21 SE   (TRAIN +74.5773)
+  P_CTL   +0.0160 pp = +0.03 SE   (TRAIN +0.0640)
+  P_CTL2  -0.0520 pp = -0.10 SE   (TRAIN +0.0633)
+  F_CAR 0.9904   D_SHIFT +0.0680 pp
+  STATE CARWD0   REC
+  STATE CTLWD0   NULL
+  STATE CTL2WD0  NULL
+  branch  CARRIER-DECAY-SUFFICES
+
+[3] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG
+  PASS the rebuild has the scorer log's line count   259 rebuilt vs 259 in the log
+  lines in the scorer log            259
+  rebuilt and matched VERBATIM       256
+  matched host-independently          3   (2 path disclosures by suffix; 1 corpus count re-filtered here)
+  MISMATCHES                          0
+
+[4] THE FINAL LINE
+  PASS the FINAL line is rebuilt token by token
+  FINAL: CARRIER-DECAY-SUFFICES | CAR-REC+CTL-NULL+CTL2-NULL | HARNESS-CLEAN | PATCH-BITES | MASK-UPDATE-AND-TRACE | CONV-LINEAR-WD-KEPT | ALL-ARMS-SCALAR | RECOVERY-AGAINST-NWD | CTL-HAS-ONE-SHIFT | CTL-DEPTH-MATCHED-NOT-MAGNITUDE | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | FLOOR-READINGS-ARE-BOUNDS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+
+VIOLATIONS 0
