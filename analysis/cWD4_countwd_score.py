@@ -380,8 +380,11 @@ READING = ("the carrier account of the scalar collapse at the mechanism cell, an
 NOT_ROUTE = "Not licensed: which ROUTE acts (weight shrink vs meta trace -- the mask changes both), decoupled WD, other cells."
 FLOOR_NOTE = "A NULL state is a location at k01's floor (164.6), a BOUND on the effect, not a measured zero."
 NOT_MAG = ("Not licensed either way: IDENTITY vs TERM MAGNITUDE.  On this network no carrier-free control can be "
-           "magnitude-matched -- the carriers are |L| ranks 1/2/3 of 62 and the only carrier-free 512-wide layer4 BN "
-           "scales are ranks 33 and 36, a sum ratio of 308.4 (SCORE-cdep1 [P]; cmg1's MAGNITUDE-NOT-SEPARATED).")
+           "magnitude-matched.  Mean |L| on the scalar anchor's PINNED records (SCORE-cdep1 [P]): the three carriers "
+           "are ranks 1/2/3 of 62 (59 3.2984e-01, 50 2.9155e-01, 53 1.9526e-01); the ONLY carrier-free 512-wide "
+           "layer4 BN scales are ranks 33 and 36 (56 1.5166e-03, 47 1.1298e-03).  The SMALLEST carrier exceeds the "
+           "LARGEST admissible control tensor by 128.8x, and SCORE-cdep1's registered sum ratio is 308.4.  cmg1's "
+           "MAGNITUDE-NOT-SEPARATED stands: this batch matches COUNT, class, width, depth and numel, never magnitude.")
 NOT_KIM = ("Not licensed: ctd1 IDENTITY vs Kim et al.'s POSITION CLASS (arXiv:2205.07260) -- {50,59} are gamma_last, "
            "53 is gamma_down, {47,56} are gamma_others, and no carrier-free gamma_last/gamma_down exists at this depth.")
 LICENSE = {
@@ -771,10 +774,13 @@ def score(runsdir, csvpath, manifest_path=""):
     print("\nWHAT IT DOES NOT LICENSE, UNCONDITIONALLY:")
     print("  * Anything about PlainNet / VGG / GroupNorm, other cells, momentum 0.9, or WD on conv / linear weights.")
     print("  * Which ROUTE (weight shrink vs meta trace -- one switch changes both), decoupled weight decay, other WD values.")
-    print("  * IDENTITY vs TERM MAGNITUDE: no magnitude-matched carrier-free control exists on this network (the carriers")
-    print("    are |L| ranks 1/2/3 of 62 AND the only tensors voting DOWN on 100 %% of pinned records; the carrier-free")
-    print("    512-wide layer4 BN scales are ranks 33 and 36).  D_MAG / D_CLASS are DESCRIPTIVE and are BOUNDS wherever")
-    print("    the singles saturate (stamp SINGLES-SATURATED).")
+    print("  * IDENTITY vs TERM MAGNITUDE: no magnitude-matched carrier-free control exists on this network.  The three")
+    print("    carriers are mean-|L| ranks 1/2/3 of 62 on the scalar anchor's pinned records AND the only tensors that")
+    print("    vote DOWN on 100 %% of them; the only carrier-free 512-wide layer4 BN scales are ranks 33 and 36, so the")
+    print("    SMALLEST carrier exceeds the LARGEST admissible control tensor by 128.8x.  The next-largest terms in the")
+    print("    whole model (linear.weight rank 4, layer4.0.conv2.weight rank 5) vote UP on 100 %% of pinned records and")
+    print("    are neither normalisation scales nor numel-matched, so they are not an admissible control either.")
+    print("    D_MAG / D_CLASS are DESCRIPTIVE and are BOUNDS wherever the singles saturate (stamp SINGLES-SATURATED).")
     print("  * ctd1 IDENTITY vs Kim et al.'s POSITION CLASS (arXiv:2205.07260) at count 3 or 1; at count TWO the carrier")
     print("    pair is {gamma_last, gamma_down} and the control is {gamma_others, gamma_others}, so class and carrier")
     print("    status remain confounded there too -- this batch separates COUNT, not CLASS.")
