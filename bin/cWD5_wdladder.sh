@@ -266,12 +266,15 @@ if [ -f "$ILOG" ] && grep -q "^TEST_DECAYMASK_D0_RC 0$" "$ILOG" && grep -q "^REA
    && [ "$(grep -c "PASS RW2 W. wd .*: NON-VACUITY" "$ILOG")" = 4 ] \
    && grep -q "PASS RW2 THE FLAG BITES: the four rungs' final weights are PAIRWISE DISTINCT" "$ILOG" \
    && grep -q "PASS RW3 printed EXACTLY cwd5's registered witness" "$ILOG" \
+   && grep -q "PASS RW3 THE MASK BITES THE META TRACE" "$ILOG" \
    && grep -q "PASS RW3 NON-VACUITY" "$ILOG" \
+   && grep -q "PASS RW3 DECLARED LIMIT, MEASURED" "$ILOG" \
    && grep -q "PASS RW4 at wd $WD_W2 a misspelt name" "$ILOG"; then
   echo "guard 4f: cwd5's bite log ALL PASS on THIS tree, THIS design, THIS driver: $(grep -c '^  PASS' "$ILOG") PASS / $(grep -c '^  FAIL' "$ILOG") FAIL (sha $(sha "$ILOG" | cut -c1-8))"
   echo "          including RW-EQ (the additive wd-parameterised child == the REGISTERED child, bitwise, at wd 0.1),"
   echo "          RW2 (the ladder's premise: the formula holds at all FOUR rungs and the four rungs' weights differ)"
-  echo "          and RW3 (PATCH_DECAYMASK at wd $WD_W2, a value it has never run at)"
+  echo "          and RW3 (PATCH_DECAYMASK at wd $WD_W2, a value it has never run at), whose DECLARED LIMIT line records"
+  echo "          which route the mask bites at the clamped initial step size and why 300 steps cannot show more"
 else
   guard_fail "guard 4f: no ALL PASS cwd5 bite log for HF $(sha "$HFH") / design $(sha "$DES") at $ILOG -- sbatch $RRSB, then copy its .out there"
 fi

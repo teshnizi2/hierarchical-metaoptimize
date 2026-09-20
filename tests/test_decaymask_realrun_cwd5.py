@@ -29,8 +29,13 @@ is touched, nothing registered is edited (RULE 16), and the transcription is not
   RW3    PATCH_DECAYMASK AT A NEW WEIGHT DECAY: the three ctd1 carriers masked at wd 1e-2 -- (a) prints EXACTLY
          cwd5's registered witness, `wd=0.01 ... masked=3 ... idx=50,53,59`; (b) every probe record carries
          dm_n == step+2, dm_skipped == dm_n*3, dm_masked == 3, dm_wdterm > 0 and three finite norms; (c) the update
-         is bitwise the formula with wd 0 on {50,53,59} and 0.01 elsewhere, and the SAME run FAILS the unmasked
-         formula, so the mask bites at float resolution; (d) its weights differ from the unmasked wd 1e-2 run's.
+         is bitwise the formula with wd 0 on {50,53,59} and 0.01 elsewhere; (d) WHICH ROUTE BITES IS MEASURED, NOT
+         ASSUMED -- at the run's own alpha0 1e-6 the skipped term is a*wd*|w| ~ 1e-8, BELOW float32 resolution next
+         to |w| ~ 1, so the WEIGHT UPDATE is bitwise unchanged while the META TRACE differs at every step; at a
+         test-only alpha0 1e-2 both routes bite and the masked and unmasked runs' final weights differ.  The
+         coincidence of the two weight trajectories at alpha0 1e-6 over 300 steps is therefore EXPLAINED and
+         DECLARED, and is a limit of the PROOF (300 steps at the clamped initial step size), not of the batch,
+         whose runs are 50,000 steps at a LEARNED, rising alpha.
   RW4    LOUDNESS AT THE NEW VALUE: at wd 1e-2 a misspelt name, a duplicate, an empty `+` token, a name outside the
          model and a bad character each raise ValueError at construction; and at wd 0 a mask raises the patch's own
          "a mask would be vacuous" ValueError.  A typo cannot run silently unmasked at any rung.
@@ -398,18 +403,38 @@ def main():
         chk(VM["stats"]["expect"] == [0, 0, 0] and VM["wd_seen"] == D.WD_VALUE[rung],
             "RW3 w', h', m' BITWISE the formula with wd 0 on idx {%s} and %s elsewhere, at every step" % (CARIDX, tok),
             str(VM["stats"]))
-        chk(VM["bites"] > 0, "RW3 the mask BITES at float resolution (the skipped decay term is non-trivial)",
-            "bites %d" % VM["bites"])
+        # WHICH ROUTE BITES AT THE RUN'S OWN alpha0, MEASURED RATHER THAN ASSUMED.  `wrong` here is the FULLY UNMASKED
+        # formula (wrong_mask is empty), so wrong[0] / wrong[1] count the steps at which the mask changed the WEIGHT
+        # UPDATE / the META TRACE.  At alpha0 1e-6 and wd 1e-2 the skipped term is a*wd*|w| ~ 1e-8, BELOW float32
+        # resolution next to |w| ~ 1, so the weight update is bitwise unchanged while the trace is not.  That is a fact
+        # about the FIRST 300 STEPS AT THE CLAMPED INITIAL STEP SIZE, not about the 50,000-step batch runs, and it is
+        # reported, not asserted away.
+        chk(VM["stats"]["wrong"][1] > 0,
+            "RW3 THE MASK BITES THE META TRACE at the run's own alpha0: h differs from the unmasked formula at %d of"
+            " %d tensor-steps" % (VM["stats"]["wrong"][1], 3 * a.steps),
+            "wrong (vs the unmasked formula) w=%d h=%d m=%d; weight-update bites at float resolution %d"
+            % (VM["stats"]["wrong"][0], VM["stats"]["wrong"][1], VM["stats"]["wrong"][2], VM["bites"]))
+        chk((VM["bites"] == 0) == (VM["stats"]["wrong"][0] == 0),
+            "RW3 CONSISTENCY: the weight update differs from the unmasked one on exactly the steps where the skipped"
+            " decay term is representable in float32 (bites %d, w-mismatches %d)" % (VM["bites"], VM["stats"]["wrong"][0]))
         VW = run_wd(a, "carw2_vs_unmasked", post, "scalar", {"DECAY_MASK": CARSPEC}, "1e-2", tok, CARIDX, "")
-        chk(VW is not None and VW["stats"]["expect"] == [0, 0, 0] and sum(VW["stats"]["wrong"][:2]) == 0,
-            "RW3 at a test-only alpha0 1e-2 the masked run still matches its own set exactly")
+        chk(VW is not None and VW["stats"]["expect"] == [0, 0, 0] and VW["bites"] > 0
+            and sum(VW["stats"]["wrong"][:2]) > 0,
+            "RW3 at a test-only alpha0 1e-2 the masked run matches ITS OWN set exactly, the skipped decay term is"
+            " representable (bites %d), and the run FAILS the fully unmasked formula" % (VW["bites"] if VW else -1),
+            "stats %s" % (VW["stats"] if VW else None))
         VU = run_wd(a, "unmasked_w2_big", post, "scalar", {}, "1e-2", tok, "", CARIDX)
         chk(VU is not None and VU["stats"]["expect"] == [0, 0, 0] and sum(VU["stats"]["wrong"][:2]) > 0,
             "RW3 NON-VACUITY: at alpha0 1e-2 an UNMASKED run at the same wd FAILS the masked formula -- the two are"
             " distinguishable on the real path", "stats %s" % (VU["stats"] if VU else None))
-        chk(VW is not None and VU is not None and VW["weights_sha256"] != VU["weights_sha256"]
-            and "W2" in shas and VM["weights_sha256"] != shas["W2"],
-            "RW3 the masked run's final weights differ from the UNMASKED run's at the same weight decay")
+        chk(VW is not None and VU is not None and VW["weights_sha256"] != VU["weights_sha256"],
+            "RW3 at alpha0 1e-2 the masked run's final weights DIFFER from the unmasked run's at the same weight decay",
+            "%s vs %s" % (VW["weights_sha256"][:12] if VW else None, VU["weights_sha256"][:12] if VU else None))
+        chk("W2" in shas and (VM["weights_sha256"] == shas["W2"]) == (VM["stats"]["wrong"][0] == 0),
+            "RW3 DECLARED LIMIT, MEASURED: at alpha0 1e-6 the masked and unmasked weight trajectories coincide over 300"
+            " steps EXACTLY BECAUSE the weight update never differed in float32; the trace difference has not reached"
+            " the weights in 300 steps.  The batch's runs are 50,000 steps at a LEARNED, rising alpha",
+            "masked %s vs rung W2 %s" % (VM["weights_sha256"][:12], shas.get("W2", "")[:12]))
 
     # ---- RW4: loudness ----------------------------------------------------------------------------------------------
     print("\nRW4 LOUDNESS AT THE NEW WEIGHT DECAY (CPU, the real HF.init_meta)")
