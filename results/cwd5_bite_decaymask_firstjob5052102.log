@@ -1,0 +1,117 @@
+NODE=node885 | JOB=cwd5bite 5052102 | BATCH=cwd5
+EXPORT_PROBE layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+NVIDIA L4, 23034 MiB
+8d08803ae1d826b149144c5b55149ab1155002b45a5da9b595eb1070bf7ef18b  tests/test_decaymask.py
+0c64e50ffaac6a2a483f68f81e1b9634199ef7a2a82545964351cad3cfb396bb  tests/test_decaymask_realrun.py
+b8b99b2fdd22e9ff9d2c6d1fd8b0aaa6cf813e1d5a0850b3e61568cc0283338e  tests/test_decaymask_realrun_cwd5.py
+690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722  tests/test_grouphold_realrun.py
+03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195  analysis/cwd_design.py
+dd3ab158eab1080406cd608982cde0ff7d20ccd52b48d41131e690ff84dbd74d  analysis/cwd5_design.py
+cf88e7d25793b73c27e7a3bafcabd68e5499fe9007e803d871f25aaef75b2379  patches/patch_decaymask.py
+94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py.pre_decaymask
+5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9  /home/s5014158/metaopt/harness_cvt8/cifar10/Optimizers/HF.py
+D0 STRUCTURE
+  PASS D0 the pre file carries no PATCH_DECAYMASK / _dm_ name
+  PASS D0 region 1 (the _dm_init call) present once
+  PASS D0 region 2 (the guarded _dm_attach) present once
+  PASS D0 region 3 (the method block) present once
+  PASS D0 region 1 sits IMMEDIATELY before `self.trace_meta = ...` in init_meta
+  PASS D0 region 1 runs AFTER the last hold patch's init call
+  PASS D0 region 2 sits IMMEDIATELY before `self._pt_attach(rec)  # PATCH_PROBE_TENSOR`
+  PASS D0 region 3 sits IMMEDIATELY before check_required_attributes
+  PASS D0 DELETING THE THREE REGIONS REPRODUCES THE PRE HF.py BYTE FOR BYTE   79768 vs 79768 bytes
+  PASS D0 the block defines exactly the four _dm_ methods, in order   ['_dm_init', '_dm_resolve', '_dm_SGDm_base_update', '_dm_attach']
+  PASS D0 every pre-existing method present, in order (51)
+  PASS D0 SGDm_base_update is the registered text in pre and post
+  PASS D0 the copy's unmasked branch is the original lines verbatim; the masked branch drops wd in delta AND in h
+
+ALL PASS
+TEST_DECAYMASK_D0_RC 0
+BATCH cwd5
+DRIVER_SHA256 b8b99b2fdd22e9ff9d2c6d1fd8b0aaa6cf813e1d5a0850b3e61568cc0283338e
+REUSED_DRIVER_SHA256 0c64e50ffaac6a2a483f68f81e1b9634199ef7a2a82545964351cad3cfb396bb
+REGISTERED_TEST_SHA256 690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722
+DESIGN_SHA256 dd3ab158eab1080406cd608982cde0ff7d20ccd52b48d41131e690ff84dbd74d
+CWD_DESIGN_SHA256 03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195
+PATCH_SHA256 cf88e7d25793b73c27e7a3bafcabd68e5499fe9007e803d871f25aaef75b2379
+TREE_PRE /home/s5014158/metaopt/harness_cvt8/cifar10 HF 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9 build_network c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+TREE_POST /home/s5014158/metaopt/harness_cwd1/cifar10 HF 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf build_network c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d
+WD_LADDER W1=0.1,W2=1e-2,W3=1e-3,W4=5e-4
+CARRIER_SET idx=50,53,59 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+  PASS --tree-post's HF.py is cwd1's PATCH_DECAYMASK tree, UNCHANGED (94aedc33...)
+  PASS --tree-pre's HF.py is cvt8's and carries no PATCH_DECAYMASK
+  PASS --tree-pre's HF.py is BYTE-IDENTICAL to --tree-post's HF.py.pre_decaymask
+  PASS the two trees' build_network.py are BYTE-IDENTICAL and == the design's BN_SHA
+  PASS the reused registered driver, cwd_design.py and patch_decaymask.py are cwd1's registered files, UNEDITED (RULE 16)
+
+steps 300, PROBE every 10, PROBE_TENSOR=1, seed 146, AUGMENT=1, BETA_CLIP -15:-2.3026, net ResNet18_c100, scalar
+
+RW-EQ EQUIVALENCE OF THE NEW wd-PARAMETERISED CHILD TO THE REGISTERED ONE, AT wd 0.1 (the only value the
+      registered child can run).  If the transcription had drifted, this is where it shows.
+  ran eq_reg_off             (verifier) tree=harness_cwd1 spec=scalar env={} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0]} bites 0
+  ran eq_new_off                 tree=harness_cwd1 wd=0.1    alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [0, 0, 0]} bites 0  weights df5952bbee8a...
+  PASS RW-EQ off      the new child and the REGISTERED child agree BITWISE at wd 0.1 (weights, betas, stats, bites)
+  PASS RW-EQ off      the optimiser's own args_base['weight_decay'] is 0.1
+  ran eq_reg_carriers        (verifier) tree=harness_cwd1 spec=scalar env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'} alpha0=1e-6  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0]} bites 900
+  ran eq_new_carriers            tree=harness_cwd1 wd=0.1    alpha0=1e-6 env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0], 'wrongwd': [0, 0, 0]} bites 900  weights 0e06dc21944c...
+  PASS RW-EQ carriers the new child and the REGISTERED child agree BITWISE at wd 0.1 (weights, betas, stats, bites)
+  PASS RW-EQ carriers the optimiser's own args_base['weight_decay'] is 0.1
+
+RW0 DETERMINISM CONTROL (the parent tree, twice, wd 0.1)
+  ran pre_k01_a                  tree=harness_cvt8 wd=0.1    alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [0, 0, 0]} bites 0  weights df5952bbee8a...
+  ran pre_k01_b                  tree=harness_cvt8 wd=0.1    alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [0, 0, 0]} bites 0  weights df5952bbee8a...
+  PASS RW0 parent k01 vs itself: beta IDENTICAL at every step   300 steps
+  PASS RW0 parent k01 vs itself: per-step loss IDENTICAL
+  PASS RW0 parent k01 vs itself: probe.jsonl BYTE-IDENTICAL   30 records
+  PASS RW0 parent k01 vs itself: every parameter and buffer after the last step BITWISE-IDENTICAL   df5952bbee8ac6ba
+
+RW1 INERTNESS AT THE ANCHOR (cwd1's tree, DECAY_MASK unset, wd 0.1 == the parent tree, bitwise)
+  ran post_k01_unset             tree=harness_cwd1 wd=0.1    alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [0, 0, 0]} bites 0  weights df5952bbee8a...
+  PASS RW1 k01 DECAY_MASK unset: beta IDENTICAL at every step   300 steps
+  PASS RW1 k01 DECAY_MASK unset: per-step loss IDENTICAL
+  PASS RW1 k01 DECAY_MASK unset: probe.jsonl BYTE-IDENTICAL   30 records
+  PASS RW1 k01 DECAY_MASK unset: every parameter and buffer after the last step BITWISE-IDENTICAL   df5952bbee8ac6ba
+  PASS RW1 printed `DECAY_MASK: off` and the parent's own witness lines
+  PASS RW1 no dm_* key in probe.jsonl on an unmasked run
+
+RW2 THE LADDER'S PREMISE -- the four rung tokens on the real GPU path, unmasked
+  ran rung_W1                    tree=harness_cwd1 wd=0.1    alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [18560, 18560, 0]} bites 0  weights df5952bbee8a...
+  PASS RW2 W1 wd 0.1  : w', h', m' BITWISE the coupled formula with THE PASSED wd at every one of 300 steps, every tensor; the optimiser's own args_base['weight_decay'] is 0.1   {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [18560, 18560, 0]}
+  PASS RW2 W1 wd 0.1  : NON-VACUITY -- the SAME run checked against the formula at wd 1e-2 FAILS, so the verifier genuinely distinguishes the rungs   wrongwd [18560, 18560, 0]
+  ran rung_W2                    tree=harness_cwd1 wd=1e-2   alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [18560, 18560, 0]} bites 0  weights 74c9c616ade5...
+  PASS RW2 W2 wd 1e-2 : w', h', m' BITWISE the coupled formula with THE PASSED wd at every one of 300 steps, every tensor; the optimiser's own args_base['weight_decay'] is 0.01   {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [18560, 18560, 0]}
+  PASS RW2 W2 wd 1e-2 : NON-VACUITY -- the SAME run checked against the formula at wd 0.1 FAILS, so the verifier genuinely distinguishes the rungs   wrongwd [18560, 18560, 0]
+  ran rung_W3                    tree=harness_cwd1 wd=1e-3   alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [12527, 18550, 0]} bites 0  weights d3a6705e87b2...
+  PASS RW2 W3 wd 1e-3 : w', h', m' BITWISE the coupled formula with THE PASSED wd at every one of 300 steps, every tensor; the optimiser's own args_base['weight_decay'] is 0.001   {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [12527, 18550, 0]}
+  PASS RW2 W3 wd 1e-3 : NON-VACUITY -- the SAME run checked against the formula at wd 1e-2 FAILS, so the verifier genuinely distinguishes the rungs   wrongwd [12527, 18550, 0]
+  ran rung_W4                    tree=harness_cwd1 wd=5e-4   alpha0=1e-6 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [12527, 18550, 0]} bites 0  weights c9a524f45023...
+  PASS RW2 W4 wd 5e-4 : w', h', m' BITWISE the coupled formula with THE PASSED wd at every one of 300 steps, every tensor; the optimiser's own args_base['weight_decay'] is 0.0005   {'expect': [0, 0, 0], 'wrong': [0, 0, 0], 'wrongwd': [12527, 18550, 0]}
+  PASS RW2 W4 wd 5e-4 : NON-VACUITY -- the SAME run checked against the formula at wd 1e-2 FAILS, so the verifier genuinely distinguishes the rungs   wrongwd [12527, 18550, 0]
+  PASS RW2 THE FLAG BITES: the four rungs' final weights are PAIRWISE DISTINCT -- no two rungs are secretly the same experiment   W1 df5952bbee W2 74c9c616ad W3 d3a6705e87 W4 c9a524f450
+
+RW3 PATCH_DECAYMASK AT A WEIGHT DECAY IT HAS NEVER RUN AT (50,53,59 carriers at wd 1e-2)
+  ran carw2                      tree=harness_cwd1 wd=1e-2   alpha0=1e-6 env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [0, 900, 0], 'wrongwd': [0, 0, 0]} bites 0  weights 74c9c616ade5...
+  PASS RW3 printed EXACTLY cwd5's registered witness -- `wd=0.01 ... masked=3 ... idx=50,53,59`   DECAY_MASK: on base=SGDm wd=0.01 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=
+  PASS RW3 at every probe record dm_n == step+2, dm_skipped == dm_n*3, dm_masked == 3, dm_wdterm > 0, 3 finite norms   30 records, 0 bad; last {'dm_n': 292, 'dm_skipped': 876, 'dm_wdterm': 5.238318104171683e-07}
+  PASS RW3 w', h', m' BITWISE the formula with wd 0 on idx {50,53,59} and 1e-2 elsewhere, at every step   {'expect': [0, 0, 0], 'wrong': [0, 900, 0], 'wrongwd': [0, 0, 0]}
+  FAIL RW3 the mask BITES at float resolution (the skipped decay term is non-trivial)   bites 0
+  ran carw2_vs_unmasked          tree=harness_cwd1 wd=1e-2   alpha0=1e-2 env={'DECAY_MASK': 'layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight'}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0], 'wrongwd': [0, 0, 0]} bites 900  weights 4d72b0ffb642...
+  FAIL RW3 at a test-only alpha0 1e-2 the masked run still matches its own set exactly
+  ran unmasked_w2_big            tree=harness_cwd1 wd=1e-2   alpha0=1e-2 env={}  300 steps on NVIDIA L4  stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0], 'wrongwd': [0, 0, 0]} bites 0  weights ddb0aa2f552c...
+  PASS RW3 NON-VACUITY: at alpha0 1e-2 an UNMASKED run at the same wd FAILS the masked formula -- the two are distinguishable on the real path   stats {'expect': [0, 0, 0], 'wrong': [900, 900, 0], 'wrongwd': [0, 0, 0]}
+  FAIL RW3 the masked run's final weights differ from the UNMASKED run's at the same weight decay
+
+RW4 LOUDNESS AT THE NEW WEIGHT DECAY (CPU, the real HF.init_meta)
+  LOUD misspelt-one wd=0.01 ValueError: PATCH_DECAYMASK: 'layer4.0.bn2.weigth' is not a parameter name of this model
+  LOUD misspelt-triple wd=0.01 ValueError: PATCH_DECAYMASK: 'layer4.0.shortcut.1.weigth' is not a parameter name of this model
+  LOUD duplicate wd=0.01 ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight+layer4.0.bn2.weight' names a tensor twice
+  LOUD empty-token wd=0.01 ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight++layer4.1.bn2.weight' has an empty + token
+  LOUD not-a-name wd=0.01 ValueError: PATCH_DECAYMASK: 'layer5.0.bn2.weight' is not a parameter name of this model
+  LOUD bad-char wd=0.01 ValueError: PATCH_DECAYMASK: DECAY_MASK 'layer4.0.bn2.weight,layer4.1.bn2.weight' has a character outside [A-Za-
+  LOUD vacuous-at-wd0 wd=0.0 ValueError: PATCH_DECAYMASK: base weight decay 0.0 is not > 0; a mask would be vacuous
+  PASS RW4 at wd 1e-2 a misspelt name, a misspelt triple, a duplicate, an empty + token, a non-name and a bad character EACH raise ValueError -- and at wd 0 a mask raises the patch's own vacuity error
+  PASS RW4 the wd-0 case raises the patch's `a mask would be vacuous` error specifically
+
+FAILURES: ['RW3 the mask BITES at float resolution (the skipped decay term is non-trivial)', 'RW3 at a test-only alpha0 1e-2 the masked run still matches its own set exactly', "RW3 the masked run's final weights differ from the UNMASKED run's at the same weight decay"]
+REALRUN_RC 1
