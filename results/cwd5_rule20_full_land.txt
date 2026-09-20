@@ -1,0 +1,38 @@
+RULE20 run utc=2026-09-20T17:46:29Z host=nodelogin03.alice.leidenuniv.nl batch=cwd5 guard_sha=81cea8b586e124a6
+  .out files: 27   with ARGS: 27   squeue: 
+  BATCH-CONSISTENCY --name cwd5- --vary seed --vary run-name --vary weight-decay-base --vary stepsize-groups -> rc=0  argsline_guard: 27 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (cwd5, each run pinned to its OWN rung's weight decay and its OWN grain): 27 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  WD COVERAGE across the started runs (the ladder's own axis, read from the runs' ARGS lines):
+          6 --weight-decay-base 0.1
+          9 --weight-decay-base 1e-2
+          6 --weight-decay-base 1e-3
+          6 --weight-decay-base 5e-4
+  GRAIN COVERAGE:
+         12 --stepsize-groups layerwise
+         15 --stepsize-groups scalar
+    DECLARED: the runner's ENV line carries NO weight decay, so THIS half cannot discriminate the ladder's
+    rungs -- the ARGS half (bin/cWD5_rule20.sh) pins each run to its own token.  THIS half discriminates the
+    GRAIN (PROBE_TENSOR type) and the MASK (the WHOLE DECAY_MASK line, including wd=, spec=, idx= and names=).
+    the registered per-arm weight decays, re-typed here for comparison with the ARGS half:
+      k01W1=0.1  kLW1=0.1  k01W2=1e-2  kLW2=1e-2  k01W3=1e-3  kLW3=1e-3  k01W4=5e-4  kLW4=5e-4  CARW2=1e-2
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x27  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x12  PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x15  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE, --constraint=L4 was requested):
+      x27  NVIDIA L4
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x27  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x27  BETA_HOLD: off
+    GROUP_HOLD witness lines (exact match to the arm's registered line):
+      x27  GROUP_HOLD: off
+    REST_HOLD witness lines (exact match to the arm's registered line):
+      x27  REST_HOLD: off
+    DECAY_MASK witness lines (exact match to the arm's registered line):
+      x24  DECAY_MASK: off
+      x3  DECAY_MASK: on base=SGDm wd=0.01 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+    coverage 27/27 runs with an .out, 0 violations
+  ENV AUDIT VERDICT cwd5: PASS
+RULE20 end utc=2026-09-20T17:46:31Z

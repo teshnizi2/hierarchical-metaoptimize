@@ -1,0 +1,104 @@
+==============================================================================
+ cwd5_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED cwd5 SCORER'S OUTPUT
+ CORRECTIONS 281.  No repo module imported, no regular expression, every literal re-typed.
+==============================================================================
+
+[1] WHAT WAS REBUILT FROM SCRATCH, BEFORE THE LOG WAS OPENED
+  PASS ResNet18_c100 rebuilt from the architecture   62 tensors, 11220132 params
+  PASS the 20 normscale tensors resolved by ndim==1 and name.endswith('.weight')   20 tensors, numel 4800
+  PASS CARW2's name list resolves to the registered set   idx 50,53,59 numel 1536 k 3
+  PASS every 512-wide BN scale in the model is one of {47,50,53,56,59} (188.1 / 275.2)   512-wide scales (47, 50, 53, 56, 59)
+  PASS ALL EIGHT LADDER ARMS ARE UNMASKED -- so no patch defect can forge a threshold (281's G-BITE split)   8 ladder arms, 1 masked arms
+  PASS BOTH GRAINS EXIST AT EVERY RUNG -- every gap is a WITHIN-rung contrast, never a cross-batch one   5 scalar / 4 layerwise arms
+  PASS the four rung tokens are PAIRWISE DISTINCT and span 200x (0.1 -> 5e-4)   W1=0.1,W2=1e-2,W3=1e-3,W4=5e-4
+  PASS alpha0 1e-6 -> beta0 re-derived through float32   -13.815510749816895
+
+[1b] THE RUNG SEPARATION, READ OFF THE RUNS' OWN ARGS LINES
+     This is the ONLY in-batch readout that tells the four rungs apart.  DECLARED, not hidden: the
+     runner's ENV line carries no weight decay, and PROBE_TENSOR carries only the grain, so neither can
+     discriminate a rung.  The bite job's RW2 is what proves, on the real GPU path, that the flag
+     CHANGES THE UPDATE at each of the four values -- this parser checks only that each run carried its own.
+      rung W1  --weight-decay-base 0.1    6 runs  (3 scalar + 3 layerwise)
+      rung W2  --weight-decay-base 1e-2   9 runs  (3 scalar + 3 layerwise + 3 CARW2)
+      rung W3  --weight-decay-base 1e-3   6 runs  (3 scalar + 3 layerwise)
+      rung W4  --weight-decay-base 5e-4   6 runs  (3 scalar + 3 layerwise)
+  PASS every one of the 27 runs carries ITS OWN rung's weight decay AND its own grain   0 wrong
+  PASS the axis coverage is exactly as registered   0.1 x6 1e-2 x9 1e-3 x6 5e-4 x6
+
+[1c] THE WITNESS, REBUILT FROM THE ARCHITECTURE *AND FROM ITS OWN RUNG'S WEIGHT DECAY*
+     CARW2 runs at 1e-2, so its witness must say wd=0.01 -- a string PATCH_DECAYMASK had never printed
+     before this batch.  The `wd=` field is what separates a carrier mask at 1e-2 from the same mask at
+     the anchor, where cwd3 and cwd4 already ran it.
+  PASS all 27 runs printed exactly the witness this parser rebuilt   27/27
+  PASS the carrier witness at 1e-2 DIFFERS from the same mask at 0.1, and no run carries the anchor's   0 swaps
+      CARW2   DECAY_MASK: on base=SGDm wd=0.01 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+      (the same mask at the anchor would read `wd=0.1`, and no cwd5 run printed that)
+      DENOMINATOR (281.10, 274's lesson): 3 masked runs x 500 records = 1500 MASKED records, 1500 with a
+      positive dm_wdterm.  The 24 UNMASKED runs contribute 12000 records and carry NO dm_* key (0 found):
+      they are NOT part of this denominator.
+  PASS every masked record carries a positive dm_wdterm and no unmasked record carries a dm_* key   1500/1500 masked, 0 dm_* keys on the ladder
+
+[1d] THE MANIFEST AND THE PROVENANCE, REBUILT
+  PASS the batch's PARTITION-MANIFEST.txt == the manifest rebuilt here, byte for byte   5306 bytes, sha256 e2a707d73100cbb1
+  PASS every PROVENANCE.txt value equals the literal RE-TYPED here (281.5 / 271.2), scorer sha included   9 keys
+
+[2] THE NUMBERS, RE-DERIVED FROM THE RAW RECORDS ONLY
+  k01W1   wd 0.1   scalar    TEST 23.2240  TRAIN 23.1700  seeds 23.5420 / 23.1040 / 23.0260
+  kLW1    wd 0.1   layerwise TEST 69.2940  TRAIN 98.8760  seeds 68.6220 / 69.6380 / 69.6220
+  k01W2   wd 1e-2  scalar    TEST 69.3513  TRAIN 97.9627  seeds 69.0220 / 69.8380 / 69.1940
+  kLW2    wd 1e-2  layerwise TEST 68.2620  TRAIN 99.4120  seeds 67.7500 / 68.4940 / 68.5420
+  k01W3   wd 1e-3  scalar    TEST 72.4980  TRAIN 99.7727  seeds 72.2800 / 72.3060 / 72.9080
+  kLW3    wd 1e-3  layerwise TEST 68.3373  TRAIN 99.6127  seeds 67.4480 / 68.7280 / 68.8360
+  k01W4   wd 5e-4  scalar    TEST 72.4080  TRAIN 99.6907  seeds 72.2360 / 72.4560 / 72.5320
+  kLW4    wd 5e-4  layerwise TEST 67.8813  TRAIN 99.4447  seeds 67.3200 / 68.3020 / 68.0220
+  CARW2   wd 1e-2  scalar    TEST 71.8327  TRAIN 99.3833  seeds 71.1760 / 72.1380 / 72.1840
+  SIGMA_INBATCH 0.485817   SIGMA_USED SIGMA_PRIOR_frozen   SE_ARM_DIFF 0.526756   df 18
+  W1  wd 0.1    G_W1 +46.0700 pp = +87.46 SE   R_W1 0.3352   -> COLLAPSE  (COLLAPSE bar scalar <= 34.6470)
+  W2  wd 1e-2   G_W2 -1.0893 pp = -2.07 SE   R_W2 1.0160   -> NOGAP     (COLLAPSE bar scalar <= 34.1310)
+  W3  wd 1e-3   G_W3 -4.1607 pp = -7.90 SE   R_W3 1.0609   -> NOGAP     (COLLAPSE bar scalar <= 34.1687)
+  W4  wd 5e-4   G_W4 -4.5267 pp = -8.59 SE   R_W4 1.0667   -> NOGAP     (COLLAPSE bar scalar <= 33.9407)
+  carrier word  CAR-UNREADABLE
+  branch        THRESHOLD-W1-W2
+
+[3] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG
+  PASS the rebuild has the scorer log's line count   401 rebuilt vs 401 in the log
+  lines in the scorer log            401
+  rebuilt and matched VERBATIM       398
+  matched host-independently          3   (2 path disclosures by suffix; 1 corpus count re-filtered here)
+  MISMATCHES                          0
+
+[4] THE FINAL LINE
+  PASS the FINAL line is rebuilt token by token
+  FINAL: THRESHOLD-W1-W2 | W1-COLLAPSE+W2-NOGAP+W3-NOGAP+W4-NOGAP+CAR-UNREADABLE | HARNESS-CLEAN | LADDER-BITES | ALL-RUNGS-IN-BATCH | BOTH-GRAINS-AT-EVERY-RUNG | REFERENCE-IS-IN-BATCH-LAYERWISE | CARRIER-AGAINST-KLW2 | COUPLED-DECAY-ONLY | DECOUPLED-NOT-TESTED | LADDER-IS-FOUR-POINTS | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | HORIZON-100-ONLY | THREE-SEEDS | WD-IS-AN-ARGS-DEVIATION | FLOOR-READINGS-ARE-BOUNDS | SIGMA-PRIOR-FROZEN | MASK-UPDATE-AND-TRACE | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+
+[5] THE CARRIER-READABILITY AUDIT (all 4^4 = 256 rung-state vectors, re-derived)
+     The carrier companion sits at rung W2 ALONE and may be void: if W2 does not COLLAPSE there is no
+     collapse for the mask to remove.  CAR-UNREADABLE was pre-registered for exactly that case (281.3).
+     This enumerates which accounts are reachable and which of them can carry a READ carrier word.
+      COLLAPSE-AT-ALL-VALUES      carrier word reachable there: READ
+      GRADED-ABOVE-THRESHOLD-W1   carrier word reachable there: CAR-UNREADABLE
+      GRADED-ABOVE-THRESHOLD-W2   carrier word reachable there: READ
+      GRADED-ABOVE-THRESHOLD-W3   carrier word reachable there: READ
+      NON-MONOTONE                carrier word reachable there: CAR-UNREADABLE,READ
+      THRESHOLD-W1-W2             carrier word reachable there: CAR-UNREADABLE
+      THRESHOLD-W2-W3             carrier word reachable there: READ
+      THRESHOLD-W3-W4             carrier word reachable there: READ
+      THIS batch: rung W2 is NOGAP, so the carrier word is CAR-UNREADABLE
+  PASS the carrier word is CAR-UNREADABLE exactly when rung W2 is not COLLAPSE
+      QUOTE-BLOCK: NO CAR-REC / CAR-PART / CAR-NULL sentence may be written, and CARW2 71.8327 is a
+      LEVEL ONLY.  P_CARW2 and D_CARW2 were not computed by the scorer and are not computed here.
+
+[6] WHICH PRINTED READINGS ARE BOUNDS RATHER THAN POINT EFFECTS (164.6)
+      W1 (wd 0.1  ) COLLAPSE: G_W1 = +46.0700 pp is a BOUND -- the scalar arm sits at its floor, so the
+      gap's SIZE is a location, not a measured effect.
+      W2 (wd 1e-2 ) NOGAP: G_W2 = -1.0893 pp is a BOUND in the other direction -- the reading is
+      'below the 10 pp bar', not 'the two grains are equal'.
+      W3 (wd 1e-3 ) NOGAP: G_W3 = -4.1607 pp is a BOUND in the other direction -- the reading is
+      'below the 10 pp bar', not 'the two grains are equal'.
+      W4 (wd 5e-4 ) NOGAP: G_W4 = -4.5267 pp is a BOUND in the other direction -- the reading is
+      'below the 10 pp bar', not 'the two grains are equal'.
+      The ladder has FOUR points: nothing between two adjacent rungs was run, so the threshold this
+      batch reports is a BRACKETING PAIR and never a value.
+      The DECOUPLED arm was never run (281.2): no sentence about it is licensed in either direction.
+
+VIOLATIONS 0
