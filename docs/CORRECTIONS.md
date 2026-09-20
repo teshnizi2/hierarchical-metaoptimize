@@ -37983,3 +37983,78 @@ Committed earlier in this cycle by the scoring track: `…/analysis/cwd5_attack_
 no `.pdf` fetched.
 
 Next free number: **286**.
+
+---
+
+## 286. TRACK E (post-landing verification of 285, ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING NEW.**  It re-ran 285's gates from the committed artefacts, in a stage that did not write 285, and re-derived the ingest with a reader of its own.  **Every gate PASSES and every count reproduces.**  It fixes **ONE** thing, and it is a WORDING defect in `WRITEUP-mechanism`, not a number: two sentences read *"below ~1e-2"* / *"below about 1e-2"*, which both EXCLUDE the tested 1e-2 rung and soften a BRACKETING PAIR into an approximate boundary **inside the unrun decade** — the same error class the refute pass struck at 285.6 **W1**.  **No level, bar, sigma, contrast, rung state, branch word or stamp moved; no data file was touched; nothing was ingested; the corpus is unchanged at 3,316 / 222.**]**
+
+### 286.1 Why this entry exists
+
+285's landing was written and pushed in one cycle by the stage that scored it.  This entry is a **second pair of
+eyes on the committed result**: it re-runs every gate 285 claims, re-derives the ingest from the two commits rather
+than from 285's prose, and reads the paper-facing sentences back as a referee would.  Nothing here is taken from
+285's commit message or from its entry text; every figure below was produced by running something.
+
+### 286.2 The gates, re-run by me on `8554afa` (working tree clean, `origin/master` up to date)
+
+| gate | invocation | result |
+|---|---|---|
+| exclusions | `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` | **exit 0, `VERDICT: PASS`** — 222 rows over **17** batches, every listed key present exactly once in the 3,316-row CSV, completeness 186/186, **two-axis runs (284): 3 listed, each carrying its ARGS witness with its ON kinds registered in `MULTI_KIND`, both axes verified: True** |
+| science | `python3 analysis/c98b_reproduce.py` | **exit 0, 806 lines**, `c98b VERDICT: science 618/618 PASS \| drift 18 site(s), 10 differ (not gated) \| guards fired 0 \| declaration OK` — 283's verdict byte for byte |
+| master table | `python3 analysis/c73_mastertable_check.py` (UNEDITED) | **exit 0**, *"header is consistent with both the table and the CSV"*, **175 data rows**, CSV **3,316 / 3407.9 GPU-h** |
+| this file's pointers | `python3 analysis/writeup_artefact_paths.py` | **exit 0, `VERDICT: PASS`** (re-run again AFTER the wording fix below) |
+| the registered scorer, POST-ingest | `python3 analysis/cWD5_wdladder_score.py ../runs_alice2` with `analysis/cWD5_wdladder_score.py` at `51c28608…` and `analysis/argsline_guard.py` at `81cea8b5…`, both **UNEDITED at HEAD** | **exit 0, 401 lines**; diffed against the committed `results/cwd5_wdladder_score_mac.txt` it differs on **exactly the two runsdir path echoes** and on nothing else.  Its corpus disclosure still reads **3,088** after the ingest, because the scorer excludes every `cwd5-` row by name — which is the check that the ingest did not move a scored quantity |
+
+**RULE 16 re-checked, not assumed**: `GAP-MONOTONE-IN-WD` and `GAP-NOT-MONOTONE-IN-WD` appear **0 times** in both
+committed `cwd5` scorer logs, so defect **F1** is exactly as 281/285 report it — the stamp is suppressed and 285
+correctly re-derives the monotonicity from the four `G` values instead of quoting a stamp.  `CTL2-PARTIAL` appears
+**0 times** in both committed `cwd4` logs, so `cwd4`'s floor clause holds and its licence paragraphs stay quotable.
+
+### 286.3 The ingest, re-derived with my own reader (not from 285's prose)
+
+Keyed on `(run, job_id)` across `8b9fbd2:results/all_runs.csv` → `91fcd57:results/all_runs.csv`, 38 fields, names
+identical: **3,289 → 3,316; added 27 EXACTLY, removed 0, duplicate keys 0 on both sides; 0 of 124,982 pre-existing
+field-cells changed.**  All 27 added rows are `cwd5-` rows, **9 arms × 3 seeds** (`k01W1 kLW1 k01W2 kLW2 k01W3 kLW3
+k01W4 kLW4 CARW2`), jobs **5052142–5052169**, every one `epochs_done` 100 / `epochs_requested` 100 / `complete` 1 /
+`superseded` 0.  **NO PROOF JOB**: no added row's name carries `bite` or `proof`.  Cost by the ingested
+`wallclock_min`: **3389.7333 → 3407.9500 GPU-h, +18.2167**.
+
+`results/CORPUS-EXCLUSIONS.tsv` **201 → 222, +21, append-only**.  The 21 are the ladder's non-anchor runs: 18
+single-axis 263 rows and **3 `CARW2` rows in 284.4's TWO-AXIS shape**.  **Every witness was re-derived from the run's
+own `ARGS:` line** and compared string-for-string: **21 of 21 match, 0 mismatches** — the values are GENERATED, not
+typed (273.9).  The **6 anchor runs** (`k01W1`, `kLW1` × 3 seeds) carry `--weight-decay-base 0.1` on their own ARGS
+lines, are plain standard-cell runs and are correctly **unlisted**.
+
+### 286.4 THE ONE FIX — a wording defect in `docs/WRITEUP-mechanism.md`, in the paper-facing sentence
+
+| where | struck | written | why |
+|---|---|---|---|
+| §1 **A4(b)** | *"it is a granularity measurement **below ~1e-2**, and at 0.1 it is measuring a broken configuration"* | *"it is a granularity measurement **at 1e-2 and below** — the three rungs that were actually run — and at 0.1 it is measuring a broken configuration"* | `LADDER-IS-FOUR-POINTS`.  **1e-2 IS a measured rung** (`NOGAP`), so *"below"* excludes the very rung that carries the claim; and *"~"* names an approximate boundary that straddles the **unrun** decade between 1e-2 and 0.1 |
+| §2, the claim paragraph (the sentence a referee reads) | *"the audit's scalar row at these cells is a granularity measurement at weight decays **below about 1e-2**"* | *"… **at 1e-2 and below — the three rungs we ran —** …"* | same, and this one is the worse of the two because it sits in the paragraph the campaign would actually defend |
+
+**This is the same error class as 285.6 W1**, which the refute pass struck from the verdict sentence; it survived in
+two prose sentences because W1 was applied where it was raised rather than swept for.  **Nothing else in either
+sentence changed**, and the fix moves no number.  285.7's own closing judgement paragraph carries the same *"below
+~1e-2"* form; **CORRECTIONS entries are not rewritten**, so that sentence stands as written and **is superseded
+here**: the writable form, in that paragraph and everywhere else, is *"at 1e-2 and below"*, and the bracketing form
+*"present at 0.1, absent at 1e-2"* remains the whole of what may be said about the transition.
+
+The file's own header records the amendment, and `analysis/writeup_artefact_paths.py` was re-run **after** the edit:
+**exit 0**.
+
+### 286.5 What this entry does NOT do, and discipline
+
+It **ingests nothing** (`results/all_runs.csv` and `results/CORPUS-EXCLUSIONS.tsv` untouched — corpus stays
+**3,316 / 222**), appends **no MASTER-TABLE row** and changes **no header count** (`c73` re-run anyway: exit 0), and
+**does not touch the site** — rows 237 and 238 still import together in a later stage.  It opens **no** question and
+closes none: `O-14` stays CLOSED (adverse) and `O-13` and §10.6 `R2` stay live and unmoved.
+
+**RULE 16 held**: no registered scorer, launcher, design module, patch, tree, runner, `analysis/argsline_guard.py`,
+`analysis/corpus_exclusions.py`, `results/*.csv` or `results/*.tsv` was edited — the only files written by this entry
+are `docs/CORRECTIONS.md` and `docs/WRITEUP-mechanism.md` (plus one `docs/STATUS.md` addendum line).  `git add` names
+its paths, never `-A`.  **Cost: ZERO GPU-hours.**  No Slurm job submitted or cancelled and **no cluster command of
+any kind was run by this stage** — everything above ran on the Mac against the already-synced
+`../runs_alice2` tree.  `alice` — Saber's shared account — **NOT contacted**.  **Nothing under `paper/` was read,
+opened or touched.**  No notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.
+
+Next free number: **287**.

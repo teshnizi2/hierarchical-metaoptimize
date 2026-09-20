@@ -13,7 +13,11 @@ non-monotonicity — and §0 item 11, §5's T19 row, §8 and §10 changed with t
 ADVERSE** — §0 item 15 was rewritten (its *"there is no ladder"* is now false), **§1 gained A5**, §2's claim paragraph
 gained the ladder's scope and a concession in the document's own words, **§3.3d (E28–E30) is NEW**, T22 moved from
 *"conceded without qualification"* to *"the ladder is run and it is adverse"*, **O-14 CLOSED**, and §10.1, §10.2,
-**§10.5's outline (title, ¶1, ¶2, ¶4)**, §10.6 R1 and §10.7 changed with them** —
+**§10.5's outline (title, ¶1, ¶2, ¶4)**, §10.6 R1 and §10.7 changed with them**; **at 286 ONE WORDING TIGHTENING AND
+NOTHING ELSE** — §1 A4(b) and §2's claim paragraph read *"below ~1e-2"* / *"below about 1e-2"* and now read
+*"at 1e-2 and below"*, because the old form both excluded the tested 1e-2 rung and softened a BRACKETING PAIR into an
+approximate boundary inside the unrun decade; **no number, bar, state, contrast, branch word or stamp moved, and no
+data file was touched, so the corpus commit below is unchanged** —
 against `master` at
 **`91fcd57`** — *the 279 header said `97eb049`, which was already stale when 280 landed; the commit is now restated at
 each amendment* — corpus **3,316 rows / 3407.9 GPU-hours** (`results/all_runs.csv` at `91fcd57`, the `cwd5` ingest),
@@ -168,8 +172,10 @@ file is bounded to a weight decay at which, and only at which, the configuration
    and `cwd4` keep wd 0.1 on conv and linear weights throughout (`CONV-LINEAR-WD-KEPT`) and remove it from 1,536
    parameters or fewer. **Neither point answered the charge; the ladder has now answered it, against us** — and the
    one thing that is genuinely gained is that *"the scalar arm is a granularity measurement"* becomes a **measured
-   qualification** rather than an assertion: it is a granularity measurement below ~1e-2, and at 0.1 it is measuring
-   a broken configuration.
+   qualification** rather than an assertion: it is a granularity measurement **at 1e-2 and below** — the three rungs
+   that were actually run — and at 0.1 it is measuring a broken configuration. *(Wording tightened at CORRECTIONS
+   **286**: the first draft of this clause read "below ~1e-2", which both excludes the tested 1e-2 rung and softens a
+   bracketing pair into an approximate boundary inside the unrun decade — the same error class as 285.6 W1.)*
 
 ---
 
@@ -441,8 +447,8 @@ would have to be made if the ladder came back this way, and it is made here rath
 > standard CIFAR weight decay the scalar and layerwise arms differ by −4.5267 pp — the scalar arm is, if anything,
 > slightly ahead — so this is a CORNER CASE and not a hazard of shared step sizes, of BatchNorm, or of MetaOptimize.
 > What it earns is not a warning to practitioners but a QUALIFICATION on our own audit: the audit's scalar row at
-> these cells is a granularity measurement at weight decays below about 1e-2, and at 0.1 it is measuring a broken
-> configuration. We report it that way.**
+> these cells is a granularity measurement at 1e-2 and below — the three rungs we ran — and at 0.1 it is measuring a
+> broken configuration. We report it that way.**
 
 Two sentences may be added, and no more:
 
