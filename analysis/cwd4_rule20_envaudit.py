@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""cwd4_rule20_envaudit.py <runsdir> -- CORRECTIONS 279: RULE 20's SEPARATE ENV half for `cwd4`.
+"""cwd4_rule20_envaudit.py <runsdir> -- CORRECTIONS 280: RULE 20's SEPARATE ENV half for `cwd4`.
 
 A copy of `l260_envaudit.py`'s logic (CORRECTIONS 260 / 261) with `cwd4`'s table.  **The witness lines below are RE-TYPED
 literals, NOT imported from analysis/cwd4_design.py**: this file is an INDEPENDENT audit of what the runs printed, so it
@@ -46,7 +46,7 @@ DM = {
     "ONE59": ("DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.1.bn2.weight"
               " masked=1 of=62 numel=512 idx=59 names=layer4.1.bn2.weight"),
 }
-# THE POINT OF RE-TYPING THESE (279.4): cwd4 has TWO arms at masked=2 and THREE at masked=1, so the `masked=` count
+# THE POINT OF RE-TYPING THESE (280.4): cwd4 has TWO arms at masked=2 and THREE at masked=1, so the `masked=` count
 # alone does NOT identify an arm.  This audit compares the WHOLE line -- spec, idx and names -- so a run that carried
 # the wrong one of two same-k strings is a VIOLATION here even though every record-level k check would pass.
 WIT = dict((a, dict(OFF, DECAY_MASK=DM[a])) for a in ARMS)

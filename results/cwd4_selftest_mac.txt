@@ -20,7 +20,7 @@ A. DESIGN, WITNESSES, ARITHMETIC
   PASS A the three singles are the three carriers, one each, pairwise distinct
   PASS A the k=1, k=2 and k=3 DECAY_MASK witnesses, as literals (CARWD0's is cwd3's CARWD0 byte for byte, 275.2)
   PASS A G-SETSEP's precondition: the 7 witnesses and the 6 idx tuples are PAIRWISE DISTINCT, so G-WITNESS separates the arms whose k collides (TWOWD0/CTL2WD0 at k=2; the three singles at k=1)
-  PASS A the k collision is REGISTERED: k in {1,2,3}, two arms at k=2 and three at k=1 (279.4's declared limit)
+  PASS A the k collision is REGISTERED: k in {1,2,3}, two arms at k=2 and three at k=1 (280.4's declared limit)
   PASS A prefix rule (245/251) over the LITERAL registration tuple: no other KIND prefixes or is prefixed by DECAY_MASK
   PASS A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = SIGMA_R18ALL
   PASS A SIGMA_USED == max(frozen floor, in-batch)
@@ -39,7 +39,7 @@ B. G-BITE ON REAL LANDED RECORDS (this host's runs directory)
   PASS B the 3 landed cwd3 CARWD0 runs PASS G-BITE read as cwd4's CARWD0 (k = 3 on every record)   3/3
   PASS B the 3 landed cwd3 CTL2WD0 runs PASS G-BITE read as cwd4's CTL2WD0 (k = 2 on every record) -- cwd4's control arm is byte-identical in spec to cwd3's, and its real records satisfy the audit   3/3
   PASS B THE WRONG-COUNT NULL ON REAL RECORDS: the 3 landed cwd3 CARWD0 runs (k = 3) read as TWOWD0 (k = 2) FAIL dm_masked on every record   3/3
-  NOTE B DECLARED (279.4): no record-level check can tell TWOWD0's k=2 from CTL2WD0's k=2, nor one single from another -- only G-WITNESS and the bite job's RR4 do.  This is stated at registration, not afterwards.
+  NOTE B DECLARED (280.4): no record-level check can tell TWOWD0's k=2 from CTL2WD0's k=2, nor one single from another -- only G-WITNESS and the bite job's RR4 do.  This is stated at registration, not afterwards.
 
 C. THE NOISE FLOOR (OPERATIONS 36) AND FRESHNESS
   PASS SIGMA_R18ALL: the FROZEN literal 0.6451413439065666 IS the FILTERED value (df 258)

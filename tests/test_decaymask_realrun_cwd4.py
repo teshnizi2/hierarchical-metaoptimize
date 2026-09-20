@@ -1,4 +1,4 @@
-"""BITE OF PATCH_DECAYMASK's NAME-LIST GRAMMAR ON cwd1's UNCHANGED TREE, FOR cwd4's SIX EXACT STRINGS.  CORRECTIONS 279.
+"""BITE OF PATCH_DECAYMASK's NAME-LIST GRAMMAR ON cwd1's UNCHANGED TREE, FOR cwd4's SIX EXACT STRINGS.  CORRECTIONS 280.
 
 `cwd4` adds NO harness code: it runs from cwd1's tree ($WS/harness_cwd1/cifar10, HF.py 94aedc33..., proved inert and
 biting by `cwdinert1` 5026046, 80 PASS / 0 FAIL, CORRECTIONS 260, and used unchanged by `cwd3`, 275 / 278) with
@@ -9,7 +9,7 @@ on ResNet18_c100's real GPU path; `cwd4` needs, IN ADDITION:
   * A NEW k=2 STRING, {50,53}, which `cwd3` never ran;
   * and -- THE POINT OF THIS DRIVER -- SET DISCRIMINATION BETWEEN ARMS WHOSE `dm_masked` k IS EQUAL.  `cwd4` has TWO
     arms at k=2 (TWOWD0 {50,53} and CTL2WD0 {47,56}) and THREE at k=1 (ONE50 / ONE53 / ONE59).  G-BITE's record audit
-    CANNOT tell them apart -- k is the same.  The scorer declares this (G-SETSEP, 279.4) and leans on G-WITNESS plus
+    CANNOT tell them apart -- k is the same.  The scorer declares this (G-SETSEP, 280.4) and leans on G-WITNESS plus
     THIS proof: RR4 below shows, on the real GPU path at a test-only alpha0, that each string masks EXACTLY its own
     tensors and FAILS the set it must be told apart from.
 
@@ -218,7 +218,7 @@ def main():
             % (arm, idx, a.steps), "%s; bites at float resolution %s" % (V["stats"] if V else None, V["bites"] if V else None))
 
     print("\nRR4 SET DISCRIMINATION (test-only alpha0 1e-2: the WD term visible at float resolution).")
-    print("    THIS IS WHAT SEPARATES THE ARMS WHOSE k COLLIDES -- G-BITE's record audit cannot (279.4).")
+    print("    THIS IS WHAT SEPARATES THE ARMS WHOSE k COLLIDES -- G-BITE's record audit cannot (280.4).")
     VO = TD.run_verify(a, "verify_big_off", post, "scalar", {}, "1e-2", "", "")
     chk(VO is not None and VO["stats"]["expect"] == [0, 0, 0], "RR4 the test-only alpha0 1e-2 OFF run matches the EMPTY-mask formula at every step")
     for arm, other in D.DISCRIMINATE:

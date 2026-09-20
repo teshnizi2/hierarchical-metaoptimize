@@ -2,7 +2,7 @@
 # =============================================================================
 # cWD4_countwd.sh -- `cwd4`: ResNet18_c100 -- SEPARATE CARRIER IDENTITY FROM COUNT / DOSE IN THE DECAY MASK.
 #   ONE SUBMISSION, 21 JOBS (7 arms x 3 seeds), 100 EPOCHS, SEEDS {143,144,145}, ResNet18_c100 / CIFAR-100,
-#   PROBE=100, PROBE_TENSOR=1 ON EVERY ARM, EVERY ARM SCALAR, --constraint=L4 ON EVERY JOB.  CORRECTIONS 279.
+#   PROBE=100, PROBE_TENSOR=1 ON EVERY ARM, EVERY ARM SCALAR, --constraint=L4 ON EVERY JOB.  CORRECTIONS 280.
 #
 # ACCOUNT: s5014158 (alice2).  WORKSPACE: /home/s5014158/metaopt.  Every guard and scancel line is filtered on `cwd4-`.
 #
@@ -210,7 +210,7 @@ grep -q "^  PASS SIGMA_R18ALL: the FROZEN literal 0.6451413439065666 IS the FILT
   && echo "guard 1c6: OPERATIONS 36 -- the frozen floor IS the corpus_exclusions.filter_rows value on the 3,268-row post-cwd3 corpus, not the naive one" \
   || guard_fail "guard 1c6: the frozen floor was not shown to be the filtered value"
 grep -q "^  PASS A G-SETSEP's precondition" "$SELFT" && grep -q "^  PASS A the k collision is REGISTERED" "$SELFT" \
-  && echo "guard 1c7: 279.4's DECLARED LIMIT is registered in the scorer -- k collides at 2 and at 1, and G-WITNESS / the bite job carry that separation" \
+  && echo "guard 1c7: 280.4's DECLARED LIMIT is registered in the scorer -- k collides at 2 and at 1, and G-WITNESS / the bite job carry that separation" \
   || guard_fail "guard 1c7: the k-collision declaration is not in the selftest"
 echo "guard 1c: scorer sha256 $(sha "$SC")"
 
@@ -269,7 +269,7 @@ if [ -f "$ILOG" ] && grep -q "^TEST_DECAYMASK_D0_RC 0$" "$ILOG" && grep -q "^REA
    && [ "$(grep -c "PASS RR4 .*\[SAME k -- THE COLLISION\]" "$ILOG")" = 5 ] \
    && grep -q "PASS RR5 a misspelt ONE-name list" "$ILOG"; then
   echo "guard 4f: cwd4's bite log ALL PASS on THIS tree, THIS design, THIS driver: $(grep -c '^  PASS' "$ILOG") PASS / $(grep -c '^  FAIL' "$ILOG") FAIL (sha $(sha "$ILOG" | cut -c1-8))"
-  echo "          including the FIVE same-k discriminations that G-BITE's record audit cannot make (279.4)"
+  echo "          including the FIVE same-k discriminations that G-BITE's record audit cannot make (280.4)"
 else
   guard_fail "guard 4f: no ALL PASS cwd4 bite log for HF $(sha "$HFH") / design $(sha "$DES") at $ILOG -- sbatch $RRSB, then copy its .out there"
 fi

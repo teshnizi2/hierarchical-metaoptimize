@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # =============================================================================
-# cWD4_countwd_score.py -- THE REGISTERED SCORER FOR `cwd4`  (CORRECTIONS 279):
+# cWD4_countwd_score.py -- THE REGISTERED SCORER FOR `cwd4`  (CORRECTIONS 280):
 #   ResNet18_c100 -- SEPARATE CARRIER IDENTITY FROM COUNT / DOSE IN THE DECAY MASK (278's bound (5), open item O-12).
 #   ONE SUBMISSION, 21 JOBS (7 arms x 3 seeds), 100 EPOCHS, SEEDS {143,144,145}, ResNet18_c100 / CIFAR-100,
 #   PROBE=100, PROBE_TENSOR=1 ON EVERY ARM, EVERY ARM IN THE SCALAR GROUPING, --constraint=L4 ON EVERY JOB,
@@ -69,7 +69,7 @@
 # G-BITE (-> PATCH-NOT-VERIFIED, before any level): 500 records; beta == Lion recomputed on the ONE group of every arm;
 #   no hold key; dm_n == step+2, dm_skipped == dm_n * k, dm_masked == k (3 / 2 / 2 / 1 / 1 / 1), a positive dm_wdterm on
 #   every masked arm; no dm_* key on k01.
-#   DECLARED LIMIT (279.4): k does NOT separate TWOWD0 from CTL2WD0 (both 2) nor the three singles from each other
+#   DECLARED LIMIT (280.4): k does NOT separate TWOWD0 from CTL2WD0 (both 2) nor the three singles from each other
 #   (all 1).  That separation rests on G-WITNESS (each run's own line carries idx and names, byte-identical to its arm's
 #   registered string), on G-SETSEP (the registered witnesses and idx tuples are pairwise distinct), and on the bite
 #   job's RR4 set discrimination on the real GPU path.  Stated, not papered over.
@@ -559,7 +559,7 @@ def score(runsdir, csvpath, manifest_path=""):
     hchk(not badpt, "G-ENV every run printed ONE `PROBE_TENSOR: on every=%d type=scalar tensors=%d`" % (PROBE, NTENS),
          "bad: %s" % badpt[:5] if badpt else "%d runs" % len(runs))
 
-    print("\nG-SETSEP  the structural precondition for G-WITNESS to discriminate arms that G-BITE's k cannot (279.4)")
+    print("\nG-SETSEP  the structural precondition for G-WITNESS to discriminate arms that G-BITE's k cannot (280.4)")
     wits = dict((a, B.WITNESS_DM[a]) for a in ARMS)
     idxs = dict((a, B.SET_IDX[a]) for a in MASKED)
     kcoll = sorted(set(K_MASKED[a] for a in MASKED if sum(K_MASKED[x] == K_MASKED[a] for x in MASKED) > 1))
@@ -995,7 +995,7 @@ def selftest(csvpath, runsdir):
         " the arms whose k collides (TWOWD0/CTL2WD0 at k=2; the three singles at k=1)")
     chk(sorted(set(K_MASKED[a] for a in MASKED)) == [1, 2, 3] and sum(K_MASKED[a] == 2 for a in MASKED) == 2
         and sum(K_MASKED[a] == 1 for a in MASKED) == 3,
-        "A the k collision is REGISTERED: k in {1,2,3}, two arms at k=2 and three at k=1 (279.4's declared limit)")
+        "A the k collision is REGISTERED: k in {1,2,3}, two arms at k=2 and three at k=1 (280.4's declared limit)")
     chk(all(not "DECAY_MASK".startswith(k) and not k.startswith("DECAY_MASK") for k in KINDS_AT_REGISTRATION if k != "DECAY_MASK"),
         "A prefix rule (245/251) over the LITERAL registration tuple: no other KIND prefixes or is prefixed by DECAY_MASK")
     chk(abs(SIGMA_PRIOR * math.sqrt(2 / 3.0) - SE_PRIOR) < 1e-6 and SIGMA_PRIOR == SIGMA_R18ALL, "A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = SIGMA_R18ALL")
@@ -1059,7 +1059,7 @@ def selftest(csvpath, runsdir):
                        " cwd4's control arm is byte-identical in spec to cwd3's, and its real records satisfy the audit", "%d/3" % k2ok)
         chk(wrongk == 3, "B THE WRONG-COUNT NULL ON REAL RECORDS: the 3 landed cwd3 CARWD0 runs (k = 3) read as TWOWD0"
                          " (k = 2) FAIL dm_masked on every record", "%d/3" % wrongk)
-        note("B DECLARED (279.4): no record-level check can tell TWOWD0's k=2 from CTL2WD0's k=2, nor one single from"
+        note("B DECLARED (280.4): no record-level check can tell TWOWD0's k=2 from CTL2WD0's k=2, nor one single from"
              " another -- only G-WITNESS and the bite job's RR4 do.  This is stated at registration, not afterwards.")
     else:
         skip("B landed cwd3 CARWD0 / CTL2WD0 records not found under %s" % runsdir)
@@ -1250,7 +1250,7 @@ def selftest(csvpath, runsdir):
         shutil.rmtree(tmp, ignore_errors=True)
 
     print("\nF. TOTALITY: decide() over 6,000 random draws returns a registered token")
-    rnd = random.Random(279)
+    rnd = random.Random(280)
     bad = 0
     for _ in range(6000):
         M = dict((a, rnd.uniform(0, 85)) for a in ARMS)

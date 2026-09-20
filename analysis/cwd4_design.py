@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""cwd4_design.py -- THE FROZEN DESIGN TABLE OF `cwd4` (CORRECTIONS 279): ON ResNet18_c100, SEPARATE CARRIER IDENTITY
+"""cwd4_design.py -- THE FROZEN DESIGN TABLE OF `cwd4` (CORRECTIONS 280): ON ResNet18_c100, SEPARATE CARRIER IDENTITY
 FROM COUNT / DOSE (and, as far as this network allows, FROM TERM MAGNITUDE) IN THE DECAY MASK.
 
 `cwd3` (275 / 278) removed coupled weight decay from the THREE ctd1 carriers alone and the scalar collapse went
@@ -60,7 +60,7 @@ DSET, EPOCHS, BATCH, CLIP, MST, A0, AUG, PROBE = W.DSET, W.EPOCHS, W.BATCH, W.CL
 STEPS_PER_EPOCH, N_RECORDS, WD_BASE, ENV_EXPECTED, WALL = W.STEPS_PER_EPOCH, W.N_RECORDS, W.WD_BASE, W.ENV_EXPECTED, "03:00:00"
 dm_indices, dm_witness = W.dm_indices, W.dm_witness
 
-# ---- the named tensors (re-derived on the LIVE model at registration, CORRECTIONS 279.2; the launcher's guard 4
+# ---- the named tensors (re-derived on the LIVE model at registration, CORRECTIONS 280.2; the launcher's guard 4
 # re-derives them again at submit time from cwd1's own tree and aborts on any disagreement) -----------------------------
 C50 = "layer4.0.bn2.weight"            # idx 50  carrier  Kim gamma_last(layer4.0)   |L| rank 1..3
 C53 = "layer4.0.shortcut.1.weight"     # idx 53  carrier  Kim gamma_down(layer4.0)
@@ -138,7 +138,7 @@ CWD4.WITNESS_DM = dict((a, dm_witness(CWD4.DMASK[a], CWD4.TENSORS)) for a in CWD
 
 # THE PAIRS the bite proof must tell apart (RR4).  G-BITE's k cannot separate TWOWD0 from CTL2WD0 (both k=2) nor the
 # three singles from each other (all k=1): that separation rests ENTIRELY on G-WITNESS (each run's own DECAY_MASK line
-# carries idx and names) and on these real-GPU discriminations.  DECLARED, not papered over -- CORRECTIONS 279.4.
+# carries idx and names) and on these real-GPU discriminations.  DECLARED, not papered over -- CORRECTIONS 280.4.
 DISCRIMINATE = (("TWOWD0", "CTL2WD0"), ("CTL2WD0", "TWOWD0"), ("CARWD0", "TWOWD0"),
                 ("ONE50", "ONE53"), ("ONE53", "ONE59"), ("ONE59", "ONE50"))
 

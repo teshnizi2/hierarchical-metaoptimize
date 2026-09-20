@@ -6,10 +6,10 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=24G
 #SBATCH --time=02:00:00
-#SBATCH --output=/home/s5014158/l279_logs/%x-%j.out
+#SBATCH --output=/home/s5014158/l280_logs/%x-%j.out
 # =============================================================================
 # cWD4_realrun_bite.sbatch -- ONE short GPU job, NOT part of the batch (job name `cwd4bite`, deliberately NOT the `cwd4-`
-# prefix the batch guards and the scorer read).  CORRECTIONS 279.
+# prefix the batch guards and the scorer read).  CORRECTIONS 280.
 #   (1) tests/test_decaymask.py --structural-only on cwd1's tree: the three PATCH_DECAYMASK regions delete back to cvt8's
 #       HF.py byte for byte (D0) -- the tree is cwd1's, UNCHANGED (cwd3 ran on the same bytes);
 #   (2) tests/test_decaymask_realrun_cwd4.py: cvt8's tree vs cwd1's tree over 300 real CIFAR-100 steps per variant:
@@ -19,7 +19,7 @@
 #       plus loudness of the name-list grammar on the ONE-name form.
 #   (3) EXPORT PROBE: the two-name carrier string, which contains `+` and `.`, is passed through sbatch's --export list
 #       exactly as the launcher passes DECAY_MASK, and echoed back -- proof that such a value rides --export unmangled.
-#   mkdir -p ~/l279_logs && sbatch --export=ALL,CWD4_EXPORT_PROBE=layer4.0.bn2.weight+layer4.0.shortcut.1.weight \
+#   mkdir -p ~/l280_logs && sbatch --export=ALL,CWD4_EXPORT_PROBE=layer4.0.bn2.weight+layer4.0.shortcut.1.weight \
 #       ~/stage_cwd4/bin/cWD4_realrun_bite.sbatch
 #       -> copy the .out to $WS/runs/cwd4/bite_decaymask_cwd4.log (the launcher's guard 4f reads it there)
 # =============================================================================

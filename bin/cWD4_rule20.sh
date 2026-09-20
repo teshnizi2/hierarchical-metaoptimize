@@ -1,5 +1,5 @@
 #!/bin/bash
-# cWD4_rule20.sh -- CORRECTIONS 279: RULE 20 at current coverage for `cwd4` (a copy of l260_rule20.sh with cwd4's table;
+# cWD4_rule20.sh -- CORRECTIONS 280: RULE 20 at current coverage for `cwd4` (a copy of l260_rule20.sh with cwd4's table;
 # the ENV half is analysis/cwd4_rule20_envaudit.py).  READ-ONLY: no accuracy number is opened.
 # analysis/argsline_guard.py is used UNEDITED from the stage.
 #   bash bin/cWD4_rule20.sh            (run from ~/stage_cwd4 on alice2)
