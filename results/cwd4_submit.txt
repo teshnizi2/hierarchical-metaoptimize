@@ -1,0 +1,129 @@
+partitions: gpu-short,gpu-l4-24g  -- chosen because --time=03:00:00 (10800s) <= gpu-short MaxTime (14400s, sinfo(live)): gpu-short ADDED -- its own QOS (qos-short-gpu, 12 GPU/user as read 2026-09-08) is an independent pool and its node set is a superset of gpu-l4-24g
+==============================================================
+ cwd4 -- ResNet18_c100: IDENTITY vs COUNT in the decay mask (PATCH_DECAYMASK; 278's bound (5) / O-12)
+ CIFAR100 / ResNet18_c100   AUGMENT=1  PROBE=100  PROBE_TENSOR=1  clamp -15:-2.3026   ms=1e-3 alpha0=1e-6  100 epochs; seeds 143 144 145
+   k01      scalar
+   CARWD0   scalar   k=3  DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+   TWOWD0   scalar   k=2  DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight
+   CTL2WD0  scalar   k=2  DECAY_MASK=layer4.0.bn1.weight+layer4.1.bn1.weight
+   ONE50    scalar   k=1  DECAY_MASK=layer4.0.bn2.weight
+   ONE53    scalar   k=1  DECAY_MASK=layer4.0.shortcut.1.weight
+   ONE59    scalar   k=1  DECAY_MASK=layer4.1.bn2.weight
+ 7 arms x 3 seeds = 21 jobs, ONE submission; mode: SUBMIT
+ harness tree /home/s5014158/metaopt/harness_cwd1/cifar10 (cwd1's, UNCHANGED)   runner /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh (cwd1's, UNCHANGED)   partitions gpu-short,gpu-l4-24g   constraint L4   walltime 03:00:00
+ DOCUMENTED INVOCATION: python3 analysis/cWD4_countwd_score.py <runsdir>
+==============================================================
+guard 0b: VOTE_W, BETA_HOLD, GROUP_HOLD, REST_HOLD and DECAY_MASK are UNSET in the launcher's environment
+guard 0: CSV present (3269 lines, sha fe3874d3e5b3489e4fd1f0f404547978441fc81dcbf883ec32a44ab90fd7ce84)
+guard 1a: present  475e1278bce0eb0e  /home/s5014158/stage_cwd4/analysis/cWD4_countwd_score.py
+guard 1a: present  a6f2c8754524a56e  /home/s5014158/stage_cwd4/analysis/cwd4_design.py
+guard 1a: present  03d2d76149157577  /home/s5014158/stage_cwd4/analysis/cwd_design.py
+guard 1a: present  d7ddb49e71013e3a  /home/s5014158/stage_cwd4/analysis/cwd_common.py
+guard 1a: present  049be59655607a40  /home/s5014158/stage_cwd4/bin/cWD4_countwd.sh
+guard 1a: present  5c53a40dff7f8eeb  /home/s5014158/stage_cwd4/analysis/cVT9_dosewindow_score.py
+guard 1a: present  5346bb6b9efd9ca3  /home/s5014158/stage_cwd4/analysis/corpus_exclusions.py
+guard 1a: present  50f75cde4cabc23a  /home/s5014158/stage_cwd4/results/CORPUS-EXCLUSIONS.tsv
+guard 1a: present  e873931cf4e73dc3  /home/s5014158/stage_cwd4/bin/cWD4_realrun_bite.sbatch
+guard 1a: present  8d08803ae1d826b1  /home/s5014158/stage_cwd4/tests/test_decaymask.py
+guard 1a: present  0c64e50ffaac6a2a  /home/s5014158/stage_cwd4/tests/test_decaymask_realrun.py
+guard 1a: present  6bfcc2360cf3a3c3  /home/s5014158/stage_cwd4/tests/test_decaymask_realrun_cwd4.py
+guard 1a: present  690218007b52243a  /home/s5014158/stage_cwd4/tests/test_grouphold_realrun.py
+guard 1a: present  529be65221ed7fdc  /home/s5014158/stage_cwd4/bin/cWD_stage_harness.sh
+guard 1a: present  a4c77e03143d747f  /home/s5014158/stage_cwd4/bin/cVT8_stage_harness.sh
+guard 1a: present  cf88e7d25793b73c  /home/s5014158/stage_cwd4/patches/patch_decaymask.py
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/stage_cwd4/jobs/run_cifar_cwd1.sh
+guard 1a: present  c45e1b73fb5bd38d  /home/s5014158/stage_cwd4/bin/_lib_guards.sh
+guard 1a: present  81cea8b586e124a6  /home/s5014158/stage_cwd4/analysis/argsline_guard.py
+guard 1a: present  fe3874d3e5b3489e  /home/s5014158/stage_cwd4/results/all_runs.csv
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh
+guard 1a: present  94aedc33046afb12  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+guard 1a: present  5197dc2eecbbcb6f  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py.pre_decaymask
+guard 1a: present  c79988833c4399a0  /home/s5014158/metaopt/harness_cwd1/cifar10/build_network.py
+guard 1b: no git repo on this host; the operator declares the staged tree is commit 6eaddd8d2cbf65656911139b23f0242182554db4 (40 hex, 271.6 F1)
+guard 1b2: the archived jobs/run_cifar_cwd1.sh == $WS/jobs/run_cifar_cwd1.sh == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's runner, UNCHANGED)
+guard 1b3: the REUSED cwd_design.py / cwd_common.py / patch_decaymask.py / test_decaymask_realrun.py are cwd1's registered bytes (RULE 16)
+guard 1c: scorer --selftest PASSES (133 PASS, 0 FAIL, 0 SKIP)
+guard 1c1: no SKIP (real records and the corpus were found on this host)
+guard 1c2: the O2 invariance proof RAN against THIS host's real corpus plus invented rows, and passed
+guard 1c3: the DOCUMENTED one-argument invocation reached FINAL on synthetic runs; a dropped run -> INCOMPLETE
+guard 1c4: the scorer's own fresh-seed / fresh-prefix checks ran and passed
+guard 1c5: G-BITE passes 3 landed cwd1 k01 and 3 cwd3 CARWD0 / 3 cwd3 CTL2WD0 runs, FAILS both broken-mask nulls on landed records; the dangerous null's levels == ALL-THREE-NEEDED's
+guard 1c6: OPERATIONS 36 -- the frozen floor IS the corpus_exclusions.filter_rows value on the 3,268-row post-cwd3 corpus, not the naive one
+guard 1c7: 280.4's DECLARED LIMIT is registered in the scorer -- k collides at 2 and at 1, and G-WITNESS / the bite job carry that separation
+guard 1c: scorer sha256 475e1278bce0eb0eb61b78b7491237466b70f03f9fb1d1a6f67029c0bc799fbc
+guard 2: no cwd4-* row in the corpus
+guard 2b: no cwd4-*.out on disk
+guard 2d: ZERO .out ARGS lines under /home/s5014158/metaopt/runs carry --seed 143/144/145
+guard 2e: sacct all-time: 0 cwd4-* jobs
+guard 2f: 0 cwd4-* in squeue
+guard 4a: cVT8_stage_harness.sh (verify mode) VERIFIES cvt8's tree:
+          V-h: HF.py.pre_resthold == cvt7's HF.py 2396f2be8102724c120ea5271d2d84acf3835ffb9a5c7947fc282121cf2a588f
+          V-h2: cvt8 HF.py sha == pinned post 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+          V-h1: the chain .pre_voteweight (LIVE 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd) -> .pre_betahold (cvt1's) -> .pre_grouphold (cvt4's) -> .pre_resthold (cvt7's) -> HF.py
+          V-h3: cvt7's HF.py is still 2396f2be8102724c120ea5271d2d84acf3835ffb9a5c7947fc282121cf2a588f (untouched)
+          V-h4: neither the LIVE nor cvt7's HF.py carries a PATCH_RESTHOLD marker
+          V-h5: the LIVE HF.py is still 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd
+          V-d: /home/s5014158/metaopt/jobs/run_cifar_cvt8.sh differs from run_cifar.sh in EXACTLY one line: cd /home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10 -> cd /home/s5014158/metaopt/harness_cvt8/cifar10
+          V-d2: runner sha == pinned 1dbe4ff52eccbbb1c9936f4a687ed88172dd41c48b14ae60eb353b45f766f5e0; run_cifar.sh and cvt7's runner unchanged
+          cVT8_stage_harness: VERIFIED
+guard 4a1: cWD_stage_harness.sh cwd1 (verify mode) VERIFIES cwd1's tree, which cwd4 uses UNCHANGED:
+          V-a: 12 files byte-identical to cvt8's tree (Optimizers/HF.py excepted)
+          V-a2: no file in the cwd1 tree beyond cvt8's except HF.py.pre_decaymask
+          V-h: HF.py.pre_decaymask == cvt8's HF.py == pinned 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+          V-h2: cwd1 HF.py sha == pinned post 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf
+          V-h3: cvt8's HF.py untouched
+          V-h4: neither the LIVE HF.py nor any cvt1/4/6/7/8/9 tree's HF.py carries a PATCH_DECAYMASK / DECAY_MASK marker
+          V-h6: the LIVE HF.py is still 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd (untouched)
+          V-d: /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh differs from run_cifar.sh in EXACTLY one line: cd /home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10 -> cd /home/s5014158/metaopt/harness_cwd1/cifar10 (sha 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371)
+          V-f: tests/test_decaymask.py D0 (deleting the three regions == cvt8's HF.py, byte for byte) passes (13 PASS)
+          cWD_stage_harness cwd1: VERIFIED
+guard 3: cifar-100-python visible under /home/s5014158/metaopt/harness_cwd1/cifar10/data
+guard 3b: build_network.py == cvt8's (c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d)
+guard 3c: HF.py == 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf (cwd1's); .pre_decaymask == cvt8's HF.py == 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+guard 3e: runner == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's run_cifar_cwd1.sh)
+guard 4b: PATCH_DECAYMASK structural D0 PASSES (deleting the three regions == cvt8's HF.py, byte for byte)
+guard 4f1: cwd1's inertness log (cwdinert1) ALL PASS on THIS tree's HF, THIS patch: 80 PASS / 0 FAIL (sha 7529f89f)
+guard 4f: cwd4's bite log ALL PASS on THIS tree, THIS design, THIS driver: 61 PASS / 0 FAIL (sha c1a943aa)
+          including the FIVE same-k discriminations that G-BITE's record audit cannot make (280.4)
+guard 4c': ARMS, spec strings, the six DECAY_MASK values, NET, NTENS, TOTPAR, SEEDS, the GPU constraint and the tree / runner shas agree in launcher / design / cwd1's stage block; the seven witnesses and six idx tuples are pairwise distinct and the two pairs are numel-matched
+guard 4: live ResNet18_c100 from cwd1's tree -- 62 tensors, 11220132 parameters
+guard 4: normscale on the live model = 20 BatchNorm2d scales (by module type), 4800 parameters
+guard 4h: every 512-wide BN scale on the live model: [47, 50, 53, 56, 59]
+guard 4h: carrier-free 512-wide BN scales: [47, 56] -- EXACTLY TWO, which is why the count-matched class-pure control exists at count 2 and CANNOT exist at count 3 (278 bound (4))
+guard 4h: CARWD0   live idx (50, 53, 59) numel 1536 owners ('BatchNorm2d', 'BatchNorm2d', 'BatchNorm2d') widths (512, 512, 512) classes ('scale', 'scale', 'scale') depth ('layer4', 'layer4', 'layer4') -> as registered
+guard 4h: TWOWD0   live idx (50, 53) numel 1024 owners ('BatchNorm2d', 'BatchNorm2d') widths (512, 512) classes ('scale', 'scale') depth ('layer4', 'layer4') -> as registered
+guard 4h: CTL2WD0  live idx (47, 56) numel 1024 owners ('BatchNorm2d', 'BatchNorm2d') widths (512, 512) classes ('scale', 'scale') depth ('layer4', 'layer4') -> as registered
+guard 4h: ONE50    live idx (50,) numel 512 owners ('BatchNorm2d',) widths (512,) classes ('scale',) depth ('layer4',) -> as registered
+guard 4h: ONE53    live idx (53,) numel 512 owners ('BatchNorm2d',) widths (512,) classes ('scale',) depth ('layer4',) -> as registered
+guard 4h: ONE59    live idx (59,) numel 512 owners ('BatchNorm2d',) widths (512,) classes ('scale',) depth ('layer4',) -> as registered
+guard 4h: TWOWD0 [50, 53] is a PROPER SUBSET of CARWD0 [50, 53, 59]; CTL2WD0 [47, 56] is disjoint from it; both pairs numel 1024
+guard 4: k01      scalar  type=scalar k=0  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: CARWD0   scalar  type=scalar k=3  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: TWOWD0   scalar  type=scalar k=2  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: CTL2WD0  scalar  type=scalar k=2  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: ONE50    scalar  type=scalar k=1  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: ONE53    scalar  type=scalar k=1  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4: ONE59    scalar  type=scalar k=1  witnesses (VOTE_W/BETA_HOLD/GROUP_HOLD/REST_HOLD off; no COMP/WINDOW; DECAY_MASK) == registered, base_update bound as registered, masked idx == registered: True
+guard 4f: step() calls self.base_update(net,g) once, before the meta update: True
+guard 4d: the live manifest is BYTE-IDENTICAL to cwd4_design.manifest_text(CWD4) (6002 bytes)
+guard 4b3: manifest (6002 bytes, sha db540cb4e6849cac...) -> /home/s5014158/metaopt/runs/cwd4/PARTITION-MANIFEST.txt and /home/s5014158/metaopt/runs/cwd4-PARTITION-MANIFEST.txt
+guard 4g: provenance written to /home/s5014158/metaopt/runs/cwd4/PROVENANCE.txt
+guard_parts_for_wall: PASS -- PARTS=gpu-short,gpu-l4-24g is consistent with --time=03:00:00 (10800s vs gpu-short cap 14400s, sinfo(live))
+guard 5b: partitions gpu-short,gpu-l4-24g all carry L4 nodes; --constraint=L4
+guard 5: 1993 GB free on $WS; 0 jobs pending, adding 21
+guard 8: with NO --manifest, `cWD4_countwd_score.py <runsdir>` resolves the manifest to /home/s5014158/metaopt/runs/cwd4/PARTITION-MANIFEST.txt (<runsdir>/cwd4/)
+guard 9: the runner cd's into /home/s5014158/metaopt/harness_cwd1/cifar10 -- the SAME tree guards 3/4 tested
+guard 6: 21 composed command lines, 0 failed the RULE 20 / DECAY_MASK / constraint pre-check
+---- 21 jobs (ACCEPTED BY SLURM); 0 rejected ----
+---- cwd4- present in bin/PROTECTED.txt ----
+guard_postlaunch: watching /home/s5014158/metaopt/runs/cwd4-*.out for the first ARGS line
+guard_postlaunch: auditing /home/s5014158/metaopt/runs/cwd4-CTL2WD0-s144-5051829.out
+--- the run's OWN ARGS line, verbatim ---
+ARGS: --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 144 --save-directory /home/s5014158/metaopt/runs/cwd4 --run-name cwd4-CTL2WD0-s144
+-----------------------------------------
+---------------------------------------------------------------
+argsline_guard: 1 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+guard_postlaunch: PASS -- the run's own ARGS line matches the design
+guard 7: RULE 20 post-launch check PASSED against a run's own ARGS line
+SCORE IT WITH, AND ONLY WITH (at 21/21 RUN_DONE):  python3 /home/s5014158/stage_cwd4/analysis/cWD4_countwd_score.py /home/s5014158/metaopt/runs
