@@ -2,17 +2,23 @@
 
 *Draft for Reza, to read and to take to Dr Salehkaleybar. **NOT paper text and NOT for submission.** Nothing under
 `paper/` was read into this file and nothing under `paper/` was touched. **REWRITTEN 2026-09-20 at CORRECTIONS 279;
-AMENDED 2026-09-20 at CORRECTIONS 282; AMENDED AGAIN 2026-09-20 at CORRECTIONS 283, the `cwd4` LANDING** —
+AMENDED 2026-09-20 at CORRECTIONS 282; AMENDED AGAIN 2026-09-20 at CORRECTIONS 283, the `cwd4` LANDING;
+AMENDED AGAIN 2026-09-21 (local; 2026-09-20T22Z) at CORRECTIONS 285, the `cwd5` LANDING — the WEIGHT-DECAY LADDER, and the amendment this
+file was waiting for** —
 **at 282: §2.5, §3.3c (E25–E27), §9.0, §10, §0 item 15 and T22 were NEW and §0 items 11 and 14's preamble, §3's SE
 table, §5, §7 (O-12 closed, O-14 added), §8, T16, T19, T21, E18, E24, A3 and A4 changed; at 283: §3.3c's STATUS block,
 E25, E26, E27 and the *"what `cwd4` settles"* paragraph carry the LANDED figures — the mean-`|L|` table RE-DERIVED IN
 BATCH instead of inherited, the record-0 dose fact, `ONE50`'s near-bar margin and the `ONE59`-vs-`TWOWD0`
-non-monotonicity — and §0 item 11, §5's T19 row, §8 and §10 changed with them** —
+non-monotonicity — and §0 item 11, §5's T19 row, §8 and §10 changed with them; **at 285 the LADDER LANDED AND IT IS
+ADVERSE** — §0 item 15 was rewritten (its *"there is no ladder"* is now false), **§1 gained A5**, §2's claim paragraph
+gained the ladder's scope and a concession in the document's own words, **§3.3d (E28–E30) is NEW**, T22 moved from
+*"conceded without qualification"* to *"the ladder is run and it is adverse"*, **O-14 CLOSED**, and §10.1, §10.2,
+**§10.5's outline (title, ¶1, ¶2, ¶4)**, §10.6 R1 and §10.7 changed with them** —
 against `master` at
-**`8b9fbd2`** — *the 279 header said `97eb049`, which was already stale when 280 landed; the commit is now restated at
-each amendment* — corpus **3,289 rows / 3389.7 GPU-hours** (`results/all_runs.csv` at `8b9fbd2`, the `cwd4` ingest),
-`results/CORPUS-EXCLUSIONS.tsv` **201 rows** **[SUPERSEDED at 282: `bc73c24`, 3,268 rows / 3375.0 GPU-h, 183
-exclusions]**. Every number below was re-derived from a committed scorer or parser
+**`91fcd57`** — *the 279 header said `97eb049`, which was already stale when 280 landed; the commit is now restated at
+each amendment* — corpus **3,316 rows / 3407.9 GPU-hours** (`results/all_runs.csv` at `91fcd57`, the `cwd5` ingest),
+`results/CORPUS-EXCLUSIONS.tsv` **222 rows** **[SUPERSEDED at 283: `8b9fbd2`, 3,289 rows / 3389.7 GPU-h, 201
+exclusions]** **[SUPERSEDED at 282: `bc73c24`, 3,268 rows / 3375.0 GPU-h, 183 exclusions]**. Every number below was re-derived from a committed scorer or parser
 output under `results/`, or from a batch's own committed `PARTITION-MANIFEST.txt`; where a number is a census figure
 rather than a scorer figure, it says so. Prose in this file is mine; the branch words, licence sentences and bars are
 the registered ones and are quoted, not paraphrased. **ZERO GPU. No Slurm job. `alice` — Saber's shared account — not
@@ -35,9 +41,11 @@ what I declined and why.*
 ## 0. Bounds, led with
 
 Before any claim, the **fifteen** things a reader must be told in the same breath as the result. Items 12–14 are new
-at CORRECTIONS 279 and are the reason §1 exists; **item 11 was rewritten and item 15 added at this amendment** — the
+at CORRECTIONS 279 and are the reason §1 exists; item 11 was rewritten and item 15 added at CORRECTIONS 282–283 — the
 first because `cwd4` refuted half of it, the second because it is the charge §10's area-chair reading says decides
-whether any of this can be published at all.
+whether any of this can be published at all. **At CORRECTIONS 285 item 15 was rewritten again, and it is now the most
+important item in this list**: the ladder it asked for has been RUN, and the answer is adverse — **every claim in this
+file is bounded to a weight decay at which, and only at which, the configuration breaks.**
 
 1. **It is a SCOPE result, not a mechanism.** Naming a precondition is not identifying a route. §4 states exactly what
    is not shown and why the instrument cannot show it.
@@ -127,10 +135,26 @@ whether any of this can be published at all.
    from weight decay is standard practice, He et al. (arXiv:1812.01187). **What is ours is the localisation half**, and
    it is bounded as item 12 says. Selling the precondition as the finding would invite exactly the referee line the
    campaign has already written into its own limits (T1).
-15. **EVERY NUMBER IN THIS FILE SITS AT ONE WEIGHT-DECAY VALUE, AND THAT VALUE IS FAR OFF COMMON PRACTICE. THERE IS NO
-   LADDER AND NO DECOUPLED ARM.** *(new at this amendment; §10, T22; the ladder is now registered as `cwd5` at
-   CORRECTIONS 281 by another track — **no result of it exists or is read anywhere in this file** — and the decoupled
-   arm is descoped with reasons: O-14)*. The coupled L2
+15. **EVERY NUMBER IN THIS FILE SITS AT ONE WEIGHT-DECAY VALUE, THAT VALUE IS FAR OFF COMMON PRACTICE, AND THE LADDER
+   HAS NOW BEEN RUN AND COMES BACK ADVERSE: THE COLLAPSE IS PRESENT AT 0.1 AND ABSENT AT 1e-2, 1e-3 AND 5e-4.**
+   *(added at 282; **REWRITTEN at CORRECTIONS 285, the `cwd5` landing** — §1 A5, §3.3d, T22, O-14 (CLOSED), §10)*.
+   **`cwd5`, 27 runs, seeds {146, 147, 148}, four rungs with BOTH grains in batch at every rung**, gives
+   `THRESHOLD-W1-W2`: at the campaign's **0.1** the scalar arm is 23.2240 against its own layerwise 69.2940
+   (`G_W1` **+46.0700 pp = +87.46 SE**, `COLLAPSE`); at **1e-2** it is 69.3513, **35.2203 pp above that rung's
+   collapse bar** (`NOGAP`); at **1e-3** and **5e-4** it is 72.4980 and 72.4080, and at those two rungs it sits
+   *above* its own layerwise arm (`G_W3` −4.1607 pp = −7.90 SE; **CO-PRIMARY `G_W4` −4.5267 pp = −8.59 SE**).
+   **So the referee's corner-case charge LANDS** (§10, T22): the mechanism line must be written as a diagnostic of
+   ONE extreme configuration, and the audit's scalar cells must carry the disclosure that they sit at a weight decay
+   ~200× the standard value at which the scalar configuration is broken. **THREE BOUNDS TRAVEL WITH THAT, AND NONE
+   SOFTENS IT.** (a) **The ladder has FOUR points**, so the transition is a BRACKETING PAIR, 0.1 and 1e-2, and
+   **nothing inside that unrun decade may be named** (`LADDER-IS-FOUR-POINTS`); *"the collapse exists only at 0.1"*
+   is forbidden. (b) **`NOGAP` is a BOUND**, *"below the 10 pp bar"*, never *"the two grains are equal"* or *"the
+   mechanism has no presence at 1e-2"*; and `G_W2` is **NOT resolved** (−2.07 SE, ±2 SE [−2.1428, −0.0358], upper
+   end 0.04 pp from zero — DESCRIPTIVE / UNSURE), so W2 may not be pooled with W3 and W4. (c) What the ladder
+   identifies is the **CONJUNCTION** of scalar grouping with a coupled decay at or near 0.1: at 0.1 the grain matters
+   enormously, at 1e-2 and below neither grain reaches the collapse bar. *"A property of wd 0.1, not of scalar
+   grouping"* is equally forbidden. **DECOUPLED weight decay is still untested in either direction**
+   (`DECOUPLED-NOT-TESTED`, descoped with reasons at 281.2), so R2 of §10.6 stays unanswered. The coupled L2
    coefficient is **0.1 at every cell**, against the **5e-4** of the standard CIFAR ResNet recipe — **a factor of
    200** *(DESCRIPTIVE: 5e-4 is the value of common practice, not a campaign measurement)*. **Nothing here varies it.**
    Every "precondition" sentence is therefore of the form *the collapse is present at wd 0.1 and absent at wd 0 on the
@@ -142,7 +166,10 @@ whether any of this can be published at all.
    column alignment marked **UNSURE** there, so this is a careful reading of the parent's table, not a quotation.*
    (b) The precondition is not "large decay hurts" but "decay **on the normalisation scales** hurts" — `cwd1`, `cwd3`
    and `cwd4` keep wd 0.1 on conv and linear weights throughout (`CONV-LINEAR-WD-KEPT`) and remove it from 1,536
-   parameters or fewer. **Neither point answers the charge**; only the ladder does.
+   parameters or fewer. **Neither point answered the charge; the ladder has now answered it, against us** — and the
+   one thing that is genuinely gained is that *"the scalar arm is a granularity measurement"* becomes a **measured
+   qualification** rather than an assertion: it is a granularity measurement below ~1e-2, and at 0.1 it is measuring
+   a broken configuration.
 
 ---
 
@@ -152,6 +179,12 @@ whether any of this can be published at all.
 committed evidence that cuts against the tensor-identity reading of the carrier account. Each row is re-derived here
 from the artefact named. A referee who reads §2 without reading §1 has been misled, which is what the second hostile
 pass said in those words.
+
+***NEW AT CORRECTIONS 285, AND IT IS THE LARGEST ITEM IN THIS SECTION: **A5**, the weight-decay ladder.*** *A1–A4 cut
+against the tensor-IDENTITY reading. **A5 cuts against the SCOPE of every sentence in the file, identity reading or
+not**, and it is the one piece of adverse evidence the campaign commissioned deliberately, registered in advance, and
+then got the bad answer to. It is placed last in §1 because it is the newest, not because it is the smallest; a
+referee reading §2 should meet it before the claim.*
 
 ### A1 — `cvt1`'s INJECT arm: a NON-carrier given a carrier-sized vote largely re-collapses the run
 
@@ -280,6 +313,46 @@ tensors hold the large terms; which tensors those are is set by the architecture
 magnitude moves the outcome (A1). **That account is what §2 claims. The tensor-identity account is what §2 does not
 claim.**
 
+### A5 — `cwd5`'s weight-decay ladder: the collapse this whole file is about does not exist at a practitioner's weight decay
+
+*Batch `cwd5`, `ResNet18_c100` at the mechanism cell, **27 runs**, seeds {146, 147, 148}, 100 epochs, **four rungs of
+the coupled base weight decay with BOTH grains run IN BATCH at every rung**, plus one carrier companion. Registered at
+CORRECTIONS **281** with every rung state and account token written before any run; **landed at CORRECTIONS 285**.
+Every figure below is read from the committed `results/cwd5_wdladder_score_mac.txt` (registered scorer `51c28608…`,
+run UNEDITED) and re-derived by `results/cwd5_attack_indep.txt` (401/401 lines, MISMATCHES 0, VIOLATIONS 0).
+**I ran no job. ZERO GPU.***
+
+| rung | `--weight-decay-base` | scalar | layerwise | `G` = L − k | state |
+|---|---|---|---|---|---|
+| **W1** (the campaign's own value, and the value of every other number in this file) | **0.1** | **23.2240** | 69.2940 | **+46.0700 pp = +87.46 SE** | **`COLLAPSE`** |
+| **W2** | 1e-2 | **69.3513** | 68.2620 | −1.0893 pp = −2.07 SE | **`NOGAP`** |
+| **W3** | 1e-3 | **72.4980** | 68.3373 | −4.1607 pp = −7.90 SE | **`NOGAP`** |
+| **W4** (the standard CIFAR value) | **5e-4** | **72.4080** | 67.8813 | **−4.5267 pp = −8.59 SE** (CO-PRIMARY) | **`NOGAP`** |
+
+**Why this is adverse, in one line: the 46-point gap this file spends sixty pages localising is a property of a
+configuration nobody uses.** At 1e-2 the scalar arm is **35.2203 pp above** that rung's collapse bar; at 1e-3 and 5e-4
+it is 38.3293 and 38.4673 pp above theirs and is in fact slightly *higher* than its own layerwise arm, with the sign
+consistent across all three seeds. The transition is **one step, between two adjacent rungs**. The layerwise ladder
+barely notices the axis at all — 1.4127 pp of spread across a 200× change — so **the whole interaction is on the
+scalar side**. At W1 the collapsed scalar arm reaches only **23.17 % TRAIN** against 97.9–99.8 % everywhere else:
+**it does not overfit, it never learns.**
+
+**Four bounds, and none of them softens it.** (1) **Four rungs BRACKET the transition and cannot locate it**
+(`LADDER-IS-FOUR-POINTS`): *"present at 0.1, absent at 1e-2"* is the whole of what may be said, and **no value inside
+that unrun decade may be named**. (2) **`NOGAP` is a BOUND**, *"below the 10 pp `GAP_BAR`"*, never *"the two grains
+are equal"*, and **`G_W2` is NOT resolved** (±2 SE [−2.1428, −0.0358], upper end 0.04 pp from zero — DESCRIPTIVE /
+UNSURE), so W2 may not be pooled with W3 and W4. (3) What is identified is the **CONJUNCTION** of scalar grouping
+with a coupled decay at or near 0.1 — at 0.1 the grain matters enormously and below it neither grain reaches the bar
+— so neither *"a general granularity effect"* nor *"a property of wd 0.1 independent of grain"* is writable.
+(4) **DECOUPLED decay is untested in either direction** and **which route the decay acts through is not separated**.
+
+**And one thing it does NOT do, stated because it is the tempting misreading.** It does **not** retract `cwd1`,
+`cwd3` or `cwd4`. Those batches measured what they measured, at wd 0.1, and every number in them stands. What `cwd5`
+does is **fix their scope**: all of §3.3–§3.3c is now known to sit at the one weight decay at which this
+configuration breaks. **The carrier companion `CARW2` says nothing about carriers at 1e-2** — `CAR-UNREADABLE` fired
+because W2 did not collapse, so there was no collapse for the mask to remove; 71.8327 is printed as a level and
+**nothing is read from it**, in either direction (§3.3d E30).
+
 ---
 
 ## 2. The claim, in one paragraph
@@ -290,6 +363,13 @@ This is the **rewritten** paragraph. Eight over-statements were struck before it
 carries the identity-vs-magnitude bound, or is not written. **§10 is a separate question and does not touch this
 paragraph: it asks where this material belongs and in what form, not what it may say.**
 
+***AMENDED AT CORRECTIONS 285, AND THE AMENDMENT IS A SCOPE BOUND ON EVERY SENTENCE IN IT.*** *`cwd5`'s ladder (§1 A5,
+§3.3d) has landed and it is ADVERSE: the collapse this paragraph is about is **present at coupled weight decay 0.1 and
+absent at 1e-2, 1e-3 and 5e-4**. **No number in the paragraph changes.** What changes is that every "collapses" clause
+now carries its decay INLINE rather than in a caveat block, and the paragraph ends by conceding the corner-case
+reading in this document's own words instead of leaving a referee to supply it. **This is the concession §10 said
+would have to be made if the ladder came back this way, and it is made here rather than argued with.***
+
 > The headline of the paper is unchanged: the **denominator** result — a properly tuned non-meta baseline is not beaten
 > by MetaOptimize, measured most strongly on CIFAR-100 (the campaign's own registered result, `cuc1`: CORRECTIONS
 > **220**, MASTER-TABLE row 19 moved `OPEN` → `CONFIRMED, RESCOPED` at **229**; see **E0**, and read E0's bounds with
@@ -299,7 +379,13 @@ paragraph: it asks where this material belongs and in what form, not what it may
 > coupled L2 weight decay applied to normalisation scales — a configuration common practice avoids (He et al.,
 > arXiv:1812.01187) and one already reported to destabilise BatchNorm training (Lobacheva et al., arXiv:2106.15739) — a
 > single shared meta-learned **Lion** step size collapses on CIFAR-100, on both a residual and a residual-free 18-layer
-> network, and removing that decay removes the collapse at every grain we tested: from every tensor and the meta trace
+> network. **That configuration is one extreme value of one axis, and we have now measured the axis**: at the coupled
+> L2 coefficient **0.1** at which every number in this file sits, the scalar arm is 23.2240 against its own in-batch
+> layerwise 69.2940; at **1e-2** it is 69.3513, at **1e-3** 72.4980 and at the standard CIFAR **5e-4** 72.4080, none
+> of them within reach of that rung's collapse bar (`cwd5`, 27 runs, both grains in batch at every rung, CORRECTIONS
+> 285; the four rungs BRACKET the transition between 1e-2 and 0.1 and locate it no further). **Every sentence that
+> follows is therefore a sentence about coupled weight decay at or near 0.1, and must be written carrying that
+> value.** At that value, removing the decay removes the collapse at every grain we tested: from every tensor and the meta trace
 > on ResNet; from the **twenty** BatchNorm scales of the whole ResNet network (4,800 of 11.2 M parameters — a
 > network-wide mask, not the three carriers); **on ResNet from three named scales ALONE** (1,536 of 11,220,132
 > parameters, in the weight update and the meta trace together), **which removes the collapse as fully as the
@@ -350,7 +436,13 @@ paragraph: it asks where this material belongs and in what form, not what it may
 > horizon-dependent**), so no share may be read off it. We do not identify the route by which the decay acts: our
 > instrumentation records a carrier's weight norm only in the arms where the decay is off, and in those arms the scales
 > **grow** rather than shrink, so the arms that actually collapse carry no measurement. **This is a scope and
-> precondition result with a bounded localisation attached. It is not a mechanism.**
+> precondition result with a bounded localisation attached. It is not a mechanism.** **And, stated in our own words
+> rather than left to a referee: the configuration in which all of this lives is one nobody trains in. At the
+> standard CIFAR weight decay the scalar and layerwise arms differ by −4.5267 pp — the scalar arm is, if anything,
+> slightly ahead — so this is a CORNER CASE and not a hazard of shared step sizes, of BatchNorm, or of MetaOptimize.
+> What it earns is not a warning to practitioners but a QUALIFICATION on our own audit: the audit's scalar row at
+> these cells is a granularity measurement at weight decays below about 1e-2, and at 0.1 it is measuring a broken
+> configuration. We report it that way.**
 
 Two sentences may be added, and no more:
 
@@ -606,6 +698,44 @@ brief asked for — a mask on idx 56, the largest-\|L\| carrier-free scale — w
 **`cwd4` therefore moves §0 item 11 and leaves §0 item 12 exactly where it was.** The arm that touches item 12 is
 **O-13**, and it is not run.
 
+### 3.3d The weight-decay LADDER — `cwd5`, and the scope it puts on everything above
+
+***STATUS, LED WITH.*** *`cwd5` was **registered at CORRECTIONS 281** (27 jobs, 5052142–5052169, seeds
+{146, 147, 148}, 9 arms in 4 rungs, its `RW2` proof job passed, RULE 20 at full coverage 27/27 before any accuracy
+line was opened) and has since **COMPLETED, been SCORED, and LANDED at CORRECTIONS 285**, **INGESTED ONCE at commit
+`91fcd57`** (3,289 → 3,316 rows, 27 added, 0 changed, 0 removed; `results/CORPUS-EXCLUSIONS.tsv` 201 → 222, the 21
+`ARGS_WD_BASE` rows including the corpus's first three TWO-AXIS rows, in the shape CORRECTIONS 284 registered).
+`results/cwd5_wdladder_score_alice2.txt`, `results/cwd5_wdladder_score_mac.txt`, `results/cwd5_attack_indep.txt` and
+`results/cwd5_rule20_full_land.txt` are committed. Every figure below is read from those; **I ran no job and no
+scorer for this section. ZERO GPU.** `SE_ARM_DIFF` here is **0.526756**, from the prior **0.645141** frozen at 281 —
+**numerically the same SE `cwd4` used, so this subsection adds NO new value to §3's SE table**, and that coincidence
+is stated rather than left to be noticed: the two batches froze the same prior, not the same measurement. All 27 runs name
+`NVIDIA L4` (`HW-UNIFORM-NVIDIA_L4`), as `cwd3`'s and `cwd4`'s did.*
+
+`ResNet18_c100` at the mechanism cell, **one axis varied**. Both grains ran **in batch at every rung**
+(`ALL-RUNGS-IN-BATCH`, `BOTH-GRAINS-AT-EVERY-RUNG`), and the reference at each rung is **that rung's own layerwise
+arm** (`REFERENCE-IS-IN-BATCH-LAYERWISE`), so **no landed cell of any other batch enters any bar** and no gap is a
+cross-batch contrast. Bars: `COLLAPSE` iff scalar ≤ 0.50 × that rung's own layerwise mean; `NOGAP` iff `G` < 10.0 pp;
+reference healthy iff layerwise ≥ 55. The anchor replicates in batch: `k01W1` **23.2240** against `cwd3`'s landed
+`k01` 22.9853 (**+0.2387 pp**, inside the 5 pp `MATCH` bar, no `ANCHOR-DIFFERS-FROM-CWD3` stamp).
+
+| # | question | arms | effect | artefact | CORR |
+|---|---|---|---|---|---|
+| **E28** | **does the collapse exist at a practitioner's weight decay?** — the ladder, and the question §10 said decides whether any of this is publishable | four rungs, both grains in batch at each: 0.1 / 1e-2 / 1e-3 / 5e-4 | **`G_W1` +46.0700 pp = +87.46 SE (`COLLAPSE`)**; `G_W2` −1.0893 = −2.07 SE, `G_W3` −4.1607 = −7.90 SE, **CO-PRIMARY `G_W4` −4.5267 pp = −8.59 SE**, all three **`NOGAP`**. Levels: scalar **23.2240 / 69.3513 / 72.4980 / 72.4080**, layerwise **69.2940 / 68.2620 / 68.3373 / 67.8813**. FINAL **`THRESHOLD-W1-W2`**. **No state is near-bar**: W1 collapses by 11.4230 pp; W2 / W3 / W4 sit **35.2203 / 38.3293 / 38.4673 pp ABOVE** their own rungs' collapse bars; and **the account replicates on every individual seed** — 146, 147 and 148 each give [`COLLAPSE`, `NOGAP`, `NOGAP`, `NOGAP`]. **BOUNDS, led with: four rungs BRACKET the transition between 1e-2 and 0.1 and LOCATE NOTHING inside it (`LADDER-IS-FOUR-POINTS`); `G_W1` is a floor LOCATION and its SIZE is where the arm landed, not a measured effect (164.6); each `NOGAP` is a bound in the other direction, "below the 10 pp bar", never "the grains are equal"; and `G_W2` is NOT resolved (±2 SE [−2.1428, −0.0358], upper end 0.04 pp from zero — DESCRIPTIVE / UNSURE), so W2 may NOT be pooled with W3 and W4.** | `results/cwd5_wdladder_score_mac.txt`, `results/cwd5_attack_indep.txt` | 281, 285 |
+| **E29** | **which side of the contrast moves?** — the only way to tell a granularity effect from a broken configuration | the two ladders read as levels | **DESCRIPTIVE, no bar.** The **layerwise** ladder is nearly flat — 69.2940 → 68.2620 → 68.3373 → 67.8813, **1.4127 pp of total spread across a 200× change in the decay** — while the **scalar** ladder swings **49.2740 pp** (23.2240 → 72.4980). **The interaction is entirely on the scalar side.** At W1 the collapsed scalar arm reaches only **23.17 % TRAIN** against 97.9–99.8 % on every other arm — **it does not overfit, it never learns** — and `TRAIN-AGREES` is stamped **on `G_W1` alone**, the only contrast clearing the 10 pp `GAP_BAR`. The SIGNED gap is monotone non-increasing in the order W1 → W4, i.e. **as the decay FALLS** (steps −47.1593, −3.0713, −0.3660, so the 2 SE tolerance is never called upon) — **but \|G\| does NOT shrink monotonically: 46.07 → 1.09 → 4.53 with the sign reversed.** The scorer's `GAP-MONOTONE-IN-WD` stamp was **suppressed by defect F1** (285.6), so this is re-derived from the four `G` values and **no stamp may be quoted for it**. **Three rungs of a flat line is not a dose–response curve, and UNSURE is the honest word for WHY the scalar arm recovers completely at 1e-2 rather than gradually.** | same | 285 |
+| **E30** | **what the carrier companion says at 1e-2** | `CARW2` (the three carriers' decay masked at wd 1e-2) **71.8327** | **NOTHING. `CAR-UNREADABLE`.** The companion was pre-registered to be read **ONLY** if rung W2 is in the `COLLAPSE` state; W2 is `NOGAP`, so there is no collapse for the mask to remove and **nothing about the carrier account is licensed at 1e-2 — not that it holds, not that it fails**. `P_CARW2` and `D_CARW2` were never computed; **71.8327 is printed as a LEVEL and nothing is read from it.** **This is a DESIGN-SCOPE limit and not a patch failure, and the gate proves it: the mask DID bite** — `dm_masked` 3, `dm_n` strictly increasing to 49,902, and a **positive `dm_wdterm` on 1,500 of 1,500 masked records** — so `MASK-UPDATE-AND-TRACE` is earned and the `CAR-NULL` null is excluded by evidence. The independent parser's audit over all **4⁴ = 256** rung-state vectors shows `THRESHOLD-W1-W2` and `GRADED-ABOVE-THRESHOLD-W1` are **exactly the two accounts that can never carry a read carrier word**: siting the companion at W2 and the threshold at W1–W2 were bound to collide. *(This is `cmo1`'s `ISO-UNREADABLE` at wd 0, CORRECTIONS 264, repeating one rung higher, and it was named as a reachable outcome before any run.)* | same | 281, 285 |
+
+***WHAT `cwd5` SETTLES, AND WHAT IT DOES NOT — the second half stated as loudly as the first.*** **Settled**: the
+question §10.6 R1 and O-14 said decides the subsection. The collapse is **present at the campaign's 0.1 and absent at
+1e-2, 1e-3 and 5e-4**, so **the referee's corner-case charge LANDS** and the mechanism line must be written as a
+diagnostic of ONE extreme configuration. **NOT touched, and this matters as much**: (i) **it retracts nothing.**
+`cwd1`, `cwd3` and `cwd4` measured what they measured at wd 0.1 and every number in them stands — what changes is
+their SCOPE, which is now known rather than assumed. (ii) **It says nothing about DECOUPLED weight decay**
+(`DECOUPLED-NOT-TESTED`; descoped with reasons at 281.2, and O-14's own second half), so §10.6 **R2 stays
+unanswered**. (iii) **It separates neither term magnitude nor position class** — those are `cwd4`'s stamps and
+`cwd5` carries no arm that bears on them; §0 items 11–13 are exactly where they were. (iv) **It locates no
+threshold.** The bracket is the result.
+
 ### 3.4 Necessity of the carrier's own applied step (PlainNet18_c100, `csv1`'s cell)
 
 | # | statement | numbers | SE used | artefact | CORR |
@@ -820,22 +950,26 @@ In the campaign's register: what a reviewer will say, and what the honest answer
 | **T19** | **"Your carrier result could just be a count of scales at that depth, and you cannot tell."** | **HALF ANSWERED, half conceded — and the half that is answered was answered by an experiment registered to be able to go the other way.** **(b) count / dose is REFUTED at this cell** by `cwd4` (E25–E27): at count **two**, where the matched carrier-free pair can exist, `TWOWD0` {50, 53} recovers (67.0713, `REC`) and `CTL2WD0` {47, 56} does not (22.8547, a `NULL` **floor location**) — `P_2SPEC` **+44.2167 pp = +83.94 SE** — and a **single** carrier suffices (`ONE59`, `ONE50` `REC`; `ONE53` `PART`). The registration named the adverse outcome `CONTROL-EXCEEDS-AT-TWO` and gave it its own licence paragraph before any run; it did not fire. **`cwd4`'s own bound, quoted because it is the reason this row is only half answered: it separates COUNT, never CLASS and never MAGNITUDE** — `POSITION-CLASS-NOT-SEPARATED` and `MAGNITUDE-NOT-SEPARATED` are on its FINAL unconditionally, and at count two the carrier pair is still {γ_last, γ_down} against {γ_others, γ_others}. **At the landing (CORRECTIONS 283) the class half got WORSE, not better: it now bites at count ONE too** — the two `REC` singles {50, 59} are both **γ_last** and the `PART` single {53} is **γ_down** — **and the magnitude half got worse with it**, because the three singles land in exactly the mean-`|L|` rank order **re-derived IN BATCH** (59 3.1188e-01 > 50 2.7474e-01 > 53 1.8077e-01, ranks 1/2/3 of 62 against controls at ranks 33 and 38, a 140.1× gap) with **both gaps resolved** and `SINGLES-SATURATED` absent, so that ordering is a measurement and is **evidence FOR the magnitude rival**. **(a) Position class therefore stands, unchanged:** *(registered at 275.1 before any `cwd3` run and re-derived from the architecture three ways there and once more here from `runs_alice2/cwd3-PARTITION-MANIFEST.txt`:* `ResNet18_c100` has exactly **five** 512-wide BN scales — **{47, 50, 53, 56, 59}** — and **three are the carriers**, so a class-pure, count-matched, depth-matched, **carrier-free triple does not exist** at that depth. In Kim et al.'s taxonomy (arXiv:2205.07260), `CARWD0` vs `CTL2WD0` is **{γ_last, γ_down} vs {γ_others}** at the same depth. *(b) as it stood at 278, kept verbatim because it is what `cwd4` was built to answer and because the reasoning still binds at count three:* `CTLWD0`'s idx 48 is a BatchNorm **shift** whose ‖w‖ is **1.3e-10 at probe record 0** (`dm_small` **512**, seed-mean absmin **8.76e-15**, only 0.0066 by record 200), so coupled decay on it does essentially nothing and **`CTLWD0`'s effective intervention is two genuine scales, not three**. With (a), **no control in `cwd3` — and none that could exist at that depth — is at once carrier-free, class-pure and count-matched at three**, so *"exempting ANY three genuine 512-wide `layer4` BN scales suffices, and two does not"* fitted **every number in `cwd3` exactly as well** as the carrier account. **That is the sentence `cwd4` refuted, by dropping to count two where the matched control does exist.** Note also that the `dm` readout matches the controls **per tensor** (‖w‖ ≈ 22.6 each) but **not in total**: decayed scale-mass stands at **3 : 2**. |
 | **T20** | **"Your own vote-injection arm says a non-carrier can do a carrier's job, and you buried it."** | **CONCEDED, AND IT WAS BURIED — the 276 and 277 drafts did not contain `cvt1` at all** (N1). It is now §1 A1, §0 item 13, a clause of the §2 claim paragraph, and E22. What the arm says: a non-carrier's term at a carrier's magnitude re-pins the complement at epoch 37.6 and costs **+34.6540 pp = +61.12 SE**. **What it does not say** (230.4, 230.6, quoted not paraphrased): it is **PARTIAL** (0.3442 of the HEAD gap kept, 0.14 pp above the registered 8–30 band); **timing is not separated from identity** and is stamped UNSURE, because the ×691 vote only turns DOWN from ≈ epoch 18, so "a full collapse starting late" and "a weaker effect because it is not 50's" are not distinguished; **one fixed K = 691, one dose, one network, one cell, 100 epochs**; and the sentence *"a carrier-sized vote from another tensor re-collapses the complement as fully as 50's own"* is **explicitly not licensed**. **The honest reading is that it refutes the strong identity claim and supports, without establishing, the magnitude claim.** The arm that would settle it is a **dose ladder on the injected magnitude with an onset control**, which is `cvt2`'s territory (registered at 233, landed at **236** as `GRADED` + `TOP-ATTENUATED`) — **on PlainNet, and not read into this file**. |
 | **T21** | **"Your controls are matched on everything except the thing that matters."** | **CONCEDED, and it is binding by the campaign's own registration, not by my judgement** (N2). `cdep1`'s scorer prints, under **"SCOPE, BINDING ON EVERY SENTENCE"**, that the design *"does NOT and CANNOT match them on DYNAMICAL MAGNITUDE"* and *"does NOT separate tensor identity from term magnitude"*; the gap is **Σ mean \|L\| 8.1665e-01 vs 2.6482e-03, ratio 308.4**, with the carriers at ranks **1/2/3 of 62** and the control members at **33 / 36 / 62**; 188.3 proves the best admissible carrier-free triple is still **×225** short and that **no choice of members closes it on this network**. `cmg1`, `cgn2` and `cgn3` stamp `MAGNITUDE-NOT-SEPARATED`; `cwd3` stamps `CTL-DEPTH-MATCHED-NOT-MAGNITUDE` and repeats the ×225 in its NOT-LICENSED block; 226.7 records the same pattern on **four** networks (×225 ResNet-BN, ×691 PlainNet, ×3.1–×14 GN, VGG `bn8` 0.58 share) and calls it *"not a design gap in any one batch; it is what these trajectories look like."* **This is why §2 claims a localisation by TERM MAGNITUDE and not by tensor identity, and why no set-matched control can ever settle it. Only a magnitude intervention can — which is what `cvt1` is (T20), and `cvt1` came out on the magnitude side.** **`cwd4` does not change this row by a single word, and said so before it ran** (280 headline bound (1)): it matches count, class, width, depth and numel, never magnitude; the magnitude arm it was asked for was dropped with reasons because `{56}` is a subset of an already-floored set (E25–E27). |
-| **T22** | **"Everything you have is at coupled weight decay 0.1, which is two hundred times what anyone uses, and you never varied it."** | **CONCEDED WITHOUT QUALIFICATION, AND IT IS THE CHARGE §10 SAYS DECIDES WHETHER ANY OF THIS IS PUBLISHABLE** (§0 item 15). Every cell in §3 is coupled L2 **0.1**; the standard CIFAR ResNet recipe is **5e-4** *(DESCRIPTIVE: common practice, not a campaign measurement)*. **There is no ladder**: the precondition is a **two-point contrast at the extremes**, decay-on against decay-off **on the masked tensors**, and nothing here locates the threshold or shows the collapse survives at a practitioner's value. **Decoupled weight decay is untested everywhere** (§0 item 6, §4.2), so "coupled" is a word the campaign uses without ever having run its alternative — **and as of CORRECTIONS 281 it is untested for a REASON that is registered rather than by omission**: the base update is coupled by construction and there is no well-defined equal-strength decoupled λ when the per-step dose is `wd · a` and `a` is learned and differs by orders of magnitude between the collapsing and the healthy arm, so a decoupled arm is `DECOUPLED-NOT-TESTED` and descoped (O-14). Two mitigations, both stated with their own limits: **wd 0.1 is the parent's own value**, which `LIMITS-PREP` §2.3 records the mechanism cell as **matching** (with that section's Appendix-Table-4 column alignment marked **UNSURE**); and the intervention removes decay from **1,536 parameters or fewer while conv and linear weights keep wd 0.1 throughout** (`CONV-LINEAR-WD-KEPT`), so the finding is not "large decay hurts". **Neither mitigation answers the charge.** **O-14 is the experiment that does, and until it lands the diagnostic framing of §10 is the only form in which this material is safe to write.** |
+| **T22** | **"Everything you have is at coupled weight decay 0.1, which is two hundred times what anyone uses, and you never varied it."** | **THE SECOND HALF IS NO LONGER TRUE, AND THE FIRST HALF IS NOW MEASURED RATHER THAN CONCEDED — AND IT LANDS.** *(REWRITTEN at CORRECTIONS 285, the `cwd5` landing; it previously read "CONCEDED WITHOUT QUALIFICATION … there is no ladder".)* **The ladder has been run**: `cwd5`, 27 runs, seeds {146, 147, 148}, four rungs — **0.1 / 1e-2 / 1e-3 / 5e-4** — with **both grains in batch at every rung**, FINAL `THRESHOLD-W1-W2` (§1 A5, §3.3d, E28–E30). **The collapse is PRESENT at 0.1 (`G_W1` +46.0700 pp = +87.46 SE, `COLLAPSE`) and ABSENT at all three lower rungs** — at 1e-2 the scalar arm sits 35.2203 pp above that rung's collapse bar, and the co-primary **`G_W4` = −4.5267 pp = −8.59 SE** says that at the standard CIFAR value the layerwise arm is, if anything, slightly *below* the scalar one. **So the referee is RIGHT and the section must say so first**: this is a corner case, not a hazard; the mechanism line is a diagnostic of ONE extreme configuration; and the audit's scalar cells carry the disclosure that they sit at a decay ~200× the standard value at which that configuration is broken. **What the campaign gains is a QUALIFICATION it can defend instead of an assertion it could not**: the scalar row is a granularity measurement below about 1e-2, and at 0.1 it is measuring a broken configuration. **FOUR BOUNDS travel with the answer**: the ladder has FOUR points, so the transition is a BRACKET between 1e-2 and 0.1 and nothing inside that decade may be named (`LADDER-IS-FOUR-POINTS`); `NOGAP` is a bound, not a measured equality, and `G_W2` is itself **not resolved** (−2.07 SE, ±2 SE upper end 0.04 pp from zero — DESCRIPTIVE / UNSURE); what is identified is the **CONJUNCTION** of scalar grouping with a decay at or near 0.1, so neither *"a general granularity effect"* nor *"a property of wd 0.1 independent of grain"* is writable; and **DECOUPLED weight decay is STILL untested in either direction** (`DECOUPLED-NOT-TESTED`, descoped with reasons at 281.2 — **§10.6 R2 remains unanswered, and a referee who asked for both halves of the chair's gate has had one answered**). The two old mitigations still stand and still do not answer the charge: **wd 0.1 is the parent's own value**, which `LIMITS-PREP` §2.3 records the mechanism cell as matching (that section's Appendix-Table-4 alignment marked **UNSURE**); and the intervention removes decay from **1,536 parameters or fewer while conv and linear weights keep wd 0.1 throughout** (`CONV-LINEAR-WD-KEPT`), so the finding is not "large decay hurts". |
 
 ---
 
 ## 7. Open questions, and what each costs
 
-Ordered by value per GPU-hour, **with O-14 placed first at this amendment** because §10's reading is that it is the
-precondition for publishing any of this, not an improvement to it. **Nothing here is registered and nothing is
-launched by this file.** Costs for O-6, O-7, O-8 are 273.12's estimates; O-2, O-9, O-11 and O-13 are my own rough
-guesses at ≈0.8 GPU-h per 100-epoch run and are **UNSURE**; **O-14 I do not cost at all**, and O-12's now-closed row
-keeps its guess beside the measured figure so the 3× miss stays visible.
+Ordered by value per GPU-hour. **O-14 was placed first at the 282 amendment because §10's reading was that it is the
+precondition for publishing any of this; at CORRECTIONS 285 it CLOSES — the ladder was run, and the answer is
+adverse (§1 A5, §3.3d, T22). Its row is kept first, struck through, with the answer in it, because a closed gate that
+came back against us is more informative than a deleted row.** With O-12 and O-14 both closed, **the top live item is
+now O-13, the magnitude arm**, which is the only one that can move §2's central bound. **Nothing here is registered
+and nothing is launched by this file.** Costs for O-6, O-7, O-8 are 273.12's estimates; O-2, O-9, O-11 and O-13 are my
+own rough guesses at ≈0.8 GPU-h per 100-epoch run and are **UNSURE**; **O-14 I did not cost at all** (its measured
+cost was 18.5092 GPU-h by `sacct`), and O-12's now-closed row keeps its guess beside the measured figure so the 3×
+miss stays visible.
 
 | id | question | cost | what an outcome would let the section say |
 |---|---|---|---|
 | **O-1** | ~~**The ResNet carrier-only decay mask**~~ — **CLOSED at CORRECTIONS 278.** `cwd3` ran it (15 runs, `ResNet18_c100` at `ciso1`'s cell, every arm SCALAR) and the first branch fired. `P_CAR` **+47.2787 pp = +89.34 SE**, `P_SPEC` **+47.2627 pp** against two controls both on `k01`'s floor (E19–E21). The **second** branch did **not** fire: the nomination set and the precondition set did not come apart. | **10.7111 GPU-h actual** (`sacct`; 10.60 by the runs' own `minutes` lines) against the ≈5–8 guessed and 275.3's ≈12.6 | **Done.** What it bought: §0 bound 3 and T2 closed. What it cost: **T18 and T19**. |
-| **O-14** | **THE WEIGHT-DECAY LADDER — and §10's reading is that this one is not optional.** ***NO LONGER AN OPEN QUESTION OF MINE TO ASK: it is `cwd5`, REGISTERED at CORRECTIONS 281 by another track of this cycle, between my writing this row and committing it.*** Its design, read from `analysis/cwd5_design.py` in the tree: **four rungs of the coupled base weight decay — 0.1 (the campaign's anchor), 1e-2, 1e-3 and 5e-4 (the standard CIFAR value) — with BOTH grains, scalar and layerwise, run IN BATCH at every rung** so the gap `G(w)` is a within-rung contrast, three seeds per point, plus one carrier-mask arm at 1e-2. **The DECOUPLED arm I asked for here is DESCOPED, with reasons** (281.2): the base update is coupled L2 by construction, a decoupled path needs a new harness patch touching both the weight update and the meta trace, and there is **no well-defined "same effective strength"** because the coupled per-step dose is `wd · a` with `a` learned and differing by orders of magnitude between the collapsing and the healthy arm — so any single λ matches one arm and not the other and the contrast would be confounded by construction. `DECOUPLED-NOT-TESTED` is stamped on every FINAL. ***NOTHING IS REGISTERED, LAUNCHED OR SCORED BY THIS FILE, AND NO RESULT OF `cwd5` EXISTS OR IS QUOTED ANYWHERE IN IT.*** | not mine to cost | **THE ITEM THAT DECIDES WHETHER THE SUBSECTION CAN BE WRITTEN AT ALL** (§10). **If the collapse persists at or near a practitioner's decay**, the "corner-case configuration" charge is answered with a curve rather than an assertion, and §10's diagnostic becomes a warning practitioners can act on. **If it appears only above some large value**, the campaign learns where its own threshold is and must say so in the first sentence — still publishable, still protecting the audit's scalar arm at the cells the audit reports. **Note what the descoping costs: R2 stays unanswered**, and "coupled" remains a qualifier the campaign uses without having run its alternative — now for a stated reason rather than by omission. **No outcome of the ladder is unpublishable, and every outcome changes what may be written.** |
+| **O-14** | ~~**THE WEIGHT-DECAY LADDER**~~ — **CLOSED at CORRECTIONS 285, AND THE ANSWER IS ADVERSE.** `cwd5` ran it (27 runs, `ResNet18_c100` at the mechanism cell, seeds {146, 147, 148}, four rungs **0.1 / 1e-2 / 1e-3 / 5e-4** with **both grains IN BATCH at every rung**, registered at CORRECTIONS 281, landed and ingested at 285). FINAL **`THRESHOLD-W1-W2`**: the collapse is **present at 0.1** (`G_W1` +46.0700 pp = +87.46 SE) and **absent at all three lower rungs** (`G_W2` −1.0893, `G_W3` −4.1607, **CO-PRIMARY `G_W4` −4.5267 pp = −8.59 SE**), with the scalar arm 35.22 / 38.33 / 38.47 pp **above** those rungs' collapse bars. **This is the outcome the row's own third column called *"it appears only above some large value"*, and the row said in advance that it is still publishable and changes what may be written — which is what §1 A5, §2, T22 and §10 now do.** **THE DECOUPLED HALF OF THE CHAIR'S ASK WAS NEVER BOUGHT and is not closed by this**: `DECOUPLED-NOT-TESTED`, descoped with reasons at 281.2 (the base update is coupled by construction and no single λ matches the coupled dose `wd·a` with `a` learned), so **§10.6 R2 remains unanswered** and a referee who reads the chair's gate as *"R1 **and** R2"* has had half of it met. **Bounds on the answer, which are bounds on every use of it**: four rungs BRACKET the transition between 1e-2 and 0.1 and locate nothing inside it; `NOGAP` is a bound, not a measured equality; `G_W2` is itself not resolved; and the ladder separates neither term magnitude nor position class, so §0 items 11–13 are untouched. | **measured: 18.5092 GPU-h** by `sacct` (18.2167 by the runs' own minutes), 27 runs — *I declined to cost it in advance and the measured figure is recorded here instead* | **IT DECIDED THE FRAMING, AND IT DECIDED IT AGAINST THE GENERALITY OF THE RESULT.** The section may now be written with a **measured** scope sentence rather than an assertion, and §10's diagnostic framing stops being a rhetorical choice and becomes the only one the data support. **What it costs**: nothing in the section may be sold as a practitioner-facing warning, and any sentence implying the collapse is a property of shared step sizes, of BatchNorm or of MetaOptimize is now refuted by our own batch. |
 | **O-12** | ~~**A TWO-carrier decay mask on ResNet**~~ — **CLOSED. `cwd4` ran it** (21 runs, `ResNet18_c100` at `cwd3`'s cell, seeds {143, 144, 145}, every arm SCALAR, registered at CORRECTIONS 280) **and added the three single-carrier arms O-12 did not ask for**, which is what stops a refuted count account being re-stated as "any two". `TWOWD0` **67.0713** `REC` against `CTL2WD0` **22.8547** `NULL`, `P_2SPEC` **+44.2167 pp = +83.94 SE**; branch `ONE-SUFFICES-PARTIAL` (E25–E27). | **≈15.0 GPU-h expected** at registration (`cwd3`'s measured 0.7141 per run × 21), against the ≈5 guessed in this row — **the guess was low by 3×, and the row is left as written so the miss is on the record** | **Done. What it bought**: T19's count/dose half **refuted** at this cell, and §0 item 11 rewritten. **What it explicitly did not buy**: T19a (position class) and **T21 (magnitude), which its own registration declared it had no power against** — `MAGNITUDE-NOT-SEPARATED` and `POSITION-CLASS-NOT-SEPARATED` are unconditional on its FINAL. |
 | **O-13** | **THE MAGNITUDE ARM, and it is the one T21 and T20 both point at.** An injection dose ladder on ResNet — `cvt1`'s `PATCH_VOTEWEIGHT` applied to a ResNet non-carrier at several K, with an **onset control** (a vote active from step 0) to separate timing from identity, against `cwd3`/`cdep1`'s own arms in batch. *(Added at 279.)* | ≈ 10–13 GPU-h (guess, **UNSURE**) | **The only item that can settle §2's central bound.** If a ResNet non-carrier at carrier magnitude collapses the run, the localisation is by **term magnitude** and the identity claim is retired for good — a cleaner, more general and more defensible result than the one the draft was trying to claim. If it does **not**, then identity survives a magnitude intervention on the network the claim is about, which is the strongest thing the campaign could say. **`cvt1` already did this on PlainNet with one K and no onset control; `cvt2` (233) ran a dose ladder there. Neither exists on ResNet.** |
 | **O-2** | **A weight-norm readout on the arms where the decay is ON** — a read-only patch (`PATCH_WNORM`-style) so the collapsing arms carry ‖w‖, min \|w\| and a small-weight count. | new patch + inertness proof + ≈ 5 GPU-h | The only item that could turn the scope result into a **mechanism**, and the only way to rule Zhou et al. in or out. **A design question for the professor, not a queue item** (273.12). |
@@ -863,6 +997,13 @@ keeps its guess beside the measured figure so the 3× miss stays visible.
    nor a separate paper, but **one bounded subsection of the existing audit paper, framed as a diagnostic that
    protects the audit's own scalar arm**. **That recommendation is an area chair's, it is stated as his, and it is
    exactly the kind of call that is his to overrule.**
+   ***AND AT CORRECTIONS 285 THE QUESTION NARROWED AGAIN, BECAUSE THE LADDER LANDED ADVERSE.*** *`cwd5` says the
+   collapse is present at coupled wd 0.1 and absent at 1e-2, 1e-3 and 5e-4 (§1 A5, §3.3d, T22). **The "mechanism
+   section" option is now effectively off the table** — a mechanism that exists at one extreme configuration is a
+   configuration note — so the live choice is between **the bounded diagnostic subsection §10 recommends** and
+   **cutting the material entirely**. **My view is the first, and my reason is that the audit reports its scalar row
+   either way, so the real choice is whether that row carries a measured qualification or none** (§10.7 items 3 and
+   5). **UNSURE, and it is his call.***
 2. **Which experiment gets bought, and in what order? There are now two candidates and they answer different
    referees.** **O-14, the weight-decay ladder plus a decoupled arm**, answers the *configuration* charge — §10's
    reading is that **without it the subsection is not safe to publish in any form**, because every number sits at
@@ -872,11 +1013,16 @@ keeps its guess beside the measured figure so the 3× miss stays visible.
    now**; O-1 was the exception it allowed because it repaired an over-statement, and `cwd4` was the next.
    **My reading, offered as a recommendation and not a decision: O-14 first**, because it protects the section's right
    to exist while O-13 only improves what the section may claim — but that ordering is exactly the kind of judgement
-   this question exists to put to him. ***Partly overtaken by events, and said plainly: O-14's ladder is REGISTERED as
-   `cwd5` at CORRECTIONS 281 by another track of this cycle, its decoupled half DESCOPED with reasons. No result of it
-   exists or is read in this file.*** So the live form of this question is: **does he want O-13 as well, does he want
-   the decoupled arm reinstated despite 281.2's reasons, and does he want **O-2** (the readout on the unmasked arms)
-   designed at all?**
+   this question exists to put to him. ***OVERTAKEN BY EVENTS, AND SAID PLAINLY: O-14's ladder RAN AND CLOSED*** *at
+   CORRECTIONS 281 → 285 — `cwd5`, 27 runs, 18.5092 GPU-h, FINAL `THRESHOLD-W1-W2`, **adverse**; its decoupled half
+   stays DESCOPED with reasons (281.2), so R2 is still unanswered. **The ordering recommendation was right for the
+   right reason and the answer it bought is a bad one, which is what a gate is for.*** So the live form of this
+   question is now: **(a) does he want O-13 at all, given that the material it would sharpen is now bounded to one
+   configuration — or does a corner-case subsection no longer justify 10–13 GPU-h on the magnitude arm? (b) does he
+   want the decoupled arm reinstated despite 281.2's reasons, so that R2 is answered too? (c) does he want **O-2**
+   (the readout on the unmasked arms) designed at all?** **My own ordering after `cwd5`: (b) before (a)**, because
+   R2 is the only half of the chair's gate still open and it is the cheaper of the two to argue about — **but this is
+   a judgement and it is exactly what the question exists to put to him.**
 3. Is "sufficiency plus a **count-matched, depth-matched** control" (E4, E6) enough necessity for the claim he wants,
    given that no set-matched control can ever be magnitude-matched on this network (E23) — or does the necessity leg
    need `csv1`'s counterfactual construction repeated on ResNet (**O-7**) despite a reviewer naming it an algorithm
@@ -977,18 +1123,22 @@ ask R9).
 verified absent), or `--all-docs` for every file under `docs/`. **Any future edit to this document should re-run it
 before the edit is committed**; that is the whole point of committing it rather than reporting a one-off grep.
 
-* Written against `master` **`8b9fbd2`** *(restated at every amendment; the 282 bullet said `bc73c24`, and before
-  that the 279 bullet said `97eb049` — a stale commit in the provenance section of a provenance document is the P8
-  defect twice in one file)*; corpus `results/all_runs.csv` at `8b9fbd2`, **3,289** rows / **3389.7**
-  GPU-hours, `results/CORPUS-EXCLUSIONS.tsv` **201** rows (re-counted at the 283 amendment: 3,290 lines including the
-  header; 222 lines including 20 comments and the header). **[SUPERSEDED headers: `bc73c24` / 3,268 rows / 3375.0
-  GPU-h at 282; `97eb049` at 279; `2ab824c` / 3,253 rows / 3364.4 GPU-h at 277; `84e4bcb` at 276; `064dff6` at 278.]**
+* Written against `master` **`91fcd57`** *(restated at every amendment; the 283 bullet said `8b9fbd2`, the 282 bullet
+  `bc73c24`, and before that the 279 bullet `97eb049` — a stale commit in the provenance section of a provenance
+  document is the P8 defect twice in one file)*; corpus `results/all_runs.csv` at `91fcd57`, **3,316** rows /
+  **3407.9** GPU-hours, `results/CORPUS-EXCLUSIONS.tsv` **222** rows (re-counted at the 285 amendment: 3,317 lines
+  including the header; 243 lines including 20 comments and the header). **[SUPERSEDED headers: `8b9fbd2` / 3,289 rows
+  / 3389.7 GPU-h and 201 exclusions at 283; `bc73c24` / 3,268 rows / 3375.0 GPU-h at 282; `97eb049` at 279; `2ab824c`
+  / 3,253 rows / 3364.4 GPU-h at 277; `84e4bcb` at 276; `064dff6` at 278.]**
   **The `cwd4` rows E25–E27 were added at 282, after `5b5b372` landed the scorer output but before the batch was
-  ingested; the corpus line above is now POST-`cwd4`-ingest (`8b9fbd2`, 21 rows added, 0 changed, 0 removed), and this
-  file still ingests nothing.** **Disclosed with it: the `--check` noise-floor DEMONSTRATION moved with that ingest,
-  `SIGMA_R18ALL` 0.645141 (df 258) → 0.645653 (df 261), `SIGMA_PLAIN` 0.460632 unchanged — no bar in any landed batch
-  reads that line, every registered floor was frozen at its own registration, but the next registration must quote the
-  new value** (283.9).
+  ingested; the `cwd5` rows E28–E30 were added at 285, AFTER its ingest, from the committed scorer and parser outputs.
+  The corpus line above is POST-`cwd5`-ingest (`91fcd57`, 27 rows added, 0 changed, 0 removed; exclusions 201 → 222,
+  of which the three `CARW2` rows are the corpus's first TWO-AXIS rows in CORRECTIONS 284's shape), and this file
+  still ingests nothing and still runs no scorer.** **Disclosed with it: the `--check` noise-floor DEMONSTRATION moved
+  again with that ingest, `SIGMA_R18ALL` 0.645653 (df 261) → 0.641573 (df 267) [SUPERSEDED: 0.645141, df 258],
+  `SIGMA_PLAIN` 0.460632 unchanged — no bar in any landed batch reads that line, every registered floor was frozen at
+  its own registration (`cwd5` correctly froze 0.645141 against the pre-`cwd4` corpus), but the next registration must
+  quote the new value** (285.9).
 * **Every number in §§3.0–3.7 was re-derived from the committed artefact named in its row before this rewrite was
   written**, together with the rows that were re-derived for the first time at 279: **E23** from
   `results/SCORE-cdep1.txt`, **E24** from four committed FINAL lines and CORRECTIONS 226.7, and **E22 / §1 A1 from the
@@ -1077,12 +1227,18 @@ difference is printed. **No PDF was fetched; no notebook site or Vercel URL was 
 3. **Buy one experiment first.** The weight-decay ladder plus a decoupled arm (**O-14**). His position is that
    **without it the "corner-case configuration" charge lands and the subsection is not safe to publish in any form** —
    so the ladder is a *precondition for writing*, not an *improvement to what is written*.
+   ***THE LADDER HALF HAS NOW BEEN RUN, AND IT SAYS THE CHARGE LANDS ANYWAY*** *(CORRECTIONS 285; §1 A5, §3.3d): the
+   collapse is present at 0.1 and absent at 1e-2, 1e-3 and 5e-4. **The chair's recommendation is therefore not
+   merely adopted here — it is now the only framing the data support**, and it is adopted for a stronger reason than
+   when it was first written. **The decoupled half was never bought** (`DECOUPLED-NOT-TESTED`, descoped with reasons
+   at 281.2), so R2 below stays unanswered.*
 
-***AND IT HAS BEEN BOUGHT, BY ANOTHER TRACK, WHILE THIS SECTION WAS BEING WRITTEN.*** *The ladder is **`cwd5`,
-registered at CORRECTIONS 281**: four rungs — 0.1, 1e-2, 1e-3, **5e-4** — with **both grains in batch at every rung**,
-three seeds per point. **I did not design it, register it, launch it or score it, and no result of it exists or is
-quoted anywhere in this file**; I record it because a recommendation that has already been acted on must not be read
-as still pending. **Two things are worth the professor's attention.** (i) **Its own design document reaches the same
+***AND IT WAS BOUGHT, BY ANOTHER TRACK, WHILE THIS SECTION WAS BEING WRITTEN — AND IT HAS SINCE LANDED.*** *The
+ladder is **`cwd5`, registered at CORRECTIONS 281 and LANDED at CORRECTIONS 285**: four rungs — 0.1, 1e-2, 1e-3,
+**5e-4** — with **both grains in batch at every rung**, three seeds per point, FINAL **`THRESHOLD-W1-W2`**. **I did
+not design it, register it, launch it or score it**; its numbers reach this file through §1 A5 and §3.3d, read from
+the committed scorer and parser outputs. **The answer is ADVERSE and it is in §10.2, §10.5 and §10.6 below, not
+deferred.** **Two things are worth the professor's attention.** (i) **Its own design document reaches the same
 framing independently** — it asks, in its own words, whether the scalar-vs-layerwise gap is *"a GRANULARITY effect, or
 a broken scalar CONFIGURATION that exists only at one extreme weight decay"* — which is §10.2's question, arrived at
 from the launcher's side rather than the referee's. (ii) **The decoupled half of the chair's ask is DESCOPED with
@@ -1118,10 +1274,16 @@ DECAY 0.1 ONLY.*** *Every arm of `cwd3` and `cwd4` is* ***SCALAR*** *— there i
 `HORIZON-100-ONLY`). What is shown is that* ***holding the grouping scalar on every arm***, *exempting one
 512-parameter BatchNorm scale from the coupled decay moves the same configuration from 22.8213 to 67.9567. Whether
 the diagnostic carries to the audit's own cells, or to normal weight-decay values, is precisely what the chair's
-ladder —* `cwd5`, *registered at CORRECTIONS 281 at wd 0.1 / 1e-2 / 1e-3 / 5e-4 — must decide.* ***It has since been
-SCORED by a concurrent track (`bfda844`,* `THRESHOLD-W1-W2 | W1-COLLAPSE+W2-NOGAP+W3-NOGAP+W4-NOGAP+CAR-UNREADABLE`*)
-but is NOT landed and NOT ingested, so nothing is read from it here beyond the fact that it exists: no `cwd5` number
-enters any sentence in this file, and what its verdict does to this framing is ITS landing's job.***
+ladder —* `cwd5`, *registered at CORRECTIONS 281 at wd 0.1 / 1e-2 / 1e-3 / 5e-4 — had to decide.*
+***IT HAS DECIDED, AND THE ANSWER IS NO*** *(CORRECTIONS 285; §1 A5, §3.3d): the diagnostic does **not** carry to
+normal weight-decay values. At 1e-2, 1e-3 and 5e-4 there is no collapse for it to diagnose — the scalar arm sits
+35.22, 38.33 and 38.47 pp above those rungs' collapse bars and is slightly above its own layerwise arm at the lower
+two. **So the diagnostic is a diagnostic OF THIS CONFIGURATION, and the sentence above holds at wd 0.1 and nowhere
+that has been measured below it.** That is a loss of reach and it is stated as one. **What survives — and it is
+exactly the thing this subsection exists for — is the qualification on the audit's own scalar row**: that row sits at
+wd 0.1, and at wd 0.1 the scalar configuration is broken, which is now MEASURED rather than asserted. **The bracket
+bound travels with every use of this**: four rungs locate nothing inside the unrun decade between 1e-2 and 0.1
+(`LADDER-IS-FOUR-POINTS`).***
 
 **Why this framing is the stronger one, stated plainly:**
 
@@ -1173,36 +1335,55 @@ tension.**
 
 **The licensed lead sentence, at these cells only:**
 
-> *At the audit's CIFAR-100 ResNet-18 cells, a single shared meta-learned step size fails — 22.8 against 69.2
-> layerwise — whenever coupled L2 weight decay is applied to the network's BatchNorm scales; exempting as few as one
-> of them restores it to 68.0, and exempting two matched non-carrier scales does not.*
+> *At the audit's CIFAR-100 ResNet-18 cells, **and at the coupled L2 weight decay of 0.1 at which those cells are
+> run**, a single shared meta-learned step size fails — 22.8 against 69.2 layerwise — whenever that decay is applied
+> to the network's BatchNorm scales; exempting as few as one of them restores it to 68.0, and exempting two matched
+> non-carrier scales does not. **At 1e-2 and below the failure is absent, so this is a property of that
+> configuration and not of shared step sizes in general.***
+
+***AMENDED AT CORRECTIONS 285.*** *The clause in bold is new. The previous form carried no weight decay at all, and
+after `cwd5` a sentence that does not name the decay is not writable: §1 A5 and §3.3d measure the axis and the
+failure lives at one end of it. The second sentence is the corner-case concession, in the lead rather than in a
+footnote, which is where the chair's own reading puts it.*
 
 ### 10.5 The proposed subsection — outline only, and the word "mechanism" does not appear in it
 
 *Sizing is the chair's ≈¾ page plus appendix. **This is an outline of a section to be written, not section text**, and
 nothing under `paper/` was read to produce it or is touched by it.*
 
-**Title:** *A weight-decay diagnostic for the scalar arm* (working).
+***REWRITTEN AT CORRECTIONS 285, BECAUSE THE LADDER LANDED AND ¶4's CONDITIONAL CLAUSE RESOLVED.*** *¶4 previously
+read "← this clause exists only if O-14 lands; without it the paragraph must instead concede the ladder is absent".
+**O-14 landed, and it landed adverse**, so the clause is written out — and ¶1 and ¶2 change with it, because a
+section that opens on "the scalar arm fails" without naming the decay is no longer honest. **The title changes too.***
+
+**Title:** *A weight-decay diagnostic for the scalar arm* (working) **[SUPERSEDED — kept because the change is the
+point]**; **now:** *When the scalar arm fails: a weight-decay diagnostic for one configuration* (working). *The
+qualifier is not decoration: after `cwd5` the section's own first claim is bounded to a configuration, and a title
+that hides that invites the objection the section exists to answer.*
 
 | ¶ | content | evidence it stands on | length |
 |---|---|---|---|
-| 1 | **The failure and the fix, in that order.** At these cells the scalar arm sits ~46 pp below layerwise; exempting the BatchNorm scales from coupled weight decay closes it. One sentence of consequence for anyone running a shared learned step size. | E1, E2, E8–E10, **E19**, §10.4's lead sentence | ~4 lines |
-| 2 | **What this means for the audit's own scalar arm.** The gap at these cells is not a granularity effect; the scalar row is therefore reported **with this qualification attached** and is not evidence that scalar granularity is intrinsically bad. | `docs/FINDINGS.md` audit row, E2, E19 | ~4 lines |
+| 1 | **The failure, ITS CONFIGURATION, and the fix — in that order.** *(REWRITTEN at 285.)* At these cells, **and at the coupled weight decay 0.1 at which they are run**, the scalar arm sits ~46 pp below layerwise; exempting the BatchNorm scales from that decay closes it. **The decay is named in the first sentence, not the fourth**, because ¶4 now reports that the failure is absent at 1e-2 and below and a reader who meets that after the claim has been led. One sentence of consequence for anyone running a shared learned step size **in this configuration**. | E1, E2, E8–E10, **E19**, **E28**, §10.4's lead sentence | ~5 lines |
+| 2 | **What this means for the audit's own scalar arm — and it is now MEASURED, not asserted.** *(REWRITTEN at 285.)* The gap at these cells is not a granularity effect: `cwd5` shows the same configuration at 1e-2, 1e-3 and 5e-4 has **no gap at all** (`G_W4` −4.5267 pp = −8.59 SE at the standard CIFAR value), so the 46-point row is a property of the decay-plus-grain conjunction and not of scalar granularity. The scalar row is therefore reported **with this qualification attached**, and the qualification is a measurement. | `docs/FINDINGS.md` audit row, E2, E19, **E28, E29** | ~5 lines |
 | 3 | **How localised the fix is** — 1,536 of 11.2 M parameters, and a single scale suffices — **with the matched carrier-free control that does not**, stated as an asymmetry between a measured rescue and a bounded floor, never as two magnitudes. | **E19, E20, E25, E26**, 164.6 | ~5 lines |
-| 4 | **The three things this does NOT establish**, in the text and not in a footnote: not a route (§4.2); not tensor identity — the selector is not resolved between identity, term magnitude and position class (E23, E24, T19a, T21); and **the decay value is far off common practice and we report where on the ladder the failure lives** ← *this clause exists only if O-14 lands; without it the paragraph must instead concede the ladder is absent, and §10.6 R1 is then unanswered*. | §0 items 12, 15; T19a, T21, T22; **O-14** | ~5 lines |
+| 4 | **The four things this does NOT establish**, in the text and not in a footnote *(REWRITTEN at 285 — the conditional clause has resolved, and it resolved against us)*: not a route (§4.2); not tensor identity — the selector is not resolved between identity, term magnitude and position class (E23, E24, T19a, T21); **the failure lives at ONE END of the decay axis and is absent at a practitioner's value, which we state as the section's own bound rather than leave to a referee** (E28); and **where on that axis it begins is not located** — four rungs BRACKET the transition between 1e-2 and 0.1 and nothing inside that decade may be named (`LADDER-IS-FOUR-POINTS`). **Also stated here, because a referee will ask and the honest answer is no: DECOUPLED weight decay is untested in either direction** (`DECOUPLED-NOT-TESTED`, R2). | §0 items 12, 15; T19a, T21, T22; **E28, E30**; **O-14 (closed, adverse)** | ~7 lines |
 | 5 | **One sentence of relation to prior work**: excluding normalisation parameters from weight decay is standard practice (He et al.); that BN + WD destabilise is known (Lobacheva et al.); the contribution here is that the practice is **load-bearing for a learned shared step size**, and how few parameters it takes. | §10.3 | ~3 lines |
-| **A** | **Appendix.** The four grains and their contrasts (E8–E11, E19–E21); the count ladder and its matched control (E25–E27); the two adverse results **in full** — `cvt1`'s INJECT arm (E22) and the magnitude-matching impossibility (E23) — plus the SE table, the floor-bound discipline, and the hardware and provenance disclosures. | §§1, 3, 6, 9 | 1–2 pages |
+| **A** | **Appendix.** The four grains and their contrasts (E8–E11, E19–E21); the count ladder and its matched control (E25–E27); **the weight-decay ladder in full, all four rungs and both grains, with the carrier companion's `CAR-UNREADABLE` stated rather than quietly dropped (E28–E30)**; the **three** adverse results **in full** — `cvt1`'s INJECT arm (E22), the magnitude-matching impossibility (E23) and **the ladder itself (§1 A5)** — plus the SE table, the floor-bound discipline, and the hardware and provenance disclosures. | §§1, 3, 6, 9 | 1–2 pages |
 
-**Three constraints on the section, carried from the chair and from this file's own record.** (i) **The word
-"mechanism" does not appear in it** — not in the title, not in the text. (ii) **Every number carries its cell**; there
-is no general statement about BatchNorm, about weight decay or about MetaOptimize. (iii) **Every floor reading is a
-bound** (164.6); *"the control recovers none of it"* is not writable anywhere in the section.
+**FOUR constraints on the section, carried from the chair, from this file's own record, and — the fourth — from
+`cwd5`.** (i) **The word "mechanism" does not appear in it** — not in the title, not in the text. (ii) **Every number
+carries its cell**; there is no general statement about BatchNorm, about weight decay or about MetaOptimize.
+(iii) **Every floor reading is a bound** (164.6); *"the control recovers none of it"* is not writable anywhere in the
+section. (iv) **NEW at 285: every number carries its WEIGHT DECAY, and no sentence may name a threshold value.** The
+ladder brackets and does not locate, so *"the collapse appears above about 0.03"* and *"the collapse exists only at
+0.1"* are both forbidden; the writable form is *"present at 0.1, absent at 1e-2 and below"*. And `NOGAP` is a bound,
+so *"the two grains are identical at 5e-4"* is not writable either — *"they do not differ by the collapse bar"* is.
 
 ### 10.6 What a reviewer will ask for, ranked — the chair's list, with our current answer beside each
 
 | # | the ask | can we answer it today? |
 |---|---|---|
-| **R1** | **"Show me the weight-decay ladder. Does this happen at 5e-4?"** | **NOT YET — and this is the one that decides the section** (§0 item 15, T22). **The experiment is registered**: `cwd5`, CORRECTIONS 281, four rungs to 5e-4 with both grains in batch (O-14). **No result exists and none is quoted here.** |
+| **R1** | **"Show me the weight-decay ladder. Does this happen at 5e-4?"** | **YES, WE CAN ANSWER IT — AND THE ANSWER IS NO, IT DOES NOT HAPPEN AT 5e-4** *(ANSWERED at CORRECTIONS 285; §1 A5, §3.3d E28, T22, O-14 closed)*. `cwd5`, 27 runs, four rungs with both grains in batch at every rung: `COLLAPSE` at **0.1** only (`G_W1` +46.0700 pp = +87.46 SE); `NOGAP` at **1e-2**, **1e-3** and **5e-4**, with the co-primary **`G_W4` = −4.5267 pp = −8.59 SE** — at the standard CIFAR value the layerwise arm is slightly *below* the scalar one. **The referee's charge lands and the section concedes it in ¶1 and ¶4.** Two bounds go with the answer: **four rungs BRACKET the transition between 1e-2 and 0.1 and locate nothing inside it**, and `NOGAP` is a bound, not a measured equality. |
 | **R2** | **"Decoupled or coupled?"** | **NO, and it is now a DESCOPED question rather than a forgotten one** (281.2): the base update is coupled by construction and no decoupled λ is equal-strength when the per-step dose is `wd · a` with `a` learned. `DECOUPLED-NOT-TESTED`. **A referee may still insist, and would be entitled to.** |
 | **R3** | **"Is it the tensors, or their term magnitudes, or their position in the block?"** | **PARTLY. Count/dose is refuted** (`cwd4`, E25–E27). **Magnitude and position class are NOT separated and are stamped so on the FINAL.** O-13 is the arm for magnitude; no arm exists for position class at this depth (T19a). |
 | **R4** | **"Does it hold for a meta-update that is not a sign rule?"** | **NO.** Lion only; Adam-meta and SGD-meta untested (T14). **A genuinely cheap ask that has never been run.** |
@@ -1220,10 +1401,21 @@ bound** (164.6); *"the control recovers none of it"* is not writable anywhere in
    because §10.3 shows the alternative framing is the one that gets attacked. **This is a judgement, not a finding.**
 2. **The ≈¾-page sizing is his, and the appendix may not fit in it.** §10.5's appendix carries two adverse results in
    full, and shortening either of those is the one economy that must not be made.
-3. **O-14 as a gate is a strong claim, and it is now partly moot.** It is possible to write §10.5 ¶1–3 honestly today
-   and concede the ladder in ¶4; the chair's position is that a referee will then simply reject the section. **I cannot
-   adjudicate that from inside the campaign.** It matters less than it did, because the ladder is registered (`cwd5`,
-   281) — **but the decoupled half is descoped, so if the chair's gate was really "answer R1 *and* R2", it is not
-   fully met and the professor should know that before the section is drafted.**
-4. **The chair did not see `cwd4`.** His reading was on the 279 draft; `cwd4` has since refuted the count/dose rival
-   (E25–E27). It strengthens §10.5 ¶3 and changes none of R1, R2 or the magnitude half of R3.
+3. **O-14 as a gate is a strong claim, and the gate has now been run.** *(REWRITTEN at 285.)* The chair's position
+   was that without the ladder a referee simply rejects the section. **The ladder is run and it came back adverse**,
+   so the question is no longer *"may we write this?"* but *"is a bounded corner-case diagnostic worth ¾ of a page?"*
+   **My own view, offered as a judgement and labelled as one: yes, because the section's real job is to qualify the
+   audit's own scalar row, and that job is now done with a measurement instead of an assertion — the alternative is
+   an audit row a reader is entitled to discount and no answer to why.** **But the decoupled half is still descoped,
+   so if the chair's gate was really "answer R1 *and* R2", it is STILL not fully met**, and the professor should know
+   that before the section is drafted. **UNSURE, and it is his call, not mine**, whether a referee reads a
+   corner-case diagnostic as worth the space or as a reason to cut the subsection entirely (§8 Q1).
+4. **The chair did not see `cwd4` OR `cwd5`.** His reading was on the 279 draft. `cwd4` has since refuted the
+   count/dose rival (E25–E27) and **`cwd5` has answered R1 against us** (E28–E30). The first strengthens §10.5 ¶3;
+   the second **vindicates his framing for a stronger reason than he gave** — the diagnostic reading is now not
+   merely the safer choice but the only one the data support — while also making his own "corner-case" objection
+   correct. **Neither moves R2 or the magnitude half of R3.**
+5. **NEW at 285, and it cuts the other way.** A reader may fairly say the ladder makes the subsection *less* worth
+   writing, not more: if the failure only exists at a decay nobody uses, why spend ¾ of a page on it? **The answer I
+   would give is that the audit reports the scalar row regardless, so the choice is between reporting it with this
+   qualification or without one** — but that is an argument, not a finding, and §8 Q1 is where it belongs.

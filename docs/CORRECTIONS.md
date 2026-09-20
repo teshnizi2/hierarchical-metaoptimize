@@ -37506,4 +37506,480 @@ licence, PDF, notebook website or Vercel URL was touched, and nothing was downlo
 entry quotes **no licence paragraph of any batch**, `cwd4`'s included, so the two obligations `cwd4`'s launch refuter
 left (the `CTL2-PARTIAL` quotation gate and the magnitude rival) are not engaged by it.  Cost: **zero GPU-hours**.
 
-Next free number: **285**.
+## 285. TRACK D (land) — **[LED WITH THE BOUNDS: (1) **THE LADDER BRACKETS A TRANSITION; IT CANNOT LOCATE ONE.**  `LADDER-IS-FOUR-POINTS` is on the FINAL.  The collapse is PRESENT at the anchor 0.1 and ABSENT at all three lower rungs, so the transition lies somewhere in the **UNRUN interval between 1e-2 and 0.1**; no finer statement is licensed — not *"the threshold is at 0.03"*, not *"the collapse exists ONLY at 0.1"*.  (2) **EVERY `COLLAPSE` AND `NOGAP` READING IS A BOUND, NEVER A POINT EFFECT** (164.6; `FLOOR-READINGS-ARE-BOUNDS`).  `G_W1` **+46.0700 pp** is a LOCATION — the scalar arm sits at its floor, so the gap's SIZE is where the arm landed.  The three `NOGAP` readings are bounds in the other direction, *"below the 10 pp `GAP_BAR`"*, never *"the two grains are equal"*.  (3) **DECOUPLED WEIGHT DECAY IS NOT TESTED, IN EITHER DIRECTION** (`DECOUPLED-NOT-TESTED`, descoped with reasons at 281.2), so nothing here may be written as *"the collapse is a coupled-decay phenomenon"*; and WHICH ROUTE the decay acts through is not separated — one flag changes the weight shrink AND the meta trace.  (4) **`CARW2` IS UNREADABLE AND IS READ AS NOTHING.**  The carrier companion was pre-registered to be read ONLY if rung W2 collapses; W2 is `NOGAP`, so `CAR-UNREADABLE` fires, `P_CARW2` and `D_CARW2` were never computed, and **71.8327 is printed as a level and nothing is read from it** — not that the carrier account holds at 1e-2, not that it fails.  (5) **ONE network, ONE cell otherwise, ONE horizon, THREE seeds**; three seeds resolve states against the 0.50 and 10 pp bars, not fine BETWEEN readings, and ±2 SE is a HALF-WIDTH, not a bound on any effect (278.6 C1).  (6) **W2's negative gap is NOT resolved**: `G_W2` −1.0893 pp = −2.07 SE, ±2 SE **[−2.1428, −0.0358]**, an interval whose upper end is 0.04 pp from zero — DESCRIPTIVE / UNSURE, and it may not be pooled with W3 and W4.]** — **`cwd5` LANDS 27/27: `THRESHOLD-W1-W2 | W1-COLLAPSE+W2-NOGAP+W3-NOGAP+W4-NOGAP+CAR-UNREADABLE`.  THE SHARED-STEP-SIZE COLLAPSE IS PRESENT AT THE CAMPAIGN'S COUPLED WEIGHT DECAY 0.1 AND ABSENT AT 1e-2, 1e-3 AND 5e-4.  THE REFEREE'S CORNER-CASE CHARGE LANDS, AND THE MECHANISM LINE MUST BE WRITTEN AS A DIAGNOSTIC OF ONE EXTREME CONFIGURATION.**
+
+*This is the ADVERSE, pre-registered outcome — registered at CORRECTIONS 281 as a reachable one, before any run
+existed.  It is the experiment §10 of `docs/WRITEUP-mechanism.md` said decides whether the mechanism line is
+publishable at all, and the answer it returns is the one that costs the campaign the most.  **ZERO GPU.  No Slurm job
+submitted; one read-only `sacct -X` / `squeue` poll on the `alice2` login node.  `alice` — Saber's shared account —
+NOT contacted.  Nothing under `paper/` read, opened or touched.  No notebook website or Vercel URL opened, nothing
+downloaded, no `.pdf` fetched.***
+
+
+### 285.1 Completion, and RULE 20 at full coverage
+
+**27/27 COMPLETE.**  Jobs **5052142–5052169** (the gap, 5052151, is the `DECAY_MASK` bite/proof job and is NOT a run),
+seeds {146, 147, 148}, 9 arms.  Re-polled read-only by this entry: `sacct -X` → **27/27 `COMPLETED 0:0`**, elapsed
+**00:38:33–00:43:09**, **18.5092 GPU-h** (mean 0.6855/run) against **18.2167** by the runs' own minutes; `squeue -u
+s5014158` empty.  Node census derived twice and agreeing — node887 ×6, node883 ×6, node882 ×6, node885 ×4, node881 ×4,
+node880 ×1.  All 27 `.out` files carry 100 epoch lines, `RUN_DONE` and no traceback.
+
+**RULE 20 re-run at FULL COVERAGE 27/27, PASS on both halves**, `bin/cWD5_rule20.sh` unchanged and
+`analysis/argsline_guard.py` **UNEDITED** (`81cea8b5…`, byte-identical to the committed file — RULE 16 held).  Log
+committed at `results/cwd5_rule20_full_land.txt` (2026-09-20T17:46:29Z, the landing track's stage) and re-run
+independently by the refute pass at 18:30:19Z and by Track C at 18:00:44Z; **four full-coverage passes on these 27
+files in all, counting the registration's own at 13:32Z, every one PASS and agreeing.**
+
+* **ARGS half — the half that discriminates the rungs.**  27 `.out` files, 27 with an `ARGS:` line.  Batch consistency
+  with `--vary seed --vary run-name --vary weight-decay-base --vary stepsize-groups`: **27 clean, 0 repeated flags,
+  0 design mismatches, VERDICT: PASS.**  Per-run `--expect`: **27 runs, 20 flags each, 0 violations**, every run
+  pinned to its OWN rung's weight-decay token AND its OWN grain.  Axis coverage read back off the runs' own ARGS
+  lines: **6 × `0.1`, 9 × `1e-2`, 6 × `1e-3`, 6 × `5e-4`**; grain **15 scalar / 12 layerwise**.  Exactly as registered.
+* **ENV half** (`analysis/cwd5_rule20_envaudit.py`) — **`ENV AUDIT VERDICT cwd5: PASS`**.  ONE distinct `ENV` line ×27
+  **AFTER the registered `PROBE_DIR` strip** — the raw lines differ only in `PROBE_DIR`, which names each run's own
+  probe directory — byte-identical to `cvt1`…`cvt9` / `cwd1` / `cwd3` / `cwd4`'s *(283.6's habit of naming the
+  normalisation rather than asserting "byte-identical" bare; refute fix **W8**)*.  TWO distinct `PROBE_TENSOR` lines,
+  `type=layerwise` ×12 and `type=scalar` ×15, which is how this half discriminates the GRAIN.  `VOTE_W` / `BETA_HOLD`
+  / `GROUP_HOLD` / `REST_HOLD` off ×27, no `COMP_HOLD` / `WINDOW_HOLD` line anywhere.  `DECAY_MASK` compared as WHOLE
+  LINES: **off ×24 and the carrier witness carrying `wd=0.01` ×3.**  All 27 name `NVIDIA L4`.
+* **The ENV half's own declared limit, re-stated in its output rather than hidden**: the runner's `ENV` line carries
+  NO weight decay, so **this half cannot discriminate the rungs**.  That was declared at registration; the ARGS half
+  is what pins each run to its token.
+
+
+### 285.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cWD5_wdladder_score.py` (`51c28608b4786e2f90cd3ceb54b6ed709dca127eedeb8dbd83ecf3eaf068866c`) was run
+**UNEDITED**, exit 0, **401 lines**, on `alice2` and on the Mac.  All six code shas match the registration's pins at
+281.5: scorer `51c28608…`, `cwd5_design.py` `dd3ab158…`, `cwd_design.py` `03d2d761…`, `cwd_common.py` `d7ddb49e…`,
+`corpus_exclusions.py` `5346bb6b…` (the HEAD-committed bytes at scoring time), `argsline_guard.py` `81cea8b5…`.
+The two stdouts differ on exactly **two** lines, both host-dependent path echoes; normalised, all 401 lines hash to
+`f0b96711…`.  Committed as `results/cwd5_wdladder_score_alice2.txt` and `results/cwd5_wdladder_score_mac.txt`.
+
+**THE STAGE, CORRECTED (refute fix W7 — the one claim the refute pass REFUTED).**  The scored track narrated its stage
+as a pure `git archive 1d2a8b76d5a6f66c7dbdf2790d55299681a964f7`.  That narration does not reproduce, and the refute
+pass proved it by doing exactly what it described: a stage built purely from `1d2a8b76` carries the **registration**
+corpus — `results/all_runs.csv` `fe3874d3…` (3,268 rows) and `results/CORPUS-EXCLUSIONS.tsv` `50f75cde…` (203 rows) —
+and prints **`corpus: 3085 rows`** on the documented one-argument invocation, not the **3,088** in both committed
+logs.  **What actually ran was CODE from the registered commit plus the two corpus DATA files from HEAD `8b9fbd2`**
+(`def0598e…`, 3,289 rows; `29327a96…`, 221 rows), which is what the parser's own section honestly discloses.  Copying
+those two files into the archive stage reproduces the committed Mac log **byte-for-byte across all 401 lines**.
+**It changes nothing scored**: the corpus line is DISCLOSURE ONLY and enters no bar, sigma, level, state, contrast,
+branch or stamp — the scorer's own selftest proves this by reading its source — and all six code shas are exactly
+what the registered commit contains.  The sentence is fixed here; the verdict is untouched.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,316 rows, 222 exclusions): exit 0, 401 lines, stdout sha
+**`29624a5a0c25ceefc4d45c593ef52b8922f369b9c2c87af5747c652639357747`** — **BYTE-IDENTICAL to the committed
+`results/cwd5_wdladder_score_mac.txt`.**  Its corpus disclosure line still reads **3,088**, because the scorer
+excludes every `cwd5-` row BY NAME and the 21 new exclusion rows are all `cwd5` rows: ingesting the batch moves no
+figure it prints.  `analysis/cwd5_attack_indep.py` re-run post-ingest likewise reproduces
+`results/cwd5_attack_indep.txt` byte-identically, **VIOLATIONS 0**.
+
+**GATES, all PASS**: 27/27 COMPLETE; `G-ARGS` 27/27 plus `G-WDPATH` (exactly the four registered tokens
+`['0.1','1e-2','1e-3','5e-4']` and no other); `G-ENV`; `G-WITNESS` 27/27 × 6 kinds; `G-STRUCT` (the frozen
+`PARTITION-MANIFEST.txt`, 5,306 bytes, byte-identical); `G-PROV` 9/9 including `SCORER_SHA256 = 51c28608…` — the file
+that produced the output is the file the launcher recorded; `G-FLOOR` / `G-CEIL`; `G-BITE` 27/27; `G-DIVERGE`.
+
+**`G-BITE` detail, with its denominators (refute fix W9).**  The gate is SPLIT as registered: the LADDER half covers
+the 8 unmasked arms and is HARD; the CARRIER half covers `CARW2` alone and can only suppress the carrier word.  500
+records each, Lion recomputed on each arm's OWN group count (1 for the 15 scalar runs, 62 for the 12 layerwise runs),
+**lion-mismatch 0 everywhere, worst residual 4.0e-07, with 240 TIE-SKIPS in total — 20 on each of the 12 layerwise
+runs and 0 on every scalar run.**  A tie is a group the check SKIPS rather than verifies, so the zero is a zero over
+the non-tied groups; the 20/0 split is stated here rather than left to be read off the per-run lines.  0 hold-key
+records, 0 `dm_*` keys on any unmasked arm.  `CARW2` ×3: `dm_masked = 3`, `dm_n = step + 2` strictly increasing to
+**49,902**, `dm_skipped = dm_n × 3`, and **`pos_wdterm` 500/500 on every seed — 1,500 of 1,500 masked records carry a
+positive `dm_wdterm`.**  `MASK-UPDATE-AND-TRACE` is therefore EARNED, and the `CAR-NULL` null (a mask that never bit)
+is excluded by evidence — which is exactly why `CAR-UNREADABLE` here is a **design-scope limit and not a patch
+failure**.  The carrier gate passing is what tells the two apart.
+
+`plateau5` comes from each run's own RAW `.out` epoch lines (mean TEST over epochs 95–99); the CSV `plateau` column is
+read by neither the scorer nor the independent parser.
+
+
+### 285.3 The numbers (in batch; every contrast WITHIN its rung)
+
+`SIGMA_PRIOR_frozen` **0.645141** (in-batch 0.485817 was smaller, so the FROZEN PRIOR binds — `SIGMA-PRIOR-FROZEN`),
+`SE_ARM_DIFF` **0.526756**, **2 SE = 1.053511 pp, the HALF-WIDTH of a ±2 SE interval and NOT a bound on any effect**
+(278.6 C1).  Collapse bar at a rung = scalar ≤ 0.50 × **that rung's own** layerwise mean; `NOGAP` iff
+layerwise − scalar < 10 pp; reference healthy iff layerwise ≥ 55.  **Both grains ran IN BATCH at every rung**
+(`ALL-RUNGS-IN-BATCH`, `BOTH-GRAINS-AT-EVERY-RUNG`), so no gap is a cross-batch contrast.
+
+| rung | `--weight-decay-base` | scalar arm | layerwise arm | `G` = L − k | G in SE | R = k/L | COLLAPSE bar (scalar ≤) | state |
+|---|---|---|---|---|---|---|---|---|
+| **W1** (anchor) | 0.1 | `k01W1` **23.2240** (sd 0.278, range 0.516) | `kLW1` **69.2940** (sd 0.582) | **+46.0700 pp** | +87.46 | 0.3352 | 34.6470 | **`COLLAPSE`** |
+| **W2** | 1e-2 | `k01W2` **69.3513** (sd 0.430) | `kLW2` **68.2620** (sd 0.444) | **−1.0893 pp** | −2.07 | 1.0160 | 34.1310 | **`NOGAP`** |
+| **W3** | 1e-3 | `k01W3` **72.4980** (sd 0.355) | `kLW3` **68.3373** (sd 0.772) | **−4.1607 pp** | −7.90 | 1.0609 | 34.1687 | **`NOGAP`** |
+| **W4** (standard CIFAR) | 5e-4 | `k01W4` **72.4080** (sd 0.154) | `kLW4` **67.8813** (sd 0.506) | **−4.5267 pp** (CO-PRIMARY) | −8.59 | 1.0667 | 33.9407 | **`NOGAP`** |
+| W2 companion | 1e-2 | `CARW2` **71.8327** (sd 0.569) | — | not computed | — | — | — | **`CAR-UNREADABLE`** |
+
+**CO-PRIMARY.  `G_W4` = `kLW4` − `k01W4` = −4.5267 pp = −8.59 SE**, ±2 SE **[−5.5802, −3.4732]**, TRAIN gap −0.2460,
+seed-wise −4.916 / −4.154 / −4.510.  **At the standard CIFAR weight decay the layerwise arm is BELOW the scalar arm,
+consistently across all three seeds.**  This is the one number the batch existed to produce, and it answers the
+referee against the campaign.
+
+**KEYS.**  `G_W1` +46.0700 pp = +87.46 SE, [+45.0165, +47.1235], TRAIN gap +75.7060, seeds +45.080 / +46.534 /
++46.596.  `G_W2` −1.0893 pp = −2.07 SE, [−2.1428, −0.0358], TRAIN gap +1.4493, seeds −1.272 / −1.344 / −0.652.
+`G_W3` −4.1607 pp = −7.90 SE, [−5.2142, −3.1072], TRAIN gap −0.1600, seeds −4.832 / −3.578 / −4.072.  Ratios
+`R_W1`…`R_W4` = 0.3352 / 1.0160 / 1.0609 / 1.0667.
+
+**Does the scalar arm collapse by the registered definition at each rung?**  W1 **yes** (23.2240 ≤ 34.6470, by
+11.4230 pp).  W2 **no** — 69.3513 sits **35.2203 pp ABOVE** its rung's bar.  W3 **no** (+38.3293).  W4 **no**
+(+38.4673).  **The transition is a single step between the anchor and one decade down, and no rung is near-bar.**
+
+**Descriptive ladders — LEVELS, not effects; boundaries defined** (in batch, 3 seeds, 100 epochs, `ResNet18_c100` /
+CIFAR-100, this cell only):
+
+```
+  scalar     0.1 23.2240 | 1e-2 69.3513 | 1e-3 72.4980 | 5e-4 72.4080
+  layerwise  0.1 69.2940 | 1e-2 68.2620 | 1e-3 68.3373 | 5e-4 67.8813
+```
+
+**The layerwise ladder is nearly flat — 1.4127 pp of total spread across a 200× change in the weight decay — while
+the scalar arm swings 49.2740 pp.  The interaction is entirely on the scalar side.**  Largest seed range of any arm
+1.388 pp (`kLW3`), well inside the 5 pp `DIVERGED` bar, so no arm is bimodal and no state is an averaging artefact.
+
+**GAP MONOTONICITY, re-derived here because the scorer did not print it** (see 285.6 F1).  The **SIGNED** gap
+`G` = layerwise − scalar is monotone non-increasing across the rungs in the order **W1 → W4, i.e. as the weight decay
+FALLS**: [+46.0700, −1.0893, −4.1607, −4.5267].  Every step is a decrease (**−47.1593, −3.0713, −0.3660**), so the
+2 SE tolerance (1.053511) is never called upon.  **This is the SIGNED gap: its MAGNITUDE does not shrink
+monotonically — |G| falls from 46.0700 to 1.0893 and then grows back to 4.5267 with the sign reversed.**
+**DESCRIPTIVE only**; the scorer's own `GAP-MONOTONE-IN-WD` stamp was SUPPRESSED by defect F1, so this must be
+re-derived from the four `G` values, as it is here, and **a landing may NOT quote a stamp the scorer did not print**
+*(refute fix **W6**: the earlier narration said "monotone non-increasing IN the weight decay … so the gap shrinks",
+which reads as non-increasing as `wd` RISES — the opposite of the fact — and contradicts the direction reversal
+stated three paragraphs above it)*.
+
+**ANCHOR REPLICATION, non-gating.**  `k01W1` **23.2240** against `cwd3`'s landed `k01` 22.9853 → **+0.2387 pp**,
+inside the 5 pp `MATCH` bar, so **no `ANCHOR-DIFFERS-FROM-CWD3` stamp**.  The batch reproduced the mechanism cell
+IN BATCH before any other rung was read; the threshold is not an artefact of a failed anchor.
+
+**TRAIN AGREES.**  Only `G_W1` exceeds the 10 pp `GAP_BAR`, and its TRAIN gap (+75.7060) has the same sign as its
+TEST gap, so `TRAIN-AGREES` is stamped — **it rests on `G_W1` alone, because that is the only contrast clearing the
+bar, and this entry says so rather than letting the stamp read as a four-rung statement.**  Note the shape of the
+anchor failure: at W1 the collapsed scalar arm trains to only **23.17 %** TRAIN while every other arm trains to
+97.9–99.8 %.  **The wd-0.1 scalar run is not overfitting or generalising badly — it never learns.**
+
+
+### 285.4 What bounds the result, led with
+
+* **THE LADDER HAS FOUR POINTS** (`LADDER-IS-FOUR-POINTS`).  The threshold is a **BRACKETING PAIR**, 0.1 and 1e-2;
+  nothing between two adjacent rungs was run.  **No finer localisation is licensed**, and the phrasings the refute
+  pass struck are named so they are not written again: *"the collapse exists ONLY at 0.1"* (refute fix **W1**) and
+  *"the collapse is a property of wd 0.1, not of scalar grouping"* (**W2**) are both **forbidden** — the first
+  because it is a point localisation finer than the bracket and contradicts the scorer's own `NOT_FINER` clause, the
+  second because it denies the grouping's role at the very rung where the **46.0700 pp within-rung gap IS the
+  grouping contrast**.
+* **EVERY `COLLAPSE` AND `NOGAP` READING IS A BOUND, NEVER A POINT EFFECT** (164.6; `FLOOR-READINGS-ARE-BOUNDS`).
+  `G_W1` is a LOCATION: the scalar arm sits at its floor, so the gap's SIZE is where the arm landed, not a measured
+  effect.  The three `NOGAP` readings are bounds in the other direction — *"below the 10 pp bar"*, **not** *"the two
+  grains are equal"* and **not** *"the mechanism has no presence at 1e-2"* (refute fix **W3**: *"no presence"*
+  asserts an absence of mechanism, which the registered `NOGAP` word does not license).
+* **W2 IS NOT RESOLVED, AND MUST NOT BE POOLED WITH W3 AND W4** (refute fix **W5**).  At W3 and W4 the scalar arm is
+  RESOLVED above its own layerwise arm (−7.90 SE, −8.59 SE, sign-consistent across all three seeds).  At W2 the same
+  sign appears but is **NOT resolved** against the frozen prior: −1.0893 pp = −2.07 SE, ±2 SE **[−2.1428, −0.0358]**,
+  an interval whose upper end is **0.04 pp from zero** — **DESCRIPTIVE / UNSURE**.  In all three cases the registered
+  state word is `NOGAP`, a bound in the other direction, **not a claim that scalar wins**.
+* **DECOUPLED WEIGHT DECAY IS NOT TESTED, IN EITHER DIRECTION** (`DECOUPLED-NOT-TESTED`; descoped with reasons at
+  281.2).  The base optimiser has no decoupled path — `SGDm_base_update` multiplies the decay by the LEARNED step
+  size in the weight update AND bakes `(1 − wd·a)` into the meta trace — and no single λ can match the coupled dose
+  `wd·a` with `a` learned and clamped to `exp([−15, −2.3026])`.  **Nothing here may be written as "the collapse is a
+  coupled-decay phenomenon".**
+* **WHICH ROUTE the decay acts through is not separated.**  One flag changes both the weight shrink and the meta
+  trace.
+* **ONE network, ONE cell otherwise, ONE horizon, THREE seeds.**  `ResNet18_c100` / CIFAR-100, SGDm 0.99 + Lion
+  0.99/0.9, ms 1e-3, α₀ 1e-6, 100 epochs, `AUGMENT=1`, `BETA_CLIP` −15:−2.3026.  Nothing about PlainNet, VGG,
+  GroupNorm, other ResNet depths, other datasets, other meta step sizes, α₀, momenta, horizons, or groupings other
+  than scalar and layerwise.
+* **Three seeds resolve STATES against the 0.50 and 10 pp bars, not fine BETWEEN readings**; ±2 SE is a half-width,
+  not a bound on any effect (278.6 C1).
+* **Every reading is WITHIN this batch.**  The corpus disclosure line (3,088 rows) is DISCLOSURE ONLY — no bar,
+  sigma, state, contrast, branch or stamp reads the corpus.  The between-batch block (`cwd3`, `cmo1`, the census
+  layerwise mean) is frozen literals feeding one non-gating replication stamp.
+* **UNSURE, and not guessed: WHY the scalar arm recovers so completely at 1e-2** rather than degrading gradually.
+  The batch measures **that** it does; it does not measure why.  Nothing in the probe readout was examined for a
+  mechanism and none should be quoted as one without its own registration.
+* **`I am NOT reporting a critical weight-decay value.`**  Li–Zhou–Xu (arXiv:2607.21005) already own *"there is a
+  critical weight decay for normalised training"* at the class grain (281.1).  The registered framing is that the
+  campaign's cell sits **above the value at which this configuration breaks**, not that the campaign discovered a
+  criticality.
+
+**CARRIED OBLIGATIONS FROM `cwd4`'s LAUNCH REFUTER — both discharged here, VERIFIED BY ME rather than inherited.**
+**(a)** `cwd4`'s FINAL reads `ONE-SUFFICES-PARTIAL | TWO-REC+CTL2-NULL+ONE50-REC+ONE53-PART+ONE59-REC | …`; `CTL2` is
+**`NULL`**, and I confirmed by grep that the `CTL2-PARTIAL` stamp is **ABSENT from both committed scorer outputs**
+(`results/cwd4_countwd_score_alice2.txt` and `_mac.txt`, 0 occurrences each; the 2 occurrences in
+`results/cwd4_attack_indep_alice2.txt` are its own reachability-audit PASS lines, not a stamp).  **The floor clause
+holds, so `cwd4`'s three licence paragraphs may be quoted verbatim.**  **(b)** `cwd4` carries
+`MAGNITUDE-NOT-SEPARATED` and has **no power against the magnitude rival by construction**.  No sentence in this
+entry reads any `cwd4` result as tensor identity, and `cwd5` says nothing about carriers at all.
+
+
+### 285.5 The attack — a new independent parser that rebuilds all 401 lines
+
+`analysis/cwd5_attack_indep.py` (77 KB, written for this landing).  **INDEPENDENCE, as designed**: it imports NOTHING
+from the scorer, `cwd5_design.py`, `cwd_design.py`, `cwd_common.py`, `corpus_exclusions.py`, `argsline_guard.py` or
+any other repo module — stdlib only (`hashlib`, `json`, `math`, `os`, `struct`, `sys`).  **No regular expression
+anywhere**: `.out` lines are split on commas / colons / whitespace, the TSV on tabs, file names on hyphens.  Every
+bar, sigma literal, rung token, witness string, tree sha and licence sentence is **RE-TYPED** from CORRECTIONS 281.
+The `ResNet18_c100` tensor table is rebuilt **FROM THE ARCHITECTURE** (stem, four stages of two BasicBlocks, three
+downsample shortcuts, linear head) and `CARW2`'s mask resolved against that rebuild **by NAME**.  float32 rounding is
+re-derived through `struct`; the Lion natural step is recomputed from the records' own `beta_pre` / `mom_pre` /
+`z_agg` on each arm's own group count.
+
+**RESULT: 401 rebuilt vs 401 in the log, 398 matched VERBATIM, 3 matched host-independently** (the 2 path echoes by
+suffix, the corpus count re-filtered by hand), **0 MISMATCHES**; the FINAL rebuilt **token by token**; **VIOLATIONS 0**
+over 18 independent PASS checks.  Its own stdout is **BYTE-IDENTICAL on both hosts** — 121 lines, `b78c4254…`.
+
+Six attacks it adds beyond a replay:
+
+* **[1] Design rebuilt from scratch**: 62 tensors / 11,220,132 params; the 20 normscale indices; `CARW2` → idx 50, 53,
+  59, numel 1,536, k = 3; the 512-wide BN scales are exactly {47, 50, 53, 56, 59}; **all eight ladder arms are
+  UNMASKED** — which is why a patch defect cannot forge a threshold; both grains exist at every rung; the four rung
+  tokens are pairwise distinct and span 200×; α₀ 1e-6 → β₀ −13.815510749816895 through float32.
+* **[1b] RUNG SEPARATION from the runs' own ARGS lines** — coverage 6/9/6/6, every run carrying its own token AND its
+  own grain, 0 wrong.  It **re-derives and states its own limit** rather than hiding it: the ENV line has no weight
+  decay and `PROBE_TENSOR` has only the grain, so the bite job's `RW2` is what proves the flag changes the update,
+  not this parser.
+* **[1c] WITNESS re-derivation INCLUDING the weight decay**: `CARW2`'s line must read `wd=0.01`, a string
+  `PATCH_DECAYMASK` had never printed before this batch; it rebuilds the anchor's `wd=0.1` variant too and confirms
+  **no `cwd5` run carries it**.  Denominator stated with 274's lesson: **3 masked runs × 500 = 1,500 masked records,
+  1,500 with positive `dm_wdterm`**; the 24 unmasked runs contribute 12,000 records and carry **0** `dm_*` keys.
+* **[1d] Manifest rebuilt byte-for-byte** (5,306 bytes, `e2a707d7…`) and all 9 PROVENANCE values matched against
+  re-typed literals.
+* **[5] CARRIER-READABILITY AUDIT over all 4⁴ = 256 rung-state vectors** — which accounts are reachable and which can
+  carry a READ carrier word.  **`THRESHOLD-W1-W2` and `GRADED-ABOVE-THRESHOLD-W1` can NEVER carry one**, because both
+  require W2 not to collapse.  It then emits a QUOTE-BLOCK instruction for this landing: no `CAR-REC` / `CAR-PART` /
+  `CAR-NULL` sentence may be written, and `CARW2` 71.8327 is a level only.  *(Re-derived analytically by the refute
+  pass as well: `carrier_state` requires W2 `COLLAPSE`, while `account_of` forces c ≥ 2 for that.)*
+* **[6] BOUNDS AUDIT** naming, rung by rung, which printed readings are bounds rather than point effects (164.6).
+* **[7] RULE 16 defect report** — 285.6 F1.
+
+**REFUTE PASS, INDEPENDENTLY OF THE PARSER.**  A refute pass recomputed `plateau5` for all nine arms **from the raw
+`.out` files before running any repo program**, with its own stdlib parser, and reproduced every level, sd and seed
+range to 4 d.p.; re-derived the sigma choice, every gap, SE multiple, ±2 SE interval, ratio, per-seed gap, TRAIN gap
+and collapse bar; read the scorer's source for window / arm-key / seed / sign / shadowing / completeness (the arm
+regex is fully anchored, each (arm, seed) has exactly one file, sign is L − k throughout); re-ran RULE 20 from its own
+`git archive` stage; re-derived the mask and bite gate from all 27 `probe.jsonl` files (13,500 records); and confirmed
+that **the account replicates on EVERY INDIVIDUAL SEED** — seeds 146, 147 and 148 each give
+[`COLLAPSE`, `NOGAP`, `NOGAP`, `NOGAP`] → `THRESHOLD-W1-W2`.  **Every bar has a wide margin**: W1 collapse by
+11.42 pp; W2/W3/W4 above their collapse bars by 35.22 / 38.33 / 38.47 pp; `NOGAP` margins 11.09 / 14.16 / 14.53 pp;
+`REF_MIN` margin 12.88; `K01_MAX` margin 6.78; `DIVERGED` margin 3.61; anchor `MATCH` margin 4.76.  **The verdict
+HOLDS; it could not be refuted.**
+
+
+### 285.6 The refute pass — ONE claim REFUTED, NINE wording fixes, ONE RULE 16 defect
+
+**REFUTED: the stage provenance in `scorer_run` (W7), and nothing else.**  It is a statement about how the scorer was
+staged, not about any scored quantity; it is corrected in full at 285.2.  **NOT refuted, checked and found sound**:
+the four rung states and their bars; the co-primary and all three key contrasts; the sigma choice; the anchor
+replication; the `CAR-UNREADABLE` determination and the fact that `P_CARW2` / `D_CARW2` appear nowhere in the scorer
+output; the carrier-readability audit's conclusion; RULE 20 on both halves; the `G-BITE` split and
+`MASK-UPDATE-AND-TRACE`; the F1 defect and its cosmetic scope; and both `cwd4` obligations.
+
+**The nine fixes, all applied above, none touching a level, contrast, bar, state, branch word or stamp:**
+
+| # | where | what was wrong | where it is fixed here |
+|---|---|---|---|
+| **W1** | verdict, opening | *"exists ONLY at 0.1 and is gone by 1e-2"* — a point localisation finer than the bracketing pair, against `LADDER-IS-FOUR-POINTS` and the scorer's `NOT_FINER` clause | 285.4 bullet 1; the headline says PRESENT at 0.1 / ABSENT at the three lower rungs, transition in the UNRUN interval |
+| **W2** | verdict + summary, closing | *"the collapse is a property of wd 0.1, not of scalar grouping"* — a false dichotomy that denies the grouping's role at the rung where the 46.0700 pp within-rung gap IS the grouping contrast | 285.4 bullet 1 and 285.7: it is a property of the **CONJUNCTION** |
+| **W3** | what_it_means (1) | *"at this cell it has no presence at 1e-2"* — a bound read as a measured zero | 285.4 bullet 2 |
+| **W4** | what_it_means, headline | *"absent" / "switches off"* without the definition it is absent under | 285.3's per-rung margins (35.22 / 38.33 / 38.47 pp above bar) and 285.7 |
+| **W5** | what_it_means (2) | *"at all three lower rungs the scalar grouping is slightly better"* — overstates W2, whose interval's upper end is 0.04 pp from zero | 285.4 bullet 3 |
+| **W6** | contrasts, monotonicity | direction stated backwards, and *"the gap shrinks"* contradicts the direction reversal stated three paragraphs earlier | 285.3's GAP MONOTONICITY paragraph |
+| **W7** | scorer_run, STAGE | **the one claim that does not reproduce** | 285.2 |
+| **W8** | rule20, ENV half | *"byte-identical"* without naming the `PROBE_DIR` normalisation | 285.1 |
+| **W9** | scorer_run, G-BITE | *"lion-mismatch 0"* without its tie denominator | 285.2 |
+
+**RULE 16 DEFECT F1 (`cwd5`), NEW, REPORTED AND NOT FIXED.**  `analysis/cWD5_wdladder_score.py` guards its
+DESCRIPTIVE gap-monotonicity stamp with
+
+```
+    if word and "UNREADABLE" not in (word or "") and branch in ACCOUNT_TOKENS:
+```
+
+The substring test was plainly meant to catch a **RUNG** state of `UNREADABLE`.  But a rung is `UNREADABLE` exactly
+when its layerwise arm is below `REF_MIN`, and `decide()` returns `UNRESOLVED-REFERENCE` in that case, which is
+**NOT** in `ACCOUNT_TOKENS` — so **the rung reading of the test is DEAD CODE**, and the only string that can ever trip
+it is the CARRIER word `CAR-UNREADABLE`.  Measured on this batch rather than inferred: `G` =
+[+46.0700, −1.0893, −4.1607, −4.5267] is monotone non-increasing within 2 SE at every step, so
+**`GAP-MONOTONE-IN-WD` would have fired — and it is SUPPRESSED, because rung W2 did not collapse and the carrier
+companion is void.**  Gap monotonicity and carrier readability are unrelated facts, and one is silencing the other.
+Verified by me: `GAP-MONOTONE-IN-WD` and `GAP-NOT-MONOTONE-IN-WD` each appear **0 times** in the committed output.
+**COSMETIC IN SCOPE**: the clause appends a descriptive stamp only; no bar, sigma, level, contrast, rung state,
+carrier word, branch or licence paragraph reads it, and the FINAL's account token (`THRESHOLD-W1-W2`) is unchanged
+either way.  **The registered scorer was NOT edited** (RULE 16); the independent parser RE-TYPES the clause as
+written and reproduces the bytes the scorer actually emits — which is why the 0-mismatch claim is honest rather than
+flattering — following `cwd4`'s precedent (283.6 F1) of reproducing a defect rather than quietly correcting it.
+**The eight older open defects stand; this entry creates no other and fixes none.**
+
+
+### 285.7 THE AREA CHAIR'S QUESTION, ANSWERED IN ONE PARAGRAPH — **IS THE COLLAPSE A HAZARD OR A CORNER CASE?**
+
+**On this evidence: a CORNER CASE, and the answer is not close.**  At the campaign's own coupled weight decay 0.1 the
+scalar arm sits at 23.2240 against its in-batch layerwise 69.2940 — a 46.0700 pp within-rung gap, 87.46 SE, with the
+scalar run reaching only 23.17 % TRAIN, i.e. it never learns; drop the decay one decade to 1e-2 and the scalar arm is
+at 69.3513, **35.2203 pp above that rung's collapse bar**, and at 1e-3 and 5e-4 it is 38.33 and 38.47 pp above theirs
+and is in fact slightly *higher* than its own layerwise arm (`G_W3` −4.1607 pp = −7.90 SE, `G_W4` −4.5267 pp =
+−8.59 SE, sign-consistent across all three seeds).  **A practitioner running the standard CIFAR recipe's 5e-4 will
+never meet this failure**, so it cannot be written as a hazard of shared step sizes, of BatchNorm, or of MetaOptimize;
+the referee's *"corner-case configuration"* charge **LANDS**, and the campaign must say so in the first sentence of
+any subsection it writes.  **What the answer is NOT.**  It is not a licence to call the collapse an artefact of a
+mistaken setting: wd 0.1 is the **parent's own value**, the whole mechanism line and `cwd1`/`cwd3`/`cwd4` were run
+there deliberately, and the audit's own most dramatic scalar row sits at that same decay — so the finding's real force
+is that it **protects the audit's scalar arm by naming the configuration it is measured in**, which is exactly the
+diagnostic framing §10 of `WRITEUP-mechanism` had already adopted for other reasons.  And it is **not a located
+threshold**: with FOUR rungs the campaign can **BRACKET** the transition between 1e-2 and 0.1 and can do nothing
+else — *"the collapse is present at 0.1 and absent at 1e-2"* is the whole of what may be said, and **no value inside
+that unrun decade may be named, in the paper or anywhere** (`LADDER-IS-FOUR-POINTS`).  **And it is not a statement
+about grouping alone or decay alone**: at 0.1 the grain matters enormously — layerwise is healthy at 69.2940 while
+scalar sits at 23.2240 — and at 1e-2 and below neither grain reaches the collapse bar, so what the ladder identifies
+is the **CONJUNCTION** of scalar grouping with a coupled weight decay at or near 0.1, and neither factor alone.
+
+**Why the outcome is publishable rather than fatal, stated as a judgement and labelled as one.**  Every outcome of
+this ladder was registered as publishable before any run existed (O-14's own row says so), and this one converts an
+*assertion* the campaign could not defend — *"the scalar arm is a granularity measurement"* — into a *measured
+qualification* it can: the scalar arm is a granularity measurement **at weight decays below ~1e-2, and at 0.1 it is
+measuring a broken configuration**.  The subsection loses its claim to generality and gains a bound; the audit's
+headline (the denominator result plus the count-matched partition audit) does not move at all.  **UNSURE, and it is
+the professor's call, not mine**: whether a referee will read a bounded corner-case diagnostic as worth three-quarters
+of a page, or as a reason to cut the subsection entirely.  §8 Q1 is where that question lives.
+
+
+### 285.8 What this licenses, and what it does not
+
+**The sentence the registration licenses, verbatim, at this cell:**
+
+> *"the shared-step-size collapse at this cell requires a coupled weight decay within a decade of 0.1; at 1e-2 and
+> below the two grains do not differ by the collapse bar."*
+
+Its registered consequence, also written before any run existed: **this is the referee's corner-case charge landing.
+The mechanism line must be written as a diagnostic of ONE extreme configuration, and the audit's scalar cells must be
+reported with the disclosure that they sit at a weight decay roughly 200× the standard value, at which the scalar
+configuration is broken.  The honest framing is that the subsection PROTECTS the audit's scalar arm by naming the
+configuration, not that it explains a general granularity effect.**
+
+**`CARW2` IS UNREADABLE, AND THIS ENTRY SAYS SO PLAINLY RATHER THAN READING IT.**  The carrier companion at rung W2
+was pre-registered to be read **ONLY** if that rung is in the `COLLAPSE` state.  W2 is `NOGAP`.  There is therefore no
+collapse for the carrier mask to remove, and **NOTHING about the carrier account is licensed at 1e-2 — not that it
+holds, not that it fails.**  `CARW2` **71.8327** is printed as a level and nothing is read from it; `P_CARW2` and
+`D_CARW2` were never computed.  This is `cmo1`'s `ISO-UNREADABLE` at wd 0 (CORRECTIONS 264) repeating one rung higher,
+and `CAR-UNREADABLE` was named as a reachable outcome **before any run** — it is not a disappointment discovered
+afterwards.  **The mask DID bite** (`dm_wdterm` positive on all 1,500 masked records, `MASK-UPDATE-AND-TRACE`
+stamped), so this is a **design-scope limit and not a patch failure**; the carrier gate passing is exactly what tells
+the two apart.  **A fact about the design worth recording for whoever designs the follow-up**: a carrier companion is
+only readable at a rung that still collapses, and the only such rung is the anchor, where `cwd3` and `cwd4` have
+already landed it twice.  Siting the companion at W2 and the threshold at W1–W2 were bound to collide.
+
+**On `cmo1`'s two endpoints.**  The wd-0 endpoint (`W0k01` 71.56) and the four `cwd5` rungs are now consistent with a
+single picture — **the scalar arm is healthy everywhere except at 0.1**.  `cmo1` fixed the endpoints between batch;
+`cwd5` fills the interval **in batch, both grains at every rung**.
+
+**NOT licensed**: decoupled weight decay in either direction; any threshold finer than the bracketing pair; any other
+network, dataset, meta step size, α₀, momentum, horizon or grouping; the carrier account at any rung other than W2;
+which ROUTE the decay acts through; anything about the corpus's landed cells.
+
+
+### 285.9 The ingest — `cwd5`, ONCE (commit `91fcd57`), with its 21 exclusion rows in the SAME commit
+
+**Corpus 3,289 → 3,316 rows; exclusion list 201 → 222 rows over 17 batches.**
+
+`analysis/aggregate.py` (`35c035e1…`, UNEDITED) `../runs ../runs_alice2` → exit 0, 3,316 runs, the same 3 standing
+duplicate-name warnings; `analysis/args_repair.py` (`e6d8918d…`, UNEDITED) `--apply` → 36 rows updated (the standing
+`dup_group` restoration, 194.7…283), **0 accuracy or config values changed, 0 rows superseded**, 3,280 untouched.
+
+**ADDED 27 exactly, REMOVED 0, CHANGED 0** — re-derived field by field against the pre-ingest CSV with a reader of my
+own keyed on `(run, job_id)`: 38 fields, names identical, **0 duplicate keys before or after, 0 of 124,982
+pre-existing field-cells changed**.  `git diff --numstat` **27/0**, so no existing line moved.  All 27 added rows are
+`cwd5-` rows, 3 per arm across 9 arms, jobs **5052142–5052169**, each `epochs_done` 100 / `epochs_requested` 100 /
+`complete` 1 / `window_ok` 1 / `superseded` 0 / `ResNet18_c100`, granularity **15 scalar + 12 layerwise**.  GPU-hours
+**3389.7333 → 3407.9500 (+18.2167)** by the ingested `wallclock_min`.  **NO PROOF JOB, checked two ways**: 0 rows
+named `bite`/`proof`, and job **5052151** — the gap in the id range, the `DECAY_MASK` bite job — has no row at all
+(its log is `../runs_alice2/cwd5/bite_decaymask_cwd5.log`, not a `.out` in the runs root).
+
+**The 21 exclusion rows = 7 ARGS-deviating arms × 3 seeds**, kind **`ARGS_WD_BASE`** (registered at 263): `k01W2`,
+`kLW2`, `k01W3`, `kLW3`, `k01W4`, `kLW4`, `CARW2` × seeds {146, 147, 148}.  **The 6 anchor runs (`k01W1`, `kLW1` at
+the standard 0.1) are plain standard-cell rows and owe none.**  Every `witness` cell was **GENERATED** by
+`corpus_exclusions.args_deviations()` on the run's OWN raw `ARGS:` line (273.9's rule), never typed; `intervention`
+and `reason` derived from that value and, for `CARW2`, from its own `DECAY_MASK` line's `spec=` and `masked=`.  Rows
+in job-id order, 9-column format; the old file's bytes are an **EXACT PREFIX** of the new (+5,364 bytes);
+`git diff --numstat` **21/0**; 222 distinct keys, 0 duplicates.  **Two independent routes agree on the count of 21**:
+the registered scorer's own closing block (*"The 21 runs at a non-standard weight decay … owe CORPUS-EXCLUSIONS rows
+of kind `ARGS_WD_BASE` at the landing"*, with a selftest asserting `len(ARGS_DEVIATING) * len(SEEDS) == 21`) and RULE
+20's own non-anchor coverage 9 + 6 + 6.
+
+**THE 3 `CARW2` ROWS ARE THE CORPUS'S FIRST TWO-AXIS ROWS, in the shape CORRECTIONS 284 registered** (284.4): listed
+with the **ARGS** witness `ARGS_WD_BASE: weight-decay-base=1e-2`, with the `DECAY_MASK: on … wd=0.01 …` line the row
+cannot carry held **byte for byte** by `MULTI_KIND[("cwd5","CARW2")]`.  My generator asserted that equality against
+the run's own `.out` before writing the row.  **`analysis/corpus_exclusions.py` (`ce97f48f…`, the 284 module) was NOT
+edited by this entry.**  **284's blocker is therefore discharged**: 281.12 said the `cwd5` ingest could not list
+`CARW2` correctly, and it now can.
+
+**GATES, both on the committed tree.**
+`python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` → **exit 0, `VERDICT: PASS`**: 222 rows
+over 17 batches, every listed key present exactly once in the 3,316-row CSV, raw `.out` witness clean, completeness
+186 `.out` files print an ON line and 186 are CSV rows every one listed with its kind, multi-kind **33 two-kind +
+12 three-kind unchanged** (284's freeze working as designed), **two-axis runs 3, verified on BOTH axes**, ARGS witness
+**18 → 39** listed runs each carrying its own value, ARGS cell mixing 649 cells with no mixed value set.
+`python3 analysis/c98b_reproduce.py` (`1bd675ea…`, UNEDITED) → **exit 0, 806 lines**,
+`c98b VERDICT: science 618/618 PASS | drift 18 site(s), 10 differ (not gated) | guards fired 0 | declaration OK` —
+byte for byte the verdict of 283 / 278 / 273 / 266.
+
+**DISCLOSURE, not a gate, and it moved again**: the `--check` noise-floor demonstration moved with the corpus,
+`SIGMA_R18ALL` **0.645653 (df 261) → 0.641573 (df 267)**; `SIGMA_PLAIN` **0.460632** unchanged.  **No bar reads that
+line**, `cwd5` correctly froze `SIGMA_PRIOR` 0.645141 at its registration and is unaffected, **but the next
+registration must quote the new value.**
+
+
+### 285.10 What this does to the write-up, and the amendment made in the same cycle
+
+**The paper's headline does not move.**  It remains the denominator result plus the count-matched partition audit,
+with the mechanism line a bounded secondary contribution stated as a **configuration-conditional failure mode** —
+which is now a *measured* qualification rather than an asserted one.
+
+Applied to `docs/WRITEUP-mechanism.md` in this same cycle: the header (provenance restated at `91fcd57`, corpus
+3,316 / 3407.9, exclusions 222, old figures bracketed); **§0 item 15**, whose *"THERE IS NO LADDER"* is now false and
+is rewritten with the ladder's answer and the bracket bound; **§1**, which gains **A5**, the ladder as the cycle's
+newest and largest piece of adverse evidence, placed where a referee meets it before the claim; **§2's claim
+paragraph**, whose every *"the collapse is present at wd 0.1"* sentence now carries the ladder's scope inline and
+whose final sentence concedes the corner-case reading in the document's own words; **§3.3d**, a new subsection with
+rows **E28–E30** for the ladder, the co-primary and the unreadable companion; **§5's T22**, which moves from
+*"CONCEDED WITHOUT QUALIFICATION … there is no ladder"* to *"the ladder is run and it is ADVERSE"*; **§7's O-14**,
+which **CLOSES**; **§8**; **§9** provenance; and **§10** — §10.1's *"buy one experiment first"*, §10.2's scope
+sentence, **§10.5's proposed subsection outline (¶1, ¶2, ¶4 and the title)** and **§10.6's R1**, which changes from
+*"NOT YET — and this is the one that decides the section"* to an **answered** row.  `analysis/writeup_artefact_paths.py`
+exit 0 after every edit.
+
+`docs/LIMITS-PREP.md` §1.1b: corpus figures updated with the old ones bracketed, the noise-floor move disclosed, a new
+**S1e** row for `cwd5`, and the NET EFFECT paragraph amended — **the whole of S1b / S1c / S1d is now known to sit at
+the ONE weight decay at which this configuration breaks**, which is a scope bound on all three and not a retraction
+of any.  `docs/STATUS.md` gains a terse **CYCLE 159 (LANDING)** table.
+
+**MASTER-TABLE row 238** appended at the END of `docs/MASTER-TABLE.md` in row 237's format, so no existing line moved;
+header counts amended in place with the old figures bracketed (**3,316 / 3407.9**, tally 174 → **175**);
+`python3 analysis/c73_mastertable_check.py` run **UNEDITED → exit 0**.  **The site is NOT touched** — rows 237 and 238
+import together in a later stage, as the brief directs.
+
+
+### 285.11 Discipline, files, cost
+
+**RULE 16 held**: no registered scorer, launcher, design module, patch, tree, runner, `analysis/argsline_guard.py`,
+`analysis/corpus_exclusions.py`, `results/*.csv` generator or `results/*.tsv` reader was edited; the ONE new defect
+found (F1) is **REPORTED, NOT FIXED**.  **RULE 20 at full coverage before any number was read** — four independent
+passes.  `plateau5` from the RAW `.out` epoch lines; the CSV `plateau` column is banned as primary and is read by
+nothing here.  **Floor and saturated readings are BOUNDS, never point effects** (164.6).  Descriptive readings are
+labelled **DESCRIPTIVE / UNSURE** with their boundaries defined.  **Licence language is quoted exactly as registered,
+at that cell only.**  `git add` names its paths, never `-A`.
+
+Files touched by this entry (absolute):
+`/Users/teshnizi/Saber Optimization/alice-backup/hierarchical-metaoptimize/results/all_runs.csv`,
+`…/results/CORPUS-EXCLUSIONS.tsv`, `…/docs/CORRECTIONS.md`, `…/docs/MASTER-TABLE.md`,
+`…/docs/WRITEUP-mechanism.md`, `…/docs/LIMITS-PREP.md`, `…/docs/STATUS.md`.
+Committed earlier in this cycle by the scoring track: `…/analysis/cwd5_attack_indep.py`,
+`…/results/cwd5_wdladder_score_alice2.txt`, `…/results/cwd5_wdladder_score_mac.txt`,
+`…/results/cwd5_attack_indep.txt`, `…/results/cwd5_rule20_full_land.txt`.
+
+**Cost: ZERO GPU-hours.**  No Slurm job submitted or cancelled; one read-only `sacct -X` / `squeue` poll on the
+`alice2` login node was the only cluster command of this stage.  `alice` — Saber's shared account — **NOT contacted**.
+**Nothing under `paper/` was read, opened or touched.**  No notebook website or Vercel URL opened; nothing downloaded;
+no `.pdf` fetched.
+
+Next free number: **286**.

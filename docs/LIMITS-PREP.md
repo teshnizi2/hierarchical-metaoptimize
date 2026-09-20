@@ -52,19 +52,24 @@ arm without which M9's `ISO-RESCUES` can never become a specificity statement).
 collapse, but base weight decay 0 DOES. Is the paper still the mechanism, stated as conditional on coupled weight
 decay, or does it become a note on a configuration pitfall?
 
-### 1.1b RESULTS SO FAR, CONTINUED — the remaining five MUST-tier readings, landed 19 Sep 2026 (CORRECTIONS 268, 270, 271, 272, 273), **plus the two ResNet decay-mask landings of 20 Sep 2026: S1c (`cwd3`, CORRECTIONS 278) and S1d (`cwd4`, CORRECTIONS 283)**
+### 1.1b RESULTS SO FAR, CONTINUED — the remaining five MUST-tier readings, landed 19 Sep 2026 (CORRECTIONS 268, 270, 271, 272, 273), **plus the three ResNet weight-decay landings of 20-21 Sep 2026: S1c (`cwd3`, CORRECTIONS 278), S1d (`cwd4`, CORRECTIONS 283) and S1e (`cwd5`, the LADDER, CORRECTIONS 285, landed 2026-09-20T22Z, i.e. just past midnight local on the 21st)**
 
 *Registered verdicts only; the authority is `docs/CORRECTIONS.md`, and each sentence below is licensed at ONE cell only.
-Corpus is now **3,289 rows / 3389.7 GPU-hours** (`cwd4` ingested once at CORRECTIONS **283**, +21 rows, 0 changed,
-0 of 124,184 pre-existing field-cells changed, commit `8b9fbd2`); `results/CORPUS-EXCLUSIONS.tsv` 183 -> **201** rows
-(18 `DECAY_MASK` rows, `corpus_exclusions.py` NOT edited), `--check` PASS, `c98b` exit 0 with the same verdict as at
-278 / 273 / 266 / 253 / 247. **[SUPERSEDED: 3,268 rows / 3375.0 GPU-hours, `cwd3` ingested once at 278, +15 rows,
+Corpus is now **3,316 rows / 3407.9 GPU-hours** (`cwd5` ingested once at CORRECTIONS **285**, +27 rows, 0 changed,
+0 of 124,982 pre-existing field-cells changed, commit `91fcd57`); `results/CORPUS-EXCLUSIONS.tsv` 201 -> **222** rows
+(21 `ARGS_WD_BASE` rows -- 7 non-anchor arms x 3 seeds -- of which the three `CARW2` rows are the corpus's **first
+TWO-AXIS rows**, listed with the ARGS witness and their `DECAY_MASK: on ... wd=0.01 ...` line held by `MULTI_KIND`
+in the shape CORRECTIONS **284** registered; `corpus_exclusions.py` NOT edited by the ingest), `--check` PASS,
+`c98b` exit 0 with the same verdict as at 283 / 278 / 273 / 266 / 253 / 247. **[SUPERSEDED: 3,289 rows / 3389.7
+GPU-hours, `cwd4` ingested once at 283, +21 rows, commit `8b9fbd2`; exclusions 183 -> 201.]**
+**[SUPERSEDED: 3,268 rows / 3375.0 GPU-hours, `cwd3` ingested once at 278, +15 rows,
 commit `064dff6`; exclusions 171 -> 183.]** **[SUPERSEDED: 3,253 rows / 3364.4 GPU-hours, the four batches ingested once,
 +72 rows, 0 changed, commit `66a19fb`; exclusions 126 -> 171.]** **DISCLOSED, and it moved again:** the `--check`
-noise-floor demonstration is now `SIGMA_R18ALL` **0.645653 (df 261)** **[SUPERSEDED: 0.645141, df 258]**
+noise-floor demonstration is now `SIGMA_R18ALL` **0.641573 (df 267)** **[SUPERSEDED: 0.645653, df 261]**
+**[SUPERSEDED: 0.645141, df 258]**
 **[SUPERSEDED: 0.648113, df 255]**, `SIGMA_PLAIN` 0.460632 unchanged; **no bar reads that line** and every registered
-floor was frozen at its registration -- `cwd5` (281) correctly froze 0.645141 against the pre-`cwd4` corpus -- but the
-next registration must quote the new value.*
+floor was frozen at its registration -- `cwd5` (281) correctly froze 0.645141 against the pre-`cwd4` corpus and is
+unaffected -- but the next registration must quote the new value.*
 
 | id | batch | registered verdict | what it does to the limit |
 |---|---|---|---|
@@ -77,6 +82,8 @@ next registration must quote the new value.*
 | **S1c** | `cwd3`, 15 runs (**278**) | `CARRIER-DECAY-SUFFICES` + `CAR-REC+CTL-NULL+CTL2-NULL` | **L1's LAST OPEN HALF ON THE WD AXIS CLOSES AT THIS CELL, and it closes with two new confounds attached.** `cwd1` (S1b) masked all **20** BN scales network-wide and therefore could not say *which* tensors carry the precondition. `cwd3` masks the **three `ctd1` carriers ALONE** -- 1,536 of 11,220,132 parameters, in the weight update AND the meta trace -- and the collapse goes: `CARWD0` **70.2640** against `k01` **22.9853**, `P_CAR` **+47.2787 pp = +89.34 SE**, and `CARWD0` lands **INSIDE** `NWD`'s recovery band (+4.5413 pp above the 65.7227 bar; `NWD` **70.7227** replicates `cwd1`'s `k01NWD` 70.7760 in batch). **It is SPECIFIC against both matched non-carrier sets -- `P_SPEC` +47.2627 pp = +89.31 SE -- but that specificity is an ASYMMETRY BETWEEN A MEASURED RESCUE AND TWO BOUNDED FLOORS, not a difference between two magnitudes**: `CTLWD0` (`cdep1`'s DEPTH triple {47,48,56}) and `CTL2WD0` (its class-pure DEPTH2 pair {47,56}) are LOCATIONS at `k01`'s floor -- `P_CTL` +0.0160 pp, `P_CTL2` -0.0520 pp, i.e. below the 2.0 pp `NULL` bar and below **1.0744 / 1.1104 pp at +/-2 SE** (2 SE = 1.058364 pp is the HALF-WIDTH, not the bound), a ratio of **42.6 : 1** at the 2-SE bound. **The other 17 scales' residual is likewise a BOUND: `P_SET` = `NWD` - `CARWD0` = +0.4587 pp = +0.87 SE, <= +1.5171 pp at 2 SE -- AND ITS SIGN IS HORIZON-DEPENDENT** (it crosses zero near epoch 80 and is still moving at 99), so **no share may be read off it and `F_CAR` 0.9904 is DESCRIPTIVE, drifting through 1 across the horizon**. **TWO confounds, both registered and neither excluded: (a) only FIVE 512-wide BN scales exist in `ResNet18_c100`, {47,50,53,56,59}, and THREE are the carriers, so a class-pure carrier-free triple CANNOT exist at that depth (275.1; Kim et al. arXiv:2205.07260); (b) `CTLWD0`'s idx 48 is a BN SHIFT carrying essentially no decay dose, so its EFFECTIVE intervention is TWO scales, not three, and a COUNT/DOSE account fits every number here as well as the carrier account.** ONE cell, ONE network, ONE horizon, every arm SCALAR, one switch changing both routes, three seeds |
 
 | **S1d** | `cwd4`, 21 runs (**283**) | `ONE-SUFFICES-PARTIAL` + `TWO-REC+CTL2-NULL+ONE50-REC+ONE53-PART+ONE59-REC` | **THE COUNT/DOSE RIVAL THAT S1c COULD NOT EXCLUDE IS REFUTED AT THIS CELL, AND THE OTHER TWO CONFOUNDS GET WORSE.** At count **two** -- where a class-pure, width-, depth-, numel- AND count-matched CARRIER-FREE pair `CTL2WD0` {47,56} DOES exist, which at count three it arithmetically could not -- the two accounts come apart: `TWOWD0` {50,53} reaches **67.0713** (`REC`) while `CTL2WD0` stays at **22.8547** (`NULL`), **`P_2SPEC` +44.2167 pp = +83.94 SE**, `TWO-SPECIFIC`. **And ONE carrier scale alone -- 512 of 11,220,132 parameters -- can suffice**: `ONE59` **67.9567** (`REC`), `ONE50` **65.2233** (`REC`, but only **+0.40 SE** past the bar -- DESCRIPTIVE / UNSURE), `ONE53` **58.5780** (`PART`, and still climbing at epoch 99). **`D_TWO` = `CARWD0` - `TWOWD0` = +2.9387 pp = +5.58 SE**, so the third carrier still adds something; **`ONE59` - `TWOWD0` = +0.8853 pp = +1.68 SE, NOT resolved**, so the ladder is not cleanly monotone. **The control reading is a BOUND, not a measured zero**: `P_CTL2` +0.0333 pp = +0.06 SE, +/-2 SE **[-1.0202, +1.0868] spanning zero**, per-seed signs flipping -- the licensed form is *"leaves the run at `k01`'s floor"*, never *"does nothing"*. **A "dose of removed decay" reading is closed with an IN-BATCH number**: at probe record 0 every BN scale is still 1.0 and `dm_wdterm` is a pure function of k, so `TWOWD0` and `CTL2WD0` remove NUMERICALLY IDENTICAL decay at init and still differ by 44.2167 pp. **BUT: this batch separates COUNT and nothing else.** `MAGNITUDE-NOT-SEPARATED` and `POSITION-CLASS-NOT-SEPARATED` are unconditional, and both confounds are now SHARPER than at S1c -- the two `REC` singles {50,59} are both Kim **γ_last** and the `PART` single {53} is **γ_down**, and the three singles land in exactly the mean-`|L|` rank order RE-DERIVED IN BATCH (59 3.1188e-01 > 50 2.7474e-01 > 53 1.8077e-01, ranks 1/2/3 of 62 against controls at 33 and 38, a **140.1x** gap; set ratio **340.2**) with BOTH gaps resolved and `SINGLES-SATURATED` absent, which is evidence **FOR** the magnitude rival. ONE cell, ONE network, **ONE WD value (coupled 0.1)**, ONE horizon, every arm SCALAR with no layerwise arm, three seeds |
+
+| **S1e** | `cwd5`, 27 runs, **the LADDER** (**285**) | `THRESHOLD-W1-W2` + `W1-COLLAPSE+W2-NOGAP+W3-NOGAP+W4-NOGAP+CAR-UNREADABLE` | **THE SCOPE OF S1b / S1c / S1d IS NOW MEASURED, AND IT IS NARROW: THE COLLAPSE EXISTS AT THE CAMPAIGN'S COUPLED WEIGHT DECAY 0.1 AND AT NO LOWER RUNG.** Four rungs -- **0.1 / 1e-2 / 1e-3 / 5e-4** -- with **BOTH grains run IN BATCH at every rung**, so every gap is a within-rung contrast and the reference at each rung is that rung's OWN layerwise arm. `G_W1` = `kLW1` - `k01W1` = 69.2940 - 23.2240 = **+46.0700 pp = +87.46 SE**, state **`COLLAPSE`** (the scalar arm is 11.4230 pp below its rung's 0.50x bar). `G_W2` **-1.0893 pp**, `G_W3` **-4.1607 pp**, and the **CO-PRIMARY `G_W4` = -4.5267 pp = -8.59 SE at the standard CIFAR 5e-4**: all three **`NOGAP`**, with the scalar arm **35.2203 / 38.3293 / 38.4673 pp ABOVE** those rungs' collapse bars and, at W3 and W4, **resolved slightly ABOVE its own layerwise arm**. **The account replicates on every individual seed.** The anchor replicates between batch (`k01W1` 23.2240 against `cwd3`'s 22.9853, **+0.2387 pp**, inside the 5 pp `MATCH` bar), so the threshold is not an artefact of a failed anchor. **This is the ADVERSE, PRE-REGISTERED outcome: the referee's corner-case charge LANDS**, and `WRITEUP-mechanism`'s O-14 CLOSES against the generality of the result. **FOUR BOUNDS, and none softens it: (a) the ladder has FOUR points, so the transition is a BRACKETING PAIR between 1e-2 and 0.1 and NOTHING inside that decade may be named (`LADDER-IS-FOUR-POINTS`) -- *"the collapse exists only at 0.1"* is forbidden; (b) `NOGAP` is a BOUND, *"below the 10 pp `GAP_BAR`"*, never *"the grains are equal"*, and `G_W2` is itself NOT RESOLVED (-2.07 SE, +/-2 SE [-2.1428, -0.0358], upper end 0.04 pp from zero -- DESCRIPTIVE / UNSURE), so W2 may not be pooled with W3 and W4; (c) what is identified is the CONJUNCTION of scalar grouping with a coupled decay at or near 0.1 -- at 0.1 the grain matters enormously and below it neither grain reaches the bar -- so neither *"a general granularity effect"* nor *"a property of wd 0.1 independent of grain"* is writable; (d) DECOUPLED weight decay is NOT TESTED in either direction (`DECOUPLED-NOT-TESTED`, descoped with reasons at 281.2) and WHICH ROUTE the decay acts through is not separated.** **The carrier companion is UNREADABLE and is read as nothing**: `CARW2` was pre-registered to be read ONLY if rung W2 collapses, W2 is `NOGAP`, so `CAR-UNREADABLE` fires, `P_CARW2` / `D_CARW2` were never computed, and **71.8327 is a LEVEL only** -- nothing about the carrier account is licensed at 1e-2, in either direction. **The mask DID bite** (positive `dm_wdterm` on 1,500 of 1,500 masked records, `MASK-UPDATE-AND-TRACE`), so this is a **design-scope limit, not a patch failure**. **It RETRACTS NOTHING**: S1b / S1c / S1d measured what they measured at wd 0.1 and every number in them stands. ONE cell, ONE network, ONE horizon, three seeds; every reading WITHIN batch |
 
 **NET EFFECT, replacing 1.1's "half answered, half confirmed": §6's single biggest remaining weakness is now FULLY
 CONFIRMED on the weight-decay axis, and localised.** Coupled L2 weight decay on normalisation scales is a
@@ -91,7 +98,18 @@ REFUTED at this cell by `cwd4` (S1d) -- at matched count two the carrier pair re
 at the floor, and a SINGLE carrier scale can suffice, so the precondition is localised further, to 512 of 11,220,132
 parameters. POSITION CLASS and TERM MAGNITUDE are NOT separated, are unconditional stamps on `cwd4`'s FINAL, and are
 both SHARPER after that batch than before it. And the whole of S1b/S1c/S1d sits at coupled weight decay 0.1: whether
-any of it exists at normal values is what `cwd5` (registered at 281, 27 runs, not landed) must decide.]** Momentum 0.99
+any of it exists at normal values is what `cwd5` (registered at 281, 27 runs, not landed) must decide.]**
+**[AMENDED AGAIN at CORRECTIONS 285, and this is the amendment that matters most to L1: `cwd5` HAS decided, and the
+answer is that NONE of it exists at normal values (S1e). The collapse is PRESENT at coupled wd 0.1 and ABSENT at
+1e-2, 1e-3 and 5e-4, so the ENTIRE precondition result -- all four grains, both networks, S1b / S1c / S1d and the
+`cmo1` / `cwd2` cells with them -- is now known to sit at ONE weight decay, the one at which this configuration
+breaks. NOTHING IS RETRACTED: every number stands, and what changes is that their scope is MEASURED instead of
+assumed. What L1 may now say is that the precondition is real AT THAT CONFIGURATION and that the configuration is a
+corner case, not a hazard; what L1 may NOT say is where between 1e-2 and 0.1 the failure begins (four rungs BRACKET
+and do not locate), that the grains are equal at low decay (`NOGAP` is a bound), or anything at all about DECOUPLED
+decay (`DECOUPLED-NOT-TESTED`). The practical consequence for the write-up is at `WRITEUP-mechanism` SS1 A5, SS3.3d
+and SS10: the mechanism line becomes a DIAGNOSTIC that qualifies the audit's own scalar row, which is the framing an
+area chair recommended for other reasons and is now the only one the data support.]** Momentum 0.99
 stays exonerated (264). **He et al. (arXiv:1812.01187, "no bias decay") is the standard reference for NOT applying
 weight decay to BatchNorm parameters and biases, so the configuration is one common practice explicitly avoids.**
 
@@ -101,7 +119,12 @@ weight decay to BatchNorm parameters and biases, so the configuration is one com
 **7,500** masked probe records **[UNCHANGED by CORRECTIONS 283: `cwd4` adds 9,000 masked records of its own (18 masked
 runs x 500; its 3 `k01` runs carry NO `dm_*` key at all and are NOT in that denominator), on all 9,000 of which
 `dm_wdterm` is positive and `dm_small` is 0; on its masked arms the scales GROW (22.6 -> 22.8-23.2 by record 499) and
-only the floored `CTL2WD0` does not move. The arms that actually collapse still carry no readout.]** **[UNCHANGED by CORRECTIONS 278: `cwd3` adds 6,000 masked records of its own, on all of
+only the floored `CTL2WD0` does not move. The arms that actually collapse still carry no readout.]**
+**[UNCHANGED by CORRECTIONS 285: `cwd5` adds only 1,500 masked records (its 3 `CARW2` runs x 500; the other 24 runs
+carry NO `dm_*` key at all and contribute 12,000 unmasked records to no denominator here), on all 1,500 of which
+`dm_wdterm` is positive and `dm_small` is 0. Its collapsing arm -- `k01W1`, the wd-0.1 scalar anchor -- again carries
+NO readout, so the ladder does not move this limit either: the batch that finally measured the decay AXIS still
+measures no weight norm on the arm that fails.]** **[UNCHANGED by CORRECTIONS 278: `cwd3` adds 6,000 masked records of its own, on all of
 which `dm_wdterm` is positive and `dm_small` is 0 for `CARWD0` / `CTL2WD0` / `NWD`; its `CTLWD0` arm is the one exception
 and it is the SHIFT member, idx 48, whose 512 entries sit below 1e-3 from init -- which is evidence about that control's
 DOSE, not about filter collapse. `cwd3`'s own collapsing arm `k01` again carries NO readout at all.]** **[CORRECTED at CORRECTIONS 274 from "12,000 masked probe records": 12,000 is the two
