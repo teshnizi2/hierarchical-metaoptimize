@@ -314,3 +314,41 @@ per-layer dominance returned 0 hits; Mechanic names per-layer as future work; Me
 gammas do not rescue) and last-block specificity. If carrier gammas are shown to go to ~0 under the large held dose
 (Zhou et al.), novelty narrows to carrier selection and the vote. If S1/N4 (LIMITS-PREP §5.1) show the collapse needs
 momentum 0.99 or coupled WD on norm scales, the finding must be stated as a mechanism under that configuration.
+
+---
+
+## Sweep 2026-09-20 — the WEIGHT-DECAY VALUE axis, and coupled vs decoupled decay (CORRECTIONS 281, batch `cwd5`)
+
+*Targeted sweep before registering the coupled weight-decay ladder. Queries and per-paper verdicts are recorded in
+full at CORRECTIONS 281.1; this section keeps the two findings that change how a result may be WRITTEN. No `.pdf` was
+fetched; arXiv abstract pages and search-result summaries only.*
+
+**1. "There is a critical weight decay for normalised training" is ALREADY OWNED — cite it, do not claim it.**
+Li, Zhou, Xu, *Weight-norm Criticality: A Mechanism for Loss Spikes Induced by the Normalization and Weight Decay*
+(arXiv:2607.21005, 23 Jul 2026) argues that as the weight-decay coefficient rises, the norms of scale-invariant
+weights are driven toward zero, sharpness rises, and training destabilises — a **value threshold at the CLASS
+grain**, with no numerical value, no per-tensor exemption, no meta-learned step size and no granularity gap. It was
+already listed as ADJACENT at CORRECTIONS 275.1; on the value axis it is the DIRECT neighbour.
+**Consequence for the campaign:** a `THRESHOLD-*` verdict from `cwd5` may NOT be written as a discovery that weight
+decay has a critical value. It must be written as *"the campaign's cell sits above / below the value at which this
+configuration breaks"* — a SCOPE and DIAGNOSTIC statement about our own configuration, which is exactly the framing
+the area chair asked for.
+
+**2. A decoupled-decay arm would confound the coupling with the effective learning rate.**
+Kosson, Messmer, Jaggi, *Rotational Equilibrium: How Weight Decay Balances Learning Across Neural Networks*
+(arXiv:2305.17212, ICML 2024): on scale-invariant vectors, weight decay and gradient updates reach an equilibrium in
+which the expected rotation — a proxy for the EFFECTIVE learning rate — is set by the decay, and the paper attributes
+part of the AdamW-vs-Adam+L2 difference to exactly this. So swapping coupled for decoupled decay moves the effective
+step size of every normalisation scale, which is the quantity under study. Together with the harness fact that
+`SGDm_base_update` multiplies the decay by the LEARNED step size and bakes `(1 - wd*a)` into the meta trace — so no
+single lambda can match the coupled dose `wd*a` — this is why `cwd5` DESCOPES the decoupled arm rather than running a
+confounded one (CORRECTIONS 281.2). `DECOUPLED-NOT-TESTED` is stamped on every `cwd5` FINAL.
+
+**3. Loshchilov & Hutter's id, verified in session:** *Decoupled Weight Decay Regularization*, **arXiv:1711.05101**,
+ICLR 2019. It decouples the decay from the optimiser step so the optimal decay factor stops depending on the learning
+rate. Nothing in it concerns a shared vs per-group META-LEARNED step size, and it does not bear on whether a collapse
+has a decay-value threshold.
+
+**Still looks new (nothing found pre-empts it):** a weight-decay VALUE threshold for a **meta-learned shared-step-size
+collapse**, and the **scalar-vs-layerwise granularity gap measured as a function of the coupled decay** — the curve
+`cwd5` exists to produce.
