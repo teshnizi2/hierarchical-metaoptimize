@@ -1,0 +1,133 @@
+==============================================================================
+ cwd4_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED cwd4 SCORER'S OUTPUT
+ CORRECTIONS 280.  No repo module imported, no regular expression, every literal re-typed.
+==============================================================================
+
+[1] WHAT WAS REBUILT FROM SCRATCH, BEFORE THE LOG WAS OPENED
+  PASS ResNet18_c100 rebuilt from the architecture   62 tensors, 11220132 params
+  PASS the 20 normscale tensors resolved by ndim==1 and name.endswith('.weight')   20 tensors, numel 4800
+  PASS CARWD0's name list resolves to the registered set   idx 50,53,59 numel 1536 k 3
+  PASS TWOWD0's name list resolves to the registered set   idx 50,53 numel 1024 k 2
+  PASS CTL2WD0's name list resolves to the registered set   idx 47,56 numel 1024 k 2
+  PASS ONE50's name list resolves to the registered set   idx 50 numel 512 k 1
+  PASS ONE53's name list resolves to the registered set   idx 53 numel 512 k 1
+  PASS ONE59's name list resolves to the registered set   idx 59 numel 512 k 1
+  PASS every 512-wide BN scale in the model is one of {47,50,53,56,59} (188.1 / 275.2)   512-wide scales (47, 50, 53, 56, 59)
+  PASS the carrier-free 512-wide BN scales are EXACTLY {47,56}: TWO -- so a count-matched class-pure control   exists at count 2 and CANNOT exist at count 3 (280's whole design insight), free512 (47, 56)
+  PASS TWOWD0 is a PROPER SUBSET of CARWD0 and CTL2WD0 is DISJOINT from it
+  PASS the two count-2 arms are numel-matched   1024 = 1024
+  PASS both count-2 sets are class-pure: every member is a 1-dim BatchNorm SCALE, no shift
+  PASS alpha0 1e-6 -> beta0 re-derived through float32   -13.815510749816895
+
+[1b] COULD THE DECAY_MASK HALF OF G-BITE HAVE FAILED?  every run's records read as EVERY k in the batch
+     (its own, and every other): this separates 280.4's null (i) -- a mask that bit on CARWD0 but on NO
+     subset arm, which predicts EXACTLY ALL-THREE-NEEDED -- from a mask that really bit.  ITS LIMIT IS
+     RE-DERIVED, NOT HIDDEN: k=2 is shared by TWOWD0 and CTL2WD0, k=1 by the three singles, so a swap
+     INSIDE either group is invisible here.  [1c] is what refuses it.
+      k01      s143  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s143  as-registered(k=3) PASS   cross-reads that also pass: none
+      TWOWD0   s143  as-registered(k=2) PASS   cross-reads that also pass: none
+      CTL2WD0  s143  as-registered(k=2) PASS   cross-reads that also pass: none
+      ONE50    s143  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE53    s143  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE59    s143  as-registered(k=1) PASS   cross-reads that also pass: none
+      k01      s144  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s144  as-registered(k=3) PASS   cross-reads that also pass: none
+      TWOWD0   s144  as-registered(k=2) PASS   cross-reads that also pass: none
+      CTL2WD0  s144  as-registered(k=2) PASS   cross-reads that also pass: none
+      ONE50    s144  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE53    s144  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE59    s144  as-registered(k=1) PASS   cross-reads that also pass: none
+      k01      s145  as-registered(k=0) PASS   cross-reads that also pass: none
+      CARWD0   s145  as-registered(k=3) PASS   cross-reads that also pass: none
+      TWOWD0   s145  as-registered(k=2) PASS   cross-reads that also pass: none
+      CTL2WD0  s145  as-registered(k=2) PASS   cross-reads that also pass: none
+      ONE50    s145  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE53    s145  as-registered(k=1) PASS   cross-reads that also pass: none
+      ONE59    s145  as-registered(k=1) PASS   cross-reads that also pass: none
+  PASS every run passes its OWN k and FAILS every other k in the batch   21 runs, 21 cross-reads refused
+      DECLARED LIMIT: k=1 is shared by ['ONE50', 'ONE53', 'ONE59'] -- the record audit alone cannot tell them apart
+      DECLARED LIMIT: k=2 is shared by ['CTL2WD0', 'TWOWD0'] -- the record audit alone cannot tell them apart
+      DENOMINATOR (280.10): 18 masked runs x 500 records = 9000 MASKED records, 9000 with a positive
+      dm_wdterm.  The 3 k01 runs contribute 1500 records and carry NO dm_* key (0 found): they are
+      NOT part of this denominator, which is exactly 274's lesson.
+  PASS every masked record carries a positive dm_wdterm and no k01 record carries a dm_* key   9000/9000 masked, 0 dm_* keys on k01
+
+[1c] THE WITNESS, RE-DERIVED FROM THE ARCHITECTURE AND MATCHED TO WHAT THE RUN ITSELF PRINTED
+     (this is the ONLY readout that separates the two k=2 arms and the three k=1 arms from each other)
+  PASS all 21 runs printed exactly the witness this parser rebuilt from the architecture   21/21
+  PASS the 7 rebuilt witnesses are PAIRWISE DISTINCT (so a swap inside a k group is detectable)
+  PASS no run carries ANOTHER arm's registered witness   0 swaps
+      k01      DECAY_MASK: off
+      CARWD0   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+      TWOWD0   DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight masked=2 of=62 numel=1024 idx=50,53 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight
+      CTL2WD0  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.1.bn1.weight masked=2 of=62 numel=1024 idx=47,56 names=layer4.0.bn1.weight,layer4.1.bn1.weight
+      ONE50    DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight masked=1 of=62 numel=512 idx=50 names=layer4.0.bn2.weight
+      ONE53    DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.shortcut.1.weight masked=1 of=62 numel=512 idx=53 names=layer4.0.shortcut.1.weight
+      ONE59    DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.1.bn2.weight masked=1 of=62 numel=512 idx=59 names=layer4.1.bn2.weight
+
+[1d] THE MANIFEST AND THE PROVENANCE, REBUILT
+  PASS the batch's PARTITION-MANIFEST.txt == the manifest rebuilt here, byte for byte   6002 bytes, sha256 db540cb4e6849cac
+  PASS every PROVENANCE.txt value equals the literal RE-TYPED here (280.5 / 271.2), scorer sha included   9 keys
+
+[2] THE NUMBERS, RE-DERIVED FROM THE RAW RECORDS ONLY
+  k01      TEST 22.8213  TRAIN 22.6753  seeds 23.3620 / 21.8640 / 23.2380
+  CARWD0   TEST 70.0100  TRAIN 94.7527  seeds 70.2180 / 69.9460 / 69.8660
+  TWOWD0   TEST 67.0713  TRAIN 84.4807  seeds 67.3960 / 66.9580 / 66.8600
+  CTL2WD0  TEST 22.8547  TRAIN 22.6107  seeds 23.5480 / 22.0820 / 22.9340
+  ONE50    TEST 65.2233  TRAIN 84.6287  seeds 65.5260 / 65.0500 / 65.0940
+  ONE53    TEST 58.5780  TRAIN 70.1460  seeds 58.8040 / 58.2800 / 58.6500
+  ONE59    TEST 67.9567  TRAIN 92.3573  seeds 67.6460 / 67.9060 / 68.3180
+  SIGMA_INBATCH 0.478878   SIGMA_USED SIGMA_PRIOR_frozen   SE_ARM_DIFF 0.526756   df 14
+  P_2SPEC  +44.2167 pp = +83.94 SE   (TRAIN +61.8700)
+  D_TWO    +2.9387 pp = +5.58 SE   (TRAIN +10.2720)
+  P_ONE53  +35.7567 pp = +67.88 SE   (TRAIN +47.4707)
+  P_CAR    +47.1887 pp = +89.58 SE   (TRAIN +72.0773)
+  P_TWO    +44.2500 pp = +84.00 SE   (TRAIN +61.8053)
+  P_CTL2   +0.0333 pp = +0.06 SE   (TRAIN -0.0647)
+  P_ONE50  +42.4020 pp = +80.50 SE   (TRAIN +61.9533)
+  P_ONE59  +45.1353 pp = +85.69 SE   (TRAIN +69.6820)
+  STATE TWOWD0   REC
+  STATE CTL2WD0  NULL
+  STATE ONE50    REC
+  STATE ONE53    PART
+  STATE ONE59    REC
+  branch  ONE-SUFFICES-PARTIAL
+
+[3] LINE-BY-LINE AGREEMENT WITH THE SCORER LOG
+  PASS the rebuild has the scorer log's line count   359 rebuilt vs 359 in the log
+  lines in the scorer log            359
+  rebuilt and matched VERBATIM       356
+  matched host-independently          3   (2 path disclosures by suffix; 1 corpus count re-filtered here)
+  MISMATCHES                          0
+
+[4] THE FINAL LINE
+  PASS the FINAL line is rebuilt token by token
+  FINAL: ONE-SUFFICES-PARTIAL | TWO-REC+CTL2-NULL+ONE50-REC+ONE53-PART+ONE59-REC | HARNESS-CLEAN | PATCH-BITES | MASK-UPDATE-AND-TRACE | CONV-LINEAR-WD-KEPT | ALL-ARMS-SCALAR | RECOVERY-AGAINST-CARWD0 | CTL2-CLASS-PURE-COUNT-MATCHED | CTL-NOT-MAGNITUDE-MATCHED | MAGNITUDE-NOT-SEPARATED | POSITION-CLASS-NOT-SEPARATED | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | TWO-SPECIFIC | ONE-ORDER-ONE59-ONE50-ONE53 | FLOOR-READINGS-ARE-BOUNDS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+
+[5] THE FLOOR-CLAUSE REACHABILITY AUDIT (the 278.6 D1 analogue, re-derived over all 3^5 = 243 states)
+     Three registered licence paragraphs -- ANY-ONE-SUFFICES, TWO-SUFFICES, COUNT-GRADED -- assert in
+     terms that the carrier-free pair {47,56} 'stays at k01' / is 'at k01'.  A PART control is NOT at the
+     floor.  This enumerates which accounts are reachable with CTL2WD0 in state PART.
+      ALL-THREE-NEEDED         CTL2WD0 states that reach it: NULL
+      ANY-ONE-SUFFICES         CTL2WD0 states that reach it: NULL,PART
+      CONTROL-EXCEEDS-AT-TWO   CTL2WD0 states that reach it: PART,REC
+      COUNT-GRADED             CTL2WD0 states that reach it: NULL
+      ONE-SUFFICES-PARTIAL     CTL2WD0 states that reach it: NULL,PART
+      PARTIAL-NON-MONOTONE     CTL2WD0 states that reach it: NULL
+      TWO-SUFFICES             CTL2WD0 states that reach it: NULL,PART
+      floor-clause accounts REACHABLE with CTL2WD0 PART: ['ANY-ONE-SUFFICES', 'TWO-SUFFICES']
+      THIS batch: CTL2WD0 is NULL, and the FINAL does not carry the CTL2-PARTIAL stamp
+  PASS the CTL2-PARTIAL stamp is present exactly when CTL2WD0 is PART
+      QUOTE-OK: branch ONE-SUFFICES-PARTIAL with CTL2WD0 NULL -- no floor clause is asserted against a non-floor control.
+
+[6] RULE 16 DEFECTS FOUND IN THE REGISTERED SCORER BY THIS REPLAY (REPORTED, NOT FIXED)
+     F1 (cwd4, NEW).  analysis/cWD4_countwd_score.py lines 779 and 781 print the literal string
+     `100 %%` from a BARE print() -- no `%` operator is applied, so the `%%` escape is never consumed
+     and the scorer's stdout carries a DOUBLE percent sign where CORRECTIONS 280's own prose has one.
+     COSMETIC: it is in the WHAT-IT-DOES-NOT-LICENSE block and touches no bar, sigma, level, contrast,
+     branch or stamp.  The registered file is NOT edited (RULE 16); this parser reproduces the bytes
+     the scorer actually emits, so the byte-identical claim above is honest rather than flattering.
+     A landing that QUOTES that sentence must write `100 %` -- the scorer's rendering is the defect.
+
+VIOLATIONS 0

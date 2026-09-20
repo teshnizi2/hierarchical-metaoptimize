@@ -1,0 +1,359 @@
+==============================================================================
+ cwd4 -- ResNet18_c100: IDENTITY vs COUNT (and, as far as this network allows, vs MAGNITUDE) IN THE DECAY MASK
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 143,144,145   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1  every arm scalar
+   k01      k=0  idx -         DECAY_MASK (unset)
+   CARWD0   k=3  idx 50,53,59  DECAY_MASK layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+   TWOWD0   k=2  idx 50,53     DECAY_MASK layer4.0.bn2.weight+layer4.0.shortcut.1.weight
+   CTL2WD0  k=2  idx 47,56     DECAY_MASK layer4.0.bn1.weight+layer4.1.bn1.weight
+   ONE50    k=1  idx 50        DECAY_MASK layer4.0.bn2.weight
+   ONE53    k=1  idx 53        DECAY_MASK layer4.0.shortcut.1.weight
+   ONE59    k=1  idx 59        DECAY_MASK layer4.1.bn2.weight
+ CO-PRIMARY: P_2SPEC = TWOWD0 - CTL2WD0; D_TWO = CARWD0 - TWOWD0; P_ONE53 = ONE53 - k01 (bounded in neither direction).
+ RECOVERY IS AGAINST THE IN-BATCH CARWD0.  plateau5 = mean TEST over epochs 95..99 of each run's own .out.
+ BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3085 rows after corpus_exclusions.filter_rows, cwd4- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  21 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   cwd4-k01-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.3620 (train 23.5260)
+  OK   cwd4-CARWD0-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.2180 (train 95.4900)
+  OK   cwd4-TWOWD0-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.3960 (train 85.7900)
+  OK   cwd4-CTL2WD0-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.5480 (train 23.3960)
+  OK   cwd4-ONE50-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.5260 (train 85.5180)
+  OK   cwd4-ONE53-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 58.8040 (train 70.4500)
+  OK   cwd4-ONE59-s143  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.6460 (train 93.1800)
+  OK   cwd4-k01-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 21.8640 (train 21.5340)
+  OK   cwd4-CARWD0-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.9460 (train 94.3000)
+  OK   cwd4-TWOWD0-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 66.9580 (train 83.5720)
+  OK   cwd4-CTL2WD0-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.0820 (train 21.6240)
+  OK   cwd4-ONE50-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.0500 (train 84.1260)
+  OK   cwd4-ONE53-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 58.2800 (train 69.8080)
+  OK   cwd4-ONE59-s144  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.9060 (train 91.7740)
+  OK   cwd4-k01-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.2380 (train 22.9660)
+  OK   cwd4-CARWD0-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.8660 (train 94.4680)
+  OK   cwd4-TWOWD0-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 66.8600 (train 84.0800)
+  OK   cwd4-CTL2WD0-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.9340 (train 22.8120)
+  OK   cwd4-ONE50-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.0940 (train 84.2420)
+  OK   cwd4-ONE53-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 58.6500 (train 70.1800)
+  OK   cwd4-ONE59-s145  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.3180 (train 92.1180)
+
+G-ARGS    every run's OWN ARGS line says what its file name registers
+  PASS G-ARGS k01-s143
+  PASS G-ARGS CARWD0-s143
+  PASS G-ARGS TWOWD0-s143
+  PASS G-ARGS CTL2WD0-s143
+  PASS G-ARGS ONE50-s143
+  PASS G-ARGS ONE53-s143
+  PASS G-ARGS ONE59-s143
+  PASS G-ARGS k01-s144
+  PASS G-ARGS CARWD0-s144
+  PASS G-ARGS TWOWD0-s144
+  PASS G-ARGS CTL2WD0-s144
+  PASS G-ARGS ONE50-s144
+  PASS G-ARGS ONE53-s144
+  PASS G-ARGS ONE59-s144
+  PASS G-ARGS k01-s145
+  PASS G-ARGS CARWD0-s145
+  PASS G-ARGS TWOWD0-s145
+  PASS G-ARGS CTL2WD0-s145
+  PASS G-ARGS ONE50-s145
+  PASS G-ARGS ONE53-s145
+  PASS G-ARGS ONE59-s145
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line (PROBE_DIR stripped), one per run   1 distinct
+        ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  PASS G-ENV the ENV line is cvt1's ... cvt9's / cwd1's / cwd3's, byte for byte (PROBE_DIR stripped)
+  PASS G-ENV every run printed ONE `PROBE_TENSOR: on every=100 type=scalar tensors=62`   21 runs
+
+G-SETSEP  the structural precondition for G-WITNESS to discriminate arms that G-BITE's k cannot (280.4)
+  PASS G-SETSEP the 7 registered DECAY_MASK witnesses are PAIRWISE DISTINCT   7 distinct
+  PASS G-SETSEP the 6 masked idx tuples are PAIRWISE DISTINCT
+  DECLARED: k collides on [1, 2] -- TWOWD0 vs CTL2WD0 (both k=2) and the three singles (all k=1) are NOT separated
+  by G-BITE's k.  They are separated by G-WITNESS (idx + names in each run's own line) and by the bite job's
+  RR4 set discrimination on the real GPU path.  This limit is registered, not discovered afterwards.
+
+G-WITNESS one line of each kind per run == the registered witness (VOTE_W / BETA_HOLD / GROUP_HOLD / REST_HOLD off; DECAY_MASK)
+  PASS G-WITNESS VOTE_W k01-s143
+  PASS G-WITNESS BETA_HOLD k01-s143
+  PASS G-WITNESS GROUP_HOLD k01-s143
+  PASS G-WITNESS REST_HOLD k01-s143
+  PASS G-WITNESS DECAY_MASK k01-s143
+  PASS G-WITNESS k01-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s143
+  PASS G-WITNESS BETA_HOLD CARWD0-s143
+  PASS G-WITNESS GROUP_HOLD CARWD0-s143
+  PASS G-WITNESS REST_HOLD CARWD0-s143
+  PASS G-WITNESS DECAY_MASK CARWD0-s143
+  PASS G-WITNESS CARWD0-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W TWOWD0-s143
+  PASS G-WITNESS BETA_HOLD TWOWD0-s143
+  PASS G-WITNESS GROUP_HOLD TWOWD0-s143
+  PASS G-WITNESS REST_HOLD TWOWD0-s143
+  PASS G-WITNESS DECAY_MASK TWOWD0-s143
+  PASS G-WITNESS TWOWD0-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s143
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s143
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s143
+  PASS G-WITNESS REST_HOLD CTL2WD0-s143
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s143
+  PASS G-WITNESS CTL2WD0-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE50-s143
+  PASS G-WITNESS BETA_HOLD ONE50-s143
+  PASS G-WITNESS GROUP_HOLD ONE50-s143
+  PASS G-WITNESS REST_HOLD ONE50-s143
+  PASS G-WITNESS DECAY_MASK ONE50-s143
+  PASS G-WITNESS ONE50-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE53-s143
+  PASS G-WITNESS BETA_HOLD ONE53-s143
+  PASS G-WITNESS GROUP_HOLD ONE53-s143
+  PASS G-WITNESS REST_HOLD ONE53-s143
+  PASS G-WITNESS DECAY_MASK ONE53-s143
+  PASS G-WITNESS ONE53-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE59-s143
+  PASS G-WITNESS BETA_HOLD ONE59-s143
+  PASS G-WITNESS GROUP_HOLD ONE59-s143
+  PASS G-WITNESS REST_HOLD ONE59-s143
+  PASS G-WITNESS DECAY_MASK ONE59-s143
+  PASS G-WITNESS ONE59-s143 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s144
+  PASS G-WITNESS BETA_HOLD k01-s144
+  PASS G-WITNESS GROUP_HOLD k01-s144
+  PASS G-WITNESS REST_HOLD k01-s144
+  PASS G-WITNESS DECAY_MASK k01-s144
+  PASS G-WITNESS k01-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s144
+  PASS G-WITNESS BETA_HOLD CARWD0-s144
+  PASS G-WITNESS GROUP_HOLD CARWD0-s144
+  PASS G-WITNESS REST_HOLD CARWD0-s144
+  PASS G-WITNESS DECAY_MASK CARWD0-s144
+  PASS G-WITNESS CARWD0-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W TWOWD0-s144
+  PASS G-WITNESS BETA_HOLD TWOWD0-s144
+  PASS G-WITNESS GROUP_HOLD TWOWD0-s144
+  PASS G-WITNESS REST_HOLD TWOWD0-s144
+  PASS G-WITNESS DECAY_MASK TWOWD0-s144
+  PASS G-WITNESS TWOWD0-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s144
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s144
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s144
+  PASS G-WITNESS REST_HOLD CTL2WD0-s144
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s144
+  PASS G-WITNESS CTL2WD0-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE50-s144
+  PASS G-WITNESS BETA_HOLD ONE50-s144
+  PASS G-WITNESS GROUP_HOLD ONE50-s144
+  PASS G-WITNESS REST_HOLD ONE50-s144
+  PASS G-WITNESS DECAY_MASK ONE50-s144
+  PASS G-WITNESS ONE50-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE53-s144
+  PASS G-WITNESS BETA_HOLD ONE53-s144
+  PASS G-WITNESS GROUP_HOLD ONE53-s144
+  PASS G-WITNESS REST_HOLD ONE53-s144
+  PASS G-WITNESS DECAY_MASK ONE53-s144
+  PASS G-WITNESS ONE53-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE59-s144
+  PASS G-WITNESS BETA_HOLD ONE59-s144
+  PASS G-WITNESS GROUP_HOLD ONE59-s144
+  PASS G-WITNESS REST_HOLD ONE59-s144
+  PASS G-WITNESS DECAY_MASK ONE59-s144
+  PASS G-WITNESS ONE59-s144 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W k01-s145
+  PASS G-WITNESS BETA_HOLD k01-s145
+  PASS G-WITNESS GROUP_HOLD k01-s145
+  PASS G-WITNESS REST_HOLD k01-s145
+  PASS G-WITNESS DECAY_MASK k01-s145
+  PASS G-WITNESS k01-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CARWD0-s145
+  PASS G-WITNESS BETA_HOLD CARWD0-s145
+  PASS G-WITNESS GROUP_HOLD CARWD0-s145
+  PASS G-WITNESS REST_HOLD CARWD0-s145
+  PASS G-WITNESS DECAY_MASK CARWD0-s145
+  PASS G-WITNESS CARWD0-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W TWOWD0-s145
+  PASS G-WITNESS BETA_HOLD TWOWD0-s145
+  PASS G-WITNESS GROUP_HOLD TWOWD0-s145
+  PASS G-WITNESS REST_HOLD TWOWD0-s145
+  PASS G-WITNESS DECAY_MASK TWOWD0-s145
+  PASS G-WITNESS TWOWD0-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W CTL2WD0-s145
+  PASS G-WITNESS BETA_HOLD CTL2WD0-s145
+  PASS G-WITNESS GROUP_HOLD CTL2WD0-s145
+  PASS G-WITNESS REST_HOLD CTL2WD0-s145
+  PASS G-WITNESS DECAY_MASK CTL2WD0-s145
+  PASS G-WITNESS CTL2WD0-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE50-s145
+  PASS G-WITNESS BETA_HOLD ONE50-s145
+  PASS G-WITNESS GROUP_HOLD ONE50-s145
+  PASS G-WITNESS REST_HOLD ONE50-s145
+  PASS G-WITNESS DECAY_MASK ONE50-s145
+  PASS G-WITNESS ONE50-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE53-s145
+  PASS G-WITNESS BETA_HOLD ONE53-s145
+  PASS G-WITNESS GROUP_HOLD ONE53-s145
+  PASS G-WITNESS REST_HOLD ONE53-s145
+  PASS G-WITNESS DECAY_MASK ONE53-s145
+  PASS G-WITNESS ONE53-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+  PASS G-WITNESS VOTE_W ONE59-s145
+  PASS G-WITNESS BETA_HOLD ONE59-s145
+  PASS G-WITNESS GROUP_HOLD ONE59-s145
+  PASS G-WITNESS REST_HOLD ONE59-s145
+  PASS G-WITNESS DECAY_MASK ONE59-s145
+  PASS G-WITNESS ONE59-s145 prints no COMP_HOLD / WINDOW_HOLD line (cvt8 lineage)
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == the frozen manifest, byte for byte
+  manifest: /home/s5014158/metaopt/runs/cwd4/PARTITION-MANIFEST.txt (<runsdir>/cwd4/)
+  PASS G-STRUCT byte-identical to cwd4_design.manifest_text(CWD4)   6002 vs 6002 bytes
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/cwd4/PROVENANCE.txt (<runsdir>/cwd4/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == cvt8's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == cwd1's PATCH_DECAYMASK tree, UNCHANGED   HF_SHA256=94aedc33046afb12
+  PASS G-PROV HF.py.pre_decaymask == cvt8's HF.py   HF_PRE_DECAYMASK_SHA256=5197dc2eecbbcb6f
+  PASS G-PROV runner == run_cifar_cwd1.sh, UNCHANGED   RUNNER_SHA256=34a8c90ee3a0bee0
+  PASS G-PROV SCORER == this file   SCORER_SHA256=475e1278bce0eb0e
+  PASS G-PROV DESIGN == the cwd4_design.py this scorer loaded   DESIGN_SHA256=a6f2c8754524a56e
+  PASS G-PROV the reused cwd_design.py this scorer loaded   CWD_DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  k01      TEST 22.8213  sd 0.8314  range 1.4980   TRAIN 22.6753   tail slope 0.005/0.004/0.001 pp/ep
+           seeds: s143 23.3620 (train 23.5260), s144 21.8640 (train 21.5340), s145 23.2380 (train 22.9660)
+  CARWD0   TEST 70.0100  sd 0.1845  range 0.3520   TRAIN 94.7527   tail slope 0.000/-0.001/-0.002 pp/ep
+           seeds: s143 70.2180 (train 95.4900), s144 69.9460 (train 94.3000), s145 69.8660 (train 94.4680)
+  TWOWD0   TEST 67.0713  sd 0.2854  range 0.5360   TRAIN 84.4807   tail slope 0.004/0.006/0.002 pp/ep
+           seeds: s143 67.3960 (train 85.7900), s144 66.9580 (train 83.5720), s145 66.8600 (train 84.0800)
+  CTL2WD0  TEST 22.8547  sd 0.7362  range 1.4660   TRAIN 22.6107   tail slope 0.004/0.009/0.005 pp/ep
+           seeds: s143 23.5480 (train 23.3960), s144 22.0820 (train 21.6240), s145 22.9340 (train 22.8120)
+  ONE50    TEST 65.2233  sd 0.2630  range 0.4760   TRAIN 84.6287   tail slope 0.012/0.000/0.017 pp/ep
+           seeds: s143 65.5260 (train 85.5180), s144 65.0500 (train 84.1260), s145 65.0940 (train 84.2420)
+  ONE53    TEST 58.5780  sd 0.2693  range 0.5240   TRAIN 70.1460   tail slope 0.044/0.047/0.029 pp/ep
+           seeds: s143 58.8040 (train 70.4500), s144 58.2800 (train 69.8080), s145 58.6500 (train 70.1800)
+  ONE59    TEST 67.9567  sd 0.3389  range 0.6720   TRAIN 92.3573   tail slope 0.004/0.023/0.020 pp/ep
+           seeds: s143 67.6460 (train 93.1800), s144 67.9060 (train 91.7740), s145 68.3180 (train 92.1180)
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp (chance 1.00)   max 70.0100
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.0100
+
+G-BITE    Lion recomputed on the one group of every arm; no hold key; the DECAY_MASK record audit (k per arm)
+  PASS G-BITE k01      s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 2.196679597662415e-06, 'dm_absmin': 1.0007961988449097, 'dm_small': 0}
+  PASS G-BITE TWOWD0   s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 3.537583655313804e-06, 'dm_absmin': 1.0035594701766968, 'dm_small': 0}
+  PASS G-BITE CTL2WD0  s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.78882440709081e-07, 'dm_absmin': 0.9990624189376831, 'dm_small': 0}
+  PASS G-BITE ONE50    s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 2.266525398522947e-05, 'dm_absmin': 1.014468789100647, 'dm_small': 0}
+  PASS G-BITE ONE53    s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 4.989383196690036e-05, 'dm_absmin': 1.0095020532608032, 'dm_small': 0}
+  PASS G-BITE ONE59    s143  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 3.853807187107965e-06, 'dm_absmin': 1.0188419818878174, 'dm_small': 0}
+  PASS G-BITE k01      s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 1.2075137491132166e-06, 'dm_absmin': 1.000731348991394, 'dm_small': 0}
+  PASS G-BITE TWOWD0   s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 1.4931688944989416e-06, 'dm_absmin': 1.003644585609436, 'dm_small': 0}
+  PASS G-BITE CTL2WD0  s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.788829391252678e-07, 'dm_absmin': 0.9989324808120728, 'dm_small': 0}
+  PASS G-BITE ONE50    s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 1.1023392708313611e-05, 'dm_absmin': 1.0132982730865479, 'dm_small': 0}
+  PASS G-BITE ONE53    s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 3.179773552810612e-05, 'dm_absmin': 1.0087096691131592, 'dm_small': 0}
+  PASS G-BITE ONE59    s144  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 1.2813675349352261e-06, 'dm_absmin': 1.0188668966293335, 'dm_small': 0}
+  PASS G-BITE k01      s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=0 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 0 nonfinite 0 last None
+  PASS G-BITE CARWD0   s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=3 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 149706, 'dm_wdterm': 1.210130052507517e-06, 'dm_absmin': 1.000801920890808, 'dm_small': 0}
+  PASS G-BITE TWOWD0   s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 3.5656611883432362e-06, 'dm_absmin': 1.0036649703979492, 'dm_small': 0}
+  PASS G-BITE CTL2WD0  s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=2 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 99804, 'dm_wdterm': 9.78883659059312e-07, 'dm_absmin': 0.99904465675354, 'dm_small': 0}
+  PASS G-BITE ONE50    s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 1.7019857852395857e-05, 'dm_absmin': 1.0147111415863037, 'dm_small': 0}
+  PASS G-BITE ONE53    s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 3.907772062991056e-05, 'dm_absmin': 1.009446620941162, 'dm_small': 0}
+  PASS G-BITE ONE59    s145  records 500  groups 1  lion-mismatch 0 (ties 0, worst 4.0e-07)  bad 0  nonfinite 0  hold-key records 0 | dm: k=1 bad_n 0 bad_skipped 0 bad_masked 0 bad_types 0 on-unmasked 0 pos_wdterm 500 nonfinite 0 last {'dm_n': 49902, 'dm_skipped': 49902, 'dm_wdterm': 2.374654516209555e-06, 'dm_absmin': 1.0193777084350586, 'dm_small': 0}
+
+G-HW      DISCLOSURE ONLY (271.4(5)): the GPU each run's own nvidia-smi line names -- NO gate reads it
+  k01      s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  CARWD0   s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  TWOWD0   s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  CTL2WD0  s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  ONE50    s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  ONE53    s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  ONE59    s143 NVIDIA L4  s144 NVIDIA L4  s145 NVIDIA L4
+  distinct devices: ['NVIDIA L4']
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.645141
+  SIGMA_INBATCH        0.478878
+  SIGMA_USED           0.645141  (= SIGMA_PRIOR_frozen)
+  SE_ARM_DIFF          0.526756  = SIGMA_USED * sqrt(2/3)  (df_inbatch 14)
+  2 SE (the HALF-WIDTH of a +/-2 SE interval, NOT a bound on any effect -- 278.6 C1): 1.053511
+
+CONTRASTS (every one WITHIN batch)
+  PRIMARY  P_2SPEC  = TWOWD0  - CTL2WD0 = +44.2167 pp = +83.94 SE   (TRAIN +61.8700)   seeds +43.848 / +44.876 / +43.926
+           +/-2 SE interval [+43.1632, +45.2702]
+  PRIMARY  D_TWO    = CARWD0  - TWOWD0  = +2.9387 pp = +5.58 SE   (TRAIN +10.2720)   seeds +2.822 / +2.988 / +3.006
+           +/-2 SE interval [+1.8852, +3.9922]
+  PRIMARY  P_ONE53  = ONE53   - k01     = +35.7567 pp = +67.88 SE   (TRAIN +47.4707)   seeds +35.442 / +36.416 / +35.412
+           +/-2 SE interval [+34.7032, +36.8102]
+  KEY      P_CAR    = CARWD0  - k01     = +47.1887 pp = +89.58 SE   (TRAIN +72.0773)   seeds +46.856 / +48.082 / +46.628
+           +/-2 SE interval [+46.1352, +48.2422]
+  KEY      P_TWO    = TWOWD0  - k01     = +44.2500 pp = +84.00 SE   (TRAIN +61.8053)   seeds +44.034 / +45.094 / +43.622
+           +/-2 SE interval [+43.1965, +45.3035]
+  KEY      P_CTL2   = CTL2WD0 - k01     = +0.0333 pp = +0.06 SE   (TRAIN -0.0647)   seeds +0.186 / +0.218 / -0.304
+           +/-2 SE interval [-1.0202, +1.0868]
+  KEY      P_ONE50  = ONE50   - k01     = +42.4020 pp = +80.50 SE   (TRAIN +61.9533)   seeds +42.164 / +43.186 / +41.856
+           +/-2 SE interval [+41.3485, +43.4555]
+  KEY      P_ONE59  = ONE59   - k01     = +45.1353 pp = +85.69 SE   (TRAIN +69.6820)   seeds +44.284 / +46.042 / +45.080
+           +/-2 SE interval [+44.0818, +46.1888]
+  DESCR    D_MAG    = ONE59 - ONE53 = +9.3787 pp   (mean |L| 3.2984e-01 vs 1.9526e-01, ratio 1.69 -- but Kim
+           class ALSO differs, gamma_last vs gamma_down: this contrast does NOT isolate magnitude)
+  DESCR    D_CLASS  = ONE59 - ONE50 = +2.7333 pp   (BOTH Kim gamma_last; mean |L| 3.2984e-01 vs 2.9155e-01,
+           ratio 1.13 -- the ONLY within-class magnitude contrast this network offers, and it is small)
+  DESCR    D_ONEMEAN = CARWD0 - mean(ONE50,ONE53,ONE59) = +6.0907 pp
+  bars: GAP_MIN 20.0 (37.97 SE) | MATCH 5.0 pp (9.49 SE) | NULL 2.0 pp (3.80 SE) | RESCUE 10.0 pp (18.98 SE)
+  state bars: REC iff arm >= 65.0100 (CARWD0 - 5) ; NULL iff arm <= 24.8213 (k01 + 2)
+  STATE    TWOWD0   67.0713 -> REC   (to REC bar +2.0613 pp, to NULL bar +42.2500 pp)   k=2  idx 50,53  Kim gamma_last,gamma_down
+  STATE    CTL2WD0  22.8547 -> NULL  (to REC bar -42.1553 pp, to NULL bar -1.9667 pp)   k=2  idx 47,56  Kim gamma_others,gamma_others
+  STATE    ONE50    65.2233 -> REC   (to REC bar +0.2133 pp, to NULL bar +40.4020 pp)   k=1  idx 50  Kim gamma_last
+  STATE    ONE53    58.5780 -> PART  (to REC bar -6.4320 pp, to NULL bar +33.7567 pp)   k=1  idx 53  Kim gamma_down
+  STATE    ONE59    67.9567 -> REC   (to REC bar +2.9467 pp, to NULL bar +43.1353 pp)   k=1  idx 59  Kim gamma_last
+
+G-DIVERGE (a branch condition, not a harness gate)
+  PASS every arm's seed range <= 5.0 pp
+
+==============================================================================
+FINAL: ONE-SUFFICES-PARTIAL | TWO-REC+CTL2-NULL+ONE50-REC+ONE53-PART+ONE59-REC | HARNESS-CLEAN | PATCH-BITES | MASK-UPDATE-AND-TRACE | CONV-LINEAR-WD-KEPT | ALL-ARMS-SCALAR | RECOVERY-AGAINST-CARWD0 | CTL2-CLASS-PURE-COUNT-MATCHED | CTL-NOT-MAGNITUDE-MATCHED | MAGNITUDE-NOT-SEPARATED | POSITION-CLASS-NOT-SEPARATED | ONE-NETWORK-RESNET18 | ONE-CELL | HORIZON-100-ONLY | SIGMA-PRIOR-FROZEN | TWO-SPECIFIC | ONE-ORDER-ONE59-ONE50-ONE53 | FLOOR-READINGS-ARE-BOUNDS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals; NO other batch enters any cwd4 bar or contrast):
+  corpus mechanism cell (LIMITS-PREP 2.2): k01 (n44) 22.9600  layerwise (n32) 69.4200
+  cwd3 (278.3): k01 22.9853  CARWD0 70.2640  CTLWD0 23.0013  CTL2WD0 22.9333  NWD 70.7227
+  cwd4 {143,144,145}: k01 22.8213  CARWD0 70.0100  TWOWD0 67.0713  CTL2WD0 22.8547  ONE50 65.2233  ONE53 58.5780  ONE59 67.9567
+  CARWD0 - cwd3's CARWD0 = -0.2540 pp; CTL2WD0 - cwd3's CTL2WD0 = -0.0786 pp; k01 - cwd3's k01 = -0.1640 pp
+
+DESCRIPTIVE (non-gating) -- PATCH_DECAYMASK's readout on the masked arms: ||w|| per masked tensor (seed means)
+and min |w|, entries |w| < 1e-3, at records 0 / 50 / 200 / 499.  k01 carries no readout (the mask is off there).
+  CARWD0   idx 50,53,59 rec 0: 22.6/22.6/22.6 absmin 1 small 0.0 | rec 50: 22.6/22.6/22.6 absmin 1 small 0.0 | rec 200: 22.8/22.7/22.8 absmin 1 small 0.0 | rec 499: 22.8/22.7/22.9 absmin 1 small 0.0
+  TWOWD0   idx 50,53    rec 0: 22.6/22.6 absmin 1 small 0.0 | rec 50: 22.6/22.6 absmin 1 small 0.0 | rec 200: 22.9/22.8 absmin 1 small 0.0 | rec 499: 22.9/22.8 absmin 1 small 0.0
+  CTL2WD0  idx 47,56    rec 0: 22.6/22.6 absmin 1 small 0.0 | rec 50: 22.6/22.6 absmin 1 small 0.0 | rec 200: 22.6/22.6 absmin 0.999 small 0.0 | rec 499: 22.6/22.6 absmin 0.999 small 0.0
+  ONE50    idx 50       rec 0: 22.6 absmin 1 small 0.0 | rec 50: 22.6 absmin 1 small 0.0 | rec 200: 23 absmin 1.01 small 0.0 | rec 499: 23.1 absmin 1.01 small 0.0
+  ONE53    idx 53       rec 0: 22.6 absmin 1 small 0.0 | rec 50: 22.6 absmin 1 small 0.0 | rec 200: 22.9 absmin 1.01 small 0.0 | rec 499: 23 absmin 1.01 small 0.0
+  ONE59    idx 59       rec 0: 22.6 absmin 1 small 0.0 | rec 50: 22.6 absmin 1 small 0.0 | rec 200: 23 absmin 1.01 small 0.0 | rec 499: 23.2 absmin 1.02 small 0.0
+  (the median of a dm_norm vector is NOT printed here: 278.6 D1 reported cWD3's upper-middle median as a
+   RULE 16 defect in a registered file; this scorer prints the per-tensor norms and no median at all.)
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  At least one carrier scale masked ALONE reaches within 5 pp of the three-carrier mask, but NOT all three do
+  (read the state word and the per-single contrasts).  SENTENCE LICENSED: 'at this cell one named carrier scale's
+  own decay suffices, and the effect is carrier-SPECIFIC WITHIN the three carriers -- it is not a function of the
+  number of masked scales alone.'  EFFECT ON the carrier account of the scalar collapse at the mechanism cell, and specifically cwd3's CARRIER-DECAY-SUFFICES (CORRECTIONS 278, MASTER-TABLE row 236): 278's COUNT / DOSE rival (T19) is REFUTED at this
+  cell, and a new within-carrier asymmetry is opened.  WHICH single sufficed is read from the state word only;
+  any ordering among the singles is DESCRIPTIVE (D_MAG / D_CLASS) and is a BOUND wherever they saturate.
+  A NULL state is a location at k01's floor (164.6), a BOUND on the effect, not a measured zero.
+  Not licensed either way: IDENTITY vs TERM MAGNITUDE.  On this network no carrier-free control can be magnitude-matched.  Mean |L| on the scalar anchor's PINNED records (SCORE-cdep1 [P]): the three carriers are ranks 1/2/3 of 62 (59 3.2984e-01, 50 2.9155e-01, 53 1.9526e-01); the ONLY carrier-free 512-wide layer4 BN scales are ranks 33 and 36 (56 1.5166e-03, 47 1.1298e-03).  The SMALLEST carrier exceeds the LARGEST admissible control tensor by 128.8x, and SCORE-cdep1's registered sum ratio is 308.4.  cmg1's MAGNITUDE-NOT-SEPARATED stands: this batch matches COUNT, class, width, depth and numel, never magnitude.
+  Not licensed: ctd1 IDENTITY vs Kim et al.'s POSITION CLASS (arXiv:2205.07260) -- {50,59} are gamma_last, 53 is gamma_down, {47,56} are gamma_others, and no carrier-free gamma_last/gamma_down exists at this depth.
+  Not licensed: which ROUTE acts (weight shrink vs meta trace -- the mask changes both), decoupled WD, other cells.
+
+WHAT IT DOES NOT LICENSE, UNCONDITIONALLY:
+  * Anything about PlainNet / VGG / GroupNorm, other cells, momentum 0.9, or WD on conv / linear weights.
+  * Which ROUTE (weight shrink vs meta trace -- one switch changes both), decoupled weight decay, other WD values.
+  * IDENTITY vs TERM MAGNITUDE: no magnitude-matched carrier-free control exists on this network.  The three
+    carriers are mean-|L| ranks 1/2/3 of 62 on the scalar anchor's pinned records AND the only tensors that
+    vote DOWN on 100 %% of them; the only carrier-free 512-wide layer4 BN scales are ranks 33 and 36, so the
+    SMALLEST carrier exceeds the LARGEST admissible control tensor by 128.8x.  The next-largest terms in the
+    whole model (linear.weight rank 4, layer4.0.conv2.weight rank 5) vote UP on 100 %% of pinned records and
+    are neither normalisation scales nor numel-matched, so they are not an admissible control either.
+    D_MAG / D_CLASS are DESCRIPTIVE and are BOUNDS wherever the singles saturate (stamp SINGLES-SATURATED).
+  * ctd1 IDENTITY vs Kim et al.'s POSITION CLASS (arXiv:2205.07260) at count 3 or 1; at count TWO the carrier
+    pair is {gamma_last, gamma_down} and the control is {gamma_others, gamma_others}, so class and carrier
+    status remain confounded there too -- this batch separates COUNT, not CLASS.
+  * Any statement about the layerwise grouping (no layerwise arm) or beyond 100 epochs.
