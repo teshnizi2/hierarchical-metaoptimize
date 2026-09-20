@@ -37243,3 +37243,267 @@ The ten bounds are the headline of this entry and are not repeated in full here.
 * **Numbering, said precisely.**  283 sits after 282 and the file's tail now reads 279, 280, 281, 282, 283, **strictly increasing**.  As 280.11 recorded, the file is **not** monotone end-to-end and was not before this append either — 43 heading pairs earlier in the file repeat or step back, an inherited artefact of sub-numbered headings.  **This entry creates none of them** (43 before, 43 after).
 
 Next free number: **284**.
+
+## 284. TRACK C (code gap, ZERO GPU) — **`corpus_exclusions.py --check` NOW EXPRESSES A **TWO-AXIS** RUN: ONE THAT BOTH PRINTS AN ON `<KIND>` LINE AND DEVIATES ON AN ARGS VALUE.  THIS IS THE FIX 281.12 REPORTED AND OWED, CLOSED UNDER ITS OWN NUMBER **BEFORE** `cwd5`'s INGEST.**  `cwd5`'s `CARW2` (281) prints `DECAY_MASK: on … wd=0.01 …` AND runs at `--weight-decay-base 1e-2` instead of the standard cell's `0.1`; a TSV row carries ONE witness, and **both listings FAILed** — re-verified here, first on a nine-arm synthetic ladder and then on the batch's REAL logs.  **THE RULE, AND IT IS FORCED BY THE CODE RATHER THAN CHOSEN: such a run is listed with its `ARGS` witness, and EVERY kind it turns ON is registered in `MULTI_KIND`.**  The completeness reader has a `MULTI_KIND` escape and the ARGS-value reader has none, so the ARGS listing is the ONLY one either reader accepts; **the reverse listing still FAILs** (`deviates on ARGS_WD_BASE but is listed with a DECAY_MASK witness`), on synthetic AND on real logs, so the module enforces the rule instead of documenting it.  **NOTHING IS WEAKENED AND TWO THINGS ARE STRENGTHENED**: the `MULTI_KIND` loop now holds `CARW2`'s `DECAY_MASK` line to its registered string byte for byte, and registering the kind for the batch puts `cwd5`'s OTHER 24 runs under the `DECAY_MASK: off` batch rule, which they were NOT under before.  **ADDITIVE**: one `MULTI_KIND` entry (re-typed from the frozen `analysis/cwd5_design.py` table, NOT imported), one frozen-count constant `MULTI_KINDS_AT_251 = 2`, one verification block, ONE new print line and one docstring paragraph; `load` / `keys` / `is_excluded` / `filter_rows` / `witness_lines` / `kind_of` / `KINDS` / `ARGS_KINDS` / the TSV schema **UNCHANGED**, and **NO row appended to `results/CORPUS-EXCLUSIONS.tsv`** — the 21 `cwd5` rows go in with that batch's own ingest.  **TESTS FIRST: C34–C36, written BEFORE the module change — 153 PASS / 11 FAIL (exit 1) against 269's module → 164 PASS / 0 FAIL (exit 0) after, with C1–C33 BYTE-IDENTICAL on both sides.**  **REAL-LOG CONTROL ON `cwd5`'s OWN 27 `.out` FILES** (copies byte-identical to `alice2`'s, sha-checked; 27 KEY-ONLY CSV rows with **every accuracy column left EMPTY**) with the 21 planned rows: **PASS, exit 0**; four corruptions FAIL, each named; and **269's module prints BYTE-IDENTICAL output on the clean input and on the corrupted `DECAY_MASK` witness — it cannot see it.**  RULE 20 RE-RUN AT FULL COVERAGE **27/27, both halves PASS**, and its ENV half's RE-TYPED witnesses are byte-identical to the line this entry registers.  **ONE LIMIT DECLARED, NOT SILENTLY LEFT: a run deviating on TWO ARGS VALUES at once is still unrepresentable** (the ARGS axis has no escape by design); `cwd5` has none, C26(d) pins the behaviour, and the fix is owed by the first batch that needs it.  **NO accuracy number of `cwd5` was read by this entry, by any tool, at any point.**  RULE 16 held: no registered scorer, launcher, patch, tree, runner, `analysis/argsline_guard.py`, `results/*.csv`, `results/*.tsv` or anything under `paper/` was edited, and **`paper/` was neither read nor touched**.  **ZERO GPU; no `sbatch`, no `srun`, no job submitted or cancelled.  `alice` — Saber's shared account — NOT CONTACTED**; `alice2` read only.  **NUMBERING, DISCLOSED: this entry was drafted as 283; Track A's `cwd4` landing took 283 while it was being written, so it is 284 and the module's print line, the tests and this entry were renumbered together before anything was committed.**  THIS ENTRY TOOK NUMBER **284**; NEXT FREE **285**.
+
+### 284.1 The gap, re-verified rather than inherited
+
+281.12 reported it at registration and did not fix it (RULE 16).  It was re-run here before anything was written, on a
+**nine-arm synthetic `cwd5` ladder** (the real run names, job ids and `ARGS` payload; `k01W1` / `kLW1` at `0.1`, six
+rung arms at `1e-2` / `1e-3` / `5e-4`, and `CARW2`), against 269's module:
+
+| listing of `CARW2` | 269's `check()` |
+|---|---|
+| its `ARGS_WD_BASE` witness | **FAIL** — `cwd5-CARW2-s146-5052150.out prints an ON DECAY_MASK line but is listed with a ARGS_WD_BASE witness` |
+| its `DECAY_MASK` witness | **FAIL** — `cwd5-CARW2-s146-5052150.out deviates on ARGS_WD_BASE but is listed with a DECAY_MASK witness` |
+
+Both messages are the ones 281.12 quoted, on a full batch rather than a single synthetic run, and both were reproduced
+again on the REAL logs (284.7).  The asymmetry is the whole of it: the KINDS / completeness reader ends
+`… and kd not in (multi_kind_of(fn) or {})`, an escape 245 built for two-kind runs; the ARGS-value reader (263) is
+`if ent is not None: bad.append("%s deviates on %s but is listed with a %s witness")`, with no escape at all.
+
+### 284.2 The rule, and why it is FORCED
+
+**A run that deviates on an ARGS value AND prints an ON `<KIND>` line is listed with its ARGS witness, and every kind
+it turns ON is registered in `MULTI_KIND`.**  It is not a preference between two workable listings:
+
+* the ARGS listing is accepted **only because** the completeness reader has the `MULTI_KIND` escape — so the escape
+  must be populated, and populating it is what makes the ON line VERIFIED rather than merely tolerated;
+* the `<KIND>` listing cannot be made to pass without giving the ARGS-value reader an escape of its own, which would
+  **weaken** it: that reader's whole job is to refuse a deviating row that is not listed by its value.  It is not
+  given one, and C35a / the real-log control prove the reverse listing still FAILs.
+
+**Why the escape cannot be abused.**  A kind registered in `MULTI_KIND` is then held to an exact line (`is registered
+with %s ON but prints %r`), its batch's unlisted runs are held to that kind's `off` line, and an ON line of a kind NOT
+registered there still FAILs (C35g, on a rung arm that has no entry).  So the entry buys expressiveness and pays for
+it with three further checks.
+
+
+**Independent agreement from the registered `cwd5` scorer, found after the rule was derived from the code.**
+`analysis/cWD5_wdladder_score.py` — registered and sha-pinned before any run existed, and NOT edited here — already
+prints, in its own "WHAT IT DOES NOT LICENSE" block: *"The 21 runs at a non-standard weight decay are ARGS-value
+deviations and owe CORPUS-EXCLUSIONS rows of kind `ARGS_WD_BASE` at the landing"*.  **Twenty-one, not eighteen** —
+`CARW2` included.  The scorer's parenthesis "(`corpus_exclusions.py` is NOT edited)" records the state at
+registration, which 281.12 then qualified by owing this edit under its own number; it is not a prohibition, and the
+kind it names is the one this entry makes expressible.  Two stages reached the same listing independently.
+### 284.3 What changed (`analysis/corpus_exclusions.py`, `5346bb6b…` → `ce97f48f…`)
+
+* **`MULTI_KIND` += `("cwd5", "CARW2"): {"DECAY_MASK": <the wd=0.01 carrier line>}`** — re-typed, NOT imported, from
+  the frozen `analysis/cwd5_design.py` `CWD5.WITNESS_DM["CARW2"]` that the registered `cWD5` scorer imports UNEDITED
+  (C36 pins the literal to that table; 284.7 pins it to the runs' own logs and to the RULE 20 ENV half's re-typed
+  witnesses).  **An entry may now register ONE kind** — 245's register two or more — and that is the two-axis case.
+* **`MULTI_KINDS_AT_251 = 2`**, the same device as 269's `KINDS_AT_251`: 245's `two-kind runs` COUNT and 251's
+  `multi-kind runs` breakdown are computed over the entries registering two or more kinds, so **both stay
+  byte-identical** as one-kind two-axis entries are added, and the two lines keep agreeing with each other (the count
+  equals the sum of the breakdown — C36).  The one-kind entry is **verified** by the same loop; only the counters skip
+  it, and it is counted on its own line.
+* **ONE new line and one new block**, `two-axis runs (CORRECTIONS 284)`: it re-checks, independently of both readers,
+  that each such run's ARGS witness IS its own `ARGS:` line's deviation and that each registered ON line IS the line
+  the run prints — so the line's verdict is a statement, not a label.
+* **Docstring**: one paragraph under the `--check` description.
+* **Not needed and not done**: any change to `load` / `keys` / `is_excluded` / `filter_rows` / `witness_lines` /
+  `kind_of` / `KINDS` / `ARGS_KINDS` / `args_witness` / the TSV schema / `aggregate.py` / any launcher, patch or
+  registered scorer.  **No row was appended to `results/CORPUS-EXCLUSIONS.tsv`.**
+* **The whole diff is +65 / −3 lines, and the three replaced lines are the two counters and the 251 print's
+  generator** — each frozen as above, with the invariance table showing the output unchanged.
+
+### 284.4 The row format for a two-axis run (`cwd5`'s 21 rows at ingest; NOT appended here)
+
+| column | the 18 single-axis rung rows | the 3 `CARW2` TWO-AXIS rows |
+|---|---|---|
+| `run` / `job_id` | `cwd5-k01W2-s146` / `5052144` (the `.out` name) | `cwd5-CARW2-s146` / `5052150` |
+| `batch` / `arm` | `cwd5` / `k01W2` | `cwd5` / `CARW2` |
+| `looks_like` | `k01 (granularity scalar)` (`kL (granularity layerwise)` for the `kL*` arms) | `k01 (granularity scalar)` |
+| `intervention` | `--weight-decay-base 1e-2` (`1e-3` / `5e-4` at the other rungs) | `--weight-decay-base 1e-2 + DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight` — **BOTH axes named in the free-text column** |
+| `witness` | `ARGS_WD_BASE: weight-decay-base=1e-2`, GENERATED from the run's own `ARGS:` line (273.9) | **`ARGS_WD_BASE: weight-decay-base=1e-2`** — the ARGS witness, NOT the `DECAY_MASK` line |
+| `registered_at` | `CORRECTIONS 284` | `CORRECTIONS 284` |
+| `reason` | base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263) | TWO-AXIS (CORRECTIONS 284): the rung's base weight decay is carried by no CSV column AND coupled decay is masked on the 3 named carriers; listed with the ARGS witness, the `DECAY_MASK` line held to `MULTI_KIND` |
+
+The `DECAY_MASK` line the row does NOT carry is not lost: `MULTI_KIND` holds it, byte for byte.  The 6 anchor runs
+(`k01W1`, `kLW1`) are plain standard-cell rows and owe no row at all.  **The ingest is not performed here.**
+
+### 284.5 Tests (`tests/test_corpus_exclusions_check.py`, `59988eda…` → `342d199f…`, +C34–C36), written BEFORE the module change
+
+The fixture is `cwd5`'s own shape: the nine arms, their real run names and job ids, the real `ARGS` payload read from
+`cwd5-CARW2-s146-5052150.out`, and the registered `DECAY_MASK` line.
+
+* **C34** — the ladder PASSES: 2 anchors unlisted at `0.1` / `DECAY_MASK: off`, 6 rung arms listed by their
+  `ARGS_WD_BASE` value, `CARW2` listed by its `ARGS_WD_BASE` value with its `DECAY_MASK` line verified through
+  `MULTI_KIND`; the new line counts it and reads `True`; completeness names `DECAY_MASK` and reads `True`; the ARGS
+  block counts all **7** deviating runs, `CARW2` among them; and the single-axis batches **that must keep working** —
+  a `cwd1`-style kind-only batch and a `cmo1`-style ARGS-only batch — pass merged in with it.
+* **C35** — eight corruptions, each FAILing and each NAMED: **(a)** the REVERSE listing (by the `DECAY_MASK` line) —
+  the rule is forced; **(b)** a wrong witness of the KIND axis (`wd=0.1`, the rung `CARW2` never ran at);
+  **(c)** `DECAY_MASK: off` — the mask never bit; **(d)** a wrong value on the ARGS axis (`0.1`, the rung never
+  arrived); **(e)** another rung's value (`1e-3`), witness ≠ the run's own; **(f)** `CARW2` dropped from the list —
+  FAILs TWICE, by completeness and by the standard-cell ARGS rule; **(g)** a single-axis rung arm printing an ON
+  `DECAY_MASK` line it has no entry for; **(h)** an unlisted anchor with no `DECAY_MASK: off` line — a check that
+  **did not exist before this entry** for this batch.
+* **C36** — the registry and the print lines: exactly ONE `cwd5` entry registering exactly `DECAY_MASK`; its literal
+  == `cwd5_design.CWD5.WITNESS_DM["CARW2"]`, at the ARM's OWN rung (`wd=0.01`); `CARW2` is the batch's only ON-line
+  arm and one of its seven ARGS-deviating arms; 245's / 251's / 269's `kinds scanned` lines and 251's `multi-kind
+  runs` line unchanged BYTE FOR BYTE; 245's count == the sum of 251's breakdown; and `--check --runs` gains exactly
+  ONE line.
+
+**Against 269's module: 153 PASS / 11 FAIL, exit 1** — every failure in C34–C36.  **After: 164 PASS / 0 FAIL, exit
+0.**  **C1–C33 are byte-identical on both sides** (diffed, not asserted), and **no historical assertion was relaxed**
+— 269 had to relax four, this entry none.
+
+
+**Fixture fidelity, checked rather than asserted.**  The nine `ARGS` payloads the fixture builds are **byte-identical
+to the nine real `cwd5-*-s146-*.out` `ARGS:` lines** (compared programmatically, all nine IDENTICAL), and the
+`DECAY_MASK` literal is the registered table's and the real logs' (284.7).  So the synthetic cases and the real-log
+control run on the same strings.
+
+### 284.6 Invariance (Mac, `/opt/homebrew/bin/python3` 3.14.5, `PYTHONDONTWRITEBYTECODE=1`, absolute `../runs` + `../runs_alice2`)
+
+Each item is run in a clean `git archive HEAD` tree (`1c8b73e`, the module at `5346bb6b…`) and in the working tree
+(the module at `ce97f48f…`) **back to back**, against the SAME absolute run directories, with the tree root replaced by
+`<TREE>` in both outputs before the `sha256`.  Track A and Track B were committing to this repository throughout, so
+back-to-back pairs are the only honest form: a before/after table taken an hour apart would credit the module with
+the corpus's and the tree's own drift.  `results/all_runs.csv` and `results/CORPUS-EXCLUSIONS.tsv` are **identical at
+`8b9fbd2` and at `1c8b73e`** (checked), so both sides read the same corpus.
+
+**35 items, 32 BYTE-IDENTICAL, 3 DIFFERing by ADDED LINES ONLY.**  The `sha256` (first 16) of each side's scrubbed
+stdout, and each side's exit code:
+
+| item (stdout `sha256`, first 16 — HEAD / working tree; exit codes as shown) | verdict |
+|---|---|
+| `load/keys/is_excluded/filter_rows + getsource of the five` — ca99944c3fae98ed / ca99944c3fae98ed, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `corpus_exclusions.py --check` — 7739eed47d2d3d3b / 7739eed47d2d3d3b, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cMG1_mergecarrier_score --selftest` — 300292891c3f05be / 300292891c3f05be, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cMO1_momwd_score --selftest` — 03d2e0ad85d42a9f / 03d2e0ad85d42a9f, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cST2_carriervote_score --selftest` — 761bef1f4662ca0e / 761bef1f4662ca0e, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cSV1_shadowvote_score --selftest` — 70543b88644b4b84 / 70543b88644b4b84, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT10_onevsthree_score --selftest` — c3fca977903919a5 / c3fca977903919a5, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT6_complementpath_score --selftest` — 71fe49dd02b77156 / 71fe49dd02b77156, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT4_betahold_score --selftest` — 0fd0f0dad9bd2db7 / 0fd0f0dad9bd2db7, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT3_downcoalition_score --selftest` — 3abf9db4d4dfe853 / 3abf9db4d4dfe853, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT2_injectladder_score --selftest` — 1ecdbd9a66e028d1 / 1ecdbd9a66e028d1, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT5_plainhorizon_score --selftest` — 2f8205c968bfb9f9 / 2f8205c968bfb9f9, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cWD2_carrierwd_score --selftest` — 775b01f5b51056ee / 775b01f5b51056ee, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cWD1_normwd_score --selftest` — 478e6d1781fcadef / 478e6d1781fcadef, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT9_dosewindow_score --selftest` — 3c1459d5100f65c2 / 3c1459d5100f65c2, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT8_doseroute_score --selftest` — 9c8af537dbb968a5 / 9c8af537dbb968a5, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cVT7_grouphold_score --selftest` — 040bd20948361a57 / 040bd20948361a57, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cWD3_carrierwd_score --selftest` — d22233333809b369 / d22233333809b369, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cWD4_countwd_score --selftest` — 550471e3028df652 / 550471e3028df652, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cWD5_wdladder_score --selftest` — 738a6938b95b3ae5 / 738a6938b95b3ae5, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cst1_cct1_registration_derivations` — cfc876be6da8a9ed / cfc876be6da8a9ed, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cmg1_registration_derivations` — 32abd9fd5137d8fe / 32abd9fd5137d8fe, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt1_registration_derivations` — e7a65b2f43cbd658 / e7a65b2f43cbd658, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cvt2_registration_derivations` — 1b5db4c8f8b7a6d7 / 1b5db4c8f8b7a6d7, EXIT=1 EXIT=1 | **IDENTICAL** |
+| `cvt3_registration_derivations` — 24485edec1a8a6fe / 24485edec1a8a6fe, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `csv1_registration_derivations` — be344fb05f89d7d7 / be344fb05f89d7d7, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt4_registration_derivations` — 97c652f69da9dbd6 / 97c652f69da9dbd6, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt5_registration_derivations` — 44ddc99f12f7f696 / 44ddc99f12f7f696, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt9_registration_derivations` — 5e90fff71514bacc / 5e90fff71514bacc, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt7_registration_derivations` — a606c5d47e11b488 / a606c5d47e11b488, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt6_registration_derivations` — bdbabd9bf848935d / bdbabd9bf848935d, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `cvt8_registration_derivations` — a8989816904b6040 / a8989816904b6040, EXIT=0 EXIT=0 | **IDENTICAL** |
+| `corpus_exclusions.py --check --runs (both dirs)` — cc22552fbc15bf6f / 93d7b8d059f46350, EXIT=0 EXIT=0 | **DIFFER** |
+| `corpus_exclusions.py --check --runs (runs only)` — b033429e7946d351 / 0c74bf5d9fbaf0d9, EXIT=1 EXIT=1 | **DIFFER** |
+| `corpus_exclusions.py (no args: usage + docstring)` — 8cf06c4eb79c58d4 / 1a91f2c5b2c57e2a, EXIT=2 EXIT=2 | **DIFFER** |
+
+* **Item 1** is `load()` / `keys()` / `is_excluded` over **every** CSV row / `filter_rows`, plus `inspect.getsource`
+  of `load` / `keys` / `is_excluded` / `filter_rows` / `_pooled`, in one stream: **IDENTICAL**.  The library surface
+  every scorer actually uses when it SCORES is untouched, proved by source and by output.
+* **Items 3–20** are the 18 importing scorers' `--selftest --runsdir ../runs_alice2`, **all IDENTICAL**, exit codes
+  unchanged (several exit 1 on both sides for the stale RULE 21 premises already disclosed at 251.5 / 263.6 / 269.6 —
+  not caused here, not touched).  **`cWD1` and `cWD2` are IDENTICAL this time**: 269.8's defect is in both trees
+  already, so this entry adds no new scorer effect.  **`cWD5` is IDENTICAL**, which matters most: it is the scorer of
+  the batch whose row this entry makes expressible, and it writes its registry proofs over LITERAL tuples
+  (`KINDS_AT_REGISTRATION`), the immune pattern 269.8 recommended.
+* **Items 21–32** are the 12 `*_registration_derivations.py`, **all IDENTICAL**.  `cvt1` / `cvt2` exit 1 on **both**
+  sides with the same traceback: they want `../runs`, not `../runs_alice2` — a harness-input mismatch of this
+  battery's own making, identical on both sides and unrelated to the module.
+* **The three DIFFERs are the intended gains, and nothing else.**  `--check --runs` over both directories:
+  **exactly ONE ADDED LINE**, `two-axis runs (CORRECTIONS 284): 0 listed runs …: True`, exit 0 on both sides — zero,
+  because **no `cwd5` row is listed yet**, which is the point: the module changes nothing for today's corpus.  The
+  same single added line over `../runs` alone (exit 1 on both sides, pre-existing).  And the no-argument usage path
+  prints the **five added docstring lines**, exit 2 on both sides.
+* **A scrubbing trap, disclosed because it first read as five DIFFERs.**  The scratch directory is
+  case-insensitive on this host, so `os.getcwd()` inside the HEAD tree returns a different SPELLING of the same path
+  than the shell's `$PWD`, and any output quoting an absolute path (tracebacks, `cVT6`'s replay-file line, `csv1`'s
+  corpus line) failed the substitution on one side only.  Re-run with the tree roots canonicalised through
+  `os.getcwd()`, **all of them are IDENTICAL**.  No item was declared identical without being re-run.
+* No launcher or scorer pins the module's `sha256` at runtime: `5346bb6b` appears only in six already-committed
+  dry-run / submission LOGS, which record what was staged at those times.
+### 284.7 Real-log control on `cwd5`'s OWN 27 `.out` files (scratch, not committed; read-only)
+
+A throwaway layout: the NEW module, the **real** `results/CORPUS-EXCLUSIONS.tsv` plus the **21 planned rows** of
+284.4, the **real** `results/all_runs.csv` plus **27 KEY-ONLY rows** for `cwd5`'s runs (cell keys only — `plateau5`,
+`best_test`, `final_test`, `plateau` and every other accuracy column left **EMPTY**; **no accuracy column was written
+or read**), and `--check --runs` over a scratch directory of **copies of the 27 real `.out` files** followed by
+`../runs` and `../runs_alice2`.  The copies are byte-identical to `alice2`'s originals — `sha256` of the three
+`cwd5-CARW2-*.out` compared over `ssh` against `/home/s5014158/metaopt/runs`:
+`a0f778bc…` / `cfa45f5b…` / `b2ae5616…` on both sides — and the originals were never written.
+
+* **Clean: PASS, exit 0.**  222 listed rows in 17 batches, every key present exactly once in 3,316 CSV rows; 222
+  listed runs carry their listed line or value and 99 unlisted runs of a listed batch hold to the eight `off` lines;
+  completeness **186 / 186** ingested ON runs listed with their kind; **45** multi-kind runs (33 two-kind, 12
+  three-kind) and **3 two-axis runs, verified on both axes**; 39 listed ARGS rows carry their own value; 649 cells
+  hold an unlisted ingested run and none pools two value sets.
+* **Corruption 1 — the KIND axis**: `cwd5-CARW2-s146`'s `DECAY_MASK` line rewritten to `wd=0.1`, the rung it never
+  ran at → **FAIL**, named twice (`is registered with DECAY_MASK ON but prints …` and the two-axis line's own
+  message).
+* **Corruption 2 — the ARGS axis**: its `ARGS:` line rewritten to `--weight-decay-base 1e-3` → **FAIL**, named twice
+  (`is a two-axis run listed with 'ARGS_WD_BASE: weight-decay-base=1e-2' but its own ARGS line gives '…1e-3'` and
+  263's own `ARGS witness … != listed`).
+* **Corruption 3 — dropped from the list** → **FAIL 4 ×**, including `is NOT listed but its witness is …`, the batch
+  rule that **only exists for `cwd5` because this entry registers the kind for it**.
+* **Corruption 4 — the REVERSE listing** (all three `CARW2` rows listed by their `DECAY_MASK` line) → **FAIL 3 ×**,
+  `deviates on ARGS_WD_BASE but is listed with a DECAY_MASK witness`.  The rule is forced on the real logs too.
+* **269's module on the same inputs:** on the clean list it FAILs **3 ×** (`prints an ON DECAY_MASK line but is listed
+  with a ARGS_WD_BASE witness`) — the gap, on real data.  Its output on **corruption 1 is BYTE-IDENTICAL to its
+  output on the clean input**: it cannot see a corrupted `DECAY_MASK` witness on this run at all.  It does see
+  corruptions 2–4 (263's reader and the completeness rule still work), but it FAILs the clean list as well, so it
+  certifies nothing either way.
+
+**Independent agreement on the registered line.**  The `DECAY_MASK` witness this entry re-types into `MULTI_KIND` is
+byte-identical to (i) `analysis/cwd5_design.py` `CWD5.WITNESS_DM["CARW2"]` (C36), (ii) the line all three real
+`cwd5-CARW2-*.out` files print, and (iii) the `x3` witness the RULE 20 ENV half prints from its own RE-TYPED table
+(`results/cwd5_rule20_full_land.txt`).  **RULE 20 re-run at full coverage by this entry** (`bash bin/cWD5_rule20.sh`
+on `alice2`, guard `81cea8b5…` UNEDITED, 18:00:44Z): batch consistency **27 clean / 0 / 0, VERDICT: PASS**, per-run
+`--expect` **27/27 with 20 flags each and 0 violations**, coverage 6 × `0.1` / 9 × `1e-2` / 6 × `1e-3` / 6 × `5e-4`
+and 15 scalar / 12 layerwise, `ENV AUDIT VERDICT cwd5: PASS`, all 27 naming `NVIDIA L4` — and **byte-identical to the
+landing track's committed `results/cwd5_rule20_full_land.txt` apart from the two timestamp lines**, so no duplicate
+artefact is committed here.
+### 284.8 What this entry does NOT do, and the one limit it leaves
+
+* **It does not ingest `cwd5` and appends no row.**  The 21 rows of 284.4 are the SHAPE, proved against the real logs;
+  writing them into `results/CORPUS-EXCLUSIONS.tsv` belongs to `cwd5`'s own landing commit, together with its CSV
+  rows, and `--check` must PASS after it.
+* **It reads no number.**  No accuracy line, no `plateau` / `plateau5` value, no level, bar, contrast, state, branch
+  word or stamp of `cwd5` (or of any batch) was opened by this entry.  The control writes 27 CSV rows whose accuracy
+  columns are EMPTY, by construction.
+* **A run deviating on TWO ARGS values at once is still unrepresentable, and that is declared, not hidden.**  The
+  ARGS-value reader has no escape by design; giving it one to express `ARGS_MOMENTUM_BASE` × `ARGS_WD_BASE` would
+  weaken exactly the check that catches an unlisted deviating row.  `cwd5` has no such run (its only ARGS axis is the
+  weight decay), test C26(d) already pins the current behaviour — such a row FAILs — and the fix is owed by the first
+  batch that needs it, under its own number, as this one was.  **UNSURE** what the right shape is: a second witness
+  column changes the TSV schema every reader loads, and that is a bigger decision than a code gap.
+* **It fixes none of the RULE 16 defects reported by others** (269.8's two `cWD` selftest premises, 270.6 F1,
+  271.6 F1 + F2, 272.6 F1 + F2, 273.6 F1 + F2, 278.6 D1, and the `cwd5` scorer defect Track B reported at 281), and
+  it reports no new one: this entry's own `--check` and the 18 scorer selftests behave exactly as they did (284.6).
+
+
+### 284.9 Discipline
+
+`git add` names `analysis/corpus_exclusions.py`, `tests/test_corpus_exclusions_check.py` and `docs/CORRECTIONS.md`
+only — never `-A`.  Track A's `cwd4` landing and Track B's `cwd5` work landed in this same working tree while this
+entry was being written (`26baf4a`, `1c8b73e`, `ed8d954`); **their files were never staged by this track**, and every
+push was a `fetch` + `rebase` first.  `results/CORPUS-EXCLUSIONS.tsv`, `results/all_runs.csv`, every registered
+scorer, launcher, patch, tree and runner, `analysis/argsline_guard.py`, `analysis/cwd_design.py`,
+`analysis/cwd5_design.py`, `tests/test_decaymask_realrun*.py` and everything under `paper/` are **unedited**, and
+`paper/` was **neither read nor opened**.  **No GPU, no `sbatch`, no `srun`, no job submitted or cancelled**; the only
+cluster contact was `alice2`, read only: one `ls` and one `sha256sum` of `cwd5`'s own `.out` files and one read-only
+run of the registered `bin/cWD5_rule20.sh`, whose own coverage line calls `squeue -h -u s5014158` to list OUR
+account's queue (a listing, not a submission).  **`alice` — Saber's shared account — NOT contacted.**  No dataset,
+licence, PDF, notebook website or Vercel URL was touched, and nothing was downloaded.  **No accuracy number of
+`cwd5`, and no level, bar, contrast, state, branch word or stamp of any batch, was read by this entry**, so RULE 20's
+"full coverage before any number" gate is not reached here — it was re-run anyway (284.7) and PASSES at 27/27.  This
+entry quotes **no licence paragraph of any batch**, `cwd4`'s included, so the two obligations `cwd4`'s launch refuter
+left (the `CTL2-PARTIAL` quotation gate and the magnitude rival) are not engaged by it.  Cost: **zero GPU-hours**.
+
+Next free number: **285**.

@@ -109,6 +109,30 @@ and `csv1`'s three switch arms print ONE:
       registered witnesses are ON in 2+ kinds are exactly those entries, so cwd1 and csv1 register none); 245's and
       251's `kinds scanned` lines are unchanged byte for byte and ONE new line names the two added kinds.
 
+ADDED AT CORRECTIONS 284 -- `cwd5`'s `CARW2` (281), the first run of the campaign that is TWO-AXIS: it BOTH prints an
+ON `<KIND>` line (`DECAY_MASK`, the three `ctd1` carriers) AND deviates on an ARGS value (`--weight-decay-base 1e-2`,
+its rung).  A TSV row carries ONE witness, and the two readers disagreed about which it must be (281.12): the KINDS
+reader has a `MULTI_KIND` escape, the ARGS-value reader has none, so BOTH listings FAILed.  THE RULE: such a run is
+listed with its **ARGS** witness and its ON kinds are registered in `MULTI_KIND` -- the only listing both readers
+accept; the reverse listing still FAILs, so the rule is enforced by the module, not merely documented:
+  C34 a cwd5-style ladder passes: the 2 anchor arms unlisted at `0.1` / `DECAY_MASK: off`, the 6 single-axis rung
+      arms listed by their ARGS_WD_BASE value, and CARW2 listed by its ARGS_WD_BASE value with its DECAY_MASK line
+      verified through MULTI_KIND; the new two-axis line counts the CARW2 run; and the single-axis batches that
+      must keep working -- a cwd1-style kind-only batch and a cmo1-style ARGS-only batch -- pass merged in with it.
+  C35 the rule is forced and every corruption FAILs, each named: (a) CARW2 listed by its DECAY_MASK line instead
+      (the reverse listing, which has no escape); (b) its DECAY_MASK line carrying `wd=0.1`, the rung it never ran
+      at; (c) `DECAY_MASK: off` (the mask never bit); (d) an ARGS line at the standard `0.1` (the rung never
+      arrived); (e) an ARGS line at another rung's value (witness != the run's own value); (f) CARW2 dropped from
+      the list (FAILs TWICE: completeness on the ON line, and the standard-cell ARGS rule); (g) a single-axis rung
+      arm printing an ON DECAY_MASK line it has no MULTI_KIND entry for; (h) an unlisted anchor run with no
+      `DECAY_MASK: off` line.
+  C36 the registry and the print lines: MULTI_KIND gains exactly ONE entry, `("cwd5", "CARW2")`, registering exactly
+      `DECAY_MASK`, whose literal == `analysis/cwd5_design.py`'s `CWD5.WITNESS_DM["CARW2"]` (the frozen table the
+      registered cWD5 scorer imports) and whose `wd=` token is the arm's OWN rung; the single-kind entry does NOT
+      disturb 251's `multi-kind runs` line, which is frozen over the entries registering `MULTI_KINDS_AT_251` or
+      more kinds and stays byte-identical, as do 245's / 251's / 269's `kinds scanned` lines; `--check --runs` gains
+      exactly ONE line.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -440,6 +464,63 @@ def sv_batch():
     listed = [S1_MUTE + (VW_MUTE,), S1_IN + (SV_INERT,), S1_SL + (SV_SHADOWLOW,), S1_NL + (SV_NAIVELOW,)]
     corpus = [S1_K01, S1_HEAD, S1_MUTE, S1_IN, S1_SL, S1_NL]
     return listed, corpus, logs
+
+
+# ---- CORRECTIONS 284: cwd5's TWO-AXIS run (an ON <KIND> line AND a deviating ARGS value) ----------------------
+# `cwd5` (281) is a four-rung coupled weight-decay ladder: `k01W1` / `kLW1` at the standard `0.1` and six arms at
+# `1e-2` / `1e-3` / `5e-4` that deviate on `--weight-decay-base` ALONE, plus `CARW2` -- scalar at `1e-2` with
+# PATCH_DECAYMASK on the three `ctd1` carriers, which therefore BOTH deviates on an ARGS value AND prints an ON
+# DECAY_MASK line.  The run names, job ids and ARGS payload below are the batch's REAL ones (281.8); the DECAY_MASK
+# line is the registered `cwd5_design.CWD5.WITNESS_DM["CARW2"]`, re-typed (C36 pins it to that table).
+CWD5_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base %s --alg-meta Lion "
+             "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 "
+             "--NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 "
+             "--alpha0 1e-6 --num-epochs 100 --stepsize-groups %s --seed 146 "
+             "--save-directory /home/s5014158/metaopt/runs/cwd5 --run-name %s")
+DM_CARRIERS3_W2 = ("DECAY_MASK: on base=SGDm wd=0.01 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+"
+                   "layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 "
+                   "names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight")
+DM_CARRIERS3_W1 = DM_CARRIERS3_W2.replace("wd=0.01", "wd=0.1")   # the rung CARW2 never ran at: a corrupted witness
+# (arm, stepsize-groups / granularity, the rung's `--weight-decay-base` token, job id of seed 146)
+CWD5_ARMS = [("k01W1", "scalar", "0.1", "5052142"), ("kLW1", "layerwise", "0.1", "5052143"),
+             ("k01W2", "scalar", "1e-2", "5052144"), ("kLW2", "layerwise", "1e-2", "5052145"),
+             ("k01W3", "scalar", "1e-3", "5052146"), ("kLW3", "layerwise", "1e-3", "5052147"),
+             ("k01W4", "scalar", "5e-4", "5052148"), ("kLW4", "layerwise", "5e-4", "5052149"),
+             ("CARW2", "scalar", "1e-2", "5052150")]
+CWD5 = dict((arm, ("cwd5-%s-s146" % arm, job)) for arm, _g, _w, job in CWD5_ARMS)
+CWD5_CAR = CWD5["CARW2"]
+
+
+def wd5_batch(carw2_by="ARGS_WD_BASE"):
+    """cwd5-style (281): 2 anchor arms at the standard 0.1, 6 single-axis rung arms, and the TWO-AXIS CARW2."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for arm, grouping, wd, _job in CWD5_ARMS:
+        key = CWD5[arm]
+        corpus.append(key)
+        logs[key] = CWD1_OFF + [DM_CARRIERS3_W2 if arm == "CARW2" else "DECAY_MASK: off"]
+        args[key] = CWD5_ARGS % (wd, grouping, key[0])
+        cells[key] = {"network": "ResNet18_c100", "granularity": grouping}
+        if arm == "CARW2":
+            listed.append(key + (DM_CARRIERS3_W2 if carw2_by == "DECAY_MASK"
+                                 else "ARGS_WD_BASE: weight-decay-base=%s" % wd,))
+        elif wd != "0.1":
+            listed.append(key + ("ARGS_WD_BASE: weight-decay-base=%s" % wd,))
+    return listed, corpus, logs, args, cells
+
+
+def merge5(wd5, *parts):
+    """merge(), for the fixtures that also carry `args` / `cells` (the cwd5 and cmo1 shapes)."""
+    listed, corpus, logs, args, cells = wd5
+    listed, corpus, logs = list(listed), list(corpus), dict(logs)
+    args, cells = dict(args), dict(cells)
+    for p in parts:
+        listed += list(p[0])
+        corpus += list(p[1])
+        logs.update(p[2])
+        if len(p) > 3:
+            args.update(p[3])
+            cells.update(p[4])
+    return listed, corpus, logs, args, cells
 
 
 def line_of(out, head):
@@ -1111,6 +1192,103 @@ def main():
     except Exception as ex:  # a table that does not import is a FAIL here, not an error
         chk(False, "C33 cwd_design and the registered cSV1 scorer import and MULTI_KIND holds cwd2's arms",
             "%s: %s" % (type(ex).__name__, ex))
+
+    # ---- CORRECTIONS 284 ------------------------------------------------------------------------------------
+    print("C34 a cwd5-style ladder with a TWO-AXIS arm passes")
+    listed, corpus, logs, args, cells = wd5_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C34 6 single-axis rung arms + CARW2 listed by their ARGS_WD_BASE value, 2 anchors unlisted -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("1 listed run" in ln and ln.endswith(": True") for ln in line_of(out, "  two-axis runs")),
+        "C34 the new two-axis line counts the CARW2 run and is True", repr(line_of(out, "  two-axis runs")))
+    chk(any("DECAY_MASK" in ln and "every one listed with its kind: True" in ln for ln in line_of(out, "  completeness")),
+        "C34 completeness names DECAY_MASK and is True with CARW2 listed by its ARGS witness",
+        repr(line_of(out, "  completeness")))
+    chk(any("7 listed runs carry their listed ARGS value" in ln for ln in line_of(out, "  ARGS witness"))
+        and any("7 deviate from the standard, 7 are CSV rows in the standard cell, every one listed: True" in ln
+                for ln in line_of(out, "  ARGS witness")),
+        "C34 the ARGS block counts all 7 deviating rung runs, CARW2 among them", repr(line_of(out, "  ARGS witness")))
+    listed, corpus, logs, args, cells = merge5(wd5_batch(), dm_batch(), cmo_batch())
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C34 the single-axis batches still pass merged in: cwd1 (kind only) + cmo1 (ARGS only) + cwd5 -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+
+    print("C35 the rule is forced and every two-axis corruption fails, each named")
+    listed, corpus, logs, args, cells = wd5_batch("DECAY_MASK")
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(("%s-%s.out" % CWD5_CAR) in f and "deviates on ARGS_WD_BASE" in f
+                        and "listed with a DECAY_MASK witness" in f for f in fails(out)),
+        "C35a the REVERSE listing (by the DECAY_MASK line) still FAILs: the ARGS reader has no escape", show(out))
+    for tag, line, msg in [("b", DM_CARRIERS3_W1, "MULTI_KIND"), ("c", "DECAY_MASK: off", "MULTI_KIND")]:
+        listed, corpus, logs, args, cells = wd5_batch()
+        logs[CWD5_CAR] = CWD1_OFF + [line]
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % CWD5_CAR) in f and msg in f for f in fails(out)),
+            "C35%s CARW2 prints %r, not its registered line -> exit 1, named with %s" % (tag, line[:40], msg),
+            show(out))
+    for tag, wd, msg in [("d", "0.1", "does not deviate"), ("e", "1e-3", "ARGS witness")]:
+        listed, corpus, logs, args, cells = wd5_batch()
+        args[CWD5_CAR] = CWD5_ARGS % (wd, "scalar", CWD5_CAR[0])
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % CWD5_CAR) in f and msg in f for f in fails(out)),
+            "C35%s CARW2's own ARGS line says --weight-decay-base %s -> exit 1, named" % (tag, wd), show(out))
+    listed, corpus, logs, args, cells = wd5_batch()
+    rc, out = run_check([r for r in listed if r[:2] != CWD5_CAR], corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("printing an ON DECAY_MASK line but is NOT listed" in f for f in fails(out))
+        and any("whose ARGS deviates" in f and "NOT listed" in f for f in fails(out)),
+        "C35f CARW2 dropped from the list -> exit 1, named TWICE (completeness and the standard-cell ARGS rule)",
+        show(out))
+    listed, corpus, logs, args, cells = wd5_batch()
+    logs[CWD5["k01W2"]] = CWD1_OFF + [DM_CARRIERS3_W2]     # a single-axis rung arm with no MULTI_KIND entry
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(("%s-%s.out" % CWD5["k01W2"]) in f and "prints an ON DECAY_MASK line" in f
+                        and "listed with a ARGS_WD_BASE witness" in f for f in fails(out)),
+        "C35g a rung arm printing an ON DECAY_MASK line it is not registered for -> exit 1, named", show(out))
+    listed, corpus, logs, args, cells = wd5_batch()
+    logs[CWD5["k01W1"]] = CWD1_OFF                         # the anchor prints no DECAY_MASK line at all
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(("%s-%s.out" % CWD5["k01W1"]) in f and "NOT listed but its witness is" in f
+                        for f in fails(out)),
+        "C35h an unlisted anchor of the listed batch with no `DECAY_MASK: off` line -> exit 1, named", show(out))
+
+    print("C36 the two-axis registry entry and the print lines")
+    mk5 = dict((k, v) for k, v in (getattr(CE, "MULTI_KIND", None) or {}).items() if k[0] == "cwd5")
+    chk(list(mk5) == [("cwd5", "CARW2")] and sorted(mk5.get(("cwd5", "CARW2"), {})) == ["DECAY_MASK"],
+        "C36 MULTI_KIND gains exactly one cwd5 entry, registering exactly DECAY_MASK", repr(sorted(mk5)))
+    chk(mk5.get(("cwd5", "CARW2"), {}).get("DECAY_MASK") == DM_CARRIERS3_W2,
+        "C36 its registered line is this test's fixture, byte for byte")
+    try:
+        import cwd5_design as D5                  # the frozen table the registered cWD5 scorer imports UNEDITED
+        chk(D5.CWD5.WITNESS_DM["CARW2"] == DM_CARRIERS3_W2 and D5.CWD5.WD["CARW2"] == "1e-2"
+            and "wd=0.01" in DM_CARRIERS3_W2 and D5.CWD5.DMASK["CARW2"] and D5.CWD5.MASKED == ("CARW2",),
+            "C36 MULTI_KIND's cwd5 line == cwd5_design's WITNESS_DM['CARW2'], at the arm's OWN rung (wd=0.01)")
+        chk([a for a in D5.CWD5.ARMS if D5.CWD5.WITNESS_DM[a] != "DECAY_MASK: off"] == ["CARW2"]
+            and sorted(D5.CWD5.ARGS_DEVIATING) == ["CARW2", "k01W2", "k01W3", "k01W4", "kLW2", "kLW3", "kLW4"],
+            "C36 CARW2 is the batch's ONLY ON-line arm and one of its 7 ARGS-deviating arms -- the two-axis run",
+            repr(sorted(D5.CWD5.ARGS_DEVIATING)))
+    except Exception as ex:                       # a table that does not import is a FAIL here, not an error
+        chk(False, "C36 cwd5_design imports and MULTI_KIND holds its CARW2 line", "%s: %s" % (type(ex).__name__, ex))
+    rc, out = run_check(*merge(rh_batch(), wh_batch(), dm_batch(), dm2_batch(), sv_batch()))
+    chk(("  multi-kind runs (CORRECTIONS 251): those runs by the number of kinds MULTI_KIND registers for them: "
+         "2 kinds 8, 3 kinds 4") in out.splitlines(),
+        "C36 251's `multi-kind runs` line is unchanged by the single-kind entry, byte for byte",
+        repr(line_of(out, "  multi-kind runs")))
+    chk(line_of(out, "  two-kind runs")[0].split(":")[1].strip().startswith("%d listed runs"
+                                                                            % sum(int(p.split()[-1]) for p in
+                                                                                  line_of(out, "  multi-kind runs")[0]
+                                                                                  .split(": ")[-1].split(", "))),
+        "C36 245's count == the sum of 251's breakdown: neither line counts the one-kind two-axis entry",
+        repr(line_of(out, "  two-kind runs") + line_of(out, "  multi-kind runs")))
+    chk(len(line_of(out, "  kinds scanned")) == 3 and len(line_of(out, "  two-axis runs")) == 1
+        and len(line_of(out, "  multi-kind runs")) == 1,
+        "C36 `--check --runs` gains exactly ONE line: three `kinds scanned`, one `multi-kind`, one `two-axis`",
+        repr(line_of(out, "  two-axis runs")))
+    chk(getattr(CE, "MULTI_KINDS_AT_251", None) == 2
+        and sorted(set(len(d) for d in CE.MULTI_KIND.values())) == [1, 2, 3],
+        "C36 the 251 line is frozen over entries of 2+ kinds while MULTI_KIND itself now holds a 1-kind entry",
+        repr(sorted(set(len(d) for d in CE.MULTI_KIND.values()))))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)
