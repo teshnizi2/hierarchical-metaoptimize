@@ -1118,7 +1118,10 @@ DECAY 0.1 ONLY.*** *Every arm of `cwd3` and `cwd4` is* ***SCALAR*** *— there i
 `HORIZON-100-ONLY`). What is shown is that* ***holding the grouping scalar on every arm***, *exempting one
 512-parameter BatchNorm scale from the coupled decay moves the same configuration from 22.8213 to 67.9567. Whether
 the diagnostic carries to the audit's own cells, or to normal weight-decay values, is precisely what the chair's
-ladder —* `cwd5`, *registered at CORRECTIONS 281 at wd 0.1 / 1e-2 / 1e-3 / 5e-4 — must decide, and it has not landed.*
+ladder —* `cwd5`, *registered at CORRECTIONS 281 at wd 0.1 / 1e-2 / 1e-3 / 5e-4 — must decide.* ***It has since been
+SCORED by a concurrent track (`bfda844`,* `THRESHOLD-W1-W2 | W1-COLLAPSE+W2-NOGAP+W3-NOGAP+W4-NOGAP+CAR-UNREADABLE`*)
+but is NOT landed and NOT ingested, so nothing is read from it here beyond the fact that it exists: no `cwd5` number
+enters any sentence in this file, and what its verdict does to this framing is ITS landing's job.***
 
 **Why this framing is the stronger one, stated plainly:**
 
