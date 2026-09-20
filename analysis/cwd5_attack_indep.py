@@ -1342,6 +1342,24 @@ def main():
     print("      The DECOUPLED arm was never run (281.2): no sentence about it is licensed in either direction.")
 
     print("")
+    print("[7] RULE 16 DEFECTS FOUND IN THE REGISTERED SCORER BY THIS REPLAY (REPORTED, NOT FIXED)")
+    print("     F1 (cwd5, NEW).  analysis/cWD5_wdladder_score.py guards the DESCRIPTIVE gap-monotonicity stamp")
+    print("     with `if word and \'UNREADABLE\' not in (word or \'\') and branch in ACCOUNT_TOKENS:`.  The")
+    print("     substring test was plainly meant to catch a RUNG state of UNREADABLE -- but a rung is UNREADABLE")
+    print("     exactly when its layerwise arm is below REF_MIN, and decide() returns UNRESOLVED-REFERENCE in that")
+    print("     case, which is NOT in ACCOUNT_TOKENS.  So the rung reading of the test is DEAD, and the only string")
+    print("     that can trip it is the CARRIER word CAR-UNREADABLE.  CONSEQUENCE, MEASURED ON THIS BATCH: the four")
+    print("     gaps are monotone non-increasing in the weight decay within 2 SE, so GAP-MONOTONE-IN-WD would have")
+    print("     fired -- and it is SUPPRESSED, because rung W2 did not collapse and the carrier companion is void.")
+    print("     Gap monotonicity and carrier readability are unrelated facts, and one is silencing the other.")
+    print("     COSMETIC IN SCOPE: the clause appends a DESCRIPTIVE stamp only.  It touches no bar, sigma, level,")
+    print("     contrast, rung state, carrier word, branch or licence paragraph, and the FINAL's account token is")
+    print("     unchanged either way.  The registered file is NOT edited (RULE 16); this parser RE-TYPES the clause")
+    print("     as written and reproduces the bytes the scorer actually emits, so the byte-identical claim above is")
+    print("     honest rather than flattering.  A landing that wants to state the monotonicity must re-derive it")
+    print("     from the four G values (this section does) and must NOT quote a stamp the scorer did not print.")
+
+    print("")
     print("VIOLATIONS %d" % len(v))
     return 0 if not v else 1
 
