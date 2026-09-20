@@ -1,0 +1,160 @@
+cWD5 --selftest: the ladder design and witnesses, G-BITE on REAL landed cwd1 / cwd3 records at BOTH grains
+and both nulls, the noise floor through corpus_exclusions.filter_rows, the account tables with exhaustive
+state reachability, the REAL score() on synthetic runs, the O2 invariance proof and the documented
+one-argument invocation.
+
+A. DESIGN, WITNESSES, ARITHMETIC
+  PASS A cvt9's registered scorer (Lion helper) is the file 249 registered
+  PASS A the REUSED cwd_design.py / cwd_common.py are cwd1's registered files, byte for byte (RULE 16)
+  PASS A patches/patch_decaymask.py is cwd1's registered file (RULE 16): NO NEW HARNESS CODE
+  PASS A the 9 arms and the FRESH seed block {146,147,148}
+  PASS A THE LADDER: four coupled weight decays, the anchor 0.1 down to the standard CIFAR value 5e-4 (200x)
+  PASS A the rungs are STRICTLY DECREASING, so the collapse prefix / threshold reading is well defined
+  PASS A rung W1 IS the campaign's own weight decay, so the anchor replicates the mechanism cell in batch
+  PASS A BOTH GRAINS run at EVERY rung, so every gap is a WITHIN-rung contrast and never a cross-batch one
+  PASS A each rung's two arms carry the SAME weight-decay token, and the carrier arm sits at rung W2
+  PASS A Lion is recomputed on each arm's OWN group count: 1 for scalar, 62 for layerwise
+  PASS A EXACTLY ONE arm is masked: the ladder's own reading uses NO patch, so a patch defect cannot forge a threshold
+  PASS A CARW2 = the three ctd1 carriers, idx 50/53/59, 1,536 params, all 512-wide layer4 BatchNorm SCALES (cwd3's set)
+  PASS A CARW2's witness prints wd=0.01 -- a string PATCH_DECAYMASK has NEVER printed; the bite job proves it on GPU
+  PASS A every ladder arm prints `DECAY_MASK: off`; only CARW2 carries a mask witness
+  PASS A 21 of the 27 runs DEVIATE from the standard cell's weight decay and owe an ARGS_WD_BASE exclusion row each; the 6 anchor runs owe none
+  PASS A the exclusion kind this batch needs ALREADY EXISTS (CORRECTIONS 263); corpus_exclusions.py is NOT edited
+  PASS A prefix rule (245/251) over the LITERAL registration tuple: no other KIND prefixes or is prefixed by DECAY_MASK
+  PASS A SE_PRIOR = SIGMA_PRIOR*sqrt(2/3); SIGMA_PRIOR = SIGMA_R18ALL
+  PASS A SIGMA_USED == max(frozen floor, in-batch)
+  PASS A O2: score() calls no sigma routine and reads the corpus once (disclosure); G-HW is read only AFTER the gates
+  PASS A no landed level enters a LEVEL, a SIGMA, a CONTRAST or a STATE BAR -- only a non-gating stamp and the disclosure block
+  PASS A decide() / rung_state() / carrier_state() read ONLY frozen literals and in-batch means
+  PASS A the frozen manifest carries the ladder, one ARMWD line per arm and the carrier SET line   107 lines
+  PASS A the ENV line is cvt9's (= cvt8's = cwd1's = cwd3's = cwd4's)
+  PASS A the runner's ENV line carries NO weight decay -- which is WHY the rungs are discriminated by the ARGS half
+  PASS A the tree, the runner and build_network are cwd1's, UNCHANGED
+
+B. G-BITE ON REAL LANDED RECORDS (this host's runs directory)
+  PASS B the 3 landed cwd1 k01 runs PASS G-BITE read as cwd5's SCALAR ladder arm (Lion on 1 group, no hold key, no dm key)   3/3
+  PASS B the Lion recompute is exact on 62 GROUPS: the 3 landed cwd1 kLNWD (layerwise) runs pass it -- the layerwise half of this ladder is readable by the same check   3/3
+  PASS B THE STRAY-MASK NULL ON REAL RECORDS: those same layerwise runs, which ARE masked, FAIL cwd5's UNMASKED ladder audit on every record (a dm_* key on a ladder arm is a gate failure)   3/3
+  PASS B ... and the Lion recompute FAILS when one real record's beta is moved by 0.01
+  PASS B the 3 landed cwd3 CARWD0 runs PASS G-BITE read as cwd5's CARW2 (k = 3 on every record) -- the carrier arm's record contract is cwd3's, and only its wd VALUE is new   3/3
+  PASS B THE CARRIER HALF'S DANGEROUS NULL ON REAL RECORDS: an UNMASKED run read as CARW2 FAILS the DECAY_MASK audit on every record.  Without this gate it would read as CAR-NULL, i.e. 'the carrier account fails at 1e-2'   3/3
+
+C. THE NOISE FLOOR (OPERATIONS 36) AND FRESHNESS
+  PASS C the LIVE corpus_exclusions registry carries the ARGS_WD_BASE kind with standard 0.1 (263), UNEDITED
+  PASS C SIGMA_R18ALL: the FROZEN literal 0.6451413439065666 IS the FILTERED value (df 258)
+  PASS C the NAIVE (unfiltered) value is the disclosed trap, not the literal
+  PASS C the registration corpus has 3268 rows
+  PASS C ZERO corpus rows OUTSIDE cwd5 carry seed 146, 147 or 148   []
+  PASS C ZERO corpus rows carry the cwd5- prefix (registration corpus)
+
+D. ACCOUNTS -> TOKENS, AND EXHAUSTIVE STATE REACHABILITY
+  PASS D account COLLAPSE-AT-ALL-VALUES midpoints -> COLLAPSE-AT-ALL-VALUES
+  PASS D account THRESHOLD-W1-W2 midpoints -> THRESHOLD-W1-W2
+  PASS D account THRESHOLD-W2-W3 midpoints -> THRESHOLD-W2-W3
+  PASS D account THRESHOLD-W3-W4 midpoints -> THRESHOLD-W3-W4
+  PASS D account GRADED-ABOVE-THRESHOLD-W1 midpoints -> GRADED-ABOVE-THRESHOLD-W1
+  PASS D account GRADED-ABOVE-THRESHOLD-W2 midpoints -> GRADED-ABOVE-THRESHOLD-W2
+  PASS D account GRADED-ABOVE-THRESHOLD-W3 midpoints -> GRADED-ABOVE-THRESHOLD-W3
+  PASS D account NON-MONOTONE midpoints -> NON-MONOTONE
+  PASS D account ANCHOR-NOT-COLLAPSED midpoints -> ANCHOR-NOT-COLLAPSED
+  PASS D account UNRESOLVED-REFERENCE midpoints -> UNRESOLVED-REFERENCE
+  PASS D the K01 / PART / FREE bands are disjoint
+  PASS D the three bands realise COLLAPSE / PARTIAL / NOGAP at a FREE layerwise arm, by construction
+  PASS D THE CARRIER HALF'S DANGEROUS NULL: a mask that never bit reads as CAR-NULL -- and does NOT move the ladder's own token, because no ladder arm is masked.  Only G-BITE separates it from a real CAR-NULL
+  PASS D a failed CARRIER gate suppresses the carrier word and leaves the ladder's token untouched
+  PASS D when rung W2 is not COLLAPSE the carrier arm is UNREADABLE (cmo1's ISO-UNREADABLE at wd 0, 264)
+  PASS D every one of the 8 registered accounts is reachable from the 27 admissible state vectors and NOTHING ELSE is   []
+  PASS D the threshold is named by the BRACKETING PAIR, a PARTIAL tail is never called a threshold, and a COLLAPSE at a LOWER weight decay than a non-collapsed rung is NON-MONOTONE
+  PASS D a layerwise arm just below REF_MIN gates the WHOLE ladder and names the rung
+  PASS D a k01W1 just above K01_MAX gates the whole ladder
+  PASS D an anchor that is under K01_MAX but NOT at or below half its own layerwise arm still gates the ladder -- so the COLLAPSE prefix is never empty inside account_of()
+
+E. THE REAL score() ON SYNTHETIC RUNS
+  PASS E base (THRESHOLD-W2-W3) -> rc 0, THRESHOLD-W2-W3 |
+  PASS E base stamps (the state word, the DESCOPE stamp, the four-point stamp, bite, HW and the scope stamps)
+  PASS E the CO-PRIMARY G_W4 is printed with its meaning spelled out
+  PASS E COLLAPSE-AT-ALL-VALUES -> rc 0, COLLAPSE-AT-ALL-VALUES
+  PASS E THRESHOLD-W1-W2 (the corner-case charge landing) -> rc 0, THRESHOLD-W1-W2
+  PASS E when rung W2 stops collapsing the carrier arm is UNREADABLE, exactly as registered
+  PASS E THRESHOLD-W3-W4 -> rc 0, THRESHOLD-W3-W4
+  PASS E GRADED-ABOVE-THRESHOLD-W2 -> rc 0, GRADED-ABOVE-THRESHOLD-W2
+  PASS E GRADED-ABOVE-THRESHOLD-W1 -> rc 0, GRADED-ABOVE-THRESHOLD-W1
+  PASS E GRADED-ABOVE-THRESHOLD-W3 -> rc 0, GRADED-ABOVE-THRESHOLD-W3
+  PASS E NON-MONOTONE (W2 healthy, W3 collapsed) -> rc 0, NON-MONOTONE
+  PASS E ANCHOR-NOT-COLLAPSED -> rc 0, ANCHOR-NOT-COLLAPSED
+  PASS E UNRESOLVED-REFERENCE (kLW4 unhealthy) -> rc 0, UNRESOLVED-REFERENCE
+  PASS E near bar: scalar = 0.50 x layerwise - 0.05 at W3 -> rc 0, THRESHOLD-W3-W4
+  PASS E near bar: scalar = 0.50 x layerwise + 0.05 at W3 -> rc 0, GRADED-ABOVE-THRESHOLD-W2
+  PASS E near bar: gap = GAP_BAR - 0.05 at W4 (NOGAP) -> rc 0, THRESHOLD-W2-W3
+  PASS E near bar: CARW2 = kLW2 - MATCH + 0.05 -> rc 0, THRESHOLD-W2-W3
+  PASS E a carrier arm just inside the MATCH bar is CAR-REC
+  PASS E near bar: CARW2 = kLW2 - MATCH - 0.05 -> rc 0, THRESHOLD-W2-W3
+  PASS E a carrier arm just outside the MATCH bar is CAR-PART
+  PASS E CARW2 at the floor (the ADVERSE carrier reading) -> rc 0, THRESHOLD-W2-W3
+  PASS E a carrier mask that does not lift the run is CAR-NULL -- registered as adverse
+  PASS E mixed hardware (NON-GATING) -> rc 0, THRESHOLD-W2-W3
+  PASS E mixed hardware changes a STAMP only, never the account
+  PASS E anchor far from cwd3 -> rc 0, THRESHOLD-W2-W3
+  PASS E an anchor more than 5 pp from cwd3's k01 is stamped (non-gating)
+  PASS E diverged arm -> rc 0, UNRESOLVED-DIVERGED
+  PASS E floor: every arm under 15 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ENV break -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS grain break (a scalar arm says layerwise) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS grain break (a layerwise arm says scalar) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS wd break: W4 arm carries the anchor's 0.1 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS wd break: W2 arm carries W3's 1e-3 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: ARGS wd break: a fifth, unregistered wd value -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK witness off on CARW2 -> rc 1, HARNESS-UNSOUND
+  PASS E harness: CARW2 carries the wd=0.1 witness (the WRONG-RUNG mask) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: DECAY_MASK on a ladder arm -> rc 1, HARNESS-UNSOUND
+  PASS E harness: a COMP_HOLD line -> rc 1, HARNESS-UNSOUND
+  PASS E harness: manifest break (a rung's wd swapped) -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov HF = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov scorer sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov design sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov cwd_design sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov common sha -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov runner = cvt8's -> rc 1, HARNESS-UNSOUND
+  PASS E harness: prov MODE dry-run -> rc 1, HARNESS-UNSOUND
+  PASS E G-BITE LADDER gate: k01W1 Lion broken -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: kLW4 Lion broken (62 groups) -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: a layerwise arm's records carry 1 group -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: a scalar arm's records carry 62 groups -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: dm keys on a ladder arm -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: a hold key on kLW1 -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: short probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: garbled record -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE LADDER gate: missing probe file -> rc 1, PATCH-NOT-VERIFIED
+  PASS E G-BITE CARRIER gate: CARW2 without dm keys (THE DANGEROUS NULL) -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E G-BITE CARRIER gate: CARW2 records carry k = 2 -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E G-BITE CARRIER gate: CARW2 dm_skipped forged -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E G-BITE CARRIER gate: CARW2 dm_n off by one -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E G-BITE CARRIER gate: CARW2 zero dm_wdterm -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E G-BITE CARRIER gate: CARW2 dm_norm not a list -> rc 0, THRESHOLD-W2-W3
+  PASS E ... and it suppresses ONLY the carrier word: the ladder's token survives, as registered
+  PASS E the carrier DANGEROUS NULL would otherwise read as CAR-NULL -> rc 0, THRESHOLD-W2-W3
+  PASS E the level a non-biting mask produces IS a registered adverse reading -- which is why the carrier gate exists
+  PASS E dropped run -> INCOMPLETE -> rc 2, INCOMPLETE
+  PASS E truncated resubmission beside a complete run is ignored -> rc 0, THRESHOLD-W2-W3
+
+   O2 INVARIANCE: FINAL identical across corpora (bars never read the corpus)
+  PASS O2 THRESH-23   real+invented minimal-invented no-corpus real real+invented
+  PASS O2 ALL-VALUES  real+invented minimal-invented no-corpus real real+invented
+  PASS O2 ONLY-AT-0.1 real+invented minimal-invented no-corpus real real+invented
+  PASS O2 GRADED-W2   real+invented minimal-invented no-corpus real real+invented
+  PASS O2 non-vacuity: the invented rows MOVE the filtered ResNet18_c100 sigma (0.6451 -> 5.0848), FINAL does not
+
+   THE DOCUMENTED ONE-ARGUMENT INVOCATION
+  PASS `python3 cWD5_wdladder_score.py <runsdir>` exits 0 and prints FINAL
+  PASS ... and on a dropped run exits 2 (INCOMPLETE)
+
+F. TOTALITY: decide() over 8,000 random draws returns a registered token
+  PASS F every draw's token is registered   0 bad
+  PASS F every account draw prints a four-rung state word plus exactly one carrier word   0 bad
+
+SELFTEST PASS

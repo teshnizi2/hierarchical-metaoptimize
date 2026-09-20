@@ -1,0 +1,174 @@
+partitions: gpu-short,gpu-l4-24g  -- chosen because --time=03:00:00 (10800s) <= gpu-short MaxTime (14400s, sinfo(live)): gpu-short ADDED -- its own QOS (qos-short-gpu, 12 GPU/user as read 2026-09-08) is an independent pool and its node set is a superset of gpu-l4-24g
+==============================================================
+ cwd5 -- ResNet18_c100: THE COUPLED WEIGHT-DECAY LADDER (does the collapse exist at NORMAL weight decays?)
+ CIFAR100 / ResNet18_c100   AUGMENT=1  PROBE=100  PROBE_TENSOR=1  clamp -15:-2.3026   ms=1e-3 alpha0=1e-6  100 epochs; seeds 146 147 148
+   rung W1  wd 0.1    k01W1 scalar   | kLW1 layerwise     (the campaign's anchor)
+   rung W2  wd 1e-2   k01W2 scalar   | kLW2 layerwise     + CARW2 scalar DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight
+   rung W3  wd 1e-3   k01W3 scalar   | kLW3 layerwise
+   rung W4  wd 5e-4   k01W4 scalar   | kLW4 layerwise     (the standard CIFAR SGD value)
+ 9 arms x 3 seeds = 27 jobs, ONE submission; mode: DRY-RUN
+ harness tree /home/s5014158/metaopt/harness_cwd1/cifar10 (cwd1's, UNCHANGED)   runner /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh (cwd1's, UNCHANGED)   partitions gpu-short,gpu-l4-24g   constraint L4   walltime 03:00:00
+ DOCUMENTED INVOCATION: python3 analysis/cWD5_wdladder_score.py <runsdir>
+==============================================================
+guard 0b: VOTE_W, BETA_HOLD, GROUP_HOLD, REST_HOLD and DECAY_MASK are UNSET in the launcher's environment
+guard 0: CSV present (3269 lines, sha fe3874d3e5b3489e4fd1f0f404547978441fc81dcbf883ec32a44ab90fd7ce84)
+guard 1a: present  51c28608b4786e2f  /home/s5014158/stage_cwd5/analysis/cWD5_wdladder_score.py
+guard 1a: present  dd3ab158eab10804  /home/s5014158/stage_cwd5/analysis/cwd5_design.py
+guard 1a: present  03d2d76149157577  /home/s5014158/stage_cwd5/analysis/cwd_design.py
+guard 1a: present  d7ddb49e71013e3a  /home/s5014158/stage_cwd5/analysis/cwd_common.py
+guard 1a: present  809b9030a37bbfbf  /home/s5014158/stage_cwd5/bin/cWD5_wdladder.sh
+guard 1a: present  5c53a40dff7f8eeb  /home/s5014158/stage_cwd5/analysis/cVT9_dosewindow_score.py
+guard 1a: present  5346bb6b9efd9ca3  /home/s5014158/stage_cwd5/analysis/corpus_exclusions.py
+guard 1a: present  50f75cde4cabc23a  /home/s5014158/stage_cwd5/results/CORPUS-EXCLUSIONS.tsv
+guard 1a: present  697b804eba0d122f  /home/s5014158/stage_cwd5/bin/cWD5_realrun_bite.sbatch
+guard 1a: present  8d08803ae1d826b1  /home/s5014158/stage_cwd5/tests/test_decaymask.py
+guard 1a: present  0c64e50ffaac6a2a  /home/s5014158/stage_cwd5/tests/test_decaymask_realrun.py
+guard 1a: present  70f5a1bdd4da3d4d  /home/s5014158/stage_cwd5/tests/test_decaymask_realrun_cwd5.py
+guard 1a: present  690218007b52243a  /home/s5014158/stage_cwd5/tests/test_grouphold_realrun.py
+guard 1a: present  529be65221ed7fdc  /home/s5014158/stage_cwd5/bin/cWD_stage_harness.sh
+guard 1a: present  a4c77e03143d747f  /home/s5014158/stage_cwd5/bin/cVT8_stage_harness.sh
+guard 1a: present  cf88e7d25793b73c  /home/s5014158/stage_cwd5/patches/patch_decaymask.py
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/stage_cwd5/jobs/run_cifar_cwd1.sh
+guard 1a: present  c45e1b73fb5bd38d  /home/s5014158/stage_cwd5/bin/_lib_guards.sh
+guard 1a: present  81cea8b586e124a6  /home/s5014158/stage_cwd5/analysis/argsline_guard.py
+guard 1a: present  fe3874d3e5b3489e  /home/s5014158/stage_cwd5/results/all_runs.csv
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh
+guard 1a: present  94aedc33046afb12  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+guard 1a: present  5197dc2eecbbcb6f  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py.pre_decaymask
+guard 1a: present  c79988833c4399a0  /home/s5014158/metaopt/harness_cwd1/cifar10/build_network.py
+guard 1b: no git repo on this host; the operator declares the staged tree is commit d3fdb53840061374a4707c51fc1e102aad41ef11 (40 hex, 271.6 F1)
+guard 1b2: the archived jobs/run_cifar_cwd1.sh == $WS/jobs/run_cifar_cwd1.sh == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's runner, UNCHANGED)
+guard 1b3: the REUSED cwd_design.py / cwd_common.py / patch_decaymask.py / test_decaymask_realrun.py are cwd1's registered bytes (RULE 16)
+guard 1c: scorer --selftest PASSES (138 PASS, 0 FAIL, 0 SKIP)
+guard 1c1: no SKIP (real records and the corpus were found on this host)
+guard 1c2: the O2 invariance proof RAN against THIS host's real corpus plus invented rows, and passed
+guard 1c3: the DOCUMENTED one-argument invocation reached FINAL on synthetic runs; a dropped run -> INCOMPLETE
+guard 1c4: the scorer's own fresh-seed / fresh-prefix checks ran and passed
+guard 1c5: G-BITE passes landed cwd1 k01 (1 group) and kLNWD (62 groups) and cwd3 CARWD0 (k=3), and FAILS both nulls on landed records
+guard 1c6: OPERATIONS 36 -- the frozen floor IS the corpus_exclusions.filter_rows value on the 3,268-row corpus, not the naive one
+guard 1c7: the SPLIT G-BITE gate and the ARGS_WD_BASE exclusion kind are registered in the scorer
+guard 1c: scorer sha256 51c28608b4786e2f90cd3ceb54b6ed709dca127eedeb8dbd83ecf3eaf068866c
+guard 2: no cwd5-* row in the corpus
+guard 2b: no cwd5-*.out on disk
+guard 2d: ZERO .out ARGS lines under /home/s5014158/metaopt/runs carry --seed 146/147/148
+guard 2c: 0 existing .out ARGS lines already carry one of this ladder's non-anchor weight decays (DISCLOSURE: the
+          ladder's rungs are a NEW cell each; the 21 non-anchor runs owe ARGS_WD_BASE exclusion rows at landing)
+guard 2e: sacct all-time: 0 cwd5-* jobs
+guard 2f: 0 cwd5-* in squeue
+guard 4a: cVT8_stage_harness.sh (verify mode) VERIFIES cvt8's tree:
+          V-h: HF.py.pre_resthold == cvt7's HF.py 2396f2be8102724c120ea5271d2d84acf3835ffb9a5c7947fc282121cf2a588f
+          V-h2: cvt8 HF.py sha == pinned post 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+          V-h1: the chain .pre_voteweight (LIVE 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd) -> .pre_betahold (cvt1's) -> .pre_grouphold (cvt4's) -> .pre_resthold (cvt7's) -> HF.py
+          V-h3: cvt7's HF.py is still 2396f2be8102724c120ea5271d2d84acf3835ffb9a5c7947fc282121cf2a588f (untouched)
+          V-h4: neither the LIVE nor cvt7's HF.py carries a PATCH_RESTHOLD marker
+          V-h5: the LIVE HF.py is still 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd
+          V-d: /home/s5014158/metaopt/jobs/run_cifar_cvt8.sh differs from run_cifar.sh in EXACTLY one line: cd /home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10 -> cd /home/s5014158/metaopt/harness_cvt8/cifar10
+          V-d2: runner sha == pinned 1dbe4ff52eccbbb1c9936f4a687ed88172dd41c48b14ae60eb353b45f766f5e0; run_cifar.sh and cvt7's runner unchanged
+          cVT8_stage_harness: VERIFIED
+guard 4a1: cWD_stage_harness.sh cwd1 (verify mode) VERIFIES cwd1's tree, which cwd5 uses UNCHANGED:
+          V-a: 12 files byte-identical to cvt8's tree (Optimizers/HF.py excepted)
+          V-a2: no file in the cwd1 tree beyond cvt8's except HF.py.pre_decaymask
+          V-h: HF.py.pre_decaymask == cvt8's HF.py == pinned 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+          V-h2: cwd1 HF.py sha == pinned post 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf
+          V-h3: cvt8's HF.py untouched
+          V-h4: neither the LIVE HF.py nor any cvt1/4/6/7/8/9 tree's HF.py carries a PATCH_DECAYMASK / DECAY_MASK marker
+          V-h6: the LIVE HF.py is still 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd (untouched)
+          V-d: /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh differs from run_cifar.sh in EXACTLY one line: cd /home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10 -> cd /home/s5014158/metaopt/harness_cwd1/cifar10 (sha 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371)
+          V-f: tests/test_decaymask.py D0 (deleting the three regions == cvt8's HF.py, byte for byte) passes (13 PASS)
+          cWD_stage_harness cwd1: VERIFIED
+guard 3: cifar-100-python visible under /home/s5014158/metaopt/harness_cwd1/cifar10/data
+guard 3b: build_network.py == cvt8's (c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d)
+guard 3c: HF.py == 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf (cwd1's); .pre_decaymask == cvt8's HF.py == 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+guard 3e: runner == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's run_cifar_cwd1.sh)
+guard 3f: train.py declares --weight-decay-base (the ladder's axis is an EXISTING registered CLI flag; no new code)
+guard 4b: PATCH_DECAYMASK structural D0 PASSES (deleting the three regions == cvt8's HF.py, byte for byte)
+guard 4f1: cwd1's inertness log (cwdinert1) ALL PASS on THIS tree's HF, THIS patch: 80 PASS / 0 FAIL (sha 7529f89f)
+guard 4f: cwd5's bite log ALL PASS on THIS tree, THIS design, THIS driver: 52 PASS / 0 FAIL (sha 7f5a3eaf)
+          including RW-EQ (the additive wd-parameterised child == the REGISTERED child, bitwise, at wd 0.1),
+          RW2 (the ladder's premise: the formula holds at all FOUR rungs and the four rungs' weights differ)
+          and RW3 (PATCH_DECAYMASK at wd 1e-2, a value it has never run at), whose DECLARED LIMIT line records
+          which route the mask bites at the clamped initial step size and why 300 steps cannot show more
+guard 4c': ARMS, the four weight-decay tokens, the DECAY_MASK value, NET, NTENS, TOTPAR, SEEDS, the GPU
+           constraint and the tree / runner shas agree in launcher / design / cwd1's stage block; both grains
+           run at every rung on the SAME weight decay; EXACTLY ONE arm is masked and its witness says wd=0.01;
+           21 of 27 runs deviate from the standard cell's weight decay and owe an exclusion row each
+guard 4: live ResNet18_c100 from cwd1's tree -- 62 tensors, 11220132 parameters
+guard 4: normscale on the live model = 20 BatchNorm2d scales (by module type), 4800 parameters
+guard 4: k01W1   wd 0.1   scalar    type=scalar k=0  witnesses == registered, base_update bound as registered: True
+guard 4: kLW1    wd 0.1   layerwise type=layerwise k=0  witnesses == registered, base_update bound as registered: True
+guard 4: k01W2   wd 1e-2  scalar    type=scalar k=0  witnesses == registered, base_update bound as registered: True
+guard 4: kLW2    wd 1e-2  layerwise type=layerwise k=0  witnesses == registered, base_update bound as registered: True
+guard 4: k01W3   wd 1e-3  scalar    type=scalar k=0  witnesses == registered, base_update bound as registered: True
+guard 4: kLW3    wd 1e-3  layerwise type=layerwise k=0  witnesses == registered, base_update bound as registered: True
+guard 4: k01W4   wd 5e-4  scalar    type=scalar k=0  witnesses == registered, base_update bound as registered: True
+guard 4: kLW4    wd 5e-4  layerwise type=layerwise k=0  witnesses == registered, base_update bound as registered: True
+guard 4: CARW2   wd 1e-2  scalar    type=scalar k=3  witnesses == registered, base_update bound as registered: True
+guard 4h: CARW2   live idx (50, 53, 59) numel 1536 owners ('BatchNorm2d', 'BatchNorm2d', 'BatchNorm2d') widths (512, 512, 512) classes ('scale', 'scale', 'scale') depth ('layer4', 'layer4', 'layer4') -> as registered
+guard 4h: at base weight decay 0 the SAME mask raises the patch's own vacuity error: 'PATCH_DECAYMASK: base weight decay 0.0 is not > 0; a mask would be vacuous'
+guard 4f: step() calls self.base_update(net,g) once, before the meta update: True
+guard 4d: the live manifest is BYTE-IDENTICAL to cwd5_design.manifest_text(CWD5) (5306 bytes)
+guard 4b3: manifest (5306 bytes, sha e2a707d73100cbb1...) -> /home/s5014158/metaopt/runs/cwd5/PARTITION-MANIFEST.txt and /home/s5014158/metaopt/runs/cwd5-PARTITION-MANIFEST.txt
+guard 4g: provenance written to /home/s5014158/metaopt/runs/cwd5/PROVENANCE.dryrun.txt
+guard_parts_for_wall: PASS -- PARTS=gpu-short,gpu-l4-24g is consistent with --time=03:00:00 (10800s vs gpu-short cap 14400s, sinfo(live))
+guard 5b: partitions gpu-short,gpu-l4-24g all carry L4 nodes; --constraint=L4
+guard 5: 1993 GB free on $WS; 0 jobs pending, adding 27
+guard 8: with NO --manifest, `cWD5_wdladder_score.py <runsdir>` resolves the manifest to /home/s5014158/metaopt/runs/cwd5/PARTITION-MANIFEST.txt (<runsdir>/cwd5/)
+guard 9: the runner cd's into /home/s5014158/metaopt/harness_cwd1/cifar10 -- the SAME tree guards 3/4 tested
+sbatch --job-name=cwd5-k01W1-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W1-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W1-s146
+
+sbatch --job-name=cwd5-kLW1-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW1-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW1-s146
+
+sbatch --job-name=cwd5-k01W2-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W2-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W2-s146
+
+sbatch --job-name=cwd5-kLW2-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW2-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW2-s146
+
+sbatch --job-name=cwd5-k01W3-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W3-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W3-s146
+
+sbatch --job-name=cwd5-kLW3-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW3-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW3-s146
+
+sbatch --job-name=cwd5-k01W4-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W4-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W4-s146
+
+sbatch --job-name=cwd5-kLW4-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW4-s146 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW4-s146
+
+sbatch --job-name=cwd5-CARW2-s146 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-CARW2-s146,DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 146 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-CARW2-s146
+
+sbatch --job-name=cwd5-k01W1-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W1-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W1-s147
+
+sbatch --job-name=cwd5-kLW1-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW1-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW1-s147
+
+sbatch --job-name=cwd5-k01W2-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W2-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W2-s147
+
+sbatch --job-name=cwd5-kLW2-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW2-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW2-s147
+
+sbatch --job-name=cwd5-k01W3-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W3-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W3-s147
+
+sbatch --job-name=cwd5-kLW3-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW3-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW3-s147
+
+sbatch --job-name=cwd5-k01W4-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W4-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W4-s147
+
+sbatch --job-name=cwd5-kLW4-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW4-s147 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW4-s147
+
+sbatch --job-name=cwd5-CARW2-s147 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-CARW2-s147,DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 147 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-CARW2-s147
+
+sbatch --job-name=cwd5-k01W1-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W1-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W1-s148
+
+sbatch --job-name=cwd5-kLW1-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW1-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW1-s148
+
+sbatch --job-name=cwd5-k01W2-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W2-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W2-s148
+
+sbatch --job-name=cwd5-kLW2-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW2-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW2-s148
+
+sbatch --job-name=cwd5-k01W3-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W3-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W3-s148
+
+sbatch --job-name=cwd5-kLW3-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW3-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-3 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW3-s148
+
+sbatch --job-name=cwd5-k01W4-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-k01W4-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-k01W4-s148
+
+sbatch --job-name=cwd5-kLW4-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-kLW4-s148 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-kLW4-s148
+
+sbatch --job-name=cwd5-CARW2-s148 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/cwd5/probe_cwd5-CARW2-s148,DECAY_MASK=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 1e-2 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 148 --save-directory /home/s5014158/metaopt/runs/cwd5 --run-name cwd5-CARW2-s148
+
+guard 6: 27 composed command lines, 0 failed the RULE 20 / DECAY_MASK / weight-decay / grain / constraint pre-check
+---- 27 jobs (DRY RUN, NOTHING SUBMITTED); 0 rejected ----
+
+NOTHING WAS SUBMITTED.  The submitting form is:  bash bin/cWD5_wdladder.sh --submit
