@@ -1,0 +1,45 @@
+cwd4 k01, seeds s143,s144,s145: determinate 1499, PINNED 944 records
+mean |L| on pinned records, IN BATCH (cwd4's own k01):
+  idx 50  layer4.0.bn2.weight              2.7474e-01   rank  2
+  idx 53  layer4.0.shortcut.1.weight       1.8077e-01   rank  3
+  idx 59  layer4.1.bn2.weight              3.1188e-01   rank  1
+  idx 47  layer4.0.bn1.weight              9.6525e-04   rank 38
+  idx 56  layer4.1.bn1.weight              1.2905e-03   rank 33
+  idx 48  layer4.0.bn1.bias                1.7632e-06   rank 60
+
+  carriers ranked: [59, 50, 53, 61, 49]
+  SUM carriers {50,53,59} 7.6739e-01 ; SUM {47,56} 2.2557e-03 ; ratio 340.2
+  smallest carrier / largest admissible control = 1.8077e-01 / 1.2905e-03 = 140.1x
+
+ORDER AMONG THE THREE SINGLES by in-batch mean |L|: ONE59 > ONE50 > ONE53
+cwd4's plateau5 order (scorer's ONE-ORDER stamp): ONE59 > ONE50 > ONE53
+INHERITED cdep1 [P] figures for comparison: 59 3.2984e-01, 50 2.9155e-01, 53 1.9526e-01, 56 1.5166e-03, 47 1.1298e-03
+
+[2] removed-decay dose at PROBE RECORD 0 (every BN scale still 1.0):
+  s143 k01      k=None  dm_wdterm=None                     dm_absmin=None
+  s143 CARWD0   k=3     dm_wdterm=3.919183056113841e-06    dm_absmin=1.0
+  s143 TWOWD0   k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s143 CTL2WD0  k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s143 ONE50    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s143 ONE53    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s143 ONE59    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s144 k01      k=None  dm_wdterm=None                     dm_absmin=None
+  s144 CARWD0   k=3     dm_wdterm=3.919183056113841e-06    dm_absmin=1.0
+  s144 TWOWD0   k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s144 CTL2WD0  k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s144 ONE50    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s144 ONE53    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s144 ONE59    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s145 k01      k=None  dm_wdterm=None                     dm_absmin=None
+  s145 CARWD0   k=3     dm_wdterm=3.919183056113841e-06    dm_absmin=1.0
+  s145 TWOWD0   k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s145 CTL2WD0  k=2     dm_wdterm=3.1999995653468277e-06   dm_absmin=1.0
+  s145 ONE50    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s145 ONE53    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+  s145 ONE59    k=1     dm_wdterm=2.2627413924507466e-06   dm_absmin=1.0
+
+  k=1 -> ONE distinct dm_wdterm across all arms and all three seeds: 2.2627413924507466e-06
+  k=2 -> ONE distinct dm_wdterm across all arms and all three seeds: 3.1999995653468277e-06
+  k=3 -> ONE distinct dm_wdterm across all arms and all three seeds: 3.919183056113841e-06
+  TWOWD0 and CTL2WD0 are both k=2 and therefore remove NUMERICALLY IDENTICAL
+  weight decay at initialisation, and still differ by P_2SPEC = +44.2167 pp.

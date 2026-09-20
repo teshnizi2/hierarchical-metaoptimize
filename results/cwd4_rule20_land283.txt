@@ -1,0 +1,532 @@
+==============================================================================
+ RULE 20 at FULL COVERAGE, cwd4 -- the LANDING entry's OWN re-run (CORRECTIONS 283)
+ host: Mac, CPU only.  No GPU, no Slurm command, no login-node compute.
+ ORDERING, DISCLOSED NOT BURIED: this pass ran AFTER I had opened the committed
+ scorer output, so it is not itself a before-any-number pass.  The discipline was
+ met by THREE earlier full-coverage passes on exactly these 21 finished files --
+ the scoring track's (results/cwd4_rule20_land280.txt, 2026-09-20T12:12:33Z, before
+ any accuracy line was opened by it), the refute track's, and the batch's own
+ 21/21 pass at 280 -- all of which PASS identically to this one.  Recorded here
+ rather than papered over; no future entry should read it as precedent (278.1).
+ tools, UNEDITED (RULE 16):
+   analysis/argsline_guard.py        81cea8b586e124a6996d462d8321f21803238ac9af91526f6f190a84b04e5388
+   analysis/cwd4_rule20_envaudit.py  feeaade79341dd33124f86c84277d8930ae252cfda3c813e82126dc1b184955c
+==============================================================================
+
+----- ARGS half: argsline_guard.py --name cwd4- --vary seed --vary run-name ../runs_alice2
+=== ../runs_alice2/cwd4-CARWD0-s143-5051820.out ===
+  cwd4-CARWD0-s143-5051820.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CARWD0-s143-5051820.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CARWD0-s143
+=== ../runs_alice2/cwd4-CARWD0-s144-5051827.out ===
+  cwd4-CARWD0-s144-5051827.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CARWD0-s144-5051827.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CARWD0-s144
+=== ../runs_alice2/cwd4-CARWD0-s145-5051834.out ===
+  cwd4-CARWD0-s145-5051834.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CARWD0-s145-5051834.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CARWD0-s145
+=== ../runs_alice2/cwd4-CTL2WD0-s143-5051822.out ===
+  cwd4-CTL2WD0-s143-5051822.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CTL2WD0-s143-5051822.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CTL2WD0-s143
+=== ../runs_alice2/cwd4-CTL2WD0-s144-5051829.out ===
+  cwd4-CTL2WD0-s144-5051829.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CTL2WD0-s144-5051829.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CTL2WD0-s144
+=== ../runs_alice2/cwd4-CTL2WD0-s145-5051836.out ===
+  cwd4-CTL2WD0-s145-5051836.out: no repeated flag (20 flags)
+  --- effective values (cwd4-CTL2WD0-s145-5051836.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-CTL2WD0-s145
+=== ../runs_alice2/cwd4-ONE50-s143-5051823.out ===
+  cwd4-ONE50-s143-5051823.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE50-s143-5051823.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE50-s143
+=== ../runs_alice2/cwd4-ONE50-s144-5051830.out ===
+  cwd4-ONE50-s144-5051830.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE50-s144-5051830.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE50-s144
+=== ../runs_alice2/cwd4-ONE50-s145-5051837.out ===
+  cwd4-ONE50-s145-5051837.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE50-s145-5051837.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE50-s145
+=== ../runs_alice2/cwd4-ONE53-s143-5051824.out ===
+  cwd4-ONE53-s143-5051824.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE53-s143-5051824.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE53-s143
+=== ../runs_alice2/cwd4-ONE53-s144-5051831.out ===
+  cwd4-ONE53-s144-5051831.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE53-s144-5051831.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE53-s144
+=== ../runs_alice2/cwd4-ONE53-s145-5051838.out ===
+  cwd4-ONE53-s145-5051838.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE53-s145-5051838.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE53-s145
+=== ../runs_alice2/cwd4-ONE59-s143-5051825.out ===
+  cwd4-ONE59-s143-5051825.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE59-s143-5051825.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE59-s143
+=== ../runs_alice2/cwd4-ONE59-s144-5051832.out ===
+  cwd4-ONE59-s144-5051832.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE59-s144-5051832.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE59-s144
+=== ../runs_alice2/cwd4-ONE59-s145-5051839.out ===
+  cwd4-ONE59-s145-5051839.out: no repeated flag (20 flags)
+  --- effective values (cwd4-ONE59-s145-5051839.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-ONE59-s145
+=== ../runs_alice2/cwd4-TWOWD0-s143-5051821.out ===
+  cwd4-TWOWD0-s143-5051821.out: no repeated flag (20 flags)
+  --- effective values (cwd4-TWOWD0-s143-5051821.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-TWOWD0-s143
+=== ../runs_alice2/cwd4-TWOWD0-s144-5051828.out ===
+  cwd4-TWOWD0-s144-5051828.out: no repeated flag (20 flags)
+  --- effective values (cwd4-TWOWD0-s144-5051828.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-TWOWD0-s144
+=== ../runs_alice2/cwd4-TWOWD0-s145-5051835.out ===
+  cwd4-TWOWD0-s145-5051835.out: no repeated flag (20 flags)
+  --- effective values (cwd4-TWOWD0-s145-5051835.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-TWOWD0-s145
+=== ../runs_alice2/cwd4-k01-s143-5051819.out ===
+  cwd4-k01-s143-5051819.out: no repeated flag (20 flags)
+  --- effective values (cwd4-k01-s143-5051819.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       143
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-k01-s143
+=== ../runs_alice2/cwd4-k01-s144-5051826.out ===
+  cwd4-k01-s144-5051826.out: no repeated flag (20 flags)
+  --- effective values (cwd4-k01-s144-5051826.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       144
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-k01-s144
+=== ../runs_alice2/cwd4-k01-s145-5051833.out ===
+  cwd4-k01-s145-5051833.out: no repeated flag (20 flags)
+  --- effective values (cwd4-k01-s145-5051833.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       145
+      --save-directory             /home/s5014158/metaopt/runs/cwd4
+      --run-name                   cwd4-k01-s145
+---------------------------------------------------------------
+argsline_guard: 21 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+
+----- ENV half: cwd4_rule20_envaudit.py ../runs_alice2
+  distinct ENV lines (PROBE_DIR stripped): 1
+    x21  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+  distinct PROBE_TENSOR lines (dir stripped): 1  (0 started runs have none yet)
+    x21  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+  GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE, --constraint=L4 was requested):
+    x21  NVIDIA L4
+  VOTE_W witness lines (exact match to the arm's registered line):
+    x21  VOTE_W: off
+  BETA_HOLD witness lines (exact match to the arm's registered line):
+    x21  BETA_HOLD: off
+  GROUP_HOLD witness lines (exact match to the arm's registered line):
+    x21  GROUP_HOLD: off
+  REST_HOLD witness lines (exact match to the arm's registered line):
+    x21  REST_HOLD: off
+  DECAY_MASK witness lines (exact match to the arm's registered line):
+    x3  DECAY_MASK: off
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn1.weight+layer4.1.bn1.weight masked=2 of=62 numel=1024 idx=47,56 names=layer4.0.bn1.weight,layer4.1.bn1.weight
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight masked=1 of=62 numel=512 idx=50 names=layer4.0.bn2.weight
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight masked=2 of=62 numel=1024 idx=50,53 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.bn2.weight+layer4.0.shortcut.1.weight+layer4.1.bn2.weight masked=3 of=62 numel=1536 idx=50,53,59 names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.0.shortcut.1.weight masked=1 of=62 numel=512 idx=53 names=layer4.0.shortcut.1.weight
+    x3  DECAY_MASK: on base=SGDm wd=0.1 spec=layer4.1.bn2.weight masked=1 of=62 numel=512 idx=59 names=layer4.1.bn2.weight
+  coverage 21/21 runs with an .out, 0 violations
+ENV AUDIT VERDICT cwd4: PASS
+
+==============================================================================
+ RULE 20 cwd4 (landing 283): PASS BOTH HALVES.  coverage 21/21, 0 violations.
+==============================================================================
