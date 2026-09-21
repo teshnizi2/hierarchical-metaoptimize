@@ -38184,3 +38184,21 @@ shared account — **NOT contacted**. **Nothing under `paper/` was read, opened 
 Vercel URL was opened; nothing was downloaded; no `.pdf` was fetched. **Nothing was pushed to the site repository.**
 
 Next free number: **288**.
+
+## 288. PLANNING (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING AND REGISTERED NOTHING.**  It records that `docs/ICML-PLAN.md` now exists: a synthesis of what paper could clear an ICML bar, the required claims per candidate (HAVE / PARTIAL / MISSING, each cited to a committed file), the experiments that would supply the missing ones, costs (ESTIMATES scaled from 285.1 and `results/all_runs.csv`, none registered), and a kill-or-continue gate.  **No level, bar, contrast, stamp or licence sentence moved.**]**
+
+* **What the plan says, in one line each.** (1) The count-matched audit stays a TMLR paper and must be re-run at
+  κ 5e-4 before submission, because every audit cell ran at 0.1 and `G_W4` (285) reverses the grain ranking there.
+  (2) The only framing with an ICML path is a cross-method "vote capture" analysis; it is gated on showing capture in
+  a non-MetaOptimize adapter or for AdamW/Lion bases at κ 0.1 on CIFAR-100 (Phase 1, ≈ 55-60 GPU-h estimated).
+  (3) The "parent's granularity advantage is a weight-decay artefact" reading is **UNSUPPORTED** on current evidence
+  (CLOSEOUT 5a; LIMITS-PREP §2.2 CIFAR-10 ratios 0.962-1.001) and is to be raised with Dr Salehkaleybar privately
+  before any test or text.  (4) Ceiling: without the Phase 1 gate passing, no candidate clears ICML on this cluster.
+* **Naming hazard recorded:** the campaign's "coupled" decay is α-scaled decoupled (SGDW-style) decay in
+  Loshchilov & Hutter's vocabulary; any external text should say "α-scaled", and the untested control is
+  "α-independent" decay (`DECOUPLED-NOT-TESTED`, 281.2, unchanged).
+* **Discipline.** Files written: `docs/ICML-PLAN.md`, `docs/CORRECTIONS.md` only.  RULE 16 held.  **Cost: ZERO
+  GPU-hours; no Slurm job submitted, no cluster command run by this stage; `alice` NOT contacted; nothing under
+  `paper/` read or touched; no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.**
+
+Next free number: **289**.
