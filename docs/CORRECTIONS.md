@@ -38057,4 +38057,130 @@ any kind was run by this stage** — everything above ran on the Mac against the
 `../runs_alice2` tree.  `alice` — Saber's shared account — **NOT contacted**.  **Nothing under `paper/` was read,
 opened or touched.**  No notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.
 
-Next free number: **287**.
+## 287. FINAL AUDIT of the 283 + 285 + 286 cycle (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING NEW AND MOVED NO NUMBER.** It is an end-to-end re-audit of the `cwd4` + `cwd5` landings and the site import, by a stage that wrote none of them. Every gate was re-run here and PASSES; every `cwd4` and `cwd5` figure quoted in the write-up, the MASTER-TABLE rows and the landing entries was re-derived **from the raw `.out` files by a reader of my own**, before any repo program was opened, and **all of them reproduce exactly**. **TWO doc slips were found and fixed, both WORDING, neither a number, and both of them the SAME failure repeating: a fix applied where it was raised rather than swept for.** No bar, state, contrast, branch word, stamp or licence sentence moves. **ZERO GPU; no Slurm job and no cluster command of any kind; `alice` NOT contacted; nothing under `paper/` read or touched; the notebook site and every Vercel URL NOT opened.**]**
+
+### 287.1 What was re-run, and what it said
+
+Every gate below was **run by me at this HEAD**, not quoted from 283, 285 or 286.
+
+* `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` → **exit 0, `VERDICT: PASS`**.
+  222 listed rows over 17 batches, every key present exactly once in the 3,316-row CSV; completeness 186/186;
+  multi-kind 33 two-kind + 12 three-kind; **`two-axis runs (CORRECTIONS 284): 3 listed runs … both verified here: True`**;
+  39 listed ARGS rows; 649 cells, none mixing.
+* `python3 analysis/c98b_reproduce.py` → **exit 0, `science 618/618 PASS | drift 18 site(s), 10 differ (not gated) |
+  guards fired 0 | declaration OK`** — **283's verdict byte for byte**.
+* `python3 analysis/c73_mastertable_check.py`, **UNEDITED** → **exit 0**, *"header is consistent with both the table
+  and the CSV"*, with `cwd4`'s and `cwd5`'s FINAL lines printed in full.
+* `python3 analysis/writeup_artefact_paths.py` → **exit 0**, and **re-run again after my two edits** → exit 0.
+
+### 287.2 The numbers, re-derived from the RAW `.out` files before any repo program was opened
+
+A stdlib-only reader of mine over the **27 `cwd5`** and **21 `cwd4`** logs in `alice-backup/runs_alice2`, taking
+`plateau5` as the mean TEST accuracy over epochs **95–99** parsed from each file's own `Epoch …` lines (the CSV
+`plateau` column was never read), with `SE_ARM_DIFF` = 0.645141·√(2/3) = **0.526755** from the prior frozen at 281:
+
+| quantity | re-derived here | as recorded |
+|---|---|---|
+| `cwd5` levels, 9 arms | 23.2240 / 69.2940 / 69.3513 / 68.2620 / 72.4980 / 68.3373 / 72.4080 / 67.8813 / 71.8327 | identical |
+| `G_W1` / `G_W2` / `G_W3` / **`G_W4`** | **+46.0700** / **−1.0893** / **−4.1607** / **−4.5267 pp = −8.59 SE** | identical |
+| collapse-bar margins | **−11.4230** / **+35.2203** / **+38.3293** / **+38.4673** pp | identical |
+| `G_W2` ±2 SE | **[−2.1428, −0.0358]** | identical |
+| layerwise spread / scalar swing | **1.4127** / **49.2740** pp | identical |
+| in-batch anchor vs `cwd3` 22.9853 | **+0.2387 pp** | identical |
+| `cwd4` levels, 7 arms | 22.8213 / 70.0100 / 67.0713 / 22.8547 / 65.2233 / 58.5780 / 67.9567 | identical |
+| `P_2SPEC` / `P_CTL2` / `P_CTL2` ±2 SE | **+44.2167 = +83.94 SE** / **+0.0333 = +0.06 SE** / **[−1.0202, +1.0868]** | identical |
+| `ONE50` margin over its 65.0100 bar | **+0.2133 pp = +0.40 SE** | identical |
+| `ONE59` − `TWOWD0` | **+0.8853 pp = +1.68 SE** (not +0.8854) | identical — 283.6 **W6** holds |
+| `D_TWO` / `D_MAG` / `D_CLASS` / `ONE50`−`ONE53` | **+2.9387** / **+9.3787** / **+2.7333** / **+6.6453** pp | identical |
+
+**Zero discrepancies, to four decimal places, in either batch.** All 48 files carry 100 epoch lines.
+
+### 287.3 Corpus, ordering and the MASTER-TABLE, checked structurally
+
+* `results/all_runs.csv` **3,316 rows, 38 fields**; **21** `cwd4-` rows and **27** `cwd5-` rows.
+  `results/CORPUS-EXCLUSIONS.tsv` **222 data rows** (243 lines = 222 + 20 comments + 1 header).
+* The two ingest commits touched those two files and **nothing else**: `8b9fbd2` **+21 / +18**, `91fcd57` **+27 / +21**,
+  by `git show --numstat`.
+* `docs/MASTER-TABLE.md` is **238 lines**. Diffing `ed8d954` against HEAD line by line, **exactly two lines differ**:
+  the header (amended in place, old figures bracketed) and the append. **No existing row moved**, which is the
+  property the site's line-number keying depends on.
+* `docs/CORRECTIONS.md` headings: the tail reads **280, 281, 282, 283, 284, 285, 286, 287**, strictly increasing.
+  Over the whole file there are **43 non-increasing heading pairs and they are all pre-existing** (every one at
+  number ≤ 167); this append creates none.
+
+### 287.4 The site, verified WITHOUT opening it
+
+GitHub `main` is **`429e0c2054628a75fbefecc6c0ce14ccad03b6ba`**, and the Production deployment for that sha reports
+**`success`** at 2026-09-21T00:33:06Z — both read through `gh api`, with **no notebook website and no Vercel URL
+opened, nothing downloaded and no `.pdf` fetched**. Its published data carry **175** experiments, outcomes
+**56 / 41 / 37 / 23**, **3,316** runs, **497** sources and **235** warnings; **MT237 and MT238 are both `mixed`**,
+with **21** and **27** runs linked by `experimentIds` and two warnings each. **I pushed nothing to the site.**
+
+### 287.5 SLIP 1, FIXED — `WRITEUP-mechanism` §5's T22 still carried the phrase 286 struck
+
+`§5`'s **T22** row read *"the scalar row is a granularity measurement **below about 1e-2**, and at 0.1 it is measuring
+a broken configuration."* That is the **THIRD** instance of the error class 285.6 **W1** named, and the one
+CORRECTIONS 286 did not find: it **excludes the tested 1e-2 rung**, which is a measured **`NOGAP`** rung, and it
+**softens a BRACKETING PAIR into an approximate boundary inside the UNRUN decade**, which
+`LADDER-IS-FOUR-POINTS` forbids.
+
+It now reads ***"at 1e-2 and below — the three rungs we ran"***, with the correction stated inline. **286's own
+diagnosis of itself was right and is worth quoting against itself**: it said the phrase *"survived in prose because
+W1 was applied where it was raised rather than swept for"* — and then 286 fixed two sites and did not sweep either.
+**This entry swept.** A programmatic search of `docs/WRITEUP-mechanism.md`, `docs/LIMITS-PREP.md`,
+`docs/MASTER-TABLE.md` and `docs/STATUS.md` for *"below ~1e-2"* and *"below about 1e-2"* now returns **only**
+occurrences that QUOTE the phrase in order to forbid it. The same sweep over the forbidden forms
+*"exists only at 0.1"*, *"the grains are equal"*, *"has no presence at 1e-2"*, *"a property of wd 0.1, not of scalar
+grouping"*, *"recovers none of it"* and *"does nothing"* returns, for the `cwd4` / `cwd5` material, **only**
+quoted-and-forbidden occurrences. **No number moves.**
+
+### 287.6 SLIP 2, FIXED — 286 recorded its own edit in the wrong section
+
+286 states, in `WRITEUP-mechanism`'s header, in `docs/STATUS.md` and in its own fix table, that the phrase was fixed
+in **"§1 A4(b)"**. **§1 A4 is the GroupNorm row** — `cgn2`'s and `cgn3`'s FINALs and 226.7's four-network reading —
+it has **no `(b)`** and **no weight-decay clause**. The sentence 286 actually changed is the closing clause of
+**§0 item 15**. A reader following the pointer lands on the wrong evidence.
+
+Corrected **in place with the old label bracketed** in `WRITEUP-mechanism`'s header and in `docs/STATUS.md`.
+**CORRECTIONS 286's own fix table is NOT rewritten** — entries are not rewritten — and that cell stands as written,
+**SUPERSEDED by this section**. This is the same failure as slip 1 in a different costume: a statement checked where
+it was written and nowhere else.
+
+### 287.7 What this entry does NOT do, and what remains owed
+
+It **measures nothing**, **registers nothing**, **ingests nothing** (`results/all_runs.csv` and
+`results/CORPUS-EXCLUSIONS.tsv` untouched — corpus stays **3,316 / 222**), appends **no MASTER-TABLE row** and changes
+**no header count** (`c73` re-run anyway: exit 0). It **does not touch the site**, which is already imported and
+deployed at `429e0c2`. It **closes no question and opens none**.
+
+**One borderline phrasing examined and deliberately NOT changed, so the judgement is on the record rather than
+silent**: §10.6 **R1** reads *"`COLLAPSE` at **0.1** only"*. In isolation that is close to the forbidden
+*"exists only at 0.1"*; in place it is immediately scoped — the same sentence lists all four rungs and closes with
+*"four rungs BRACKET the transition between 1e-2 and 0.1 and locate nothing inside it"*. **It is defensible as a
+statement about the four rungs run, and changing it is an editorial call, not a provable slip.** Flagged here for
+whoever drafts §10.5.
+
+**A disclosure carried forward, because 283.9 will otherwise send the next registration to a stale number.** The
+`--check` noise-floor **DEMONSTRATION** moved again with the `cwd5` ingest: at this HEAD it prints
+`SIGMA_R18ALL` **0.641573 (df 267)**, against the **0.645653 (df 261)** 283.9 told the next registration to quote and
+the **0.645141** `cwd5` correctly froze at 281. **No bar reads that line** and freezing the prior at registration is
+exactly what keeps `cwd5`'s SE stable — but **the next registration must quote 0.641573**, not 283.9's figure.
+`SIGMA_PLAIN` is **0.460632**, unchanged.
+
+**Still owed, none of it by this entry**: **O-13**, the magnitude arm, is the top live item; **§10.6 R2**, decoupled
+weight decay, is **UNANSWERED BY DESIGN** (`DECOUPLED-NOT-TESTED`, 281.2); the transition **is not located** and four
+points cannot locate it, so nothing inside the 1e-2 … 0.1 decade may be named anywhere; RULE 16 defects `cwd5` **F1**
+and `cwd4` **F1** stay **REPORTED-NOT-FIXED** alongside the eight older ones; the single-witness-per-ARGS-axis limit
+declared at 284 stands; and §8 **Q1** / **Q2** and §10.6 **R9** are the professor's calls, not the campaign's.
+
+### 287.8 Discipline
+
+**RULE 16 held**: no registered scorer, launcher, design module, patch, tree, runner, `analysis/argsline_guard.py`,
+`analysis/corpus_exclusions.py`, `results/*.csv` or `results/*.tsv` was edited — the only files written by this entry
+are `docs/CORRECTIONS.md`, `docs/WRITEUP-mechanism.md` and `docs/STATUS.md`. `git add` names its paths, never `-A`.
+**Cost: ZERO GPU-hours.** No Slurm job was submitted or cancelled and **no cluster command of any kind was run by
+this stage** — everything above ran on the Mac against the already-synced `../runs_alice2` tree. `alice` — Saber's
+shared account — **NOT contacted**. **Nothing under `paper/` was read, opened or touched.** No notebook website or
+Vercel URL was opened; nothing was downloaded; no `.pdf` was fetched. **Nothing was pushed to the site repository.**
+
+Next free number: **288**.
