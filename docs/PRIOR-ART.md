@@ -501,3 +501,66 @@ The one consequence for WRITING: any `g3b` sentence about decay changing the ste
 on the abstract-page tool (`get_abstract` for 2510.19093 and 1910.07454) returned "not found" for BOTH, including the
 long-published 1910.07454, so the tool, not the ids, is taken to be at fault — UNSURE; the verifier may re-check the
 two abstract pages before either is cited in the draft.*
+
+## Sweep 2026-09-22 — α-scaled vs α-INDEPENDENT weight decay, and how decay enters a hypergradient trace (CORRECTIONS 305, the `DECAY_ROUTE` patch, Track F1)
+
+*Targeted sweep BEFORE writing `PATCH_DECAYROUTE`. Web search and arXiv abstract pages only; no `.pdf` was fetched, no
+paper was downloaded, `download_paper` / `read_paper` were not used. Queries, verbatim:*
+1. *hypergradient descent learning rate adaptation weight decay term in hypergradient derivation*
+2. *learned step size meta-optimization weight decay scaled by learning rate versus independent decay comparison*
+3. *Kosson rotational equilibrium weight decay effective learning rate arXiv 2305.17212*
+4. *IDBD SwiftTD step-size adaptation weight decay trace derivation meta-gradient*
+5. *"weight decay" "learning rate" coupling hypergradient online step size "decoupled" meta-gradient experiment*
+6. *Li Arora exponential learning rate schedule weight decay normalized networks 1910.07454*
+7. *MetaOptimize framework optimizing step sizes weight decay trace h SGD momentum arXiv 2402.02342*
+8. *adaptive learning rate hypergradient AdamW "weight decay" interaction learned learning rate shrinks decay experiment normalization layers*
+9. *meta-learned per-parameter step sizes "decoupled weight decay" versus "learning-rate-scaled" decay hypergradient trace comparison 2025 2026*
+
+**Found (verdict per item):**
+* Loshchilov & Hutter, *Decoupled Weight Decay Regularization* (arXiv:1711.05101, ICLR 2019; already on file, 281 / 292 /
+  293). SGDW / AdamW apply the decay outside the gradient step and the preconditioner, scaled by the schedule multiplier
+  η_t only. **This IS the form `alpha_indep:<LAMBDA>` implements, with η_t constant** (the patch refuses a non-constant
+  PATCH_SCHED multiplier). It has no learned step size, so it says nothing about the trace.
+* Kosson, Welborn, Liu, Jaggi, Chen, *Weight Decay may matter more than µP for Learning Rate Transfer in Practice*
+  (arXiv:2510.19093, ICLR 2026; abstract page read 2026-09-22). It separates "standard" decay scaling (PyTorch's AdamW,
+  shrink η·λ, which is the harness's α-scaled form with η = the learned α) from "independent" decay (shrink λ, not moving
+  with η), and states in its abstract that µP needs the independent variant for good transfer. **The CLOSEST
+  published contrast of the two forms, for HAND-SET learning rates across widths.** No learned or meta-learned step
+  size, no hypergradient.
+* Kosson, Messmer, Jaggi, *Rotational Equilibrium* (arXiv:2305.17212, ICML 2024; on file since 281): on scale-invariant
+  weights the decay and the updates reach an equilibrium whose rotation rate (an effective learning rate) is set by the
+  decay. **This is why the α-independent arm is NOT a pure route control**: switching forms changes the effective step
+  of every normalised tensor, which is the quantity the meta-learner adapts. The registrations that use the patch
+  (306 / 307) must say so.
+* Li & Arora, *An Exponential Learning Rate Schedule for Deep Learning* (arXiv:1910.07454; search summaries only, the
+  abstract page was not opened): on a scale-invariant objective, SGD with momentum and weight decay is equivalent to SGD with an exponentially
+  growing learning rate and no decay. ADJACENT, the same mechanism family: decay and step size trade off on normalised
+  nets, so "which decay form" and "which step size" are not separable questions.
+* Ramesh, Lewandowski, Schmidhuber, *Learning to Forget: Continual Learning with Adaptive Weight Decay* (FADE,
+  arXiv:2604.27063, 29 Apr 2026; abstract page read): adapts per-parameter DECAY RATES online by an approximate
+  (IDBD-style) meta-gradient, and is also combined with IDBD step-size adaptation (search summary). A search summary
+  returned beside it (source NOT pinned to this paper) says that in coupled decay-and-step-size adaptation for online
+  linear regression the weight update multiplies the per-parameter step size into the decay term. ADJACENT and the
+  nearest in machinery: it learns the decay, the campaign learns the step size under a FIXED decay; **the abstract does
+  not say how decay enters the step-size trace, and the body was not read (UNSURE)**.
+* Baydin et al., *Online Learning Rate Adaptation with Hypergradient Descent* (arXiv:1703.04782) and its 2025 analysis
+  (arXiv:2502.11229): the one-step hypergradient of the learning rate; the search summaries report no decay term in the
+  derivation. NOT RELEVANT to the form question.
+* The parent, *MetaOptimize* (arXiv:2402.02342, ICML 2025; abstract only): the framework wraps SGD / RMSProp / Adam / Lion
+  and maintains a trace of dw/dβ; the abstract does not say how the base optimiser's decay enters the trace. The
+  harness's own form (`h <- γ(1 − wd·a)h − delta`, HF.py) is the campaign's evidence of what the parent's code does,
+  not a statement from the paper (the `.pdf` was not read).
+* Apte, *Scale Weight Decay and Train Better* (arXiv:2607.23777, search summary only): scaling decay by η_t/η_max, a
+  schedule-multiplier form like Loshchilov & Hutter's. ADJACENT; no learned step size.
+
+**Has anyone tested LEARNED step sizes under α-scaled vs α-independent decay?  NOT FOUND.**  Nothing in the nine
+queries runs a hypergradient / meta-learned step-size method under both decay forms, or asks whether the decay's
+presence in the hypergradient trace (the horizon factor) matters separately from its action on the weights.  The
+closest work contrasts the two forms for HAND-SET learning rates (Kosson et al. 2510.19093, independent better for
+transfer) or learns the decay itself (FADE).  **Verdict: the patch is not replicating a published test; the question
+row 1.6 asks is open, to the depth of a nine-query web sweep.**  Consequences for WRITING: (1) any sentence about the
+α-independent control must cite Loshchilov & Hutter for the form and Kosson et al. 2510.19093 for the known
+standard-vs-independent contrast; (2) any route reading must carry the rotational-equilibrium caveat (2305.17212):
+changing the decay form moves the effective step size of normalised tensors.
+*Provenance: every id above is the arXiv id in a URL the search engine returned; 2604.27063, 2510.19093 and 2605.19095
+(checked for a decay/adaptive-LR statement; its abstract carries none) were opened on their abstract pages.*

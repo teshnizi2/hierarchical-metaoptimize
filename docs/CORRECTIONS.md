@@ -40539,7 +40539,146 @@ Next free number: **304**.  *(Cycle-4 audit, 2026-09-22: 299–303 are all writt
 
 ## 304. RESERVED — Track E (code debts, zero GPU): the `VAL_SPLIT` exclusion kind (303.9) and the owed `bin/PROTECTED.txt` prefixes. Placeholder; replaced in place by its track.
 
-## 305. RESERVED — Track F: the `DECAY_ROUTE` patch (ICML-PLAN row 1.6: shrink-only, trace-only, α-independent decay). Placeholder; replaced in place by its track.
+## 305. TRACK F1 (patch, ≈0.23 GPU-h of proof) — **[LED WITH THE BOUNDS: (1) **THIS ENTRY MEASURED NO ACCURACY OF ANY BATCH AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It adds an OPT-IN harness patch, `PATCH_DECAYROUTE`, in a NEW isolated tree, and proves it inert when off and biting when on by ONE Slurm job on alice2.  `DECOUPLED-NOT-TESTED` STANDS: nothing here is a run of α-independent decay on the audit; that is 306 / 307's registration.  (2) **Inertness is proven BITWISE under deterministic kernels only** (the 302.4 driver form); production runs do not set them.  (3) **`shrink_only` and `trace_only` are INTERVENTIONS on the trace, deliberately NOT the hypergradient of their own weight update**; only OFF and `alpha_indep` carry a trace that is the (Hessian-free) hypergradient of their update, and the finite-difference check shows exactly that (305.3).  (4) **The α-independent arm is not a pure route control**: on normalised tensors the decay form sets the effective step (Kosson et al. arXiv:2305.17212), so a reading of it moves the quantity the meta-learner adapts (305.1).  (5) **The meaning of `delta'` in the brief's shrink-only formula was a judgement** (305.2): the trace's additive term is the APPLIED change in every mode; the other reading is a one-line change and was not built.]** — **THE HARNESS NOW HAS THE ROW-1.6 ROUTE SWITCH, BEHIND ONE ENV VARIABLE, IN `$WS/harness_cdr1`: `DECAY_ROUTE=shrink_only` (weights keep the α-scaled decay, the trace factor drops it), `trace_only` (weights undecayed, the trace keeps (1 − wd·a)), `alpha_indep:<LAMBDA>` (w ← w − Λw − a·u, outside the step size, momentum and preconditioner, as SGDW / AdamW with a constant schedule, trace h ← γ(1 − Λ)h − a·u), FOR ALL FIVE BASE OPTIMISERS.  UNSET OR EMPTY, THE TREE IS BITWISE THE LIVE ONE.  PROOF JOB 5081090 (node887, L4, 13 min 15 s) `ALL PASS`, 410 PASS / 0 FAIL.**
+
+### 305.1 Prior art FIRST (web search, 2026-09-22; dated section appended to `docs/PRIOR-ART.md`)
+
+Nine queries (listed verbatim there); search summaries and arXiv abstract pages only, no `.pdf`, nothing downloaded.
+**Has anyone tested learned step sizes under α-scaled vs α-independent decay? NOT FOUND.**  The form `alpha_indep`
+implements is Loshchilov & Hutter's SGDW / AdamW (arXiv:1711.05101) with η_t constant.  The closest published contrast
+of the two forms is Kosson et al. (arXiv:2510.19093, ICLR 2026): "standard" (η·λ, PyTorch's AdamW, the harness's form
+with η = the learned α) vs "independent" (λ) decay, for HAND-SET learning rates across widths; its abstract says µP
+needs the independent variant for good transfer.  The nearest machinery is FADE (Ramesh, Lewandowski, Schmidhuber,
+arXiv:2604.27063), which meta-learns the DECAY RATE by an IDBD-style meta-gradient; its abstract does not say how decay
+enters a step-size trace (body not read, UNSURE).  Rotational equilibrium (arXiv:2305.17212) and Li & Arora
+(arXiv:1910.07454) say decay and step size trade off on normalised nets — bound (4).  The parent's abstract
+(arXiv:2402.02342) does not state the trace's decay term; the harness's HF.py is the only evidence of the form.
+**Verdict: `WORTH-BUILDING`; the patch replicates no published test.**  Writing consequence: cite 1711.05101 for the
+form and 2510.19093 for the known contrast; carry bound (4) on every route reading.
+
+### 305.2 The patch (`patches/patch_decayroute.py`, sha `12c10788…`), additive and opt-in, like `PATCH_DECAYMASK` (260)
+
+With a = exp(β) (the applied step size, schedule included), u the base direction (SGD: g; SGDm: the momentum buffer;
+RMSProp / AdamW: the preconditioned gradient / momentum; Lion: the sign) and wd = `--weight-decay-base`:
+
+| mode (`DECAY_ROUTE=`) | delta | weight update | trace | premise (LOUD otherwise) |
+|---|---|---|---|---|
+| unset / empty (OFF) | a·(u + wd·w) | w − delta | γ(1 − wd·a)h − delta | — (the live code, not rebound) |
+| `shrink_only` | a·(u + wd·w) | w − delta (BITWISE OFF's) | **γ·h − delta** | wd > 0 |
+| `trace_only` | **a·u** | w − delta | γ(1 − wd·a)h − delta | wd > 0 |
+| `alpha_indep:<Λ>` | **a·u** | **w − Λ·w − delta** | **γ(1 − Λ)h − delta** | wd == 0 exactly; 0 < Λ < 1; SCHED unset or `none` with no warm-up |
+
+The momentum / normaliser lines, the meta update, the clamp, PROBE and PROBE_TENSOR are untouched in every mode.
+**Judgement on the brief's `delta'`:** in every mode the trace's additive term is the APPLIED change `delta` (its own
+β-derivative, since delta ∝ a), so `shrink_only`'s trace keeps the direct term a·wd·w and `trace_only`'s does not; the
+mode switches the decay in the WEIGHT update and in the trace FACTOR, which is the horizon route of T-C (1.20, 301).  The
+other reading (`shrink_only` trace = γh − a·u, dropping the direct term too) is a one-line change in `_dr_core`; it was
+NOT built (bound 5).  `alpha_indep` REPLACES the α-scaled decay rather than stacking on it (with both, the correct
+factor would be (1 − Λ − wd·a), not a product), so the ARGS line must carry `--weight-decay-base 0`; the patch refuses
+anything else.  **Witness on EVERY run** (the runner's ENV line cannot carry DECAY_ROUTE; the harness prints the value
+that reached the update, which an echo of the variable could not): `DECAY_ROUTE: off`, or `DECAY_ROUTE: on
+mode=<m> base=<alg> wd=<repr> lambda=<repr|na> lambda_f32=<repr|na> gamma=<repr>` — e.g. `mode=alpha_indep base=SGDm
+wd=0.0 lambda=5e-05 lambda_f32=4.999999873689376e-05 gamma=1.0`; the ARGS line witnesses wd.  LOUD (`ValueError:
+PATCH_DECAYROUTE`, at construction): any value that is not a full match of `shrink_only | trace_only |
+alpha_indep:[0-9]+(\.[0-9]+)?(e-?[0-9]+)?`, an unknown base algorithm, wd None, and each premise in the table.  Every
+legal value is one `--export` token.  **Probe keys** (PROBE on; appended, no key touched): `dr_mode`, `dr_lam`,
+`dr_n` (= step + 2), and at each probe step the MEASURED per-step shrink `dr_shrink_meas` = Σ⟨w0 − a·u − w1, w0⟩ /
+Σ‖w0‖² (float64, read-only), `dr_shrink_applied` (numel mean of a·wd | 0 | Λ), `dr_trace_decay` (numel mean of 1 |
+1 − wd·a | 1 − Λ) — so any batch on this tree reports its realised shrink per arm without a probe patch.  THREE
+insertions, NO existing line edited: `self._dr_init()` before `trace_meta` in `init_meta`; a guarded `_dr_attach(rec)`
+before `_pt_attach` in `_probe`; one block of twelve `_dr_` methods before `check_required_attributes`.  When on,
+`_dr_init` rebinds `base_update` to `_dr_<alg>_base_update`, whose preamble, loop and momentum lines are the originals.
+
+**The tree** `$WS/harness_cdr1/cifar10`, built by `bin/cDR1_stage_harness.sh --stage` (sha `62b531fb…`; a copy of
+`cVL1_stage_harness.sh` whose one patch step is HF.py): a byte copy of the live tree at `cgw1`'s pinned shas (train
+`3fea309e…`, build_network `c7998883…`, load_data `b52b58a3…`, build_optimizer `25a899b3…`, tin_data `9e0f3322…`),
+then the patch on HF.py: **post HF.py `17ee0a2862b31b48c4196a75e88d60cf19f49d0f993cecc2750af832fe44b020`** (the same
+sha the Mac computed from the same pre bytes), `HF.py.pre_decayroute` = **`4732b74a…`** (the live / `cgw1` HF.py);
+data symlinked; runner `$WS/jobs/run_cifar_cdr1.sh` (`d3d3bdd7…`, copied to `jobs/run_cifar_cdr1.sh`) differs from
+`run_cifar.sh` (`a0d0a1b9…`) in exactly the `cd` line; `STAGE-MANIFEST.txt` `7f82f0a1…`, staged 08:55:10Z.  Verify
+mode: VERIFIED (also inside the proof job, `STAGE_VERIFY_RC 0`).  The live tree, `harness_cgw1` (read-only reference)
+and the running batches' trees (g3b, crt1, csh1, cvl1) were not written.
+
+### 305.3 The trace derivation (the one `alpha_indep` must carry)
+
+h_t stands for dw_t/dβ under the harness's OWN approximation: it drops du_t/dβ (the Hessian, and the β-dependence of
+the momentum and of any preconditioner), which is exact when u does not depend on w (a linear loss).  a = e^β, so
+da/dβ = a.
+* **α-scaled (OFF):** w_{t+1} = (1 − wd·a) w_t − a u_t ⇒ dw_{t+1}/dβ = (1 − wd·a) dw_t/dβ − a·wd·w_t − a u_t, i.e.
+  h ← γ(1 − wd·a)h − delta with delta = a(u + wd·w): the decay enters TWICE, as the factor (a horizon ≈ 1/(wd·a) that
+  moves with the learned a) and as its own derivative a·wd·w inside delta.
+* **α-independent:** w_{t+1} = (1 − Λ) w_t − a u_t ⇒ **dw_{t+1}/dβ = (1 − Λ) dw_t/dβ − a u_t, i.e.
+  h ← γ(1 − Λ)h − delta with delta = a·u.**  Λw_t has no direct β-dependence, so the decay contributes NO term to
+  delta; the horizon is 1/Λ, fixed.
+* The correct traces of the two interventions' own weight updates are OFF's (`shrink_only`, whose weights are α-scaled)
+  and h ← γh − a·u (`trace_only`, whose weights are undecayed); the patch does NOT use them — that is the intervention.
+
+**Tested** (`tests/test_decayroute.py` R4, float64, a linear loss, T = 20 real `HF.step()`s, layerwise, meta `fixed`,
+central finite difference ε = 1e-5, all five base optimisers): OFF (wd 0.2) and `alpha_indep:0.02` trace vs FD rel err
+**1.45e-11 – 4.05e-11** (< 1e-7); the two WRONG α-independent traces (factor dropped; Λw put into delta) **0.143 – 0.221**
+(> 1e-3: the check discriminates); `shrink_only` / `trace_only` **0.0663 – 0.102** (they are not the derivative, as
+registered) while the correct trace of each one's weight update, recomputed from the trajectory, matches FD
+(≤ 4.8e-11).  Read on alice2 in the proof job and in the CPU development job 5081002 (node042, 26 s, 248 / 0).
+
+### 305.4 Tests first
+
+`tests/test_decayroute.py` (sha `7044b1c7…`) and `tests/test_decayroute_realrun.py` (`466d2b4a…`) were written BEFORE
+the patch; the unit test's first run on the Mac FAILED on "patches/patch_decayroute.py exists", as it should.  After
+the patch: **Mac 52 PASS / 0 FAIL** (R0 structure: deleting the three regions reproduces the pre HF.py byte for byte,
+59,450 bytes; a second application is `ALREADY_PATCHED`; each missing anchor is refused with nothing written; the five
+base updates unchanged; R1: 8 registered values parse, 20 malformed values / premises raise; R2–R6 skipped, no torch).
+**alice2, inside the proof job, 370 PASS / 0 FAIL**: R2 OFF (unset AND empty) over 8 real `HF.step()`s, Lion meta,
+scalar and layerwise, all five optimisers → weights, h, β and base state BITWISE the pre HF.py's, `base_update` not
+rebound; R3 on CPU AND on the GPU, three successive updates from one state, α a mix of a numpy float32, 0-d and per-row
+tensors, γ 0.97: each mode's weights and h BITWISE its registered formula, base state BITWISE the unpatched update's,
+the intended term DIFFERS from the unpatched update's (`shrink_only`'s weights are BITWISE the unpatched ones),
+**Λ 5e-05 vs 7e-05 from one state change EVERY tensor**; R4 (305.3); R5 probe records (float64): `alpha_indep`
+measured shrink = Λ (rel 1e-9), `trace_only` 0 (1e-12), `shrink_only` wd·a (1e-9); R6 on the GPU, ResNet18's 62
+tensors, `alpha_indep:5e-05`: measured shrink **5.0006e-05 – 5.0011e-05** (rel ≤ 2.3e-4; float32 rounding — at w = 1.0,
+the 4,800 BatchNorm scales' initial value, the float32 update realises 5.00083e-05, checked by hand).
+
+### 305.5 THE PROOF — Slurm job 5081090 on alice2 (never the login node), read line by line
+
+`bin/cDR1_realrun_proof.sbatch` (`4664ac5b…`), partition **`testing`** (node887, NVIDIA L4, its own QOS: 1 GPU, 30-min
+cap — chosen so the proof neither waits behind nor takes a slot from the 118 queued / running batch jobs), 13 min 15 s,
+08:55:17Z–09:08:30Z; log sha **`dc73dfba…`**, kept at `$WS/runs/cdr1/proof_decayroute.log`.  `STAGE_VERIFY_RC 0`,
+`TEST_DECAYROUTE_RC 0` (370 / 0), **`REALRUN_RC 0`, 40 PASS / 0 FAIL**; **410 PASS / 0 FAIL in the log.**  The real
+train.py, the audit core cell's ARGS (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3), 2 epochs, seed 1,
+deterministic kernels, work in `/tmp` (deleted; not campaign runs):
+* **RR0** the pre tree (`harness_cgw1`, HF `4732b74a…` = the live HF.py), chunk777, twice: Epoch lines and probe.jsonl
+  IDENTICAL (probe `e10792c3…` both).
+* **RR1 INERTNESS, flag OFF** (unset AND empty), chunk777: Epoch lines and probe.jsonl **BYTE-IDENTICAL** to the pre
+  tree's (`e10792c3…`); ONE `DECAY_ROUTE: off` line; stdout differs by that line only; no `dr_*` key.
+* **RR2 BITE**, scalar grain, each against the pre tree at its own ARGS:
+  * `shrink_only` (wd 0.1): the registered witness; 200 records, `dr_n` = step + 2; **measured shrink = 0.1·exp(β) at
+    every record (max rel dev 1.05e-4)**, 1.00003e-4 at step 0; h_absmax and the probe bytes DIFFER; β differs at
+    162 / 200 records and the Epoch lines differ (INFO, not gated).
+  * `trace_only` (wd 0.1): the witness; **measured shrink 0 at every record (|s| ≤ 2.77e-9, float32 rounding)**; Epoch
+    lines DIFFER.
+  * `alpha_indep:5e-05` (wd 0): the witness `lambda=5e-05 lambda_f32=4.999999873689376e-05`; **measured shrink = 5e-05
+    at every one of 200 records (max rel dev 3.98e-4; 5.00077e-05 at step 0, 4.99951e-05 at the last)**;
+    `dr_shrink_applied` = Λ, `dr_trace_decay` = 1 − Λ; Epoch lines DIFFER from the pre tree at wd 0.
+* **RR3 LOUD**: `alpha_indep` (no Λ), `alpha_indep:5e-05` at wd 0.1, `shrink_only` at wd 0 → each exits 1 with
+  `ValueError: PATCH_DECAYROUTE: …` before any Epoch line.
+
+### 305.6 What this licenses, and what it owes
+
+It licenses registering batches on `harness_cdr1` with `DECAY_ROUTE` set, reading each arm's realised shrink from its
+own probe records, and nothing else; it measures nothing about the audit or the collapse.  **Owed by 306 / 307:** (a)
+the matching of Λ is theirs to register (row 1.6 says "matched on initial per-step shrink", i.e. Λ = α0·wd of the arm
+it replaces, e.g. 1e-3 × 5e-4 = 5e-7 at the audit's 5e-4 rung — a value, not a decision taken here); (b) bound (4) on
+every reading; (c) the `argsline_guard` expectation `--weight-decay-base 0` for every `alpha_indep` arm and a
+`G-WITNESS` gate on the `DECAY_ROUTE:` line; (d) **a corpus-exclusion kind**: `corpus_exclusions.py`'s `KINDS` has no
+DECAY_ROUTE kind (the witness prefix is `DECAY_R`, first letter D like `DECAY_MASK`'s, so the kind must be keyed on the
+full prefix `DECAY_ROUTE`), and every ON run must be listed in `results/CORPUS-EXCLUSIONS.tsv` at ingest — a code gap
+**reported, not fixed here** (Track E owns that file this cycle).  GPU: **≈0.23 GPU-h** (the one proof job; the
+development job 5081002 was CPU only).  `alice` was not contacted; nothing under `paper/` was read, listed or opened; no
+clone, checkout or worktree was made; nothing was downloaded; docs/STATUS.md and docs/ICML-PLAN.md were not edited;
+no job was cancelled.
+
+NEW: `patches/patch_decayroute.py`, `tests/test_decayroute.py`, `tests/test_decayroute_realrun.py`,
+`bin/cDR1_stage_harness.sh`, `bin/cDR1_realrun_proof.sbatch`, `jobs/run_cifar_cdr1.sh`.  EDITED: this entry,
+`docs/PRIOR-ART.md` (appended section).
 
 ## 306. RESERVED — Track F: the audit under α-independent decay (registration). Placeholder; replaced in place by its track.
 
