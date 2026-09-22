@@ -1,0 +1,231 @@
+==============================================================================
+ crd1 -- THE COLLAPSE ROUTE (ICML-PLAN 1.6).  At the mechanism cell (wd 0.1): weight shrink, shortened trace,
+         or neither alone?  And does the collapse survive alpha-INDEPENDENT decay (LAMBDA 3.15e-4)?
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 196,197,198   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1  SGDm(0.99)+Lion
+   SRS  cell S scalar    wd 0.1 DECAY_ROUTE=shrink_only            route W alone: alpha-scaled weight shrink, trace factor 1
+   SRL  cell S layerwise wd 0.1 DECAY_ROUTE=shrink_only            S's in-batch layerwise reference
+   TRS  cell T scalar    wd 0.1 DECAY_ROUTE=trace_only             route H alone: weights undecayed, trace factor (1 - 0.1*a)
+   TRL  cell T layerwise wd 0.1 DECAY_ROUTE=trace_only             T's in-batch layerwise reference
+   AIS  cell I scalar    wd 0   DECAY_ROUTE=alpha_indep:3.15e-4    both routes, alpha-INDEPENDENT (LAMBDA 3.15e-4)
+   AIL  cell I layerwise wd 0   DECAY_ROUTE=alpha_indep:3.15e-4    I's in-batch layerwise reference
+ Every state is WITHIN its cell.  plateau5 = mean TEST over epochs 95..99.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3115 rows after corpus_exclusions.filter_rows, crd1- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  18 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   crd1-SRS-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.0840 (train 22.3540)
+  OK   crd1-SRL-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.0100 (train 98.0720)
+  OK   crd1-TRS-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.2640 (train 88.9860)
+  OK   crd1-TRL-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.2220 (train 94.0660)
+  OK   crd1-AIS-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 62.0660 (train 70.9940)
+  OK   crd1-AIL-s196  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.5180 (train 71.5660)
+  OK   crd1-SRS-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.1600 (train 23.1040)
+  OK   crd1-SRL-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 69.8700 (train 98.4060)
+  OK   crd1-TRS-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.7320 (train 89.2140)
+  OK   crd1-TRL-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.1980 (train 94.2880)
+  OK   crd1-AIS-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.5440 (train 70.9460)
+  OK   crd1-AIL-s197  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.5460 (train 71.3880)
+  OK   crd1-SRS-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 23.0520 (train 23.1020)
+  OK   crd1-SRL-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 70.2960 (train 98.4080)
+  OK   crd1-TRS-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 64.1660 (train 89.2140)
+  OK   crd1-TRL-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.3180 (train 94.2620)
+  OK   crd1-AIS-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.3800 (train 70.8960)
+  OK   crd1-AIL-s198  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 63.8440 (train 71.2360)
+
+G-ARGS    [HARNESS-NULL] every run's OWN ARGS line == its arm's registered flags (wd 0.1 on S / T, 0 on I)
+  PASS G-ARGS SRS-s196 (scalar wd 0.1)
+  PASS G-ARGS SRL-s196 (layerwise wd 0.1)
+  PASS G-ARGS TRS-s196 (scalar wd 0.1)
+  PASS G-ARGS TRL-s196 (layerwise wd 0.1)
+  PASS G-ARGS AIS-s196 (scalar wd 0)
+  PASS G-ARGS AIL-s196 (layerwise wd 0)
+  PASS G-ARGS SRS-s197 (scalar wd 0.1)
+  PASS G-ARGS SRL-s197 (layerwise wd 0.1)
+  PASS G-ARGS TRS-s197 (scalar wd 0.1)
+  PASS G-ARGS TRL-s197 (layerwise wd 0.1)
+  PASS G-ARGS AIS-s197 (scalar wd 0)
+  PASS G-ARGS AIL-s197 (layerwise wd 0)
+  PASS G-ARGS SRS-s198 (scalar wd 0.1)
+  PASS G-ARGS SRL-s198 (layerwise wd 0.1)
+  PASS G-ARGS TRS-s198 (scalar wd 0.1)
+  PASS G-ARGS TRL-s198 (layerwise wd 0.1)
+  PASS G-ARGS AIS-s198 (scalar wd 0)
+  PASS G-ARGS AIL-s198 (layerwise wd 0)
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line (PROBE_DIR stripped), one per run   1 distinct
+  PASS G-ENV the ENV line is cvt1 ... cwd5 / csh1's, byte for byte (PROBE_DIR stripped)
+
+G-PT      ONE PROBE_TENSOR line per run == its arm's witness (grain, 62 tensors, Lion meta)
+  PASS G-PT SRS-s196
+  PASS G-PT SRL-s196
+  PASS G-PT TRS-s196
+  PASS G-PT TRL-s196
+  PASS G-PT AIS-s196
+  PASS G-PT AIL-s196
+  PASS G-PT SRS-s197
+  PASS G-PT SRL-s197
+  PASS G-PT TRS-s197
+  PASS G-PT TRL-s197
+  PASS G-PT AIS-s197
+  PASS G-PT AIL-s197
+  PASS G-PT SRS-s198
+  PASS G-PT SRL-s198
+  PASS G-PT TRS-s198
+  PASS G-PT TRL-s198
+  PASS G-PT AIS-s198
+  PASS G-PT AIL-s198
+
+G-WITNESS [HARNESS-NULL] EXACTLY ONE `DECAY_ROUTE:` line == the arm's registered witness (mode, wd, LAMBDA, its float32, gamma); NO hold / mask witness line (the cdr1 tree has none of those patches)
+  PASS G-WITNESS SRS-s196 (shrink_only)
+  PASS G-WITNESS SRL-s196 (shrink_only)
+  PASS G-WITNESS TRS-s196 (trace_only)
+  PASS G-WITNESS TRL-s196 (trace_only)
+  PASS G-WITNESS AIS-s196 (alpha_indep:3.15e-4)
+  PASS G-WITNESS AIL-s196 (alpha_indep:3.15e-4)
+  PASS G-WITNESS SRS-s197 (shrink_only)
+  PASS G-WITNESS SRL-s197 (shrink_only)
+  PASS G-WITNESS TRS-s197 (trace_only)
+  PASS G-WITNESS TRL-s197 (trace_only)
+  PASS G-WITNESS AIS-s197 (alpha_indep:3.15e-4)
+  PASS G-WITNESS AIL-s197 (alpha_indep:3.15e-4)
+  PASS G-WITNESS SRS-s198 (shrink_only)
+  PASS G-WITNESS SRL-s198 (shrink_only)
+  PASS G-WITNESS TRS-s198 (trace_only)
+  PASS G-WITNESS TRL-s198 (trace_only)
+  PASS G-WITNESS AIS-s198 (alpha_indep:3.15e-4)
+  PASS G-WITNESS AIL-s198 (alpha_indep:3.15e-4)
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == crd1_design.manifest_text(), byte for byte
+  manifest: /home/s5014158/metaopt/runs/crd1/PARTITION-MANIFEST.txt (<runsdir>/crd1/)
+  PASS G-STRUCT byte-identical
+
+G-PROV    PROVENANCE.txt
+  provenance: /home/s5014158/metaopt/runs/crd1/PROVENANCE.txt (<runsdir>/crd1/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == the cdr1 tree's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == the cdr1 tree's PATCH_DECAYROUTE bytes, UNCHANGED   HF_SHA256=17ee0a2862b31b48
+  PASS G-PROV HF.py.pre_decayroute == the live HF.py   HF_PRE_SHA256=4732b74aa3a10508
+  PASS G-PROV runner == run_cifar_cdr1.sh, UNCHANGED   RUNNER_SHA256=d3d3bdd781282416
+  PASS G-PROV train.py == the tree's   TRAIN_SHA256=3fea309e172609c1
+  PASS G-PROV patches/patch_decayroute.py == 305's   PATCH_SHA256=12c107884db4c928
+  PASS G-PROV SCORER == this file   SCORER_SHA256=8684f086ef68ef85
+  PASS G-PROV DESIGN == the crd1_design.py this scorer loaded   DESIGN_SHA256=ac12901b9bafa65e
+  PASS G-PROV the reused csh1_design.py this scorer loaded   CSH1_DESIGN_SHA256=7925e0edf31baa82
+  PASS G-PROV the reused cwd_design.py this scorer loaded   CWD_DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+G-PROBE   [HARNESS-NULL] 500 records per run; the step-size count is the GRAIN's (1 or 62); on the scalar arms the per-tensor Lion vote sums to the harness's applied term (within 0.001 of sum|L_i|) with its sign
+  PASS G-PROBE SRS-s196 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE SRL-s196 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE TRS-s196 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE TRL-s196 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AIS-s196 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AIL-s196 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE SRS-s197 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE SRL-s197 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE TRS-s197 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE TRL-s197 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AIS-s197 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AIL-s197 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE SRS-s198 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE SRL-s198 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE TRS-s198 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE TRL-s198 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AIS-s198 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AIL-s198 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+
+G-ROUTE   [HARNESS-NULL] PATCH_DECAYROUTE's OWN record on every run: dr_mode / dr_lam / dr_n == step + 2 on all 500 records, and the MEASURED shrink is the mode's: shrink_only |meas/applied - 1| <= 0.05 (scalar) or inside [wd*min a, wd*max a] +/- 0.02 (layerwise) where applied >= 1e-05, trace factor exactly 1; trace_only |meas| <= 1e-06, applied 0; alpha_indep |meas/LAMBDA - 1| <= 0.01, applied LAMBDA, trace factor 1 - LAMBDA
+  PASS G-ROUTE SRS-s196 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 81, worst 2.255e-04
+  PASS G-ROUTE SRL-s196 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 453, worst 0.000e+00
+  PASS G-ROUTE TRS-s196 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.990e-09
+  PASS G-ROUTE TRL-s196 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.784e-09
+  PASS G-ROUTE AIS-s196 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.301e-04
+  PASS G-ROUTE AIL-s196 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.301e-04
+  PASS G-ROUTE SRS-s197 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 81, worst 1.996e-04
+  PASS G-ROUTE SRL-s197 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 453, worst 0.000e+00
+  PASS G-ROUTE TRS-s197 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.767e-09
+  PASS G-ROUTE TRL-s197 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.759e-09
+  PASS G-ROUTE AIS-s197 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.301e-04
+  PASS G-ROUTE AIL-s197 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.301e-04
+  PASS G-ROUTE SRS-s198 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 81, worst 2.472e-04
+  PASS G-ROUTE SRL-s198 (shrink_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 453, worst 0.000e+00
+  PASS G-ROUTE TRS-s198 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.862e-09
+  PASS G-ROUTE TRL-s198 (trace_only)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 2.887e-09
+  PASS G-ROUTE AIS-s198 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.302e-04
+  PASS G-ROUTE AIL-s198 (alpha_indep)   n 500 bad_rec 0 mode 0 lam 0 n-count 0 missing 0 shrink 0 coef 0; checked 500, worst 1.302e-04
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp   max 70.0587
+  PASS G-CEIL max arm mean <= 90.00 pp   max 70.0587
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  SRS  scalar    shrink_only            TEST 22.7653  sd 0.5925  range 1.0760   TRAIN 22.8533   tail slope 0.003/0.006/-0.005 pp/ep
+           seeds: s196 22.0840 (train 22.3540), s197 23.1600 (train 23.1040), s198 23.0520 (train 23.1020)
+  SRL  layerwise shrink_only            TEST 70.0587  sd 0.2171  range 0.4260   TRAIN 98.2953   tail slope 0.012/0.022/0.042 pp/ep
+           seeds: s196 70.0100 (train 98.0720), s197 69.8700 (train 98.4060), s198 70.2960 (train 98.4080)
+  TRS  scalar    trace_only             TEST 63.7207  sd 0.4511  range 0.9020   TRAIN 89.1380   tail slope 0.027/0.011/0.032 pp/ep
+           seeds: s196 63.2640 (train 88.9860), s197 63.7320 (train 89.2140), s198 64.1660 (train 89.2140)
+  TRL  layerwise trace_only             TEST 60.2460  sd 0.0635  range 0.1200   TRAIN 94.2053   tail slope 0.001/0.003/0.011 pp/ep
+           seeds: s196 60.2220 (train 94.0660), s197 60.1980 (train 94.2880), s198 60.3180 (train 94.2620)
+  AIS  scalar    alpha_indep:3.15e-4    TEST 62.9967  sd 0.8101  range 1.4780   TRAIN 70.9453   tail slope 0.001/0.037/0.015 pp/ep
+           seeds: s196 62.0660 (train 70.9940), s197 63.5440 (train 70.9460), s198 63.3800 (train 70.8960)
+  AIL  layerwise alpha_indep:3.15e-4    TEST 63.6360  sd 0.1807  range 0.3260   TRAIN 71.3967   tail slope 0.065/0.047/0.065 pp/ep
+           seeds: s196 63.5180 (train 71.5660), s197 63.5460 (train 71.3880), s198 63.8440 (train 71.2360)
+
+G-HW      DISCLOSURE ONLY: the GPU each run's own nvidia-smi line names -- NO gate reads it
+  distinct devices: ['NVIDIA L4']
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.636566
+  SIGMA_INBATCH        0.464529
+  SIGMA_USED 0.636566 (= SIGMA_PRIOR_frozen); SE_ARM_DIFF 0.519754; 2 SE 1.039507 is the HALF-WIDTH of a +/-2 SE interval, NOT a bound on any effect (278.6 C1)
+
+THE SHRINK, THE TRACE AND THE DOSE, MEASURED from each arm's OWN records (PATCH_DECAYROUTE dr_*; arm value = median over its 3 seeds).  Source (cwd5 k01W1, OFF, wd 0.1): onset-window median 3.1477e-04, recorded peak 5.5256e-04
+  SRS  shrink_only  shrink onset-median 3.1446e-04 peak 5.7684e-04 cumulative 1.1782   trace factor (onset) 1.00000000 horizon inf   turns 8700/8700/8700   late beta-floor share 1.000
+  SRL  shrink_only  shrink onset-median 1.2087e-04 peak 1.2549e-04 cumulative 0.5085   trace factor (onset) 1.00000000 horizon inf   turns 0/8000/900   late beta-floor share 1.000
+  TRS  trace_only   shrink onset-median 1.7114e-10 peak 2.8618e-09 cumulative 0.0000   trace factor (onset) 0.99968586 horizon 3183   turns 9500/9400/9400   late beta-floor share 0.000
+  TRL  trace_only   shrink onset-median 7.2392e-11 peak 2.7839e-09 cumulative 0.0000   trace factor (onset) 0.99968613 horizon 3186   turns 500/8000/900   late beta-floor share 0.000
+  AIS  alpha_indep  shrink onset-median 3.1500e-04 peak 3.1504e-04 cumulative 15.7500   trace factor (onset) 0.99968500 horizon 3175   turns None/None/None   late beta-floor share 0.000
+  AIL  alpha_indep  shrink onset-median 3.1500e-04 peak 3.1504e-04 cumulative 15.7500   trace factor (onset) 0.99968500 horizon 3175   turns 500/7000/900   late beta-floor share 0.000
+  cell S: RHO_D = SRS's measured shrink peak / source peak = 1.0439 -> DECAY-DOSE-S-REACHED
+  cell T: RHO_D = TRS's measured shrink peak / source peak = 0.0000 -> DECAY-DOSE-T-BELOW
+  cell I: RHO_D = AIS's measured shrink peak / source peak = 0.5701 -> DECAY-DOSE-I-REACHED
+
+THE CELLS (every contrast WITHIN its cell)
+  S shrink_only            scalar 22.7653  layerwise 70.0587   G_S = +47.2933 pp = +90.99 SE   R = 0.3249   -> COLLAPSE
+           +/-2 SE [+46.2538, +48.3328]   TRAIN gap +75.4420   seeds +47.926 / +46.710 / +47.244   scalar seeds at/below the bar: 3/3
+  T trace_only             scalar 63.7207  layerwise 60.2460   G_T = -3.4747 pp = -6.69 SE   R = 1.0577   -> NOGAP
+           +/-2 SE [-4.5142, -2.4352]   TRAIN gap +5.0673   seeds -3.042 / -3.534 / -3.848   scalar seeds at/below the bar: 0/3
+  I alpha_indep:3.15e-4    scalar 62.9967  layerwise 63.6360   G_I = +0.6393 pp = +1.23 SE   R = 0.9900   -> NOGAP
+           +/-2 SE [-0.4002, +1.6788]   TRAIN gap +0.4513   seeds +1.452 / +0.002 / +0.464   scalar seeds at/below the bar: 0/3
+           bars: COLLAPSE iff scalar <= 0.50 x layerwise; NOGAP iff G < 10.0 pp; reference healthy iff layerwise >= 55.0 and its seed range <= 5.0
+
+IN-BATCH CONTRASTS ACROSS CELLS (descriptive; +/-2 SE)
+  k_S - k_T  = -40.9553 pp [-41.9948, -39.9158]
+  k_I - k_S  = +40.2313 pp [+39.1918, +41.2708]
+  k_I - k_T  = -0.7240 pp [-1.7635, +0.3155]
+  L_S - L_T  = +9.8127 pp [+8.7732, +10.8522]
+  L_I - L_S  = -6.4227 pp [-7.4622, -5.3832]
+
+BETWEEN-BATCH, NON-GATING: against the landed OFF premise cwd5 W1 (scalar 23.2240, layerwise 69.2940; state COLLAPSE)
+  cell S: scalar - landed k01W1 -0.4587 pp; layerwise - landed kLW1 +0.7647 pp
+  cell T: scalar - landed k01W1 +40.4967 pp; layerwise - landed kLW1 -9.0480 pp
+  cell I: scalar - landed k01W1 +39.7727 pp; layerwise - landed kLW1 -5.6580 pp
+
+==============================================================================
+FINAL: ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP | S-COLLAPSE+T-NOGAP+I-NOGAP | DECAY-DOSE-S-REACHED | DECAY-DOSE-T-BELOW | DECAY-DOSE-I-REACHED | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | ROUTE-MEASURED-IN-RECORDS | SUFFICIENCY-NOT-NECESSITY | ROUTE-INTERVENTIONS-NOT-HYPERGRADIENTS | DELTA-IS-APPLIED-CHANGE | ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL | LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE | ONE-LAMBDA | NO-INBATCH-OFF-ANCHOR | CDR1-TREE-OFF-INERT-BY-PROOF-NOT-RERUN | KAPPA-0.1-CELL-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND | CSH1-JOINT-READING-NOT-IN-THIS-FINAL | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-T-DESCRIPTIVE | BETA-FLOOR-SRS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+==============================================================================
+
+PREMISE (frozen literals, non-gating): the OFF collapse at this cell on five landed batches, cmo1 k01 22.7887, cwd3 k01 22.9853, cwd4 k01WD 22.8213, cwd5 k01W1 23.2240
+REGISTERED PREDICTION (UNSURE): ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP; this batch: ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  "At the mechanism cell (wd 0.1) the alpha-scaled weight shrink with the trace factor removed collapses the scalar step size to at most half its in-batch layerwise level, and the learned trace factor with the weights undecayed does not (grains within the 10 pp bar)."  The weight-shrink route is SUFFICIENT and the trace route is NOT sufficient at this cell: the collapse section may say the collapse travels through the weight shrink (with the direct a*wd*w term in the trace), and T-C's horizon route is excluded as a sufficient account with the LEARNED horizon, not only a constant gamma.
+  "With alpha-INDEPENDENT decay at the onset-matched per-step dose (LAMBDA 3.15e-4, applied from step 0, ~14x the source's cumulative shrink) scalar and layerwise stay within the 10 pp bar."  At this cell the collapse REQUIRES the decay to move with the learned alpha (a bound: one LAMBDA, a constant schedule); the collapse section may call it a property of alpha-scaled decay, which is PyTorch AdamW's default form, not of decay as such.
+  Every COLLAPSE and NOGAP state is a BOUND, never a point effect (164.6): a collapsed arm's gap is a LOCATION, and NOGAP means 'below the 10 pp bar', never 'the grains are equal'.
+  shrink_only and trace_only are INTERVENTIONS on the trace, not the hypergradient of their own weight update (305.3); shrink_only's trace keeps the direct term a*wd*w (DELTA-IS-APPLIED-CHANGE, 305.2).  A route word is SUFFICIENCY at this cell, never necessity.
+  LAMBDA 3.15e-4 is matched to the collapsing arm's ONSET-WINDOW per-step shrink, not to its init (1e-7, degenerate here) nor to its cumulative dose (the constant arm delivers ~14x the source's whole-run log-shrink). On normalised tensors decay and step size trade off (Kosson et al. arXiv:2305.17212), so the alpha-independent arm is not a pure route control.
+  Not licensed: any other network, dataset, meta step, alpha0, horizon, grouping, base or meta optimiser, decay value (only the wd-0.1 cell and one LAMBDA ran), the other reading of shrink_only's trace, the audit cells (306), or anything about the parent paper.  csh1's outcome is read beside this FINAL by the joint table of CORRECTIONS 307.7, never inside it.
+
+OWED AT LANDING: a DECAY_ROUTE kind in corpus_exclusions.py (keyed on the full prefix `DECAY_ROUTE`) and 18 rows under it; 6 ARGS_WD_BASE rows (the AI* arms, weight-decay-base=0: two-axis runs, 284's form); SR* / TR* run at the standard wd 0.1 and owe no ARGS row.

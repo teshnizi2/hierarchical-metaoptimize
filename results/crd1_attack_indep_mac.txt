@@ -1,0 +1,127 @@
+crd1_attack_indep -- independent rebuild of cRD1_route_score.py (8684f086...) + attack.  runsdir <runsdir>.
+
+[0] SYNC INTEGRITY: one digest over every run file's name and bytes (equal on both hosts <=> the sync is exact)
+  18 top-level crd1-*.out, 77 files under crd1/ (Tensorboard_outputs not hashed), 75302427 bytes: digest c82eb19089f5a43cc7079fcaf2d1097fbb7a6c8c295d0f77eaf735addc3ad5d1
+  PASS  exactly 18 .out files (one per run, no resubmission)   18
+
+[1] REGISTERED FILES in the stage (--repo) at the registered bytes (RULE 16: read as bytes, never imported)
+  PASS  analysis/argsline_guard.py 81cea8b5...
+  PASS  analysis/cRD1_route_score.py 8684f086...
+  PASS  analysis/crd1_design.py ac12901b...
+  PASS  analysis/crd1_rule20_envaudit.py f6613bd2...
+  PASS  analysis/csh1_design.py 7925e0ed...
+  PASS  analysis/cwd_common.py d7ddb49e...
+  PASS  analysis/cwd_design.py 03d2d761...
+  PASS  bin/cRD1_rule20.sh 807fccd0...
+  PASS  patches/patch_decayroute.py 12c10788...
+  PASS  STAGED_COMMIT == registered commit 855b936
+  PASS  stage corpus == the registered corpus cc189bd1...
+  PASS  stage exclusion TSV == registered 7b034d3e...
+
+[2] THE DESIGN, rebuilt from 307.3-307.4 and read back off the runs' own lines
+  PASS  18 (arm, seed) pairs = 6 arms x seeds 196/197/198
+  PASS  one .out per (arm, seed): no resubmission, no truncated twin
+  PASS  every .out's job id == 307.11's (5081273 + 6*seed_idx + arm_idx)
+  PASS  every ARGS line == the design's 20 flags, in order, value for value (save dir and run name included)
+  PASS  SRS: exactly one DECAY_ROUTE line per run, == `mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0`
+  PASS  SRL: exactly one DECAY_ROUTE line per run, == `mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0`
+  PASS  TRS: exactly one DECAY_ROUTE line per run, == `mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0`
+  PASS  TRL: exactly one DECAY_ROUTE line per run, == `mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0`
+  PASS  AIS: exactly one DECAY_ROUTE line per run, == `mode=alpha_indep base=SGDm wd=0.0 lambda=0.000315 lambda_f32=0.0003150000120513141 gamma=1.0`
+  PASS  AIL: exactly one DECAY_ROUTE line per run, == `mode=alpha_indep base=SGDm wd=0.0 lambda=0.000315 lambda_f32=0.0003150000120513141 gamma=1.0`
+  PASS  no VOTE_W / *_HOLD / DECAY_MASK line in any .out (the cdr1 tree has none)
+  PASS  every ENV line's PROBE_DIR is the run's own probe directory
+  PASS  no malformed and no repeated Epoch line in any .out
+  PASS  no traceback, RUN_DONE present, in every .out
+  PASS  one `<n>  minutes` line per run   sum 688 min = 11.4667 GPU-h (the runs' own lines)
+  PASS  manifest: 62 TENSOR lines numbered 1..62, sizes summing to TOTAL_PARAMS 11,220,132
+  PASS  manifest ARM lines == the design table (cell, grain, wd, DECAY_ROUTE)
+  PASS  manifest ARGS lines == this file's rebuilt flags (seed 0, save <save>)
+  PASS  manifest DRWITNESS / PTWITNESS lines == the re-typed witnesses
+  PASS  manifest sha256 starts 135e6df8 and is 7498 bytes (307.8 guard 4d)
+  PASS  PROVENANCE REGISTERED_COMMIT == 855b936f...
+  PASS  PROVENANCE corpus / exclusion shas == registered
+  PASS  PROVENANCE ROUTES line == the design's three routes
+
+[3] PROBE RECORDS, raw (this file's own reader), and each route's arithmetic on its own records
+  PASS  record steps are exactly 0, 100, ..., 49,900 on every run (500 records)
+  PASS  SRS: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  SRL: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  TRS: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  TRL: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  AIS: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  AIL: 12 onset-window records (7,500 <= step < 8,700) per seed
+  PASS  SRS: applied shrink == 0.1*exp(beta) within one meta step on 1,500 records; trace factor exactly 1.0   max rel dev 1.0010e-03
+  PASS  TRS: 1 - trace factor == 0.1*exp(beta) within one meta step on 1,500 records (the LEARNED horizon); applied 0   max rel dev 1.0006e-03
+  PASS  TRL: applied shrink 0 on 1,500 records
+  PASS  AIS: applied == LAMBDA, trace factor == 1 - LAMBDA = 0.999685, dr_lam == 3.15e-4 on 1,500 records   measured / LAMBDA - 1 max 1.3021e-04
+  PASS  AIL: applied == LAMBDA, trace factor == 1 - LAMBDA = 0.999685, dr_lam == 3.15e-4 on 1,500 records   measured / LAMBDA - 1 max 1.3023e-04
+  T's LEARNED trace factor and horizon in the onset window, per seed (307.11: quoted beside any T reading):
+    TRS: s196 factor 0.99968586 horizon 3183.3; s197 factor 0.99968586 horizon 3183.3; s198 factor 0.99968586 horizon 3183.3
+    TRL: s196 factor 0.99968613 horizon 3186.1; s197 factor 0.99968612 horizon 3185.9; s198 factor 0.99968643 horizon 3189.1
+    csh1's constant gamma_M = 0.999685 has horizon 3174.6; crd1 I's 1 - LAMBDA = 0.999685 the same 3174.6
+  scalar beta turns (first record whose applied Lion sign is +1): SRS 8700/8700/8700; TRS 9500/9400/9400; AIS None/None/None
+
+[4] THE NOISE FLOOR, re-derived from the stage corpus by this file's own filter and pooling (selftest C's claim)
+  filtered: sigma 0.636565585885  df 274  cells 53   (frozen 0.636565585885, df 274; demo value 0.636566)
+  PASS  frozen SIGMA_PRIOR re-derived to 1e-12 at df 274
+  unfiltered (the OPERATIONS 36 trap, disclosure): sigma 14.485345  df 401
+  in-batch pooled sigma 0.464529 (df 12) < the frozen floor -> SIGMA_USED 0.636566, SE 0.519754
+
+[5] BOUNDS AND FLOOR / CEILING AUDIT (164.6) -- what bounds the verdict, printed before any reading
+  cell S: layerwise 70.0587 (seed range 0.4260, bar 5.0; REF_MIN 55.0 -> margin +15.0587); scalar 22.7653; COLLAPSE bar 0.5 x L = 35.0293 (scalar minus bar -12.2640; seeds -12.945/-11.869/-11.977); NOGAP bar G < 10: G +47.2933 (margin to the bar -37.2933)
+  cell T: layerwise 60.2460 (seed range 0.1200, bar 5.0; REF_MIN 55.0 -> margin +5.2460); scalar 63.7207; COLLAPSE bar 0.5 x L = 30.1230 (scalar minus bar +33.5977; seeds +33.141/+33.609/+34.043); NOGAP bar G < 10: G -3.4747 (margin to the bar +13.4747)
+  cell I: layerwise 63.6360 (seed range 0.3260, bar 5.0; REF_MIN 55.0 -> margin +8.6360); scalar 62.9967; COLLAPSE bar 0.5 x L = 31.8180 (scalar minus bar +31.1787; seeds +30.248/+31.726/+31.562); NOGAP bar G < 10: G +0.6393 (margin to the bar +9.3607)
+  every seed of every arm lies in [22.0840, 70.2960]: 7.08 pp above the 15 pp floor gate, 19.70 pp below the 90 pp ceiling
+  a T reading turns UNREADABLE (-> ROUTE-WEIGHT-SHRINK-SUFFICES-TRACE-UNRESOLVED) if TRL falls 5.2460 pp; an I reading turns UNREADABLE (-> INDEP-UNREADABLE) if AIL falls 8.6360 pp
+  TRAIN levels (under-fitting check): SRS 22.8533, SRL 98.2953, TRS 89.1380, TRL 94.2053, AIS 70.9453, AIL 71.3967
+  NOGAP is a BOUND: it says L - k < 10 pp in that cell (and L - k may be negative), never 'the grains are equal'.
+  late beta-floor share (scalar arms; >= 0.5 stamps BETA-FLOOR): SRS 1.000, TRS 0.000, AIS 0.000
+  RHO_D (measured shrink peak / the collapsing source arm's): S 1.0439, T 0.0000, I 0.5701; cumulative measured log-shrink S 1.1782, I 15.7500 (I / S 13.37x)
+
+[6] LEAVE-ONE-SEED-OUT (DESCRIPTIVE, not a gate): the cell state and the ladders with each seed pair dropped
+  drop s196: S G +46.9770 COLLAPSE; T G -3.6910 NOGAP; I G +0.2330 NOGAP -> ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP
+  drop s197: S G +47.5850 COLLAPSE; T G -3.4450 NOGAP; I G +0.9580 NOGAP -> ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP
+  drop s198: S G +47.3180 COLLAPSE; T G -3.2880 NOGAP; I G +0.7270 NOGAP -> ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP
+
+[7] THE EXCLUSION ROWS OWED (results/CORPUS-EXCLUSIONS.tsv full row form, 308.8 / 308.4: 18 rows, 12 one-kind + 6 two-axis; PROPOSED, not applied here)
+  run	job_id	batch	arm	looks_like	intervention	witness	registered_at	reason
+  crd1-SRS-s196	5081273	crd1	SRS	k01 (granularity scalar)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-SRL-s196	5081274	crd1	SRL	kL (granularity layerwise)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRS-s196	5081275	crd1	TRS	k01 (granularity scalar)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRL-s196	5081276	crd1	TRL	kL (granularity layerwise)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-AIS-s196	5081277	crd1	AIS	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  crd1-AIL-s196	5081278	crd1	AIL	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  crd1-SRS-s197	5081279	crd1	SRS	k01 (granularity scalar)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-SRL-s197	5081280	crd1	SRL	kL (granularity layerwise)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRS-s197	5081281	crd1	TRS	k01 (granularity scalar)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRL-s197	5081282	crd1	TRL	kL (granularity layerwise)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-AIS-s197	5081283	crd1	AIS	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  crd1-AIL-s197	5081284	crd1	AIL	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  crd1-SRS-s198	5081285	crd1	SRS	k01 (granularity scalar)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-SRL-s198	5081286	crd1	SRL	kL (granularity layerwise)	DECAY_ROUTE=shrink_only	DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRS-s198	5081287	crd1	TRS	k01 (granularity scalar)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-TRL-s198	5081288	crd1	TRL	kL (granularity layerwise)	DECAY_ROUTE=trace_only	DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0	CORRECTIONS 317	decay-route switch (PATCH_DECAYROUTE, CORRECTIONS 305): not carried by any CSV column; the line held to DECAY_ROUTE_ARMS (CORRECTIONS 308)
+  crd1-AIS-s198	5081289	crd1	AIS	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  crd1-AIL-s198	5081290	crd1	AIL	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:3.15e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 317	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  rows digest (sha256 of the 18 rows joined by newlines): e7b6d3066433a97bd7332df1031d70dc8dfdc679d94bf2e04aa67c4f72a071f1
+  PASS  no ARGS deviation on SR* / TR* (wd 0.1, momentum 0.99: the standard), so their rows are ONE-kind
+  PASS  AI*: weight-decay-base 0 once on each ARGS line (TWO-AXIS with the DECAY_ROUTE line)
+  PASS  the PROPOSED file's header and 18 data rows == this rebuild, byte for byte   19 non-comment lines
+
+[8] THE JOINT READING OF CORRECTIONS 307.7 (applied here, from the TOKENS of the two FINAL lines only)
+  csh1 FINAL tokens: HORIZON-DOES-NOT-REPRODUCE | M-NOGAP   crd1: T-NOGAP, I-NOGAP
+  horizon row  : the trace route is insufficient in BOTH forms at this cell; T-C excluded as a sufficient account (constant and learned horizon), as bounds
+  M x I row    : neither the constant horizon nor horizon + constant shrink collapses: the collapse needs the decay to move with alpha
+  PASS  csh1's landed FINAL is HORIZON-DOES-NOT-REPRODUCE with M-NOGAP (310.2)
+
+[9] THE REBUILT FINAL
+  FINAL: ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP | S-COLLAPSE+T-NOGAP+I-NOGAP | DECAY-DOSE-S-REACHED | DECAY-DOSE-T-BELOW | DECAY-DOSE-I-REACHED | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | ROUTE-MEASURED-IN-RECORDS | SUFFICIENCY-NOT-NECESSITY | ROUTE-INTERVENTIONS-NOT-HYPERGRADIENTS | DELTA-IS-APPLIED-CHANGE | ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL | LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE | ONE-LAMBDA | NO-INBATCH-OFF-ANCHOR | CDR1-TREE-OFF-INERT-BY-PROOF-NOT-RERUN | KAPPA-0.1-CELL-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND | CSH1-JOINT-READING-NOT-IN-THIS-FINAL | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-T-DESCRIPTIVE | BETA-FLOOR-SRS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+  PASS  the rebuilt ladders equal the registered prediction (307.6)   ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP
+  PASS  all 16 registered bounds are on the rebuilt FINAL
+
+[10] LINE-BY-LINE AGREEMENT with each scorer stdout (231 lines rebuilt)
+  PASS  scorer log #1: 231 lines, 231 rebuilt, 0 differ (2 host-path lines matched by suffix)
+  PASS  scorer log #2: 231 lines, 231 rebuilt, 0 differ (2 host-path lines matched by suffix)
+
+ATTACK: 57 PASS / 0 FAIL

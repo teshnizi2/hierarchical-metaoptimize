@@ -1,0 +1,30 @@
+RULE20 run utc=2026-09-22T16:38:10Z host=nodelogin03.alice.leidenuniv.nl batch=crd1 guard_sha=81cea8b586e124a6 design_sha=ac12901b9bafa65e
+  .out files: 18   with ARGS: 18   squeue: 
+  BATCH-CONSISTENCY --name crd1- --vary seed --vary run-name --vary stepsize-groups --vary weight-decay-base -> rc=0  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (crd1, EVERY flag pinned to the run's OWN arm, flag count checked): 18 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  weight-decay-base COVERAGE across the started runs (read from the runs' ARGS lines):
+          6 --weight-decay-base 0
+         12 --weight-decay-base 0.1
+  stepsize-groups COVERAGE across the started runs (read from the runs' ARGS lines):
+          9 --stepsize-groups layerwise
+          9 --stepsize-groups scalar
+  gamma COVERAGE across the started runs (read from the runs' ARGS lines):
+         18 --gamma 1
+    DECLARED: the runner's ENV line cannot carry DECAY_ROUTE; the harness's OWN `DECAY_ROUTE:` witness is
+    checked instead, and it DISCRIMINATES the route, LAMBDA and the wd that reached the update on every run.  The
+    ARGS half (bin/cRD1_rule20.sh) pins --weight-decay-base and every other flag.
+    DECAY_ROUTE witness lines (exact match to the arm's registered line):
+      x6  DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=0.000315 lambda_f32=0.0003150000120513141 gamma=1.0
+      x6  DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0
+      x6  DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x18  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x9  PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x9  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE, --constraint=L4 was requested):
+      x18  NVIDIA L4
+    coverage 18/18 runs with an .out, 0 violations
+  ENV AUDIT VERDICT crd1: PASS
+RULE20 end utc=2026-09-22T16:38:15Z
+rc=0

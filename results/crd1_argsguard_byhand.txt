@@ -1,0 +1,420 @@
+argsline_guard by hand: utc=2026-09-22T16:38:04Z host=nodelogin03.alice.leidenuniv.nl python=Python 3.10.4 guard_sha=81cea8b586e124a6 stage=855b936fed91f4b3399dd988b12b5aca83aa0d90
+$ python3 analysis/argsline_guard.py /home/s5014158/metaopt/runs --name crd1-
+=== /home/s5014158/metaopt/runs/crd1-AIL-s196-5081278.out ===
+  crd1-AIL-s196-5081278.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIL-s196-5081278.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIL-s196
+=== /home/s5014158/metaopt/runs/crd1-AIL-s197-5081284.out ===
+  crd1-AIL-s197-5081284.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIL-s197-5081284.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIL-s197
+=== /home/s5014158/metaopt/runs/crd1-AIL-s198-5081290.out ===
+  crd1-AIL-s198-5081290.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIL-s198-5081290.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIL-s198
+=== /home/s5014158/metaopt/runs/crd1-AIS-s196-5081277.out ===
+  crd1-AIS-s196-5081277.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIS-s196-5081277.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIS-s196
+=== /home/s5014158/metaopt/runs/crd1-AIS-s197-5081283.out ===
+  crd1-AIS-s197-5081283.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIS-s197-5081283.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIS-s197
+=== /home/s5014158/metaopt/runs/crd1-AIS-s198-5081289.out ===
+  crd1-AIS-s198-5081289.out: no repeated flag (20 flags)
+  --- effective values (crd1-AIS-s198-5081289.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-AIS-s198
+=== /home/s5014158/metaopt/runs/crd1-SRL-s196-5081274.out ===
+  crd1-SRL-s196-5081274.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRL-s196-5081274.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRL-s196
+=== /home/s5014158/metaopt/runs/crd1-SRL-s197-5081280.out ===
+  crd1-SRL-s197-5081280.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRL-s197-5081280.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRL-s197
+=== /home/s5014158/metaopt/runs/crd1-SRL-s198-5081286.out ===
+  crd1-SRL-s198-5081286.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRL-s198-5081286.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRL-s198
+=== /home/s5014158/metaopt/runs/crd1-SRS-s196-5081273.out ===
+  crd1-SRS-s196-5081273.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRS-s196-5081273.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRS-s196
+=== /home/s5014158/metaopt/runs/crd1-SRS-s197-5081279.out ===
+  crd1-SRS-s197-5081279.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRS-s197-5081279.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRS-s197
+=== /home/s5014158/metaopt/runs/crd1-SRS-s198-5081285.out ===
+  crd1-SRS-s198-5081285.out: no repeated flag (20 flags)
+  --- effective values (crd1-SRS-s198-5081285.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-SRS-s198
+=== /home/s5014158/metaopt/runs/crd1-TRL-s196-5081276.out ===
+  crd1-TRL-s196-5081276.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRL-s196-5081276.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRL-s196
+=== /home/s5014158/metaopt/runs/crd1-TRL-s197-5081282.out ===
+  crd1-TRL-s197-5081282.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRL-s197-5081282.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRL-s197
+=== /home/s5014158/metaopt/runs/crd1-TRL-s198-5081288.out ===
+  crd1-TRL-s198-5081288.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRL-s198-5081288.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            layerwise
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRL-s198
+=== /home/s5014158/metaopt/runs/crd1-TRS-s196-5081275.out ===
+  crd1-TRS-s196-5081275.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRS-s196-5081275.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       196
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRS-s196
+=== /home/s5014158/metaopt/runs/crd1-TRS-s197-5081281.out ===
+  crd1-TRS-s197-5081281.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRS-s197-5081281.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       197
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRS-s197
+=== /home/s5014158/metaopt/runs/crd1-TRS-s198-5081287.out ===
+  crd1-TRS-s198-5081287.out: no repeated flag (20 flags)
+  --- effective values (crd1-TRS-s198-5081287.out) ---
+      --optimizer                  HF
+      --alg-base                   SGDm
+      --momentum-param-base        0.99
+      --weight-decay-base          0.1
+      --alg-meta                   Lion
+      --momentum-param-meta        0.99
+      --Lion-beta2-meta            0.9
+      --weight-decay-meta          0
+      --dataset                    CIFAR100
+      --NN-name                    ResNet18_c100
+      --batch-size                 100
+      --max-time                   999:00:00
+      --gamma                      1
+      --meta-stepsize              1e-3
+      --alpha0                     1e-6
+      --num-epochs                 100
+      --stepsize-groups            scalar
+      --seed                       198
+      --save-directory             /home/s5014158/metaopt/runs/crd1
+      --run-name                   crd1-TRS-s198
+---------------------------------------------------------------
+argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line
+VERDICT: PASS
+rc=0
