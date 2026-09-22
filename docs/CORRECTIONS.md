@@ -43095,3 +43095,29 @@ entry's Mac scratch (and the session's earlier local `g3b` stage copies) is dele
 batch (`cai1`, `crd1`, `crt2`) touched.
 
 Next free number: **316**.
+
+## 316. AUDIT ADDENDUM to 315 (ZERO GPU; one transposed pair of health margins) — **[LED WITH THE BOUND: this entry measured nothing and moves no level, bar, state, contrast, stamp, token, registered licence sentence or ingest count.  315's verdict `UNRESOLVED-BOXBOUND-W4 | SCALAR-BEATS-BEST | DENOM-HOLDS | W1-SURVIVES+W4-BOXBOUND`, its bounds, its six refute fixes, the ingest (3,501 rows, 370 exclusions), 1.16 PARTIAL — LANDED for `cdn1`, and the venue (TMLR) STAND.]**
+
+*A cycle-6 style audit of 315 (zero GPU; read-only `sacct -X` on `alice2`; `alice` NOT contacted; nothing under `paper/`
+read; no clone, checkout or worktree; nothing downloaded; `cai1`, `crd1`, `crt2` untouched).*
+
+**What was checked and passes.**  origin/master = local at `1155c29`; 315 is the last entry, in numeric order, with one
+current 'Next free' line; MASTER-TABLE 244 lines and `c73` exit 0; every level, sd, seed value, σ, SE, contrast,
+interval, GAP, dose and ratio in 315 and row 244 matches `results/g3b_c100wd_score_mac.txt` (`4450a028…`; the `alice2`
+log differs only on the two path lines) or `results/g3b_attack_indep_mac.txt` (per-seed rec_hi 0.0787 / 0.0796 / 0.0794 /
+0.0796, onsets 46,020–46,065, 33.4500 GPU-h by `minutes`); the `n_at_hi` maximum 4–6 (ch and kL W4) re-read from the
+synced `probe.jsonl` files; `sacct -X` re-read: 32/32 `COMPLETED 0:0`, 33.7636 GPU-h; the CSV has 3,501 rows, 32 `g3b-`,
+`wallclock_min` sum 3561.6833 over 3,486 rows; `CORPUS-EXCLUSIONS.tsv` 370 data rows over 23 batches; `corpus_exclusions.py
+--check` exit 0 PASS, ARGS witness 171, `SIGMA_R18ALL` 0.636566 (df 274); refute fixes F1–F6 present at the places 315.6
+names; the notebook commit `2928fcb` carries MT244 with a `Vercel: success` status and a Production deployment whose
+latest status is `success`.
+
+**The one slip (transposed pair).**  315's headline bound (5) and MASTER-TABLE row 244's bound (5) read *"the ch / nd W4
+levels sit only +7.94 / +8.01 pp above it [HEALTH_MIN 55]"*.  From the scorer log, chW4 63.0070 − 55 = **+8.0070** and
+ndW4 62.9425 − 55 = **+7.9425**, so the pair is transposed: it should read **"ch / nd +8.01 / +7.94"**.  315.4 item 5 and
+the F6 row state the range "+7.94 to +8.01" without an order and are correct.  No bar reads the pair (the registered
+floor gate is ≥ +10.0 as a prediction and selftest G's ≥ 5; both margins clear 5 and miss 10 either way), so nothing
+downstream moves.  315 and row 244 are not rewritten in place (append-only); this entry is the correction, and the
+notebook's MT244 text (which quotes row 244) carries the transposed pair until its next import from this repo.
+
+Next free number: **317**.
