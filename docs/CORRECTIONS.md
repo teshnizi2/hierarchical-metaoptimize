@@ -40957,9 +40957,24 @@ coverage is owed once all 32 have started (`bash bin/cAI1_rule20.sh` from the st
   log; `cGW1_auditwd_score.py`; `argsline_guard.py`; `_lib_guards.sh`; `corpus_exclusions.py`.  RULE 16: no registered
   scorer edited.  Another track's (F3, `crd1`, 307) uncommitted files in the same working tree were NOT staged.
 
-### 306.10 Registration commit
+### 306.10 Registration commit, and dry run 1 from the pushed stage
 
-*(Filled by the follow-up commit.)*
+* **Registration commit `03f5e3c1c19d0105b4395ebd4d2d660f7439b7df`**, pushed to `origin/master` (`git branch -r
+  --contains` names origin/master); the scorer at that commit on origin hashes
+  **`fb766d935e2f4b074b6d5bbb759696f3935821ee7872b41441e2a567fe0420f5`** (= the dry-run scorer), design `edf7000d…`,
+  launcher `948dcec5…`, RULE 20 pair `05ba28d6…` / `c8ebe855…`, live check `3f627426…`.  This follow-up commit changes
+  none of them.
+* **Stage `~/stage_cai1`** on alice2 = `git archive 03f5e3c -- analysis bin results patches tests jobs` (1,413 entries,
+  0 under `paper/`); its scorer hashes `fb766d93…`.
+* **dry 1** (`CAI1_REGISTERED_COMMIT=03f5e3c1… CAI1_SCORER_SHA256=fb766d93… bash bin/cAI1_alphaindep.sh --dry-run` under
+  bash from the stage; log `~/stage_cai1_dry1.log`, 156 lines, sha `8c295206…`): **RC 0, 0 guard failures**; guard 1b
+  PASSES on the declared commit and scorer sha; selftest 115 / 0 / 0; guard 6 "32 composed command lines, 0 failed"; the
+  32 `sbatch` lines are **byte-identical to dry 0's** (`5d8a4145…`).  `bash bin/cAI1_rule20.sh` from the stage runs
+  clean (0 runs: UNVERIFIED, as it must be before launch).
+* **The submission is the verifier's**: the command in 306.8 with `CAI1_REGISTERED_COMMIT=03f5e3c1c19d0105b4395ebd4d2d660f7439b7df`;
+  32 jobs; nothing was submitted by this track.
+
+Next free number: **308**.
 
 ## 307. TRACK F3 — **`crd1` REGISTERED, NOT SUBMITTED: THE COLLAPSE ROUTE (ICML-PLAN row 1.6, stamp `DECOUPLED-NOT-TESTED`).  AT THE MECHANISM CELL (ResNet18_c100, wd 0.1), WHICH ROUTE OF THE α-SCALED DECAY CARRIES THE SCALAR COLLAPSE — THE WEIGHT SHRINK (`DECAY_ROUTE=shrink_only`), THE SHORTENED META-TRACE (`trace_only`), BOTH, OR NEITHER ALONE — AND DOES THE COLLAPSE SURVIVE α-INDEPENDENT DECAY (`alpha_indep:3.15e-4` at wd 0)?  3 ROUTES × {scalar, layerwise} × SEEDS {196, 197, 198} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **SUFFICIENCY, NOT NECESSITY.** Each single-route arm says what that route IS ENOUGH to do at this cell; a null never says the route plays no part when both are on.  (2) **`shrink_only` AND `trace_only` ARE INTERVENTIONS, NOT HYPERGRADIENTS** of their own weight update (305.3), and `shrink_only`'s trace keeps the direct term a·wd·w (305.2's judgement on `delta'`, `DELTA-IS-APPLIED-CHANGE`).  (3) **Λ IS MATCHED TO THE ONSET-WINDOW PER-STEP SHRINK, NOT TO THE INIT** (the brief's init match, wd × α0 = 1e-7, is degenerate at this cell: dose ratio 1.8e-4, below the campaign's DOSE bar) **AND NOT TO THE CUMULATIVE DOSE** — a constant Λ front-loads the decay and delivers **13.6×** the collapsing arm's whole-run log-shrink.  ONE Λ.  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL** (normalised layers, arXiv:2305.17212).  (5) **NO in-batch OFF anchor**: the OFF collapse is the landed premise (five batches, 22.79–23.22; cwd5 W1 23.2240 / 69.2940), and the cdr1 tree's OFF inertness is by 305's proof, not re-run.  (6) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (7) ONE cell, ONE network, 100 epochs, 3 seeds.  (8) **csh1's outcome is read BESIDE this FINAL by the joint table 307.7, never inside it.**  All 16 bounds are stamped on every scored FINAL.]**
 
