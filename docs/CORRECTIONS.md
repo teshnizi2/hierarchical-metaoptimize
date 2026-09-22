@@ -41326,3 +41326,7 @@ at 09:47:44Z, so the margin by that proof is **≥ 1 min 05 s**.  Owed: `bash bi
 have started; the landing debts of 307.9.
 
 Next free number: **308**.  *(Cycle-5 audit, 2026-09-22: 304–307 are all written in place, in numeric order; no RESERVED stub remains; none withdrawn (305's patch PROVED, job 5081090 410/0).  The duplicate next-free line 306.11's verifier left between 306 and 307 was removed; this is the one line.)*
+
+## 308. RESERVED — Track G (code gap, zero GPU): the `DECAY_ROUTE` exclusion kind that `cai1` / `crd1` need before ingest (306/307 owed list). Placeholder; replaced in place by its track.
+
+Next free number after the reservation: **309** (the crt1 / csh1 landing takes 309 and 310 in order).
