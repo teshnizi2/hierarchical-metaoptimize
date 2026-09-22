@@ -1,0 +1,43 @@
+RULE20 run utc=2026-09-22T02:20:30Z host=nodelogin04.alice.leidenuniv.nl batch=caw2 guard_sha=81cea8b586e124a6 design_sha=a219661f1e3ef140
+  .out files: 27   with ARGS: 27   squeue:      16 RUNNING 
+  BATCH-CONSISTENCY --name caw2- --vary seed --vary run-name --vary stepsize-groups --vary weight-decay-base --vary alg-base --vary normalizer-param-base --vary momentum-param-base --vary alg-meta --vary normalizer-param-meta --vary momentum-param-meta --vary Lion-beta2-meta -> rc=0  argsline_guard: 27 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (caw2, EVERY flag pinned to the run's OWN arm, flag count checked): 27 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  alg-base COVERAGE across the started runs (read from the runs' ARGS lines):
+         18 --alg-base AdamW
+          9 --alg-base SGDm
+  alg-meta COVERAGE across the started runs (read from the runs' ARGS lines):
+         18 --alg-meta Adam
+          9 --alg-meta Lion
+  weight-decay-base COVERAGE across the started runs (read from the runs' ARGS lines):
+         21 --weight-decay-base 0.1
+          6 --weight-decay-base 1.0
+  stepsize-groups COVERAGE across the started runs (read from the runs' ARGS lines):
+         12 --stepsize-groups layerwise
+         15 --stepsize-groups scalar
+    DECLARED: the runner's ENV line carries neither the base alg nor the weight decay, so THIS half cannot
+    discriminate the base swap or the dose -- the ARGS half (bin/cAW2_rule20.sh) pins every flag.  THIS half
+    discriminates the GRAIN (PROBE_TENSOR type) and the META alg (the PROBE_TENSOR meta_alg / momentum tail),
+    and requires every hold / mask witness `off`.  The registered pairings, re-typed for comparison:
+      K01=SGDm+Lion wd 0.1  MS=SGDm+Adam wd 0.1  ML=SGDm+Adam wd 0.1  LS=AdamW+Lion wd 0.1  LL=AdamW+Lion wd 0.1  AS=AdamW+Adam wd 0.1  AL=AdamW+Adam wd 0.1  XS=AdamW+Adam wd 1.0  XL=AdamW+Adam wd 1.0
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x27  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 4  (0 started runs have none yet)
+      x9  PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9
+      x3  PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x9  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9
+      x6  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE, --constraint=L4 was requested):
+      x27  NVIDIA L4
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x27  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x27  BETA_HOLD: off
+    GROUP_HOLD witness lines (exact match to the arm's registered line):
+      x27  GROUP_HOLD: off
+    REST_HOLD witness lines (exact match to the arm's registered line):
+      x27  REST_HOLD: off
+    DECAY_MASK witness lines (exact match to the arm's registered line):
+      x27  DECAY_MASK: off
+    coverage 27/27 runs with an .out, 0 violations
+  ENV AUDIT VERDICT caw2: PASS
+RULE20 end utc=2026-09-22T02:20:32Z
