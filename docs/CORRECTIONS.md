@@ -39919,7 +39919,7 @@ included, before `git sparse-checkout set /docs/CORRECTIONS.md` removed everythi
 paper/ was listed, read, opened or edited; its absence afterwards was confirmed with `test -e` only.  It is recorded
 because a checkout is a copy.
 
-## 301. TRACK C — **`csh1` REGISTERED: THE SHORT-HORIZON γ CONTROL (ICML-PLAN 1.20, THREAT T-C).  AT THE MECHANISM CELL WITH THE DECAY DOSE REMOVED (wd 5e-4), DOES SHORTENING THE HYPERGRADIENT HORIZON WITH `--gamma` < 1 — TO THE COLLAPSING ARM's OWN REALISED (1 − κα) — REPRODUCE THE SCALAR COLLAPSE?  6 ARMS × SEEDS {180, 181, 182} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  NOT SUBMITTED (the verifier submits).  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **γ IS CONSTANT; THE COLLAPSING ARM's HORIZON IS NOT.** Its trace factor is (1 − 0.1·a) with `a` learned, so no constant γ reproduces it; γ_M matches the onset-window MEDIAN and γ_P is at least as short AT EVERY STEP.  Neither is the learned horizon (`CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON`).  (2) **SUFFICIENCY, NOT NECESSITY.** A null says the short trace is not SUFFICIENT without the dose; it cannot say the trace plays no part at wd 0.1, where the dose and the short trace act together (`SUFFICIENCY-NOT-NECESSITY`).  (3) **TWO γ VALUES BRACKET; THEY LOCATE NOTHING.**  (4) **NO in-batch wd-0.1 positive control; ONE cell, ONE network, wd 5e-4 only, 100 epochs, 3 seeds.**  (5) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (6) **A trace-only patch (h ← (1 − 0.1·a)h − δ with the weights at 5e-4) is NOT run** — it would track `a` exactly but is new harness code.  All are stamped on every scored FINAL.]**
+## 301. TRACK C — **`csh1` REGISTERED: THE SHORT-HORIZON γ CONTROL (ICML-PLAN 1.20, THREAT T-C).  AT THE MECHANISM CELL WITH THE DECAY DOSE REMOVED (wd 5e-4), DOES SHORTENING THE HYPERGRADIENT HORIZON WITH `--gamma` < 1 — TO THE COLLAPSING ARM's OWN REALISED (1 − κα) — REPRODUCE THE SCALAR COLLAPSE?  6 ARMS × SEEDS {180, 181, 182} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  VERIFIED AND SUBMITTED BY THE VERIFIER 2026-09-22, 18 / 18 JOBS 5080645–5080662 (301.11).  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **γ IS CONSTANT; THE COLLAPSING ARM's HORIZON IS NOT.** Its trace factor is (1 − 0.1·a) with `a` learned, so no constant γ reproduces it; γ_M matches the onset-window MEDIAN and γ_P is at least as short AT EVERY STEP.  Neither is the learned horizon (`CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON`).  (2) **SUFFICIENCY, NOT NECESSITY.** A null says the short trace is not SUFFICIENT without the dose; it cannot say the trace plays no part at wd 0.1, where the dose and the short trace act together (`SUFFICIENCY-NOT-NECESSITY`).  (3) **TWO γ VALUES BRACKET; THEY LOCATE NOTHING.**  (4) **NO in-batch wd-0.1 positive control; ONE cell, ONE network, wd 5e-4 only, 100 epochs, 3 seeds.**  (5) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (6) **A trace-only patch (h ← (1 − 0.1·a)h − δ with the weights at 5e-4) is NOT run** — it would track `a` exactly but is new harness code.  All are stamped on every scored FINAL.]**
 
 ### 301.1 Question, and why it is worth GPU
 
@@ -40089,6 +40089,63 @@ login node was CPU construction and three CPU `HF.step`s per arm on a batch of 4
 command went to `alice2`).  Nothing under `paper/` read, listed or copied (every rsync / archive excluded it).  Nothing
 downloaded, no `.pdf` fetched, no arXiv download tool used, no licence accepted, no notebook site or Vercel URL opened.
 **DISCLOSURE — one `paper/` incident by this track.**  To commit this entry without touching the shared working tree, a temporary `git worktree` of `origin/master` was created in the scratch directory; its checkout wrote the tracked `paper/` files to disk there, and one command of mine began with `ls paper >/dev/null 2>&1` — a listing of that directory whose output was discarded.  No file under `paper/` was opened, read, staged or edited; the worktree was removed (`git worktree remove --force`) minutes later, and this addendum was committed with git plumbing (a temporary index), with no checkout.  It was an error, not a decision.
+
+### 301.11 Independent pre-launch verification — PASSED; `csh1` SUBMITTED, 18 / 18 jobs (verifier, 2026-09-22)
+
+*The verifier's own checks, each re-run, not read off 301.8.  No file of the registration was changed: the scorer, design,
+launcher, CPU γ check and RULE 20 pair are the bytes of `5ac1dd7` (unchanged at the tip, `git diff --quiet`).  `alice`
+NOT contacted; GPU work only as the 18 Slurm jobs below.  Nothing under `paper/` read, listed, copied or checked out: the
+verifier's clone was a sparse checkout excluding `/paper/`, the local archive was `git archive 5ac1dd7 -- . ':!paper'`
+(0 `paper` entries).  One command tested whether a `paper` directory EXISTS at the stage root (`ls -d paper`, no listing
+of any content); it does not exist.*
+
+* **(1) Prior art.** `docs/PRIOR-ART.md` "Sweep 2026-09-22 — SHORT-HORIZON BIAS as a rival account…": dated, five queries
+  recorded, verdict "not answered anywhere found; kept at 18 runs".  Spot-checked by web search: arXiv:2604.27063 (FADE,
+  Ramesh, Lewandowski, Schmidhuber, 29 Apr 2026) and arXiv:2209.11303 (Vuorio et al., meta-gradient bias-variance) are
+  real papers on the stated topics; Wu et al. arXiv:1803.02021 is ICLR 2018 as cited.  The conclusion justifies the GPU:
+  T-C is the one live rival against the collapse section's causal sentences, and no queued batch addresses it.
+* **(2) Design answers its question; not confounded into uninformativeness.**  The anchor A (γ 1) is the landed cwd5
+  W4 cell (scalar 72.41 > layerwise 67.88, i.e. NOGAP), so a γ < 1 collapse is attributable to γ alone (only `--gamma`
+  and the grain vary; the 18 composed lines collapse to ONE with run name, seed, γ and grain masked).  The three
+  informative outcomes (M COLLAPSE / P-only COLLAPSE / both NOGAP) license three different collapse-section sentences;
+  the damage-to-both-grains case is caught by UNREADABLE (checked before COLLAPSE in `cell_state`), so a γ that simply
+  breaks training cannot be read as a scalar collapse.  γ_P dominates the collapsing arm's shrink at every step, so a
+  γ_P null cannot be dismissed as "horizon not short enough".  The declared limits (constant γ, sufficiency only,
+  from-step-0 horizon, no in-batch wd-0.1 control) bound the reading but do not make any branch uninformative.
+* **(3) Bars and ladder.**  R50, GAP_BAR, REF_MIN, DIVERGED_BAR, FLOOR_MIN / CEIL_MAX, DOSE_BAR_LO, FLOOR_BETA /
+  FLOOR_SHARE_BAR, MATCH_BAR and SIGMA_PRIOR are module-level literals (scorer lines 87–108); `decide()` is first-match
+  and ends in a default (HORIZON-PARTIAL), so it is exhaustive; INCOMPLETE and HARNESS-UNSOUND are taken before it;
+  the 13 BOUND_STAMPS are joined onto every scored FINAL (line 639; selftest E asserts all 13).
+* **(4) Selftest re-run.**  Mac (`/opt/homebrew/bin/python3`, `--runsdir …/alice-backup/runs_alice2`, from a clone at
+  the tip): **86 PASS / 0 FAIL / 0 SKIP**, rc 0.  alice2 (`~/stage_csh1_dry`, `--runsdir $WS/runs`):
+  **86 / 0 / 0**, rc 0 (`~/csh1_verifier_selftest.log`, `7b99bcba…`).  (Without `--runsdir` it gives 70 / 0 / 3 SKIP —
+  the landed-record sections cannot find the records; the launcher's guard 1c passes `--runsdir` and 1c1 refuses a SKIP.)
+* **(5) Dry run re-run.**  The stage `~/stage_csh1_dry` was first checked BYTE FOR BYTE against the commit: all 1,214
+  files of `git archive 5ac1dd7 -- . ':!paper'` match by sha256 (`sha256sum -c`, 0 mismatches; the one extra file is
+  `STAGED_COMMIT` = `5ac1dd79…`).  `CSH1_REGISTERED_COMMIT=5ac1dd79… bash bin/cSH1_horizon.sh --dry-run` →
+  `~/csh1_verifier_dry.log` (149 lines, `76600713…`), rc 0, **0 GUARD FAIL**, guard 6 "18 composed command lines, 0
+  failed"; its 18 sbatch lines are IDENTICAL (`diff`) to the registrant's `~/stage_csh1_dry0.log`.  **Flag for flag:**
+  the G1S line's 20 flags equal landed `cwd5-k01W4-s146`'s ARGS line (same order and values, `--gamma 1`, wd 5e-4,
+  `--stepsize-groups scalar`) except `--seed`, `--save-directory`, `--run-name`; the other arms differ only in
+  `--gamma` (1 / 0.999685 / 0.99941) and `--stepsize-groups` (scalar / layerwise), as the design table says.
+* **(6) Seeds fresh and in block.**  {180, 181, 182} ⊂ Track C's block 180–182; `results/all_runs.csv` (3,383 rows) has
+  NO seed in 170–191 (max 162); no other design file uses them; 0 `csh1` jobs in sacct/squeue before submission.
+* **(7) Noise floor** SIGMA_PRIOR = 0.636565585885168 (df 274) = the demo value **0.636566**, re-derived through
+  `corpus_exclusions.filter_rows` by selftest C on both hosts.
+* **(8) RULE 21.**  `git ls-remote origin master` = `767e21b8…`, a descendant of `5ac1dd7` (`merge-base --is-ancestor`);
+  GitHub's PushEvent for `5ac1dd7` is **2026-09-22T07:07:05Z**.
+* **(9) Predictions** written before launch: 301.7 and the scorer's `ACCOUNTS` / `PREDICTION = HORIZON-DOES-NOT-REPRODUCE`.
+* **(10) GPU-h:** expected 12.34, hard bound 54 (301.9).
+
+**SUBMITTED** on alice2 with the registered runner, one invocation: `cd ~/stage_csh1_dry &&
+CSH1_REGISTERED_COMMIT=5ac1dd7971b7a5553472858e3ba77321769534bf bash bin/cSH1_horizon.sh --submit` (log
+`~/csh1_submit.log`): "18 jobs (ACCEPTED BY SLURM); 0 rejected", 0 GUARD FAIL; provenance `$WS/runs/csh1/PROVENANCE.txt`.
+**Job ids 5080645–5080662 (18, contiguous):** s180 G1S 5080645, G1L 5080646, GMS 5080647, GML 5080648, GPS 5080649,
+GPL 5080650; s181 G1S 5080651 … GPL 5080656; s182 G1S 5080657 … GPL 5080662 (same arm order).  `squeue` shows exactly
+**18** `csh1-*` jobs, all PENDING (QOSMaxGRESPerUser, behind `crt1`).  **RULE 21 margin:** push 07:07:05Z → first
+submission 07:21:38Z (sacct Submit of 5080645, 09:21:38 CEST) = **14 min 33 s**.  **Owed:** `bash bin/cSH1_rule20.sh`
+from `~/stage_csh1_dry` once all 18 have started (the launcher's post-launch guard 7 was still waiting for a first ARGS
+line when this entry was written, every job pending; its verdict is not recorded here); score only at 18/18 RUN_DONE with `python3 analysis/cSH1_horizon_score.py $WS/runs`.
 
 ## 302. TRACK D (patch, 0.30 GPU-h of proof jobs) — **[LED WITH THE BOUNDS: (1) **THIS ENTRY MEASURED NO ACCURACY OF ANY BATCH AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It records what the audit selected on the TEST set (302.1) and adds an OPT-IN loader patch, `PATCH_VALSPLIT`, proven inert when off and biting when on by two short Slurm jobs on alice2.  (2) **The first proof job (5080195) FAILED its determinism control**: the UNPATCHED tree run twice gave different Epoch lines and probe bytes, so its bitwise-inertness checks could not be read (302.4).  The second (5080389) set deterministic kernels identically in every child and PASSED 82 / 0.  (3) **Inertness is proven BITWISE under deterministic kernels only**; production runs do not set them, and any kernel nondeterminism there acts on patched and unpatched trees alike.  (4) The patch changes WHAT THE MODEL TRAINS ON when on: 45,000 images and 450 steps per epoch, not 50,000 and 500.]** — **THE HARNESS NOW HAS A HELD-OUT VALIDATION SPLIT, BEHIND ONE ENV SWITCH: `VAL_SPLIT=5000:302` HOLDS OUT 5,000 CLASS-STRATIFIED TRAINING IMAGES (500 PER CLASS), CHOSEN BY A SPLIT SEED THAT IS INDEPENDENT OF THE RUN SEED, TRAINS ON THE OTHER 45,000, AND PRINTS A `VAL:` LINE EVERY EPOCH.  UNSET OR EMPTY, THE TREE IS BITWISE THE UNPATCHED ONE.**
 
