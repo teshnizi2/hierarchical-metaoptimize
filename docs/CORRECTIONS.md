@@ -42553,7 +42553,10 @@ catch.
   with `CRT2_REGISTERED_COMMIT=986e165e…` and `CRT2_SCORER_SHA256=47009634…` declared; log `~/stage_crt2_dry1.log`, 276
   lines, `42320a6e…`): **rc 0, 0 guard failures**; guard 1b ACCEPTS the declared commit and the staged scorer's sha
   (the pushed file's sha256 is `47009634…`, checked with `git show`); selftest 104 / 0 / 0; guard 6 45 lines, 0 failed;
-  53 jobs pending at the time.  Both stage directories were then deleted; the two logs are kept.
+  53 jobs pending at the time.  This stage carries the corpus AFTER `cvl1`'s ingest (`5545d88`, another track's commit
+  that landed between the two dry runs: 3,469 rows): guard 2d2 still finds 0 rows with a seed in 200–207, and the
+  selftest's corpus-floor disclosure still reproduces (it is read by nothing).  Both stage directories were then
+  deleted; the two logs are kept.
 * **RULE 20 script** `bin/cRT2_rule20.sh` runs from the stage (0 / 45 present → `UNVERIFIED`, as it must before launch);
   it pins every run to its OWN config's ms and α0, its OWN grain and wd 5e-4 via `analysis/argsline_guard.py`
   (`81cea8b5…`, UNEDITED), and the ENV half `analysis/crt2_rule20_envaudit.py` re-types every literal.  RULE 20 at full
