@@ -1,0 +1,25 @@
+RULE20 run utc=2026-09-22T10:12:45Z host=nodelogin04.alice.leidenuniv.nl batch=crt1 guard_sha=81cea8b586e124a6
+  .out files: 36   with ARGS: 36   squeue: 
+  BATCH-CONSISTENCY --name crt1- --vary seed --vary run-name --vary meta-stepsize --vary alpha0 --vary stepsize-groups -> rc=0  argsline_guard: 36 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (crt1, each run pinned to its OWN config's meta step size and alpha0, its OWN grain, wd 5e-4): 36 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  COVERAGE across the started runs (read from the runs' ARGS lines; registered counts first):
+    registered meta-stepsize: 1e-4 x18, 3e-4 x9, 3e-5 x9 | alpha0: 1e-3 x27, 1e-2 x9 | weight-decay-base: 5e-4 x36
+         18 --meta-stepsize 1e-4
+          9 --meta-stepsize 3e-4
+          9 --meta-stepsize 3e-5
+          9 --alpha0 1e-2
+         27 --alpha0 1e-3
+         36 --weight-decay-base 5e-4
+  GRAIN COVERAGE (registered: 12 each):
+         12 --stepsize-groups chunk777
+         12 --stepsize-groups nodewise
+         12 --stepsize-groups scalar
+    DECLARED: the ENV line carries NO meta step size, NO alpha0 and NO grain; the ARGS half (bin/cRT1_rule20.sh) pins all three.
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x36  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=5 EB_RHO=na EB_LOG=0
+    hold / mask witness lines seen (every one must be ': off'):
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE; --constraint=L4 was requested):
+      x36  NVIDIA L4
+    coverage 36/36 runs with an .out, 0 violations
+  ENV AUDIT VERDICT crt1: PASS
+RULE20 end utc=2026-09-22T10:12:55Z

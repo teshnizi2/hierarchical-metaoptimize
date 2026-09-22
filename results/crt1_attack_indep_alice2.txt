@@ -1,0 +1,136 @@
+==================================================================================================================
+ crt1_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED crt1 SCORER'S OUTPUT (CORRECTIONS 300)
+ No repo module imported, no regular expression, every literal re-typed.  Host-independent output.
+==================================================================================================================
+
+[0] SYNC INTEGRITY -- one digest over every run file's name and bytes, in registered run order
+  files 72   bytes 2776619456   digest 899138c8d3a5de956c2062fe34f9621f2f519e98ec7d519ea2cfbbecd0e5d943
+  PASS 36 .out + 36 probe.jsonl present, exactly one .out per registered run (no twin)   72 files
+  PASS no crt1- .out outside the registered 36 runs
+  PASS PROVENANCE: MODE submit, scorer / design / HF shas and the registered commit are 300.10's   commit 34e564fb31dc
+
+[1] THE DESIGN, REBUILT FROM CORRECTIONS 300.3 / 300.4
+  PASS 12 arms x 3 seeds = 36 runs (the brief's 27 + the 9 A2 runs)
+  PASS the grid: M2 incumbent, A2 alpha0 x10, M3 ms x3, M1 ms /3   M2,A2,M3,M1
+  PASS grain group counts ch 14421 / nd 14420 / k01 1 (count-matched)
+  PASS EMAX4 re-derived by quadrature equals the re-typed 1.0293753730   1.0293753730
+  PASS quadrature exact on the closed form E[max of 3] = 3/(2 sqrt(pi))
+
+[2] EVERY RUN'S ARGS LINE (20 flags, in order), ENV LINE AND G-ONCE, REBUILT
+  PASS 36 / 36 runs complete (100 epoch lines + RUN_DONE)   36
+  PASS G-ONCE: one ARGS line, one ENV line, every epoch line once, on all 36   36
+  PASS every ARGS line == the rebuilt 20-flag line (its OWN config's ms / alpha0, its OWN grain, wd 5e-4)   36
+  PASS every ENV line == the registered line with the run's own PROBE_DIR   36
+  PASS no `<KIND>: on` witness and no PROBE_TENSOR line on any run   36
+  PASS axis coverage read off the ARGS lines is exactly the registered ms 1e-4 x18 / 3e-4 x9 / 3e-5 x9, alpha0 1e-3 x27 / 1e-2 x9
+  GPU (disclosure): NVIDIA L4 x36
+  harness minutes per run (the runs' own `N  minutes` line): chunk777 52-58  nodewise 45-51  scalar 47-49
+
+[3] PROBE STRUCTURE, INITIAL beta, BOX OCCUPANCY AND SHRINK, FROM THE RAW RECORDS
+  PASS 36 / 36 probe files: 10,000 records at steps 0,5,..,49995, n_beta == the arm's m on every record, a beta list on every record, beta moved   36
+  PASS every run's FIRST record has every stored log step size at ln(its own alpha0) (+/- 1e-3): -6.9078 at 1e-3, -4.6052 at 1e-2   36
+  box occupancy per arm (max over seeds): rec_lo / rec_hi, the published 5 % gate (a STAMP here, never a gate)
+    chM2   rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    ndM2   rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    k01M2  rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    chA2   rec_lo 0.0000  rec_hi 0.4947  BOUND   per seed rec_hi 0.4911 0.4887 0.4947
+    ndA2   rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    k01A2  rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    chM3   rec_lo 0.4540  rec_hi 0.6742  BOUND   per seed rec_hi 0.6551 0.6742 0.6710
+    ndM3   rec_lo 0.1910  rec_hi 0.0358  BOUND   per seed rec_hi 0.0214 0.0238 0.0358
+    k01M3  rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    chM1   rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    ndM1   rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+    k01M1  rec_lo 0.0000  rec_hi 0.0000  free   per seed rec_hi 0.0000 0.0000 0.0000
+
+[4] LEVELS, SIGMA, SELECTION, BIAS BOUND, CONTRASTS, STATES AND TOKENS, RECOMPUTED
+  SIGMA_INBATCH 0.249842 (df 24)  floor 0.178183  SIGMA_USED 0.249842 (SIGMA_INBATCH)
+  B = 0.148483   TRAIN-selected ch=A2,nd=A2,k01=A2   TEST-selected ch=A2,nd=A2,k01=A2
+  TUNED-SCALAR-TIES-BEST  ORACLE-SCALAR-TIES-BEST  per-config M2-BEATS+A2-BEATS+M3-BEATS+M1-BEATS  ->  WEAKENED-TO-TIE
+
+[5] THE SCORER'S STDOUT, REBUILT LINE BY LINE AND COMPARED WITH EACH COMMITTED LOG
+  PASS log crt1_retune_score_alice2.txt: 57 lines, 55 rebuilt byte for byte, 2 host-dependent matched by form
+  PASS log crt1_retune_score_mac.txt: 57 lines, 55 rebuilt byte for byte, 2 host-dependent matched by form
+  the FINAL line, rebuilt token by token:
+    FINAL WEAKENED-TO-TIE | TUNED-SCALAR-TIES-BEST | ORACLE-SCALAR-TIES-BEST | M2-BEATS+A2-BEATS+M3-BEATS+M1-BEATS | SEL-TRAIN:ch=A2,nd=A2,k01=A2 SEL-TEST:ch=A2,nd=A2,k01=A2 | ONE-CELL ONE-DECAY-5e-4 FOUR-POINT-GRID ALPHA0-TWO-POINTS SELBIAS-B=0.1485 NO-VALIDATION-SPLIT ALPHA-SCALED-DECAY-ONLY UNDER-DECAYED-VS-STANDARD-RECIPE TIES-ARE-BOUNDS CGW1-COMPARISON-DESCRIPTIVE SIGMA-INBATCH REPLICATE-MATCHES-CGW1 GRID-EDGE-ch-A2 SEL-AGREE-ch SELECTED-BOX-BOUND-ch GRID-EDGE-nd-A2 SEL-AGREE-nd GRID-EDGE-k01-A2 SEL-AGREE-k01 BOX-BOUND-chA2 BOX-BOUND-chM3 BOX-BOUND-ndM3
+
+[6] THE REALISED PER-STEP SHRINK a*wd PER ARM (DESCRIPTIVE).  caw2's registered definition (CORRECTIONS 290): per
+    record, the median over the arm's stored step sizes of exp(beta) x wd; plateau = median over records at step
+    >= 47,500; arm value = median over its 3 seeds.  EXACT for scalar (m 1); for chunk777 / nodewise the records
+    carry only the 62 per-tensor MEANS of log step size, so their figure is a PROXY (labelled).  'max_win' =
+    exp(beta_true_max) x wd, the EXACT largest single-coordinate shrink, window median.  References: a standard
+    SGD recipe's steady-state shrink ~5e-4 (lr 0.1 x wd 5e-4 inside a 0.9 momentum buffer, 296.4) and its bare
+    per-step lr x wd 5e-5.
+  arm    kind     shrink_pl   shrink_pk     max_win   5e-4/pl (x)   5e-5/pl (x)        a_pl
+  chM2   proxy   2.0286e-06  2.0385e-06  3.3442e-05         246.5         24.65  4.0571e-03
+  ndM2   proxy   5.7412e-07  5.7744e-07  1.3381e-05         870.9         87.09  1.1482e-03
+  k01M2  exact   4.2597e-06  4.6608e-06  4.2597e-06         117.4         11.74  8.5195e-03
+  chA2   proxy   1.1556e-05  1.2028e-05  4.9999e-05          43.3          4.33  2.3112e-02
+  ndA2   proxy   5.0457e-06  5.2211e-06  3.3342e-05          99.1          9.91  1.0091e-02
+  k01A2  exact   5.2467e-06  7.6892e-06  5.2467e-06          95.3          9.53  1.0493e-02
+  chM3   proxy   6.0805e-06  7.6284e-06  4.9999e-05          82.2          8.22  1.2161e-02
+  ndM3   proxy   7.6669e-07  7.7402e-07  4.9285e-05         652.2         65.22  1.5334e-03
+  k01M3  exact   4.8282e-06  6.8610e-06  4.8282e-06         103.6         10.36  9.6564e-03
+  chM1   proxy   8.3461e-07  8.4016e-07  2.1492e-06         599.1         59.91  1.6692e-03
+  ndM1   proxy   5.1805e-07  5.1859e-07  1.5777e-06         965.2         96.52  1.0361e-03
+  k01M1  exact   2.0972e-06  2.1608e-06  2.0972e-06         238.4         23.84  4.1944e-03
+  every arm's plateau shrink is 43x to 965x below the standard recipe's ~5e-4 (DESCRIPTIVE): 296.4's W4
+  caveat binds UNWEAKENED at every point of this grid, including the selected A2 arms (chunk777 43x, nodewise 99x, scalar 95x).
+  PASS no arm's plateau shrink reaches even the bare lr x wd 5e-5 (UNDER-DECAYED-VS-STANDARD-RECIPE holds on all 12 arms)
+
+[7] WHAT BOUNDS THE VERDICT -- the registered reading's margins, then DESCRIPTIVE sensitivities (license nothing)
+  REGISTERED (sigma SIGMA_INBATCH 0.249842, B 0.148483, SE 0.203995, 2 SE 0.407989):
+    BEATS needs BOTH T - B >= +0.30 AND T - B > 2 SE:  ch T-B +0.3002 (bar clause met, resolution clause MISSED by -0.1078)
+                                                     nd T-B +0.5395 (bar clause met, resolution clause met by +0.1315)
+    TIES needs min T - B - 2 SE >= -0.30:  -0.1078  -> met
+    PARTITION-ABOVE needs min T + B <= -0.30:  min T + B = +0.5972  (0.8972 pp away)
+    the lower edges (T - B - 2 SE): ch -0.1078, nd +0.1315;  the upper edges (T + B + 2 SE): ch +1.0051, nd +1.2445
+  DESCRIPTIVE 1 -- the reading hinges on O2's sigma.  At the FROZEN floor instead of the in-batch sigma:
+    B 0.105896, SE 0.145486: ch T-B +0.3428 vs 2 SE 0.2910, nd T-B +0.5821  -> the same rule would print TUNED-SCALAR-BEATS-BEST
+    NOT the registered reading (O2 takes the larger sigma).  The in-batch sigma exceeds the floor by 40.2 %;
+    per-arm sd: chM2 0.270  ndM2 0.385  k01M2 0.039  chA2 0.343  ndA2 0.258  k01A2 0.245  chM3 0.140  ndM3 0.066  k01M3 0.060  chM1 0.252  ndM1 0.409  k01M1 0.156
+    pooled sd of the three SELECTED arms alone: 0.285308 (df 6) -- also above the floor
+    the sigma at which the TUNED ch contrast would clear 2 SE net of B (T_ch = B(s) + 2 SE(s)): s = 0.201439
+  DESCRIPTIVE 2 -- the every-config reading (NO selection, so NO B): M2-BEATS+A2-BEATS+M3-BEATS+M1-BEATS; at A2 alone T_ch +0.4487 = 2.20 SE.
+    Scalar's POINT estimate is above both partitions at every config; the TIE is a bound from B and 2 SE, not a
+    measured zero (TIES-ARE-BOUNDS).
+  DESCRIPTIVE 3 -- per seed at the selected config A2 (plateau5):
+    chunk777  s176 90.95  s177 91.49  s178 91.58   mean 91.3400
+    nodewise  s176 91.30  s177 91.20  s178 90.81   mean 91.1007
+    scalar    s176 91.88  s177 91.51  s178 91.98   mean 91.7887
+    same-seed paired k01 - ch: s176 +0.93 s177 +0.02 s178 +0.39;  k01 - nd: s176 +0.58 s177 +0.31 s178 +1.17
+    drop seed 176: T_ch +0.2090  T_nd +0.7420  (2 v 2)
+    drop seed 177: T_ch +0.6610  T_nd +0.8750  (2 v 2)
+    drop seed 178: T_ch +0.4760  T_nd +0.4470  (2 v 2)
+  DESCRIPTIVE 4 -- the grid edge: every grain selects A2 (alpha0 1e-2), the TOP of a TWO-point alpha0 axis
+    (GRID-EDGE-*-A2 x3).  From M2 to A2 the partitions gained ch +3.5887 / nd +3.5040 pp, scalar +1.2780; so the gap
+    closed by 2.3107 / 2.2260 pp.  Nothing above alpha0 1e-2 was run: the grid does not locate any grain's optimum
+    (ALPHA0-TWO-POINTS); whether a larger alpha0 closes the gap further is UNSURE.
+  DESCRIPTIVE 5 -- the box: the SELECTED chunk777 arm is BOX-BOUND (rec_hi 0.4947 max over seeds: its largest
+    coordinate sits at the upper box edge -2.3026 on that fraction of records); ndA2 0.0000, k01A2 0.0000.  The box is
+    a stamp, never a gate: the question is the tuned level at the harness's fixed box.
+  DESCRIPTIVE 6 -- the selector: train5 at A2 ch 99.4407 nd 99.4027 k01 99.6927; next-best config's train5 margin ch +0.3880,
+    nd +0.5667, k01 +0.1480.  TRAIN and TEST select the same config for every grain (SEL-AGREE x3), so the
+    TUNED and ORACLE contrasts are the SAME numbers; the ORACLE reading adds no independent evidence.
+  FLOOR / CEILING (164.6):
+    chM2   level 87.7513  above HEALTH_MIN 80 by +7.7513  above chance 10 by 77.7513  below 100 by 12.2487
+    ndM2   level 87.5967  above HEALTH_MIN 80 by +7.5967  above chance 10 by 77.5967  below 100 by 12.4033
+    k01M2  level 90.5107  above HEALTH_MIN 80 by +10.5107  above chance 10 by 80.5107  below 100 by 9.4893
+    chA2   level 91.3400  above HEALTH_MIN 80 by +11.3400  above chance 10 by 81.3400  below 100 by 8.6600
+    ndA2   level 91.1007  above HEALTH_MIN 80 by +11.1007  above chance 10 by 81.1007  below 100 by 8.8993
+    k01A2  level 91.7887  above HEALTH_MIN 80 by +11.7887  above chance 10 by 81.7887  below 100 by 8.2113
+    chM3   level 89.7180  above HEALTH_MIN 80 by +9.7180  above chance 10 by 79.7180  below 100 by 10.2820
+    ndM3   level 89.2327  above HEALTH_MIN 80 by +9.2327  above chance 10 by 79.2327  below 100 by 10.7673
+    k01M3  level 91.4147  above HEALTH_MIN 80 by +11.4147  above chance 10 by 81.4147  below 100 by 8.5853
+    chM1   level 86.7000  above HEALTH_MIN 80 by +6.7000  above chance 10 by 76.7000  below 100 by 13.3000
+    ndM1   level 86.6680  above HEALTH_MIN 80 by +6.6680  above chance 10 by 76.6680  below 100 by 13.3320
+    k01M1  level 87.4820  above HEALTH_MIN 80 by +7.4820  above chance 10 by 77.4820  below 100 by 12.5180
+  PASS every level >= 5 pp above HEALTH_MIN 80 and >= 5 pp below 100: no contrast is floor- or ceiling-bounded
+    the SELECTOR train5 spans 95.2153 .. 99.6927; its maximum is 0.3073 pp below 100 (not saturated, but close at A2)
+
+[8] THE EXCLUSION ROWS OWED AT INGEST (results/CORPUS-EXCLUSIONS.tsv; kind ARGS_WD_BASE, CORRECTIONS 263 / 300.9)
+  PASS 36 rows rebuilt, one per run, each witnessed by weight-decay-base=5e-4 on the run's OWN ARGS line; ms and alpha0 are CSV columns, so no run owes a second kind
+  PASS the PROPOSED file's 36 data rows == the rebuild, byte for byte, in job order
+  rows digest cb3b65448fb1f0247cdaaf9937b30287ac245d8bee80c008422f6ff8674b122e
+
+SUMMARY  PASS 22  FAIL 0
