@@ -41604,7 +41604,7 @@ threats:** a larger α0 (the grid edge), and the thin σ margin (309.4 item 2).
 
 ### 309.8 What this licenses, and what it does not
 
-**The registered licence, verbatim, at this cell only (`LICENCE[WEAKENED-TO-TIE]`, scorer line 55):**
+**The registered licence, verbatim, at this cell only (`LICENCE[WEAKENED-TO-TIE]`, line 55 of the scorer log):**
 
 > *"after re-tuning, scalar is at most 0.30 pp below the better audited partition at the lower edge (2 SE plus the
 > selection bound) and no longer resolved above both by the bar -- a BOUND: at this cell cgw1's +2.6-2.8 pp was, at
@@ -41806,7 +41806,7 @@ other cell.
 
 ### 310.8 What this licenses, and what it does not
 
-**The registered licence, verbatim, at this cell only (`HORIZON-DOES-NOT-REPRODUCE`, scorer line 195):**
+**The registered licence, verbatim, at this cell only (`HORIZON-DOES-NOT-REPRODUCE`, line 195 of the scorer log):**
 
 > *"At the mechanism cell with the decay dose removed (wd 5e-4), shortening the hypergradient horizon with a constant
 > gamma -- to the collapsing arm's onset-window median (0.999685) and to a horizon at least as short as the collapsing
@@ -41815,7 +41815,7 @@ other cell.
 > a sufficient account, as a BOUND and for a constant gamma.  It does NOT show that the short trace plays no part at wd
 > 0.1, where it acts together with the dose.*
 
-**NOT licensed** (scorer line 198, verbatim in substance): any other network, dataset, meta step, α0, horizon,
+**NOT licensed** (line 198 of the scorer log, in substance): any other network, dataset, meta step, α0, horizon,
 grouping, base or meta optimiser, decay value (only wd 5e-4 ran), a trace-only patch (not run), or anything about the
 collapse's NECESSARY causes at wd 0.1; nothing about the parent paper.  Nor: "the grains are equal"; that γ < 1 damages
 the grains equally (H3); any joint 307.7 row before `crd1` lands.

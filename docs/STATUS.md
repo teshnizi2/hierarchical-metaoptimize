@@ -30,7 +30,7 @@ Draft = `paper/paper.tex` + `paper/DRAFT-v4.md` (**76 pp**). Corpus = **2,761 ro
 
 | item | value |
 |---|---|
-| `crt1` verdict | **`WEAKENED-TO-TIE \| TUNED-SCALAR-TIES-BEST \| ORACLE-SCALAR-TIES-BEST \| M2-BEATS+A2-BEATS+M3-BEATS+M1-BEATS \| SEL-TRAIN:ch=A2,nd=A2,k01=A2 SEL-TEST:ch=A2,nd=A2,k01=A2`** + 14 stamps |
+| `crt1` verdict | **`WEAKENED-TO-TIE \| TUNED-SCALAR-TIES-BEST \| ORACLE-SCALAR-TIES-BEST \| M2-BEATS+A2-BEATS+M3-BEATS+M1-BEATS \| SEL-TRAIN:ch=A2,nd=A2,k01=A2 SEL-TEST:ch=A2,nd=A2,k01=A2`** + 12 stamps |
 | `crt1` bounds first | one cell, one decay (α-scaled 5e-4); **the branch rests on σ** — at the floor σ both readings would print BEATS (`NOT-A-TUNING-ARTEFACT`), break-even 0.2014, in-batch 0.2498; four-point grid, α0 two points, **every grain selected at the edge A2**; B 0.1485 is an expected-bias bound; no validation split; 43–965× under-decayed vs a standard recipe; a tie is a bound |
 | `crt1` numbers | tuned (= oracle) **T_ch +0.4487, T_nd +0.6880 pp**; B 0.1485, 2 SE 0.4080; chunk777 misses the 2 SE clause by **0.1078** net of B → TIES; PARTITION-ABOVE 0.90 pp from its bar; untuned M2 replicates `cgw1` (+2.7593 / +2.9140); M2 → A2 the partitions gain +3.59 / +3.50, scalar +1.28 (descriptive) |
 | `csh1` verdict | **`HORIZON-DOES-NOT-REPRODUCE \| A-NOGAP+M-NOGAP+P-NOGAP`** + `TRACE-P-DOMINATES`, `DECAY-DOSE-A/M/P-BELOW`, `HARNESS-CLEAN` and the 13 registered bounds (FINAL verbatim at 310.2) — the registered prediction |
