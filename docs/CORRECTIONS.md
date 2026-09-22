@@ -39690,7 +39690,108 @@ scorer and `docs/STATUS.md` / `docs/ICML-PLAN.md` NOT edited.  **Submission is t
 
 ## 301. RESERVED — Track C: the 1.20 short-horizon γ control (threat T-C). Placeholder; replaced in place by its track.
 
-## 302. RESERVED — Track D: the validation-split loader patch (1.14, CORRECTIONS 135.1). Placeholder; replaced in place by its track.
+## 302. TRACK D (patch, 0.30 GPU-h of proof jobs) — **[LED WITH THE BOUNDS: (1) **THIS ENTRY MEASURED NO ACCURACY OF ANY BATCH AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It records what the audit selected on the TEST set (302.1) and adds an OPT-IN loader patch, `PATCH_VALSPLIT`, proven inert when off and biting when on by two short Slurm jobs on alice2.  (2) **The first proof job (5080195) FAILED its determinism control**: the UNPATCHED tree run twice gave different Epoch lines and probe bytes, so its bitwise-inertness checks could not be read (302.4).  The second (5080389) set deterministic kernels identically in every child and PASSED 82 / 0.  (3) **Inertness is proven BITWISE under deterministic kernels only**; production runs do not set them, and any kernel nondeterminism there acts on patched and unpatched trees alike.  (4) The patch changes WHAT THE MODEL TRAINS ON when on: 45,000 images and 450 steps per epoch, not 50,000 and 500.]** — **THE HARNESS NOW HAS A HELD-OUT VALIDATION SPLIT, BEHIND ONE ENV SWITCH: `VAL_SPLIT=5000:302` HOLDS OUT 5,000 CLASS-STRATIFIED TRAINING IMAGES (500 PER CLASS), CHOSEN BY A SPLIT SEED THAT IS INDEPENDENT OF THE RUN SEED, TRAINS ON THE OTHER 45,000, AND PRINTS A `VAL:` LINE EVERY EPOCH.  UNSET OR EMPTY, THE TREE IS BITWISE THE UNPATCHED ONE.**
+
+### 302.1 What the audit selected on the TEST set (the question 1.14 asks, answered from the records)
+
+Every number of the count-matched partition audit is plateau5 = mean TEST accuracy over epochs 95–99; the harness has
+never had a validation split (135.1 lists "no held-out validation split" among the abstract's threats; PLAN.md B3
+ruled selection "on a fixed 5,000-image validation split carved from train", and that half of the ruling was never
+implemented).  Read item by item, from the records named, for the core cell (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion /
+ms 1e-4 / α0 1e-3):
+
+| choice | selected on TEST? | record |
+|---|---|---|
+| **meta step size ms = 1e-4** | **YES.**  Scalar's ms was moved 1e-3 → 1e-4 by its plateau5-TEST level (FINDINGS 38.1, "`scalar` at ms=1e-4 lands 92.2–92.6"); at cycle 73 `tw0`'s guard 2b "re-derived from the CSV that ms=1e-4 is the argmax for weightwise, layerwise AND scalar" (FINDINGS 72.4 / 73.5) — the CSV's plateau5 is a TEST mean.  **Nodewise's own TEST argmax is 3e-4, not 1e-4** (+0.420 pp, t ≈ 4.1, CORRECTIONS 108); chunk777 had no ms curve at all when 1e-4 was fixed (108). | FINDINGS 38.1, 72.4, 73.5; CORRECTIONS 108 |
+| α0 = 1e-3 | **Not an argmax in the records read**: adopted to remove the "escape confound" of α0 = 1e-6 (FINDINGS 35.2, 38.3) — a mechanism reason, though the comparisons that exposed it were test readings.  **UNSURE** whether any test-accuracy comparison chose 1e-3 over a neighbour. | FINDINGS 35.2, 38.3 |
+| the partitions (chunk777 vs nodewise) | **No.**  chunk777's K is fixed by COUNT-MATCHING (m 14,421 v 14,420); nodewise is the architecture's own grouping. | MASTER-TABLE §10; CORRECTIONS 104–119 |
+| the plateau window (epochs 95–99, mean) | **No.**  Fixed a priori by PLAN.md B3's ruling (final epoch and mean of the last 5), replacing best-of-100, which WAS a per-run test selection and is logged only for the parent-paper table. | PLAN.md B3; PLAN-appendix-infra §"do not report best test accuracy" |
+| wd 0.1, Lion 0.99 / 0.9, meta wd 0, γ 1, bs 100 | **No record of a test selection**: these are `train.py`'s own defaults. | `train.py` parse_args |
+| SGDm base momentum 0.99, the box −15:−2.3026 | **UNSURE — not traced.**  `train.py`'s default base momentum is 0.9; where 0.99 was chosen, and on what, is not established by the records read for this entry. | — |
+
+**Consequence for the TMLR paper:** the one hyperparameter of the core cell known to be test-selected is ms, and
+`cgw1`'s 5e-4 rung inherits it from a selection made at wd 0.1 — which is Track B's question (300, `crt1`).  What
+1.14 can test cheaply is the READING: whether the rankings the audit reports on test hold when the same runs are read
+on data nobody selected on.  That is `cvl1` (303).  It does NOT re-select ms (bound `MS-ALPHA0-NOT-RESELECTED`).
+
+### 302.2 The patch (`patches/patch_valsplit.py`, sha `a18dfa9b…`), additive and opt-in, like `PATCH_SHADOWVOTE` (262)
+
+`VAL_SPLIT=<n_val>:<split_seed>`; UNSET or EMPTY → OFF.  FOUR insertions, NO existing line edited: in `load_data.py`
+one call `trainset = _vs_apply(...)` between the dataset branches' `else: 0/0` and the train DataLoader, and one module
+block appended after `compute_test_accuracy`; in `train.py` one `import load_data as _vs_ld` and one guarded VAL
+evaluation right after the per-epoch print.  ON: for each class in increasing order its ascending indices are
+permuted by ONE `numpy.random.RandomState(split_seed)` and the first n_val/K are held out — a function of (labels,
+n_val, split_seed) only; it never reads or advances the global numpy or torch RNG.  The held-out images are read
+through a second dataset object with the TEST transform (no crop / flip); the model trains on the rest through the
+original AUGMENT transform and the same shuffled loader; the test loader is untouched.  Every epoch, after the
+unchanged `Epoch …` line: `VAL: epoch <e> val_acc <x> % n_val <n>` (compute_test_accuracy, the harness's own; at 5,000
+images every accuracy is a multiple of 0.02, so two decimals are exact; the line contains neither `Test Accuracy: `
+nor `Epoch N, Train Accuracy`, so no corpus or scorer reader of test accuracy can read it).  Witness on EVERY run:
+`VAL_SPLIT: off`, or `VAL_SPLIT: on dataset=… n_val=… n_train=… classes=… per_class=… split_seed=… val_sha=<64 hex>
+train_sha=<64 hex>` (the runner's ENV line cannot carry VAL_SPLIT).  Premises LOUD (ValueError): a malformed value
+(anything but `<digits>:<digits>`, full match), n_val 0, not a multiple of the class count, or ≥ N; a class too small;
+a dataset other than CIFAR10 / CIFAR100.  The value is one `--export` token.
+
+**The tree** `$WS/harness_cvl1/cifar10`, built by `bin/cVL1_stage_harness.sh --stage` (sha `1b5bb812…`): a byte copy
+of the live tree (each file at `cgw1`'s pinned sha), then the patch; post `load_data.py` **`c8eb8385…`**, post
+`train.py` **`8706d8c7…`** (the same two shas the Mac computed from the same pre bytes), `*.pre_valsplit` backups equal
+to the pre shas `b52b58a3…` / `3fea309e…`; `HF.py` **`4732b74a…` UNPATCHED** (cgw1's), build_network / build_optimizer /
+tin_data at their pinned shas; data symlinked; runner `$WS/jobs/run_cifar_cvl1.sh` (`7e9b00bb…`) differs from
+`run_cifar.sh` in exactly the `cd` line.  Verify mode: VERIFIED.
+
+### 302.3 Tests first
+
+`tests/test_valsplit.py` (sha `bc65c10a…`) and `tests/test_valsplit_realrun.py` were written BEFORE the patch; the
+unit test's first run on the Mac FAILED on "patches/patch_valsplit.py exists", as it should.  After the patch:
+**Mac 39 PASS / 0 FAIL** (V0 structure, V1 split, V2 loudness, V4; V3 skipped, no torch); **alice2, inside the proof
+job, 52 PASS / 0 FAIL** (V3 on the REAL CIFAR-10 train set added).  V0: deleting the four regions reproduces both pre
+files BYTE FOR BYTE; a second application is `ALREADY_PATCHED` and changes nothing; a missing anchor is refused with
+nothing written.  V1: 5,000 held out, exactly 500 per class, disjoint, union complete, identical after re-seeding the
+global numpy RNG with every run seed 184–191, the global RNG not consumed, split seed 303 differs.  **Cross-version
+stability:** the synthetic split's val sha is `9fcd50ca…` on the Mac (numpy 2.4.4) AND on alice2 (numpy 1.26.4).
+V3 (CPU, real labels): OFF (unset and empty) → the train loader's dataset IS the 50,000-image CIFAR10 object and
+VAL_LOADER is None; ON → 45,000 / 5,000, 500 per class, the val subset on the test transform, two reads of one val image
+equal, the witness line equal to the patch's own formatter, the split IDENTICAL for run seeds 184 and 191.
+
+### 302.4 THE PROOF — two Slurm jobs on alice2 (never the login node), both read line by line
+
+* **Job 5080195** (`bin/cVL1_realrun_proof.sbatch` as first written; node880, NVIDIA L4, 8 min 58 s; log sha
+  `65320a93…`, kept at `$WS/runs/cvl1/proof_valsplit_first_nondeterministic.log`): the unit test ALL PASS; the
+  real-run driver ran plain `python train.py` and **RR0 FAILED — the UNPATCHED tree against ITSELF gave different
+  Epoch lines (e.g. epoch 0 test 29.79 vs 29.81) and different probe bytes**, so RR1's six bitwise checks failed
+  with it and are UNREADABLE, not evidence against the patch.  Its bite checks (RR2, RR3) all passed.  **Recorded as
+  a failed determinism control, not as a pass.**
+* **Fix (driver only, patch unchanged):** each variant now runs in a child that sets `cudnn.deterministic=True`,
+  `cudnn.benchmark=False`, `torch.use_deterministic_algorithms(True, warn_only=True)` and
+  `CUBLAS_WORKSPACE_CONFIG=:4096:8` identically, then executes the tree's OWN, unchanged `train.py` as `__main__`
+  (`runpy`).  Driver sha `22737f01…`.
+* **Job 5080389** (node880, NVIDIA L4, 9 min 00 s, 06:59:34Z–07:08:33Z; log sha **`d02a744c…`**, copied to
+  `$WS/runs/cvl1/proof_valsplit.log` for the launcher's guard 3g): `STAGE_VERIFY_RC 0`, `TEST_VALSPLIT_RC 0` (52/0),
+  **`REALRUN_RC 0`, 30 PASS / 0 FAIL**; 82 PASS / 0 FAIL in the log.  The real train.py, chunk777, 2 epochs per variant:
+  * **RR0** the unpatched tree twice: Epoch lines and probe.jsonl IDENTICAL (probe sha `abdbd36f…` both).
+  * **RR1 INERTNESS, flag OFF** (unset AND empty): Epoch lines (train and test accuracy) and probe.jsonl
+    **BYTE-IDENTICAL** to the unpatched tree's (`abdbd36f…`); ONE `VAL_SPLIT: off` line, NO `VAL:` line; the stdout
+    differs from the unpatched tree's by that one line only; last probe step 995 (500 steps × 2).
+  * **RR2 BITE, flag ON** (`5000:302`, run seeds 184 AND 185): ONE witness `n_val=5000 n_train=45000 classes=10
+    per_class=500 split_seed=302`; **TRAIN SET SIZE**: probe records at 0, 5, …, 895, i.e. 450 batches of 100 per
+    epoch — the model trained on 45,000; **VAL LINES**: 2 per run, epochs 0–1, each right after its Epoch line,
+    n_val 5000, multiples of 0.02 (s184: 27.72, 37.78; s185: 27.52, 36.28); the Epoch lines differ from OFF's;
+    **SPLIT IDENTICAL ACROSS SEEDS**: val_sha **`7d3a1489390161d637ad0b526ac32a10723210722879f8deead4462e4f69bb0e`**
+    and train_sha **`2733a990cf7a76d8…`** for both seeds, and val_sha equal to V3's CPU value.  The full train_sha
+    (`2733a990cf7a76d8e92014cdd6aceeb8c055f7cd49cc7df913923b066c1e5e91`) was re-derived by the tree's own helper from
+    the `data_batch_1..5` labels on the login node (a label read, no model, no GPU); its first 16 hex equal RR2's.
+  * **RR3 NON-VACUITY**: split seed 303 → a different val_sha; `VAL_SPLIT=5000` → exit 1, `ValueError:
+    PATCH_VALSPLIT: …` before any Epoch line.
+
+### 302.5 What this licenses, and what it owes
+
+It licenses running a batch on `harness_cvl1` with `VAL_SPLIT=5000:302` and reading its VAL lines as accuracy on
+5,000 images the model never trained on, and nothing else; it measures nothing about the audit.  **Owed at any
+ingest of a VAL_SPLIT run:** such runs train on 45,000 images, which no CSV column carries, so every one must be
+listed in `results/CORPUS-EXCLUSIONS.tsv`; `corpus_exclusions.py`'s `KINDS` has **no VAL_SPLIT kind** (a listed
+witness of an unknown kind FAILs `--check`, and an unknown ON line is not seen by the completeness reader).  That is
+a code gap for a Track C entry (as 284 / 294 were), **reported, not fixed here**.  GPU: **0.30 GPU-h** (two proof jobs,
+9 min each on L4).  `alice` was not contacted; nothing under `paper/` was read; nothing was downloaded.
 
 ## 303. RESERVED — Track D: the 1.14 validation-split batch registration. Placeholder; replaced in place by its track.
 

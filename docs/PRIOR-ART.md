@@ -353,6 +353,38 @@ has a decay-value threshold.
 collapse**, and the **scalar-vs-layerwise granularity gap measured as a function of the coupled decay** — the curve
 `cwd5` exists to produce.
 
+## Sweep 2026-09-22 — validation vs test selection, and whether small-gap rankings transfer (CORRECTIONS 303, batch `cvl1`, Track D)
+
+Abstract pages and web search only; no `.pdf` fetched, nothing downloaded. **Queries:** (1) "test set selection vs
+validation split optimizer comparison rankings change CIFAR-10 hyperparameter selection bias"; (2) "arXiv optimizer
+benchmark validation test ranking agreement small accuracy differences seeds CIFAR held-out 5000"; (3) "per-group
+learning rate partition meta-learned step size validation split re-selection test-set overfitting"; (4)–(5) the
+abstract pages of arXiv:2304.01910 and arXiv:1806.00451 (search-result abstracts; the arXiv abstract tool returned
+"not found" for both ids, so their content here is what the abstract pages / search snippets state); (6) the
+abstract of arXiv:2103.03098 (read through the arXiv abstract tool).
+
+**Found, read at abstract level:**
+* Recht, Roelofs, Schmidt, Shankar, *Do CIFAR-10 Classifiers Generalize to CIFAR-10?* (arXiv:1806.00451) — a fresh
+  CIFAR-10 test set costs a broad range of models 4–10 % accuracy, but models with higher original accuracy keep
+  larger gains, which the authors read as NOT due to adaptive over-fitting. **ADJACENT:** it concerns ranking transfer
+  across MODEL FAMILIES with gaps of many points, not sub-point contrasts between optimiser partitions at one model.
+* *On the Variance of Neural Network Training with respect to Test Sets and Distributions* (arXiv:2304.01910, ICLR
+  2024) — standard CIFAR-10 trainings vary markedly on their TEST SET across seeds while varying little on the
+  underlying test DISTRIBUTION; i.e. much seed-to-seed test variance is finite-sample. **ADJACENT, and it bears on
+  the design:** a 5,000-image validation set carries roughly twice the finite-sample variance of the 10,000-image
+  test set, so cvl1's VAL reader must use its own in-batch sigma (it does: SIGMA_VAL = max(floor, in-batch)).
+* Bouthillier et al., *Accounting for Variance in Machine Learning Benchmarks* (arXiv:2103.03098) — data sampling,
+  initialisation and hyperparameter choice all move benchmark conclusions markedly. **ADJACENT:** a general warning,
+  no test of our contrast.
+* Schmidt, Schneider, Hennig, *Descending through a Crowded Valley* (arXiv:2007.01547) — already on file at
+  ICML-PLAN B2; optimiser benchmarking with tuning budgets. **ADJACENT.**
+
+**Verdict:** nothing found tests whether a SUB-POINT partition ranking of a meta-learned step size (±0.2–0.5 pp), or
+a 2.6 pp scalar-over-partition gap, measured on test, survives on a held-out validation split. The literature
+predicts that a gap of several points transfers and that a sub-point gap may not, and it says the smaller split is
+noisier — which is exactly what cvl1 is built to read, not a reason to drop it. The batch is not shrunk on
+prior-art grounds; it is capped at 32 runs by the task.
+
 ---
 
 ## Sweep 2026-09-22 — SHORT-HORIZON BIAS as a rival account of the scalar collapse (CORRECTIONS 301, batch `csh1`)
