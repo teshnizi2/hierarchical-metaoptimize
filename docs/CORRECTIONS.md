@@ -42333,7 +42333,7 @@ batch (`g3b`, `cai1`, `crd1`) touched.
 
 *(312 written in place over its RESERVED stub; 313 is its own track's.  **Provenance note:** the campaign working tree is shared, and this entry's text entered `origin/master` inside the `crt2` track's commit `e445db3` ("CORRECTIONS 313.10: second crt2 dry run …", +375 lines, of which 370 are 312), which staged `docs/CORRECTIONS.md` while 312 was written and not yet committed; the text is byte-identical to what this track wrote.  The 312 landing commit carries `docs/ICML-PLAN.md`, `docs/MASTER-TABLE.md`, `docs/STATUS.md` and this note.)*
 
-## 313. TRACK B — **`crt2` REGISTERED, NOT SUBMITTED: THE RETUNE PAST `crt1`'s GRID EDGE.  AFTER TUNING EACH GRAIN UNTIL ITS OPTIMUM IS LOCATED, DOES PLAIN SCALAR TIE, BEAT, OR FALL BELOW THE BETTER COUNT-MATCHED PARTITION AT `crt1`'s CELL (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, α-scaled wd 5e-4)?  {chunk777, nodewise, scalar} × A FIVE-POINT PLUS GRID CENTRED ON (ms 1e-4, α0 3e-2) — A2 1e-4/1e-2 (`crt1`'s selection, REPLICATED), A3 1e-4/3e-2, A4 1e-4/1e-1, H3 3e-4/3e-2, L3 3e-5/3e-2 — × SEEDS {200, 201, 202}; 15 ARMS, 45 JOBS, 40.25 GPU-h EXPECTED, 90 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, ONE DECAY** (`crt1`'s; α-scaled 5e-4 only).  (2) **A FIVE-POINT GRID INSIDE THE HARNESS's FIXED BOX.**  "Located" means located on this plus: only the centre A3 is interior on both axes; A2 counts as located on α0 only because `crt1`'s landed IN-BATCH A2 − M2 contrast brackets it from below (a literal, cross-batch); the ms axis is crossed at α0 3e-2 only.  (3) **THE CEILING −2.3026 (a ≤ 0.1) IS NOT AN AXIS** (313.4), and the upper α0 point A4 STARTS on it, so an A4 selection is NOT LOCATED by construction.  (4) **σ IS FROZEN** at `crt1`'s in-batch 0.249842 (df 24); every threshold is a registered constant; the in-batch σ is a validity gate only (313.7).  (5) **B = 0.1678 pp is an EXPECTED-bias bound over five configs**, not a high-probability bound.  (6) **NO VALIDATION SPLIT**: selection on TRAIN, the oracle on TEST (`cvl1`, 303, is the batch for 1.14).  (7) **EVERY ARM IS UNDER-DECAYED AGAINST A STANDARD SGD RECIPE** (296.4 binds; the ceiling a = 0.1 is itself 10× below a standard recipe's effective step, 313.4).  (8) **A TIE IS A BOUND** (164.6), and at three seeds the UNRESOLVED band is ±0.2757 pp around zero, so an exact tie reads UNRESOLVED, not "ties".  All are stamped on every FINAL.]**
+## 313. TRACK B — **`crt2` REGISTERED; VERIFIED AND SUBMITTED 2026-09-22 (313.12: 45 jobs 5083795–5083839, RULE 21 +20 min 07 s): THE RETUNE PAST `crt1`'s GRID EDGE.  AFTER TUNING EACH GRAIN UNTIL ITS OPTIMUM IS LOCATED, DOES PLAIN SCALAR TIE, BEAT, OR FALL BELOW THE BETTER COUNT-MATCHED PARTITION AT `crt1`'s CELL (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, α-scaled wd 5e-4)?  {chunk777, nodewise, scalar} × A FIVE-POINT PLUS GRID CENTRED ON (ms 1e-4, α0 3e-2) — A2 1e-4/1e-2 (`crt1`'s selection, REPLICATED), A3 1e-4/3e-2, A4 1e-4/1e-1, H3 3e-4/3e-2, L3 3e-5/3e-2 — × SEEDS {200, 201, 202}; 15 ARMS, 45 JOBS, 40.25 GPU-h EXPECTED, 90 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, ONE DECAY** (`crt1`'s; α-scaled 5e-4 only).  (2) **A FIVE-POINT GRID INSIDE THE HARNESS's FIXED BOX.**  "Located" means located on this plus: only the centre A3 is interior on both axes; A2 counts as located on α0 only because `crt1`'s landed IN-BATCH A2 − M2 contrast brackets it from below (a literal, cross-batch); the ms axis is crossed at α0 3e-2 only.  (3) **THE CEILING −2.3026 (a ≤ 0.1) IS NOT AN AXIS** (313.4), and the upper α0 point A4 STARTS on it, so an A4 selection is NOT LOCATED by construction.  (4) **σ IS FROZEN** at `crt1`'s in-batch 0.249842 (df 24); every threshold is a registered constant; the in-batch σ is a validity gate only (313.7).  (5) **B = 0.1678 pp is an EXPECTED-bias bound over five configs**, not a high-probability bound.  (6) **NO VALIDATION SPLIT**: selection on TRAIN, the oracle on TEST (`cvl1`, 303, is the batch for 1.14).  (7) **EVERY ARM IS UNDER-DECAYED AGAINST A STANDARD SGD RECIPE** (296.4 binds; the ceiling a = 0.1 is itself 10× below a standard recipe's effective step, 313.4).  (8) **A TIE IS A BOUND** (164.6), and at three seeds the UNRESOLVED band is ±0.2757 pp around zero, so an exact tie reads UNRESOLVED, not "ties".  All are stamped on every FINAL.]**
 
 *ZERO GPU by this entry.  The live check is CPU construction on the `alice2` login node inside the dry run; no Slurm
 job submitted (the verifier submits).  `alice` NOT contacted.  Nothing under `paper/` listed, read or touched; no clone,
@@ -42580,5 +42580,82 @@ exclusion rows**; scoring with and only with `python3 analysis/cRT2_retune_score
 **GPU used by this entry: ZERO.**  Batch expected 40.25 GPU-h, hard bound 90.  Scratch: `~/stage_crt2_dry` deleted after
 this entry (its logs `~/stage_crt2_dry0.log` and `~/stage_crt2_harness.log` are cited above and kept); the Mac scratch
 under the session scratchpad deleted.
+
+### 313.12 INDEPENDENT VERIFICATION AND SUBMISSION (2026-09-22) — **PASSED; 45 JOBS SUBMITTED, 5083795–5083839**
+
+*Verifier's entry.  ZERO GPU used by verification (selftest and dry run are CPU; the live check is CPU construction on
+the `alice2` login node).  `alice` NOT contacted; nothing under `paper/` touched; no clone, checkout or worktree (stage
+= `git archive 986e165 -- analysis bin results`); nothing downloaded; no Vercel URL opened; `g3b` / `cai1` / `crd1` not
+touched (they stay ahead in the queue).  No registered file edited: this subsection and the heading tag are the only
+changes.*
+
+**Checks, each with its evidence.**
+
+| check | evidence | verdict |
+|---|---|---|
+| prior art | `docs/PRIOR-ART.md` "Sweep 2026-09-22 — tuning-protocol fairness and LOCATING …": dated, queries listed, five arXiv ids (1910.05446, 1910.11758, 2007.01547, 2306.07179, 1703.04782, the last by search summary only, disclosed); verdict "not shrunk" | PASS |
+| grid brackets each predicted optimum on α0 | see (a) below | PASS (a JUDGEMENT; residual risk disclosed) |
+| clip-ceiling decision | ceiling is ENV `BETA_CLIP`, not a CLI flag (the 45 composed lines export `BETA_CLIP=-15:-2.3026`, identical to `crt1`'s ENV line); selftest B re-derives the chA2 ceiling fraction 2.77e-4 and nd / k01 0 from `crt1`'s REAL probe records on both hosts; A4 and any `CEIL-BULK` selection are NOT LOCATED by `located()` (read in the scorer) | PASS |
+| σ rule cannot flip the branch | see (b) below | PASS |
+| frozen literal bars | re-computed here: B = EMAX5·σ/√3 = 0.1677530, SE = σ√(2/3) = 0.2039947, EDGE_BEATS = max(0.30, 2 SE) + B = 0.5757425, EDGE_TIE = 2 SE + B − 0.30 = 0.2757425 — equal to the scorer's literals to 6 d.p.; SURV 0.30, RES 2.0, HEALTH_MIN 80, DIVERGED 2.0, CEIL_BULK 0.05, MATCH 0.50 as registered | PASS |
+| ladder exhaustive, ordered, all three outcomes reachable | `reading_of()` read line by line: gates → BEATS (both T > 0.5757) → PARTITION-ABOVE (min T < −0.5757) → SCALAR-TIES (min T ≥ 0.2757) → PARTITION-TIES (min T ≤ −0.2757) → UNRESOLVED; the five regions partition the real line of min T with no overlap, so "scalar beats", "ties" (both directions) and "a partition beats" are each reachable; `branch_of()` maps every (TUNED, ORACLE, gate) to one of the eight; selftest C exhaustive | PASS |
+| bounds on the FINAL | the FINAL carries every registered bound (selftest E asserts it is the last line and carries each) | PASS |
+| `--selftest`, Mac (rerun) | `python3 analysis/cRT2_retune_score.py --selftest --runsdir ../runs_alice2`, Python 3.14: **104 PASS / 0 FAIL / 0 SKIP** | PASS |
+| `--selftest`, `alice2` (rerun) | guard 1c of the verifier's dry run, mo venv Python 3.10.4: **104 / 0 / 0**, 1c1–1c4 PASS | PASS |
+| dry run (rerun) | `~/stage_crt2` = `git archive 986e165 -- analysis bin results`, with `CRT2_REGISTERED_COMMIT` and `CRT2_SCORER_SHA256` declared; log `~/stage_crt2_verify_dry.log` (276 lines): **rc 0, 0 GUARD FAIL**; guard 1b accepts the declared commit and scorer sha; guard 4b3 live manifest 1,513 bytes `7ea89eb2…` (= the design's); guard 6: 45 lines, 0 failed | PASS |
+| ARGS lines flag for flag | independent script (not the launcher's): each of the 45 composed train.py tails parsed into (flag, value) pairs and compared, IN ORDER, with `crt1-chA2-s176`'s own landed ARGS line (20 flags) with only `--meta-stepsize`, `--alpha0`, `--stepsize-groups`, `--seed`, `--save-directory`, `--run-name` substituted from the design grid: **45 / 45 identical, 0 mismatches, 45 distinct runs**; each `--export` string identical bar `PROBE_DIR`; every line `--constraint=L4 --time=02:00:00` | PASS |
+| seeds fresh, in 200–207 | seeds used {200, 201, 202}; `results/all_runs.csv` (3,469 rows) 0 rows with a seed in 200–207 and 0 `crt2*` runs; guard 2d 0 `.out` ARGS lines with 200–207; guard 2e/2f 0 `crt2-*` in sacct / squeue; running / queued batches carry seeds 171–173 (`g3b`) and 192–198 (`cai1`, `crd1`) only | PASS |
+| noise floor quoted | `NOISE_FLOOR_DEMO = 0.636566` (df 274) in the scorer, read by no bar (grep: no bar references it) | PASS |
+| predictions | `crt2_design.PRED` per arm, eight branch priors summing to 1, LOC-ALL 0.45, written before launch (selftest G) | PASS |
+| GPU-h hard bound | 45 × WALL 2 h = **90 GPU-h**; expected 15 × (59 + 52 + 50) / 60 = 40.25 | PASS |
+| RULE 21 | see (c) | PASS |
+
+**(a) Where each grain's optimum should lie, from 309's numbers (a JUDGEMENT, UNSURE).**  At ms 1e-4, from α0 1e-3 to
+1e-2 the partitions gained +3.59 / +3.50 pp and scalar +1.28 (309.3).  Two points on a concave curve cannot place an
+optimum, so the verifier used the hypergradient's own drift at A2 (313.4, `crt1`'s probe records): **scalar's β ends at
+−4.55 to −4.60 (a ≈ 0.0100–0.0106), essentially where it started (ln 1e-2 = −4.605)**, i.e. its meta-gradient does
+not push above 1e-2; **nodewise's per-tensor mean β ends at −3.35 to −3.39 (a ≈ 0.034–0.035)**, i.e. it climbs from
+1e-2 to about 3.5e-2; chunk777 climbs too (a handful of groups reach the ceiling).  Prediction: **scalar's optimum
+near 1e-2 (between 1e-3 and 3e-2)**, bracketed by `crt1`'s landed A2 − M2 contrast below (+1.2780 > 2 SE 0.4080; the
+`LOCATED-A0-XB` rule) and by A3 above; **the partitions' optima near 3e-2 (between 1e-2 and 1e-1)**, bracketed in batch
+by A2 and A4 around A3.  So the grid contains each predicted optimum with a point on each side.  **Residual risk,
+recorded:** if the partitions (or scalar) keep improving up to the ceiling a = 0.1 — plausible, since the ceiling is
+10× below a standard recipe's effective step (313.4) — the selection lands on A4 and reads `NOT-LOCATED-A0HI-CEILING`
+/ `LOC-PARTIAL`, which is a registered, stamped outcome, not a scorer failure.  The ceiling is part of the harness's
+fixed box and moving it would change the ENV line against `crt1`; not a fundamental defect.
+
+**(b) Break-even σ.**  With T the min contrast, BEATS needs T > kσ and SCALAR-TIES needs T ≥ kσ − 0.30, where
+k = 2√(2/3) + EMAX5/√3 = 2.30442.  For `crt1`-like outcomes: T = +0.4487 → BEATS iff σ < 0.1947, TIES iff σ ≤ 0.3249;
+T = +0.6880 → 0.2986 / 0.4287; T = +0.20 → 0.0868 / 0.2170; T = 0 → TIES iff σ ≤ 0.1302.  The frozen 0.249842 sits
+0.055 above and 0.075 below the two break-evens for 309's own case, but this no longer matters: **σ is a registered
+constant, so no in-batch σ moves any edge**; the in-batch σ can only fire the validity gate (0.3342 at df 30, 34 %
+above the frozen value, nominal size 0.5 %, simulated 0.42 %), which WITHDRAWS a licence (`BRANCH-SIGMA-INCONSISTENT`)
+and never swaps one for another (`branch_of()` read).  Selftest S (0 of 600 tables move) confirms on both hosts.
+
+**(c) RULE 21.**  Registration commit `986e165` (scorer sha256 `47009634…`, design `39e4541c…`, launcher `d17c64db…`,
+all seven registered files byte-identical at `origin/master`) — commit time 2026-09-22T13:07:00Z; **GitHub PushEvent
+13:07:02Z**.  Immediately before submission `git ls-remote origin refs/heads/master` returned `a3d422a` (another
+track's later commit) and `986e165` is its ancestor (checked 13:24:45Z).  First job submitted **13:27:09Z** (Slurm
+SubmitTime 15:27:09 CEST), last 13:27:16Z.  **RULE 21 margin: +20 min 07 s after the PushEvent (≥ +2 min 24 s after
+the ls-remote confirmation).**
+
+**Submission.**  On `alice2`, from `~/stage_crt2` (= `git archive 986e165 -- analysis bin results`), exactly the
+registered command: `CRT2_REGISTERED_COMMIT=986e165e59c9675eeda4e9249d94b111d95b8601
+CRT2_SCORER_SHA256=47009634d2136fe317bcee72a11b316339f141c026f09a6577be6253fcd4231d bash bin/cRT2_retune.sh --submit`
+(log `~/stage_crt2_submit.log`).  Every guard passed; guard 5 at submission: 50 pending + 45 = 95 ≤ 110.
+**45 jobs ACCEPTED BY SLURM, 0 rejected: job ids 5083795–5083839 (contiguous), names `crt2-<arm>-s<seed>`, 15 arms ×
+seeds 200–202, all PENDING** behind `g3b` / `cai1` / `crd1` (confirmed by `squeue`).  Guard 7 (RULE 20 post-launch):
+**UNVERIFIED** (no `crt2` job started within its 600 s window, as expected with the batch queued behind three others; launcher rc 0).  The by-hand ARGS audit (`python3 analysis/argsline_guard.py $WS/runs --name crt2-`) and RULE 20 at full coverage are therefore OWED before any number is quoted.  `$WS/runs/crt2-PROVENANCE.txt` written by the launcher.
+
+**Discrepancies noted (wording only, no registered file changed):** 313.8 says 54 jobs pending "at the dry run" (the
+first dry run); the second showed 53 and this verifier's 50.  The launcher discards `sbatch`'s stdout, so the job ids
+above come from `squeue`, not the log.
+
+**Owed at landing (unchanged):** RULE 20 at full coverage (`bash bin/cRT2_rule20.sh`) once all 45 have started and
+before any number is read; 45 `ARGS_WD_BASE: weight-decay-base=5e-4` exclusion rows; scoring only with
+`python3 analysis/cRT2_retune_score.py $WS/runs` at 45 / 45 RUN_DONE.  Hard bound 90 GPU-h.  Cited logs kept on
+`alice2`: `~/stage_crt2_verify_dry.log`, `~/stage_crt2_submit.log`, and the submission stage `~/stage_crt2` itself
+(KEPT: it is the tree the launcher's printed scoring command names, byte-identical to `986e165`'s `analysis bin
+results`).  No Mac scratch kept.
 
 Next free number after the reservations: **314**.
