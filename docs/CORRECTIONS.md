@@ -39512,7 +39512,181 @@ Next free number: **299**.
 
 ## 299. RESERVED — Track A: `G3b` registration (the audit's CIFAR-100 cell at κ 0.1 and 5e-4). Placeholder written before the tracks start so that concurrent entries stay in numeric order; the track replaces this stub in place.
 
-## 300. RESERVED — Track B: the 5e-4 retune of the audit's core cell (ICML-PLAN §4a rank 2). Placeholder; replaced in place by its track.
+## 300. TRACK B — **`crt1` REGISTERED: IS `cgw1`'s SCALAR-BEATS-BEST AT WEIGHT DECAY 5e-4 A TUNING ARTEFACT OF HYPERPARAMETERS CHOSEN AT 0.1?  `cgw1`'s W4 CELL VERBATIM EXCEPT `--meta-stepsize` AND `--alpha0`: {chunk777, nodewise, scalar} × FOUR TUNING CONFIGS (ms 3e-5 / 1e-4 / 3e-4 at α0 1e-3, AND α0 1e-2 at ms 1e-4) × SEEDS {176, 177, 178}; 12 ARMS, 36 JOBS, ≈34.4 GPU-h EXPECTED, 72 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, ONE DECAY** (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion / α-scaled 5e-4); nothing here is about CIFAR-100 (Track A's `G3b`) or any other value.  (2) **A FOUR-POINT GRID**: "not a tuning artefact" can only mean "over this grid"; α0 has TWO points.  (3) **SELECTION IS ON TRAIN, AND EVERY SELECTED CONTRAST CARRIES THE BOUND B = E[max of 4] × σ/√3 (0.1059 pp at the floor) ADVERSELY**; the best-of-grid reading selects on the TEST set and is co-reported with the same bound; there is still NO validation split (1.14, Track D).  (4) **W4's decay caveat binds unweakened** (296.4): the harness's 5e-4 is far less decayed than a standard SGD recipe.  (5) **The ms 1e-4 column is an in-batch REPLICATE of `cgw1` W4, compared DESCRIPTIVELY and never pooled.**  (6) **A TIES reading is a BOUND.**  All are printed on every FINAL.]** — **THE BRIEF's 27 RUNS BECAME 36: ONE α0 POINT WAS ADDED, BECAUSE `cgw1`'s OWN W4 PROBE RECORDS SHOW THE PARTITIONS' STEP SIZES SITTING AT THEIR INITIAL VALUE (300.3).**
+
+*ZERO GPU by this entry: the live check is CPU construction on the `alice2` login node; no Slurm job submitted (the
+verifier submits after it passes).  `alice` NOT contacted.  Nothing under `paper/` listed, read or touched (the stage
+tarball held `analysis/*.py`, `bin/` and two `results/` files only).  No notebook website or Vercel URL opened, nothing
+downloaded, no `.pdf` fetched.*
+
+### 300.1 Question, and why it is worth GPU
+
+`cgw1` (296) landed `SCALAR-BEATS-BEST` at its primary rung: at α-scaled 5e-4, plain scalar 90.4650 is above chunk777
+87.9060 (+2.5590 pp, +20.23 SE) and nodewise 87.6650 (+2.8000, +22.13 SE).  297.2 put that row in the rewritten TMLR
+headline "as prominently as the headline".  But ms 1e-4 and α0 1e-3 were chosen at wd 0.1, and from 0.1 to 5e-4 the
+partitions fell 4.4–4.5 pp while scalar fell 1.7 (296.3, descriptive) — the signature of a mis-tuned grain.  This is
+the ONLY batch in the queue that can REFUTE the row (ICML-PLAN §4a rank 2, B2); G3b can only replicate it.  If the row
+is a tuning artefact and the paper goes out with it, a referee who re-tunes one hyperparameter kills the headline.
+
+### 300.2 The registered decision (`analysis/cRT1_retune_score.py`, docstring and `select` / `reading_of` / `branch_of`)
+
+* **Levels** plateau5 = mean TEST over epochs 95–99; **selector** train5 = mean TRAIN over the same epochs; both from
+  each run's OWN raw `.out`.  σ_USED = max(frozen floor, in-batch pooled sd) (O2).
+* **Selection, per grain** over its non-DIVERGED configs (seed range ≤ 2.0 pp): TUNED = argmax train5 (PRIMARY, no
+  test-set selection); ORACLE = argmax plateau5 (best-of-grid ON THE TEST SET, co-reported).  Exact ties go to the
+  earlier of M2, A2, M3, M1 (the incumbent first).
+* **Selection-bias bound.**  B = EMAX4 × σ_USED/√3, EMAX4 = E[max of 4 iid N(0,1)] = **1.0293753730** (re-derived by
+  quadrature in selftest H; exact on the closed form for k = 3).  At the floor **B = 0.105896 pp**.  It bounds the
+  EXPECTED optimism of a selected arm; equal means are the worst case (selftest H: unequal means give 0.0212; train
+  selection with train/test noise correlation 0.5 gives 0.0527; equal means 0.1056 by Monte Carlo against 0.1059).  It
+  is NOT a high-probability bound; the 2 SE half-width is added on top.  Both sides of T = k01_sel − x_sel are selected,
+  so **every scalar-favouring reading uses T − B and every partition-favouring one uses T + B.**
+* **Reading** (TUNED and ORACLE alike; SE = σ√(2/3) = 0.145486 at the floor), first match:
+  `-SCALAR-DIVERGED` | `-SCALAR-COLLAPSED` (selected scalar < 80) | `-UNREADABLE` |
+  `-SCALAR-BEATS-BEST` (both T − B ≥ +0.30 and > 2 SE) | `-SCALAR-TIES-BEST` (min T − B − 2 SE ≥ −0.30, a BOUND) |
+  `-PARTITION-ABOVE-SCALAR` (min T + B ≤ −0.30 and < −2 SE) | `-UNRESOLVED`.
+  At the floor: BEATS needs T ≥ +0.406 on both partitions; PARTITION-ABOVE needs a partition ≥ 0.406 pp above scalar;
+  TIES needs min T ≥ +0.097.
+* **BRANCH** (the answer), from (TUNED, ORACLE): `BRANCH-UNREADABLE` (TUNED a gate) → `HEADLINE-REFUTED-BY-RETUNE`
+  (TUNED-PARTITION-ABOVE) → `NOT-A-TUNING-ARTEFACT` (TUNED-BEATS and ORACLE-BEATS) → `SELECTION-DEPENDENT` (TUNED-BEATS,
+  ORACLE anything else) → `WEAKENED-TO-TIE` (TUNED-TIES) → `RETUNE-UNDECIDED`.  All 49 pairs map onto exactly these six
+  (selftest C).
+* **Every-config reading** (co-reported, no selection, no B): `cgw1`'s scalar ladder at each config → `M2-…+A2-…+M3-…+M1-…`.
+* **Descriptive, licensing nothing:** D = ch − nd per config and at the tuned selection; T_tuned − T_M2; M2 against
+  `cgw1` W4 per grain with cross-batch SE σ√(1/3 + 1/4) and a non-gating `REPLICATE-MATCHES-CGW1` / `-DIFFERS-<g>` stamp
+  (|diff| ≤ 0.50); **the realised per-step shrink a·wd per arm** (caw2's definition, 290: per record the median over the
+  step sizes of exp(β)·wd; plateau = median over records at step ≥ 47,500; median over seeds; partitions APPROXIMATE,
+  62 per-tensor means) with peak shrink, plateau β and peak β.  Selftest B reproduces 296.4's `cgw1` W4 figures from the
+  landed records with this function: scalar **4.3493e-6**, chunk777 **2.0424e-6**, nodewise **5.6611e-7**.
+* **Stamps:** `SELBIAS-B=<value>`, `SIGMA-*`, `GRID-EDGE-<g>-<c>` (selected at M1, M3 or A2), `SEL-AGREE/DISAGREE-<g>`
+  (train vs test selection), `ORACLE-PARTITION-ABOVE`, `SELECTED-BOX-BOUND-<g>`, `BOX-BOUND-<arm>`, `DIVERGED-<arm>`.
+  The box is a STAMP here, never a gate: the question is the tuned level at the harness's fixed box.
+* **Bounds on every FINAL** (the FINAL is the last stdout line, selftest E): `ONE-CELL ONE-DECAY-5e-4 FOUR-POINT-GRID
+  ALPHA0-TWO-POINTS SELBIAS-B=… NO-VALIDATION-SPLIT ALPHA-SCALED-DECAY-ONLY UNDER-DECAYED-VS-STANDARD-RECIPE TIES-ARE-BOUNDS
+  CGW1-COMPARISON-DESCRIPTIVE`.
+* **Changed from `cgw1`'s scorer, none a relaxation:** HEALTH_MIN 85 → **80** (cgw1's W4 partitions landed 2.7 pp above
+  85; a tuning point below 85 is a result, not a failed run; 80 is still 70 pp above chance); `cgw1`'s latent RULE 16
+  defect F1 (296.6: a repeated epoch line silently overwrites) is FIXED in this new scorer — a repeated epoch, ARGS or
+  ENV line is a `G-ONCE` harness failure (selftest E drives it); `cGW1_auditwd_score.py` itself is not edited.
+  Probe records must carry a `beta` list (needed for the shrink).
+
+### 300.3 The α0 question, answered from `cgw1`'s own W4 records — and why the grid has an α0 point
+
+Read from `../runs_alice2/cgw1/probe_cgw1-*W4-s15{2..5}/probe.jsonl` (4 seeds per grain; scratch script, not committed):
+* With Lion as the META optimiser each log step size moves by EXACTLY ms per step (scalar W4: −6.908 at step 0,
+  −6.43 at epoch 10 = 0.48 nats in 5,000 steps).  So ms sets the rate AND the reach: 1.5 / 5 / 15 nats over 50,000
+  steps at 3e-5 / 1e-4 / 3e-4.
+* **Scalar** climbed at the rate limit (−4.93 to −4.97 at epoch 40) and plateaued at −4.69 to −4.81 (a ≈ 8.8e-3):
+  **2.2 nats ABOVE its init ln 1e-3 = −6.908 and 2.4 BELOW the box edge −2.3026 — near neither.**
+* **The partitions did not move in bulk.**  The mean of the 62 per-tensor mean log step sizes at epoch 99: chunk777
+  −5.57 to −5.62, nodewise −6.56 to −6.57; the extremes spread to [−11.84, −2.65] (chunk777) and [−10.63, −3.40]
+  (nodewise); nodewise's median realised step size is 5.66e-7 / 5e-4 = **1.13e-3 — its initial value**; chunk777's ≈ 4.1e-3.
+  None reached the box edge (max β −2.60 to −3.61).
+* **Consequence:** at W4 the partitions' bulk step size is set by α0, not learned; an ms-only retune changes how FAST a
+  group travels, not where it starts.  A NOT-A-TUNING-ARTEFACT from ms alone would be open to the obvious objection.
+  **So one α0 point is added: A2 = α0 1e-2 at the incumbent ms 1e-4, for all three grains** (the selection must be over
+  the same grid per grain).  1e-2 is the decade of the step size scalar itself learns at W4; it is inside the box
+  (ln 1e-2 = −4.605); the harness normalises the base momentum buffer (`(1 − 0.99)·grad`, `SGDm_base_update`), so
+  a = 1e-2 is a base learning rate of 0.01, a tenth of a standard SGD recipe's 0.1 — not a stability risk.  The live
+  check confirms every A2 arm constructs with β = −4.605170 on every group.  **Not added, with reasons:** α0 1e-2 at
+  ms 3e-5 / 3e-4 (+18 runs; a second full column); α0 3e-3 (a location, not a refutation).  Hence `ALPHA0-TWO-POINTS`.
+  The 3e-5 column is REACH-limited for scalar (1.5 nats < the 2.2 it climbed at 1e-4), declared now.
+
+### 300.4 The cell, the seeds, the tree
+
+* **Cell:** `cgw1`'s W4 ARGS line verbatim (20 flags, the audit's order; selftest A asserts M2's line equals `cgw1`'s
+  chW4 line except seed and name, and that the ENV template and tree / runner shas equal `cgw1`'s), wd 5e-4, 100 ep,
+  AUGMENT=1, BETA_CLIP −15:−2.3026, PROBE=5; only `--meta-stepsize`, `--alpha0` and `--stepsize-groups` vary.  Layerwise is
+  NOT re-run (the question is scalar vs the two AUDITED partitions).
+* **Seeds {176, 177, 178}** (Track B's block), verified FREE: 0 of 3,383 corpus rows, 0 `.out` ARGS lines under
+  `$WS/runs` on `alice2`, 0 `crt1-*` jobs in `sacct` (all-time) or `squeue` (launcher guards 2 / 2b / 2d / 2d2 / 2e / 2f).
+* **Tree `$WS/harness_crt1/cifar10`**, built by `bin/cRT1_stage_harness.sh --stage` on 2026-09-22: the SAME pinned bytes
+  `cgw1` ran (HF.py `4732b74a…`, train.py `3fea309e…`, build_network.py `c7998883…`, build_optimizer.py `25a899b3…`,
+  load_data.py `b52b58a3…`, tin_data.py `9e0f3322…`), data symlinked, no patch; runner `$WS/jobs/run_cifar_crt1.sh`
+  (`bed0a207…`) differs from `run_cifar.sh` (`a0d0a1b9…`) in exactly the `cd` line.  VERIFIED.
+* **The decay premise without a proof job**, by code identity (as `cgw1`, 291.3): guard 4e — `SGDm_base_update` source
+  text identical (516 chars, `f42a121c…`) to harness_cwd1's, whose landed bite log (`7f5a3eaf…`, 52 PASS / 0 FAIL) proved
+  wd reaches the update bitwise at 5e-4 (guard 4f).
+* **Live model** (`analysis/crt1_live_check.py`, CPU construction, no forward pass): all 12 arms construct with m 14,421
+  / 14,420 / 1, wd 0.0005, ms 1e-4 / 1e-4 / 3e-4 / 3e-5, α0 1e-3 / 1e-2 / 1e-3 / 1e-3 with EVERY initial β equal to ln α0,
+  `SGDm_base_update`; 62 tensors, 11,173,962 parameters; the live manifest is byte-identical to
+  `crt1_design.manifest_text()` (1,264 bytes, `d7af3007…`).
+
+### 300.5 Seed count and cost
+
+3 seeds per arm (36 runs).  At the floor, a contrast between two selected arms has SE 0.1455 and the bias bound 0.1059,
+so the resolution edges are ±0.406 pp — against `cgw1`'s +2.56 / +2.80, a refutation needs the partitions to recover
+≥ 2.15 pp net, and a surviving row needs scalar still ≥ 0.41 above both: both are readable at 3 seeds.  4 seeds would
+cost +11.5 GPU-h for an edge of ±0.39.  **Cost:** per-run L4 minutes at this exact cell and decay from `cgw1`'s own W4
+`wallclock_min` (chunk777 57–62, nodewise 52–56, scalar 51–55; +1, rounded up: 61 / 56 / 55) → **34.4 GPU-h expected**
+(cgw1's `sacct` ran 1.2 % over its `minutes` lines); **hard bound WALL 2 h × 36 = 72 GPU-h.**  Above ICML-PLAN §4a's ≈20: the
+brief's 27 runs alone cost ≈25.8 GPU-h at W4's own per-run minutes (W4 runs were `cgw1`'s slowest), plus 8.6 for the 9 α0
+runs.
+
+### 300.6 Predictions (written before launch; JUDGEMENTS, UNSURE)
+
+Per arm, plateau5 (`crt1_design.PRED`): M2 ch 87.4–88.4, nd 87.2–88.2, k01 90.0–91.0 (at `cgw1` W4 ± 0.5); A2 ch
+88.0–91.2, nd 87.5–91.0, k01 89.8–91.2 (widest: no run of this network has ever used α0 1e-2); M3 ch 87.6–89.8, nd
+87.4–89.5, k01 89.0–91.0 (at wd 0.1, 3e-4 lifted the partitions ≈ +0.45 and cost scalar ≈ −3.5, raw CSV means); M1 ch
+86.5–88.3, nd 86.8–88.3, k01 88.5–90.5 (reach-limited).  **Branch priors:** NOT-A-TUNING-ARTEFACT 0.45, WEAKENED-TO-TIE
+0.22, RETUNE-UNDECIDED 0.15, HEADLINE-REFUTED-BY-RETUNE 0.10, SELECTION-DEPENDENT 0.06, BRANCH-UNREADABLE 0.02.
+**Floor gate (164.6):** every predicted level is ≥ 6.5 pp above HEALTH_MIN 80, ≥ 76 above chance and ≥ 8.8 below 100
+(selftest G), so no reading is floor- or ceiling-bounded except through an arm failing, which the gates catch.
+
+| branch | TMLR consequence (registered licence, `LICENCE[...]`) |
+|---|---|
+| NOT-A-TUNING-ARTEFACT | the row may say "robust to re-tuning the meta step size and α0 over a four-point grid", at this cell only |
+| WEAKENED-TO-TIE | the row must be rewritten from "beats" to "ties (a bound) after re-tuning"; `cgw1`'s +2.6–2.8 pp was at least in part a tuning artefact |
+| HEADLINE-REFUTED-BY-RETUNE | the row must be WITHDRAWN and replaced by this reading |
+| SELECTION-DEPENDENT | report both readings; no robustness sentence |
+| RETUNE-UNDECIDED | report the interval and the grid |
+
+### 300.7 Prior art (first; full section appended to `docs/PRIOR-ART.md`, dated 2026-09-22)
+
+Six queries (listed there).  Sivaprasad et al. (arXiv:1910.11758, ICML 2020) and Schmidt et al. (arXiv:2007.01547) own
+the general point that optimiser rankings depend on the tuning protocol — to be CITED, not claimed; Im et al.
+(arXiv:2102.07813) is adjacent (per-layer vs global online hyperparameters); Lion (arXiv:2302.06675) supplies the
+sign-update fact used in 300.3.  **Nothing tests whether a scalar-vs-partition ranking of meta-learned step sizes at a
+fixed decay survives per-grain re-tuning.  The batch is not shrunk.**
+
+### 300.8 Registration evidence
+
+* **Frozen floor:** SIGMA_PRIOR **0.17818264951145454**, df 190, 34 cells, 224 rows — `cgw1`'s cell filter verbatim,
+  re-derived by the selftest through `corpus_exclusions.filter_rows` on the CURRENT corpus (3,383 rows → 3,115 kept),
+  equal to 1e-12.  **The unfiltered value is 1.034333 (df 218)**: `cgw1`'s W2 / W4 rows share the 15-key cell with its W1
+  rows (wd is not a key) and only the exclusion list removes them — disclosure, and the reason the floor must be read
+  through the filter.  **The noise-floor demonstration value is 0.636566 (df 274)** (`corpus_exclusions.py --check`,
+  `SIGMA_R18ALL` under the FUTURE READER row, re-run for this entry: VERDICT PASS); quoted, read by no bar.
+* **Selftest drives the real `score()`:** **92 PASS / 0 FAIL / 0 SKIP on the Mac and 92 / 0 / 0 on `alice2`** (the landed
+  `cgw1` W4 records are present on both).  It covers every reading, branch and per-config state at and around its bars
+  with exhaustive reachability; the adverse direction of B on both sides; `select`'s tie rule; 3,000-table totality;
+  EMAX4 by quadrature and Monte Carlo; the shrink calibration on real records; 18 harness breaks (wrong wd / ms / α0 /
+  grain token, `0.0003` for `3e-4`, repeated flag, wrong ENV, patch and PROBE_TENSOR witnesses, repeated epoch line,
+  n_beta ≠ m, no β list, 9,999 records, provenance, unregistered seed, a foreign arm name, duplicate `.out`); O2
+  invariance (FINAL byte-identical on the real corpus, none, a missing path and invented rows at this cell); the
+  documented one-argument invocation; the FINAL as the last line carrying every bound; and the 164.6 floor gate.
+* **Dry run** (`bash bin/cRT1_retune.sh --dry-run` from `~/stage_crt1_dry`, log `~/stage_crt1_dry0.log`, 235 lines, exit
+  0), **read line by line: every guard 0–9 passes, 0 guard failures**; the only non-pass is guard 1b's NOTE that the
+  stage has no git repo (`--submit` requires the declared commit and scorer sha).  **36 composed lines, 0 failing** the
+  RULE 20 / design-line / ms / α0 / wd / constraint pre-checks; with run name, seed, ms, α0 and grain masked the 36 lines
+  collapse to **ONE**; the 36 (arm, seed) pairs are distinct and exactly the design's.  Non-vacuity: the composed-line
+  check rejects the A2 line with `--alpha0 1e-3`.  Staged shas equal the Mac's (scorer `7fe5ca76…`, design `21d8a556…`).
+* **The argsline guard** (`analysis/argsline_guard.py`, `81cea8b5…`, UNEDITED) is what guard 6 and `bin/cRT1_rule20.sh`
+  call: batch consistency with `--vary seed --vary run-name --vary meta-stepsize --vary alpha0 --vary stepsize-groups
+  --strict`, then per run every flag pinned to its OWN config (wd 5e-4 on all 36).  RULE 20 at full coverage is owed
+  after all 36 have started, before any number is read.
+
+### 300.9 Discipline, files, what is owed
+
+Files (registration commit): `analysis/crt1_design.py`, `analysis/cRT1_retune_score.py`, `analysis/crt1_live_check.py`,
+`analysis/crt1_rule20_envaudit.py`, `bin/cRT1_retune.sh`, `bin/cRT1_stage_harness.sh`, `bin/cRT1_rule20.sh`,
+`docs/CORRECTIONS.md` (this stub replaced in place), `docs/PRIOR-ART.md` (this track's section only; another track's
+uncommitted section in the shared tree was NOT staged).  `corpus_exclusions.py`, `argsline_guard.py`, every registered
+scorer and `docs/STATUS.md` / `docs/ICML-PLAN.md` NOT edited.  **Submission is the verifier's**, from a stage built by
+`git archive` of the pushed commit (`analysis bin results` only).  **Owed at landing:** RULE 20 at full coverage;
+**36 ARGS_WD_BASE rows** (`weight-decay-base=5e-4`; ms and α0 are CSV columns, so no run is two-ARGS); `crt1-` into
+`bin/PROTECTED.txt`; scoring with and only with `python3 analysis/cRT1_retune_score.py $WS/runs` at 36 / 36 RUN_DONE.
+**GPU used by this entry: ZERO.**  Batch expected 34.4 GPU-h, hard bound 72.
 
 ## 301. RESERVED — Track C: the 1.20 short-horizon γ control (threat T-C). Placeholder; replaced in place by its track.
 

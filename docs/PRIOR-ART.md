@@ -387,3 +387,41 @@ to γ 1, refuting a trace-overflow cause. Different grain, dataset and clip; it 
 **Verdict.** The general bias is known and must be cited; whether shortening the horizon WITHOUT the decay dose
 reproduces THIS collapse, at a horizon matched to the collapsing arm's own realised (1 − κα), is not answered anywhere
 found. The batch is kept at its planned size plus one bracket cell (18 runs), not shrunk.
+
+## Sweep 2026-09-22 — per-grain re-tuning, tuning-protocol dependence and selection bias (CORRECTIONS 300, batch `crt1`, Track B)
+
+*Targeted sweep before registering the 5e-4 re-tune of the audit's core cell. Web search and arXiv abstract pages only;
+no `.pdf` fetched, nothing downloaded (the arXiv abstract tool returned "not found" for every id tried, so the abstract
+pages were read directly).* **Queries:** (1) "hypergradient per-parameter vs scalar learning rate meta step size tuning
+fairness comparison"; (2) "benchmarking optimizers hyperparameter tuning budget selection bias validation tuning
+protocol comparison conclusions change"; (3) "Lion optimizer sign update learning rate initial value travel distance
+meta-learned step size initialization sensitivity hypergradient"; (4) "per-layer learning rate groups vs single global
+learning rate retuned weight decay ablation tuning artifact CIFAR ResNet"; (5) "winner's curse best-of-k hyperparameter
+selection optimistic bias expected maximum Gaussian model comparison deep learning"; (6) "learned step size granularity
+scalar vs blockwise vs per-parameter meta step size sensitivity weight decay 5e-4 hypergradient descent CIFAR-10".
+
+**Found, read at abstract level:**
+* Sivaprasad, Mai, Vogels, Jaggi, Fleuret, *Optimizer Benchmarking Needs to Account for Hyperparameter Tuning*
+  (arXiv:1910.11758, ICML 2020) — which optimiser "wins" depends on the tuning protocol and budget. **MOTIVATES the
+  batch, does not answer it:** it is the general reason a ranking obtained at hyperparameters tuned elsewhere (here: at
+  wd 0.1) must be re-read after per-condition tuning; it says nothing about meta-learned step-size grains.
+* Schmidt, Schneider, Hennig, *Descending through a Crowded Valley* (arXiv:2007.01547) — trying several optimisers at
+  defaults does about as well as tuning one. **ADJACENT**: same lesson (tuning changes rankings), different objects.
+* Im, Savin, Cho, *Online hyperparameter optimization by real-time recurrent learning* (arXiv:2102.07813) — per-layer
+  vs global online hyperparameter adaptation (per the search summary, layerwise beat global on CIFAR-10); the abstract
+  page itself does not state the comparison or its tuning. **ADJACENT**, not a test of a scalar-vs-partition gap under
+  re-tuning at a fixed decay.
+* Chen et al., *Symbolic Discovery of Optimization Algorithms* (Lion, arXiv:2302.06675) — Lion's sign update has a
+  uniform per-coordinate magnitude equal to its learning rate. **USED IN THE DESIGN**: with Lion as the META optimiser
+  every log step size moves by exactly the meta step size per step, so ms sets both rate and REACH, and alpha0 sets the
+  start — which is why `crt1` adds an alpha0 point (300.3).
+* The winner's-curse / post-selection literature (search summaries only, e.g. arXiv:2605.05973, arXiv:2605.18887) — the
+  best of k noisy estimates is optimistically biased. **USED IN THE DESIGN** as the standard fact behind the registered
+  bound B = E[max of 4 iid N(0,1)] x sigma / sqrt(3); no specific paper's method is adopted.
+* Already on file: Kosson et al. *Rotational Equilibrium* (arXiv:2305.17212) — at low decay the effective step on
+  scale-invariant tensors is not set by the decay, one plausible reason the grains' optimal step sizes move with wd.
+
+**Verdict:** nothing found tests whether a scalar-vs-partition ranking of META-LEARNED step sizes at a fixed decay
+survives per-grain re-tuning of the meta step size and initial step size. The general point (rankings depend on
+tuning) is owned by Sivaprasad et al. and Schmidt et al. and must be cited, not claimed. The batch is not a replication
+of published work and is NOT shrunk on prior-art grounds.
