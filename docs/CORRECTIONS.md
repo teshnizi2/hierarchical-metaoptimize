@@ -41961,3 +41961,9 @@ one rival is removed in one form, and the learned horizon waits for `crd1`.  The
 unsaid); nothing in 309 / 310 is more pessimistic than the numbers.
 
 Next free number: **312**.
+
+## 312. RESERVED — the `cvl1` landing (1.14, validation split; registered at 303). Placeholder; replaced in place by its track.
+
+## 313. RESERVED — the `crt2` registration: the retune extended past crt1's grid edge (309: every grain selected alpha0 1e-2, the top of a two-point axis; 311 A3). Placeholder; replaced in place by its track.
+
+Next free number after the reservations: **314**.
