@@ -10,10 +10,16 @@ that could not be checked is marked UNVERIFIED or left out.*
 > **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
 > is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`
 > ~588-657, the same form for every base optimiser), so the decay is **multiplied by the learned step size**
-> a = exp(β) and is added outside the momentum buffer and any preconditioner. In Loshchilov & Hutter's vocabulary
-> (arXiv:1711.05101) that is **decoupled, SGDW/AdamW-style** decay — the form PyTorch's `AdamW` uses by default, where
-> the decay is multiplied by the learning rate — and **not** L2 regularisation, which is what a referee hears in the
-> word "coupled". (With a plain-SGD base and no momentum the two forms coincide.) The campaign's older word "coupled"
+> a = exp(β) and is added outside the momentum buffer and any preconditioner — the form PyTorch's `AdamW` uses by
+> default, where the per-step shrink is lr·wd (here a·wd) — and it is **not** L2 regularisation, which is what a referee
+> hears in the word "coupled". (With a plain-SGD base and no momentum the two forms coincide.) **Nor is it Loshchilov &
+> Hutter's decoupled decay as they wrote it** (arXiv:1711.05101, ICLR 2019; this sentence corrected at CORRECTIONS 293,
+> which struck 292's "In Loshchilov & Hutter's vocabulary that is decoupled, SGDW/AdamW-style decay"): their SGDW and
+> AdamW (Algorithms 1-2) also apply the decay outside the gradient step and the preconditioner, but scale it by the
+> **schedule multiplier η_t only, not by the step size α** — SGDW `θ_t ← θ_{t−1} − m_t − η_t λ θ_{t−1}` with
+> `m_t ← β1 m_{t−1} + η_t α g_t`; AdamW `θ_t ← θ_{t−1} − η_t (α m̂_t/(√v̂_t + ε) + λ θ_{t−1})`. The harness shares their
+> placement and not their scaling: its shrink moves with the LEARNED α, theirs does not (in form, the untested
+> α-independent control below is their decay). The campaign's older word "coupled"
 > only ever meant "multiplied by the learned α", so from CORRECTIONS 292 on this file says **α-scaled weight decay**
 > (alpha-scaled), and the untested control, decay at a rate that does not move with α, is **α-independent weight
 > decay**. Registered tokens, stamps and quotations keep their original spelling and are read through this

@@ -21,10 +21,16 @@ before it was written. No level, bar, contrast, stamp or licence sentence moved.
 > **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
 > is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`
 > ~588-657, the same form for every base optimiser), so the decay is **multiplied by the learned step size**
-> a = exp(β) and is added outside the momentum buffer and any preconditioner. In Loshchilov & Hutter's vocabulary
-> (arXiv:1711.05101) that is **decoupled, SGDW/AdamW-style** decay — the form PyTorch's `AdamW` uses by default, where
-> the decay is multiplied by the learning rate — and **not** L2 regularisation, which is what a referee hears in the
-> word "coupled". (With a plain-SGD base and no momentum the two forms coincide.) The campaign's older word "coupled"
+> a = exp(β) and is added outside the momentum buffer and any preconditioner — the form PyTorch's `AdamW` uses by
+> default, where the per-step shrink is lr·wd (here a·wd) — and it is **not** L2 regularisation, which is what a referee
+> hears in the word "coupled". (With a plain-SGD base and no momentum the two forms coincide.) **Nor is it Loshchilov &
+> Hutter's decoupled decay as they wrote it** (arXiv:1711.05101, ICLR 2019; this sentence corrected at CORRECTIONS 293,
+> which struck 292's "In Loshchilov & Hutter's vocabulary that is decoupled, SGDW/AdamW-style decay"): their SGDW and
+> AdamW (Algorithms 1-2) also apply the decay outside the gradient step and the preconditioner, but scale it by the
+> **schedule multiplier η_t only, not by the step size α** — SGDW `θ_t ← θ_{t−1} − m_t − η_t λ θ_{t−1}` with
+> `m_t ← β1 m_{t−1} + η_t α g_t`; AdamW `θ_t ← θ_{t−1} − η_t (α m̂_t/(√v̂_t + ε) + λ θ_{t−1})`. The harness shares their
+> placement and not their scaling: its shrink moves with the LEARNED α, theirs does not (in form, the untested
+> α-independent control below is their decay). The campaign's older word "coupled"
 > only ever meant "multiplied by the learned α", so from CORRECTIONS 292 on this file says **α-scaled weight decay**
 > (alpha-scaled), and the untested control, decay at a rate that does not move with α, is **α-independent weight
 > decay**. Registered tokens, stamps and quotations keep their original spelling and are read through this
@@ -40,9 +46,13 @@ before it was written. No level, bar, contrast, stamp or licence sentence moved.
    one rung where both grains were measured at standard decay the ranking reverses: scalar **72.4080** vs layerwise
    **67.8813**, `G_W4` = **−4.5267 pp = −8.59 SE** (CORRECTIONS 285, table line ~37612). Its right venue stays TMLR
    (STATUS.md ~1741-1747), **but it must be re-run at 5e-4 before it goes anywhere** (§4, gate G3). *(292: G3 now runs
-   FIRST or alongside Step 1, not after the gate: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) already ties the
-   audit's best partitions (72.41 / 72.00, as the area chair read them — his figures, not re-derived here), so the
-   audit's +0.56 pp may itself be a κ 0.1 artefact.)*
+   FIRST or alongside Step 1, not after the gate: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) already lands at or
+   above the audit's best partitions — **72.054** (`gm2` `chunk771`, 3 seeds) and 72.000 (`gm2` `chunk2293`), CIFAR-100
+   ResNet18 SGDm+Lion at κ 0.1, re-derived at CORRECTIONS 293 from the raw `.out` files and `results/all_runs.csv`
+   (292 quoted the chair's "72.41 / 72.00"; 72.41 is the scalar's own level, not an audit arm) — so the audit's
+   +0.56 pp may itself be a κ 0.1 artefact. **Between-batch only:** 72.4080 (`cwd5`, seeds 146-148, meta step 1e-3,
+   α0 1e-6, κ 5e-4) and 72.054 (`gm2`, seeds 0-2, meta step 1e-4, α0 1e-3, κ 0.1) are DIFFERENT BATCHES, so "scalar
+   ties or beats the audit best" is orientation, not a contrast, until G3 puts both in one batch.)*
 2. **The one framing with a plausible ICML path** is a cross-method analysis paper: *"A step size shared across
    tensors is a magnitude-weighted vote; under step-size-scaled decay a few normalisation gains capture that vote, and
    whether finer granularity helps depends on the decay."* It is plausible **only if** the capture is shown in at
@@ -99,8 +109,10 @@ claims on the arXiv/ar5iv HTML, before writing).**
 | T-C | **Wu, Ren, Liao, Grosse, "Understanding Short-Horizon Bias in Stochastic Meta-Optimization", arXiv:1803.02021 (ICLR 2018)** | Gradient-based meta-optimisation over short horizons systematically picks learning rates that are too small | **Rival mechanism**: the harness's trace is `h <- gamma*(1 - wd*a)*h - delta`, so α-scaled decay also **shortens the hypergradient horizon** to ~1/(κα) at γ = 1; a collapsed scalar step could be short-horizon bias, not vote capture | **1.20** — the short-horizon γ control (and 1.6's trace-only variant) |
 | T-D | Kosson, Messmer, Jaggi arXiv:2305.17212; Li, Zhou, Xu arXiv:2607.21005; Amin, Chang, Khanna arXiv:2609.09116; Summers & Dinneen arXiv:1906.03548; LARS arXiv:1708.03888 | (as read at 288) | background to T-A | — |
 
-**Naming.** See the definition at the top of this file: the harness's decay is **α-scaled** (decoupled, SGDW/AdamW-style,
-in Loshchilov & Hutter's vocabulary, arXiv:1711.05101), never "coupled"; the missing control is **α-independent**.
+**Naming.** See the definition at the top of this file: the harness's decay is **α-scaled** (placed like Loshchilov & Hutter's
+decoupled decay, arXiv:1711.05101, outside the gradient step and the preconditioner, but multiplied by the learned
+α = exp(β) where theirs is multiplied by the schedule multiplier η_t only; CORRECTIONS 293 corrected 292's "decoupled,
+SGDW/AdamW-style, in Loshchilov & Hutter's vocabulary"), never "coupled"; the missing control is **α-independent**.
 *(This paragraph replaced 288's "naming hazard" note, which said the same and cited `patches/HF_patched.py` ~592-598;
 the decay term is in every base update, ~588-657.)*
 
@@ -239,7 +251,7 @@ reach the parent's CIFAR-10 cells"* — which C1 needs anyway.
 | # | Claim | Status | Experiment | Runs / GPU-h |
 |---|---|---|---|---|
 | 4.1 | Uniform > aligned at matched count, 20/20 | HAVE at κ 0.1 (211.2) | — | — |
-| 4.2 | **…and it is not a κ = 0.1 phenomenon** | **MISSING** — and now urgent: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) ties the audit's best partitions (72.41 / 72.00, the area chair's reading) | G3: core count-matched cells (chunk vs nodewise at two counts; ResNet18 on CIFAR-10 and CIFAR-100; SGDm+Lion) × κ {5e-4, 1e-2} × 3 seeds, plus scalar/layerwise in batch | 24-36 runs ≈ 17-25 GPU-h |
+| 4.2 | **…and it is not a κ = 0.1 phenomenon** | **MISSING** — and now urgent: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) lands at or above the audit's best partitions (**72.054** `gm2` `chunk771` / 72.000 `gm2` `chunk2293`, re-derived at CORRECTIONS 293; 292's "72.41" was the scalar's own level) — a DIFFERENT BATCH, so between-batch orientation only until G3 lands | G3: core count-matched cells (chunk vs nodewise at two counts; ResNet18 on CIFAR-10 and CIFAR-100; SGDm+Lion) × κ {5e-4, 1e-2} × 3 seeds, plus scalar/layerwise in batch | 24-36 runs ≈ 17-25 GPU-h |
 | 4.3 | Stale sentences ("1.8-4.2 pp", "none of nine mechanisms") updated | PARTIAL (project memory) | writing only | 0 |
 
 ---
@@ -281,7 +293,8 @@ those entries — none of them had reached `origin/master` when this was written
   (a subset of 1.4; decay value and meta settings fixed in that registration, not here). It asks the question that
   decides everything else: **is the collapse a hazard at a standard recipe, or a corner case of SGDm(0.99) at κ 0.1?**
 - **G3 — first or alongside, not after.** The count-matched audit's core cells at standard decay (4.2). Every audit
-  cell ran at κ 0.1, and plain scalar at 5e-4 already ties the audit's best partitions, so the audit's +0.56 pp may
+  cell ran at κ 0.1, and plain scalar at 5e-4 (72.4080) already lands at or above the audit's best partition (72.054,
+  `gm2` `chunk771`; a different batch, so between-batch orientation only until G3 lands), so the audit's +0.56 pp may
   itself be a κ 0.1 artefact. G3 serves the TMLR paper and must not wait on the ICML gate.
 - **Gate rule (to be pre-registered with frozen literal bars):** continue C1 **iff** Step 1 shows the scalar arm
   collapsing (R ≤ 0.50 against its own in-batch layerwise arm) **and** the declared carrier set dominating the shared

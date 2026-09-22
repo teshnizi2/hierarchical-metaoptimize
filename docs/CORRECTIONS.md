@@ -38290,3 +38290,73 @@ contacted; nothing under `paper/` read or touched; no notebook website or Vercel
 `.pdf` fetched (abstract and HTML pages only).**
 
 Next free number: **293** (289-291 are held by the concurrent tracks).
+
+## 293. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING NEW, REGISTERED NOTHING AND MOVED NO LEVEL, BAR, STATE, CONTRAST OR STAMP.**  It fixes two DOCUMENT errors the verifier found in 292 (V3, V4).  One quoted figure changes: the audit's best partition level in `docs/ICML-PLAN.md` is **72.054**, not 72.41.]** — **THE HARNESS'S DECAY IS α-SCALED AND IS *NOT* LOSHCHILOV & HUTTER'S DECOUPLED DECAY AS WRITTEN (THEIRS IS SCALED BY THE SCHEDULE MULTIPLIER η_t, NOT BY α); AND THE AUDIT'S BEST PARTITION IS 72.054 (`gm2` `chunk771`), A DIFFERENT BATCH FROM `cwd5`'S SCALAR 72.4080.**
+
+### 293.1 V3 — the comparison sentence in 292's naming paragraph was wrong
+
+**The error.** 292.3 (and the definition paragraph it inserted into `docs/ICML-PLAN.md`, `docs/WRITEUP-mechanism.md`,
+`docs/LIMITS-PREP.md`, `docs/STATUS.md`, plus ICML-PLAN §1's "Naming." note) said: "In Loshchilov & Hutter's vocabulary
+(arXiv:1711.05101) that is decoupled, SGDW/AdamW-style decay".  That equates the harness's decay with theirs.  It is not.
+
+**Their form, read this session** on the arXiv abstract page (`arxiv.org/abs/1711.05101`, v3, ICLR 2019) and the ar5iv
+HTML (Algorithms 1-2; no `.pdf` fetched): SGDW line 8-9 `m_t ← β1 m_{t−1} + η_t α g_t`, `θ_t ← θ_{t−1} − m_t −
+η_t λ θ_{t−1}`; AdamW line 12 `θ_t ← θ_{t−1} − η_t (α m̂_t/(√v̂_t + ε) + λ θ_{t−1})`, with η_t the schedule multiplier
+returned by `SetScheduleMultiplier(t)`.  The decay sits outside the gradient step and the preconditioner and is
+multiplied by **η_t only, not by the step size α** — the abstract's stated purpose is to decouple the optimal decay
+factor "from the setting of the learning rate".
+
+**The harness's form, re-read** (`patches/HF_patched.py` line 595, `SGDm_base_update`): `delta = a*(m + wd*w)`, `h <-
+gamma*(1 - wd*a)*h - delta` — same placement as L&H, but the shrink `a·wd` moves with the LEARNED a = exp(β).  That is
+the form `torch.optim.AdamW` uses (shrink lr·wd), which differs from the paper's.  So: **"α-scaled" stays** (it is
+accurate for the harness); only the comparison sentence changed.  The four paragraphs now say the harness shares L&H's
+placement but not their scaling, quote both L&H update lines, and note that the untested α-independent control is, in
+form, their decay.  ICML-PLAN §1's note was reworded to match.  The retired 292 wording is quoted inside the corrected
+paragraph so the change is visible in place.
+
+**Not edited, deliberately (RULE 16).** The same wrong sentence is in two REGISTERED, committed files:
+`analysis/caw1_design.py` line 19 ("decoupled in Loshchilov & Hutter's sense") and `analysis/cAW1_stdrecipe_score.py`
+lines 14-15 ("DECOUPLED / AdamW-style decay in Loshchilov & Hutter's vocabulary").  Both are prose comments; neither
+enters a computation, bar or token.  They are corrected **by this entry**, and whoever registers a caw1 successor (V2
+already requires one) must carry the corrected sentence.  Every older CORRECTIONS entry is history and is read
+through this one.
+
+### 293.2 V4 — the "72.41 audit-best" figure was the scalar's own value
+
+**Re-derivation.** `analysis/cT211_partition_audit_rederive.py` (reads the raw `.out` series in `../runs` and
+`../runs_alice2`; 368 complete runs; its CSV cross-check against `results/all_runs.csv` shows max |Δplateau5| =
+0.000000), with its own `arm()` applied to every granularity of every cell in `CELLS` (scratch driver, not committed).
+The audit's CIFAR-100 ResNet18 SGDm(0.99)+Lion cells (the cell `cwd5` runs, all at κ 0.1), arm means of plateau5:
+
+| cell / arm | level | seeds (plateau5) |
+|---|---|---|
+| `gm2` `chunk771` | **72.0540** | 72.006 / 72.408 / 71.748 |
+| `gm2` `chunk2293` | 72.0000 | 72.076 / 71.964 / 71.960 |
+| `gc1` `chunk771` | 71.9515 | 4 seeds |
+| `gm2` `nodewise1d` | 71.9320 | 3 seeds |
+| `gm2` `nodewise` | 70.5693 | 3 seeds |
+| `gc1` `nodewise` | 70.3115 | 4 seeds |
+
+So the audit's best partition is **72.054 (`gm2` `chunk771`)**, as the verifier found; the second is 72.000.  `cwd5`
+`k01W4` (scalar, κ 5e-4) is 72.236 / 72.456 / 72.532 → **72.4080** in `results/all_runs.csv`.  "72.41" was that scalar
+level carried into the audit column.  (A coincidence worth recording so nobody re-derives it as a match: `gm2-ch-s1`, one
+seed of the best arm, is also 72.408.)  `corpus_exclusions.filter_rows` on the current corpus keeps every `gm2`/`gc1`
+row and drops the three `cwd5-k01W4` rows (their non-standard decay is a declared exclusion), which is one more reason the
+two numbers are not one population.
+
+**Corrected in `docs/ICML-PLAN.md`** at §0 item 1, the 4.2 row and Phase 1's G3 bullet: 72.054 / 72.000 with their
+arms, and a plain statement that 72.4080 (`cwd5`, seeds 146-148, meta step 1e-3, α0 1e-6, κ 5e-4) and 72.054 (`gm2`,
+seeds 0-2, meta step 1e-4, α0 1e-3, κ 0.1) are **DIFFERENT BATCHES**, so "scalar ties or beats the audit best" is
+between-batch orientation only until G3 lands.  "Ties" became "lands at or above" (+0.35 pp between batches; no SE is
+claimed for a between-batch gap).  The 1.1 row's "72.41" is the scalar's own level at 5e-4 and is correct; unchanged.
+No other forward doc quoted 72.41 as an audit level (grep over `docs/*.md` and `analysis/*.py`, `paper/` excluded; the
+uncommitted `analysis/cgw1_design.py` of another track already says 72.05 / 72.00 and was not touched).
+
+### 293.3 Discipline
+
+Files written: `docs/ICML-PLAN.md`, `docs/WRITEUP-mechanism.md`, `docs/LIMITS-PREP.md`, `docs/STATUS.md`,
+`docs/CORRECTIONS.md`.  No file under `analysis/`, `results/`, `tests/` or `paper/` edited (RULE 16 held;
+`corpus_exclusions.py` untouched); other tracks' uncommitted files left as found.  **Cost: ZERO GPU-hours; no Slurm job,
+no cluster command; `alice` NOT contacted; nothing under `paper/` read; no notebook website or Vercel URL opened;
+nothing downloaded; no `.pdf` fetched (arXiv abstract page and ar5iv HTML only).**  289-291 remain held by the
+concurrent tracks and go BEFORE 292.  Next free number after this entry: **294**.
