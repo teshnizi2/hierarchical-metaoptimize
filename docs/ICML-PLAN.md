@@ -58,7 +58,7 @@ the scalar row is restated as "untuned +2.6-2.8 pp; after re-tuning, a tie (a bo
 under-decay, grid-edge and σ-margin qualifiers, and is no longer stated as a win; the collapse section gains 310.8's
 T-C sentence with its two bounds. The practical-significance qualification stands in weaker form (no audited
 partition is resolved above scalar before or after re-tuning). Venue TMLR, unchanged; its 0.6-0.7 is a judgement, not
-re-estimated. The joint ingest is `5db62be` (3,437 rows, 322 exclusions).***
+re-estimated. The joint ingest is `5db62be` (3,437 rows, 322 exclusions).*** *[CORRECTIONS 311: on the scalar row this paragraph governs over the 297 paragraph above; the untuned +2.6-2.8 pp travels with "at least in part, a tuning artefact" (309.8); α0 above 1e-2 is untested (grid edge), so the 0.6-0.7 is an un-argued judgement, UNSURE.]*
 
 > **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
 > is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`

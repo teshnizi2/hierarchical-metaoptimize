@@ -41922,3 +41922,42 @@ landing: committed at `4603851` by the scoring track (`analysis/csh1_attack_inde
 campaign repo; nothing downloaded; no running batch (`cvl1`, `g3b`, `cai1`, `crd1`) touched.
 
 Next free number: **311**.  *(309 and 310 written in numeric order after 308; no RESERVED stub remains; none withdrawn.)*
+
+## 311. AUDIT ADDENDUM to 308–310 (ZERO GPU, doc slips and one optimistic sentence) — **[LED WITH THE BOUND: this entry measured nothing and moves no level, bar, state, contrast, stamp, branch, registered licence sentence or ingest count.  It corrects two miscounted headings (309.6, 310.6), narrows one sentence of 310.10(c) to what `crt1` licenses, and adds one consequence 310.10 left unstated.  309's and 310's verdicts, the rewritten scalar row "ties (a bound) after re-tuning", and the venue (TMLR) STAND.]**
+
+*Independent final audit of the 308–310 landing: origin/master == local at `6241f83`; CORRECTIONS 308, 309, 310 in
+numeric order, 308 written over its RESERVED stub (no stub remains), one current `Next free` line at the end;
+MASTER-TABLE 242 lines, the only earlier line changed is header line 3 (bracketed in-place amendment), rows 241 / 242
+appended; every decimal number in rows 241 / 242 and entries 309 / 310 found in a committed artefact
+(`results/crt1_*`, `results/csh1_*`, earlier CORRECTIONS / MASTER-TABLE) or derived from them in one step (0.5565 =
+2 SE 0.4080 + B 0.1485; 0.735 = 0.636566·√(4/3), the SE of a difference of differences; 3501.9167 = Σ `wallclock_min`
+/ 60 over 3,437 rows); break-even σ re-derived as T_ch / (1.0294/√3 + 2√(2/3)) = 0.2015 from the rounded T_ch 0.4487 (0.2014 recorded, from the unrounded T), floor-σ readings BEATS
+re-derived; stamp counts 12 (crt1) and 17 (csh1) and csh1's 13 registered bounds counted from the FINAL lines; the 11
+refute fixes present in 309 / 310 / MT241 / MT242 (R3's +0.1315 = 0.5395 − 0.4080; H1's `looks_like` k01 / kL on all
+18 csh1 rows; "about equally" survives only as the quoted as-written text); corpus 3,437 rows, CORPUS-EXCLUSIONS 322
+rows (crt1 36 byte-identical to the PROPOSED file, csh1 18 registered at 310); `corpus_exclusions.py --check` exit 0
+PASS (SIGMA_R18ALL 0.636566 df 274); `c73_mastertable_check.py` exit 0; site `main` = `2274dbd` (ls-remote), GitHub
+Production deployment for `2274dbd` state `success` (via `gh api`), MT241 `mixed` and MT242 `mixed` present in the
+published register, MT240 still `unresolved` (Open), outcomes 56 / 41 / 40 / 24 over 179 records.  `alice` NOT
+contacted; nothing under `paper/` read; no clone / checkout / worktree; no Vercel URL opened; nothing downloaded.*
+
+| # | where | as written | what the record / numbers license |
+|---|---|---|---|
+| **A1** | 309.6 heading | "TWO OVERREACHES, FIVE wording fixes" | its table has **five fixes in all** (R1–R5), of which R1 and R4 are the two overreaches: read "TWO OVERREACHES AND THREE wording fixes (five in all)", as MT241 and STATUS CYCLE 163 already state. |
+| **A2** | 310.6 heading | "ONE BOOKKEEPING ERROR, ONE OVERSTATEMENT, SIX wording fixes" | its table has **six fixes in all** (H1–H6), of which H1 is the bookkeeping error and H3 the overstatement: read "… AND FOUR wording fixes (six in all)", as MT242 and STATUS already state. |
+| **A3** | 310.10(c) | "the row is weaker but can no longer be killed by a one-hyperparameter retune, which was the objection `crt1` existed to answer" | **optimistic.**  Every grain selected A2, the TOP of a two-point α0 axis (`GRID-EDGE-*-A2` ×3); 309.7 names "a larger α0 (the grid edge)" as an open threat and 309.8 licenses nothing above α0 1e-2.  So a ONE-hyperparameter extension (α0 > 1e-2) remains untested and could close the tie further or reverse it; DESCRIPTIVE, M2 → A2 moved the partitions +3.59 / +3.50 pp against scalar +1.28.  Read: "the row survives the retune `crt1` ran (ms × α0, four points) as a tie; it has not been tested above α0 1e-2".  That sentence was the only reason given for holding the TMLR figure, so the 0.6–0.7 now stands as an un-argued JUDGEMENT, UNSURE (not re-estimated here; the pressure is downward, since the load-bearing new claim of 297 is now a tie). |
+| **A4** | 310.10(a), the restated scalar row | "at 5e-4, untuned, plain scalar is above both audited partitions by 2.6–2.8 pp; after … re-tuning … it ties the better partition (a bound)" | the untuned figure travels with the registered clause of `LICENCE[WEAKENED-TO-TIE]` (309.8, verbatim): *"at this cell cgw1's +2.6-2.8 pp was, at least in part, a tuning artefact"*.  The row may not print +2.6–2.8 without it. |
+| **A5** | 310.10 (unstated) | — | `g3b` (299), `cvl1` (303) and `cai1` (306) all run at ms 1e-4 / α0 1e-3 (their designs), i.e. `crt1`'s **M2**, the configuration whose scalar lead `crt1` found to be at least in part a tuning artefact at the CIFAR-10 cell.  Their registered licences are NOT amended and `crt1`'s finding does not transfer to their cells; but the draft may not present any scalar-over-partition reading they return at 5e-4 as robust to tuning, only as an untuned reading at that configuration. |
+| **A6** | `docs/ICML-PLAN.md`, the 297 paragraph | "where it disagrees with this paragraph, this paragraph wins" | written before 309 / 310; on the scalar row the 309 / 310 paragraph below it governs.  A bracketed pointer is added in place. |
+
+**Disclosed by the landing, recorded here (not a doc slip):** the site import ran `npm ci` from the npm registry
+(locked dependencies, also run inside `package --verify`'s clean extraction) — a network fetch that sits awkwardly with
+"download nothing"; no licence was accepted and nothing outside the lockfile was installed.
+
+**Judgement of 310.10 (a judgement, not a measurement).**  (a) is what the numbers license — the registered licence
+verbatim, at one cell, with the four qualifiers — except A4's missing clause.  (b) is what `csh1` licenses: T-C is
+excluded as a SUFFICIENT account only, as a bound, for a constant γ; "supports the causal sentences" means only that
+one rival is removed in one form, and the learned horizon waits for `crd1`.  The only optimism is A3 (and A5 left
+unsaid); nothing in 309 / 310 is more pessimistic than the numbers.
+
+Next free number: **312**.
