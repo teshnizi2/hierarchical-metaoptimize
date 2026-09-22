@@ -39688,7 +39688,175 @@ scorer and `docs/STATUS.md` / `docs/ICML-PLAN.md` NOT edited.  **Submission is t
 `bin/PROTECTED.txt`; scoring with and only with `python3 analysis/cRT1_retune_score.py $WS/runs` at 36 / 36 RUN_DONE.
 **GPU used by this entry: ZERO.**  Batch expected 34.4 GPU-h, hard bound 72.
 
-## 301. RESERVED — Track C: the 1.20 short-horizon γ control (threat T-C). Placeholder; replaced in place by its track.
+## 301. TRACK C — **`csh1` REGISTERED: THE SHORT-HORIZON γ CONTROL (ICML-PLAN 1.20, THREAT T-C).  AT THE MECHANISM CELL WITH THE DECAY DOSE REMOVED (wd 5e-4), DOES SHORTENING THE HYPERGRADIENT HORIZON WITH `--gamma` < 1 — TO THE COLLAPSING ARM's OWN REALISED (1 − κα) — REPRODUCE THE SCALAR COLLAPSE?  6 ARMS × SEEDS {180, 181, 182} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  NOT SUBMITTED (the verifier submits).  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **γ IS CONSTANT; THE COLLAPSING ARM's HORIZON IS NOT.** Its trace factor is (1 − 0.1·a) with `a` learned, so no constant γ reproduces it; γ_M matches the onset-window MEDIAN and γ_P is at least as short AT EVERY STEP.  Neither is the learned horizon (`CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON`).  (2) **SUFFICIENCY, NOT NECESSITY.** A null says the short trace is not SUFFICIENT without the dose; it cannot say the trace plays no part at wd 0.1, where the dose and the short trace act together (`SUFFICIENCY-NOT-NECESSITY`).  (3) **TWO γ VALUES BRACKET; THEY LOCATE NOTHING.**  (4) **NO in-batch wd-0.1 positive control; ONE cell, ONE network, wd 5e-4 only, 100 epochs, 3 seeds.**  (5) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (6) **A trace-only patch (h ← (1 − 0.1·a)h − δ with the weights at 5e-4) is NOT run** — it would track `a` exactly but is new harness code.  All are stamped on every scored FINAL.]**
+
+### 301.1 Question, and why it is worth GPU
+
+The harness's meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`SGDm_base_update`, `$WS/harness_cwd1/cifar10/Optimizers/HF.py`
+line 1531, the tree `cwd5` and `caw2` ran).  So the α-scaled decay does two things at once: it shrinks the weights by
+`a·wd` per step AND it shortens the hypergradient horizon to ~1/(wd·a).  Wu et al. (arXiv:1803.02021) show that short
+meta-horizons bias learned step sizes DOWN — the collapse's direction.  If the trace route alone reproduces the collapse,
+the collapse section may not attribute it to the weight shrink (289) or to vote capture; if it does not, T-C — the one
+live rival mechanism against the collapse section's causal sentences (ICML-PLAN §4a rank 3, 297.3) — is excluded as a
+sufficient account at this cell.  ~12 GPU-h; no other experiment in the queue addresses T-C.
+
+### 301.2 Prior art, checked FIRST (web search, 2026-09-22; abstract pages / search summaries only, no `.pdf`)
+
+Queries and verdicts in the dated section appended to `docs/PRIOR-ART.md` ("SHORT-HORIZON BIAS as a rival account…").
+Wu, Ren, Liao, Grosse (arXiv:1803.02021): the bias is owned and must be cited; its direction (smaller steps) matches the
+collapse, so the account cannot be dismissed on sign.  Adjacent: meta-gradient truncation bias (arXiv:2209.11303,
+arXiv:1905.07473), FADE (arXiv:2604.27063, meta-learned per-parameter decay beside IDBD); none separates a decay's
+shortening of the step-size trace from its shrinking of the weights.  The parent (arXiv:2402.02342) discounts future
+losses with the same γ; nothing found runs a γ < 1 control against a decay-induced collapse.  Internal: the corpus's only
+γ < 1 runs, `d3_g999_s0/s1` (CIFAR-10, weightwise, γ 0.999, unclipped, 10.0 %), "failed identically" to γ 1 (CORRECTIONS
+§5) — different grain / dataset / clip; not decisive.  **Verdict: not answered in the literature; the batch is kept.**
+
+### 301.3 The cell, and where `--gamma` enters (VERIFIED, not assumed)
+
+* **Cell, read from `cwd5`'s own ARGS lines** (`cwd5-k01W4-s146`, `cwd5-kLW4-s146` on alice2): ResNet18_c100 / CIFAR-100 /
+  bs 100 / SGDm 0.99 / Lion 0.99, β2 0.9 / meta wd 0 / **`--gamma 1`** / ms 1e-3 / α0 1e-6 / 100 ep / wd 5e-4; ENV
+  AUGMENT=1, BETA_CLIP −15:−2.3026, PROBE=100; PROBE_TENSOR on.  `csh1`'s G1S / G1L are those lines flag for flag AND in
+  order (selftest A, both hosts); only `--gamma` and `--stepsize-groups` vary across the batch.
+* **The source path, read** (live tree): `train.py` (`3fea309e…`) `parser.add_argument("--gamma", type=float, default=1)`;
+  `build_optimizer.py` (`25a899b3…`) passes `gamma=args.gamma` to HF; HF.py (`94aedc33…`) stores `self.gamma` in
+  `__init__` and reads it ONLY in the `*_base_update` trace lines (AST scan: 8 sites — `__init__` store, the two
+  DECAY_MASK-branch lines, SGD / SGDm / RMSProp / Lion / AdamW; `SGDm_base_update`'s line is exactly
+  `self.h_condenced[i] = self.gamma*(1-self.args_base['weight_decay']*a)*self.h_condenced[i] - delta`).
+  `patches/HF_patched.py` (an older copy in the repo) carries the same form; the LIVE bytes are what was checked.
+* **Proved bitwise, on the login node's CPU (no GPU)** — `analysis/csh1_gamma_cpu_check.py` (`e8969442…`), launcher guard
+  4h, **38 PASS / 0 FAIL**: for each of the 6 arms, the arm's OWN registered ARGS through train.py's own `parse_args` and
+  `build_optimizer` give `HF.gamma == float(token)` (a Python float), `SGDm_base_update` / `Lion_meta_update`, wd 5e-4, the
+  registered grain; 3 real `HF.step`s on the live ResNet18_c100 (a batch of 4 random inputs) give the trace BITWISE
+  `γ(1 − wd·a)h − a(m + wd·w)` on 186/186 tensor-steps and the weights bitwise `w − a(m + wd·w)`; **non-vacuity:** the other
+  γ's formula FAILS on 104 tensor-steps of every arm (γ 1 on the γ < 1 arms; 0.99941 on the γ-1 arms).  Log
+  `$WS/runs/csh1/gamma_cpu_check.dryrun.log` (`a07cf47f…`).
+* **The ARGS line witnesses γ.**  `jobs/run_cifar_cwd1.sh` echoes `ARGS:` on every run; the scorer's G-ARGS and
+  `bin/cSH1_rule20.sh`'s per-run half pin `--gamma` to the arm's token (a synthetic run at the wrong γ is a PER-RUN
+  VIOLATION on alice2 and HARNESS-UNSOUND in the selftest; the batch-consistency half cannot see it because γ is a
+  declared axis).  **Declared limit:** neither the ENV nor the PROBE_TENSOR line carries γ; only the ARGS half can.
+* **`corpus_exclusions`: NO new ARGS kind.**  `gamma` is a CSV column written from the ARGS line (`analysis/aggregate.py`)
+  and one of `corpus_exclusions.CELLKEYS`, so a γ < 1 row can never pool with a γ-1 row.  The ingest owes ONE existing-kind
+  row per run: **18 × `ARGS_WD_BASE: weight-decay-base=5e-4`**; no run deviates on two ARGS kinds.
+  `corpus_exclusions.py` and its tests are **not edited** (selftest A asserts `gamma` ∈ `CELLKEYS`).
+
+### 301.4 γ, DERIVED from the records (`csh1_design.derive_gammas`, re-run by selftest B on both hosts)
+
+Source: `cwd5` `k01W1` (wd 0.1, scalar, the collapsing arm), seeds 146/147/148, per record q = 0.1·exp(β).
+
+| seed | β TURN (first applied Lion sign +1) | onset-window median q, 7,500 ≤ step < TURN (12 records) | recorded peak q (step) |
+|---|---|---|---|
+| 146 | 8,700 | 3.14773e-4 | 5.52560e-4 (8,700) |
+| 147 | 8,700 | 3.14773e-4 | 5.55885e-4 (8,700) |
+| 148 | 8,700 | 3.14773e-4 | 5.44879e-4 (8,600) |
+
+The window opens at G_0.5 — the same-seed accuracy-deficit onset, step 7,500 on all three seeds (289.4, W1 vs W4) — and
+closes at the turn; Lion's saturated pre-turn climb makes β identical across seeds, hence one median.
+* **γ_M (MATCHED, the registered statistic) = 1 − 3.15e-4 = `0.999685`** (the median rounded to 3 s.f.; horizon ~3,175).
+* **γ_P (DOMINATING, the shorter-horizon bracket) = 1 − 5.9e-4 = `0.99941`** (horizon ~1,695).  Why a bracket: γ_M's
+  horizon is LONGER than the collapsing arm's from step ~8,055 (where 0.1·a first reaches 3.15e-4) through the turn —
+  the ~650 steps where the collapse sets in — so a γ_M null alone could be dismissed.  γ_P is chosen so that its horizon
+  is no longer than the collapsing arm's at ANY step, recorded or not: the largest recorded q (5.5589e-4) × the largest
+  between-record excursion exp(0.05) (Lion moves β by exactly ms = 1e-3 per step, every step is ≤ 50 steps from a record;
+  selftest B measures the largest 100-step move on the landed records, 0.10004, i.e. 1e-3 per step to float32 rounding,
+  and checks the dominance with a 0.1 % allowance) = 5.8439e-4, rounded UP to 5.9e-4.  In the γ arms the factor is
+  γ(1 − 5e-4·a) ≤ γ, so the arm's own decay only shortens the horizon further.  **So a γ_P null is a DOMINANCE null.**
+* **The dose is absent by construction:** at wd 5e-4 and the clip a ≤ exp(−2.3026) = 0.1, the decay dose wd·a ≤ 5e-5 =
+  0.09 × the source's recorded peak; the scorer MEASURES it anyway (RHO_D, `DECAY-DOSE-<cell>-BELOW` iff < 0.5, caw2's
+  bar), calibrated on landed `k01W4` (RHO_D 0.044 / 0.043 / 0.045 → BELOW).
+
+### 301.5 The design (`analysis/csh1_design.py`, `7925e0ed…`)
+
+| cell | arms | `--gamma` | role |
+|---|---|---|---|
+| A | G1S \| G1L | 1 | the in-batch anchor = landed `cwd5` k01W4 / kLW4 (72.4080 / 67.8813) |
+| M | GMS \| GML | 0.999685 | MATCHED horizon (onset-window median) |
+| P | GPS \| GPL | 0.99941 | DOMINATING horizon (≥ the collapsing arm's shrink at every step) |
+
+Seeds {180, 181, 182} (Track C's block), verified FREE: 0 corpus rows (max corpus seed 162), 0 `.out` ARGS lines under
+`$WS/runs` with `--seed 180..182`, 0 `csh1-*` jobs in sacct / squeue, 0 `.out` lines with `--gamma 0.999685 / 0.99941`.
+cwd1's tree and runner UNCHANGED (stage script verify mode VERIFIED); no hold / mask variable on any arm.
+
+### 301.6 The scorer (`analysis/cSH1_horizon_score.py`, **`ba36f00b9c4fc8937b416ddc1ecb4f9f7d7001730dac0a3bfb6d3347aff95bac`**)
+
+**Frozen literals (O2):** R50 0.50, GAP_BAR 10 pp, REF_MIN 55, DIVERGED 5 pp, FLOOR 15 / CEIL 90, DOSE_BAR 0.5,
+FLOOR_BETA −14.99 / share 0.5, MATCH_BAR 5 pp; **noise floor SIGMA_PRIOR = 0.636565585885168 (df 274, 53 cells) — the
+demo value 0.636566, re-derived by selftest C through `corpus_exclusions.filter_rows` on the CURRENT corpus (3,383 rows,
+`cc189bd1…`) to 1e-12**; the naive 14.4853 (df 401) is disclosed as the trap; σ_used = max(frozen, in-batch), SE 0.519754.
+**States** (within cell, caw2's): UNREADABLE (L < 55 or L range > 5) > SPLIT > COLLAPSE (k ≤ 0.5·L) > NOGAP (L − k < 10) >
+PARTIAL.  **Branch ladder (first match):** INCOMPLETE → HARNESS-UNSOUND → **ANCHOR-NOT-HEALTHY** (A ≠ NOGAP) →
+**HORIZON-REPRODUCES-COLLAPSE** (M COLLAPSE) → **HORIZON-REPRODUCES-AT-DOMINATING-HORIZON-ONLY** (M NOGAP ∧ P COLLAPSE) →
+**HORIZON-DOES-NOT-REPRODUCE** (M NOGAP ∧ P NOGAP) → **HORIZON-REFERENCE-UNREADABLE** (M or P UNREADABLE) →
+**HORIZON-PARTIAL**.  Co-reported, descriptive: G_c, D_c = k_c − k_A, E_c = L_c − L_A (±2 SE); the MEASURED trace shrink
+q = 1 − γ(1 − wd·a) (onset median, min, peak) and `TRACE-P-DOMINATES`; RHO_D; each scalar arm's own turn; the late
+β-floor share (`BETA-FLOOR-<arm>`, calibrated: landed k01W1 at the floor, k01W4 not).  **Gates:** G-ARGS (every flag incl.
+`--gamma`, no repeat, no extra), G-ENV, G-PT, G-WITNESS, G-STRUCT, G-PROV (incl. TRAIN_SHA256), G-PROBE (500 records, the
+grain's step-size count, the Lion vote decomposition on scalar arms), G-FLOOR / G-CEIL.  **Bounds on the FINAL line,
+every scored branch:** `CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON | SUFFICIENCY-NOT-NECESSITY | TRACE-ONLY-PATCH-NOT-RUN |
+TWO-GAMMAS-BRACKET-NOT-LOCATE | NO-INBATCH-COLLAPSE-CONTROL | KAPPA-5E-4-ONLY | ALPHA-SCALED-DECAY-ONLY |
+ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND`
+(selftest E asserts all 13 are printed).
+**Selftest: 86 PASS / 0 FAIL / 0 SKIP on alice2 (`~/stage_csh1_selftest_alice2.log`, and inside both dry runs) and 86 / 0 / 0
+on the Mac** (`/opt/homebrew/bin/python3` 3.14.5, runsdir `../runs_alice2`): design literals; G1S / G1L == landed cwd5 ARGS /
+PT / ENV lines; the derivation and calibrations on landed records (B); the floor (C); reachability of all 6 scored tokens,
+inclusive / strict bars, account midpoints → own token (D); the REAL `score()` on 12 synthetic scenarios, 11 ARGS / witness
+breaks (wrong γ ×3, γ dropped, γ repeated, wd 0.1, wrong grain, extra flag, PT, ENV, hold on), 4 probe breaks, 4
+provenance / manifest breaks, a dropped run, a truncated resubmission, the documented one-argument CLI (E); O2 invariance
+over real / no / invented corpus (F).
+
+### 301.7 Accounts, predicted levels (UNSURE bands), what each means for the TMLR collapse section
+
+| account (prior, a judgement) | GMS | GPS | the rest | consequence |
+|---|---|---|---|---|
+| **HORIZON-DOES-NOT-REPRODUCE** (0.55) | 60–76 | 60–76 | 60–76 | T-C excluded as a SUFFICIENT account at this cell (a bound, constant γ); cite Wu et al. and this control |
+| HORIZON-REPRODUCES-AT-DOMINATING-HORIZON-ONLY (0.12) | 60–76 | 1–30 | 60–76 | T-C neither excluded nor confirmed; the section must name it as an unexcluded rival |
+| HORIZON-REPRODUCES-COLLAPSE (0.08) | 1–30 | 1–30 | 60–76 | T-C is a live sufficient rival; no causal sentence may credit the weight shrink or the vote alone |
+| HORIZON-PARTIAL (0.15) | 60–76 | 36–52 | 60–76 | not excluded; replicate before any sentence |
+| HORIZON-REFERENCE-UNREADABLE (0.07) | 60–76 | 20–54 | GPL 20–54 | γ < 1 damages both grains; no scalar-collapse sentence |
+| ANCHOR-NOT-HEALTHY (0.03) | — | — | G1S 1–30 | nothing read |
+
+**Registered prediction (UNSURE): HORIZON-DOES-NOT-REPRODUCE** — 289.4: the deficit opens 700–1,700 steps before the turn
+while β, and so the trace-driven meta update's output, is still identical to the healthy partner's.  Against it: Wu et al.'s
+direction, and γ_P's ~1,700-step horizon from step 0.  Floor gate (164.6): every healthy band starts ≥ 5 pp above REF_MIN and
+ends 24 pp below 100; the collapsed band sits below R50 × the lowest healthy reference.
+
+### 301.8 The dry run (0 guard failures) and the RULE 20 pair
+
+* **Registration commit `5ac1dd7971b7a5553472858e3ba77321769534bf`, pushed to `origin/master`** (confirmed by `git ls-remote`).
+  Stage `~/stage_csh1_dry` = `git archive 5ac1dd7 -- . ':!paper'` (0 `paper/` entries in the tar), `STAGED_COMMIT` written.
+* `CSH1_REGISTERED_COMMIT=5ac1dd79… bash bin/cSH1_horizon.sh --dry-run` → `~/stage_csh1_dry0.log` (149 lines, `2ac8e18d…`),
+  **rc 0, 0 GUARD FAIL**, read line by line: guard 1b declares the full commit; 1b3 reused files at registered bytes; 1c
+  selftest 86/0/0 with no SKIP, O2 on the real corpus, derivation reproduced, floor 0.636566 filtered; 2* fresh prefix /
+  seeds / γ tokens; 4a1 cwd1's tree VERIFIED; 3f `--gamma` declared; **4h the CPU γ check 38/0**; 4c' literals agree; **4
+  the LIVE model and optimiser of every arm hold γ = 1.0 / 0.999685 / 0.99941 as floats**; 4d live manifest byte-identical
+  (6,774 bytes, `f6de4193…`); partitions gpu-short,gpu-l4-24g, `--constraint=L4`; guard 6 **18 composed lines, 0 failed**.
+  With run name, seed, γ and grain masked the 18 lines collapse to **ONE**; the 18 (γ, grain, seed) rows are exactly the
+  design's; byte-identical to the pre-commit dry run from the dev stage.
+* **RULE 20 script tested on 18 synthetic `.out`s on alice2** (one planted at the wrong γ): batch-consistency PASS (γ is a
+  declared axis), per-run **1 violation, the planted one** (`--gamma declared '0.99941' but EFFECTIVE '1'`); ENV half PASS.
+  `analysis/argsline_guard.py` NOT edited (`81cea8b5…`).
+* Dry-run artefacts on alice2: `$WS/runs/csh1/{PARTITION-MANIFEST.txt, PROVENANCE.dryrun.txt, gamma_cpu_check.dryrun.log}`
+  and `$WS/runs/csh1-PARTITION-MANIFEST.txt`; guard 4b3 re-verifies the manifest at submission and refuses a different one.
+
+### 301.9 Cost, submission (for the verifier), and what is owed
+
+* **Expected 18 × 0.6855 = 12.34 GPU-h** (cwd5's sacct mean of this exact cell on L4); **hard bound WALL 3 h × 18 = 54
+  GPU-h.**  ICML-PLAN's 8.4 was 12 runs; the γ_P bracket adds 6 (≈4.1 GPU-h).
+* **Submit (verifier only, after it passes):** on alice2, `cd ~/stage_csh1_dry && CSH1_REGISTERED_COMMIT=5ac1dd7971b7a5553472858e3ba77321769534bf bash bin/cSH1_horizon.sh --submit`
+  — ONE invocation, **18 jobs** `csh1-<arm>-s<seed>`, `--constraint=L4`.  Then `bash bin/cSH1_rule20.sh` from the stage
+  once all 18 have started.
+* **Owed at landing:** RULE 20 at full coverage; score with and only with `python3 analysis/cSH1_horizon_score.py $WS/runs`
+  at 18/18 RUN_DONE; 18 `ARGS_WD_BASE` exclusion rows at the ingest; licensed sentences by the FINAL's tokens only.
+
+### 301.10 Discipline
+
+Files (commit `5ac1dd7`): `analysis/csh1_design.py`, `analysis/cSH1_horizon_score.py`, `analysis/csh1_gamma_cpu_check.py`,
+`analysis/csh1_rule20_envaudit.py`, `bin/cSH1_horizon.sh`, `bin/cSH1_rule20.sh`, `bin/PROTECTED.txt` (+`csh1-`),
+`docs/PRIOR-ART.md` (this track's section only; another track's uncommitted section in the shared working tree was left
+unstaged).  This entry replaces its reserved stub in place.  No registered scorer, `argsline_guard.py`,
+`corpus_exclusions.py`, STATUS or ICML-PLAN edited.  **GPU: ZERO** — no Slurm job submitted; the only compute on the
+login node was CPU construction and three CPU `HF.step`s per arm on a batch of 4.  `alice` NOT contacted (every cluster
+command went to `alice2`).  Nothing under `paper/` read, listed or copied (every rsync / archive excluded it).  Nothing
+downloaded, no `.pdf` fetched, no arXiv download tool used, no licence accepted, no notebook site or Vercel URL opened.
 
 ## 302. TRACK D (patch, 0.30 GPU-h of proof jobs) — **[LED WITH THE BOUNDS: (1) **THIS ENTRY MEASURED NO ACCURACY OF ANY BATCH AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It records what the audit selected on the TEST set (302.1) and adds an OPT-IN loader patch, `PATCH_VALSPLIT`, proven inert when off and biting when on by two short Slurm jobs on alice2.  (2) **The first proof job (5080195) FAILED its determinism control**: the UNPATCHED tree run twice gave different Epoch lines and probe bytes, so its bitwise-inertness checks could not be read (302.4).  The second (5080389) set deterministic kernels identically in every child and PASSED 82 / 0.  (3) **Inertness is proven BITWISE under deterministic kernels only**; production runs do not set them, and any kernel nondeterminism there acts on patched and unpatched trees alike.  (4) The patch changes WHAT THE MODEL TRAINS ON when on: 45,000 images and 450 steps per epoch, not 50,000 and 500.]** — **THE HARNESS NOW HAS A HELD-OUT VALIDATION SPLIT, BEHIND ONE ENV SWITCH: `VAL_SPLIT=5000:302` HOLDS OUT 5,000 CLASS-STRATIFIED TRAINING IMAGES (500 PER CLASS), CHOSEN BY A SPLIT SEED THAT IS INDEPENDENT OF THE RUN SEED, TRAINS ON THE OTHER 45,000, AND PRINTS A `VAL:` LINE EVERY EPOCH.  UNSET OR EMPTY, THE TREE IS BITWISE THE UNPATCHED ONE.**
 
