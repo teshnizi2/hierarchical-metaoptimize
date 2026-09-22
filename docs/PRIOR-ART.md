@@ -608,3 +608,54 @@ direction, FADE for the only published trace re-derivation with decay (summary l
 caveat on every `alpha_indep` reading.
 *Provenance: every id above is the arXiv id in a URL the search engine returned; no abstract page was newly opened by
 this sweep beyond those 301 / 305 already opened (1803.02021, 2604.27063, 2305.17212).*
+
+## Sweep 2026-09-22 — does a PARTITION RANKING of learned step sizes (count-matched uniform vs aligned, and scalar vs partitions) survive a change from α-scaled to α-INDEPENDENT decay? (CORRECTIONS 306, batch `cai1`, Track F2)
+
+*Web search result lists and summaries, and arXiv ABSTRACT pages only; no `.pdf` fetched, nothing downloaded, no arXiv
+download / read tool used, no licence accepted.  It builds on 305's nine-query sweep (the two decay FORMS for hand-set
+learning rates) and asks the narrower question 306 registers.*
+
+Queries (verbatim):
+1. `partition of learned per-group step sizes hypergradient weight decay independent of learning rate comparison`
+2. `"independent weight decay" versus "learning-rate-coupled" weight decay per-layer learning rate ranking changes`
+3. `rotational equilibrium weight decay effective learning rate normalized layers per-layer learning rate irrelevant equilibrium angular update`
+4. `meta-learned learning rate IDBD MetaOptimize weight decay decoupled SGDW step-size adaptation per-parameter vs scalar`
+5. `hypergradient descent learned step size with decoupled weight decay AdamW interaction "weight decay" learned learning rate collapse or shrink`
+
+Found, and read at abstract / summary level:
+* Kosson, Messmer, Jaggi, *Rotational Equilibrium* (arXiv:2305.17212, ICML 2024; on file since 281; search summaries of
+  the OpenReview / PMLR / arXiv pages this sweep): under decay the gradient-to-weight ratios of ALL normalised layers
+  converge to one steady-state ratio, which balances the effective rate of learning across layers and neurons
+  "without requiring per-layer learning rate tuning", and decoupled decay preserves that balancing.  **THE ONE
+  DESIGN-RELEVANT HIT, AND IT CUTS BOTH WAYS**: it PREDICTS that under α-independent decay a partition of step sizes
+  should matter LESS on normalised tensors (so a VANISHES / TIES reading is expected on mechanism), and it is exactly
+  why such a reading cannot, alone, say "the audit effect was a harness artefact".  Built into the design as the prior
+  (AI-ARTEFACT-VANISHES and AI-ABSENT-ONE-LAMBDA favoured over AI-SURVIVES) and as the bound
+  `ROTATIONAL-EQUILIBRIUM-CONFOUND` on every FINAL.
+* Kosson et al., *Weight Decay may matter more than muP for Learning Rate Transfer in Practice* (arXiv:2510.19093; on
+  file since 305; search summary this sweep): independent decay, not per-layer scaling rules, stabilises update
+  dynamics across layers for transfer.  ADJACENT (hand-set learning rates, widths); it does not rank partitions of a
+  learned step size.
+* Fan, Liu, Zhao, Yuan, Gu, *Robust Layerwise Scaling Rules by Proper Weight Decay Tuning* (arXiv:2510.15262; abstract
+  page read): a width-dependent AdamW weight-decay scaling rule (λ ∝ √d) alongside µP's learning-rate rule for
+  zero-shot transfer.  **Does NOT compare lr-scaled vs lr-independent decay, per-layer learning rates or learned step
+  sizes** (read on its abstract page).  NOT RELEVANT to the ranking question.
+* Chou, *Correction of Decoupled Weight Decay* (arXiv:2512.08217; abstract page read): argues decoupled decay should
+  scale as γ² (γ the learning rate), not γ, for stable weight norms.  ADJACENT: a third scaling of decay with the step
+  size; it says nothing about learned step sizes or partitions.  Recorded because it shows "the right way to tie decay
+  to the step size" is itself open, which is why this batch registers a form (α-independent) rather than claiming the
+  standard one.
+* Zhao & Liu, *A Self-Attentive Meta-Optimizer with Group-Adaptive Learning Rates and Weight Decay* (arXiv:2605.04055; on
+  file since 291; search summary): per-group modulation of BOTH the learning rate and the decay over a grouping strategy.
+  ADJACENT: it learns the decay per group; it does not hold group count fixed or change the decay FORM.
+* FADE (arXiv:2604.27063; on file since 305), Baydin et al. (1703.04782), the parent (2402.02342): nothing new at summary
+  level; none tests a partition ranking under two decay forms.
+
+**Has anyone tested whether a count-matched PARTITION ranking of meta-learned step sizes, or a scalar-vs-partition gap,
+survives a change from α-scaled to α-independent decay?  NOT FOUND**, to the depth of five queries plus 305's nine.
+**Verdict: WORTH-TESTING** (the batch replicates no published test).  Consequences: (1) the prior favours the gap
+SHRINKING under α-independent decay (rotational equilibrium), stated before any run exists; (2) every reading carries
+`ROTATIONAL-EQUILIBRIUM-CONFOUND`; (3) any sentence about the α-independent form cites Loshchilov & Hutter
+(1711.05101) for the form and Kosson et al. (2510.19093) for the known standard-vs-independent contrast.
+*Provenance: every id above is the arXiv id in a URL the search engine returned; 2510.15262 and 2512.08217 were opened on
+their abstract pages this sweep; the rest are on file with their earlier provenance.*
