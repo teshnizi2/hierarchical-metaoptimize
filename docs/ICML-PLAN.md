@@ -40,6 +40,26 @@ bounded configuration-conditional section (C2 merged into C4). No ICML submissio
 §4a below. Everything else in this file is kept as the history of the plan; where it disagrees with this paragraph,
 this paragraph wins.***
 
+***AMENDED 2026-09-22 at CORRECTIONS 309 + 310 (LANDING of §4a ranks 2 and 3, zero GPU): THE SCALAR ROW IS WEAKENED
+TO A TIE; T-C IS EXCLUDED AS A SUFFICIENT RIVAL, FOR A CONSTANT γ.** `crt1` (309) lands `WEAKENED-TO-TIE |
+TUNED-SCALAR-TIES-BEST | ORACLE-SCALAR-TIES-BEST`: after per-grain re-tuning of the meta step size and α0 over a
+four-point grid at α-scaled 5e-4, every grain selects A2 (α0 1e-2, the grid edge), `cgw1`'s +2.6-2.8 pp closes to
+T_ch +0.4487 / T_nd +0.6880 pp, and net of the selection bound B 0.1485 the chunk777 lead misses the 2 SE resolution
+clause by 0.1078 pp — so the TMLR row is rewritten from "beats" to **"ties (a bound) after re-tuning"** (the registered
+`LICENCE[WEAKENED-TO-TIE]`). It is NOT refuted (`HEADLINE-REFUTED-BY-RETUNE` not reached) and NOT robust; the branch
+rests on the in-batch σ 0.2498 lying above the break-even 0.2014 (at the floor σ the rule would read
+NOT-A-TUNING-ARTEFACT), and the grid did not locate any optimum. `csh1` (310) lands `HORIZON-DOES-NOT-REPRODUCE |
+A-NOGAP+M-NOGAP+P-NOGAP`, the registered prediction: with the decay dose removed, neither the matched γ 0.999685 nor
+the dominating γ 0.99941 collapses the scalar arm (G = −4.01 / −5.63 / −3.68 pp, scalar ahead), so short-horizon bias
+through the trace (T-C, Wu et al. arXiv:1803.02021) is **not sufficient** for the collapse at this cell — a bound, for
+a constant γ only, sufficiency not necessity; the learned horizon is `crd1`'s TR arm (307.7), not yet run. **What it
+does to the ONE TMLR paper (310.10):** the audit headline keeps the count-matched sign at 0.1 with the 5e-4 interval;
+the scalar row is restated as "untuned +2.6-2.8 pp; after re-tuning, a tie (a bound)", at this cell, with the α-scaled,
+under-decay, grid-edge and σ-margin qualifiers, and is no longer stated as a win; the collapse section gains 310.8's
+T-C sentence with its two bounds. The practical-significance qualification stands in weaker form (no audited
+partition is resolved above scalar before or after re-tuning). Venue TMLR, unchanged; its 0.6-0.7 is a judgement, not
+re-estimated. The joint ingest is `5db62be` (3,437 rows, 322 exclusions).***
+
 > **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
 > is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`
 > ~588-657, the same form for every base optimiser), so the decay is **multiplied by the learned step size**
@@ -380,15 +400,15 @@ LIMITS-PREP §5.5). **Calendar: ~7-9 weeks of experiments + ~3-4 weeks of writin
 late December 2026 at the earliest. Against an unverified late-January ICML 2027 deadline that is feasible but has
 little slack; the theory item and the ViT recipe are the schedule risks.
 
-### 4a. THE LIVE QUEUE (CORRECTIONS 297) — at most three, ranked; **all three REGISTERED AND LAUNCHED 2026-09-22 (299–301), plus 1.14 (`cvl1`, 303) and the two α-independent batches (`cai1` 306, `crd1` 307); none landed (`crt1` 36 / 36 COMPLETED, unscored)**
+### 4a. THE LIVE QUEUE (CORRECTIONS 297) — at most three, ranked; **all three REGISTERED AND LAUNCHED 2026-09-22 (299–301), plus 1.14 (`cvl1`, 303) and the two α-independent batches (`cai1` 306, `crd1` 307); ranks 2 and 3 LANDED (309 `crt1` WEAKENED-TO-TIE, 310 `csh1` HORIZON-DOES-NOT-REPRODUCE)** *[was: none landed (`crt1` 36 / 36 COMPLETED, unscored)]*
 
 Each needs its own registration (scorer before batch), a prior-art check first, and fresh seeds. Costs are ESTIMATES.
 
 | rank | experiment | question | cost | why it outranks the others | status (cycle-5 audit, 2026-09-22 10:01 UTC) |
 |---|---|---|---|---|---|
 | 1 | **G3b**: the audit's CIFAR-100 cell (`gc1` / `cdn1`: `ResNet18_c100`, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3) at κ {0.1 anchor, 5e-4} × {chunk771, nodewise, scalar, layerwise} × 4 seeds, realised shrink reported | Do `SCALAR-BEATS-BEST` and the count-matched sign hold on the audit's second dataset? The chunk771 arm at 5e-4 is also 1.16's denominator arm | 32 runs ≈ 26 GPU-h | the rewritten headline rests on ONE cell; this is the referee's first question and it folds in 1.16 | **LAUNCHED** as `g3b`, CORRECTIONS 299: 32 jobs **5080798–5080829**, seeds 170–173, 8 arms (wd 0.1 / 5e-4 × chunk771 / nodewise / scalar / layerwise); 24.4 GPU-h expected, 64 bound; 0 / 32 started (32 pending) |
-| 2 | **Retune at 5e-4 on the core cell** (1.18 applied to the audit): ResNet18 / CIFAR-10, κ 5e-4, meta step {3e-5, 1e-4, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact of hyperparameters chosen at 0.1? | 27 runs ≈ 20 GPU-h | it can REFUTE the new headline's strongest claim (B2), where G3b can only replicate it | **LAUNCHED** as `crt1`, CORRECTIONS 300: **36** jobs (one α0 point added, 300.3) **5080605, 5080607–5080626, 5080628–5080642**, seeds 176–178; 34.4 GPU-h expected, 72 bound; **36 / 36 COMPLETED, not yet scored or ingested** |
-| 3 | **1.20 short-horizon γ control** at the mechanism cell | Does a shortened hypergradient horizon without decay reproduce the collapse (T-C)? | 12 runs ≈ 8.4 GPU-h | the one live rival mechanism against the collapse section's causal sentences; 1.17 is largely decided by `cwd1` (271) | **LAUNCHED** as `csh1`, CORRECTIONS 301: **18** jobs (a γ_P bracket added) **5080645–5080662**, seeds 180–182; 12.3 GPU-h expected, 54 bound; 13 COMPLETED / 5 running |
+| 2 | **Retune at 5e-4 on the core cell** (1.18 applied to the audit): ResNet18 / CIFAR-10, κ 5e-4, meta step {3e-5, 1e-4, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact of hyperparameters chosen at 0.1? | 27 runs ≈ 20 GPU-h | it can REFUTE the new headline's strongest claim (B2), where G3b can only replicate it | **LANDED (CORRECTIONS 309)** as `crt1`: 36 jobs **5080605, 5080607–5080626, 5080628–5080642**, seeds 176–178; 31.05 GPU-h by `sacct`; **`WEAKENED-TO-TIE \| TUNED-SCALAR-TIES-BEST \| ORACLE-SCALAR-TIES-BEST`** — every grain selects A2 (α0 1e-2, grid edge), T_ch +0.4487 / T_nd +0.6880 pp, chunk777 misses the 2 SE clause by 0.1078 net of B; the row becomes "ties (a bound) after re-tuning"; NOT refuted, NOT robust; σ-margin bound (break-even 0.2014); ingested at `5db62be` *[was: 36 / 36 COMPLETED, not yet scored or ingested]* |
+| 3 | **1.20 short-horizon γ control** at the mechanism cell | Does a shortened hypergradient horizon without decay reproduce the collapse (T-C)? | 12 runs ≈ 8.4 GPU-h | the one live rival mechanism against the collapse section's causal sentences; 1.17 is largely decided by `cwd1` (271) | **LANDED (CORRECTIONS 310)** as `csh1`: 18 jobs **5080645–5080662**, seeds 180–182; 12.45 GPU-h by `sacct`; **`HORIZON-DOES-NOT-REPRODUCE \| A-NOGAP+M-NOGAP+P-NOGAP`** (the registered prediction) — G −4.0127 / −5.6273 / −3.6780 pp, scalar ahead in every cell; T-C excluded as a SUFFICIENT account at this cell, a bound, constant γ only; cell P's reference +1.97 pp over REF_MIN; the learned horizon waits for `crd1` (307.7); ingested at `5db62be` *[was: 13 COMPLETED / 5 running]* |
 | off-queue | **1.14 validation split** (`PATCH_VALSPLIT`, 302): `cgw1`'s cell at wd 0.1 / 5e-4 × four grains with 5,000 held-out images | Do the audit's TEST rankings hold on VAL, and would VAL select the same configuration? | 32 runs ≈ 21.7 GPU-h | the audit's ms 1e-4 was chosen on TEST (302.1) | **LAUNCHED** as `cvl1`, CORRECTIONS 303: 32 jobs **5080667–5080698**, seeds 184–187; 64 bound; 10 running / 22 pending |
 | off-queue | **α-independent audit** (`PATCH_DECAYROUTE`, 305): `cgw1`'s cell at wd 0 with `DECAY_ROUTE=alpha_indep:Λ`, Λ ∈ {5e-5, 5e-4} × four grains × 4 seeds | Does the count-matched sign survive, and `SCALAR-BEATS-BEST` hold, when the decay no longer moves with α (`DECOUPLED-NOT-TESTED`)? | 32 runs ≈ 27.0 GPU-h | the paper's biggest open referee point: every result uses α-scaled decay | **LAUNCHED** as `cai1`, CORRECTIONS 306: 32 jobs **5081292–5081323**, seeds 192–195; 64 bound; RULE 21 +15 min 16 s; 0 / 32 started |
 | off-queue | **1.6 the collapse route** (§3 row 1.6) | shrink vs trace vs α-independent at the mechanism cell | 18 runs ≈ 12.3 GPU-h | row 1.6, MUST | **LAUNCHED** as `crd1`, CORRECTIONS 307: 18 jobs **5081273–5081290**, seeds 196–198; 54 bound; RULE 21 +14 min 55 s (≥ +1 min 05 s by ls-remote); 0 / 18 started |
