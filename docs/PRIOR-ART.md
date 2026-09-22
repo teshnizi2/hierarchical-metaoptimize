@@ -564,3 +564,47 @@ standard-vs-independent contrast; (2) any route reading must carry the rotationa
 changing the decay form moves the effective step size of normalised tensors.
 *Provenance: every id above is the arXiv id in a URL the search engine returned; 2604.27063, 2510.19093 and 2605.19095
 (checked for a decay/adaptive-LR statement; its abstract carries none) were opened on their abstract pages.*
+
+## Sweep 2026-09-22 — WHICH ROUTE of the α-scaled decay carries a learned-step-size collapse: weight shrink vs meta-trace (CORRECTIONS 307, batch `crd1`, Track F3)
+
+*Web search only (the search engine's result lists and summaries); no `.pdf` fetched, nothing downloaded, no arXiv
+download tool used, no licence accepted.  It builds on 305's nine-query sweep (the two decay FORMS) and 301's sweep
+(short-horizon bias); it asks the narrower question 307 registers: has anyone separated the decay's action on the
+WEIGHTS from its action on the step-size (hypergradient) TRACE, or shown which one drives a learned step size down?*
+
+Queries (verbatim):
+1. `hypergradient step size adaptation weight decay effective horizon meta-gradient trace ablation`
+2. `weight decay effect on learned learning rate hypergradient descent collapse to small step size`
+3. `IDBD step-size adaptation weight decay trace decay factor separate ablation`
+4. `learned global learning rate vs per-layer learning rate weight decay interaction meta-learning collapse arXiv`
+5. `forward-mode hypergradient learning rate weight decay "horizon" truncation bias learned learning rate too small`
+
+What came back, and what it means for `crd1`:
+* FADE, Ramesh, Lewandowski, Schmidhuber (arXiv:2604.27063): the search summaries for query 3 say that when FADE is
+  combined with IDBD the IDBD trace "must be re-derived because of the introduction of weight decay", and that later
+  versions carry ablations isolating adaptive decay from step-size adaptation.  **The nearest published object**: it
+  derives how decay enters a step-size trace (as 305.3 does for the harness), but learns the DECAY and does not, in
+  anything the summaries show, intervene on the trace factor and the weight shrink SEPARATELY.  Summary-level only;
+  body not read (UNSURE on its exact trace form).
+* Wu, Ren, Liao, Grosse (arXiv:1803.02021; on file since 301): short-horizon bias drives meta-learned learning rates
+  toward negligible values early in training — the TRACE route's direction.  `crd1`'s `trace_only` arm is the learned-
+  horizon version of csh1's constant-γ control, i.e. the direct test of this account at the collapse cell.
+* Micaelli et al., *Gradient-based Hyperparameter Optimization Over Long Horizons* (arXiv:2007.07869, NeurIPS 2021;
+  result list only): forward-mode hypergradients over long horizons, learning rate / momentum / weight decay schedules.  ADJACENT:
+  it learns the decay as a hyperparameter; no route separation.
+* *Norm matters* (arXiv:1803.01814), *FixNorm* (arXiv:2103.15345) and *Why Gradients Rapidly Increase Near the End of
+  Training* (arXiv:2506.02285) (result lists / summaries only; authors not checked):
+  on normalised layers the decay sets the effective step size (weight-norm equilibrium).  ADJACENT, and the same
+  caveat 305 recorded from rotational equilibrium (arXiv:2305.17212): the `alpha_indep` arm changes the effective step
+  of every normalised tensor, so it is not a pure route control.
+* MetaAdamW (arXiv:2605.04055, abstract summary): meta-learned per-group learning rates AND weight decay via a
+  Transformer; no hypergradient trace, no route separation.  NOT RELEVANT beyond context.
+* The parent (arXiv:2402.02342) appears in query 1's results; its abstract does not state the trace's decay term (305).
+
+**Has anyone separated the weight-shrink route from the trace route of a decay under a LEARNED step size, or asked
+which one collapses it?  NOT FOUND** to the depth of these five queries plus 305's nine and 301's five.  **Verdict:
+`WORTH-GPU` — the batch is kept at 18 runs.**  Consequences for WRITING: cite Wu et al. for the trace route's
+direction, FADE for the only published trace re-derivation with decay (summary level), and carry the normalised-layer
+caveat on every `alpha_indep` reading.
+*Provenance: every id above is the arXiv id in a URL the search engine returned; no abstract page was newly opened by
+this sweep beyond those 301 / 305 already opened (1803.02021, 2604.27063, 2305.17212).*
