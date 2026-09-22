@@ -160,6 +160,43 @@ witness of EVERY ARGS kind it deviates on; each registered value is then held to
   C40 the registry guard: a MULTI_ARGS entry registering ONE kind, a witness of an unregistered kind, and a witness
       whose flag is not its kind's flag each FAIL, named, even without --runs.
 
+ADDED AT CORRECTIONS 304 -- `cvl1`'s VAL_SPLIT (302 / 303), a train-set ENVIRONMENT switch (`VAL_SPLIT=5000:302`: 5,000
+class-stratified training images held out, the model trains on 45,000) whose `VAL_SPLIT: on ...` line no CSV column
+carries.  EVERY cvl1 run prints it; the 16 W1 runs (wd 0.1) are ONE-kind rows, and the 16 W4 runs (wd 5e-4) are
+TWO-AXIS (284's rule: listed by their ARGS_WD_BASE witness, VAL_SPLIT registered in MULTI_KIND for (cvl1, <grain>W4)).
+The fixture is cvl1's own shape: the 8 arms x seeds 184-187 with their REAL job ids (5080667-5080698, read from
+alice2's queue) and ARGS payloads pinned to `analysis/cvl1_design.py`'s `args_line`; every log also carries `VAL:`
+lines, which no reader may take:
+  C41 a cvl1-style batch passes: 16 W1 runs listed by their VAL_SPLIT line, 16 W4 runs by `ARGS_WD_BASE:
+      weight-decay-base=5e-4` with the VAL_SPLIT line held to MULTI_KIND; the completeness line names VAL_SPLIT (32
+      ON, 32 CSV rows); 284's two-axis line counts the 16 W4 runs, True; the new `kinds scanned (CORRECTIONS 304)`
+      line names VAL_SPLIT, 9 in all, True; and every earlier kind's batch passes MERGED IN with it (cvt8 / cvt9 /
+      cwd1 / cwd2 / csv1 / cwd5 / cmo1 / caw2 fixtures).
+  C42 every VAL_SPLIT corruption FAILs, each named: (a) a listed W1 run printing `VAL_SPLIT: off` (the switch never
+      reached it); (b) split seed 303; (c) n_val 4999; (d) TWO witness lines; (e) a W1 run dropped from the list
+      (completeness); (f) a W4 run listed by its VAL_SPLIT line (the REVERSE listing, no escape on the ARGS reader);
+      (g) a W4 run printing split seed 303 and (h) `VAL_SPLIT: off` (MULTI_KIND); (i) a W4 ARGS line at the standard
+      0.1 and (j) at 1e-3; (k) a W4 run dropped (completeness); (l) a W1 run at wd 5e-4, an UNREGISTERED two-axis run,
+      listed either way; (m) a not-yet-ingested ON .out of the listed batch, unlisted (the batch rule); (n) an ON
+      VAL_SPLIT corpus row of ANOTHER batch, unlisted.  And (o) an unlisted `VAL_SPLIT: off` run of the listed batch
+      passes (off runs are not required).
+  C43 the prefix proof and the line forms: no name of the 9 line kinds + 2 ARGS kinds is a prefix of another (VAL_SPLIT
+      and VOTE_W share their first letter and diverge at the second, so 269's "first letters differ" is no longer the
+      reason and is not claimed); the per-epoch `VAL:` line starts with no KINDS prefix and is not an `ARGS:` line;
+      witness_lines puts one on and one off line of each of the NINE kinds under its own kind and collects no `VAL:`
+      line; patch_valsplit.py prints only `VAL_SPLIT: off` / `VAL_SPLIT: on dataset=...` witness lines.
+  C44 the registry: KINDS[:8] unchanged, KINDS[8] == ("VAL_SPLIT", "VAL_SPLIT: off"), KINDS_AT_269 == 8; MULTI_KIND's
+      cvl1 entries are exactly (cvl1, <grain>W4) for cvl1_design.ARGS_DEVIATING, each registering exactly VAL_SPLIT
+      with cvl1_design.witness_on(), byte for byte; MULTI_ARGS unchanged; the fixture's 32 ARGS payloads ==
+      cvl1_design.args_line; on 284's cwd5 fixture `--check --runs` gains exactly ONE line over 294's module (the
+      new `kinds scanned` line) and 269's `kinds scanned` line is unchanged byte for byte; without --runs nothing changes.
+  C45 csh1's gamma (301.3): NO ARGS kind is added, and this pins why none is needed -- `gamma` is one of CELLKEYS and
+      of aggregate.py's FIELDS; aggregate.parse_out writes each csh1 arm's `--gamma` token (1 / 0.999685 / 0.99941,
+      csh1_design.GAMMA_TOKEN) into the row, verbatim; _pooled keeps gamma-1 and gamma<1 rows of one otherwise equal
+      cell apart; ARGS_KINDS names no gamma flag; and a csh1-style batch (6 arms, real seed-180 job ids, payloads ==
+      csh1_design.args_string) passes listed by `ARGS_WD_BASE: weight-decay-base=5e-4` ONLY (301.3's plan), while a
+      dropped gamma<1 row still FAILs (standard-cell ARGS rule).
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -608,6 +645,77 @@ def caw2_batch(x_by="ARGS_WD_BASE"):
             listed.append(key + ({"ARGS_WD_BASE": W_WD10, "ARGS_MOMENTUM_BASE": W_MOM9}[x_by],))
         elif mom != "0.99":
             listed.append(key + (W_MOM9,))
+    return listed, corpus, logs, args, cells
+
+
+# ---- CORRECTIONS 304: cvl1's VAL_SPLIT (a train-set switch; ONE-kind W1 rows, TWO-AXIS W4 rows) ------------------
+# `cvl1` (303) runs cgw1's CIFAR-10 cell with PATCH_VALSPLIT on (VAL_SPLIT=5000:302).  Every run prints ONE `VAL_SPLIT:
+# on ...` line and, every epoch, a `VAL: epoch <e> val_acc <x> % n_val 5000` line; the cgw1 tree prints no other kind's
+# line.  The run names, the job ids (squeue on alice2, 2026-09-22: W1 5080667-5080682, W4 5080683-5080698, per seed ch /
+# nd / k01 / kL) and the ARGS payload are the batch's REAL ones; C44 pins the payloads and the witness to cvl1_design.
+VS_ON = ("VAL_SPLIT: on dataset=CIFAR10 n_val=5000 n_train=45000 classes=10 per_class=500 split_seed=302 "
+         "val_sha=7d3a1489390161d637ad0b526ac32a10723210722879f8deead4462e4f69bb0e "
+         "train_sha=2733a990cf7a76d8e92014cdd6aceeb8c055f7cd49cc7df913923b066c1e5e91")
+VS_ON_303 = VS_ON.replace("split_seed=302", "split_seed=303")         # another split: a corrupted witness
+VS_ON_4999 = VS_ON.replace("n_val=5000 n_train=45000", "n_val=4999 n_train=45001")
+VS_VAL_LINES = ["VAL: epoch 0 val_acc 1.00 % n_val 5000", "VAL: epoch 1 val_acc 2.00 % n_val 5000"]  # synthetic values
+CVL1_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base %s --alg-meta Lion "
+             "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR10 --NN-name ResNet18 "
+             "--batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-4 --alpha0 1e-3 --num-epochs 100 "
+             "--stepsize-groups %s --seed %d --save-directory /home/s5014158/metaopt/runs/cvl1 --run-name %s")
+CVL1_GRAINS = [("ch", "chunk777"), ("nd", "nodewise"), ("k01", "scalar"), ("kL", "layerwise")]
+CVL1_RUNGS = [("W1", "0.1", 5080667), ("W4", "5e-4", 5080683)]
+CVL1_SEEDS = (184, 185, 186, 187)
+# (arm, grain spec, wd token, seed) -> (run, job id)
+CVL1 = dict((("%s%s" % (g, r), s), ("cvl1-%s%s-s%d" % (g, r, s), str(j0 + 4 * (s - 184) + gi)))
+            for r, _w, j0 in CVL1_RUNGS for s in CVL1_SEEDS for gi, (g, _spec) in enumerate(CVL1_GRAINS))
+CVL1_SPEC = dict(("%s%s" % (g, r), spec) for r, _w, _j in CVL1_RUNGS for g, spec in CVL1_GRAINS)
+CVL1_WD = dict(("%s%s" % (g, r), w) for r, w, _j in CVL1_RUNGS for g, _spec in CVL1_GRAINS)
+W_WD5E4 = "ARGS_WD_BASE: weight-decay-base=5e-4"
+
+
+def cvl1_args(arm, seed, wd=None):
+    return CVL1_ARGS % (wd or CVL1_WD[arm], CVL1_SPEC[arm], seed, CVL1[(arm, seed)][0])
+
+
+def cvl1_batch(w4_by="ARGS_WD_BASE"):
+    """cvl1-style (303): 16 W1 runs listed by their VAL_SPLIT line, 16 TWO-AXIS W4 runs listed by `w4_by`."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for (arm, seed), key in sorted(CVL1.items()):
+        corpus.append(key)
+        logs[key] = [VS_ON] + VS_VAL_LINES
+        args[key] = cvl1_args(arm, seed)
+        cells[key] = {"network": "ResNet18", "dataset": "CIFAR10", "granularity": CVL1_SPEC[arm],
+                      "meta_stepsize": "1e-4", "alpha0": "1e-3"}
+        if CVL1_WD[arm] != "0.1":
+            listed.append(key + ({"ARGS_WD_BASE": W_WD5E4, "VAL_SPLIT": VS_ON}[w4_by],))
+        else:
+            listed.append(key + (VS_ON,))
+    return listed, corpus, logs, args, cells
+
+
+# ---- CORRECTIONS 304: csh1's gamma arms (301) -- a CSV column, so NO ARGS kind; ARGS_WD_BASE rows only -------------
+# The payload is csh1_design.args_string (C45 pins it); job ids are the real seed-180 ones (squeue on alice2).
+CSH1_ARMS = [("G1S", "scalar", "1", "5080645"), ("G1L", "layerwise", "1", "5080646"),
+             ("GMS", "scalar", "0.999685", "5080647"), ("GML", "layerwise", "0.999685", "5080648"),
+             ("GPS", "scalar", "0.99941", "5080649"), ("GPL", "layerwise", "0.99941", "5080650")]
+CSH1_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 5e-4 --alg-meta Lion "
+             "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 "
+             "--NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma %s --meta-stepsize 1e-3 "
+             "--alpha0 1e-6 --num-epochs 100 --stepsize-groups %s --seed 180 "
+             "--save-directory /home/s5014158/metaopt/runs/csh1 --run-name csh1-%s-s180")
+CSH1_OFF = ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off", "REST_HOLD: off", "DECAY_MASK: off"]  # csh1_design.OFF_LINES
+
+
+def csh1_batch():
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for arm, grain, g, job in CSH1_ARMS:
+        key = ("csh1-%s-s180" % arm, job)
+        corpus.append(key)
+        logs[key] = list(CSH1_OFF)
+        args[key] = CSH1_ARGS % (g, grain, arm)
+        cells[key] = {"network": "ResNet18_c100", "granularity": grain, "gamma": g}
+        listed.append(key + (W_WD5E4,))
     return listed, corpus, logs, args, cells
 
 
@@ -1198,9 +1306,11 @@ def main():
         "C32d an unlisted run of the listed batch with no `SHADOW_VOTE: off` line -> exit 1, named", show(out))
 
     print("C33 the new KINDS, the prefix proof, the patches' line forms, and MULTI_KIND against the cwd / csv tables")
-    chk(CE.KINDS[6:] == [("DECAY_MASK", "DECAY_MASK: off"), ("SHADOW_VOTE", "SHADOW_VOTE: off")] and len(CE.KINDS) == 8,
+    # CORRECTIONS 304: was `CE.KINDS[6:] == [...] and len(CE.KINDS) == 8`; KINDS now also holds VAL_SPLIT (C44 owns the
+    # total and the added entry).  269's claim is unchanged over entries 7 and 8.
+    chk(CE.KINDS[6:8] == [("DECAY_MASK", "DECAY_MASK: off"), ("SHADOW_VOTE", "SHADOW_VOTE: off")],
         "C33 KINDS = 251's six + DECAY_MASK + SHADOW_VOTE, appended", repr(CE.KINDS[6:]))
-    kinds8 = [k for k, _off in CE.KINDS]
+    kinds8 = [k for k, _off in CE.KINDS[:8]]   # CORRECTIONS 304: 269's eight, not every kind (C43 proves the nine)
     chk(len(kinds8) == 8 and len(set(k[0] for k in kinds8)) == 8
         and all(not a.startswith(b) for a in kinds8 for b in kinds8 if a != b),
         "C33 the eight first letters differ (%s), so no prefix is a prefix of another" % " ".join(k[0] for k in kinds8))
@@ -1227,7 +1337,10 @@ def main():
                    + ["%s: off" % k for k in EIGHT])
         open(p, "w").write("\n".join(sixteen) + "\n")
         got = CE.witness_lines(p)
-        chk(sorted(got) == sorted(EIGHT) and all(got[k] == [ln for ln in sixteen if ln.split(":")[0] == k] for k in EIGHT),
+        # CORRECTIONS 304: was `sorted(got) == sorted(EIGHT)`; witness_lines now also returns VAL_SPLIT's key, empty on
+        # these sixteen lines -- so the kinds that COLLECT a line are still exactly 269's eight.
+        chk(sorted(k for k in got if got[k]) == sorted(EIGHT)
+            and all(got[k] == [ln for ln in sixteen if ln.split(":")[0] == k] for k in EIGHT),
             "C33 witness_lines puts each of 16 lines (one on, one off per kind) under its own kind only", repr(sorted(got)))
     finally:
         shutil.rmtree(tmp)
@@ -1241,7 +1354,9 @@ def main():
     chk(any("DECAY_MASK / SHADOW_VOTE" in ln and "8 in all" in ln and ln.endswith(": True")
             for ln in line_of(out, "  kinds scanned (CORRECTIONS 269)")),
         "C33 ONE new line names the two added kinds, no prefix collision", repr(line_of(out, "  kinds scanned")))
-    chk(len(line_of(out, "  kinds scanned")) == 3, "C33 exactly three `kinds scanned` lines",
+    # CORRECTIONS 304: was `len(line_of(out, "  kinds scanned")) == 3`; 304 adds ONE line of its own (C41 / C44 own it)
+    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3,
+        "C33 exactly three `kinds scanned` lines",
         repr(line_of(out, "  kinds scanned")))
     try:
         mk = getattr(CE, "MULTI_KIND", None) or {}
@@ -1369,7 +1484,9 @@ def main():
                                                                                   .split(": ")[-1].split(", "))),
         "C36 245's count == the sum of 251's breakdown: neither line counts the one-kind two-axis entry",
         repr(line_of(out, "  two-kind runs") + line_of(out, "  multi-kind runs")))
-    chk(len(line_of(out, "  kinds scanned")) == 3 and len(line_of(out, "  two-axis runs")) == 1
+    # CORRECTIONS 304: was `len(line_of(out, "  kinds scanned")) == 3`; 304's own line is excluded (C44 owns it)
+    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3
+        and len(line_of(out, "  two-axis runs")) == 1
         and len(line_of(out, "  multi-kind runs")) == 1,
         "C36 `--check --runs` gains exactly ONE line: three `kinds scanned`, one `multi-kind`, one `two-axis`",
         repr(line_of(out, "  two-axis runs")))
@@ -1463,13 +1580,17 @@ def main():
             "C39 every MULTI_ARGS witness == args_witness(kind, the registered design's own value)")
     except Exception as ex:
         chk(False, "C39 caw2_design imports and MULTI_ARGS holds its X arms", "%s: %s" % (type(ex).__name__, ex))
+    # CORRECTIONS 304: was `len(CE.KINDS) == 8 and len(CE.MULTI_KIND) == 16`; 304 appends VAL_SPLIT and four cvl1 entries
+    # (C44 owns them), so the claim is now made over everything else
     chk(CE.ARGS_KINDS == [("ARGS_MOMENTUM_BASE", "momentum-param-base", "0.99"), ("ARGS_WD_BASE", "weight-decay-base", "0.1")]
-        and len(CE.KINDS) == 8 and len(CE.MULTI_KIND) == 16,
+        and len([k for k in CE.KINDS if k[0] != "VAL_SPLIT"]) == 8 and len([k for k in CE.MULTI_KIND if k[0] != "cvl1"]) == 16,
         "C39 ARGS_KINDS / KINDS / MULTI_KIND are unchanged (2 / 8 / 16 entries)",
         "%d %d %d" % (len(CE.ARGS_KINDS), len(CE.KINDS), len(CE.MULTI_KIND)))
     b = wd5_batch()
     rc, out = run_check(*b[:3], args=b[3], cells=b[4])
-    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(NEWLINE))
+    # CORRECTIONS 304: 304's own `kinds scanned` line is dropped too (C44 proves it is the only line 304 adds)
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1]
+                   if not ln.startswith(NEWLINE) and not ln.startswith("  kinds scanned (CORRECTIONS 304)"))
     chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
         == "115c74ed3d7e87d9b9a5a1637ae421de56d81bb1b0d94870b76e5172f72d65df" and len(line_of(out, NEWLINE)) == 1,
         "C39 on 284's cwd5 fixture `--check --runs` gains exactly ONE line; every other byte == 284's module output",
@@ -1494,6 +1615,243 @@ def main():
                             module_append=src)
         chk(rc == 1 and any("MULTI_ARGS entry" in f and msg in f for f in fails(out)),
             "C40%s a malformed MULTI_ARGS entry FAILs without --runs, named with %r" % (tag, msg), show(out))
+
+    # ---- CORRECTIONS 304 ------------------------------------------------------------------------------------
+    import math
+    L304 = "  kinds scanned (CORRECTIONS 304)"
+    ALL_PRIOR = (wd5_batch(), rh_batch(), wh_batch(), dm_batch(), dm2_batch(), sv_batch(), cmo_batch(), caw2_batch())
+    print("C41 a cvl1-style VAL_SPLIT batch passes (16 one-kind W1 rows, 16 two-axis W4 rows)")
+    listed, corpus, logs, args, cells = cvl1_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C41 W1 listed by the VAL_SPLIT line, W4 by ARGS_WD_BASE=5e-4 with VAL_SPLIT in MULTI_KIND -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("VAL_SPLIT" in ln and "32 .out files print an ON line; 32 are CSV rows, every one listed with its kind: True" in ln
+            for ln in line_of(out, "  completeness")),
+        "C41 the completeness line names VAL_SPLIT: 32 ON runs, 32 CSV rows, every one listed",
+        repr(line_of(out, "  completeness")))
+    chk(any("16 listed runs deviate on an ARGS value AND print an ON line" in ln and ln.endswith(": True")
+            for ln in line_of(out, "  two-axis runs")),
+        "C41 284's two-axis line counts the 16 W4 runs, True", repr(line_of(out, "  two-axis runs")))
+    chk(line_of(out, L304) == [L304 + ": also VAL_SPLIT, 9 in all; no prefix of the 9 is a prefix of another: True"],
+        "C41 ONE new `kinds scanned` line names VAL_SPLIT, 9 in all, no prefix collision", repr(line_of(out, L304)))
+    chk(any("16 listed runs carry their listed ARGS value" in ln
+            and "16 deviate from the standard, 0 are CSV rows in the standard cell" in ln
+            for ln in line_of(out, "  ARGS witness")),
+        "C41 the ARGS block reads the 16 W4 values (CIFAR-10: outside the standard cell, so none is a std-cell row)",
+        repr(line_of(out, "  ARGS witness")))
+    listed, corpus, logs, args, cells = merge5(cvl1_batch(), *ALL_PRIOR)
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out
+        and all(ln.endswith(": True") for ln in line_of(out, "  kinds scanned") + line_of(out, "  two-axis runs")
+                + line_of(out, "  two-kind runs") + line_of(out, "  multi-ARGS runs")),
+        "C41 merged with cvt8 / cvt9 / cwd1 / cwd2 / csv1 / cwd5 / cmo1 / caw2 fixtures -> exit 0 PASS, every line True",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("17 listed runs deviate on an ARGS value AND print an ON line" in ln for ln in line_of(out, "  two-axis runs"))
+        and ("  multi-kind runs (CORRECTIONS 251): those runs by the number of kinds MULTI_KIND registers for them: "
+             "2 kinds 8, 3 kinds 4") in out.splitlines(),
+        "C41 merged: the two-axis line counts cwd5's CARW2 + cvl1's 16; 251's multi-kind line is unchanged",
+        repr(line_of(out, "  two-axis runs") + line_of(out, "  multi-kind runs")))
+
+    print("C42 every VAL_SPLIT corruption fails, each named")
+    w1, w4 = ("chW1", 185), ("kLW4", 186)
+    for tag, arm_seed, lines, msg in [
+            ("a", w1, ["VAL_SPLIT: off"], "witness ['VAL_SPLIT: off'] != listed"),
+            ("b", w1, [VS_ON_303], "split_seed=303"),
+            ("c", w1, [VS_ON_4999], "n_val=4999"),
+            ("d", w1, [VS_ON, VS_ON], "!= listed"),
+            ("g", w4, [VS_ON_303], "registered with VAL_SPLIT ON but prints"),
+            ("h", w4, ["VAL_SPLIT: off"], "registered with VAL_SPLIT ON but prints")]:
+        listed, corpus, logs, args, cells = cvl1_batch()
+        key = CVL1[arm_seed]
+        logs[key] = lines + VS_VAL_LINES
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C42%s %s prints %r -> exit 1, named with %r" % (tag, key[0], [ln[:34] for ln in lines], msg), show(out))
+    for tag, arm_seed, msg in [("e", w1, "is a CSV row printing an ON VAL_SPLIT line but is NOT listed"),
+                               ("k", w4, "is a CSV row printing an ON VAL_SPLIT line but is NOT listed")]:
+        listed, corpus, logs, args, cells = cvl1_batch()
+        key = CVL1[arm_seed]
+        rc, out = run_check([r for r in listed if r[:2] != key], corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C42%s %s dropped from the list -> exit 1, named (completeness)" % (tag, key[0]), show(out))
+    listed, corpus, logs, args, cells = cvl1_batch("VAL_SPLIT")
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and sum(1 for f in fails(out) if "deviates on ARGS_WD_BASE but is listed with a VAL_SPLIT witness" in f) == 16,
+        "C42f the 16 W4 runs listed by their VAL_SPLIT line (the REVERSE listing) -> exit 1, each named: no ARGS escape",
+        show(out)[:300])
+    for tag, wd, msg in [("i", "0.1", "does not deviate"), ("j", "1e-3", "ARGS witness")]:
+        listed, corpus, logs, args, cells = cvl1_batch()
+        key = CVL1[w4]
+        args[key] = cvl1_args(w4[0], w4[1], wd=wd)
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C42%s %s's own ARGS line says --weight-decay-base %s -> exit 1, named" % (tag, key[0], wd), show(out))
+    for by, msg in [("VAL_SPLIT", "deviates on ARGS_WD_BASE but is listed with a VAL_SPLIT witness"),
+                    ("ARGS_WD_BASE", "prints an ON VAL_SPLIT line but is listed with a ARGS_WD_BASE witness")]:
+        listed, corpus, logs, args, cells = cvl1_batch()
+        key = CVL1[w1]
+        args[key] = cvl1_args(w1[0], w1[1], wd="5e-4")        # a W1 arm has NO MULTI_KIND entry
+        listed = [r if r[:2] != key else key + ({"VAL_SPLIT": VS_ON, "ARGS_WD_BASE": W_WD5E4}[by],) for r in listed]
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C42l an UNREGISTERED two-axis run (a W1 arm at wd 5e-4) listed by %s -> exit 1, named" % by, show(out))
+    listed, corpus, logs, args, cells = cvl1_batch()
+    extra = ("cvl1-chW1-s188", "5099901")                    # an unused seed: an ON .out nobody ingested or listed
+    logs[extra] = [VS_ON] + VS_VAL_LINES
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("cvl1-chW1-s188-5099901.out is NOT listed but its witness is" in f for f in fails(out)),
+        "C42m a not-yet-ingested ON .out of the listed batch, unlisted -> exit 1, named (the batch rule)", show(out))
+    listed, corpus, logs, args, cells = cvl1_batch()
+    other = ("syn4-VS-s1", "5099902")                        # an ON corpus row of ANOTHER batch
+    corpus.append(other)
+    logs[other] = [VS_ON]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("syn4-VS-s1-5099902.out is a CSV row printing an ON VAL_SPLIT line but is NOT listed" in f
+                        for f in fails(out)),
+        "C42n an ON VAL_SPLIT corpus row of an unlisted batch -> exit 1, named (completeness is corpus-wide)", show(out))
+    listed, corpus, logs, args, cells = cvl1_batch()
+    plain = ("cvl1-PLAIN-s184", "5099903")                   # an `off` run of the listed batch
+    corpus.append(plain)
+    logs[plain] = ["VAL_SPLIT: off"]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C42o an unlisted `VAL_SPLIT: off` run of the listed batch -> exit 0 PASS (off runs are not required)",
+        "rc=%d %s" % (rc, show(out)))
+    logs[plain] = []
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("cvl1-PLAIN-s184-5099903.out is NOT listed but its witness is []" in f for f in fails(out)),
+        "C42o ... and the same run printing NO VAL_SPLIT line -> exit 1, named", show(out))
+
+    print("C43 the prefix proof, the VAL: lines, and patch_valsplit.py's line forms")
+    NINE = ["VOTE_W", "BETA_HOLD", "GROUP_HOLD", "COMP_HOLD", "REST_HOLD", "WINDOW_HOLD", "DECAY_MASK", "SHADOW_VOTE",
+            "VAL_SPLIT"]  # literal, not read from the module
+    kinds9 = [k for k, _off in CE.KINDS]
+    names11 = kinds9 + [k for k, _f, _s in CE.ARGS_KINDS]
+    chk(kinds9 == NINE and not [(a, b) for a in names11 for b in names11 if a != b and a.startswith(b)],
+        "C43 no name of the 9 line kinds + 2 ARGS kinds is a prefix of another", repr(names11))
+    chk([k for k in kinds9 if k[0] == "V"] == ["VOTE_W", "VAL_SPLIT"] and "VOTE_W"[1] != "VAL_SPLIT"[1],
+        "C43 VAL_SPLIT and VOTE_W share the first letter and diverge at the second (so neither prefixes the other)")
+    chk(not [k for k in kinds9 if VS_VAL_LINES[0].startswith(k) or "VAL:".startswith(k) or "ARGS:".startswith(k)
+             or k.startswith("ARGS")]
+        and CE._ARGS_RE.match(VS_VAL_LINES[0]) is None and CE._ARGS_RE.match(VS_ON) is None
+        and CE.kind_of(VS_ON) == "VAL_SPLIT" and CE.kind_of("VAL_SPLIT: off") == "VAL_SPLIT"
+        and CE.kind_of(VS_VAL_LINES[0]) is None,
+        "C43 a `VAL:` line starts with no KINDS prefix and is no ARGS line; kind_of reads VAL_SPLIT's lines as VAL_SPLIT only")
+    tmp = tempfile.mkdtemp(prefix="ce_prefix_test_")
+    try:
+        p = os.path.join(tmp, "x.out")
+        eighteen = ([VW_MUTE, BH_TRI, GH_TRI, CH_REC, RH_REC, WH_EARLY, DM_NORMSCALE, SV_SHADOWLOW, VS_ON]
+                    + ["%s: off" % k for k in NINE])
+        open(p, "w").write("\n".join(eighteen[:9] + VS_VAL_LINES + eighteen[9:]) + "\n")
+        got = CE.witness_lines(p)
+        chk(sorted(got) == sorted(NINE) and all(got[k] == [ln for ln in eighteen if ln.split(":")[0] == k] for k in NINE)
+            and not [ln for v in got.values() for ln in v if ln.startswith("VAL:")],
+            "C43 witness_lines puts each of 18 lines (one on, one off per kind) under its own kind; no `VAL:` line is taken",
+            repr(sorted(got)))
+    finally:
+        shutil.rmtree(tmp)
+    src = open(os.path.join(REPO, "patches", "patch_valsplit.py")).read()
+    lits = re.findall(r"'((?:%s): [^']*)'" % "|".join(sorted(NINE)), src)
+    chk("VAL_SPLIT: off" in lits and any(l.startswith("VAL_SPLIT: on dataset=") for l in lits)
+        and all(l.startswith("VAL_SPLIT: ") for l in lits),
+        "C43 patch_valsplit.py prints only `VAL_SPLIT: off` / `VAL_SPLIT: on dataset=...` witness lines",
+        repr(sorted(set(lits)))[:300])
+    chk("'VAL: epoch %d val_acc" in src or "'VAL: epoch " in src,
+        "C43 patch_valsplit.py's per-epoch line starts `VAL: epoch` (the form this test's VAL lines copy)")
+
+    print("C44 the registry: KINDS, MULTI_KIND's cvl1 entries against cvl1_design, and the print lines")
+    chk(CE.KINDS[:8] == [(k, "%s: off" % k) for k in NINE[:8]] and CE.KINDS[8:] == [("VAL_SPLIT", "VAL_SPLIT: off")]
+        and getattr(CE, "KINDS_AT_269", None) == 8 and CE.KINDS_AT_251 == 6,
+        "C44 KINDS = 269's eight unchanged + VAL_SPLIT, appended; KINDS_AT_269 == 8", repr(CE.KINDS[8:]))
+    mkv = dict((k, v) for k, v in CE.MULTI_KIND.items() if k[0] == "cvl1")
+    chk(sorted(mkv) == sorted(("cvl1", "%sW4" % g) for g, _s in CVL1_GRAINS)
+        and all(v == {"VAL_SPLIT": VS_ON} for v in mkv.values())
+        and len([k for k in CE.MULTI_KIND if k[0] != "cvl1"]) == 16,
+        "C44 MULTI_KIND gains exactly the 4 cvl1 W4 entries, each registering exactly VAL_SPLIT == this test's VS_ON; "
+        "the 16 earlier entries are unchanged in number", repr(sorted(mkv)))
+    chk(sorted(CE.MULTI_ARGS) == [("caw2", "XL"), ("caw2", "XS")] and len(CE.ARGS_KINDS) == 2,
+        "C44 MULTI_ARGS and ARGS_KINDS are unchanged")
+    try:
+        import cvl1_design as V1                  # the registered design; imported by the test only
+        chk(V1.witness_on() == VS_ON, "C44 VS_ON == cvl1_design.witness_on(), byte for byte")
+        chk(sorted(V1.ARGS_DEVIATING) == sorted(a for _b, a in mkv)
+            and all(V1.WD[a] == "5e-4" for a in V1.ARGS_DEVIATING)
+            and sorted(V1.RUNS) == sorted(CVL1) and V1.NJOBS == 32 and V1.N_EXCLUSION_ROWS == 32,
+            "C44 MULTI_KIND's cvl1 arms == cvl1_design.ARGS_DEVIATING (the W4 arms, wd 5e-4); the fixture's 32 runs == RUNS",
+            repr(V1.ARGS_DEVIATING))
+        chk(all("ARGS: " + cvl1_args(a, s) == V1.args_line(a, s, "/home/s5014158/metaopt/runs/cvl1") for a, s in V1.RUNS),
+            "C44 this test's 32 cvl1 ARGS payloads == cvl1_design.args_line, byte for byte")
+    except Exception as ex:
+        chk(False, "C44 cvl1_design imports and MULTI_KIND holds its W4 witness", "%s: %s" % (type(ex).__name__, ex))
+    b = wd5_batch()
+    rc, out = run_check(*b[:3], args=b[3], cells=b[4])
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(L304))
+    chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
+        == "0273bd078abe3d81f88b3a0369d25fd6a3aa529dcd295b61db760b9ee62ef8af" and len(line_of(out, L304)) == 1,
+        "C44 on 284's cwd5 fixture `--check --runs` gains exactly ONE line; every other byte == 294's module output",
+        hashlib.sha256(kept.encode()).hexdigest()[:16])
+    b = merge5(*ALL_PRIOR)
+    rc, out = run_check(*b[:3], args=b[3], cells=b[4])
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(L304))
+    chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
+        == "a472afe0f7c3c6890b8a9c68b90e3ba6324857cec3ab4a60420739bbdb95666c"
+        and ("  kinds scanned (CORRECTIONS 269): also DECAY_MASK / SHADOW_VOTE, 8 in all; no prefix of the 8 is a prefix "
+             "of another: True") in out.splitlines(),
+        "C44 on every earlier kind's fixture merged, ONE line is added and 269's `kinds scanned` line is unchanged",
+        hashlib.sha256(kept.encode()).hexdigest()[:16])
+    l5, c5, g5, a5, e5 = merge5(cmo_batch())
+    rc, out = run_check(l5, c5, g5, args=a5, cells=e5, with_runs=False)
+    chk(rc == 0 and hashlib.sha256(out.encode()).hexdigest()
+        == "8e67462ac2950669b206eacdfbe6f3cdf4b6790f448401d29b62a7663d7e121b",
+        "C44 without --runs nothing changes: cmo1's no-runs output == 284's / 294's module output, byte for byte")
+
+    print("C45 csh1's gamma: a CSV cell-key column, so NO ARGS kind (301.3), and the rows it does owe")
+    import aggregate as AG                        # the ingest's own parser; imported by the test only
+    chk("gamma" in CE.CELLKEYS and "gamma" in AG.FIELDS, "C45 `gamma` is one of CELLKEYS and of aggregate.py's FIELDS")
+    chk(not [f for _k, f, _s in CE.ARGS_KINDS if "gamma" in f] and not [k for k in CE.KINDS if "GAMMA" in k[0]],
+        "C45 no ARGS kind or line kind names gamma (none is needed)")
+    tmp = tempfile.mkdtemp(prefix="ce_gamma_test_")
+    try:
+        got = {}
+        for arm, grain, g, job in CSH1_ARMS:
+            p = os.path.join(tmp, "csh1-%s-s180-%s.out" % (arm, job))
+            open(p, "w").write("NODE=synthetic\nARGS: %s\nENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na "
+                               "ETA_RATIO=na\nEpoch 0, Train Accuracy: 1.0, Test Accuracy: 1.0\n" % (CSH1_ARGS % (g, grain, arm)))
+            r = AG.parse_out(p)
+            got[arm] = (r or {}).get("gamma")
+        chk(got == dict((a, g) for a, _gr, g, _j in CSH1_ARMS),
+            "C45 aggregate.parse_out writes each csh1 arm's --gamma token into the row, verbatim", repr(got))
+    finally:
+        shutil.rmtree(tmp)
+    base = dict(CSV_STD, network="ResNet18_c100", plateau5="50.0")
+    rows = [dict(base, gamma=g, plateau5=v) for g, v in (("1", "50.0"), ("1", "52.0"), ("0.999685", "70.0"),
+                                                        ("0.999685", "72.0"), ("0.99941", "60.0"), ("0.99941", "62.0"))]
+    sd, df, nc = CE._pooled(rows, "ResNet18_c100")
+    chk(nc == 3 and df == 3 and abs(sd - math.sqrt(2.0)) < 1e-12,
+        "C45 _pooled keeps gamma 1 / 0.999685 / 0.99941 rows of one otherwise equal cell apart (3 cells, sd sqrt 2)",
+        "nc=%d df=%d sd=%r" % (nc, df, sd))
+    try:
+        import csh1_design as H1
+        chk(all(CSH1_ARGS % (g, gr, a) == H1.args_string(a, 180, "/home/s5014158/metaopt/runs/csh1")
+                for a, gr, g, _j in CSH1_ARMS) and sorted(H1.ARMS) == sorted(a for a, _g, _t, _j in CSH1_ARMS)
+            and sorted(set(g for _a, _gr, g, _j in CSH1_ARMS)) == sorted(H1.GAMMA_TOKEN.values())
+            and list(H1.OFF_LINES) == CSH1_OFF,
+            "C45 this test's 6 csh1 payloads == csh1_design.args_string; gamma tokens == GAMMA_TOKEN; off lines == OFF_LINES")
+    except Exception as ex:
+        chk(False, "C45 csh1_design imports", "%s: %s" % (type(ex).__name__, ex))
+    listed, corpus, logs, args, cells = csh1_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out
+        and any("6 listed runs carry their listed ARGS value" in ln and "6 are CSV rows in the standard cell, every one "
+                "listed: True" in ln for ln in line_of(out, "  ARGS witness")),
+        "C45 a csh1-style batch listed by ARGS_WD_BASE=5e-4 ONLY (301.3's plan) -> exit 0 PASS, 6 standard-cell rows",
+        "rc=%d %s" % (rc, show(out)))
+    key = ("csh1-GMS-s180", "5080647")
+    rc, out = run_check([r for r in listed if r[:2] != key], corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("csh1-GMS-s180-5080647.out is a CSV row in the standard cell whose ARGS deviates" in f
+                        for f in fails(out)),
+        "C45 a dropped gamma<1 row still FAILs (its wd 5e-4 is the axis the list must carry)", show(out))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)

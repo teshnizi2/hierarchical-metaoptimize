@@ -65,3 +65,8 @@ cwd5-
 caw2-
 cgw1-
 csh1-
+# cycle 5 (CORRECTIONS 304): owed to the repo copy -- each launcher wrote only its STAGE copy at submission
+# (g3b 299.12, crt1 300.10, cvl1 303.10); csh1- is above (301).
+g3b-
+crt1-
+cvl1-

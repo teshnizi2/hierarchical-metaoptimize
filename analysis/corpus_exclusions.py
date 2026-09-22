@@ -47,6 +47,11 @@ From the command line:
            ONCE, by the ARGS witness of any one of its deviating kinds, and MULTI_ARGS registers the witness of EVERY
            ARGS kind its (batch, arm) deviates on; each registered value is held to the run's own ARGS line, and a
            two-ARGS run of an arm with no MULTI_ARGS entry still FAILs;
+           TRAIN-SET SWITCH (CORRECTIONS 304): VAL_SPLIT (patches/patch_valsplit.py, 302) is a ninth line kind -- a
+           run that trains on 45,000 of CIFAR's 50,000 images prints `VAL_SPLIT: on ...`, which no CSV column carries.
+           cvl1's W1 runs are listed by that line; its W4 runs (wd 5e-4) are TWO-AXIS and follow 284's rule (ARGS
+           witness, VAL_SPLIT registered in MULTI_KIND).  The per-epoch `VAL:` lines start with no kind prefix and are
+           read by no reader here;
            then prints the noise-floor demonstration: the registered cvt1 sigmas (227.6) re-derived on
            the current corpus three ways -- as 227 did (every `cvt1-` row dropped), as a future
            registration should (only the listed rows dropped), and naively (nothing dropped).
@@ -137,6 +142,16 @@ KINDS = [
 # No prefix above is a prefix of another (their first letters V / B / G / C / R / W / D / S differ), so no line starts with two of
 # them and every `startswith` reader selects each line for ONE kind (CORRECTIONS 245); check() FAILs if an entry breaks it.
 KINDS_AT_251 = 6   # CORRECTIONS 269: 251's `kinds scanned` line is frozen over the first six entries, so it stays byte-identical
+# ---- CORRECTIONS 304: VAL_SPLIT, the ninth kind (patches/patch_valsplit.py, CORRECTIONS 302; cvl1, 303) ------------------
+# `VAL_SPLIT=<n_val>:<split_seed>` holds out a class-stratified validation split and TRAINS ON THE REST (cvl1: 45,000 images,
+# 450 steps per epoch), which no CSV column carries; its tree prints `VAL_SPLIT: off` or ONE `VAL_SPLIT: on dataset=...`
+# line on every run.  Appended; the eight entries above are unchanged.  VAL_SPLIT shares its first letter with VOTE_W, so
+# 269's "first letters differ" no longer holds for the nine -- but neither is a prefix of the other (they diverge at the
+# second character, `A` / `O`), which is the necessary and sufficient condition check() proves over ALL of KINDS.  The
+# per-epoch `VAL: epoch <e> val_acc <x> % n_val <n>` line starts with no KINDS prefix (`VAL:` is not `VAL_SPLIT`), is not
+# an `ARGS:` line, and is read by no reader here.  tests/test_corpus_exclusions_check.py C41-C44.
+KINDS.append(("VAL_SPLIT", "VAL_SPLIT: off"))
+KINDS_AT_269 = 8   # CORRECTIONS 304: 269's `kinds scanned` line is frozen over the first eight entries, so it stays byte-identical
 
 # ---- --check only: runs whose registered design turns ON more than one kind (CORRECTIONS 245) ----------------------
 # A TSV row carries ONE witness.  Such a run is listed ONCE, by any one of its ON lines; each (batch, arm) below must
@@ -230,6 +245,21 @@ _CWD5_DM_CARW2 = ("DECAY_MASK: on base=SGDm wd=0.01 spec=layer4.0.bn2.weight+lay
                   "names=layer4.0.bn2.weight,layer4.0.shortcut.1.weight,layer4.1.bn2.weight")
 MULTI_KIND.update({
     ("cwd5", "CARW2"): {"DECAY_MASK": _CWD5_DM_CARW2},
+})
+# CORRECTIONS 304: cvl1 (303), 284's TWO-AXIS rule applied to the new kind.  EVERY cvl1 run prints the ON `VAL_SPLIT` line
+# below; its 16 W4 runs ALSO run at `--weight-decay-base 5e-4` (cgw1's W4 rung, cvl1_design.ARGS_DEVIATING), so they are
+# listed with their ARGS witness `ARGS_WD_BASE: weight-decay-base=5e-4` and VAL_SPLIT is registered here for their four
+# arms.  The 16 W1 runs (wd 0.1, the standard) are ONE-kind rows listed by the VAL_SPLIT line itself and register nothing.
+# Re-typed (NOT imported) from the registered design `analysis/cvl1_design.py` `witness_on()`, whose shas are the real
+# CIFAR-10 split's (302.4, proof job 5080389); tests/test_corpus_exclusions_check.py C44 pins the literal and the arm set.
+_CVL1_VS = ("VAL_SPLIT: on dataset=CIFAR10 n_val=5000 n_train=45000 classes=10 per_class=500 split_seed=302 "
+            "val_sha=7d3a1489390161d637ad0b526ac32a10723210722879f8deead4462e4f69bb0e "
+            "train_sha=2733a990cf7a76d8e92014cdd6aceeb8c055f7cd49cc7df913923b066c1e5e91")
+MULTI_KIND.update({
+    ("cvl1", "chW4"): {"VAL_SPLIT": _CVL1_VS},
+    ("cvl1", "ndW4"): {"VAL_SPLIT": _CVL1_VS},
+    ("cvl1", "k01W4"): {"VAL_SPLIT": _CVL1_VS},
+    ("cvl1", "kLW4"): {"VAL_SPLIT": _CVL1_VS},
 })
 MULTI_KINDS_AT_251 = 2  # 251's `multi-kind runs` line is computed over the entries registering 2+ kinds, so it stays
 #                         byte-identical as one-kind two-axis entries are added; the added ones get their own line.
@@ -527,8 +557,12 @@ def check(runs_dirs):
         # so both verdicts are the stronger statement.
         print("  kinds scanned (CORRECTIONS 251): also %s, %d in all; no prefix of the %d is a prefix of another: %s"
               % (" / ".join(kd for kd, _off in KINDS[4:KINDS_AT_251]), KINDS_AT_251, KINDS_AT_251, not collide))
+        # CORRECTIONS 304: 269's line is frozen over the EIGHT kinds it registered (KINDS_AT_269), as 251's is over six;
+        # the kind added since is named on the next line.
         print("  kinds scanned (CORRECTIONS 269): also %s, %d in all; no prefix of the %d is a prefix of another: %s"
-              % (" / ".join(kd for kd, _off in KINDS[KINDS_AT_251:]), len(KINDS), len(KINDS), not collide))
+              % (" / ".join(kd for kd, _off in KINDS[KINDS_AT_251:KINDS_AT_269]), KINDS_AT_269, KINDS_AT_269, not collide))
+        print("  kinds scanned (CORRECTIONS 304): also %s, %d in all; no prefix of the %d is a prefix of another: %s"
+              % (" / ".join(kd for kd, _off in KINDS[KINDS_AT_269:]), len(KINDS), len(KINDS), not collide))
         # TWO-KIND RUNS (CORRECTIONS 245): a listed run of a MULTI_KIND (batch, arm) prints exactly its registered line of
         # every kind registered there -- the kind its witness names and the one the TSV row cannot carry.
         nb = len(bad)
