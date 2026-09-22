@@ -1,0 +1,52 @@
+==============================================================================================================
+cvl1 -- DO THE AUDIT'S TEST RANKINGS HOLD ON A HELD-OUT VALIDATION SPLIT?  (CORRECTIONS 303; ICML-PLAN 1.14)
+scorer sha256 85c73e21de04db48eae004467e8df54a440112126afe16cb1642846199996d7c   design sha256 946a119fedf0fa22a9e1f21af6a7ea3b9bebde1805ae37756bcf1a66c8683e6f
+runsdir /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2
+==============================================================================================================
+COMPLETION  32 / 32 registered runs complete (100 epoch lines + RUN_DONE)
+G-PROV  /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2/cvl1/PROVENANCE.txt  MODE submit  SCORER 85c73e21de04db48  DESIGN 946a119fedf0fa22  LOAD_DATA c8eb838593124871  TRAIN 8706d8c752ff8971
+G-ARGS / G-ENV / G-VALSPLIT / G-KIND / G-VAL / G-STRUCT  32 of 32 complete runs pass (20 flags, the registered ENV line, ONE registered VAL_SPLIT witness, 100 VAL lines, 9000 probe records with n_beta == m)
+G-HW (DISCLOSURE ONLY): NVIDIA L4 x32
+corpus: 3115 rows after corpus_exclusions.filter_rows, cvl1- excluded  (DISCLOSURE ONLY -- enters no bar, sigma, level, state or stamp)
+
+ARMS  plateau5 over epochs 95-99, TEST and VAL from the SAME runs; box from each run's OWN probe.jsonl
+  arm    wd   grain      n      TEST      sd   range       VAL      sd   range  VAL-TEST  box  
+  chW1   0.1  chunk777   4   91.6045   0.287   0.686   91.6420   0.238   0.568   +0.0375  free 
+  ndW1   0.1  nodewise   4   91.3455   0.359   0.854   91.2090   0.501   1.224   -0.1365  free 
+  k01W1  0.1  scalar     4   91.8845   0.210   0.458   92.1640   0.076   0.176   +0.2795  free 
+  kLW1   0.1  layerwise  4   92.3140   0.219   0.512   92.2580   0.166   0.356   -0.0560  free 
+  chW4   5e-4 chunk777   4   86.8265   0.189   0.458   86.3720   0.132   0.288   -0.4545  free 
+  ndW4   5e-4 nodewise   4   86.6605   0.259   0.562   86.4640   0.184   0.432   -0.1965  free 
+  k01W4  5e-4 scalar     4   89.6360   0.213   0.476   89.5260   0.268   0.584   -0.1100  free 
+  kLW4   5e-4 layerwise  4   88.9275   0.197   0.424   88.8340   0.240   0.560   -0.0935  free 
+
+SIGMA  O2: max(frozen floor, in-batch) per reader -- nothing from the corpus
+  TEST SIGMA_PRIOR_frozen 0.178183 (df 190) | SIGMA_INBATCH 0.247551 (df 24) | SIGMA_USED 0.247551 (= SIGMA_INBATCH)
+  VAL  SIGMA_PRIOR_frozen 0.178183 (df 190) | SIGMA_INBATCH 0.255365 (df 24) | SIGMA_USED 0.255365 (= SIGMA_INBATCH)
+  paired (VAL - TEST) per-run sd 0.284535 (df 24) -- DESCRIPTIVE gaps only
+
+CONTRASTS (WITHIN a rung, WITHIN a reader; +/-2 SE is a HALF-WIDTH, not a bound on any effect)
+  TEST D_W1 = ch - nd = +0.2590 pp = +1.48 SE (SE 0.175045) [-0.0911, +0.6091]  state UNDECIDED
+  VAL  D_W1 = ch - nd = +0.4330 pp = +2.40 SE (SE 0.180570) [+0.0719, +0.7941]  state SURVIVES
+       GAP D_W1 VAL - TEST = +0.1740 pp = +0.86 paired SE (SE 0.201197) [-0.2284, +0.5764]  not resolved
+  TEST D_W4 = ch - nd = +0.1660 pp = +0.95 SE (SE 0.175045) [-0.1841, +0.5161]  state UNDECIDED
+  VAL  D_W4 = ch - nd = -0.0920 pp = -0.51 SE (SE 0.180570) [-0.4531, +0.2691]  state VANISHES
+       GAP D_W4 VAL - TEST = -0.2580 pp = -1.28 paired SE (SE 0.201197) [-0.6604, +0.1444]  not resolved
+  TEST T_W4 = k01 - ch +2.8095 (+16.05 SE), k01 - nd +2.9755 (+17.00 SE)  state SCALAR-BEATS-BEST
+  TEST G_W1 = kL - k01 = +0.4295 pp   DESCRIPTIVE
+  TEST G_W4 = kL - k01 = -0.7085 pp   DESCRIPTIVE
+  VAL  T_W4 = k01 - ch +3.1540 (+17.47 SE), k01 - nd +3.0620 (+16.96 SE)  state SCALAR-BEATS-BEST
+  VAL  G_W1 = kL - k01 = +0.0940 pp   DESCRIPTIVE
+  VAL  G_W4 = kL - k01 = -0.6920 pp   DESCRIPTIVE
+       GAP min(T_W4) VAL - TEST = +0.2525 pp = +1.25 paired SE [-0.1499, +0.6549]  not resolved
+
+SELECTION  over the 8 configurations: TEST picks kLW1 (92.3140), VAL picks kLW1 (92.2580); TEST regret of VAL's pick +0.0000 pp (SE 0.175045)  -> SELECT-SAME
+  rung W1: best grain on TEST layerwise, on VAL layerwise
+  rung W4: best grain on TEST scalar, on VAL scalar
+
+PER CLAIM  W1: TEST UNDECIDED | VAL SURVIVES -> DIFF  W4: TEST UNDECIDED | VAL VANISHES -> DIFF  SC: TEST SCALAR-BEATS-BEST | VAL SCALAR-BEATS-BEST -> SAME
+
+LICENCE (primary)    a reading changes state between test and validation but no paired gap is resolved: the change is not distinguishable from reader noise at this seed count; report both states and the paired intervals; no sentence that the ranking does or does not hold on validation.
+LICENCE (selection)  the configuration (grain x decay) with the best validation plateau is the one with the best test plateau: selecting on validation would have picked the same one, among these 8.
+
+FINAL VAL-DIFFERS-UNRESOLVED | SELECT-SAME | W1-TUNDECIDED/VSURVIVES+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST | ONE-CELL TWO-RUNGS MS-ALPHA0-NOT-RESELECTED TRAIN-45K ONE-SPLIT ALPHA-INDEPENDENT-DECAY-NOT-TESTED FLOOR-READINGS-ARE-BOUNDS SELECT-W1-SAME SELECT-W4-SAME TEST-SIGMA-INBATCH VAL-SIGMA-INBATCH TEST-STATE-DIFFERS-FROM-CGW1-W1 TEST-LEVEL-DIFFERS-FROM-CGW1-chW1 TEST-LEVEL-DIFFERS-FROM-CGW1-ndW1 TEST-LEVEL-DIFFERS-FROM-CGW1-chW4 TEST-LEVEL-DIFFERS-FROM-CGW1-ndW4 TEST-LEVEL-DIFFERS-FROM-CGW1-k01W4 TEST-LEVEL-DIFFERS-FROM-CGW1-kLW4

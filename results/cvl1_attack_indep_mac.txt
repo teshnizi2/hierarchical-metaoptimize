@@ -1,0 +1,141 @@
+==============================================================================================================
+cvl1_attack_indep.py -- an INDEPENDENT re-derivation of cvl1 (CORRECTIONS 303) from the raw run files
+  stdlib only, no repo import, no regex, no shlex; every literal re-typed.  Scorer under attack: sha 85c73e21de04db48
+==============================================================================================================
+
+[0] RUN FILES AND SYNC INTEGRITY
+  PASS each cvl1-*.out file name occurs once across <runsdir> and <runsdir>/cvl1
+  PASS 32 cvl1-*.out files found (found 32)
+  PASS the 32 file names are exactly the design's (arm, seed) set, 8 arms x seeds 184-187, no stray or duplicate
+  PASS all 64 run files present (32 .out + 32 probe.jsonl)
+  DIGEST over the 64 run files' names and sha256: 8f4a94ed3dc72d4a19ee8b13616449dd01e7ca97787a7aae980a0a12d4207651  (2077049771 bytes)
+  PASS job ids are 5080667-5080698, contiguous, one per run (303.10)
+  PASS job order is W1 then W4, per seed ch / nd / k01 / kL (303.10)
+  PASS PROVENANCE MODE submit
+  PASS PROVENANCE SCORER_SHA256 = 85c73e21de04db48
+  PASS PROVENANCE DESIGN_SHA256 = 946a119fedf0fa22
+  PASS PROVENANCE HF_SHA256 = 4732b74aa3a10508
+  PASS PROVENANCE LOAD_DATA_SHA256 = c8eb838593124871
+  PASS PROVENANCE TRAIN_SHA256 = 8706d8c752ff8971
+  PASS PROVENANCE PATCH_SHA256 = a18dfa9b237ccee4
+  PASS PROVENANCE PROOF_LOG_SHA256 = d02a744caf1d49b5
+  PASS PROVENANCE REGISTERED_COMMIT = 14e63bac7f4dee24
+  PASS PROVENANCE VAL_SPLIT = 5000:302
+
+[1]-[4] PER RUN: ARGS rebuilt flag by flag, ENV, VAL_SPLIT witness, Epoch / VAL lines, probe structure
+  PASS ARGS: exactly ONE line per run, equal to the design's 20 flags in order, value for value, byte for byte (0 of 32 fail; 0)
+  PASS ONE save directory across the 32 runs
+  PASS ENV: exactly ONE line per run, the registered one with the run's own PROBE_DIR (0 fail)
+  PASS VAL_SPLIT: exactly ONE witness per run, byte-equal to the registered line (split seed 302, val_sha 7d3a1489..., train_sha 2733a990...) (0 fail)
+  PASS no other ON witness of any kind and no PROBE_TENSOR line (0 fail)
+  PASS RUN_DONE on every run (0 fail)
+  PASS Epoch lines: epochs 0..99 once each, 100 lines (0 fail)
+  PASS VAL lines: epochs 0..99 once each, n_val 5000, none malformed (0 fail)
+  PASS each VAL line is the line RIGHT AFTER its own Epoch line (stricter than the scorer's order rule) (0 fail)
+  PASS every VAL value is printed to 2 decimals and is a multiple of 0.02 (5,000 images) (0 fail)
+  PASS probe.jsonl: 9,000 records at steps 0,5,...,44995 (450 steps/epoch = 45,000 images), n_beta == the arm's m on every record, beta moved (0 fail)
+  PASS 32 of 32 runs read
+
+  PER RUN (plateau5 = mean of epochs 95-99; box occupancy from the raw probe records; minutes from the run's own line)
+  run                  job     TEST      VAL VAL-TEST   TEST99    VAL99 rec_lo rec_hi
+  cvl1-chW1-s184   5080667   92.002   91.972   -0.030    91.73    91.70 0.0000 0.0000
+  cvl1-chW1-s185   5080671   91.546   91.580   +0.034    91.76    91.36 0.0000 0.0000
+  cvl1-chW1-s186   5080675   91.316   91.612   +0.296    91.10    90.80 0.0000 0.0000
+  cvl1-chW1-s187   5080679   91.554   91.404   -0.150    91.54    91.08 0.0000 0.0000
+  cvl1-ndW1-s184   5080668   91.822   91.796   -0.026    92.22    91.60 0.0000 0.0000
+  cvl1-ndW1-s185   5080672   91.218   91.208   -0.010    91.51    91.54 0.0000 0.0000
+  cvl1-ndW1-s186   5080676   90.968   91.260   +0.292    91.15    91.64 0.0000 0.0000
+  cvl1-ndW1-s187   5080680   91.374   90.572   -0.802    91.15    90.36 0.0000 0.0000
+  cvl1-k01W1-s184  5080669   91.798   92.188   +0.390    91.69    92.26 0.0000 0.0000
+  cvl1-k01W1-s185  5080673   92.022   92.080   +0.058    92.06    92.20 0.0000 0.0000
+  cvl1-k01W1-s186  5080677   91.630   92.132   +0.502    91.67    92.26 0.0000 0.0000
+  cvl1-k01W1-s187  5080681   92.088   92.256   +0.168    92.15    92.20 0.0000 0.0000
+  cvl1-kLW1-s184   5080670   92.226   92.148   -0.078    92.35    92.30 0.0000 0.0000
+  cvl1-kLW1-s185   5080674   92.306   92.140   -0.166    92.30    92.12 0.0000 0.0000
+  cvl1-kLW1-s186   5080678   92.106   92.496   +0.390    92.35    92.62 0.0000 0.0000
+  cvl1-kLW1-s187   5080682   92.618   92.248   -0.370    92.46    92.16 0.0000 0.0000
+  cvl1-chW4-s184   5080683   86.800   86.452   -0.348    86.89    86.48 0.0000 0.0000
+  cvl1-chW4-s185   5080687   87.050   86.508   -0.542    87.14    86.30 0.0000 0.0000
+  cvl1-chW4-s186   5080691   86.592   86.308   -0.284    86.72    86.52 0.0000 0.0000
+  cvl1-chW4-s187   5080695   86.864   86.220   -0.644    86.94    86.26 0.0000 0.0000
+  cvl1-ndW4-s184   5080684   86.650   86.388   -0.262    86.42    85.92 0.0000 0.0000
+  cvl1-ndW4-s185   5080688   86.834   86.264   -0.570    86.86    86.22 0.0000 0.0000
+  cvl1-ndW4-s186   5080692   86.860   86.696   -0.164    86.93    86.34 0.0000 0.0000
+  cvl1-ndW4-s187   5080696   86.298   86.508   +0.210    86.25    86.34 0.0000 0.0000
+  cvl1-k01W4-s184  5080685   89.806   89.800   -0.006    89.82    89.50 0.0000 0.0000
+  cvl1-k01W4-s185  5080689   89.660   89.216   -0.444    89.58    89.24 0.0000 0.0000
+  cvl1-k01W4-s186  5080693   89.330   89.396   +0.066    89.10    89.54 0.0000 0.0000
+  cvl1-k01W4-s187  5080697   89.748   89.692   -0.056    90.17    89.86 0.0000 0.0000
+  cvl1-kLW4-s184   5080686   89.102   89.176   +0.074    88.82    88.78 0.0000 0.0000
+  cvl1-kLW4-s185   5080690   89.068   88.616   -0.452    89.17    88.72 0.0000 0.0000
+  cvl1-kLW4-s186   5080694   88.678   88.788   +0.110    88.63    88.76 0.0000 0.0000
+  cvl1-kLW4-s187   5080698   88.862   88.756   -0.106    88.96    89.02 0.0000 0.0000
+  PASS every run box-free (rec_lo and rec_hi < 0.05)
+  PASS every run prints its own `<n>  minutes` line
+  GPU-h by the runs' own minutes lines: 26.3167 (1579 minutes; 303.7 expected 21.65, hard bound 64)
+
+[5]-[6] THE SCORER'S STDOUT REBUILT AND COMPARED LINE BY LINE WITH EACH COMMITTED LOG
+  PASS corpus disclosure count re-derived from --csv / --tsv: 3115
+  rebuilt: 52 lines; FINAL rebuilt: FINAL VAL-DIFFERS-UNRESOLVED | SELECT-SAME | W1-TUNDECIDED/VSURVIVES+W4-TUNDECID ...
+  PASS committed log #1 (52 lines): 50 lines byte for byte, 2 host-dependent lines by form; mismatches none
+  PASS committed log #1's FINAL is the last line and equals the rebuilt FINAL
+  PASS committed log #2 (52 lines): 50 lines byte for byte, 2 host-dependent lines by form; mismatches none
+  PASS committed log #2's FINAL is the last line and equals the rebuilt FINAL
+
+[7] THE TWO QUESTIONS OF 303, FROM THE NUMBERS ABOVE
+  (a) DO THE RANKINGS REPORTED ON TEST HOLD ON VALIDATION?  per registered claim (state on TEST | on VAL):
+      W1 TEST UNDECIDED         VAL SURVIVES          -> DIFF   (cgw1's landed 50,000-image TEST state: SURVIVES)
+      W4 TEST UNDECIDED         VAL VANISHES          -> DIFF   (cgw1's landed 50,000-image TEST state: UNDECIDED)
+      SC TEST SCALAR-BEATS-BEST VAL SCALAR-BEATS-BEST -> SAME   (cgw1's landed 50,000-image TEST state: SCALAR-BEATS-BEST)
+      full ranking of the 8 configurations, TEST: kLW1 > k01W1 > chW1 > ndW1 > k01W4 > kLW4 > chW4 > ndW4
+      full ranking of the 8 configurations, VAL : kLW1 > k01W1 > chW1 > ndW1 > k01W4 > kLW4 > ndW4 > chW4
+      pairwise order agreement over the 28 pairs: 27 concordant, 1 discordant, Kendall tau 0.9286   DESCRIPTIVE
+      rung W1 grain order  TEST layerwise > scalar > chunk777 > nodewise | VAL layerwise > scalar > chunk777 > nodewise   SAME ORDER
+      rung W4 grain order  TEST scalar > layerwise > chunk777 > nodewise | VAL scalar > layerwise > nodewise > chunk777   ORDER DIFFERS
+      discordant pairs: chW4-ndW4 (TEST +0.1660, VAL -0.0920)
+  (b) WOULD SELECTING ON VALIDATION HAVE PICKED THE SAME CONFIGURATION?
+      TEST argmax kLW1 92.3140 (runner-up k01W1 91.8845, margin +0.4295); VAL argmax kLW1 92.2580 (runner-up k01W1 92.1640, margin +0.0940)
+      -> SELECT-SAME (TEST regret of VAL's pick +0.0000 pp); per rung: W1 best TEST layerwise / VAL layerwise, W4 best TEST scalar / VAL scalar
+  PASS primary token recomputed (first match of 303.4's ladder): VAL-DIFFERS-UNRESOLVED
+  PASS selection token recomputed: SELECT-SAME
+
+[8] WHAT BOUNDS THE VERDICT: margins of the registered reading, then DESCRIPTIVE sensitivities (none is registered)
+  TEST D_W1 +0.2590  SE 0.175045: to SURVIVES needs D >= +0.30 (short +0.0410) and D > 2 SE = 0.3501 (short +0.0911); VANISHES needs D <= +0.15 (+0.1090) and D + 2 SE < 0.5556 (+0.0535)
+  VAL  D_W1 +0.4330  SE 0.180570: to SURVIVES needs D >= +0.30 (short -0.1330) and D > 2 SE = 0.3611 (short -0.0719); VANISHES needs D <= +0.15 (+0.2830) and D + 2 SE < 0.5556 (+0.2385)
+  TEST D_W4 +0.1660  SE 0.175045: to SURVIVES needs D >= +0.30 (short +0.1340) and D > 2 SE = 0.3501 (short +0.1841); VANISHES needs D <= +0.15 (+0.0160) and D + 2 SE < 0.5556 (-0.0395)
+  VAL  D_W4 -0.0920  SE 0.180570: to SURVIVES needs D >= +0.30 (short +0.3920) and D > 2 SE = 0.3611 (short +0.4531); VANISHES needs D <= +0.15 (-0.2420) and D + 2 SE < 0.5556 (-0.2865)
+  GAP W1 +0.1740: RESOLVED needs |gap| >= 0.30 (short 0.1260) AND > 2 paired SE = 0.4024 (short 0.2284)
+  GAP W4 -0.2580: RESOLVED needs |gap| >= 0.30 (short 0.0420) AND > 2 paired SE = 0.4024 (short 0.1444)
+  GAP SC +0.2525: RESOLVED needs |gap| >= 0.30 (short 0.0475) AND > 2 paired SE = 0.4024 (short 0.1499)
+  => no paired gap reaches the 0.30 bar (largest |gap| 0.2580), so VAL-SHIFTS is unreachable at ANY s_delta: the primary token does not depend on the paired sd.
+  TEST D_W1 UNDECIDED: D +0.2590; SURVIVES unreachable at any sigma (D < +0.30); VANISHES unreachable at any sigma (D > +0.15)
+  TEST D_W4 UNDECIDED: D +0.1660; SURVIVES unreachable at any sigma (D < +0.30); VANISHES unreachable at any sigma (D > +0.15)
+  VAL  D_W1 SURVIVES for every sigma < 0.306177 (d / (2 sqrt(1/2)))
+  VAL  D_W4 VANISHES for every sigma < 0.457922 ((0.5556 - d) / (2 sqrt(1/2)))
+  AT THE FROZEN FLOOR sigma 0.178183 on BOTH readers (DESCRIPTIVE counterfactual): VAL-DIFFERS-UNRESOLVED | SELECT-SAME | W1-TUNDECIDED/VSURVIVES+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST
+  LEAVE-ONE-SEED-OUT (3 seeds per arm, in-batch sigma recomputed; DESCRIPTIVE):
+    drop s184: VAL-DIFFERS-UNRESOLVED SELECT-SAME                W1-TUNDECIDED/VSURVIVES+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST  pick T kLW1 / V kLW1  D_W1 T +0.2853 V +0.5187  D_W4 T +0.1713 V -0.1440
+    drop s185: VAL-DIFFERS-UNRESOLVED SELECT-SAME                W1-TUNDECIDED/VUNDECIDED+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST  pick T kLW1 / V kLW1  D_W1 T +0.2360 V +0.4533  D_W4 T +0.1493 V -0.2040
+    drop s186: VAL-DIFFERS-UNRESOLVED SELECT-SAME                W1-TUNDECIDED/VUNDECIDED+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST  pick T kLW1 / V kLW1  D_W1 T +0.2293 V +0.4600  D_W4 T +0.3107 V +0.0067
+    drop s187: VAL-AGREES             SELECT-SAME                W1-TUNDECIDED/VUNDECIDED+W4-TVANISHES/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST  pick T kLW1 / V kLW1  D_W1 T +0.2853 V +0.3000  D_W4 T +0.0327 V -0.0267
+  AGAINST cgw1 (trained on 50,000 images; NON-GATING, between batches, never pooled):
+    chW1   in-batch TEST  91.6045  cgw1  92.4287  diff -0.8242   registered prediction [91.6, 92.7] inside
+    ndW1   in-batch TEST  91.3455  cgw1  92.0593  diff -0.7138   registered prediction [91.2, 92.3] inside
+    k01W1  in-batch TEST  91.8845  cgw1  92.1907  diff -0.3062   registered prediction [91.3, 92.5] inside
+    kLW1   in-batch TEST  92.3140  cgw1  92.7933  diff -0.4793   registered prediction [92.0, 93.0] inside
+    chW4   in-batch TEST  86.8265  cgw1  87.9060  diff -1.0795   registered prediction [86.6, 88.4] inside
+    ndW4   in-batch TEST  86.6605  cgw1  87.6650  diff -1.0045   registered prediction [86.3, 88.2] inside
+    k01W4  in-batch TEST  89.6360  cgw1  90.4650  diff -0.8290   registered prediction [89.5, 90.9] inside
+    kLW4   in-batch TEST  88.9275  cgw1  89.8110  diff -0.8835   registered prediction [88.8, 90.3] inside
+    D_W1 in-batch TEST +0.2590 (VAL +0.4330)  cgw1 TEST +0.3693
+    D_W4 in-batch TEST +0.1660 (VAL -0.0920)  cgw1 TEST +0.2410
+  VAL minus TEST per arm lies in [-0.4545, +0.2795]; registered prediction [-0.8, +0.8]
+  floor / ceiling (164.6): every arm level is 86.66-92.31 on TEST and 86.37-92.26 on VAL: >= 70 pp above chance 10, >= 6 pp below 100, so no contrast is floor- or ceiling-bounded.
+
+[9] THE 32 EXCLUSION ROWS OWED AT INGEST (304.8's format; W1 one-kind by the VAL_SPLIT line, W4 TWO-AXIS by ARGS)
+  rebuilt 32 rows; digest dc8e3cf112fe192928298edfafce9a663eebd3d1a19d5ea0160cd9dbc84c9b8c
+  PASS 16 W1 rows carry the VAL_SPLIT line, 16 W4 rows the ARGS_WD_BASE 5e-4 witness
+  PASS PROPOSED file header is the 9-column form
+  PASS PROPOSED file's 32 data rows equal the rebuild byte for byte, in job order
+
+ATTACK 40 PASS / 0 FAIL
