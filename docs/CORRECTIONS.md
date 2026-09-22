@@ -40761,7 +40761,7 @@ NEW: `patches/patch_decayroute.py`, `tests/test_decayroute.py`, `tests/test_deca
 `bin/cDR1_stage_harness.sh`, `bin/cDR1_realrun_proof.sbatch`, `jobs/run_cifar_cdr1.sh`.  EDITED: this entry,
 `docs/PRIOR-ART.md` (appended section).
 
-## 306. TRACK F2 (registration) — **`cai1` REGISTERED, NOT SUBMITTED: THE COUNT-MATCHED AUDIT UNDER α-INDEPENDENT DECAY.  DOES THE COUNT-MATCHED SIGN (chunk777 − nodewise) SURVIVE, AND DOES `SCALAR-BEATS-BEST` HOLD, WHEN THE BASE DECAY NO LONGER MOVES WITH THE LEARNED STEP SIZE?  `cgw1`'s CELL VERBATIM EXCEPT `--weight-decay-base 0` AND `DECAY_ROUTE=alpha_indep:<Λ>` (`PATCH_DECAYROUTE`, 305) AT TWO STANDARD-RECIPE Λ — 5e-5 (lr·wd of SGD 0.1 / 5e-4) AND 5e-4 (the same with its 0.9 momentum buffer) — × {chunk777, nodewise, scalar, layerwise} × SEEDS {192..195}; 8 ARMS, 32 JOBS, ≈27.0 GPU-h EXPECTED, 64 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL** (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3); nothing here is about CIFAR-100 or the collapse cell.  (2) **TWO Λ BRACKET THE STANDARD RECIPE; THEY LOCATE NOTHING BETWEEN** (`TWO-LAMBDAS-BRACKET`).  (3) **NO α-SCALED ARM IS IN THIS BATCH**: "the effect exists under α-scaled decay" is `cgw1`'s in-batch W1 / W2 SURVIVES (296), read BETWEEN batches and never pooled (`ALPHA-SCALED-REFERENCE-BETWEEN-BATCH`).  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL**: on normalised tensors the decay form sets the effective step (Kosson et al. arXiv:2305.17212), so an ABSENT / TIES reading may mean "the partition stops controlling the effective step", not "the audit effect was a harness artefact" (`ROTATIONAL-EQUILIBRIUM-CONFOUND`, 305 bound 4).  (5) **Λ MATCHES A STANDARD RECIPE's per-step SHRINK, NOT its decay-to-step RATIO**: the learned a ≈ 1e-3 is ~100× the recipe's lr below, so Λ/a is ~100–1000× the recipe's (`SHRINK-MATCHED-NOT-RATIO-MATCHED`); constant schedule (`CONSTANT-SCHEDULE`).  (6) **Every VANISHES / TIES reading is a BOUND.**  All are printed on every FINAL.]** — **"THE AUDIT EFFECT IS AN ARTEFACT OF α-SCALED DECAY" IS A REGISTERED, REACHABLE TOKEN (`AI-ARTEFACT-VANISHES` / `AI-ARTEFACT-REVERSES`: absent at BOTH Λ) — AND THE PRIOR FAVOURS IT (0.30 together) ON MECHANISM, WHICH IS WHY IT CARRIES BOUND (4).  ZERO GPU AT REGISTRATION.**
+## 306. TRACK F2 (registration) — **`cai1` REGISTERED, NOT SUBMITTED: THE COUNT-MATCHED AUDIT UNDER α-INDEPENDENT DECAY.  DOES THE COUNT-MATCHED SIGN (chunk777 − nodewise) SURVIVE, AND DOES `SCALAR-BEATS-BEST` HOLD, WHEN THE BASE DECAY NO LONGER MOVES WITH THE LEARNED STEP SIZE?  `cgw1`'s CELL VERBATIM EXCEPT `--weight-decay-base 0` AND `DECAY_ROUTE=alpha_indep:<Λ>` (`PATCH_DECAYROUTE`, 305) AT TWO STANDARD-RECIPE Λ — 5e-5 (lr·wd of SGD 0.1 / 5e-4) AND 5e-4 (the same with its 0.9 momentum buffer) — × {chunk777, nodewise, scalar, layerwise} × SEEDS {192..195}; 8 ARMS, 32 JOBS, ≈27.0 GPU-h EXPECTED, 64 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL** (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3); nothing here is about CIFAR-100 or the collapse cell.  (2) **TWO Λ BRACKET THE STANDARD RECIPE; THEY LOCATE NOTHING BETWEEN** (`TWO-LAMBDAS-BRACKET`).  (3) **NO α-SCALED ARM IS IN THIS BATCH**: "the effect exists under α-scaled decay" is `cgw1`'s in-batch W1 / W2 SURVIVES (296), read BETWEEN batches and never pooled (`ALPHA-SCALED-REFERENCE-BETWEEN-BATCH`).  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL**: on normalised tensors the decay form sets the effective step (Kosson et al. arXiv:2305.17212), so an ABSENT / TIES reading may mean "the partition stops controlling the effective step", not "the audit effect was a harness artefact" (`ROTATIONAL-EQUILIBRIUM-CONFOUND`, 305 bound 4).  (5) **Λ MATCHES A STANDARD RECIPE's per-step SHRINK, NOT its decay-to-step RATIO**: the learned a ≈ 1e-3 is ~100× the recipe's lr below, so Λ/a is ~100–1000× the recipe's (`SHRINK-MATCHED-NOT-RATIO-MATCHED`); constant schedule (`CONSTANT-SCHEDULE`).  (6) **Every VANISHES / TIES reading is a BOUND.**  All are printed on every FINAL.]** — **"THE AUDIT EFFECT IS AN ARTEFACT OF α-SCALED DECAY" IS A REGISTERED, REACHABLE TOKEN (`AI-ARTEFACT-VANISHES` / `AI-ARTEFACT-REVERSES`: absent at BOTH Λ) — AND THE PRIOR FAVOURS IT (0.30 together) ON MECHANISM, WHICH IS WHY IT CARRIES BOUND (4).  ZERO GPU AT REGISTRATION.** — **VERIFIED AND SUBMITTED by the verifier 2026-09-22: 32 / 32 jobs 5081292–5081323, RULE 21 margin 15 min 16 s (306.11).**
 
 *`alice` NOT contacted (every cluster command went to `alice2` / s5014158).  Nothing under `paper/` listed, read, archived
 or touched; no clone, checkout or worktree (the alice2 stage is a `tar` / `git archive` of `analysis bin results patches
@@ -40973,6 +40973,86 @@ coverage is owed once all 32 have started (`bash bin/cAI1_rule20.sh` from the st
   clean (0 runs: UNVERIFIED, as it must be before launch).
 * **The submission is the verifier's**: the command in 306.8 with `CAI1_REGISTERED_COMMIT=03f5e3c1c19d0105b4395ebd4d2d660f7439b7df`;
   32 jobs; nothing was submitted by this track.
+
+### 306.11 Independent pre-launch verification — PASSED; `cai1` SUBMITTED, 32 / 32 jobs (verifier, 2026-09-22)
+
+*The verifier's own checks, each re-run, not read off 306.5–306.10.  No file of the registration was changed: scorer
+`fb766d93…`, design `edf7000d…`, launcher `948dcec5…`, live check, RULE 20 pair are the bytes of `03f5e3c` (`git diff
+--quiet 03f5e3c origin/master` over the six files).  `alice` NOT contacted.  No clone, checkout or worktree: the local
+comparison tree was `git archive 03f5e3c -- analysis bin results patches tests jobs ':!paper'` into the scratchpad.
+Nothing under `paper/` read or listed.  GPU work only as the 32 Slurm jobs below.  No job cancelled.*
+
+* **(1) Prior art.**  `docs/PRIOR-ART.md` "Sweep 2026-09-22 — does a PARTITION RANKING … survive a change from α-scaled
+  to α-INDEPENDENT decay?": dated, five queries verbatim, verdict "NOT FOUND … WORTH-TESTING".  Spot-checked by web
+  search (result lists only): arXiv:2512.08217 is Chou, *Correction of Decoupled Weight Decay* (decay ∝ γ²), and
+  arXiv:2510.15262 is Fan, Liu, Zhao, Yuan, Gu, *Robust Layerwise Scaling Rules by Proper Weight Decay Tuning* (λ ∝ √d for
+  AdamW).  Both are real papers on the topics stated.  The sweep's conclusion justifies the GPU: `DECOUPLED-NOT-TESTED` is
+  the paper's biggest open referee point, and no queued batch runs α-independent decay on the audit cell (`crd1`, 307,
+  is the collapse cell).
+* **(2) The design can decide its own question.**  Only the decay form changes: the 32 composed lines collapse to ONE
+  with name, seed, grain and route masked, and the I5 `chunk777` line's 20 ARGS flags equal landed `cgw1-chW1-s152`'s
+  ARGS line flag for flag (same order and values) except `--weight-decay-base` (0.1 → 0), `--seed`, `--save-directory`
+  and `--run-name`.  The ENV line is `cgw1`'s template.  The rung is witnessed by the harness's `DECAY_ROUTE:` line (the
+  live check shows all 8 arms print the registered witness with `lam 5e-05` / `lam 0.0005`, wd 0.0, bound
+  `_dr_SGDm_base_update`) and gated per record by G-SHRINK.  The bracket covers the α-scaled reference's own dose: `cgw1`
+  W1's realised initial shrink is 0.1·α0 = 1e-4, between Λ 5e-5 and 5e-4, so an absent-at-both reading is not a dose
+  shortfall.  Power at the floor (4 v 4): P(VANISHES | D = 0) 0.883 per rung.  P(SURVIVES) is 0.979 at D = +0.5556 and
+  ≈ 0.71 at `cgw1` W1's +0.37 (the verifier's arithmetic).  So the artefact token and the survive token are both
+  reachable at useful power, and the in-between tokens license no sentence.  The bounds (rotational equilibrium,
+  between-batch reference, shrink- not ratio-matched) limit the reading.  None of them makes a branch uninformative.
+  **Not withdrawn.**
+* **(3) Λ choice.**  5e-5 = lr·wd of SGD 0.1 / 5e-4, and 5e-4 ≈ lr·wd/(1 − 0.9), the two bases 296.4 / 298 quote.  I
+  agree that a single level would leave a null open to "wrong Λ".  Dropping α0·wd = 5e-7 is justified: its horizon is
+  2e6 steps, 40× the run.  G-SHRINK's 1 % tolerance cannot be tripped by float32 rounding.  A half-ulp of w is at most
+  2^-24·|w|, i.e. ≤ 1.2e-3 relative to Λ·|w| at Λ = 5e-5 per rounding, ≤ 2.4e-3 for the patch's two roundings
+  (`w − Λw − δ`, patches/patch_decayroute.py line 237).  So a G-SHRINK failure would mean a real defect, not noise.
+* **(4) Bars, ladder, FINAL.**  SURV, NULLBAR, POOL_EXCLUDE, RES, HEALTH_MIN, DIVERGED, BOXFREE_MAX, MATCH, SIGMA_PRIOR,
+  SHRINK_TOL / APPLIED_TOL / TRACE_TOL are module-level literals.  `primary_of` is first-match and ends in a default
+  (AI-UNDECIDED), and `sc_of` ends in SC-PARTIAL; both are exhaustive.  The seven BOUNDS head the stamp list of every
+  scored FINAL, which is the last line printed.
+* **(5) Selftest re-run.**  Mac (`/opt/homebrew/bin/python3`, main tree): **112 PASS / 0 FAIL / 1 SKIP**, rc 0.  The
+  skip is F: the landed gn1 records are not on the Mac.  alice2 (`~/stage_cai1`, `--runsdir $WS/runs --csv
+  results/all_runs.csv`): **115 / 0 / 0**, rc 0 (`~/cai1_verifier_selftest.log`, `55f5abd2…`).
+* **(6) Dry run re-run.**  The stage `~/stage_cai1` was first checked BYTE FOR BYTE against the commit: all 1,215 files
+  of `git archive 03f5e3c -- analysis bin results patches tests jobs` match by sha256 (`sha256sum -c`, 0 mismatches, 0
+  extra files, no `paper` directory).  `CAI1_REGISTERED_COMMIT=03f5e3c1… CAI1_SCORER_SHA256=fb766d93… bash
+  bin/cAI1_alphaindep.sh --dry-run` → `~/cai1_verifier_dry.log` (156 lines, `9286525f…`), rc 0, **0 GUARD FAIL**, guard 6
+  "32 composed command lines, 0 failed".  Its 32 sbatch lines hash **`5d8a4145…`**, identical to the registrant's dry 0
+  and dry 1.  Guard 4n1 passed (unset → `SGDm_base_update`, `DECAY_ROUTE: off`).  Guard 4n2 passed (alpha_indep at wd 0.1
+  refused).  Guard 3g passed (proof log `dc73dfba…`, 410 PASS / 0 FAIL).
+* **(7) Seeds fresh and in block.**  {192..195} is Track F2's block.  `results/all_runs.csv` (3,383 rows) has none (max
+  162).  The live designs' blocks: g3b 170–173, crt1 176–178, csh1 180–182, cvl1 184–187 (188–191 unused), crd1 196–198.
+  None overlaps.  Guards 2–2f: 0 `.out` ARGS lines under `$WS/runs` carry 192–195, and there were 0 `cai1-*` jobs in
+  sacct or squeue before submission.
+* **(8) Noise floor.**  The demo value is quoted in 306.5: **0.636566 (df 274)**.  Selftest re-derived it on alice2 as
+  0.636566 (df 274), and the frozen SIGMA_PRIOR 0.17818264951145454 (df 190) as the filtered value.
+* **(9) RULE 21.**  `git ls-remote origin master` = `66c63fbb…`, and 03f5e3c is its ancestor (`merge-base
+  --is-ancestor`).  GitHub's PushEvent for `03f5e3c` is **2026-09-22T09:36:11Z**.
+* **(10) Predictions** were written before launch: 306.6 and `cai1_design.PRED / PRIOR_P / PRIOR_SC`.
+* **(11) GPU-h:** expected 26.99, hard bound 64 (WALL 2 h × 32).  cgw1's slowest grain × 1.15 is ≈ 61 min, inside the
+  wall.
+
+**SUBMITTED** on alice2 with the registered launcher, one invocation, under bash: `cd ~/stage_cai1 &&
+CAI1_REGISTERED_COMMIT=03f5e3c1c19d0105b4395ebd4d2d660f7439b7df
+CAI1_SCORER_SHA256=fb766d935e2f4b074b6d5bbb759696f3935821ee7872b41441e2a567fe0420f5 bash bin/cAI1_alphaindep.sh
+--submit`.  The log is `~/cai1_submit.log`: "32 jobs (ACCEPTED BY SLURM); 0 rejected", 0 GUARD FAIL.  Guard 5 counted 74
+jobs pending, under the cap of 100.  Provenance is `$WS/runs/cai1/PROVENANCE.txt` (`0e8d37aa…`,
+REGISTERED_COMMIT 03f5e3c1…).
+
+**Job ids 5081292–5081323 (32, contiguous), in the launcher's order:**
+* I5, s192 → s195: ch, nd, k01, kL = 5081292–5081295 / 5081296–5081299 / 5081300–5081303 / 5081304–5081307.
+* I4, s192 → s195: the same order, 5081308–5081311 / 5081312–5081315 / 5081316–5081319 / 5081320–5081323.
+
+`squeue` shows exactly **32** `cai1-*` jobs, all PENDING (QOSMaxGRESPerUser, behind the running batches).
+
+**RULE 21 margin:** push 09:36:11Z → first submission 09:51:27Z (sacct Submit of 5081292, 11:51:27 CEST) = **15 min
+16 s**.
+
+**Owed:**
+* `bash bin/cAI1_rule20.sh` from `~/stage_cai1` once all 32 have started.  The launcher's guard 7 was still waiting for
+  a first ARGS line when this entry was written, every job pending, so its verdict is not recorded here.
+* A DECAY_ROUTE kind in `corpus_exclusions.py` before ingest (306.9).
+* Score only at 32 / 32 RUN_DONE, with `python3 analysis/cAI1_alphaindep_score.py $WS/runs`.
 
 Next free number: **308**.
 
