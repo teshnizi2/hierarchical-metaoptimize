@@ -39688,6 +39688,64 @@ scorer and `docs/STATUS.md` / `docs/ICML-PLAN.md` NOT edited.  **Submission is t
 `bin/PROTECTED.txt`; scoring with and only with `python3 analysis/cRT1_retune_score.py $WS/runs` at 36 / 36 RUN_DONE.
 **GPU used by this entry: ZERO.**  Batch expected 34.4 GPU-h, hard bound 72.
 
+### 300.10 Independent pre-launch verification — PASSED; `crt1` SUBMITTED, 36 / 36 jobs (verifier, 2026-09-22)
+
+*The verifier's own checks, each re-run, not read off 300.8.  No file of the registration was changed: the scorer, design,
+launcher and every guard are the bytes of `34e564f`.  `alice` NOT contacted; GPU work only as the 36 Slurm jobs below.*
+
+* **(1) Prior art.** `docs/PRIOR-ART.md` "Sweep 2026-09-22 … (CORRECTIONS 300, batch `crt1`, Track B)": dated, six queries
+  recorded, verdict "nothing tests a scalar-vs-partition ranking of meta-learned step sizes under per-grain re-tuning".
+  The two 2026 winner's-curse ids were checked on their arXiv abstract pages and are real papers on that topic
+  (arXiv:2605.05973, arXiv:2605.18887); they support only the generic fact behind B.  The general "rankings depend on
+  tuning" point stays cited to Sivaprasad et al. / Schmidt et al.  Justifies the GPU.
+* **(2) Design answers its question; not confounded into uninformativeness.**  Every branch licenses a distinct sentence
+  (300.6 table).  The caw1-type risk here would be an uninformative selector: checked on `cgw1`'s landed W4 `.out`
+  files, TRAIN accuracy at epoch 99 is NOT saturated (chunk777 97.47–97.82, nodewise 97.47–97.66, scalar 98.85–99.11)
+  and orders the grains as TEST does, so train-selection can discriminate; ORACLE is co-reported for the case it does not.
+  The α0 point A2 (300.3) removes the obvious "the partitions never left α0" objection to an ms-only retune.
+* **(3) Bars and ladder.**  SURV 0.30, RES 2.0, HEALTH_MIN 80, DIVERGED 2.0, MATCH 0.50, SIGMA_PRIOR, EMAX4, B_PRIOR, SE3
+  are module-level literals; `reading_of` / `branch_of` read in order and first-match; every (TUNED, ORACLE) pair lands
+  in exactly one of six branches (selftest C, exhaustive); the FINAL is the last stdout line and carries every bound
+  token (selftest E).
+* **(4) Selftest re-run:** Mac `python3 analysis/cRT1_retune_score.py --selftest --runsdir ../runs_alice2` →
+  **92 PASS / 0 FAIL / 0 SKIP** (rc 0); `alice2` (inside guard 1c of the dry run below) → **92 / 0 / 0**, 1c1–1c4 PASS.
+* **(5) Dry run re-run** from a fresh stage `~/stage_crt1` = `git archive 34e564f -- analysis bin results` (paper/
+  excluded by construction; staged shas scorer `7fe5ca76…`, design `21d8a556…`, launcher `60540d4a…` = the commit's):
+  `~/stage_crt1_dry1.log`, 236 lines, rc 0, **0 guard failures**; guard 1b accepts the declared commit and scorer sha;
+  guard 6 "36 composed command lines, 0 failed".  **Flag for flag:** each composed line carries `cgw1`'s chW4 ARGS line's
+  20 flags in the same order and values (`--optimizer HF --alg-base SGDm --momentum-param-base 0.99
+  --weight-decay-base 5e-4 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0
+  --dataset CIFAR10 --NN-name ResNet18 --batch-size 100 --max-time 999:00:00 --gamma 1 … --num-epochs 100 …`),
+  differing only in `--meta-stepsize` / `--alpha0` (M2 1e-4/1e-3, A2 1e-4/1e-2, M3 3e-4/1e-3, M1 3e-5/1e-3, each
+  checked on its 9 lines), `--stepsize-groups` (chunk777 / nodewise / scalar), `--seed`, `--save-directory` and
+  `--run-name`; ENV `AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=5` as `cgw1`'s.
+* **(6) Seeds** {176, 177, 178}: inside Track B's block, disjoint from A 170–173 / C 180–182 / D 184–191; 0 of 3,383
+  `results/all_runs.csv` rows carry them (checked on the Mac); guards 2d / 2d2 / 2e / 2f on `alice2` found 0 `.out`
+  ARGS lines, corpus rows, `sacct` or `squeue` jobs.
+* **(7) Noise floor** 0.636566 (df 274) quoted (300.8; `NOISE_FLOOR_DEMO` in the scorer).
+* **(8) RULE 21.**  `34e564f` (scorer + design + launcher) is an ancestor of `origin/master`; GitHub PushEvent for head
+  `34e564f`: **2026-09-22T07:09:14Z**.  First submission (PROVENANCE `UTC`, `sacct` Submit): **2026-09-22T07:17:52Z**.
+  **Margin: 8 min 38 s, push before submission.**
+* **(9) Predictions** in `crt1_design.PRED` and 300.6, committed before launch.  **(10) Hard bound** 72 GPU-h
+  (WALL 2 h × 36) stated; expected 34.4.
+
+**SUBMITTED** with the registered runner and the pinned commit: `CRT1_REGISTERED_COMMIT=34e564fb… CRT1_SCORER_SHA256=7fe5ca76…
+bash bin/cRT1_retune.sh --submit` from `~/stage_crt1`, log `~/stage_crt1_submit.log`, rc 0: "36 jobs (ACCEPTED BY SLURM);
+0 rejected"; `crt1-` appended to the stage copy of `bin/PROTECTED.txt`; `$WS/runs/crt1/PROVENANCE.txt` MODE submit,
+REGISTERED_COMMIT `34e564f…`.  **Job ids (36): 5080605, 5080607–5080626, 5080628–5080642** (5080627 is not ours;
+M2 605/607–614, A2 615–623, M3 624–626/628–633, M1 634–642).  `squeue -u s5014158` right after: **36 `crt1-*` jobs** (17
+RUNNING, 19 PENDING), all on gpu-short / gpu-l4-24g with `--constraint=L4`.
+
+**Still owed:** RULE 20 at full coverage (`bash bin/cRT1_rule20.sh` from `~/stage_crt1`) once all 36 have started and
+before any number is read; at landing the 36 ARGS_WD_BASE rows and `crt1-` in the repo's `bin/PROTECTED.txt`; scoring
+only with `python3 analysis/cRT1_retune_score.py /home/s5014158/metaopt/runs` at 36 / 36 RUN_DONE.
+
+**Disclosure (paper/, verifier).**  To edit this entry without touching other tracks' uncommitted files in the shared
+tree, the verifier ran `git worktree add --detach <scratchpad> origin/master`, which checked out the FULL tree, paper/
+included, before `git sparse-checkout set /docs/CORRECTIONS.md` removed everything except this file.  Nothing under
+paper/ was listed, read, opened or edited; its absence afterwards was confirmed with `test -e` only.  It is recorded
+because a checkout is a copy.
+
 ## 301. TRACK C — **`csh1` REGISTERED: THE SHORT-HORIZON γ CONTROL (ICML-PLAN 1.20, THREAT T-C).  AT THE MECHANISM CELL WITH THE DECAY DOSE REMOVED (wd 5e-4), DOES SHORTENING THE HYPERGRADIENT HORIZON WITH `--gamma` < 1 — TO THE COLLAPSING ARM's OWN REALISED (1 − κα) — REPRODUCE THE SCALAR COLLAPSE?  6 ARMS × SEEDS {180, 181, 182} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  NOT SUBMITTED (the verifier submits).  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **γ IS CONSTANT; THE COLLAPSING ARM's HORIZON IS NOT.** Its trace factor is (1 − 0.1·a) with `a` learned, so no constant γ reproduces it; γ_M matches the onset-window MEDIAN and γ_P is at least as short AT EVERY STEP.  Neither is the learned horizon (`CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON`).  (2) **SUFFICIENCY, NOT NECESSITY.** A null says the short trace is not SUFFICIENT without the dose; it cannot say the trace plays no part at wd 0.1, where the dose and the short trace act together (`SUFFICIENCY-NOT-NECESSITY`).  (3) **TWO γ VALUES BRACKET; THEY LOCATE NOTHING.**  (4) **NO in-batch wd-0.1 positive control; ONE cell, ONE network, wd 5e-4 only, 100 epochs, 3 seeds.**  (5) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (6) **A trace-only patch (h ← (1 − 0.1·a)h − δ with the weights at 5e-4) is NOT run** — it would track `a` exactly but is new harness code.  All are stamped on every scored FINAL.]**
 
 ### 301.1 Question, and why it is worth GPU
