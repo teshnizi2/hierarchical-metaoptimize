@@ -43121,3 +43121,676 @@ downstream moves.  315 and row 244 are not rewritten in place (append-only); thi
 notebook's MT244 text (which quotes row 244) carries the transposed pair until its next import from this repo.
 
 Next free number: **317**.
+
+## 317. TRACK F3 (land) — **[LED WITH THE BOUNDS: (1) **SUFFICIENCY, NOT NECESSITY** (`SUFFICIENCY-NOT-NECESSITY`).  `S COLLAPSE` says the α-scaled weight shrink is ENOUGH to collapse the scalar step size at this cell; it never says the trace plays no part when both routes are on.  (2) **THE SHRINK CANNOT BE SEPARATED FROM ITS OWN UNDECAYED TRACE TERM** (307.11, `DELTA-IS-APPLIED-CHANGE`): S's trace has factor 1 and γ 1, so `h` accumulates the direct term −a·wd·w with no decay at all.  Every sentence that says the collapse travels through the weight shrink keeps the parenthesis *"(with the direct a·wd·w term in the trace, undecayed)"*, and none may say "the shrink alone".  (3) **`shrink_only` AND `trace_only` ARE INTERVENTIONS, NOT HYPERGRADIENTS** of their own weight update (305.3).  (4) **T's NULL RESTS ON A THIN REFERENCE**: TRL is 60.2460, only **+5.2460 pp** above REF_MIN 55; about 5.25 pp worse and cell T would read UNREADABLE and the route token would become `ROUTE-WEIGHT-SHRINK-SUFFICES-TRACE-UNRESOLVED`.  (Separately, TRS is +33.5977 pp above its collapse bar 30.1230, 0/3 seeds at it.)  (5) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL** (`ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL`, Kosson et al. arXiv:2305.17212), Λ is **onset-matched, not init- or cumulative-matched** (`LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE`; measured cumulative log-shrink 15.75 against SRS's 1.1782, **13.37×**), there is **ONE Λ** on a constant schedule, and **both I grains under-fit** (TRAIN 70.95 / 71.40), so `INDEP-NOGAP` says only that neither grain collapses relative to the other — never that a constant decay is harmless.  (6) **NO IN-BATCH OFF ANCHOR** (`NO-INBATCH-OFF-ANCHOR`): the OFF premise is the landed `cwd5` W1 (23.2240 / 69.2940), read between batches and gating nothing; the cdr1 tree's OFF inertness is 305's proof, not a re-run (`CDR1-TREE-OFF-INERT-BY-PROOF-NOT-RERUN`).  (7) **EVERY COLLAPSE AND NOGAP IS A BOUND** (164.6): SRS's 22.7653 is a collapse LOCATION, not an effect size, and NOGAP means "below the 10 pp bar", never "the grains are equal".  (8) **SCOPE**: `KAPPA-0.1-CELL-ONLY`, `ONE-NETWORK-RESNET18`, `ONE-CELL-OTHERWISE`, `EPOCHS-100-ONLY`, `THREE-SEEDS`, `SIGMA-PRIOR-FROZEN`; **`csh1`'s outcome is read BESIDE this FINAL by 307.7's joint table, never inside it** (`CSH1-JOINT-READING-NOT-IN-THIS-FINAL`).]** — **`crd1` LANDS 18/18: `ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP | S-COLLAPSE+T-NOGAP+I-NOGAP`, THE REGISTERED PREDICTION (307.6, prior 0.25, UNSURE).  AT THE MECHANISM CELL THE α-SCALED WEIGHT SHRINK WITH THE TRACE FACTOR DROPPED STILL COLLAPSES THE SCALAR ARM (22.7653 against its own layerwise 70.0587, G +47.2933 pp); THE LEARNED TRACE FACTOR WITH THE WEIGHTS UNDECAYED DOES NOT (G −3.4747 pp, scalar AHEAD); AND α-INDEPENDENT DECAY AT THE ONSET-MATCHED DOSE DOES NOT COLLAPSE EITHER GRAIN (G +0.6393 pp).  SO THE COLLAPSE TRAVELS THROUGH THE α-SCALED WEIGHT SHRINK (WITH ITS UNDECAYED DIRECT TERM) AND NEEDS THE DECAY TO MOVE WITH THE LEARNED α — A PROPERTY OF α-SCALED DECAY (PyTorch AdamW's DEFAULT FORM), NOT OF DECAY AS SUCH.  WITH `csh1` (307.7): T-C's HORIZON ROUTE IS EXCLUDED AS A SUFFICIENT ACCOUNT IN BOTH FORMS — A CONSTANT γ AND THE LEARNED ONE — AS BOUNDS.  ITS 18 ROWS ARE IN THE ONE `crd1` + `cai1` INGEST (318.9).**
+
+*The registered prediction was this branch (307.6, UNSURE, prior 0.25).  **ZERO GPU by this entry.**  No Slurm job
+submitted or cancelled; read-only `sacct -X` / `squeue` on the `alice2` login node.  `alice` NOT contacted.  Nothing
+under `paper/` listed, read or touched; no clone, checkout or worktree of the campaign repo was made (the stages are
+`git archive` of the registered commit).  No notebook website or Vercel URL opened, nothing downloaded, no `.pdf`
+fetched.  The running batch `crt2` was not touched.*
+
+
+### 317.1 Completion, the by-hand ARGS audit, and RULE 20 at full coverage
+
+**18/18 COMPLETE.**  Jobs **5081273–5081290**, contiguous and in the registered order (per seed SRS / SRL / TRS / TRL /
+AIS / AIL), seeds {196, 197, 198}, 6 arms (307.4).  `sacct -X` read-only: **18/18 `COMPLETED 0:0`**, **11.6575 GPU-h**
+by `sacct` ElapsedRaw (**11.4667** by the runs' own `minutes` lines), against 307.9's 12.34 expected; hard bound 54.
+`squeue` empty of `crd1-*`.
+
+**The by-hand audit**: `python3 analysis/argsline_guard.py $WS/runs --name crd1-` (guard `81cea8b5…`, UNEDITED, on
+`alice2`): 18 `.out`, **18 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line; VERDICT PASS, rc 0**
+(`results/crd1_argsguard_byhand.txt`, `76b19285…`).
+
+**RULE 20 at FULL coverage, PASS on both halves, after all 18 had COMPLETED and BEFORE any accuracy number was
+opened**: `bin/cRD1_rule20.sh` (`807fccd0…`, UNEDITED) with `analysis/crd1_rule20_envaudit.py` (`f6613bd2…`, UNEDITED)
+from a fresh `git archive 855b936 -- . ':!paper'` stage on `alice2`, log committed as
+`results/crd1_rule20_full_land.txt` (`bf78b401…`), read line by line; **re-run independently by the refute pass** from
+its own fresh stage, PASS and agreeing (its stage deleted).
+* **ARGS half**: 18 `.out`, all with an `ARGS:` line.  Batch consistency rc 0, **18 clean**, VERDICT PASS.  Per-run,
+  each run pinned to its own arm's wd and grain: **18 checked, 0 violations**.  Coverage exactly the registration's:
+  `--weight-decay-base` 0 ×6 / 0.1 ×12; 9 scalar + 9 layerwise; `--gamma 1` ×18.
+* **ENV half** PASS: **three DECAY_ROUTE witnesses, 6 runs each, exact** (`shrink_only`, `trace_only`,
+  `alpha_indep:3.15e-4`); **1 distinct ENV line**; **18 × NVIDIA L4**; no traceback, no NaN, `RUN_DONE` in every log.
+
+Sync: 95 run files (18 `.out` + 77 under `crd1/`; Tensorboard outputs excluded) sha256-checked against a list generated
+on `alice2`, `shasum -c` **95 OK** (`results/crd1_runfiles_sha256.txt`, `75f1bed4…`).  `plateau5` is read from each run's
+RAW `.out` (mean TEST over epochs 95–99) in batch; the CSV `plateau` column is read by nothing here.
+
+
+### 317.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cRD1_route_score.py` (**`8684f086…`**, design `ac12901b…`; the registered commit `855b936`'s bytes, HEAD's and
+PROVENANCE's) ran **UNEDITED** with the documented invocation, **rc 0, 231 lines**: on `alice2` from a fresh `git archive
+855b936` stage (Python 3.10.4, the `mo` venv; `results/crd1_route_score_alice2.txt`, `bd23aa80…`) and on the Mac (3.14.5)
+from a scratch archive of the same commit on `../runs_alice2` (`results/crd1_route_score_mac.txt`, `6dd5397a…`).  The two
+stdouts differ only on lines 100 and 104, the manifest and provenance host paths.  Every gate passes (`HARNESS-CLEAN`):
+G-ARGS, G-ENV, G-PT, G-WITNESS, G-STRUCT, G-PROV (12/12), G-PROBE (500 records per run, the grain's step-size count, the
+Lion vote decomposition clean on the scalar arms) and **G-ROUTE 18/18**; G-FLOOR / G-CEIL pass on the maximum arm mean
+70.0587.  **RULE 16 held**: neither the scoring track nor the refute pass reported a defect in the scorer.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,551 rows, 420 exclusions; HEAD bytes, on `../runs_alice2`, the
+Mac): rc 0, 231 lines, **identical to the committed Mac log except the two path echoes and the corpus DISCLOSURE line**,
+and the FINAL is byte-identical.  **The disclosure line moves, and why** (unlike 312.2 / 315.2): it reads 3,131 rows
+here against the committed log's 3,115, because the committed logs were produced from stages of the REGISTRATION commit
+`855b936`, whose `results/all_runs.csv` and `results/CORPUS-EXCLUSIONS.tsv` were the pre-`g3b` files (3,437 rows, 322
+exclusions → 3,115), while HEAD's are the post-ingest ones (3,551 − 420 = 3,131).  Every one of the 50 rows this ingest
+adds is listed, so the count moves only by the two earlier ingests already in HEAD.  The line is DISCLOSURE ONLY — no
+bar, σ, branch or stamp reads it — and no other line moved.
+
+**The FINAL line, verbatim (line 217 of the scorer log):**
+
+    FINAL: ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP | S-COLLAPSE+T-NOGAP+I-NOGAP | DECAY-DOSE-S-REACHED | DECAY-DOSE-T-BELOW | DECAY-DOSE-I-REACHED | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | ROUTE-MEASURED-IN-RECORDS | SUFFICIENCY-NOT-NECESSITY | ROUTE-INTERVENTIONS-NOT-HYPERGRADIENTS | DELTA-IS-APPLIED-CHANGE | ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL | LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE | ONE-LAMBDA | NO-INBATCH-OFF-ANCHOR | CDR1-TREE-OFF-INERT-BY-PROOF-NOT-RERUN | KAPPA-0.1-CELL-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND | CSH1-JOINT-READING-NOT-IN-THIS-FINAL | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-T-DESCRIPTIVE | BETA-FLOOR-SRS | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+
+All **16 registered bounds** are on the line (307.5; selftest E asserts them).
+
+
+### 317.3 The numbers (in batch; every contrast WITHIN its cell)
+
+`plateau5` = mean TEST over epochs 95–99 from each run's RAW `.out`; TRAIN is the same window; n = 3 seeds per arm.
+
+| arm | route | grain | wd | TEST plateau5 | sd | range | TRAIN | seeds s196 / s197 / s198 |
+|---|---|---|---|---|---|---|---|---|
+| SRS | `shrink_only` | scalar | 0.1 | **22.7653** | 0.5925 | 1.0760 | 22.8533 | 22.0840 / 23.1600 / 23.0520 |
+| SRL | `shrink_only` | layerwise | 0.1 | **70.0587** | 0.2171 | 0.4260 | 98.2953 | 70.0100 / 69.8700 / 70.2960 |
+| TRS | `trace_only` | scalar | 0.1 | **63.7207** | 0.4511 | 0.9020 | 89.1380 | 63.2640 / 63.7320 / 64.1660 |
+| TRL | `trace_only` | layerwise | 0.1 | **60.2460** | 0.0635 | 0.1200 | 94.2053 | 60.2220 / 60.1980 / 60.3180 |
+| AIS | `alpha_indep:3.15e-4` | scalar | 0 | **62.9967** | 0.8101 | 1.4780 | 70.9453 | 62.0660 / 63.5440 / 63.3800 |
+| AIL | `alpha_indep:3.15e-4` | layerwise | 0 | **63.6360** | 0.1807 | 0.3260 | 71.3967 | 63.5180 / 63.5460 / 63.8440 |
+
+**σ (O2)**: the frozen floor **0.636566** (df 274) binds over the in-batch 0.464529 (df 12) → `SIGMA-PRIOR-FROZEN`;
+SE of a within-cell contrast **0.519754**, and 2 SE **1.039507** is a HALF-WIDTH, not a bound on any effect.
+
+| cell | route | G = L − k | SE multiple | ±2 SE | R = k/L | state | per-seed G | scalar seeds at the bar |
+|---|---|---|---|---|---|---|---|---|
+| S | `shrink_only`, wd 0.1 | **+47.2933 pp** | +90.99 | [+46.2538, +48.3328] | 0.3249 | **COLLAPSE** | +47.926 / +46.710 / +47.244 | **3/3** (bar 35.0293; SRS is 12.26 pp below it) |
+| T | `trace_only`, wd 0.1 | **−3.4747 pp** | −6.69 | [−4.5142, −2.4352] | 1.0577 | **NOGAP** (scalar ahead; `SCALAR-AHEAD-T-DESCRIPTIVE`) | −3.042 / −3.534 / −3.848 | 0/3 (bar 30.1230) |
+| I | `alpha_indep:3.15e-4`, wd 0 | **+0.6393 pp** | +1.23 | [−0.4002, +1.6788] | 0.9900 | **NOGAP** | +1.452 / +0.002 / +0.464 | 0/3 |
+
+TRAIN gaps: S **+75.4420**, T +5.0673, I +0.4513.  Ladders: ROUTE(S = COLLAPSE, T = NOGAP) → **`ROUTE-IS-WEIGHT-SHRINK`**;
+INDEP(I = NOGAP) → **`INDEP-NOGAP`**.  Floor and ceiling gates: the maximum arm mean, 70.0587, lies between FLOOR 15 and
+CEIL 90 (PASS).  Descriptively every seed lies in [22.0840, 70.2960], so the lowest seed is 7.08 pp above 15 and the
+highest 19.70 pp below 90 (refute fix D2).
+
+**Measured from each arm's OWN records** (`PATCH_DECAYROUTE`'s `dr_*` keys; arm value = median over its 3 seeds; source
+= `cwd5` k01W1 OFF at wd 0.1, onset-window median 3.1477e-4, recorded peak 5.5256e-4):
+* **SRS**: shrink onset-median **3.1446e-4**, peak 5.7684e-4, cumulative **1.1782** (source 1.154 / 1.157 / 1.135); trace
+  factor 1, horizon ∞; β turns 8700 / 8700 / 8700, the same as the source's TURN; late β-floor share 1.000
+  (`BETA-FLOOR-SRS`).
+* **TRS**: measured shrink effectively 0 (peak 2.86e-9, by design); **trace factor 0.99968586, horizon 3183**; turns
+  9500 / 9400 / 9400.  Per seed the factor is 0.99968586 / 0.99968586 / 0.99968586 (horizon 3183.3); TRL's are
+  0.99968613 / 0.99968612 / 0.99968643 (horizons 3186.1 / 3185.9 / 3189.1).  For comparison `csh1`'s γ_M and crd1 I's
+  1 − Λ both give 3174.6 — **T's horizon is T's OWN learned one, not OFF's** (307.11).
+* **AIS / AIL**: shrink **3.1500e-4** (peak 3.1504e-4), cumulative **15.75**, factor 0.999685, horizon 3175; β never
+  turns on AIS (no applied +1 sign).
+* **Dose ratio against the source peak**: S **1.0439** → `DECAY-DOSE-S-REACHED`; T 0.0000 → `DECAY-DOSE-T-BELOW` (by
+  design); I **0.5701** → `DECAY-DOSE-I-REACHED`.
+
+**In-batch contrasts ACROSS cells (DESCRIPTIVE, ±2 SE, licensing nothing):** k_S − k_T −40.9553 [−41.9948, −39.9158];
+k_I − k_S +40.2313 [+39.1918, +41.2708]; k_I − k_T −0.7240 [−1.7635, +0.3155]; L_S − L_T +9.8127 [+8.7732, +10.8522];
+L_I − L_S −6.4227 [−7.4622, −5.3832].
+
+**Between batches, against the landed OFF premise `cwd5` W1 (23.2240 / 69.2940, state COLLAPSE; NON-GATING):** cell S
+scalar −0.4587 / layerwise +0.7647; cell T +40.4967 / −9.0480; cell I +39.7727 / −5.6580.
+
+**Descriptive robustness, licensing nothing:** dropping any one seed keeps `ROUTE-IS-WEIGHT-SHRINK | INDEP-NOGAP`.
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, after RULE 20 had passed and the ingest had run):** from the
+18 raw `.out` files in `../runs_alice2` (epochs 0–99 exactly once, `RUN_DONE` last, one ARGS / ENV / DECAY_ROUTE line
+each, no traceback), all six plateau5 means, sds, ranges and TRAIN means reproduce to 4 d.p.; in-batch σ 0.464529
+(df 12), σ_used 0.636566, SE 0.519754, G_S +47.2933, G_T −3.4747, G_I +0.6393 and every ±2 SE interval reproduce.
+
+
+### 317.4 What bounds the result, led with
+
+1. **Sufficiency, not necessity** (headline (1)).
+2. **The shrink is not separable from its undecayed direct term** (headline (2), 307.11): S's trace keeps −a·wd·w with
+   factor 1 and γ 1.  The parenthesis and `DELTA-IS-APPLIED-CHANGE` travel with every route sentence; "the shrink
+   alone" is never licensed.
+3. **Interventions, not hypergradients** (headline (3), 305.3).
+4. **T's null rests on a thin reference** (headline (4)): TRL +5.2460 pp over REF_MIN 55.  What the margin bounds is
+   whether cell T can be READ, not how near TRS is to a collapse (TRS is +33.5977 pp above its bar, 0/3 seeds at it).
+5. **The α-independent arm is not a pure route control, and its dose is onset-matched only** (headline (5)): one Λ, a
+   constant schedule, cumulative log-shrink 15.75 against 1.1782 (**13.37×**; the registered figure against the source
+   was 13.6×), and **both I grains under-fit** (TRAIN 70.95 / 71.40; AIL sits 6.42 pp below SRL in batch).
+   `INDEP-NOGAP` says only that neither grain collapses relative to the other (a bound).  Descriptively both I grains
+   train to about 71 %; this licenses no sentence about the constant decay's harm, only that it did not collapse the
+   scalar arm (refute fix D4).
+6. **No in-batch OFF anchor** (headline (6)); the cdr1 tree's OFF inertness is by 305's bitwise proof, not a re-run.
+7. **Every COLLAPSE and NOGAP is a bound** (headline (7), 164.6).
+8. **Scope** (headline (8)): κ 0.1 cell only, ResNet18_c100 only, 100 epochs, three seeds; `csh1`'s reading sits beside
+   this FINAL, not inside it.
+9. **σ**: the frozen floor 0.636566 (df 274) binds over the in-batch 0.464529 (df 12); 2 SE 1.039507 is a half-width.
+10. GPU: 11.6575 GPU-h by `sacct`, under the 12.34 expected and far inside the 54 hard bound.
+
+
+### 317.5 The attack — an independent parser, 57 PASS / 0 FAIL
+
+`analysis/crd1_attack_indep.py` (`c1e50ff6…`, committed at `39b9793`): standard library only, no repo imports, no regex,
+no shlex; every literal, bar, licence sentence and stamp re-typed.  It **rebuilds all 231 lines of both committed scorer
+logs with 0 differences** and scores **57 PASS / 0 FAIL**; its stdout is **byte-identical on `alice2` and the Mac**
+(sha256 `fa8679db…`; `results/crd1_attack_indep_alice2.txt`, `_mac.txt`).  Section [7] verifies the 18 PROPOSED
+exclusion rows byte for byte (rows digest `e7b6d306…`).  **Non-vacuity:** a mutated log (one digit and one path changed)
+was caught, 2 lines flagged.
+
+
+### 317.6 The refute pass — NOTHING REFUTED; FOUR WORDING / PRECISION FIXES (all applied)
+
+The refute pass (`holds: true`) parsed the 18 raw `.out` files with its own stdlib parser BEFORE running any repo
+program and reproduced every level, sd, range, TRAIN, per-seed value, σ, SE, G and its interval, R, the collapse bars,
+the per-seed gaps, the TRAIN gaps, all five cross-cell contrasts, all six between-batch offsets and both ladders; it
+recomputed the probe-derived quantities from all 500 records per run (onset medians, peaks, cumulative shrink, trace
+factors, horizons, dose ratios, the 13.37× cumulative ratio); it read the scorer's source (window 95–99; `cell_state`
+order UNREADABLE > SPLIT > COLLAPSE > NOGAP > PARTIAL; `decide_route` / `decide_indep` first-match ladders ending in
+defaults; the onset window [7500, 8700); the source literals) and found it correct and unedited; it re-ran RULE 20 from
+its own fresh `git archive 855b936` stage on `alice2` (both halves PASS, 18/18) and re-checked the sha lists, `sacct`
+and the 18 exclusion rows.  **No RULE 16 defect.**
+
+| # | where | as written | fixed to (applied at) |
+|---|---|---|---|
+| **D1** | 317.10's plain heading | "**The weight shrink carries the collapse.**" | it dropped 307.11's required parenthesis and "carries" reads as necessity: **"At this cell the α-scaled weight shrink (with the direct a·wd·w term in the trace, undecayed) is SUFFICIENT for the collapse (a bound; sufficiency, not necessity)"**, and the landed OFF level beside it is labelled *(between batches, non-gating)* (317.10) |
+| **D2** | the floor-gate sentence | "every seed lies in [22.0840, 70.2960], 7.08 pp above the 15 pp floor gate and 19.70 below the 90 ceiling" | misdescribes the gate: G-FLOOR / G-CEIL test the MAXIMUM ARM MEAN (70.0587), not each seed.  Rewritten as the gate plus a labelled descriptive sentence about the seeds (317.3) |
+| **D3** | the G-ROUTE disclosure | "the `worst` field reads 0.000e+00 on the SRL runs because it tracks the worst deviation only on scalar arms" | imprecise: **`route_audit` records a deviation only on `shrink_only` SCALAR arms; on `shrink_only` layerwise arms the check is a bracket test [wd·e^min β, wd·e^max β] ± tolerance and records none; `trace_only` and `alpha_indep` arms record it on both grains** (317.7's disclosure list) |
+| **D4** | bounds item 7 / the plain reading | "the constant decay is not harmless, only non-collapsing" | states a harm no gate measures: **"`INDEP-NOGAP` says only that neither grain collapses relative to the other (a bound).  Descriptively both I grains train to about 71 % (TRAIN 70.95 / 71.40) and AIL sits 6.42 pp below SRL in batch; this licenses no sentence about the constant decay's harm, only that it did not collapse the scalar arm."** (317.4 item 5, 317.10) |
+
+**Also checked and found correct, so NOT changed:** the phrases "~14×", "requires the decay to move with the learned
+alpha" and "not of decay as such" are the scorer's own registered licence text; the 307.11 parenthesis and T's factor
+and horizon are quoted; the Kosson caveat is carried and `ROTATIONAL-EQUILIBRIUM-CONFOUND` is correctly reserved for a
+`cai1` artefact reading (318); 311 A5 does not apply here, because `crd1` runs `cwd5`'s cell (ms 1e-3, α0 1e-6), not
+`crt1`'s M2 setting.  The refute pass's leave-one-seed-out cuts all keep COLLAPSE / NOGAP / NOGAP, and its check of the
+UNREADABLE knife-edge (TRL would have to be 5.2460 pp worse) agrees with the bound.
+
+
+### 317.7 The joint reading with `csh1` (307.7), applied from the tokens of the two FINAL lines only
+
+`csh1` landed `HORIZON-DOES-NOT-REPRODUCE | A-NOGAP+M-NOGAP+P-NOGAP` (310).  307.7's rows, matched on those tokens and
+this FINAL's, and on nothing else:
+
+| 307.7 row | tokens | joint reading, as registered |
+|---|---|---|
+| horizon row | csh1 `DOES-NOT-REPRODUCE` × crd1 T `NOGAP` | **the trace route is insufficient in BOTH forms at this cell**: T-C is excluded as a SUFFICIENT account for the constant γ (csh1, wd 5e-4) and for the LEARNED factor (crd1 T, wd 0.1) — as bounds, sufficiency not necessity |
+| M × I row | csh1 cell M `NOGAP` × crd1 I `NOGAP` | **neither the constant horizon nor the horizon plus a constant weight shrink collapses**: the collapse needs the decay to MOVE WITH α (a bound: one Λ, a constant schedule) |
+
+Neither scorer computed this table (O2 independence); it is applied here, at landing, by the two FINAL lines' tokens.
+Disclosure, not a defect: the scorer's `G-ROUTE` "worst" field is 0.000e+00 on the `shrink_only` LAYERWISE runs because
+`route_audit` records a deviation only on `shrink_only` scalar arms (D3); nothing reads the field.
+
+
+### 317.8 What this licenses, and what it does not
+
+**The registered licence, verbatim, at this cell only (the scorer log's `WHAT THIS DECIDES` block, lines 221–222):**
+
+> *"At the mechanism cell (wd 0.1) the alpha-scaled weight shrink with the trace factor removed collapses the scalar
+> step size to at most half its in-batch layerwise level, and the learned trace factor with the weights undecayed does
+> not (grains within the 10 pp bar)."  The weight-shrink route is SUFFICIENT and the trace route is NOT sufficient at
+> this cell: the collapse section may say the collapse travels through the weight shrink (with the direct a*wd*w term in
+> the trace), and T-C's horizon route is excluded as a sufficient account with the LEARNED horizon, not only a constant
+> gamma.*
+
+> *"With alpha-INDEPENDENT decay at the onset-matched per-step dose (LAMBDA 3.15e-4, applied from step 0, ~14x the
+> source's cumulative shrink) scalar and layerwise stay within the 10 pp bar."  At this cell the collapse REQUIRES the
+> decay to move with the learned alpha (a bound: one LAMBDA, a constant schedule); the collapse section may call it a
+> property of alpha-scaled decay, which is PyTorch AdamW's default form, not of decay as such.*
+
+Beside them, always: the parenthesis of bound (2); `SUFFICIENCY-NOT-NECESSITY`; the Kosson caveat and the under-fitting
+I grains (bound (5)); T's own factor 0.99968586 and horizon ≈ 3,183 steps (bound (4)); the OFF premise as a between-batch,
+non-gating number.
+
+**NOT licensed** (the scorer log's line 229, in substance): any other network, dataset, meta step, α0, horizon,
+grouping, base or meta optimiser, or decay value (only the wd-0.1 cell and one Λ ran); the other reading of
+`shrink_only`'s trace (not built, 305.2 bound 5); "the shrink alone"; "the trace plays no part"; "the grains are equal";
+"a constant decay is harmless"; the audit cells (that is `cai1`, 318); anything about the parent paper.  `csh1`'s
+outcome is read beside this FINAL by 307.7, never inside it.
+
+
+### 317.9 Its 18 exclusion rows
+
+Owed under 308's `DECAY_ROUTE` rule in 308.4's form — **18 rows, not 24**: 12 one-kind SR* / TR* rows witnessed by the
+run's own `DECAY_ROUTE` line, and 6 TWO-AXIS AI* rows witnessed by `ARGS_WD_BASE: weight-decay-base=0` with the
+`DECAY_ROUTE` line held to `MULTI_KIND` and `DECAY_ROUTE_ARMS`.  They are `results/crd1_exclusion_rows_PROPOSED.tsv`
+(`48fd750a…`, rows digest `e7b6d306…`), appended byte for byte in the ONE `crd1` + `cai1` ingest, `registered_at`
+**CORRECTIONS 317** — the number the PROPOSED file named provisionally, which this entry takes, so no column is
+rewritten.  The ingest is recorded once for both batches at **318.9** (commit `fecd462`).
+
+
+### 317.10 WHAT THIS DOES TO THE PAPER
+
+**(a) The collapse section gains its route sentence, with the parenthesis.**  At the mechanism cell the draft may now
+say: **at this cell the α-scaled weight shrink (with the direct a·wd·w term in the trace, undecayed) is SUFFICIENT for
+the collapse — a bound, sufficiency not necessity** — and that the learned trace factor with the weights undecayed is
+NOT sufficient (scalar finishes 3.47 pp ABOVE layerwise, descriptive, on a reference only 5.25 pp above the readability
+bar).  It may NOT say "the shrink alone", "the trace plays no part at wd 0.1", or anything about necessity.
+
+**(b) T-C is now excluded in both forms.**  310.10 (b) could exclude the trace route only for a CONSTANT γ and had to
+leave the learned horizon to `crd1`.  With this landing the collapse section may cite Wu et al. (arXiv:1803.02021) and
+say that short-horizon bias through the trace is **not sufficient** for the collapse at this cell in either form — the
+constant γ (`csh1`, wd 5e-4) and the learned factor 1 − 0.1·a (`crd1` T, wd 0.1) — as bounds, sufficiency not necessity.
+
+**(c) The collapse is a property of α-SCALED decay, not of decay as such (at this cell).**  With α-independent decay at
+the onset-matched per-step dose both grains stay inside the 10 pp bar, so the section may say the collapse requires the
+decay to move with the learned α — the form PyTorch's `AdamW` uses by default (292 NAMING) — with `ONE-LAMBDA`, the
+constant schedule, the 13.37× cumulative front-loading, `ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL` (arXiv:2305.17212) and
+the under-fitting I grains (TRAIN ≈ 71) beside it.
+
+**(d) `DECOUPLED-NOT-TESTED`, for the COLLAPSE section only.**  The stamp (281.2) said α-independent decay had never
+been run.  It has now been run here, readably, at the mechanism cell, so **for the collapse section at this cell the
+stamp is retired and replaced by the bounded sentence of (c)**.  It is NOT retired for the audit headline: that is
+`cai1`'s cell, where both rungs are unreadable (318.10).  ICML-PLAN row **1.6** is re-tagged **PARTIAL — LANDED (317,
+318)**: the route half is answered at the mechanism cell (weight shrink sufficient, trace not), the α-independent half
+is answered there and is UNREADABLE at the audit cell.
+
+**(e) Not touched by this batch:** the count-matched audit headline, the scalar row ("ties (a bound) after re-tuning",
+309 / 310.10 (a) as narrowed by 311 A3 / A4), the denominator, and the venue.  **Venue: TMLR, unchanged**; the 0.6–0.7
+stays an un-argued JUDGEMENT, UNSURE (311 A3), not re-estimated here.
+
+**(f) Later-evidence relations this entry states, in the relation vocabulary (for the notebook's cross-links):**
+* MT242 (`csh1`) → MT245 (`crd1`), **qualifies**: "the trace route is insufficient in BOTH forms at this cell" — 310's
+  row was bounded to a CONSTANT γ (`CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON`); with this batch's T arm the exclusion of
+  T-C as a sufficient account covers the LEARNED horizon too (307.7's horizon row, applied at 317.7), still as a bound
+  and still sufficiency, not necessity.
+* Not stated as a relation: MT238 (`cwd5`), whose W1 arms are this batch's OFF premise — read between batches, gating
+  nothing (`NO-INBATCH-OFF-ANCHOR`); the bearing is a premise, not one of the five relations, so it is left out rather
+  than relabelled.  Nor anything to the audit rows (MT240 / MT244): this batch runs the MECHANISM cell, and the audit's
+  α-independent question is `cai1`'s (318).
+
+**(g) Owed to the draft (NOT edited here; `paper/` untouched):** the collapse section's route sentence with the 307.11
+parenthesis and `SUFFICIENCY-NOT-NECESSITY`; the T-C sentence in its two-form version (b); the α-scaled-decay sentence
+(c) with its four qualifiers; the retirement of `DECOUPLED-NOT-TESTED` for the collapse section only, with the audit
+half stated as unreadable.
+
+
+### 317.11 Discipline, files, cost
+
+RULE 16 held: no registered scorer, design, launcher, guard, `aggregate.py`, `args_repair.py` or `corpus_exclusions.py`
+edited.  RULE 20 at full coverage before any number was read (plus the by-hand `argsline_guard` audit).  `plateau5` from
+RAW `.out`; the CSV `plateau` column read by nothing.  Floor readings are bounds; descriptive readings labelled; the
+licence quoted verbatim, at this cell only.  Files of this landing: committed at `39b9793` by the scoring track
+(`analysis/crd1_attack_indep.py`, `results/crd1_route_score_alice2.txt`, `results/crd1_route_score_mac.txt`,
+`results/crd1_attack_indep_alice2.txt`, `results/crd1_attack_indep_mac.txt`, `results/crd1_rule20_full_land.txt`,
+`results/crd1_argsguard_byhand.txt`, `results/crd1_runfiles_sha256.txt`, `results/crd1_exclusion_rows_PROPOSED.tsv`);
+the ingest commit is `fecd462` (318.9); this entry writes `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md` (row 245),
+`docs/ICML-PLAN.md` and `docs/STATUS.md`.  The synced run files stay in `../runs_alice2` (the committed sha file cites
+them).  **Cost: ZERO GPU-hours this cycle** (the batch itself: 11.6575 GPU-h by `sacct`).  `alice` NOT contacted;
+nothing under `paper/` read, listed or touched; no clone, checkout or worktree of the campaign repo; nothing downloaded;
+no notebook or Vercel URL opened by this entry; the running batch `crt2` not touched.
+
+## 318. TRACK F2 (land) + THE JOINT INGEST — **[LED WITH THE BOUNDS, ALL SEVEN REGISTERED BEFORE ANY RUN EXISTED (306): (1) **ONE CELL** (`ONE-CELL`): ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3, `--weight-decay-base 0` with `DECAY_ROUTE=alpha_indep:Λ`.  (2) **TWO Λ BRACKET THE STANDARD RECIPE AND LOCATE NOTHING BETWEEN THEM** (`TWO-LAMBDAS-BRACKET`).  (3) **NO α-SCALED ARM IS IN THIS BATCH** (`ALPHA-SCALED-REFERENCE-BETWEEN-BATCH`): `cgw1` is read beside, never pooled.  (4) **`ROTATIONAL-EQUILIBRIUM-CONFOUND`** (Kosson et al. arXiv:2305.17212) — printed on the FINAL and carried, although no artefact reading was reached to pair it with.  (5) **`SHRINK-MATCHED-NOT-RATIO-MATCHED`**: Λ matches a standard recipe's per-step SHRINK, not its decay-to-step RATIO.  (6) **`CONSTANT-SCHEDULE`**.  (7) **`FLOOR-READINGS-ARE-BOUNDS`**.  AND, ON TOP OF THEM: **the I5 rung is unreadable only through the registered 5 % BOX gate** (chunk777's largest step size sits at the upper edge −2.3026 on 7.02–7.38 % of its records; nodewise is box-free at 2.91 %); **the I4 rung is unreadable through HEALTH** (every arm 77.42–80.78, below HEALTH_MIN 85, and all four are box-bound as well); **`SIGMA_USED` is the in-batch 0.490126 (df 24), 175.1 % above the frozen floor 0.178183**, inflated by the I4 arms' spread; and **the scalar reading is UNTUNED** — this batch runs `crt1`'s M2 configuration (311 A5).]** — **`cai1` LANDS 32/32: `AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND+I4-UNHEALTHY | I5-SCALAR-UNRESOLVED+I4-SCALAR-COLLAPSED`.  THE BATCH THAT COULD HAVE REMOVED THE PAPER's HEADLINE DID NOT REACH EITHER BRANCH: `AI-SURVIVES` WAS NOT REACHED, AND NEITHER WAS `AI-ARTEFACT-VANISHES` / `-REVERSES` (the registered artefact prior was 0.30 together, 306.6).  BOTH RUNGS ARE UNREADABLE, SO **NO PARTITION READING EXISTS UNDER α-INDEPENDENT DECAY AT THIS CELL** AND THE LEVELS THEMSELVES ARE THE FINDING: at the unamplified shrink (Λ 5e-5) all four grains are healthy at 90.13–90.77, and at the momentum-amplified shrink (Λ 5e-4, a standard recipe's own per-step shrink, verified on every one of 320,000 records) all four train to only 77.42–80.78.  THE TMLR HEADLINE THEREFORE KEEPS ITS "UNDER α-SCALED DECAY" QUALIFIER, IS NOT REMOVED, AND IS NOT CONFIRMED ROBUST.  AND: THE ONE `crd1` + `cai1` INGEST (3,501 → 3,551; 50 EXCLUSION ROWS), AND WHAT BOTH DO TO THE PAPER (318.10).**
+
+*The registered priors (306.6): `AI-SURVIVES` 0.15, `AI-ARTEFACT-VANISHES` 0.25, `-REVERSES` 0.05,
+`AI-LAMBDA-DEPENDENT` 0.10, `AI-SURVIVES-ONE-LAMBDA` 0.08, `AI-ABSENT-ONE-LAMBDA` 0.15, `AI-UNDECIDED` 0.10, **one-rung /
+unreadable 0.12** — the bin this batch landed in — and `SC-PARTIAL` 0.22.  **ZERO GPU by this entry.**  No Slurm job
+submitted or cancelled; read-only `sacct -X` / `squeue` on the `alice2` login node.  `alice` NOT contacted.  Nothing
+under `paper/` listed, read or touched; no clone, checkout or worktree of the campaign repo was made (the stages are
+`git archive` of the registered commit).  No notebook website or Vercel URL opened by the scoring or refute tracks,
+nothing downloaded, no `.pdf` fetched.  The running batch `crt2` was not touched.*
+
+
+### 318.1 Completion, the by-hand ARGS audit, and RULE 20 at full coverage
+
+**32/32 COMPLETE.**  Jobs **5081292–5081323**, contiguous and in the launcher's order (I5 then I4, per seed ch / nd /
+k01 / kL), seeds {192, 193, 194, 195}, 8 arms (306.4).  `sacct -X` read-only: **32/32 `COMPLETED 0:0`**, **35.4869
+GPU-h** by `sacct` ElapsedRaw (**35.1667** by the runs' own `minutes` lines), against 306.8's 26.99 expected; hard bound
+64.  `squeue` empty of `cai1-*`.
+
+**The by-hand audit**: `python3 analysis/argsline_guard.py $WS/runs --name cai1-` (guard `81cea8b5…`, UNEDITED, on
+`alice2`): **32 clean, VERDICT PASS, rc 0** (`results/cai1_argsguard_byhand.txt`, `52892ac7…`).
+
+**RULE 20 at FULL coverage, PASS on both halves, BEFORE any number was opened** (16:50Z): `bin/cAI1_rule20.sh`
+(`05ba28d6…`) with `analysis/cai1_rule20_envaudit.py` (`c8ebe855…`), both UNEDITED, from a fresh `git archive 03f5e3c`
+stage on `alice2`; log committed as `results/cai1_rule20_full_land.txt` (`b0112ab5…`), read line by line; **re-run
+independently by the refute pass** from its own stage at 17:08Z, PASS and agreeing (its stage deleted).
+* **ARGS half**: batch consistency **32 clean**, VERDICT PASS; per-run **32 checked, 0 violations**; coverage exactly
+  the registration's: `--weight-decay-base` **0 ×32**, 8 runs per grain.
+* **ENV half** PASS: **1 distinct ENV line**; DECAY_ROUTE witnesses **16 × `lambda=5e-05`** and **16 ×
+  `lambda=0.0005`**, each the arm's own rung's; **32 × NVIDIA L4**; 0 violations.
+
+Sync: **163 run files** (32 `.out` + 131 under `cai1/`) sha256-checked against a list generated on `alice2`,
+`shasum -c` **163 OK** (`results/cai1_runfiles_sha256.txt`, `9d31a36d…`); the refute pass re-checked all 163 and re-hashed
+the 64 `.out` + `probe.jsonl` files on `alice2` against the Mac copies, 64/64.  `plateau5` is read from each run's RAW
+`.out` (mean TEST over epochs 95–99); the CSV `plateau` column is read by nothing here.
+
+
+### 318.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cAI1_alphaindep_score.py` (**`fb766d93…`**, design `edf7000d…`; the registered commit `03f5e3c`'s bytes,
+HEAD's and PROVENANCE's) ran **UNEDITED** with the documented invocation, **rc 0, 53 lines**: on `alice2` from the
+`03f5e3c` stage (Python 3.10.4, the `mo` venv; `results/cai1_alphaindep_score_alice2.txt`, `61cec3cb…`) and on the Mac
+(3.14.5) on `../runs_alice2` (`results/cai1_alphaindep_score_mac.txt`, `c29b3e85…`).  The two stdouts differ only on the
+`runsdir` and G-PROV path lines.  **Every gate passes on all 32 runs**: G-PROV (MODE submit, SCORER `fb766d93`, DESIGN
+`edf7000d`, HF `17ee0a28` — the POST-patch bytes), G-EPOCH, G-ARGS, G-ENV, **G-WITNESS** (exactly ONE `DECAY_ROUTE:`
+line, the arm's own rung's), G-KIND, G-STRUCT (10,000 records, n_beta = m) and **G-SHRINK** (every record: `dr_mode`
+alpha_indep, `dr_lam` the rung's Λ, `dr_n` = step + 2, applied = Λ, trace factor = 1 − Λ, measured shrink within 1 % of
+Λ).  **RULE 16 held**: neither the scoring track nor the refute pass reported a defect in the scorer.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,551 rows, 420 exclusions; HEAD bytes, on `../runs_alice2`, the
+Mac): rc 0, 53 lines, **identical to the committed Mac log except the path echoes and the corpus DISCLOSURE line**, and
+the FINAL is byte-identical.  The disclosure line reads 3,131 against the committed log's 3,115 for the reason given at
+317.2 — the committed logs came from stages of the registration commit, whose CSV and TSV predate the `g3b` ingest.  It
+is DISCLOSURE ONLY and enters no bar, σ, level, state, contrast or stamp.
+
+**The FINAL, verbatim (the log's last line):**
+
+    FINAL AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND+I4-UNHEALTHY | I5-SCALAR-UNRESOLVED+I4-SCALAR-COLLAPSED | ONE-CELL TWO-LAMBDAS-BRACKET ALPHA-SCALED-REFERENCE-BETWEEN-BATCH ROTATIONAL-EQUILIBRIUM-CONFOUND SHRINK-MATCHED-NOT-RATIO-MATCHED CONSTANT-SCHEDULE FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH I5-VS-CGW1-W1-DIFFERS BOX-BOUND-kLI5 I4-VS-CGW1-W1-DIFFERS LAYERWISE-BELOW-SCALAR-I4 BOX-BOUND-k01I4 BOX-BOUND-kLI4 UNHEALTHY-chI4 UNHEALTHY-ndI4 UNHEALTHY-k01I4 UNHEALTHY-kLI4
+
+Two branch words, the rung and scalar states, the **seven registered bounds** in order, then eleven non-gating stamps.
+
+
+### 318.3 The numbers (in batch; every contrast WITHIN a Λ rung)
+
+n = 4 seeds per arm (192–195).  `train5` = mean TRAIN over the same window.  `rec_hi` = the seed-maximum fraction of
+records with a step size at the box's upper edge −2.3026; `rec_lo` is **0 on every run**.
+
+| arm | Λ | grain | plateau5 | sd | range | train5 | box | rec_hi | a_plateau | Λ/a |
+|---|---|---|---|---|---|---|---|---|---|---|
+| chI5 | 5e-5 | chunk777 | **90.4470** | 0.096 | 0.230 | 96.7825 | **BOUND** | 0.0738 | 5.043e-3 | 0.00991 |
+| ndI5 | 5e-5 | nodewise | **90.1250** | 0.325 | 0.778 | 96.6130 | free | 0.0291 | 1.339e-3 | 0.0373 |
+| k01I5 | 5e-5 | scalar | **90.7655** | 0.156 | 0.372 | 96.2985 | free | 0.0000 | 5.201e-2 | 0.000961 |
+| kLI5 | 5e-5 | layerwise | **90.3980** | 0.147 | 0.332 | 97.9320 | **BOUND** | 0.0736 | 4.836e-3 | 0.0103 |
+| chI4 | 5e-4 | chunk777 | **79.0840** | 0.746 | 1.694 | 81.7835 | **BOUND** | 0.0796 | 7.576e-3 | 0.066 |
+| ndI4 | 5e-4 | nodewise | **77.4190** | 0.438 | 1.008 | 80.0115 | **BOUND** | 0.0796 | 5.591e-3 | 0.0894 |
+| k01I4 | 5e-4 | scalar | **80.7820** | 0.482 | 1.042 | 83.5935 | **BOUND** | 0.0796 | 9.9999e-2 (the box top) | 0.005 |
+| kLI4 | 5e-4 | layerwise | **79.8105** | 0.884 | 1.900 | 82.1380 | **BOUND** | 0.0796 | 7.709e-3 | 0.0649 |
+
+Per seed (192 / 193 / 194 / 195): chI5 90.418 / 90.564 / 90.334 / 90.472; ndI5 90.026 / 90.184 / 89.756 / 90.534;
+k01I5 90.814 / 90.574 / 90.728 / 90.946; kLI5 90.332 / 90.472 / 90.228 / 90.560; chI4 79.148 / 78.020 / 79.714 /
+79.454; ndI4 77.950 / 77.570 / 76.942 / 77.214; k01I4 80.450 / 80.666 / 80.520 / 81.492; kLI4 78.574 / 80.420 /
+79.774 / 80.474.  Every seed range is at most 1.900, under the DIVERGED bar 2.0.  **Level change I5 → I4:** ch
+−11.3630, nd −12.7060, k01 −9.9835, kL −10.5875.
+
+**σ (O2)**: frozen floor 0.178183 (df 190); **in-batch 0.490126 (df 24)** → `SIGMA_USED` = in-batch (`SIGMA-INBATCH`),
+**175.1 % above the floor**, inflated by the I4 arms' spread (sd 0.438–0.884); SE of a within-rung contrast **0.346571**,
+2 SE 0.6931 (a HALF-WIDTH).  The noise-floor demonstration 0.636566 (df 274) is quoted and gates nothing.
+
+**Contrasts** (in batch, within a rung):
+
+| contrast | value | SE multiple | ±2 SE | TRAIN | state / reading |
+|---|---|---|---|---|---|
+| D_I5 = chI5 − ndI5 | **+0.3220 pp** | +0.93 | [−0.3711, +1.0151] | +0.1695 | **BOXBOUND** |
+| D_I4 = chI4 − ndI4 | **+1.6650 pp** | +4.80 | [+0.9719, +2.3581] | +1.7720 | **UNHEALTHY** |
+| DD = D_I4 − D_I5 | +1.3430 pp | +2.74 (SE 0.490126) | — | — | DESCRIPTIVE |
+| Tch_I5 = k01I5 − chI5 | +0.3185 | +0.92 | — | — | `SCALAR-UNRESOLVED` (min T − 2 SE = −0.3746) |
+| Tnd_I5 = k01I5 − ndI5 | +0.6405 | +1.85 | — | — | as above |
+| Tch_I4 = k01I4 − chI4 | +1.6980 | +4.90 | — | — | `SCALAR-COLLAPSED` — the health bar, and nothing more: the scalar level 80.782 is below HEALTH_MIN 85, while scalar is the HIGHEST I4 arm |
+| Tnd_I4 = k01I4 − ndI4 | +3.3630 | +9.70 | — | — | as above |
+| G_I5 = kLI5 − k01I5 | −0.3675 | −1.06 | — | — | DESCRIPTIVE |
+| G_I4 = kLI4 − k01I4 | −0.9715 | −2.80 | — | — | DESCRIPTIVE → `LAYERWISE-BELOW-SCALAR-I4` |
+
+**G-SHRINK, the batch's own proof that the patch bit** (every one of 320,000 records): the measured per-step shrink
+equals Λ in every arm — **5.000002e-05** in every I5 arm (max |rel dev| 4.09e-4 to 4.13e-4; per-run range 4.9979e-05 to
+5.0021e-05) and **5.000000e-04** in every I4 arm (max |rel dev| 4.27e-05 to 4.29e-05).
+
+**The same shrink beside the α-scaled references (DESCRIPTIVE, between batches, never pooled):** `cgw1` W4's plateau
+a·wd (296.4) is ch 2.0424e-6, nd 5.6611e-7, k01 4.3493e-6, kL 2.8833e-6 — **1/115 to 1/883 of 5e-4**; `crt1`'s selected
+A2 arms (309.3) are 1.1556e-5 / 5.0457e-6 / 5.2467e-6 — **1/43 to 1/99 of 5e-4**.  So cai1's I5 shrink is 4–88× the
+references' and its I4 shrink 43–883×.  **By design** the applied decay coefficient equals a standard recipe's per-step
+shrink (I5 = lr·wd 5e-5; I4 = its momentum-amplified ≈ 5e-4); G-SHRINK verifies the coefficient the patch APPLIED on
+every record — it is not the net weight-norm change (refute fix W4).
+
+**The box, per seed:** chI5 `rec_hi` 0.0702–0.0738, kLI5 0.0702–0.0736, ndI5 0.0074–0.0291 (box-FREE), k01I5 0; every
+I4 run 0.0795–0.0796.  Onsets: I4 **steps 46,020–46,025 on all 16 runs**; I5 ch / kL 46,310–46,490, nd 48,545–49,630,
+scalar never.  In the epoch-95+ window chI5 holds only about **0.04 % of its 14,421 groups** at the edge
+(`n_at_hi`/`n_beta` 4.0e-4 to 4.1e-4; maximum `n_at_hi` 6, seed 194).
+
+**Descriptive, labelled, licensing nothing:** the FINAL is unchanged at the frozen floor, at the in-batch σ and at the
+demo σ, and under every leave-one-seed-out cut (D_I5 ranges +0.2367 to +0.4500, D_I4 +1.2960 to +2.0700); same-seed
+paired chI5 − ndI5 +0.392 / +0.380 / +0.578 / −0.062 and chI4 − ndI4 +1.198 / +0.450 / +2.772 / +2.240; with the BOX
+gate removed I5 would read UNDECIDED at `SIGMA_USED`, and SURVIVES at the frozen floor (2 SE 0.2520) or at an I5-only
+pooled sd 0.200548 (not a registered σ; 2 SE 0.2836) — in both cases clearing the 0.30 bar by only **+0.0220**, and a
+single seed moves D_I5 by up to 0.085, so those counterfactual readings are knife-edge as well as unlicensed; with the
+health and box gates both removed I4 would read SURVIVES at `SIGMA_USED`; at the frozen floor the I5 scalar reading
+would read BEATS.  **Reference, between batches, never pooled:** `cgw1` D_W1 +0.3693 SURVIVES, D_W2 +0.4533 SURVIVES,
+D_W4 +0.2410 UNDECIDED, scalar at W4 `SCALAR-BEATS-BEST` (untuned); `crt1`'s tuned Tch +0.4487 / Tnd +0.6880 (a tie).
+
+**Prediction bands (306.6):** every I5 arm lies inside its registered 89.0–92.5 band; **all four I4 arms missed their
+84.0–91.0 band low** (77.42–80.78).  The registration disclosed that the I4 low edge sits below HEALTH_MIN and that
+UNHEALTHY at I4 was a reachable outcome (selftest G).
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, after RULE 20 had passed and the ingest had run):** from the
+32 raw `.out` files in `../runs_alice2` all eight plateau5 means, sds and ranges reproduce to 4 d.p.; in-batch σ
+0.490126 (df 24), SE 0.346571, D_I5 +0.3220 [−0.3711, +1.0151], D_I4 +1.6650, DD +1.3430, the four T values and both G
+values reproduce.
+
+
+### 318.4 What bounds the result, led with
+
+1. **The seven registered bounds** (headline (1)–(7)): `ONE-CELL`, `TWO-LAMBDAS-BRACKET`,
+   `ALPHA-SCALED-REFERENCE-BETWEEN-BATCH`, `ROTATIONAL-EQUILIBRIUM-CONFOUND`, `SHRINK-MATCHED-NOT-RATIO-MATCHED`,
+   `CONSTANT-SCHEDULE`, `FLOOR-READINGS-ARE-BOUNDS`.  The rotational-equilibrium bound stays printed although no
+   artefact reading exists to pair it with.
+2. **I5 is unreadable only through the BOX gate**: chI5's largest step size sits at the upper edge on 7.02–7.38 % of its
+   records, above the registered 5 % gate; ndI5 is box-free (max 0.0291) and kLI5 is bound (0.0736).  The gate is a
+   record-level gate: within the plateau window only about 0.04 % of chI5's 14,421 groups sit at the edge.
+3. **I4 is unreadable through HEALTH**: every arm is below HEALTH_MIN 85 (77.42–80.78), and all four are box-bound too
+   (rec_hi 0.0795–0.0796).  The registered I4 band 84.0–91.0 was missed low on all four arms.
+4. **At I4 `SCALAR-COLLAPSED` is the health bar and nothing more**: the scalar level 80.78 is below 85; it is not a
+   β-floor collapse, scalar is the highest I4 arm, and its plateau step size sits at the box top (9.9999e-2).
+5. **σ**: `SIGMA_USED` is the in-batch 0.490126 (df 24), 175.1 % above the frozen floor 0.178183, inflated by the I4
+   arms' spread.  The demo 0.636566 (df 274) is quoted and gates nothing.
+6. **The scalar reading is UNTUNED** (311 A5): this batch runs `crt1`'s M2 configuration, whose scalar lead `crt1`
+   found at the CIFAR-10 cell to be at least in part a tuning artefact.  It says nothing about tuning.
+7. **The I4 box onset is exactly the maximum Lion meta-rate under float32 arithmetic** (refute fix W1, re-derived
+   independently by this entry): β is float32, so each step's float32(1e-4) increment rounds to **1.001358e-4** on
+   [−8, −4) (spacing 2^−21, 210 spacings) and to **9.98974e-5** on [−4, −2) (spacing 2^−22, 419 spacings); a float32
+   accumulation from float32(ln 1e-3) = **−6.9077554** first reaches the gate edge −2.3036 after **exactly 46,020
+   steps** (the record at step 46,020 reads −2.3035545), and the exact-arithmetic figure **46,041.6** is not the bound.
+   So at I4 the largest step size — and for k01I4 the ONLY step size (0 non-increasing records before the cap, seed
+   192) — rose by one full meta-step on every step from initialisation until it hit the box top.  The I5 onsets
+   (ch / kL 46,310–46,490, nd 48,545–49,630, scalar never) are later than that maximum.  Whether `g3b`'s 46,020 onset
+   (315.4 item 6) has the same cause is **UNSURE**: its records were not re-read here.
+8. **Λ matches a shrink, not a ratio** (bound (5), with measured numbers, refute fix W3): the recipe's decay-to-step
+   ratio is 5e-4 (at I5, 5e-5 / lr 0.1; at I4, 5e-4 / the effective 0.1/(1 − 0.9)).  At the plateau this cell's Λ/a is
+   **0.00096–0.037 at I5 (1.9–74× the recipe's)** and **0.005–0.089 at I4 (10–179×)**.  The registration's "~100–1000×"
+   assumed a ≈ 1e-3; the learned plateau a is 1.3e-3 to 0.1 (APPROXIMATE for ch / nd, 296.4).  The schedule is constant
+   with no anneal.  So "77.4–80.8 % under a standard recipe's shrink" is a statement about this untuned,
+   constant-schedule cell at matched SHRINK, not about the recipe.
+9. **Every unreadable reading is a bound**, and the ±2 SE half-widths are not bounds on any effect (164.6 / 278.6 C1).
+10. GPU: 35.4869 GPU-h by `sacct`, above the 26.99 expected and inside the 64 hard bound.
+
+
+### 318.5 The attack — an independent parser, 45 PASS / 0 FAIL
+
+`analysis/cai1_attack_indep.py` (`d75c5bfc…`, committed at `01b43e1`): standard library only, no repo imports, no regex
+or `shlex`, plain float addition; every literal, bar, licence sentence and stamp re-typed.  It **rebuilds all 53 lines
+of both committed scorer logs** and **re-runs G-SHRINK on all 320,000 records**: **45 PASS / 0 FAIL**, its stdout
+**byte-identical on `alice2` and the Mac** (sha256 `1ed96ad5…`; `results/cai1_attack_indep_alice2.txt`, `_mac.txt`).
+Section [8] verifies the 32 PROPOSED exclusion rows byte for byte (rows digest `09fcbbda…`).  **Non-vacuity:** one digit
+changed in a log line and one corrupted PROPOSED row each produced a FAIL.
+
+
+### 318.6 The refute pass — NOTHING REFUTED; ONE WRONG SUB-CLAIM IN A BOUND AND THREE WORDING FIXES (four in all, all applied)
+
+The refute pass (`holds: true`) parsed the 32 raw `.out` files with its own stdlib parser BEFORE running any repo
+program (100 epochs each, no duplicate epoch lines, `RUN_DONE` on all, wd 0 ×32, grain and seed agreeing with each file
+name) and reproduced every level, sd, range, train5 and per-seed value to 4 d.p., σ_INBATCH and SE, D_I5 and its
+interval, D_I4, DD, all four T and both G values, the level drops, the I5-only pooled sd, the paired same-seed
+differences and all four leave-one-seed-out cuts; it read all 320,000 probe records itself (rec_hi per seed, the
+onsets, `dr_mode` / `dr_lam` / `dr_n` on every record, the maximum relative shrink deviations, `a_plateau`); it read the
+scorer's source in full (window 95–99 TEST; arm key from the file name cross-checked against ARGS; `rung_state` order
+DIVERGED > UNHEALTHY > BOXBOUND; the box gate arm-level and applied to ch and nd only, so I5 goes BOXBOUND through chI5
+alone and I4 goes UNHEALTHY before its box gate is reached; `scalar_of`, `sc_of`, `primary_of`; the DD SE = √2·SE = σ)
+and found it correct and unedited; it re-ran the scorer from a fresh `git archive 03f5e3c` stage on `alice2` (rc 0,
+byte-identical but for the disclosure-only corpus line, which read "not readable" because `results/` was not in its
+stage) and RULE 20 at full coverage (both halves PASS); it re-checked `sacct`, the 163-file sha list, a fresh 64-file
+hash on `alice2`, both attack hashes and the PROPOSED file.  **No RULE 16 defect.**
+
+| # | where | as written | fixed to (applied at) |
+|---|---|---|---|
+| **W1** | bound (f) of the scoring summary | the I4 onset is "~20 steps EARLIER" than the maximum Lion rate, "which a strict 1e-4-per-step rise cannot produce" | **WRONG on its central point.**  Under float32 arithmetic the onset IS exactly the maximum rate: increments of 1.001358e-4 on [−8, −4) and 9.98974e-5 on [−4, −2), a float32 accumulation from −6.9077554 reaching −2.3036 after exactly 46,020 steps; 46,041.6 is the exact-arithmetic figure, not the bound.  Bound (f) is replaced in full by 318.4 item 7, with the `g3b` link left UNSURE.  (This entry re-derived the float32 simulation itself: 46,020 steps, β −2.3035545, and +0.00050068 over the first five steps.) |
+| **W2** | the plain reading's I5 sentence | "the chunk777 arm's step sizes reach the box on about 7 % of records" | reads as though 7 % of the step sizes were at the edge: **on 7.0–7.4 % of chunk777's probe RECORDS (from step 46,310–46,490 to the end, so across the whole epoch-95–99 window) one or more of its 14,421 step sizes sits at the box top; within the window about 0.04 % of its groups (up to 6) do.**  The registered 5 % record gate therefore makes the rung unreadable, and D_I5 is printed but not read (318.10 (b)) |
+| **W3** | wherever the I4 "standard recipe" sentence appears | the `SHRINK-MATCHED-NOT-RATIO-MATCHED` bound quoted without measured numbers | quoted with them: the recipe's ratio is 5e-4; this cell's plateau Λ/a is 0.00096–0.037 at I5 (1.9–74×) and 0.005–0.089 at I4 (10–179×); the registration's "~100–1000×" assumed a ≈ 1e-3, while the learned plateau a is 1.3e-3 to 0.1 (318.4 item 8) |
+| **W4** | the summary's novelty clause | "cai1 is the first campaign batch whose realised decay equals a standard recipe's shrink" | **"by design, cai1's APPLIED decay coefficient equals a standard recipe's per-step shrink (I5 = lr·wd 5e-5; I4 = its momentum-amplified ≈ 5e-4).  G-SHRINK verifies the coefficient the patch applied on every record.  It is not the net weight-norm change."** (318.3) |
+
+**Also checked and found correct, so NOT changed:** every level, contrast, state, token, stamp and gate; the box-gate
+and health-gate orderings; the priors and prediction bands; 311 A5's untuned caveat; the carriage of
+`ROTATIONAL-EQUILIBRIUM-CONFOUND`; "bounds are bounds"; the verbatim licences.  The refute pass records one further
+disclosure, applied above: "box-bound" at I5 means 7.0–7.4 % of RECORDS, against about 0.04 % of GROUPS in the window
+(W2).
+
+
+### 318.7 THE TWO QUESTIONS OF 306, ANSWERED
+
+**(Q1) Does the count-matched sign D = chunk777 − nodewise SURVIVE when the decay no longer moves with α?  NOT
+READABLE, AT EITHER Λ.**  At I5 the rung is BOXBOUND (chunk777's step sizes reach the box on 7.0–7.4 % of records,
+above the registered 5 % gate); at I4 it is UNHEALTHY (every arm below 85).  `AI-SURVIVES` was not reached and neither
+was `AI-ARTEFACT-VANISHES` or `-REVERSES`.  The registered licence is explicit: *"both LAMBDA rungs are unreadable: no
+partition reading under alpha-independent decay; the levels themselves are the finding."*  The point estimates (D_I5
++0.3220 [−0.3711, +1.0151]; D_I4 +1.6650) are printed and not read.
+
+**(Q2) Does `SCALAR-BEATS-BEST` hold under α-independent decay?  PARTIAL, AND NO COMBINED SENTENCE.**  At I5 scalar is
++0.3185 / +0.6405 pp above the two partitions, `SCALAR-UNRESOLVED` (min T − 2 SE = −0.3746, past the −0.30 bar); at I4
+scalar is the highest arm but below the health bar, `SCALAR-COLLAPSED`.  The registered licence: *"at least one
+LAMBDA's scalar reading is unresolved or gated: report both rungs' intervals; no combined scalar sentence."*
+
+**What IS the finding, then: the levels.**  With the decay matched to a standard recipe's per-step shrink (I4, 5e-4 on
+every step, verified on every record) all four grains of this untuned cell train to only **77.4–80.8 %** — below the
+run-health bar, below the registered band, with every arm box-bound.  At the unamplified shrink (I5, 5e-5) all four are
+healthy at **90.1–90.8 %**.  The α-scaled reference `cgw1` is read only through the registered between-batch stamps
+(`I5-VS-CGW1-W1-DIFFERS`, `I4-VS-CGW1-W1-DIFFERS`) and its contrasts, never pooled with these levels.
+
+
+### 318.8 What this licenses, and what it does not
+
+**The registered licences, verbatim (lines 51 and 52 of the scorer log):**
+
+> *primary:* "both LAMBDA rungs are unreadable: no partition reading under alpha-independent decay; the levels
+> themselves are the finding."
+
+> *scalar:* "at least one LAMBDA's scalar reading is unresolved or gated: report both rungs' intervals; no combined
+> scalar sentence."
+
+Beside them, always: the seven bounds; that the scalar reading is untuned (311 A5); that the box-free and floor-σ
+counterfactuals license nothing; and the W2 / W3 / W4 clauses.
+
+**NOT licensed**: "the audit effect is an artefact of α-scaled decay"; "the count-matched sign survives α-independent
+decay"; any survive / vanish / artefact / robust sentence at either Λ; any combined scalar sentence; any reading of the
+box-free or gate-free counterfactuals; any pooled reading with `cgw1`; "the constant decay is harmless"; any other
+cell, dataset, Λ or schedule; anything about the parent paper.
+
+
+### 318.9 THE INGEST — `crd1` + `cai1`, ONCE (commit `fecd462`), with all 50 exclusion rows in the SAME commit
+
+**Corpus 3,501 → 3,551 rows; exclusion list 370 → 420 rows over 25 batches.**  Built on 308's `corpus_exclusions.py`
+(`3723a499…`, UNEDITED), which is the module that made these rows expressible.
+
+`analysis/aggregate.py` (`35c035e1…`, UNEDITED) `../runs ../runs_alice2 > results/all_runs.csv` → exit 0, 3,551 runs,
+the same 3 standing duplicate-name warnings; `analysis/args_repair.py` (`e6d8918d…`, UNEDITED) `--apply` → 36 rows
+updated (the standing `dup_group` restoration), **0 accuracy or config values changed, 0 superseded**, 3,515 untouched
+(its `.bak` deleted; `*.bak*` is git-ignored).  The same two steps run first on scratch copies gave a **byte-identical**
+CSV.
+
+**ADDED 50 exactly (crd1 18 + cai1 32), REMOVED 0, CHANGED 0** — re-derived with a reader of my own keyed on
+`(run, job_id)` against the pre-ingest CSV: 38 fields, names identical, **0 duplicate keys before or after, 0 of
+133,038 pre-existing field-cells changed**; `git diff --numstat` **50 / 0**.  Every added row `epochs_done` 100 /
+`epochs_requested` 100 / `complete` 1 / `window_ok` 1 / `superseded` 0; jobs 5081273–5081290 (`crd1`,
+`ResNet18_c100` / CIFAR100, scalar 9 + layerwise 9) and 5081292–5081323 (`cai1`, ResNet18 / CIFAR10, four grains × 8,
+ms 1e-4, α0 1e-3).  **NO PROOF JOB**: 0 added rows named `proof` / `bite` (305's proof log is not a `.out` file and
+enters nothing).  GPU-hours by `wallclock_min` **3561.6833 → 3608.3167 (+46.6333: `crd1` 11.4667, `cai1` 35.1667)**;
+47.1444 by `sacct` (11.6575 + 35.4869).
+
+**The 50 exclusion rows**, appended in job order, **byte for byte** the data rows of the two PROPOSED files, 9-column
+form; the old file an EXACT PREFIX of the new (+18,708 bytes); `git diff --numstat` 50 / 0; 420 distinct keys:
+* **`crd1`, 18 rows** (`results/crd1_exclusion_rows_PROPOSED.tsv`, `48fd750a…`, rows digest `e7b6d306…`),
+  `registered_at` **CORRECTIONS 317**: 12 one-kind SR* / TR* rows (wd 0.1) whose witness is the run's OWN
+  `DECAY_ROUTE: on mode=shrink_only|trace_only …` line, and 6 TWO-AXIS AI* rows (wd 0) witnessed by `ARGS_WD_BASE:
+  weight-decay-base=0` with the `alpha_indep:3.15e-4` line held to `MULTI_KIND` and `DECAY_ROUTE_ARMS` — 308.4's
+  expressible reading of 307.9, 18 rows and not 24.
+* **`cai1`, 32 rows** (`results/cai1_exclusion_rows_PROPOSED.tsv`, `395b9dca…`, rows digest `09fcbbda…`),
+  `registered_at` **CORRECTIONS 318**: ALL TWO-AXIS (306.9 / 308.2), witness `ARGS_WD_BASE: weight-decay-base=0`
+  GENERATED by `corpus_exclusions.args_deviations()` on each run's own `ARGS:` line (273.9), never typed, with each
+  rung's `DECAY_ROUTE` line held to `MULTI_KIND` and `DECAY_ROUTE_ARMS`.  The PROPOSED file named 318 provisionally
+  (because `crd1`'s already named 317); this entry takes it, so no column is rewritten.
+* `looks_like` carries the corpus LOOKALIKE BASE ARM in every row (`ch` chunk777 / `nd` nodewise / `k01` scalar / `kL`
+  layerwise), as 310.6's fix H1 established.
+
+**GATES, on the committed tree.**  `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` →
+**exit 0, `VERDICT: PASS`**: 420 rows over 25 batches, every listed key present exactly once in the 3,551-row CSV; raw
+`.out` witnesses: 420 listed runs carry their listed line; ON-line completeness **218 → 268** (the 50 new `DECAY_ROUTE`
+ON lines, every one listed with its kind); two-axis **19 → 57** runs (cai1's 32 + crd1's 6); multi-kind 2 kinds 33,
+3 kinds 12 (unchanged); **ARGS witness 171 → 209** listed runs, each carrying its own value; 75 / 75 deviating
+standard-cell rows listed; 651 cells, none mixing; multi-ARGS 6, True; **decay-route runs (CORRECTIONS 308): 50 listed
+runs of a registered route arm, every one printing exactly its arm's registered `DECAY_ROUTE` line, and no listed run
+of a route batch outside the registry: True** — the first batch of rows under the kind 308 added.  `SIGMA_R18ALL`
+**0.636566 (df 274), unchanged**.  `python3 analysis/c98b_reproduce.py` (`1bd675ea…`, UNEDITED) → **exit 0, 806 lines,
+`science 618/618 PASS | drift 18 site(s), 10 differ (not gated) | guards fired 0 | declaration OK`** — 315.9's verdict
+byte for byte.  Both registered scorers re-run post-ingest (317.2, 318.2): identical but for the path echoes and the
+disclosure line, both FINALs byte-identical.  `crd1-` and `cai1-` are both in `bin/PROTECTED.txt` (lines 74, 76).
+
+
+### 318.10 WHAT THIS DOES TO THE PAPER
+
+**(a) Is `DECOUPLED-NOT-TESTED` lifted?  FOR THE COLLAPSE SECTION, YES (317.10 (d)); FOR THE AUDIT HEADLINE, NO.**  The
+stamp (281.2) recorded that α-independent decay had never been run.  It has now been run at both cells, so the stamp's
+literal claim is spent; what replaces it is two precise statements, not one lifting:
+* at the **mechanism cell** (`crd1` I arms, wd 0 with Λ 3.15e-4) it is run and READABLE: neither grain collapses, and
+  the collapse needs the decay to move with α (317.8, with `ONE-LAMBDA` and the Kosson caveat);
+* at the **audit's core cell** (`cai1`, this entry) it is run and **UNREADABLE at both standard-recipe Λ** — I5 through
+  the registered 5 % box gate, I4 through the health bar.
+So ICML-PLAN row **1.6** becomes **PARTIAL — LANDED (317, 318)**, and the audit half of the row is recorded as run and
+unreadable, not as answered.  Any successor stamp on the audit side must say *α-independent decay RUN at the audit cell,
+UNREADABLE at both Λ*, never *not tested* and never *tested*.
+
+**(b) Does the headline survive α-independent decay, weaken, or become an artefact?  NONE OF THE THREE: the question is
+unanswered at this cell, and the headline is unchanged.**  The registered artefact branch (prior 0.30 together with
+`-REVERSES`) was NOT reached and the survive branch (0.15) was NOT reached.  The count-matched headline therefore keeps
+its "at α-scaled decay" qualifier exactly as 310.10 (a) and 315.10 state it, with no new sentence in either direction:
+the draft may NOT say the sign survives the decay form, and may NOT say it is an artefact of α-scaled decay.  **The
+headline is not removed**, and nothing here weakens it; what this batch removes is the chance of closing the referee
+point at this cell in this design.  What the draft MAY add, with both intervals and all seven bounds, is the LEVELS: at
+the audit's own cell, with the decay matched to a standard recipe's per-step shrink and no longer moving with α, all
+four grains train to 77.4–80.8 % (untuned, constant schedule, every arm box-bound), while at the ten-times-smaller
+shrink all four are healthy at 90.1–90.8 % and the chunk777 arm's step sizes reach the box's upper edge on 7.0–7.4 % of
+its records.
+
+**(c) What the TMLR paper now is.**  Unchanged in shape from 315.10: **one paper — the count-matched partition audit
+with its rewritten headline (the sign at α-scaled 0.1, 20/20 cells, reproduced in batch on both datasets; the 5e-4
+interval beside it with no survive / vanish sentence), the denominator, and the collapse as a bounded
+configuration-conditional section.**  This cycle changes it in exactly two places: the collapse section gains `crd1`'s
+route sentence and the two-form exclusion of T-C (317.10 (a)–(c)), and the threats / limitations section gains the
+statement that the α-independent control has now been RUN at the audit cell and came back unreadable at both
+standard-recipe Λ, with the levels and the box fact.  **The headline is NOT removed and no headline number moves.**
+The scalar row stays "ties (a bound) after re-tuning" (309 / 311 A3–A5; `cai1`'s own scalar reading is untuned and
+unreadable at I4, so it neither strengthens nor weakens it).  **Venue: TMLR, unchanged**; the 0.6–0.7 stays an
+un-argued JUDGEMENT, UNSURE (311 A3), not re-estimated here.
+
+**(d) What a referee can now be told about the biggest open point.**  That the control was built (305, proved bitwise
+inert off and biting on), registered with its branches and priors before any run (306), run at 32 jobs on the audit's
+own cell at two standard-recipe Λ, and returned unreadable at both — I5 because the harness's own step-size box binds
+the audit's chunk777 grain on 7 % of records, I4 because the cell trains to 77–81 % at that dose.  Whether a follow-up
+belongs to the registry (a retune at I4, or a box above −2.3026, or an intermediate Λ) is **UNSURE and not registered
+here**; the box is the harness's fixed instrument and moving it changes the ENV line against every landed batch (313.4).
+
+**(e) Later-evidence relations this entry states, in the relation vocabulary (for the notebook's cross-links):**
+* MT240 (`cgw1`) → MT246 (`cai1`), **qualifies**: "the headline keeps its 'at α-scaled decay' qualifier: at the audit's
+  core cell under α-independent decay neither Λ rung is readable" — the row's reading stays a reading at α-scaled
+  decay, and this batch is the control that could not be read.
+* MT175 (the audit headline) → MT246, **qualifies**: "α-independent decay is RUN at the audit cell and UNREADABLE at
+  both Λ" — `DECOUPLED-NOT-TESTED` is not lifted for the headline (318.10 (a)).
+* Not stated as a relation: `crd1` / MT245, whose cell and Λ are different (this entry's own bound), and the denominator
+  or collapse rows, on which this batch bears not at all.
+
+**(f) Applied to the documents:** `docs/ICML-PLAN.md` (a 317 / 318 amendment at the top; row **1.6** re-tagged
+**PARTIAL — LANDED (317, 318)**; §4a's two off-queue rows moved to LANDED); `docs/STATUS.md` (a CYCLE 166 table);
+`docs/MASTER-TABLE.md` rows **245** (`crd1`) and **246** (`cai1`) appended at the end in row 244's form, header counts
+amended in place (3,551 runs / 3608.3 GPU-h; appended rows 33 → 35; tally 181 → 183; the `wallclock_min`-carrying row
+count 3,486 → 3,536), old figures bracketed; `c73` exit 0.
+
+
+### 318.11 Discipline, files, cost
+
+RULE 16 held: no registered scorer, design, launcher, guard, `aggregate.py`, `args_repair.py` or `corpus_exclusions.py`
+edited.  RULE 20 at full coverage on both batches before any number was read (plus both by-hand `argsline_guard`
+audits).  `plateau5` from RAW `.out`; the CSV `plateau` column read by nothing.  Unreadable and floor readings are
+bounds; descriptive readings labelled; both licences quoted verbatim, at this cell only.  Files of this landing:
+committed at `01b43e1` by the scoring track (`analysis/cai1_attack_indep.py`,
+`results/cai1_alphaindep_score_alice2.txt`, `results/cai1_alphaindep_score_mac.txt`,
+`results/cai1_attack_indep_alice2.txt`, `results/cai1_attack_indep_mac.txt`, `results/cai1_rule20_full_land.txt`,
+`results/cai1_argsguard_byhand.txt`, `results/cai1_runfiles_sha256.txt`,
+`results/cai1_exclusion_rows_PROPOSED.tsv`); ingest commit `fecd462` (`results/all_runs.csv`,
+`results/CORPUS-EXCLUSIONS.tsv`); this entry writes `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md` (row 246),
+`docs/ICML-PLAN.md` and `docs/STATUS.md`.  The synced run files stay in `../runs_alice2` (the committed sha file cites
+them; the 64-file digest is `d3945d2e…`, 2,368,435,577 bytes).  **Cost: ZERO GPU-hours this cycle** (the two batches
+themselves: 47.1444 GPU-h by `sacct`).  `alice` NOT contacted; nothing under `paper/` read, listed or touched; no clone,
+checkout or worktree of the campaign repo; nothing downloaded; the running batch `crt2` not touched and no job
+submitted or cancelled.
+
+Next free number: **319**.
