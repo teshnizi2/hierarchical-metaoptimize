@@ -39510,7 +39510,7 @@ retune lands, the rewritten headline rests on one CIFAR-10 cell.
 
 Next free number: **299**.
 
-## 299. TRACK A (G3b) — **`g3b` REGISTERED, NOT SUBMITTED: DO `SCALAR-BEATS-BEST` AND THE COUNT-MATCHED SIGN HOLD ON THE AUDIT's SECOND DATASET, AND DOES THE DENOMINATOR's MetaOptimize ARM SURVIVE BEING RUN AT 5e-4?  ResNet18_c100 / CIFAR-100, THE AUDIT's CIFAR-100 CELL (`gc1` / `gm2` / `cdn1-m`) VERBATIM EXCEPT `--weight-decay-base` ∈ {0.1 (IN-BATCH ANCHOR), 5e-4 (PRIMARY)}, WITH `chunk771`, `nodewise`, `scalar` AND `layerwise` AT BOTH RUNGS; 8 ARMS, 32 JOBS, SEEDS {170..173}, ≈24.4 GPU-h EXPECTED, 64 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CIFAR-100 CELL, TWO RUNGS**; with `cgw1` the audit's decay question then rests on two cells, one per dataset, and the two are read side by side, never pooled. (2) **α-SCALED DECAY ONLY**; "5e-4" is a nominal VALUE, and `cgw1`'s realised-shrink caveat (W4 115–883× below a standard recipe's, 296.4) is expected to carry over: the batch reports each arm's realised shrink and cannot settle the decay-artefact question. (3) **THE DENOM WORD IS BETWEEN-BATCH BY CONSTRUCTION**: the tuned SGD + cosine level is `cdn1`'s landed literal (lr 0.1 chosen on the TEST set, 1.14), not an in-batch arm. (4) **Every VANISHES / TIES / CLOSES reading is a BOUND.**  All are stamped on every FINAL.]** — zero GPU so far; nothing submitted: the verifier submits after it passes (299.10).
+## 299. TRACK A (G3b) — **`g3b` REGISTERED, NOT SUBMITTED: DO `SCALAR-BEATS-BEST` AND THE COUNT-MATCHED SIGN HOLD ON THE AUDIT's SECOND DATASET, AND DOES THE DENOMINATOR's MetaOptimize ARM SURVIVE BEING RUN AT 5e-4?  ResNet18_c100 / CIFAR-100, THE AUDIT's CIFAR-100 CELL (`gc1` / `gm2` / `cdn1-m`) VERBATIM EXCEPT `--weight-decay-base` ∈ {0.1 (IN-BATCH ANCHOR), 5e-4 (PRIMARY)}, WITH `chunk771`, `nodewise`, `scalar` AND `layerwise` AT BOTH RUNGS; 8 ARMS, 32 JOBS, SEEDS {170..173}, ≈24.4 GPU-h EXPECTED, 64 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CIFAR-100 CELL, TWO RUNGS**; with `cgw1` the audit's decay question then rests on two cells, one per dataset, and the two are read side by side, never pooled. (2) **α-SCALED DECAY ONLY**; "5e-4" is a nominal VALUE, and `cgw1`'s realised-shrink caveat (W4 115–883× below a standard recipe's, 296.4) is expected to carry over: the batch reports each arm's realised shrink and cannot settle the decay-artefact question. (3) **THE DENOM WORD IS BETWEEN-BATCH BY CONSTRUCTION**: the tuned SGD + cosine level is `cdn1`'s landed literal (lr 0.1 chosen on the TEST set, 1.14), not an in-batch arm. (4) **Every VANISHES / TIES / CLOSES reading is a BOUND.**  All are stamped on every FINAL.]** — zero GPU at registration; **VERIFIED and SUBMITTED by the verifier: 32 / 32 jobs 5080798–5080829, RULE 21 margin 1 h 02 min 48 s (299.12).**
 
 ### 299.1 Question, and why it is worth GPU
 
@@ -39684,6 +39684,74 @@ construction on the alice2 login node; no Slurm job submitted or cancelled).  `a
 Nothing under `paper/` listed, read or touched (the stage archive excludes it).  No notebook website or Vercel URL
 opened; nothing downloaded; no `.pdf` fetched; no paper-downloading tool used (one abstract-page call, which failed).
 STATUS.md and ICML-PLAN.md not edited.
+
+### 299.12 Independent pre-launch verification — PASSED; `g3b` SUBMITTED, 32 / 32 jobs (verifier, 2026-09-22)
+
+*The verifier's own checks, each re-run, not read off 299.7.  No file of the registration was changed: the scorer, design,
+launcher and every guard are the bytes of `31792c4`.  `alice` NOT contacted; GPU work only as the 32 Slurm jobs below.
+Nothing under paper/ listed, read or touched (the stage is `git archive … ':!paper'`; this entry was edited in the main
+working tree, no worktree checkout).*
+
+* **(1) Prior art.** `docs/PRIOR-ART.md` "Sweep 2026-09-22 — the audit's CIFAR-100 cell at weight decay 5e-4 … (CORRECTIONS
+  299, batch `g3b`)": dated, five queries verbatim, verdict "the question is open; the batch is not shrunk".  **The UNSURE
+  in 299.2 is resolved:** the verifier opened both arXiv ABSTRACT pages (no `.pdf`): arXiv:2510.19093 is Kosson, Welborn,
+  Liu, Jaggi, Chen, *Weight Decay may matter more than muP for Learning Rate Transfer in Practice*; arXiv:1910.07454 is
+  Li & Arora, *An Exponential Learning Rate Schedule for Deep Learning*.  Both ids are the papers 299.2 names and may be
+  cited.  The conclusion justifies the GPU: nothing on file measures a count-matched partition contrast, a scalar-vs-partition
+  ranking of a meta-learned step size, or a MetaOptimize denominator arm across decay values.
+* **(2) The design answers its question; not confounded into uninformativeness.**  The three questions are ICML-PLAN §4a
+  rank 1 row verbatim (cell, κ {0.1, 5e-4}, four grains, 4 seeds, realised shrink reported).  The primary D_W4 is an
+  IN-BATCH, within-rung contrast with an in-batch anchor rung (W1) that can fail visibly (ANCHOR-NOT-REPRODUCED /
+  -UNREADABLE), so the caw1 failure (a design that cannot decide its own question) does not arise: at the frozen floor the
+  4 v 4 SE is 0.193, P(SURVIVES | D +0.60) 0.865, P(VANISHES | D 0) 0.781.  The two known limits — α-scaled decay only
+  (realised shrink far below a standard recipe's) and a between-batch SGD level for DENOM — are stamped bounds on every
+  FINAL (`ALPHA-INDEPENDENT-DECAY-NOT-TESTED`, `W4-IS-A-NOMINAL-VALUE`, `DENOM-IS-CROSS-BATCH`), and 299.8 forbids the
+  sentences they would otherwise license.  They qualify, they do not empty, the branches.  The collapsed k01W1 enters no
+  gated contrast and is excluded from the in-batch σ pool.
+* **(3) Bars and ladder.**  SURV 0.30, NULLBAR 0.15, POOL_EXCLUDE 1.5602, RES 2.0, HEALTH_MIN 55.0, DIVERGED 2.5,
+  BOXFREE_MAX 0.05, MATCH 0.50, DENOM_BAR 1.0, SIGMA_PRIOR 0.2734275099082097 are module-level literals.  `rung_state`,
+  `primary_of`, `scalar_of`, `denom_of` are first-match, ordered, and each ends in a catch-all (UNDECIDED / AUDIT-<state> /
+  SCALAR-UNRESOLVED / DENOM-UNRESOLVED), so every table lands in exactly one token (selftest: 49-pair primary
+  reachability, 20,000-draw scalar/denom reachability, 3,000-table totality).  The FINAL is the last stdout line and its
+  stamps begin with the six BOUNDS in order (selftest E).  Noted, not a defect: with SE 0.193 the VANISHES clause
+  `D + 2 SE < 1.5602` is implied by `D ≤ 0.15`, so VANISHES reads effectively as D ≤ +0.15 (as in `cgw1`).
+* **(4) Selftest re-run:** Mac `python3 analysis/cG3B_c100wd_score.py --selftest --runsdir ../runs_alice2` →
+  **120 PASS / 0 FAIL / 1 SKIP** (rc 0; the SKIP is F, the gm2 probe records exist only on alice2); alice2 (guard 1c of
+  both the verifier's dry run and the submit run) → **125 / 0 / 0**, 1c1–1c4 PASS.
+* **(5) Dry run re-run** from a fresh stage `~/stage_g3b` = `git archive 31792c4 -- analysis bin results ':!paper'` (staged
+  shas scorer `f21f57bd…`, design `f31f4ee4…`, launcher `0ec3f879…` = the commit's): `~/stage_g3b_dry1.log`, 203 lines.
+  Guard 1b accepts the declared commit and scorer sha; guards 2 / 2b / 2d / 2d2 / 2e / 2f fresh; 3, 3b, 3f, 4, 4b3, 4c', 4e,
+  4f, 4g, 5b, 9 pass; guard 6 "32 composed command lines, 0 failed".  **ONE guard failed at the dry run: guard 5, "69
+  pending, over cap"** (other tracks' crt1 19 / csh1 18 / cvl1 32 pending; cap 60) — a queue-state guard, not a defect of
+  the registration.  The verifier did NOT edit the guard; it waited until `squeue` showed ≤ 56 pending, and the submit
+  run's own guard 5 read **53 pending** and passed.  **Flag for flag:** the 32 composed lines, with run name / wd / grain /
+  seed masked, collapse to ONE line whose train.py half is `cdn1-m-s0`'s landed ARGS line on alice2 (`cdn1-m-s0-4920426.out`)
+  flag for flag in order and value, except `--weight-decay-base` (0.1 ×16, 5e-4 ×16), `--stepsize-groups` (chunk771 /
+  nodewise / scalar / layerwise ×8 each), `--seed` (170–173 ×8 each), `--save-directory` and `--run-name`; the ENV export
+  `AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=5` gives `cdn1-m`'s ENV line.
+* **(6) Seeds** {170, 171, 172, 173}: Track A's block, disjoint from B 176–178 / C 180–182 / D 184–191; 0 of 3,383
+  `results/all_runs.csv` rows carry them (corpus max seed 162, checked on the Mac); guards 2d / 2d2 / 2e / 2f on alice2:
+  0 `.out` ARGS lines, 0 corpus rows, 0 `sacct` / `squeue` g3b jobs.
+* **(7) Noise floor** 0.636566 (df 274) quoted (299.4; `SIGMA_DEMO` in the scorer, re-derived by guard 1c2).
+* **(8) RULE 21.**  `31792c4` (scorer + design + launcher + this entry's registration) is an ancestor of `origin/master`
+  (`git merge-base --is-ancestor`, and `origin/master:analysis/cG3B_c100wd_score.py` sha256 = `f21f57bd…`).  GitHub
+  PushEvent for head `31792c4`: **2026-09-22T07:20:37Z**.  First submission (`sacct` Submit of 5080798; PROVENANCE `UTC`
+  08:23:24Z): **2026-09-22T08:23:25Z**.  **Margin: 1 h 02 min 48 s, push before submission.**
+* **(9) Predictions** in `g3b_design.PRED_W1 / PRED_W4 / PRED_D4 / PRIOR_P` and 299.5, committed before launch.
+  **(10) Hard bound** 64 GPU-h (WALL 2 h × 32) stated; expected 24.4.
+
+**SUBMITTED ONCE** with the registered runner and the pinned commit: `G3B_REGISTERED_COMMIT=31792c46… G3B_SCORER_SHA256=f21f57bd…
+bash bin/cG3B_c100wd.sh --submit` from `~/stage_g3b`, log `~/stage_g3b_submit.log`, rc 0: "32 jobs (ACCEPTED BY SLURM);
+0 rejected"; `g3b-` appended to the stage copy of `bin/PROTECTED.txt`; `$WS/runs/g3b/PROVENANCE.txt` MODE submit,
+REGISTERED_COMMIT `31792c4…`.  **Job ids (32): 5080798–5080829, contiguous** (W1 798–813, W4 814–829; within each seed
+ch / nd / k01 / kL).  `squeue -u s5014158` right after: **32 `g3b-*` jobs**, all PENDING on gpu-short,gpu-l4-24g with
+`--constraint=L4`.  **Guard 7 (post-launch RULE 20) is UNVERIFIED:** no g3b job had started inside its 600 s window.
+
+**Still owed:** the RULE 20 check against the runs' own ARGS lines (`python3 analysis/argsline_guard.py
+/home/s5014158/metaopt/runs --name g3b-`, then `bash bin/cG3B_rule20.sh` from `~/stage_g3b` at full coverage) once all 32
+have started and before any number is read; at landing the 16 ARGS_WD_BASE rows and `g3b-` in the repo's
+`bin/PROTECTED.txt`; scoring only with `python3 analysis/cG3B_c100wd_score.py /home/s5014158/metaopt/runs` at 32 / 32
+RUN_DONE.
 
 ## 300. TRACK B — **`crt1` REGISTERED: IS `cgw1`'s SCALAR-BEATS-BEST AT WEIGHT DECAY 5e-4 A TUNING ARTEFACT OF HYPERPARAMETERS CHOSEN AT 0.1?  `cgw1`'s W4 CELL VERBATIM EXCEPT `--meta-stepsize` AND `--alpha0`: {chunk777, nodewise, scalar} × FOUR TUNING CONFIGS (ms 3e-5 / 1e-4 / 3e-4 at α0 1e-3, AND α0 1e-2 at ms 1e-4) × SEEDS {176, 177, 178}; 12 ARMS, 36 JOBS, ≈34.4 GPU-h EXPECTED, 72 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, ONE DECAY** (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion / α-scaled 5e-4); nothing here is about CIFAR-100 (Track A's `G3b`) or any other value.  (2) **A FOUR-POINT GRID**: "not a tuning artefact" can only mean "over this grid"; α0 has TWO points.  (3) **SELECTION IS ON TRAIN, AND EVERY SELECTED CONTRAST CARRIES THE BOUND B = E[max of 4] × σ/√3 (0.1059 pp at the floor) ADVERSELY**; the best-of-grid reading selects on the TEST set and is co-reported with the same bound; there is still NO validation split (1.14, Track D).  (4) **W4's decay caveat binds unweakened** (296.4): the harness's 5e-4 is far less decayed than a standard SGD recipe.  (5) **The ms 1e-4 column is an in-batch REPLICATE of `cgw1` W4, compared DESCRIPTIVELY and never pooled.**  (6) **A TIES reading is a BOUND.**  All are printed on every FINAL.]** — **THE BRIEF's 27 RUNS BECAME 36: ONE α0 POINT WAS ADDED, BECAUSE `cgw1`'s OWN W4 PROBE RECORDS SHOW THE PARTITIONS' STEP SIZES SITTING AT THEIR INITIAL VALUE (300.3).**
 
