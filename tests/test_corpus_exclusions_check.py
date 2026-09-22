@@ -197,6 +197,48 @@ lines, which no reader may take:
       csh1_design.args_string) passes listed by `ARGS_WD_BASE: weight-decay-base=5e-4` ONLY (301.3's plan), while a
       dropped gamma<1 row still FAILs (standard-cell ARGS rule).
 
+ADDED AT CORRECTIONS 308 -- PATCH_DECAYROUTE (305) and its two batches, `cai1` (306) and `crd1` (307).  The patched tree
+prints `DECAY_ROUTE: off` or exactly ONE `DECAY_ROUTE: on mode=<m> base=<alg> wd=<repr> lambda=<repr|na> lambda_f32=<repr|na>
+gamma=<repr>` line on EVERY run, which no CSV column carries.  `cai1`'s 32 runs ALL run at `--weight-decay-base 0` (the
+patch refuses alpha_indep at any other value), so every one is TWO-AXIS (284's rule: listed by `ARGS_WD_BASE:
+weight-decay-base=0`, the DECAY_ROUTE line registered in MULTI_KIND for its (cai1, <grain><rung>) arm).  `crd1`'s 12 SR* /
+TR* runs are at the standard 0.1 and are ONE-kind rows listed by their DECAY_ROUTE line; its 6 AI* runs (wd 0) are
+TWO-AXIS.  So crd1 owes 18 rows, not 24: a (run, job_id) key may be listed ONCE.  Every listed run of either batch is
+also held to its ARM's registered line (DECAY_ROUTE_ARMS), so a TSV row that copied a wrong mode or LAMBDA FAILs too.
+The fixtures carry the batches' REAL job ids (squeue on alice2, 2026-09-22: crd1 5081273-5081290, cai1 5081292-5081323)
+and ARGS payloads pinned to `cai1_design.args_line` / `crd1_design.args_string`:
+  C46 a cai1-style batch (32 two-axis runs) and a crd1-style batch (12 one-kind + 6 two-axis) pass, separately and merged
+      with every earlier kind's fixture; the completeness line names DECAY_ROUTE; 284's two-axis line counts 32 / 6 / 38
+      (+ earlier) runs; the new `kinds scanned (CORRECTIONS 308)` line names DECAY_ROUTE, 10 in all, True; the new
+      `decay-route runs (CORRECTIONS 308)` line counts 32 / 18 / 50, True; crd1's AI* runs count on the ARGS block as
+      standard-cell rows (the mechanism cell), cai1's do not (CIFAR-10).
+  C47 every DECAY_ROUTE corruption FAILs, each named -- wrong MODE: (a) crd1 SRS printing trace_only's line; (b) the same
+      with the TSV row copying the wrong line (caught ONLY by DECAY_ROUTE_ARMS); wrong LAMBDA: (c) a cai1 I4 run printing
+      I5's line (MULTI_KIND); (d) crd1 AIS at lambda 0.0005; (e) a lambda_f32 token that is not LAMBDA's float32; (f) gamma
+      0.97; (g) `DECAY_ROUTE: off` on a listed ON run (the switch never reached it), one-kind and two-axis; (h) TWO
+      witness lines; (i) NO witness line; (j) a cai1 run dropped from the list; (k) a crd1 AIS run dropped (completeness
+      AND the standard-cell ARGS rule); (l) a crd1 TRL run dropped; (m) the two-axis runs listed by their DECAY_ROUTE
+      line (the REVERSE listing: no ARGS escape); (n) 307.9's owed list read as 24 rows (AI* listed twice: duplicate
+      key); (o) a crd1 SR* run at wd 0 (an UNREGISTERED two-axis run); (p) a cai1 ARGS line at wd 0.1 (the removed
+      decay came back); (q) a listed run of a route batch whose arm is not registered; (r) a not-yet-ingested ON .out of
+      the listed batch, unlisted (the batch rule); (s) an ON DECAY_ROUTE corpus row of an UNLISTED batch.
+  C48 `DECAY_ROUTE: off`, printed by every run of the patched tree with the switch unset: an unlisted corpus run printing
+      it (in or out of a listed batch) passes and is not required to be listed; an unlisted run of a listed route batch
+      with NO DECAY_ROUTE line FAILs (the batch rule); a DECAY_MASK tree's `DECAY_MASK: off` line beside it is read as
+      DECAY_MASK only.
+  C49 the prefix proof and the line forms: DECAY_ROUTE and DECAY_MASK share `DECAY_` and diverge at index 6 (`R` / `M`),
+      so NEITHER is a prefix of the other; no name of the 10 line kinds + 2 ARGS kinds is a prefix of another; witness_lines
+      puts one on and one off line of each of the TEN kinds under its own kind; kind_of reads both DECAY_ lines correctly;
+      patch_decayroute.py prints only `DECAY_ROUTE: off` / `DECAY_ROUTE: on mode=...`; the registry literals ==
+      cai1_design.witness_on / crd1_design.dr_witness, and == the three RR2 witness strings the real proof log 5081090
+      recorded where it is on disk (skipped, not failed, where it is not).
+  C50 the registry: KINDS[:9] unchanged, KINDS[9] == ("DECAY_ROUTE", "DECAY_ROUTE: off"), KINDS_AT_304 == 9; DECAY_ROUTE_ARMS
+      is exactly cai1's 8 + crd1's 6 arms; MULTI_KIND gains exactly cai1's 8 + crd1's AIS / AIL, each registering exactly
+      DECAY_ROUTE with its arm's line, == the arms the designs name as ARGS-deviating; MULTI_ARGS / ARGS_KINDS unchanged;
+      this test's 50 payloads == the designs'; on every earlier fixture `--check --runs` gains exactly the TWO 308 lines
+      (every other byte == 304's module output) and 304's `kinds scanned` line is unchanged byte for byte; without --runs
+      nothing changes; the registry guard FAILs a malformed DECAY_ROUTE_ARMS entry and a MULTI_KIND line that disagrees.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -716,6 +758,86 @@ def csh1_batch():
         args[key] = CSH1_ARGS % (g, grain, arm)
         cells[key] = {"network": "ResNet18_c100", "granularity": grain, "gamma": g}
         listed.append(key + (W_WD5E4,))
+    return listed, corpus, logs, args, cells
+
+
+# ---- CORRECTIONS 308: PATCH_DECAYROUTE's cai1 (306, all TWO-AXIS) and crd1 (307, one-kind SR* / TR*, two-axis AI*) ------
+# The witness lines are the harness's own format (patches/patch_decayroute.py `_dr_init`), re-typed; C49 pins them to
+# cai1_design.witness_on / crd1_design.dr_witness and to the real proof log's RR2 lines.  The cdr1 tree is the live HF.py
+# + PATCH_DECAYROUTE only, so it prints NO other kind's line (crd1_design.NO_LINE_KINDS); crd1 also prints a PROBE_TENSOR
+# line, which is no kind.  Job ids: squeue on alice2, 2026-09-22 (cai1 in the launcher's order: rung, seed, grain).
+DR_OFF = "DECAY_ROUTE: off"
+DR_I5 = ("DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=5e-05 lambda_f32=4.999999873689376e-05 "
+         "gamma=1.0")
+DR_I4 = ("DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=0.0005 lambda_f32=0.0005000000237487257 "
+         "gamma=1.0")
+DR_SR = "DECAY_ROUTE: on mode=shrink_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0"
+DR_TR = "DECAY_ROUTE: on mode=trace_only base=SGDm wd=0.1 lambda=na lambda_f32=na gamma=1.0"
+DR_AI = ("DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=0.000315 lambda_f32=0.0003150000120513141 "
+         "gamma=1.0")
+W_WD0 = "ARGS_WD_BASE: weight-decay-base=0"
+CAI1_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base %s --alg-meta Lion "
+             "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR10 --NN-name ResNet18 "
+             "--batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-4 --alpha0 1e-3 --num-epochs 100 "
+             "--stepsize-groups %s --seed %d --save-directory /home/s5014158/metaopt/runs/cai1 --run-name %s")
+CAI1_GRAINS = [("ch", "chunk777"), ("nd", "nodewise"), ("k01", "scalar"), ("kL", "layerwise")]
+CAI1_RUNGS = [("I5", DR_I5, 5081292), ("I4", DR_I4, 5081308)]
+CAI1_SEEDS = (192, 193, 194, 195)
+CAI1 = dict((("%s%s" % (g, r), s), ("cai1-%s%s-s%d" % (g, r, s), str(j0 + 4 * (s - 192) + gi)))
+            for r, _w, j0 in CAI1_RUNGS for s in CAI1_SEEDS for gi, (g, _spec) in enumerate(CAI1_GRAINS))
+CAI1_SPEC = dict(("%s%s" % (g, r), spec) for r, _w, _j in CAI1_RUNGS for g, spec in CAI1_GRAINS)
+CAI1_DR = dict(("%s%s" % (g, r), w) for r, w, _j in CAI1_RUNGS for g, _spec in CAI1_GRAINS)
+CRD1_ARGS = ("--optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base %s --alg-meta Lion "
+             "--momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 "
+             "--NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 "
+             "--alpha0 1e-6 --num-epochs 100 --stepsize-groups %s --seed %d "
+             "--save-directory /home/s5014158/metaopt/runs/crd1 --run-name %s")
+# (arm, grain, wd token, witness), in the launcher's order; job = 5081273 + 6 * (seed - 196) + index
+CRD1_ARMS = [("SRS", "scalar", "0.1", DR_SR), ("SRL", "layerwise", "0.1", DR_SR),
+             ("TRS", "scalar", "0.1", DR_TR), ("TRL", "layerwise", "0.1", DR_TR),
+             ("AIS", "scalar", "0", DR_AI), ("AIL", "layerwise", "0", DR_AI)]
+CRD1_SEEDS = (196, 197, 198)
+CRD1 = dict(((a, s), ("crd1-%s-s%d" % (a, s), str(5081273 + 6 * (s - 196) + i)))
+            for s in CRD1_SEEDS for i, (a, _g, _w, _dr) in enumerate(CRD1_ARMS))
+CRD1_SPEC = dict((a, g) for a, g, _w, _dr in CRD1_ARMS)
+CRD1_WD = dict((a, w) for a, _g, w, _dr in CRD1_ARMS)
+CRD1_DR = dict((a, dr) for a, _g, _w, dr in CRD1_ARMS)
+CRD1_PT = "PROBE_TENSOR: on every=100 type=%s tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9"
+
+
+def cai1_args(arm, seed, wd=None):
+    return CAI1_ARGS % (wd or "0", CAI1_SPEC[arm], seed, CAI1[(arm, seed)][0])
+
+
+def crd1_args(arm, seed, wd=None):
+    return CRD1_ARGS % (wd or CRD1_WD[arm], CRD1_SPEC[arm], seed, CRD1[(arm, seed)][0])
+
+
+def cai1_batch(by="ARGS_WD_BASE"):
+    """cai1-style (306): 32 TWO-AXIS runs (DECAY_ROUTE on AND wd 0), listed by `by`'s witness."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for (arm, seed), key in sorted(CAI1.items()):
+        corpus.append(key)
+        logs[key] = [CAI1_DR[arm]]
+        args[key] = cai1_args(arm, seed)
+        cells[key] = {"network": "ResNet18", "dataset": "CIFAR10", "granularity": CAI1_SPEC[arm],
+                      "meta_stepsize": "1e-4", "alpha0": "1e-3"}
+        listed.append(key + ({"ARGS_WD_BASE": W_WD0, "DECAY_ROUTE": CAI1_DR[arm]}[by],))
+    return listed, corpus, logs, args, cells
+
+
+def crd1_batch(ai_by="ARGS_WD_BASE"):
+    """crd1-style (307): 12 one-kind SR* / TR* runs listed by their DECAY_ROUTE line, 6 TWO-AXIS AI* runs by `ai_by`."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for (arm, seed), key in sorted(CRD1.items()):
+        corpus.append(key)
+        logs[key] = [CRD1_DR[arm], CRD1_PT % CRD1_SPEC[arm]]
+        args[key] = crd1_args(arm, seed)
+        cells[key] = {"network": "ResNet18_c100", "granularity": CRD1_SPEC[arm]}
+        if CRD1_WD[arm] != "0.1":
+            listed.append(key + ({"ARGS_WD_BASE": W_WD0, "DECAY_ROUTE": CRD1_DR[arm]}[ai_by],))
+        else:
+            listed.append(key + (CRD1_DR[arm],))
     return listed, corpus, logs, args, cells
 
 
@@ -1355,7 +1477,10 @@ def main():
             for ln in line_of(out, "  kinds scanned (CORRECTIONS 269)")),
         "C33 ONE new line names the two added kinds, no prefix collision", repr(line_of(out, "  kinds scanned")))
     # CORRECTIONS 304: was `len(line_of(out, "  kinds scanned")) == 3`; 304 adds ONE line of its own (C41 / C44 own it)
-    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3,
+    # CORRECTIONS 308: was `... if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3`; 308 adds ONE more (C46 /
+    # C50 own it), so both later lines are excluded
+    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith(("  kinds scanned (CORRECTIONS 304)",
+                                                                                 "  kinds scanned (CORRECTIONS 308)"))]) == 3,
         "C33 exactly three `kinds scanned` lines",
         repr(line_of(out, "  kinds scanned")))
     try:
@@ -1485,7 +1610,9 @@ def main():
         "C36 245's count == the sum of 251's breakdown: neither line counts the one-kind two-axis entry",
         repr(line_of(out, "  two-kind runs") + line_of(out, "  multi-kind runs")))
     # CORRECTIONS 304: was `len(line_of(out, "  kinds scanned")) == 3`; 304's own line is excluded (C44 owns it)
-    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3
+    # CORRECTIONS 308: was `... if not ln.startswith("  kinds scanned (CORRECTIONS 304)")]) == 3`; 308's line is excluded too
+    chk(len([ln for ln in line_of(out, "  kinds scanned") if not ln.startswith(("  kinds scanned (CORRECTIONS 304)",
+                                                                                 "  kinds scanned (CORRECTIONS 308)"))]) == 3
         and len(line_of(out, "  two-axis runs")) == 1
         and len(line_of(out, "  multi-kind runs")) == 1,
         "C36 `--check --runs` gains exactly ONE line: three `kinds scanned`, one `multi-kind`, one `two-axis`",
@@ -1583,14 +1710,18 @@ def main():
     # CORRECTIONS 304: was `len(CE.KINDS) == 8 and len(CE.MULTI_KIND) == 16`; 304 appends VAL_SPLIT and four cvl1 entries
     # (C44 owns them), so the claim is now made over everything else
     chk(CE.ARGS_KINDS == [("ARGS_MOMENTUM_BASE", "momentum-param-base", "0.99"), ("ARGS_WD_BASE", "weight-decay-base", "0.1")]
-        and len([k for k in CE.KINDS if k[0] != "VAL_SPLIT"]) == 8 and len([k for k in CE.MULTI_KIND if k[0] != "cvl1"]) == 16,
+        # CORRECTIONS 308: was `k[0] != "VAL_SPLIT"` and `k[0] != "cvl1"`; 308 appends DECAY_ROUTE and ten cai1 / crd1 entries
+        and len([k for k in CE.KINDS if k[0] not in ("VAL_SPLIT", "DECAY_ROUTE")]) == 8
+        and len([k for k in CE.MULTI_KIND if k[0] not in ("cvl1", "cai1", "crd1")]) == 16,
         "C39 ARGS_KINDS / KINDS / MULTI_KIND are unchanged (2 / 8 / 16 entries)",
         "%d %d %d" % (len(CE.ARGS_KINDS), len(CE.KINDS), len(CE.MULTI_KIND)))
     b = wd5_batch()
     rc, out = run_check(*b[:3], args=b[3], cells=b[4])
     # CORRECTIONS 304: 304's own `kinds scanned` line is dropped too (C44 proves it is the only line 304 adds)
     kept = "".join(ln + "\n" for ln in out.split("\n")[:-1]
-                   if not ln.startswith(NEWLINE) and not ln.startswith("  kinds scanned (CORRECTIONS 304)"))
+                   if not ln.startswith(NEWLINE) and not ln.startswith("  kinds scanned (CORRECTIONS 304)")
+                   # CORRECTIONS 308: was the two conditions above only; 308's two added lines are dropped too (C50)
+                   and not ln.startswith(("  kinds scanned (CORRECTIONS 308)", "  decay-route runs (CORRECTIONS 308)")))
     chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
         == "115c74ed3d7e87d9b9a5a1637ae421de56d81bb1b0d94870b76e5172f72d65df" and len(line_of(out, NEWLINE)) == 1,
         "C39 on 284's cwd5 fixture `--check --runs` gains exactly ONE line; every other byte == 284's module output",
@@ -1619,6 +1750,7 @@ def main():
     # ---- CORRECTIONS 304 ------------------------------------------------------------------------------------
     import math
     L304 = "  kinds scanned (CORRECTIONS 304)"
+    L308S = ("  kinds scanned (CORRECTIONS 308)", "  decay-route runs (CORRECTIONS 308)")   # CORRECTIONS 308 (C46 / C50)
     ALL_PRIOR = (wd5_batch(), rh_batch(), wh_batch(), dm_batch(), dm2_batch(), sv_batch(), cmo_batch(), caw2_batch())
     print("C41 a cvl1-style VAL_SPLIT batch passes (16 one-kind W1 rows, 16 two-axis W4 rows)")
     listed, corpus, logs, args, cells = cvl1_batch()
@@ -1726,7 +1858,7 @@ def main():
     print("C43 the prefix proof, the VAL: lines, and patch_valsplit.py's line forms")
     NINE = ["VOTE_W", "BETA_HOLD", "GROUP_HOLD", "COMP_HOLD", "REST_HOLD", "WINDOW_HOLD", "DECAY_MASK", "SHADOW_VOTE",
             "VAL_SPLIT"]  # literal, not read from the module
-    kinds9 = [k for k, _off in CE.KINDS]
+    kinds9 = [k for k, _off in CE.KINDS[:9]]   # CORRECTIONS 308: was `CE.KINDS`; 304's nine, not every kind (C49 proves the ten)
     names11 = kinds9 + [k for k, _f, _s in CE.ARGS_KINDS]
     chk(kinds9 == NINE and not [(a, b) for a in names11 for b in names11 if a != b and a.startswith(b)],
         "C43 no name of the 9 line kinds + 2 ARGS kinds is a prefix of another", repr(names11))
@@ -1745,7 +1877,10 @@ def main():
                     + ["%s: off" % k for k in NINE])
         open(p, "w").write("\n".join(eighteen[:9] + VS_VAL_LINES + eighteen[9:]) + "\n")
         got = CE.witness_lines(p)
-        chk(sorted(got) == sorted(NINE) and all(got[k] == [ln for ln in eighteen if ln.split(":")[0] == k] for k in NINE)
+        # CORRECTIONS 308: was `sorted(got) == sorted(NINE)`; witness_lines now also returns DECAY_ROUTE's key, empty on
+        # these lines -- so the kinds that COLLECT a line are still exactly 304's nine.
+        chk(sorted(k for k in got if got[k]) == sorted(NINE)
+            and all(got[k] == [ln for ln in eighteen if ln.split(":")[0] == k] for k in NINE)
             and not [ln for v in got.values() for ln in v if ln.startswith("VAL:")],
             "C43 witness_lines puts each of 18 lines (one on, one off per kind) under its own kind; no `VAL:` line is taken",
             repr(sorted(got)))
@@ -1761,13 +1896,15 @@ def main():
         "C43 patch_valsplit.py's per-epoch line starts `VAL: epoch` (the form this test's VAL lines copy)")
 
     print("C44 the registry: KINDS, MULTI_KIND's cvl1 entries against cvl1_design, and the print lines")
-    chk(CE.KINDS[:8] == [(k, "%s: off" % k) for k in NINE[:8]] and CE.KINDS[8:] == [("VAL_SPLIT", "VAL_SPLIT: off")]
+    # CORRECTIONS 308: was `CE.KINDS[8:] == [...]`; KINDS now also holds DECAY_ROUTE (C50 owns the total and the added entry)
+    chk(CE.KINDS[:8] == [(k, "%s: off" % k) for k in NINE[:8]] and CE.KINDS[8:9] == [("VAL_SPLIT", "VAL_SPLIT: off")]
         and getattr(CE, "KINDS_AT_269", None) == 8 and CE.KINDS_AT_251 == 6,
         "C44 KINDS = 269's eight unchanged + VAL_SPLIT, appended; KINDS_AT_269 == 8", repr(CE.KINDS[8:]))
     mkv = dict((k, v) for k, v in CE.MULTI_KIND.items() if k[0] == "cvl1")
     chk(sorted(mkv) == sorted(("cvl1", "%sW4" % g) for g, _s in CVL1_GRAINS)
         and all(v == {"VAL_SPLIT": VS_ON} for v in mkv.values())
-        and len([k for k in CE.MULTI_KIND if k[0] != "cvl1"]) == 16,
+        # CORRECTIONS 308: was `k[0] != "cvl1"`; 308's cai1 / crd1 entries are excluded too (C50 owns them)
+        and len([k for k in CE.MULTI_KIND if k[0] not in ("cvl1", "cai1", "crd1")]) == 16,
         "C44 MULTI_KIND gains exactly the 4 cvl1 W4 entries, each registering exactly VAL_SPLIT == this test's VS_ON; "
         "the 16 earlier entries are unchanged in number", repr(sorted(mkv)))
     chk(sorted(CE.MULTI_ARGS) == [("caw2", "XL"), ("caw2", "XS")] and len(CE.ARGS_KINDS) == 2,
@@ -1786,14 +1923,16 @@ def main():
         chk(False, "C44 cvl1_design imports and MULTI_KIND holds its W4 witness", "%s: %s" % (type(ex).__name__, ex))
     b = wd5_batch()
     rc, out = run_check(*b[:3], args=b[3], cells=b[4])
-    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(L304))
+    # CORRECTIONS 308: was `if not ln.startswith(L304)`; 308's two added lines are dropped too (C50 proves they are the only two)
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith((L304,) + L308S))
     chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
         == "0273bd078abe3d81f88b3a0369d25fd6a3aa529dcd295b61db760b9ee62ef8af" and len(line_of(out, L304)) == 1,
         "C44 on 284's cwd5 fixture `--check --runs` gains exactly ONE line; every other byte == 294's module output",
         hashlib.sha256(kept.encode()).hexdigest()[:16])
     b = merge5(*ALL_PRIOR)
     rc, out = run_check(*b[:3], args=b[3], cells=b[4])
-    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(L304))
+    # CORRECTIONS 308: was `if not ln.startswith(L304)`; 308's two added lines are dropped too (C50 proves they are the only two)
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith((L304,) + L308S))
     chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
         == "a472afe0f7c3c6890b8a9c68b90e3ba6324857cec3ab4a60420739bbdb95666c"
         and ("  kinds scanned (CORRECTIONS 269): also DECAY_MASK / SHADOW_VOTE, 8 in all; no prefix of the 8 is a prefix "
@@ -1852,6 +1991,306 @@ def main():
     chk(rc == 1 and any("csh1-GMS-s180-5080647.out is a CSV row in the standard cell whose ARGS deviates" in f
                         for f in fails(out)),
         "C45 a dropped gamma<1 row still FAILs (its wd 5e-4 is the axis the list must carry)", show(out))
+
+    # ---- CORRECTIONS 308 ------------------------------------------------------------------------------------
+    L308 = "  kinds scanned (CORRECTIONS 308)"
+    LDR = "  decay-route runs (CORRECTIONS 308)"
+    L308_TEXT = L308 + ": also DECAY_ROUTE, 10 in all; no prefix of the 10 is a prefix of another: True"
+    L304_TEXT = L304 + ": also VAL_SPLIT, 9 in all; no prefix of the 9 is a prefix of another: True"
+    MK_DR = "is registered with DECAY_ROUTE ON but prints"
+    ARMS_DR = "not its arm's registered line (DECAY_ROUTE_ARMS)"
+    print("C46 cai1-style (32 two-axis) and crd1-style (12 one-kind + 6 two-axis) DECAY_ROUTE batches pass")
+    listed, corpus, logs, args, cells = cai1_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C46 cai1: 32 runs listed by ARGS_WD_BASE=0 with the DECAY_ROUTE line in MULTI_KIND -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("DECAY_ROUTE" in ln and "32 .out files print an ON line; 32 are CSV rows, every one listed with its kind: True"
+            in ln for ln in line_of(out, "  completeness")),
+        "C46 cai1: the completeness line names DECAY_ROUTE, 32 ON runs, 32 CSV rows", repr(line_of(out, "  completeness")))
+    chk(any("32 listed runs deviate on an ARGS value AND print an ON line" in ln and ln.endswith(": True")
+            for ln in line_of(out, "  two-axis runs")),
+        "C46 cai1: 284's two-axis line counts the 32 runs, True", repr(line_of(out, "  two-axis runs")))
+    chk(line_of(out, L308) == [L308_TEXT] and line_of(out, L304) == [L304_TEXT],
+        "C46 cai1: ONE new `kinds scanned` line names DECAY_ROUTE, 10 in all, True; 304's line unchanged",
+        repr(line_of(out, "  kinds scanned")))
+    chk(len(line_of(out, LDR)) == 1 and line_of(out, LDR)[0].startswith(LDR + ": 32 listed runs")
+        and line_of(out, LDR)[0].endswith(": True"),
+        "C46 cai1: the decay-route line counts 32 registered-arm runs, True", repr(line_of(out, LDR)))
+    chk(any("32 listed runs carry their listed ARGS value" in ln
+            and "32 deviate from the standard, 0 are CSV rows in the standard cell" in ln
+            for ln in line_of(out, "  ARGS witness")),
+        "C46 cai1: the ARGS block reads the 32 wd-0 values (CIFAR-10: outside the standard cell)",
+        repr(line_of(out, "  ARGS witness")))
+    listed, corpus, logs, args, cells = crd1_batch()
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out,
+        "C46 crd1: 12 SR* / TR* listed by their DECAY_ROUTE line, 6 AI* by ARGS_WD_BASE=0 (18 rows) -> exit 0 PASS",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("DECAY_ROUTE" in ln and "18 .out files print an ON line; 18 are CSV rows, every one listed with its kind: True"
+            in ln for ln in line_of(out, "  completeness")),
+        "C46 crd1: completeness 18 ON / 18 CSV rows, every one listed", repr(line_of(out, "  completeness")))
+    chk(any("6 listed runs deviate on an ARGS value AND print an ON line" in ln and ln.endswith(": True")
+            for ln in line_of(out, "  two-axis runs")),
+        "C46 crd1: the two-axis line counts the 6 AI* runs, True", repr(line_of(out, "  two-axis runs")))
+    chk(any("6 listed runs carry their listed ARGS value" in ln
+            and "6 are CSV rows in the standard cell, every one listed: True" in ln for ln in line_of(out, "  ARGS witness")),
+        "C46 crd1: the 6 AI* runs are standard-cell ARGS rows (the mechanism cell), every one listed",
+        repr(line_of(out, "  ARGS witness")))
+    chk(len(line_of(out, LDR)) == 1 and line_of(out, LDR)[0].startswith(LDR + ": 18 listed runs")
+        and line_of(out, LDR)[0].endswith(": True"),
+        "C46 crd1: the decay-route line counts 18, True", repr(line_of(out, LDR)))
+    ALL_308 = (cvl1_batch(),) + ALL_PRIOR
+    listed, corpus, logs, args, cells = merge5(cai1_batch(), crd1_batch(), *ALL_308)
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out
+        and all(ln.endswith(": True") for ln in line_of(out, "  kinds scanned") + line_of(out, "  two-axis runs")
+                + line_of(out, "  two-kind runs") + line_of(out, "  multi-ARGS runs") + line_of(out, LDR)),
+        "C46 merged with cvl1 and every earlier kind's fixture -> exit 0 PASS, every line True",
+        "rc=%d %s" % (rc, show(out)))
+    chk(any("55 listed runs deviate on an ARGS value AND print an ON line" in ln for ln in line_of(out, "  two-axis runs"))
+        and line_of(out, LDR)[0].startswith(LDR + ": 50 listed runs")
+        and ("  multi-kind runs (CORRECTIONS 251): those runs by the number of kinds MULTI_KIND registers for them: "
+             "2 kinds 8, 3 kinds 4") in out.splitlines(),
+        "C46 merged: two-axis 55 (cwd5 1 + cvl1 16 + cai1 32 + crd1 6); decay-route 50; 251's line unchanged",
+        repr(line_of(out, "  two-axis runs") + line_of(out, LDR)))
+
+    print("C47 every DECAY_ROUTE corruption fails, each named (wrong mode, wrong LAMBDA, the listing rules)")
+    srs, srl, trs, trl = CRD1[("SRS", 197)], CRD1[("SRL", 196)], CRD1[("TRS", 197)], CRD1[("TRL", 196)]
+    ais, ais8 = CRD1[("AIS", 196)], CRD1[("AIS", 198)]
+    k4, c5, n5 = CAI1[("kLI4", 194)], CAI1[("chI5", 192)], CAI1[("ndI5", 193)]
+    cases = [
+        ("a", "crd1", srs, [DR_TR], None, ["!= listed", ARMS_DR]),                       # wrong MODE, row correct
+        ("b", "crd1", srs, [DR_TR], DR_TR, [ARMS_DR]),                                  # wrong MODE, row copied it
+        ("c", "cai1", k4, [DR_I5], None, [MK_DR]),                                      # wrong LAMBDA (the other rung)
+        ("d", "crd1", ais8, [DR_AI.replace("lambda=0.000315", "lambda=0.0005")], None, [MK_DR]),
+        ("e", "cai1", c5, [DR_I5.replace("lambda_f32=4.999999873689376e-05", "lambda_f32=5e-05")], None, [MK_DR]),
+        ("f", "crd1", trl, [DR_TR.replace("gamma=1.0", "gamma=0.97")], None, ["!= listed", ARMS_DR]),
+        ("g1", "crd1", srl, [DR_OFF], None, ["witness ['DECAY_ROUTE: off'] != listed", ARMS_DR]),
+        ("g2", "cai1", n5, [DR_OFF], None, [MK_DR]),
+        ("h", "crd1", srs, [DR_SR, DR_SR], None, ["!= listed", ARMS_DR]),
+        ("i1", "crd1", ais, [], None, [MK_DR]),
+        ("i2", "crd1", trs, [], None, ["witness [] != listed", ARMS_DR]),
+        ("t", "crd1", srs, [DR_SR, "DECAY_ROUTE=shrink_only"], None, ["!= listed", ARMS_DR])]  # an echo would be collected
+    for tag, batch, key, lines, row_w, msgs in cases:
+        listed, corpus, logs, args, cells = cai1_batch() if batch == "cai1" else crd1_batch()
+        logs[key] = lines + ([CRD1_PT % "scalar"] if batch == "crd1" else [])
+        if row_w is not None:
+            listed = [r if r[:2] != key else key + (row_w,) for r in listed]
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and all(any(("%s-%s.out" % key) in f and m in f for f in fails(out)) for m in msgs)
+            and (row_w is None or all(ARMS_DR in f for f in fails(out))),
+            "C47%s %s prints %r%s -> exit 1, named with %r" % (tag, key[0], [ln[:48] for ln in lines],
+                                                               " (TSV row copies it)" if row_w else "", msgs), show(out))
+    for tag, batch, key, msgs in [
+            ("j", "cai1", CAI1[("chI4", 195)], ["is a CSV row printing an ON DECAY_ROUTE line but is NOT listed",
+                                                "is an unlisted run of a listed batch whose ARGS deviates"]),
+            ("k", "crd1", CRD1[("AIS", 197)], ["is a CSV row printing an ON DECAY_ROUTE line but is NOT listed",
+                                               "is a CSV row in the standard cell whose ARGS deviates"]),
+            ("l", "crd1", CRD1[("TRL", 198)], ["is a CSV row printing an ON DECAY_ROUTE line but is NOT listed"])]:
+        listed, corpus, logs, args, cells = cai1_batch() if batch == "cai1" else crd1_batch()
+        rc, out = run_check([r for r in listed if r[:2] != key], corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and all(any(("%s-%s.out" % key) in f and m in f for f in fails(out)) for m in msgs),
+            "C47%s %s dropped from the list -> exit 1, named %d way(s)" % (tag, key[0], len(msgs)), show(out))
+    for tag, b, n in [("m1", cai1_batch("DECAY_ROUTE"), 32), ("m2", crd1_batch("DECAY_ROUTE"), 6)]:
+        rc, out = run_check(*b[:3], args=b[3], cells=b[4])
+        chk(rc == 1 and sum(1 for f in fails(out) if "deviates on ARGS_WD_BASE but is listed with a DECAY_ROUTE witness"
+                            in f) == n,
+            "C47%s the %d two-axis runs listed by their DECAY_ROUTE line (the REVERSE listing) -> exit 1, each named"
+            % (tag, n), show(out)[:300])
+    listed, corpus, logs, args, cells = crd1_batch()
+    listed = listed + [CRD1[(a, s)] + (DR_AI,) for a in ("AIS", "AIL") for s in CRD1_SEEDS]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("duplicate key in the list" in f for f in fails(out)) and len(listed) == 24,
+        "C47n 307.9's owed list read as 24 rows (the 6 AI* runs listed twice) -> exit 1, `duplicate key in the list`",
+        show(out)[:300])
+    for by, msg in [("DECAY_ROUTE", "deviates on ARGS_WD_BASE but is listed with a DECAY_ROUTE witness"),
+                    ("ARGS_WD_BASE", "prints an ON DECAY_ROUTE line but is listed with a ARGS_WD_BASE witness")]:
+        listed, corpus, logs, args, cells = crd1_batch()
+        key = CRD1[("SRS", 196)]
+        args[key] = crd1_args("SRS", 196, wd="0")                  # an SR* arm has NO MULTI_KIND entry
+        listed = [r if r[:2] != key else key + ({"DECAY_ROUTE": DR_SR, "ARGS_WD_BASE": W_WD0}[by],) for r in listed]
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C47o an UNREGISTERED two-axis run (crd1 SRS at wd 0) listed by %s -> exit 1, named" % by, show(out))
+    listed, corpus, logs, args, cells = cai1_batch()
+    key = CAI1[("k01I5", 192)]
+    args[key] = cai1_args("k01I5", 192, wd="0.1")
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(("%s-%s.out" % key) in f and "does not deviate" in f for f in fails(out)),
+        "C47p a cai1 run whose own ARGS line says --weight-decay-base 0.1 (the removed decay came back) -> exit 1, named",
+        show(out))
+    listed, corpus, logs, args, cells = crd1_batch()
+    odd = ("crd1-XYZ-s196", "5099911")                          # a listed run of the route batch, arm not registered
+    corpus.append(odd)
+    logs[odd] = [DR_SR]
+    args[odd] = crd1_args("SRS", 196).replace("crd1-SRS-s196", "crd1-XYZ-s196")
+    cells[odd] = {"network": "ResNet18_c100"}
+    listed.append(odd + (DR_SR,))
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("crd1-XYZ-s196-5099911.out" in f and "has no registered line (DECAY_ROUTE_ARMS)" in f
+                        for f in fails(out)),
+        "C47q a listed run of a route batch whose arm is not in DECAY_ROUTE_ARMS -> exit 1, named", show(out))
+    listed, corpus, logs, args, cells = crd1_batch()
+    extra = ("crd1-SRS-s199", "5099912")                        # an unused seed: an ON .out nobody ingested or listed
+    logs[extra] = [DR_SR]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("crd1-SRS-s199-5099912.out is NOT listed but its witness is" in f for f in fails(out)),
+        "C47r a not-yet-ingested ON .out of the listed batch, unlisted -> exit 1, named (the batch rule)", show(out))
+    listed, corpus, logs, args, cells = crd1_batch()
+    other = ("syn5-DR-s1", "5099913")                           # an ON corpus row of an UNLISTED batch
+    corpus.append(other)
+    logs[other] = [DR_SR]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("syn5-DR-s1-5099913.out is a CSV row printing an ON DECAY_ROUTE line but is NOT listed" in f
+                        for f in fails(out)),
+        "C47s an ON DECAY_ROUTE corpus row of an unlisted batch -> exit 1, named (completeness is corpus-wide)", show(out))
+
+    print("C48 `DECAY_ROUTE: off` (every run of the patched tree, switch unset) is not required; a missing line is")
+    listed, corpus, logs, args, cells = crd1_batch()
+    plain = ("crd1-OFF-s196", "5099914")                        # an `off` run of the listed batch, at the standard 0.1
+    corpus.append(plain)
+    logs[plain] = [DR_OFF]
+    args[plain] = crd1_args("SRS", 196).replace("crd1-SRS-s196", "crd1-OFF-s196")
+    cells[plain] = {"network": "ResNet18_c100"}
+    other = ("syn6-OFF-s1", "5099915")                          # an `off` corpus run of an UNLISTED batch, beside a mask line
+    corpus.append(other)
+    logs[other] = ["DECAY_MASK: off", DR_OFF]
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out
+        and any("18 .out files print an ON line; 18 are CSV rows" in ln for ln in line_of(out, "  completeness")),
+        "C48 unlisted `DECAY_ROUTE: off` runs (in the listed batch, and in an unlisted one) -> exit 0 PASS, not counted ON",
+        "rc=%d %s" % (rc, show(out)))
+    logs[plain] = []
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("crd1-OFF-s196-5099914.out is NOT listed but its witness is []" in f for f in fails(out))
+        and not any("syn6-OFF-s1" in f for f in fails(out)),
+        "C48 ... the same run of the listed batch printing NO DECAY_ROUTE line -> exit 1, named; the other batch's is not",
+        show(out))
+    tmp = tempfile.mkdtemp(prefix="ce_prefix_test_")
+    try:
+        p = os.path.join(tmp, "x.out")
+        four = ["DECAY_MASK: off", DR_OFF, DM_NORMSCALE, DR_SR]
+        open(p, "w").write("\n".join(four) + "\n")
+        got = CE.witness_lines(p)
+        chk(got.get("DECAY_MASK") == ["DECAY_MASK: off", DM_NORMSCALE] and got.get("DECAY_ROUTE") == [DR_OFF, DR_SR],
+            "C48 witness_lines puts two DECAY_MASK and two DECAY_ROUTE lines each under its own kind only",
+            repr((got.get("DECAY_MASK"), got.get("DECAY_ROUTE"))))
+    finally:
+        shutil.rmtree(tmp)
+
+    print("C49 the prefix proof (DECAY_ROUTE vs DECAY_MASK), the line forms, and the literals against the designs")
+    TEN = NINE + ["DECAY_ROUTE"]   # literal, not read from the module
+    kinds10 = [k for k, _off in CE.KINDS]
+    names12 = kinds10 + [k for k, _f, _s in CE.ARGS_KINDS]
+    chk(kinds10 == TEN and not [(a, b) for a in names12 for b in names12 if a != b and a.startswith(b)],
+        "C49 no name of the 10 line kinds + 2 ARGS kinds is a prefix of another", repr(names12))
+    pre = os.path.commonprefix(["DECAY_ROUTE", "DECAY_MASK"])
+    chk(pre == "DECAY_" and "DECAY_ROUTE"[6] == "R" and "DECAY_MASK"[6] == "M"
+        and not "DECAY_ROUTE".startswith("DECAY_MASK") and not "DECAY_MASK".startswith("DECAY_ROUTE"),
+        "C49 DECAY_ROUTE and DECAY_MASK share `DECAY_` and diverge at index 6 (R / M): neither is a prefix of the other")
+    chk(CE.kind_of(DR_SR) == "DECAY_ROUTE" and CE.kind_of(DR_OFF) == "DECAY_ROUTE" and CE.kind_of(DR_I5) == "DECAY_ROUTE"
+        and CE.kind_of(DM_NORMSCALE) == "DECAY_MASK" and CE.kind_of("DECAY_MASK: off") == "DECAY_MASK"
+        and CE.kind_of("DECAY_ROUTE=shrink_only") is None and CE._ARGS_RE.match(DR_SR) is None
+        and not [k for k in kinds10 if "ARGS:".startswith(k) or k.startswith("ARGS")],
+        "C49 kind_of reads each DECAY_ line as its own kind; an `=` echo names no kind; no line is an ARGS line")
+    tmp = tempfile.mkdtemp(prefix="ce_prefix_test_")
+    try:
+        p = os.path.join(tmp, "x.out")
+        twenty = ([VW_MUTE, BH_TRI, GH_TRI, CH_REC, RH_REC, WH_EARLY, DM_NORMSCALE, SV_SHADOWLOW, VS_ON, DR_AI]
+                  + ["%s: off" % k for k in TEN])
+        open(p, "w").write("\n".join(twenty) + "\n")
+        got = CE.witness_lines(p)
+        chk(sorted(got) == sorted(TEN) and all(got[k] == [ln for ln in twenty if ln.split(":")[0] == k] for k in TEN),
+            "C49 witness_lines puts each of 20 lines (one on, one off per kind) under its own kind only", repr(sorted(got)))
+    finally:
+        shutil.rmtree(tmp)
+    src = open(os.path.join(REPO, "patches", "patch_decayroute.py")).read()
+    lits = re.findall(r"'((?:%s): [^']*)'" % "|".join(sorted(TEN)), src)
+    chk("DECAY_ROUTE: off" in lits and any(l.startswith("DECAY_ROUTE: on mode=") for l in lits)
+        and all(l.startswith("DECAY_ROUTE: ") for l in lits),
+        "C49 patch_decayroute.py prints only `DECAY_ROUTE: off` / `DECAY_ROUTE: on mode=...` witness lines",
+        repr(sorted(set(lits)))[:300])
+    try:
+        import cai1_design as AI1                 # the registered designs; imported by the test only
+        import crd1_design as RD1
+        chk(AI1.witness_on("I5") == DR_I5 and AI1.witness_on("I4") == DR_I4
+            and all(RD1.dr_witness(a) == CRD1_DR[a] for a in RD1.ARMS) and sorted(RD1.ARMS) == sorted(CRD1_DR),
+            "C49 this test's DECAY_ROUTE lines == cai1_design.witness_on / crd1_design.dr_witness, byte for byte")
+    except Exception as ex:
+        chk(False, "C49 cai1_design / crd1_design import", "%s: %s" % (type(ex).__name__, ex))
+    import hashlib as _hl
+    plog = os.environ.get("DECAYROUTE_PROOF_LOG", "")
+    if plog and os.path.exists(plog):
+        raw = open(plog, "rb").read()
+        txt = raw.decode("utf-8", "replace").splitlines()
+        rr2 = dict((m, [ln.split("registered string   ", 1)[1] for ln in txt
+                        if ln.startswith("  PASS RR2 %s: ONE witness line == the registered string   " % m)])
+                   for m in ("shrink_only", "trace_only", "alpha_indep:5e-05"))
+        chk(_hl.sha256(raw).hexdigest() == "dc73dfbabf25fa01f2d0669a46fdb3202502e0e4a5851d4b4cce99146c8f25b1"
+            and rr2 == {"shrink_only": [DR_SR], "trace_only": [DR_TR], "alpha_indep:5e-05": [DR_I5]}
+            and not [ln for ln in txt if ln.startswith("DECAY_ROUTE")],
+            "C49 REAL proof log 5081090 (dc73dfba...): its RR2 real-run witnesses == DR_SR / DR_TR / DR_I5, and no line of it "
+            "starts with DECAY_ROUTE (every mention is indented)", repr(rr2)[:300])
+    else:
+        print("  SKIP C49 the real proof log (set DECAYROUTE_PROOF_LOG to a copy of $WS/runs/cdr1/proof_decayroute.log)")
+
+    print("C50 the registry: KINDS, DECAY_ROUTE_ARMS, MULTI_KIND's cai1 / crd1 entries, and the print lines")
+    chk(CE.KINDS[:9] == [(k, "%s: off" % k) for k in NINE] and CE.KINDS[9:] == [("DECAY_ROUTE", "DECAY_ROUTE: off")]
+        and getattr(CE, "KINDS_AT_304", None) == 9 and CE.KINDS_AT_269 == 8 and CE.KINDS_AT_251 == 6,
+        "C50 KINDS = 304's nine unchanged + DECAY_ROUTE, appended; KINDS_AT_304 == 9", repr(CE.KINDS[9:]))
+    dra = getattr(CE, "DECAY_ROUTE_ARMS", None) or {}
+    want_arms = dict([(("cai1", a), CAI1_DR[a]) for a in CAI1_DR] + [(("crd1", a), CRD1_DR[a]) for a in CRD1_DR])
+    chk(dra == want_arms and len(dra) == 14,
+        "C50 DECAY_ROUTE_ARMS == cai1's 8 + crd1's 6 arms, each with this test's line, byte for byte", repr(sorted(dra)))
+    mkr = dict((k, v) for k, v in CE.MULTI_KIND.items() if k[0] in ("cai1", "crd1"))
+    want_mk = dict([(("cai1", a), {"DECAY_ROUTE": CAI1_DR[a]}) for a in CAI1_DR]
+                   + [(("crd1", a), {"DECAY_ROUTE": CRD1_DR[a]}) for a in ("AIS", "AIL")])
+    chk(mkr == want_mk and len([k for k in CE.MULTI_KIND if k[0] not in ("cai1", "crd1")]) == 20,
+        "C50 MULTI_KIND gains exactly cai1's 8 + crd1's AIS / AIL (the two-axis arms), each registering exactly "
+        "DECAY_ROUTE; the 20 earlier entries are unchanged in number", repr(sorted(mkr)))
+    chk(sorted(CE.MULTI_ARGS) == [("caw2", "XL"), ("caw2", "XS")] and len(CE.ARGS_KINDS) == 2,
+        "C50 MULTI_ARGS and ARGS_KINDS are unchanged")
+    try:
+        chk(sorted(AI1.RUNS) == sorted(CAI1) and AI1.NJOBS == 32 and AI1.N_EXCLUSION_ROWS == 32 and AI1.WD_TOKEN == "0"
+            and all("ARGS: " + cai1_args(a, s) == AI1.args_line(a, s, "/home/s5014158/metaopt/runs/cai1")
+                    for a, s in AI1.RUNS),
+            "C50 this test's 32 cai1 runs == cai1_design.RUNS and their ARGS payloads == args_line, byte for byte")
+        chk(sorted((a, s) for a in RD1.ARMS for s in RD1.SEEDS) == sorted(CRD1) and RD1.NJOBS == 18
+            and all(crd1_args(a, s) == RD1.args_string(a, s, "/home/s5014158/metaopt/runs/crd1")
+                    for a in RD1.ARMS for s in RD1.SEEDS),
+            "C50 this test's 18 crd1 runs == crd1_design's arms x seeds and their ARGS payloads == args_string")
+        chk(sorted(a for a in RD1.ARMS if RD1.args_deviating_kinds(a)) == ["AIL", "AIS"]
+            and all(RD1.args_deviating_kinds(a) == ("ARGS_WD_BASE",) for a in ("AIS", "AIL"))
+            and sorted(a for _b, a in mkr if _b == "crd1") == ["AIL", "AIS"],
+            "C50 MULTI_KIND's crd1 arms == the arms crd1_design names as ARGS-deviating (AIS / AIL, ARGS_WD_BASE only)")
+    except Exception as ex:
+        chk(False, "C50 the designs import and pin the fixture", "%s: %s" % (type(ex).__name__, ex))
+    # the sha256 of 304's module output (analysis/corpus_exclusions.py 4846f2e4...) on the same two fixtures, whole
+    SHA304 = {"wd5": "6f532634d02c0130cf33d0187f705382a28570f87bc189fe047ec4880db653ec", "all": "b30fa47bc3909fa1252cda45d66b967fce5b08946198f6d571196bcc581b4a3f"}
+    for tag, b in [("wd5", wd5_batch()), ("all", merge5(*ALL_308))]:
+        rc, out = run_check(*b[:3], args=b[3], cells=b[4])
+        kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(L308S))
+        chk(rc == 0 and _hl.sha256(kept.encode()).hexdigest() == SHA304[tag]
+            and len(line_of(out, L308)) == 1 and len(line_of(out, LDR)) == 1 and line_of(out, L304) == [L304_TEXT]
+            and line_of(out, LDR)[0].startswith(LDR + ": 0 listed runs"),
+            "C50 on the %s fixture `--check --runs` gains exactly the TWO 308 lines (decay-route 0 runs); every other byte "
+            "== 304's module output; 304's `kinds scanned` line unchanged" % tag, _hl.sha256(kept.encode()).hexdigest()[:16])
+    l5, c5, g5, a5, e5 = merge5(cmo_batch())
+    rc, out = run_check(l5, c5, g5, args=a5, cells=e5, with_runs=False)
+    chk(rc == 0 and _hl.sha256(out.encode()).hexdigest()
+        == "8e67462ac2950669b206eacdfbe6f3cdf4b6790f448401d29b62a7663d7e121b",
+        "C50 without --runs nothing changes: cmo1's no-runs output == 284's / 294's / 304's module output, byte for byte")
+    for tag, src, msg in [
+            ("a", 'DECAY_ROUTE_ARMS[("crd1", "SRS")] = "DECAY_ROUTE: off"', "is not a well-formed DECAY_ROUTE ON line"),
+            ("b", 'DECAY_ROUTE_ARMS[("crd1", "SRS")] = "DECAY_MASK: on base=SGDm wd=0.1"',
+             "is not a well-formed DECAY_ROUTE ON line"),
+            ("c", 'MULTI_KIND[("crd1", "AIS")] = {"DECAY_ROUTE": DECAY_ROUTE_ARMS[("cai1", "chI5")]}',
+             "disagrees with DECAY_ROUTE_ARMS")]:
+        rc, out = run_check(*merge5(cmo_batch())[:3], args=cmo_batch()[3], cells=cmo_batch()[4], with_runs=False,
+                            module_append=src)
+        chk(rc == 1 and any("DECAY_ROUTE" in f and msg in f for f in fails(out)),
+            "C50%s a malformed DECAY_ROUTE registry entry FAILs without --runs, named with %r" % (tag, msg), show(out))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)
