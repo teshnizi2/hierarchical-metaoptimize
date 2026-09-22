@@ -659,3 +659,37 @@ SHRINKING under α-independent decay (rotational equilibrium), stated before any
 (1711.05101) for the form and Kosson et al. (2510.19093) for the known standard-vs-independent contrast.
 *Provenance: every id above is the arXiv id in a URL the search engine returned; 2510.15262 and 2512.08217 were opened on
 their abstract pages this sweep; the rest are on file with their earlier provenance.*
+
+---
+
+## Sweep 2026-09-22 — tuning-protocol fairness and LOCATING each grain's optimum before comparing (CORRECTIONS 313, batch `crt2`, Track B)
+
+*Brief targeted check before registering the retune past `crt1`'s grid edge. arXiv abstract pages and one ar5iv HTML
+page only; no `.pdf` fetched, nothing downloaded.* **Queries / pages:** (1) arXiv:1910.05446 abstract; (2) its ar5iv
+HTML, asked whether search spaces were checked against their boundaries; (3) arXiv:1910.11758 abstract; (4)
+arXiv:2007.01547 abstract; (5) arXiv:2306.07179 abstract; (6) web search "hypergradient learned learning rate
+per-parameter vs scalar initial learning rate sensitivity re-tuned comparison meta step size".
+
+**Found:**
+* Choi, Shallue, Nado, Lee, Maddison, Dahl, *On Empirical Comparisons of Optimizers for Deep Learning*
+  (arXiv:1910.05446) — the hyperparameter search space can decide an optimizer ranking, and restricted search spaces
+  break the inclusion relations between optimizers. Their Section 4 reports checking that every optimizer's optimal
+  hyperparameters sat away from the search-space boundaries (ar5iv HTML). **USED IN THE DESIGN**: `crt2`'s `located`
+  criterion (a selection at a grid edge or held by the ceiling is NOT LOCATED) is this check, made a registered state
+  per grain. The same grid for every grain follows their fairness argument.
+* Sivaprasad, Mai, Vogels, Jaggi, Fleuret (arXiv:1910.11758, ICML 2020), and Schmidt, Schneider, Hennig
+  (arXiv:2007.01547) — already on file (crt1 sweep): rankings depend on the tuning protocol and budget. **CITED, not
+  claimed.**
+* Dahl et al., *Benchmarking Neural Network Training Algorithms* (AlgoPerf, arXiv:2306.07179) — names fair
+  hyperparameter comparison as one of three open problems in comparing training algorithms. **ADJACENT**: motivates an
+  equal, pre-registered tuning protocol per grain. It does not test learned step-size grains.
+* The search (6) returned the hypergradient literature (e.g. Baydin et al., arXiv:1703.04782, by search summary only):
+  hypergradient adaptation is reported to REDUCE sensitivity to the initial learning rate. `crt1` found the opposite for
+  the partitions at this cell (their bulk step sizes stayed at alpha0, 300.3; +3.5 pp from alpha0 1e-3 to 1e-2).
+  **ADJACENT**, recorded as a contrast rather than a claim.
+
+**Verdict:** nothing found tests whether a scalar-vs-partition ranking of meta-learned step sizes survives per-grain
+tuning that brackets each grain's optimum. The protocol points are Choi et al.'s and Sivaprasad et al.'s and must be
+cited. The batch is not shrunk on prior-art grounds.
+*Provenance: every id above is from an arXiv URL opened this sweep (1910.05446, 1910.11758, 2007.01547, 2306.07179) or
+returned by the search engine (1703.04782, not opened).*

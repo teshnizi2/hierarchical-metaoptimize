@@ -74,3 +74,5 @@ cvl1-
 crd1-
 # cycle 5 (CORRECTIONS 306): cai1 registered by Track F2, not yet submitted
 cai1-
+# cycle 6 (CORRECTIONS 313): crt2- registered (the retune past crt1's grid edge); protected before submission
+crt2-
