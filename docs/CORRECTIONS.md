@@ -38616,6 +38616,23 @@ error, not a decision, and it is recorded here rather than left out. No other co
   and only with `python3 analysis/cGW1_auditwd_score.py $WS/runs` at 40/40 RUN_DONE.
 * **GPU used by this entry's registration: ZERO.** Batch expected 29.3 GPU-h, hard bound 80.
 
+### 291.11 RULE 20 AT FULL COVERAGE — PASS (40 / 40 started)
+
+`bash bin/cGW1_rule20.sh` from `~/stage_cgw1` at **04:05:13Z**, after the last of the 40 runs had started (04:04:44Z);
+log `~/stage_cgw1_rule20_full.log`. `analysis/argsline_guard.py` (sha `81cea8b5…`, unedited):
+* **batch-consistency** (`--vary seed --vary run-name --vary weight-decay-base --vary stepsize-groups`, `--strict`):
+  **40 clean, 0 with repeated flags or design mismatch, 0 without an ARGS line — PASS**;
+* **per-run**, each run pinned to its OWN rung's decay, its OWN grain, its seed (checked against the rung's registered
+  seeds), save directory and run name, 20 flags each: **40 checked, 0 violations**;
+* **coverage read from the runs' own ARGS lines:** `--weight-decay-base` 0.1 ×12, 1e-2 ×12, 5e-4 ×16;
+  `--stepsize-groups` chunk777 / nodewise / scalar / layerwise ×10 each — exactly the registered table;
+* **ENV half** (`analysis/cgw1_rule20_envaudit.py`): ONE distinct ENV line ×40 (PROBE=5, the box, AUGMENT=1, no
+  schedule; PROBE_DIR each run's own), no PROBE_TENSOR line, no hold / mask witness printed, NODE headers match,
+  **40 × NVIDIA L4 — PASS**.
+At that poll: 23 COMPLETED (ExitCode 0:0), 17 RUNNING. No number from any run was opened by this check or by this entry.
+`cgw1-` added to `bin/PROTECTED.txt`. **Still owed at landing:** the scorer at 40/40 RUN_DONE, the 28 ARGS_WD_BASE
+exclusion rows, the ingest, and the licensed sentences for the TMLR draft by the FINAL's tokens only.
+
 ## 292. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO NUMBER.**  It applies the hostile area chair's corrections to `docs/ICML-PLAN.md` and fixes the campaign's name for its own weight decay in four forward-looking documents.  **No level, bar, state, contrast, branch word, stamp or licence CONTENT changes; no registered scorer token, stamp or CORRECTIONS text is edited.**  The chair's verdict is recorded, not contested: **no ICML candidate is an accept as planned.**]** — **THE ICML PLAN NOW LEADS WITH STEP 0 + THE AdamW GATE + G3, SCORES DOMINANCE BY `DOM_C`, AND CARRIES TWO NEW DIRECT THREATS; AND FROM THIS ENTRY ON THE HARNESS'S DECAY IS CALLED "α-SCALED", NEVER "COUPLED".**
 
 ### 292.1 Why this entry exists
