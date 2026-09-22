@@ -38203,6 +38203,160 @@ Next free number: **288**.
 
 Next free number: **289**.
 
+## 289. STEP 0 (TRACK 0, ZERO GPU) — **[LED WITH THE BOUND: **DESCRIPTIVE ONLY.  THIS ENTRY REGISTERED NOTHING, GATED NOTHING, AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It reads only committed probe records and raw `.out` files (498 probe runs, 360,480 records); no noise floor is computed, so `corpus_exclusions.filter_rows` is not needed and not called.  The ONE thing it changes is `docs/ICML-PLAN.md`'s reading of C1 and of the Step 0 gate.]** — **THE REGISTERED LEAD-LAG TEST (`DOM_C` ONSET vs THE β TURN) CANNOT FIND A LEAD BY CONSTRUCTION, AND THAT IS DISCLOSED HERE AS A FINDING ABOUT THE TEST.  ON THE FAIR EVENT — THE SAME-SEED TEST GAP TO A HEALTHY PARTNER — THE ACCURACY DEFICIT OPENS 700-1,700 STEPS BEFORE THE β TURN ON 15 / 15 PAIRS (0.5 pp, sustained) WHILE β IS STILL IDENTICAL IN BOTH ARMS, AND BEFORE ANY `DOM_C` RECORD BY 1,100-2,100 STEPS.  THE DECAY DOSE ACTS FIRST; VOTE CAPTURE COMES AFTER.  C1's CAUSAL "VOTE CAPTURE COLLAPSES TRAINING" FRAMING IS UNSUPPORTED — UNSURE, LEANING AGAINST.  AND EARLY N_eff DOES NOT SEPARATE COLLAPSING FROM HEALTHY RUNS, SO THE PLAN'S OWN 1.8 SOFT GATE IS MET: THE EARLY-DIAGNOSTIC CLAIM IS DEAD IN ITS PLANNED FORM.**
+
+### 289.1 What ran, and what binds the numbers
+
+* **Script** `analysis/c289_step0_zero_gpu.py`, sha256 **`a379e3c3a2a91dd408866bc026b9c290bae8223dfec2805abd603db01c3544c4`**;
+  **output** `results/c289_step0_zero_gpu.txt`, sha256 **`7b8ebdf6de7a076231ff27152dc36272f093b2e86d922ded766944e1832aa9d3`**,
+  whose own line 2 prints the script sha above (they match: the committed output is the committed script's output).
+  Registered core read through, not edited: `analysis/cCV0_carrier_vote_core.py` sha256 `0754ca84…c5e6` (256.3).
+  Input binding printed on line 5: combined sha256 of (run name, probe.jsonl sha) over the 498 runs =
+  `8e619f887f66976ef484e8d284daf122ac02dbdf69af2a8179fc28caa118d96a`.  Run time ≈ 38 s, Mac, stdlib only.
+* **Selftest PASS** before anything else is printed: the 256.3 calibration `DOM_C` per run (0.820 / 0.784 / 0.810 /
+  0.806 / 0.786 / 0.806 / 0.814 / 0.816 / 0.820, pooled 0.8069) and 265's `cct1` pooled `DOM_C` 0.0000 / TOP3_C 0.6940
+  are re-derived through the registered core on the same records; N_eff arithmetic on synthetic vectors.
+* **History, disclosed.** A first version of this script and output were left uncommitted when an API overload killed the
+  previous cycle; that output was STALE (its printed sha no longer matched the script and it lacked B1).  Both are
+  replaced, not amended: the verifier's V1 changed section B (289.3-289.5), a second pass fixed three bugs found by
+  reading the new output (an unwarmed-up SHARE_C threshold that fired at step 0; a β-divergence test that fired at
+  step 0 on `cmo1`, whose W0 partner sits a constant 1.0004e-3 nat off from step 0 — now offset-corrected and printed;
+  a pooled line that counted `cwd3` `k01` twice — now one partner per collapsing run, n = 15), and a comment in section A
+  that repeated 293's V3 error was corrected to 293's wording.  Sections A and C are byte-identical to a run of the uncommitted script
+  as found, apart from C's new per-run N_eff line.
+
+### 289.2 (A) The realised per-step shrink α·κ (1.5a)
+
+The harness's base update is `delta = a*(m + wd*w)`, so one step multiplies w by (1 − a·wd), a = exp(β) the learned
+step size; no momentum amplification.  Peaks are per seed; κ = `--weight-decay-base`.
+
+| arm | κ | state | peak a·κ per seed (epoch) | ep 10-15 median | ep 15-20 median |
+|---|---|---|---|---|---|
+| `cwd5` `k01W1` | 0.1 | COLLAPSED | **5.53e-4 / 5.56e-4 / 5.45e-4** (17.4 / 17.4 / 17.2) | 4.94e-5 | 3.03e-4 |
+| `cwd5` `k01W2` | 1e-2 | healthy | median 1.64e-4 | | |
+| `cwd5` `k01W3` | 1e-3 | healthy | median 3.37e-5 | | |
+| `cwd5` `k01W4` | 5e-4 | healthy | 2.43e-5 / 2.40e-5 / 2.50e-5 (89.6 / 62.4 / 73.6) | | |
+| `cmo1` `k01` / `M9k01` | 0.1 | COLLAPSED | medians 5.50e-4 / 5.45e-4 | | |
+| `ctd1` `sc` | 0.1 | COLLAPSED | median 5.45e-4 | | |
+| **`cct1` `k01` (CIFAR-10)** | 0.1 | **healthy** | **4.67e-4 / 4.72e-4 / 4.86e-4** (17.2 / 17.0 / 17.2) | | |
+| `cau1` `m6` / `m6t` (AdamW base, CIFAR-10) | 0.1 | healthy | medians 4.99e-5 / 3.00e-5 | | |
+
+* **Against standard recipes** (lr·wd at peak lr; the sources are the local arXiv texts the script cites, re-checked by
+  grep at the cited lines this cycle; the ResNet-20 column parse and its μ 0.9 stay **UNSURE**, as the script says):
+  the largest small-batch raw shrink is 1.00e-4 (AdamW lr 1e-3, wd 0.1); the largest small-batch momentum-amplified
+  one is 5.00e-4 (e.g. CIFAR SGD lr 0.1, wd 5e-4, μ 0.9: lr·wd/(1−μ)); large-batch amplified reaches 4.8e-3.  The collapse's
+  peak dose is **+1.74 log10 above PyTorch's AdamW default, +0.74 above the largest small-batch raw recipe, +0.04 above
+  the largest small-batch amplified one, −0.94 below the large-batch amplified maximum.**  Whether the harness's
+  un-amplified a·κ should be compared with a recipe's raw or amplified shrink is **UNSURE**; both are printed.
+* **Time-matched** at `k01W1`'s own peak record (same seed, same step): s148 at step 8,600, β = −5.212 in every rung,
+  W1 5.45e-4 vs W4 2.72e-6 — ×200, exactly κ's ratio at equal β (on s146/s147 W1 has already turned by its peak
+  record, 5.53e-4 vs 3.01e-6).
+* **The dose is not sufficient on its own:** `cct1` `k01` carries the same peak dose (4.7e-4) on CIFAR-10 and does not
+  collapse.  The AdamW CIFAR-10 cells (`cau1`) run an order of magnitude lower (3-5e-5) than the collapsing SGDm cells,
+  so "κ 0.1 on SGDm" and "κ 0.1 on AdamW" are **not the same dose** — the question 1.5a asked.
+
+### 289.3 (B0) THE REGISTERED LEAD-LAG TEST IS BIASED TOWARD "LAG" BY CONSTRUCTION — a finding about the test
+
+`DOM_C` (256.3) is true on a record only if `sign(Σ_C L) == s`, the APPLIED shared sign, **and** |Σ_C L| > Σ_rest |L|.
+Through the saturated early climb the applied sign is s = −1 (the vote pushes β up) on every record, while from
+~5,000 steps on the carriers' summed term is positive (they push β down).  On those records `DOM_C` is false by
+definition, whatever the carriers' magnitude, so it can only become true after s flips — i.e. after the very turn it is
+being timed against.  The counts (39 unmasked COLLAPSED scalar runs, every quotable batch; TURN = first record with
+s = +1):
+
+* **3,392 pre-TURN records; s = −1 on all 3,392; the carriers oppose s on 1,361; `DOM_C` is even ADMISSIBLE (the
+  carriers' sign equals s) on 2,031, and the last admissible record is at step 4,800-5,300** — from step 4,900-5,400 to
+  the TURN (8,600-8,700) the carriers oppose s on **every** record.  `DOM_C` true pre-TURN: **0**.
+* Healthy runs (42): 3,875 pre-TURN records, `DOM_C` true on 0 — the statistic is silent before the turn in both classes.
+
+So section B's "pre-EXIT(0.1) `DOM_C` share 0.000" and its LAG column (`Dc` − EXIT(0.1) = +100..+500 steps; first
+`DOM_C` record 8,900-9,200) are **near-guaranteed by the definition and carry no information about cause.**  The registered
+definition is kept unchanged (RULE 16); the output now says so at the point of use.
+
+**What is NOT an artefact.** The sign-FREE analogue MAG_C = |Σ_C L| > Σ_rest |L| (descriptive, not registered) is
+also true on **0** pre-TURN records and first holds **+200..+500 steps after** the TURN on all 39 runs.  So even with
+the sign clause removed, the carriers' magnitude does not exceed the rest's before the turn.  At the turn itself the
+carriers ARE pivotal in the weaker net-sum sense: B2's PIV (the carriers set s against the rest's NET sum) equals the
+down-vote rate on every turn-window record of the collapsing runs (0.605 / 0.605 at 8,500-9,000 steps), while in the
+masked healthy arms the turn comes from the rest (Rdn ≈ sdn, carriers' share ≤ 0.002).  That is the strongest pro-C1
+fact here, and it is about who tips the TURN, not about what starts the collapse.
+
+### 289.4 (B1) THE FAIR EVENT: same-seed divergence from a healthy partner
+
+The earlier B1 event "FALL" (first epoch after the TEST maximum with TEST < 0.9·max) is **undefined on 39 / 39** collapsed
+runs — they never fall; they climb slowly and plateau near 23 % — and is **dropped**.  The collapse is a failure to
+learn, so its accuracy onset is when the collapsing arm starts to trail a same-seed arm that differs only in κ or in
+the decay mask.  GAP(e) = TEST_partner − TEST_collapsing at epoch e (ends at step 500·(e+1)); G_t = first epoch with
+GAP ≥ t that stays ≥ t through epoch 49.  Pooled over ONE partner per collapsing run (`cwd5` W1 vs W4; `cmo1` k01 vs
+W0k01; `cwd3` k01 vs CARWD0; `cwd4` k01 vs CARWD0; `cwd1` k01 vs k01NWD; 15 pairs):
+
+| t (pp) | G_t end-step | G_t − TURN | before TURN | before first `DOM_C` record | a·κ of the collapsing arm at G_t |
+|---|---|---|---|---|---|
+| **0.5** | 7,000-8,000 | **−1,700..−700** | **15 / 15** | **15 / 15** (by 1,100-2,100) | 1.10e-4 .. 2.99e-4 |
+| **1** | 8,000-9,000 | −700..+300 | 14 / 15 | 14 / 15 (one tie) | |
+| 2 | 8,500-9,000 | −200..+300 | 11 / 15 | 12 / 15 | |
+| 5 | 9,500-10,000 | +800..+1,300 | 0 / 15 | 0 / 15 | |
+
+* **β is identical across the pair until the divergence**: BDIV (|Δβ| > 1e-3 nat beyond the step-0 offset) is at
+  8,600-8,700, at or one record before the TURN; G_0.5 precedes it on 15 / 15.  So the early accuracy deficit cannot come
+  from the vote or from β; it comes from the decay term acting on the weights at the same learned α.
+* **`cwd5` W1 vs W4 (the verifier's pair) reproduces exactly:** GAP 0.7 / 0.8 / 0.7 pp at epoch 14; G_0.5 at epoch 14 on
+  all three seeds (step 7,500, a·κ 1.81e-4); G_2 at epoch 16 (step 8,500, a·κ 4.93e-4) on all three; TURN 8,700 ×3;
+  first `DOM_C` 9,200 / 9,000 / 9,000.
+* **Null** (12 same-seed pairs of two HEALTHY arms: `cwd5` W2/W3 vs W4, `cwd3` CARWD0 vs NWD, `cwd4` CARWD0 vs TWOWD0):
+  max |GAP| over epochs 0-16 is **0.19-1.30 pp**, and **no null pair sustains 0.5 pp before epoch 41**.  So a single-epoch
+  touch of 0.5-1 pp is within the null; the SUSTAINED crossing is what separates, which is why G_t, not the touch g_t,
+  is the pooled event.  (The null pairs are not matched in κ-difference to the test pairs; this is orientation, not a
+  registered floor.)
+* **SHARE_C before the turn (B1b).** The collapsing arm's carrier share rises steadily through the climb — run medians
+  0.002-0.003 (5.0-5.5k steps) → 0.057-0.060 (6.5-7.0k) → 0.174-0.184 (7.5-8.0k) → 0.283-0.306 (8.0-8.5k); first record
+  ≥ 0.05 at 6,600-6,700, ≥ 0.10 at 7,100-7,200, ≥ 0.25 at 8,100, ≥ 0.50 only at 9,000-9,200 (after the TURN) — against
+  ≤ 0.001-0.003 for W4 (verifier's 7,000-8,500 figure: W1 0.174-0.184 vs W4 0.0006; a one-off spot-check gives W4
+  0.00059 / 0.00064 / 0.00061).  In these pairs the carriers' term is largely their own decay term, so the rise is the
+  dose seen through the vote, not an independent lead indicator: it grows alongside the accuracy gap and cannot order
+  them.
+
+### 289.5 (C) N_eff — the plan's 1.8 soft gate is met
+
+Early N_eff (epochs [1,5), run medians): `cwd5` W1 **3.21 / 3.09 / 3.50** vs W4 **3.17 / 3.05 / 3.47** (same seeds) —
+**overlaps**; every paired cell (wd rungs, `cmo1` wd 0 vs 0.1, the three mask pairs, CIFAR-100 vs CIFAR-10) overlaps in
+the early window, and separates only from epochs 10-15, when the dose is already large.  Over all 171 scalar runs with
+per-tensor records the best single cut misclassifies **47 / 171** against a base rate of 53 / 171 (ResNet18_c100: 36 / 87).
+`docs/ICML-PLAN.md` Phase 0 stated: "If early N_eff does not separate collapsing from healthy runs, the diagnostic
+contribution (1.8) is dead."  **It does not separate; 1.8's early-diagnostic form is dead** (a late N_eff is not a
+prediction, and is not claimed).
+
+### 289.6 What this does to C1 — how strongly
+
+* **Unsupported, not refuted.** No run here intervenes on the vote while holding the dose, so capture is not shown to be
+  irrelevant.  But every observational ordering available puts the decay's effect on accuracy **first**: 0.5 pp
+  sustained, 700-1,700 steps before the TURN and 1,100-2,100 before the first `DOM_C` record, on 15 / 15 pairs, with β
+  identical in both arms.  On ICML-PLAN 1.19's own stated rule ("if capture LAGS the collapse, it is a symptom and C1's
+  causal framing dies") the causal framing **dies as a cause-first claim**.  Verdict: **UNSURE, leaning against** C1's
+  thesis sentence "a few normalisation gains capture that vote and collapse training".
+* **What survives, descriptively:** decay dose → early accuracy deficit → a carrier-PIVOTAL turn (net-sum sense) → vote
+  capture (`DOM_C`, then MAG_C) → β driven to the −15 floor (FLOOR 18,500-18,600) → the plateau.  Capture may be the
+  LOCK-IN stage (the floor freezes learning), which is a mechanism claim about the terminal state, not about onset.
+  The same dose on CIFAR-10 (`cct1`) does not collapse, so "dose alone" is not a sufficient story either.
+* **What would decide it** (not registered; UNSURE which is cheapest): an intervention that holds the vote while the dose
+  runs — e.g. the existing `BETA_HOLD` patch (237) replaying the healthy partner's β on the κ 0.1 scalar arm — asks
+  whether the collapse still happens when the turn cannot occur.
+* **Gate consequence** (recorded in `docs/ICML-PLAN.md` §4): the gate's Step 0 clause ("Step 0's lead-lag does not show
+  capture lagging the collapse") is **NOT MET** on the fair event, and the registered `DOM_C` lead-lag is declared
+  uninformative.  Autopilot decision: C1 cannot continue as a causal "vote capture" paper on the Phase 1 gate; Step 1
+  (the standard-recipe cell, Track 1's registration) still decides "hazard vs corner case" for C2/C4 and for a
+  re-scoped, descriptive C1, and nothing in this entry edits Track 1's design.
+
+### 289.7 Discipline
+
+Files written: `analysis/c289_step0_zero_gpu.py` (new, unregistered, descriptive), `results/c289_step0_zero_gpu.txt`,
+`docs/ICML-PLAN.md`, `docs/CORRECTIONS.md`.  No registered file edited (RULE 16; `cCV0_carrier_vote_core.py` and
+`corpus_exclusions.py` untouched); other tracks' uncommitted files (`cgw1_*`, `cGW1_*`) left as found.  Prior art: this
+entry tests a claim, it registers no new design; the threats it bears on (Defazio §6.1, He et al. §3.1, Wu et al.) are
+292's, unchanged.  **Cost: ZERO GPU-hours; no Slurm job, no cluster command of any kind; `alice` NOT contacted; nothing
+under `paper/` read or touched; no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.**
+Inserted before 292 so the file stays in numeric order; 290-291 remain the concurrent tracks'.
+
 ## 292. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO NUMBER.**  It applies the hostile area chair's corrections to `docs/ICML-PLAN.md` and fixes the campaign's name for its own weight decay in four forward-looking documents.  **No level, bar, state, contrast, branch word, stamp or licence CONTENT changes; no registered scorer token, stamp or CORRECTIONS text is edited.**  The chair's verdict is recorded, not contested: **no ICML candidate is an accept as planned.**]** — **THE ICML PLAN NOW LEADS WITH STEP 0 + THE AdamW GATE + G3, SCORES DOMINANCE BY `DOM_C`, AND CARRIES TWO NEW DIRECT THREATS; AND FROM THIS ENTRY ON THE HARNESS'S DECAY IS CALLED "α-SCALED", NEVER "COUPLED".**
 
 ### 292.1 Why this entry exists
