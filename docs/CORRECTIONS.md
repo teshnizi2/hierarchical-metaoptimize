@@ -40193,6 +40193,151 @@ witness of an unknown kind FAILs `--check`, and an unknown ON line is not seen b
 a code gap for a Track C entry (as 284 / 294 were), **reported, not fixed here**.  GPU: **0.30 GPU-h** (two proof jobs,
 9 min each on L4).  `alice` was not contacted; nothing under `paper/` was read; nothing was downloaded.
 
-## 303. RESERVED — Track D: the 1.14 validation-split batch registration. Placeholder; replaced in place by its track.
+## 303. TRACK D (registration) — **`cvl1` REGISTERED, NOT SUBMITTED: DO THE AUDIT'S RANKINGS, REPORTED ON TEST, HOLD ON A HELD-OUT VALIDATION SPLIT — AND WOULD SELECTING ON VALIDATION HAVE PICKED THE SAME CONFIGURATION?  `cgw1`'s CELL VERBATIM AT wd 0.1 AND 5e-4, FOUR GRAINS, SEEDS {184..187}, `VAL_SPLIT=5000:302` ON EVERY RUN; 8 ARMS, 32 JOBS, ≈21.7 GPU-h EXPECTED, 64 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, TWO RUNGS.**  (2) **`MS-ALPHA0-NOT-RESELECTED`: the one core-cell hyperparameter known to be chosen on test (ms 1e-4, 302.1) is NOT re-chosen here**; this batch re-reads the audit's RANKINGS on validation, it does not redo the audit's TUNING on validation (that is an ms ladder; Track B's `crt1`, 300, retunes ms at 5e-4 on test).  (3) **`TRAIN-45K`: every model trains on 45,000 images and 450 steps per epoch**, so in-batch TEST levels are not `cgw1`'s and are compared with them only through non-gating stamps.  (4) **`ONE-SPLIT`**: one fixed 5,000-image split; split-to-split variance is not measured.  (5) **`VAL-DIFFERS-UNRESOLVED` is the likeliest single outcome BY CONSTRUCTION** (prior 0.45): the state bands are 0.15–0.30 pp wide and `cgw1`'s D_W1 (+0.37) sits near the SURVIVES edge, so one reader can cross it on noise; that token licenses NO sentence either way.  (6) ALPHA-INDEPENDENT-DECAY-NOT-TESTED; every VANISHES / TIES reading is a BOUND.  All are printed on every FINAL.]**
+
+### 303.1 Question, and why it is worth GPU
+
+The TMLR paper's rewritten headline rests on ONE cell's TEST readings (`cgw1`, 296): D_W1 = chunk777 − nodewise
++0.3693 at wd 0.1 SURVIVES, D_W4 +0.2410 at 5e-4 UNDECIDED, scalar above both partitions at 5e-4 by 2.559 / 2.800 pp
+(SCALAR-BEATS-BEST).  Every number the audit reports is a test number, one of the cell's hyperparameters was selected
+on test (302.1), and the harness has had no held-out split (135.1).  A TMLR referee's B10 question — "is anything here
+an artefact of reading and choosing on the test set?" — is answerable now that `PATCH_VALSPLIT` exists (302): train
+on 45,000, read the SAME runs on test and on the 5,000 held out, and ask (a) whether each of the three readings is in
+the same registered state on both readers, and (b) whether the argmax configuration is the same on both.
+
+### 303.2 Prior art (sweep appended to `docs/PRIOR-ART.md`, dated 2026-09-22; abstract pages / search only)
+
+Queries and hits are recorded in the PRIOR-ART section.  Recht et al. (arXiv:1806.00451): rankings of MODEL FAMILIES
+with multi-point gaps transfer to a new CIFAR-10 test set; arXiv:2304.01910 (ICLR 2024): much seed-to-seed test-set
+variance on CIFAR-10 is finite-sample; Bouthillier et al. (arXiv:2103.03098): data sampling, init and hyperparameter
+choice move benchmark conclusions; Schmidt et al. (arXiv:2007.01547) already on file.  **Nothing found tests whether a
+sub-point partition ranking of a meta-learned step size, or a 2.6 pp scalar-over-partition gap, measured on test,
+holds on a held-out split.**  The literature predicts the big gap transfers and the small one may not, and that a
+5,000-image split is noisier than the 10,000-image test set — which is built into the reader (its own in-batch σ) and
+into the prior, not a reason to drop the batch.  Not shrunk on prior-art grounds; 32 runs is the task's ceiling.
+
+### 303.3 The cell, the seeds, the tree
+
+* **Cell:** `cgw1`'s ARGS lines VERBATIM (20 flags, same order: ResNet18 / CIFAR-10 / bs 100 / SGDm 0.99 / Lion 0.99 /
+  β2 0.9 / meta wd 0 / γ 1 / ms 1e-4 / α0 1e-3 / 100 ep), ENV AUGMENT=1, BETA_CLIP=−15:−2.3026, PROBE=5, plus ONE
+  `--export` item `VAL_SPLIT=5000:302`.  Axes: `--weight-decay-base` ∈ {0.1 (W1), 5e-4 (W4)} × `--stepsize-groups` ∈
+  {chunk777 (m 14,421), nodewise (14,420), scalar (1), layerwise (62)}.
+* **Seeds {184, 185, 186, 187} on every arm** (the assigned block 184–191; 188–191 unused), verified FREE: 0 corpus
+  rows carry any of 184–191 (max corpus seed 162); 0 `.out` ARGS lines under `$WS/runs` carry them; 0 `cvl1-*` in
+  sacct or squeue (guards 2–2f).  No seed may be added after any run is read (108.6a).
+* **Tree `$WS/harness_cvl1/cifar10`** (302.2): cgw1's bytes + `PATCH_VALSPLIT`; HF.py `4732b74a…` unpatched;
+  load_data `c8eb8385…`, train `8706d8c7…`; runner `run_cifar_cvl1.sh` `7e9b00bb…` (only the `cd` differs).
+  Guard 3g ties the batch to the passed proof log `d02a744c…` (82 / 0) by the tree's, the patch's, the unit test's
+  and the real-run driver's shas; guard 4f / 4e inherit the premise that the passed decay reaches the update bitwise at
+  0.1 and 5e-4 from `cwd5`'s bite log, by source identity of `SGDm_base_update`, as `cgw1` did (291.3).
+* **Every run must print the registered witness** `VAL_SPLIT: on dataset=CIFAR10 n_val=5000 n_train=45000 classes=10
+  per_class=500 split_seed=302 val_sha=7d3a1489…4f69bb0e train_sha=2733a990…6c1e5e91` (full shas in
+  `analysis/cvl1_design.py`, re-typed in `analysis/cvl1_rule20_envaudit.py`).
+* **Live check** (`analysis/cvl1_live_check.py`, CPU construction on the login node, no forward pass): all 8 arms
+  construct with the registered m and wd; 62 tensors, 11,173,962 parameters; the live manifest (920 bytes, sha
+  `66adcb31…`) is byte-identical to `cvl1_design.manifest_text()`.
+
+### 303.4 The registered decision (`analysis/cVL1_valsplit_score.py`, sha **`85c73e21…`**; design `946a119f…`)
+
+TEST plateau5 = mean of the `Epoch e … Test Accuracy` lines over epochs 95–99; VAL plateau5 = the same over the `VAL:`
+lines; both from each run's OWN `.out`.  σ_X = max(SIGMA_PRIOR, in-batch σ of reader X) (O2), with **SIGMA_PRIOR
+0.17818264951145454** (df 190, 34 cells, 227 rows) — `cgw1`'s definition re-derived through
+`corpus_exclusions.filter_rows` on the current corpus (3,383 rows, 268 exclusion rows → 3,115; `cgw1`'s 12 unlisted
+W1 rows now in the cell, df 178 → 190); the unfiltered value is 1.034333 (cgw1's wd-deviating rows join the cells), so
+the filter is load-bearing.  **The corpus_exclusions noise-floor DEMONSTRATION quoted, as every registration must:
+`SIGMA_R18ALL` 0.636566 (df 274)** — no bar reads it; the selftest prints the current value beside it.
+**Frozen bars, `cgw1`'s verbatim:** SURV 0.30, NULLBAR 0.15, POOL_EXCLUDE 0.5556, RES 2.0, HEALTH_MIN 85.0, DIVERGED
+2.0, BOXFREE_MAX 0.05.  Per reader and rung, `cgw1`'s `rung_state` (DIVERGED > UNHEALTHY > BOXBOUND > REVERSES >
+VANISHES > SURVIVES > UNDECIDED) on D = ch − nd; at W4, `cgw1`'s `scalar_of`.  **Three CLAIMS**, each read on both
+readers: W1, W4, SC.  Per claim SAME / FLIP ({SURVIVES, REVERSES} or {BEATS, BELOW}) / DIFF.  **Paired gap** per claim
+= contrast(VAL) − contrast(TEST) from the same runs, SE = s_δ·√(1/4+1/4) with s_δ the in-batch sd of each run's
+(VAL − TEST) plateau5 (df 24); RESOLVED at |gap| ≥ 0.30 AND > 2 SE.
+**Branch ladder (primary), first match:** `UNREADABLE-TEST` → `UNREADABLE-VAL` → `VAL-FLIPS` → `VAL-AGREES` (every
+claim SAME) → `VAL-SHIFTS` (a state differs AND a paired gap is resolved) → `VAL-DIFFERS-UNRESOLVED`.
+**Selection (co-reported):** argmax arm over the 8 configurations on each reader; `SELECT-SAME` | `SELECT-DIFFERS-
+RESOLVED` (the TEST regret of VAL's pick ≥ 0.30 and > 2 SE_TEST) | `SELECT-DIFFERS-UNRESOLVED`; per-rung best-grain
+stamps `SELECT-W1-SAME/-DIFFERS`, `SELECT-W4-…`.  **Stamps:** the seven bounds; σ source per reader; `GAP-RESOLVED-<c>`;
+`TEST-STATE-DIFFERS-FROM-CGW1-<c>` and `TEST-LEVEL-DIFFERS-FROM-CGW1-<arm>` (non-gating; cgw1's landed values are read
+once each, for stamps only); `BOX-BOUND-<scalar/layerwise arm>`.  **Harness gates (exit 3):** G-PROV (scorer, design, HF,
+the POST load_data / train shas), G-ARGS (20 flags, per arm), G-ENV, **G-VALSPLIT (exactly ONE registered witness)**,
+G-KIND (no other ON witness), **G-VAL (100 VAL lines, epochs 0–99 once each, each right after its Epoch line, n_val
+5000)**, G-STRUCT (**9,000** probe records, n_beta = m).  The FINAL line is the last line and carries every bound.
+
+**Selftest, driving the real `score()`:** **Mac 73 PASS / 0 FAIL / 1 SKIP** (F: no landed probe records there);
+**alice2 75 PASS / 0 FAIL / 0 SKIP** (inside dry run 2).  It covers the frozen floor through filter_rows, every bar
+edge, exhaustive reachability of the 6 primary tokens, 4,000-table totality, 16 harness breaks (wrong rung / grain,
+repeated flag, ENV, `VAL_SPLIT: off`, split seed 303, two witnesses, a DECAY_MASK witness, a missing VAL line, n_val
+4999, 10,000 probe records, wrong n_beta, provenance naming the UNPATCHED load_data, another scorer, an unregistered
+seed, a duplicate `.out`), O2 invariance (FINAL byte-identical with the real corpus, none, a missing path, invented
+rows), the documented one-argument invocation, and the landed `gn1` records passing as 10,000-record runs and FAILING
+this batch's 9,000-record G-STRUCT.  The ENV half was also run on 32 synthetic `.out` files with one planted
+`VAL_SPLIT: off`: exactly 1 violation, FAIL, as it should.
+
+### 303.5 Predictions (written before any run exists; PRIORS, UNSURE)
+
+Levels (plateau5, TEST; VAL predicted within ±0.8 pp of TEST): chW1 91.6–92.7, ndW1 91.2–92.3, k01W1 91.3–92.5,
+kLW1 92.0–93.0; chW4 86.6–88.4, ndW4 86.3–88.2, k01W4 89.5–90.9, kLW4 88.8–90.3 (cgw1's landed levels lowered
+0.2–0.6 pp for 45,000 training images).  **Disclosed:** chW4 / ndW4's predicted low edges sit within 3 pp of
+HEALTH_MIN 85 (a run-failure bar, not a floor; cgw1's partitions landed 2.7–2.9 above it); every predicted level is
+≥ 70 pp above chance and ≥ 6 pp below 100, so no contrast is floor- or ceiling-bounded (164.6).
+**Primary:** VAL-AGREES 0.30, VAL-SHIFTS 0.13, **VAL-DIFFERS-UNRESOLVED 0.45**, VAL-FLIPS 0.04, UNREADABLE 0.08.
+Per claim: SC SAME (BEATS on both) ≈ 0.85 — a 2.6 pp gap is ~10 SE even at a VAL σ of 0.3; W4 SAME (UNDECIDED on
+both) ≈ 0.5; W1 SAME ≈ 0.45 (D_W1's point estimate is near the +0.30 edge).  **Selection:** SELECT-SAME 0.75 (the
+TEST argmax is expected at kLW1, ~0.3 pp above chW1), DIFFERS-UNRESOLVED 0.22, DIFFERS-RESOLVED 0.03.
+**What each means for the TMLR paper:** AGREES — the three readings may be stated with "the same states hold on a
+held-out validation split (one cell, one split, ms not re-selected)"; SHIFTS — the moved claim is stated with both
+readings beside it; DIFFERS-UNRESOLVED — both states and intervals reported, no sentence either way; FLIPS — the flipped
+ranking may not be stated from test alone.  SELECT-DIFFERS-RESOLVED would add a sentence that test and validation
+selection disagree materially in this cell.
+
+### 303.6 Dry runs, read line by line
+
+* **dry 0** (`~/stage_cvl1_dry0`, a tar of the working tree before the registration commit; log `f5cba083…`, 206
+  lines): every guard passes (1b NOTE: no git); 32 composed lines, 0 failing; with run name, decay, grain and seed
+  masked the 32 lines collapse to **ONE**; the 32 (name, wd, grain, seed) rows are exactly the design's.  The scorer
+  was then changed (the paired-gap tokens `VAL-SHIFTS` / `VAL-DIFFERS-UNRESOLVED` replaced a single `VAL-DIFFERS`, and
+  the design's priors with it) BEFORE the registration commit, so dry 0 is superseded.
+* **dry 1** (`~/stage_cvl1`, `git archive 14e63ba -- analysis bin results patches tests`, paper/ excluded): **guard 1b
+  FAILED — my operator error**: zsh read `$C:analysis` as a path modifier, so the declared scorer sha was the empty
+  string's.  Nothing else failed.  Recorded, not hidden.
+* **dry 2** (same stage, correct `CVL1_REGISTERED_COMMIT` / `CVL1_SCORER_SHA256`; log `~/stage_cvl1_dry2.log`, sha
+  `783b6db8…`, 207 lines): **RC 0, 0 guard failures**; guard 1b PASSES on the declared commit and scorer sha; selftest
+  75 / 0 / 0; guards 1c1–1c4, 2–2f, 3, 3b, **3g**, 3f, 4f, 4c', 4e, 4, 4d, 4b3, 4g, 5, 5b, 9 pass; guard 6 "32 composed
+  command lines, 0 failed"; the 32 `sbatch` lines are **byte-identical to dry 0's** (sha of the lines `509c6943…`).
+  `bash bin/cVL1_rule20.sh` from the stage runs clean (0 runs: UNVERIFIED, as it must be before launch).
+
+### 303.7 Cost
+
+cgw1's per-grain L4 minutes at this cell (53 / 45 / 43 / 35 incl. start-up) × 0.9 for 450 of 500 steps + 1 min per run
+for 100 VAL passes → **21.65 GPU-h expected**; **hard bound WALL 2 h × 32 = 64 GPU-h**.  GPU used by this
+registration: **ZERO** (302's proof jobs, 0.30 GPU-h, are 302's).
+
+### 303.8 RULE 21, and the ONE submission (for the verifier; this track does NOT submit)
+
+Registration commit **`14e63bac7f4dee24e94611626811fc413fce546c`** pushed to `origin/master` (confirmed by `git branch
+-r --contains`); the scorer at that commit hashes **`85c73e21de04db48eae004467e8df54a440112126afe16cb1642846199996d7c`**.
+Stage `~/stage_cvl1` on alice2 = `git archive` of that commit (analysis/ bin/ results/ patches/ tests/ only).
+The only submitting form, run ONCE from the stage on alice2 after the verifier passes:
+
+    cd ~/stage_cvl1 && CVL1_REGISTERED_COMMIT=14e63bac7f4dee24e94611626811fc413fce546c \
+      CVL1_SCORER_SHA256=85c73e21de04db48eae004467e8df54a440112126afe16cb1642846199996d7c \
+      bash bin/cVL1_valsplit.sh --submit
+
+**32 jobs** `cvl1-<arm>-s<seed>`, partitions gpu-short,gpu-l4-24g, `--constraint=L4`, WALL 02:00:00.  RULE 20 at full
+coverage is owed once all 32 have started (`bash bin/cVL1_rule20.sh` from the stage); score with, and only with,
+`python3 analysis/cVL1_valsplit_score.py $WS/runs` at 32 / 32 RUN_DONE.
+
+### 303.9 Owed at landing, and discipline
+
+* **`corpus_exclusions.py` has no VAL_SPLIT kind** (302.5).  All 32 runs owe a `results/CORPUS-EXCLUSIONS.tsv` row
+  (they trained on 45,000 images, which no CSV column carries); the 16 W4 runs are two-axis (ON line + ARGS_WD_BASE).
+  The kind must be added by a Track C code-gap entry BEFORE the ingest; it is not added here.
+* `cvl1-` into the repo's `bin/PROTECTED.txt` (the launcher writes the stage copy's at submission).
+* Files: `analysis/cVL1_valsplit_score.py`, `analysis/cvl1_design.py`, `analysis/cvl1_live_check.py`,
+  `analysis/cvl1_rule20_envaudit.py`, `bin/cVL1_valsplit.sh`, `bin/cVL1_rule20.sh` (commit `14e63ba`); 302's patch,
+  tests, stage script and proof sbatch (commit `04ca2b5`).  RULE 16: no registered scorer and not
+  `argsline_guard.py` edited; `corpus_exclusions.py`, `docs/STATUS.md`, `docs/ICML-PLAN.md` not edited.  `alice` was
+  not contacted; nothing under `paper/` was read, listed or archived; nothing was downloaded; no `.pdf` fetched; no
+  notebook or Vercel URL opened; no job of another track was touched.
 
 Next free number after the reservations: **304**.
