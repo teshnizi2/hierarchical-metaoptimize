@@ -25,6 +25,21 @@ not top-3 membership; Prodigy is out of the gate; the conditional ceiling lowere
 citation added at 292 was checked on its arXiv abstract page (and, for the section-level claims, the arXiv/ar5iv HTML)
 before it was written. No level, bar, contrast, stamp or licence sentence moved.*
 
+***AMENDED 2026-09-22 at CORRECTIONS 297 (THE PATH DECISION, zero GPU, autopilot): THE GATE HAS RETURNED, AND IT CLOSES
+C1 ON BOTH HALVES.** Step 0's clause was not met (289), and Step 1 does not fire: `caw2` (295) lands
+`NO-COLLAPSE-CONTROL-DOSE-NOT-REACHED | M-COLLAPSE+L-NOGAP+A-NOGAP+X-NOGAP+K-COLLAPSED | ATTR-BASE-PROTECTS |
+GATE-DOES-NOT-FIRE` — the harness's standard AdamW + Adam does not collapse at `ResNet18_c100` (`G_A` −5.1053 pp = −9.75
+SE, NOGAP, a bound), the meta swap alone still collapses, the base swap alone does not (and cuts the realised shrink
+~50×), and the dose arm reached only `RHO_X` 0.0591 of the control's shrink, so immunity at the control's dose is
+UNDECIDED. G3 has landed too: `cgw1` (296) `AUDIT-UNDECIDED | SCALAR-BEATS-BEST | W1-SURVIVES+W2-SURVIVES+W4-UNDECIDED` —
+the count-matched sign survives in batch at 0.1 (+0.3693) and 1e-2 (+0.4533), is undecided at 5e-4 (+0.2410, ±2 SE
+[−0.0120, +0.4940]), and at 5e-4 plain scalar is above both partitions by 2.6–2.8 pp; W4's realised shrink is 115–883×
+below a standard recipe's, so the decay-artefact question is NOT settled. **By §4's own rule, C1 is dead: the campaign
+writes ONE paper, for TMLR — the count-matched audit with its headline rewritten, the denominator, and the collapse as a
+bounded configuration-conditional section (C2 merged into C4). No ICML submission is planned.** The ranked live queue is
+§4a below. Everything else in this file is kept as the history of the plan; where it disagrees with this paragraph,
+this paragraph wins.***
+
 > **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
 > is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`
 > ~588-657, the same form for every base optimiser), so the decay is **multiplied by the learned step size**
@@ -59,7 +74,10 @@ before it was written. No level, bar, contrast, stamp or licence sentence moved.
    (292 quoted the chair's "72.41 / 72.00"; 72.41 is the scalar's own level, not an audit arm) — so the audit's
    +0.56 pp may itself be a κ 0.1 artefact. **Between-batch only:** 72.4080 (`cwd5`, seeds 146-148, meta step 1e-3,
    α0 1e-6, κ 5e-4) and 72.054 (`gm2`, seeds 0-2, meta step 1e-4, α0 1e-3, κ 0.1) are DIFFERENT BATCHES, so "scalar
-   ties or beats the audit best" is orientation, not a contrast, until G3 puts both in one batch.)*
+   ties or beats the audit best" is orientation, not a contrast, until G3 puts both in one batch.)* *(297: G3 has put
+   them in one batch on the CIFAR-10 core cell — `cgw1`, 296: D at 5e-4 is UNDECIDED and scalar beats both partitions
+   by 2.6–2.8 pp, resolved, at the decay VALUE 5e-4 applied α-scaled. The audit goes to TMLR with its headline
+   rewritten; it is the campaign's one paper.)*
 2. **The one framing with a plausible ICML path** is a cross-method analysis paper: *"A step size shared across
    tensors is a magnitude-weighted vote; under step-size-scaled decay a few normalisation gains capture that vote, and
    whether finer granularity helps depends on the decay."* It is plausible **only if** the capture is shown in at
@@ -69,6 +87,8 @@ before it was written. No level, bar, contrast, stamp or licence sentence moved.
    vote-capture part of this sentence is unclaimed.)* *(289: Step 0 finds the decay dose acting BEFORE capture —
    the same-seed accuracy gap leads the β turn by 700-1,700 steps on 15 / 15 pairs — so "capture … collapses
    training" is unsupported as a causal claim (UNSURE, leaning against); §2 C1 and §4 carry the consequence.)*
+   *(297: CLOSED. Step 1 (`caw2`, 295) does not fire — at this cell the standard recipe does not collapse — so neither
+   condition of the gate holds, and the ICML line is not pursued.)*
 3. **The "parent's granularity result is a weight-decay artefact" claim is unsupported now and partly contradicted**
    by our own data (§3, C3). It is testable cheaply (≈28 GPU-h minimal) but must go through Dr Salehkaleybar first.
 4. **Honest ceiling:** even if every gate passes, the paper has no ImageNet-1k (impossible, `docs/DATASETS.md`) and no
@@ -281,9 +301,9 @@ Scores are my judgement: P = probability the experiments deliver an ICML-quality
 
 | Rank | Candidate | P(ICML-quality result) | Value | Cost (GPU-h) | P×V/C (relative) | Verdict |
 |---|---|---|---|---|---|---|
-| 1 | **C1 vote capture** | ~0.15 (gated on Step 0 + the AdamW cell; lowered at 292) — *289: Step 0's clause failed and the causal thesis is unsupported, so this figure now applies only to a re-scoped, descriptive C1 and is an upper bound (judgement, not re-estimated)* | 5 | ~430-480 + theory | **highest**, because Phase 1 is cheap and decisive | **PRIMARY** |
-| 2 | C2 absent the collapse, scalar ≥ layerwise | ~0.10 for ICML; ~0.7 for TMLR | 3 | ~180-200 | medium | **FALLBACK** (to TMLR, merged with C4 or standalone) |
-| 3 | C4 audit | ~0.05 ICML; 0.8 TMLR (STATUS) | 2 | ~20-25 (G3) | high for TMLR, n/a for ICML | ship to TMLR regardless, after G3 |
+| 1 | **C1 vote capture** | ~0.15 (gated on Step 0 + the AdamW cell; lowered at 292) — *289: Step 0's clause failed and the causal thesis is unsupported, so this figure now applies only to a re-scoped, descriptive C1 and is an upper bound (judgement, not re-estimated)* | 5 | ~430-480 + theory | **highest**, because Phase 1 is cheap and decisive | ~~PRIMARY~~ **CLOSED at 297** (Step 0 not met, 289; Step 1 does not fire, 295) |
+| 2 | C2 absent the collapse, scalar ≥ layerwise | ~0.10 for ICML; ~0.7 for TMLR | 3 | ~180-200 | medium | ~~FALLBACK~~ **MERGED INTO C4 at 297** (the collapse becomes the audit paper's bounded configuration-conditional section; not written standalone) |
+| 3 | C4 audit | ~0.05 ICML; 0.8 TMLR (STATUS) | 2 | ~20-25 (G3) | high for TMLR, n/a for ICML | **THE CAMPAIGN's ONE PAPER at 297** — G3 has landed (`cgw1`, 296); TMLR with the headline rewritten (CORRECTIONS 296.7-296.8, 297.2) |
 | 4 | C3 parent-conditional | not an ICML paper; ~0.3 that P1 even shows an interaction | 2 (high sensitivity) | 28-83 | low standalone | fold into C1 **only** with Saber's agreement |
 
 ### Phased plan
@@ -337,6 +357,8 @@ those entries — none of them had reached `origin/master` when this was written
   `cct1` the carriers were top-3 on 69 % of CIFAR-10 records with `DOM_C` = 0 on all 1,500 and no collapse (265), so
   top-3 can fire where nothing is captured. **If Step 1 does not fire, C1 is dead**: write C2 + C4 for TMLR and stop
   spending on ICML scope (1.10, 1.11, 1.13).
+  ***297: Step 1 did NOT fire (`caw2`, CORRECTIONS 295: `GATE-DOES-NOT-FIRE`). This rule is applied: C1 is dead; C2 is
+  merged into C4 for TMLR; 1.3, 1.9, 1.10, 1.11, 1.12 (at ICML scope) and 1.13 are stopped. 1.14 stays open, unranked.***
 - **G1 (cross-method) moves after the gate** and only if Step 1 fires: Baydin HD and Mechanic (adapters that can
   decrease the step size), with the same `DOM_C` criterion. **Prodigy is dropped from the gate**: a non-decreasing
   adapter is immune by construction (Defazio arXiv:2605.19095's framing), so it can only fail to fire; it stays in
@@ -358,6 +380,16 @@ LIMITS-PREP §5.5). **Calendar: ~7-9 weeks of experiments + ~3-4 weeks of writin
 late December 2026 at the earliest. Against an unverified late-January ICML 2027 deadline that is feasible but has
 little slack; the theory item and the ViT recipe are the schedule risks.
 
+### 4a. THE LIVE QUEUE (CORRECTIONS 297) — at most three, ranked; none registered or submitted
+
+Each needs its own registration (scorer before batch), a prior-art check first, and fresh seeds. Costs are ESTIMATES.
+
+| rank | experiment | question | cost | why it outranks the others |
+|---|---|---|---|---|
+| 1 | **G3b**: the audit's CIFAR-100 cell (`gc1` / `cdn1`: `ResNet18_c100`, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3) at κ {0.1 anchor, 5e-4} × {chunk771, nodewise, scalar, layerwise} × 4 seeds, realised shrink reported | Do `SCALAR-BEATS-BEST` and the count-matched sign hold on the audit's second dataset? The chunk771 arm at 5e-4 is also 1.16's denominator arm | 32 runs ≈ 26 GPU-h | the rewritten headline rests on ONE cell; this is the referee's first question and it folds in 1.16 |
+| 2 | **Retune at 5e-4 on the core cell** (1.18 applied to the audit): ResNet18 / CIFAR-10, κ 5e-4, meta step {3e-5, 1e-4, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact of hyperparameters chosen at 0.1? | 27 runs ≈ 20 GPU-h | it can REFUTE the new headline's strongest claim (B2), where G3b can only replicate it |
+| 3 | **1.20 short-horizon γ control** at the mechanism cell | Does a shortened hypergradient horizon without decay reproduce the collapse (T-C)? | 12 runs ≈ 8.4 GPU-h | the one live rival mechanism against the collapse section's causal sentences; 1.17 is largely decided by `cwd1` (271) |
+
 ---
 
 ## 5. The ceiling, stated plainly
@@ -372,6 +404,8 @@ little slack; the theory item and the ViT recipe are the schedule risks.
 - **With Phase 1 passing**, C1 is a credible ICML submission but still missing ImageNet-1k (impossible here) and,
   unless Reza unblocks TinyStories, a language model. The ViT arm and a toy-model theory are what substitute for
   them, following the Lobacheva (NeurIPS 2021) / Kosson (ICML 2024) precedent.
+- **297: the gate FAILED (289 + 295). The venue is TMLR, for ONE paper** (the audit with the collapse as a bounded
+  section); TMLR acceptance ≈ 0.6–0.7 after the rewrite, a judgement.
 - **Best realistic venue if the gate fails: TMLR**, with the audit (after G3) and the decay × granularity mechanism
   either merged or as two papers; ReScience/MLRC for the reproduction angle. The C3 question, whatever it returns,
   goes to Saber, not into a venue.

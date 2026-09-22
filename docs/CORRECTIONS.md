@@ -38904,3 +38904,582 @@ A temp layout: the module, the REAL TSV + the 18 planned rows of 294.4, the REAL
 ### 294.8 Discipline
 
 RULE 16: no registered scorer, design, launcher, patch, `analysis/argsline_guard.py`, `results/*.csv` or `results/*.tsv` edited; `caw2_design.py` is imported by the TEST only.  **ZERO GPU; no `sbatch` / `srun`; no job submitted or cancelled.  `alice` NOT CONTACTED**; `alice2` read only (`find` / `sha256sum` / `grep -c RUN_DONE` of the 27 `.out` names; nothing copied from it — the local copies already matched).  No accuracy line read.  Nothing downloaded; no `.pdf`; no licence; no notebook site or Vercel URL.  **`paper/`: one incident, disclosed.**  Building the first invariance trees, `git archive HEAD | tar -x` extracted the whole tree, `paper/` included, into scratch, and one command then ran `ls <scratch copy>/paper >/dev/null 2>&1` as an existence test.  Its output was discarded: **no file name under `paper/` was printed or seen, and no file was opened, read, staged or edited.**  Both trees were deleted at once and rebuilt with `git archive HEAD -- . ':(exclude)paper'`; the battery ran only on those.  `git add` named this entry's three paths only (the untracked `analysis/cgw1_attack_indep.py` belongs to another track and was not touched).  THIS ENTRY TOOK NUMBER **294**; NEXT FREE **295**.
+
+## 295. TRACK D (land) — **[LED WITH THE BOUNDS: (1) **THE DOSE WAS NOT REACHED, SO NOTHING IS DECIDED ABOUT IMMUNITY.**  The dose arm XS (AdamW + Adam at wd 1.0) peaked at a realised per-step shrink of **3.1923e-5**, against the control K01's **5.4054e-4**: `RHO_X` **0.0591**, against a registered bar of 0.5.  The bar is 8.5× above the registered `RHO_X` and 8.3× above even the worst seed pairing (0.0605).  The branch is therefore `NO-COLLAPSE-CONTROL-DOSE-NOT-REACHED`, **not** `…-PAIRING-IMMUNE-AT-CONTROL-DOSE`: whether AdamW + Adam would survive the control's dose is **undecided**.  (2) **EVERY `NOGAP` IS A BOUND** ("below the 10 pp bar"), never "the grains are equal" (164.6).  (3) **THE ATTRIBUTION CANNOT SEPARATE THE BASE FROM THE DOSE.**  `ATTR-BASE-PROTECTS` is printed beside `DOSE-L-BELOW`: in cell L the base swap removed the collapse AND cut the realised peak shrink to `RHO_L` **0.0202** (about 50× lower), and it also changed base momentum from 0.99 to 0.9 (AdamW's own β1).  This batch cannot tell "the AdamW base protects" apart from "the AdamW base never reaches the dangerous dose".  (4) **K01's and MS's late-window shrinks are the `BETA_CLIP` FLOOR** (3.0590e-8 = exp(−15)·0.1): bounds, not measurements.  (5) **ONE cell**: `ResNet18_c100` / CIFAR-100, 100 epochs, three seeds, α-scaled decay only; wd 1e-2, a Lion base and α-independent decay were not run; wd 1.0 is a DOSE arm, not a standard value.  (6) **"The standard recipe" here means the HARNESS's AdamW + Adam** (`HARNESS-ADAMW-M-UNNORMALISED`, 290.2).]** — **`caw2` LANDS 27/27: `NO-COLLAPSE-CONTROL-DOSE-NOT-REACHED | M-COLLAPSE+L-NOGAP+A-NOGAP+X-NOGAP+K-COLLAPSED | ATTR-BASE-PROTECTS | GATE-DOES-NOT-FIRE`.  AT THIS CELL THE STANDARD AdamW + Adam RECIPE DOES NOT COLLAPSE, AT wd 0.1 OR AT THE DOSE ARM's 1.0; SWAPPING ONLY THE META OPTIMISER STILL COLLAPSES; SWAPPING ONLY THE BASE REMOVES THE COLLAPSE — AND ITS DOSE WITH IT.  C1's STEP-1 GATE DOES NOT FIRE.  THE COLLAPSE IS A CORNER CASE OF THE SGDm BASE, NOT A HAZARD OF THE STANDARD RECIPE, AT THIS CELL.**
+
+*This is the registered prediction (290.7: A-NOGAP with ATTR-BASE-PROTECTS; the X branch UNSURE).  **ZERO GPU.**  No
+Slurm job submitted or cancelled; one read-only `sacct -X` / `squeue` poll on the `alice2` login node.  `alice` —
+Saber's shared account — NOT contacted.  Nothing under `paper/` listed, read, opened or touched.  No notebook website or
+Vercel URL opened, nothing downloaded, no `.pdf` fetched.  The ingest of this batch is shared with `cgw1` and is recorded
+at 296.9 (one commit, `477a853`).*
+
+
+### 295.1 Completion, and RULE 20 at full coverage
+
+**27/27 COMPLETE.**  Jobs **5079299–5079325**, seeds {160, 161, 162}, 9 arms (290.5).  Re-polled read-only by this
+entry: `sacct -X` → **27/27 `COMPLETED 0:0`**, elapsed 39–45 min, **19.1833 GPU-h** by `sacct` (18.9333 by the runs' own
+`minutes` lines, against 290.5's 18.5 expected), nodes node887 ×7, node882 ×6, node883 ×6, node884 ×6, node880 ×2;
+`squeue -u s5014158` empty.  The caw2 proof job **5079238** is not a run and owns no corpus row.
+
+**RULE 20 at FULL coverage, PASS on both halves, BEFORE any number was read**: `bin/cAW2_rule20.sh` (`07087366…`) run
+UNEDITED from `~/stage_caw2` (`STAGED_COMMIT` `1dcca097…`; argsline_guard `81cea8b5`, design `a219661f`, scorer
+`bdeb1321`, envaudit `2c873dc1`, each checked by sha against `1dcca09` first) at 2026-09-22T04:18:39Z, log committed as
+`results/caw2_rule20_complete.txt` (`3f1b14a2…`); re-run independently by the refute pass at 04:28:56Z, PASS and
+agreeing, with an aggregate sha256 over the 27 `.out` files equal on `alice2` and on the Mac (`2e8674a2…`).  Counting the
+registration's own at 02:20:30Z (290.8a), **three full-coverage passes, all PASS**.
+* **ARGS half**: 27 `.out`, 27 with an `ARGS:` line, queue empty.  Batch consistency `--strict` rc 0, **27 clean**.
+  Per-run with every flag pinned to its own arm and the flag COUNT checked (20 SGDm, 21 AdamW): **27 checked, 0
+  violations**.  Coverage off the runs' own lines: alg-base AdamW 18 / SGDm 9; alg-meta Adam 18 / Lion 9; wd 0.1 ×21 /
+  1.0 ×6; layerwise 12 / scalar 15 — exactly the design's.
+* **ENV half** PASS: one distinct `ENV` line ×27 after the `PROBE_DIR` strip, four `PROBE_TENSOR` witnesses (9 / 3 / 9
+  / 6), every hold / mask witness `off` ×27, **27 × NVIDIA L4**.
+
+`plateau5` is read from each run's RAW `.out` epoch lines (mean TEST over epochs 95–99); the CSV `plateau` column is read
+by nothing here.
+
+
+### 295.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cAW2_confound_score.py` (**`bdeb1321…`**) ran **UNEDITED**, exit 0, **267 lines**, on `alice2` (from
+`~/stage_caw2`, Python 3.10.4; `results/caw2_score_alice2.txt`, `da4dc52a…`) and on the Mac (HEAD bytes, Python 3.14.5,
+on `../runs_alice2`; `results/caw2_score_mac.txt`, `8138665b…`).  The two stdouts differ on exactly lines 141 and 145,
+the manifest and provenance path echoes.  Every gate PASSES: G-ARGS 27, G-ENV, G-PT 27, G-WITNESS 27, G-STRUCT (the
+8,883-byte manifest byte-identical), G-PROV 8 (`SCORER_SHA256 = bdeb1321…`), G-PROBE 27 (500 records each; the vote
+decomposition exact on all 15 scalar runs under each arm's OWN meta alg, 0 off, 0 wrong sign, 0 non-finite), G-FLOOR /
+G-CEIL (max arm 73.2507).  Sync: all 27 runs in `../runs_alice2`, 168 files sha256-checked against `alice2`, 0 mismatches.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,383 rows, 268 exclusions): exit 0, 267 lines, **identical to the
+committed Mac log except ONE line, the corpus DISCLOSURE line, 3,094 → 3,106**.  The scorer excludes every `caw2-` row
+by name; the twelve extra rows are `cgw1`'s twelve UNLISTED W1 runs (wd 0.1, the standard), which now enter the
+filtered corpus.  That line is DISCLOSURE ONLY (the scorer says so on the line itself and its selftest F proves the
+FINAL invariant to the corpus), so the ingest moves no figure the scorer prints.  The FINAL is byte-identical.
+
+**A STALE SENTENCE IN THE SCORER's OWN OUTPUT, noted and not edited (RULE 16).**  Its closing block still says XS / XL
+"deviate on TWO ARGS kinds …, which corpus_exclusions.py cannot list today".  That was true at registration; CORRECTIONS
+294 (`6f8b16d`) closed the gap and the 6 rows are listed at 296.9.  The sentence enters no bar, state, branch or stamp.
+
+
+### 295.3 The numbers (in batch; every contrast WITHIN its cell)
+
+`SIGMA_PRIOR_frozen` **0.641573** (in-batch 0.218865 was smaller, so the FROZEN PRIOR binds — `SIGMA-PRIOR-FROZEN`),
+`SE_ARM_DIFF` **0.523842**, 2 SE = 1.047685 pp, a HALF-WIDTH, not a bound on any effect (278.6 C1).  COLLAPSE iff scalar
+≤ 0.50 × that cell's own layerwise mean; NOGAP iff layerwise − scalar < 10 pp; reference healthy iff layerwise ≥ 55 and
+its seed range ≤ 5.
+
+| cell | base + meta, wd | scalar arm | layerwise arm | G = L − S | G in SE | R = S/L | state |
+|---|---|---|---|---|---|---|---|
+| **K** (control) | SGDm 0.99 + Lion, 0.1 | `K01` **22.5240** (sd 0.347; seeds 22.466 / 22.896 / 22.210) | — | — | — | — | **COLLAPSED** (bar ≤ 30) |
+| **M** (meta swap) | SGDm 0.99 + Adam, 0.1 | `MS` **13.2440** (sd 0.361) | `ML` **68.2060** (sd 0.242) | **+54.9620** | +104.92 | 0.1942 | **COLLAPSE**, 3/3 seeds at or below the bar 34.103 |
+| **L** (base swap) | AdamW + Lion, 0.1 | `LS` **72.5673** (sd 0.065) | `LL` **68.1093** (sd 0.081) | **−4.4580** | −8.51 | 1.0655 | **NOGAP** |
+| **A** (standard recipe, CO-PRIMARY) | AdamW + Adam, 0.1 | `AS` **72.9493** (sd 0.178) | `AL` **67.8440** (sd 0.038) | **−5.1053** | −9.75 | 1.0753 | **NOGAP** |
+| **X** (dose arm) | AdamW + Adam, **1.0** | `XS` **73.2507** (sd 0.229) | `XL` **68.6840** (sd 0.160) | **−4.5667** | −8.72 | 1.0665 | **NOGAP** |
+
+**CO-PRIMARY `G_A` = −5.1053 pp = −9.75 SE**, ±2 SE **[−6.1530, −4.0576]**, TRAIN gap −0.1247, seed-paired gaps
+−4.992 / −5.290 / −5.034.  **M**: ±2 SE [+53.9143, +56.0097], TRAIN gap +86.2740; seed-paired gaps `ML_s − MS_s`
++54.594 / +54.764 / +55.528 (DESCRIPTIVE; the registered state uses the layerwise MEAN 68.206, against which the per-seed
+gaps are +54.578 / +55.014 / +55.294 — refute fix W5).  **L**: [−5.5057, −3.4103], seeds −4.396 / −4.518 / −4.460.
+**X**: [−5.6144, −3.5190], seeds −4.890 / −4.668 / −4.142.  Layerwise seed ranges 0.48 / 0.16 / 0.07 / 0.29, every one far
+under the 5 pp UNREADABLE bar.  K01 at 22.5240 sits beside its landed 22.79–23.22 (frozen between-batch literals,
+non-gating).
+
+**THE DOSE (registered at 290.7; per record the median over the arm's step sizes of exp(β)·wd; arm value = median over
+seeds).**
+
+| arm | DOSE_PEAK | DOSE_PRE (step ≤ 8,500) | late median (step ≥ 40,000) | peak step per seed | ρ = peak / K01's | word |
+|---|---|---|---|---|---|---|
+| K01 | **5.4054e-4** | 4.9303e-4 | 3.0590e-8 (**FLOOR, a bound**) | 8,700 / 8,600 / 8,600 | 1 | — |
+| MS | 1.8420e-3 | 1.8420e-3 | 3.0590e-8 (**FLOOR, a bound**) | 1,100 / 900 / 900 | **3.4078** | `DOSE-M-ABOVE` |
+| LS | 1.0895e-5 | 3.5320e-6 | 2.6267e-6 | 20,800 / 19,800 / 21,300 | **0.0202** | `DOSE-L-BELOW` |
+| AS | 1.2038e-5 | 5.1581e-6 | 2.2355e-6 | 17,700 / 16,100 / 17,100 | **0.0223** | `DOSE-A-BELOW` |
+| XS | 3.1923e-5 | 2.9839e-5 | 5.0984e-6 | 8,600 / 11,600 / 13,100 | **0.0591** | `DOSE-X-BELOW` |
+
+Layerwise arms, DESCRIPTIVE (median over their 62 step sizes): ML 2.0576e-6, LL 1.7037e-6, AL 1.5847e-6, XL 1.7988e-5.
+Pre-window ratios (descriptive): M 3.7362, L 0.0072, A 0.0105, X 0.0605.  RHO_X by the worst seed pairing
+max(XS) / min(K01) **0.0605**; mean over mean 0.0585; leave-one-seed-out 0.0575–0.0598 — every reading BELOW.
+
+**THE VOTE (the gate word's input; descriptive beyond it).**  `DOM_C` with C fitted on seed 160 and scored on 161 / 162:
+K01 **0.7360**, C_fit {50, 53, 59}, so the control reads; MS 0.2470 (MS picks the same carriers as K01, descriptive); LS
+0.0130; AS 0.0050; XS 0.0070.  **`GATE-DOES-NOT-FIRE`**: the gate needs A to COLLAPSE, and A is NOGAP, so the gate is not
+read on a NO-COLLAPSE branch at all.  This is the Step-1 half only; Step 0's lead-lag is not read (`LEADLAG-NOT-READ`).
+
+**Leave-one-seed-out (descriptive)**: every drop gives the same branch and attribution.  **TRAIN AGREES**: only G_M
+clears the 10 pp bar, and its TRAIN gap (+86.2740) has the same sign — the stamp rests on G_M alone.  MS trains to only
+13.24 % TRAIN: like the control, **it never learns**.
+
+
+### 295.4 What bounds the result, led with
+
+* **NOT-REACHED is not IMMUNE.**  XS peaked at 5.9 % of the control's realised shrink.  Raising wd tenfold (AS → XS)
+  raised the realised peak shrink only about 2.65× (1.2038e-5 → 3.1923e-5).  Since shrink = a·wd, XS's learned step size
+  peaked about 3.8× lower than AS's (3.19e-5 against 1.20e-4).  **This batch does not test why** (refute fix W3), and
+  XS's step size never "fell" below its start (min β = the initial −13.8141 on XS and AS alike): it peaked lower.  So the
+  question *"is the standard recipe hazardous at the control's dose?"* stays OPEN; a dose-matched test would have to HOLD
+  the realised shrink at the control's level, not raise the nominal wd.
+* **Every NOGAP is a bound.**  L / A / X are "below the 10 pp bar", never "equal".  In all three the scalar arm is
+  4.5–5.1 pp AHEAD of layerwise (stamped `SCALAR-AHEAD-L/A/X-DESCRIPTIVE`): DESCRIPTIVE only, and not a claim that scalar
+  wins by a registered bar.
+* **The attribution is read beside its dose words.**  `ATTR-BASE-PROTECTS` means: in this cell M (SGDm base + Adam)
+  collapses and L (AdamW base + Lion) does not.  L's base swap also removed ~98 % of the realised shrink (`DOSE-L-BELOW`)
+  and changed the base momentum 0.99 → 0.9, so the base's effect is not separated from the dose or the momentum.
+* **Floor readings are bounds.**  K01 sits on the `BETA_CLIP` floor on 315 / 500 records per seed, 100 / 100 in the late
+  window, first at step 18,500; MS on 442 / 462 / 351 (late 94 / 99 / 76).  LS, AS and XS never touch the floor.
+* **K01's pre-window dose is fixed by the ramp, not by the seed** (refute fix W4): β rose 8.502155 between the step-0 and
+  step-8,500 records (8,500 updates), identically on all three seeds — ≈ 1e-3 per update, the Lion sign ramp at its
+  nominal maximum of exactly 1e-3.  The +0.025 % excess is UNSURE, plausibly float32 rounding of the stored β.
+* **"The standard recipe" is the HARNESS's AdamW + Adam** (refute fix W1).  The harness AdamW differs from
+  `torch.optim.AdamW`: its first moment is an unnormalised sum, which makes the gradient step up to 1/(1−β1) = 10×
+  torch's at the same step size (290.2), and its decay is α-scaled (multiplied by the learned step size), not Loshchilov
+  & Hutter's schedule-scaled decay.
+* **ONE cell, three seeds, 100 epochs, α-scaled decay only.**  Not run: wd 1e-2, a Lion base, α-independent decay, any
+  other network, dataset, meta step, α0 or horizon.  wd 1.0 is a DOSE arm (`X-IS-A-DOSE-ARM-NOT-A-STANDARD-VALUE`).
+* **UNSURE, one reading outside every registered quantity** (refute fix W6): XL's MAXIMUM over its 62 per-tensor step
+  sizes gives a shrink of 1.75–1.99e-3, 3.2–3.7× K01's peak.  For context every layerwise arm's per-tensor maximum is of
+  that order, including the healthy references — LL 5.2–5.5e-4 (≈ 1.0× K01's peak), AL 7.8–8.1e-4 (≈ 1.5×) — and ML
+  reaches 1.000e-2, exactly the `BETA_CLIP` ceiling exp(−2.3026)·0.1, a BOUND.  The XL figure is therefore not
+  distinctive and stays uninterpreted.
+
+
+### 295.5 The attack — an independent parser that rebuilds all 267 lines
+
+`analysis/caw2_attack_indep.py` (`8b19587d…`, committed at `aa80a93`): stdlib only, imports NOTHING from the repo (the
+registered files are read only as bytes, for their sha).  It re-types the arm table, flags, witnesses, bars and shas,
+parses the raw `.out` files with its own exact-line epoch regex and the `probe.jsonl` files with its own code, and
+rebuilds the scorer's stdout with the runsdir written as `<runsdir>`.  **267 / 267 lines identical on each host**
+against that host's scorer stdout; its own output is **byte-identical on both hosts** (`0a4268db…`; committed as
+`results/caw2_attack_indep_mac.txt` and `_alice2.txt`); ATTACK VERDICT PASS.  Extra checks, all PASS: A0 registered
+shas; A1 one `.out` per run, no duplicate or non-standard epoch line, epochs 0..99, no nan; A2 probe steps 0..49,900 in
+order, every β inside the clip; A6 worst-case `RHO_X` 0.0605 < 0.5.  **Re-run by this entry post-ingest** against the
+post-ingest scorer stdout: 267 / 267 identical, PASS — its output differs from the committed file on the one corpus
+disclosure line only (3,094 → 3,106), because it re-derives that count itself.
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, before writing any number here):** all 27 `.out` files carry
+epochs 0–99 exactly once and `RUN_DONE`; the nine arm means and sds reproduce to 4 d.p. (above), and G_M / G_L / G_A /
+G_X = +54.9620 / −4.4580 / −5.1053 / −4.5667.
+
+
+### 295.6 The refute pass — NOTHING REFUTED, EIGHT wording fixes
+
+The refute pass (`holds: true`) re-parsed all 27 raw `.out` files with its own stdlib parser BEFORE running any repo
+program, reproduced every level, sd, contrast and state; read the scorer's source for window (95–99), cell mapping
+(SCALAR_OF / LAYER_OF), the WDF factor, the dose definition, the late window (step ≥ 40,000), the branch order and
+G-ARGS's handling of repeated and unregistered flags, and found no window, arm-key, seed, sign, shadowing or
+completeness error; checked each run's own ARGS line (every arm's flags, grain and seed, 20 or 21 flags); re-ran RULE 20
+(PASS); recomputed every dose figure, floor count, DOM_C and σ; and found the 18 exclusion rows' kinds equal to
+`caw2_design.args_deviating_kinds`.  **No claim that carries the verdict is refuted.**  The eight fixes, all applied in
+295.3–295.8 and none touching a level, contrast, bar, state, branch word or stamp:
+
+| # | where | what was wrong | fixed at |
+|---|---|---|---|
+| **W1** | what_it_means | the stamp `HARNESS-ADAMW-M-UNNORMALISED` was dropped from the prose, so "the standard recipe" read as torch's AdamW | 295.4 bullet 6, 295.7 |
+| **W2** | what_it_means | *"still collapses, and harder: 13.24 against 68.21"* — "harder" is a between-cell severity comparison with K01, which has no in-batch layerwise reference and another meta alg | 295.7: MS against its OWN layerwise, no between-cell severity sentence |
+| **W3** | what_it_means | *"because the learned step size fell"* — a causal "because" the batch does not test, and XS's step size never fell below its start | 295.4 bullet 1 |
+| **W4** | bounds 5 | *"1.000254e-3 per step: the Lion ramp at its maximum rate"* — imprecise; the nominal maximum is exactly 1e-3 | 295.4 bullet 5 |
+| **W5** | contrasts | M's per-seed gaps were seed-paired but unlabelled | 295.3 |
+| **W6** | contrasts | the UNSURE XL per-tensor reading lacked the context that makes it non-distinctive | 295.4 bullet 8 |
+| **W7** | bounds 1 | *"The 0.5 bar is 8.3× above"* — 8.3× is against the worst pairing; against the registered `RHO_X` it is 8.5× | headline (1) |
+| **W8** | exclusions | the 5-field list is a summary, not the 9-column TSV row format; the AdamW 0.9 is AdamW's standard β1, flagged only because the registered ARGS standard (0.99) is the SGDm mechanism cell's | 296.9 (the rows are written in the full 9-column form) and here |
+
+**No new RULE 16 defect.**  The stale "cannot list today" sentence (295.2) is text, not computation.
+
+
+### 295.7 THE AREA CHAIR's QUESTION, ANSWERED — **HAZARD AT THE STANDARD RECIPE, OR A CORNER CASE?**
+
+**On this evidence: a CORNER CASE OF THE SGDm BASE, at this cell, and the answer is not close for the standard recipe.**
+With the harness's AdamW + Adam at wd 0.1 the scalar arm lands at 72.9493, 5.1053 pp ABOVE its in-batch layerwise
+67.8440 — far from its 33.922 collapse bar — and at wd 1.0 it lands at 73.2507.  Swapping only the meta optimiser (SGDm
+base + Adam) still collapses: MS is 13.24 against its in-batch layerwise 68.21 (R_M 0.194, 3 / 3 seeds), at a realised
+peak shrink 3.4× the control's (`DOSE-M-ABOVE`); **no between-cell severity comparison with K01 is licensed** (W2).
+Swapping only the base (AdamW + Lion) removes the collapse — and keeps the realised shrink ~50× below the control's.
+Together with `cwd5` (285: on the SGDm base the collapse is present at α-scaled wd 0.1 and absent at 1e-2, 1e-3 and
+5e-4), the collapse is now bounded on TWO axes at this cell: it needs the SGDm base AND a decay within a decade of 0.1.
+**What the answer is NOT.**  It is not "AdamW + Adam is immune": the dose arm never reached the control's realised
+shrink, so immunity at the control's dose is undecided.  It is not "the base is the cause": the base and the dose moved
+together.  And it is not a statement about any other cell.
+
+**CONSEQUENCE FOR THE ICML PLAN, BY ITS OWN RULE (`docs/ICML-PLAN.md` §4):** *"If Step 1 does not fire, C1 is dead:
+write C2 + C4 for TMLR and stop spending on ICML scope."*  Step 1 does not fire (`GATE-DOES-NOT-FIRE`), and 289 had
+already failed the gate's Step 0 clause.  **C1 is dead on both halves of its gate.**  The path decision is 297.
+
+
+### 295.8 What this licenses, and what it does not
+
+**The registered licence, verbatim, at this cell only:**
+
+> *"With AdamW + Adam the grains do not differ by the 10 pp bar at wd 0.1 or 1.0, but even at wd 1.0 the scalar arm's
+> realised peak shrink stayed below half the control's."*
+
+With its registered gloss: *the standard recipe does not collapse here; whether the pairing is immune at the control's
+dose is NOT decided (the learned step size kept the dose low); C1's gate does not fire.*  Here "AdamW + Adam" is the
+harness's AdamW (`HARNESS-ADAMW-M-UNNORMALISED`) with α-scaled decay.  The attribution reading, at this cell only:
+**`ATTR-BASE-PROTECTS`**, printed with `DOSE-M-ABOVE` and `DOSE-L-BELOW` and never without them.
+
+**NOT licensed**: immunity at the control's dose; that the base, rather than the dose it produces, protects; any other
+network, dataset, meta step, α0, horizon or grouping; a Lion base; wd 1e-2; α-independent decay; anything about the
+parent paper's own cells; wd 1.0 as "a standard setting"; "the grains are equal"; any between-cell severity reading.
+
+
+### 295.9 The ingest
+
+Recorded once for both batches at **296.9** (commit `477a853`): 27 `caw2` rows added, 0 changed; 18 `caw2` exclusion
+rows (12 `ARGS_MOMENTUM_BASE`, 6 TWO-ARGS under CORRECTIONS 294's rule).
+
+
+### 295.10 Discipline, files, cost
+
+RULE 16 held: no registered scorer, design, launcher, guard, `aggregate.py`, `args_repair.py` or `corpus_exclusions.py`
+edited.  RULE 20 at full coverage before any number was read.  `plateau5` from RAW `.out`.  Floor readings are bounds.
+Descriptive readings are labelled.  The licence is quoted verbatim, at its cell only.  Files of this landing: committed
+at `aa80a93` by the scoring track (`analysis/caw2_attack_indep.py`, `results/caw2_rule20_complete.txt`,
+`results/caw2_score_alice2.txt`, `results/caw2_score_mac.txt`, `results/caw2_attack_indep_mac.txt`,
+`results/caw2_attack_indep_alice2.txt`); this entry writes `docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md` (row 239),
+`docs/ICML-PLAN.md` and `docs/STATUS.md`.  **Cost: ZERO GPU-hours** this cycle (the batch itself: 19.1833 GPU-h by
+`sacct`).  `alice` NOT contacted; nothing under `paper/` touched; nothing downloaded.
+
+## 296. TRACK D (land) — **[LED WITH THE BOUNDS: (1) **ONE CELL.**  ResNet18 / CIFAR-10, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3 — the audit's most load-bearing cell and nothing else; nothing here is about CIFAR-100 (`gc1`, `gm2`).  (2) **THREE RUNGS** bracket; they locate nothing.  (3) **EVERY RUNG IS THE HARNESS's α-SCALED DECAY**; α-independent decay is not tested.  (4) **W4 IS FAR LESS DECAYED THAN A STANDARD SGD RECIPE, AND THE REGISTRATION VERIFIER's CAVEAT BINDS UNWEAKENED:** W4's realised plateau shrink is 1/11 (scalar) and 1/17 (layerwise) of lr·wd = 5e-5, and about 1/115 to 1/883 of a standard recipe's steady-state shrink with its 0.9 momentum buffer (≈ 5e-4).  **No reading at W4 settles whether the audit effect is an artefact of non-standard decay.**  (5) **"Standard decay" in the licence sentence means the standard decay VALUE 5e-4, applied the harness's α-scaled way** — never a standard recipe's realised decay.  (6) σ is the FROZEN floor 0.178914 (in-batch 0.138102 is lower), so the SEs are conservative.]** — **`cgw1` LANDS 40/40: `AUDIT-UNDECIDED | SCALAR-BEATS-BEST | W1-SURVIVES+W2-SURVIVES+W4-UNDECIDED`.  THE AUDIT's UNIFORM-OVER-ALIGNED SIGN IS REPRODUCED IN BATCH AT 0.1 (+0.37 pp, SURVIVES) AND HOLDS AT 1e-2 (+0.45, SURVIVES); AT THE PRIMARY RUNG 5e-4 IT IS +0.24 pp, BETWEEN THE BARS, AND NO SURVIVE OR VANISH SENTENCE IS LICENSED.  AND AT 5e-4 PLAIN SCALAR IS ABOVE BOTH AUDITED PARTITIONS BY 2.6–2.8 pp, RESOLVED: THE AUDIT's PRACTICAL SIGNIFICANCE MUST BE QUALIFIED WHATEVER D4 SAYS.**
+
+*`AUDIT-UNDECIDED` carried a registered prior of 0.15 and `SCALAR-TIES-OR-BEATS-BEST` 0.35 (291.5); both were reachable
+and named before any run existed.  **ZERO GPU.**  No Slurm job submitted or cancelled; one read-only `sacct -X` /
+`squeue` poll on the `alice2` login node.  `alice` NOT contacted.  Nothing under `paper/` listed, read or touched.  No
+notebook website or Vercel URL opened, nothing downloaded, no `.pdf` fetched.*
+
+
+### 296.1 Completion, and RULE 20 at full coverage
+
+**40/40 COMPLETE.**  Jobs **5079331–5079370**, seeds 152–154 at W1 and W2, 152–155 at W4, 12 arms.  Re-polled read-only by
+this entry: `sacct -X` → **40/40 `COMPLETED 0:0`**, elapsed 34–62 min, **32.4308 GPU-h** by `sacct` (32.0333 by the runs'
+own `minutes` lines, against 291.4's 29.3 expected; hard bound 80), nodes node883 ×10, node882 ×10, node884 ×10, node887
+×8, node880 ×2; `squeue` empty.  Nothing failed, was cancelled or was resubmitted.
+
+**RULE 20 at FULL coverage, PASS on both halves, after all 40 had COMPLETED and before any number was read**:
+`bin/cGW1_rule20.sh` (`ae9608f7…`), `analysis/argsline_guard.py` (`81cea8b5…`) and `analysis/cgw1_rule20_envaudit.py`
+(`3e0cb6b8…`), all UNEDITED, from `~/stage_cgw1_land` (a `git archive` of the registered commit `cfc12ff`) at 05:02:29Z;
+log committed as `results/cgw1_rule20_full_land.txt` (`905ac080…`).  Batch consistency: 40 clean, 0 repeated flags or
+design mismatches, 0 without an ARGS line.  Per-run: 40 checked, 0 violations.  Coverage off the runs' own lines:
+`--weight-decay-base` 0.1 ×12 / 1e-2 ×12 / 5e-4 ×16; grain chunk777 / nodewise / scalar / layerwise ×10 each.  ENV: ONE
+distinct ENV line ×40, no hold or mask witness, **40 × NVIDIA L4**, PASS.  Re-run by the refute pass on the Mac with
+the same `--expect` table (PASS, 40 / 40, 0 violations) and read-only on `alice2` (40 `.out` files, sha256-of-sha256s
+`c3cec8bb…` equal to the Mac copy).  Counting the registration's own at 04:05:13Z (291.11), **three passes, all PASS**.
+Sync: 203 run files (40 `.out` + 163 under `cgw1/`) each checked with `shasum -c` against a list made on `alice2`: 203 OK
+(`results/cgw1_runfiles_sha256.txt`).
+
+
+### 296.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cGW1_auditwd_score.py` (**`8bf0aaf7…`**, the same bytes as at `cfc12ff`; no diff since for the scorer, design
+or guard) ran **UNEDITED**, rc 0, **57 lines**, on `alice2` from `~/stage_cgw1_land` (scorer, design, guard, corpus and
+exclusion shas equal to the registered ones; `results/cgw1_auditwd_score_alice2.txt`, `3659f371…`) and on the Mac on
+`../runs_alice2` (`results/cgw1_auditwd_score_mac.txt`, `46ae0899…`).  The two stdouts differ only on the runsdir and
+G-PROV path lines.  Gates: 40 / 40 complete (100 epoch lines + `RUN_DONE`), G-PROV MODE submit (scorer / design / HF
+shas equal to the launcher's record), G-ARGS / G-ENV / G-KIND / G-STRUCT 40 / 40 (20 flags each, the registered ENV line,
+no patch witness, 10,000 probe records with n_beta equal to the arm's m), G-HW disclosure `NVIDIA L4 ×40`.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS**: rc 0, 57 lines, identical to the committed Mac log except the two
+path echoes and **ONE corpus DISCLOSURE line, 3,094 → 3,103** — the nine unlisted `caw2` rows (K01, MS, ML at the
+standard 0.99 / 0.1) now enter the filtered corpus; every `cgw1-` row is excluded by name.  The line is DISCLOSURE ONLY
+and enters no bar, sigma, level, state, contrast or stamp; the FINAL is byte-identical.
+
+
+### 296.3 The numbers (in batch; every contrast WITHIN its rung)
+
+`plateau5` = mean TEST over epochs 95–99 from each run's own raw `.out`; n = 3 at W1 / W2, 4 at W4.
+`SIGMA_USED` **0.178914** (the FROZEN floor, df 178; in-batch 0.138102, df 28); SE 0.146083 at W1 / W2 (3 v 3),
+0.126511 at W4 (4 v 4).
+
+| grain | W1 (0.1, anchor) | W2 (1e-2) | W4 (5e-4, primary) |
+|---|---|---|---|
+| chunk777 | **92.4287** (sd 0.245) | **89.2047** (0.079) | **87.9060** (0.117) |
+| nodewise | **92.0593** (0.055) | **88.7513** (0.149) | **87.6650** (0.089) |
+| scalar | **92.1907** (0.222) | **91.1793** (0.183) | **90.4650** (0.104) |
+| layerwise | **92.7933** (0.130) | **90.6300** (0.160) | **89.8110** (0.036) |
+
+Every seed range is 0.076–0.488 pp (DIVERGED bar 2.0); every arm is box-free (rec_lo = rec_hi = 0.0000, window
+coordinate occupancy 0).  Five arms (chW2, ndW2, chW4, ndW4, kLW4) sit within 5 pp of HEALTH_MIN 85, which is a
+run-FAILURE bar and not a floor; none is UNHEALTHY, and none is near chance (10 %) or 100, so no contrast is floor- or
+ceiling-bounded (164.6).
+
+**The primary contrast D = chunk777 − nodewise, per rung:**
+
+| rung | D | SE multiple | ±2 SE | TRAIN D | state |
+|---|---|---|---|---|---|
+| W1 | **+0.3693 pp** | +2.53 | [+0.0772, +0.6615] | +0.4393 | **SURVIVES** |
+| W2 | **+0.4533 pp** | +3.10 | [+0.1612, +0.7455] | +0.2527 | **SURVIVES** |
+| W4 | **+0.2410 pp** | +1.90 | **[−0.0120, +0.4940]** | +0.1470 | **UNDECIDED** |
+
+**W4 is UNDECIDED** (refute fix W1): D = +0.2410 is below the +0.30 SURVIVES bar and above the +0.15 VANISHES bar.  Its
+±2 SE interval does lie below the audit's SGDm pool value +0.5556, but that clause alone does not make a VANISHES
+reading.  The anchor gate passes (W1 SURVIVES), and |D_W1 − 0.5556| = 0.186 ≤ 0.5 gives `ANCHOR-MATCHES-POOL`; every W1
+level is within 0.5 of the landed levels (291.5), so no `W1-LEVEL-DIFFERS` stamp.
+
+**Scalar against the partitions (the gated reading is W4's):** `Tch_W4` = k01 − ch = **+2.5590 pp = +20.23 SE**, `Tnd_W4`
+= k01 − nd = **+2.8000 pp = +22.13 SE** → **`SCALAR-BEATS-BEST`**.  Descriptive at W1: −0.2380 (−1.63 SE) against chunk777,
++0.1313 against nodewise; at W2: +1.9747 / +2.4280.
+
+**Descriptive, labelled, licensing nothing:**
+* DD_W2 = D_W2 − D_W1 = +0.0840 (+0.41 SE); DD_W4 = −0.1283 (−0.66 SE).  **No trend in D across the rungs is resolved.**
+* Layerwise − scalar: W1 **+0.6027** (+4.13 SE), W2 **−0.5493** (−3.76 SE), W4 **−0.6540** (−5.17 SE, stamped
+  `LAYERWISE-BELOW-SCALAR-W4`).  In this cell layerwise is above scalar at 0.1 and below it at 1e-2 and 5e-4 (refute fix
+  W5).  `cwd5` (285, a different cell: `ResNet18_c100` at the mechanism cell) also changed state between 0.1 and 1e-2;
+  its W1 reading was a floor LOCATION and its W2 negative gap was not resolved.  **The two batches are not pooled or
+  compared quantitatively.**
+* The level ladders: every grain is LOWER at 5e-4 than at 0.1 in this cell — chunk777 −4.52, nodewise −4.39, scalar
+  −1.73, layerwise −2.98 pp.  The two partitions fall most.  DESCRIPTIVE, one cell, and not a statement about why.
+* Leave-one-seed-out on D_W4: +0.1793 to +0.3000; **dropping s154 lands exactly on the +0.30 bar** (refute fix W6).
+  Same-seed chunk777 − nodewise at W4: +0.29 / +0.43 / +0.06 / +0.18.  DESCRIPTIVE, not a gate, and **no seed may be
+  added or removed after reading (108.6a).**
+* The prior missed: 291.5 predicted every W4 arm at 90.3 or above; the partitions landed at 87.7–87.9 (2.7–2.9 pp above
+  HEALTH_MIN 85, where ≥ +5.3 was predicted).  No arm is UNHEALTHY.
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, before writing any number here):** all 40 `.out` files carry
+epochs 0–99 exactly once and `RUN_DONE`; all 12 arm means and sds, D_W1 / D_W2 / D_W4 = +0.3693 / +0.4533 / +0.2410,
+Tch_W4 / Tnd_W4 = +2.5590 / +2.8000 and G = +0.6027 / −0.5493 / −0.6540 reproduce to 4 d.p.
+
+
+### 296.4 What bounds the result, led with
+
+* **W4 is effectively under-decayed, and the caveat stands as written** (refute fix W3, which restores it).  Realised
+  per-step shrink a·wd (caw2's registered definition, 290: per record the median over the step sizes of exp(β)·wd;
+  plateau window step ≥ 47,500; median over seeds), DESCRIPTIVE: at 5e-4 scalar **4.3493e-6**, layerwise **2.8833e-6**,
+  chunk777 ≈ 2.0424e-6 and nodewise ≈ 5.6611e-7 (the two partitions APPROXIMATE: their probe stores 62 per-tensor mean
+  log step sizes, not the per-group values).  Against lr·wd = 5e-5 alone that is 1/11, 1/17, ≈ 1/24 and ≈ 1/88; against a
+  standard SGD recipe's steady-state shrink with its 0.9 momentum buffer (≈ lr·wd/(1 − 0.9) = 5e-4) it is about 1/115,
+  1/173, 1/245 and 1/883.  **On either basis W4 is far less decayed than a standard SGD recipe; no reading at W4 settles
+  whether the audit effect is an artefact of non-standard decay.**  (The landing report had written that the "~100×"
+  caveat "holds only for nodewise on the approximate measure"; that re-judged the caveat on one chosen basis and is
+  struck.)
+* **The realised shrink is not monotone in the nominal value** (DESCRIPTIVE): at 0.1 the scalar arm's plateau shrink is
+  2.3732e-6 (peak 1.7448e-4), at 1e-2 9.9675e-6, at 5e-4 4.3493e-6 (peak 4.7787e-6) — the learned step size at 5e-4
+  plateaus above 0.1's.  So the three rungs are three NOMINAL values, not three realised doses in order.
+* **`UNDECIDED` is not a vanish and not a survive**; the licence is the interval.
+* **One cell, three rungs, α-scaled decay only, σ frozen.**
+* **`SCALAR-BEATS-BEST` is gated at W4 only** and carries W4's decay bound; at W1 scalar is between the two partitions.
+
+
+### 296.5 The attack — an independent parser, 15 PASS / 0 FAIL
+
+`analysis/cgw1_attack_indep.py` (`e88e67b5…`, committed at `e9d3884`): stdlib only, imports nothing from the repo, no
+regular expressions, every literal re-typed.  It checks sync integrity with one digest over all 80 run files; rebuilds
+the design, every run's 20-flag ARGS line and its ENV line, and the rung separation; re-derives probe structure and box
+occupancy; recomputes every level, σ, contrast, state, token and stamp; and rebuilds the scorer's 57-line stdout — 55
+lines byte for byte and the 2 path lines by form — against BOTH committed logs.  **15 PASS / 0 FAIL on both hosts, its
+stdout byte-identical on `alice2` and the Mac** (`ee271180…`).  One design fact it surfaced: for chunk777 and nodewise a
+probe record's `beta` is 62 per-tensor means of log step size, not the 14,421 / 14,420 per-group values (hence "approximate" in
+296.4).  **Re-run by this entry post-ingest** against the post-ingest scorer log: 14 PASS / 0 FAIL (one log given
+instead of two), 55 / 57 lines byte for byte, 2 by form — it re-derives the corpus disclosure count itself.
+
+
+### 296.6 The refute pass — NOTHING REFUTED THAT CARRIES THE VERDICT, THREE prose slips, FOUR qualifications, ONE latent RULE 16 defect
+
+The refute pass (`holds: true`) re-parsed all 40 raw `.out` files with its own stdlib parser, checked each run's arm
+against its own ARGS rung and grain (the 16 other flags identical on all 40), reproduced all 12 levels, σ, every
+contrast, state and stamp, re-derived the branch by hand, read the scorer's source for window (95–99 inclusive), arm key
+(from the file name, then the full 20-flag line must equal `expected_args(arm, seed)`), seeds, sign (D = ch − nd,
+T = k01 − x, G = kL − k01), completeness and the 291.6 bars, re-ran the scorer on the Mac (byte-identical), re-ran
+RULE 20 (PASS) and reproduced every realised-shrink figure.  Fixes, all applied above, none touching a level, contrast,
+bar, state, token or stamp:
+
+| # | where | what was wrong | fixed at |
+|---|---|---|---|
+| **W1** | contrasts | *"not VANISHES: … D + 2 SE (+0.494) does not exclude the pool value +0.5556"* — FALSE: +0.494 < +0.5556, so the pool clause IS met; W4 is not VANISHES only because D > +0.15 | 296.3 |
+| **W2** | exclusions prose | the W2 job ids were wrong (they named W1 runs); the true W2 jobs are s152 5079343–46, s153 5079347–50, s154 5079351–54. The committed `results/cgw1_exclusion_rows_PROPOSED.tsv` was already right | 296.9 (the rows are generated from the runs' own files) |
+| **W3** | bounds 3 | *"the '~100×' caveat holds only for nodewise on the approximate measure"* re-judged the verifier's caveat on one basis; on a standard recipe's momentum-amplified shrink W4 is 115–883× below | 296.4 bullet 1; headline (4) |
+| **W4** | what_it_means | the SCALAR-BEATS-BEST licence quotes "at standard decay" without saying it is the VALUE 5e-4 applied α-scaled | headline (5); 296.8 |
+| **W5** | contrasts | *"the ranking flips … as it did in cwd5"* — a cross-batch comparison with a floor-location reading | 296.3 |
+| **W6** | leave-one-out | the fragility (dropping s154 lands on the bar) was not stated | 296.3 |
+| **W7** | what_it_means | *"the effect also survives at 1e-2"* read as a licensed sentence; it is a rung state, and no licence text is registered for W2 | 296.8 |
+
+**RULE 16 DEFECT F1 (`cgw1`), LATENT, REPORTED AND NOT FIXED.**  The scorer's `.out` reader keeps the first `ARGS:` /
+`ENV:` line (harmless: every file has exactly one), but a LATER duplicate epoch line would silently overwrite an earlier
+one.  **No file of this batch has one** (the attack's A1-style check and my own reader both assert each epoch appears
+once).  No reading changes; the registered scorer is not edited.
+
+
+### 296.7 THE TMLR QUESTION, ANSWERED — **DOES THE AUDIT's EFFECT SURVIVE AT STANDARD DECAY?**
+
+**The sign survives, the size is undecided at 5e-4, and the practical value is qualified — at this one cell.**  The
+uniform-over-aligned difference is reproduced IN BATCH at the audit's own 0.1 (+0.37 pp, within 0.19 of the pool) and is
+resolved at 1e-2 (+0.45); at 5e-4 it is +0.24 with an interval from −0.01 to +0.49.  That is neither the audit's effect
+confirmed at standard decay nor the audit's effect gone.  **What IS resolved is the scalar reading**: at 5e-4 a single
+shared step size is 2.6–2.8 pp above BOTH audited partitions, and layerwise too is above both (descriptive).  So whatever
+D4 means, the partition question the audit answers — which uniform or aligned split of the tensors, at matched count —
+is a question about grains that, at this cell and value, lose to no split at all.  **The TMLR headline therefore does
+NOT die, does NOT stand as written, and must be rewritten**: the count-matched sign as a finding at α-scaled 0.1 (20 / 20
+cells) that also holds in batch at 1e-2 on the core cell, with the 5e-4 interval beside it, and the scalar-beats-both
+row stated as prominently as the headline.  And every such sentence carries W4's bound: the harness's 5e-4 is not a
+standard recipe's realised decay.
+
+
+### 296.8 What this licenses, and what it does not
+
+**The registered licences, verbatim, at this cell only:**
+
+> *(primary)* "D4 lies between the bars or is not resolved: report the interval; no seeds may be added after seeing it
+> (108.6a); no survive / vanish sentence."
+
+> *(scalar)* "plain scalar is ABOVE both audit partitions at 5e-4 by >= 0.30 pp, resolved: at standard decay, in this
+> cell, no audited partition beats a single shared step size."
+
+**Qualifier that travels with the scalar sentence** (refute fix W4): *here "standard decay" means the standard decay
+VALUE 5e-4, applied the harness's α-scaled way; its realised per-step shrink is well below a standard SGD recipe's
+(296.4), so the sentence may not be quoted without that qualifier, at this one cell only.*
+
+**The registered TMLR consequence** (291.5, `SCALAR-TIES-OR-BEATS-BEST`): *the audit's PRACTICAL significance must be
+qualified in the draft whatever D4 says.*  The primary's: *report the interval; no survive / vanish sentence.*
+
+**Rung states, not licensed sentences** (refute fix W7): W1-SURVIVES (+0.3693, +2.53 SE) and W2-SURVIVES (+0.4533,
++3.10 SE); no licence text is registered for W2.
+
+**NOT licensed**: "the audit effect survives at standard decay"; "the audit effect vanishes at standard decay"; any
+CIFAR-100 statement; any finer localisation; α-independent decay; any standard RECIPE (as opposed to value) claim; the
+layerwise-vs-scalar sign as a pooled or cross-batch finding.
+
+
+### 296.9 THE INGEST — `caw2` + `cgw1`, ONCE (commit `477a853`), with all 46 exclusion rows in the SAME commit
+
+**Corpus 3,316 → 3,383 rows; exclusion list 222 → 268 rows over 19 batches.**
+
+`analysis/aggregate.py` (`35c035e1…`, UNEDITED) `../runs ../runs_alice2` → exit 0, 3,383 runs, the same 3 standing
+duplicate-name warnings; `analysis/args_repair.py` (`e6d8918d…`, UNEDITED) `--apply` → 36 rows updated (the standing
+`dup_group` restoration), **0 accuracy or config values changed, 0 superseded**, 3,347 untouched.
+
+**ADDED 67 exactly (caw2 27 + cgw1 40), REMOVED 0, CHANGED 0** — re-derived field by field against the pre-ingest CSV
+(`d07266bd…`) with a reader of my own keyed on `(run, job_id)`: 38 fields, names identical, **0 duplicate keys before or
+after, 0 of 126,008 pre-existing field-cells changed**; `git diff --numstat` **67 / 0**.  Every added row
+`epochs_done` 100 / `epochs_requested` 100 / `complete` 1 / `window_ok` 1 / `superseded` 0; jobs 5079299–5079370.
+`caw2`: `ResNet18_c100` / CIFAR100, scalar 15 + layerwise 12, base AdamW 18 / SGDm 9, meta Adam 18 / Lion 9.  `cgw1`:
+ResNet18 / CIFAR10, SGDm + Lion, 10 each of chunk777 / nodewise / scalar / layerwise.  **NO PROOF JOB**: 0 rows named
+`bite` / `proof`, and `caw2`'s proof job 5079238 has no row.  GPU-hours by `wallclock_min` **3407.9500 → 3458.9167
+(+50.9667: caw2 18.9333, cgw1 32.0333)**.
+
+**The 46 exclusion rows**, every `witness` GENERATED by `corpus_exclusions.args_deviations()` on the run's OWN raw
+`ARGS:` line (273.9's rule), never typed; 9-column form; job-id order; the old file an EXACT PREFIX of the new (+11,271
+bytes); `git diff --numstat` 46 / 0; 268 distinct keys:
+* **caw2, 12 one-kind rows** (LS / LL / AS / AL × 3): `ARGS_MOMENTUM_BASE: momentum-param-base=0.9`, intervention
+  `--momentum-param-base 0.9`, `looks_like` `AdamW+Lion (granularity scalar|layerwise)` / `AdamW+Adam (…)`, registered at
+  CORRECTIONS 295, reason 263's.  The 0.9 is AdamW's own standard β1; it is flagged only because 263's ARGS standard
+  (0.99) is per FLAG, set at the SGDm mechanism cell, and `in_standard_cell` does not read `base` (294.4; refute W8).
+* **caw2, 6 TWO-ARGS rows** (XS / XL × 3): listed ONCE by `ARGS_WD_BASE: weight-decay-base=1.0`, intervention
+  `--momentum-param-base 0.9 + --weight-decay-base 1.0` (both kinds named), the momentum kind held by `MULTI_ARGS`;
+  my generator asserted the run's deviating kind SET equals `MULTI_ARGS[("caw2", arm)]` before writing each row.  Reason
+  294.4's.  **These are the corpus's first TWO-ARGS rows.**  `corpus_exclusions.py` (`45d2045a…`, the 294 module) was
+  NOT edited here.
+* **cgw1, 28 rows**: `ARGS_WD_BASE: weight-decay-base=1e-2` (chW2 / ndW2 / k01W2 / kLW2 at s152 5079343–46, s153
+  5079347–50, s154 5079351–54) and `…=5e-4` (the four W4 arms at s152–s155, 5079355–5079370), registered at CORRECTIONS
+  296; **equal column for column to `results/cgw1_exclusion_rows_PROPOSED.tsv` except `registered_at`** (the PROPOSED
+  file named the registration, 291; the rows are registered at their landing, as `cwd5`'s were at 285).
+* **Owe none**: caw2 K01 / MS / ML (the meta alg is the CSV `meta` column) and cgw1's 12 W1 runs at the standard 0.1.
+
+**GATES, on the committed tree.**  `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` →
+**exit 0, `VERDICT: PASS`**: 268 rows over 19 batches, every listed key present exactly once in the 3,383-row CSV; raw
+`.out` witnesses clean; ON-line completeness 186 / 186 (unchanged); two-axis runs 3 (unchanged); **ARGS witness 39 → 85
+listed runs** each carrying its own value, **57 / 57 deviating standard-cell rows listed** (39 + caw2's 18; cgw1's 28 sit
+outside 263's standard cell and are listed all the same), the 128 deviating rows outside the standard cell that owe
+nothing unchanged; ARGS cell mixing 651 cells, none mixed; **multi-ARGS runs (CORRECTIONS 294): 6 listed, True** — the
+first time that line counts anything.  `python3 analysis/c98b_reproduce.py` (`1bd675ea…`, UNEDITED) → **exit 0, 806
+lines, `science 618/618 PASS | drift 18 site(s), 10 differ (not gated) | guards fired 0 | declaration OK`** — 285's
+verdict byte for byte.
+
+**DISCLOSURE, not a gate, and it moved again**: the `--check` noise-floor demonstration moved with the corpus,
+`SIGMA_R18ALL` **0.641573 (df 267) → 0.636566 (df 274)** (the nine unlisted `caw2` rows join the standard cell's
+pooling: K01 into the existing k01 cell, MS and ML as two new cells); `SIGMA_PLAIN` 0.460632 unchanged.  **No bar reads
+that line**; `caw2` froze 0.641573 at its registration and is unaffected; **the next registration must quote 0.636566.**
+
+
+### 296.10 Discipline, files, cost
+
+RULE 16 held (one latent defect REPORTED, F1, not fixed).  RULE 20 at full coverage before any number was read.
+`plateau5` from RAW `.out`; the CSV `plateau` column read by nothing.  Floor / saturated readings: none here; the
+bounds are scope.  Licence language quoted exactly as registered, at that cell only, with the refute pass's qualifier.
+Files touched by 295–297 (absolute): `/Users/teshnizi/Saber Optimization/alice-backup/hierarchical-metaoptimize/results/all_runs.csv`
+and `…/results/CORPUS-EXCLUSIONS.tsv` (ingest commit `477a853`), `…/docs/CORRECTIONS.md`, `…/docs/MASTER-TABLE.md`,
+`…/docs/ICML-PLAN.md`, `…/docs/STATUS.md`.  Committed earlier in the cycle by the scoring track at `e9d3884`:
+`analysis/cgw1_attack_indep.py`, `results/cgw1_runfiles_sha256.txt`, `results/cgw1_rule20_full_land.txt`,
+`results/cgw1_auditwd_score_alice2.txt`, `results/cgw1_auditwd_score_mac.txt`, `results/cgw1_attack_indep_alice2.txt`,
+`results/cgw1_attack_indep_mac.txt`, `results/cgw1_exclusion_rows_PROPOSED.tsv`.  **Cost: ZERO GPU-hours this cycle**
+(the batch itself: 32.4308 GPU-h by `sacct`).  `alice` NOT contacted.  Nothing under `paper/` touched.
+
+## 297. THE PATH DECISION (ZERO GPU, AUTOPILOT) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.**  It is a DECISION about which paper the campaign writes, made on autopilot (standing authority since 22 Sep) from the landed evidence of 285, 289, 295 and 296 only.  Every probability in it is a JUDGEMENT, not a measurement.  Nothing under `paper/` was read or edited: the draft's changes are OWED, and are listed here as licensed sentences for whoever edits it.]** — **THE CAMPAIGN NOW WRITES ONE PAPER, FOR TMLR: THE COUNT-MATCHED PARTITION AUDIT WITH ITS HEADLINE REWRITTEN BY `cgw1`, THE DENOMINATOR RESULT, AND THE COLLAPSE AS A BOUNDED, CONFIGURATION-CONDITIONAL SECTION.  THE ICML LINE (C1, "VOTE CAPTURE") IS CLOSED BY ITS OWN GATE, ON BOTH HALVES.  NO ICML SUBMISSION IS PLANNED.**
+
+### 297.1 What the evidence now says, one line per question
+
+| question | answer | evidence | what bounds it |
+|---|---|---|---|
+| Does capture CAUSE the collapse (C1's thesis)? | **Unsupported, leaning against** — the decay dose acts first | 289: the same-seed accuracy gap leads the β turn by 700–1,700 steps on 15 / 15 pairs, β identical | observational; nothing held the vote while the dose ran |
+| Is the collapse a hazard at the standard recipe? | **No — a corner case, at this cell** | 295: harness AdamW + Adam NOGAP at wd 0.1 (`G_A` −5.1053 pp) and at 1.0; `GATE-DOES-NOT-FIRE` | NOGAP is a bound; the dose arm reached only `RHO_X` 0.0591, so immunity at the control's dose is UNDECIDED |
+| What does the collapse need? | **the SGDm base AND a decay within a decade of 0.1**, at this cell | 285 (decay axis: present at 0.1, absent at 1e-2 / 1e-3 / 5e-4); 295 (base axis: M collapses, L does not) | the base swap also cut the realised shrink ~50× and changed base momentum; the two are not separated |
+| Does the audit's effect survive at the standard decay VALUE? | **The sign is kept, its size at 5e-4 is undecided, its practical value shrinks** | 296: D +0.37 (W1, SURVIVES), +0.45 (W2, SURVIVES), +0.24 [−0.01, +0.49] (W4, UNDECIDED); scalar beats both partitions at 5e-4 by 2.6–2.8 pp, resolved | one cell; W4's realised shrink is 115–883× below a standard recipe's, so "artefact of non-standard decay" is NOT settled |
+
+**So `cgw1` neither kills nor keeps the audit as it stands.  It KEEPS the count-matched sign (resolved at two of three
+rungs, never reversed), SHRINKS its practical significance (at 5e-4 no audited partition beats one shared step size, at
+this cell), and leaves the decay-robustness question OPEN at a realistic realised dose.**  `caw2` CONFIRMS the corner
+case: the collapse is not a hazard of the harness's standard AdamW + Adam at this cell; it is a failure of the SGDm base
+at α-scaled decay near 0.1.
+
+### 297.2 The decision
+
+1. **C1 (the ICML "vote capture" paper) is CLOSED.**  The plan's gate (ICML-PLAN §4) needed Step 0's lead-lag not to
+   show capture lagging (289: NOT MET) AND Step 1 to fire (295: `GATE-DOES-NOT-FIRE`).  Its own rule: *"If Step 1 does not
+   fire, C1 is dead: write C2 + C4 for TMLR and stop spending on ICML scope (1.10, 1.11, 1.13)."*  Applied.  Also
+   stopped: G1 / 1.3 (cross-method adapters), 1.9 (the normalised-vote fix), 1.12 (Tiny-ImageNet at ICML scope) and Phase 3.  1.14 (the validation-split
+   re-report) is NOT stopped: test-set selection is a TMLR referee's question too, and it stays open, unranked.  A re-scoped, descriptive C1 ("capture as the lock-in stage") is
+   not pursued as a paper: it is one MetaOptimize cell's terminal-state description, and it would fail B1 and B3.
+2. **ONE paper, not two.**  C2 ("absent the collapse, scalar ≥ layerwise") is NOT written standalone: its "≥" rests on one
+   network with `G_W2` unresolved (285), it is single-method and CIFAR-scale, and its collapse half is now a measured
+   corner case.  It is MERGED into the audit paper, where it does the one job it can do: it names the configuration in
+   which the audit's scalar arm is broken (285.8's registered consequence) and shows that the standard recipe does not
+   share that failure at this cell (295).
+3. **The paper: "the count-matched partition audit", TMLR.**  Its headline is REWRITTEN (296.7, licences at 296.8):
+   * the count-matched uniform-over-aligned sign as a finding at α-scaled 0.1 (20 / 20 cells, pool +0.5556 ± 0.0448 pp,
+     211.2), reproduced IN BATCH on the core cell (+0.3693) and resolved at 1e-2 there (+0.4533, a rung state), with
+     the 5e-4 interval [−0.0120, +0.4940] beside it and **no survive or vanish sentence**;
+   * **the scalar-beats-both row stated as prominently as the headline**, with its qualifier: at the decay VALUE 5e-4,
+     applied α-scaled, in this cell, plain scalar is above both audited partitions by 2.6–2.8 pp;
+   * the denominator result (MetaOptimize loses to tuned SGD + cosine), unchanged, still carrying 1.16's disclosure that
+     its MetaOptimize arms ran at α-scaled 0.1;
+   * the collapse as a bounded section, first sentence conceding the corner case: *"the shared-step-size collapse at this
+     cell requires a coupled weight decay within a decade of 0.1; at 1e-2 and below the two grains do not differ by the
+     collapse bar"* (285.8, verbatim; "coupled" read as α-scaled per 292) and *"With AdamW + Adam the grains do not
+     differ by the 10 pp bar at wd 0.1 or 1.0, but even at wd 1.0 the scalar arm's realised peak shrink stayed below half
+     the control's"* (295.8, verbatim), each at its own cell only.
+4. **Venue: TMLR.**  No ICML submission is planned.  JUDGEMENT: TMLR acceptance ≈ 0.6–0.7 after the revision (lowered
+   from STATUS's 0.80, because the headline must now carry a qualification a referee will press on); ICML < 5 % and not
+   pursued.  ReScience / MLRC stays the fallback (0.60).
+5. **The parent-paper question (C3) is unchanged and is Saber's**: nothing about the parent goes anywhere until he has
+   seen the data.  `caw2` bears on it only at one CIFAR-100 cell and says nothing about the parent's own cells.
+6. **What the draft owes** (not edited here; `paper/` untouched): the abstract and the audit section's headline sentence
+   (296.7); the scalar-beats-both row and its qualifier; the W4 bound wherever 5e-4 is called "standard"; the collapse
+   section's first sentence (285.8, 295.8); the harness-AdamW disclosure (`HARNESS-ADAMW-M-UNNORMALISED`).  The
+   abstract has no headroom (STATUS open item 5): any edit must go through its gate.
+
+### 297.3 The ranked next experiments — at most three, none submitted this cycle
+
+Each needs its own registration (scorer before batch, RULE 21), a prior-art check first (the standing rule), and fresh
+seeds.  Costs are ESTIMATES from `results/all_runs.csv` per-run minutes on L4, none registered.
+
+| rank | experiment | question | cost (estimate) | why it outranks the others |
+|---|---|---|---|---|
+| **1** | **G3b — the audit's CIFAR-100 cell at 5e-4.**  `ResNet18_c100` / CIFAR-100, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3 (the `gc1` / `cdn1` cell), `--weight-decay-base` {0.1 anchor, 5e-4 primary} × {chunk771, nodewise, scalar, layerwise} × 4 seeds, the realised shrink reported per arm | Does `SCALAR-BEATS-BEST`, and the count-matched sign, hold on the audit's second dataset, where its largest D lives?  The chunk771 arm at 5e-4 is also the denominator's MetaOptimize arm (`cdn1`) at the lower decay, so 1.16 is answered in the same batch | 32 runs ≈ 26 GPU-h (gc1 chunk771 56.5 min, nodewise 45.5 min per run; scalar / layerwise UNSURE, assumed ≤ 50) | The rewritten headline rests on ONE cell (296.4); this is a referee's first question about the only paper the campaign is writing, and it folds in the denominator's fairness check at no extra runs |
+| **2** | **Retune at 5e-4 on the core cell** (1.18 applied to the audit).  ResNet18 / CIFAR-10, 5e-4, meta step {3e-5, 1e-4 in-batch anchor, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact?  The cell's ms 1e-4 / α0 1e-3 were chosen at 0.1; at 5e-4 the partitions fell 4.4–4.5 pp while scalar fell 1.7 (296.3, descriptive), which is exactly what a mis-tuned grain would look like | 27 runs ≈ 20 GPU-h (cgw1's per-run 34–62 min) | It attacks the new headline's strongest new claim at its weakest point (B2, per-condition tuning); G3b can only replicate that claim, this can refute it |
+| **3** | **1.20 — the short-horizon γ control.**  `ResNet18_c100` at the mechanism cell, κ 5e-4, γ matched to the κ 0.1 scalar arm's realised (1 − κα) (from 289's shrink), plus a γ = 1 anchor, scalar and layerwise, 3 seeds | Does shortening the hypergradient horizon WITHOUT decay reproduce the collapse (Wu et al. arXiv:1803.02021, threat T-C)? | 12 runs ≈ 8.4 GPU-h | It is the one live RIVAL MECHANISM against the collapse section's causal carrier sentences (`ctd1` / `cwd3` / `cwd4`); it outranks 1.17 (the all-1-D exemption), whose outcome `cwd1` has largely decided already (masking the 20 BN scales removes the collapse, 271), and it outranks a dose-held AdamW + Adam arm for `caw2`'s open question, which with C1 closed would buy only a scope sentence the paper does not need |
+
+**Deliberately NOT in the top three:** 1.17 (largely pre-decided by `cwd1`); `caw2`'s dose-matched follow-up (the wd
+needed to reach ρ ≥ 0.5 is UNSURE — tenfold wd bought only 2.65× shrink — and it serves only the closed C1); any seed
+top-up of `cgw1` W4 (forbidden, 108.6a); 1.7's multi-network replication of the reversal (belongs to the closed C2
+standalone); P1 / C3 (Saber's call).
+
+### 297.4 Applied to the documents
+
+* `docs/ICML-PLAN.md`: a 297 amendment at the top; §0's short answer and §4's ranking table and gate carry the outcome
+  (C1 CLOSED on both halves; C2 merged into C4; TMLR the venue; the ICML scope rows stopped); the ranked experiments
+  above replace Phase 2 as the live queue.  The plan's history is kept, not rewritten.
+* `docs/STATUS.md`: a CYCLE 160 table for 295–297 above the older cycles, and the Venue row amended in place with the
+  old figure bracketed.
+* `docs/MASTER-TABLE.md`: rows **239** (`caw2`) and **240** (`cgw1`) appended at the end in row 238's form; header counts
+  amended in place (3,383 runs / 3458.9 GPU-h; tally 175 → 177), old figures bracketed; `c73` exit 0.
+
+### 297.5 Discipline
+
+**ZERO GPU; no Slurm job submitted or cancelled; `alice` NOT contacted; nothing under `paper/` read, listed or edited;
+no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.**  RULE 16 held.  No new licence
+sentence is created: every sentence quoted for the draft is a registered one, at its own cell.
+
+Next free number: **298**.
