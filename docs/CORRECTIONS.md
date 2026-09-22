@@ -38357,6 +38357,156 @@ entry tests a claim, it registers no new design; the threats it bears on (Defazi
 under `paper/` read or touched; no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.**
 Inserted before 292 so the file stays in numeric order; 290-291 remain the concurrent tracks'.
 
+## 291. TRACK 2 (G3) — **`cgw1` REGISTERED: DOES THE COUNT-MATCHED PARTITION AUDIT SURVIVE AT STANDARD WEIGHT DECAY?  ResNet18 / CIFAR-10, THE AUDIT'S CORE SGDm CELL VERBATIM EXCEPT `--weight-decay-base` ∈ {0.1 (IN-BATCH ANCHOR), 1e-2, 5e-4 (PRIMARY)}, WITH `chunk777`, `nodewise`, `scalar` AND `layerwise` AT EVERY RUNG; 12 ARMS, 40 JOBS, ≈29.3 GPU-h EXPECTED.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL.** CIFAR-10 only; the CIFAR-100 cells (`gc1`, `gm2`, the largest D) are NOT re-run, and nothing here is about CIFAR-100. (2) **THREE RUNGS**; the ladder brackets, it cannot locate. (3) **α-INDEPENDENT DECAY IS NOT TESTED**: every rung is the harness's α-scaled decay. (4) **A VANISHES / TIES reading is a BOUND ("below the bar"), never a measured zero.**  All four are printed on every FINAL.]** — the draft left in the working tree by the interrupted agent was reviewed line by line; **four of its choices were changed** (291.6), and **one error of mine is disclosed at 291.9.**
+
+### 291.1 Question, and why now
+
+Every one of the audit's 20 count-matched cells ran at `--weight-decay-base 0.1` (MASTER-TABLE §10; SGDm fixed-effect pool
+**+0.5556 ± 0.0448 pp**, CORRECTIONS 211.2). `cwd5` (285) showed the mechanism cell's scalar-vs-layerwise ranking reverses
+between 0.1 and 5e-4, and the area chair asked (292.1, ICML-PLAN 4.2 / G3) whether the audit's own headline is a 0.1
+artefact. `cgw1` answers it on the audit's most load-bearing cell, with the 0.1 anchor, scalar and layerwise IN BATCH.
+
+### 291.2 Prior art, and the two figures the verifier corrected (V3, V4)
+
+**Sweep (2026-09-22, abstract / HTML pages only; no `.pdf` fetched).** Queries: weight decay × per-layer / per-group
+learning-rate partition; hypergradient per-group step size × weight-decay value; weight-decay value as a confound in
+optimiser comparisons; uniform-chunk vs layer-aligned grouping. Found, and read at abstract level:
+* Zhao & Liu, *A Self-Attentive Meta-Optimizer with Group-Adaptive Learning Rates and Weight Decay* (arXiv:2605.04055) —
+  learns per-group LR and decay, ablates "grouping strategies"; it does not hold the group count fixed and does not vary a
+  global decay value. ADJACENT.
+* Filatov et al., *Optimal Scaling Needs Optimal Norm* (arXiv:2510.03871) — per-layer-group LR tuning helps; decay not
+  discussed in the abstract. ADJACENT.
+* Apte, *Scale Weight Decay and Train Better* (arXiv:2607.23777) — a global decay schedule; no grouping. NOT RELEVANT.
+* Already on file (PRIOR-ART.md): Kosson et al. *Rotational Equilibrium* (arXiv:2305.17212) — on scale-invariant tensors
+  the effective step is set by the decay, which is the most likely route by which a partition effect could depend on
+  the decay value (it motivates the AUDIT-VANISHES account below); Li, Zhou, Xu (arXiv:2607.21005) weight-norm criticality.
+**Verdict:** nothing found tests whether a partition effect at matched group count depends on the decay value. The
+question is open; running it is not a replication of published work.
+
+**V3, verified at source.** Loshchilov & Hutter (arXiv:1711.05101, ar5iv HTML, Algorithm 1 line 9):
+`θ_t ← θ_{t−1} − m_t − η_t λ θ_{t−1}` — the decay is scaled by the SCHEDULE MULTIPLIER η_t, not by the step size α (α sits
+in the momentum line). The harness computes `delta = a*(m + wd*w)`: decay outside the momentum buffer (so not L2), but
+multiplied by the LEARNED step size. So the harness's decay is **not** L&H's decoupled decay in their parameterisation.
+The draft `analysis/cgw1_design.py` carried the verifier's V3 slip ("in Loshchilov & Hutter's vocabulary … DECOUPLED /
+SGDW-style"); it was rewritten before registration. The same slip in 292.3's definition paragraph (ICML-PLAN,
+WRITEUP-mechanism, LIMITS-PREP, STATUS) is fixed by Track 3 at **CORRECTIONS 293**, not here.
+
+**V4, re-derived from `results/all_runs.csv` @ 3,316 rows through `corpus_exclusions.filter_rows` (3,094 kept).**
+The audit's CIFAR-100 partitions: `gm2` chunk771 **72.054** (n 3), `gm2` chunk2293 **72.000** (n 3), `gc1` chunk771
+**71.9515** (n 4); nodewise `gm2` 70.5693, `gc1` 70.3115. "72.41" is `cwd5` `k01W4` (72.4080, unfiltered; its row is an
+ARGS_WD_BASE exclusion) — the scalar value, not an audit figure. The scalar-vs-audit comparison (72.408 vs 72.054, +0.354)
+is **cross-cell** (ms 1e-3 / α0 1e-6 vs ms 1e-4 / α0 1e-3) and cross-batch. ICML-PLAN's "72.41 / 72.00" is corrected
+by Track 3 at **CORRECTIONS 293** (its 72.054 agrees with this entry's independent re-derivation); not edited here.
+
+### 291.3 The cell, the seeds, the tree
+
+* **Cell (verbatim `mm1` / `pp1` / `cc1` / `gn1`-BN, the ARGS lines read on alice2):** ResNet18 / CIFAR-10 / bs 100 /
+  SGDm 0.99 / Lion 0.99 / β2 0.9 / meta wd 0 / γ 1 / ms 1e-4 / α0 1e-3 / 100 ep / AUGMENT=1 / BETA_CLIP=-15:-2.3026 /
+  PROBE=5; 20 ARGS flags in the audit's own order; only `--weight-decay-base` and `--stepsize-groups` vary.
+* **Why this cell only.** 4 of the 8 SGDm pool cells are this exact configuration, the other 4 are one-axis variants of
+  it, and 13 further audit batches change one variable from it. A second (CIFAR-100) cell at the same 3 rungs × 4 grains
+  would cost a second ≈29 GPU-h and break the ceiling. So `ONE-CELL` is a registered bound.
+* **Seeds {152..155}, verified FREE:** 0 corpus rows carry any seed 149–159 (max seed in the corpus is 148); 0 `.out`
+  ARGS lines anywhere under `$WS` on alice2 carry `--seed 149..159`; `caw1` (Track 1, withdrawn) held 149–151 and its successor `caw2` (290) holds 160–162; 0 `cgw1-*` jobs in
+  sacct or squeue. 156–159 stay unused.
+* **Tree `$WS/harness_cgw1/cifar10`**, built by `bin/cGW1_stage_harness.sh --stage` on 2026-09-22: a byte copy of the
+  live tree's 6 harness `.py` files, each equal to its pinned sha (HF.py `4732b74a…`, train.py `3fea309e…`,
+  build_network.py `c7998883…`, build_optimizer.py `25a899b3…`, load_data.py `b52b58a3…`, tin_data.py `9e0f3322…`),
+  data symlinked, no patch, no `PATCH_*` marker in HF.py; runner `$WS/jobs/run_cifar_cgw1.sh` (`676b84cc…`) differs
+  from `run_cifar.sh` (`a0d0a1b9…`) in exactly the `cd` line. Why a copy: a PENDING job imports what is on disk when
+  it starts, and three other tracks share the workspace.
+* **The premise without a proof job.** `SGDm_base_update`'s source text in this tree is IDENTICAL (AST segment, 516
+  chars, sha `f42a121c…`) to harness_cwd1's (`94aedc33…`), on which `cwd5`'s landed bite log (`7f5a3eaf…`, 52 PASS /
+  0 FAIL) proved, on a real L4, that the passed decay reaches the update BITWISE at 0.1, 1e-2, 1e-3 and 5e-4 (RW2, with
+  non-vacuity). `train.py` and `build_optimizer.py` are byte-identical. Guards 4e and 4f re-check this at submission.
+* **Spec strings on the LIVE model** (`analysis/cgw1_live_check.py`, CPU construction on the login node, no forward pass):
+  all 12 arms construct with `chunk777` → chunkwise m 14,421, `nodewise` → m 14,420, `scalar` → m 1, `layerwise` → m 62;
+  the optimizer holds wd 0.1 / 0.01 / 0.0005 exactly; `base_update` is `SGDm_base_update`; 62 tensors, 11,173,962
+  parameters; the live manifest is byte-identical to `cgw1_design.manifest_text()` (1,108 bytes, sha `fbb900fb…`).
+
+### 291.4 Seed count and cost
+
+At the frozen floor σ = 0.1789 (291.7), the primary contrast D4 = ch − nd with 4 v 4 has SE **0.1265**:
+P(SURVIVES | D = +0.5556) **0.978**, P(SURVIVES | D = +0.40) **0.785**, P(VANISHES | D = 0) **0.882**. 5 v 5 gives
+0.988 / 0.812 / 0.908 for +2.9 GPU-h and breaks the ceiling; 3 v 3 gives 0.960 / 0.753 / 0.848. The anchor W1 only has
+to clear +0.15: P at 3 v 3 = 0.997. **Decision: 4 seeds at W4 (all four grains), 3 at W1 and W2.** The draft's 5 at W4
+(44 runs) was ≈32 GPU-h by the same arithmetic. No seed may be added after any run is read (108.6a).
+**Cost:** per-run L4 minutes at this exact cell from the corpus (`wallclock_min`, nodes 880–887): chunk777 52 (n 10),
+nodewise 44 (n 20), scalar 42 (n 6), layerwise 34 (n 17), +1 each → **29.3 GPU-h expected**; hard bound WALL 2 h × 40
+= 80 GPU-h.
+
+### 291.5 Accounts, predicted levels, what each means for the TMLR submission
+
+PRIORS, UNSURE: no MetaOptimize ResNet18 / CIFAR-10 run has ever run at a decay other than 0.1. W1 is predicted at the
+landed levels (filtered corpus, this exact cell): ch **92.562** (n 19), nd **92.044** (n 32), k01 **92.262** (n 5),
+kL **92.887** (n 11), ± 0.5. At a ≈ 1e-3 the realised per-step shrink a·κ falls from ≈1e-4 at 0.1 to ≈5e-7 at 5e-4, so
+W4 is close to undecayed training; all arms are predicted 0.5–1.5 pp lower there.
+
+| Account (prior P) | ch W4 | nd W4 | k01 W4 | kL W4 | D4 | TMLR consequence |
+|---|---|---|---|---|---|---|
+| **AUDIT-SURVIVES** (0.45) | 91.0–92.4 | 90.5–91.9 | 90.5–92.2 | 91.0–92.6 | +0.30 to +0.80 | keep the headline; add the 5e-4 row; disclose ONE-CELL |
+| **AUDIT-VANISHES** (0.30) | 90.5–92.0 | 90.5–92.0 | 90.5–92.2 | 91.0–92.6 | −0.15 to +0.15 | the headline must be rewritten as a finding AT α-scaled decay 0.1, this row beside it; the pool may not be quoted without that qualifier |
+| **AUDIT-REVERSES** (0.10) | 90.3–91.7 | 90.6–92.0 | 90.5–92.2 | 91.0–92.6 | ≤ −0.15 | the headline does not hold at standard decay; the paper must be reframed around decay-dependence (ICML-PLAN C2) and may not go out with its current abstract |
+| AUDIT-UNDECIDED (0.15) | — | — | — | — | between the bars | report the interval; no survive / vanish sentence |
+| **SCALAR-TIES-OR-BEATS-BEST** (0.35; co-reported) | 90.5–92.2 | 90.3–92.0 | 90.9–92.6 | 91.0–92.6 | — | at standard decay, in this cell, the partition buys nothing a single step size does not; the audit's PRACTICAL significance must be qualified in the draft whatever D4 says |
+
+The scorer's tokens are `SCALAR-TIES-BEST` and `SCALAR-BEATS-BEST`; the account is their union.
+**Floor gate (164.6):** chance is 10 %; HEALTH_MIN 85. Every predicted W4 level is ≥ **+5.3 pp** above HEALTH_MIN and
+≥ **7.4 pp** below 100 (selftest G asserts ≥ 5 / ≥ 7), so no account's D is floor- or ceiling-bounded; the only route
+to a bounded contrast is an arm collapsing, which UNHEALTHY / SCALAR-COLLAPSED catch before any contrast is read.
+
+### 291.6 The decision, and what was changed from the unreviewed draft
+
+Registered in `analysis/cGW1_auditwd_score.py` (docstring and `rung_state` / `primary_of` / `scalar_of`): plateau5 =
+mean TEST over epochs 95–99 from each run's own `.out`; SIGMA_USED = max(frozen floor, in-batch pooled sd); per rung
+D = ch − nd; states DIVERGED > UNHEALTHY > BOXBOUND (the audit's published 5 % rec gate) > REVERSES (D ≤ −0.15 and
+< −2 SE) > VANISHES > SURVIVES (D ≥ +0.30 and > 2 SE) > UNDECIDED; primary gated on the anchor (W1 unreadable →
+ANCHOR-UNREADABLE; W1 VANISHES/REVERSES → ANCHOR-NOT-REPRODUCED); scalar vs the better partition at W4 at a ±0.30 bar.
+**Changes from the draft, each checked, none a relaxation:**
+1. **Seeds 5 → 4 at W4; 44 → 40 runs** (291.4, the ceiling). 28 runs (W2 + W4) owe ARGS_WD_BASE exclusion rows at landing.
+2. **VANISHES now also requires D + 2 SE < +0.5556** (the audit's own pooled effect, a frozen literal `POOL_EXCLUDE`).
+   The draft read VANISHES from D ≤ +0.15 alone, so a noisy rung (in-batch σ ≳ 0.29) could print "vanishes" while its
+   interval still covered the audit's effect. At the prior's SE the clause never binds; the selftest drives both sides.
+3. **The V3 slip in the design's prose was removed** and the V4 figures replaced by the re-derived ones (291.2).
+4. **The launcher, stage script, RULE 20 pair and a source-identity guard (4e) did not exist**; the design named
+   `bin/cGW1_stage_harness.sh` and `bin/cGW1_auditwd.sh` but neither was in the tree. Written here.
+Verified and KEPT: the ARGS template (identical to the landed `gn1` BN lines); the ENV template; LANDED_W1 (re-derived,
+all four match to 3 d.p.); the frozen floor (291.7); the BOXBOUND gate; the anchor gate; the stamps.
+
+### 291.7 Registration evidence
+
+* **Frozen floor:** SIGMA_PRIOR **0.1789141365540324**, df 178, 34 cells, 212 rows — re-derived by the selftest through
+  `corpus_exclusions.filter_rows` on the CURRENT corpus (3,316 rows), equal to 1e-12; the unfiltered value is identical
+  (no exclusion row touches this cell), disclosure only.
+* **Selftest drives the real `score()`:** **99 PASS / 0 FAIL / 0 SKIP on alice2** (95 / 0 / 1 on the Mac, where F's
+  landed probe records are absent). It covers every primary and scalar token at and around its bars, exhaustive
+  reachability, 3,000-table totality, 16 harness breaks (wrong rung token, wrong grain, repeated flag, wrong ENV, patch
+  witness, n_beta ≠ m, provenance mismatch, unregistered seed, duplicate .out), O2 invariance (FINAL byte-identical on the
+  real corpus, no corpus, and a corpus with invented rows at this cell), the documented one-argument invocation, the
+  landed `gn1` records through the real probe audit, and the 164.6 floor gate.
+* **Dry run** (`bash bin/cGW1_auditwd.sh --dry-run` from `~/stage_cgw1_dry`, log `~/stage_cgw1_dry0.log`, 242 lines),
+  **read line by line:** every guard 0–9 passes; the only non-pass is guard 1b's NOTE that the stage has no git repo;
+  40 composed lines, 0 failing the RULE 20 / design-line / decay / constraint pre-checks; with run name, decay, grain and
+  seed masked the 40 lines collapse to **ONE** distinct line; the 40 (name, wd, grain, seed) rows are exactly the design's.
+  Each composed train.py half is checked token for token against `cgw1_design.args_line` (non-vacuity checked: a wrong
+  decay token fails it).
+
+### 291.8 Discipline (registration commit)
+
+Files: `analysis/cgw1_design.py`, `analysis/cGW1_auditwd_score.py`, `analysis/cgw1_live_check.py`,
+`analysis/cgw1_rule20_envaudit.py`, `bin/cGW1_auditwd.sh`, `bin/cGW1_stage_harness.sh`, `bin/cGW1_rule20.sh`,
+`docs/CORRECTIONS.md`. `corpus_exclusions.py` NOT edited. Nothing under `paper/` read or touched. The Step-0 files left in
+the working tree (`analysis/c289_step0_zero_gpu.py`, `results/c289_step0_zero_gpu.txt`) are not this track's and were not
+staged. **GPU so far: ZERO** (live check = CPU construction on the login node; no Slurm job). Nothing downloaded; no
+notebook website or Vercel URL opened.
+
+### 291.9 DISCLOSURE — one breach of the `alice` rule by this track
+
+While reading the landed audit ARGS lines on alice2, one shell command of mine ended with `ssh alice 'true' 2>/dev/null`
+— an **ssh connection to Saber's shared `alice` account, which the rules forbid contacting at all.** It ran the no-op
+`true`, read and wrote nothing, and its output was discarded; no file, job or setting on `alice` was touched. It was an
+error, not a decision, and it is recorded here rather than left out. No other command of this track contacted `alice`.
+
 ## 292. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO NUMBER.**  It applies the hostile area chair's corrections to `docs/ICML-PLAN.md` and fixes the campaign's name for its own weight decay in four forward-looking documents.  **No level, bar, state, contrast, branch word, stamp or licence CONTENT changes; no registered scorer token, stamp or CORRECTIONS text is edited.**  The chair's verdict is recorded, not contested: **no ICML candidate is an accept as planned.**]** — **THE ICML PLAN NOW LEADS WITH STEP 0 + THE AdamW GATE + G3, SCORES DOMINANCE BY `DOM_C`, AND CARRIES TWO NEW DIRECT THREATS; AND FROM THIS ENTRY ON THE HARNESS'S DECAY IS CALLED "α-SCALED", NEVER "COUPLED".**
 
 ### 292.1 Why this entry exists
