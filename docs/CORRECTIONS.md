@@ -39509,3 +39509,15 @@ scalar-beats-both row and W4's decay bound at full prominence, and on 1.14 (test
 retune lands, the rewritten headline rests on one CIFAR-10 cell.
 
 Next free number: **299**.
+
+## 299. RESERVED — Track A: `G3b` registration (the audit's CIFAR-100 cell at κ 0.1 and 5e-4). Placeholder written before the tracks start so that concurrent entries stay in numeric order; the track replaces this stub in place.
+
+## 300. RESERVED — Track B: the 5e-4 retune of the audit's core cell (ICML-PLAN §4a rank 2). Placeholder; replaced in place by its track.
+
+## 301. RESERVED — Track C: the 1.20 short-horizon γ control (threat T-C). Placeholder; replaced in place by its track.
+
+## 302. RESERVED — Track D: the validation-split loader patch (1.14, CORRECTIONS 135.1). Placeholder; replaced in place by its track.
+
+## 303. RESERVED — Track D: the 1.14 validation-split batch registration. Placeholder; replaced in place by its track.
+
+Next free number after the reservations: **304**.
