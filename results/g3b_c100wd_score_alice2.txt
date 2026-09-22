@@ -1,0 +1,84 @@
+==============================================================================================================
+g3b -- THE COUNT-MATCHED AUDIT, SCALAR, AND THE DENOMINATOR ON CIFAR-100 AT 0.1 AND 5e-4  (CORRECTIONS 299; G3b)
+scorer sha256 f21f57bdcceea3a3873b8399d09c38b98cb4c9270eda8892872cac0f260c9589   design sha256 f31f4ee407880a92688491ec5cb2563b66f941a56810210a4d958a9ba994d83e
+runsdir /home/s5014158/metaopt/runs
+==============================================================================================================
+COMPLETION  32 / 32 registered runs complete (100 epoch lines + RUN_DONE)
+G-PROV  /home/s5014158/metaopt/runs/g3b/PROVENANCE.txt  MODE submit  SCORER f21f57bdcceea3a3  DESIGN f31f4ee407880a92  HF 4732b74aa3a10508
+G-ARGS / G-ENV / G-KIND / G-STRUCT  32 of 32 complete runs pass (20 flags each, ONE ARGS and ONE ENV line, the registered ENV line, no patch witness, no epoch printed twice, 10,000 probe records with n_beta == the arm's m and a beta list of the grain's length)
+G-HW (DISCLOSURE ONLY, never a gate): NVIDIA L4 x32
+corpus: 3115 rows after corpus_exclusions.filter_rows, g3b- excluded  (DISCLOSURE ONLY -- enters no bar, sigma, level, state, contrast or stamp)
+
+ARMS  plateau5 = mean TEST over epochs 95-99 from each run's OWN .out; box occupancy from its OWN probe.jsonl
+  arm    rung wd    grain      n  plateau5      sd   range    train5  box      rec_lo   rec_hi coordlo_win coordhi_win
+  chW1   W1   0.1   chunk771   4   71.8810   0.367   0.796   96.1320  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 71.9560, s171 72.3700, s172 71.6240, s173 71.5740
+  ndW1   W1   0.1   nodewise   4   70.6640   0.237   0.532   92.5805  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 70.8900, s171 70.8060, s172 70.6020, s173 70.3580
+  k01W1  W1   0.1   scalar     4   35.1490   0.848   1.972   38.5310  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 36.2980, s171 34.7540, s172 34.3260, s173 35.2180
+  kLW1   W1   0.1   layerwise  4   70.7495   0.177   0.382   97.3600  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 70.6180, s171 71.0000, s172 70.7480, s173 70.6320
+  chW4   W4   5e-4  chunk771   4   63.0070   0.733   1.580   94.9620  BOUND    0.0000   0.0796    0.000000    0.000271
+         seeds: s170 63.7740, s171 63.4560, s172 62.6040, s173 62.1940
+  ndW4   W4   5e-4  nodewise   4   62.9425   0.450   0.802   94.4655  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 63.3160, s171 63.3480, s172 62.5460, s173 62.5600
+  k01W4  W4   5e-4  scalar     4   69.0415   0.514   1.114   97.8200  free     0.0000   0.0000    0.000000    0.000000
+         seeds: s170 69.4880, s171 69.4000, s172 68.3740, s173 68.9040
+  kLW4   W4   5e-4  layerwise  4   67.0545   0.271   0.620   98.5365  BOUND    0.0000   0.0796    0.000000    0.061258
+         seeds: s170 67.1980, s171 67.3020, s172 66.6820, s173 67.0360
+
+SIGMA  O2: max(frozen cell floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.273428  (df 21, filtered, literal; this cell)
+  SIGMA_INBATCH        0.431036  (df 21, pooled within the 7 arms with mean >= 55: chW1 ndW1 kLW1 chW4 ndW4 k01W4 kLW4)
+  SIGMA_USED           0.431036  (= SIGMA_INBATCH)
+  SIGMA_DEMO (quoted)  0.636566  (df 274; corpus_exclusions --check SIGMA_R18ALL, the mechanism cell; DESCRIPTIVE)
+
+CONTRASTS (every one WITHIN a rung, IN BATCH unless marked; +/-2 SE is a HALF-WIDTH, not a bound on any effect)
+  D_W1  = chW1 - ndW1 = +1.2170 pp = +3.99 SE (SE 0.304788)  [+0.6074, +1.8266]  TRAIN +3.5515   state SURVIVES
+  D_W4  = chW4 - ndW4 = +0.0645 pp = +0.21 SE (SE 0.304788)  [-0.5451, +0.6741]  TRAIN +0.4965   state BOXBOUND
+  DD_W4 = D_W4 - D_W1 = -1.1525 pp = -2.67 SE (SE 0.431036)   DESCRIPTIVE
+  Tch_W1 = k01W1 - chW1 = -36.7320 pp = -120.52 SE   DESCRIPTIVE (k01W1 is predicted collapsed)
+  Tnd_W1 = k01W1 - ndW1 = -35.5150 pp = -116.52 SE   DESCRIPTIVE (k01W1 is predicted collapsed)
+  Tch_W4 = k01W4 - chW4 = +6.0345 pp = +19.80 SE
+  Tnd_W4 = k01W4 - ndW4 = +6.0990 pp = +20.01 SE
+  G_W1  = kLW1 - k01W1 = +35.6005 pp = +116.80 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+  G_W4  = kLW4 - k01W4 = -1.9870 pp = -6.52 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+
+DENOMINATOR (BETWEEN-BATCH: tuned SGD + cosine = the landed cdn1 lr 0.1 literal 77.5927, n 3, sd 0.4259, wd 5e-4)
+  GAPch_W1 = SGD - chW1 = +5.7117 pp = +17.47 SE (SE 0.326973)  [+5.0578, +6.3656]   DESCRIPTIVE
+  GAPnd_W1 = SGD - ndW1 = +6.9287 pp = +21.19 SE (SE 0.326973)  [+6.2748, +7.5826]   DESCRIPTIVE
+  GAPk01_W1 = SGD - k01W1 = +42.4437 pp = +129.81 SE (SE 0.326973)  [+41.7898, +43.0976]   DESCRIPTIVE
+  GAPkL_W1 = SGD - kLW1 = +6.8432 pp = +20.93 SE (SE 0.326973)  [+6.1893, +7.4971]   DESCRIPTIVE
+  GAPch_W4 = SGD - chW4 = +14.5857 pp = +44.61 SE (SE 0.326973)  [+13.9318, +15.2396]   GATED (the cdn1-m arm)
+  GAPnd_W4 = SGD - ndW4 = +14.6502 pp = +44.81 SE (SE 0.326973)  [+13.9963, +15.3041]   DESCRIPTIVE
+  GAPk01_W4 = SGD - k01W4 = +8.5512 pp = +26.15 SE (SE 0.326973)  [+7.8973, +9.2051]   DESCRIPTIVE
+  GAPkL_W4 = SGD - kLW4 = +10.5382 pp = +32.23 SE (SE 0.326973)  [+9.8843, +11.1921]   DESCRIPTIVE
+  best grain at W4 = scalar (69.0415): GAP +8.5512 -- DESCRIPTIVE, a max over four arms is biased UP, so this gap is biased DOWN
+  landed cdn1 GAP_in (cdn1-m at 0.1, in cdn1's batch) +5.6993; GAPch_W1 here +5.7117 (DESCRIPTIVE replication)
+
+THE DOSE (DESCRIPTIVE): realised per-step shrink a*wd = median over the arm's step sizes of exp(beta)*wd per record; plateau = median over records with step >= 47500; arm = median over its seeds.  ch / nd are APPROXIMATE (62 per-tensor mean log step sizes per record).
+  chW1   chunk771  wd 0.1   plateau 2.4478e-05  peak 2.0237e-04  (approx)
+  ndW1   nodewise  wd 0.1   plateau 6.2062e-05  peak 1.1804e-04  (approx)
+  k01W1  scalar    wd 0.1   plateau 2.1415e-06  peak 1.6666e-04
+  kLW1   layerwise wd 0.1   plateau 1.6158e-05  peak 2.0346e-04
+  chW4   chunk771  wd 5e-4  plateau 2.7430e-06  peak 2.8108e-06  (approx)   = 1/18 of lr*wd 5e-05, 1/182 of a standard recipe's ~5e-04
+  ndW4   nodewise  wd 5e-4  plateau 7.0439e-07  peak 7.1149e-07  (approx)   = 1/71 of lr*wd 5e-05, 1/710 of a standard recipe's ~5e-04
+  k01W4  scalar    wd 5e-4  plateau 1.2840e-05  peak 1.3165e-05   = 1/4 of lr*wd 5e-05, 1/39 of a standard recipe's ~5e-04
+  kLW4   layerwise wd 5e-4  plateau 3.8062e-06  peak 4.0816e-06   = 1/13 of lr*wd 5e-05, 1/131 of a standard recipe's ~5e-04
+
+SENSITIVITY (DESCRIPTIVE, no token): the primary states re-read at the quoted SIGMA_DEMO 0.636566 instead of SIGMA_USED:
+  W1-SURVIVES W4-BOXBOUND
+
+LADDERS (LEVELS, not effects; this cell only)
+  chunk771  0.1 71.8810 | 5e-4 63.0070
+  nodewise  0.1 70.6640 | 5e-4 62.9425
+  scalar    0.1 35.1490 | 5e-4 69.0415
+  layerwise 0.1 70.7495 | 5e-4 67.0545
+  cgw1 side by side (CIFAR-10, DESCRIPTIVE, cross-batch): D_W1 +0.3693, D_W4 +0.2410, Tch_W4 +2.5590, Tnd_W4 +2.8000
+
+LICENCE (primary)  a primary-rung partition arm is box-bound; the contrast is not an audit replication.  Itself a fact: at 5e-4 the step sizes reach the box.
+LICENCE (scalar)   plain scalar is ABOVE both audit partitions at 5e-4 by >= 0.30 pp, resolved: at the decay VALUE 5e-4 applied alpha-scaled, on this CIFAR-100 cell, no audited partition beats a single shared step size -- cgw1's reading holds on the audit's second dataset.
+LICENCE (denom)    the audit's CIFAR-100 MetaOptimize arm (chunk771, cdn1-m's configuration) run at the decay VALUE 5e-4 is still below the landed tuned SGD + cosine (cdn1, lr 0.1, wd 5e-4) by >= 1.0 pp, resolved: the denominator deficit is not an artefact of running the MetaOptimize arm at 0.1 (ICML-PLAN 1.16), at this cell, between batches, with the SGD arm's lr chosen on the test set (1.14).
+
+FINAL UNRESOLVED-BOXBOUND-W4 | SCALAR-BEATS-BEST | DENOM-HOLDS | W1-SURVIVES+W4-BOXBOUND | ONE-CELL-C100 TWO-RUNGS ALPHA-INDEPENDENT-DECAY-NOT-TESTED W4-IS-A-NOMINAL-VALUE DENOM-IS-CROSS-BATCH FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH ANCHOR-MATCHES-POOL W1-LEVEL-DIFFERS-k01 K01W1-COLLAPSED LAYERWISE-BELOW-SCALAR-W4

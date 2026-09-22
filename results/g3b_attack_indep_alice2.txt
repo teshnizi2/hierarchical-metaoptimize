@@ -1,0 +1,139 @@
+==============================================================================================================
+g3b_attack_indep.py -- an INDEPENDENT re-derivation of g3b (CORRECTIONS 299) from the raw run files
+  stdlib only, no repo import, no regex, no shlex; every literal re-typed.  Scorer under attack: sha f21f57bdcceea3a3
+==============================================================================================================
+
+[0] RUN FILES, SYNC INTEGRITY, PROVENANCE, STAGE
+  PASS each g3b-*.out file name occurs once across <runsdir> and <runsdir>/g3b
+  PASS 32 g3b-*.out files found (found 32)
+  PASS the 32 file names are exactly the design's (arm, seed) set, 8 arms x seeds 170-173
+  PASS all 64 run files present (32 .out + 32 probe.jsonl)
+  DIGEST over the 64 run files' names and sha256: 1785ec6d6466fd677fc7046a7cadf0ab84913f515d12a679c844c36586857b4e  (2312928299 bytes)
+  PASS job ids are 5080798-5080829, contiguous, W1 then W4, per seed ch / nd / k01 / kL (299.12)
+  PASS PROVENANCE MODE = submit
+  PASS PROVENANCE SCORER_SHA256 = f21f57bdcceea3a3
+  PASS PROVENANCE DESIGN_SHA256 = f31f4ee407880a92
+  PASS PROVENANCE HF_SHA256 = 4732b74aa3a10508
+  PASS PROVENANCE RUNNER_SHA256 = a478739882d9cd15
+  PASS PROVENANCE REGISTERED_COMMIT = 31792c4601863e47
+  PASS PROVENANCE WD_LADDER = W1=0.1 W4=5e-4
+  PASS PROVENANCE SEEDS = W1=170 171 172 173 W4=170 171 172 173
+  PASS PROVENANCE GRAINS = ch=chunk771 nd=nodewise k01=scalar kL=layerwise
+  PASS stage scorer sha256 = f21f57bdcceea3a3 (the registered bytes)
+  PASS stage design sha256 = f31f4ee407880a92
+
+[1]-[3] PER RUN: ARGS rebuilt flag by flag, ENV, epoch lines, probe structure, box occupancy per seed
+  PASS ARGS: exactly ONE line per run, equal to the design's 20 flags in order, value for value, byte for byte (0 of 32 fail; [])
+  PASS ONE save directory across the 32 runs
+  PASS ENV: exactly ONE line per run, the registered one with the run's own PROBE_DIR (0 fail)
+  PASS no `<KIND>: on` witness and no PROBE_TENSOR line (0 fail)
+  PASS RUN_DONE exactly once on every run (0 fail)
+  PASS Epoch lines: epochs 0..99 once each, 100 lines (0 fail)
+  PASS every line carrying `Test Accuracy` parses as an epoch line (0 fail)
+  PASS every run's nvidia-smi line names an NVIDIA L4 (0 fail)
+  PASS probe.jsonl: 10,000 records at steps 0,5,...,49995, n_beta == the arm's m, beta list 1 (scalar) or 62 entries, beta moved (0 fail)
+  PASS every run's first probe record sits at ln(alpha0 1e-3) = -6.9078 (+/-1e-3) (0 fail)
+
+  PER RUN (plateau5 = mean TEST of epochs 95-99; box occupancy from the raw probe records; minutes from the run's own line)
+  run                  job  plateau5    train5   TEST99   rec_lo   rec_hi  coordhi    first@HI minutes
+  g3b-chW1-s170    5080798   71.9560   96.1920    71.61   0.0000   0.0000 0.000000           -      79
+  g3b-ndW1-s170    5080799   70.8900   93.0620    70.50   0.0000   0.0000 0.000000           -      72
+  g3b-k01W1-s170   5080800   36.2980   39.8040    36.45   0.0000   0.0000 0.000000           -      64
+  g3b-kLW1-s170    5080801   70.6180   97.2960    70.24   0.0000   0.0000 0.000000           -      55
+  g3b-chW1-s171    5080802   72.3700   96.3300    72.43   0.0000   0.0000 0.000000           -      65
+  g3b-ndW1-s171    5080803   70.8060   92.7220    71.56   0.0000   0.0000 0.000000           -      73
+  g3b-k01W1-s171   5080804   34.7540   37.7700    34.77   0.0000   0.0000 0.000000           -      75
+  g3b-kLW1-s171    5080805   71.0000   97.4380    70.98   0.0000   0.0000 0.000000           -      66
+  g3b-chW1-s172    5080806   71.6240   95.9120    72.33   0.0000   0.0000 0.000000           -      80
+  g3b-ndW1-s172    5080807   70.6020   92.2980    71.32   0.0000   0.0000 0.000000           -      75
+  g3b-k01W1-s172   5080808   34.3260   37.7840    34.30   0.0000   0.0000 0.000000           -      75
+  g3b-kLW1-s172    5080809   70.7480   97.3140    70.85   0.0000   0.0000 0.000000           -      68
+  g3b-chW1-s173    5080810   71.5740   96.0940    71.56   0.0000   0.0000 0.000000           -      82
+  g3b-ndW1-s173    5080811   70.3580   92.2400    70.91   0.0000   0.0000 0.000000           -      71
+  g3b-k01W1-s173   5080812   35.2180   38.7660    35.49   0.0000   0.0000 0.000000           -      71
+  g3b-kLW1-s173    5080813   70.6320   97.3920    71.00   0.0000   0.0000 0.000000           -      65
+  g3b-chW4-s170    5080814   63.7740   95.1440    63.85   0.0000   0.0787 0.000271       46065      74
+  g3b-ndW4-s170    5080815   63.3160   94.6240    62.85   0.0000   0.0000 0.000000           -      63
+  g3b-k01W4-s170   5080816   69.4880   97.8140    69.04   0.0000   0.0000 0.000000           -      62
+  g3b-kLW4-s170    5080817   67.1980   98.5260    67.58   0.0000   0.0796 0.052581       46020      52
+  g3b-chW4-s171    5080818   63.4560   95.1420    63.62   0.0000   0.0796 0.000254       46020      60
+  g3b-ndW4-s171    5080819   63.3480   94.7120    63.10   0.0000   0.0000 0.000000           -      55
+  g3b-k01W4-s171   5080820   69.4000   97.8080    70.22   0.0000   0.0000 0.000000           -      57
+  g3b-kLW4-s171    5080821   67.3020   98.5180    67.85   0.0000   0.0796 0.061032       46020      45
+  g3b-chW4-s172    5080822   62.6040   94.8180    62.55   0.0000   0.0794 0.000262       46030      63
+  g3b-ndW4-s172    5080823   62.5460   94.2700    62.46   0.0000   0.0000 0.000000           -      53
+  g3b-k01W4-s172   5080824   68.3740   97.7680    68.63   0.0000   0.0000 0.000000           -      53
+  g3b-kLW4-s172    5080825   66.6820   98.4560    66.51   0.0000   0.0796 0.059806       46020      40
+  g3b-chW4-s173    5080826   62.1940   94.7440    62.50   0.0000   0.0796 0.000250       46020      57
+  g3b-ndW4-s173    5080827   62.5600   94.2560    62.70   0.0000   0.0000 0.000000           -      49
+  g3b-k01W4-s173   5080828   68.9040   97.8900    69.22   0.0000   0.0000 0.000000           -      48
+  g3b-kLW4-s173    5080829   67.0360   98.6460    67.19   0.0000   0.0796 0.061258       46020      40
+  GPU time by the runs' own `minutes` lines: 2007 min = 33.4500 GPU-h (registered expectation 24.4, hard bound 64)
+
+[4]-[5] THE SCORER'S STDOUT REBUILT (84 lines) AND COMPARED LINE BY LINE WITH EACH COMMITTED LOG
+  rebuild digest (host-dependent lines as their @ placeholders): ea28325ea371d9f6b30050179a4af4aa2fc9226337cd9a6cb7587d5c358e3c5a
+  PASS committed log #1: 84 lines, every line equal to the rebuild (82 byte for byte, 2 host lines by form) []
+  PASS committed log #1: its LAST line is the rebuilt FINAL
+  PASS committed log #2: 84 lines, every line equal to the rebuild (82 byte for byte, 2 host lines by form) []
+  PASS committed log #2: its LAST line is the rebuilt FINAL
+
+[6] THE THREE QUESTIONS OF 299, FROM THE NUMBERS (bounds first)
+  BOUNDS on every reading: ONE-CELL-C100 TWO-RUNGS ALPHA-INDEPENDENT-DECAY-NOT-TESTED W4-IS-A-NOMINAL-VALUE DENOM-IS-CROSS-BATCH FLOOR-READINGS-ARE-BOUNDS
+  FINAL UNRESOLVED-BOXBOUND-W4 | SCALAR-BEATS-BEST | DENOM-HOLDS | W1-SURVIVES+W4-BOXBOUND | ONE-CELL-C100 TWO-RUNGS ALPHA-INDEPENDENT-DECAY-NOT-TESTED W4-IS-A-NOMINAL-VALUE DENOM-IS-CROSS-BATCH FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH ANCHOR-MATCHES-POOL W1-LEVEL-DIFFERS-k01 K01W1-COLLAPSED LAYERWISE-BELOW-SCALAR-W4
+  sigma_used 0.431036 (SIGMA_INBATCH; in-batch 0.431036 df 21 is 57.6 % above the frozen floor 0.273428)
+  PRIMARY  D_W1 +1.2170 (SE 0.3048, state SURVIVES) | D_W4 +0.0645 [-0.5451, +0.6741] state BOXBOUND -> UNRESOLVED-BOXBOUND-W4
+  SCALAR   Tch_W4 +6.0345, Tnd_W4 +6.0990 (2 SE 0.6096); min T - 2 SE +5.4249 -> SCALAR-BEATS-BEST
+  DENOM    GAP4 +14.5857 [+13.9318, +15.2396] (SE 0.326973) -> DENOM-HOLDS   (between-batch; the SGD lr was chosen on TEST, 1.14)
+
+[7] WHAT BOUNDS THE VERDICT (DESCRIPTIVE unless it restates a registered gate)
+  BOX: chW4 is BOUND on seed(s) 170 171 172 173: rec_hi 0.0787 0.0796 0.0794 0.0796 (gate 0.05); first record at the top edge -2.3026 at meta step 46065 46020 46030 46020
+  BOX: kLW4 is BOUND on seed(s) 170 171 172 173: rec_hi 0.0796 0.0796 0.0796 0.0796 (gate 0.05); first record at the top edge -2.3026 at meta step 46020 46020 46020 46020
+  COUNTERFACTUAL (no token, not a licence): with the 5 % box gate removed the rung states would read W1-SURVIVES W4-VANISHES, i.e. AUDIT-VANISHES
+  COUNTERFACTUAL at the frozen floor sigma 0.273428 and no box gate: W1-SURVIVES W4-VANISHES (D_W4 +0.0645, 2 SE 0.3867)
+  VANISHES needs D_W4 <= +0.15 (D_W4 +0.0645 is 0.0855 inside that bar) and D_W4 + 2 SE < 1.5602 (+0.6741); SURVIVES would need D_W4 >= 0.30 and > 2 SE 0.6096 (D_W4 is 0.2355 short of the 0.30 bar)
+  BOX-GATE CAVEAT: the box gate applies to BOTH ch and nd arms of a rung; only chW4 is bound (ndW4 free), and its bound coordinates are a small share of its groups in the plateau window (coordhi_win max 0.000271)
+  leave-one-seed-out D_W4 (drop the same seed from ch and nd):
+    drop s170: D_W4 -0.0667
+    drop s171: D_W4 +0.0500
+    drop s172: D_W4 +0.0667
+    drop s173: D_W4 +0.2080
+  same-seed paired chW4 - ndW4: s170 +0.4580, s171 +0.1080, s172 +0.0580, s173 -0.3660
+  SCALAR: min T - 2 SE +5.4249 clears the BEATS bar by 5.4249 (T >= 0.30 and > 2 SE 0.6096); at SIGMA_DEMO 2 SE is 0.9002
+  SCALAR per seed k01W4 - max(chW4, ndW4): s170 +5.7140, s171 +5.9440, s172 +5.7700, s173 +6.3440
+  DENOM: GAP4 - 2 SE +13.9318 clears the 1.0 pp bar by 12.9318
+  FLOOR GATE (164.6): every W4 level vs HEALTH_MIN 55 and 100: chW4 +8.01 / 36.99, ndW4 +7.94 / 37.06, k01W4 +14.04 / 30.96, kLW4 +12.05 / 32.95
+  predicted (299.5) vs measured W4 levels, SURVIVES account: ch 63.0070, nd 62.9425, k01 69.0415, kL 67.0545  (ch 66.5-71.5, nd 65.0-70.5, k01 68.0-73.5, kL 66.0-70.5)
+  level drop 0.1 -> 5e-4 per grain: ch -8.8740, nd -7.7215, k01 +33.8925, kL -3.6950
+  REALISED SHRINK per arm (plateau median a*wd; W4 beside lr*wd 5e-5 and a standard recipe's ~5e-4):
+    chW1   plateau 2.4478e-05  peak 2.0237e-04  (approx)
+    ndW1   plateau 6.2062e-05  peak 1.1804e-04  (approx)
+    k01W1  plateau 2.1415e-06  peak 1.6666e-04
+    kLW1   plateau 1.6158e-05  peak 2.0346e-04
+    chW4   plateau 2.7430e-06  peak 2.8108e-06  = 18.2x below lr*wd, 182.3x below a standard recipe  (approx)
+    ndW4   plateau 7.0439e-07  peak 7.1149e-07  = 71.0x below lr*wd, 709.8x below a standard recipe  (approx)
+    k01W4  plateau 1.2840e-05  peak 1.3165e-05  = 3.9x below lr*wd, 38.9x below a standard recipe
+    kLW4   plateau 3.8062e-06  peak 4.0816e-06  = 13.1x below lr*wd, 131.4x below a standard recipe
+
+[8] THE 16 EXCLUSION ROWS OWED AT INGEST (299.9), REBUILT FROM THE RUNS' OWN FILE NAMES AND ARGS LINES
+  PASS PROPOSED file header is CORPUS-EXCLUSIONS.tsv's 9-column header
+  PASS exactly the 16 W4 runs deviate (wd 5e-4 != 0.1); no W1 run and no momentum deviation
+  PASS the PROPOSED rows equal the rebuild byte for byte, in job order (16 rows)
+  rows digest 038f1f990d986274c12f76cdd3e96d71b8aa7dfac7b3c12b80f7f9d7d62cfc43
+  g3b-chW4-s170	5080814	g3b	chW4	ch (granularity chunk771)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-ndW4-s170	5080815	g3b	ndW4	nd (granularity nodewise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-k01W4-s170	5080816	g3b	k01W4	k01 (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-kLW4-s170	5080817	g3b	kLW4	kL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-chW4-s171	5080818	g3b	chW4	ch (granularity chunk771)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-ndW4-s171	5080819	g3b	ndW4	nd (granularity nodewise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-k01W4-s171	5080820	g3b	k01W4	k01 (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-kLW4-s171	5080821	g3b	kLW4	kL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-chW4-s172	5080822	g3b	chW4	ch (granularity chunk771)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-ndW4-s172	5080823	g3b	ndW4	nd (granularity nodewise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-k01W4-s172	5080824	g3b	k01W4	k01 (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-kLW4-s172	5080825	g3b	kLW4	kL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-chW4-s173	5080826	g3b	chW4	ch (granularity chunk771)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-ndW4-s173	5080827	g3b	ndW4	nd (granularity nodewise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-k01W4-s173	5080828	g3b	k01W4	k01 (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  g3b-kLW4-s173	5080829	g3b	kLW4	kL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 315	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+
+SUMMARY 33 PASS / 0 FAIL
