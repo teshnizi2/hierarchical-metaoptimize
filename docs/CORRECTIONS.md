@@ -40961,6 +40961,227 @@ coverage is owed once all 32 have started (`bash bin/cAI1_rule20.sh` from the st
 
 *(Filled by the follow-up commit.)*
 
-## 307. RESERVED — Track F: the collapse-route batch, row 1.6 (registration). Placeholder; replaced in place by its track.
+## 307. TRACK F3 — **`crd1` REGISTERED, NOT SUBMITTED: THE COLLAPSE ROUTE (ICML-PLAN row 1.6, stamp `DECOUPLED-NOT-TESTED`).  AT THE MECHANISM CELL (ResNet18_c100, wd 0.1), WHICH ROUTE OF THE α-SCALED DECAY CARRIES THE SCALAR COLLAPSE — THE WEIGHT SHRINK (`DECAY_ROUTE=shrink_only`), THE SHORTENED META-TRACE (`trace_only`), BOTH, OR NEITHER ALONE — AND DOES THE COLLAPSE SURVIVE α-INDEPENDENT DECAY (`alpha_indep:3.15e-4` at wd 0)?  3 ROUTES × {scalar, layerwise} × SEEDS {196, 197, 198} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **SUFFICIENCY, NOT NECESSITY.** Each single-route arm says what that route IS ENOUGH to do at this cell; a null never says the route plays no part when both are on.  (2) **`shrink_only` AND `trace_only` ARE INTERVENTIONS, NOT HYPERGRADIENTS** of their own weight update (305.3), and `shrink_only`'s trace keeps the direct term a·wd·w (305.2's judgement on `delta'`, `DELTA-IS-APPLIED-CHANGE`).  (3) **Λ IS MATCHED TO THE ONSET-WINDOW PER-STEP SHRINK, NOT TO THE INIT** (the brief's init match, wd × α0 = 1e-7, is degenerate at this cell: dose ratio 1.8e-4, below the campaign's DOSE bar) **AND NOT TO THE CUMULATIVE DOSE** — a constant Λ front-loads the decay and delivers **13.6×** the collapsing arm's whole-run log-shrink.  ONE Λ.  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL** (normalised layers, arXiv:2305.17212).  (5) **NO in-batch OFF anchor**: the OFF collapse is the landed premise (five batches, 22.79–23.22; cwd5 W1 23.2240 / 69.2940), and the cdr1 tree's OFF inertness is by 305's proof, not re-run.  (6) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (7) ONE cell, ONE network, 100 epochs, 3 seeds.  (8) **csh1's outcome is read BESIDE this FINAL by the joint table 307.7, never inside it.**  All 16 bounds are stamped on every scored FINAL.]**
+
+*ZERO GPU by this track.  No Slurm job submitted (the verifier submits).  The only compute on the alice2 login node was
+CPU: construction of the six arms' optimisers and 3 CPU `HF.step`s per arm on a batch of 4 (guard 4h / `analysis/
+crd1_route_cpu_check.py`), the scorer selftest, and the RULE 20 pair on synthetic `.out` files.  `alice` NOT contacted
+(every cluster command went to `alice2`).  Nothing under `paper/` read, listed, opened or copied: every rsync excluded
+`/paper`, the stage is `git archive 855b936 -- . ':!paper'` (0 `paper` entries in the tar), and no clone, checkout or
+worktree was made.  Nothing downloaded, no `.pdf` fetched, no arXiv download tool used, no licence accepted, no notebook
+site or Vercel URL opened.  docs/STATUS.md and docs/ICML-PLAN.md NOT edited.  No job cancelled.*
+
+### 307.1 Question, and why it is worth GPU
+
+The harness's decay is α-scaled (292 NAMING): `delta = a(m + wd·w)`, `w ← w − delta`, `h ← γ(1 − wd·a)h − delta`.  ONE
+flag moves two routes: the weights shrink by wd·a per step (route W), and the meta trace's horizon is cut to ≈1/(wd·a),
+which moves with the learned a, with the decay's own derivative a·wd·w inside delta (route H).  Every collapse batch so
+far moved both at once (285's bound 3: "WHICH ROUTE the decay acts through is not separated").  csh1 (301) tests route H
+with a CONSTANT γ and the dose removed, and stamps `TRACE-ONLY-PATCH-NOT-RUN`; `crd1` runs that patch (the learned horizon,
+`trace_only`), its complement (`shrink_only`), and the α-independent form the referee asks for (`DECOUPLED-NOT-TESTED`,
+ICML-PLAN §3 row 1.6, "MUST (reviewers will ask)").  It is the only queued experiment that can say which route the TMLR
+collapse section may name, and whether the collapse is a property of α-scaled decay (PyTorch AdamW's default form) or
+of decay as such.
+
+### 307.2 Prior art, checked FIRST (web search, 2026-09-22; search result lists and summaries only, no `.pdf`)
+
+Five queries, verbatim in the dated section appended to `docs/PRIOR-ART.md` ("WHICH ROUTE of the α-scaled decay…"),
+on top of 305's nine (the two decay forms) and 301's five (short-horizon bias).  Nearest: FADE (arXiv:2604.27063) —
+search summaries say its IDBD trace is re-derived for the decay and that later versions ablate adaptive decay against
+step-size adaptation; it learns the DECAY and, in anything the summaries show, never intervenes on the trace factor and
+the weight shrink separately (summary level, UNSURE).  Wu et al. (arXiv:1803.02021) fix the trace route's direction
+(learned rates driven small).  Micaelli et al. (arXiv:2007.07869) learn decay schedules by forward-mode hypergradients,
+no route separation.  Norm/decay equilibrium work (arXiv:1803.01814, 2103.15345, 2506.02285; 2305.17212 on file) is the
+bound (4) caveat.  **Has anyone separated the weight-shrink route from the trace route under a LEARNED step size?  NOT
+FOUND.  Verdict: `WORTH-GPU`; kept at 18 runs.**
+
+### 307.3 The cell, the tree, and Λ (VERIFIED, not assumed)
+
+* **Cell, read from `cwd5`'s own ARGS lines** (`cwd5-k01W1-s146`, `cwd5-kLW1-s146`): ResNet18_c100 / CIFAR-100 / bs 100 /
+  SGDm 0.99 / Lion 0.99, β2 0.9 / meta wd 0 / `--gamma 1` / ms 1e-3 / α0 1e-6 / 100 ep / **wd 0.1**; ENV AUGMENT=1,
+  BETA_CLIP −15:−2.3026, SCHED=none, PROBE=100; PROBE_TENSOR on.  The SR* / TR* arms are those lines flag for flag AND
+  in order; the AI* arms differ in `--weight-decay-base 0` only (selftest A, both hosts: 6 / 6).
+* **Tree:** `$WS/harness_cdr1/cifar10` (305), UNCHANGED — HF.py `17ee0a28…` (PATCH_DECAYROUTE; `.pre_decayroute` =
+  the live `4732b74a…`), train `3fea309e…`, build_network `c7998883…`, build_optimizer `25a899b3…`; runner
+  `$WS/jobs/run_cifar_cdr1.sh` `d3d3bdd7…`; `bin/cDR1_stage_harness.sh` (verify mode) VERIFIED inside the dry run
+  (guard 4a1).  CIFAR-100 visible through the data symlink (guard 3).  **cwd5 ran on `harness_cwd1` (HF `94aedc33…`,
+  five patches all OFF); the cdr1 tree is the live HF.py + PATCH_DECAYROUTE only, so it prints NO `VOTE_W` / … /
+  `DECAY_MASK` line and the scorer requires none** (G-WITNESS).  Every patch in both chains was proven bitwise inert OFF
+  (305.5 RR1 for this one); the OFF equivalence to cwd5's tree is BY PROOF, not re-run here (bound 5).
+* **The wiring, proved on the login node's CPU** — `analysis/crd1_route_cpu_check.py` (`e6e40b18…`), **43 PASS / 0 FAIL**
+  (guard 4h, log `$WS/runs/crd1/route_cpu_check.dryrun.log`, `81cb569b…`): for each arm, its OWN ARGS through train.py's
+  own `parse_args` + `build_optimizer`, with its OWN `DECAY_ROUTE` value, print EXACTLY ONE `DECAY_ROUTE:` line equal to
+  the registered witness, no hold / mask line, `base_update` = `_dr_SGDm_base_update`, `_dr_mode` / `_dr_lam` / wd / grain /
+  γ as registered; 3 real `HF.step`s on the live ResNet18_c100 give weights AND trace BITWISE the mode's formula on
+  186 / 186 tensor-steps (6 / 6 arms); **non-vacuity:** OFF's formula FAILS on every arm (shrink_only: its weights equal
+  OFF's on 186 / 186 by design, its trace differs on 104; trace_only / alpha_indep: OFF's weights fail on 146); **loud:**
+  `alpha_indep` at wd 0.1 and `shrink_only` at wd 0 each raise `ValueError: PATCH_DECAYROUTE`.
+* **Λ, DERIVED (`crd1_design.derive_lambda` → `csh1_design.derive_gammas`, csh1's registered file UNEDITED, RULE 16).**
+  The brief's default "Λ = wd × the init step size" is **1e-7** here; the collapsing arm cwd5 k01W1's realised shrink
+  0.1·exp(β) is 1.0e-7 at step 0 but **3.1477e-4** (median, 12 records per seed, identical on seeds 146/147/148) in the
+  onset window [G_0.5 = step 7,500, β TURN = 8,700) where the collapse sets in, and peaks at 5.4–5.6e-4.  A Λ of 1e-7
+  has dose ratio 1.8e-4 against the source's recorded peak — `DECAY-DOSE-BELOW` by caw2's bar (0.5), the campaign's own
+  "a null cannot be read" case — so the init match is REJECTED WITH THAT REASON.  **Λ = 3.15e-4 = csh1's Q_M** (the onset
+  median, 3 s.f.): dose ratio 0.570 (REACHED), and **1 − Λ = γ_M = 0.999685 exactly, so crd1's AI* arms and csh1's GM*
+  arms share one trace horizon (≈3,175 steps)** — AI* = GM* + a constant weight shrink at the matched dose.  Disclosed
+  (selftest B): the source's cumulative log-shrink Σ0.1·a is **0.1724** before step 7,500 and **1.1541 / 1.1575 / 1.1346**
+  over the run; Λ gives **2.3625** and **15.75** (13.6×).  The cumulative match (≈2.3e-5) is also BELOW the dose bar;
+  not run.  Λ reaches the update as `float("3.15e-4")` = 0.000315 (float32 0.0003150000120513141, in the witness).
+
+### 307.4 The design (`analysis/crd1_design.py`, `ac12901b…`)
+
+| cell | arms | wd | `DECAY_ROUTE` | weights | trace | reads |
+|---|---|---|---|---|---|---|
+| S | SRS \| SRL | 0.1 | `shrink_only` | w − a(m + wd·w)  (== OFF, bitwise) | γh − a(m + wd·w) | route W alone |
+| T | TRS \| TRL | 0.1 | `trace_only` | w − a·m (undecayed) | γ(1 − 0.1a)h − a·m | route H alone, LEARNED horizon |
+| I | AIS \| AIL | 0 | `alpha_indep:3.15e-4` | w − Λw − a·m | γ(1 − Λ)h − a·m | α-independent, both routes |
+
+Seeds {196, 197, 198} (Track F3's block), verified FREE: 0 corpus rows (3,383 rows, max seed 162), 0 `.out` ARGS lines
+under `$WS/runs` with `--seed 196..198`, 0 `crd1-*` jobs in sacct / squeue, 0 `.out` with a `DECAY_ROUTE: on` line
+(guards 2–2f).  `DECAY_ROUTE` rides each job's `--export` list (one token; the launcher unsets it and every hold / mask
+variable in its own environment, guard 0b).  Only `--weight-decay-base` and `--stepsize-groups` vary in the ARGS.
+
+### 307.5 The scorer (`analysis/cRD1_route_score.py`, **`8684f086ef68ef853e512f937c550cda2203173fc287f916c02b0fe8ea4b3011`**)
+
+**Frozen literals (O2):** R50 0.50, GAP_BAR 10 pp, REF_MIN 55, DIVERGED 5 pp, FLOOR 15 / CEIL 90, DOSE_BAR 0.5,
+FLOOR_BETA −14.99 / share 0.5; the G-ROUTE tolerances SHRINK_CHECK_MIN 1e-5, S_REL_TOL 5e-2, LW_REL_TOL 2e-2 /
+LW_ABS_TOL 1e-7, T_ABS_MAX 1e-6, I_REL_TOL 1e-2, EXACT_TOL 1e-9 (each ≥ 25× the deviation 305.5 measured, and ≥ the
+float32 half-ulp bound at the check's floor); **noise floor SIGMA_PRIOR = 0.636565585885168 (df 274, 53 cells) — the demo
+value 0.636566, re-derived by selftest C through `corpus_exclusions.filter_rows` on the CURRENT corpus (3,383 rows,
+`cc189bd1…`) to 1e-12**; the naive 14.4853 (df 401) is disclosed as the trap; σ_used = max(frozen, in-batch), SE 0.519754.
+**States** (within cell, caw2's / csh1's): UNREADABLE > SPLIT > COLLAPSE (k ≤ 0.5·L) > NOGAP (L − k < 10) > PARTIAL.
+**Two exhaustive, ordered ladders (first match), after INCOMPLETE → HARNESS-UNSOUND:**
+ROUTE(S, T): **ROUTE-EITHER-SUFFICES** (S, T COLLAPSE) → **ROUTE-IS-WEIGHT-SHRINK** (S COLLAPSE, T NOGAP) → **ROUTE-IS-TRACE**
+(T COLLAPSE, S NOGAP) → **ROUTE-NEITHER-ALONE** (both NOGAP) → **ROUTE-WEIGHT-SHRINK-SUFFICES-TRACE-UNRESOLVED** (S COLLAPSE,
+T other) → **ROUTE-TRACE-SUFFICES-SHRINK-UNRESOLVED** → **ROUTE-REFERENCE-UNREADABLE** (S or T UNREADABLE) →
+**ROUTE-PARTIAL** (default).  INDEP(I): **INDEP-COLLAPSES** / **INDEP-NOGAP** / **INDEP-UNREADABLE** / **INDEP-PARTIAL**
+(default, SPLIT included).  FINAL = `FINAL: <ROUTE> | <INDEP> | S-<st>+T-<st>+I-<st> | …`.
+**Gates:** G-ARGS (every flag, own arm's wd, no repeat, no extra), G-ENV, G-PT, **G-WITNESS** (exactly one `DECAY_ROUTE:`
+line == the arm's witness — mode, wd, Λ, its float32, γ — and NO hold / mask line), G-STRUCT, G-PROV (HF post and pre,
+runner, train, **patch**, scorer, design, csh1 / cwd designs, common), G-PROBE (500 records, the grain's step-size count,
+the Lion vote decomposition on scalar arms), **G-ROUTE** (PATCH_DECAYROUTE's own record on all 500: `dr_mode`, `dr_lam`,
+`dr_n` = step + 2, and the MEASURED shrink is the mode's — shrink_only ratio / layerwise bracket where applied ≥ 1e-5,
+trace factor exactly 1; trace_only |meas| ≤ 1e-6, applied 0; alpha_indep |meas/Λ − 1| ≤ 1e-2, applied Λ, factor 1 − Λ;
+a shrink_only arm whose β never lifts the applied shrink to 1e-5 is stamped `S-SHRINK-CHECK-VACUOUS-…`, not failed),
+G-FLOOR / G-CEIL.  **Co-reported, descriptive:** G_c; k_S − k_T, k_I − k_S, k_I − k_T, L_S − L_T, L_I − L_S (±2 SE);
+between-batch k_c − 23.2240 and L_c − 69.2940 (the landed OFF premise, non-gating); per arm the measured shrink
+(onset median, peak, cumulative), the trace factor and horizon, RHO_D → `DECAY-DOSE-<cell>-<BELOW|REACHED>`, each scalar
+arm's β turn, `BETA-FLOOR-<arm>`.  **Bounds on the FINAL line, every scored branch (selftest E asserts all 16):**
+`SUFFICIENCY-NOT-NECESSITY | ROUTE-INTERVENTIONS-NOT-HYPERGRADIENTS | DELTA-IS-APPLIED-CHANGE | ALPHA-INDEP-NOT-A-PURE-ROUTE-CONTROL |
+LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE | ONE-LAMBDA | NO-INBATCH-OFF-ANCHOR | CDR1-TREE-OFF-INERT-BY-PROOF-NOT-RERUN |
+KAPPA-0.1-CELL-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS |
+NOGAP-IS-A-BOUND | CSH1-JOINT-READING-NOT-IN-THIS-FINAL`.
+**Selftest: 122 PASS / 0 FAIL / 0 SKIP on alice2** (`~/stage_crd1_selftest_alice2.log`, `c2dc53f9…`, Python 3.10.4, and
+inside the dry run, guard 1c) **and 122 / 0 / 0 on the Mac** (`/opt/homebrew/bin/python3`, runsdir `../runs_alice2`):
+A design literals, reused shas (cwd_design, cwd_common, csh1_design, the patch), every arm's flags == the landed cwd5
+W1 ARGS line flag for flag and in order, PT / ENV witnesses; B Λ re-derived, cumulative dose, the dose words that reject
+the init / cumulative matches, **the PREMISE (landed cwd5 W1 23.2240 / 69.2940 → COLLAPSE by this scorer's own
+`cell_state`)**, landed records have no `dr_*` key, `route_audit` passes consistent records of every arm and FAILS eight
+forgeries, an OFF run, and an out-of-bracket layerwise shrink; C the floor and freshness; D reachability of all 8 + 4
+tokens, ladder order, inclusive / strict bars, every account's band midpoints → its own pair; E the REAL `score()` on 14
+synthetic scenarios, 14 ARGS / witness / ENV breaks (AIS at wd 0.1, TRS at wd 0, a repeated wd, wrong grain, extra flag,
+γ 0.99941, an OFF witness, no witness, the wrong mode, another Λ, two witnesses, a hold line, PT, ENV), 8 probe / route
+breaks, 5 provenance / manifest breaks, a dropped run, a truncated resubmission, the documented one-argument CLI; F O2
+invariance over real / no / invented corpus.
+
+### 307.6 Accounts, predicted levels (UNSURE bands), what each means for the TMLR collapse section
+
+Bands: healthy 60–76, collapsed 1–30, partial 36–52, unhealthy reference 20–54.  Priors are judgements.
+
+| account (ROUTE + INDEP) | prior | predicted | consequence |
+|---|---|---|---|
+| **ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP** | 0.25 | SRS 1–30; rest 60–76 | the collapse travels through the α-scaled weight shrink (with its a·wd·w trace term); it needs the decay to move with α; T-C excluded as sufficient with the learned horizon |
+| ROUTE-IS-WEIGHT-SHRINK + INDEP-COLLAPSES | 0.12 | SRS, AIS 1–30 | shrink route; the collapse survives a constant decay (not "the same dose made constant": 13.6× cumulative) |
+| ROUTE-IS-WEIGHT-SHRINK + INDEP-PARTIAL | 0.10 | SRS 1–30, AIS 36–52 | shrink route; survival undecided |
+| ROUTE-IS-WEIGHT-SHRINK + INDEP-UNREADABLE | 0.08 | SRS 1–30, AI* 20–54 | shrink route; Λ damages both grains, `DECOUPLED-NOT-TESTED` not retired |
+| ROUTE-NEITHER-ALONE + INDEP-NOGAP | 0.12 | all 60–76 | the collapse needs both routes together; no single-route sentence |
+| ROUTE-NEITHER-ALONE + INDEP-COLLAPSES | 0.05 | AIS 1–30 | both routes needed in α-scaled form, yet a constant decay collapses |
+| ROUTE-IS-TRACE + INDEP-NOGAP | 0.05 | TRS 1–30 | T-C is the live sufficient mechanism; no sentence may credit the shrink |
+| ROUTE-EITHER-SUFFICES + INDEP-COLLAPSES | 0.05 | SRS, TRS, AIS 1–30 | either route suffices; attribute to neither alone |
+| ROUTE-PARTIAL + INDEP-PARTIAL | 0.13 | SRS, AIS 36–52 | nothing decided; replicate |
+| ROUTE-REFERENCE-UNREADABLE + INDEP-UNREADABLE | 0.05 | SR*, AI* 20–54 | no sentence |
+
+**Registered prediction (UNSURE): ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP.**  For: 289.4 — the collapsing arm's deficit
+opens 700–1,700 steps before its β turn while β is identical to the healthy partner's, so the shrink acts first; S keeps
+exactly that shrink, T removes it (every landed rung at wd ≤ 1e-2 is healthy).  For INDEP-NOGAP: Λ·w has no
+β-dependence, so the direct term a·wd·w — through which the trace sees that a larger a shrinks the weights more — is
+absent, cutting the feedback that drives β down.  Against: Λ front-loads 13.6× the cumulative dose (INDEP-UNREADABLE
+is live), and Wu et al.'s bias points the trace route in the collapse's direction.  Floor gate (164.6): every healthy
+band starts ≥ 5 pp above REF_MIN and ends ≥ 24 pp below 100; the collapsed band sits below R50 × the lowest healthy
+reference (selftest D).
+
+### 307.7 How `csh1`'s outcome changes this batch's reading (registered now, so the two batches cannot contradict)
+
+The two batches test route H in two forms: csh1 with a CONSTANT γ from step 0 and the dose removed (wd 5e-4); crd1's T
+with the LEARNED factor (1 − 0.1·a) — near 1 early (a ≈ 1e-6), ≈ 1 − 3e-4 only in the onset window — and the weights
+undecayed.  And csh1's GM* and crd1's AI* share the horizon 1/Λ exactly.  Read together, first match per row:
+
+| csh1 FINAL | crd1 T (route H) | joint reading licensed |
+|---|---|---|
+| DOES-NOT-REPRODUCE | NOGAP | the trace route is insufficient in BOTH forms at this cell; T-C excluded as a sufficient account (constant and learned horizon), as bounds |
+| DOES-NOT-REPRODUCE | COLLAPSE | NOT a contradiction: the learned horizon — which shortens as a grows, a feedback a constant γ lacks — suffices where a constant one does not; csh1's null is then read under its own `CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON` only, and T-C is a LIVE mechanism |
+| REPRODUCES (at M, or at P only) | NOGAP | a horizon short FROM STEP 0 suffices, but the learned one (long until the onset window) does not: T-C is a real bias of the method, not the route of the wd-0.1 collapse; the section names both |
+| REPRODUCES | COLLAPSE | the trace route is sufficient in both forms; with S COLLAPSE too the reading is "either route suffices" |
+| PARTIAL / UNREADABLE / ANCHOR-NOT-HEALTHY | any | crd1's T reading stands alone; csh1 adds nothing |
+
+| csh1 cell M (γ_M = 1 − Λ, no dose) | crd1 I (same horizon + constant shrink Λ) | joint reading |
+|---|---|---|
+| NOGAP | COLLAPSE | the constant weight shrink (front-loaded) is what adds the collapse at an unchanged horizon |
+| NOGAP | NOGAP | neither the constant horizon nor horizon + constant shrink collapses: the collapse needs the decay to move with α |
+| COLLAPSE | COLLAPSE | I's collapse is attributable to the horizon (already sufficient); "survives α-independence" may NOT be credited to the shrink |
+| COLLAPSE | NOGAP | adding the constant shrink removes a horizon-driven collapse: reported as found, no mechanism sentence (bound 4: decay raises the effective step of normalised tensors) |
+
+S (route W) is not tested by csh1; its reading does not depend on csh1.  None of this table is computed by either
+scorer (O2 independence); it is applied at landing, by the tokens of the two FINAL lines only.
+
+### 307.8 The dry run (0 guard failures) and the RULE 20 pair
+
+* **Registration commit `855b936fed91f4b3399dd988b12b5aca83aa0d90`, pushed to `origin/master`** (`git ls-remote` =
+  `855b936f…` at push).  Stage `~/stage_crd1_dry` = `git archive 855b936 -- . ':!paper'` (0 `paper` entries in the tar),
+  `STAGED_COMMIT` written.
+* `CRD1_REGISTERED_COMMIT=855b936fed91f4b3399dd988b12b5aca83aa0d90 bash bin/cRD1_route.sh --dry-run` →
+  `~/stage_crd1_dry0.log` (160 lines, `90da88d5…`), **rc 0, 0 GUARD FAIL**: 0b every hold / mask / route variable unset;
+  1b the full commit declared; 1b2 runner; 1b3 reused files at registered bytes; 1c selftest 122 / 0 / 0, no SKIP, O2 on
+  the real corpus, Λ re-derived, premise re-read, floor 0.636566 filtered, 6 / 6 landed-ARGS matches; 2* fresh prefix /
+  seeds; 4a1 cdr1's tree VERIFIED; 3* data, HF post + pre, runner, train; **4h the CPU route check 43 / 0**; 4c' literals
+  agree with the stage script; **4 the live model and optimiser of every arm hold their mode / Λ / wd / grain and print
+  their witness; 4d live manifest byte-identical** (7,498 bytes, `135e6df8…`); partitions gpu-short,gpu-l4-24g,
+  `--constraint=L4`; guard 5 counted **69 pending** (its cap is 120 in this launcher, raised from csh1's 60 because the
+  queue already carries 69 pending jobs of other batches — a sanity limit, not a scheduler one); guard 6 **18 composed
+  lines, 0 failed**, each carrying exactly its `DECAY_ROUTE=` token and its own wd token; the 18 `sbatch` lines are
+  IDENTICAL to the pre-commit dev-stage dry run's.  Example (AIS, s196):
+  `sbatch --job-name=crd1-AIS-s196 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/crd1/probe_crd1-AIS-s196,DECAY_ROUTE=alpha_indep:3.15e-4 /home/s5014158/metaopt/jobs/run_cifar_cdr1.sh --optimizer HF … --weight-decay-base 0 … --stepsize-groups scalar --seed 196 …`
+* **RULE 20 pair tested on 18 synthetic `.out`s on alice2** (`bin/cRD1_rule20.sh` with R pointed at a scratch dir):
+  clean → batch-consistency PASS, per-run 0 / 18 violations, ENV half PASS; **with two planted faults** → per-run **1
+  violation, the planted one** (`--weight-decay-base declared '0' but EFFECTIVE '0.1'` on AIS-s197) and the ENV half
+  **FAIL on the planted witness** (TRL-s198 printing the shrink_only witness).  The ENV half DISCRIMINATES the route, Λ
+  and the wd that reached the update (the harness's own witness), which csh1's could not do for γ.
+  `analysis/argsline_guard.py` NOT edited (`81cea8b5…`).
+* Dry-run artefacts on alice2: `$WS/runs/crd1/{PARTITION-MANIFEST.txt, PROVENANCE.dryrun.txt, route_cpu_check.dryrun.log}`
+  and `$WS/runs/crd1-PARTITION-MANIFEST.txt`; guard 4b3 refuses a different manifest at submission.
+
+### 307.9 Cost, submission (for the verifier), and what is owed
+
+* **Expected 18 × 0.6855 = 12.34 GPU-h** (cwd5's sacct mean of this exact cell on L4, 285.1; PATCH_DECAYROUTE adds a
+  float64 read of the weights at probe steps only); **hard bound WALL 3 h × 18 = 54 GPU-h.**  ICML-PLAN's 13 GPU-h
+  estimate for row 1.6 is met.  The jobs queue behind the 118 of g3b / crt1 / csh1 / cvl1 at the 16-GPU cap.
+* **Submit (verifier only, after it passes):** on alice2,
+  `cd ~/stage_crd1_dry && CRD1_REGISTERED_COMMIT=855b936fed91f4b3399dd988b12b5aca83aa0d90 bash bin/cRD1_route.sh --submit`
+  — ONE invocation, **18 jobs** `crd1-<arm>-s<seed>`, `--constraint=L4`.  Then `bash bin/cRD1_rule20.sh` from the stage
+  once all 18 have started.
+* **Owed at landing:** RULE 20 at full coverage; score with and only with `python3 analysis/cRD1_route_score.py $WS/runs`
+  at 18/18 RUN_DONE; **a `DECAY_ROUTE` kind in `analysis/corpus_exclusions.py` (keyed on the full prefix, 305.6 d — not
+  yet present) and 18 rows under it**, plus 6 `ARGS_WD_BASE: weight-decay-base=0` rows (the AI* arms are two-axis runs,
+  284's form; SR* / TR* run at the standard 0.1); the joint reading of 307.7 once csh1 has landed; licensed sentences by
+  the FINAL's tokens only.
+
+### 307.10 Discipline
+
+Files (commit `855b936`): `analysis/cRD1_route_score.py`, `analysis/crd1_design.py` (`ac12901b…`),
+`analysis/crd1_route_cpu_check.py` (`e6e40b18…`), `analysis/crd1_rule20_envaudit.py` (`f6613bd2…`), `bin/cRD1_route.sh`
+(`775d135f…`), `bin/cRD1_rule20.sh` (`807fccd0…`), `bin/PROTECTED.txt` (+`crd1-`), `docs/PRIOR-ART.md` (this track's
+section only).  Another track's (306, `cai1`) uncommitted files in the shared working tree were NOT added.  This entry
+replaces its reserved stub in place.  No registered scorer, `argsline_guard.py`, `corpus_exclusions.py`, the patch,
+the cdr1 tree or runner, STATUS or ICML-PLAN edited; no running batch's tree, run or runner touched.  **GPU: ZERO.**
 
 Next free number after the reservations: **308**.
