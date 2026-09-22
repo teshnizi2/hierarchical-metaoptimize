@@ -38589,6 +38589,29 @@ While reading the landed audit ARGS lines on alice2, one shell command of mine e
 `true`, read and wrote nothing, and its output was discarded; no file, job or setting on `alice` was touched. It was an
 error, not a decision, and it is recorded here rather than left out. No other command of this track contacted `alice`.
 
+### 291.10 SUBMITTED — ONE submission, 40 / 40 accepted
+
+* **RULE 21.** Registration commit **`cfc12ff83810ab7e2d09f0597e2f5c5a59a3575a`** pushed to `origin/master` at
+  **01:34:12Z** (confirmed by `git branch -r --contains`); the scorer at that commit on origin hashes
+  `8bf0aaf754d41485…`, equal to the staged scorer's. The stage `~/stage_cgw1` was built by `git archive` of that commit
+  (analysis/, bin/, results/ only). First `sbatch` accepted **01:37:50Z**, last **01:37:55Z**: margin **3 min 38 s**
+  after the push.
+* **A second dry run from the pushed stage** (`~/stage_cgw1_dry1.log`) was read line by line before submitting: every
+  guard passes (guard 1b now passes on the declared commit + scorer sha), and its 40 composed lines are byte-identical
+  to the first dry run's.
+* **Submission** (`~/stage_cgw1_submit.log`): `bash bin/cGW1_auditwd.sh --submit` ONCE; guard 6 "40 composed command
+  lines, 0 failed"; **"40 jobs (ACCEPTED BY SLURM); 0 rejected"**. Jobs **5079331–5079370** (`cgw1-<arm>-s<seed>`),
+  `--constraint=L4` on every one, partitions gpu-short,gpu-l4-24g, WALL 02:00:00. `$WS/runs/cgw1/PROVENANCE.txt`
+  (MODE submit) names scorer `8bf0aaf7…`, design `ae66758d…`, launcher `19299099…`, HF `4732b74a…`, runner `676b84cc…`,
+  commit `cfc12ff8…`.
+* **guard 7 UNVERIFIED** at submission: all 40 were PENDING (`caw2`'s 27 jobs, submitted minutes earlier by Track 1,
+  hold the per-user GPU QOS), so no ARGS line existed inside the 600 s window. This is not a pass; RULE 20 is owed at full
+  coverage once all 40 have started (291.11).
+* **Owed at landing:** 28 ARGS_WD_BASE rows in `results/CORPUS-EXCLUSIONS.tsv` (the 12 W2 + 16 W4 runs; kind exists since
+  263; `corpus_exclusions.py` not edited); `cgw1-` into the repo's `bin/PROTECTED.txt` (the stage copy has it); scoring with
+  and only with `python3 analysis/cGW1_auditwd_score.py $WS/runs` at 40/40 RUN_DONE.
+* **GPU used by this entry's registration: ZERO.** Batch expected 29.3 GPU-h, hard bound 80.
+
 ## 292. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO NUMBER.**  It applies the hostile area chair's corrections to `docs/ICML-PLAN.md` and fixes the campaign's name for its own weight decay in four forward-looking documents.  **No level, bar, state, contrast, branch word, stamp or licence CONTENT changes; no registered scorer token, stamp or CORRECTIONS text is edited.**  The chair's verdict is recorded, not contested: **no ICML candidate is an accept as planned.**]** — **THE ICML PLAN NOW LEADS WITH STEP 0 + THE AdamW GATE + G3, SCORES DOMINANCE BY `DOM_C`, AND CARRIES TWO NEW DIRECT THREATS; AND FROM THIS ENTRY ON THE HARNESS'S DECAY IS CALLED "α-SCALED", NEVER "COUPLED".**
 
 ### 292.1 Why this entry exists
