@@ -42659,3 +42659,44 @@ before any number is read; 45 `ARGS_WD_BASE: weight-decay-base=5e-4` exclusion r
 results`).  No Mac scratch kept.
 
 Next free number after the reservations: **314**.
+
+## 314. AUDIT ADDENDUM to 312–313 (ZERO GPU, one mis-cited item, one optimistic clause narrowed, stale queue states) — **[LED WITH THE BOUND: this entry measured nothing and moves no level, bar, state, contrast, stamp, token, registered licence sentence or ingest count.  312's verdict `VAL-DIFFERS-UNRESOLVED | SELECT-SAME`, 1.14 PARTIAL, the scalar row "ties (a bound) after re-tuning", 313's registration and submission, and the venue (TMLR) STAND.]**
+
+*Independent final audit of the cycle-6 landing (312) and registration (313), 2026-09-22 ~14:15Z: origin/master ==
+local at `9fb218f`; CORRECTIONS 312 and 313 written over their RESERVED stubs (the diff from `36d9441` removes exactly
+the two stub lines), in numeric order, one current `Next free` line at the end; MASTER-TABLE 243 lines, the only
+earlier line changed is header line 3 (the old figures kept in `[SUPERSEDED: …]` brackets, checked character by
+character: the only other edits in that line are the bracketed row-count, entry-list and tally updates), row 243
+appended; every number in row 243 and 312 found in `results/cvl1_valsplit_score_{mac,alice2}.txt` or
+`results/cvl1_attack_indep_{mac,alice2}.txt` (levels, sds, σ ×3, contrasts, intervals, gaps, Kendall 27 / 28 and
+within-rung 11 / 12, leave-one-seed-out, the +0.0719 2 SE margin, the 0.31–1.08 pp `cgw1` deltas, 26.3167 GPU-h), in
+earlier CORRECTIONS (109.2 +0.697 t 5.90; 109.5 rec_lo 0.456; 171.5 `cdn1` worst rung +3.4800; 296.3 `cgw1` W2
++0.4533, W4 +0.2410 [−0.0120, +0.4940]; 303.5 priors 0.45 / 0.75; 311 A5), or re-read by this audit (26.5836 GPU-h
+= Σ ElapsedRaw / 3600 over `sacct -X` of 5080667–5080698, 32 `COMPLETED`, read-only on `alice2`); the six refute fixes
+F1–F6 present in 312.3 / 312.4 / 312.6 / 312.8 / 312.10 and MT243; corpus 3,469 rows; CORPUS-EXCLUSIONS 354 rows over
+22 batches, the 32 `cvl1` rows byte-identical to `results/cvl1_exclusion_rows_PROPOSED.tsv` (16 W1 `VAL_SPLIT`, 16
+W4 two-axis carrying both witnesses); `corpus_exclusions.py --check` exit 0 PASS (SIGMA_R18ALL 0.636566 df 274);
+`c73_mastertable_check.py` exit 0; site `main` = `11a8788` (`gh api`), commit status `success`, Production deployment
+6592677131 state `success`, MT243 present with outcome `unresolved` (Open), 180 records; all 40 `later-evidence`
+relations re-checked against the campaign's own CORRECTIONS: each cited entry / subsection exists and contains the
+quoted words (MT240 → MT241 `weakens` sits across a block-quote line break in 309.8, words verbatim); `crt2` on
+`alice2`: 45 jobs 5083795–5083839, names `crt2-{ch,nd,k01}{A2,A3,A4,H3,L3}-s{200,201,202}` exactly, all PENDING,
+`--constraint` L4, 2 h walltime, partitions gpu-short,gpu-l4-24g; the staged scorer sha `47009634…` equals the
+registration commit's.  `alice` NOT contacted; nothing under `paper/` read; no clone / checkout / worktree; no Vercel
+URL opened; nothing downloaded; no job cancelled or touched.*
+
+| # | where | as written | what the record / numbers license |
+|---|---|---|---|
+| **A1** | 312.10 (b) 4 | "`crt1`'s own selection was on TRAIN (309.4 item 5)" | mis-cited: 309.4 item 5 is "Ties are bounds".  The TRAIN selection is 309's headline bound (5) ("TUNED selects on TRAIN, ORACLE on TEST") and 309.3 ("Selection (registered, on TRAIN)"); 309.4 item 8 is "No validation split".  Read "(309 headline (5); 309.3)".  The sentence's content is right. |
+| **A2** | 312.10 (b) 4 | "the untuned +2.6–2.8 pp may carry beside it that its registered state is the same on a held-out split" | OPTIMISTIC by attachment.  The +2.6–2.8 pp is `cgw1`'s (50,000 training images, TEST only); the held-out-split state is `cvl1`'s OWN in-batch SC (45,000 images; TEST +2.81 / +2.98, VAL +3.15 / +3.06 pp), a different batch, never pooled (`TRAIN-45K`).  Narrowed: the draft may report, beside the untuned figure, that **in `cvl1`, at `crt1`'s untuned M2 (311 A5), SC is SCALAR-BEATS-BEST on both readers, paired gap +0.2525 [−0.1499, +0.6549] not resolved** — naming the batch and its own numbers; it may not say `cgw1`'s +2.6–2.8 pp "holds" or "is the same" on a held-out split (F1, F2). |
+| **A3** | ICML-PLAN 312 paragraph; STATUS CYCLE 164 "licences (verbatim)" | the primary quoted from "the change is not distinguishable …"; the selection from "selecting on validation …" | both are exact substrings of the registered sentences, so not misquotes; but the draft must carry the FULL registered sentences of 312.8.  The selection licence's opening clause, "the configuration (grain x decay) with the best validation plateau is the one with the best test plateau", is its scope: it is what keeps the sentence from reading as a statement about ms / α0 (`MS-ALPHA0-NOT-RESELECTED`).  The summary line "among these 8" alone does not carry "(grain x decay)". |
+| **A4** | ICML-PLAN §4a rank 1 and off-queue rows; STATUS CYCLE 164 "still running" | `g3b` "0 / 32 started (32 pending)"; `cai1` / `crd1` "0 / N started"; `crt2` absent from §4a | stale.  At 14:12Z (`sacct` / `squeue`, read-only): **`g3b` 32 / 32 `COMPLETED`** (last end 14:07:02Z; 33.76 GPU-h by `sacct` ElapsedRaw; NOT scored, no number read — its landing is owed, RULE 20 first); `crd1` 9 / 18 COMPLETED, the rest running; `cai1` 7 running / 25 pending; `crt2` 45 pending.  Amended in place in ICML-PLAN §4a with brackets. |
+
+**Judgement of 312's paper effect (autopilot, a JUDGEMENT):** LICENSED, with the one optimistic attachment A2
+narrowed above and the one precision point A3.  Nothing in 312.10 is more pessimistic than the numbers: PARTIAL for
+1.14 is exactly what `MS-ALPHA0-NOT-RESELECTED` forces, the modal token is correctly given no sentence, and the
+threats sentence (ms chosen on test, 302.1) is owed whatever `cvl1` said.  `ar1`'s +0.697 at ms 3e-4 (109.2) is
+correctly labelled a TEST reading taken where the box binds (rec_lo ≈ 0.456, 109.5); it bears on "does the sign need
+ms 1e-4", not on "was ms chosen on test".
+
+Next free number: **315**.
