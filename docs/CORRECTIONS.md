@@ -40536,3 +40536,13 @@ before any number is read; at landing the VAL_SPLIT exclusion kind in `corpus_ex
 analysis/cVL1_valsplit_score.py $WS/runs` at 32 / 32 RUN_DONE.
 
 Next free number: **304**.  *(Cycle-4 audit, 2026-09-22: 299–303 are all written in place, in numeric order; no RESERVED stub remains; none withdrawn.)*
+
+## 304. RESERVED — Track E (code debts, zero GPU): the `VAL_SPLIT` exclusion kind (303.9) and the owed `bin/PROTECTED.txt` prefixes. Placeholder; replaced in place by its track.
+
+## 305. RESERVED — Track F: the `DECAY_ROUTE` patch (ICML-PLAN row 1.6: shrink-only, trace-only, α-independent decay). Placeholder; replaced in place by its track.
+
+## 306. RESERVED — Track F: the audit under α-independent decay (registration). Placeholder; replaced in place by its track.
+
+## 307. RESERVED — Track F: the collapse-route batch, row 1.6 (registration). Placeholder; replaced in place by its track.
+
+Next free number after the reservations: **308**.
