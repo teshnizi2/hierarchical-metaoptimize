@@ -1,0 +1,53 @@
+==============================================================================================================
+cai1 -- THE COUNT-MATCHED AUDIT UNDER ALPHA-INDEPENDENT DECAY  (CORRECTIONS 306; ICML-PLAN 1.6, DECOUPLED-NOT-TESTED)
+scorer sha256 fb766d935e2f4b074b6d5bbb759696f3935821ee7872b41441e2a567fe0420f5   design sha256 edf7000df4abbd9546ff0e3031763df1eafb60e991200547a1e351135b61c919
+runsdir /home/s5014158/metaopt/runs
+==============================================================================================================
+COMPLETION  32 / 32 registered runs complete (100 epoch lines + RUN_DONE)
+G-PROV  /home/s5014158/metaopt/runs/cai1/PROVENANCE.txt  MODE submit  SCORER fb766d935e2f4b07  DESIGN edf7000df4abbd95  HF 17ee0a2862b31b48
+G-ARGS / G-ENV / G-WITNESS / G-KIND / G-STRUCT / G-SHRINK  32 of 32 complete runs pass (20 flags each, wd 0, the registered ENV line, ONE own-rung DECAY_ROUTE witness, no other patch witness, 10,000 probe records with n_beta == m, every record's measured shrink within 0.01 of its LAMBDA)
+G-HW (DISCLOSURE ONLY, never a gate): NVIDIA L4 x32
+corpus: 3115 rows after corpus_exclusions.filter_rows, cai1- excluded  (DISCLOSURE ONLY -- enters no bar, sigma, level, state, contrast or stamp)
+
+ARMS  plateau5 = mean TEST over epochs 95-99 from each run's OWN .out; box occupancy, measured shrink and learned step size from its OWN probe.jsonl
+  arm    rung LAMBDA  grain      n  plateau5      sd   range    train5  box    rec_lo  rec_hi  shrink_meas  maxreldev    a_plateau     LAM/a
+  chI5   I5   5e-5    chunk777   4   90.4470   0.096   0.230   96.7825  BOUND  0.0000  0.0738 5.000002e-05   4.11e-04 5.043050e-03   0.00991
+  ndI5   I5   5e-5    nodewise   4   90.1250   0.325   0.778   96.6130  free   0.0000  0.0291 5.000002e-05   4.12e-04 1.339139e-03    0.0373
+  k01I5  I5   5e-5    scalar     4   90.7655   0.156   0.372   96.2985  free   0.0000  0.0000 5.000002e-05   4.13e-04 5.201189e-02  0.000961
+  kLI5   I5   5e-5    layerwise  4   90.3980   0.147   0.332   97.9320  BOUND  0.0000  0.0736 5.000002e-05   4.09e-04 4.835992e-03    0.0103
+  chI4   I4   5e-4    chunk777   4   79.0840   0.746   1.694   81.7835  BOUND  0.0000  0.0796 5.000000e-04   4.27e-05 7.576073e-03     0.066
+  ndI4   I4   5e-4    nodewise   4   77.4190   0.438   1.008   80.0115  BOUND  0.0000  0.0796 5.000000e-04   4.29e-05 5.591332e-03    0.0894
+  k01I4  I4   5e-4    scalar     4   80.7820   0.482   1.042   83.5935  BOUND  0.0000  0.0796 5.000000e-04   4.27e-05 9.999852e-02     0.005
+  kLI4   I4   5e-4    layerwise  4   79.8105   0.884   1.900   82.1380  BOUND  0.0000  0.0796 5.000000e-04   4.28e-05 7.709431e-03    0.0649
+  (shrink_meas / a_plateau / LAM/a are DESCRIPTIVE: a_plateau = median over the epoch-95+ records of the median over the record's stored step sizes of exp(beta); for chunk777 / nodewise the probe stores 62 per-tensor MEANS of log step size, not the per-group values -- APPROXIMATE, as 296.4)
+
+SIGMA  O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.178183  (df 190, filtered, literal)
+  SIGMA_INBATCH        0.490126  (df 24, pooled within the 8 arms)
+  SIGMA_USED           0.490126  (= SIGMA_INBATCH)
+
+CONTRASTS (every one WITHIN a LAMBDA rung, IN BATCH; +/-2 SE is a HALF-WIDTH, not a bound on any effect)
+  D_I5  = chI5 - ndI5 = +0.3220 pp = +0.93 SE (SE 0.346571)  [-0.3711, +1.0151]  TRAIN +0.1695   state BOXBOUND
+  D_I4  = chI4 - ndI4 = +1.6650 pp = +4.80 SE (SE 0.346571)  [+0.9719, +2.3581]  TRAIN +1.7720   state UNHEALTHY
+  DD   = D_I4 - D_I5 = +1.3430 pp = +2.74 SE (SE 0.490126)   DESCRIPTIVE
+  Tch_I5 = k01I5 - chI5 = +0.3185 pp = +0.92 SE
+  Tnd_I5 = k01I5 - ndI5 = +0.6405 pp = +1.85 SE
+    scalar reading at I5: SCALAR-UNRESOLVED
+  Tch_I4 = k01I4 - chI4 = +1.6980 pp = +4.90 SE
+  Tnd_I4 = k01I4 - ndI4 = +3.3630 pp = +9.70 SE
+    scalar reading at I4: SCALAR-COLLAPSED
+  G_I5  = kLI5 - k01I5 = -0.3675 pp = -1.06 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+  G_I4  = kLI4 - k01I4 = -0.9715 pp = -2.80 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+
+LADDERS (LEVELS, not effects; this cell only)
+  chunk777  LAMBDA 5e-5 90.4470 | LAMBDA 5e-4 79.0840
+  nodewise  LAMBDA 5e-5 90.1250 | LAMBDA 5e-4 77.4190
+  scalar    LAMBDA 5e-5 90.7655 | LAMBDA 5e-4 80.7820
+  layerwise LAMBDA 5e-5 90.3980 | LAMBDA 5e-4 79.8105
+
+REFERENCE (between batch, never pooled; cgw1 296.3, alpha-scaled): D_W1 +0.3693 SURVIVES, D_W2 +0.4533 SURVIVES, D_W4 +0.2410 UNDECIDED; scalar at W4 SCALAR-BEATS-BEST
+
+LICENCE (primary)  both LAMBDA rungs are unreadable: no partition reading under alpha-independent decay; the levels themselves are the finding.
+LICENCE (scalar)   at least one LAMBDA's scalar reading is unresolved or gated: report both rungs' intervals; no combined scalar sentence.
+
+FINAL AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND+I4-UNHEALTHY | I5-SCALAR-UNRESOLVED+I4-SCALAR-COLLAPSED | ONE-CELL TWO-LAMBDAS-BRACKET ALPHA-SCALED-REFERENCE-BETWEEN-BATCH ROTATIONAL-EQUILIBRIUM-CONFOUND SHRINK-MATCHED-NOT-RATIO-MATCHED CONSTANT-SCHEDULE FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH I5-VS-CGW1-W1-DIFFERS BOX-BOUND-kLI5 I4-VS-CGW1-W1-DIFFERS LAYERWISE-BELOW-SCALAR-I4 BOX-BOUND-k01I4 BOX-BOUND-kLI4 UNHEALTHY-chI4 UNHEALTHY-ndI4 UNHEALTHY-k01I4 UNHEALTHY-kLI4

@@ -1,0 +1,190 @@
+==============================================================================================================
+cai1_attack_indep.py -- an INDEPENDENT re-derivation of cai1 (CORRECTIONS 306) from the raw run files
+  stdlib only, no repo import, no regex, no shlex; every literal re-typed.  Scorer under attack: sha fb766d935e2f4b07
+==============================================================================================================
+
+[0] RUN FILES, SYNC INTEGRITY, PROVENANCE, STAGE
+  PASS each cai1-*.out file name occurs once across <runsdir> and <runsdir>/cai1
+  PASS 32 cai1-*.out files found (found 32)
+  PASS the 32 file names are exactly the design's (arm, seed) set, 8 arms x seeds 192-195
+  PASS all 64 run files present (32 .out + 32 probe.jsonl)
+  DIGEST over the 64 run files' names and sha256: d3945d2edb9f2ab328b212bd58cfdef069375b24190025781e350ce227a9441f  (2368435577 bytes)
+  PASS job ids are 5081292-5081323, contiguous, I5 then I4, per seed ch / nd / k01 / kL (306.11)
+  PASS PROVENANCE MODE = submit
+  PASS PROVENANCE SCORER_SHA256 = fb766d935e2f4b07
+  PASS PROVENANCE DESIGN_SHA256 = edf7000df4abbd95
+  PASS PROVENANCE HF_SHA256 = 17ee0a2862b31b48
+  PASS PROVENANCE RUNNER_SHA256 = d3d3bdd781282416
+  PASS PROVENANCE PATCH_SHA256 = 12c107884db4c928
+  PASS PROVENANCE PROOF_LOG_SHA256 = dc73dfbabf25fa01
+  PASS PROVENANCE REGISTERED_COMMIT = 03f5e3c1c19d0105
+  PASS PROVENANCE DECAY_ROUTE = I5=alpha_indep:5e-5 I4=alpha_indep:5e-4
+  PASS PROVENANCE WEIGHT_DECAY_BASE = 0
+  PASS PROVENANCE SEEDS = 192 193 194 195
+  PASS PROVENANCE GRAINS = ch=chunk777 nd=nodewise k01=scalar kL=layerwise
+  PASS PROVENANCE HF is the PATCHED HF.py, not the unpatched 4732b74aa3a10508
+  PASS stage scorer sha256 = fb766d935e2f4b07 (the registered bytes)
+  PASS stage design sha256 = edf7000df4abbd95
+  PASS the stage carries no paper/ directory
+
+[1]-[3] PER RUN: ARGS rebuilt flag by flag, ENV, the DECAY_ROUTE witness, epoch lines, probe structure, G-SHRINK
+  PASS the I5 witness rebuilt with struct equals 306.4's line (and the proof job's real-run line, 305.5)
+  PASS the I4 witness rebuilt with struct equals 306.4's line
+  PASS ARGS: exactly ONE line per run, equal to the design's 20 flags in order (wd 0), byte for byte (0 of 32 fail; [])
+  PASS ONE save directory across the 32 runs
+  PASS ENV: exactly ONE line per run, the registered one with the run's own PROBE_DIR (0 fail)
+  PASS DECAY_ROUTE: exactly ONE line per run, its OWN rung's witness, never the other rung's, and no other line mentions DECAY_ROUTE (0 fail; [])
+  PASS no other `<KIND>: on` witness and no PROBE_TENSOR line (0 fail)
+  PASS RUN_DONE exactly once on every run (0 fail)
+  PASS Epoch lines: epochs 0..99 once each, 100 lines (0 fail)
+  PASS every line carrying `Test Accuracy` parses as an epoch line (0 fail)
+  PASS every run's nvidia-smi line names an NVIDIA L4 (0 fail)
+  PASS probe.jsonl: 10,000 records at steps 0,5,...,49995, n_beta == the arm's m, beta list 1 (scalar) or 62 entries, beta moved, n_at_lo / n_at_hi present (0 fail)
+  PASS every run's first probe record sits at ln(alpha0 1e-3) = -6.9078 (+/-1e-3) (0 fail)
+  PASS G-SHRINK re-done on all 320,000 records: dr_mode alpha_indep, dr_lam == the rung's LAMBDA, dr_n == step + 2, applied == LAMBDA (1e-9 rel), trace factor == 1 - LAMBDA (1e-12), MEASURED shrink within 1 % of LAMBDA (0 fail; [])
+
+  PER RUN (plateau5 = mean TEST of epochs 95-99; MEASURED per-step shrink dr_shrink_meas from the raw probe records:
+  median over all 10,000 records via the relative deviation, min, max, and the plateau-window median; minutes from the run's own line)
+  run                   job  plateau5    train5   rec_lo   rec_hi    shrink_med    shrink_min    shrink_max    shrink_win maxreldev minutes
+  cai1-chI5-s192    5081292   90.4180   96.6960   0.0000   0.0702  5.000001e-05  4.998077e-05  5.001955e-05  5.000000e-05  3.91e-04      62
+  cai1-ndI5-s192    5081293   90.0260   96.5080   0.0000   0.0113  5.000002e-05  4.998066e-05  5.001961e-05  5.000000e-05  3.92e-04      52
+  cai1-k01I5-s192   5081294   90.8140   96.3800   0.0000   0.0000  5.000002e-05  4.998053e-05  5.001979e-05  5.000001e-05  3.96e-04      91
+  cai1-kLI5-s192    5081295   90.3320   97.9540   0.0000   0.0702  5.000002e-05  4.998044e-05  5.001951e-05  5.000004e-05  3.91e-04      70
+  cai1-chI5-s193    5081296   90.5640   96.9080   0.0000   0.0731  5.000001e-05  4.997989e-05  5.002054e-05  5.000000e-05  4.11e-04      70
+  cai1-ndI5-s193    5081297   90.1840   96.6880   0.0000   0.0239  5.000002e-05  4.997955e-05  5.002056e-05  4.999999e-05  4.11e-04      63
+  cai1-k01I5-s193   5081298   90.5740   96.3420   0.0000   0.0000  5.000002e-05  4.997974e-05  5.002065e-05  5.000003e-05  4.13e-04      62
+  cai1-kLI5-s193    5081299   90.4720   98.0800   0.0000   0.0732  5.000001e-05  4.997991e-05  5.002044e-05  5.000000e-05  4.09e-04      53
+  cai1-chI5-s194    5081300   90.3340   96.6620   0.0000   0.0738  5.000002e-05  4.997947e-05  5.002054e-05  5.000004e-05  4.11e-04      71
+  cai1-ndI5-s194    5081301   89.7560   96.5600   0.0000   0.0291  5.000002e-05  4.997939e-05  5.002052e-05  5.000003e-05  4.12e-04      95
+  cai1-k01I5-s194   5081302   90.7280   96.2440   0.0000   0.0000  5.000002e-05  4.997952e-05  5.002052e-05  5.000003e-05  4.10e-04      64
+  cai1-kLI5-s194    5081303   90.2280   97.8140   0.0000   0.0736  5.000001e-05  4.997966e-05  5.002047e-05  4.999999e-05  4.09e-04      58
+  cai1-chI5-s195    5081304   90.4720   96.8640   0.0000   0.0718  5.000003e-05  4.998038e-05  5.001959e-05  5.000002e-05  3.92e-04      73
+  cai1-ndI5-s195    5081305   90.5340   96.6960   0.0000   0.0074  5.000001e-05  4.998021e-05  5.001955e-05  4.999998e-05  3.96e-04      67
+  cai1-k01I5-s195   5081306   90.9460   96.2280   0.0000   0.0000  5.000002e-05  4.998055e-05  5.001944e-05  5.000002e-05  3.89e-04      67
+  cai1-kLI5-s195    5081307   90.5600   97.8800   0.0000   0.0716  5.000002e-05  4.998070e-05  5.001965e-05  5.000002e-05  3.93e-04      58
+  cai1-chI4-s192    5081308   79.1480   81.7500   0.0000   0.0795  5.000000e-04  4.999787e-04  5.000187e-04  5.000000e-04  4.25e-05      67
+  cai1-ndI4-s192    5081309   77.9500   80.0960   0.0000   0.0795  5.000000e-04  4.999787e-04  5.000187e-04  4.999999e-04  4.26e-05      69
+  cai1-k01I4-s192   5081310   80.4500   83.5320   0.0000   0.0796  5.000000e-04  4.999786e-04  5.000188e-04  5.000000e-04  4.27e-05      60
+  cai1-kLI4-s192    5081311   78.5740   82.2020   0.0000   0.0796  5.000000e-04  4.999787e-04  5.000187e-04  5.000000e-04  4.25e-05      50
+  cai1-chI4-s193    5081312   78.0200   82.2760   0.0000   0.0795  5.000000e-04  4.999788e-04  5.000192e-04  5.000000e-04  4.24e-05      69
+  cai1-ndI4-s193    5081313   77.5700   80.5200   0.0000   0.0796  5.000000e-04  4.999788e-04  5.000194e-04  5.000000e-04  4.23e-05      61
+  cai1-k01I4-s193   5081314   80.6660   83.5400   0.0000   0.0796  5.000000e-04  4.999788e-04  5.000193e-04  5.000000e-04  4.23e-05      66
+  cai1-kLI4-s193    5081315   80.4200   82.4380   0.0000   0.0796  5.000000e-04  4.999789e-04  5.000194e-04  5.000000e-04  4.23e-05      58
+  cai1-chI4-s194    5081316   79.7140   81.3000   0.0000   0.0796  5.000000e-04  4.999789e-04  5.000194e-04  5.000000e-04  4.21e-05      72
+  cai1-ndI4-s194    5081317   76.9420   79.2060   0.0000   0.0796  5.000000e-04  4.999790e-04  5.000192e-04  5.000001e-04  4.21e-05      80
+  cai1-k01I4-s194   5081318   80.5200   83.4600   0.0000   0.0796  5.000000e-04  4.999789e-04  5.000194e-04  5.000000e-04  4.22e-05      66
+  cai1-kLI4-s194    5081319   79.7740   81.8760   0.0000   0.0796  5.000000e-04  4.999788e-04  5.000194e-04  5.000001e-04  4.23e-05      58
+  cai1-chI4-s195    5081320   79.4540   81.8080   0.0000   0.0796  5.000000e-04  4.999787e-04  5.000187e-04  5.000000e-04  4.27e-05      73
+  cai1-ndI4-s195    5081321   77.2140   80.2240   0.0000   0.0796  5.000000e-04  4.999785e-04  5.000188e-04  5.000000e-04  4.29e-05      67
+  cai1-k01I4-s195   5081322   81.4920   83.8420   0.0000   0.0795  5.000000e-04  4.999787e-04  5.000187e-04  5.000000e-04  4.26e-05      64
+  cai1-kLI4-s195    5081323   80.4740   82.0360   0.0000   0.0796  5.000000e-04  4.999786e-04  5.000187e-04  5.000000e-04  4.28e-05      54
+  GPU time by the runs' own `minutes` lines: 2110 min = 35.1667 GPU-h (registered expectation 26.99, hard bound 64)
+
+[4]-[5] THE SCORER'S STDOUT REBUILT (53 lines) AND COMPARED LINE BY LINE WITH EACH COMMITTED LOG
+  rebuild digest (host-dependent lines as their @ placeholders): 9ed2470c105dc7617f3d59b109be82c12132d71ec5de0b96a96f5dac8aca0c5d
+  corpus disclosure rebuilt from the stage's CSV (3383 rows) and TSV (268 listed keys): 3115 rows
+  PASS committed log #1: 53 lines, every line equal to the rebuild (51 byte for byte, 2 host lines by form) []
+  PASS committed log #1: its LAST line is the rebuilt FINAL
+  PASS committed log #1: all seven registered bounds are on the FINAL
+  PASS committed log #2: 53 lines, every line equal to the rebuild (51 byte for byte, 2 host lines by form) []
+  PASS committed log #2: its LAST line is the rebuilt FINAL
+  PASS committed log #2: all seven registered bounds are on the FINAL
+
+[6] THE TWO QUESTIONS OF 306, FROM THE NUMBERS (bounds first)
+  BOUNDS on every reading: ONE-CELL TWO-LAMBDAS-BRACKET ALPHA-SCALED-REFERENCE-BETWEEN-BATCH ROTATIONAL-EQUILIBRIUM-CONFOUND SHRINK-MATCHED-NOT-RATIO-MATCHED CONSTANT-SCHEDULE FLOOR-READINGS-ARE-BOUNDS
+  FINAL AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND+I4-UNHEALTHY | I5-SCALAR-UNRESOLVED+I4-SCALAR-COLLAPSED | ONE-CELL TWO-LAMBDAS-BRACKET ALPHA-SCALED-REFERENCE-BETWEEN-BATCH ROTATIONAL-EQUILIBRIUM-CONFOUND SHRINK-MATCHED-NOT-RATIO-MATCHED CONSTANT-SCHEDULE FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH I5-VS-CGW1-W1-DIFFERS BOX-BOUND-kLI5 I4-VS-CGW1-W1-DIFFERS LAYERWISE-BELOW-SCALAR-I4 BOX-BOUND-k01I4 BOX-BOUND-kLI4 UNHEALTHY-chI4 UNHEALTHY-ndI4 UNHEALTHY-k01I4 UNHEALTHY-kLI4
+  sigma_used 0.490126 (SIGMA_INBATCH; in-batch 0.490126 df 24 is +175.1 % against the frozen floor 0.178183 df 190); noise-floor demo 0.636566 (df 274) quoted, no bar
+  Q1 I5 (LAMBDA 5e-5)  D = ch - nd +0.3220 pp, 2 SE 0.6931, [-0.3711, +1.0151], TRAIN +0.1695 -> BOXBOUND
+  Q1 I4 (LAMBDA 5e-4)  D = ch - nd +1.6650 pp, 2 SE 0.6931, [+0.9719, +2.3581], TRAIN +1.7720 -> UNHEALTHY
+  Q1 PRIMARY -> AI-UNREADABLE
+  Q2 I5  Tch = k01 - ch +0.3185, Tnd = k01 - nd +0.6405 (2 SE 0.6931); min T - 2 SE -0.3746 -> SCALAR-UNRESOLVED
+  Q2 I4  Tch = k01 - ch +1.6980, Tnd = k01 - nd +3.3630 (2 SE 0.6931); min T - 2 SE +1.0049 -> SCALAR-COLLAPSED
+  Q2 SCALAR -> SC-PARTIAL
+
+[7] WHAT BOUNDS THE VERDICT (DESCRIPTIVE unless it restates a registered gate)
+  I5 margins: SURVIVES needs D >= 0.30 and D > 2 SE 0.6931 (D +0.3220: +0.0220 to the 0.30 bar, -0.3711 to 2 SE); VANISHES needs D <= 0.15 (-0.1720) and D + 2 SE < 0.5556 (+1.0151, margin -0.4595); REVERSES needs D <= -0.15 and D < -2 SE
+  I4 margins: SURVIVES needs D >= 0.30 and D > 2 SE 0.6931 (D +1.6650: +1.3650 to the 0.30 bar, +0.9719 to 2 SE); VANISHES needs D <= 0.15 (-1.5150) and D + 2 SE < 0.5556 (+2.3581, margin -1.8025); REVERSES needs D <= -0.15 and D < -2 SE
+  sigma sensitivity at the frozen floor 0.178183: AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND/SCALAR-BEATS-BEST I4-UNHEALTHY/SCALAR-COLLAPSED
+  sigma sensitivity at the in-batch sigma 0.490126: AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND/SCALAR-UNRESOLVED I4-UNHEALTHY/SCALAR-COLLAPSED
+  sigma sensitivity at the quoted demo 0.636566: AI-UNREADABLE | SC-PARTIAL | I5-BOXBOUND/SCALAR-UNRESOLVED I4-UNHEALTHY/SCALAR-COLLAPSED
+  COUNTERFACTUAL (no token, licenses nothing): 5 % box gate removed, sigma = SIGMA_USED 0.490126: I5-UNDECIDED (D +0.3220, 2 SE 0.6931)
+  COUNTERFACTUAL (no token, licenses nothing): 5 % box gate removed, sigma = the frozen floor 0.178183: I5-SURVIVES (D +0.3220, 2 SE 0.2520)
+  COUNTERFACTUAL (no token, licenses nothing): 5 % box gate removed, sigma = the I5-only pooled sd (df 12, NOT a registered sigma) 0.200548: I5-SURVIVES (D +0.3220, 2 SE 0.2836)
+  COUNTERFACTUAL (no token, licenses nothing): box AND health gates removed at SIGMA_USED: I4-SURVIVES (D +1.6650, 2 SE 0.6931); every I4 arm is below HEALTH_MIN 85
+  leave-one-seed-out (drop the same seed from every arm; sigma re-composed by O2 on the 3-seed in-batch value):
+    drop s192: D_I5 +0.2987 (BOXBOUND)  D_I4 +1.8207 (UNHEALTHY)  -> AI-UNREADABLE | SC-PARTIAL
+    drop s193: D_I5 +0.3027 (BOXBOUND)  D_I4 +2.0700 (UNHEALTHY)  -> AI-UNREADABLE | SC-PARTIAL
+    drop s194: D_I5 +0.2367 (BOXBOUND)  D_I4 +1.2960 (UNHEALTHY)  -> AI-UNREADABLE | SC-PARTIAL
+    drop s195: D_I5 +0.4500 (BOXBOUND)  D_I4 +1.4733 (UNHEALTHY)  -> AI-UNREADABLE | SC-PARTIAL
+  same-seed paired chI5 - ndI5: s192 +0.3920, s193 +0.3800, s194 +0.5780, s195 -0.0620
+  same-seed k01I5 - max(chI5, ndI5): s192 +0.3960, s193 +0.0100, s194 +0.3940, s195 +0.4120
+  same-seed paired chI4 - ndI4: s192 +1.1980, s193 +0.4500, s194 +2.7720, s195 +2.2400
+  same-seed k01I4 - max(chI4, ndI4): s192 +1.3020, s193 +2.6460, s194 +0.8060, s195 +2.0380
+  FLOOR GATE (164.6): every level vs HEALTH_MIN 85 / chance 10 / 100: chI5 +5.45 / +80.45 / 9.55, ndI5 +5.12 / +80.12 / 9.88, k01I5 +5.77 / +80.77 / 9.23, kLI5 +5.40 / +80.40 / 9.60, chI4 -5.92 / +69.08 / 20.92, ndI4 -7.58 / +67.42 / 22.58, k01I4 -4.22 / +70.78 / 19.22, kLI4 -5.19 / +69.81 / 20.19
+  predicted bands (306.6: every I5 arm 89.0-92.5, every I4 arm 84.0-91.0) vs measured: chI5 90.4470 in, ndI5 90.1250 in, k01I5 90.7655 in, kLI5 90.3980 in, chI4 79.0840 OUT, ndI4 77.4190 OUT, k01I4 80.7820 OUT, kLI4 79.8105 OUT
+  box onset per run (first probe step whose largest step size sits at the upper edge -2.3026 / smallest at -15; '-' = never):
+    chI5   s192 hi 46490 lo -  s193 hi 46345 lo -  s194 hi 46310 lo -  s195 hi 46410 lo -
+    ndI5   s192 hi 49435 lo -  s193 hi 48805 lo -  s194 hi 48545 lo -  s195 hi 49630 lo -
+    k01I5  s192 hi - lo -  s193 hi - lo -  s194 hi - lo -  s195 hi - lo -
+    kLI5   s192 hi 46490 lo -  s193 hi 46340 lo -  s194 hi 46320 lo -  s195 hi 46420 lo -
+    chI4   s192 hi 46025 lo -  s193 hi 46025 lo -  s194 hi 46020 lo -  s195 hi 46020 lo -
+    ndI4   s192 hi 46025 lo -  s193 hi 46020 lo -  s194 hi 46020 lo -  s195 hi 46020 lo -
+    k01I4  s192 hi 46020 lo -  s193 hi 46020 lo -  s194 hi 46020 lo -  s195 hi 46025 lo -
+    kLI4   s192 hi 46020 lo -  s193 hi 46020 lo -  s194 hi 46020 lo -  s195 hi 46020 lo -
+  box-onset arithmetic (DESCRIPTIVE): a step size rising from ln(alpha0) = -6.9078 by the Lion meta step 1e-4 on EVERY step first reaches the gate's edge -2.3026 - 1e-3 after 46041.6 steps; the I4 onsets span steps 46020-46025
+  box: chI5 BOUND (rec_lo 0.0000 rec_hi 0.0738), ndI5 free (rec_lo 0.0000 rec_hi 0.0291), k01I5 free (rec_lo 0.0000 rec_hi 0.0000), kLI5 BOUND (rec_lo 0.0000 rec_hi 0.0736), chI4 BOUND (rec_lo 0.0000 rec_hi 0.0796), ndI4 BOUND (rec_lo 0.0000 rec_hi 0.0796), k01I4 BOUND (rec_lo 0.0000 rec_hi 0.0796), kLI4 BOUND (rec_lo 0.0000 rec_hi 0.0796)
+  level change I5 -> I4 per grain: ch -11.3630, nd -12.7060, k01 -9.9835, kL -10.5875
+  cgw1 side by side (alpha-scaled, cross-batch, never pooled): D_W1 +0.3693 SURVIVES, D_W2 +0.4533 SURVIVES, D_W4 +0.2410 UNDECIDED; Tch_W4 +2.5590, Tnd_W4 +2.8000 (untuned; crt1's retune ties at the tuned selection, Tch +0.4487 / Tnd +0.6880, 309.3)
+  REALISED PER-STEP SHRINK (G-SHRINK: it must equal LAMBDA).  cai1 per arm, MEASURED dr_shrink_meas (median of the seed medians):
+    chI5   LAMBDA 5e-5  measured 5.000002e-05 (= 1.000000 x LAMBDA; max |rel dev| 4.11e-04)  = 1.00x lr*wd 5e-5, 0.10x a recipe's ~5e-4; a_plateau 5.0431e-03, LAMBDA/a 0.00991
+    ndI5   LAMBDA 5e-5  measured 5.000002e-05 (= 1.000000 x LAMBDA; max |rel dev| 4.12e-04)  = 1.00x lr*wd 5e-5, 0.10x a recipe's ~5e-4; a_plateau 1.3391e-03, LAMBDA/a 0.0373
+    k01I5  LAMBDA 5e-5  measured 5.000002e-05 (= 1.000000 x LAMBDA; max |rel dev| 4.13e-04)  = 1.00x lr*wd 5e-5, 0.10x a recipe's ~5e-4; a_plateau 5.2012e-02, LAMBDA/a 0.000961
+    kLI5   LAMBDA 5e-5  measured 5.000002e-05 (= 1.000000 x LAMBDA; max |rel dev| 4.09e-04)  = 1.00x lr*wd 5e-5, 0.10x a recipe's ~5e-4; a_plateau 4.8360e-03, LAMBDA/a 0.0103
+    chI4   LAMBDA 5e-4  measured 5.000000e-04 (= 1.000000 x LAMBDA; max |rel dev| 4.27e-05)  = 10.00x lr*wd 5e-5, 1.00x a recipe's ~5e-4; a_plateau 7.5761e-03, LAMBDA/a 0.066
+    ndI4   LAMBDA 5e-4  measured 5.000000e-04 (= 1.000000 x LAMBDA; max |rel dev| 4.29e-05)  = 10.00x lr*wd 5e-5, 1.00x a recipe's ~5e-4; a_plateau 5.5913e-03, LAMBDA/a 0.0894
+    k01I4  LAMBDA 5e-4  measured 5.000000e-04 (= 1.000000 x LAMBDA; max |rel dev| 4.27e-05)  = 10.00x lr*wd 5e-5, 1.00x a recipe's ~5e-4; a_plateau 9.9999e-02, LAMBDA/a 0.005
+    kLI4   LAMBDA 5e-4  measured 5.000000e-04 (= 1.000000 x LAMBDA; max |rel dev| 4.28e-05)  = 10.00x lr*wd 5e-5, 1.00x a recipe's ~5e-4; a_plateau 7.7094e-03, LAMBDA/a 0.0649
+    cgw1 W4 (alpha-scaled 5e-4, plateau a*wd, 296.4; ch / nd approximate): ch 2.0424e-06 (1/245 of 5e-4), nd 5.6611e-07 (1/883 of 5e-4), k01 4.3493e-06 (1/115 of 5e-4), kL 2.8833e-06 (1/173 of 5e-4); cgw1 W1 scalar 2.3732e-06
+    crt1 selected A2 arms (alpha-scaled 5e-4, 309.3; ch / nd approximate): ch 1.1556e-05 (1/43 of 5e-4), nd 5.0457e-06 (1/99 of 5e-4), k01 5.2467e-06 (1/95 of 5e-4)
+    so cai1's I5 shrink is 4-88x and its I4 shrink 43-883x the alpha-scaled 5e-4 references' plateau shrink (5.6611e-07-1.1556e-05)
+
+[8] THE 32 EXCLUSION ROWS OWED AT INGEST (306.9, 308.8: TWO-AXIS), REBUILT FROM THE RUNS' OWN FILE NAMES, ARGS AND DECAY_ROUTE LINES
+  PASS PROPOSED file header is CORPUS-EXCLUSIONS.tsv's 9-column header
+  PASS all 32 runs are two-axis (wd 0 + their own rung's DECAY_ROUTE line); no momentum deviation
+  PASS the PROPOSED rows equal the rebuild byte for byte, in job order (32 rows)
+  PASS every rebuilt row has 9 tab-separated fields
+  rows digest 09fcbbda18b62f90c65daf18e01ef4ce30c519603668269fbe5b58431286834b
+  cai1-chI5-s192	5081292	cai1	chI5	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI5-s192	5081293	cai1	ndI5	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I5-s192	5081294	cai1	k01I5	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI5-s192	5081295	cai1	kLI5	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI5-s193	5081296	cai1	chI5	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI5-s193	5081297	cai1	ndI5	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I5-s193	5081298	cai1	k01I5	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI5-s193	5081299	cai1	kLI5	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI5-s194	5081300	cai1	chI5	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI5-s194	5081301	cai1	ndI5	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I5-s194	5081302	cai1	k01I5	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI5-s194	5081303	cai1	kLI5	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI5-s195	5081304	cai1	chI5	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI5-s195	5081305	cai1	ndI5	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I5-s195	5081306	cai1	k01I5	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI5-s195	5081307	cai1	kLI5	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-5	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI4-s192	5081308	cai1	chI4	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI4-s192	5081309	cai1	ndI4	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I4-s192	5081310	cai1	k01I4	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI4-s192	5081311	cai1	kLI4	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI4-s193	5081312	cai1	chI4	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI4-s193	5081313	cai1	ndI4	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I4-s193	5081314	cai1	k01I4	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI4-s193	5081315	cai1	kLI4	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI4-s194	5081316	cai1	chI4	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI4-s194	5081317	cai1	ndI4	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I4-s194	5081318	cai1	k01I4	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI4-s194	5081319	cai1	kLI4	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-chI4-s195	5081320	cai1	chI4	ch (granularity chunk777)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-ndI4-s195	5081321	cai1	ndI4	nd (granularity nodewise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-k01I4-s195	5081322	cai1	k01I4	k01 (granularity scalar)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+  cai1-kLI4-s195	5081323	cai1	kLI4	kL (granularity layerwise)	--weight-decay-base 0 + DECAY_ROUTE=alpha_indep:5e-4	ARGS_WD_BASE: weight-decay-base=0	CORRECTIONS 318	TWO-AXIS (CORRECTIONS 284 / 308): the alpha-independent decay route AND the removed alpha-scaled base decay are carried by no CSV column; listed with the ARGS witness, the DECAY_ROUTE line held to MULTI_KIND and DECAY_ROUTE_ARMS
+
+SUMMARY 45 PASS / 0 FAIL

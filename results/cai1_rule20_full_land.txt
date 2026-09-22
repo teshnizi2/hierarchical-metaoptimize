@@ -1,0 +1,28 @@
+05ba28d6ca21a635
+c8ebe8559075e939
+81cea8b586e124a6
+RULE20 run utc=2026-09-22T16:50:07Z host=nodelogin03.alice.leidenuniv.nl batch=cai1 guard_sha=81cea8b586e124a6
+  .out files: 32   with ARGS: 32   squeue: 
+  BATCH-CONSISTENCY --name cai1- --vary seed --vary run-name --vary stepsize-groups -> rc=0  argsline_guard: 32 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (cai1, each run pinned to wd 0, its OWN grain and its rung's seeds): 32 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  WD COVERAGE across the started runs (read from the runs' ARGS lines; the registered counts are on the next line):
+    registered: 0 x32
+         32 --weight-decay-base 0
+  GRAIN COVERAGE (registered: 8 each):
+          8 --stepsize-groups chunk777
+          8 --stepsize-groups layerwise
+          8 --stepsize-groups nodewise
+          8 --stepsize-groups scalar
+    DECLARED: the ENV line carries NO weight decay and NO grain; the ARGS half (bin/cAI1_rule20.sh) pins wd 0 and the grain; the DECAY_ROUTE witness below carries the LAMBDA rung.
+    DECAY_ROUTE witness lines (every run must print exactly its OWN rung's registered one):
+      x16  DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=0.0005 lambda_f32=0.0005000000237487257 gamma=1.0
+      x16  DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=5e-05 lambda_f32=4.999999873689376e-05 gamma=1.0
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x32  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=5 EB_RHO=na EB_LOG=0
+    hold / mask witness lines seen (every one must be ': off'):
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE; --constraint=L4 was requested):
+      x32  NVIDIA L4
+    coverage 32/32 runs with an .out, 0 violations
+  ENV AUDIT VERDICT cai1: PASS
+RULE20 end utc=2026-09-22T16:50:08Z
+rc=0
