@@ -380,15 +380,16 @@ LIMITS-PREP §5.5). **Calendar: ~7-9 weeks of experiments + ~3-4 weeks of writin
 late December 2026 at the earliest. Against an unverified late-January ICML 2027 deadline that is feasible but has
 little slack; the theory item and the ViT recipe are the schedule risks.
 
-### 4a. THE LIVE QUEUE (CORRECTIONS 297) — at most three, ranked; none registered or submitted
+### 4a. THE LIVE QUEUE (CORRECTIONS 297) — at most three, ranked; **all three REGISTERED AND LAUNCHED 2026-09-22 (299–301), plus 1.14 (`cvl1`, 303); none landed**
 
 Each needs its own registration (scorer before batch), a prior-art check first, and fresh seeds. Costs are ESTIMATES.
 
-| rank | experiment | question | cost | why it outranks the others |
-|---|---|---|---|---|
-| 1 | **G3b**: the audit's CIFAR-100 cell (`gc1` / `cdn1`: `ResNet18_c100`, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3) at κ {0.1 anchor, 5e-4} × {chunk771, nodewise, scalar, layerwise} × 4 seeds, realised shrink reported | Do `SCALAR-BEATS-BEST` and the count-matched sign hold on the audit's second dataset? The chunk771 arm at 5e-4 is also 1.16's denominator arm | 32 runs ≈ 26 GPU-h | the rewritten headline rests on ONE cell; this is the referee's first question and it folds in 1.16 |
-| 2 | **Retune at 5e-4 on the core cell** (1.18 applied to the audit): ResNet18 / CIFAR-10, κ 5e-4, meta step {3e-5, 1e-4, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact of hyperparameters chosen at 0.1? | 27 runs ≈ 20 GPU-h | it can REFUTE the new headline's strongest claim (B2), where G3b can only replicate it |
-| 3 | **1.20 short-horizon γ control** at the mechanism cell | Does a shortened hypergradient horizon without decay reproduce the collapse (T-C)? | 12 runs ≈ 8.4 GPU-h | the one live rival mechanism against the collapse section's causal sentences; 1.17 is largely decided by `cwd1` (271) |
+| rank | experiment | question | cost | why it outranks the others | status (cycle-4 audit, 2026-09-22 08:35 UTC) |
+|---|---|---|---|---|---|
+| 1 | **G3b**: the audit's CIFAR-100 cell (`gc1` / `cdn1`: `ResNet18_c100`, SGDm 0.99 + Lion, ms 1e-4, α0 1e-3) at κ {0.1 anchor, 5e-4} × {chunk771, nodewise, scalar, layerwise} × 4 seeds, realised shrink reported | Do `SCALAR-BEATS-BEST` and the count-matched sign hold on the audit's second dataset? The chunk771 arm at 5e-4 is also 1.16's denominator arm | 32 runs ≈ 26 GPU-h | the rewritten headline rests on ONE cell; this is the referee's first question and it folds in 1.16 | **LAUNCHED** as `g3b`, CORRECTIONS 299: 32 jobs **5080798–5080829**, seeds 170–173, 8 arms (wd 0.1 / 5e-4 × chunk771 / nodewise / scalar / layerwise); 24.4 GPU-h expected, 64 bound; 0 / 32 started |
+| 2 | **Retune at 5e-4 on the core cell** (1.18 applied to the audit): ResNet18 / CIFAR-10, κ 5e-4, meta step {3e-5, 1e-4, 3e-4} × {chunk777, nodewise, scalar} × 3 seeds | Is `SCALAR-BEATS-BEST` a tuning artefact of hyperparameters chosen at 0.1? | 27 runs ≈ 20 GPU-h | it can REFUTE the new headline's strongest claim (B2), where G3b can only replicate it | **LAUNCHED** as `crt1`, CORRECTIONS 300: **36** jobs (one α0 point added, 300.3) **5080605, 5080607–5080626, 5080628–5080642**, seeds 176–178; 34.4 GPU-h expected, 72 bound; 17 COMPLETED / 16 running / 3 pending |
+| 3 | **1.20 short-horizon γ control** at the mechanism cell | Does a shortened hypergradient horizon without decay reproduce the collapse (T-C)? | 12 runs ≈ 8.4 GPU-h | the one live rival mechanism against the collapse section's causal sentences; 1.17 is largely decided by `cwd1` (271) | **LAUNCHED** as `csh1`, CORRECTIONS 301: **18** jobs (a γ_P bracket added) **5080645–5080662**, seeds 180–182; 12.3 GPU-h expected, 54 bound; 0 / 18 started |
+| off-queue | **1.14 validation split** (`PATCH_VALSPLIT`, 302): `cgw1`'s cell at wd 0.1 / 5e-4 × four grains with 5,000 held-out images | Do the audit's TEST rankings hold on VAL, and would VAL select the same configuration? | 32 runs ≈ 21.7 GPU-h | the audit's ms 1e-4 was chosen on TEST (302.1) | **LAUNCHED** as `cvl1`, CORRECTIONS 303: 32 jobs **5080667–5080698**, seeds 184–187; 64 bound; 0 / 32 started |
 
 ---
 
