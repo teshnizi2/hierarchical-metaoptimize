@@ -1,0 +1,102 @@
+csh1_attack_indep -- independent rebuild of cSH1_horizon_score.py (ba36f00b...) + attack.  runsdir <runsdir>.
+
+[0] SYNC INTEGRITY: one digest over every run file's name and bytes (equal on both hosts <=> the sync is exact)
+  18 top-level csh1-*.out, 77 files under csh1/ (Tensorboard_outputs not hashed): digest a2bad1fffa7b7b02ff3f98cbee04a20addec89f78db72ba4242f4ebf6ab6f800
+  PASS  exactly 18 .out files (one per run, no resubmission)   18
+
+[1] REGISTERED FILES in the stage (--repo) at the registered bytes (RULE 16: read as bytes, never imported)
+  PASS  analysis/cSH1_horizon_score.py ba36f00b...
+  PASS  analysis/csh1_design.py 7925e0ed...
+  PASS  analysis/cwd_common.py d7ddb49e...
+  PASS  analysis/cwd_design.py 03d2d761...
+  PASS  STAGED_COMMIT == registered commit 5ac1dd7
+  PASS  stage corpus == the registered corpus cc189bd1...
+  PASS  stage exclusion TSV == registered 7b034d3e...
+
+[2] THE DESIGN, rebuilt from 301.5 and read back off the runs' own lines
+  PASS  18 (arm, seed) pairs = 6 arms x seeds 180/181/182
+  PASS  every .out's job id == 301.11's (5080645 + 6*seed_idx + arm_idx)
+  PASS  G1S: --gamma ['1'], --weight-decay-base ['5e-4'], --stepsize-groups ['scalar'] on all 3 ARGS lines
+  PASS  G1L: --gamma ['1'], --weight-decay-base ['5e-4'], --stepsize-groups ['layerwise'] on all 3 ARGS lines
+  PASS  GMS: --gamma ['0.999685'], --weight-decay-base ['5e-4'], --stepsize-groups ['scalar'] on all 3 ARGS lines
+  PASS  GML: --gamma ['0.999685'], --weight-decay-base ['5e-4'], --stepsize-groups ['layerwise'] on all 3 ARGS lines
+  PASS  GPS: --gamma ['0.99941'], --weight-decay-base ['5e-4'], --stepsize-groups ['scalar'] on all 3 ARGS lines
+  PASS  GPL: --gamma ['0.99941'], --weight-decay-base ['5e-4'], --stepsize-groups ['layerwise'] on all 3 ARGS lines
+  PASS  every ARGS line carries exactly 20 flags, in design order
+  PASS  every ENV line's PROBE_DIR is the run's own probe directory
+  PASS  no malformed Epoch line in any .out
+  PASS  no traceback in any .out
+  PASS  manifest ARM lines == the design table (cell, grain, gamma)
+  PASS  manifest ARGS lines == this file's rebuilt flags (seed 0, save <save>)
+  PASS  PROVENANCE REGISTERED_COMMIT == 5ac1dd79...
+  PASS  PROVENANCE corpus / exclusion shas == registered
+  PASS  PROVENANCE GAMMAS line == 301.4's tokens
+
+[3] PROBE RECORDS, raw (this file's own reader)
+  PASS  500 records on every run
+  PASS  record steps are exactly 0, 100, ..., 49,900 on every run
+  PASS  G1S: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  G1L: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  GMS: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  GML: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  GPS: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  GPL: 12 onset-window records (7,500 <= step < 8,700) per seed   [12, 12, 12]
+  PASS  G1S: every record's q >= 1 - gamma = 0 (the arm's own decay only shortens the trace)   min q 5.0050e-10/5.0050e-10/5.0050e-10
+  PASS  G1L: every record's q >= 1 - gamma = 0 (the arm's own decay only shortens the trace)   min q 5.0000e-10/5.0000e-10/5.0000e-10
+  PASS  GMS: every record's q >= 1 - gamma = 0.000315 (the arm's own decay only shortens the trace)   min q 3.1500e-04/3.1500e-04/3.1500e-04
+  PASS  GML: every record's q >= 1 - gamma = 0.000315 (the arm's own decay only shortens the trace)   min q 3.1500e-04/3.1500e-04/3.1500e-04
+  PASS  GPS: every record's q >= 1 - gamma = 0.00059 (the arm's own decay only shortens the trace)   min q 5.9000e-04/5.9000e-04/5.9000e-04
+  PASS  GPL: every record's q >= 1 - gamma = 0.00059 (the arm's own decay only shortens the trace)   min q 5.9000e-04/5.9000e-04/5.9000e-04
+
+[4] THE NOISE FLOOR, re-derived from the stage corpus by this file's own filter and pooling (selftest C's claim)
+  filtered: sigma 0.636565585885  df 274  cells 53   (frozen 0.636565585885, df 274; demo value 0.636566)
+  PASS  frozen SIGMA_PRIOR re-derived to 1e-12 at df 274
+  unfiltered (the OPERATIONS 36 trap, disclosure): sigma 14.485345  df 401
+  in-batch pooled sigma 0.561868 (df 12) < the frozen floor -> SIGMA_USED 0.636566, SE 0.519754
+
+[5] BOUNDS AND FLOOR / CEILING AUDIT (164.6) -- what bounds the verdict, printed before any reading
+  cell A: layerwise 68.4547 (seed range 0.6440, bar 5.0; REF_MIN 55.0 -> margin +13.4547); scalar 72.4673; COLLAPSE bar 0.5 x L = 34.2273 (scalar margin above it +38.2400); NOGAP bar G < 10: G -4.0127 (margin to the bar +14.0127)
+  cell M: layerwise 60.6707 (seed range 0.9820, bar 5.0; REF_MIN 55.0 -> margin +5.6707); scalar 66.2980; COLLAPSE bar 0.5 x L = 30.3353 (scalar margin above it +35.9627); NOGAP bar G < 10: G -5.6273 (margin to the bar +15.6273)
+  cell P: layerwise 56.9707 (seed range 1.8760, bar 5.0; REF_MIN 55.0 -> margin +1.9707); scalar 60.6487; COLLAPSE bar 0.5 x L = 28.4853 (scalar margin above it +32.1633); NOGAP bar G < 10: G -3.6780 (margin to the bar +13.6780)
+  every seed of every arm lies in [55.8300, 72.5720]: 40.83 pp above the 15 pp floor gate, 17.43 pp below the 90 pp ceiling
+  NOGAP is a BOUND: it says |L - k| < 10 pp in that cell (and L - k may be negative), never 'the grains are equal'.
+  late beta-floor share (scalar arms; >= 0.5 would stamp BETA-FLOOR): G1S 0.000, GMS 0.000, GPS 0.000
+  RHO_D (decay dose peak / the collapsing source arm's): A 0.0454, M 0.0136, P 0.0108 -- the dose is ABSENT by construction and measured so
+
+[6] LEAVE-ONE-SEED-OUT (DESCRIPTIVE, not a gate): the cell state with each seed pair dropped
+  cell A: drop s180: G -3.7860 -> NOGAP; drop s181: G -4.1460 -> NOGAP; drop s182: G -4.1060 -> NOGAP
+  cell M: drop s180: G -5.6630 -> NOGAP; drop s181: G -5.5650 -> NOGAP; drop s182: G -5.6540 -> NOGAP
+  cell P: drop s180: G -3.3340 -> NOGAP; drop s181: G -3.8530 -> NOGAP; drop s182: G -3.8470 -> NOGAP
+  per-seed within-seed gaps L - k: A -4.4660 / -3.7460 / -3.8260; M -5.5560 / -5.7520 / -5.5740; P -4.3660 / -3.3280 / -3.3400
+
+[7] THE EXCLUSION ROWS OWED (results/CORPUS-EXCLUSIONS.tsv full row form; PROPOSED, not applied here)
+  run	job_id	batch	arm	looks_like	intervention	witness	registered_at	reason
+  csh1-G1S-s180	5080645	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-G1L-s180	5080646	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GMS-s180	5080647	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GML-s180	5080648	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPS-s180	5080649	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPL-s180	5080650	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-G1S-s181	5080651	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-G1L-s181	5080652	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GMS-s181	5080653	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GML-s181	5080654	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPS-s181	5080655	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPL-s181	5080656	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-G1S-s182	5080657	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-G1L-s182	5080658	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GMS-s182	5080659	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GML-s182	5080660	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPS-s182	5080661	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  csh1-GPL-s182	5080662	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+  PASS  18 rows, each witnessed by its own ARGS line (weight-decay-base=5e-4, once)
+  PASS  no run deviates on a second ARGS kind (momentum-param-base 0.99 = the standard)
+
+[8] THE REBUILT FINAL
+  FINAL: HORIZON-DOES-NOT-REPRODUCE | A-NOGAP+M-NOGAP+P-NOGAP | DECAY-DOSE-A-BELOW | DECAY-DOSE-M-BELOW | DECAY-DOSE-P-BELOW | TRACE-P-DOMINATES | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | ANCHOR-IN-BATCH | CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON | SUFFICIENCY-NOT-NECESSITY | TRACE-ONLY-PATCH-NOT-RUN | TWO-GAMMAS-BRACKET-NOT-LOCATE | NO-INBATCH-COLLAPSE-CONTROL | KAPPA-5E-4-ONLY | ALPHA-SCALED-DECAY-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-A-DESCRIPTIVE | SCALAR-AHEAD-M-DESCRIPTIVE | SCALAR-AHEAD-P-DESCRIPTIVE | SCALAR-COST-M-DESCRIPTIVE | LAYERWISE-COST-M-DESCRIPTIVE | SCALAR-COST-P-DESCRIPTIVE | LAYERWISE-COST-P-DESCRIPTIVE | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+
+[9] LINE-BY-LINE AGREEMENT with each scorer stdout (200 lines rebuilt)
+  PASS  scorer log #1: 200 lines, 200 rebuilt, 0 differ (2 host-path lines matched by suffix)
+  PASS  scorer log #2: 200 lines, 200 rebuilt, 0 differ (2 host-path lines matched by suffix)
+
+ATTACK: 44 PASS / 0 FAIL

@@ -1,0 +1,23 @@
+# PROPOSED rows for results/CORPUS-EXCLUSIONS.tsv, owed by CORRECTIONS 301.3 / 301.9 at csh1's landing (18 = every run; wd 5e-4).
+# NOT applied here: this stage does NOT edit results/CORPUS-EXCLUSIONS.tsv or analysis/corpus_exclusions.py; the ingest applies them.
+# Kind ARGS_WD_BASE exists since CORRECTIONS 263 (standard 0.1).  gamma is a CSV cell-key column (304.4, C45), so no gamma kind is owed; ONE ARGS kind per run.
+# job_id from each run's own .out file name (= 301.11's ids); witness = the value on the run's own ARGS line (verified by analysis/csh1_attack_indep.py [7]).  looks_like follows cwd5's form (arm + granularity).
+run	job_id	batch	arm	looks_like	intervention	witness	registered_at	reason
+csh1-G1S-s180	5080645	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-G1L-s180	5080646	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GMS-s180	5080647	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GML-s180	5080648	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPS-s180	5080649	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPL-s180	5080650	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-G1S-s181	5080651	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-G1L-s181	5080652	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GMS-s181	5080653	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GML-s181	5080654	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPS-s181	5080655	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPL-s181	5080656	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-G1S-s182	5080657	csh1	G1S	G1S (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-G1L-s182	5080658	csh1	G1L	G1L (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GMS-s182	5080659	csh1	GMS	GMS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GML-s182	5080660	csh1	GML	GML (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPS-s182	5080661	csh1	GPS	GPS (granularity scalar)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)
+csh1-GPL-s182	5080662	csh1	GPL	GPL (granularity layerwise)	--weight-decay-base 5e-4	ARGS_WD_BASE: weight-decay-base=5e-4	CORRECTIONS 301	base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263)

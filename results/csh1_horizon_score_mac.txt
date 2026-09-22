@@ -1,0 +1,200 @@
+==============================================================================
+ csh1 -- THE SHORT-HORIZON gamma CONTROL (T-C).  At the mechanism cell with the decay dose removed (wd 5e-4),
+         does a shortened hypergradient horizon (constant gamma < 1) reproduce the scalar collapse?
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 180,181,182   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1  SGDm(0.99)+Lion
+   G1S  cell A scalar    gamma 1         gamma 1: the in-batch anchor (landed cwd5 k01W4 72.41)
+   G1L  cell A layerwise gamma 1         gamma 1: the anchor's in-batch reference (landed cwd5 kLW4 67.88)
+   GMS  cell M scalar    gamma 0.999685  gamma 0.999685: the MATCHED horizon (onset-window median of the collapsing arm)
+   GML  cell M layerwise gamma 0.999685  gamma 0.999685: M's in-batch reference
+   GPS  cell P scalar    gamma 0.99941   gamma 0.99941: the DOMINATING horizon (>= the collapsing arm's shrink at every step)
+   GPL  cell P layerwise gamma 0.99941   gamma 0.99941: P's in-batch reference
+ Every state is WITHIN its cell.  plateau5 = mean TEST over epochs 95..99.  BARS ARE FROZEN LITERALS (O2).
+==============================================================================
+corpus: 3115 rows after corpus_exclusions.filter_rows, csh1- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  18 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   csh1-G1S-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.5720 (train 99.7360)
+  OK   csh1-G1L-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.1060 (train 99.4880)
+  OK   csh1-GMS-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 65.7020 (train 90.8360)
+  OK   csh1-GML-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.1460 (train 92.6720)
+  OK   csh1-GPS-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.1960 (train 71.0240)
+  OK   csh1-GPL-s180  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 55.8300 (train 73.6720)
+  OK   csh1-G1S-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.4960 (train 99.6960)
+  OK   csh1-G1L-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.7500 (train 99.4800)
+  OK   csh1-GMS-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 66.8800 (train 91.3400)
+  OK   csh1-GML-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 61.1280 (train 93.1240)
+  OK   csh1-GPS-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 61.0340 (train 72.2740)
+  OK   csh1-GPL-s181  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 57.7060 (train 74.2400)
+  OK   csh1-G1S-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.3340 (train 99.7160)
+  OK   csh1-G1L-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.5080 (train 99.4720)
+  OK   csh1-GMS-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 66.3120 (train 91.5560)
+  OK   csh1-GML-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.7380 (train 93.3320)
+  OK   csh1-GPS-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 60.7160 (train 72.3240)
+  OK   csh1-GPL-s182  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 57.3760 (train 74.7480)
+
+G-ARGS    [HARNESS-NULL] every run's OWN ARGS line == its arm's registered flags, --gamma token included
+  PASS G-ARGS G1S-s180 (scalar gamma 1 wd 5e-4)
+  PASS G-ARGS G1L-s180 (layerwise gamma 1 wd 5e-4)
+  PASS G-ARGS GMS-s180 (scalar gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GML-s180 (layerwise gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GPS-s180 (scalar gamma 0.99941 wd 5e-4)
+  PASS G-ARGS GPL-s180 (layerwise gamma 0.99941 wd 5e-4)
+  PASS G-ARGS G1S-s181 (scalar gamma 1 wd 5e-4)
+  PASS G-ARGS G1L-s181 (layerwise gamma 1 wd 5e-4)
+  PASS G-ARGS GMS-s181 (scalar gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GML-s181 (layerwise gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GPS-s181 (scalar gamma 0.99941 wd 5e-4)
+  PASS G-ARGS GPL-s181 (layerwise gamma 0.99941 wd 5e-4)
+  PASS G-ARGS G1S-s182 (scalar gamma 1 wd 5e-4)
+  PASS G-ARGS G1L-s182 (layerwise gamma 1 wd 5e-4)
+  PASS G-ARGS GMS-s182 (scalar gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GML-s182 (layerwise gamma 0.999685 wd 5e-4)
+  PASS G-ARGS GPS-s182 (scalar gamma 0.99941 wd 5e-4)
+  PASS G-ARGS GPL-s182 (layerwise gamma 0.99941 wd 5e-4)
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line (PROBE_DIR stripped), one per run   1 distinct
+  PASS G-ENV the ENV line is cvt1 ... cwd5's, byte for byte (PROBE_DIR stripped)
+
+G-PT      ONE PROBE_TENSOR line per run == its arm's witness (grain, 62 tensors, Lion meta)
+  PASS G-PT G1S-s180
+  PASS G-PT G1L-s180
+  PASS G-PT GMS-s180
+  PASS G-PT GML-s180
+  PASS G-PT GPS-s180
+  PASS G-PT GPL-s180
+  PASS G-PT G1S-s181
+  PASS G-PT G1L-s181
+  PASS G-PT GMS-s181
+  PASS G-PT GML-s181
+  PASS G-PT GPS-s181
+  PASS G-PT GPL-s181
+  PASS G-PT G1S-s182
+  PASS G-PT G1L-s182
+  PASS G-PT GMS-s182
+  PASS G-PT GML-s182
+  PASS G-PT GPS-s182
+  PASS G-PT GPL-s182
+
+G-WITNESS the five `off` lines once each; no COMP_HOLD / WINDOW_HOLD line
+  PASS G-WITNESS G1S-s180
+  PASS G-WITNESS G1L-s180
+  PASS G-WITNESS GMS-s180
+  PASS G-WITNESS GML-s180
+  PASS G-WITNESS GPS-s180
+  PASS G-WITNESS GPL-s180
+  PASS G-WITNESS G1S-s181
+  PASS G-WITNESS G1L-s181
+  PASS G-WITNESS GMS-s181
+  PASS G-WITNESS GML-s181
+  PASS G-WITNESS GPS-s181
+  PASS G-WITNESS GPL-s181
+  PASS G-WITNESS G1S-s182
+  PASS G-WITNESS G1L-s182
+  PASS G-WITNESS GMS-s182
+  PASS G-WITNESS GML-s182
+  PASS G-WITNESS GPS-s182
+  PASS G-WITNESS GPL-s182
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == csh1_design.manifest_text(), byte for byte
+  manifest: /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2/csh1/PARTITION-MANIFEST.txt (<runsdir>/csh1/)
+  PASS G-STRUCT byte-identical
+
+G-PROV    PROVENANCE.txt
+  provenance: /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2/csh1/PROVENANCE.txt (<runsdir>/csh1/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == cvt8's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == cwd1's tree, UNCHANGED   HF_SHA256=94aedc33046afb12
+  PASS G-PROV runner == run_cifar_cwd1.sh, UNCHANGED   RUNNER_SHA256=34a8c90ee3a0bee0
+  PASS G-PROV train.py == the tree's (declares --gamma type=float)   TRAIN_SHA256=3fea309e172609c1
+  PASS G-PROV SCORER == this file   SCORER_SHA256=ba36f00b9c4fc893
+  PASS G-PROV DESIGN == the csh1_design.py this scorer loaded   DESIGN_SHA256=7925e0edf31baa82
+  PASS G-PROV the reused cwd_design.py this scorer loaded   CWD_DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+G-PROBE   [HARNESS-NULL] 500 records per run; the step-size count is the GRAIN's (1 or 62); on the scalar arms the per-tensor Lion vote sums to the harness's applied term (within 0.001 of sum|L_i|) with its sign
+  PASS G-PROBE G1S-s180 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE G1L-s180 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GMS-s180 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GML-s180 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GPS-s180 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GPL-s180 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE G1S-s181 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE G1L-s181 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GMS-s181 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GML-s181 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GPS-s181 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GPL-s181 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE G1S-s182 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE G1L-s182 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GMS-s182 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GML-s182 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE GPS-s182 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; Lion decomposition: 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE GPL-s182 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp   max 72.4673
+  PASS G-CEIL max arm mean <= 90.00 pp   max 72.4673
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  G1S  scalar    gamma 1         TEST 72.4673  sd 0.1216  range 0.2380   TRAIN 99.7160   tail slope 0.083/0.059/0.049 pp/ep
+           seeds: s180 72.5720 (train 99.7360), s181 72.4960 (train 99.6960), s182 72.3340 (train 99.7160)
+  G1L  layerwise gamma 1         TEST 68.4547  sd 0.3253  range 0.6440   TRAIN 99.4800   tail slope 0.032/0.033/0.020 pp/ep
+           seeds: s180 68.1060 (train 99.4880), s181 68.7500 (train 99.4800), s182 68.5080 (train 99.4720)
+  GMS  scalar    gamma 0.999685  TEST 66.2980  sd 0.5891  range 1.1780   TRAIN 91.2440   tail slope 0.006/-0.002/0.005 pp/ep
+           seeds: s180 65.7020 (train 90.8360), s181 66.8800 (train 91.3400), s182 66.3120 (train 91.5560)
+  GML  layerwise gamma 0.999685  TEST 60.6707  sd 0.4945  range 0.9820   TRAIN 93.0427   tail slope 0.014/-0.004/-0.007 pp/ep
+           seeds: s180 60.1460 (train 92.6720), s181 61.1280 (train 93.1240), s182 60.7380 (train 93.3320)
+  GPS  scalar    gamma 0.99941   TEST 60.6487  sd 0.4230  range 0.8380   TRAIN 71.8740   tail slope 0.005/0.004/0.005 pp/ep
+           seeds: s180 60.1960 (train 71.0240), s181 61.0340 (train 72.2740), s182 60.7160 (train 72.3240)
+  GPL  layerwise gamma 0.99941   TEST 56.9707  sd 1.0015  range 1.8760   TRAIN 74.2200   tail slope -0.004/0.002/0.005 pp/ep
+           seeds: s180 55.8300 (train 73.6720), s181 57.7060 (train 74.2400), s182 57.3760 (train 74.7480)
+
+G-HW      DISCLOSURE ONLY: the GPU each run's own nvidia-smi line names -- NO gate reads it
+  distinct devices: ['NVIDIA L4']
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.636566
+  SIGMA_INBATCH        0.561868
+  SIGMA_USED 0.636566 (= SIGMA_PRIOR_frozen); SE_ARM_DIFF 0.519754; 2 SE 1.039507 is the HALF-WIDTH of a +/-2 SE interval, NOT a bound on any effect (278.6 C1)
+
+THE TRACE AND THE DOSE, MEASURED from each arm's OWN records (arm value = median over its 3 seeds)
+  q = 1 - gamma*(1 - wd*a): the realised per-step trace shrink.  The collapsing source arm (cwd5 k01W1, wd 0.1, gamma 1): onset-window median 3.1477e-04, recorded peak 5.5256e-04 (frozen literals)
+  G1S  gamma 1         q onset-median 1.5739e-06  q min 5.0050e-10  q peak 2.5080e-05   decay dose peak wd*a 2.5080e-05   turns 9800/9900/9900   late beta-floor share 0.000
+  G1L  gamma 1         q onset-median 1.5289e-06  q min 5.0000e-10  q peak 1.3399e-05   decay dose peak wd*a 1.3399e-05   turns 0/0/3900   late beta-floor share 1.000
+  GMS  gamma 0.999685  q onset-median 3.1657e-04  q min 3.1500e-04  q peak 3.2252e-04   decay dose peak wd*a 7.5246e-06   turns 9700/9500/9800   late beta-floor share 0.000
+  GML  gamma 0.999685  q onset-median 3.1653e-04  q min 3.1500e-04  q peak 3.1885e-04   decay dose peak wd*a 3.8479e-06   turns 0/7200/7700   late beta-floor share 1.000
+  GPS  gamma 0.99941   q onset-median 5.9157e-04  q min 5.9000e-04  q peak 5.9598e-04   decay dose peak wd*a 5.9786e-06   turns 9400/9500/9300   late beta-floor share 0.000
+  GPL  gamma 0.99941   q onset-median 5.9153e-04  q min 5.9000e-04  q peak 5.9327e-04   decay dose peak wd*a 3.2714e-06   turns 0/7500/7700   late beta-floor share 1.000
+  cell A: trace ratio q_onset(G1S)/source 0.0050 (descriptive);  RHO_D = dose peak / source peak 0.0454 -> DECAY-DOSE-A-BELOW
+  cell M: trace ratio q_onset(GMS)/source 1.0057 (descriptive);  RHO_D = dose peak / source peak 0.0136 -> DECAY-DOSE-M-BELOW
+  cell P: trace ratio q_onset(GPS)/source 1.8794 (descriptive);  RHO_D = dose peak / source peak 0.0108 -> DECAY-DOSE-P-BELOW
+  cell P dominance: min q over every record of GPS / GPL 5.9000e-04 / 5.9000e-04 vs the bound on the source arm's shrink at ANY step 5.8439e-04 -> TRACE-P-DOMINATES
+
+THE CELLS (every contrast WITHIN its cell)
+  A gamma 1         scalar 72.4673  layerwise 68.4547   G_A = -4.0127 pp = -7.72 SE   R = 1.0586   -> NOGAP
+           +/-2 SE [-5.0522, -2.9732]   TRAIN gap -0.2360   seeds -4.466 / -3.746 / -3.826   scalar seeds at/below the bar: 0/3
+  M gamma 0.999685  scalar 66.2980  layerwise 60.6707   G_M = -5.6273 pp = -10.83 SE   R = 1.0928   -> NOGAP
+           +/-2 SE [-6.6668, -4.5878]   TRAIN gap +1.7987   seeds -5.556 / -5.752 / -5.574   scalar seeds at/below the bar: 0/3
+  P gamma 0.99941   scalar 60.6487  layerwise 56.9707   G_P = -3.6780 pp = -7.08 SE   R = 1.0646   -> NOGAP
+           +/-2 SE [-4.7175, -2.6385]   TRAIN gap +2.3460   seeds -4.366 / -3.328 / -3.340   scalar seeds at/below the bar: 0/3
+           bars: COLLAPSE iff scalar <= 0.50 x layerwise; NOGAP iff G < 10.0 pp; reference healthy iff layerwise >= 55.0 and its seed range <= 5.0
+
+THE HORIZON's COST, across cells, IN BATCH (descriptive; +/-2 SE)
+  D_M = GMS - G1S = -6.1693 pp [-7.2088, -5.1298]    E_M = GML - G1L = -7.7840 pp [-8.8235, -6.7445]
+  D_P = GPS - G1S = -11.8187 pp [-12.8582, -10.7792]    E_P = GPL - G1L = -11.4840 pp [-12.5235, -10.4445]
+
+==============================================================================
+FINAL: HORIZON-DOES-NOT-REPRODUCE | A-NOGAP+M-NOGAP+P-NOGAP | DECAY-DOSE-A-BELOW | DECAY-DOSE-M-BELOW | DECAY-DOSE-P-BELOW | TRACE-P-DOMINATES | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | ANCHOR-IN-BATCH | CONSTANT-GAMMA-NOT-A-LEARNED-HORIZON | SUFFICIENCY-NOT-NECESSITY | TRACE-ONLY-PATCH-NOT-RUN | TWO-GAMMAS-BRACKET-NOT-LOCATE | NO-INBATCH-COLLAPSE-CONTROL | KAPPA-5E-4-ONLY | ALPHA-SCALED-DECAY-ONLY | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | EPOCHS-100-ONLY | THREE-SEEDS | FLOOR-READINGS-ARE-BOUNDS | NOGAP-IS-A-BOUND | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-A-DESCRIPTIVE | SCALAR-AHEAD-M-DESCRIPTIVE | SCALAR-AHEAD-P-DESCRIPTIVE | SCALAR-COST-M-DESCRIPTIVE | LAYERWISE-COST-M-DESCRIPTIVE | SCALAR-COST-P-DESCRIPTIVE | LAYERWISE-COST-P-DESCRIPTIVE | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals): the landed cwd5 W4 cell G1S 72.4080 / G1L 67.8813 (this batch 72.4673 / 68.4547; bar 5.0 pp); the landed wd-0.1 collapse cmo1 k01 22.7887, cwd3 k01 22.9853, cwd4 k01WD 22.8213, cwd5 k01W1 23.2240
+REGISTERED PREDICTION (UNSURE): HORIZON-DOES-NOT-REPRODUCE; this batch: HORIZON-DOES-NOT-REPRODUCE
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  "At the mechanism cell with the decay dose removed (wd 5e-4), shortening the hypergradient horizon with a constant gamma -- to the collapsing arm's onset-window median (0.999685) and to a horizon at least as short as the collapsing arm's at every step (0.99941) -- does not collapse the scalar step size: at both, scalar and layerwise stay within the 10 pp bar."  Short-horizon bias through the trace is NOT SUFFICIENT for the collapse at this cell; T-C is excluded as a sufficient account, as a BOUND and for a constant gamma.  It does NOT show that the short trace plays no part at wd 0.1, where it acts together with the dose.
+  Every COLLAPSE and NOGAP state is a BOUND, never a point effect (164.6): a collapsed arm's gap is a LOCATION, and NOGAP means 'below the 10 pp bar', never 'the grains are equal'.
+  gamma is CONSTANT; the collapsing arm's horizon 1/(0.1*a) shrinks as its learned a grows.  gamma_M matches the onset-window MEDIAN; gamma_P is at least as short at every step.  Neither is the learned horizon.
+  Not licensed: any other network, dataset, meta step, alpha0, horizon, grouping, base or meta optimiser, decay value (only wd 5e-4 ran), a trace-only patch (not run), or anything about the collapse's NECESSARY causes at wd 0.1 (there the dose and the short trace act together); nothing about the parent paper.
+
+OWED AT LANDING: 18 CORPUS-EXCLUSIONS rows, ARGS_WD_BASE (weight-decay-base=5e-4), one per run; gamma is a CSV cell-key column, so no gamma kind is owed and no run deviates on two ARGS kinds.

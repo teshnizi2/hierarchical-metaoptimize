@@ -1,0 +1,38 @@
+RULE20 run utc=2026-09-22T10:29:07Z host=nodelogin04.alice.leidenuniv.nl batch=csh1 guard_sha=81cea8b586e124a6 design_sha=7925e0edf31baa82
+  .out files: 18   with ARGS: 18   squeue: 
+  BATCH-CONSISTENCY --name csh1- --vary seed --vary run-name --vary stepsize-groups --vary gamma -> rc=0  argsline_guard: 18 clean, 0 WITH REPEATED FLAGS OR DESIGN MISMATCH, 0 without an ARGS line VERDICT: PASS 
+  PER-RUN --expect (csh1, EVERY flag pinned to the run's OWN arm, flag count checked): 18 runs with an ARGS line checked, 0 violations, 0 .out without ARGS yet
+  gamma COVERAGE across the started runs (read from the runs' ARGS lines):
+          6 --gamma 0.99941
+          6 --gamma 0.999685
+          6 --gamma 1
+  weight-decay-base COVERAGE across the started runs (read from the runs' ARGS lines):
+         18 --weight-decay-base 5e-4
+  stepsize-groups COVERAGE across the started runs (read from the runs' ARGS lines):
+          9 --stepsize-groups layerwise
+          9 --stepsize-groups scalar
+    DECLARED: neither the runner's ENV line nor the PROBE_TENSOR line carries gamma or the weight decay, so THIS
+    half cannot discriminate the gamma cells -- the ARGS half (bin/cSH1_rule20.sh) pins --gamma on every run.
+    THIS half discriminates the GRAIN (PROBE_TENSOR type) and the META alg (the PROBE_TENSOR tail), and requires
+    every hold / mask witness `off`.  The registered gammas, re-typed for comparison:
+      G1S=gamma 1  G1L=gamma 1  GMS=gamma 0.999685  GML=gamma 0.999685  GPS=gamma 0.99941  GPL=gamma 0.99941
+    distinct ENV lines (PROBE_DIR stripped): 1
+      x18  ENV: AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none LAM=na ETA_RATIO=na COS_TOTAL=default COS_WARMUP=default SCHED=none SCHED_TOTAL=none SCHED_WARMUP=none SCHED_MIN=none PROBE=100 EB_RHO=na EB_LOG=0
+    distinct PROBE_TENSOR lines (dir stripped): 2  (0 started runs have none yet)
+      x9  PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+      x9  PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9
+    GPU devices named by the runs' own nvidia-smi lines (DISCLOSURE, --constraint=L4 was requested):
+      x18  NVIDIA L4
+    VOTE_W witness lines (exact match to the arm's registered line):
+      x18  VOTE_W: off
+    BETA_HOLD witness lines (exact match to the arm's registered line):
+      x18  BETA_HOLD: off
+    GROUP_HOLD witness lines (exact match to the arm's registered line):
+      x18  GROUP_HOLD: off
+    REST_HOLD witness lines (exact match to the arm's registered line):
+      x18  REST_HOLD: off
+    DECAY_MASK witness lines (exact match to the arm's registered line):
+      x18  DECAY_MASK: off
+    coverage 18/18 runs with an .out, 0 violations
+  ENV AUDIT VERDICT csh1: PASS
+RULE20 end utc=2026-09-22T10:29:13Z
