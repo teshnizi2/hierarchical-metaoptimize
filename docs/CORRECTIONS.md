@@ -40397,4 +40397,74 @@ coverage is owed once all 32 have started (`bash bin/cVL1_rule20.sh` from the st
   not contacted; nothing under `paper/` was read, listed or archived; nothing was downloaded; no `.pdf` fetched; no
   notebook or Vercel URL opened; no job of another track was touched.
 
+### 303.10 Independent pre-launch verification — PASSED; `cvl1` SUBMITTED, 32 / 32 jobs (verifier, 2026-09-22)
+
+*The verifier's own checks, each re-run, not read off 303.4–303.8.  No file of the registration was changed: scorer,
+design, launcher, RULE 20 pair and every guard are the bytes of `14e63ba`.  `alice` NOT contacted; nothing under paper/
+read, listed or archived (the Mac stage was `git archive 14e63ba -- analysis bin results patches tests`); GPU work only as
+the 32 Slurm jobs below.*
+
+* **(1) Prior art.** `docs/PRIOR-ART.md` "Sweep 2026-09-22 — validation vs test selection … (CORRECTIONS 303, batch
+  `cvl1`, Track D)": dated, six queries recorded, four papers at abstract level, verdict "nothing found tests whether a
+  sub-point partition ranking of a meta-learned step size, or a 2.6 pp scalar-over-partition gap, measured on test,
+  survives on a held-out validation split".  The one design-relevant point (a 5,000-image split is noisier) is built
+  into the reader.  Justifies the GPU.
+* **(2) Design answers its question; not confounded into uninformativeness.**  The two readers are read from the SAME
+  runs, so no training difference can separate them; the held-out images are read on the TEST transform (302.2), so VAL
+  is a second finite sample of the same distribution, which is what the question needs.  The caw1-type risk is the
+  0.45 prior on `VAL-DIFFERS-UNRESOLVED` (no sentence).  It does not make every branch uninformative: the SC claim
+  (predicted SAME ≈ 0.85; a 2.6 pp gap is many SE) and the selection reading decide on their own, every paired
+  VAL−TEST gap is printed with its interval whatever the token, and `VAL-AGREES` / `VAL-FLIPS` / `VAL-SHIFTS` each license
+  a distinct sentence.  In-batch TEST levels are 45,000-image levels, not `cgw1`'s; the licences are correctly scoped to
+  "the rankings this batch reports on test" and `TRAIN-45K` is on every FINAL.  **Two wording notes, no code change:**
+  (a) `VAL-SHIFTS` fires when SOME claim's state differs AND SOME claim's paired gap is resolved — not necessarily the
+  same claim; its licence ("at least one … AND at least one …") says exactly that, and the per-claim lines show which;
+  (b) `cvl1_design.ACCOUNTS` / `PRIOR_P` name one `VAL-UNREADABLE` account (0.08) where the scorer has two tokens,
+  `UNREADABLE-TEST` / `UNREADABLE-VAL`; the 0.08 is their combined prior.
+* **(3) Bars and ladder.**  SURV 0.30, NULLBAR 0.15, POOL_EXCLUDE 0.5556, RES 2.0, HEALTH_MIN 85.0, DIVERGED 2.0,
+  BOXFREE_MAX 0.05, MATCH 0.50 and SIGMA_PRIOR 0.17818264951145454 are module-level literals; `primary_of` is first-match
+  in the registered order UNREADABLE-TEST → UNREADABLE-VAL → VAL-FLIPS → VAL-AGREES → VAL-SHIFTS → VAL-DIFFERS-UNRESOLVED,
+  total by construction (the last is the else); `select_of` is total over three tokens; `score()` prints the FINAL as its
+  last line with all seven bounds (selftest E checks it).
+* **(4) Selftest re-run:** Mac `/opt/homebrew/bin/python3 analysis/cVL1_valsplit_score.py --selftest` → **73 PASS / 0
+  FAIL / 1 SKIP** (F: no landed gn1 probe records on the Mac); `alice2` (guard 1c of the dry run below) → **75 / 0 / 0**,
+  1c1–1c4 PASS.
+* **(5) Dry run re-run.**  First, `~/stage_cvl1` on alice2 was checked file by file against `git archive 14e63ba --
+  analysis bin results patches tests` on the Mac: **1,147 files, every sha256 equal, no extra file**.  Then, under bash
+  (not zsh), `CVL1_REGISTERED_COMMIT=14e63bac… CVL1_SCORER_SHA256=85c73e21… bash bin/cVL1_valsplit.sh --dry-run` →
+  `~/verify_cvl1_dry.log`, 207 lines, **RC 0, 0 guard failures** (guard 1b accepts the declared commit and scorer sha;
+  3 / 3b / 3g / 4 ×8 / 4c' / 4d / 4e / 4f / 5 / 5b / 9 pass; guard 5: 37 pending, cap 60; guard 6 "32 composed command
+  lines, 0 failed").  **Flag for flag** (a script over the 32 `sbatch` lines): each line's 20 runner flags equal
+  `cvl1_design.expected_args(arm, seed, $WS/runs/cvl1)` in order and value, 0 mismatches; the (arm, seed) set equals
+  `D.RUNS`; each carries `--constraint=L4`, `--time=02:00:00` and `VAL_SPLIT=5000:302` in `--export`; and
+  `cvl1_design.expected_args` equals `cgw1_design.expected_args` flag for flag at the same arm and seed except
+  `--run-name` — `cgw1`'s cell verbatim.
+* **(6) Seeds** {184, 185, 186, 187}: inside Track D's block 184–191, disjoint from A 170–173 / B 176–178 / C 180–182;
+  0 of 3,383 `results/all_runs.csv` rows carry any of 184–191 (max seed 162, checked on the Mac); guards 2d / 2d2 / 2e /
+  2f on alice2 found 0 `.out` ARGS lines, corpus rows, `sacct` or `squeue` jobs.
+* **(7) Noise floor** 0.636566 (df 274) quoted (303.4; `DEMO_R18ALL_AT_REG` in the scorer).
+* **(8) RULE 21.**  `14e63ba` (scorer `85c73e21…` + design `946a119f…` + launcher `26b81d4f…`) is on `origin/master`
+  (`git branch -r --contains`, `git ls-remote`).  Push time: the GitHub events feed has no event for head `14e63ba`
+  itself; it is an ancestor of `2bcb9d4`, the `before` of the PushEvent for `31792c4` at **2026-09-22T07:20:37Z**, so
+  it was on origin by then (commit time 07:16:54Z is the lower bound).  First submission (`sacct` Submit, UTC, job
+  5080667): **2026-09-22T07:27:57Z**; PROVENANCE `UTC` 07:27:56Z.  **Margin: at least 7 min 20 s (at most 11 min 3 s),
+  push before submission.**
+* **(9) Predictions** in `cvl1_design.PRED` / `PRIOR_P` / `PRIOR_SELECT` and 303.5, committed before launch.  **(10) Hard
+  bound** 64 GPU-h (WALL 2 h × 32) stated; expected 21.65.
+
+**SUBMITTED** with the registered runner and pinned commit, once, from `~/stage_cvl1`: `CVL1_REGISTERED_COMMIT=14e63bac…
+CVL1_SCORER_SHA256=85c73e21… bash bin/cVL1_valsplit.sh --submit`, log `~/stage_cvl1_submit.log`: "32 jobs (ACCEPTED BY
+SLURM); 0 rejected"; `cvl1-` in the stage copy of `bin/PROTECTED.txt`; `$WS/runs/cvl1/PROVENANCE.txt` MODE submit,
+REGISTERED_COMMIT `14e63bac…`.  **Job ids (32): 5080667–5080698, contiguous** (W1 5080667–5080682, W4 5080683–5080698;
+per seed ch / nd / k01 / kL).  `squeue -u s5014158` right after: **32 `cvl1-*` jobs**, all PENDING on
+gpu-short,gpu-l4-24g (queue behind crt1 / csh1).  **Post-launch guard (guard 7): UNVERIFIED** — no `cvl1` job started
+within its 600 s window (all 32 still PENDING at 07:38:28Z, the script's exit, RC 0), so no run's own ARGS line has yet been
+audited; that audit (`python3 analysis/argsline_guard.py $WS/runs --name cvl1-`) is OWED once the first job starts, and
+before any number is quoted.  This is a queue wait, not a guard failure.
+
+**Still owed:** RULE 20 at full coverage (`bash bin/cVL1_rule20.sh` from `~/stage_cvl1`) once all 32 have started and
+before any number is read; at landing the VAL_SPLIT exclusion kind in `corpus_exclusions.py` (Track C code gap, 303.9),
+32 exclusion rows (16 two-axis) and `cvl1-` in the repo's `bin/PROTECTED.txt`; scoring only with `python3
+analysis/cVL1_valsplit_score.py $WS/runs` at 32 / 32 RUN_DONE.
+
 Next free number after the reservations: **304**.
