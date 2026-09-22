@@ -38202,3 +38202,91 @@ Next free number: **288**.
   `paper/` read or touched; no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.**
 
 Next free number: **289**.
+
+## 292. TRACK 3 (ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NOTHING AND MOVED NO NUMBER.**  It applies the hostile area chair's corrections to `docs/ICML-PLAN.md` and fixes the campaign's name for its own weight decay in four forward-looking documents.  **No level, bar, state, contrast, branch word, stamp or licence CONTENT changes; no registered scorer token, stamp or CORRECTIONS text is edited.**  The chair's verdict is recorded, not contested: **no ICML candidate is an accept as planned.**]** — **THE ICML PLAN NOW LEADS WITH STEP 0 + THE AdamW GATE + G3, SCORES DOMINANCE BY `DOM_C`, AND CARRIES TWO NEW DIRECT THREATS; AND FROM THIS ENTRY ON THE HARNESS'S DECAY IS CALLED "α-SCALED", NEVER "COUPLED".**
+
+### 292.1 Why this entry exists
+
+CORRECTIONS 288 recorded `docs/ICML-PLAN.md` and, in one bullet, the naming hazard.  The area chair's attack on that plan
+returned: no candidate is an ICML accept as planned; the cheapest decisive gate is (Step 0) the realised per-step shrink
+plus a lead-lag check at zero GPU and (Step 1) one standard-recipe cell, an AdamW base at its usual decay; and G3 (the
+count-matched audit's core cells at standard decay) must run first or alongside, because every audit cell ran at 0.1
+and plain scalar at 5e-4 (`cwd5` `k01W4` **72.4080**, 285) ties the audit's best partitions (72.41 / 72.00 as the chair
+read them; **not re-derived by this entry**), so the audit's +0.56 pp may itself be a 0.1 artefact.  Steps 0/1 and G3 are
+being registered by concurrent tracks as **CORRECTIONS 289-291**; none of them had reached `origin/master` when this
+entry was written, so the plan cites them as a range and does not say which is which.
+
+### 292.2 The plan changes (`docs/ICML-PLAN.md`), each one the chair asked for
+
+1. **Threat list added (§1)**, each citation checked before writing, on its arXiv abstract page (via WebFetch of
+   `arxiv.org/abs/<id>`; the arXiv MCP returned "not found" for all four ids and was not relied on) and, for section-level
+   claims, on the arXiv HTML (2605.19095) or ar5iv (1812.01187):
+   * **Defazio, arXiv:2605.19095, §6.1 "Learning Rate Adaptation Breaks Weight Decay"** (title "ScheduleFree+", submitted
+     18 May 2026; heading confirmed on the HTML) — the prior art that pre-empts the BROAD story.
+   * **He et al., arXiv:1812.01187, §3.1 "No bias decay"** (confirmed on ar5iv: decay on conv/FC weights only; biases and
+     BN γ, β undecayed) — a DIRECT threat, because the collapse needs decay on the BN scales.
+   * **Wu, Ren, Liao, Grosse, arXiv:1803.02021** ("Understanding Short-Horizon Bias in Stochastic Meta-Optimization",
+     ICLR 2018; abstract confirmed) — a RIVAL mechanism.  This entry adds one observation of its own, from the code and
+     not from any run: with the trace `h <- gamma*(1 - wd*a)*h - delta` and the mechanism cell's `--gamma 1` (read off
+     `cwd5`'s ARGS lines), α-scaled decay also shortens the hypergradient horizon to ~1/(κα).  **UNSURE whether that
+     matters; 1.20 is the test.**
+   * Loshchilov & Hutter arXiv:1711.05101 ("Decoupled Weight Decay Regularization", ICLR 2019; abstract confirmed) is
+     the vocabulary source for 292.3.
+2. **Retagged PARTIAL**: B2 (was "HAVE for the denominator": the denominator's MetaOptimize arms ran at κ 0.1 and
+   nothing was re-tuned at 5e-4); 1.16 (same reason); 3.1 (the parent's tables show κ 0.1 on every reported row, but the
+   SGDm-row alignment is UNSURE and unreported κ values are unknown — Saber's to close).
+3. **Phase 1 replaced**: the G1-led pilot is gone; Phase 1 = Step 0 (1.5a realised shrink α·κ, 1.19 lead-lag) + Step 1
+   (the AdamW cell) + G3 first or alongside.  G1 moves after the gate and runs only if Step 1 fires.
+4. **Gate dominance criterion = `DOM_C`** (defined at CORRECTIONS 256: the carrier set's summed term has the applied sign
+   AND exceeds the summed |terms| of the rest), with C fixed from early records.  **Top-3 membership is rejected** because
+   `cct1` (265) had the carriers top-3 on 69 % of CIFAR-10 records with `DOM_C` = 0 on all 1,500 and no collapse.
+5. **Prodigy dropped from the gate** (non-decreasing, so immune by construction on Defazio's framing — it could only fail
+   to fire); kept as a Phase 2 scope contrast.
+6. **Missing experiments added**, all ESTIMATES at 0.70 GPU-h/run, none registered: **1.17** standard-practice all-1-D
+   exemption arm (12 runs ≈ 8.4 GPU-h; `DECAY_MASK`'s existing `<name>+<name>` form — whether the full name list fits
+   one `--export` token is UNSURE); **1.18** retune at 5e-4 (meta step {3e-4, 1e-3, 3e-3}, 18 runs ≈ 12.6); **1.19**
+   lead-lag (zero GPU); **1.20** short-horizon γ control (12 runs ≈ 8.4).
+7. **C2's thesis restated** as "absent the collapse, scalar ≥ layerwise", with its bound inline (`G_W2` unresolved, so
+   "≥" rests on W3/W4 on one network).
+8. **Ceiling lowered**: conditional ICML ~10-15 % (was 15-25 %), unconditional under 5 %; C1's P column 0.25 → 0.15;
+   totals re-summed to ≈ 430-540 GPU-h.  These are judgements, not measurements.
+
+### 292.3 The naming fix — "α-scaled weight decay", never "coupled"
+
+**The fact.** `patches/HF_patched.py` (~588-657, every base type) computes `delta = a*(m + wd*w)` and
+`h <- gamma*(1 - wd*a)*h - delta`: the decay is multiplied by the learned step size and sits outside the momentum
+buffer and the preconditioner.  In Loshchilov & Hutter's vocabulary that is **decoupled, SGDW/AdamW-style** decay (the
+form PyTorch's `AdamW` uses by default), not L2 — the two coincide only for a plain-SGD base without momentum.  The
+campaign's "coupled" meant only "multiplied by the learned α", and an ICML referee reads "coupled" as L2.
+
+**What was changed.** In `docs/ICML-PLAN.md`, `docs/WRITEUP-mechanism.md`, `docs/LIMITS-PREP.md` and `docs/STATUS.md`
+(forward-looking documents), one identical definition paragraph was inserted near the top, and every prose use of
+"coupled" for the harness's decay became "α-scaled", every prose "decoupled" for the untested control became
+"α-independent" (73 substitutions by a script: WRITEUP 44, LIMITS-PREP 19, STATUS 10; plus six "a α-" → "an α-" article
+fixes and one hand edit, WRITEUP §10.6's R2 label, which now reads "α-independent or α-scaled?" and says it was written
+as "Decoupled or coupled?" before this entry).  "coupled L2 weight decay" became "α-scaled weight decay" — the "L2" was
+wrong as well as the "coupled".
+
+**What was NOT changed, deliberately.** (i) Every backticked token — stamps, scorer tokens, code — is untouched:
+**`DECOUPLED-NOT-TESTED` stays verbatim** and the definition paragraph says it means *α-independent decay not tested*.
+(There is no `COUPLED-DECAY-ONLY` stamp anywhere in the four files; the brief named it as an example.)  (ii) Two quoted
+passages in WRITEUP keep "coupled": §2.1's O1 row, which quotes the old sentence under correction, and §10.4's quotation
+of the chair.  (iii) Nothing in `docs/CORRECTIONS.md` and no MASTER-TABLE row was edited; old entries that say
+"coupled" are history and are read through the definition.  (iv) STATUS.md's older cycle logs were renamed in prose
+only; their stamps and numbers are byte-identical.
+
+**One sentence to flag.** WRITEUP §10.4's *licensed lead sentence* ("…and at the coupled L2 weight decay of 0.1 at which
+those cells are run…") now reads "α-scaled weight decay".  That is a NAME change inside a licensed sentence, not a
+content change: the licence's cell, value, numbers and scope are unchanged.  If a later stage holds that licensed text
+must be byte-stable, revert that one line and let the definition paragraph carry it.
+
+### 292.4 Discipline
+
+Files written: `docs/ICML-PLAN.md`, `docs/WRITEUP-mechanism.md`, `docs/LIMITS-PREP.md`, `docs/STATUS.md`,
+`docs/CORRECTIONS.md`.  `git diff -- analysis/ paper/` empty (RULE 16 held; `corpus_exclusions.py` untouched).  Remaining
+bare "coupled" in the four files, checked by grep after the edit: only the definition paragraphs, the two quotations in
+292.3 (ii) and the R2 note.  **Cost: ZERO GPU-hours; no Slurm job, no cluster command of any kind; `alice` NOT
+contacted; nothing under `paper/` read or touched; no notebook website or Vercel URL opened; nothing downloaded; no
+`.pdf` fetched (abstract and HTML pages only).**
+
+Next free number: **293** (289-291 are held by the concurrent tracks).

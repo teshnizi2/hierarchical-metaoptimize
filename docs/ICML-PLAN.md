@@ -8,6 +8,29 @@ proceedings pages, ids given). GPU-hour figures are **estimates** scaled from me
 PlainNet18_c100 0.65, ResNet18_tin 1.56 GPU-h per 100 epochs on L4, from `results/all_runs.csv`). None is registered.
 The recorded entry is CORRECTIONS 288.*
 
+***AMENDED 2026-09-22 at CORRECTIONS 292 (zero GPU): the hostile area chair's corrections applied, and the naming fixed.***
+*The chair's verdict, recorded rather than argued with: **no candidate below is an ICML accept as planned.** What changed
+here because of it: two direct threats added to §1 (He et al. arXiv:1812.01187, Wu et al. arXiv:1803.02021) and
+Defazio arXiv:2605.19095 §6.1 named as the prior art that pre-empts the broad story; B2, 1.16 and 3.1 retagged
+**PARTIAL**; C2's thesis restated as "absent the collapse, scalar ≥ layerwise"; four missing experiments added (1.17-1.20);
+the G1-led Phase 1 replaced by **Step 0 + the AdamW gate + G3** (§4); the gate's dominance criterion is now **`DOM_C`**,
+not top-3 membership; Prodigy is out of the gate; the conditional ceiling lowered to **~10-15 %**. Every outside
+citation added at 292 was checked on its arXiv abstract page (and, for the section-level claims, the arXiv/ar5iv HTML)
+before it was written. No level, bar, contrast, stamp or licence sentence moved.*
+
+> **NAMING (CORRECTIONS 292): the campaign's weight decay is "α-scaled", not "coupled".** The harness's base update
+> is `delta = a*(m + wd*w)` and its meta trace is `h <- gamma*(1 - wd*a)*h - delta` (`patches/HF_patched.py`
+> ~588-657, the same form for every base optimiser), so the decay is **multiplied by the learned step size**
+> a = exp(β) and is added outside the momentum buffer and any preconditioner. In Loshchilov & Hutter's vocabulary
+> (arXiv:1711.05101) that is **decoupled, SGDW/AdamW-style** decay — the form PyTorch's `AdamW` uses by default, where
+> the decay is multiplied by the learning rate — and **not** L2 regularisation, which is what a referee hears in the
+> word "coupled". (With a plain-SGD base and no momentum the two forms coincide.) The campaign's older word "coupled"
+> only ever meant "multiplied by the learned α", so from CORRECTIONS 292 on this file says **α-scaled weight decay**
+> (alpha-scaled), and the untested control, decay at a rate that does not move with α, is **α-independent weight
+> decay**. Registered tokens, stamps and quotations keep their original spelling and are read through this
+> definition: the stamp `DECOUPLED-NOT-TESTED` stays verbatim and means *α-independent decay not tested*, and quoted
+> text that says "coupled" means α-scaled. **No number, bar, state, contrast or stamp changes with the name.**
+
 ---
 
 ## 0. The short answer
@@ -16,17 +39,23 @@ The recorded entry is CORRECTIONS 288.*
    0.0448 pp (MASTER-TABLE line 175, CORRECTIONS 211.2), every audit cell ran at `--weight-decay-base 0.1`, and at the
    one rung where both grains were measured at standard decay the ranking reverses: scalar **72.4080** vs layerwise
    **67.8813**, `G_W4` = **−4.5267 pp = −8.59 SE** (CORRECTIONS 285, table line ~37612). Its right venue stays TMLR
-   (STATUS.md ~1741-1747), **but it must be re-run at 5e-4 before it goes anywhere** (§4, gate G3).
+   (STATUS.md ~1741-1747), **but it must be re-run at 5e-4 before it goes anywhere** (§4, gate G3). *(292: G3 now runs
+   FIRST or alongside Step 1, not after the gate: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) already ties the
+   audit's best partitions (72.41 / 72.00, as the area chair read them — his figures, not re-derived here), so the
+   audit's +0.56 pp may itself be a κ 0.1 artefact.)*
 2. **The one framing with a plausible ICML path** is a cross-method analysis paper: *"A step size shared across
    tensors is a magnitude-weighted vote; under step-size-scaled decay a few normalisation gains capture that vote, and
    whether finer granularity helps depends on the decay."* It is plausible **only if** the capture is shown in at
    least one adapter other than MetaOptimize, or at a standard setting (AdamW/Lion at κ = 0.1). Today it is shown in
-   neither. That is the kill gate.
+   neither. That is the kill gate. *(292: the gate is now Step 0 + the AdamW cell + G3, §4; and Defazio
+   arXiv:2605.19095 §6.1 already argues that learning-rate adaptation breaks weight decay, so only the per-tensor
+   vote-capture part of this sentence is unclaimed.)*
 3. **The "parent's granularity result is a weight-decay artefact" claim is unsupported now and partly contradicted**
    by our own data (§3, C3). It is testable cheaply (≈28 GPU-h minimal) but must go through Dr Salehkaleybar first.
 4. **Honest ceiling:** even if every gate passes, the paper has no ImageNet-1k (impossible, `docs/DATASETS.md`) and no
-   language model unless Reza clears TinyStories. I put ICML acceptance at roughly **15-25 %** conditional on the
-   gates passing, and roughly **5 %** unconditionally from today. The realistic best venue is **TMLR** for the
+   language model unless Reza clears TinyStories. I put ICML acceptance at roughly **~10-15 %** conditional on the
+   gates passing *(lowered at 292 from 15-25 %, on the area chair's attack: two direct threats and a pre-empting
+   prior-art section were not priced in)*, and **under 5 %** unconditionally from today. The realistic best venue is **TMLR** for the
    audit + mechanism, with the vote-capture paper aimed at ICML only if Phase 1 passes. These probabilities are my
    judgement, not measurements.
 
@@ -41,7 +70,7 @@ icml.cc; the deadline is UNSURE** (a third-party aggregator's 22 Jan 2027 is unv
 | # | Bar item | Where it comes from | Campaign status today |
 |---|---|---|---|
 | B1 | A claim of general interest, not a corner case | Significance; "Reject" names weak/limited evaluation | **FAILING** — CORRECTIONS 285 itself concedes a corner case |
-| B2 | Controlled manipulation, tuned per condition | peer analysis papers (Kunstner ICLR 2023, Crowded Valley ICML 2021) | HAVE for the denominator; PARTIAL for the collapse (4-rung bracket) |
+| B2 | Controlled manipulation, tuned per condition | peer analysis papers (Kunstner ICLR 2023, Crowded Valley ICML 2021) | **PARTIAL** *(retagged at 292; was "HAVE for the denominator")*: the MetaOptimize comparison arms of the denominator ran at α-scaled κ 0.1, where the scalar grain collapses, and nothing was re-tuned at 5e-4 (1.16, 1.18); the collapse itself is a 4-rung bracket |
 | B3 | Breadth: >1 architecture family, incl. a transformer | every step-size method paper reviewed has an LM/transformer task (D-Adaptation arXiv:2301.07733, Prodigy arXiv:2306.06101, DoG arXiv:2302.12022, Mechanic arXiv:2306.00144, Schedule-Free arXiv:2405.15682, the parent arXiv:2402.02342) | **MISSING** transformer; HAVE ResNet/VGG/GN/PlainNet |
 | B4 | Scale beyond CIFAR | same | PARTIAL: Tiny-ImageNet and IN-489 single batches (LIMITS-PREP §2.2); ImageNet-1k impossible |
 | B5 | Mechanism with formal or toy-model support (for CNN-only analysis papers) | Lobacheva et al. NeurIPS 2021 (arXiv:2106.15739), Wu et al. ICLR 2018 (arXiv:1803.02021) | **MISSING** |
@@ -60,10 +89,20 @@ shared *meta-learned* step size's failure to per-tensor dominance of a summed vo
 gains, with causal interventions, or measure the scalar-vs-finer gap as a function of decay. That is the unclaimed
 ground.
 
-**A naming hazard to fix in any ICML text.** The parent rule is Δw = −αm − καw (parent text line ~662) and the harness
-does the same (`patches/HF_patched.py` ~592-598). In Loshchilov & Hutter's vocabulary (arXiv:1711.05101) that is
-*decoupled* (SGDW-style) decay. What the campaign calls "coupled" means "multiplied by the learned α". An ICML referee
-will read "coupled" as L2. Call it **α-scaled decay**; the missing control is **α-independent decay**.
+**Threat list (added at 292, from the area chair's attack; each checked on its arXiv abstract page, and the section
+claims on the arXiv/ar5iv HTML, before writing).**
+
+| # | Paper | What it says (paraphrase) | Why it threatens us | What answers it |
+|---|---|---|---|---|
+| T-A | **Defazio, "ScheduleFree+", arXiv:2605.19095, §6.1 "Learning Rate Adaptation Breaks Weight Decay"** | Adapting the learning rate changes the gradient-to-weight-norm balance of normalised layers, which feeds back into the gradient norms — a loop the section says breaks learning-rate adaptation; it proposes an AdamC-style decay term with a squared learning rate | **Pre-empts the broad story** ("decay breaks step-size adaptation") in 2026, so C1 cannot claim it; what is left is the per-tensor vote capture and the granularity reversal | Frame C1 as a *mechanism inside* that loop for shared meta-learned step sizes; cite §6.1 as the known phenomenon |
+| T-B | **He et al., "Bag of Tricks for Image Classification with CNNs", arXiv:1812.01187, §3.1 "No bias decay"** | The standard recipe applies weight decay only to conv and fully-connected weights and leaves biases and BN γ, β undecayed | **Direct threat**: the collapse needs decay on the BN scales (WRITEUP E8-E11, E19), which the standard recipe exempts, so our configuration is non-standard on two axes at once (κ 0.1 AND decayed 1-D tensors) | **1.17** — the standard-practice all-1-D exemption arm |
+| T-C | **Wu, Ren, Liao, Grosse, "Understanding Short-Horizon Bias in Stochastic Meta-Optimization", arXiv:1803.02021 (ICLR 2018)** | Gradient-based meta-optimisation over short horizons systematically picks learning rates that are too small | **Rival mechanism**: the harness's trace is `h <- gamma*(1 - wd*a)*h - delta`, so α-scaled decay also **shortens the hypergradient horizon** to ~1/(κα) at γ = 1; a collapsed scalar step could be short-horizon bias, not vote capture | **1.20** — the short-horizon γ control (and 1.6's trace-only variant) |
+| T-D | Kosson, Messmer, Jaggi arXiv:2305.17212; Li, Zhou, Xu arXiv:2607.21005; Amin, Chang, Khanna arXiv:2609.09116; Summers & Dinneen arXiv:1906.03548; LARS arXiv:1708.03888 | (as read at 288) | background to T-A | — |
+
+**Naming.** See the definition at the top of this file: the harness's decay is **α-scaled** (decoupled, SGDW/AdamW-style,
+in Loshchilov & Hutter's vocabulary, arXiv:1711.05101), never "coupled"; the missing control is **α-independent**.
+*(This paragraph replaced 288's "naming hazard" note, which said the same and cited `patches/HF_patched.py` ~592-598;
+the decay term is in every base update, ~588-657.)*
 
 ---
 
@@ -93,9 +132,15 @@ will read "coupled" as L2. Call it **α-scaled decay**; the missing control is *
 
 ### C2 — "Decay decides granularity" *(analysis, MetaOptimize-specific)*
 
-> **Thesis:** "For MetaOptimize, the sign of the granularity benefit depends on α-scaled weight decay: layerwise wins
-> by a floor-sized margin at κ = 0.1 and scalar wins at 5e-4, because a few BatchNorm gains own the shared vote only
-> when decay keeps their terms large."
+> **Thesis (restated at 292):** "For MetaOptimize, **absent the collapse, scalar ≥ layerwise**: the one regime in
+> which the finer grain wins is the α-scaled-decay collapse at κ = 0.1, and there it wins because the scalar arm is
+> broken, not because granularity helps."
+
+*The 288 thesis ("layerwise wins by a floor-sized margin at κ = 0.1 and scalar wins at 5e-4, because a few BatchNorm
+gains own the shared vote only when decay keeps their terms large") claimed a mechanism for the sign flip that the
+data do not yet carry; the restated form claims only what the ladder shows and names what must hold for it: `G_W2`
+is **not resolved** (−2.07 SE, 285), so "≥" rests on W3 and W4 on ONE network, and 1.7 (replication) and 1.18
+(retune at 5e-4) are what would make it a result.*
 
 * **Type:** analysis, single method. This is C1 with the cross-method section (and the fix) removed.
 * **Why it could clear:** clean controlled manipulation with huge SE; the reversal is new.
@@ -149,8 +194,8 @@ acceptance; "Saber" = needs the supervisor.
 |---|---|---|---|---|---|---|---|
 | 1.1 | A shared MetaOptimize step size collapses at α-scaled κ 0.1 and not at 1e-2, 1e-3, 5e-4 | **HAVE** (one cell): `cwd5`, CORRECTIONS 285, scalar 23.22/69.35/72.50/72.41 vs layerwise 69.29/68.26/68.34/67.88 | — | — | — | — | MUST |
 | 1.2 | The collapse is carried by term magnitude of a few tensors, and removing their decay removes it | **PARTIAL**: ISO (`ciso1`, 187), depth control (`cdep1`, 193), inject re-collapse on PlainNet (`cvt1`, 230), masks (`cwd3` 278, `cwd4` 283). Magnitude vs identity on ResNet unseparated; weight norms unmeasured | **O-13** magnitude/dose ladder on a ResNet non-carrier with onset control (WRITEUP-mechanism ~983); **O-2** weight-norm readout on the κ 0.1 arms | O-13 ≈ 10-13 GPU-h (WRITEUP's guess, UNSURE); O-2 ≈ 5 GPU-h + patch | O-13: existing `PATCH_VOTEWEIGHT`; O-2: read-only patch + inertness proof | O-2 flagged "a design question for the professor" (273.12) — Saber | MUST (O-13), NICE (O-2) |
-| 1.3 | **Capture generalises beyond MetaOptimize** | **MISSING**: no Prodigy/D-Adapt/DoG/Mechanic/Baydin-HD run anywhere in docs (grep, novelty stage) | ResNet18_c100, κ {0.1, 5e-4}: Baydin HD (exact γ=0 case) scalar vs layerwise; Mechanic (can decrease) scalar; Prodigy (non-decreasing contrast) scalar; per-tensor attribution probe on each | pilot 24 runs ≈ 17 GPU-h; full (4 adapters × κ {0.1,1e-2,5e-4} × 2 grains where defined × 3 seeds) ≈ 60-72 runs ≈ 45-50 GPU-h | HD: ~10-line `SGD_meta_update`; Mechanic/Prodigy: pip in a **separate venv** + 30-60-line wrappers + inertness test; probe generalisation | pip install on alice2 login node (PyPI reachable) — Reza's go-ahead | **MUST** (kill gate) |
-| 1.4 | Capture happens at a *standard* setting | **MISSING**: AdamW/Lion bases never run on CIFAR-100 (LIMITS-PREP coverage table: AdamW 9 cells, all CIFAR-10) | T2: AdamW+Adam and Lion+Lion bases, ResNet18_c100, κ {0.1, 1e-2}, scalar vs layerwise, 3 seeds (κ 0.1 is the parent's standard for these) | 24 runs ≈ 17 GPU-h | none (flags exist) | registration | **MUST** (kill gate, with 1.3) |
+| 1.3 | **Capture generalises beyond MetaOptimize** | **MISSING**: no Prodigy/D-Adapt/DoG/Mechanic/Baydin-HD run anywhere in docs (grep, novelty stage) | ResNet18_c100, κ {0.1, 5e-4}: Baydin HD (exact γ=0 case) scalar vs layerwise; Mechanic (can decrease) scalar; Prodigy (non-decreasing contrast) scalar; per-tensor attribution probe on each | pilot 24 runs ≈ 17 GPU-h; full (4 adapters × κ {0.1,1e-2,5e-4} × 2 grains where defined × 3 seeds) ≈ 60-72 runs ≈ 45-50 GPU-h | HD: ~10-line `SGD_meta_update`; Mechanic/Prodigy: pip in a **separate venv** + 30-60-line wrappers + inertness test; probe generalisation | pip install on alice2 login node (PyPI reachable) — Reza's go-ahead | **MUST**, but no longer the gate *(292: runs only after Step 1 fires; Prodigy is a scope contrast, not a gate arm)* |
+| 1.4 | Capture happens at a *standard* setting | **MISSING**: AdamW/Lion bases never run on CIFAR-100 (LIMITS-PREP coverage table: AdamW 9 cells, all CIFAR-10) | T2: AdamW+Adam and Lion+Lion bases, ResNet18_c100, κ {0.1, 1e-2}, scalar vs layerwise, 3 seeds (κ 0.1 is the parent's standard for these) | 24 runs ≈ 17 GPU-h | none (flags exist) | registration | **MUST**; its AdamW cell at the usual decay is now **Step 1, the gate** *(292)* |
 | 1.5 | The transition is *located*, and expressed on the realised per-step shrink α·κ | **PARTIAL**: bracketed in (1e-2, 0.1) only (285, `LADDER-IS-FOUR-POINTS`) | (a) zero-GPU T0: compute α·κ from committed probe β records for every `cwd5` rung and the AdamW C10 cells; (b) κ {0.02, 0.03, 0.05} × 2 grains × 5 seeds | (b) 30 runs ≈ 21 GPU-h | none | registration | MUST |
 | 1.6 | The route is identified: weight shrink vs meta-trace, and α-independent decay | **MISSING** (`DECOUPLED-NOT-TESTED`, 281.2; one flag moves both routes) | 3 variants at κ 0.1 on ResNet18_c100: shrink-only, trace-only, α-independent (matched on initial per-step shrink) × 2 grains × 3 seeds | 18 runs ≈ 13 GPU-h | 40-80-line opt-in patch like `PATCH_DECAYMASK` + inertness proof | registration | MUST (reviewers will ask) |
 | 1.7 | The reversal (scalar > layerwise at 5e-4) replicates | **PARTIAL**: one network, 3 seeds (`G_W4`, 285) | PlainNet18_c100, VGG11_bn_c100, ResNet18/CIFAR-10 at κ 5e-4 (+0.1 anchor) × 2 grains × 5 seeds | 60 runs ≈ 35 GPU-h | PlainNet in isolated trees only; probe hard-codes 62 tensors | registration | MUST |
@@ -162,18 +207,23 @@ acceptance; "Saber" = needs the supervisor.
 | 1.13 | A toy model predicts the threshold | **MISSING** | analytic: noisy quadratic (Wu et al.) + one scale-variant gain group under α-scaled decay and a Lion/sign meta-vote; predict the capture threshold in α·κ and check against 1.5 | 0 GPU; ~1-2 weeks of Reza/Saber time | — | Saber (theory ownership) | MUST (B5) |
 | 1.14 | Validation-split reporting | **MISSING** (CORRECTIONS 135.1) | 45k/5k split, re-select and re-report the headline cells (1.1, 1.3-1.4, 1.7, 1.9) on validation | ≈ 30 runs ≈ 21 GPU-h | split flag in the loader (small) | registration | MUST (B10) |
 | 1.15 | 5+ seeds on every load-bearing contrast | **PARTIAL** (3 seeds) | top-ups folded into 1.5/1.7/1.9; plus 2 seeds on 1.1 | ≈ 20 runs ≈ 14 GPU-h | none | — | MUST for sub-1-pp effects; NICE for 40-pp effects |
-| 1.16 | Practical context: tuned non-meta baseline | **HAVE**: `cdn1` +5.699 pp = +18.80 SE (171/175), `cau1` +3.617 = +9.92 SE (209), `cuc1` +12.178 = +26.05 SE (220) | re-run the MetaOptimize comparison arm at κ 5e-4 (the `cdn1` arm ran at 0.1) — cheap, removes the wd confound | 6 runs ≈ 4 GPU-h | none | — | MUST (fairness) |
+| 1.16 | Practical context: tuned non-meta baseline | **PARTIAL** *(retagged at 292; was HAVE)*: `cdn1` +5.699 pp = +18.80 SE (171/175), `cau1` +3.617 = +9.92 SE (209), `cuc1` +12.178 = +26.05 SE (220) — but every MetaOptimize arm in those contrasts ran at α-scaled κ 0.1, so the denominator is not yet separated from the κ 0.1 configuration | re-run the MetaOptimize comparison arm at κ 5e-4 (the `cdn1` arm ran at 0.1) — cheap, removes the wd confound | 6 runs ≈ 4 GPU-h | none | — | MUST (fairness) |
+| 1.17 | **Standard-practice exemption** (He et al. §3.1, threat T-B): with ALL 1-D tensors (biases, BN γ and β) undecayed, does the collapse exist at κ 0.1, and is scalar ≥ layerwise at 5e-4? | **MISSING** (`cwd1` masked the 20 BN scales only, 271) | ResNet18_c100, κ {0.1, 5e-4}, `DECAY_MASK` = the explicit list of every 1-D parameter (the existing `<name>+<name>` form, derived on the LIVE model), 2 grains, 3 seeds | 12 runs ≈ 8.4 GPU-h (0.70/run) | none if the name list fits the one-token `--export` limit — UNSURE, check at registration | registration | **MUST** |
+| 1.18 | **Retune at 5e-4**: the mechanism cell's meta step 1e-3 and α₀ 1e-6 were chosen at κ 0.1; is the 5e-4 ranking robust to re-tuning each grain? | **MISSING** | ResNet18_c100, κ 5e-4, meta step {3e-4, 1e-3, 3e-3} × 2 grains × 3 seeds, each grain's best reported | 18 runs ≈ 12.6 GPU-h | none | registration | **MUST** (B2) |
+| 1.19 | **Lead-lag**: does the carriers' vote share (and the realised shrink α·κ) move BEFORE the scalar arm's accuracy falls, or after it? | **MISSING** | zero GPU: from committed per-record probes (`cwd5` W1 arms, `ctd1`, `ciso1` `k01`), time of DOM_C onset vs time of the accuracy/β drop, per seed | 0 GPU | analysis script only | — | **MUST** (Step 0): if capture LAGS the collapse, it is a symptom and C1's causal framing dies |
+| 1.20 | **Short-horizon γ control** (Wu et al., threat T-C): does shortening the hypergradient horizon WITHOUT decay reproduce the collapse? | **MISSING** | ResNet18_c100, κ 5e-4, γ chosen so γ matches the realised (1 − κα) of the κ 0.1 scalar arm (from Step 0), plus γ = 1 anchor, 2 grains, 3 seeds | 12 runs ≈ 8.4 GPU-h | none (`--gamma` exists; the cell runs `--gamma 1`, read from `cwd5`'s ARGS lines) | registration | **MUST** (rival mechanism) |
 
 ### C2 — Decay decides granularity
 
-Required claims = C1 rows **1.1, 1.2, 1.5, 1.6, 1.7, 1.8(a), 1.12, 1.14, 1.15, 1.16**, all as costed above. Drops 1.3,
-1.4, 1.9, 1.10, 1.11, 1.13. Adds: none. **Cost ≈ 150-170 GPU-h.** Ceiling: TMLR strong; ICML weak (B1, B3 fail).
+Required claims = C1 rows **1.1, 1.2, 1.5, 1.6, 1.7, 1.8(a), 1.12, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.20**, all as
+costed above (1.17-1.20 added at 292, ≈ 29 GPU-h together). Drops 1.3,
+1.4, 1.9, 1.10, 1.11, 1.13. Adds: none. **Cost ≈ 180-200 GPU-h** *(was 150-170 before 1.17-1.20)*. Ceiling: TMLR strong; ICML weak (B1, B3 fail).
 
 ### C3 — Parent-conditional claim
 
 | # | Claim | Status + evidence | Experiment | Runs / GPU-h | New code | Decision | Bar |
 |---|---|---|---|---|---|---|---|
-| 3.1 | The parent measured granularity only at κ = 0.1 | **HAVE**: parent Tables 2-4 (local text); PAPER-CONFIG.md; CORRECTIONS 254 | — | — | — | Saber to confirm SGDm-row alignment | MUST |
+| 3.1 | The parent measured granularity only at κ = 0.1 | **PARTIAL** *(retagged at 292; was HAVE)*: parent Tables 2-4 (local text); PAPER-CONFIG.md; CORRECTIONS 254 — the tables show κ = 0.1 on every row reported, but the SGDm-row alignment is UNSURE and whether other κ were run and not reported is unknown; only Saber can close it | — | — | — | Saber to confirm SGDm-row alignment | MUST |
 | 3.2 | At the parent's exact SGDm row, blockwise − scalar at κ 0.1 is resolved | **MISSING** (the exact row, ρ 0.9 + Adam meta on CIFAR-10, was never run) | P1-min: CIFAR-10, ResNet18, bs 100, AUGMENT=0, SGDm 0.9 + Adam, α0 1e-6, η 1e-3, γ 1, wide β box −60:6.0; scalar vs `resnet18_blocks` × κ {0.1, 1e-3} × 5 seeds; same for AdamW+Adam | 40 runs ≈ 28 GPU-h | none (flags exist; `resnet18_blocks` = [3,12,15,15,15,2] in `HF_patched.py` ~215 — whether it equals the parent's six blocks is UNSURE, same code lineage) | **Saber first**; registration | MUST |
 | 3.3 | The gap shrinks/reverses at low κ (interaction I resolved) | **MISSING** | P1-full: + (Lion, Lion), (RMSprop, Adam), κ {0.1, 1e-2, 1e-3}, 5 seeds | 120 runs ≈ 83 GPU-h | none | Saber | MUST |
 | 3.4 | The β-clip floor did not manufacture the gap | **PARTIAL**: CLOSEOUT 5a guard caveat (1.184 nats above the floor) | covered by the wide box in P1, plus the 9-job `BETA_CLIP=-15:0` control CLOSEOUT names | 9 runs ≈ 6 GPU-h | none | — | MUST |
@@ -189,7 +239,7 @@ reach the parent's CIFAR-10 cells"* — which C1 needs anyway.
 | # | Claim | Status | Experiment | Runs / GPU-h |
 |---|---|---|---|---|
 | 4.1 | Uniform > aligned at matched count, 20/20 | HAVE at κ 0.1 (211.2) | — | — |
-| 4.2 | **…and it is not a κ = 0.1 phenomenon** | **MISSING** | G3: core count-matched cells (chunk vs nodewise at two counts; ResNet18 on CIFAR-10 and CIFAR-100; SGDm+Lion) × κ {5e-4, 1e-2} × 3 seeds, plus scalar/layerwise in batch | 24-36 runs ≈ 17-25 GPU-h |
+| 4.2 | **…and it is not a κ = 0.1 phenomenon** | **MISSING** — and now urgent: plain scalar at 5e-4 (72.4080, `cwd5` `k01W4`) ties the audit's best partitions (72.41 / 72.00, the area chair's reading) | G3: core count-matched cells (chunk vs nodewise at two counts; ResNet18 on CIFAR-10 and CIFAR-100; SGDm+Lion) × κ {5e-4, 1e-2} × 3 seeds, plus scalar/layerwise in batch | 24-36 runs ≈ 17-25 GPU-h |
 | 4.3 | Stale sentences ("1.8-4.2 pp", "none of nine mechanisms") updated | PARTIAL (project memory) | writing only | 0 |
 
 ---
@@ -201,8 +251,8 @@ Scores are my judgement: P = probability the experiments deliver an ICML-quality
 
 | Rank | Candidate | P(ICML-quality result) | Value | Cost (GPU-h) | P×V/C (relative) | Verdict |
 |---|---|---|---|---|---|---|
-| 1 | **C1 vote capture** | ~0.25 (gated on 1.3/1.4) | 5 | ~400-450 + theory | **highest**, because Phase 1 is cheap and decisive | **PRIMARY** |
-| 2 | C2 decay decides granularity | ~0.10 for ICML; ~0.7 for TMLR | 3 | ~150-170 | medium | **FALLBACK** (to TMLR, merged with C4 or standalone) |
+| 1 | **C1 vote capture** | ~0.15 (gated on Step 0 + the AdamW cell; lowered at 292) | 5 | ~430-480 + theory | **highest**, because Phase 1 is cheap and decisive | **PRIMARY** |
+| 2 | C2 absent the collapse, scalar ≥ layerwise | ~0.10 for ICML; ~0.7 for TMLR | 3 | ~180-200 | medium | **FALLBACK** (to TMLR, merged with C4 or standalone) |
 | 3 | C4 audit | ~0.05 ICML; 0.8 TMLR (STATUS) | 2 | ~20-25 (G3) | high for TMLR, n/a for ICML | ship to TMLR regardless, after G3 |
 | 4 | C3 parent-conditional | not an ICML paper; ~0.3 that P1 even shows an interaction | 2 (high sensitivity) | 28-83 | low standalone | fold into C1 **only** with Saber's agreement |
 
@@ -219,27 +269,44 @@ Scores are my judgement: P = probability the experiments deliver an ICML-quality
   P1, and who owns the toy-model theory (1.13).
 - Decide the TMLR timing of the audit (dual-submission) and the public-repo anonymity question (B9).
 
-**Phase 1 — the kill-or-continue gate, ~1.5 weeks, ≈ 55-60 GPU-h, ≈ 80 runs.**
-- **G1** cross-method pilot (1.3): Baydin HD + Mechanic + Prodigy at ResNet18_c100, κ {0.1, 5e-4}. ≈ 17 GPU-h, plus
-  the HD patch and two wrappers.
-- **G2** standard-setting test (1.4): AdamW+Adam, Lion+Lion bases on CIFAR-100 at κ {0.1, 1e-2}. ≈ 17 GPU-h, no code.
-- **G3** audit survival at 5e-4 (4.2). ≈ 17-25 GPU-h, no code. Serves the fallback, not the gate.
-- **Gate rule (to be pre-registered):** continue C1 **iff** G1 shows collapse *and* top-3 vote dominance in ≥ 1
-  non-MetaOptimize adapter, **or** G2 shows R50 collapse for AdamW or Lion at κ 0.1. Also require Phase 0's N_eff to
-  separate at least the `cwd5` κ 0.1 vs 5e-4 arms. **If neither G1 nor G2 fires, C1 is dead**: write C2 + C4 for TMLR
-  and stop spending on ICML scope (1.10, 1.11, 1.13).
-- If Prodigy is immune and HD/Mechanic are not, that is still a pass, with the claim narrowed to adapters that can
-  decrease the step size.
+**Phase 1 — REPLACED at 292 by the area chair's cheapest decisive gate: Step 0 + the AdamW cell + G3.** *(The 288
+version led with G1, a three-adapter cross-method pilot needing new code and a pip install. The chair's point: that is
+neither the cheapest nor the most decisive first move, and top-3 membership is the wrong dominance test. These three
+now run as **CORRECTIONS 289-291**, registered by concurrent tracks; which number is which, and their status, is in
+those entries — none of them had reached `origin/master` when this was written.)*
+- **Step 0 — zero GPU.** (a) The **realised per-step shrink** α·κ from committed probe β records, for every `cwd5` rung
+  and the AdamW CIFAR-10 cells (1.5a); (b) the **lead-lag check** (1.19): does `DOM_C` onset precede the scalar arm's
+  fall? If capture lags the collapse, C1's causal framing is dead before any GPU is spent.
+- **Step 1 — one standard-recipe cell.** AdamW base at its usual decay, ResNet18_c100, scalar vs layerwise, 3 seeds
+  (a subset of 1.4; decay value and meta settings fixed in that registration, not here). It asks the question that
+  decides everything else: **is the collapse a hazard at a standard recipe, or a corner case of SGDm(0.99) at κ 0.1?**
+- **G3 — first or alongside, not after.** The count-matched audit's core cells at standard decay (4.2). Every audit
+  cell ran at κ 0.1, and plain scalar at 5e-4 already ties the audit's best partitions, so the audit's +0.56 pp may
+  itself be a κ 0.1 artefact. G3 serves the TMLR paper and must not wait on the ICML gate.
+- **Gate rule (to be pre-registered with frozen literal bars):** continue C1 **iff** Step 1 shows the scalar arm
+  collapsing (R ≤ 0.50 against its own in-batch layerwise arm) **and** the declared carrier set dominating the shared
+  vote by **`DOM_C`** — `sign(Σ_C L_i)` equals the applied sign **and** `|Σ_C L_i| > Σ_{i∉C} |L_i|`, the criterion
+  defined at CORRECTIONS 256 — on ≥ 0.50 of its scalar records, with C fixed from early records before the rest are
+  read; **and** Step 0's lead-lag does not show capture lagging the collapse. **Top-3 membership is not the test**: at
+  `cct1` the carriers were top-3 on 69 % of CIFAR-10 records with `DOM_C` = 0 on all 1,500 and no collapse (265), so
+  top-3 can fire where nothing is captured. **If Step 1 does not fire, C1 is dead**: write C2 + C4 for TMLR and stop
+  spending on ICML scope (1.10, 1.11, 1.13).
+- **G1 (cross-method) moves after the gate** and only if Step 1 fires: Baydin HD and Mechanic (adapters that can
+  decrease the step size), with the same `DOM_C` criterion. **Prodigy is dropped from the gate**: a non-decreasing
+  adapter is immune by construction (Defazio arXiv:2605.19095's framing), so it can only fail to fire; it stays in
+  Phase 2 as a scope contrast, not as a gate arm.
+- G2's Lion+Lion half and the rest of 1.4 move to Phase 2.
 
-**Phase 2 — build the paper, ~4-6 weeks, ≈ 300-350 GPU-h** (only if Phase 1 passes). In order: 1.6 route patch; 1.5
+**Phase 2 — build the paper, ~4-6 weeks, ≈ 330-380 GPU-h** (only if Phase 1 passes). In order: 1.17 all-1-D
+exemption; 1.20 short-horizon γ control; 1.18 retune at 5e-4; 1.6 route patch; 1.5
 located boundary; 1.7 reversal replication; 1.3 full cross-method; 1.10 ViT (smoke job first); 1.12 Tiny-ImageNet;
 1.9 fix; 1.14 validation re-report; 1.15 seed top-ups; 1.16 κ-matched denominator arm; 1.2 O-13 (+ O-2 if Saber
 agrees). P1 (C3) in parallel only on Saber's say-so. Theory (1.13) in parallel, human time.
 
 **Phase 3 — optional, Reza-gated:** TinyStories LM arm (1.11); ImageNet32 (image-net.org terms, his login).
 
-**Totals (estimates, not registered):** Phase 1 ≈ 55-60 GPU-h; Phase 2 ≈ 300-350 GPU-h; P1 +28-83; overall
-**≈ 400-500 GPU-h, ≈ 550-700 runs**. alice2 delivered 301-545 GPU-h/week recently (sacct, feasibility stage), so GPU
+**Totals (estimates, not registered; re-summed at 292):** Step 0 = 0; Step 1 + G3 ≈ 20-30 GPU-h; G1 ≈ 17 if the gate
+fires; Phase 2 ≈ 330-380 GPU-h; P1 +28-83; overall **≈ 430-540 GPU-h, ≈ 600-750 runs**. alice2 delivered 301-545 GPU-h/week recently (sacct, feasibility stage), so GPU
 is ~1-1.5 weeks of throughput; the real pacing limit is patches, inertness proofs and registrations (~40 jobs/night,
 LIMITS-PREP §5.5). **Calendar: ~7-9 weeks of experiments + ~3-4 weeks of writing ≈ 10-13 weeks from go-ahead**, i.e.
 late December 2026 at the earliest. Against an unverified late-January ICML 2027 deadline that is feasible but has
@@ -253,6 +320,9 @@ little slack; the theory item and the ViT recipe are the schedule risks.
   CIFAR-scale results with a self-conceded corner-case setting; the reviewer form's "limited evaluation" caps them at
   Weak Accept at best, and prior art (arXiv:2605.19095, 2305.17212, 2607.21005) makes "well-known result" objections
   likely.
+- **The area chair's verdict (292): no candidate is an ICML accept as planned.** With the gate passing, **~10-15 %**
+  conditional, not 15-25 %; Defazio §6.1 takes the broad story, He et al. makes the configuration doubly
+  non-standard, and Wu et al. offers a rival mechanism that must be excluded (1.17, 1.20).
 - **With Phase 1 passing**, C1 is a credible ICML submission but still missing ImageNet-1k (impossible here) and,
   unless Reza unblocks TinyStories, a language model. The ViT arm and a toy-model theory are what substitute for
   them, following the Lobacheva (NeurIPS 2021) / Kosson (ICML 2024) precedent.
