@@ -1,0 +1,267 @@
+==============================================================================
+ caw2 -- THE STANDARD-RECIPE GATE, WITH EACH CONFOUND IN ITS OWN CELL.  Does the shared-step-size collapse
+         survive the META swap (M), the BASE swap (L), both (A: AdamW+Adam, the standard recipe) and a 10x
+         dose (X), against the in-batch mechanism cell K01?
+ ResNet18_c100 / CIFAR100   100 epochs   seeds 160,161,162   AUGMENT=1  BETA_CLIP=-15:-2.3026  PROBE=100  PROBE_TENSOR=1
+   K01  SGDm +Lion scalar    wd 0.1   SGDm(0.99)+Lion at wd 0.1: the mechanism cell, POSITIVE CONTROL
+   MS   SGDm +Adam scalar    wd 0.1   SGDm(0.99)+Adam at wd 0.1 (META swap alone), scalar
+   ML   SGDm +Adam layerwise wd 0.1   SGDm(0.99)+Adam at wd 0.1, layerwise -- M's in-batch reference
+   LS   AdamW+Lion scalar    wd 0.1   AdamW+Lion at wd 0.1 (BASE swap alone), scalar
+   LL   AdamW+Lion layerwise wd 0.1   AdamW+Lion at wd 0.1, layerwise -- L's in-batch reference
+   AS   AdamW+Adam scalar    wd 0.1   AdamW+Adam at wd 0.1 (the STANDARD RECIPE), scalar
+   AL   AdamW+Adam layerwise wd 0.1   AdamW+Adam at wd 0.1, layerwise -- A's in-batch reference
+   XS   AdamW+Adam scalar    wd 1.0   AdamW+Adam at wd 1.0 (the DOSE arm, 10x A's decay), scalar
+   XL   AdamW+Adam layerwise wd 1.0   AdamW+Adam at wd 1.0, layerwise -- X's in-batch reference
+ CO-PRIMARY: G_A = AL - AS.  Every state is WITHIN its cell.  plateau5 = mean TEST over epochs 95..99.
+ BARS ARE FROZEN LITERALS (O2).  ALPHA-INDEPENDENT DECAY IS NOT TESTED.
+==============================================================================
+corpus: 3094 rows after corpus_exclusions.filter_rows, caw2- excluded  (DISCLOSURE ONLY -- no bar, sigma, branch or stamp reads it)
+
+COMPLETE  27 runs, epochs 0..99, RUN_DONE, no traceback, finite plateau5
+  OK   caw2-K01-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.4660 (train 22.2500)
+  OK   caw2-MS-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 13.6280 (train 13.4600)
+  OK   caw2-ML-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.2220 (train 99.4980)
+  OK   caw2-LS-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.5200 (train 99.6880)
+  OK   caw2-LL-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.1240 (train 99.5760)
+  OK   caw2-AS-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.8600 (train 99.7920)
+  OK   caw2-AL-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.8680 (train 99.6900)
+  OK   caw2-XS-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 73.4660 (train 99.8500)
+  OK   caw2-XL-s160  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.5760 (train 99.8080)
+  OK   caw2-K01-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.8960 (train 22.7220)
+  OK   caw2-MS-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 13.1920 (train 13.5580)
+  OK   caw2-ML-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.9560 (train 99.4940)
+  OK   caw2-LS-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.5400 (train 99.7040)
+  OK   caw2-LL-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.0220 (train 99.5600)
+  OK   caw2-AS-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 73.1540 (train 99.7620)
+  OK   caw2-AL-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.8640 (train 99.6440)
+  OK   caw2-XS-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 73.2760 (train 99.8480)
+  OK   caw2-XL-s161  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.6080 (train 99.8160)
+  OK   caw2-K01-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 22.2100 (train 22.0360)
+  OK   caw2-MS-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 12.9120 (train 12.7000)
+  OK   caw2-ML-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.4400 (train 99.5480)
+  OK   caw2-LS-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.6420 (train 99.7180)
+  OK   caw2-LL-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.1820 (train 99.4860)
+  OK   caw2-AS-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 72.8340 (train 99.7620)
+  OK   caw2-AL-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 67.8000 (train 99.6080)
+  OK   caw2-XS-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 73.0100 (train 99.8420)
+  OK   caw2-XL-s162  100 epoch lines, RUN_DONE=True, traceback=False, plateau5 68.8680 (train 99.7980)
+
+G-ARGS    [HARNESS-NULL] every run's OWN ARGS line == its arm's registered flags (base, meta, decay, grain)
+  PASS G-ARGS K01-s160 (SGDm+Lion scalar wd 0.1)
+  PASS G-ARGS MS-s160 (SGDm+Adam scalar wd 0.1)
+  PASS G-ARGS ML-s160 (SGDm+Adam layerwise wd 0.1)
+  PASS G-ARGS LS-s160 (AdamW+Lion scalar wd 0.1)
+  PASS G-ARGS LL-s160 (AdamW+Lion layerwise wd 0.1)
+  PASS G-ARGS AS-s160 (AdamW+Adam scalar wd 0.1)
+  PASS G-ARGS AL-s160 (AdamW+Adam layerwise wd 0.1)
+  PASS G-ARGS XS-s160 (AdamW+Adam scalar wd 1.0)
+  PASS G-ARGS XL-s160 (AdamW+Adam layerwise wd 1.0)
+  PASS G-ARGS K01-s161 (SGDm+Lion scalar wd 0.1)
+  PASS G-ARGS MS-s161 (SGDm+Adam scalar wd 0.1)
+  PASS G-ARGS ML-s161 (SGDm+Adam layerwise wd 0.1)
+  PASS G-ARGS LS-s161 (AdamW+Lion scalar wd 0.1)
+  PASS G-ARGS LL-s161 (AdamW+Lion layerwise wd 0.1)
+  PASS G-ARGS AS-s161 (AdamW+Adam scalar wd 0.1)
+  PASS G-ARGS AL-s161 (AdamW+Adam layerwise wd 0.1)
+  PASS G-ARGS XS-s161 (AdamW+Adam scalar wd 1.0)
+  PASS G-ARGS XL-s161 (AdamW+Adam layerwise wd 1.0)
+  PASS G-ARGS K01-s162 (SGDm+Lion scalar wd 0.1)
+  PASS G-ARGS MS-s162 (SGDm+Adam scalar wd 0.1)
+  PASS G-ARGS ML-s162 (SGDm+Adam layerwise wd 0.1)
+  PASS G-ARGS LS-s162 (AdamW+Lion scalar wd 0.1)
+  PASS G-ARGS LL-s162 (AdamW+Lion layerwise wd 0.1)
+  PASS G-ARGS AS-s162 (AdamW+Adam scalar wd 0.1)
+  PASS G-ARGS AL-s162 (AdamW+Adam layerwise wd 0.1)
+  PASS G-ARGS XS-s162 (AdamW+Adam scalar wd 1.0)
+  PASS G-ARGS XL-s162 (AdamW+Adam layerwise wd 1.0)
+
+G-ENV     the environment rode the ENV line on every run
+  PASS G-ENV one distinct ENV line (PROBE_DIR stripped), one per run   1 distinct
+  PASS G-ENV the ENV line is cvt1 ... cwd5's, byte for byte (PROBE_DIR stripped)
+
+G-PT      [HARNESS-NULL] ONE PROBE_TENSOR line per run == its arm's witness (grain, 62 tensors, META alg)
+  PASS G-PT K01-s160
+  PASS G-PT MS-s160
+  PASS G-PT ML-s160
+  PASS G-PT LS-s160
+  PASS G-PT LL-s160
+  PASS G-PT AS-s160
+  PASS G-PT AL-s160
+  PASS G-PT XS-s160
+  PASS G-PT XL-s160
+  PASS G-PT K01-s161
+  PASS G-PT MS-s161
+  PASS G-PT ML-s161
+  PASS G-PT LS-s161
+  PASS G-PT LL-s161
+  PASS G-PT AS-s161
+  PASS G-PT AL-s161
+  PASS G-PT XS-s161
+  PASS G-PT XL-s161
+  PASS G-PT K01-s162
+  PASS G-PT MS-s162
+  PASS G-PT ML-s162
+  PASS G-PT LS-s162
+  PASS G-PT LL-s162
+  PASS G-PT AS-s162
+  PASS G-PT AL-s162
+  PASS G-PT XS-s162
+  PASS G-PT XL-s162
+
+G-WITNESS the five `off` lines once each; no COMP_HOLD / WINDOW_HOLD line
+  PASS G-WITNESS K01-s160
+  PASS G-WITNESS MS-s160
+  PASS G-WITNESS ML-s160
+  PASS G-WITNESS LS-s160
+  PASS G-WITNESS LL-s160
+  PASS G-WITNESS AS-s160
+  PASS G-WITNESS AL-s160
+  PASS G-WITNESS XS-s160
+  PASS G-WITNESS XL-s160
+  PASS G-WITNESS K01-s161
+  PASS G-WITNESS MS-s161
+  PASS G-WITNESS ML-s161
+  PASS G-WITNESS LS-s161
+  PASS G-WITNESS LL-s161
+  PASS G-WITNESS AS-s161
+  PASS G-WITNESS AL-s161
+  PASS G-WITNESS XS-s161
+  PASS G-WITNESS XL-s161
+  PASS G-WITNESS K01-s162
+  PASS G-WITNESS MS-s162
+  PASS G-WITNESS ML-s162
+  PASS G-WITNESS LS-s162
+  PASS G-WITNESS LL-s162
+  PASS G-WITNESS AS-s162
+  PASS G-WITNESS AL-s162
+  PASS G-WITNESS XS-s162
+  PASS G-WITNESS XL-s162
+
+G-STRUCT  the batch's own PARTITION-MANIFEST.txt == caw2_design.manifest_text(), byte for byte
+  manifest: /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2/caw2/PARTITION-MANIFEST.txt (<runsdir>/caw2/)
+  PASS G-STRUCT byte-identical
+
+G-PROV    PROVENANCE.txt
+  provenance: /Users/teshnizi/Saber Optimization/alice-backup/runs_alice2/caw2/PROVENANCE.txt (<runsdir>/caw2/)
+  PASS G-PROV MODE submit   MODE=submit
+  PASS G-PROV build_network.py == cvt8's   BUILD_NETWORK_SHA256=c79988833c4399a0
+  PASS G-PROV HF.py == cwd1's tree, UNCHANGED   HF_SHA256=94aedc33046afb12
+  PASS G-PROV runner == run_cifar_cwd1.sh, UNCHANGED   RUNNER_SHA256=34a8c90ee3a0bee0
+  PASS G-PROV SCORER == this file   SCORER_SHA256=bdeb132189a2e907
+  PASS G-PROV DESIGN == the caw2_design.py this scorer loaded   DESIGN_SHA256=a219661f1e3ef140
+  PASS G-PROV the reused cwd_design.py this scorer loaded   CWD_DESIGN_SHA256=03d2d76149157577
+  PASS G-PROV COMMON == the cwd_common.py this scorer loaded   COMMON_SHA256=d7ddb49e71013e3a
+
+G-PROBE   [HARNESS-NULL] 500 records per run; the step-size count is the GRAIN's (1 or 62); on the scalar arms the per-tensor vote sums to the harness's applied term (within 0.001 of the vote's mass sum|L_i|) with its sign, under the arm's OWN meta alg
+  PASS G-PROBE K01-s160 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE MS-s160 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE ML-s160 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE LS-s160 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE LL-s160 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AS-s160 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AL-s160 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE XS-s160 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE XL-s160 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE K01-s161 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE MS-s161 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE ML-s161 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE LS-s161 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE LL-s161 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AS-s161 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AL-s161 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE XS-s161 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE XL-s161 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE K01-s162 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE MS-s162 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE ML-s162 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE LS-s162 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Lion): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE LL-s162 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE AS-s162 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE AL-s162 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+  PASS G-PROBE XS-s162 (scalar, 1 step size(s))   500 records, 0 malformed / wrong step-size count; decomposition (Adam): 500 usable, 0 off, 0 wrong sign, 0 non-finite (disclosed)
+  PASS G-PROBE XL-s162 (layerwise, 62 step size(s))   500 records, 0 malformed / wrong step-size count
+
+G-FLOOR / G-CEIL
+  PASS G-FLOOR max arm mean >= 15.00 pp   max 73.2507
+  PASS G-CEIL max arm mean <= 90.00 pp   max 73.2507
+
+LEVELS    plateau5 (TEST) and TRAIN, IN BATCH; tail slope = TEST OLS over epochs 80-99 (descriptive)
+  K01  SGDm +Lion scalar    wd 0.1  TEST 22.5240  sd 0.3467  range 0.6860   TRAIN 22.3360   tail slope 0.002/0.003/0.003 pp/ep
+           seeds: s160 22.4660 (train 22.2500), s161 22.8960 (train 22.7220), s162 22.2100 (train 22.0360)
+  MS   SGDm +Adam scalar    wd 0.1  TEST 13.2440  sd 0.3608  range 0.7160   TRAIN 13.2393   tail slope 0.004/0.005/-0.001 pp/ep
+           seeds: s160 13.6280 (train 13.4600), s161 13.1920 (train 13.5580), s162 12.9120 (train 12.7000)
+  ML   SGDm +Adam layerwise wd 0.1  TEST 68.2060  sd 0.2424  range 0.4840   TRAIN 99.5133   tail slope 0.048/0.027/0.019 pp/ep
+           seeds: s160 68.2220 (train 99.4980), s161 67.9560 (train 99.4940), s162 68.4400 (train 99.5480)
+  LS   AdamW+Lion scalar    wd 0.1  TEST 72.5673  sd 0.0654  range 0.1220   TRAIN 99.7033   tail slope 0.046/0.021/0.058 pp/ep
+           seeds: s160 72.5200 (train 99.6880), s161 72.5400 (train 99.7040), s162 72.6420 (train 99.7180)
+  LL   AdamW+Lion layerwise wd 0.1  TEST 68.1093  sd 0.0810  range 0.1600   TRAIN 99.5407   tail slope 0.016/-0.003/0.002 pp/ep
+           seeds: s160 68.1240 (train 99.5760), s161 68.0220 (train 99.5600), s162 68.1820 (train 99.4860)
+  AS   AdamW+Adam scalar    wd 0.1  TEST 72.9493  sd 0.1777  range 0.3200   TRAIN 99.7720   tail slope 0.022/0.015/0.004 pp/ep
+           seeds: s160 72.8600 (train 99.7920), s161 73.1540 (train 99.7620), s162 72.8340 (train 99.7620)
+  AL   AdamW+Adam layerwise wd 0.1  TEST 67.8440  sd 0.0382  range 0.0680   TRAIN 99.6473   tail slope 0.036/0.010/0.010 pp/ep
+           seeds: s160 67.8680 (train 99.6900), s161 67.8640 (train 99.6440), s162 67.8000 (train 99.6080)
+  XS   AdamW+Adam scalar    wd 1.0  TEST 73.2507  sd 0.2291  range 0.4560   TRAIN 99.8467   tail slope 0.009/0.017/-0.000 pp/ep
+           seeds: s160 73.4660 (train 99.8500), s161 73.2760 (train 99.8480), s162 73.0100 (train 99.8420)
+  XL   AdamW+Adam layerwise wd 1.0  TEST 68.6840  sd 0.1601  range 0.2920   TRAIN 99.8073   tail slope 0.019/0.042/0.020 pp/ep
+           seeds: s160 68.5760 (train 99.8080), s161 68.6080 (train 99.8160), s162 68.8680 (train 99.7980)
+
+G-HW      DISCLOSURE ONLY: the GPU each run's own nvidia-smi line names -- NO gate reads it
+  distinct devices: ['NVIDIA L4']
+
+SIGMA     O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.641573
+  SIGMA_INBATCH        0.218865
+  SIGMA_USED 0.641573 (= SIGMA_PRIOR_frozen); SE_ARM_DIFF 0.523842; 2 SE 1.047685 is the HALF-WIDTH of a +/-2 SE interval, NOT a bound on any effect (278.6 C1)
+
+THE DOSE   the REALISED per-step shrink a*wd (median over the arm's step sizes, per record), from the arm's OWN probe records; arm value = median over its 3 seeds
+  K01  SGDm +Lion scalar    wd 0.1   DOSE_PEAK 5.4054e-04  DOSE_PRE(step<=8500) 4.9303e-04  late median 3.0590e-08   per seed peak 5.4706e-04 / 5.3946e-04 / 5.4054e-04
+  MS   SGDm +Adam scalar    wd 0.1   DOSE_PEAK 1.8420e-03  DOSE_PRE(step<=8500) 1.8420e-03  late median 3.0590e-08   per seed peak 1.6163e-03 / 2.1289e-03 / 1.8420e-03
+  ML   SGDm +Adam layerwise wd 0.1   DOSE_PEAK 2.0576e-06  DOSE_PRE(step<=8500) 1.7749e-07  late median 1.7324e-06   per seed peak 2.0576e-06 / 2.4392e-06 / 1.7825e-06
+  LS   AdamW+Lion scalar    wd 0.1   DOSE_PEAK 1.0895e-05  DOSE_PRE(step<=8500) 3.5320e-06  late median 2.6267e-06   per seed peak 1.0179e-05 / 1.0895e-05 / 1.0895e-05
+  LL   AdamW+Lion layerwise wd 0.1   DOSE_PEAK 1.7037e-06  DOSE_PRE(step<=8500) 1.7037e-06  late median 4.4562e-07   per seed peak 1.7803e-06 / 1.5894e-06 / 1.7037e-06
+  AS   AdamW+Adam scalar    wd 0.1   DOSE_PEAK 1.2038e-05  DOSE_PRE(step<=8500) 5.1581e-06  late median 2.2355e-06   per seed peak 1.2038e-05 / 1.2013e-05 / 1.2667e-05
+  AL   AdamW+Adam layerwise wd 0.1   DOSE_PEAK 1.5847e-06  DOSE_PRE(step<=8500) 1.5847e-06  late median 3.8566e-07   per seed peak 1.9722e-06 / 1.4945e-06 / 1.5847e-06
+  XS   AdamW+Adam scalar    wd 1.0   DOSE_PEAK 3.1923e-05  DOSE_PRE(step<=8500) 2.9839e-05  late median 5.0984e-06   per seed peak 3.0576e-05 / 3.1923e-05 / 3.2621e-05
+  XL   AdamW+Adam layerwise wd 1.0   DOSE_PEAK 1.7988e-05  DOSE_PRE(step<=8500) 1.7988e-05  late median 2.4183e-06   per seed peak 1.7988e-05 / 1.4919e-05 / 1.8210e-05
+  RHO_M = DOSE_PEAK(MS) / DOSE_PEAK(K01) = 3.4078 -> DOSE-M-ABOVE   (pre-window ratio 3.7362, descriptive)
+  RHO_L = DOSE_PEAK(LS) / DOSE_PEAK(K01) = 0.0202 -> DOSE-L-BELOW   (pre-window ratio 0.0072, descriptive)
+  RHO_A = DOSE_PEAK(AS) / DOSE_PEAK(K01) = 0.0223 -> DOSE-A-BELOW   (pre-window ratio 0.0105, descriptive)
+  RHO_X = DOSE_PEAK(XS) / DOSE_PEAK(K01) = 0.0591 -> DOSE-X-BELOW   (pre-window ratio 0.0605, descriptive)
+
+THE CELLS (every contrast WITHIN its cell)
+  M  SGDm +Adam wd 0.1   scalar 13.2440  layerwise 68.2060   G_M = +54.9620 pp = +104.92 SE   R_M = 0.1942   -> COLLAPSE
+           +/-2 SE [+53.9143, +56.0097]   TRAIN gap +86.2740   seeds +54.594 / +54.764 / +55.528   scalar seeds at/below the bar: 3/3
+  L  AdamW+Lion wd 0.1   scalar 72.5673  layerwise 68.1093   G_L = -4.4580 pp = -8.51 SE   R_L = 1.0655   -> NOGAP
+           +/-2 SE [-5.5057, -3.4103]   TRAIN gap -0.1627   seeds -4.396 / -4.518 / -4.460   scalar seeds at/below the bar: 0/3
+  A  AdamW+Adam wd 0.1   scalar 72.9493  layerwise 67.8440   G_A = -5.1053 pp = -9.75 SE   R_A = 1.0753   -> NOGAP
+           +/-2 SE [-6.1530, -4.0576]   TRAIN gap -0.1247   seeds -4.992 / -5.290 / -5.034   scalar seeds at/below the bar: 0/3
+  X  AdamW+Adam wd 1.0   scalar 73.2507  layerwise 68.6840   G_X = -4.5667 pp = -8.72 SE   R_X = 1.0665   -> NOGAP
+           +/-2 SE [-5.6144, -3.5190]   TRAIN gap -0.0393   seeds -4.890 / -4.668 / -4.142   scalar seeds at/below the bar: 0/3
+           bars: COLLAPSE iff scalar <= 0.50 x layerwise; NOGAP iff G < 10.0 pp; reference healthy iff layerwise >= 55.0 and its seed range <= 5.0
+  CONTROL K01 (SGDm 0.99 + Lion, wd 0.1, scalar) 22.5240  -> COLLAPSED (bar <= 30.0)
+  CO-PRIMARY G_A = -5.1053 pp = -9.75 SE
+
+THE VOTE    DOM_C per scalar arm: C fitted on seed 160 (top-3 by signed contribution), scored on seeds 161/162;
+            and the DECLARED carriers {50,53,59} on all seeds (KEY, descriptive)
+  K01  meta Lion  C_fit = {50,53,59}  DOM_C 0.7360 (n 1000)   declared {50,53,59} DOM 0.7593 (n 1500)
+  MS   meta Adam  C_fit = {50,53,59}  DOM_C 0.2470 (n 1000)   declared {50,53,59} DOM 0.2593 (n 1500)
+  LS   meta Lion  C_fit = {1,58,61}  DOM_C 0.0130 (n 1000)   declared {50,53,59} DOM 0.0000 (n 1500)
+  AS   meta Adam  C_fit = {1,38,61}  DOM_C 0.0050 (n 1000)   declared {50,53,59} DOM 0.0000 (n 1500)
+  XS   meta Adam  C_fit = {1,19,61}  DOM_C 0.0070 (n 1000)   declared {50,53,59} DOM 0.0000 (n 1500)
+
+==============================================================================
+FINAL: NO-COLLAPSE-CONTROL-DOSE-NOT-REACHED | M-COLLAPSE+L-NOGAP+A-NOGAP+X-NOGAP+K-COLLAPSED | ATTR-BASE-PROTECTS | GATE-DOES-NOT-FIRE | DOSE-M-ABOVE | DOSE-L-BELOW | DOSE-A-BELOW | DOSE-X-BELOW | HARNESS-CLEAN | BOTH-GRAINS-IN-BATCH | CONTROL-IN-BATCH | ALPHA-SCALED-DECAY-ONLY | ALPHA-INDEPENDENT-NOT-TESTED | HARNESS-ADAMW-M-UNNORMALISED | X-IS-A-DOSE-ARM-NOT-A-STANDARD-VALUE | ONE-NETWORK-RESNET18 | ONE-CELL-OTHERWISE | HORIZON-100-ONLY | THREE-SEEDS | WD-1E-2-NOT-RUN | LION-BASE-NOT-RUN | STEP1-HALF-OF-GATE-ONLY | LEADLAG-NOT-READ | FLOOR-READINGS-ARE-BOUNDS | SIGMA-PRIOR-FROZEN | SCALAR-AHEAD-L-DESCRIPTIVE | SCALAR-AHEAD-A-DESCRIPTIVE | SCALAR-AHEAD-X-DESCRIPTIVE | HW-UNIFORM-NVIDIA_L4 | TRAIN-AGREES
+==============================================================================
+
+BETWEEN-BATCH, NON-GATING (frozen literals): the control's landed levels cmo1 k01 22.7887, cwd3 k01 22.9853, cwd4 k01WD 22.8213, cwd5 k01W1 23.2240; caw2 K01 22.5240
+REGISTERED PREDICTION (UNSURE): A-NOGAP / ATTR-BASE-PROTECTS / X-UNSURE; this batch: A-NOGAP, ATTR-BASE-PROTECTS
+
+WHAT THIS DECIDES -- as registered, before any run existed:
+  "With AdamW + Adam the grains do not differ by the 10 pp bar at wd 0.1 or 1.0, but even at wd 1.0 the scalar arm's realised peak shrink stayed below half the control's."  The standard recipe does not collapse here; whether the pairing is immune at the control's dose is NOT decided (the learned step size kept the dose low).  C1's gate does not fire.
+  Every COLLAPSE and NOGAP state is a BOUND, never a point effect (164.6; FLOOR-READINGS-ARE-BOUNDS): a collapsed arm's gap is a LOCATION, and NOGAP means 'below the 10 pp bar', never 'the grains are equal'.
+  Not licensed: any other network, dataset, meta step size, alpha0, horizon, grouping, base optimiser (a Lion base was NOT run), any decay other than the two run (1e-2 was NOT run), or anything about ALPHA-INDEPENDENT decay; nothing about the parent paper's own cells; wd 1.0 is a DOSE arm, not a standard harness value.
+  ATTRIBUTION ATTR-BASE-PROTECTS: M (SGDm base + Adam meta) collapses and L (AdamW base + Lion meta) does not: in this cell the BASE swap, not the meta swap, is what removes the collapse -- read beside L's dose word.  (DOSE-M-ABOVE, DOSE-L-BELOW)
+
+THE GATE WORD GATE-DOES-NOT-FIRE: the Step-1 HALF of the ICML plan's gate only (A COLLAPSE AND DOM_C(AS) >= 0.50, C fixed on seed 160).  Step 0's lead-lag is NOT read here (V1: biased toward 'lag' by construction).
+
+OWED AT LANDING: CORPUS-EXCLUSIONS rows -- LS/LL/AS/AL ARGS_MOMENTUM_BASE (momentum-param-base 0.9); XS/XL deviate on TWO ARGS kinds (0.9 and wd 1.0), which corpus_exclusions.py cannot list today (as caw1's AS2/AL2 would have; reported, not fixed); K01 / MS / ML none (the meta alg is a CSV cell-key column).
