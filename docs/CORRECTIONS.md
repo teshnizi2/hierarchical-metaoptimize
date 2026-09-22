@@ -39483,3 +39483,29 @@ no notebook website or Vercel URL opened; nothing downloaded; no `.pdf` fetched.
 sentence is created: every sentence quoted for the draft is a registered one, at its own cell.
 
 Next free number: **298**.
+
+## 298. AUDIT ADDENDUM to 295–297 (ZERO GPU, doc slips only) — **[LED WITH THE BOUND: this entry measured nothing and moves no level, bar, state, contrast, stamp, licence sentence or decision.  It narrows four sentences of 297 (one also in 295.7) to what the landed numbers license.  297's decision (C1 closed; one paper, TMLR) STANDS.]**
+
+*Independent final audit of the 295–297 landing: origin/master == local at `8a99001`; CORRECTIONS 289–297 ascending, the
+twelve historical duplicate headings unchanged, none new; MASTER-TABLE 240 lines, the only earlier line changed is the
+bracketed header amendment; every number in rows 239 / 240 and in 295 / 296 found in a committed scorer or attack log
+(`results/caw2_*`, `results/cgw1_*`); `corpus_exclusions.py --check` exit 0 PASS (268 rows, multi-ARGS 6 True, SIGMA_R18ALL
+0.636566 df 274); `c73_mastertable_check.py` exit 0; site `60dc6ba` Production deployment `success`, MT239 Mixed (MT238
+precedent) and MT240 Open (MT183 precedent), outcomes 56 / 41 / 38 / 24 over 177 records.  `alice` NOT contacted; nothing
+under `paper/` read; no Vercel URL opened; nothing downloaded.*
+
+| # | where | as written | what the numbers license |
+|---|---|---|---|
+| **A1** | 297.1 row 4 ("The sign is kept"); 297.1 paragraph ("KEEPS the count-matched sign") | reads as the sign holding at the standard decay VALUE | the sign is RESOLVED at 0.1 and 1e-2 only (rung states); at 5e-4 its ±2 SE interval **[−0.0120, +0.4940] includes zero**, so at 5e-4 the sign itself is not resolved and the licence is the interval (296.8).  "Never reversed" is a point-estimate reading. |
+| **A2** | 297.1 row 3 ("needs the SGDm base"), 295.7 ("it needs the SGDm base AND …"), 297.1 "a failure of the SGDm base" | a causal base reading | the collapse **occurs with the SGDm base and not with the AdamW base, which also runs at ~50× lower realised dose and base momentum 0.9**; 295.8 does NOT license "the base, rather than the dose it produces, protects".  Read "needs the SGDm base" as "was observed only with the SGDm base, at this cell". |
+| **A3** | 297.1 closing ("`caw2` CONFIRMS the corner case") | "confirms" | "is consistent with, at this one cell" — RHO_X 0.0591 leaves immunity at the control's dose UNDECIDED. |
+| **A4** | 297.2 item 3 ("20 / 20 cells, pool +0.5556 ± 0.0448 pp") | reads as a pool over the 20 cells | +0.5556 ± 0.0448 is the **SGDm-8 pool** (211.2); 20 / 20 is the count of positive cells. |
+| **A5** | 297.3 rank 1 cost ("32 runs ≈ 26 GPU-h"); ICML-PLAN §4a; STATUS CYCLE 160 | ≈ 26 | its own inputs (gc1 chunk771 56.5 min, nodewise 45.5 min, scalar / layerwise assumed ≤ 50 min, 8 runs each) give **≤ 26.9 ≈ 27 GPU-h**, an estimate. |
+
+**Judgement of the path decision (a judgement, not a measurement).**  Closing C1 and writing ONE TMLR paper is what the
+evidence and the plan's own §4 rule require; it is not more pessimistic than the numbers.  The only optimism is in the
+wording fixed above (A1–A3).  The TMLR ≈ 0.6–0.7 figure is defensible but is conditional on the rewrite carrying the
+scalar-beats-both row and W4's decay bound at full prominence, and on 1.14 (test-set selection); until G3b or the 5e-4
+retune lands, the rewritten headline rests on one CIFAR-10 cell.
+
+Next free number: **299**.
