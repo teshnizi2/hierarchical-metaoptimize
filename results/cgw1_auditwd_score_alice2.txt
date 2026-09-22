@@ -1,0 +1,57 @@
+==============================================================================================================
+cgw1 -- DOES THE COUNT-MATCHED PARTITION AUDIT SURVIVE AT STANDARD WEIGHT DECAY?  (CORRECTIONS 291; G3)
+scorer sha256 8bf0aaf754d41485b91b107b9190d7de5c0c27ba792e9684b487ecea47c7139c   design sha256 ae66758d60ac0577d26d678c8a8098349fc870ecfd45a93fc0dde9bccb23dbed
+runsdir /home/s5014158/metaopt/runs
+==============================================================================================================
+COMPLETION  40 / 40 registered runs complete (100 epoch lines + RUN_DONE)
+G-PROV  /home/s5014158/metaopt/runs/cgw1/PROVENANCE.txt  MODE submit  SCORER 8bf0aaf754d41485  DESIGN ae66758d60ac0577  HF 4732b74aa3a10508
+G-ARGS / G-ENV / G-KIND / G-STRUCT  40 of 40 complete runs pass (20 flags each, the registered ENV line, no patch witness, 10,000 probe records with n_beta == the arm's m)
+G-HW (DISCLOSURE ONLY, never a gate): NVIDIA L4 x40
+corpus: 3094 rows after corpus_exclusions.filter_rows, cgw1- excluded  (DISCLOSURE ONLY -- enters no bar, sigma, level, state, contrast or stamp)
+
+ARMS  plateau5 = mean TEST over epochs 95-99 from each run's OWN .out; box occupancy from its OWN probe.jsonl
+  arm    rung wd     grain      n  plateau5      sd   range    train5  box        rec_lo   rec_hi coordlo_win coordhi_win
+  chW1   W1   0.1    chunk777   3   92.4287   0.245   0.488   98.8427  free       0.0000   0.0000    0.000000    0.000000
+  ndW1   W1   0.1    nodewise   3   92.0593   0.055   0.096   98.4033  free       0.0000   0.0000    0.000000    0.000000
+  k01W1  W1   0.1    scalar     3   92.1907   0.222   0.414   99.6087  free       0.0000   0.0000    0.000000    0.000000
+  kLW1   W1   0.1    layerwise  3   92.7933   0.130   0.256   99.7300  free       0.0000   0.0000    0.000000    0.000000
+  chW2   W2   1e-2   chunk777   3   89.2047   0.079   0.158   97.9813  free       0.0000   0.0000    0.000000    0.000000
+  ndW2   W2   1e-2   nodewise   3   88.7513   0.149   0.280   97.7287  free       0.0000   0.0000    0.000000    0.000000
+  k01W2  W2   1e-2   scalar     3   91.1793   0.183   0.364   99.5753  free       0.0000   0.0000    0.000000    0.000000
+  kLW2   W2   1e-2   layerwise  3   90.6300   0.160   0.320   99.4560  free       0.0000   0.0000    0.000000    0.000000
+  chW4   W4   5e-4   chunk777   4   87.9060   0.117   0.270   97.4640  free       0.0000   0.0000    0.000000    0.000000
+  ndW4   W4   5e-4   nodewise   4   87.6650   0.089   0.196   97.3170  free       0.0000   0.0000    0.000000    0.000000
+  k01W4  W4   5e-4   scalar     4   90.4650   0.104   0.222   98.9955  free       0.0000   0.0000    0.000000    0.000000
+  kLW4   W4   5e-4   layerwise  4   89.8110   0.036   0.076   98.9685  free       0.0000   0.0000    0.000000    0.000000
+
+SIGMA  O2: max(frozen floor, in-batch) -- nothing from the corpus
+  SIGMA_PRIOR_frozen   0.178914  (df 178, filtered, literal)
+  SIGMA_INBATCH        0.138102  (df 28, pooled within the 12 arms)
+  SIGMA_USED           0.178914  (= SIGMA_PRIOR_frozen)
+
+CONTRASTS (every one WITHIN a rung, IN BATCH; +/-2 SE is a HALF-WIDTH, not a bound on any effect)
+  D_W1  = chW1 - ndW1 = +0.3693 pp = +2.53 SE (SE 0.146083)  [+0.0772, +0.6615]  TRAIN +0.4393   state SURVIVES
+  D_W2  = chW2 - ndW2 = +0.4533 pp = +3.10 SE (SE 0.146083)  [+0.1612, +0.7455]  TRAIN +0.2527   state SURVIVES
+  D_W4  = chW4 - ndW4 = +0.2410 pp = +1.90 SE (SE 0.126511)  [-0.0120, +0.4940]  TRAIN +0.1470   state UNDECIDED
+  DD_W2 = D_W2 - D_W1 = +0.0840 pp = +0.41 SE (SE 0.206592)   DESCRIPTIVE
+  DD_W4 = D_W4 - D_W1 = -0.1283 pp = -0.66 SE (SE 0.193249)   DESCRIPTIVE
+  Tch_W1 = k01W1 - chW1 = -0.2380 pp = -1.63 SE   DESCRIPTIVE
+  Tnd_W1 = k01W1 - ndW1 = +0.1313 pp = +0.90 SE   DESCRIPTIVE
+  Tch_W2 = k01W2 - chW2 = +1.9747 pp = +13.52 SE   DESCRIPTIVE
+  Tnd_W2 = k01W2 - ndW2 = +2.4280 pp = +16.62 SE   DESCRIPTIVE
+  Tch_W4 = k01W4 - chW4 = +2.5590 pp = +20.23 SE
+  Tnd_W4 = k01W4 - ndW4 = +2.8000 pp = +22.13 SE
+  G_W1  = kLW1 - k01W1 = +0.6027 pp = +4.13 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+  G_W2  = kLW2 - k01W2 = -0.5493 pp = -3.76 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+  G_W4  = kLW4 - k01W4 = -0.6540 pp = -5.17 SE   DESCRIPTIVE (layerwise vs scalar in this cell)
+
+LADDERS (LEVELS, not effects; this cell only)
+  chunk777  0.1 92.4287 | 1e-2 89.2047 | 5e-4 87.9060
+  nodewise  0.1 92.0593 | 1e-2 88.7513 | 5e-4 87.6650
+  scalar    0.1 92.1907 | 1e-2 91.1793 | 5e-4 90.4650
+  layerwise 0.1 92.7933 | 1e-2 90.6300 | 5e-4 89.8110
+
+LICENCE (primary)  D4 lies between the bars or is not resolved: report the interval; no seeds may be added after seeing it (108.6a); no survive / vanish sentence.
+LICENCE (scalar)   plain scalar is ABOVE both audit partitions at 5e-4 by >= 0.30 pp, resolved: at standard decay, in this cell, no audited partition beats a single shared step size.
+
+FINAL AUDIT-UNDECIDED | SCALAR-BEATS-BEST | W1-SURVIVES+W2-SURVIVES+W4-UNDECIDED | ONE-CELL THREE-RUNGS ALPHA-INDEPENDENT-DECAY-NOT-TESTED FLOOR-READINGS-ARE-BOUNDS SIGMA-PRIOR-FROZEN ANCHOR-MATCHES-POOL LAYERWISE-BELOW-SCALAR-W4
