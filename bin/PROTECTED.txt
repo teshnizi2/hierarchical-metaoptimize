@@ -76,3 +76,5 @@ crd1-
 cai1-
 # cycle 6 (CORRECTIONS 313): crt2- registered (the retune past crt1's grid edge); protected before submission
 crt2-
+# cycle 7 (CORRECTIONS 315): g3b- landed (the audit's CIFAR-100 cell at 0.1 / 5e-4; registered 299, owed 299.9)
+g3b-
