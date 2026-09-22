@@ -89,8 +89,11 @@ PAIR = {
 COMMON = (("dataset", DSET), ("NN-name", NET), ("batch-size", str(BATCH)), ("max-time", "999:00:00"),
           ("gamma", "1"), ("meta-stepsize", MST), ("alpha0", A0), ("num-epochs", str(EPOCHS)))
 # what each pairing's PROBE_TENSOR line prints after `type=<grain> tensors=62 ` (HF._pt_init: meta alg, the META
-# momentum, and Lion_beta2 with a 1.0 default when the meta alg has none; `%g` formatting)
-PT_TAIL = {"AW": "meta_alg=Adam momentum_param=0.9 Lion_beta2=1",
+# momentum, and args_meta's Lion_beta2; `%g` formatting).  MEASURED, NOT ASSUMED (CORRECTIONS 290.6): the first proof
+# job 5079156 showed the Adam arms print `Lion_beta2=0.9`, not the `=1` first written here -- train.py's
+# --Lion-beta2-meta defaults to 0.9 (not -1), so build_optimizer puts 0.9 into args_meta for EVERY meta alg, and the
+# Adam meta update never reads it.  The value is inert for Adam and is pinned as printed.
+PT_TAIL = {"AW": "meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9",
            "SL": "meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9"}
 # the pairing's meta momentum and how the per-tensor vote term is formed from the probe's own EMA (m_tensor, which
 # HF._pt_capture keeps as mp*m + (1-mp)*z for EVERY meta alg):
