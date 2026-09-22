@@ -133,6 +133,33 @@ accept; the reverse listing still FAILs, so the rule is enforced by the module, 
       more kinds and stays byte-identical, as do 245's / 251's / 269's `kinds scanned` lines; `--check --runs` gains
       exactly ONE line.
 
+ADDED AT CORRECTIONS 294 -- `caw2`'s XS / XL (290), the first runs of the campaign that deviate on TWO ARGS kinds at
+once: AdamW base momentum `--momentum-param-base 0.9` AND the dose `--weight-decay-base 1.0`.  A TSV row carries ONE
+witness, and 263's ARGS-value reader FAILs a run that deviates on a kind its witness does not name (C26d pins that for
+an UNREGISTERED run, and it still does).  THE RULE: such a run is listed ONCE, by the ARGS witness of ANY one of its
+deviating kinds (294's planned rows use `ARGS_WD_BASE`, the X cell's defining factor), and `MULTI_ARGS` registers the
+witness of EVERY ARGS kind it deviates on; each registered value is then held to the run's OWN `ARGS:` line:
+  C37 a caw2-style batch passes: K01 / MS / ML unlisted at 0.99 / 0.1, LS / LL / AS / AL listed by their
+      ARGS_MOMENTUM_BASE value, XS / XL listed by their ARGS_WD_BASE value (and, separately, by their
+      ARGS_MOMENTUM_BASE value) with the other kind verified through MULTI_ARGS; the new line counts 2 runs and is
+      True; the ARGS block counts all 6 listed and 6 deviating standard-cell rows; and the cases that must keep
+      working -- a cmo1-style single-ARGS batch, cwd5's switch + ARGS (two-axis) ladder and a cwd1-style kind-only
+      batch -- pass merged in with it.
+  C38 every corruption FAILs, each named: (a) XS's ARGS line at the standard wd 0.1 (the dose never arrived), listed
+      by ARGS_WD_BASE; (b) the same, listed by ARGS_MOMENTUM_BASE (the REGISTERED kind is what catches it);
+      (c) XS at momentum 0.99 (the base swap never arrived); (d) XS at wd 2.0, a wrong value of the LISTED kind;
+      (e) XS at momentum 0.8, a wrong value of the kind the row does NOT carry; (f) XS dropped from the list;
+      (g) AS run at wd 1.0 -- a two-ARGS run of an arm with NO MULTI_ARGS entry, which still FAILs as C26d does;
+      (h) a deviating XS .out of the listed batch that is not yet a CSV row, unlisted (the batch rule).
+  C39 the registry: MULTI_ARGS holds exactly two caw2 entries, (caw2, XS) and (caw2, XL), each registering exactly
+      ARGS_MOMENTUM_BASE and ARGS_WD_BASE, whose witnesses == `args_witness(kind, value)` for the values in
+      `analysis/caw2_design.py`'s registered ARGS (and `caw2_design.args_deviating_kinds` names exactly those two arms
+      as two-kind); this test's caw2 ARGS payloads == `caw2_design.args_string` for all 9 arms; MULTI_KIND, KINDS and
+      ARGS_KINDS are unchanged; 245's / 251's / 269's / 284's lines are unchanged byte for byte on their fixtures; and
+      `--check --runs` gains exactly ONE line.
+  C40 the registry guard: a MULTI_ARGS entry registering ONE kind, a witness of an unregistered kind, and a witness
+      whose flag is not its kind's flag each FAIL, named, even without --runs.
+
 RUN:  python3 tests/test_corpus_exclusions_check.py      (stdlib only; exit 0 all pass, 1 any fail)
 """
 import os
@@ -221,11 +248,13 @@ CSV_STD = {"network": "PlainNet18_c100", "dataset": "CIFAR100", "granularity": "
 DEFAULT_ARGS = "--network PlainNet18_c100 --seed 90"
 
 
-def run_check(listed, corpus, logs, with_runs=True, args=None, cells=None):
+def run_check(listed, corpus, logs, with_runs=True, args=None, cells=None, module_append=None):
     """listed: [(run, job, witness)]; corpus: [(run, job)]; logs: {(run, job): [lines]} -> (rc, stdout).
 
     args:  {(run, job): "<ARGS payload>"}  -- the run's own ARGS line (default: 239's, no factor flag).
-    cells: {(run, job): {column: value}}   -- CSV cell-key overrides (default: the standard cell)."""
+    cells: {(run, job): {column: value}}   -- CSV cell-key overrides (default: the standard cell).
+    module_append: source text inserted into the module COPY just before its `if __name__` block (CORRECTIONS 294's
+                   C40 corrupts a registry that way); None (the default) copies the module byte for byte, as before."""
     args = args or {}
     cells = cells or {}
     tmp = tempfile.mkdtemp(prefix="ce_check_test_")
@@ -233,6 +262,12 @@ def run_check(listed, corpus, logs, with_runs=True, args=None, cells=None):
         os.makedirs(os.path.join(tmp, "analysis"))
         os.makedirs(os.path.join(tmp, "results"))
         shutil.copyfile(MODULE, os.path.join(tmp, "analysis", "corpus_exclusions.py"))
+        if module_append is not None:
+            mp = os.path.join(tmp, "analysis", "corpus_exclusions.py")
+            src = open(mp).read()
+            cut = src.rindex('\nif __name__ == "__main__":')
+            with open(mp, "w") as f:
+                f.write(src[:cut] + "\n" + module_append + "\n" + src[cut:])
         with open(os.path.join(tmp, "results", "CORPUS-EXCLUSIONS.tsv"), "w") as f:
             f.write("# synthetic exclusion list\n" + "\t".join(tsv_header()) + "\n")
             for r in listed:
@@ -520,6 +555,59 @@ def merge5(wd5, *parts):
         if len(p) > 3:
             args.update(p[3])
             cells.update(p[4])
+    return listed, corpus, logs, args, cells
+
+
+# ---- CORRECTIONS 294: caw2's TWO-ARGS runs (two ARGS kinds deviating on the SAME run) ------------------------
+# `caw2` (290) swaps the base optimiser to AdamW on six arms; the harness's AdamW takes `--momentum-param-base 0.9`,
+# which is ARGS_MOMENTUM_BASE's non-standard value (the `base` column carries AdamW, but no column carries the flag),
+# and the X cell runs that recipe at `--weight-decay-base 1.0` -- so XS / XL deviate on BOTH ARGS kinds.  The payload
+# below is the batch's REAL ARGS line (read on alice2 from caw2-XS-s160-5079306.out and its 26 twins, and pinned in
+# C39 to `analysis/caw2_design.py`'s registered `args_string`); the run names and job ids are the real seed-160 ones.
+CAW2_BASE = {"SGDm": "--alg-base SGDm --momentum-param-base %s --weight-decay-base %s",
+             "AdamW": "--alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base %s --weight-decay-base %s"}
+CAW2_META = {"Lion": "--alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0",
+             "Adam": "--alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0"}
+CAW2_COMMON = ("--dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 "
+               "--meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups %s --seed %d "
+               "--save-directory /home/s5014158/metaopt/runs/caw2 --run-name %s")
+# (arm, base, meta, grain, momentum token, wd token, job id of seed 160)
+CAW2_ARMS = [("K01", "SGDm", "Lion", "scalar", "0.99", "0.1", "5079299"),
+             ("MS", "SGDm", "Adam", "scalar", "0.99", "0.1", "5079300"),
+             ("ML", "SGDm", "Adam", "layerwise", "0.99", "0.1", "5079301"),
+             ("LS", "AdamW", "Lion", "scalar", "0.9", "0.1", "5079302"),
+             ("LL", "AdamW", "Lion", "layerwise", "0.9", "0.1", "5079303"),
+             ("AS", "AdamW", "Adam", "scalar", "0.9", "0.1", "5079304"),
+             ("AL", "AdamW", "Adam", "layerwise", "0.9", "0.1", "5079305"),
+             ("XS", "AdamW", "Adam", "scalar", "0.9", "1.0", "5079306"),
+             ("XL", "AdamW", "Adam", "layerwise", "0.9", "1.0", "5079307")]
+CAW2 = dict((r[0], ("caw2-%s-s160" % r[0], r[6])) for r in CAW2_ARMS)
+CAW2_OFF = ["VOTE_W: off", "BETA_HOLD: off", "GROUP_HOLD: off", "REST_HOLD: off", "DECAY_MASK: off"]  # 290.8a
+W_MOM9 = "ARGS_MOMENTUM_BASE: momentum-param-base=0.9"
+W_WD10 = "ARGS_WD_BASE: weight-decay-base=1.0"
+
+
+def caw2_args(arm, seed=160, mom=None, wd=None):
+    """-> the ARGS payload of one caw2 run; `mom` / `wd` override the arm's registered tokens (for corruptions)."""
+    r = dict((x[0], x) for x in CAW2_ARMS)[arm]
+    return " ".join(["--optimizer HF", CAW2_BASE[r[1]] % (mom or r[4], wd or r[5]), CAW2_META[r[2]],
+                     CAW2_COMMON % (r[3], seed, "caw2-%s-s%d" % (arm, seed))])
+
+
+def caw2_batch(x_by="ARGS_WD_BASE"):
+    """caw2-style (290): 3 arms at the standard 0.99 / 0.1, 4 AdamW arms at momentum 0.9 (ONE ARGS kind), and the
+    two X arms at momentum 0.9 AND wd 1.0 (TWO ARGS kinds), listed once by `x_by`'s witness."""
+    listed, corpus, logs, args, cells = [], [], {}, {}, {}
+    for arm, base, meta, grain, mom, wd, _job in CAW2_ARMS:
+        key = CAW2[arm]
+        corpus.append(key)
+        logs[key] = list(CAW2_OFF)
+        args[key] = caw2_args(arm)
+        cells[key] = {"network": "ResNet18_c100", "granularity": grain, "base": base, "meta": meta}
+        if wd != "0.1":
+            listed.append(key + ({"ARGS_WD_BASE": W_WD10, "ARGS_MOMENTUM_BASE": W_MOM9}[x_by],))
+        elif mom != "0.99":
+            listed.append(key + (W_MOM9,))
     return listed, corpus, logs, args, cells
 
 
@@ -1289,6 +1377,123 @@ def main():
         and sorted(set(len(d) for d in CE.MULTI_KIND.values())) == [1, 2, 3],
         "C36 the 251 line is frozen over entries of 2+ kinds while MULTI_KIND itself now holds a 1-kind entry",
         repr(sorted(set(len(d) for d in CE.MULTI_KIND.values()))))
+
+    # ---- CORRECTIONS 294 ------------------------------------------------------------------------------------
+    import hashlib
+    NEWLINE = "  multi-ARGS runs (CORRECTIONS 294)"
+    xs, xl = "%s-%s.out" % CAW2["XS"], "%s-%s.out" % CAW2["XL"]
+    print("C37 a caw2-style batch with TWO-ARGS runs passes")
+    for by in ("ARGS_WD_BASE", "ARGS_MOMENTUM_BASE"):
+        listed, corpus, logs, args, cells = caw2_batch(by)
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 0 and "VERDICT: PASS" in out,
+            "C37 XS / XL listed ONCE by their %s value, the other kind held to MULTI_ARGS -> exit 0 PASS" % by,
+            "rc=%d %s" % (rc, show(out)))
+        chk(any("2 listed runs" in ln and ln.endswith(": True") for ln in line_of(out, NEWLINE)),
+            "C37 (%s) the new multi-ARGS line counts the 2 X runs and is True" % by, repr(line_of(out, NEWLINE)))
+        chk(any("6 listed runs carry their listed ARGS value" in ln
+                and "6 deviate from the standard, 6 are CSV rows in the standard cell, every one listed: True" in ln
+                for ln in line_of(out, "  ARGS witness")),
+            "C37 (%s) the ARGS block counts all 6 listed / deviating standard-cell rows, XS / XL among them" % by,
+            repr(line_of(out, "  ARGS witness")))
+    listed, corpus, logs, args, cells = merge5(caw2_batch(), cmo_batch(), wd5_batch(), dm_batch())
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 0 and "VERDICT: PASS" in out
+        and any("1 listed runs" in ln and ln.endswith(": True") for ln in line_of(out, "  two-axis runs"))
+        and any("2 listed runs" in ln and ln.endswith(": True") for ln in line_of(out, NEWLINE)),
+        "C37 merged with cmo1 (single ARGS) + cwd5 (switch + ARGS) + cwd1 (kind only) -> exit 0 PASS, both lines True",
+        "rc=%d %s" % (rc, show(out)))
+
+    print("C38 every two-ARGS corruption fails, each named")
+    for tag, by, arm, mom, wd, msg in [
+            ("a", "ARGS_WD_BASE", "XS", None, "0.1", "but its own ARGS line does not deviate"),
+            ("b", "ARGS_MOMENTUM_BASE", "XS", None, "0.1", "(MULTI_ARGS)"),
+            ("c", "ARGS_WD_BASE", "XS", "0.99", None, "(MULTI_ARGS)"),
+            ("d", "ARGS_WD_BASE", "XS", None, "2.0", "ARGS witness"),
+            ("e", "ARGS_WD_BASE", "XL", "0.8", None, "(MULTI_ARGS)")]:
+        listed, corpus, logs, args, cells = caw2_batch(by)
+        key = CAW2[arm]
+        args[key] = caw2_args(arm, mom=mom, wd=wd)
+        rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+        chk(rc == 1 and any(("%s-%s.out" % key) in f and msg in f for f in fails(out)),
+            "C38%s %s listed by %s, its own ARGS line at momentum %s / wd %s -> exit 1, named with %r"
+            % (tag, arm, by, mom or "0.9", wd or "1.0", msg), show(out))
+        if tag in ("b", "c", "e"):                     # the kind the row does NOT carry: MULTI_ARGS's own catch
+            chk(any(ln.endswith(": False") for ln in line_of(out, NEWLINE)),
+                "C38%s the multi-ARGS line itself reads False" % tag, repr(line_of(out, NEWLINE)))
+    listed, corpus, logs, args, cells = caw2_batch()
+    rc, out = run_check([r for r in listed if r[:2] != CAW2["XS"]], corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(xs in f and "standard cell whose ARGS deviates" in f and "NOT listed" in f for f in fails(out)),
+        "C38f XS dropped from the list -> exit 1, named (a standard-cell row deviating, unlisted)", show(out))
+    listed, corpus, logs, args, cells = caw2_batch()
+    args[CAW2["AS"]] = caw2_args("AS", wd="1.0")          # AS has NO MULTI_ARGS entry
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any(("%s-%s.out" % CAW2["AS"]) in f and "deviates on ARGS_WD_BASE" in f
+                        and "listed with a ARGS_MOMENTUM_BASE witness" in f for f in fails(out)),
+        "C38g a two-ARGS run of an UNREGISTERED arm (AS at wd 1.0) -> exit 1, named: the escape is per (batch, arm)",
+        show(out))
+    listed, corpus, logs, args, cells = caw2_batch()
+    extra = ("caw2-XS-s161", "5079315")
+    logs[extra] = list(CAW2_OFF)
+    args[extra] = caw2_args("XS", seed=161)
+    rc, out = run_check(listed, corpus, logs, args=args, cells=cells)
+    chk(rc == 1 and any("caw2-XS-s161-5079315.out" in f and "unlisted run of a listed batch" in f for f in fails(out)),
+        "C38h a deviating XS .out of the listed batch, not yet a CSV row, unlisted -> exit 1, named", show(out))
+
+    print("C39 the MULTI_ARGS registry, the fixture against the registered design, and the print lines")
+    ma = getattr(CE, "MULTI_ARGS", None) or {}
+    chk(sorted(ma) == [("caw2", "XL"), ("caw2", "XS")],
+        "C39 MULTI_ARGS holds exactly (caw2, XS) and (caw2, XL)", repr(sorted(ma)))
+    chk(all(ma.get(k) == {"ARGS_MOMENTUM_BASE": W_MOM9, "ARGS_WD_BASE": W_WD10} for k in (("caw2", "XS"), ("caw2", "XL"))),
+        "C39 each registers exactly ARGS_MOMENTUM_BASE=0.9 and ARGS_WD_BASE=1.0, in the args_witness form",
+        repr([ma.get(k) for k in sorted(ma)]))
+    try:
+        import caw2_design as A2                   # the registered design; imported by the test only
+        chk(all(caw2_args(a) == A2.args_string(a, 160, "/home/s5014158/metaopt/runs/caw2") for a in A2.ARMS)
+            and sorted(A2.ARMS) == sorted(CAW2),
+            "C39 this test's 9 caw2 ARGS payloads == caw2_design.args_string, byte for byte")
+        two = [a for a in A2.ARMS if len(A2.args_deviating_kinds(a)) >= 2]
+        chk(two == ["XS", "XL"] and all(A2.args_deviating_kinds(a) == ("ARGS_MOMENTUM_BASE",)
+                                        for a in ("LS", "LL", "AS", "AL"))
+            and all(A2.args_deviating_kinds(a) == () for a in ("K01", "MS", "ML")),
+            "C39 caw2_design names XS / XL (and only they) as two-ARGS-kind arms; LS / LL / AS / AL one; K01 / MS / ML none",
+            repr(dict((a, A2.args_deviating_kinds(a)) for a in A2.ARMS)))
+        chk(all(ma.get(("caw2", a), {}).get(k) == CE.args_witness(k, dict(A2.args_pairs(a, 0, "x"))[f])
+                for a in two for k, f, _s in CE.ARGS_KINDS),
+            "C39 every MULTI_ARGS witness == args_witness(kind, the registered design's own value)")
+    except Exception as ex:
+        chk(False, "C39 caw2_design imports and MULTI_ARGS holds its X arms", "%s: %s" % (type(ex).__name__, ex))
+    chk(CE.ARGS_KINDS == [("ARGS_MOMENTUM_BASE", "momentum-param-base", "0.99"), ("ARGS_WD_BASE", "weight-decay-base", "0.1")]
+        and len(CE.KINDS) == 8 and len(CE.MULTI_KIND) == 16,
+        "C39 ARGS_KINDS / KINDS / MULTI_KIND are unchanged (2 / 8 / 16 entries)",
+        "%d %d %d" % (len(CE.ARGS_KINDS), len(CE.KINDS), len(CE.MULTI_KIND)))
+    b = wd5_batch()
+    rc, out = run_check(*b[:3], args=b[3], cells=b[4])
+    kept = "".join(ln + "\n" for ln in out.split("\n")[:-1] if not ln.startswith(NEWLINE))
+    chk(rc == 0 and hashlib.sha256(kept.encode()).hexdigest()
+        == "115c74ed3d7e87d9b9a5a1637ae421de56d81bb1b0d94870b76e5172f72d65df" and len(line_of(out, NEWLINE)) == 1,
+        "C39 on 284's cwd5 fixture `--check --runs` gains exactly ONE line; every other byte == 284's module output",
+        hashlib.sha256(kept.encode()).hexdigest()[:16])
+    l5, c5, g5, a5, e5 = merge5(cmo_batch())
+    rc, out = run_check(l5, c5, g5, args=a5, cells=e5, with_runs=False)
+    chk(rc == 0 and hashlib.sha256(out.encode()).hexdigest()
+        == "8e67462ac2950669b206eacdfbe6f3cdf4b6790f448401d29b62a7663d7e121b"
+        and not line_of(out, NEWLINE),
+        "C39 without --runs no line is added: cmo1's no-runs output == 284's module output, byte for byte",
+        hashlib.sha256(out.encode()).hexdigest()[:16])
+
+    print("C40 the MULTI_ARGS registry guard")
+    for tag, src, msg in [
+            ("a", 'MULTI_ARGS[("caw2", "AS")] = {"ARGS_MOMENTUM_BASE": "ARGS_MOMENTUM_BASE: momentum-param-base=0.9"}',
+             "registers 1 ARGS kind"),
+            ("b", 'MULTI_ARGS[("syn", "Q")] = {"ARGS_MOMENTUM_BASE": "ARGS_MOMENTUM_BASE: momentum-param-base=0.9", '
+                  '"ARGS_LR_BASE": "ARGS_LR_BASE: lr=1"}', "is not a well-formed"),
+            ("c", 'MULTI_ARGS[("syn", "Q")] = {"ARGS_MOMENTUM_BASE": "ARGS_MOMENTUM_BASE: weight-decay-base=0.9", '
+                  '"ARGS_WD_BASE": "ARGS_WD_BASE: weight-decay-base=1.0"}', "is not a well-formed")]:
+        rc, out = run_check(*merge5(cmo_batch())[:3], args=cmo_batch()[3], cells=cmo_batch()[4], with_runs=False,
+                            module_append=src)
+        chk(rc == 1 and any("MULTI_ARGS entry" in f and msg in f for f in fails(out)),
+            "C40%s a malformed MULTI_ARGS entry FAILs without --runs, named with %r" % (tag, msg), show(out))
 
     print("\n%s" % ("ALL PASS" if not FAILED else "FAILURES: %d" % len(FAILED)))
     raise SystemExit(1 if FAILED else 0)

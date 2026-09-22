@@ -38790,3 +38790,117 @@ Files written: `docs/ICML-PLAN.md`, `docs/WRITEUP-mechanism.md`, `docs/LIMITS-PR
 no cluster command; `alice` NOT contacted; nothing under `paper/` read; no notebook website or Vercel URL opened;
 nothing downloaded; no `.pdf` fetched (arXiv abstract page and ar5iv HTML only).**  289-291 remain held by the
 concurrent tracks and go BEFORE 292.  Next free number after this entry: **294**.
+
+
+## 294. TRACK C (code gap, ZERO GPU) — **[LED WITH THE BOUND: **THIS ENTRY MEASURED NOTHING, REGISTERED NO BATCH AND MOVED NO LEVEL, BAR, STATE, CONTRAST, STAMP OR LICENCE SENTENCE.  NO accuracy number of `caw2` or of any other batch was read, by any tool, at any point; the real-log control's 27 CSV rows are KEY-ONLY with every accuracy column EMPTY.  NO row is appended to `results/CORPUS-EXCLUSIONS.tsv` here** — `caw2`'s 18 rows go in with that batch's own ingest.]** — **`corpus_exclusions.py --check` NOW EXPRESSES A **TWO-ARGS** RUN: ONE THAT DEVIATES ON TWO ARGS KINDS AT ONCE (`caw2`'s XS / XL: `--momentum-param-base 0.9` AND `--weight-decay-base 1.0`).  THE RULE: such a run is listed ONCE, by the ARGS witness of ANY one of its deviating kinds (the planned rows use `ARGS_WD_BASE`), and a new registry `MULTI_ARGS` holds, per (batch, arm), the witness of EVERY ARGS kind it deviates on; each is held to the run's own `ARGS:` line.  An arm with no entry still FAILs exactly as before.  ADDITIVE: +77 / −0 lines in the module.  TESTS FIRST (C37–C40): 173 PASS / 20 FAIL (exit 1) against 284's module → 193 PASS / 0 FAIL (exit 0) after, C1–C36 BYTE-IDENTICAL.  INVARIANCE: 39 items, 36 BYTE-IDENTICAL, 3 DIFFER by ADDED LINES ONLY.  REAL-LOG CONTROL on `caw2`'s own 27 `.out` files with the 18 planned rows: PASS; 284's module FAILs the same input 6×; five corruptions FAIL, each named.**  Closes the gap 284.8 declared and 290.9 owed.  RULE 16 held.
+
+### 294.1 The gap, re-verified rather than inherited
+
+284.8 declared it ("a run deviating on TWO ARGS VALUES at once is still unrepresentable"), 290.9 owed it for `caw2`'s XS / XL.  Re-run here against 284's module (`ce97f48f…`) on the REAL input (294.5): with the 18 planned rows, **exit 1, 6 FAILs, one per X run**, each `caw2-X?-s16?-….out deviates on ARGS_MOMENTUM_BASE but is listed with a ARGS_WD_BASE witness`.  Listing by the other kind fails the mirror way.  The cause is one line of 263's ARGS-value reader: any deviating kind other than the witness's own is refused for a listed run, with no escape (284.1 quoted it).  Read from the runs' own ARGS lines (`../runs_alice2` copies, **sha256-identical to alice2's 27 files**, all 27 `RUN_DONE`): XS / XL carry `--alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0`; LS / LL / AS / AL carry `0.9` / `0.1` (ONE kind); K01 / MS / ML carry `0.99` / `0.1` (none); every run prints the five `off` lines (290.8a) and no ON line.
+
+### 294.2 The rule, and why this form
+
+**A run that deviates on two or more ARGS kinds is listed ONCE, by the ARGS witness of any one of them, and `MULTI_ARGS[(batch, arm)]` registers the `args_witness` of EVERY ARGS kind it deviates on.**  It is the ARGS axis's counterpart of 245's `MULTI_KIND` ("listed ONCE, by either ON line"), and it was chosen over the alternatives for three reasons:
+* a TSV row carries ONE witness and the schema is not changed (every reader of the TSV stays byte-identical);
+* the escape is **per registered (batch, arm)**, so an unregistered run deviating on two kinds still FAILs (C26d on `cmo1`, C38g on a synthetic `AS` at wd 1.0, and corruption 4 on a real `AS` log);
+* it **strengthens** the check on the kinds it covers: the new block holds the registered kind SET to the run's own deviating set and every registered value to the run's own ARGS line, so the kind the row does not carry is **verified, not skipped** (C38b / C38c / C38e and corruptions 1 / 2 are caught ONLY by it).
+
+Which witness the row carries is not forced by the code (either passes, C37 and 294.5).  **The planned rows use `ARGS_WD_BASE`**: it is the X cell's defining factor, the one thing XS / XL change relative to AS / AL, which are listed by `ARGS_MOMENTUM_BASE`.  A two-ARGS run that ALSO prints an ON line is covered by composition: 284's rule (list by an ARGS witness, ON kinds in `MULTI_KIND`) plus this one; no such run exists and none is tested beyond C37's merged batch.
+
+### 294.3 What changed (`analysis/corpus_exclusions.py`, `ce97f48f…` → `45d2045a…`, +77 / −0)
+
+* **`MULTI_ARGS`** = `{("caw2","XS"), ("caw2","XL")}` → `{ARGS_MOMENTUM_BASE: "ARGS_MOMENTUM_BASE: momentum-param-base=0.9", ARGS_WD_BASE: "ARGS_WD_BASE: weight-decay-base=1.0"}`, re-typed (NOT imported) from the registered `analysis/caw2_design.py` (`args_pairs`, `ARM_TABLE`, `args_deviating_kinds`); C39 pins it there.  Plus `multi_args_of(fn)`.
+* **The escape** (4 lines) in 263's ARGS-value loop: a kind other than the witness's is accepted only when the row is listed by an ARGS witness AND the kind is registered for the run's (batch, arm).
+* **One block and ONE new print line**, `multi-ARGS runs (CORRECTIONS 294): N listed runs …: True|False`, after 263's cell-mixing line: the witness names a registered kind; the deviating set == the registered set; each registered witness == the run's own value.
+* **A registry guard** (no print line; FAILs only): every entry registers ≥ 2 kinds, each a well-formed `args_witness` of its own kind (C40).
+* **Docstring**: one paragraph.
+* **Unchanged**: `load` / `keys` / `is_excluded` / `filter_rows` / `_pooled` / `witness_lines` / `kind_of` / `args_witness` / `args_deviations` / `KINDS` / `ARGS_KINDS` / `MULTI_KIND` / the TSV schema.  No line of the module was removed or edited.
+
+### 294.4 The row format for a two-ARGS run (`caw2`'s 18 rows at ingest; NOT appended here)
+
+| column | the 12 one-kind rows (LS / LL / AS / AL × 3 seeds) | the 6 TWO-ARGS rows (XS / XL × 3 seeds) |
+|---|---|---|
+| `run` / `job_id` | `caw2-AS-s160` / `5079304` (the `.out` name) | `caw2-XS-s160` / `5079306` |
+| `batch` / `arm` | `caw2` / `AS` | `caw2` / `XS` |
+| `looks_like` | `AdamW+Adam (granularity scalar)` (`AdamW+Lion …` for L; `layerwise` for LL / AL) | `AdamW+Adam (granularity scalar)` (`layerwise` for XL) |
+| `intervention` | `--momentum-param-base 0.9` | `--momentum-param-base 0.9 + --weight-decay-base 1.0` — **both kinds named** |
+| `witness` | `ARGS_MOMENTUM_BASE: momentum-param-base=0.9` | **`ARGS_WD_BASE: weight-decay-base=1.0`** (the other kind held to `MULTI_ARGS`) |
+| `registered_at` | `CORRECTIONS <the ingest's entry>` | same |
+| `reason` | base-optimiser CLI flag not carried by any CSV column (ARGS-value kind, CORRECTIONS 263) | TWO-ARGS (CORRECTIONS 294): the AdamW base momentum AND the dose-arm weight decay are carried by no CSV column; listed by ONE ARGS witness, every deviating kind held to MULTI_ARGS |
+
+K01 / MS / ML owe no row (the meta alg is the CSV `meta` column).  A DESCRIPTIVE note, not changed here: the AdamW arms' `0.9` is AdamW's own β1, yet it counts as an `ARGS_MOMENTUM_BASE` deviation because 263's standards are per flag, not per base; `in_standard_cell` does not read `base`, so completeness REQUIRES those 12 rows.  That is 290.9's plan and it is kept.
+
+### 294.5 Tests (`tests/test_corpus_exclusions_check.py`, `342d199f…` → `4a14aaf8…`, +C37–C40), written BEFORE the module change
+
+The fixture is `caw2`'s own shape: the nine arms with their real seed-160 job ids and the real ARGS payload (**27 / 27 real payloads == the fixture's `caw2_args(arm, seed)`**, compared programmatically; C39 also pins all 9 to `caw2_design.args_string`).  `run_check` gains an optional `module_append` (default None = the old byte copy) so C40 can corrupt the registry in a module COPY.
+* **C37** — passes listed by `ARGS_WD_BASE` and, separately, by `ARGS_MOMENTUM_BASE`; the new line counts 2 and reads True; the ARGS block counts 6 listed / 6 deviating standard-cell rows; merged with `cmo1` (single ARGS), `cwd5` (switch + ARGS, 284's line counting 1, True) and `cwd1` (kind only): PASS.
+* **C38** — eight corruptions FAIL, each named: (a) XS wd 0.1 listed by WD; (b) the same listed by MOM — caught only by `MULTI_ARGS`; (c) XS momentum 0.99; (d) XS wd 2.0 (the listed kind's value); (e) XL momentum 0.8 (the kind the row does not carry); (f) XS dropped (FAILs on both kinds); (g) an unregistered AS at wd 1.0 (still 263's message); (h) an unlisted, not-yet-ingested XS .out of the listed batch (the batch rule, on both kinds).  For (b) / (c) / (e) the new line itself reads False.
+* **C39** — the registry holds exactly the two X entries with exactly the two kinds; each witness == `args_witness(kind, caw2_design's own value)`; `caw2_design.args_deviating_kinds` names XS / XL, and only they, as two-kind; `ARGS_KINDS` / `KINDS` / `MULTI_KIND` unchanged (2 / 8 / 16); on 284's `cwd5` fixture the output minus the ONE new line has the sha256 of 284's module output (`115c74ed…`); without `--runs` the `cmo1` output == 284's byte for byte (`8e67462a…`).
+* **C40** — a one-kind entry, an unknown kind, and a witness whose flag is not its kind's each FAIL without `--runs`, named.
+
+**Against 284's module: 173 PASS / 20 FAIL, exit 1** — every failure in C37–C40.  **After: 193 PASS / 0 FAIL, exit 0.**  **C1–C36 output BYTE-IDENTICAL on both sides** (diffed), and no earlier assertion was changed.
+
+### 294.6 Invariance (Mac, `/opt/homebrew/bin/python3` 3.14.5, `PYTHONDONTWRITEBYTECODE=1`, absolute `../runs` + `../runs_alice2`)
+
+Two scratch trees made by `git archive HEAD` (`52f102b`, **with `paper/` excluded**, see 294.8): A as is, B = A + this entry's two files (`diff -rq` shows only those two).  Every item run in both, in parallel, against the same run directories and the same `results/*.csv` / `*.tsv`, tree root scrubbed to `<TREE>` (both spellings, `pwd -P`) before the sha256.  Items: the library surface (`load` / `keys` / `is_excluded` over every CSV row / `filter_rows`, plus `inspect.getsource` of the five); `--check`; `--check --runs` (both dirs, `../runs` only); the usage path; the 21 importing scorers' `--selftest --runsdir ../runs_alice2` (**now including `cAW1`, `cAW2`, `cGW1`**, added since 284); `cst2_tol_crosscheck`; the 12 `*_registration_derivations.py` (`cvt1` / `cvt2` given `../runs`, the rest `../runs_alice2`).
+
+| item | stdout sha256 (first 16), A / B | exit A / B | verdict |
+|---|---|---|---|
+| `00_library` | 10a596d2b431a388 / 10a596d2b431a388 | 0 / 0 | **IDENTICAL** |
+| `01_check` | 152ee783d3cc19db / 152ee783d3cc19db | 0 / 0 | **IDENTICAL** |
+| `02_check_runs_both` | 5bbf65e5c530e77a / 0ab6b15015246905 | 0 / 0 | **DIFFER** (added lines only) |
+| `03_check_runs_only` | a0d63e8ee8b8a002 / 2871658415ab3bb7 | 1 / 1 | **DIFFER** (added lines only) |
+| `04_usage` | 092af70257236832 / baef4fa5af47ed66 | 2 / 2 | **DIFFER** (added lines only) |
+| `10_cAW1_stdrecipe_score` | e23d45a696abb82a / e23d45a696abb82a | 0 / 0 | **IDENTICAL** |
+| `10_cAW2_confound_score` | caa8bd77f38ad114 / caa8bd77f38ad114 | 0 / 0 | **IDENTICAL** |
+| `10_cGW1_auditwd_score` | 76b14b7b9bab6646 / 76b14b7b9bab6646 | 0 / 0 | **IDENTICAL** |
+| `10_cMG1_mergecarrier_score` | 61f41e5f2d15decc / 61f41e5f2d15decc | 1 / 1 | **IDENTICAL** |
+| `10_cMO1_momwd_score` | e80cc6b1054e5ba6 / e80cc6b1054e5ba6 | 1 / 1 | **IDENTICAL** |
+| `10_cST2_carriervote_score` | bfaee447169270f3 / bfaee447169270f3 | 0 / 0 | **IDENTICAL** |
+| `10_cSV1_shadowvote_score` | 18bdb450201d91be / 18bdb450201d91be | 1 / 1 | **IDENTICAL** |
+| `10_cVT10_onevsthree_score` | 9b590e17da50399c / 9b590e17da50399c | 1 / 1 | **IDENTICAL** |
+| `10_cVT2_injectladder_score` | dee221549ef7067d / dee221549ef7067d | 1 / 1 | **IDENTICAL** |
+| `10_cVT3_downcoalition_score` | b980e7bcfb55a75d / b980e7bcfb55a75d | 1 / 1 | **IDENTICAL** |
+| `10_cVT4_betahold_score` | 3f3ce7d29df6c233 / 3f3ce7d29df6c233 | 1 / 1 | **IDENTICAL** |
+| `10_cVT5_plainhorizon_score` | 006f427ecefb9226 / 006f427ecefb9226 | 1 / 1 | **IDENTICAL** |
+| `10_cVT6_complementpath_score` | b341d557334dd0c4 / b341d557334dd0c4 | 1 / 1 | **IDENTICAL** |
+| `10_cVT7_grouphold_score` | 74c06b6637e2fb15 / 74c06b6637e2fb15 | 1 / 1 | **IDENTICAL** |
+| `10_cVT8_doseroute_score` | f43b2fc771fb5ca9 / f43b2fc771fb5ca9 | 1 / 1 | **IDENTICAL** |
+| `10_cVT9_dosewindow_score` | 875f2af3b58a98de / 875f2af3b58a98de | 1 / 1 | **IDENTICAL** |
+| `10_cWD1_normwd_score` | e09885989a4e8647 / e09885989a4e8647 | 1 / 1 | **IDENTICAL** |
+| `10_cWD2_carrierwd_score` | bebc3861b75d2125 / bebc3861b75d2125 | 1 / 1 | **IDENTICAL** |
+| `10_cWD3_carrierwd_score` | bb182c45a610c56d / bb182c45a610c56d | 0 / 0 | **IDENTICAL** |
+| `10_cWD4_countwd_score` | 4bca200131b1f623 / 4bca200131b1f623 | 0 / 0 | **IDENTICAL** |
+| `10_cWD5_wdladder_score` | 9cd3a857923cc39c / 9cd3a857923cc39c | 0 / 0 | **IDENTICAL** |
+| `30_cst2_tol_crosscheck` | 1638e5f2c243bd4d / 1638e5f2c243bd4d | 0 / 0 | **IDENTICAL** |
+| `40_cmg1_registration_derivations` | fdeb920f56ec0db4 / fdeb920f56ec0db4 | 0 / 0 | **IDENTICAL** |
+| `40_cst1_cct1_registration_derivations` | 1304f9c038f3827f / 1304f9c038f3827f | 0 / 0 | **IDENTICAL** |
+| `40_csv1_registration_derivations` | 50d931f44555482a / 50d931f44555482a | 0 / 0 | **IDENTICAL** |
+| `40_cvt1_registration_derivations` | bf06861374cf65e3 / bf06861374cf65e3 | 1 / 1 | **IDENTICAL** |
+| `40_cvt2_registration_derivations` | dedb82dab0e17705 / dedb82dab0e17705 | 1 / 1 | **IDENTICAL** |
+| `40_cvt3_registration_derivations` | d65d67cef7f66fa6 / d65d67cef7f66fa6 | 0 / 0 | **IDENTICAL** |
+| `40_cvt4_registration_derivations` | 7bedc39d1bc8debc / 7bedc39d1bc8debc | 0 / 0 | **IDENTICAL** |
+| `40_cvt5_registration_derivations` | f7e1912bf5f25e44 / f7e1912bf5f25e44 | 0 / 0 | **IDENTICAL** |
+| `40_cvt6_registration_derivations` | 20ada1d25050a354 / 20ada1d25050a354 | 0 / 0 | **IDENTICAL** |
+| `40_cvt7_registration_derivations` | 6dc7aba774cc71ec / 6dc7aba774cc71ec | 0 / 0 | **IDENTICAL** |
+| `40_cvt8_registration_derivations` | 6e41b9f19d9b81e3 / 6e41b9f19d9b81e3 | 0 / 0 | **IDENTICAL** |
+| `40_cvt9_registration_derivations` | 41efd71a9791482f / 41efd71a9791482f | 0 / 0 | **IDENTICAL** |
+
+* **36 IDENTICAL, 3 DIFFER, and the three DIFFERs are ADDED LINES ONLY** (diffed): `--check --runs` over both dirs and over `../runs` alone each gain exactly ONE line, `multi-ARGS runs (CORRECTIONS 294): 0 listed runs …: True` — zero, because **no `caw2` row is ingested or listed yet**, so the module changes nothing for today's corpus; the usage path prints the five added docstring lines.  Exit codes unchanged everywhere.
+* The exit-1 items are exit 1 on BOTH sides for premises already disclosed (251.5 / 263.6 / 269.6 / 284.6: stale RULE 21 corpus premises, `cWD1`'s 269.8 prefix defect, `cvt1` / `cvt2`'s missing `cpl2` probe path, `../runs`-only missing listed logs); not caused here and not touched.  **`cAW2`, the scorer of the batch whose rows this entry makes expressible, is IDENTICAL, exit 0.**
+
+### 294.7 Real-log control on `caw2`'s OWN 27 `.out` files (scratch, not committed; read-only)
+
+A temp layout: the module, the REAL TSV + the 18 planned rows of 294.4, the REAL CSV + 27 KEY-ONLY `caw2` rows (cell keys only, every accuracy column EMPTY), the 27 `.out` copies; `--check --runs <tmp>/runs ../runs ../runs_alice2`.
+* **Clean, 294's module: PASS, exit 0** — 240 listed rows; 57 listed runs carry their ARGS value (cmo1 18 + cwd5 21 + caw2 18); 57 / 57 deviating standard-cell rows listed; 651 cells, none mixing; 284's two-axis line 3 runs, True; **multi-ARGS 6 runs, True**.
+* **Clean, 284's module: FAIL, exit 1, exactly 6 FAILs**, one per X run (294.1).
+* The X rows listed by `ARGS_MOMENTUM_BASE` instead: PASS (either witness accepted).
+* **Corruption 1** — XS-s161's ARGS wd 1.0 → 0.1: FAIL ×3 (`does not deviate`; the registered set; the registered WD witness).
+* **Corruption 2** — XL-s162's momentum 0.9 → 0.99: FAIL ×2, **both by `MULTI_ARGS` only** — the kind the row does not carry, which 284's module could never have checked on a listed run.
+* **Corruption 3** — XS-s160's row dropped: FAIL ×2 (standard-cell completeness, once per kind).
+* **Corruption 4** — AS-s160 (no entry) at wd 1.0: FAIL, `deviates on ARGS_WD_BASE but is listed with a ARGS_MOMENTUM_BASE witness` — the escape is per arm.
+* **Corruption 5** — XS-s162 at wd 2.0: FAIL ×2 (263's witness mismatch and `MULTI_ARGS`).
+
+### 294.8 Discipline
+
+RULE 16: no registered scorer, design, launcher, patch, `analysis/argsline_guard.py`, `results/*.csv` or `results/*.tsv` edited; `caw2_design.py` is imported by the TEST only.  **ZERO GPU; no `sbatch` / `srun`; no job submitted or cancelled.  `alice` NOT CONTACTED**; `alice2` read only (`find` / `sha256sum` / `grep -c RUN_DONE` of the 27 `.out` names; nothing copied from it — the local copies already matched).  No accuracy line read.  Nothing downloaded; no `.pdf`; no licence; no notebook site or Vercel URL.  **`paper/`: one incident, disclosed.**  Building the first invariance trees, `git archive HEAD | tar -x` extracted the whole tree, `paper/` included, into scratch, and one command then ran `ls <scratch copy>/paper >/dev/null 2>&1` as an existence test.  Its output was discarded: **no file name under `paper/` was printed or seen, and no file was opened, read, staged or edited.**  Both trees were deleted at once and rebuilt with `git archive HEAD -- . ':(exclude)paper'`; the battery ran only on those.  `git add` named this entry's three paths only (the untracked `analysis/cgw1_attack_indep.py` belongs to another track and was not touched).  THIS ENTRY TOOK NUMBER **294**; NEXT FREE **295**.
