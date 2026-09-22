@@ -41962,7 +41962,376 @@ unsaid); nothing in 309 / 310 is more pessimistic than the numbers.
 
 Next free number: **312**.
 
-## 312. RESERVED — the `cvl1` landing (1.14, validation split; registered at 303). Placeholder; replaced in place by its track.
+## 312. TRACK D (land) + ITS INGEST — **[LED WITH THE BOUNDS: (1) **ONE CELL, TWO RUNGS** (`ONE-CELL` `TWO-RUNGS`).  ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3, α-scaled `--weight-decay-base` 0.1 (W1) and 5e-4 (W4) only; nothing here is about CIFAR-100 (`g3b`), α-independent decay (`cai1`) or any other cell.  (2) **`MS-ALPHA0-NOT-RESELECTED`.**  The one core-cell hyperparameter known to be chosen on TEST (ms 1e-4, 302.1) is NOT re-chosen on validation.  This batch re-reads the audit's RANKINGS on a held-out split; it does not redo the audit's TUNING there.  (3) **`TRAIN-45K`.**  Every model trained on 45,000 images, so the in-batch TEST levels are not `cgw1`'s; the two are compared only through non-gating stamps, never pooled.  (4) **`ONE-SPLIT`**: one fixed 5,000-image split (split seed 302); split-to-split variance is not measured.  (5) **THE PRIMARY TOKEN HANGS ON ONE SEED.**  DESCRIPTIVE: leave-one-seed-out gives `VAL-AGREES` when s187 is dropped and `VAL-DIFFERS-UNRESOLVED` in the other three cuts; the VAL W1 SURVIVES clears its 2 SE lower edge by only +0.0719 pp.  (6) **`VAL-DIFFERS-UNRESOLVED` WAS THE REGISTERED MODAL OUTCOME (prior 0.45, 303.5) AND LICENSES NO SENTENCE EITHER WAY** on whether the partition ranking holds on validation.  (7) `ALPHA-INDEPENDENT-DECAY-NOT-TESTED`; `FLOOR-READINGS-ARE-BOUNDS`: VAL W4 VANISHES is a bound, never "the partitions are equal" (164.6).]** — **`cvl1` LANDS 32/32: `VAL-DIFFERS-UNRESOLVED | SELECT-SAME | W1-TUNDECIDED/VSURVIVES+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST`.  THE TWO PARTITION CLAIMS CHANGE STATE BETWEEN THE READERS (W1 UNDECIDED → SURVIVES, W4 UNDECIDED → VANISHES), BUT NEITHER PAIRED GAP IS RESOLVED, SO THE CHANGE IS NOT DISTINGUISHABLE FROM READER NOISE AT FOUR SEEDS.  SC IS IN THE SAME STATE, SCALAR-BEATS-BEST, ON BOTH READERS.  SELECTING ON VALIDATION PICKS THE SAME CONFIGURATION AS TEST (kLW1) AND THE SAME BEST GRAIN PER RUNG.  ICML-PLAN 1.14 CLOSES FOR ITS RE-REPORTING HALF AT THE AUDIT CELL ONLY; ITS RE-SELECTION HALF (ms, α0 ON VALIDATION) STAYS OPEN.  AND: THE ONE INGEST (3,437 → 3,469; 32 EXCLUSION ROWS), AND WHAT IT DOES TO THE PAPER (312.10).**
+
+*The registered prior on this branch was 0.45 (303.5); `VAL-AGREES` carried 0.30, `VAL-SHIFTS` 0.13, `VAL-FLIPS` 0.04;
+`SELECT-SAME` 0.75; all named before any run existed.  **ZERO GPU by this entry.**  No Slurm job submitted or
+cancelled; read-only `sacct -X` / `squeue` on the `alice2` login node by the scoring track.  `alice` NOT contacted.
+Nothing under `paper/` listed, read or touched; no clone, checkout or worktree of the campaign repo was made (the stages
+are `git archive` of the registered commit).  No notebook website or Vercel URL opened, nothing downloaded, no `.pdf`
+fetched.  The running batches `g3b`, `cai1`, `crd1` were not touched.*
+
+
+### 312.1 Completion, the owed by-hand audit, and RULE 20 at full coverage
+
+**32/32 COMPLETE.**  Jobs **5080667–5080698**, contiguous and in the registered order (W1 5080667–5080682, W4
+5080683–5080698; per seed ch / nd / k01 / kL), seeds {184, 185, 186, 187}, 8 arms (303.3).  `sacct -X` read-only:
+**32/32 `COMPLETED 0:0`**, **26.5836 GPU-h** by `sacct` (26.3167 by the runs' own `minutes` lines; per run 34–67 min),
+against 303.7's 21.65 expected; hard bound 64.  `squeue` empty of `cvl1-*`.
+
+**The by-hand audit owed at 303.10** (post-launch guard 7 had read UNVERIFIED on a queue wait): `python3
+analysis/argsline_guard.py $WS/runs --name cvl1-` (guard `81cea8b5…`, UNEDITED; `alice2` nodelogin04, Python 3.10.4,
+2026-09-22T12:28:57Z): 32 `.out`, each "no repeated flag (20 flags)"; **32 clean, 0 WITH REPEATED FLAGS OR DESIGN
+MISMATCH, 0 without an ARGS line; VERDICT PASS, rc 0** (`results/cvl1_argsguard_byhand.txt`, `03bbab08…`).  Effective
+values: wd 0.1 ×16 / 5e-4 ×16; chunk777 / nodewise / scalar / layerwise ×8 each; seeds 184–187 ×8 each; ms 1e-4, α0
+1e-3, ResNet18, 100 epochs ×32; one save directory.
+
+**RULE 20 at FULL coverage, PASS on both halves, after all 32 had COMPLETED and BEFORE any accuracy number was
+opened**: `bin/cVL1_rule20.sh` (`973f38f7…`, UNEDITED) from `~/stage_cvl1_land` (`git archive 14e63ba -- analysis bin
+results patches tests`, no `paper/`) on `alice2`, 12:29:05–12:29:16Z, log `results/cvl1_rule20_full_land.txt`
+(`936ec5fc…`), read line by line; re-run independently by the refute pass from the same stage, rc 0, PASS and agreeing.
+* **ARGS half**: 32 `.out`, 32 with ARGS; squeue empty of `cvl1`.  Batch consistency (`--vary seed --vary run-name
+  --vary weight-decay-base --vary stepsize-groups --strict`) rc 0, **32 clean**, VERDICT PASS.  Per-run, each run pinned
+  to its own rung's wd and its own grain: **32 checked, 0 violations**.  Coverage exactly the registration's: 0.1 ×16,
+  5e-4 ×16; each grain ×8.
+* **ENV half** PASS: the registered `VAL_SPLIT` witness ×32; one distinct `ENV` line ×32 (`AUGMENT=1
+  BETA_CLIP=-15:-2.3026 … PROBE=5`); no hold or mask witness; **32 × NVIDIA L4**; coverage 32/32, 0 violations.
+
+Sync: 165 run files (32 `.out` + 133 under `cvl1/`) sha256-checked against a list generated on `alice2` at 12:31:40Z,
+`shasum -c` 165 OK (`results/cvl1_runfiles_sha256.txt`, `0e41a04d…`).  `plateau5` is read from each run's RAW `.out`:
+TEST = mean of the `Epoch e … Test Accuracy` lines over epochs 95–99, VAL = the same over the `VAL:` lines; the CSV
+`plateau` column is read by nothing here.
+
+
+### 312.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cVL1_valsplit_score.py` (**`85c73e21…`**, design `946a119f…`; the registered commit's bytes, HEAD's and
+PROVENANCE's) ran **UNEDITED** with the documented invocation, **rc 0, 52 lines**: on `alice2` from `~/stage_cvl1_land`
+(Python 3.10.4, the `mo` venv) as `python3 analysis/cVL1_valsplit_score.py $WS/runs`
+(`results/cvl1_valsplit_score_alice2.txt`, `cb698150…`), and on the Mac (3.14.5) on `../runs_alice2`
+(`results/cvl1_valsplit_score_mac.txt`, `dded0eb8…`).  The two stdouts differ only on the runsdir and G-PROV path
+lines.  Gates: COMPLETION 32/32; G-PROV MODE submit, SCORER `85c73e21`, DESIGN `946a119f`, LOAD_DATA `c8eb8385`, TRAIN
+`8706d8c7`; G-ARGS / G-ENV / G-VALSPLIT / G-KIND / G-VAL / G-STRUCT 32 of 32 (20 flags, the registered ENV line, ONE
+registered VAL_SPLIT witness, 100 VAL lines, 9,000 probe records with n_beta = m); G-HW `NVIDIA L4 ×32` (disclosure).
+**RULE 16 held**: no defect in the scorer was reported by the scoring track or by the refute pass (one minor point
+recorded at 312.6, not a defect in this batch).
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,469 rows, 354 exclusions; HEAD bytes, on `../runs_alice2`, the
+Mac): rc 0, 52 lines, **identical to the committed Mac log except the two path echoes** (runsdir and G-PROV).  **The
+corpus DISCLOSURE line does not move** (3,115 before and after): every one of the 32 rows this ingest adds is listed in
+`results/CORPUS-EXCLUSIONS.tsv`, so none enters the filtered corpus.  The FINAL is byte-identical.
+
+**The FINAL, verbatim (the log's last line):**
+
+    FINAL VAL-DIFFERS-UNRESOLVED | SELECT-SAME | W1-TUNDECIDED/VSURVIVES+W4-TUNDECIDED/VVANISHES+SC-TSCALAR-BEATS-BEST/VSCALAR-BEATS-BEST | ONE-CELL TWO-RUNGS MS-ALPHA0-NOT-RESELECTED TRAIN-45K ONE-SPLIT ALPHA-INDEPENDENT-DECAY-NOT-TESTED FLOOR-READINGS-ARE-BOUNDS SELECT-W1-SAME SELECT-W4-SAME TEST-SIGMA-INBATCH VAL-SIGMA-INBATCH TEST-STATE-DIFFERS-FROM-CGW1-W1 TEST-LEVEL-DIFFERS-FROM-CGW1-chW1 TEST-LEVEL-DIFFERS-FROM-CGW1-ndW1 TEST-LEVEL-DIFFERS-FROM-CGW1-chW4 TEST-LEVEL-DIFFERS-FROM-CGW1-ndW4 TEST-LEVEL-DIFFERS-FROM-CGW1-k01W4 TEST-LEVEL-DIFFERS-FROM-CGW1-kLW4
+
+Seven registered bounds, two selection stamps, two σ-source stamps and seven non-gating cross-batch stamps (18 in all).
+
+
+### 312.3 The numbers (in batch; TEST and VAL from the SAME 32 runs)
+
+n = 4 seeds per arm; TEST is the 10,000-image test set, VAL the 5,000 held-out training images read on the TEST
+transform (302.2).
+
+| arm | wd | grain | TEST plateau5 | sd | range | VAL plateau5 | sd | range | VAL − TEST | box |
+|---|---|---|---|---|---|---|---|---|---|---|
+| chW1 | 0.1 | chunk777 | **91.6045** | 0.287 | 0.686 | **91.6420** | 0.238 | 0.568 | +0.0375 | free |
+| ndW1 | 0.1 | nodewise | **91.3455** | 0.359 | 0.854 | **91.2090** | 0.501 | 1.224 | −0.1365 | free |
+| k01W1 | 0.1 | scalar | **91.8845** | 0.210 | 0.458 | **92.1640** | 0.076 | 0.176 | +0.2795 | free |
+| kLW1 | 0.1 | layerwise | **92.3140** | 0.219 | 0.512 | **92.2580** | 0.166 | 0.356 | −0.0560 | free |
+| chW4 | 5e-4 | chunk777 | **86.8265** | 0.189 | 0.458 | **86.3720** | 0.132 | 0.288 | −0.4545 | free |
+| ndW4 | 5e-4 | nodewise | **86.6605** | 0.259 | 0.562 | **86.4640** | 0.184 | 0.432 | −0.1965 | free |
+| k01W4 | 5e-4 | scalar | **89.6360** | 0.213 | 0.476 | **89.5260** | 0.268 | 0.584 | −0.1100 | free |
+| kLW4 | 5e-4 | layerwise | **88.9275** | 0.197 | 0.424 | **88.8340** | 0.240 | 0.560 | −0.0935 | free |
+
+Every run is box-free (rec_lo = rec_hi = 0.0000 on all 32).  **σ (O2)**: TEST in-batch **0.247551** (df 24) above the
+frozen floor 0.178183 (df 190), so `TEST-SIGMA-INBATCH`; VAL in-batch **0.255365** (df 24), `VAL-SIGMA-INBATCH`; paired
+(VAL − TEST) per-run sd s_δ **0.284535** (df 24; no frozen floor exists for it).  SE of a within-reader contrast:
+TEST 0.175045, VAL 0.180570; paired SE 0.201197.  **Floor gate (164.6):** TEST 86.66–92.31, VAL 86.37–92.26; every
+level ≥ 1.37 pp above HEALTH_MIN 85 (a run-failure bar, not a floor), ≥ 76 pp above chance and ≥ 7.6 pp below 100, so
+no contrast is floor- or ceiling-bounded.  **All 8 TEST levels lie inside their registered 303.5 bands** (refute fix
+F5: chW1 91.6045 sits 0.0045 above its band's low edge 91.6; VAL was registered only as within ±0.8 pp of TEST, and
+every VAL − TEST lies in [−0.4545, +0.2795]).
+
+**The contrasts** (value, SE multiple, ±2 SE half-width interval, state):
+
+| claim | TEST | VAL | paired GAP VAL − TEST | per claim |
+|---|---|---|---|---|
+| **W1**: D_W1 = ch − nd | **+0.2590** (+1.48 SE) [−0.0911, +0.6091] **UNDECIDED** | **+0.4330** (+2.40 SE) [+0.0719, +0.7941] **SURVIVES** | +0.1740 (+0.86 paired SE) [−0.2284, +0.5764], not resolved | **DIFF** |
+| **W4**: D_W4 = ch − nd | **+0.1660** (+0.95 SE) [−0.1841, +0.5161] **UNDECIDED** | **−0.0920** (−0.51 SE) [−0.4531, +0.2691] **VANISHES** (a bound) | −0.2580 (−1.28 paired SE) [−0.6604, +0.1444], not resolved | **DIFF** |
+| **SC**: T_W4 = k01 − ch, k01 − nd | +2.8095 (+16.05 SE), +2.9755 (+17.00 SE) **SCALAR-BEATS-BEST** | +3.1540 (+17.47 SE), +3.0620 (+16.96 SE) **SCALAR-BEATS-BEST** | min(T_W4) +0.2525 (+1.25 paired SE) [−0.1499, +0.6549], not resolved | **SAME** |
+
+No FLIP; no `GAP-RESOLVED-*` stamp (no |gap| reaches the 0.30 bar: the largest is 0.2580, 0.042 short).  Branch
+ladder, first match: not UNREADABLE (both readers healthy); no FLIP; not AGREES (W1, W4 DIFF); not SHIFTS (no gap
+resolved) → **`VAL-DIFFERS-UNRESOLVED`**.
+
+**Selection** over the 8 configurations: TEST picks **kLW1** (92.3140), VAL picks **kLW1** (92.2580); the TEST regret of
+VAL's pick is +0.0000 pp (SE 0.175045) → **`SELECT-SAME`**.  Per rung: W1 layerwise on both readers
+(`SELECT-W1-SAME`), W4 scalar on both (`SELECT-W4-SAME`).  The VAL argmax margin is thin: kLW1 − k01W1 = **+0.0940 pp**
+on VAL, against +0.4295 on TEST.
+
+**Descriptive, labelled, licensing nothing** (the attack's section [8], re-derived by the refute pass):
+* G = kL − k01: TEST W1 +0.4295, W4 −0.7085; VAL W1 +0.0940, W4 −0.6920.
+* Ranking concordance (refute fix F4): 27 of 28 pairs concordant (Kendall τ 0.9286), but 16 of those pairs are
+  cross-rung and separated by 2–5 pp.  **Within rungs, 11 of 12 are concordant** (W1 6/6; W4 5/6, the discordant pair
+  being chW4 vs ndW4).
+* σ sensitivity: TEST D_W1 (+0.259) and TEST D_W4 (+0.166) can reach neither SURVIVES nor VANISHES at any σ; VAL D_W1
+  stays SURVIVES for σ < 0.306177; VAL D_W4 stays VANISHES for σ < 0.457922; at the frozen floor σ on both readers the
+  FINAL is identical.  `VAL-SHIFTS` is unreachable at any s_δ (no |gap| ≥ 0.30), so the primary token does not depend
+  on the paired sd.
+* Leave-one-seed-out: drop s184 → `VAL-DIFFERS-UNRESOLVED` (VAL W1 SURVIVES); drop s185 → `VAL-DIFFERS-UNRESOLVED` (VAL
+  W1 UNDECIDED); drop s186 → `VAL-DIFFERS-UNRESOLVED` (VAL W1 UNDECIDED); **drop s187 → `VAL-AGREES`** (W1 UNDECIDED on
+  both, W4 VANISHES on both); `SELECT-SAME` (kLW1) in all four.  So VAL D_W1 reads SURVIVES in only one of the four cuts.
+* Against `cgw1`'s 50,000-image TEST levels (non-gating, cross-batch, never pooled): every arm is lower, by −0.31 to
+  −1.08 pp; the six stamped arms are exactly those differing by more than 0.5 pp.  In-batch TEST D_W1 +0.2590 and D_W4
+  +0.1660, against `cgw1`'s +0.3693 (SURVIVES) and +0.2410; hence `TEST-STATE-DIFFERS-FROM-CGW1-W1`.
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, after RULE 20 had passed and the ingest had run):** from the 32
+raw `.out` files in `../runs_alice2`, all 8 TEST and VAL plateau5 means reproduce to 4 d.p.; pooled in-batch σ
+0.247551 (TEST) and 0.255365 (VAL), df 24 each; D_W1 +0.2590 / +0.4330 and D_W4 +0.1660 / −0.0920 reproduce.
+
+
+### 312.4 What bounds the result, led with
+
+1. **One cell, two rungs** (headline (1)).
+2. **`MS-ALPHA0-NOT-RESELECTED`** (headline (2)).  Refute fix F2: SC is SAME only as a per-claim stamp.  The primary
+   token is `VAL-DIFFERS-UNRESOLVED`, which licenses no sentence that the ranking does or does not hold on validation.
+   The SC paired gap (+0.2525, not resolved) is a bound, not evidence of reader-independence.  It says nothing about
+   tuning: `crt1` (309) found that re-tuning α0 to 1e-2 weakens the scalar lead to a TIE, and `cvl1` runs at `crt1`'s
+   untuned M2 configuration (311 A5), so its SC reading is an untuned reading at that configuration.
+3. **`TRAIN-45K`** (headline (3)): the in-batch TEST D_W1 (+0.2590) is UNDECIDED rather than `cgw1`'s SURVIVES; that
+   comparison is non-gating and cross-batch — a bound on this batch, not a refutation of `cgw1`.
+4. **`ONE-SPLIT`** (headline (4)).
+5. **The primary token is seed-fragile** (headline (5)).
+6. **The modal token licenses nothing** (headline (6)); `SELECT-SAME` had a prior of 0.75.
+7. **The paired-gap SE has no frozen floor** (df 24).
+8. **Every VALIDATION reading comes from the same 32 runs as the TEST reading**, so no training difference separates the
+   readers; VAL is a second finite sample of the same distribution (303.10 (2)).
+9. `ALPHA-INDEPENDENT-DECAY-NOT-TESTED`; `FLOOR-READINGS-ARE-BOUNDS` (headline (7)).
+10. GPU: 26.58 GPU-h by `sacct`, above the 21.65 expected and inside the 64 hard bound.
+11. **UNSURE, inherited from 302.1**: whether any test comparison chose α0 1e-3; where base momentum 0.99 and the box
+    −15:−2.3026 came from.  Nothing is UNSURE in the scoring itself.
+
+
+### 312.5 The attack — an independent parser, 40 PASS / 0 FAIL
+
+`analysis/cvl1_attack_indep.py` (`94563329…`, committed at `f69b491`): stdlib only (hashlib, json, math, os, sys), no
+repo imports, no regex, no shlex; every literal, bar, licence sentence and stamp re-typed.  **40 PASS / 0 FAIL on both
+hosts, its stdout byte-identical on `alice2` (3.10.4, `$WS/runs`) and the Mac (3.14.5, `../runs_alice2`)** (sha256
+`ef3515b5…`; `results/cvl1_attack_indep_alice2.txt`, `_mac.txt`).  It checks: [0] one digest over the 64 run files (32
+`.out` + 32 `probe.jsonl`; 2,077,049,771 bytes, `8f4a94ed…`), job ids 5080667–5080698 contiguous in the registered
+order, PROVENANCE MODE submit and its scorer / design / HF / load_data / train / patch / proof-log / commit `14e63ba` /
+VAL_SPLIT 5000:302 values; [1]–[4] per run exactly one ARGS line (the design's 20 flags in order), one ENV line,
+exactly one VAL_SPLIT witness (the registered line), no other ON witness, RUN_DONE, Epoch lines 0–99 once each; VAL
+lines 0–99 once each with n_val 5000, each IMMEDIATELY after its own Epoch line (stricter than the scorer), every VAL
+value two decimals and a multiple of 0.02; 9,000 probe records at steps 0–44995 (45,000 training images) with n_beta
+= m on every record; [5]–[6] the scorer's 52-line stdout rebuilt and compared with both committed logs (50 lines byte
+for byte, the 2 host-dependent lines by form), the corpus disclosure count 3,115 re-derived from the registered
+commit's CSV and TSV, the FINAL equal; [7] 303's two questions, the rankings and the selection; [8] margins, σ
+break-evens, the floor-σ counterfactual, leave-one-seed-out, the `cgw1` comparison; [9] the 32 exclusion rows rebuilt
+from the runs, equal byte for byte to `results/cvl1_exclusion_rows_PROPOSED.tsv` (rows digest `dc8e3cf1…`).
+**Non-vacuity:** two deliberate corruptions each produced a FAIL (rc 1): one digit changed in a scorer-log contrast line
+(log line 30 flagged), and one PROPOSED row's witness changed to 5e-3.
+
+
+### 312.6 The refute pass — NOTHING REFUTED; THREE LICENCE OVERREACHES AND THREE PRECISION FIXES (six in all, all applied)
+
+The refute pass (`holds: true`) parsed the 32 raw `.out` files with its own stdlib parser (TEST Epoch lines and `VAL:`
+lines, plateau5 over 95–99; Epoch and VAL epochs 0–99 once each, n_val 5000, RUN_DONE; each run's ARGS wd, grain, seed,
+ms 1e-4 and α0 1e-3 matched to its file name) and reproduced every reported number to 4 d.p. (levels, sds, ranges,
+σ ×3, every contrast, state, gap, the primary, the selection, leave-one-seed-out, Kendall, the `cgw1` deltas and the
+six stamped arms, both break-evens, the 303.5 bands).  It read the scorer's source (window 95–99 on both readers; arm
+key from the file name with G-ARGS on the full ARGS line; SE = σ·√(1/4 + 1/4); sign ch − nd and k01 − x; gap VAL − TEST
+from the same runs; the VAL regex anchored and parsed before the Epoch regex, so the readers cannot mix; completeness
+one complete `.out` per registered run; `rung_state` / `scalar_of` / `primary_of` in 303.4's order; no shadowing) and
+found it correct and unedited.  **One minor point, recorded, not a defect here:** `read_out` keeps the LAST duplicate
+Epoch line instead of rejecting it (the same latent form as 296's F1); both independent parsers confirm each epoch
+appears exactly once in this batch, so no reading moves.  **The split, re-derived:** on `alice2` the refute pass
+recomputed the split from the harness's local CIFAR-10 training labels (numpy on CPU on the login node, nothing
+downloaded, temp file deleted): 5,000 val / 45,000 train, overlap 0, union 50,000, 500 per class, and **both val_sha
+`7d3a1489…` and train_sha `2733a990…` equal the witness exactly**; the patch draws VAL from `train=True` as the
+complement of the training subset and leaves the test loader untouched.  It re-ran RULE 20 (rc 0, PASS) and
+`argsline_guard --name cvl1-` (32 clean, PASS).  Not independently verified: the GPU-h figures and 302.1's provenance
+claims (inherited).
+
+| # | where (the scoring track's summary) | as written | fixed to (applied at) |
+|---|---|---|---|
+| **F1** | what_it_means, SC bullet (overreach) | "the reading does not depend on reading it on test.  SCALAR-BEATS-BEST holds on the held-out split at 16-17 SE, with an unresolved paired gap of +0.2525." | "SC is in the same registered state, SCALAR-BEATS-BEST, on both readers (TEST +2.81 / +2.98 pp, VAL +3.15 / +3.06 pp over ch / nd).  The paired VAL − TEST gap of min(T_W4) is +0.2525 pp [−0.1499, +0.6549], not resolved (a bound).  Under the primary licence, no sentence may say this ranking does or does not hold on validation; report both states and the paired interval." (312.8, 312.10) |
+| **F2** | bounds item 2 (overreach) | "So SC being the SAME says the scalar lead at ms 1e-4 / alpha0 1e-3 does not depend on which reader is used.  It says nothing about tuning." | "SC is SAME only as a per-claim stamp.  The primary token is VAL-DIFFERS-UNRESOLVED, which licenses no sentence that the ranking does or does not hold on validation.  The SC paired gap (+0.2525, not resolved) is a bound, not evidence of reader-independence.  It says nothing about tuning." (312.4 item 2) |
+| **F3** | what_it_means, Selection (overreach) | "For the 8 configurations, choosing on test did not change what was picked." | the selection licence exactly as registered, *"selecting on validation would have picked the same one, among these 8"*, plus: the VAL argmax margin is +0.0940 pp over k01W1, against +0.4295 on TEST (312.3, 312.8) |
+| **F4** | answer (a), Kendall sentence (imprecise) | "the 8-configuration ranking is 27 of 28 pairs concordant (Kendall tau 0.9286)" | DESCRIPTIVE: 27 / 28 (τ 0.9286), but 16 pairs are cross-rung and 2–5 pp apart; within rungs 11 / 12 (W1 6/6; W4 5/6, chW4 vs ndW4) (312.3) |
+| **F5** | levels table, "All 8 arms land inside their registered prediction bands" (imprecise) | as quoted | appended: the TEST bands of 303.5; chW1 91.6045 sits 0.0045 above its band's low edge 91.6; VAL was registered only as within ±0.8 pp of TEST (312.3) |
+| **F6** | completeness note (addition) | — | the VAL_SPLIT shas independently re-derived from the harness's CIFAR-10 training labels, both equal to the witness (this section) |
+
+**No RULE 16 defect.**  No refuted claim; every fix is a wording or precision fix, and none moves a number, state,
+token, stamp or licence.
+
+
+### 312.7 THE TWO QUESTIONS OF 303, ANSWERED
+
+**(a) Do the rankings the audit reports on TEST come back as the same registered states on VALIDATION?**  For the two
+partition claims, **not as the same states, and the change is not resolved**: W1 is UNDECIDED on TEST and SURVIVES on
+VAL; W4 is UNDECIDED on TEST and VANISHES on VAL (a bound); neither paired gap is resolved (W1 +0.1740, W4 −0.2580,
+each under the 0.30 bar and under 2 paired SE = 0.4024).  Under the registered licence no sentence may say the partition
+ranking does or does not hold on validation.  For SC, the state is the same on both readers (SCALAR-BEATS-BEST at 16–17
+SE each; paired gap +0.2525, not resolved) — reported with both states and the paired interval, never as "holds on
+validation" (F1).
+
+**(b) Would selecting on VALIDATION have picked the same configuration?**  **Yes, among these 8**: both readers pick
+kLW1 (TEST regret +0.0000 pp), and the same best grain per rung (layerwise at W1, scalar at W4).  The VAL margin of the
+pick is thin (+0.0940 pp over k01W1).  This is a selection over grain × decay only; ms and α0 were not re-selected.
+
+**302's finding on what the audit selected on TEST, carried into this landing unchanged:** ms 1e-4 WAS selected on
+TEST (scalar moved 1e-3 → 1e-4 by its plateau5-TEST level, FINDINGS 38.1; `tw0`'s guard 2b took 1e-4 as the TEST argmax
+for weightwise, layerwise and scalar, FINDINGS 72.4 / 73.5; nodewise's own TEST argmax is 3e-4, not 1e-4, +0.420 pp,
+CORRECTIONS 108; chunk777 had no ms curve when 1e-4 was fixed).  α0 1e-3 is not an argmax in the records read (adopted
+to remove the α0 = 1e-6 escape confound; UNSURE whether any test comparison chose it).  NOT test-selected: the
+partitions (chunk777's K fixed by count-matching, m 14,421 vs 14,420) and the plateau window (fixed a priori, PLAN.md
+B3).  wd 0.1, Lion 0.99 / 0.9, meta wd 0, γ 1, bs 100 are `train.py` defaults with no record of a test selection; base
+momentum 0.99 and the box: UNSURE, not traced.  `cvl1` re-reads rankings; it does not redo that tuning.
+
+
+### 312.8 What this licenses, and what it does not
+
+**The registered licences, verbatim, at this cell only (lines 49 and 50 of the scorer log):**
+
+> *primary:* "a reading changes state between test and validation but no paired gap is resolved: the change is not
+> distinguishable from reader noise at this seed count; report both states and the paired intervals; no sentence that
+> the ranking does or does not hold on validation."
+
+> *selection:* "the configuration (grain x decay) with the best validation plateau is the one with the best test
+> plateau: selecting on validation would have picked the same one, among these 8."
+
+Beside them: the per-claim states and paired intervals of 312.3 (W1 TEST UNDECIDED [−0.0911, +0.6091] / VAL SURVIVES
+[+0.0719, +0.7941], gap [−0.2284, +0.5764]; W4 TEST UNDECIDED [−0.1841, +0.5161] / VAL VANISHES [−0.4531, +0.2691], gap
+[−0.6604, +0.1444]; SC SCALAR-BEATS-BEST on both, gap [−0.1499, +0.6549]), the thin VAL argmax margin (+0.0940 pp),
+and the seed-fragility of the primary (drop s187 → `VAL-AGREES`).
+
+**NOT licensed**: "the audit's rankings hold on validation" or "do not hold"; "the partition sign survives / vanishes
+on validation"; "the scalar lead does not depend on the reader" or "is robust to the test set" (F1, F2); "the audit's
+tuning is validation-proof" (`MS-ALPHA0-NOT-RESELECTED`); "the partitions are equal" at W4; any pooled reading with
+`cgw1`; any other cell, dataset or decay form; any selection statement beyond these 8 configurations.
+
+
+### 312.9 THE INGEST — `cvl1`, ONCE (commit `5545d88`), with all 32 exclusion rows in the SAME commit
+
+**Corpus 3,437 → 3,469 rows; exclusion list 322 → 354 rows over 22 batches.**  Built on 308's `corpus_exclusions.py`
+(`3723a499…`, UNEDITED; 304 gave it the `VAL_SPLIT` kind).
+
+`analysis/aggregate.py` (`35c035e1…`, UNEDITED) `../runs ../runs_alice2 > results/all_runs.csv` → exit 0, 3,469 runs,
+the same 3 standing duplicate-name warnings; `analysis/args_repair.py` (`e6d8918d…`, UNEDITED) `--apply` → 36 rows
+updated (the standing `dup_group` restoration), **0 accuracy or config values changed, 0 superseded**, 3,433 untouched.
+The same two steps run first on scratch copies gave a byte-identical CSV.
+
+**ADDED 32 exactly, REMOVED 0, CHANGED 0** — re-derived with a reader of my own keyed on `(run, job_id)` against the
+pre-ingest CSV: 38 fields, names identical, **0 duplicate keys before or after, 0 of 130,606 pre-existing field-cells
+changed**; `git diff --numstat` **32 / 0**.  Every added row `epochs_done` 100 / `epochs_requested` 100 / `complete` 1 /
+`window_ok` 1 / `superseded` 0, ResNet18 / CIFAR10, ms 1e-4, α0 1e-3; jobs 5080667–5080698; chunk777 / nodewise /
+scalar / layerwise × 8, seeds 184–187 × 8.  **NO PROOF JOB**: 0 added rows named `proof` / `bite` / `cvl1proof`; 302's
+two proof logs (`runs_alice2/cvl1/proof_valsplit*.log`) are not `.out` files and enter nothing.  GPU-hours by
+`wallclock_min` **3501.9167 → 3528.2333 (+26.3167)**; 26.5836 by `sacct`.
+
+**The 32 exclusion rows** — the data rows of `results/cvl1_exclusion_rows_PROPOSED.tsv` (`9b0baa79…`) appended
+**byte for byte** in job order, 304.8's 9-column form, `registered_at` **CORRECTIONS 312**; the old file an EXACT PREFIX
+of the new; `git diff --numstat` 32 / 0; 354 distinct keys:
+* **W1, 16 one-kind rows**: intervention `VAL_SPLIT=5000:302`, witness the run's own `VAL_SPLIT: on dataset=CIFAR10
+  n_val=5000 n_train=45000 classes=10 per_class=500 split_seed=302 val_sha=7d3a1489… train_sha=2733a990…` line verbatim,
+  reason "held-out validation split: trains on 45,000 of 50,000 images; not carried by any CSV column".
+* **W4, 16 TWO-AXIS rows** (284's rule): witness `ARGS_WD_BASE: weight-decay-base=5e-4`, GENERATED by
+  `corpus_exclusions.args_deviations()` on each run's own ARGS line, never typed; intervention `--weight-decay-base 5e-4
+  + VAL_SPLIT=5000:302`; `MULTI_KIND` holds each run's VAL_SPLIT line to the registered string (304).
+* `looks_like` `ch (granularity chunk777)` / `nd (granularity nodewise)` / `k01 (granularity scalar)` / `kL (granularity
+  layerwise)`.
+
+**GATES, on the committed tree.**  `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` →
+**exit 0, `VERDICT: PASS`**: 354 rows over 22 batches, every listed key present exactly once in the 3,469-row CSV; raw
+`.out` witnesses: 354 listed runs carry their listed line; ON-line completeness **186 → 218** (the 32 `cvl1` VAL_SPLIT
+ON lines, every one listed with its kind); two-axis **3 → 19** runs (the 16 W4 rows); multi-kind 2 kinds 33, 3 kinds 12;
+**ARGS witness 139 → 155 listed runs**, each carrying its own value; 75 / 75 deviating standard-cell rows listed; 651
+cells, none mixing; multi-ARGS 6, True; decay-route 0 listed, True.  `SIGMA_R18ALL` **0.636566 (df 274), unchanged**.
+`python3 analysis/c98b_reproduce.py` (UNEDITED) → **exit 0, `science 618/618 PASS | drift 18 site(s), 10 differ (not
+gated) | guards fired 0 | declaration OK`** — 310.9's verdict byte for byte.  The registered scorer re-run post-ingest
+(312.2): identical except the path echoes.  `cvl1-` is in `bin/PROTECTED.txt` (304.9; verified, line 72).  The scoring
+track's scratch control (HEAD's module, the real CSV + 32 aggregated rows, the real TSV ± these 32 rows) had shown PASS
+with the rows and FAIL (36 FAILs: 32 unlisted ON rows, 4 cell-mixing) without them.
+
+
+### 312.10 WHAT THIS DOES TO THE PAPER
+
+**(a) Does ICML-PLAN 1.14 close?  FOR ITS RE-REPORTING HALF, AT THE AUDIT CELL; NOT FOR ITS RE-SELECTION HALF.**  Row
+1.14 asked for a 45k / 5k split, re-selection and re-reporting of the headline cells on validation.  `cvl1` re-reports
+the ONE cell the TMLR paper's headline rests on (`cgw1`'s, at 0.1 and 5e-4) on a held-out split and re-selects over
+the 8 grain × decay configurations: the partition claims read `VAL-DIFFERS-UNRESOLVED` (no sentence either way) and
+the selection reads `SELECT-SAME`.  It does NOT re-select ms or α0 on validation (`MS-ALPHA0-NOT-RESELECTED`); the
+C1-era headline cells 1.1, 1.3–1.4, 1.7, 1.9 are stopped with C1 (297) and not re-read.  **So B10's question — "is
+anything here an artefact of reading and choosing on the test set?" — is answered for the READING and for the
+grain / decay CHOICE at this cell, and stays OPEN for the TUNING** (ms is the one core-cell hyperparameter known to be
+test-selected).  1.14 is re-tagged **PARTIAL — LANDED (312)**, not DONE.  No new batch is registered here; a validation
+ms ladder would be its own registration (UNSURE whether a referee will ask; the pressure is that 302.1 is on file).
+
+**(b) What the test-set selection finding (302.1) means for every headline number of the ONE TMLR paper**, read with
+`cvl1`:
+1. **The count-matched sign at α-scaled 0.1** (20 / 20 positive cells; SGDm-8 pool +0.5556 ± 0.0448 pp, 211.2).  Every
+   one of these is a TEST reading at ms 1e-4, a value selected on TEST for the scalar / weightwise / layerwise arms and
+   NOT nodewise's own TEST argmax.  The partitions themselves and the window were not test-selected (302.1).  On the
+   ms side, the record already has one check that runs AGAINST the test-selection worry: at nodewise's preferred ms
+   3e-4 the count-matched D is larger, +0.697 pp (t 5.90, n 3v3; `ar1`, 109.2) — itself a TEST reading, at a step size
+   where the box binds on ~46 % of records (109.5).  `cvl1` adds, at the one in-batch cell: VAL D_W1 SURVIVES, in-batch
+   TEST D_W1 UNDECIDED, gap unresolved.  **The draft must state that every audit number is read on the test set with ms
+   chosen on it (302.1), may cite `ar1`'s 3e-4 reading as a TEST-read robustness check, and may report `cvl1`'s two
+   W1 states with their paired interval; it may NOT say the sign holds (or fails) on validation.**
+2. **`cgw1`'s in-batch replicate** (W1 +0.3693 SURVIVES, W2 +0.4533): TEST readings at 50,000 training images.  `cvl1`'s
+   45,000-image in-batch TEST D_W1 is UNDECIDED (+0.2590) — a non-gating cross-batch stamp (`TEST-STATE-DIFFERS-FROM-
+   CGW1-W1`), a caution on how firm the W1 in-batch replicate is, not a refutation (never pooled).
+3. **The 5e-4 interval** (`cgw1` D_W4 +0.2410, [−0.0120, +0.4940], no survive / vanish sentence, 296.8): unchanged.
+   `cvl1` reads W4 UNDECIDED on TEST and VANISHES (a bound) on VAL, gap unresolved; both states may be reported beside
+   the interval, and still no survive / vanish sentence.
+4. **The scalar row** (310.10 (a) as narrowed by 311 A3 / A4: "untuned +2.6–2.8 pp, at least in part a tuning
+   artefact; after re-tuning, a tie (a bound)").  `cvl1`'s SC is SCALAR-BEATS-BEST on both readers at ms 1e-4 / α0 1e-3,
+   i.e. `crt1`'s UNTUNED M2 configuration (311 A5), with an unresolved paired gap.  It neither strengthens nor weakens
+   309's rewrite: the row stays "ties (a bound) after re-tuning", and the untuned +2.6–2.8 pp may carry beside it that
+   its registered state is the same on a held-out split, with the paired interval and no "holds on validation"
+   sentence (F1, F2).  `crt1`'s own selection was on TRAIN (309.4 item 5), not on test, so the tie is not a
+   test-selection artefact; its grid-edge bound (α0 above 1e-2, `crt2` at 313) is untouched.
+5. **The selection statement** (new): the draft may say, at this cell, *"selecting on validation would have picked the
+   same one, among these 8"* — the licence verbatim — with the thin VAL margin beside it.
+6. **The denominator** (MetaOptimize vs a tuned non-meta baseline: `cdn1` GAP_in +5.699 pp on CIFAR-100, `cau1` +3.6173
+   pp on CIFAR-10, MASTER-TABLE header).  `cvl1` does not touch it.  Its best baseline rung is itself a TEST argmax
+   over an lr ladder, but EVERY rung of the `cdn1` ladder beats the meta cell (smallest margin +3.480 pp), so that
+   selection is not what carries the sign; the magnitude is a best-of-ladder TEST number and is stated as such.
+7. **The collapse section** (CIFAR-100, 23 vs 69 pp gaps; 285.8 / 295.8 / 310.8): `cvl1` does not touch it; its gaps are
+   tens of SE and not a selection question.
+
+**(c) Owed to the draft (NOT edited here; `paper/` untouched):** a threats sentence that every audit number is a TEST
+reading with ms selected on test (302.1), `MS-ALPHA0-NOT-RESELECTED` beside it; the `cvl1` states and paired intervals
+at the audit cell (no "holds on validation" sentence); the selection licence verbatim.  **Venue: TMLR, unchanged**;
+the 0.6–0.7 stays an un-argued JUDGEMENT, UNSURE (311 A3), not re-estimated here.  The one referee point this batch
+could have closed outright (`VAL-AGREES`) was not reached, and the one that could have hurt (`VAL-FLIPS` /
+`SELECT-DIFFERS-RESOLVED`) was not reached either.
+
+**(d) Applied to the documents:** `docs/ICML-PLAN.md` (a 312 amendment at the top; row 1.14 and §4a's off-queue 1.14
+status); `docs/STATUS.md` (a CYCLE 164 table); `docs/MASTER-TABLE.md` row **243** (`cvl1`) appended at the end in row
+241's form, header counts amended in place (3,469 runs / 3528.2 GPU-h; tally 179 → 180), old figures bracketed; `c73`
+exit 0.
+
+
+### 312.11 Discipline, files, cost
+
+RULE 16 held: no registered scorer, design, launcher, guard, `aggregate.py`, `args_repair.py` or `corpus_exclusions.py`
+edited.  RULE 20 at full coverage before any number was read (plus the by-hand audit owed at 303.10).  `plateau5` from
+RAW `.out`; the CSV `plateau` column read by nothing.  Floor readings are bounds; descriptive readings labelled; both
+licences quoted verbatim, at this cell only.  Files of this landing: committed at `f69b491` by the scoring track
+(`analysis/cvl1_attack_indep.py`, `results/cvl1_argsguard_byhand.txt`, `results/cvl1_rule20_full_land.txt`,
+`results/cvl1_valsplit_score_alice2.txt`, `results/cvl1_valsplit_score_mac.txt`, `results/cvl1_attack_indep_alice2.txt`,
+`results/cvl1_attack_indep_mac.txt`, `results/cvl1_runfiles_sha256.txt`, `results/cvl1_exclusion_rows_PROPOSED.tsv`);
+ingest commit `5545d88` (`results/all_runs.csv`, `results/CORPUS-EXCLUSIONS.tsv`); this entry writes
+`docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md` (row 243), `docs/ICML-PLAN.md`, `docs/STATUS.md`.  The `alice2` stage
+`~/stage_cvl1_land` (`git archive 14e63ba`, 147M) is KEPT: this entry cites it for re-runs of RULE 20 and the scorer.
+**Cost: ZERO GPU-hours this cycle** (the batch itself: 26.5836 GPU-h by `sacct`).  `alice` NOT contacted; nothing under
+`paper/` read, listed or touched; no clone, checkout or worktree of the campaign repo; nothing downloaded; no running
+batch (`g3b`, `cai1`, `crd1`) touched.
+
+*(312 written in place over its RESERVED stub; 313 stays RESERVED for its own track.)*
 
 ## 313. TRACK B — **`crt2` REGISTERED, NOT SUBMITTED: THE RETUNE PAST `crt1`'s GRID EDGE.  AFTER TUNING EACH GRAIN UNTIL ITS OPTIMUM IS LOCATED, DOES PLAIN SCALAR TIE, BEAT, OR FALL BELOW THE BETTER COUNT-MATCHED PARTITION AT `crt1`'s CELL (ResNet18 / CIFAR-10 / SGDm 0.99 + Lion, α-scaled wd 5e-4)?  {chunk777, nodewise, scalar} × A FIVE-POINT PLUS GRID CENTRED ON (ms 1e-4, α0 3e-2) — A2 1e-4/1e-2 (`crt1`'s selection, REPLICATED), A3 1e-4/3e-2, A4 1e-4/1e-1, H3 3e-4/3e-2, L3 3e-5/3e-2 — × SEEDS {200, 201, 202}; 15 ARMS, 45 JOBS, 40.25 GPU-h EXPECTED, 90 HARD BOUND.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **ONE CELL, ONE DECAY** (`crt1`'s; α-scaled 5e-4 only).  (2) **A FIVE-POINT GRID INSIDE THE HARNESS's FIXED BOX.**  "Located" means located on this plus: only the centre A3 is interior on both axes; A2 counts as located on α0 only because `crt1`'s landed IN-BATCH A2 − M2 contrast brackets it from below (a literal, cross-batch); the ms axis is crossed at α0 3e-2 only.  (3) **THE CEILING −2.3026 (a ≤ 0.1) IS NOT AN AXIS** (313.4), and the upper α0 point A4 STARTS on it, so an A4 selection is NOT LOCATED by construction.  (4) **σ IS FROZEN** at `crt1`'s in-batch 0.249842 (df 24); every threshold is a registered constant; the in-batch σ is a validity gate only (313.7).  (5) **B = 0.1678 pp is an EXPECTED-bias bound over five configs**, not a high-probability bound.  (6) **NO VALIDATION SPLIT**: selection on TRAIN, the oracle on TEST (`cvl1`, 303, is the batch for 1.14).  (7) **EVERY ARM IS UNDER-DECAYED AGAINST A STANDARD SGD RECIPE** (296.4 binds; the ceiling a = 0.1 is itself 10× below a standard recipe's effective step, 313.4).  (8) **A TIE IS A BOUND** (164.6), and at three seeds the UNRESOLVED band is ±0.2757 pp around zero, so an exact tie reads UNRESOLVED, not "ties".  All are stamped on every FINAL.]**
 
@@ -42180,6 +42549,11 @@ catch.
   **Guard 6: 45 composed lines, 0 failing** the RULE 20 / design-line / ms / α0 / wd / constraint pre-checks; with run
   name, seed, ms, α0 and grain masked the 45 lines collapse to **ONE**; 45 distinct run names.  **Non-vacuity:** the
   design-line check rejects the chA3 s201 line with `--alpha0 1e-2` (REJECTED) and accepts the true one (MATCH).
+* **Second dry run, from the PUSHED registration commit** (`git archive 986e165 -- analysis bin results` → `~/stage_crt2_dry1`,
+  with `CRT2_REGISTERED_COMMIT=986e165e…` and `CRT2_SCORER_SHA256=47009634…` declared; log `~/stage_crt2_dry1.log`, 276
+  lines, `42320a6e…`): **rc 0, 0 guard failures**; guard 1b ACCEPTS the declared commit and the staged scorer's sha
+  (the pushed file's sha256 is `47009634…`, checked with `git show`); selftest 104 / 0 / 0; guard 6 45 lines, 0 failed;
+  53 jobs pending at the time.  Both stage directories were then deleted; the two logs are kept.
 * **RULE 20 script** `bin/cRT2_rule20.sh` runs from the stage (0 / 45 present → `UNVERIFIED`, as it must before launch);
   it pins every run to its OWN config's ms and α0, its OWN grain and wd 5e-4 via `analysis/argsline_guard.py`
   (`81cea8b5…`, UNEDITED), and the ENV half `analysis/crt2_rule20_envaudit.py` re-types every literal.  RULE 20 at full
