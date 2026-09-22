@@ -352,3 +352,38 @@ has a decay-value threshold.
 **Still looks new (nothing found pre-empts it):** a weight-decay VALUE threshold for a **meta-learned shared-step-size
 collapse**, and the **scalar-vs-layerwise granularity gap measured as a function of the coupled decay** — the curve
 `cwd5` exists to produce.
+
+---
+
+## Sweep 2026-09-22 — SHORT-HORIZON BIAS as a rival account of the scalar collapse (CORRECTIONS 301, batch `csh1`)
+
+*Targeted sweep before registering the short-horizon γ control (ICML-PLAN row 1.20, threat T-C). Web search and
+search-result summaries / abstract pages only; no `.pdf` fetched, nothing downloaded. Queries:
+(1) "short-horizon bias meta-learned learning rate hypergradient horizon truncation collapse step size";
+(2) "hypergradient descent trace decay factor gamma forgetting IDBD step-size adaptation weight decay interaction";
+(3) "MetaOptimize Sharifnassab Salehkaleybar Sutton gamma trace decay step-size optimization";
+(4) "\"MetaOptimize\" discount factor gamma ablation step size collapse weight decay";
+(5) "truncated backpropagation bias online learning rate adaptation weight decay shortens effective horizon meta-gradient".*
+
+**1. The rival mechanism is owned, and its DIRECTION matches the collapse.** Wu, Ren, Liao, Grosse, *Understanding
+Short-Horizon Bias in Stochastic Meta-Optimization* (arXiv:1803.02021, ICLR 2018): meta-objectives defined over
+horizons orders of magnitude shorter than training bias stochastic learning-rate meta-optimisation toward SMALL step
+sizes (analysed on a noisy quadratic). A collapsed scalar step at the −15 floor is the extreme of that direction, so the
+account cannot be dismissed on sign alone. Nothing in it concerns α-scaled weight decay acting as the horizon, a shared
+vs per-layer step size, or a matched-horizon control.
+
+**2. Adjacent, not pre-emptive.** Truncated-backprop bias in meta-gradients (e.g. *An Investigation of the Bias-Variance
+Tradeoff in Meta-Gradients*, arXiv:2209.11303; adaptive truncation, arXiv:1905.07473) establishes that short truncations
+bias the outer gradient — the general fact, not our configuration. FADE (*Learning to Forget: Continual Learning with
+Adaptive Weight Decay*, arXiv:2604.27063) meta-learns a per-parameter decay alongside IDBD step sizes; it does not test
+whether a decay's shortening of the step-size trace, as opposed to its shrinking of the weights, harms the step size.
+The parent (arXiv:2402.02342) defines its regret through a discounted sum of future losses (the harness's `--gamma`);
+nothing found in its abstract or summaries runs a γ < 1 control against a decay-induced collapse.
+
+**3. Internal prior art, on file.** The only γ < 1 runs in the corpus are `d3_g999_s0/s1` (CIFAR-10 ResNet18,
+weightwise, γ 0.999, no β clip, collapsed to 10.0 %); CORRECTIONS §5 recorded that this control "failed identically"
+to γ 1, refuting a trace-overflow cause. Different grain, dataset and clip; it does not decide the scalar question.
+
+**Verdict.** The general bias is known and must be cited; whether shortening the horizon WITHOUT the decay dose
+reproduces THIS collapse, at a horizon matched to the collapsing arm's own realised (1 − κα), is not answered anywhere
+found. The batch is kept at its planned size plus one bracket cell (18 runs), not shrunk.
