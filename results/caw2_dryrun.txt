@@ -1,0 +1,188 @@
+partitions: gpu-short,gpu-l4-24g  -- chosen because --time=03:00:00 (10800s) <= gpu-short MaxTime (14400s, sinfo(live)): gpu-short ADDED -- its own QOS (qos-short-gpu, 12 GPU/user as read 2026-09-08) is an independent pool and its node set is a superset of gpu-l4-24g
+==============================================================
+ caw2 -- THE STANDARD-RECIPE GATE, EACH CONFOUND IN ITS OWN CELL (successor of the WITHDRAWN caw1)
+ CIFAR100 / ResNet18_c100   AUGMENT=1  PROBE=100  PROBE_TENSOR=1  clamp -15:-2.3026   ms=1e-3 alpha0=1e-6  100 epochs; seeds 160 161 162
+   K01      SGDm(0.99)+Lion   wd 0.1  scalar       (positive control)
+   MS | ML  SGDm(0.99)+Adam   wd 0.1  both grains  (META swap alone)
+   LS | LL  AdamW+Lion        wd 0.1  both grains  (BASE swap alone)
+   AS | AL  AdamW+Adam        wd 0.1  both grains  (the STANDARD RECIPE)
+   XS | XL  AdamW+Adam        wd 1.0  both grains  (the DOSE arm)
+ 9 arms x 3 seeds = 27 jobs, ONE submission; mode: DRY-RUN
+ harness tree /home/s5014158/metaopt/harness_cwd1/cifar10 (cwd1's, UNCHANGED)   runner /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh (cwd1's, UNCHANGED)   partitions gpu-short,gpu-l4-24g   constraint L4   walltime 03:00:00
+ DOCUMENTED INVOCATION: python3 analysis/cAW2_confound_score.py <runsdir>
+==============================================================
+guard 0b: VOTE_W, BETA_HOLD, GROUP_HOLD, REST_HOLD and DECAY_MASK are UNSET in the launcher's environment
+guard 0: CSV present (3317 lines, sha d07266bdb8e257792923ba9dad4427374370b6f3a529b43c3a7e6ee581d95046)
+guard 1a: present  bdeb132189a2e907  /home/s5014158/stage_caw2/analysis/cAW2_confound_score.py
+guard 1a: present  a219661f1e3ef140  /home/s5014158/stage_caw2/analysis/caw2_design.py
+guard 1a: present  03d2d76149157577  /home/s5014158/stage_caw2/analysis/cwd_design.py
+guard 1a: present  d7ddb49e71013e3a  /home/s5014158/stage_caw2/analysis/cwd_common.py
+guard 1a: present  bec52f87ec1781fa  /home/s5014158/stage_caw2/bin/cAW2_stdrecipe.sh
+guard 1a: present  07087366f3d85b99  /home/s5014158/stage_caw2/bin/cAW2_rule20.sh
+guard 1a: present  2c873dc1aa4280e1  /home/s5014158/stage_caw2/analysis/caw2_rule20_envaudit.py
+guard 1a: present  ce97f48fca83094f  /home/s5014158/stage_caw2/analysis/corpus_exclusions.py
+guard 1a: present  4e6d938745fade2e  /home/s5014158/stage_caw2/results/CORPUS-EXCLUSIONS.tsv
+guard 1a: present  5508fe340cf3b6c0  /home/s5014158/stage_caw2/bin/cAW2_realrun_proof.sbatch
+guard 1a: present  78cae066f329b81d  /home/s5014158/stage_caw2/tests/test_caw2_realrun.py
+guard 1a: present  72bcb3e17ab7a8df  /home/s5014158/stage_caw2/tests/test_caw1_realrun.py
+guard 1a: present  690218007b52243a  /home/s5014158/stage_caw2/tests/test_grouphold_realrun.py
+guard 1a: present  529be65221ed7fdc  /home/s5014158/stage_caw2/bin/cWD_stage_harness.sh
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/stage_caw2/jobs/run_cifar_cwd1.sh
+guard 1a: present  c45e1b73fb5bd38d  /home/s5014158/stage_caw2/bin/_lib_guards.sh
+guard 1a: present  81cea8b586e124a6  /home/s5014158/stage_caw2/analysis/argsline_guard.py
+guard 1a: present  d07266bdb8e25779  /home/s5014158/stage_caw2/results/all_runs.csv
+guard 1a: present  34a8c90ee3a0bee0  /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh
+guard 1a: present  94aedc33046afb12  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+guard 1a: present  c79988833c4399a0  /home/s5014158/metaopt/harness_cwd1/cifar10/build_network.py
+guard 1b: no git repo on this host; the operator declares the staged tree is commit 1dcca097ed0dbe91c76c739b45f1a8bac283ad9d (40 hex, 271.6 F1)
+guard 1b2: the archived jobs/run_cifar_cwd1.sh == $WS/jobs/run_cifar_cwd1.sh == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's runner, UNCHANGED)
+guard 1b3: the REUSED cwd_design.py / cwd_common.py / test_caw1_realrun.py and the WITHDRAWN caw1's design + scorer are their registered bytes (RULE 16)
+guard 1c: scorer --selftest PASSES (107 PASS, 0 FAIL, 0 SKIP)
+guard 1c1: no SKIP (real records and the corpus were found on this host)
+guard 1c2: the O2 invariance proof RAN against THIS host's real corpus plus invented rows, and passed
+guard 1c3: the DOCUMENTED one-argument invocation reached FINAL on synthetic runs; a dropped run -> INCOMPLETE
+guard 1c4: the scorer's own fresh-seed / fresh-prefix checks ran and passed
+guard 1c5: DOM_C and the DOSE were calibrated on landed cwd5 records (the verifier's peak shrinks reproduced)
+guard 1c6: the frozen floor IS the corpus_exclusions.filter_rows value on the CURRENT corpus, not the naive one
+guard 1c7: K01 == landed cwd5 k01W1; AS / MS / LS == the landed CIFAR-10 cells' optimiser flags; caw1 unedited
+guard 1c: scorer sha256 bdeb132189a2e907dfe9d9908e6fa2a0cc4f4fb0b1b6d9d0d6ecd8965675bfab
+guard 2: no caw2-* row in the corpus
+guard 2b: no caw2-*.out on disk
+guard 2b1: no caw1-*.out on disk (caw1 was WITHDRAWN BEFORE LAUNCH)
+guard 2d: ZERO .out ARGS lines under /home/s5014158/metaopt/runs carry a seed of the block 160..165
+guard 2c: 0 existing .out ARGS lines already carry --weight-decay-base 1.0 (DISCLOSURE: the X cell is new)
+guard 2e: sacct all-time: 0 caw1-* / caw2-* jobs
+guard 2f: 0 caw2-* in squeue
+guard 4a1: cWD_stage_harness.sh cwd1 (verify mode) VERIFIES cwd1's tree, which caw2 uses UNCHANGED:
+          V-a: 12 files byte-identical to cvt8's tree (Optimizers/HF.py excepted)
+          V-a2: no file in the cwd1 tree beyond cvt8's except HF.py.pre_decaymask
+          V-h: HF.py.pre_decaymask == cvt8's HF.py == pinned 5197dc2eecbbcb6feb815f3798b3455171e6ad614deac913be5df48dd9ede1a9
+          V-h2: cwd1 HF.py sha == pinned post 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf
+          V-h3: cvt8's HF.py untouched
+          V-h4: neither the LIVE HF.py nor any cvt1/4/6/7/8/9 tree's HF.py carries a PATCH_DECAYMASK / DECAY_MASK marker
+          V-h6: the LIVE HF.py is still 4732b74aa3a10508896e92eccced5c89051c353fa8a01a3af21aab9aeda0cecd (untouched)
+          V-d: /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh differs from run_cifar.sh in EXACTLY one line: cd /home/s5014158/metaopt/MetaOptimize/codes/Supervised_tasks/MetaOptimize/cifar10 -> cd /home/s5014158/metaopt/harness_cwd1/cifar10 (sha 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371)
+          V-f: tests/test_decaymask.py D0 (deleting the three regions == cvt8's HF.py, byte for byte) passes (13 PASS)
+          cWD_stage_harness cwd1: VERIFIED
+guard 3: cifar-100-python visible under /home/s5014158/metaopt/harness_cwd1/cifar10/data
+guard 3b: build_network.py == cvt8's (c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d)
+guard 3c: HF.py == 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf (cwd1's)
+guard 3e: runner == 34a8c90ee3a0bee00aa2d0b4a3ad5d16d461fbf5a1f0cda5797e44e44c158371 (cwd1's run_cifar_cwd1.sh)
+guard 3f: train.py declares every base / meta flag the arms use (EXISTING registered CLI flags; no new code)
+guard 4f: caw2's harness-null proof ALL PASS on THIS tree, THIS design, THIS driver: 107 PASS / 0 FAIL (sha b346f4e3)
+          RC1/RC2 every arm's base and meta BITWISE at its passed wd (9+9), the SGDm fallback excluded on the 6 AdamW
+          arms, RC4 the nine witnesses MEASURED, RC5 the vote decomposition on all five scalar arms, RC6-RC8
+guard 4c': ARMS, SEEDS, NET, NTENS, TOTPAR, the cell, NJOBS, WALL, the GPU constraint and the tree / runner shas
+           agree in launcher / design / cwd1's stage block
+           K01  SGDm +Lion scalar    wd 0.1  -> 20 flags
+           MS   SGDm +Adam scalar    wd 0.1  -> 20 flags
+           ML   SGDm +Adam layerwise wd 0.1  -> 20 flags
+           LS   AdamW+Lion scalar    wd 0.1  -> 21 flags
+           LL   AdamW+Lion layerwise wd 0.1  -> 21 flags
+           AS   AdamW+Adam scalar    wd 0.1  -> 21 flags
+           AL   AdamW+Adam layerwise wd 0.1  -> 21 flags
+           XS   AdamW+Adam scalar    wd 1.0  -> 21 flags
+           XL   AdamW+Adam layerwise wd 1.0  -> 21 flags
+guard 4: live ResNet18_c100 from cwd1's tree -- 62 tensors, 11220132 parameters
+guard 4: K01  SGDm +Lion wd 0.1  scalar    base_update=SGDm_base_update meta_update=Lion_meta_update n_beta=1 witness `PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` -> as registered
+guard 4: MS   SGDm +Adam wd 0.1  scalar    base_update=SGDm_base_update meta_update=Adam_meta_update n_beta=1 witness `PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4: ML   SGDm +Adam wd 0.1  layerwise base_update=SGDm_base_update meta_update=Adam_meta_update n_beta=62 witness `PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4: LS   AdamW+Lion wd 0.1  scalar    base_update=AdamW_base_update meta_update=Lion_meta_update n_beta=1 witness `PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` -> as registered
+guard 4: LL   AdamW+Lion wd 0.1  layerwise base_update=AdamW_base_update meta_update=Lion_meta_update n_beta=62 witness `PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9` -> as registered
+guard 4: AS   AdamW+Adam wd 0.1  scalar    base_update=AdamW_base_update meta_update=Adam_meta_update n_beta=1 witness `PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4: AL   AdamW+Adam wd 0.1  layerwise base_update=AdamW_base_update meta_update=Adam_meta_update n_beta=62 witness `PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4: XS   AdamW+Adam wd 1.0  scalar    base_update=AdamW_base_update meta_update=Adam_meta_update n_beta=1 witness `PROBE_TENSOR: on every=100 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4: XL   AdamW+Adam wd 1.0  layerwise base_update=AdamW_base_update meta_update=Adam_meta_update n_beta=62 witness `PROBE_TENSOR: on every=100 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9` -> as registered
+guard 4d: the LIVE manifest (live model, live optimisers, live PROBE_TENSOR witnesses) is BYTE-IDENTICAL to caw2_design.manifest_text() (8883 bytes)
+guard 4b3: manifest (8883 bytes, sha ef05473ef5b388b2...) -> /home/s5014158/metaopt/runs/caw2/PARTITION-MANIFEST.txt and /home/s5014158/metaopt/runs/caw2-PARTITION-MANIFEST.txt
+guard 4g: provenance written to /home/s5014158/metaopt/runs/caw2/PROVENANCE.dryrun.txt
+guard_parts_for_wall: PASS -- PARTS=gpu-short,gpu-l4-24g is consistent with --time=03:00:00 (10800s vs gpu-short cap 14400s, sinfo(live))
+guard 5b: partitions gpu-short,gpu-l4-24g all carry L4 nodes; --constraint=L4
+guard 5: 1992 GB free on $WS; 0 jobs pending, adding 27
+guard 8: with NO --manifest, `cAW2_confound_score.py <runsdir>` resolves the manifest to /home/s5014158/metaopt/runs/caw2/PARTITION-MANIFEST.txt (<runsdir>/caw2/)
+guard 9: the runner cd's into /home/s5014158/metaopt/harness_cwd1/cifar10 -- the SAME tree guards 3/4 tested
+sbatch --job-name=caw2-K01-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-K01-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-K01-s160
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-MS-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-MS-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-MS-s160
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-ML-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-ML-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-ML-s160
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LS-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LS-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LS-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LL-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LL-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LL-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AS-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AS-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AS-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AL-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AL-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AL-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XS-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XS-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XS-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XL-s160 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XL-s160 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 160 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XL-s160
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-K01-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-K01-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-K01-s161
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-MS-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-MS-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-MS-s161
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-ML-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-ML-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-ML-s161
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LS-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LS-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LS-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LL-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LL-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LL-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AS-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AS-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AS-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AL-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AL-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AL-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XS-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XS-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XS-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XL-s161 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XL-s161 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 161 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XL-s161
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-K01-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-K01-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-K01-s162
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-MS-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-MS-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-MS-s162
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-ML-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-ML-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base SGDm --momentum-param-base 0.99 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-ML-s162
+    (20 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LS-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LS-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LS-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-LL-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-LL-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Lion --momentum-param-meta 0.99 --Lion-beta2-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-LL-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AS-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AS-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AS-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-AL-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-AL-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 0.1 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-AL-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XS-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XS-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups scalar --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XS-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+sbatch --job-name=caw2-XL-s162 --partition=gpu-short,gpu-l4-24g --constraint=L4 --gres=gpu:1 --cpus-per-task=6 --mem=16G --time=03:00:00 --export=ALL,AUGMENT=1,BETA_CLIP=-15:-2.3026,HIER=none,SCHED=none,PROBE=100,PROBE_TENSOR=1,PROBE_DIR=/home/s5014158/metaopt/runs/caw2/probe_caw2-XL-s162 /home/s5014158/metaopt/jobs/run_cifar_cwd1.sh --optimizer HF --alg-base AdamW --normalizer-param-base 0.999 --momentum-param-base 0.9 --weight-decay-base 1.0 --alg-meta Adam --normalizer-param-meta 0.999 --momentum-param-meta 0.9 --weight-decay-meta 0 --dataset CIFAR100 --NN-name ResNet18_c100 --batch-size 100 --max-time 999:00:00 --gamma 1 --meta-stepsize 1e-3 --alpha0 1e-6 --num-epochs 100 --stepsize-groups layerwise --seed 162 --save-directory /home/s5014158/metaopt/runs/caw2 --run-name caw2-XL-s162
+    (21 flags, every one pinned by the RULE 20 pre-check)
+
+guard 6: 27 composed command lines, 0 failed the RULE 20 / flag-count / hold / constraint pre-check
+---- 27 jobs (DRY RUN, NOTHING SUBMITTED); 0 rejected ----
+
+NOTHING WAS SUBMITTED.  The submitting form is:  bash bin/cAW2_stdrecipe.sh --submit

@@ -1,0 +1,161 @@
+NODE=node880 | JOB=caw2proof 5079238 | BATCH=caw2
+NVIDIA L4, 23034 MiB
+78cae066f329b81d199e1edd93a7c23c07e6388330400947909d722b3febb94a  tests/test_caw2_realrun.py
+72bcb3e17ab7a8dfd41e2057671d237c46e1c3f5c4a5b09e0cbdac9959483f5a  tests/test_caw1_realrun.py
+690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722  tests/test_grouphold_realrun.py
+a219661f1e3ef140e2fa47fdf4aeae0d1aff1962748cf2489f6efffe2348b378  analysis/caw2_design.py
+03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195  analysis/cwd_design.py
+94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf  /home/s5014158/metaopt/harness_cwd1/cifar10/Optimizers/HF.py
+c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d  /home/s5014158/metaopt/harness_cwd1/cifar10/build_network.py
+3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7  /home/s5014158/metaopt/harness_cwd1/cifar10/train.py
+BATCH caw2
+DRIVER_SHA256 78cae066f329b81d199e1edd93a7c23c07e6388330400947909d722b3febb94a
+REUSED_CHILD_SHA256 72bcb3e17ab7a8dfd41e2057671d237c46e1c3f5c4a5b09e0cbdac9959483f5a
+DESIGN_SHA256 a219661f1e3ef140e2fa47fdf4aeae0d1aff1962748cf2489f6efffe2348b378
+CWD_DESIGN_SHA256 03d2d7614915757798699ff75ca971a11fca2056d383649fecbbf5adf06c0195
+REGISTERED_TEST_SHA256 690218007b52243a77751f14dd6b2561f609e4b81832f2cf09161db777313722
+TREE /home/s5014158/metaopt/harness_cwd1/cifar10 HF 94aedc33046afb12782ffb7f2eb729bafc7fcba5f42227fec373fa67b6f58ebf build_network c79988833c4399a06cc84d15c0830f54d86f59feeec345f47a2287c1cf2ba77d train 3fea309e172609c1ee1be143d5f1847404426df31869a63c4cefbb1ebddfcab7
+ARMS K01=SGDm+Lion/scalar/0.1,MS=SGDm+Adam/scalar/0.1,ML=SGDm+Adam/layerwise/0.1,LS=AdamW+Lion/scalar/0.1,LL=AdamW+Lion/layerwise/0.1,AS=AdamW+Adam/scalar/0.1,AL=AdamW+Adam/layerwise/0.1,XS=AdamW+Adam/scalar/1.0,XL=AdamW+Adam/layerwise/1.0
+  PASS the reused child tests/test_caw1_realrun.py is caw1's registered file, UNEDITED
+  PASS the tree's HF.py is cwd1's, UNCHANGED (94aedc33...)
+  PASS the tree's build_network.py is cvt8's (c7998883...)
+  PASS analysis/cwd_design.py is the registered file, UNEDITED (RULE 16)
+
+steps 300, PROBE every 10, PROBE_TENSOR=1, seed 160, AUGMENT=1, BETA_CLIP -15:-2.3026, HIER=none, net ResNet18_c100
+
+RC1-RC4 EACH ARM'S OWN ARGS, THROUGH train.py's parse_args, ON THE REAL GPU PATH
+  ran arm_K01        K01  alpha0=1e-6  base=SGDm meta=Lion wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18560, 18560, 0, 0], "sgdm": [0, 0, 0, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18560, "tensor_steps": 18600}  weights 5553c08e3ca6...
+  PASS RC1 K01 the optimiser's own args carry base SGDm, meta Lion and wd 0.1
+  PASS RC1 K01 SGDm base: w', h', m' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 K01 NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18560, 18560, 0, 0]
+  PASS RC2 K01 Lion meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 K01 NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 K01 grain: stepsize_type=scalar with 1 step size(s)   scalar / 1
+  PASS RC4 K01 printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 K01 printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_K01/probe
+  PASS RC4 K01 wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 K01 decay term changed the float32 weight update at 18560 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_MS         MS   alpha0=1e-6  base=SGDm meta=Adam wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18560, 18560, 0, 0], "sgdm": [0, 0, 0, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18560, "tensor_steps": 18600}  weights 48d46a5bad7d...
+  PASS RC1 MS the optimiser's own args carry base SGDm, meta Adam and wd 0.1
+  PASS RC1 MS SGDm base: w', h', m' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 MS NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18560, 18560, 0, 0]
+  PASS RC2 MS Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 MS NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 MS grain: stepsize_type=scalar with 1 step size(s)   scalar / 1
+  PASS RC4 MS printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 MS printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_MS/probe
+  PASS RC4 MS wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 MS decay term changed the float32 weight update at 18560 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_ML         ML   alpha0=1e-6  base=SGDm meta=Adam wd=0.1 type=layerwise n_beta=62  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18560, 18560, 0, 0], "sgdm": [0, 0, 0, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18560, "tensor_steps": 18600}  weights 899a905a12f4...
+  PASS RC1 ML the optimiser's own args carry base SGDm, meta Adam and wd 0.1
+  PASS RC1 ML SGDm base: w', h', m' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 ML NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18560, 18560, 0, 0]
+  PASS RC2 ML Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 ML NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 ML grain: stepsize_type=layerwise with 62 step size(s)   layerwise / 62
+  PASS RC4 ML printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 ML printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_ML/probe
+  PASS RC4 ML wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 ML decay term changed the float32 weight update at 18560 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_LS         LS   alpha0=1e-6  base=AdamW meta=Lion wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights a7ffb736f4b1...
+  PASS RC1 LS the optimiser's own args carry base AdamW, meta Lion and wd 0.1
+  PASS RC1 LS AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 LS NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 LS the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 LS THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 LS Lion meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 LS NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 LS grain: stepsize_type=scalar with 1 step size(s)   scalar / 1
+  PASS RC4 LS printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 LS printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_LS/probe
+  PASS RC4 LS wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 LS decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_LL         LL   alpha0=1e-6  base=AdamW meta=Lion wd=0.1 type=layerwise n_beta=62  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 6eaff8849fd6...
+  PASS RC1 LL the optimiser's own args carry base AdamW, meta Lion and wd 0.1
+  PASS RC1 LL AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 LL NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 LL the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 LL THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 LL Lion meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 LL NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 LL grain: stepsize_type=layerwise with 62 step size(s)   layerwise / 62
+  PASS RC4 LL printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 LL printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Lion momentum_param=0.99 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_LL/probe
+  PASS RC4 LL wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 LL decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_AS         AS   alpha0=1e-6  base=AdamW meta=Adam wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 8f74e92b2dc2...
+  PASS RC1 AS the optimiser's own args carry base AdamW, meta Adam and wd 0.1
+  PASS RC1 AS AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 AS NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 AS the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 AS THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 AS Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 AS NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 AS grain: stepsize_type=scalar with 1 step size(s)   scalar / 1
+  PASS RC4 AS printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 AS printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_AS/probe
+  PASS RC4 AS wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 AS decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_AL         AL   alpha0=1e-6  base=AdamW meta=Adam wd=0.1 type=layerwise n_beta=62  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 62b98b4d967d...
+  PASS RC1 AL the optimiser's own args carry base AdamW, meta Adam and wd 0.1
+  PASS RC1 AL AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 0.1 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 AL NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 AL the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 AL THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 AL Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 AL NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 AL grain: stepsize_type=layerwise with 62 step size(s)   layerwise / 62
+  PASS RC4 AL printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 AL printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_AL/probe
+  PASS RC4 AL wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 AL decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 0.1)
+  ran arm_XS         XS   alpha0=1e-6  base=AdamW meta=Adam wd=1.0 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 52f0cba560a8...
+  PASS RC1 XS the optimiser's own args carry base AdamW, meta Adam and wd 1.0
+  PASS RC1 XS AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 1.0 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 XS NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 XS the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 XS THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 XS Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 XS NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 XS grain: stepsize_type=scalar with 1 step size(s)   scalar / 1
+  PASS RC4 XS printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 XS printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=scalar tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_XS/probe
+  PASS RC4 XS wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 XS decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 1.0)
+  ran arm_XL         XL   alpha0=1e-6  base=AdamW meta=Adam wd=1.0 type=layerwise n_beta=62  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 19a143dbff9b...
+  PASS RC1 XL the optimiser's own args carry base AdamW, meta Adam and wd 1.0
+  PASS RC1 XL AdamW base: w', h', m', v' BITWISE the formula with THE PASSED wd 1.0 at every one of 300 steps, every tensor   [0, 0, 0, 0]
+  PASS RC1 XL NON-VACUITY: the same run checked against the formula at the OTHER decay FAILS   wrongwd [18580, 18580, 0, 0]
+  PASS RC1 XL the second-moment bias-correction clock lambda advanced as b2^t
+  PASS RC1 XL THE HARNESS-NULL IS EXCLUDED: the run FAILS the SGDm base formula (w and m)   [18600, 0, 18600, 0]
+  PASS RC2 XL Adam meta: beta (and its moments) BITWISE the formula at every step
+  PASS RC2 XL NON-VACUITY: the same run FAILS the other meta alg's formula   wrongalg 299
+  PASS RC3 XL grain: stepsize_type=layerwise with 62 step size(s)   layerwise / 62
+  PASS RC4 XL printed exactly the five `off` witnesses and no COMP_HOLD / WINDOW_HOLD line
+  PASS RC4 XL printed ONE PROBE_TENSOR line == the design's witness (every=10 here) `PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=...`   PROBE_TENSOR: on every=10 type=layerwise tensors=62 meta_alg=Adam momentum_param=0.9 Lion_beta2=0.9 dir=/tmp/caw2_realrun_5079238/arm_XL/probe
+  PASS RC4 XL wrote 30 probe records, each with a 62-tensor z_tensor   30
+  RC8 XL decay term changed the float32 weight update at 18580 of 18600 tensor-steps (alpha0 1e-6, wd 1.0)
+
+RC5 THE VOTE DECOMPOSITION DOM_C READS, ON REAL RECORDS (every scalar arm, both meta algs)
+  PASS RC5 K01 (Lion meta) sum_i L_i == the harness's applied momentum term (within 1e-3 of sum|L_i|) and has its sign on every record   30 records, 0 off, 0 sign
+  PASS RC5 MS (Adam meta) sum_i L_i == the harness's applied momentum term (within 1e-3 of sum|L_i|) and has its sign on every record   30 records, 0 off, 0 sign
+  PASS RC5 LS (Lion meta) sum_i L_i == the harness's applied momentum term (within 1e-3 of sum|L_i|) and has its sign on every record   30 records, 0 off, 0 sign
+  PASS RC5 AS (Adam meta) sum_i L_i == the harness's applied momentum term (within 1e-3 of sum|L_i|) and has its sign on every record   30 records, 0 off, 0 sign
+  PASS RC5 XS (Adam meta) sum_i L_i == the harness's applied momentum term (within 1e-3 of sum|L_i|) and has its sign on every record   30 records, 0 off, 0 sign
+
+RC6 DETERMINISM (AS twice)
+  ran arm_AS_again   AS   alpha0=1e-6  base=AdamW meta=Adam wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 8f74e92b2dc2...
+  PASS RC6 AS run twice: identical final weights
+
+RC7 THE NINE ARMS ARE DISTINCT EXPERIMENTS
+  PASS RC7 the nine arms' final weights are PAIRWISE DISTINCT   AL 62b98b4d96 AS 8f74e92b2d K01 5553c08e3c LL 6eaff8849f LS a7ffb736f4 ML 899a905a12 MS 48d46a5bad XL 19a143dbff XS 52f0cba560
+
+RC8 THE DECAY ROUTE AT A TEST-ONLY alpha0 1e-2 (NOT a batch value)
+  ran big_AS         AS   alpha0=1e-2  base=AdamW meta=Adam wd=0.1 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 299, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights 9409b9fe94f5...
+  ran big_XS         XS   alpha0=1e-2  base=AdamW meta=Adam wd=1.0 type=scalar n_beta=1  300 steps on NVIDIA L4  {"expect": [0, 0, 0, 0], "wrongwd": [18580, 18580, 0, 0], "sgdm": [18600, 0, 18600, 0], "meta_expect": 0, "meta_wrongalg": 298, "decay_bites": 18580, "tensor_steps": 18600, "lam_ok": 300}  weights c95f7bd90b63...
+  PASS RC8 AS at alpha0 1e-2 the AdamW formula holds bitwise and the decay term reaches the weights   {'expect': [0, 0, 0, 0], 'wrongwd': [18580, 18580, 0, 0], 'sgdm': [18600, 0, 18600, 0], 'meta_expect': 0, 'meta_wrongalg': 299, 'decay_bites': 18580, 'tensor_steps': 18600, 'lam_ok': 300}
+  PASS RC8 XS at alpha0 1e-2 the AdamW formula holds bitwise and the decay term reaches the weights   {'expect': [0, 0, 0, 0], 'wrongwd': [18580, 18580, 0, 0], 'sgdm': [18600, 0, 18600, 0], 'meta_expect': 0, 'meta_wrongalg': 298, 'decay_bites': 18580, 'tensor_steps': 18600, 'lam_ok': 300}
+  PASS RC8 at alpha0 1e-2 the wd-0.1 (AS) and wd-1.0 (XS) runs' final weights DIFFER
+
+ALL PASS
+REALRUN_RC 0
