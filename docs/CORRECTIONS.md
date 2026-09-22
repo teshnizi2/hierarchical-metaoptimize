@@ -40976,7 +40976,7 @@ coverage is owed once all 32 have started (`bash bin/cAI1_rule20.sh` from the st
 
 Next free number: **308**.
 
-## 307. TRACK F3 — **`crd1` REGISTERED, NOT SUBMITTED: THE COLLAPSE ROUTE (ICML-PLAN row 1.6, stamp `DECOUPLED-NOT-TESTED`).  AT THE MECHANISM CELL (ResNet18_c100, wd 0.1), WHICH ROUTE OF THE α-SCALED DECAY CARRIES THE SCALAR COLLAPSE — THE WEIGHT SHRINK (`DECAY_ROUTE=shrink_only`), THE SHORTENED META-TRACE (`trace_only`), BOTH, OR NEITHER ALONE — AND DOES THE COLLAPSE SURVIVE α-INDEPENDENT DECAY (`alpha_indep:3.15e-4` at wd 0)?  3 ROUTES × {scalar, layerwise} × SEEDS {196, 197, 198} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **SUFFICIENCY, NOT NECESSITY.** Each single-route arm says what that route IS ENOUGH to do at this cell; a null never says the route plays no part when both are on.  (2) **`shrink_only` AND `trace_only` ARE INTERVENTIONS, NOT HYPERGRADIENTS** of their own weight update (305.3), and `shrink_only`'s trace keeps the direct term a·wd·w (305.2's judgement on `delta'`, `DELTA-IS-APPLIED-CHANGE`).  (3) **Λ IS MATCHED TO THE ONSET-WINDOW PER-STEP SHRINK, NOT TO THE INIT** (the brief's init match, wd × α0 = 1e-7, is degenerate at this cell: dose ratio 1.8e-4, below the campaign's DOSE bar) **AND NOT TO THE CUMULATIVE DOSE** — a constant Λ front-loads the decay and delivers **13.6×** the collapsing arm's whole-run log-shrink.  ONE Λ.  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL** (normalised layers, arXiv:2305.17212).  (5) **NO in-batch OFF anchor**: the OFF collapse is the landed premise (five batches, 22.79–23.22; cwd5 W1 23.2240 / 69.2940), and the cdr1 tree's OFF inertness is by 305's proof, not re-run.  (6) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (7) ONE cell, ONE network, 100 epochs, 3 seeds.  (8) **csh1's outcome is read BESIDE this FINAL by the joint table 307.7, never inside it.**  All 16 bounds are stamped on every scored FINAL.]**
+## 307. TRACK F3 — **`crd1` REGISTERED, NOT SUBMITTED: THE COLLAPSE ROUTE (ICML-PLAN row 1.6, stamp `DECOUPLED-NOT-TESTED`).  AT THE MECHANISM CELL (ResNet18_c100, wd 0.1), WHICH ROUTE OF THE α-SCALED DECAY CARRIES THE SCALAR COLLAPSE — THE WEIGHT SHRINK (`DECAY_ROUTE=shrink_only`), THE SHORTENED META-TRACE (`trace_only`), BOTH, OR NEITHER ALONE — AND DOES THE COLLAPSE SURVIVE α-INDEPENDENT DECAY (`alpha_indep:3.15e-4` at wd 0)?  3 ROUTES × {scalar, layerwise} × SEEDS {196, 197, 198} = 18 JOBS, ≈12.3 GPU-h EXPECTED, HARD BOUND 54.  [LED WITH THE BOUNDS, ALL REGISTERED BEFORE ANY RUN EXISTS: (1) **SUFFICIENCY, NOT NECESSITY.** Each single-route arm says what that route IS ENOUGH to do at this cell; a null never says the route plays no part when both are on.  (2) **`shrink_only` AND `trace_only` ARE INTERVENTIONS, NOT HYPERGRADIENTS** of their own weight update (305.3), and `shrink_only`'s trace keeps the direct term a·wd·w (305.2's judgement on `delta'`, `DELTA-IS-APPLIED-CHANGE`).  (3) **Λ IS MATCHED TO THE ONSET-WINDOW PER-STEP SHRINK, NOT TO THE INIT** (the brief's init match, wd × α0 = 1e-7, is degenerate at this cell: dose ratio 1.8e-4, below the campaign's DOSE bar) **AND NOT TO THE CUMULATIVE DOSE** — a constant Λ front-loads the decay and delivers **13.6×** the collapsing arm's whole-run log-shrink.  ONE Λ.  (4) **THE α-INDEPENDENT ARM IS NOT A PURE ROUTE CONTROL** (normalised layers, arXiv:2305.17212).  (5) **NO in-batch OFF anchor**: the OFF collapse is the landed premise (five batches, 22.79–23.22; cwd5 W1 23.2240 / 69.2940), and the cdr1 tree's OFF inertness is by 305's proof, not re-run.  (6) **Every COLLAPSE and NOGAP reading is a BOUND** (164.6).  (7) ONE cell, ONE network, 100 epochs, 3 seeds.  (8) **csh1's outcome is read BESIDE this FINAL by the joint table 307.7, never inside it.**  All 16 bounds are stamped on every scored FINAL.]** — **VERIFIED AND SUBMITTED by the verifier 2026-09-22: 18 / 18 jobs 5081273–5081290, RULE 21 margin 14 min 55 s from commit (≥ 1 min 05 s by ls-remote) (307.11).** *(Header note added by the verifier.)*
 
 *ZERO GPU by this track.  No Slurm job submitted (the verifier submits).  The only compute on the alice2 login node was
 CPU: construction of the six arms' optimisers and 3 CPU `HF.step`s per arm on a batch of 4 (guard 4h / `analysis/
@@ -41198,5 +41198,53 @@ Files (commit `855b936`): `analysis/cRD1_route_score.py`, `analysis/crd1_design.
 section only).  Another track's (306, `cai1`) uncommitted files in the shared working tree were NOT added.  This entry
 replaces its reserved stub in place.  No registered scorer, `argsline_guard.py`, `corpus_exclusions.py`, the patch,
 the cdr1 tree or runner, STATUS or ICML-PLAN edited; no running batch's tree, run or runner touched.  **GPU: ZERO.**
+
+### 307.11 Independent verification and SUBMISSION (verifier, 2026-09-22)
+
+*The verifier touched no registered file: no scorer, design, launcher, RULE 20 script, patch, tree or runner was edited,
+so the RULE 21 commit is still `855b936`.  `alice` NOT contacted (every cluster command went to `alice2`).  Nothing under
+`paper/` read, listed or copied; no clone, checkout or worktree (the stage was checked against `git archive 855b936`
+excluding paper, below).  Nothing downloaded; STATUS and ICML-PLAN not edited; no job cancelled.*
+
+| check | evidence | verdict |
+|---|---|---|
+| prior art first | the dated `docs/PRIOR-ART.md` section ("WHICH ROUTE…", five queries verbatim) is present and ordered before the registration.  The verifier ran two more web searches (search result lists only): no work that separates the weight-shrink route from the trace route under a learned step size.  The nearest hits were again FADE 2604.27063, Kosson et al. 2510.19093 and MetaAdamW 2605.04055, all on file | PASS (`WORTH-GPU` stands) |
+| the design can decide its question | S = OFF's weights bitwise with the trace factor dropped; T = OFF's trace factor with the weights undecayed; I = α-independent.  The premise (landed OFF collapse, five batches) is re-read by the scorer's own `cell_state`.  Each cell reads scalar against its OWN in-batch layerwise reference, so a ROUTE token needs no between-batch comparison.  All 8 + 4 tokens are reachable (selftest D) | PASS |
+| Λ choice | the init match (1e-7) has dose ratio 1.8e-4, below DOSE_BAR 0.5, so its null could not be read: rejecting it is right.  Λ = csh1's Q_M 3.15e-4 is re-derived by the unedited `csh1_design` (guard 1c5) and gives dose ratio 0.570.  The 13.6× cumulative front-loading is stamped (`LAMBDA-ONSET-MATCHED-NOT-INIT-OR-CUMULATIVE`) and `INDEP-UNREADABLE` is a registered, reachable account | PASS, with the caveat below |
+| frozen literals (O2) | R50 0.50, GAP_BAR 10, REF_MIN 55, DIVERGED 5, FLOOR 15 / CEIL 90, DOSE_BAR 0.5, and the G-ROUTE tolerances are all module-level literals; selftest F shows FINAL is invariant over the real corpus, no corpus, and invented rows | PASS |
+| ladder | `decide_route` has 8 first-match rungs and ends in the default `ROUTE-PARTIAL`; `decide_indep` has 4 and ends in `INDEP-PARTIAL`.  Both are exhaustive over the five states | PASS |
+| bounds on FINAL | the 16 `BOUND_STAMPS` are appended to every scored FINAL (line 769); selftest E asserts them | PASS |
+| noise floor | `SIGMA_PRIOR = 0.636565585885168` (df 274), which is the demo value 0.636566.  Guard 1c6 re-derives it through `filter_rows` on the current corpus (3,383 rows, `cc189bd1…`) | PASS |
+| selftest, rerun | Mac `/opt/homebrew/bin/python3 analysis/cRD1_route_score.py --selftest --runsdir ../runs_alice2`: **122 PASS / 0 FAIL / 0 SKIP**.  alice2 (Python 3.10.4, stage, `--runsdir $WS/runs`): **122 / 0 / 0** (`~/crd1_verify_selftest_alice2.log`, `0600d89e…`).  A run without `--runsdir` gives 104 / 0 / 6 SKIP, because it has no landed records; the launcher passes `--runsdir` and refuses any SKIP (guard 1c1) | PASS |
+| stage integrity | the sha256 of every file under analysis / bin / jobs / patches / tests in `~/stage_crd1_dry` equals `git archive 855b936`'s (977 files).  The stage's only extras are six `__pycache__/*.pyc` files; `STAGED_COMMIT` = `855b936f…` | PASS |
+| dry run, rerun | `~/stage_crd1_dry_verify.log` (160 lines, `2336b6ed…`): **rc 0, 0 GUARD FAIL**.  Guard 4h CPU route check 43 / 0; guard 4d manifest byte-identical (7,498 bytes, `135e6df8…`); guard 6 composed 18 lines with 0 failed | PASS |
+| ARGS / ENV witness | the full composed ARGS of SRS-s196 equals the landed `cwd5-k01W1-s146` ARGS line flag for flag and in order, save `--seed`, `--save-directory` and `--run-name`; AIL-s196 differs from the landed kLW1 line in `--weight-decay-base 0` only.  The ENV `--export` list is cwd5's with `PROBE_TENSOR=1` and exactly one `DECAY_ROUTE=` token.  Guard 4 prints each arm's harness witness, e.g. AIS: `DECAY_ROUTE: on mode=alpha_indep base=SGDm wd=0.0 lambda=0.000315 lambda_f32=0.0003150000120513141 gamma=1.0`; SR* / TR* print their mode with `wd=0.1 lambda=na` | PASS |
+| seeds fresh, inside 196–198 | 0 corpus rows with seeds 196–198 (3,383 rows, max seed 162).  The live squeue carries seeds 170–173, 178, 180–182 and 184–187 only.  0 `crd1-*` rows in all-time sacct; 0 `.out` ARGS lines under `$WS/runs` with seeds 196–198 (guard 2d, and an independent grep).  cai1's block 192–195 is disjoint | PASS |
+| predictions | the 10-account table (307.6) and `PREDICTION` (UNSURE: ROUTE-IS-WEIGHT-SHRINK + INDEP-NOGAP) are committed in `855b936` | PASS |
+| GPU-h | expected 18 × 0.6855 = 12.34; hard bound 3 h × 18 = **54 GPU-h** (the `--time=03:00:00` in each sbatch line) | PASS |
+| RULE 21 | `git ls-remote origin master` = `66c63fbb…` at 09:47:44Z; `855b936` is its ancestor, and the 12 registered and reused files are byte-unchanged from `855b936` to that tip | PASS |
+
+**Caveat, wording only (no file changed):** S's trace has factor 1 and γ 1, so h accumulates the direct term −a·wd·w
+without any decay.  A `ROUTE-IS-WEIGHT-SHRINK` reading therefore names the α-scaled shrink **together with** that
+undecayed direct term.  This batch cannot separate the two, and the licence's parenthesis ("with the direct a*wd*w term
+in the trace") and `DELTA-IS-APPLIED-CHANGE` carry that bound.  Any sentence that credits the weight shrink "alone"
+must keep the parenthesis.  Likewise, T's learned horizon is the one T itself learns without the weight shrink, not
+OFF's; the scorer co-reports each arm's trace factor and horizon, so the landing must quote them beside a T reading.
+
+**SUBMITTED.**  On alice2, `cd ~/stage_crd1_dry && CRD1_REGISTERED_COMMIT=855b936fed91f4b3399dd988b12b5aca83aa0d90 bash
+bin/cRD1_route.sh --submit` (one invocation; log `~/stage_crd1_submit.log`, 0 GUARD FAIL, "18 jobs (ACCEPTED BY SLURM);
+0 rejected").  **18 / 18 jobs 5081273–5081290**, all PENDING on gpu-short,gpu-l4-24g with `--constraint=L4`, queued
+behind the running batches (squeue confirmed):
+
+| seed | SRS | SRL | TRS | TRL | AIS | AIL |
+|---|---|---|---|---|---|---|
+| 196 | 5081273 | 5081274 | 5081275 | 5081276 | 5081277 | 5081278 |
+| 197 | 5081279 | 5081280 | 5081281 | 5081282 | 5081283 | 5081284 |
+| 198 | 5081285 | 5081286 | 5081287 | 5081288 | 5081289 | 5081290 |
+
+**RULE 21 margin:** the registration commit `855b936` is dated 09:33:54Z and the first job (5081273) was submitted at
+09:48:49Z, so the margin is **14 min 55 s** from commit.  The verifier's own `ls-remote` confirmed the commit on origin
+at 09:47:44Z, so the margin by that proof is **≥ 1 min 05 s**.  Owed: `bash bin/cRD1_rule20.sh` from the stage once all 18
+have started; the landing debts of 307.9.
 
 Next free number after the reservations: **308**.
