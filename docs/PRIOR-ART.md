@@ -457,3 +457,47 @@ scalar vs blockwise vs per-parameter meta step size sensitivity weight decay 5e-
 survives per-grain re-tuning of the meta step size and initial step size. The general point (rankings depend on
 tuning) is owned by Sivaprasad et al. and Schmidt et al. and must be cited, not claimed. The batch is not a replication
 of published work and is NOT shrunk on prior-art grounds.
+
+---
+
+## Sweep 2026-09-22 — the audit's CIFAR-100 cell at weight decay 5e-4, and the denominator's decay confound (CORRECTIONS 299, batch `g3b`)
+
+*Targeted sweep BEFORE registering `g3b`. Web search only; search-result summaries and arXiv abstract pages; no `.pdf`
+was fetched and no paper was downloaded. Queries, verbatim:*
+1. *hypergradient learned step size grouping per-layer vs global weight decay CIFAR-100 ResNet-18*
+2. *weight decay value changes ranking of learning rate parameterization granularity global vs layerwise adaptive step size*
+3. *uniform chunk partition vs architecture-aligned parameter groups adaptive learning rate matched number of groups*
+4. *meta-learned learning rate optimizer benchmark tuned SGD baseline weight decay 5e-4 CIFAR-100 fair comparison*
+5. *hypergradient descent learning rate adaptation weight decay interaction effective learning rate scale-invariant*
+
+**Found (verdict per item):**
+* Kosson et al., *Weight Decay may matter more than µP for Learning Rate Transfer in Practice* (arXiv:2510.19093, ICLR
+  2026) — weight decay, not the parameterisation, stabilises update dynamics and so governs learning-rate transfer.
+  ADJACENT: it supports the premise that the decay VALUE can change which step-size parameterisation looks best, and
+  is a citation for why `g3b` asks the question; it tests no meta-learned step size, no group partition and no CIFAR-100
+  count-matched contrast.
+* Li & Arora, *An Exponential Learning Rate Schedule for Deep Learning* (arXiv:1910.07454) and *FixNorm* (arXiv:2103.15345)
+  — on normalised nets the decay sets the effective learning rate. ADJACENT, the same mechanism family as Kosson et al.
+  *Rotational Equilibrium* (arXiv:2305.17212, already on file).
+* Zhao & Liu (arXiv:2605.04055, already on file) — group-adaptive LR and decay with ablated grouping strategies; no
+  matched group count, no global decay-value axis. ADJACENT.
+* Baydin et al., *Hypergradient Descent* (arXiv:1703.04782) and its 2025 analysis (arXiv:2502.11229) — hypergradient
+  step-size adaptation; no decay-value × grouping study. NOT RELEVANT to the question.
+* CIFAR-100 benchmark papers using SGD 0.9 / wd 5e-4 as the tuned baseline (e.g. MLR-SNet arXiv:2007.14546, APO
+  arXiv:2203.00089, LRTuner arXiv:2105.14526) — they compare their meta or tuned-LR method against SGD at the SAME
+  standard decay, which is exactly the fairness `cdn1` lacked (its MetaOptimize arm ran at α-scaled 0.1). ADJACENT:
+  it confirms that 1.16's confound is the kind of comparison a referee expects to be decay-matched, and nothing in them
+  measures MetaOptimize.
+* The parent, *MetaOptimize* (arXiv:2402.02342) — block-wise vs scalar step sizes on ResNet-18 / CIFAR; no matched-count
+  partition audit and no decay-value axis. Already the campaign's reference; nothing new.
+
+**Verdict:** nothing found tests whether a count-matched partition effect, or a scalar-vs-partition ranking, of a
+meta-learned step size changes with the weight-decay value on CIFAR-100, or re-runs a MetaOptimize denominator arm at the
+baseline's decay. **The question is open; `g3b` is not a replication of published work, and the batch is not shrunk.**
+The one consequence for WRITING: any `g3b` sentence about decay changing the step-size ranking must cite Kosson et al.
+(arXiv:2510.19093) as the general phenomenon, and claim only the campaign-specific, count-matched, meta-learned instance.
+*Provenance of the ids above: each is the arXiv id in the URL the search engine returned (e.g.
+`arxiv.org/abs/2510.19093`, whose ICLR 2026 listing the same search also returned). An attempt to confirm two of them
+on the abstract-page tool (`get_abstract` for 2510.19093 and 1910.07454) returned "not found" for BOTH, including the
+long-published 1910.07454, so the tool, not the ids, is taken to be at fault — UNSURE; the verifier may re-check the
+two abstract pages before either is cited in the draft.*
