@@ -42700,3 +42700,398 @@ correctly labelled a TEST reading taken where the box binds (rec_lo ≈ 0.456, 1
 ms 1e-4", not on "was ms chosen on test".
 
 Next free number: **315**.
+
+## 315. TRACK A (land) + ITS INGEST — **[LED WITH THE BOUNDS: (1) **ONE CIFAR-100 CELL, TWO RUNGS** (`ONE-CELL-C100` `TWO-RUNGS`).  `ResNet18_c100` / CIFAR-100 / SGDm 0.99 + Lion, ms 1e-4, α0 1e-3, α-scaled `--weight-decay-base` 0.1 (W1) and 5e-4 (W4) only; read beside `cgw1` (296) and never pooled with it.  (2) **`ALPHA-INDEPENDENT-DECAY-NOT-TESTED`**: the decay is the harness's α-scaled form only.  (3) **`W4-IS-A-NOMINAL-VALUE`**: every W4 arm's realised plateau shrink a·wd is 3.9–71.0× below lr·wd 5e-5 and 38.9–709.8× below a standard recipe's ≈ 5e-4 (296.4's caveat carries over), and the arms compared at the same nominal 5e-4 differ among themselves in realised shrink by up to 18.2×.  (4) **`DENOM-IS-CROSS-BATCH`**: the SGD level is `cdn1`'s landed 77.5927, its lr chosen on the TEST set (1.14).  (5) **`FLOOR-READINGS-ARE-BOUNDS`**: no gated level is floor- or ceiling-bound (W4 levels 7.94–14.04 pp above HEALTH_MIN 55, ≥ 30.96 pp below 100), but the ch / nd W4 levels sit only +7.94 / +8.01 pp above it, under the registered +10.0 prediction (299.5).  (6) **THE PRIMARY IS UNREADABLE BY THE REGISTERED 5 % BOX GATE**: chW4 is box-bound on all four seeds (rec_hi 0.0787–0.0796; its top coordinate sits at the box's upper edge −2.3026 from meta step ≈ 46,020, epoch ≈ 92, to the end, on at most 0.027 % of its 14,595 groups in the plateau window); ndW4 is box-free.  kLW4 is box-bound too.  (7) **THE SCALAR READING IS UNTUNED** (311 A5): `g3b` runs `crt1`'s M2 configuration, whose scalar lead `crt1` found at the CIFAR-10 cell to be at least in part a tuning artefact; robustness to tuning is untested here, not refuted.  (8) **σ_USED is the in-batch 0.431036 (df 21), 57.6 % above the frozen floor 0.273428.**  (9) **Every registered W4 prediction band for the partitions was missed low** (ch 63.0070, nd 62.9425 against bands starting at 65.0–66.5, 299.5).]** — **`g3b` LANDS 32/32: `UNRESOLVED-BOXBOUND-W4 | SCALAR-BEATS-BEST | DENOM-HOLDS | W1-SURVIVES+W4-BOXBOUND`.  AT α-SCALED 0.1 THE AUDIT's CIFAR-100 SIGN REPRODUCES IN BATCH (D +1.2170 pp, +3.99 SE, `ANCHOR-MATCHES-POOL`); AT THE DECAY VALUE 5e-4 THE COUNT-MATCHED CONTRAST IS NOT READABLE — THE CHUNK771 ARM's STEP SIZES REACH THE BOX — SO NO SURVIVE / VANISH / REVERSE SENTENCE EXISTS FOR CIFAR-100 AT 5e-4.  AT 5e-4 PLAIN SCALAR IS ABOVE BOTH AUDITED PARTITIONS BY +6.03 / +6.10 pp, RESOLVED (AN UNTUNED READING).  THE CIFAR-100 MetaOptimize ARM RUN AT 5e-4 IS STILL +14.59 pp BELOW THE LANDED TUNED SGD + COSINE (`DENOM-HOLDS`, BETWEEN BATCHES): ICML-PLAN 1.16's DECAY CONFOUND IS NOT SUPPORTED IN ITS NOMINAL-VALUE FORM AT THIS CELL.  AND: THE ONE INGEST (3,469 → 3,501; 16 EXCLUSION ROWS), AND WHAT IT DOES TO THE PAPER (315.10).**
+
+*The registered priors were AUDIT-SURVIVES 0.55, AUDIT-VANISHES 0.15, AUDIT-REVERSES 0.05, AUDIT-UNDECIDED 0.25 (the
+box state was not given a prior), SCALAR-TIES-OR-BEATS-BEST 0.55, DENOM-HOLDS 0.85 (299.5); all named before any run
+existed.  **ZERO GPU by this entry.**  No Slurm job submitted or cancelled; read-only `sacct -X` / `squeue` on the
+`alice2` login node by the scoring and refute tracks.  `alice` NOT contacted.  Nothing under `paper/` listed, read or
+touched; no clone, checkout or worktree of the campaign repo was made (the stages are `git archive` of the registered
+commit).  No notebook website or Vercel URL opened, nothing downloaded, no `.pdf` fetched.  The running batches `cai1`,
+`crd1`, `crt2` were not touched.*
+
+
+### 315.1 Completion, the owed by-hand audit, and RULE 20 at full coverage
+
+**32/32 COMPLETE.**  Jobs **5080798–5080829**, contiguous and in the registered order (W1 5080798–5080813, W4
+5080814–5080829; per seed ch / nd / k01 / kL), seeds {170, 171, 172, 173}, 8 arms (299.3).  `sacct -X` read-only:
+**32/32 `COMPLETED 0:0`**, **33.7636 GPU-h** by `sacct` ElapsedRaw (33.45 by the runs' own `minutes` lines), against
+299.4's 24.4 expected; hard bound 64.  All 32 ended by 14:07Z 2026-09-22.
+
+**The by-hand audit owed at 299.12** (post-launch guard 7 had read UNVERIFIED on a queue wait): `python3
+analysis/argsline_guard.py $WS/runs --name g3b-` (guard `81cea8b5…`, UNEDITED; `alice2` nodelogin04, Python 3.10.4,
+2026-09-22T14:29:39Z): 32 `.out`, each "no repeated flag (20 flags)"; **32 clean, 0 WITH REPEATED FLAGS OR DESIGN
+MISMATCH, 0 without an ARGS line; VERDICT PASS, rc 0** (`results/g3b_argsguard_byhand.txt`, `10800fa5…`).
+
+**RULE 20 at FULL coverage, PASS on both halves, after all 32 had COMPLETED and BEFORE any accuracy number was
+opened**: `bin/cG3B_rule20.sh` (`76a4ace9…`, UNEDITED) with `analysis/g3b_rule20_envaudit.py` (`7fb91e3d…`, UNEDITED)
+from a fresh `git archive 31792c4` stage on `alice2`, 14:30:03–14:30:22Z, log `results/g3b_rule20_full_land.txt`
+(`afb0a4ef…`), read line by line; **re-run independently by the refute pass** from its own fresh `git archive 31792c4 --
+analysis bin` stage at 14:49Z, PASS and agreeing (its stage deleted).
+* **ARGS half**: 32 `.out`, 32 with ARGS; squeue empty of `g3b`.  Batch consistency (`--vary seed --vary run-name
+  --vary weight-decay-base --vary stepsize-groups`) rc 0, **32 clean**, VERDICT PASS.  Per-run, each run pinned to its own
+  rung's wd and its own grain: **32 checked, 0 violations**.  Coverage exactly the registration's: 0.1 ×16, 5e-4 ×16;
+  chunk771 / nodewise / scalar / layerwise ×8 each.
+* **ENV half** PASS: one distinct `ENV` line ×32 (`AUGMENT=1 BETA_CLIP=-15:-2.3026 HIER=none … PROBE=5`); no hold or mask
+  witness; **32 × NVIDIA L4**; coverage 32/32, 0 violations; `ENV AUDIT VERDICT g3b: PASS`.
+
+Sync: 163 run files (32 `.out` + 131 under `g3b/`) sha256-checked against a list generated on `alice2`, `shasum -c`
+163 OK, 0 FAILED (`results/g3b_runfiles_sha256.txt`, `56662cbd…`); the refute pass re-checked all 163.  `plateau5` is
+read from each run's RAW `.out`: TEST = mean of the `Epoch e … Test Accuracy` lines over epochs 95–99; the CSV
+`plateau` column is read by nothing here.
+
+
+### 315.2 The registered scorer, unedited — and re-run by this entry after the ingest
+
+`analysis/cG3B_c100wd_score.py` (**`f21f57bd…`**, design `f31f4ee4…`; the registered commit `31792c4`'s bytes, HEAD's and
+PROVENANCE's) ran **UNEDITED** with the documented invocation, **rc 0, 84 lines**: on `alice2` from the `31792c4` stage
+(Python 3.10.4, the `mo` venv) as `python3 analysis/cG3B_c100wd_score.py $WS/runs`
+(`results/g3b_c100wd_score_alice2.txt`, `c459958b…`), and on the Mac (3.14.5) on `../runs_alice2`
+(`results/g3b_c100wd_score_mac.txt`, `4450a028…`).  The two stdouts differ only on the runsdir and G-PROV path lines.
+Gates: COMPLETION 32/32; G-PROV MODE submit, SCORER `f21f57bd`, DESIGN `f31f4ee4`, HF `4732b74a`; G-ARGS / G-ENV / G-KIND
+/ G-STRUCT 32 of 32 (20 flags, ONE ARGS and ONE ENV line, the registered ENV line, no patch witness, no epoch printed
+twice, 10,000 probe records with n_beta equal to the arm's m and a beta list of the grain's length); G-HW `NVIDIA L4 ×32`
+(disclosure).  **RULE 16 held**: neither the scoring track nor the refute pass reported a defect in the scorer.
+
+**RE-RUN BY THIS ENTRY ON THE POST-INGEST CORPUS** (3,501 rows, 370 exclusions; HEAD bytes `f21f57bd…`, on
+`../runs_alice2`, the Mac): rc 0, 84 lines, **identical to the committed Mac log except the two path echoes** (runsdir
+and G-PROV).  **The corpus DISCLOSURE line does not move** (3,115 before and after): the scorer excludes `g3b-` from its
+disclosure count and every W4 row this ingest adds is listed in `results/CORPUS-EXCLUSIONS.tsv`.  The FINAL is
+byte-identical.
+
+**The FINAL, verbatim (the log's last line):**
+
+    FINAL UNRESOLVED-BOXBOUND-W4 | SCALAR-BEATS-BEST | DENOM-HOLDS | W1-SURVIVES+W4-BOXBOUND | ONE-CELL-C100 TWO-RUNGS ALPHA-INDEPENDENT-DECAY-NOT-TESTED W4-IS-A-NOMINAL-VALUE DENOM-IS-CROSS-BATCH FLOOR-READINGS-ARE-BOUNDS SIGMA-INBATCH ANCHOR-MATCHES-POOL W1-LEVEL-DIFFERS-k01 K01W1-COLLAPSED LAYERWISE-BELOW-SCALAR-W4
+
+Three branch words and the rung states, the six registered bounds in order, then five non-gating stamps.
+
+
+### 315.3 The numbers (in batch; every contrast WITHIN its rung unless marked)
+
+n = 4 seeds per arm (170 / 171 / 172 / 173).  `train5` = mean TRAIN over the same epochs.  Box from each run's own
+`probe.jsonl` (rec_hi = the seed-maximum fraction of records with a coordinate at the upper edge −2.3026; coordhi_win = the
+fraction of groups at that edge in the plateau window).
+
+| arm | wd | grain | plateau5 | sd | range | train5 | box | rec_hi | coordhi_win | seeds 170 / 171 / 172 / 173 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| chW1 | 0.1 | chunk771 | **71.8810** | 0.367 | 0.796 | 96.1320 | free | 0.0000 | 0.000000 | 71.9560 / 72.3700 / 71.6240 / 71.5740 |
+| ndW1 | 0.1 | nodewise | **70.6640** | 0.237 | 0.532 | 92.5805 | free | 0.0000 | 0.000000 | 70.8900 / 70.8060 / 70.6020 / 70.3580 |
+| k01W1 | 0.1 | scalar | **35.1490** | 0.848 | 1.972 | 38.5310 | free (collapsed, as predicted) | 0.0000 | 0.000000 | 36.2980 / 34.7540 / 34.3260 / 35.2180 |
+| kLW1 | 0.1 | layerwise | **70.7495** | 0.177 | 0.382 | 97.3600 | free | 0.0000 | 0.000000 | 70.6180 / 71.0000 / 70.7480 / 70.6320 |
+| chW4 | 5e-4 | chunk771 | **63.0070** | 0.733 | 1.580 | 94.9620 | **BOUND** | 0.0796 | 0.000271 | 63.7740 / 63.4560 / 62.6040 / 62.1940 |
+| ndW4 | 5e-4 | nodewise | **62.9425** | 0.450 | 0.802 | 94.4655 | free | 0.0000 | 0.000000 | 63.3160 / 63.3480 / 62.5460 / 62.5600 |
+| k01W4 | 5e-4 | scalar | **69.0415** | 0.514 | 1.114 | 97.8200 | free | 0.0000 | 0.000000 | 69.4880 / 69.4000 / 68.3740 / 68.9040 |
+| kLW4 | 5e-4 | layerwise | **67.0545** | 0.271 | 0.620 | 98.5365 | **BOUND** | 0.0796 | 0.061258 | 67.1980 / 67.3020 / 66.6820 / 67.0360 |
+
+Level change 0.1 → 5e-4: ch −8.8740, nd −7.7215, k01 +33.8925, kL −3.6950.  **σ (O2)**: frozen floor
+**0.273428** (df 21); in-batch **0.431036** (df 21, 7 arms, the collapsed k01W1 excluded as registered) → `SIGMA_USED` =
+in-batch (`SIGMA-INBATCH`); `SIGMA_DEMO` **0.636566** (df 274) quoted (299.4).  SE of a within-rung contrast 0.304788.
+
+**Primary (D = ch − nd):**
+* **D_W1 = +1.2170 pp, +3.99 SE, ±2 SE [+0.6074, +1.8266], TRAIN +3.5515 → SURVIVES**; the anchor reproduces;
+  `ANCHOR-MATCHES-POOL` (|1.2170 − 1.5602| = 0.3432 ≤ 0.5).
+* **D_W4 = +0.0645 pp, +0.21 SE, [−0.5451, +0.6741], TRAIN +0.4965 → BOXBOUND** (chW4 box-bound), so the branch ladder
+  reads **`UNRESOLVED-BOXBOUND-W4`** (first match after the anchor checks pass).
+* DD_W4 = D_W4 − D_W1 = −1.1525 pp, −2.67 SE (SE 0.431036) — DESCRIPTIVE.
+
+**Scalar at W4 (`cgw1`'s rule):** Tch_W4 = k01W4 − chW4 **+6.0345 pp (+19.80 SE)**; Tnd_W4 = k01W4 − ndW4 **+6.0990 pp
+(+20.01 SE)**; 2 SE 0.6096; min T − 2 SE **+5.4249** ≥ 0.30 → **`SCALAR-BEATS-BEST`**.  DESCRIPTIVE: Tch_W1 −36.7320 and
+Tnd_W1 −35.5150 (k01W1 collapsed); G = kL − k01: W1 +35.6005 (+116.80 SE), **W4 −1.9870 (−6.52 SE) →
+`LAYERWISE-BELOW-SCALAR-W4`**.
+
+**Denominator (between batches; SGD = `cdn1`'s landed lr-0.1 literal 77.5927, sd 0.4259, n 3; SE √(σ²/4 + 0.4259²/3) =
+0.326973 for every gap):**
+
+| gap = SGD − arm | pp | SE multiple | ±2 SE | role |
+|---|---|---|---|---|
+| GAPch_W4 | **+14.5857** | +44.61 | [+13.9318, +15.2396] | **GATED → `DENOM-HOLDS`** |
+| GAPnd_W4 | +14.6502 | +44.81 | [+13.9963, +15.3041] | descriptive |
+| GAPk01_W4 | +8.5512 | +26.15 | [+7.8973, +9.2051] | descriptive |
+| GAPkL_W4 | +10.5382 | +32.23 | [+9.8843, +11.1921] | descriptive |
+| GAPch_W1 | +5.7117 | +17.47 | [+5.0578, +6.3656] | descriptive |
+| GAPnd_W1 | +6.9287 | +21.19 | [+6.2748, +7.5826] | descriptive |
+| GAPk01_W1 | +42.4437 | +129.81 | [+41.7898, +43.0976] | descriptive |
+| GAPkL_W1 | +6.8432 | +20.93 | [+6.1893, +7.4971] | descriptive |
+
+The best grain at W4 is scalar (GAP +8.5512), a max over four arms and therefore biased DOWN.  GAPch_W1 +5.7117 against
+the landed `cdn1` GAP_in +5.6993 is a descriptive replication (between batches).
+
+**The dose (DESCRIPTIVE; realised per-step shrink a·wd, plateau median over records at step ≥ 47,500 and the peak; ch /
+nd APPROXIMATE, 62 per-tensor mean log step sizes per record, 296.5):**
+
+| arm | plateau | peak | below lr·wd 5e-5 | below a standard recipe's ≈ 5e-4 |
+|---|---|---|---|---|
+| chW1 | 2.4478e-5 (approx) | 2.0237e-4 | — | — |
+| ndW1 | 6.2062e-5 (approx) | 1.1804e-4 | — | — |
+| k01W1 | 2.1415e-6 | 1.6666e-4 | — | — |
+| kLW1 | 1.6158e-5 | 2.0346e-4 | — | — |
+| chW4 | 2.7430e-6 (approx) | 2.8108e-6 | 18.2× | 182.3× |
+| ndW4 | 7.0439e-7 (approx) | 7.1149e-7 | 71.0× | 709.8× |
+| k01W4 | 1.2840e-5 | 1.3165e-5 | 3.9× | 38.9× |
+| kLW4 | 3.8062e-6 | 4.0816e-6 | 13.1× | 131.4× |
+
+**Descriptive, labelled, licensing nothing:**
+* Leave-one-seed-out D_W4: drop s170 −0.0667, s171 +0.0500, s172 +0.0667, s173 +0.2080.  Same-seed paired chW4 − ndW4:
+  +0.4580, +0.1080, +0.0580, −0.3660.
+* **Counterfactual with the box gate removed (NOT registered, licenses nothing):** W4 would read VANISHES (branch
+  AUDIT-VANISHES), at SIGMA_USED and at the frozen floor alike.
+* σ sensitivity (the registered descriptive line): at SIGMA_DEMO 0.636566 the rung states read W1-SURVIVES W4-BOXBOUND.
+* `cgw1` side by side (CIFAR-10, cross-batch, never pooled): D_W1 +0.3693, D_W4 +0.2410, Tch_W4 +2.5590, Tnd_W4 +2.8000
+  (untuned; at that cell cgw1's +2.6-2.8 pp was, at least in part, a tuning artefact, 309.8 / 311 A4).
+* The box onset: in chW4 and kLW4 the top coordinate reaches −2.3026 from steps 46,020–46,065 (ch) and 46,020 (kL) and
+  stays there to step 49,995 without a gap; ndW4, k01W4 and every W1 arm never reach the upper edge.  Both arms pin at
+  most 4–6 groups (`n_at_hi`) from the same step.  **UNSURE**: why the onset is nearly the same across seeds and across
+  the ch and kL arms; the same few tensors reaching the box is the obvious reading, and it has not been checked.
+
+**MY OWN RE-DERIVATION (this entry, stdlib, no repo code, after RULE 20 had passed and the ingest had run):** from the 32
+raw `.out` files in `../runs_alice2` (each epoch 0–99 exactly once, `RUN_DONE` present), all 8 plateau5 means and sds
+reproduce to 4 d.p. / 3 d.p.; in-batch σ 0.431036 (df 21), SE 0.304788, D_W1 +1.2170, D_W4 +0.0645 [−0.5451, +0.6741],
+Tch_W4 +6.0345, Tnd_W4 +6.0990, G_W4 −1.9870, GAPch_W4 +14.5857 and its SE 0.326973 reproduce.
+
+
+### 315.4 What bounds the result, led with
+
+1. **One CIFAR-100 cell, two rungs** (headline (1)); never pooled with `cgw1`.
+2. **α-scaled decay only** (headline (2)).
+3. **W4 is a nominal value** (headline (3)).  So 296.4's caveat carries over.  Every W4 arm is 3.9–71× below lr·wd and
+   38.9–709.8× below a standard recipe's shrink (cgw1: 115–883×).  The scalar arm is the least under-decayed at 38.9×,
+   which is outside cgw1's range.  DESCRIPTIVE: the arms compared at the same nominal 5e-4 have realised shrinks that
+   differ by up to 18.2× (k01W4 1.2840e-5, ndW4 7.0439e-7), so SCALAR-BEATS-BEST compares one nominal value, not one
+   realised dose.
+4. **The denominator is between batches** (headline (4)), and inherits 1.14's test-set selection of the SGD lr.
+5. **Floor readings are bounds** (headline (5)).  The W4 levels sit 7.94 to 14.04 pp above HEALTH_MIN 55 (the
+   registered prediction was ≥ +10.0 pp, 299.5; the ch and nd arms realised only +7.94 to +8.01, still above selftest G's
+   ≥ 5 bar) and ≥ 30.96 pp below 100.
+6. **The primary is unreadable by the registered 5 % box gate** (headline (6)).  chW4 is box-bound on all four seeds (rec_hi
+   0.0787 / 0.0796 / 0.0794 / 0.0796); in the plateau window at most 0.027 % of its 14,595 groups sit at the edge
+   (coordhi_win max 0.000271); ndW4 is box-free.  kLW4 is also bound: rec_hi is 0.0796 on every seed, and coordhi_win is
+   0.061258, about 6.1 % of its 62 groups in the plateau window, far more than chW4's 0.027 %.  It gates no token, but it
+   is one of the two arms in G_W4 and in the stamp LAYERWISE-BELOW-SCALAR-W4, so that stamp is read against a box-bound
+   arm.  The registered scalar and denom rules gate on health and divergence only, not on the box (299.6), so
+   SCALAR-BEATS-BEST (through Tch_W4) and DENOM-HOLDS (whose only gated arm is chW4) stand even though chW4 is box-bound.
+   Against the box-free ndW4 the same readings hold descriptively: Tnd_W4 is +6.0990 and GAPnd_W4 is +14.6502.  ch and kL
+   pin the same maximum number of groups (n_at_hi 4–6) from the same step (46,020–46,065 for ch, 46,020 for kL); this
+   points to the same few tensors reaching the box; it has not been checked (UNSURE).
+7. **The scalar reading is untuned** (headline (7)): the scalar reading here is an untuned reading at that configuration
+   and may not be presented as robust to tuning.  crt1's finding does not transfer to this cell (311 A5), so robustness
+   to tuning is untested here, not refuted.
+8. **σ** (headline (8)): the in-batch σ is 57.6 % above the frozen floor; the chW4 seed sd is 0.733.  No registered token
+   changes between the two σ values.
+9. **Predictions missed** (headline (9)): ch 63.0070 and nd 62.9425 lie below every account's predicted W4 range (from
+   65.0–66.5 up); k01W4 69.0415 and kLW4 67.0545 lie inside theirs.
+10. GPU: 33.7636 GPU-h by `sacct`, above the 24.4 expected and inside the 64 hard bound.
+
+
+### 315.5 The attack — an independent parser, 33 PASS / 0 FAIL
+
+`analysis/g3b_attack_indep.py` (committed at `7e348a3`): standard library only, no repo imports, no regex, no shlex;
+every literal and bar re-typed.  **33 PASS / 0 FAIL on both hosts, its stdout byte-identical on `alice2` and the Mac**
+(sha256 `27250e42…`; `results/g3b_attack_indep_alice2.txt`, `_mac.txt`).  It checks: one digest over the 64 run files (32
+`.out` + 32 `probe.jsonl`; 2,312,928,299 bytes, `1785ec6d…`); job ids 5080798–5080829 contiguous in the registered order;
+PROVENANCE MODE submit and its scorer / design / HF / runner / registered-commit `31792c4` / ladder / seeds / grains
+values; per run exactly ONE ARGS line (the design's 20 flags in order, value for value), ONE ENV line, no `<KIND>: on`
+witness, `RUN_DONE` once, Epoch lines 0–99 once each, an NVIDIA L4; 10,000 probe records per run with n_beta = m, every
+first record at ln(α0) = −6.9078; every level, σ, contrast, state, token and stamp; the scorer's 84-line stdout rebuilt
+and compared with BOTH committed logs (82 lines byte for byte, the 2 host-dependent lines by form; the FINAL the last
+line); and [8] the 16 exclusion rows rebuilt from the runs' own file names and ARGS lines, equal byte for byte to
+`results/g3b_exclusion_rows_PROPOSED.tsv` (rows digest `038f1f99…`).
+
+
+### 315.6 The refute pass — NOTHING REFUTED; ONE OVERREACH PAST A REGISTERED BOUND, ONE UNMEASURED NEGATIVE, ONE MISSTATED MAGNITUDE, AND THREE DISCLOSURE FIXES (six in all, all applied)
+
+The refute pass (`holds: true`) parsed the 32 raw `.out` files with its own stdlib parser BEFORE running any repo program
+(each epoch 0–99 once, `RUN_DONE`; seed, run name, wd, grain, ms 1e-4, α0 1e-3 and CIFAR100 asserted from each ARGS line)
+and reproduced to the 4th decimal every level, sd, range, train5 and per-seed value, σ_INBATCH and its SE, D_W1, D_W4
+and its interval, DD, the T and G contrasts, every GAP and its SE, leave-one-seed-out, the paired differences and the
+TRAIN D; it reproduced the branch (anchor SURVIVES; W4 BOXBOUND → UNRESOLVED-BOXBOUND-W4), the box-free counterfactual
+(VANISHES at both σ) and the σ-demo line.  It read the scorer's source (on-disk `f21f57bd` = `git show 31792c4`): window
+95–99 TEST from each run's own `.out`; arm and seed from the file name, cross-checked against a full 20-flag ARGS
+equality; D = ch − nd; more than one complete `.out` a HARNESS-FAIL, incomplete twins ignored, a duplicated epoch or ARGS
+/ ENV line a HARNESS-FAIL; completeness 100 epochs + `RUN_DONE`; DENOM gated on chW4 only against 77.5927 with SE
+√(σ²/4 + sd²/3); first-match ladders as registered in 299.6; the box gate rec-based (rec_lo and rec_hi both below 0.05,
+eps 1e-3) and gating only the rung states — `scalar_of` and `denom_of` check health and divergence only.  It re-ran RULE
+20 (315.1), confirmed `sacct` 32/32 `COMPLETED 0:0` and 33.7636 GPU-h, and re-checked all 163 synced files.  **No
+RULE 16 defect.**
+
+| # | where (the scoring track's summary) | as written | fixed to (applied at) |
+|---|---|---|---|
+| **F1** | plain, DENOM paragraph (overreach past `W4-IS-A-NOMINAL-VALUE` and 299.8) | "So this cell gives 1.16's decay confound no support." and "The gap widened from +5.71 at 0.1 to +14.59 pp at 5e-4" | "So at this cell 1.16's decay confound is not supported in its nominal-value form: lowering the MetaOptimize arm's nominal decay from 0.1 to the SGD arm's 5e-4 widens the gap rather than closing it.  A realised-decay match was not tested.  At both rungs the chunk771 arm's realised plateau shrink (2.4478e-5 at 0.1 and 2.7430e-6 at 5e-4, both approximate) is below the SGD recipe's ~5e-4.  The comparison is still between batches and inherits 1.14's test-set selection."; and "Descriptively (both between batches), the gap is +5.71 pp at 0.1 and +14.59 pp at 5e-4" (315.7 (c), 315.10 (c)) |
+| **F2** | plain, SCALAR paragraph; contrasts, the `cgw1` line (missing clause) | the licence's "cgw1's reading holds" with no 311 A4 clause | after the licence: "cgw1's reading" means cgw1's UNTUNED reading at ms 1e-4 / α0 1e-3; after crt1's retune, cgw1's scalar row reads as a tie (a bound) (309 / 310); under 311 A4 its +2.6–2.8 pp may be quoted only with the clause *"at this cell cgw1's +2.6-2.8 pp was, at least in part, a tuning artefact"*; so what generalises to CIFAR-100 is the untuned reading only.  The `cgw1` line carries the clause (315.3, 315.8) |
+| **F3** | bounds item 7 (an unmeasured negative) | "so the scalar reading here is untuned and not robust to tuning" | "… an untuned reading at that configuration and may not be presented as robust to tuning.  crt1's finding does not transfer to this cell (311 A5), so robustness to tuning is untested here, not refuted." (315.4 item 7) |
+| **F4** | bounds item 3 (misstated magnitude) | "So 296.4's caveat carries over unweakened." | "So 296.4's caveat carries over", with the 3.9–71× / 38.9–709.8× ranges, cgw1's 115–883×, the scalar arm at 38.9× outside cgw1's range, and the up-to-18.2× realised-dose spread among arms at the same nominal value (315.4 item 3; headline (3)) |
+| **F5** | bounds item 6 (disclosure) | "kLW4 is also bound (rec_hi 0.0796 on every seed), but it gates nothing." | kLW4's coordhi_win 0.061258 (≈ 6.1 % of 62 groups) disclosed; the stamp LAYERWISE-BELOW-SCALAR-W4 read against a box-bound arm; the scalar and denom rules gate on health and divergence only, so SCALAR-BEATS-BEST and DENOM-HOLDS stand with chW4 box-bound, and hold descriptively against the box-free ndW4 (Tnd_W4 +6.0990, GAPnd_W4 +14.6502); the shared n_at_hi 4–6 onset added to the UNSURE (315.4 item 6) |
+| **F6** | bounds item 5 (optional, applied) | "The W4 levels sit 7.94 to 14.04 pp above HEALTH_MIN 55" | adds: the registered prediction was ≥ +10.0 pp (299.5); ch and nd realised only +7.94 to +8.01, still above selftest G's ≥ 5 bar (315.4 item 5; headline (5)) |
+
+No refuted claim; every fix is a wording, scope or disclosure fix, and none moves a number, state, token, stamp or
+licence.
+
+
+### 315.7 THE THREE QUESTIONS OF 299, ANSWERED
+
+**(a) PRIMARY — does the count-matched sign hold at 5e-4 on CIFAR-100?  NOT READABLE.**  At the in-batch anchor (α-scaled
+0.1) the audit's CIFAR-100 sign reproduces: D_W1 +1.2170 pp (+3.99 SE, SURVIVES, `ANCHOR-MATCHES-POOL` against the
+landed pool +1.5602).  At 5e-4 the chunk771 arm is box-bound, the registered gate makes the rung BOXBOUND, and the
+branch is `UNRESOLVED-BOXBOUND-W4`: the point estimate (+0.0645 pp, ±2 SE [−0.5451, +0.6741]) is not a registered survive,
+vanish or reverse reading, and the box-free counterfactual (VANISHES) licenses nothing.  The registered fact that stands:
+at 5e-4 the step sizes reach the box.
+
+**(b) SCALAR — does `SCALAR-BEATS-BEST` generalise?  AS AN UNTUNED READING, YES, AT THIS CELL.**  At 5e-4 plain scalar
+is above both audited partitions by +6.0345 / +6.0990 pp (19.8 / 20.0 SE; min T − 2 SE +5.4249), resolved.  It is
+`crt1`'s untuned M2 configuration (311 A5), and after `crt1`'s retune `cgw1`'s own scalar row reads as a tie (a bound);
+no retune has been run at this CIFAR-100 cell, so robustness to tuning is untested here, not refuted (F2, F3).
+
+**(c) DENOM — is the chW4 arm still ≥ 1 pp below the landed tuned SGD + cosine?  YES: `DENOM-HOLDS`**, GAPch_W4 +14.5857
+pp (+44.61 SE, [+13.9318, +15.2396]), between batches.  So at this cell 1.16's decay confound is not supported in its
+nominal-value form: lowering the MetaOptimize arm's nominal decay from 0.1 to the SGD arm's 5e-4 widens the gap rather
+than closing it.  A realised-decay match was not tested.  At both rungs the chunk771 arm's realised plateau shrink
+(2.4478e-5 at 0.1 and 2.7430e-6 at 5e-4, both approximate) is below the SGD recipe's ~5e-4.  The comparison is still
+between batches and inherits 1.14's test-set selection (F1).  Descriptively (both between batches), the gap is +5.71 pp
+at 0.1 and +14.59 pp at 5e-4; even the best grain at 5e-4 (scalar) is +8.55 pp below, a max-selected, downward-biased
+figure.  Whether re-tuning ms / α0 at 5e-4 would close part of the gap is untested at this cell (`crt1`'s partition
+gains of +3.59 / +3.50 pp at A2 belong to the CIFAR-10 cell and are not transferred).
+
+
+### 315.8 What this licenses, and what it does not
+
+**The registered licences, verbatim, at this cell only (the `LICENCE` lines of the scorer log):**
+
+> *primary:* "a primary-rung partition arm is box-bound; the contrast is not an audit replication.  Itself a fact: at 5e-4 the step sizes reach the box."
+
+> *scalar:* "plain scalar is ABOVE both audit partitions at 5e-4 by >= 0.30 pp, resolved: at the decay VALUE 5e-4 applied alpha-scaled, on this CIFAR-100 cell, no audited partition beats a single shared step size -- cgw1's reading holds on the audit's second dataset."
+
+> *denom:* "the audit's CIFAR-100 MetaOptimize arm (chunk771, cdn1-m's configuration) run at the decay VALUE 5e-4 is still below the landed tuned SGD + cosine (cdn1, lr 0.1, wd 5e-4) by >= 1.0 pp, resolved: the denominator deficit is not an artefact of running the MetaOptimize arm at 0.1 (ICML-PLAN 1.16), at this cell, between batches, with the SGD arm's lr chosen on the test set (1.14)."
+
+**Clauses that travel with them (F1–F5):** with the scalar licence, *"cgw1's reading" means cgw1's UNTUNED reading at
+ms 1e-4 / α0 1e-3; after crt1's retune cgw1's scalar row reads as a tie (a bound); cgw1's +2.6–2.8 pp is quoted only
+with "at this cell cgw1's +2.6-2.8 pp was, at least in part, a tuning artefact"; what generalises to CIFAR-100 is the
+untuned reading only; the reading is untuned (311 A5) and robustness to tuning is untested here, not refuted; it
+compares one nominal decay value, not one realised dose (up to 18.2× apart among the arms)*.  With the denom licence,
+*the nominal-value form only; a realised-decay match was not tested; the chunk771 arm is box-bound at 5e-4 (the rule
+does not gate on the box; the box-free nodewise arm reads +14.6502 descriptively)*.  With every licence, the α-scaled
+nominal-5e-4 qualifier of 296.8.
+
+**NOT licensed**: "the audit effect survives at 5e-4 on CIFAR-100" or "vanishes" (the primary is unreadable); any reading
+of the box-free counterfactual; any pooled reading with `cgw1` or any two-dataset claim; "the audit effect survives or
+vanishes at standard decay"; anything about a standard RECIPE's realised decay; "scalar beats the partitions after
+tuning" or "robust to tuning"; "not robust to tuning"; the DENOM result as an in-batch comparison or without 1.14's
+test-set caveat; "1.16's confound is refuted" in any realised-decay form; the layerwise-below-scalar stamp as a
+box-free reading; any other cell, dataset or decay form.
+
+
+### 315.9 THE INGEST — `g3b`, ONCE (commit `4f7e191`), with all 16 exclusion rows in the SAME commit
+
+**Corpus 3,469 → 3,501 rows; exclusion list 354 → 370 rows over 23 batches.**  Built on 308's `corpus_exclusions.py`
+(`3723a499…`, UNEDITED).
+
+`analysis/aggregate.py` (`35c035e1…`, UNEDITED) `../runs ../runs_alice2 > results/all_runs.csv` → exit 0, 3,501 runs,
+the same 3 standing duplicate-name warnings; `analysis/args_repair.py` (`e6d8918d…`, UNEDITED) `--apply` → 36 rows
+updated (the standing `dup_group` restoration), **0 accuracy or config values changed, 0 superseded**, 3,465 untouched
+(its `.bak` deleted; `*.bak*` is git-ignored).  The same two steps run first on scratch copies gave a byte-identical CSV.
+
+**ADDED 32 exactly, REMOVED 0, CHANGED 0** — re-derived with a reader of my own keyed on `(run, job_id)` against the
+pre-ingest CSV: 38 fields, names identical, **0 duplicate keys before or after, 0 of 131,822 pre-existing field-cells
+changed**; `git diff --numstat` **32 / 0**.  Every added row `epochs_done` 100 / `epochs_requested` 100 / `complete` 1 /
+`window_ok` 1 / `superseded` 0, `ResNet18_c100` / CIFAR100, ms 1e-4, α0 1e-3; jobs 5080798–5080829; chunk771 / nodewise /
+scalar / layerwise × 8, seeds 170–173 × 8.  **NO PROOF JOB**: 0 added rows named `proof` / `bite` (`g3b` had none).
+GPU-hours by `wallclock_min` **3528.2333 → 3561.6833 (+33.4500)**; 33.7636 by `sacct`.
+
+**The 16 exclusion rows** — the data rows of `results/g3b_exclusion_rows_PROPOSED.tsv` (`c6ea6a6d…`) appended **byte for
+byte** in job order (their `"\n"`-joined digest `038f1f99…` equals the attack's [8]), 9-column form, `registered_at`
+**CORRECTIONS 315** (the PROPOSED file named this number provisionally; this entry takes it, so no column is rewritten);
+the old file an EXACT PREFIX of the new (+3,592 bytes); `git diff --numstat` 16 / 0; 370 distinct keys:
+* **W4, 16 one-kind rows**: intervention `--weight-decay-base 5e-4`, witness `ARGS_WD_BASE: weight-decay-base=5e-4`
+  GENERATED by `corpus_exclusions.args_deviations()` on each run's own ARGS line (273.9), never typed; `looks_like` `ch
+  (granularity chunk771)` / `nd (granularity nodewise)` / `k01 (granularity scalar)` / `kL (granularity layerwise)`;
+  reason 263's.  momentum-param-base is 0.99 on every run, so no row is two-ARGS; no ON line, so no row is two-axis.
+* The 16 W1 runs sit at the standard 0.1 and owe nothing.
+
+**GATES, on the committed tree.**  `python3 analysis/corpus_exclusions.py --check --runs ../runs ../runs_alice2` →
+**exit 0, `VERDICT: PASS`**: 370 rows over 23 batches, every listed key present exactly once in the 3,501-row CSV; raw
+`.out` witnesses: 370 listed runs carry their listed line; ON-line completeness 218 / 218 (unchanged); two-axis 19
+(unchanged); multi-kind 2 kinds 33, 3 kinds 12 (unchanged); **ARGS witness 155 → 171 listed runs**, each carrying its own
+value; 75 / 75 deviating standard-cell rows listed (`g3b`'s 16 sit outside 263's standard cell and are listed all the
+same); 651 cells, none mixing; multi-ARGS 6, True; decay-route 0 listed, True.  `SIGMA_R18ALL` **0.636566 (df 274),
+unchanged**.  `python3 analysis/c98b_reproduce.py` (`1bd675ea…`, UNEDITED) → **exit 0, 806 lines, `science 618/618 PASS
+| drift 18 site(s), 10 differ (not gated) | guards fired 0 | declaration OK`** — 312.9's verdict byte for byte.  The
+registered scorer re-run post-ingest (315.2): identical except the path echoes.  **`g3b-` added to `bin/PROTECTED.txt`**
+in the same commit (owed at 299.9; the launcher had added it to the stage copy only).
+
+
+### 315.10 WHAT THIS DOES TO THE PAPER
+
+**(a) The audit's second dataset at 5e-4.**  The rewritten headline (310.10 (a)) keeps the count-matched sign as a
+finding at α-scaled 0.1; `g3b` adds an IN-BATCH reproduction on the second dataset at 0.1 (D_W1 +1.2170, SURVIVES,
+within 0.35 pp of the landed CIFAR-100 pool), so the 0.1 sign is now reproduced in batch on both datasets (`cgw1` +0.3693
+on CIFAR-10).  At 5e-4 the CIFAR-100 contrast is **unreadable** (`UNRESOLVED-BOXBOUND-W4`): the draft may say, at this
+cell, only the registered fact that at 5e-4 the step sizes reach the box, and must say neither "survives at 5e-4" nor
+"vanishes at 5e-4" for CIFAR-100.  **So the 5e-4 question still rests on ONE readable cell** — `cgw1`'s interval
+[−0.0120, +0.4940] (296.8) — and 298's judgement ("until G3b or the 5e-4 retune lands, the rewritten headline rests on
+one CIFAR-10 cell") is not lifted for the partition sign; it IS lifted for the scalar row (b).  A referee may read the
+box as a harness limit binding the audit's own grain at a standard decay value; the draft should state it as that fact
+(chunk771's top coordinate reaches the box's upper edge from epoch ≈ 92, on ≤ 0.027 % of groups), with the UNSURE onset.
+
+**(b) The scalar reading is untuned (311 A5).**  At this cell `SCALAR-BEATS-BEST` holds untuned, by +6.03 / +6.10 pp.  The
+scalar row of the draft therefore reads, with every qualifier: **at α-scaled 5e-4, untuned, plain scalar is above both
+audited partitions on CIFAR-10 (+2.6–2.8 pp, `cgw1`; at least in part a tuning artefact there) and on CIFAR-100 (+6.03 /
++6.10 pp, `g3b`; tuning untested there); after per-grain re-tuning on CIFAR-10 it ties the better partition (a bound,
+`crt1`; `crt2` running past its grid edge)**.  The row stays "ties (a bound) after re-tuning" as its CIFAR-10 headline;
+the CIFAR-100 reading may not be presented as robust to tuning, and a CIFAR-100 retune is not registered (UNSURE whether
+a referee will ask; the pressure is that `crt1` closed most of the CIFAR-10 gap by raising α0).  The descriptive
+`LAYERWISE-BELOW-SCALAR-W4` (G −1.9870) is read against a box-bound layerwise arm (F5).
+
+**(c) The denominator at 5e-4 — does 1.16 close?  FOR `cdn1`'s CIFAR-100 CONTRAST, IN ITS NOMINAL-VALUE FORM, YES; NOT IN
+A REALISED-DECAY FORM, AND NOT FOR `cau1` / `cuc1`.**  Row 1.16 asked to re-run the MetaOptimize comparison arm at κ
+5e-4 because `cdn1`'s ran at 0.1.  `chW4` is that re-run (`cdn1-m`'s configuration, 32 runs rather than 1.16's 6):
+`DENOM-HOLDS`, +14.5857 pp.  Lowering the MetaOptimize arm's nominal decay to the SGD arm's value widens the gap rather
+than closing it (descriptively +5.71 → +14.59 pp, both between batches), so the reported +5.699 pp (MetaOptimize at 0.1)
+is the more favourable comparison for the method at this cell.  Bounds that stay on the sentence: a realised-decay
+match was not tested (the chunk771 arm's realised plateau shrink is below the SGD recipe's ≈ 5e-4 at both rungs); the
+comparison is between batches and the SGD lr was chosen on TEST (1.14); the 5e-4 MetaOptimize arm runs the 0.1-tuned ms /
+α0 (untuned at 5e-4); the chunk771 arm is box-bound at 5e-4.  **1.16 is re-tagged PARTIAL — LANDED (315) for `cdn1`**:
+the κ confound is removed for the CIFAR-100 denominator in its nominal-value form; `cau1` (CIFAR-10, +3.617) and `cuc1`
+(+12.178) were not re-run at 5e-4.
+
+**(d) Owed to the draft (NOT edited here; `paper/` untouched):** the CIFAR-100 0.1 in-batch reproduction beside
+`cgw1`'s; the 5e-4 CIFAR-100 primary as the registered box fact, with no survive / vanish sentence; the scalar row's
+CIFAR-100 untuned figure with the 311 A5 / A4 clauses (b); the denominator paragraph's 1.16 sentence as the registered
+denom licence verbatim with its nominal-value, cross-batch and 1.14 qualifiers (c).  **Venue: TMLR, unchanged**; the
+0.6–0.7 stays an un-argued JUDGEMENT, UNSURE (311 A3), not re-estimated here.  The one referee point this batch could
+have closed for the headline (a readable CIFAR-100 5e-4 sign) was not reached; the two it could have hurt (SCALAR-BELOW,
+DENOM-CLOSES) were not reached either.
+
+**(e) Later-evidence relations this entry states, in the relation vocabulary (for the notebook's cross-links):**
+* MT240 (`cgw1`) → MT244 (`g3b`), **replicates**: the registered scalar licence, "cgw1's reading holds on the audit's second dataset" — the UNTUNED scalar reading (ms 1e-4 / α0 1e-3) at the decay value 5e-4, α-scaled, on one CIFAR-100 cell, never pooled.
+* MT191 (`gc1`) → MT244, **replicates**: at the in-batch anchor, "the audit's CIFAR-100 sign reproduces at weight decay 0.1 (D_W1 +1.2170, ANCHOR-MATCHES-POOL)" — the pool is `gc1` + `gm2` (+1.5602).
+* MT199 (`gm2`) → MT244, **replicates**: the same sentence, "the audit's CIFAR-100 sign reproduces at weight decay 0.1 (D_W1 +1.2170, ANCHOR-MATCHES-POOL)"; MT199's own Open outcome is not moved.
+* MT175 (the audit headline) → MT244, **qualifies**: "the audit's practical significance stays qualified on the second dataset: at 5e-4, untuned, no audited partition beats a single shared step size on CIFAR-100".
+* Not stated as a relation: the denominator (MT155, `cdn1`).  This entry says the deficit "is not an artefact" of the 0.1 arm in its nominal-value form, which is none of the five relations; it is left out rather than relabelled.
+
+**(f) Applied to the documents:** `docs/ICML-PLAN.md` (a 315 amendment at the top; row 1.16 re-tagged PARTIAL — LANDED
+(315) for `cdn1`; §4a heading and rank 1 LANDED); `docs/STATUS.md` (a CYCLE 165 table); `docs/MASTER-TABLE.md` row **244**
+(`g3b`) appended at the end in row 243's form, header counts amended in place (3,501 runs / 3561.7 GPU-h; appended rows
+32 → 33; tally 180 → 181), old figures bracketed; `c73` exit 0.  **One stale header count found and corrected in place,
+bracketed**: the header's "rows that carry a `wallclock_min`" still read 3,301 (its cycle-159 value, not bumped at 296,
+310 or 312); re-derived from the CSV it is 3,486 of 3,501 (15 without); no number outside that clause read it, and the
+registered checker does not read it.
+
+
+### 315.11 Discipline, files, cost
+
+RULE 16 held: no registered scorer, design, launcher, guard, `aggregate.py`, `args_repair.py` or `corpus_exclusions.py`
+edited.  RULE 20 at full coverage before any number was read (plus the by-hand audit owed at 299.12).  `plateau5` from
+RAW `.out`; the CSV `plateau` column read by nothing.  Floor readings are bounds; descriptive readings labelled; the three
+licences quoted verbatim, at this cell only.  Files of this landing: committed at `7e348a3` by the scoring track
+(`analysis/g3b_attack_indep.py`, `results/g3b_c100wd_score_alice2.txt`, `results/g3b_c100wd_score_mac.txt`,
+`results/g3b_attack_indep_alice2.txt`, `results/g3b_attack_indep_mac.txt`, `results/g3b_rule20_full_land.txt`,
+`results/g3b_argsguard_byhand.txt`, `results/g3b_runfiles_sha256.txt`, `results/g3b_exclusion_rows_PROPOSED.tsv`);
+ingest commit `4f7e191` (`results/all_runs.csv`, `results/CORPUS-EXCLUSIONS.tsv`, `bin/PROTECTED.txt`); this entry writes
+`docs/CORRECTIONS.md`, `docs/MASTER-TABLE.md` (row 244), `docs/ICML-PLAN.md`, `docs/STATUS.md`.  The synced run files stay
+in `../runs_alice2` (cited above).  The registration-era stages on `alice2` (`~/stage_g3b`, `~/stage_g3b_dry*`, cited by
+299.7 / 299.12) are KEPT; the scoring and refute tracks report their own landing stages and scratch deleted, and this
+entry's Mac scratch (and the session's earlier local `g3b` stage copies) is deleted.
+**Cost: ZERO GPU-hours this cycle** (the batch itself: 33.7636 GPU-h by `sacct`).  `alice` NOT contacted; nothing under
+`paper/` read, listed or touched; no clone, checkout or worktree of the campaign repo; nothing downloaded; no running
+batch (`cai1`, `crd1`, `crt2`) touched.
+
+Next free number: **316**.
