@@ -1,0 +1,168 @@
+======================================================================================================================
+ crt2_attack_indep -- AN INDEPENDENT RE-DERIVATION OF THE REGISTERED crt2 SCORER'S OUTPUT (CORRECTIONS 313)
+ No repo module imported, no regular expression, every literal re-typed.  Host-independent output.
+======================================================================================================================
+
+[0] SYNC INTEGRITY -- one digest over every run file's name and bytes, in registered run order
+  files 90   bytes 3472297140   digest bcdf621393985eb510e6b15065f9926afb924a860a3617dcdf4d61575a7043c6
+  PASS 45 .out + 45 probe.jsonl present, exactly one .out per registered run (no twin)   90 files
+  PASS no crt2- .out outside the registered 45 runs
+  PASS PROVENANCE: MODE submit, scorer / design / HF shas and the registered commit are 313.11 / 313.12's   commit 986e165e59c9
+
+[1] THE DESIGN, REBUILT FROM CORRECTIONS 313.3 / 313.4 / 313.5
+  PASS 15 arms x 3 seeds = 45 runs
+  PASS the PLUS: alpha0 {1e-2,3e-2,1e-1} at ms 1e-4; ms {3e-5,1e-4,3e-4} at alpha0 3e-2; centre A3   A2,A3,A4,H3,L3
+  PASS three alpha0 points and three ms points; only A3 is interior on BOTH axes (313.3)
+  PASS A4's ln(alpha0) = -2.302585 IS the box ceiling -2.3026 to 1.5e-5: its upper alpha0 edge and the ceiling coincide
+  PASS grain group counts ch 14421 / nd 14420 / k01 1 (count-matched)
+  PASS EMAX5 re-derived by quadrature equals the re-typed 1.1629644736   1.1629644736
+  PASS quadrature exact on the closed form E[max of 3] = 3/(2 sqrt(pi))
+  PASS the frozen literals re-derive: B 0.167753, SE 0.203995, EDGE_BEATS 0.575743, EDGE_TIE 0.275743
+
+[2] EVERY RUN'S ARGS LINE (20 flags, in order), ENV LINE AND G-ONCE, REBUILT
+  PASS 45 / 45 runs complete (100 epoch lines + RUN_DONE)   45
+  PASS G-ONCE: one ARGS line, one ENV line, every epoch line once, on all 45   45
+  PASS every ARGS line == the rebuilt 20-flag line (its OWN config's ms / alpha0, its OWN grain, wd 5e-4)   45
+  PASS every ENV line == the registered line with the run's own PROBE_DIR (the ceiling is in ENV, not a flag)   45
+  PASS no `<KIND>: on` witness and no PROBE_TENSOR line on any run (no patch tree)   45
+  PASS axis coverage read off the ARGS lines is the registered ms 1e-4 x27 / 3e-4 x9 / 3e-5 x9, alpha0 1e-2 x9 / 3e-2 x27 / 1e-1 x9, 15 runs per grain, wd 5e-4 x45 (RULE 20 at full coverage, re-derived)
+  GPU (disclosure): NVIDIA L4 x45
+  harness minutes per run (the runs' own `N  minutes` line): chunk777 51-71  nodewise 44-64  scalar 43-63
+
+[3] PROBE STRUCTURE, INITIAL beta, RECORD-LEVEL BOX OCCUPANCY, BULK CEILING OCCUPANCY AND SHRINK, FROM THE RAW RECORDS
+  PASS 45 / 45 probe files: 10,000 records at steps 0,5,..,49995, n_beta == the arm's m on every record, a beta list AND an n_at_hi count on every record, beta moved   45
+  PASS G-STRUCT's NEW requirement: an integer n_at_hi on every one of 450,000 records   45
+  PASS every run's FIRST record has every stored log step size at ln(its own alpha0) (+/- 1e-3): -4.6052 at 1e-2, -3.5066 at 3e-2, -2.3026 at 1e-1 (A4 starts ON the ceiling)   45
+  box and ceiling occupancy per arm: rec_hi (max over seeds; crt1's record stamp) and ceil_frac (window-median
+  fraction of GROUPS at the ceiling, median over seeds; CEIL-BULK at >= 0.05), with the raw group counts
+    chA2   rec_hi 0.4982  BOUND  ceil_frac 2.774e-04  bulk-free  window-median groups at the ceiling 4/5/4 of 14421 (max 8/8/7)
+    ndA2   rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 14420 (max 0/0/0)
+    k01A2  rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 1 (max 0/0/0)
+    chA3   rec_hi 0.7377  BOUND  ceil_frac 6.934e-05  bulk-free  window-median groups at the ceiling 1/1/1 of 14421 (max 2/3/3)
+    ndA3   rec_hi 0.2575  BOUND  ceil_frac 2.774e-04  bulk-free  window-median groups at the ceiling 4/4/5 of 14420 (max 10/10/12)
+    k01A3  rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 1 (max 0/0/0)
+    chA4   rec_hi 1.0000  BOUND  ceil_frac 2.774e-04  bulk-free  window-median groups at the ceiling 4/4/3 of 14421 (max 7/8/7)
+    ndA4   rec_hi 1.0000  BOUND  ceil_frac 1.411e-02  bulk-free  window-median groups at the ceiling 200/203.5/219 of 14420 (max 359/323/370)
+    k01A4  rec_hi 0.0004  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 1 (max 0/0/0)
+    chH3   rec_hi 0.9065  BOUND  ceil_frac 1.387e-04  bulk-free  window-median groups at the ceiling 2/1/2 of 14421 (max 5/5/5)
+    ndH3   rec_hi 0.7992  BOUND  ceil_frac 5.617e-03  bulk-free  window-median groups at the ceiling 82/81/70 of 14420 (max 124/130/117)
+    k01H3  rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 1 (max 0/0/0)
+    chL3   rec_hi 0.1670  BOUND  ceil_frac 4.161e-04  bulk-free  window-median groups at the ceiling 6/5/6 of 14421 (max 7/7/9)
+    ndL3   rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 14420 (max 0/0/0)
+    k01L3  rec_hi 0.0000  free   ceil_frac 0.000e+00  bulk-free  window-median groups at the ceiling 0/0/0 of 1 (max 0/0/0)
+
+[4] LEVELS, THE FROZEN SIGMA AND ITS VALIDITY GATE, SELECTION, BIAS BOUND, CONTRASTS, LOC, STATES AND TOKENS
+  SIGMA_FROZEN 0.249842 (literal, crt1 df 24)   SIGMA_INBATCH 0.188910 (df 30)   all arms 0.188910 (df 30)
+  GATE threshold 0.334178 (chi2_0.995,30 re-derived by Simpson + bisection: 53.671962)  -> PASS
+  B = 0.167753   TRAIN-selected ch=H3,nd=H3,k01=A4   TEST-selected ch=A4,nd=A4,k01=A4   LOC ch=NOT-LOCATED-MSHI,nd=NOT-LOCATED-MSHI,k01=NOT-LOCATED-A0HI-CEILING
+  TUNED-UNRESOLVED  ORACLE-PARTITION-TIES-SCALAR  per-config A2-TIES+A3-LEADBOUNDED+A4-BELOW+H3-BELOW+L3-TIES  ->  RETUNE-UNDECIDED | LOC-PARTIAL
+  PASS SIGMA_FROZEN re-derived from crt1's OWN 36 raw .out files: 0.249841505314 (df 24) == the re-typed literal
+  PASS crt1's A2 levels re-derived: chunk777 91.3400 nodewise 91.1007 scalar 91.7887
+  PASS crt1's IN-BATCH A2 - M2 contrasts (the cross-batch lower alpha0 bracket of an A2 selection) re-derived: chunk777 +3.5887 nodewise +3.5040 scalar +1.2780
+  PASS each A2 - M2 contrast exceeds crt1's 2 SE 0.4080, so an A2 selection would read LOCATED-A0-XB (313.5)
+
+[5] THE SCORER'S STDOUT, REBUILT LINE BY LINE AND COMPARED WITH EACH COMMITTED LOG
+  corpus counts re-derived from the 2 (csv, tsv) pair(s) given: 3131, 3115
+  PASS log crt2_retune_score_alice2.txt: 61 lines, 58 rebuilt byte for byte, 3 host-dependent matched by form
+  PASS log crt2_retune_score_mac.txt: 61 lines, 58 rebuilt byte for byte, 3 host-dependent matched by form
+  the FINAL line, rebuilt token by token:
+    FINAL RETUNE-UNDECIDED | LOC-PARTIAL:ch=NOT-LOCATED-MSHI,nd=NOT-LOCATED-MSHI,k01=NOT-LOCATED-A0HI-CEILING | TUNED-UNRESOLVED | ORACLE-PARTITION-TIES-SCALAR | A2-TIES+A3-LEADBOUNDED+A4-BELOW+H3-BELOW+L3-TIES | SEL-TRAIN:ch=H3,nd=H3,k01=A4 SEL-TEST:ch=A4,nd=A4,k01=A4 | ONE-CELL ONE-DECAY-5e-4 FIVE-POINT-PLUS-GRID ALPHA0-THREE-POINTS SELBIAS-B=0.1678 NO-VALIDATION-SPLIT ALPHA-SCALED-DECAY-ONLY UNDER-DECAYED-VS-STANDARD-RECIPE CEILING-FIXED-AT-0.1 SIGMA-FROZEN-FROM-CRT1 TIES-ARE-BOUNDS CRT1-COMPARISON-DESCRIPTIVE SIGMA-INBATCH=0.1889 REPLICATE-MATCHES-CRT1 GRID-EDGE-ch-H3 SEL-DISAGREE-ch SELECTED-BOX-BOUND-ch GRID-EDGE-nd-H3 SEL-DISAGREE-nd SELECTED-BOX-BOUND-nd GRID-EDGE-k01-A4 SEL-AGREE-k01 BOX-BOUND-chA2 BOX-BOUND-chA3 BOX-BOUND-ndA3 BOX-BOUND-chA4 BOX-BOUND-ndA4 BOX-BOUND-chH3 BOX-BOUND-ndH3 BOX-BOUND-chL3
+
+[6] THE REALISED PER-STEP SHRINK a*wd PER ARM (DESCRIPTIVE).  caw2's registered definition (CORRECTIONS 290): per
+    record, the median over the arm's stored step sizes of exp(beta) x wd; plateau = median over records at step
+    >= 47,500; arm value = median over its 3 seeds.  EXACT for scalar (m 1); for chunk777 / nodewise the records
+    carry only the 62 per-tensor MEANS of log step size, so their figure is a PROXY (labelled).  'max_win' =
+    exp(beta_true_max) x wd, the EXACT largest single-coordinate shrink, window median.  References: a standard
+    SGD recipe's steady-state shrink ~5e-4 (lr 0.1 x wd 5e-4 inside a 0.9 momentum buffer, 296.4) and its bare
+    per-step lr x wd 5e-5.
+  arm    kind     shrink_pl   shrink_pk     max_win   5e-4/pl (x)   5e-5/pl (x)        a_pl
+  chA2   proxy   1.2377e-05  1.2705e-05  4.9999e-05          40.4          4.04  2.4753e-02
+  ndA2   proxy   5.0552e-06  5.2755e-06  3.1532e-05          98.9          9.89  1.0110e-02
+  k01A2  exact   5.3253e-06  7.9071e-06  5.3253e-06          93.9          9.39  1.0651e-02
+  chA3   proxy   1.6905e-05  2.2377e-05  4.9999e-05          29.6          2.96  3.3811e-02
+  ndA3   proxy   1.4593e-05  1.5001e-05  4.9999e-05          34.3          3.43  2.9187e-02
+  k01A3  exact   6.1516e-06  1.5032e-05  6.1516e-06          81.3          8.13  1.2303e-02
+  chA4   proxy   1.4796e-05  4.9999e-05  4.9999e-05          33.8          3.38  2.9591e-02
+  ndA4   proxy   2.8557e-05  4.9997e-05  4.9999e-05          17.5          1.75  5.7114e-02
+  k01A4  exact   6.0420e-06  4.9999e-05  6.0420e-06          82.8          8.28  1.2084e-02
+  chH3   proxy   9.6411e-06  2.5906e-05  4.9999e-05          51.9          5.19  1.9282e-02
+  ndH3   proxy   1.3667e-05  1.5002e-05  4.9999e-05          36.6          3.66  2.7333e-02
+  k01H3  exact   5.7792e-06  1.5095e-05  5.7792e-06          86.5          8.65  1.1558e-02
+  chL3   proxy   1.8448e-05  1.8640e-05  4.9999e-05          27.1          2.71  3.6897e-02
+  ndL3   proxy   1.4964e-05  1.5000e-05  2.4775e-05          33.4          3.34  2.9927e-02
+  k01L3  exact   6.5566e-06  1.5009e-05  6.5566e-06          76.3          7.63  1.3113e-02
+  every arm's plateau shrink is 18x to 99x below the standard recipe's ~5e-4 (DESCRIPTIVE): 296.4's caveat
+  binds UNWEAKENED at every point of this grid, the raised alpha0 points included (A2 94x, A3 81x, A4 83x, H3 87x, L3 76x).
+  PASS no arm's plateau shrink reaches even the bare lr x wd 5e-5 (UNDER-DECAYED-VS-STANDARD-RECIPE holds on all 15 arms)
+  PASS no arm's plateau step size exceeds the fixed ceiling a = 0.1 (CEILING-FIXED-AT-0.1): max a_pl 5.7114e-02
+
+[7] WHAT BOUNDS THE VERDICT -- the registered reading's margins, then DESCRIPTIVE sensitivities (license nothing)
+  REGISTERED (sigma FROZEN 0.249842, B 0.167753, SE 0.203995, 2 SE 0.407989):
+    BEATS needs BOTH T - B >= +0.30 AND T - B > 2 SE:  ch T-B -0.2051 (bar clause MISSED, resolution clause MISSED by -0.6131)
+                                                     nd T-B -0.3084 (bar clause MISSED, resolution clause MISSED by -0.7164)
+    PARTITION-ABOVE needs min T + B <= -0.30 AND < -2 SE:  min T + B = +0.0271  (0.3271 pp short of the bar)
+    SCALAR-TIES needs min T - B - 2 SE >= -0.30:  -0.7164  -> missed (short by 0.4164)
+    PARTITION-TIES needs min T + B + 2 SE <= +0.30:  +0.4351  -> missed (over by 0.1351)
+    so the reported interval of min T is [-0.7164, +0.4351], width 1.1515 pp = 2 x (2 SE + B); UNRESOLVED needs
+    |min T| < 0.2757, and |min T| = 0.1407.
+  DESCRIPTIVE 1 -- the frozen sigma cannot move the branch (313.7): the change points over [0.05, 0.60] are
+    0.0695 (TUNED-SCALAR-TIES-BEST -> TUNED-PARTITION-TIES-SCALAR); 0.1915 (TUNED-PARTITION-TIES-SCALAR -> TUNED-UNRESOLVED); the frozen value 0.249842 is 0.0583 above the nearest.
+    The in-batch sigma 0.188910 (df 30) is BELOW the frozen literal by 24.4 %, and the gate threshold is 0.334178, so
+    the frozen sigma is CONSERVATIVE here: every edge is wider than the batch's own noise would give.
+  DESCRIPTIVE 2 -- the every-config reading (NO selection, so NO B): A2-TIES+A3-LEADBOUNDED+A4-BELOW+H3-BELOW+L3-TIES.
+    Scalar is ahead at A2 and L3 and BEHIND at A3, A4 and H3; the sign of T flips inside the grid, which is why
+    the selected contrast lands near zero (TIES-ARE-BOUNDS: none of these is 'the grains are equal').
+  DESCRIPTIVE 3 -- per seed at the TRAIN-selected arms (plateau5):
+    chunk777  H3  s200 92.59  s201 92.14  s202 92.13   mean 92.2833
+    nodewise  H3  s200 92.12  s201 92.70  s202 92.33   mean 92.3867
+    scalar    A4  s200 92.45  s201 92.16  s202 92.13   mean 92.2460
+    drop seed 200: T_ch +0.0120  T_nd -0.3750  (2 v 2)
+    drop seed 201: T_ch -0.0660  T_nd +0.0630  (2 v 2)
+    drop seed 202: T_ch -0.0580  T_nd -0.1100  (2 v 2)
+  DESCRIPTIVE 4 -- LOCATED (313.5).  TRAIN selects ch=H3,nd=H3,k01=A4; chunk777 NOT-LOCATED-MSHI, nodewise NOT-LOCATED-MSHI, scalar NOT-LOCATED-A0HI-CEILING.
+    Both partitions select H3 (ms 3e-4, the TOP of the ms axis {3e-5, 1e-4, 3e-4}), so the ms axis is NOT
+    bracketed above for them; scalar selects A4 (alpha0 1e-1), whose start IS the ceiling, NOT LOCATED by
+    construction (313.4 / 313.5).  Locating them would need ms above 3e-4 at alpha0 3e-2 for the partitions and
+    an alpha0 above 1e-1 -- i.e. a RAISED BETA_CLIP -- for scalar; neither exists in this batch or in crt1.
+    On the alpha0 axis at ms 1e-4 the in-batch trend is: ch 91.1173 -> 92.1927 -> 92.6773, nd 91.0540 -> 92.1473 -> 92.3893,
+    k01 91.5027 -> 91.7973 -> 92.2460 (A2 -> A3 -> A4): every grain still RISING at the ceiling on TEST.
+  DESCRIPTIVE 5 -- the ceiling in bulk (313.4's registered measure).  ceil_frac per arm:
+    A2  ch 2.774e-04  nd 0.000e+00  k01 0.000e+00   none at or above 0.05
+    A3  ch 6.934e-05  nd 2.774e-04  k01 0.000e+00   none at or above 0.05
+    A4  ch 2.774e-04  nd 1.411e-02  k01 0.000e+00   none at or above 0.05
+    H3  ch 1.387e-04  nd 5.617e-03  k01 0.000e+00   none at or above 0.05
+    L3  ch 4.161e-04  nd 0.000e+00  k01 0.000e+00   none at or above 0.05
+    The rec-based BOX stamp fires on 8 arms; the BULK measure fires on none, so no selection is NOT-LOCATED-CEILING
+    and A4's NOT-LOCATED is by construction (its start), not by bulk occupancy.
+  DESCRIPTIVE 6 -- the selector.  train5 at the selected arms: chunk777 99.8173  nodewise 99.8373  scalar 99.8600; TRAIN and TEST select the SAME config only for
+    scalar, so the TUNED and ORACLE contrasts are different numbers and the ORACLE reading is independent evidence.
+    train5 spans 99.2580 .. 99.8600, its maximum 0.1400 pp below 100: the SELECTOR is close to saturation, and the
+    train-selected and test-selected configs differ for both partitions (SEL-DISAGREE x2).
+  DESCRIPTIVE 7 -- BESIDE crt1 (309), CROSS-BATCH, NEVER POOLED.  crt1's TUNED contrasts at its A2 selection were
+    T_ch +0.4487 / T_nd +0.6880 (WEAKENED-TO-TIE, sigma break-even 0.2014); crt2's A2 replicate gives T_ch +0.3853 /
+    T_nd +0.4487 on fresh seeds, and crt2's TUNED contrasts after tuning past that edge are T_ch -0.0373 / T_nd -0.1407.
+    The scalar POINT lead at A2 is reproduced in sign and size; it does NOT survive raising alpha0 past 1e-2.
+  FLOOR / CEILING (164.6):
+    chA2   level 91.1173  above HEALTH_MIN 80 by +11.1173  above chance 10 by 81.1173  below 100 by 8.8827
+    ndA2   level 91.0540  above HEALTH_MIN 80 by +11.0540  above chance 10 by 81.0540  below 100 by 8.9460
+    k01A2  level 91.5027  above HEALTH_MIN 80 by +11.5027  above chance 10 by 81.5027  below 100 by 8.4973
+    chA3   level 92.1927  above HEALTH_MIN 80 by +12.1927  above chance 10 by 82.1927  below 100 by 7.8073
+    ndA3   level 92.1473  above HEALTH_MIN 80 by +12.1473  above chance 10 by 82.1473  below 100 by 7.8527
+    k01A3  level 91.7973  above HEALTH_MIN 80 by +11.7973  above chance 10 by 81.7973  below 100 by 8.2027
+    chA4   level 92.6773  above HEALTH_MIN 80 by +12.6773  above chance 10 by 82.6773  below 100 by 7.3227
+    ndA4   level 92.3893  above HEALTH_MIN 80 by +12.3893  above chance 10 by 82.3893  below 100 by 7.6107
+    k01A4  level 92.2460  above HEALTH_MIN 80 by +12.2460  above chance 10 by 82.2460  below 100 by 7.7540
+    chH3   level 92.2833  above HEALTH_MIN 80 by +12.2833  above chance 10 by 82.2833  below 100 by 7.7167
+    ndH3   level 92.3867  above HEALTH_MIN 80 by +12.3867  above chance 10 by 82.3867  below 100 by 7.6133
+    k01H3  level 91.8727  above HEALTH_MIN 80 by +11.8727  above chance 10 by 81.8727  below 100 by 8.1273
+    chL3   level 91.8180  above HEALTH_MIN 80 by +11.8180  above chance 10 by 81.8180  below 100 by 8.1820
+    ndL3   level 91.9207  above HEALTH_MIN 80 by +11.9207  above chance 10 by 81.9207  below 100 by 8.0793
+    k01L3  level 92.0873  above HEALTH_MIN 80 by +12.0873  above chance 10 by 82.0873  below 100 by 7.9127
+  PASS every level >= 5 pp above HEALTH_MIN 80 and >= 5 pp below 100: no contrast is floor- or ceiling-bounded
+
+[8] THE EXCLUSION ROWS OWED AT INGEST (results/CORPUS-EXCLUSIONS.tsv; kind ARGS_WD_BASE, CORRECTIONS 263 / 313.11)
+  PASS 45 rows rebuilt, one per run, each witnessed by weight-decay-base=5e-4 on the run's OWN ARGS line; ms and alpha0 are CSV columns, so no run owes a second kind
+  PASS the PROPOSED file's 45 data rows == the rebuild, byte for byte, in job order
+  rows digest 4d93636faefe52e6ec0c7eaac39603d34da34d5f283ec9548ac139fb2cb04320
+
+SUMMARY  PASS 31  FAIL 0

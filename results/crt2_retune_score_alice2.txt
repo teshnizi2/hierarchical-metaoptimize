@@ -1,0 +1,61 @@
+==============================================================================================================
+crt2 -- AFTER TUNING EACH GRAIN UNTIL ITS OPTIMUM IS LOCATED, DOES SCALAR TIE, BEAT OR FALL BELOW THE BETTER PARTITION?  (CORRECTIONS 313)
+scorer sha256 47009634d2136fe317bcee72a11b316339f141c026f09a6577be6253fcd4231d   design sha256 39e4541c0e0fd1a2d00933428c25a3503f5a3dc74d62c5f8c1a44c610b93963e
+runsdir /home/s5014158/metaopt/runs
+==============================================================================================================
+COMPLETION  45 / 45 registered runs complete (100 epoch lines + RUN_DONE)
+G-PROV  /home/s5014158/metaopt/runs/crt2/PROVENANCE.txt  MODE submit  SCORER 47009634d2136fe3  DESIGN 39e4541c0e0fd1a2  HF 4732b74aa3a10508
+G-ONCE / G-ARGS / G-ENV / G-KIND / G-STRUCT  45 of 45 complete runs pass (one ARGS / ENV line and each epoch once, 20 flags, the registered ENV line, no patch witness, 10,000 probe records with n_beta == the arm's m)
+G-HW (DISCLOSURE ONLY, never a gate): NVIDIA L4 x45
+corpus: 3115 rows after corpus_exclusions.filter_rows, crt2- excluded  (DISCLOSURE ONLY -- enters no bar, sigma, level, selection, reading or stamp)
+
+ARMS  plateau5 = mean TEST, train5 = mean TRAIN (the SELECTOR), epochs 95-99, from each run's OWN .out
+  arm    cfg ms    a0    grain      n  plateau5      sd   range    train5  box     rec_hi ceil_frac   shrink_pl   beta_pl   beta_pk
+  chA2   A2  1e-4  1e-2  chunk777   3   91.1173   0.085   0.160   99.4007  BOUND   0.4982  2.77e-04  1.2377e-05   -3.6989   -2.3026
+  ndA2   A2  1e-4  1e-2  nodewise   3   91.0540   0.200   0.398   99.4460  free    0.0000  0.00e+00  5.0552e-06   -4.5942   -2.6495
+  k01A2  A2  1e-4  1e-2  scalar     3   91.5027   0.156   0.294   99.6587  free    0.0000  0.00e+00  5.3253e-06   -4.5421   -4.1450
+  chA3   A3  1e-4  3e-2  chunk777   3   92.1927   0.066   0.128   99.5787  BOUND   0.7377  6.93e-05  1.6905e-05   -3.3870   -2.3026
+  ndA3   A3  1e-4  3e-2  nodewise   3   92.1473   0.142   0.270   99.6727  BOUND   0.2575  2.77e-04  1.4593e-05   -3.5341   -2.3026
+  k01A3  A3  1e-4  3e-2  scalar     3   91.7973   0.091   0.160   99.7433  free    0.0000  0.00e+00  6.1516e-06   -4.3979   -3.5044
+  chA4   A4  1e-4  1e-1  chunk777   3   92.6773   0.107   0.196   99.6333  BOUND   1.0000  2.77e-04  1.4796e-05   -3.5203   -2.3026
+  ndA4   A4  1e-4  1e-1  nodewise   3   92.3893   0.184   0.366   99.4380  BOUND   1.0000  1.41e-02  2.8557e-05   -2.8634   -2.3026
+  k01A4  A4  1e-4  1e-1  scalar     3   92.2460   0.179   0.322   99.8600  free    0.0004  0.00e+00  6.0420e-06   -4.4159   -2.3026
+  chH3   H3  3e-4  3e-2  chunk777   3   92.2833   0.264   0.462   99.8173  BOUND   0.9065  1.39e-04  9.6411e-06   -3.9490   -2.3026
+  ndH3   H3  3e-4  3e-2  nodewise   3   92.3867   0.294   0.580   99.8373  BOUND   0.7992  5.62e-03  1.3667e-05   -3.5997   -2.3026
+  k01H3  H3  3e-4  3e-2  scalar     3   91.8727   0.240   0.480   99.7287  free    0.0000  0.00e+00  5.7792e-06   -4.4603   -3.5003
+  chL3   L3  3e-5  3e-2  chunk777   3   91.8180   0.270   0.540   99.2580  BOUND   0.1670  4.16e-04  1.8448e-05   -3.3001   -2.3026
+  ndL3   L3  3e-5  3e-2  nodewise   3   91.9207   0.114   0.224   99.3887  free    0.0000  0.00e+00  1.4964e-05   -3.5090   -2.8945
+  k01L3  L3  3e-5  3e-2  scalar     3   92.0873   0.232   0.464   99.8073  free    0.0000  0.00e+00  6.5566e-06   -4.3341   -3.5059
+  ceil_frac = window-median fraction of GROUPS at the ceiling (median over seeds); CEIL-BULK at >= 0.05.  box = crt1's rec-based stamp (any coordinate at an edge on >= 5 % of records).  shrink = realised a*wd (caw2's definition); partitions APPROXIMATE.  DESCRIPTIVE.  A standard SGD recipe's steady-state shrink is ~5e-04 (296.4).
+
+SIGMA  (313.7) SIGMA_USED = SIGMA_FROZEN, a literal; the in-batch value is a VALIDITY GATE only
+  SIGMA_FROZEN          0.249842  (crt1 in-batch at this cell, df 24)  -> B 0.167753, SE 0.203995, 2 SE 0.407989
+  SIGMA_INBATCH         0.188910  (df 30, pooled within the non-diverged arms)   all arms 0.188910 (df 30)
+  GATE  frozen rejected iff in-batch > SIGMA_FROZEN x sqrt(chi2_0.995,30 / 30) = 0.334178  -> PASS (frozen not rejected)
+  DISCLOSURE: corpus floor 0.178183 (crt1's, df 190) and noise-floor demonstration 0.636566 (df 274) are read by nothing.
+
+SELECTION  (per grain over its non-diverged configs; exact ties to the earlier of A2,A3,A4,H3,L3)
+  selection-bias bound B = EMAX5 x SIGMA_FROZEN / sqrt(3) = 1.1630 x 0.249842 / 1.7321 = 0.167753 pp (EXPECTED bias, max over 5)
+  chunk777  TRAIN-selected H3  (train5 A2 99.4007 A3 99.5787 A4 99.6333 H3 99.8173 L3 99.2580)   TEST-selected A4  (plateau5 A2 91.1173 A3 92.1927 A4 92.6773 H3 92.2833 L3 91.8180)   LOC NOT-LOCATED-MSHI
+  nodewise  TRAIN-selected H3  (train5 A2 99.4460 A3 99.6727 A4 99.4380 H3 99.8373 L3 99.3887)   TEST-selected A4  (plateau5 A2 91.0540 A3 92.1473 A4 92.3893 H3 92.3867 L3 91.9207)   LOC NOT-LOCATED-MSHI
+  scalar    TRAIN-selected A4  (train5 A2 99.6587 A3 99.7433 A4 99.8600 H3 99.7287 L3 99.8073)   TEST-selected A4  (plateau5 A2 91.5027 A3 91.7973 A4 92.2460 H3 91.8727 L3 92.0873)   LOC NOT-LOCATED-A0HI-CEILING
+
+CONTRASTS (IN BATCH; +/-2 SE is a HALF-WIDTH).  Registered edges: BEATS / PARTITION-ABOVE beyond +/-0.5757; a tie reading needs |min T| >= 0.2757
+  TUNED   T_ch = -0.0373 pp (T-B -0.2051, T+B +0.1304)   T_nd = -0.1407 pp (T-B -0.3084, T+B +0.0271)   SE 0.203995   interval of min T [-0.7164, +0.4351]
+  ORACLE  T_ch = -0.4313 pp (T-B -0.5991, T+B -0.2636)   T_nd = -0.1433 pp (T-B -0.3111, T+B +0.0244)   SE 0.203995   interval of min T [-1.0071, +0.1444]
+  A2 (ms 1e-4, a0 1e-2)  T_ch +0.3853 (+1.89 SE)  T_nd +0.4487 (+2.20 SE)  -> TIES          D = ch - nd +0.0633 (+0.31 SE) DESCRIPTIVE
+  A3 (ms 1e-4, a0 3e-2)  T_ch -0.3953 (-1.94 SE)  T_nd -0.3500 (-1.72 SE)  -> LEADBOUNDED   D = ch - nd +0.0453 (+0.22 SE) DESCRIPTIVE
+  A4 (ms 1e-4, a0 1e-1)  T_ch -0.4313 (-2.11 SE)  T_nd -0.1433 (-0.70 SE)  -> BELOW         D = ch - nd +0.2880 (+1.41 SE) DESCRIPTIVE
+  H3 (ms 3e-4, a0 3e-2)  T_ch -0.4107 (-2.01 SE)  T_nd -0.5140 (-2.52 SE)  -> BELOW         D = ch - nd -0.1033 (-0.51 SE) DESCRIPTIVE
+  L3 (ms 3e-5, a0 3e-2)  T_ch +0.2693 (+1.32 SE)  T_nd +0.1667 (+0.82 SE)  -> TIES          D = ch - nd -0.1027 (-0.50 SE) DESCRIPTIVE
+  SENSITIVITY (DESCRIPTIVE, licenses nothing): had the frozen sigma been another literal in [0.05, 0.60], the TUNED reading would change at 0.0695 (TUNED-SCALAR-TIES-BEST -> TUNED-PARTITION-TIES-SCALAR); 0.1915 (TUNED-PARTITION-TIES-SCALAR -> TUNED-UNRESOLVED)
+
+REPLICATE (DESCRIPTIVE, CROSS-BATCH, NOT POOLED): A2 is crt1's selected config with fresh seeds
+  chunk777  crt2 A2 91.1173   crt1 A2 91.3400   diff -0.2227 (-1.09 x cross-batch SE 0.2040)
+  nodewise  crt2 A2 91.0540   crt1 A2 91.1007   diff -0.0467 (-0.23 x cross-batch SE 0.2040)
+  scalar    crt2 A2 91.5027   crt1 A2 91.7887   diff -0.2860 (-1.40 x cross-batch SE 0.2040)
+  T at A2: ch +0.3853 (crt1 +0.4487), nd +0.4487 (crt1 +0.6880)
+
+LICENCE  after re-tuning, neither grain is resolved above the other and neither 0.30 pp tie bound holds: report the interval min T +/- (2 SE + B).  TMLR: the row may say neither 'beats' nor 'ties (a bound)'; it states the interval and the grid.  NOT LOCATED for at least one grain (see LOC): the reading holds over this grid only, and the question 'after tuning until located' is NOT answered for that grain.
+
+FINAL RETUNE-UNDECIDED | LOC-PARTIAL:ch=NOT-LOCATED-MSHI,nd=NOT-LOCATED-MSHI,k01=NOT-LOCATED-A0HI-CEILING | TUNED-UNRESOLVED | ORACLE-PARTITION-TIES-SCALAR | A2-TIES+A3-LEADBOUNDED+A4-BELOW+H3-BELOW+L3-TIES | SEL-TRAIN:ch=H3,nd=H3,k01=A4 SEL-TEST:ch=A4,nd=A4,k01=A4 | ONE-CELL ONE-DECAY-5e-4 FIVE-POINT-PLUS-GRID ALPHA0-THREE-POINTS SELBIAS-B=0.1678 NO-VALIDATION-SPLIT ALPHA-SCALED-DECAY-ONLY UNDER-DECAYED-VS-STANDARD-RECIPE CEILING-FIXED-AT-0.1 SIGMA-FROZEN-FROM-CRT1 TIES-ARE-BOUNDS CRT1-COMPARISON-DESCRIPTIVE SIGMA-INBATCH=0.1889 REPLICATE-MATCHES-CRT1 GRID-EDGE-ch-H3 SEL-DISAGREE-ch SELECTED-BOX-BOUND-ch GRID-EDGE-nd-H3 SEL-DISAGREE-nd SELECTED-BOX-BOUND-nd GRID-EDGE-k01-A4 SEL-AGREE-k01 BOX-BOUND-chA2 BOX-BOUND-chA3 BOX-BOUND-ndA3 BOX-BOUND-chA4 BOX-BOUND-ndA4 BOX-BOUND-chH3 BOX-BOUND-ndH3 BOX-BOUND-chL3
